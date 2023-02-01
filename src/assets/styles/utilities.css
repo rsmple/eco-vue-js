@@ -1,0 +1,19 @@
+@tailwind utilities;
+
+@layer utilities {
+  .rounded-inherit {
+    border-radius: inherit;
+  }
+
+  .bg-current {
+    background-color: currentColor;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .overflow-y-overlay {
+    @apply supports-overlay:[overflow-y:overlay] supports-overlay-not:overflow-y-auto
+  }
+}

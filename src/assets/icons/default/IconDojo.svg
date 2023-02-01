@@ -1,0 +1,25 @@
+<svg
+    width="20"
+    height="20"
+    viewBox="0 0 124 124"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+
+  <rect
+    class="rect"
+    height="100%"
+    width="100%"
+    stroke-width="40"
+    stroke="#194665"
+    stroke-dasharray="440"
+  />
+
+  <rect
+    x="45"
+    y="45"
+    width="34"
+    height="34"
+    fill="#26a0c4"
+  />
+  </svg>

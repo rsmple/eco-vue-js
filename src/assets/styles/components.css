@@ -1,0 +1,88 @@
+@tailwind components;
+
+@layer components {
+
+  /*
+  *
+  * . RIPPLE
+  *
+  */
+
+  .tw-ripple::before {
+    content: "";
+
+    @apply absolute top-0 left-0 h-full w-full
+      rounded-inherit bg-current pointer-events-none select-none
+      opacity-0 transition-opacity duration-100
+  }
+  .group\/ripple:active .tw-ripple::before,
+  .tw-ripple:active::before {
+    @apply opacity-10
+  }
+  .tw-ripple-hover:hover .tw-ripple:not(:active)::before,
+  .tw-ripple-hover:hover.tw-ripple:not(:active)::before {
+    @apply opacity-5
+  }
+
+  /*
+  *
+  * . HOVER CIRCLE
+  *
+  */
+
+  .tw-hover-circle::after {
+    content: "";
+
+    @apply absolute top-0 left-0 h-full w-full
+      rounded-full bg-current pointer-events-none select-none
+      scale-50 opacity-0 transition-all duration-200 z-0
+  }
+  .group\/hover-circle:hover .tw-hover-circle::after,
+  .tw-hover-circle:hover::after {
+    @apply scale-200 opacity-5
+  }
+  .group\/hover-circle:active .tw-hover-circle::after,
+  .tw-hover-circle:active::after {
+    @apply scale-180 opacity-5
+  }
+
+  /*
+  *
+  * . PROGRESS STRIPED
+  *
+  */
+
+  .progress-striped::before {
+    content: "";
+    background-image: linear-gradient(135deg, hsla(0,0%,100%,.125) 25%, transparent 0, transparent 50%, hsla(0,0%,100%,.125) 0, hsla(0,0%,100%,.125) 75%, transparent 0, transparent);
+
+    @apply absolute top-0 left-0 w-[calc(100%+40px)] h-full bg-repeat bg-[length:40px_40px] animate-move-horizontal
+  }
+
+  .dark .progress-striped::before {
+    background-image: linear-gradient(135deg, hsla(0,0%,10%,.125) 25%, transparent 0, transparent 50%, hsla(0,0%,10%,.125) 0, hsla(0,0%,10%,.125) 75%, transparent 0, transparent);
+  }
+
+  /*
+  *
+  * . FIELDS
+  *
+  */
+
+  .field-v-select {
+    @apply py-[0.3125rem] px-3 flex items-center whitespace-nowrap
+  }
+
+  .list-row-item {
+    @apply pr-6
+      first-of-type:pl-4
+      last-of-type:pr-4
+  }
+
+  .list-header-item {
+    @apply h-12 list-row-item
+      bg-primary-light dark:bg-primary-darkest border-y border-solid border-gray-300 dark:border-gray-700
+      first-of-type:border-l first-of-type:rounded-l-2xl
+      last-of-type:border-r last-of-type:rounded-r-2xl
+  }
+}
