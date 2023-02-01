@@ -75,5 +75,8 @@
       "import": "./dist/components/Input/WInputAsync.vue.js"
     }
   },
-  "types": "./dist/main.d.ts"
+  "types": "./dist/main.d.ts",
+  "publishConfig": {
+    "@whitespots:registry": "https://gitlab.com/api/v4/projects/42983764/packages/npm/"
+  }
 }
