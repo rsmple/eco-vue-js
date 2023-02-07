@@ -12,14 +12,14 @@ import WToggle from '@/components/Toggle/WToggle.vue'
 
 export default {
   install: (app: App | any) => {
-    app.component('WButton', WButton),
-    app.component('WButtonAction', WButtonAction),
-    app.component('WCounter', WCounter),
-    app.component('WFieldWrapper', WFieldWrapper),
-    app.component('WInput', WInput),
-    app.component('WInputAsync', WInputAsync),
-    app.component('WSkeleton', WSkeleton),
-    app.component('WSpinner', WSpinner),
+    app.component('WButton', WButton)
+    app.component('WButtonAction', WButtonAction)
+    app.component('WCounter', WCounter)
+    app.component('WFieldWrapper', WFieldWrapper)
+    app.component('WInput', WInput)
+    app.component('WInputAsync', WInputAsync)
+    app.component('WSkeleton', WSkeleton)
+    app.component('WSpinner', WSpinner)
     app.component('WToggle', WToggle)
   },
 }
@@ -33,5 +33,5 @@ export {
   WInputAsync,
   WSkeleton,
   WSpinner,
-  WToggle
+  WToggle,
 }

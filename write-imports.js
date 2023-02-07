@@ -18,7 +18,7 @@ const getIconImports = (list) => {
 const writeIconDefault = async () => {
   return fs.writeFile(
     'src/utils/iconsDefault.ts',
-    getIconImports(await getIconPaths('src/assets/icons/default'))
+    getIconImports(await getIconPaths('src/assets/icons/default')),
   )
 }
 
@@ -39,7 +39,7 @@ const getComponentPaths = root => {
       .map(name => ({
         name: name.slice(0, -4),
         path: path.join(dirPath, name),
-      }))
+      })),
     )
 }
 
@@ -70,7 +70,7 @@ const getImports = list => {
 const getVuePlugin = list => {
   const result = list
     .map(item => `    app.component('${item.name}', ${item.name})`)
-    .join(',\n')
+    .join('\n')
   
   return `export default {\n  install: (app: App | any) => {\n${result}\n  },\n}`
 }
@@ -80,7 +80,7 @@ const getExports = list => {
     .map(item => `  ${item.name}`)
     .join(',\n')
 
-  return `export {\n${result}\n}`
+  return `export {\n${result},\n}`
 }
 
 const writePlugin = async (list) => {
@@ -91,17 +91,17 @@ const writePlugin = async (list) => {
 
 const getPackageExports = (list) => {
   const result = {
-    ".": {
-      "import": "./dist/main.js"
+    '.': {
+      'import': './dist/main.js',
     },
-    "./tailwind-base/index.cjs": {
-      "require": "./tailwind-base/index.cjs"
+    './tailwind-base/index.cjs': {
+      'require': './tailwind-base/index.cjs',
     },
-    "./dist/assets/icons/default/*": {
-      "import": "./dist/assets/icons/default/*.svg.js"
+    './dist/assets/icons/default/*': {
+      'import': './dist/assets/icons/default/*.svg.js',
     },
-    "./dist/assets/icons/sax/*": {
-      "import": "./dist/assets/icons/sax/*.svg.js"
+    './dist/assets/icons/sax/*': {
+      'import': './dist/assets/icons/sax/*.svg.js',
     },
   }
 
@@ -118,7 +118,7 @@ const writePackageExports = async (list) => {
 
   obj.exports = getPackageExports(list)
 
-  fs.writeFile('package.json', JSON.stringify(obj, null, 2), 'utf8')
+  fs.writeFile('package.json', JSON.stringify(obj, null, 2) + '\n', 'utf8')
 }
 
 const writeComponents = async () => {
