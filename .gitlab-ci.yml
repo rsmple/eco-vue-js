@@ -2,7 +2,7 @@ image: node:latest
 
 stages:
   - prepare
-  - lint
+  - test
   - build
   - publish
 
@@ -11,19 +11,25 @@ prepare:
   script:
     - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}">.npmrc
     - npm ci
+  artifacts:
+    paths:
+      - node_modules/
   rules:
     - changes:
         - package.json
 
 lint:
-  stage: lint
+  stage: test
   script:
-    - npm run lint
+    - npm run lint:no-fix
 
 build:
   stage: build
   script:
     - npm run build
+  artifacts:
+    paths:
+      - dist/
 
 publish:
   stage: publish
