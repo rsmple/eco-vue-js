@@ -7,10 +7,9 @@ module.exports = {
     'plugin:vue/vue3-essential',
     'eslint:recommended',
     '@vue/eslint-config-typescript',
-    '@vue/eslint-config-prettier'
   ],
   parserOptions: {
-    ecmaVersion: 'latest'
+    ecmaVersion: 'latest',
   },
   env: {
     'vue/setup-compiler-macros': true,
@@ -30,7 +29,6 @@ module.exports = {
     'no-undef': 'off',
     'default-case-last': 'off',
     '@typescript-eslint/no-unused-vars': ['error', {vars: 'all', args: 'none', ignoreRestSiblings: false}],
-    'prettier/prettier': ['error', { singleQuote: true }],
   },
   plugins: [
     'unused-imports',

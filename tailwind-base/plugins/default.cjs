@@ -93,7 +93,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       '--input-autofull-text': theme('colors.black.default'),
       '.dark &':{
         '--input-autofill-bg': theme('colors.default-dark'),
-        '--input-autofull-text': theme('colors.gray.100')
+        '--input-autofull-text': theme('colors.gray.100'),
       },
 
       '&::-webkit-textfield-decoration-container': {
@@ -108,7 +108,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
           'height': '0',
           'width': '0',
           'margin': '0',
-        }
+        },
       },
 
       '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
@@ -127,7 +127,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       '&[type=number]': {
         '-moz-appearance': 'textfield',
         'appearance': 'textfield',
-      }
+      },
     },
   })
 
@@ -170,8 +170,8 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       },
       '@supports (not (overflow: overlay))': {
         'overflow-y': 'auto',
-      }
-    }
+      },
+    },
   })
 
   addUtilities({
@@ -181,7 +181,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
     '.no-scrollbar': {
       '&::-webkit-scrollbar': {
          'display': 'none',
-      }
+      },
     },
     '.overflow-y-overlay': {
       '@supports (overflow: overlay)': {
@@ -189,8 +189,8 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       },
       '@supports (not (overflow: overlay))': {
         'overflow-y': 'auto',
-      }
-    }
+      },
+    },
   })
 
   addComponents({
@@ -198,14 +198,14 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       'color': theme('colors.black.default'),
       '.dark &': {
         'color': theme('colors.gray.200'),
-      }
+      },
     },
     '.text-description': {
       'color': theme('colors.gray.400'),
       '.dark &': {
         'color': theme('colors.gray.500'),
-      }
-    }
+      },
+    },
   })
 
   addUtilities({
@@ -268,8 +268,8 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       '&:active::after, .w-hover-circle-trigger:active &::after': {
         'opacity': '0.05',
         'transform': 'scaleX(1.8) scaleY(1.8)',
-      }
-    }
+      },
+    },
   })
 
   addUtilities({
@@ -288,8 +288,8 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       },
       '.dark &::before': {
         'background-image': 'linear-gradient(135deg, hsla(0,0%,10%,.125) 25%, transparent 0, transparent 50%, hsla(0,0%,10%,.125) 0, hsla(0,0%,10%,.125) 75%, transparent 0, transparent)',
-      }
-    }
+      },
+    },
   })
 
   addComponents({
@@ -310,7 +310,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       },
       '&:last-of-type': {
         'padding-right': '1rem',
-      }
+      },
     },
 
     '.w-list-header-item': {
@@ -333,7 +333,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         'border-right-width': '1px',
         'border-top-right-radius': '1rem',
         'border-bottom-right-radius': '1rem',
-      }
+      },
     },
   })
 })

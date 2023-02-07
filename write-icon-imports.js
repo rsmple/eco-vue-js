@@ -37,7 +37,7 @@ const writeSax = async () => {
 const run = async () => {
   await Promise.all([
     writeDefault(),
-    writeSax()
+    writeSax(),
   ])
 
   console.log('Successfully written')

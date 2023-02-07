@@ -33,7 +33,7 @@ export default {
     app.component('WSpinner', WSpinner)
 
     app.component('WToggle', WToggle)
-  }
+  },
 }
 
 export * as iconsDefault from '@/utils/iconsDefault'

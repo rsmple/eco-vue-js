@@ -35,7 +35,7 @@ export default defineConfig({
       external: ['vue', 'vue-router'],
       output: {
         preserveModules: true,
-        entryFileNames: "[name].js",
+        entryFileNames: '[name].js',
         globals: {
           vue: 'Vue',
           'vue-router': 'VueRouter',
@@ -45,7 +45,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
-  }
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
 })

@@ -1,5 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-const colors = require('tailwindcss/colors')
 
 module.exports = {
   mode: 'jit',
@@ -8,6 +7,6 @@ module.exports = {
     './src/**/*.{vue,ts}',
   ],
   presets: [
-    require('../tailwind-base/index.cjs')
+    require('../tailwind-base/index.cjs'),
   ],
 }
