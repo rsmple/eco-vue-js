@@ -93,7 +93,7 @@
         <div
           v-if="allowClear"
           v-show="!disabled && !readonly"
-          class="tw-ripple absolute bottom-0 right-0 h-full w-11 flex items-center justify-center text-description cursor-pointer select-none rounded-xl"
+          class="w-ripple w-ripple-hover absolute bottom-0 right-0 h-full w-11 flex items-center justify-center text-description cursor-pointer select-none rounded-xl"
           @mousedown.prevent.stop=""
           @click="clearValue"
         >

@@ -14,7 +14,7 @@
       'py-2.5 px-6': !minimize,
       [semanticTypeStylesMap[semanticType]]: true,
       'st-outline': outline,
-      'hover:bg-opacity-80 dark:hover:bg-opacity-80 active:bg-opacity-80 dark:active:bg-opacity-80 tw-ripple': !loading && !disabled,
+      'hover:bg-opacity-80 dark:hover:bg-opacity-80 active:bg-opacity-80 dark:active:bg-opacity-80 w-ripple': !loading && !disabled,
     }"
     :disabled="!loading && disabled"
     :type="type"

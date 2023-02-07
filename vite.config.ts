@@ -7,7 +7,6 @@ import svgLoader from 'vite-svg-loader'
 import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
 import postcssImport from 'postcss-import'
-import path from 'path'
 
 export default defineConfig({
   plugins: [

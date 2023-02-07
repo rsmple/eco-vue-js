@@ -8,7 +8,8 @@
     "test:unit": "vitest --environment jsdom --root src/",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "write-icon-imports": "node write-icon-imports.js"
   },
   "peerDependencies": {
     "vue": "^3.2.0",
@@ -58,6 +59,9 @@
     "./dist/assets/icons/default/*": {
       "import": "./dist/assets/icons/default/*.svg.js"
     },
+    "./dist/assets/icons/sax/*": {
+      "import": "./dist/assets/icons/sax/*.svg.js"
+    },
     "./dist/components/Button/WButton.vue": {
       "import": "./dist/components/Button/WButton.vue.js"
     },
@@ -72,6 +76,9 @@
     },
     "./dist/components/Input/WInputAsync.vue": {
       "import": "./dist/components/Input/WInputAsync.vue.js"
+    },
+    "./dist/components/Toggle/WToggle.vue": {
+      "import": "./dist/components/Toggle/WToggle.vue.js"
     }
   },
   "types": "./dist/main.d.ts",

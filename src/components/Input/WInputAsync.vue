@@ -30,7 +30,7 @@
           class="relative h-11 w-11 min-w-[44px] max-w-[44px] rounded-lg flex items-center justify-center text-description"
           :class="{
             'cursor-not-allowed': disabled || loading,
-            'hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer tw-ripple': !disabled && !loading,
+            'hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer w-ripple': !disabled && !loading,
           }"
           @click="toggle"
           @mousedown.stop.prevent=""

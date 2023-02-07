@@ -14,6 +14,8 @@ import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 
+import WToggle from '@/components/Toggle/WToggle.vue'
+
 export default {
   install: (app: App | any) => {
     app.component('WButton', WButton)
@@ -29,8 +31,13 @@ export default {
     app.component('WSkeleton', WSkeleton)
 
     app.component('WSpinner', WSpinner)
+
+    app.component('WToggle', WToggle)
   }
 }
+
+export * as iconsDefault from '@/utils/iconsDefault'
+export * as iconsSax from '@/utils/iconsSax'
 
 export {
   WButton,
@@ -39,4 +46,5 @@ export {
   WInputAsync,
   WSkeleton,
   WSpinner,
+  WToggle,
 }
