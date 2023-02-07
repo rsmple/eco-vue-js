@@ -10,7 +10,7 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "lint:no-fix": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore",
-    "write-icon-imports": "node write-icon-imports.js"
+    "write-imports": "node write-imports.js"
   },
   "peerDependencies": {
     "vue": "^3.2.0",
@@ -68,6 +68,9 @@
     "./dist/components/Button/WButtonAction.vue": {
       "import": "./dist/components/Button/WButtonAction.vue.js"
     },
+    "./dist/components/Counter/WCounter.vue": {
+      "import": "./dist/components/Counter/WCounter.vue.js"
+    },
     "./dist/components/FieldWrapper/WFieldWrapper.vue": {
       "import": "./dist/components/FieldWrapper/WFieldWrapper.vue.js"
     },
@@ -76,6 +79,12 @@
     },
     "./dist/components/Input/WInputAsync.vue": {
       "import": "./dist/components/Input/WInputAsync.vue.js"
+    },
+    "./dist/components/Skeleton/WSkeleton.vue": {
+      "import": "./dist/components/Skeleton/WSkeleton.vue.js"
+    },
+    "./dist/components/Spinner/WSpinner.vue": {
+      "import": "./dist/components/Spinner/WSpinner.vue.js"
     },
     "./dist/components/Toggle/WToggle.vue": {
       "import": "./dist/components/Toggle/WToggle.vue.js"
