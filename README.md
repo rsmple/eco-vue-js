@@ -1,52 +1,91 @@
 # ui-kit
 
-This template should help get you started developing with Vue 3 in Vite.
+UI-Kit is a design system project for [Whitespots](https://whitespots.io/) projects. It provides a consistent look and feel by defining a set of reusable Vue components and icons.
 
-## Recommended IDE Setup
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## Usage
 
-## Type Support for `.vue` Imports in TS
+### Installation
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+1. Create a `.npmrc` file in the root directory of your project:
+    1) Open a text editor and create a new file.
+    2) Save the file as `.npmrc` in the root directory of your project.
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+2. Add the following lines to the `.npmrc` file:
+    ```
+    @whitespots:registry=https://gitlab.com/api/v4/packages/npm/
+    //gitlab.com/api/v4/packages/npm/:_authToken=<personal_access_token>
+    ```
+3. Replace `<personal_access_token>` with the actual personal access token:
+    1) Go to https://gitlab.com/-/profile/personal_access_tokens.
+    2) Create a new personal access token with a name of your choice.
+    3) Set the expiration date to one year from the current date.
+    4) Select the `read_api` and `read_registry` scopes.
+    5) Copy the personal access token to the `.npmrc` file, replacing `<personal_access_token>`.
 
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+4. Install the library:
+    ```
+    npm i @whitespots/ui-kit
+    ```
 
-## Customize configuration
+The library should now be installed in your project.
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+Note: The personal access token is private and should not be committed with changes. You will need to create a new token after its expiration.
 
-## Project Setup
+### Tailwind configuration
 
-```sh
-npm install
+1. Add the following lines to the `content` section in your [Tailwind configuration file](https://tailwindcss.com/docs/content-configuration):
+    ```
+    content: [
+      './node_modules/@whitespots/ui-kit/dist/components/**/*.vue.js}',
+      './node_modules/@whitespots/ui-kit/dist/components/**/*.js}',
+    ]
+    ```
+2. Add the library's [Tailwind preset](https://tailwindcss.com/docs/presets) to your configuration file:
+    ```
+    presets: [
+      require('@whitespots/ui-kit/tailwind-base/index.cjs'),
+    ]
+    ```
+
+### Import components
+
+Here's an example of how to import the WButton component:
+```
+import WButton from '@whitespots/ui-kit/dist/components/Button/WButton.vue'
 ```
 
-### Compile and Hot-Reload for Development
+### Import icons
 
-```sh
-npm run dev
+The icons in the library are functional Vue components generated from SVG files during build.
+
+Here's an example of how to import an icon named IconCheck:
+```
+import IconCheck from '@whitespots/ui-kit/dist/assets/icons/default/IconCheck'
 ```
 
-### Type-Check, Compile and Minify for Production
+## Development
 
-```sh
-npm run build
+### Local testing
+
+1. Build library:
+    ```
+    npm i
+    npm run build
+    ```
+2. Create a `.tgz` file and copy absolute path to it:
+    ```
+    npm pack
+    ```
+3. Install library from created `.tgz`
+    ```
+    npm i --save <absolute_path_to_file>
+    ```
+
+### Updating the bundle
+
+To automatically add imports for new components or icons added to the library, run the command
 ```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
+npm run write-imports
 ```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+This will update the files in the `/imports` directory and add new exports to the `package.json` file.
