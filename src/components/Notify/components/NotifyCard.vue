@@ -5,7 +5,7 @@
     :style="elementStyles"
   >
     <div class="relative rounded-xl bg-black-default dark:bg-gray-800 py-3 pl-8 pr-4 min-h-[4.5rem] max-w-[calc(100vw-2rem)] sm:max-w-lg flex gap-6 items-center select-none my-2 mr-4 ml-auto shadow-md">
-      <VCounter
+      <WCounter
         v-show="count > 1"
         class="absolute -top-2.5 -left-2.5 shadow-md"
         :count="count"
@@ -65,8 +65,8 @@ import IconDanger from '@/assets/icons/default/IconDanger.svg?component'
 import IconWarn from '@/assets/icons/default/IconWarn.svg?component'
 import IconSuccess from '@/assets/icons/default/IconSuccess.svg?component'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
-import VCounter from '@/components/Counter/VCounter.vue'
-import WButton from '@whitespots/ui-kit/dist/components/Button/WButton.vue'
+import WCounter from '@/components/Counter/WCounter.vue'
+import WButton from '@/components/Button/WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
 

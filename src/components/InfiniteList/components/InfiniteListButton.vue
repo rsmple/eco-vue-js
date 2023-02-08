@@ -11,7 +11,7 @@
 
 <script lang="ts" setup>
 import {SemanticType} from '@/utils/SemanticType'
-import WButton from '@whitespots/ui-kit/dist/components/Button/WButton.vue'
+import WButton from '@/components/Button/WButton.vue'
 
 defineEmits<{
   (e: 'click'): void

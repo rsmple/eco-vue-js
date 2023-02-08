@@ -63,17 +63,68 @@
     "./dist/assets/icons/sax/*": {
       "import": "./dist/assets/icons/sax/*.svg.js"
     },
+    "./dist/utils/HorizontalAlign": {
+      "import": "./dist/utils/HorizontalAlign.js"
+    },
+    "./dist/utils/SemanticType": {
+      "import": "./dist/utils/SemanticType.js"
+    },
+    "./dist/utils/dateTime": {
+      "import": "./dist/utils/dateTime.js"
+    },
+    "./dist/utils/utils": {
+      "import": "./dist/utils/utils.js"
+    },
+    "./dist/utils/mobile": {
+      "import": "./dist/utils/mobile.js"
+    },
+    "./dist/utils/Modal": {
+      "import": "./dist/utils/Modal.js"
+    },
+    "./dist/utils/Notify": {
+      "import": "./dist/utils/Notify.js"
+    },
+    "./dist/components/BottomSheet/WBottomSheet.vue": {
+      "import": "./dist/components/BottomSheet/WBottomSheet.vue.js"
+    },
     "./dist/components/Button/WButton.vue": {
       "import": "./dist/components/Button/WButton.vue.js"
     },
     "./dist/components/Button/WButtonAction.vue": {
       "import": "./dist/components/Button/WButtonAction.vue.js"
     },
+    "./dist/components/Button/WButtonCopy.vue": {
+      "import": "./dist/components/Button/WButtonCopy.vue.js"
+    },
+    "./dist/components/Checkbox/WCheckbox.vue": {
+      "import": "./dist/components/Checkbox/WCheckbox.vue.js"
+    },
     "./dist/components/Counter/WCounter.vue": {
       "import": "./dist/components/Counter/WCounter.vue.js"
     },
+    "./dist/components/DatePicker/WDatePicker.vue": {
+      "import": "./dist/components/DatePicker/WDatePicker.vue.js"
+    },
+    "./dist/components/Dropdown/WDropdown.vue": {
+      "import": "./dist/components/Dropdown/WDropdown.vue.js"
+    },
+    "./dist/components/DropdownMenu/WDropdownMenu.vue": {
+      "import": "./dist/components/DropdownMenu/WDropdownMenu.vue.js"
+    },
     "./dist/components/FieldWrapper/WFieldWrapper.vue": {
       "import": "./dist/components/FieldWrapper/WFieldWrapper.vue.js"
+    },
+    "./dist/components/FilePicker/WFilePicker.vue": {
+      "import": "./dist/components/FilePicker/WFilePicker.vue.js"
+    },
+    "./dist/components/Form/WForm.vue": {
+      "import": "./dist/components/Form/WForm.vue.js"
+    },
+    "./dist/components/Form/WFormValidator.vue": {
+      "import": "./dist/components/Form/WFormValidator.vue.js"
+    },
+    "./dist/components/InfiniteList/WInfiniteList.vue": {
+      "import": "./dist/components/InfiniteList/WInfiniteList.vue.js"
     },
     "./dist/components/Input/WInput.vue": {
       "import": "./dist/components/Input/WInput.vue.js"
@@ -81,14 +132,44 @@
     "./dist/components/Input/WInputAsync.vue": {
       "import": "./dist/components/Input/WInputAsync.vue.js"
     },
+    "./dist/components/Link/WLink.vue": {
+      "import": "./dist/components/Link/WLink.vue.js"
+    },
+    "./dist/components/Link/WLinkArrow.vue": {
+      "import": "./dist/components/Link/WLinkArrow.vue.js"
+    },
+    "./dist/components/Modal/WModal.vue": {
+      "import": "./dist/components/Modal/WModal.vue.js"
+    },
+    "./dist/components/Modal/WModalWrapper.vue": {
+      "import": "./dist/components/Modal/WModalWrapper.vue.js"
+    },
+    "./dist/components/Notify/WNotify.vue": {
+      "import": "./dist/components/Notify/WNotify.vue.js"
+    },
+    "./dist/components/Select/WSelect.vue": {
+      "import": "./dist/components/Select/WSelect.vue.js"
+    },
+    "./dist/components/Select/WSelectSingle.vue": {
+      "import": "./dist/components/Select/WSelectSingle.vue.js"
+    },
     "./dist/components/Skeleton/WSkeleton.vue": {
       "import": "./dist/components/Skeleton/WSkeleton.vue.js"
     },
     "./dist/components/Spinner/WSpinner.vue": {
       "import": "./dist/components/Spinner/WSpinner.vue.js"
     },
+    "./dist/components/Tabs/WTabs.vue": {
+      "import": "./dist/components/Tabs/WTabs.vue.js"
+    },
     "./dist/components/Toggle/WToggle.vue": {
       "import": "./dist/components/Toggle/WToggle.vue.js"
+    },
+    "./dist/components/Tooltip/WTooltip.vue": {
+      "import": "./dist/components/Tooltip/WTooltip.vue.js"
+    },
+    "./dist/components/Tooltip/WTooltipContainer.vue": {
+      "import": "./dist/components/Tooltip/WTooltipContainer.vue.js"
     }
   },
   "types": "./dist/main.d.ts",

@@ -103,7 +103,7 @@
 
 <script lang="ts" setup>
 import {onMounted, onUnmounted, ref} from 'vue'
-import WButton from '@whitespots/ui-kit/dist/components/Button/WButton.vue'
+import WButton from '@/components/Button/WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
 
 defineProps<{

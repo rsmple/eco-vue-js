@@ -13,7 +13,7 @@
       class="-mt-[1px]"
     />
 
-    <VTooltip
+    <WTooltip
       class="pointer-events-none"
       text="Copy"
       no-touch
@@ -26,7 +26,7 @@ import {ref} from 'vue'
 import IconCopy from '@/assets/icons/sax/IconCopy.svg?component'
 import IconCopySuccess from '@/assets/icons/sax/IconCopySuccess.svg?component'
 import {Notify} from '@/utils/Notify'
-import VTooltip from '@/components/Tooltip/VTooltip.vue'
+import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 const props = defineProps<{
   value: string

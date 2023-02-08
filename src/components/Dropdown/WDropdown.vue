@@ -116,7 +116,7 @@ onBeforeUnmount(() => {
 
 defineExpose({
   update: () => {
-    setParentRect()
+  setParentRect()
   },
 })
 

@@ -45,7 +45,7 @@
 <script lang="ts" setup>
 import {ref} from 'vue'
 import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
-import WButton from '@whitespots/ui-kit/dist/components/Button/WButton.vue'
+import WButton from '@/components/Button/WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
 
 const props = defineProps<{

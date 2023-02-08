@@ -13,6 +13,7 @@ export default defineConfig({
     dts({
       tsConfigFilePath: 'tsconfig.app.json',
       entryRoot: 'src',
+      skipDiagnostics: true,
     }),
     vue(),
     svgLoader({defaultImport: 'component'}),
