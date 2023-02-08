@@ -6,11 +6,6 @@ stages:
   - build
   - publish
 
-.when_package_json:
-  rules:
-    - changes:
-        - package.json
-
 prepare:
   stage: prepare
   script:
@@ -19,15 +14,13 @@ prepare:
   artifacts:
     paths:
       - node_modules/
-  extends:
-    - .when_package_json
+  when: manual
 
 lint:
   stage: test
   script:
     - npm run lint:no-fix
-  extends:
-    - .when_package_json
+  when: manual
 
 build:
   stage: build
@@ -36,12 +29,10 @@ build:
   artifacts:
     paths:
       - dist/
-  extends:
-    - .when_package_json
+  when: manual
 
 publish:
   stage: publish
   script:
     - npm publish
-  extends:
-    - .when_package_json
+  when: manual
