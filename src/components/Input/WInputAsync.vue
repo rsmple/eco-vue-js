@@ -54,7 +54,7 @@ import IconEdit from '@/assets/icons/default/IconEdit.svg?component'
 import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
-type ValidateFn = (value: string | number | undefined) => string | undefined
+type ValidateFn = (value: string | number | undefined | string[]) => string | undefined
 
 const props = defineProps<{
   modelValue?: string | number

@@ -1,3 +1,3 @@
-export * as iconsDefault from '@/utils/iconsDefault'
-export * as iconsSax from '@/utils/iconsSax'
-export * from '@/utils/componentsPlugin'
+export * as iconsDefault from '@/imports/iconsDefault'
+export * as iconsSax from '@/imports/iconsSax'
+export * from '@/imports/componentsPlugin'

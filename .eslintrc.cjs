@@ -29,6 +29,7 @@ module.exports = {
     'no-undef': 'off',
     'default-case-last': 'off',
     '@typescript-eslint/no-unused-vars': ['error', {vars: 'all', args: 'none', ignoreRestSiblings: false}],
+    'no-empty': ['error', {'allowEmptyCatch': true}],
   },
   plugins: [
     'unused-imports',

@@ -17,14 +17,14 @@ const getIconImports = (list) => {
 
 const writeIconDefault = async () => {
   return fs.writeFile(
-    'src/utils/iconsDefault.ts',
+    'src/imports/iconsDefault.ts',
     getIconImports(await getIconPaths('src/assets/icons/default')),
   )
 }
 
 const writeIconSax = async () => {
   return fs.writeFile(
-    'src/utils/iconsSax.ts',
+    'src/imports/iconsSax.ts',
     getIconImports(await getIconPaths('src/assets/icons/sax')),
   )
 }
@@ -86,7 +86,7 @@ const getExports = list => {
 const writePlugin = async (list) => {
   const result = `import type {App} from 'vue'\n\n${getImports(list)}\n\n${getVuePlugin(list)}\n\n${getExports(list)}`
 
-  return fs.writeFile('src/utils/componentsPlugin.ts', result)
+  return fs.writeFile('src/imports/componentsPlugin.ts', result)
 }
 
 const getPackageExports = (list) => {
@@ -102,6 +102,27 @@ const getPackageExports = (list) => {
     },
     './dist/assets/icons/sax/*': {
       'import': './dist/assets/icons/sax/*.svg.js',
+    },
+    './dist/utils/HorizontalAlign': {
+      'import': './dist/utils/HorizontalAlign.js',
+    },
+    './dist/utils/SemanticType': {
+      'import': './dist/utils/SemanticType.js',
+    },
+    './dist/utils/dateTime': {
+      'import': './dist/utils/dateTime.js',
+    },
+    './dist/utils/utils': {
+      'import': './dist/utils/utils.js',
+    },
+    './dist/utils/mobile': {
+      'import': './dist/utils/mobile.js',
+    },
+    './dist/utils/Modal': {
+      'import': './dist/utils/Modal.js',
+    },
+    './dist/utils/Notify': {
+      'import': './dist/utils/Notify.js',
     },
   }
 
