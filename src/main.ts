@@ -4,6 +4,7 @@ export * from '@/imports/componentsPlugin'
 
 export * from '@/utils/Notify'
 export * from '@/utils/Modal'
+export * from '@/utils/DOMListenerContainer'
 export * from '@/utils/SemanticType'
 export * from '@/utils/HorizontalAlign'
 export * from '@/utils/dateTime'

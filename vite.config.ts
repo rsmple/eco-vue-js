@@ -33,13 +33,14 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
-      external: ['vue', 'vue-router'],
+      external: ['vue', 'vue-router', 'vue-query'],
       output: {
         preserveModules: true,
         entryFileNames: '[name].js',
         globals: {
           vue: 'Vue',
           'vue-router': 'VueRouter',
+          'vue-query': 'VueQuery',
         },
       },
     },
