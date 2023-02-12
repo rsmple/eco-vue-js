@@ -296,8 +296,8 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
     '.w-select-field': {
       'padding-top': '0.3125rem',
       'padding-bottom': '0.3125rem',
-      'padding-left': '0.75rem',
-      'padding-right': '0.75rem',
+      'padding-left': '0.5rem',
+      'padding-right': '0.5rem',
       'display': 'flex',
       'align-items': 'center',
       'white-space': 'nowrap',
