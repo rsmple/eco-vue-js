@@ -7,9 +7,9 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, inject, onBeforeUnmount, ref, useSlots, watch} from 'vue'
+import {computed, onBeforeUnmount, ref, useSlots, watch} from 'vue'
 import {getIsTouchDevice} from '@/utils/mobile'
-import {wTooltipSetMeta} from './models/injection'
+import {Tooltip} from '@/utils/Tooltip'
 
 const props = defineProps<{
   text?: string
@@ -24,7 +24,6 @@ const isTouchDevice = getIsTouchDevice()
 const container = ref<HTMLDivElement>()
 
 const parent = computed(() => container.value?.parentElement ?? null)
-const injectedSetMeta = inject(wTooltipSetMeta)
 
 const open = () => {
   const slot = slots.default?.()?.[0]
@@ -38,11 +37,11 @@ const open = () => {
     if (parent.value.scrollHeight === Math.round(rect.height) && parent.value.scrollWidth === Math.round(rect.width)) return
   }
 
-  injectedSetMeta?.({parent: parent.value, slot, text: props.text, light: props.light})
+  Tooltip.add({parent: parent.value, slot, text: props.text, light: props.light})
 }
 
 const close = () => {
-  injectedSetMeta?.(null)
+  Tooltip.close()
 }
 
 watch(parent, (newValue, oldValue) => {

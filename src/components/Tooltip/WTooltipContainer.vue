@@ -50,10 +50,10 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, onUnmounted, ref, type CSSProperties, watch, provide} from 'vue'
+import {onMounted, onUnmounted, ref, type CSSProperties, watch, onBeforeMount, onBeforeUnmount} from 'vue'
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
-import {wTooltipSetMeta, type SetTooltipMeta, type TooltipMeta} from './models/injection'
+import {initTooltip, type SetTooltipMeta, type TooltipMeta} from '@/utils/Tooltip'
 
 const MARGIN = 48
 
@@ -96,14 +96,20 @@ watch(container, value => {
   containerStyles.value = undefined
 })
 
+onBeforeMount(() => {
+  initTooltip(setTooltipMeta)
+})
+
 onMounted(() => {
   window.addEventListener('touch', close)
+})
+
+onBeforeUnmount(() => {
+  initTooltip(undefined)
 })
 
 onUnmounted(() => {
   window.removeEventListener('touch', close)
 })
-
-provide(wTooltipSetMeta, setTooltipMeta)
 
 </script>

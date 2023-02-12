@@ -103,6 +103,9 @@ const getPackageExports = (list) => {
     './dist/assets/icons/sax/*': {
       'import': './dist/assets/icons/sax/*.svg.js',
     },
+    './dist/utils/DOMListenerContainer': {
+      'import': './dist/utils/DOMListenerContainer.js',
+    },
     './dist/utils/HorizontalAlign': {
       'import': './dist/utils/HorizontalAlign.js',
     },
@@ -123,6 +126,9 @@ const getPackageExports = (list) => {
     },
     './dist/utils/Notify': {
       'import': './dist/utils/Notify.js',
+    },
+    './dist/utils/Tooltip': {
+      'import': './dist/utils/Tooltip.js',
     },
   }
 
