@@ -9,7 +9,7 @@ stages:
 prepare:
   stage: prepare
   script:
-    - npm config set //registry.npmjs.org/:_authToken "${NPM_PUSHER}"
+    - npm config set "//registry.npmjs.org/:_authToken" $NPM_PUSHER
     - npm ci
   artifacts:
     paths:
