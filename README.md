@@ -10,10 +10,6 @@ UI-Kit is a design system project for [Whitespots](https://whitespots.io/) proje
 npm i @whitespots/ui-kit
 ```
 
-The library should now be installed in your project.
-
-Note: The personal access token is private and should not be committed with changes. You will need to create a new token after its expiration.
-
 ### Tailwind configuration
 
 1. Add the following lines to the `content` section in your [Tailwind configuration file](https://tailwindcss.com/docs/content-configuration):
