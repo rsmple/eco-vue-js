@@ -34,5 +34,5 @@ publish:
   stage: publish
   script:
     - echo "//registry.npmjs.org/:_authToken=${NPM_PUSHER}">.npmrc
-    - npm publish
+    - npm publish --access=public
   when: manual
