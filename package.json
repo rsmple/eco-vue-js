@@ -178,8 +178,5 @@
       "import": "./dist/components/Tooltip/WTooltipContainer.vue.js"
     }
   },
-  "types": "./dist/main.d.ts",
-  "publishConfig": {
-    "@whitespots:registry": "https://gitlab.com/api/v4/projects/42983764/packages/npm/"
-  }
+  "types": "./dist/main.d.ts"
 }
