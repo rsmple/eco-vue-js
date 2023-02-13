@@ -6,27 +6,9 @@ UI-Kit is a design system project for [Whitespots](https://whitespots.io/) proje
 ## Usage
 
 ### Installation
-
-1. Create a `.npmrc` file in the root directory of your project:
-    1) Open a text editor and create a new file.
-    2) Save the file as `.npmrc` in the root directory of your project.
-
-2. Add the following lines to the `.npmrc` file:
-    ```
-    @whitespots:registry=https://gitlab.com/api/v4/packages/npm/
-    //gitlab.com/api/v4/packages/npm/:_authToken=<personal_access_token>
-    ```
-3. Replace `<personal_access_token>` with the actual personal access token:
-    1) Go to https://gitlab.com/-/profile/personal_access_tokens.
-    2) Create a new personal access token with a name of your choice.
-    3) Set the expiration date to one year from the current date.
-    4) Select the `read_api` and `read_registry` scopes.
-    5) Copy the personal access token to the `.npmrc` file, replacing `<personal_access_token>`.
-
-4. Install the library:
-    ```
-    npm i @whitespots/ui-kit
-    ```
+```
+npm i @whitespots/ui-kit
+```
 
 The library should now be installed in your project.
 
