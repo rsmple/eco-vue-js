@@ -19,8 +19,7 @@ lint:
   stage: test
   script:
     - npm run lint:no-fix
-  dependencies:
-    - prepare
+  needs: ["prepare"]
 
 build:
   stage: build
@@ -29,13 +28,11 @@ build:
   artifacts:
     paths:
       - dist/
-  dependencies:
-    - prepare
+  needs: ["prepare", "lint"]
 
 publish:
   stage: publish
   script:
     - echo "//registry.npmjs.org/:_authToken=${NPM_PUSHER}">.npmrc
     - npm publish --access=public
-  dependencies:
-    - build
+  needs: ["build"]
