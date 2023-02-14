@@ -72,7 +72,7 @@ const getVuePlugin = list => {
     .map(item => `    app.component('${item.name}', ${item.name})`)
     .join('\n')
   
-  return `export default {\n  install: (app: App | any) => {\n${result}\n  },\n}`
+  return `export default {\n  // eslint-disable-next-line @typescript-eslint/no-explicit-any\n  install: (app: App | any) => {\n${result}\n  },\n}`
 }
 
 const getExports = list => {

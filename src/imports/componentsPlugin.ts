@@ -31,6 +31,7 @@ import WTooltip from '@/components/Tooltip/WTooltip.vue'
 import WTooltipContainer from '@/components/Tooltip/WTooltipContainer.vue'
 
 export default {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   install: (app: App | any) => {
     app.component('WBottomSheet', WBottomSheet)
     app.component('WButton', WButton)

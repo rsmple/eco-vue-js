@@ -11,9 +11,11 @@
   >
     <div
       v-if="title"
-      class="text-base font-semibold text-accent flex-1"
+      class="font-semibold text-accent flex-1"
       :class="{
         'order-1': rightLabel,
+        'text-xs': small,
+        'text-base': !small,
       }"
     >
       {{ title }}
@@ -27,7 +29,7 @@
       }"
     >
       <div
-        class="absolute h-6 w-6 -top-1 rounded-full transition-all"
+        class="absolute square-6 -top-1 rounded-full transition-all"
         :class="{
           'right-4': !modelValue,
           'right-0': modelValue,
@@ -57,6 +59,7 @@ import WSpinner from '@/components/Spinner/WSpinner.vue'
 defineProps<{
   modelValue: boolean
   title?: string
+  small?: boolean
   disabled?: boolean
   loading?: boolean
   readonly?: boolean

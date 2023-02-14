@@ -31,6 +31,7 @@ export const getAllScrollParents = (node?: Element, max = 10): Array<Element> =>
   return arr
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DebounceCb = (...args: any[]) => void
 
 export function debounce<T extends DebounceCb>(cb: T, delay = 200): T {
