@@ -19,7 +19,8 @@ lint:
   stage: test
   script:
     - npm run lint:no-fix
-  when: manual
+  dependencies:
+    - prepare
 
 build:
   stage: build
@@ -28,11 +29,13 @@ build:
   artifacts:
     paths:
       - dist/
-  when: manual
+  dependencies:
+    - prepare
 
 publish:
   stage: publish
   script:
     - echo "//registry.npmjs.org/:_authToken=${NPM_PUSHER}">.npmrc
     - npm publish --access=public
-  when: manual
+  dependencies:
+    - build
