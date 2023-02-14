@@ -6,6 +6,7 @@ stages:
 
 prepare:
   stage: prepare
+  allow_failure: false
   script:
     - npm ci
   artifacts:
@@ -15,12 +16,14 @@ prepare:
 
 lint:
   stage: test
+  allow_failure: false
   script:
     - npm run lint:no-fix
   when: manual
 
 build:
   stage: build
+  allow_failure: false
   script:
     - npm run build
   artifacts:
@@ -30,6 +33,7 @@ build:
 
 publish:
   stage: publish
+  allow_failure: false
   script:
     - echo "//registry.npmjs.org/:_authToken=${NPM_PUSHER}">.npmrc
     - npm publish --access=public
