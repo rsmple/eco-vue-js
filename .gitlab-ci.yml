@@ -1,3 +1,5 @@
+image: node:19.0.0
+
 stages:
   - prepare
   - test
