@@ -206,6 +206,10 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         'color': theme('colors.gray.500'),
       },
     },
+    '.text-secure': {
+      'text-security': 'disc',
+      '-webkit-text-security': 'disc',
+    },
   })
 
   addUtilities({

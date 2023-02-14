@@ -11,6 +11,9 @@
       :error-message="errorMessage"
       :skeleton="skeleton"
       :textarea="textarea"
+      :name="name"
+      :mono="mono"
+      :text-secure="textSecure"
       allow-clear
       class="w-full"
       @keypress:enter="emitUpdateModelValue(value)"
@@ -67,6 +70,9 @@ const props = defineProps<{
   disabled?: boolean
   skeleton?: boolean
   textarea?: boolean
+  name?: string
+  mono?: boolean
+  textSecure?: boolean
 }>()
 
 const emit = defineEmits<{

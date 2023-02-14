@@ -70,6 +70,7 @@
             'pl-11': icon,
             'w-0 max-w-0 p-0 absolute': hideInput,
             'font-mono': mono,
+            'text-secure': textSecure,
           }"
           :value="modelValue"
           :placeholder="placeholder"
@@ -186,6 +187,7 @@ const props = withDefaults(
     size?: number
     emitInternalClick?: boolean
     mono?: boolean
+    textSecure?: boolean
   }>(),
   {
     size: 40,
