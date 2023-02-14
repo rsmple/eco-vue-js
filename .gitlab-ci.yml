@@ -28,7 +28,7 @@ build:
   artifacts:
     paths:
       - dist/
-  needs: ["test"]
+  needs: ["prepare", "lint"]
 
 publish:
   stage: publish
