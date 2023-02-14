@@ -52,7 +52,7 @@
                 >
                   <div
                     v-if="!disableClear"
-                    class="w-ripple relative flex h-5 w-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center hover:bg-opacity-5 hover:bg-black-default"
+                    class="w-ripple relative flex square-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center hover:bg-opacity-5 hover:bg-black-default"
                     :class="{'cursor-progress': loading}"
                     @mousedown.stop.prevent=""
                     @click.stop.prevent="!loading && unselect(option)"
@@ -65,7 +65,7 @@
 
             <div
               v-if="!optionComponent && !disableClear"
-              class="w-ripple relative flex h-5 w-5 rounded-full items-center justify-center hover:bg-opacity-5 hover:bg-black-default"
+              class="w-ripple relative flex square-5 rounded-full items-center justify-center hover:bg-opacity-5 hover:bg-black-default"
               :class="{'cursor-progress': loading}"
               @mousedown.stop.prevent=""
               @click.stop.prevent="!loading && unselect(option)"
@@ -77,7 +77,7 @@
 
         <template #suffix>
           <IconArrow
-            class="h-3 w-3 text-gray-300 transition-transform"
+            class="square-3 text-gray-400 dark:text-gray-600 transition-transform"
             :class="{'rotate-180': isOpen}"
           />
         </template>

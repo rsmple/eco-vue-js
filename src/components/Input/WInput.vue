@@ -36,10 +36,10 @@
         :class="{
           'focus-within:border-primary-default dark:focus-within:border-primary-dark': !disabled && !readonly,
           'opacity-80 cursor-not-allowed': disabled,
-          'pr-11': $slots.suffix?.()?.length || allowClear,
           'pl-1 py-1 gap-1': $slots.suffix?.()?.length,
           'border-negative dark:border-negative-dark': errorMessage,
         }"
+        :style="{paddingRight: paddingRight + 'px'}"
         @click="focus"
         @mousedown.prevent=""
       >
@@ -70,7 +70,7 @@
             'pl-11': icon,
             'w-0 max-w-0 p-0 absolute': hideInput,
             'font-mono': mono,
-            'text-secure': textSecure,
+            'text-secure': textSecure && !isSecureVisible,
           }"
           :value="modelValue"
           :placeholder="placeholder"
@@ -91,30 +91,25 @@
           @mousedown.stop=""
         />
 
-        <div
-          v-if="allowClear"
-          v-show="!disabled && !readonly"
-          class="w-ripple w-ripple-hover absolute bottom-0 right-0 h-full w-11 flex items-center justify-center text-description cursor-pointer select-none rounded-xl"
-          @mousedown.prevent.stop=""
-          @click="clearValue"
+        <InputActions
+          :loading="loading"
+          :allow-clear="allowClear"
+          :disabled="disabled || readonly"
+          :text-secure="textSecure"
+          class="absolute top-0 right-0 bottom-0"
+          @click:clear="clearValue"
+          @click:slot="isFocused ? blur() : focus(); emitInternalClick && $emit('click:internal', $event)"
+          @show:secure="isSecureVisible = true"
+          @hide:secure="isSecureVisible = false"
+          @update:width="paddingRight = $event"
         >
-          <IconCancel class="w-5 h-5" />
-        </div>
-
-        <div
-          v-if="loading"
-          class="absolute top-0 right-0 h-full w-11 flex items-center justify-center text-description"
-        >
-          <WSpinner class="[--spinner-size:1.5rem]" />
-        </div>
-
-        <div
-          v-else-if="$slots.suffix?.()?.length"
-          class="absolute top-0 right-0 h-full w-11 flex items-center justify-center cursor-pointer"
-          @click.stop="isFocused ? blur() : focus(); emitInternalClick && $emit('click:internal', $event)"
-        >
-          <slot name="suffix" />
-        </div>
+          <template
+            v-if="$slots.suffix?.()?.length"
+            #default
+          >
+            <slot name="suffix" />
+          </template>
+        </InputActions>
       </div>
 
       <WSkeleton
@@ -159,9 +154,8 @@
 
 <script lang="ts" setup>
 import {onMounted, ref} from 'vue'
-import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
-import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+import InputActions from './components/InputActions.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -219,6 +213,8 @@ const emit = defineEmits<{
 
 const input = ref<HTMLInputElement>()
 const isFocused = ref(false)
+const isSecureVisible = ref(false)
+const paddingRight = ref(0)
 
 const updateModelValue = (value: string | number | undefined): void => {
   if (props.loading || props.disabled || props.readonly) return
