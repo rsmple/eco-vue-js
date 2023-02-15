@@ -93,7 +93,7 @@
         class="bg-default dark:bg-default-dark"
         :class="{
           'max-h-full': isMobile,
-          'rounded-xl shadow-md max-h-72 overflow-x-hidden overflow-y-overlay overscroll-contain mt-4 mb-1': !isMobile,
+          'rounded-xl shadow-md max-h-72 overflow-x-hidden overflow-y-overlay overscroll-contain mt-4 mb-1 dark:border dark:border-solid dark:border-gray-800': !isMobile,
         }"
       >
         <div

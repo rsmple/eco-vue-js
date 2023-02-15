@@ -13,6 +13,7 @@ export {default as IconFilter} from '@/assets/icons/default/IconFilter.svg?compo
 export {default as IconInProgress} from '@/assets/icons/default/IconInProgress.svg?component'
 export {default as IconJira} from '@/assets/icons/default/IconJira.svg?component'
 export {default as IconLogout} from '@/assets/icons/default/IconLogout.svg?component'
+export {default as IconMore} from '@/assets/icons/default/IconMore.svg?component'
 export {default as IconNotification} from '@/assets/icons/default/IconNotification.svg?component'
 export {default as IconProfile} from '@/assets/icons/default/IconProfile.svg?component'
 export {default as IconSearch} from '@/assets/icons/default/IconSearch.svg?component'
