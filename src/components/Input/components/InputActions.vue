@@ -14,12 +14,17 @@
 
     <button
       v-if="textSecure"
-      class="relative w-ripple w-ripple-hover h-full w-11 flex items-center justify-center text-description cursor-pointer select-none"
-      @mousedown.prevent.stop="$emit('show:secure')"
-      @mouseup="$emit('hide:secure')"
-      @mouseleave="$emit('hide:secure')"
+      class="relative w-ripple w-ripple-hover h-full w-11 flex items-center justify-center cursor-pointer select-none"
+      @click="isSecureVisible ? $emit('hide:secure') : $emit('show:secure')"
     >
-      <IconEye class="w-5 h-5" />
+      <IconEyeSlash
+        v-show="!isSecureVisible"
+        class="w-5 h-5 text-description"
+      />
+      <IconEye
+        v-show="isSecureVisible"
+        class="w-5 h-5 text-primary-default dark:text-primary-dark"
+      />
     </button>
 
     <div
@@ -43,6 +48,7 @@
 import {onMounted, ref, toRef, watch} from 'vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 import IconEye from '@/assets/icons/sax/IconEye.svg?component'
+import IconEyeSlash from '@/assets/icons/sax/IconEyeSlash.svg?component'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import {debounce} from '@/utils/utils'
 
@@ -51,6 +57,7 @@ const props = defineProps<{
   allowClear?: boolean
   disabled?: boolean
   textSecure?: boolean
+  isSecureVisible?: boolean
 }>()
 
 const emit = defineEmits<{

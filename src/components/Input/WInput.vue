@@ -96,6 +96,7 @@
           :allow-clear="allowClear"
           :disabled="disabled || readonly"
           :text-secure="textSecure"
+          :is-secure-visible="isSecureVisible"
           class="absolute top-0 right-0 bottom-0"
           @click:clear="clearValue"
           @click:slot="isFocused ? blur() : focus(); emitInternalClick && $emit('click:internal', $event)"

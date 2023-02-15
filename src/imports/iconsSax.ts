@@ -15,6 +15,7 @@ export {default as IconEditCircle} from '@/assets/icons/sax/IconEditCircle.svg?c
 export {default as IconElement} from '@/assets/icons/sax/IconElement.svg?component'
 export {default as IconExport} from '@/assets/icons/sax/IconExport.svg?component'
 export {default as IconEye} from '@/assets/icons/sax/IconEye.svg?component'
+export {default as IconEyeSlash} from '@/assets/icons/sax/IconEyeSlash.svg?component'
 export {default as IconFilter} from '@/assets/icons/sax/IconFilter.svg?component'
 export {default as IconFinding} from '@/assets/icons/sax/IconFinding.svg?component'
 export {default as IconFolder} from '@/assets/icons/sax/IconFolder.svg?component'

@@ -88,6 +88,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
   addBase({
     'input': {
       'outline': 'none',
+      '-webkit-user-select': 'all !important',
 
       '--input-autofill-bg': theme('colors.default'),
       '--input-autofull-text': theme('colors.black.default'),
