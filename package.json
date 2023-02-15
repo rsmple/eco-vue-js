@@ -1,6 +1,6 @@
 {
   "name": "@whitespots/ui-kit",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check build-only",
