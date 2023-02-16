@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-default dark:bg-default-dark shadow-md rounded-3xl py-8 w-[35rem] max-h-full overflow-hidden group"
+    class="bg-default dark:bg-default-dark shadow-md rounded-3xl py-8 w-[var(--modal-wrapper-width,35rem)] max-h-full overflow-hidden group"
     :class="{
       'max-w-[calc(100%-var(--inner-margin)*2)] -mx--inner-margin': !maximized,
       'm-0 max-w-full rounded-none': maximized,

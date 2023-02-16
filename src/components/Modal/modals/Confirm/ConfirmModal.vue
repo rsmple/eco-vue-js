@@ -1,5 +1,5 @@
 <template>
-  <WModalWrapper class="min-w-[40rem]">
+  <WModalWrapper class="[--modal-wrapper-width:40rem]">
     <template #title>
       {{ title }}
     </template>
