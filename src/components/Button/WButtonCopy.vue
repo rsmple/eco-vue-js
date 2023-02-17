@@ -42,7 +42,6 @@ const doCopy = () => {
 
       Notify.success({
         title: 'Copied',
-        userInput: props.value,
       })
 
       if (timeout) clearTimeout(timeout)
