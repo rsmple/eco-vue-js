@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref} from 'vue'
+import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch, toRef} from 'vue'
 import DOMListenerContainer from '@/utils/DOMListenerContainer'
 import {getAllScrollParents} from '@/utils/utils'
 import {horizontalGetterOrderMap, searchStyleGetter, VerticalGetter, type HorizontalGetter} from './utils/DropdownStyle'
@@ -80,7 +80,7 @@ const setParentRect = (updateSize = false): void => {
   if (isLeftChanged) horizontalStyle.value = horizontalGetter.styleGetter(newRect)
   if (isTopChanged) verticalStyle.value = verticalGetter.styleGetter(newRect)
 
-  if (isTopChanged || isTopChanged) parentRect = newRect
+  if (isLeftChanged || isTopChanged) parentRect = newRect
 }
 
 onBeforeMount(() => {
@@ -114,9 +114,13 @@ onBeforeUnmount(() => {
   domListenerContainer.destroy()
 })
 
+watch(toRef(props, 'parentElement'), () => {
+  setParentRect()
+})
+
 defineExpose({
   update: () => {
-  setParentRect()
+    setParentRect()
   },
 })
 

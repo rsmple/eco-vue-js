@@ -15,7 +15,11 @@
       class="z-[10000] [--arrow-size:8px]"
       @update:rect="close"
     >
-      <div class="min-w-[15rem] flex justify-center items-center flex-col drop-shadow-md dark:drop-shadow-none">
+      <div
+        class="min-w-[15rem] flex justify-center items-center flex-col drop-shadow-md dark:drop-shadow-none"
+        @mouseover="setTooltipMeta(tooltipMeta)"
+        @mouseleave="close()"
+      >
         <div
           class="
               w-[calc(var(--arrow-size)/2)] z-10
@@ -60,13 +64,32 @@ const MARGIN = 48
 const tooltipMeta = ref<TooltipMeta | null>(null)
 const container = ref<HTMLDivElement | undefined>()
 const containerStyles = ref<CSSProperties | undefined>()
+let timeout: NodeJS.Timeout | undefined
 
 const setTooltipMeta: SetTooltipMeta = (meta: TooltipMeta | null) => {
-  tooltipMeta.value = meta
+  clearTimeoutOnClose()
+
+  if (!meta) {
+    timeout = setTimeout(() => {
+      tooltipMeta.value = null
+      timeout = undefined
+    }, 100)
+  } else {
+    tooltipMeta.value = meta
+  }
 }
 
 const close = () => {
+  clearTimeoutOnClose()
+
   tooltipMeta.value = null
+}
+
+const clearTimeoutOnClose = () => {
+  if (!timeout) return
+
+  clearTimeout(timeout)
+  timeout = undefined
 }
 
 watch(container, value => {
