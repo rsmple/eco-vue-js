@@ -45,14 +45,14 @@ const close = () => {
 }
 
 watch(parent, (newValue, oldValue) => {
-  oldValue?.removeEventListener('mouseover', open)
+  oldValue?.removeEventListener('mouseenter', open)
   oldValue?.removeEventListener('mouseleave', close)
-  newValue?.addEventListener('mouseover', open)
+  newValue?.addEventListener('mouseenter', open)
   newValue?.addEventListener('mouseleave', close)
 })
 
 onBeforeUnmount(() => {
-  parent.value?.removeEventListener('mouseover', open)
+  parent.value?.removeEventListener('mouseenter', open)
   parent.value?.removeEventListener('mouseleave', close)
 
   close()

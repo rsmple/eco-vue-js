@@ -16,7 +16,8 @@
       @update:rect="close"
     >
       <div
-        class="min-w-[15rem] flex justify-center items-center flex-col drop-shadow-md dark:drop-shadow-none"
+        ref="container"
+        class="flex justify-center items-center flex-col drop-shadow-md dark:drop-shadow-none"
         @mouseover="setTooltipMeta(tooltipMeta)"
         @mouseleave="close()"
       >
@@ -32,7 +33,6 @@
         />
 
         <div
-          ref="container"
           class="py-3 px-4 rounded-xl text-xs font-medium text-center"
           :class="{
             'bg-black-default dark:bg-gray-800 text-default': !tooltipMeta.light,
@@ -54,12 +54,12 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, onUnmounted, ref, type CSSProperties, watch, onBeforeMount, onBeforeUnmount} from 'vue'
+import {onMounted, onUnmounted, ref, type CSSProperties, onBeforeMount, onBeforeUnmount, nextTick} from 'vue'
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {initTooltip, type SetTooltipMeta, type TooltipMeta} from '@/utils/Tooltip'
 
-const MARGIN = 48
+const MARGIN = 12
 
 const tooltipMeta = ref<TooltipMeta | null>(null)
 const container = ref<HTMLDivElement | undefined>()
@@ -71,17 +71,22 @@ const setTooltipMeta: SetTooltipMeta = (meta: TooltipMeta | null) => {
 
   if (!meta) {
     timeout = setTimeout(() => {
+      containerStyles.value = undefined
       tooltipMeta.value = null
       timeout = undefined
     }, 100)
-  } else {
+  } else if (tooltipMeta.value !== meta) {
     tooltipMeta.value = meta
+
+    containerStyles.value = undefined
+    nextTick().then(() => nextTick().then(() => updateContainerStyles(container.value)))
   }
 }
 
 const close = () => {
   clearTimeoutOnClose()
 
+  containerStyles.value = undefined
   tooltipMeta.value = null
 }
 
@@ -92,7 +97,7 @@ const clearTimeoutOnClose = () => {
   timeout = undefined
 }
 
-watch(container, value => {
+const updateContainerStyles = (value: HTMLDivElement | undefined) => {
   if (!value) {
     containerStyles.value = undefined
     return
@@ -101,8 +106,10 @@ watch(container, value => {
   const rect = value.getBoundingClientRect()
 
   if (rect.left < MARGIN) {
+    const margin = MARGIN - rect.left
     containerStyles.value = {
-      marginLeft: (MARGIN - rect.left) + 'px',
+      marginLeft: margin + 'px',
+      marginRight: (margin * -1) + 'px',
     }
     return
   }
@@ -110,14 +117,16 @@ watch(container, value => {
   const right = window.innerWidth - rect.right
 
   if (right < MARGIN) {
+    const margin = MARGIN - right
     containerStyles.value = {
-      marginRight: (MARGIN - right) + 'px',
+      marginRight: margin + 'px',
+      marginLeft: (margin * -1) + 'px',
     }
     return
   }
 
   containerStyles.value = undefined
-})
+}
 
 onBeforeMount(() => {
   initTooltip(setTooltipMeta)

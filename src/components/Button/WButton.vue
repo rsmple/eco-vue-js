@@ -12,7 +12,7 @@
     :class="{
       'p-1.5': minimize,
       'py-2.5 px-6': !minimize,
-      [semanticTypeStylesMap[semanticType]]: true,
+      [semanticTypeButtonStylesMap[semanticType]]: true,
       'st-outline': outline,
       'hover:bg-opacity-80 dark:hover:bg-opacity-80 active:bg-opacity-80 dark:active:bg-opacity-80 w-ripple': !loading && !disabled,
     }"
@@ -47,7 +47,7 @@
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import {SemanticType} from '@/utils/SemanticType'
 import {type RouteLocationRaw, RouterLink} from 'vue-router'
-import {semanticTypeStylesMap} from './models/semanticTypeStylesMap'
+import {semanticTypeButtonStylesMap} from './models/semanticTypeStylesMap'
 
 const props = withDefaults(
   defineProps<{

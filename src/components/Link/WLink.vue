@@ -3,14 +3,21 @@
     v-bind="!to ? {target, href} : {}"
     :is="to ? RouterLink : 'a'"
     :to="to"
-    class="
-      cursor-pointer text-primary-default dark:text-primary-dark overflow-hidden
-      no-underline hover:underline text-base font-normal truncate whitespace-normal
-    "
+    class="cursor-pointer overflow-hidden no-underline hover:underline font-normal truncate whitespace-normal"
+    :class="{
+      'text-base': !small,
+      'text-xs': small,
+      [semanticTypeTextStylesMap[semanticType]]: true,
+    }"
   >
     <span class="inline mr-1">
       <IconLink
-        class="inline -mt-1 square-5 bg-primary-default dark:bg-primary-dark bg-opacity-95 rounded-lg text-default dark:text-default-dark p-[1px]"
+        class="inline -mt-1 rounded-lg p-[1px]"
+        :class="{
+          'square-5': !small,
+          'square-3': small,
+          [semanticTypeIconStylesMap[semanticType]]: true,
+        }"
       />
     </span>
 
@@ -23,12 +30,25 @@
 <script lang="ts" setup>
 import {RouterLink, type RouteLocationRaw} from 'vue-router'
 import IconLink from '@/assets/icons/sax/IconLink.svg?component'
+import {SemanticType} from '@/utils/SemanticType'
+import {semanticTypeIconStylesMap, semanticTypeTextStylesMap} from '@/components/Button/models/semanticTypeStylesMap'
 
-defineProps<{
-  to?: RouteLocationRaw
-  href?: string
-  target?: '_self' | '_blank' | '_parent' | '_top'
-  text?: string
-}>()
+withDefaults(
+  defineProps<{
+    to?: RouteLocationRaw
+    href?: string
+    target?: '_self' | '_blank' | '_parent' | '_top'
+    text?: string
+    semanticType?: SemanticType
+    small?: boolean
+  }>(),
+  {
+    semanticType: SemanticType.PRIMARY,
+    to: undefined,
+    href: undefined,
+    target: undefined,
+    text: undefined,
+  },
+)
 
 </script>
