@@ -21,6 +21,7 @@ export {default as IconFinding} from '@/assets/icons/sax/IconFinding.svg?compone
 export {default as IconFolder} from '@/assets/icons/sax/IconFolder.svg?component'
 export {default as IconFolderCross} from '@/assets/icons/sax/IconFolderCross.svg?component'
 export {default as IconJira} from '@/assets/icons/sax/IconJira.svg?component'
+export {default as IconLayer} from '@/assets/icons/sax/IconLayer.svg?component'
 export {default as IconLink} from '@/assets/icons/sax/IconLink.svg?component'
 export {default as IconLinkBold} from '@/assets/icons/sax/IconLinkBold.svg?component'
 export {default as IconLinkOutline} from '@/assets/icons/sax/IconLinkOutline.svg?component'
