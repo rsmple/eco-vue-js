@@ -80,6 +80,7 @@
           :readonly="readonly"
           :autocomplete="autocomplete"
           :size="size || undefined"
+          :spellcheck="spellcheck ? 'true' : 'false'"
           @input="handleInputEvent"
           @keypress.enter.exact.stop.prevent="!disabled && !readonly && $emit('keypress:enter', $event)"
           @keydown.up.exact.stop="!disabled && !readonly && $emit('keypress:up', $event)"
@@ -183,6 +184,7 @@ const props = withDefaults(
     emitInternalClick?: boolean
     mono?: boolean
     textSecure?: boolean
+    spellcheck?: boolean
   }>(),
   {
     size: 40,
