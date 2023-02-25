@@ -41,7 +41,10 @@
           :style="containerStyles"
         >
           <template v-if="tooltipMeta.slot">
-            <component :is="tooltipMeta.slot" />
+            <component
+              :is="tooltipMeta.slot"
+              :key="tooltipMeta.key"
+            />
           </template>
 
           <template v-else-if="tooltipMeta.text">

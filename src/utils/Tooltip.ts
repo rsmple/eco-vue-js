@@ -1,6 +1,6 @@
 import type {VNode} from 'vue'
 
-export type TooltipMeta = {parent: HTMLElement, slot?: VNode, text?: string, light?: boolean}
+export type TooltipMeta = {parent: HTMLElement, slot?: VNode, text?: string, light?: boolean, key: number}
 
 export type SetTooltipMeta = (meta: TooltipMeta | null) => void
 

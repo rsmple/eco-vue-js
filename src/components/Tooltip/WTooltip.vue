@@ -10,6 +10,7 @@
 import {computed, onBeforeUnmount, ref, useSlots, watch} from 'vue'
 import {getIsTouchDevice} from '@/utils/mobile'
 import {Tooltip} from '@/utils/Tooltip'
+import {getIncrement} from './models/utils'
 
 const props = defineProps<{
   text?: string
@@ -37,7 +38,7 @@ const open = () => {
     if (parent.value.scrollHeight === Math.round(rect.height) && parent.value.scrollWidth === Math.round(rect.width)) return
   }
 
-  Tooltip.add({parent: parent.value, slot, text: props.text, light: props.light})
+  Tooltip.add({parent: parent.value, slot, text: props.text, light: props.light, key: getIncrement()})
 }
 
 const close = () => {
