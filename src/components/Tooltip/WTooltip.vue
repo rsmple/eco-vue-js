@@ -17,6 +17,7 @@ const props = defineProps<{
   noTouch?: boolean
   overflowOnly?: boolean
   light?: boolean
+  trigger?: Element
 }>()
 
 const slots = useSlots()
@@ -25,6 +26,7 @@ const isTouchDevice = getIsTouchDevice()
 const container = ref<HTMLDivElement>()
 
 const parent = computed(() => container.value?.parentElement ?? null)
+const triggerElement = computed(() => props.trigger ?? parent.value)
 
 const open = () => {
   const slot = slots.default?.()?.[0]
@@ -45,7 +47,7 @@ const close = () => {
   Tooltip.close()
 }
 
-watch(parent, (newValue, oldValue) => {
+watch(triggerElement, (newValue, oldValue) => {
   oldValue?.removeEventListener('mouseenter', open)
   oldValue?.removeEventListener('mouseleave', close)
   newValue?.addEventListener('mouseenter', open)
@@ -53,8 +55,8 @@ watch(parent, (newValue, oldValue) => {
 })
 
 onBeforeUnmount(() => {
-  parent.value?.removeEventListener('mouseenter', open)
-  parent.value?.removeEventListener('mouseleave', close)
+  triggerElement.value?.removeEventListener('mouseenter', open)
+  triggerElement.value?.removeEventListener('mouseleave', close)
 
   close()
 })
