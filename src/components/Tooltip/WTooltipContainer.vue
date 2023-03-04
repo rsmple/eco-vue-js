@@ -47,9 +47,12 @@
             />
           </template>
 
-          <template v-else-if="tooltipMeta.text">
+          <div
+            v-else-if="tooltipMeta.text"
+            class="whitespace-nowrap"
+          >
             {{ tooltipMeta.text }}
-          </template>
+          </div>
         </div>
       </div>
     </WDropdown>
