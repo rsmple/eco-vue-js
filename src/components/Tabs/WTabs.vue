@@ -40,13 +40,12 @@
           leaveToClass: 'swipe-horizontal-reverse-leave-to',
         }"
       >
-        <div
+        <TabItem
           v-for="(slot, index) in $slots.default?.()"
-          v-show="index === current"
           :key="index"
-          ref="content"
-          :name="index.toString()"
+          :is-active="index === current"
           class="width-full"
+          @update:height="updateHeight"
         >
           <WForm
             :name="index.toString()"
@@ -55,7 +54,7 @@
           >
             <component :is="slot" />
           </WForm>
-        </div>
+        </TabItem>
       </TransitionGroup>
     </div>
   </div>
@@ -63,6 +62,7 @@
 
 <script lang="ts" setup>
 import {onMounted, ref, watch} from 'vue'
+import TabItem from './components/TabItem.vue'
 import WForm from '@/components/Form/WForm.vue'
 import {debounce} from '@/utils/utils'
 
@@ -74,7 +74,6 @@ const current = ref(0)
 const isDirect = ref(true)
 const button = ref<HTMLDivElement[]>([])
 const indicatorStyle = ref({})
-const content = ref<HTMLDivElement[]>([])
 const minHeight = ref(0)
 
 const isValidMap = ref<Record<number, boolean>>({})
@@ -115,20 +114,18 @@ const updateIndicator = () => {
   }
 }
 
+const updateHeight = (value: number): void => {
+  if (minHeight.value >= value) return
+
+  minHeight.value = value
+}
+
 watch(current, () => {
   updateIndicator()
 })
 
 onMounted(() => {
   updateIndicator()
-})
-
-watch(current, (value, oldValue) => {
-  const rect = content.value[oldValue]?.getBoundingClientRect?.()
-
-  if (!rect || minHeight.value > rect.height) return
-
-  minHeight.value = rect.height
 })
 
 </script>

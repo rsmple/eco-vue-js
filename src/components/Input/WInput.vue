@@ -239,7 +239,10 @@ const handleInputEvent = (event: Event): void => {
   if (props.maxLength && typeof value === 'string' && value.length > props.maxLength) {
     event.preventDefault()
 
-    if (target) target.value = value.substring(0, props.maxLength)
+    const substring = value.substring(0, props.maxLength)
+
+    if (target) target.value = substring
+    updateModelValue(substring)
     return
   }
 
