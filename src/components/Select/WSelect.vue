@@ -16,18 +16,18 @@
         :readonly="(readonly || unclickable)"
         :skeleton="skeleton"
         :size="searchSize"
-        :emit-internal-click="isMobile"
         :error-message="errorMessage"
         :required="required"
+        stop-mouse-down
         class="cursor-pointer"
         @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
-        @keypress:enter="selectCursor"
+        @keypress:enter.stop.prevent="selectCursor"
         @keypress:up.prevent="cursorUp"
         @keypress:down.prevent="cursorDown"
         @keypress:delete="captureDoubleDelete"
         @focus="open(); focused = true"
         @blur="!isMobile && close(); focused = false"
-        @click:internal="unclickable && open()"
+        @click:internal="isMobile && unclickable && open()"
       >
         <template
           v-if="hidePrefix ? isMobile ? !focused : !isOpen : true"

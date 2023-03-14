@@ -1,7 +1,7 @@
 <template>
   <div
     class="relative mt-1 mb-[var(--input-b-margin,1.125rem)]"
-    @click="emitInternalClick && $emit('click:internal', $event)"
+    @click="$emit('click:internal', $event)"
   >
     <div
       v-if="title || $slots.title?.()?.length"
@@ -82,14 +82,14 @@
           :size="size || undefined"
           :spellcheck="spellcheck ? 'true' : 'false'"
           @input="handleInputEvent"
-          @keypress.enter.exact.stop.prevent="!disabled && !readonly && $emit('keypress:enter', $event)"
+          @keypress.enter.exact="!disabled && !readonly && $emit('keypress:enter', $event)"
           @keydown.up.exact.stop="!disabled && !readonly && $emit('keypress:up', $event)"
           @keydown.down.exact.stop="!disabled && !readonly && $emit('keypress:down', $event)"
           @keydown.delete.exact="!disabled && !readonly && $emit('keypress:delete', $event)"
           @focus="$emit('focus', $event); setIsFocused(true)"
           @blur="$emit('blur', $event); setIsFocused(false)"
           @click="$emit('click', $event)"
-          @mousedown.stop=""
+          @mousedown="stopMouseDown && $event.stopPropagation()"
         />
 
         <InputActions
@@ -100,7 +100,7 @@
           :is-secure-visible="isSecureVisible"
           class="absolute top-0 right-0 bottom-0"
           @click:clear="clearValue"
-          @click:slot="isFocused ? blur() : focus(); emitInternalClick && $emit('click:internal', $event)"
+          @click:slot="isFocused ? blur() : focus(); $emit('click:internal', $event)"
           @show:secure="isSecureVisible = true"
           @hide:secure="isSecureVisible = false"
           @update:width="paddingRight = $event"
@@ -181,10 +181,10 @@ const props = withDefaults(
     hideInput?: boolean
     skeleton?: boolean
     size?: number
-    emitInternalClick?: boolean
     mono?: boolean
     textSecure?: boolean
     spellcheck?: boolean
+    stopMouseDown?: boolean
   }>(),
   {
     size: 40,

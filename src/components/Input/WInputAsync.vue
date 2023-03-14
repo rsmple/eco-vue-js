@@ -16,7 +16,7 @@
       :text-secure="textSecure"
       allow-clear
       class="w-full"
-      @keypress:enter="emitUpdateModelValue(value)"
+      @keypress:enter.stop.prevent="emitUpdateModelValue(value)"
       @click="open"
       @blur="close"
     >
