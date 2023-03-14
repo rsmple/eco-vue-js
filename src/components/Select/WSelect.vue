@@ -18,7 +18,6 @@
         :size="searchSize"
         :error-message="errorMessage"
         :required="required"
-        stop-mouse-down
         class="cursor-pointer"
         @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
         @keypress:enter.stop.prevent="selectCursor"

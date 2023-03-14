@@ -89,7 +89,7 @@
           @focus="$emit('focus', $event); setIsFocused(true)"
           @blur="$emit('blur', $event); setIsFocused(false)"
           @click="$emit('click', $event)"
-          @mousedown="stopMouseDown && $event.stopPropagation()"
+          @mousedown.stop=""
         />
 
         <InputActions
@@ -184,7 +184,6 @@ const props = withDefaults(
     mono?: boolean
     textSecure?: boolean
     spellcheck?: boolean
-    stopMouseDown?: boolean
   }>(),
   {
     size: 40,
