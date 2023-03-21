@@ -94,7 +94,7 @@
 
         <InputActions
           :loading="loading"
-          :allow-clear="allowClear"
+          :allow-clear="allowClear && modelValue !== undefined && modelValue !== ''"
           :disabled="disabled || readonly"
           :text-secure="textSecure"
           :is-secure-visible="isSecureVisible"

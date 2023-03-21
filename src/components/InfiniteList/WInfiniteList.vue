@@ -104,6 +104,7 @@ const props = withDefaults(
     hidePageTitle?: boolean
     headerMargin?: number
     pageLabelWithMargin?: boolean
+    skipScrollTarget?: boolean
   }>(),
   {
     isEnabled: true,
@@ -239,7 +240,7 @@ const resetPage = async () => {
   nextPage.value = null
   previousPage.value = null
 
-  if (target.value) target.value.scrollIntoView({block: 'start'})
+  if (!props.skipScrollTarget && target.value) target.value.scrollIntoView({block: 'start'})
 
   await nextTick()
 
