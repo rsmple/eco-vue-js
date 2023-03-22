@@ -8,14 +8,14 @@ export const removeKey = <T extends Record<string, unknown>>(entity: T, key: str
 }
 
 const fieldMessageStart = '- '
-const subformMessageStart = ''
+const subformMessageStart = '  '
 
 export const compileMessage = (title: string, message: string | undefined): string | undefined => {
   if (message === undefined) return undefined
 
-  if (message.startsWith(fieldMessageStart)) {
-    return `${subformMessageStart}${title}:\n${message}`
+  if (message.startsWith(fieldMessageStart) || message.startsWith(subformMessageStart)) {
+    return `${ subformMessageStart }${ title }:\n${ message }`
   } else {
-    return `${fieldMessageStart}${title}: ${message}`
+    return `${ fieldMessageStart }${ title }: ${ message }`
   }
 }

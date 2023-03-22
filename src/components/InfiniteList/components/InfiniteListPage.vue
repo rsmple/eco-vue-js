@@ -18,6 +18,11 @@
         Page: {{ queryParams.page }}
       </RouterLink>
 
+      <div
+        v-else
+        class="h-6"
+      />
+
       <component
         :is="contentComponent || 'div'"
         v-bind="contentComponent ? {items: data?.results ?? [], skeleton: !data?.results} : undefined"
@@ -68,19 +73,27 @@ import {RouterLink, useRoute, useRouter} from 'vue-router'
 import {Notify} from '@/utils/Notify'
 import type {QueryParams, UseDefaultQueryFn} from '../models/types'
 
-const props = defineProps<{
-  queryParams: QueryParams
-  useQueryFn: UseDefaultQueryFn
-  isInvalidPage: (error: unknown) => boolean
-  isEnabled?: boolean
-  contentComponent?: VueComponent
-  keyGetter?: (data: unknown, index: number) => string | number
-  skeletonLength?: number
-  firstPage: boolean
-  lastPage: boolean
-  hidePageTitle?: boolean
-  pageLabelWithMargin?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    queryParams: QueryParams
+    useQueryFn: UseDefaultQueryFn
+    isInvalidPage: (error: unknown) => boolean
+    isEnabled?: boolean
+    contentComponent?: VueComponent
+    keyGetter?: (data: unknown, index: number) => string | number
+    skeletonLength?: number
+    firstPage: boolean
+    lastPage: boolean
+    hidePageTitle?: boolean
+    pageLabelWithMargin?: boolean
+  }>(),
+  {
+    isEnabled: true,
+    contentComponent: undefined,
+    keyGetter: undefined,
+    skeletonLength: 24,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'update:count', value: number): void
@@ -98,7 +111,7 @@ const router = useRouter()
 
 const queryParams = toRef(props, 'queryParams')
 const element = ref<HTMLElement>()
-const isEnabled = computed(() => props.isEnabled ?? true)
+const isEnabled = toRef(props, 'isEnabled')
 
 const {data, error, setData, refetch} = props.useQueryFn(queryParams, {enabled: isEnabled})
 

@@ -53,7 +53,7 @@
       :page-label-with-margin="pageLabelWithMargin"
       :style="{'--infinite-list-header-height': headerHeight + 'px'}"
       class="min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16"
-      @update:count="updateCount"
+      @update:count="updateCount($event); $emit('update:count', $event)"
       @update:pages-count="updatePagesCount"
       @update:next-page="updateNextPage"
       @update:previous-page="updatePreviousPage"
@@ -105,6 +105,7 @@ const props = withDefaults(
     headerMargin?: number
     pageLabelWithMargin?: boolean
     skipScrollTarget?: boolean
+    skipPageUpdate?: boolean
   }>(),
   {
     isEnabled: true,
@@ -118,6 +119,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'update:header-padding', value: number): void
+  (e: 'update:count', value: number): void
 }>()
 
 const route = useRoute()
@@ -180,7 +182,7 @@ const addNextPage = () => {
 
   pages.value.push(nextPage.value)
 
-  updateQueryParams({page: nextPage.value})
+  if (!props.skipPageUpdate) updateQueryParams({page: nextPage.value})
 
   if (pages.value.length < MAX_PAGES) return
 
@@ -197,7 +199,7 @@ const addPreviousPage = (options: {updateQuery?: boolean} = {}) => {
 
   pages.value.unshift(previousPage.value)
 
-  if (options.updateQuery !== false) updateQueryParams({page: previousPage.value})
+  if (options.updateQuery !== false && !props.skipPageUpdate) updateQueryParams({page: previousPage.value})
 
   if (pages.value.length < MAX_PAGES) return
 
