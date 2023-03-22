@@ -16,7 +16,6 @@ prepare:
   artifacts:
     paths:
       - node_modules/
-  when: manual
 
 lint:
   stage: test
