@@ -8,6 +8,9 @@ stages:
 
 prepare:
   stage: prepare
+  tags:
+    - builder
+
   script:
     - npm ci
   artifacts:
@@ -17,12 +20,16 @@ prepare:
 
 lint:
   stage: test
+  tags:
+    - builder
   script:
     - npm run lint:no-fix
   needs: ["prepare"]
 
 build:
   stage: build
+  tags:
+    - builder
   script:
     - npm run build
   artifacts:
@@ -32,6 +39,8 @@ build:
 
 publish:
   stage: publish
+  tags:
+    - builder
   script:
     - echo "//registry.npmjs.org/:_authToken=${NPM_PUSHER}">.npmrc
     - npm publish --access=public
