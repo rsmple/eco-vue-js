@@ -56,5 +56,6 @@ export const useInfiniteListHeader = (headerMargin: Ref<number>, updageHeaderPad
     header,
     headerHeight,
     headerTop,
+    isIntersecting,
   }
 }

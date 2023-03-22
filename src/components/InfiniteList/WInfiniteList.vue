@@ -11,7 +11,11 @@
 
   <div
     ref="header"
-    class="z-20 sticky top-[var(--header-height)]"
+    class="sticky top-[var(--header-height)]"
+    :class="{
+      'z-[1]': isIntersecting,
+      'z-20': !isIntersecting,
+    }"
   >
     <div
       v-for="(slot, index) in $slots.header?.()"
@@ -153,7 +157,7 @@ const updateHeaderPadding = (value: number): void => {
   emit('update:header-padding', value)
 }
 
-const {indicator, header, headerTop, headerHeight} = useInfiniteListHeader(toRef(props, 'headerMargin'), updateHeaderPadding)
+const {indicator, header, headerTop, headerHeight, isIntersecting} = useInfiniteListHeader(toRef(props, 'headerMargin'), updateHeaderPadding)
 const {pageComponent, refetchNextPages} = useRefetchNextPages()
 
 const updateCount = (value: number): void => {
