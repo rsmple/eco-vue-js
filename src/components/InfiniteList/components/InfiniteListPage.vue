@@ -111,9 +111,9 @@ const router = useRouter()
 
 const queryParams = toRef(props, 'queryParams')
 const element = ref<HTMLElement>()
-const isEnabled = toRef(props, 'isEnabled')
+const enabled = toRef(props, 'isEnabled')
 
-const {data, error, setData, refetch} = props.useQueryFn(queryParams, {enabled: isEnabled})
+const {data, error, setData, refetch} = props.useQueryFn(queryParams, {enabled})
 
 const count = computed(() => data.value?.count)
 const pagesCount = computed(() => data.value?.pages_count)

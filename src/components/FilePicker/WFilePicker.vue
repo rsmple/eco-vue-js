@@ -46,42 +46,65 @@
           />
         </svg>
 
-        <div class="w-full h-full flex flex-col items-center text-base text-accent">
-          <template v-if="!modelValue">
-            <div class="font-semibold mt-16">
-              Drag and drop files here
-            </div>
+        <div
+          v-if="placeholder"
+          class="flex gap-6 h-full items-center justify-center"
+        >
+          <FilePickerItem
+            @click:cancel="$emit('clear:placeholder')"
+          >
+            <slot name="placeholder" />
+          </FilePickerItem>
+        </div>
 
-            <div class="font-normal mt-4">
-              or
-            </div>
+        <div
+          v-if="modelValue.length === 0"
+          class="w-full h-full flex flex-col items-center text-base text-accent"
+        >
+          <div class="font-semibold mt-16">
+            Drag and drop files here
+          </div>
 
-            <WButton
-              :semantic-type="SemanticType.PRIMARY"
-              class="mt-4"
-              @click.stop.prevent="input?.click()"
-            >
-              Browse file
-            </WButton>
-          </template>
+          <div class="font-normal mt-4">
+            or
+          </div>
 
-          <div v-else>
-            <div
-              v-for="(file, index) in (modelValue as unknown as File[])"
+          <WButton
+            :semantic-type="SemanticType.PRIMARY"
+            class="mt-4"
+            @click.stop.prevent="input?.click()"
+          >
+            Browse file
+          </WButton>
+        </div>
+
+        <div
+          v-else
+          class="h-full flex items-center justify-center"
+        >
+          <div class="overflow-x-overlay flex gap-6 items-center">
+            <FilePickerItem
+              v-for="(file, index) in modelValue"
               :key="index"
-              class="flex flex-col items-center"
+              @click:cancel="unselectFile(index)"
             >
-              <div
-                :style="{backgroundImage: `url(${createUrl(file)})`}"
-                class="square-44 rounded-full mt-6 mb-3 mx-3 bg-cover bg-no-repeat"
-              />
+              <slot
+                name="file"
+                :file="file"
+              >
+                <div
+                  :style="{backgroundImage: `url(${createUrl(file)})`}"
+                  class="square-44 rounded-full bg-cover bg-no-repeat"
+                />
+              </slot>
 
-              <div class="text-base text-accent font-normal truncate max-w-[15rem]">
+              <div class="text-base text-accent text-center font-normal truncate">
                 {{ file.name }}
               </div>
-            </div>
+            </FilePickerItem>
           </div>
         </div>
+        
       </label>
     </div>
 
@@ -105,23 +128,26 @@
 import {onMounted, onUnmounted, ref} from 'vue'
 import WButton from '@/components/Button/WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
+import FilePickerItem from './components/FilePickerItem.vue'
 
-defineProps<{
-  modelValue: FileList | undefined
+const props = defineProps<{
+  modelValue: File[]
+  placeholder?: boolean
   multiple?: boolean
   accept?: string
   errorMessage?: string
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: FileList | undefined): void
+  (e: 'update:modelValue', value: File[]): void
+  (e: 'clear:placeholder'): void
 }>()
 
 const input = ref<HTMLInputElement>()
 const isActive = ref(false)
 
 const updateModelValue = (): void => {
-  emit('update:modelValue', input.value?.files?.length ? input.value.files : undefined)
+  emit('update:modelValue', input.value?.files?.length ? Array.from(input.value.files) : [])
 }
 
 const setIsActive = (value: boolean): void => {
@@ -131,7 +157,17 @@ const setIsActive = (value: boolean): void => {
 const onDrop = (event: DragEvent): void => {
   setIsActive(false)
 
-  emit('update:modelValue', event.dataTransfer?.files?.length ? event.dataTransfer.files : undefined)
+  emit('update:modelValue', event.dataTransfer?.files?.length ? Array.from(event.dataTransfer.files) : [])
+}
+
+const unselectFile = (index: number): void => {
+  const newFiles = props.modelValue.slice()
+
+  newFiles.splice(index, 1)
+
+  emit('update:modelValue', newFiles)
+
+  if (newFiles.length === 0 && input.value) input.value.value = ''
 }
 
 const createUrl = (file: File): string => {

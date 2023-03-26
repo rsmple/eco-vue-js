@@ -192,6 +192,14 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         'overflow-y': 'auto',
       },
     },
+    '.overflow-x-overlay': {
+      '@supports (overflow: overlay)': {
+        'overflow-x': 'overlay',
+      },
+      '@supports (not (overflow: overlay))': {
+        'overflow-x': 'auto',
+      },
+    },
   })
 
   addComponents({

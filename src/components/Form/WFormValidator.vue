@@ -2,14 +2,14 @@
   <component
     :is="component"
     :error-message="errorMessage"
-    @update:model-value="validateOnUpdate"
+    @update:model-value="validateOnUpdate($event)"
     @select="validateOnUpdate"
     @unselect="validateOnUpdate"
   />
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, useSlots, watch, inject, onBeforeMount, onBeforeUnmount, nextTick} from 'vue'
+import {computed, ref, useSlots, watch, inject, onBeforeMount, onBeforeUnmount} from 'vue'
 import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
 
 const props = defineProps<{
@@ -57,40 +57,32 @@ const title = computed<string | undefined>(() => props.title ?? component.value?
 const errorMessage = ref<string | undefined>()
 
 const hasChanges = ref<boolean>(false)
+const hasBeenValidated = ref<boolean>(false)
 
-const validateOnUpdate = async () => {
-  await nextTick()
-
-  validate()
-  updateHasChanges()
-}
-
-const updateHasChanges = (): void => {
+const _updateHasChanges = (value: Parameters<ValidateFn>[0]): void => {
   if (initModelValue.value === undefined) {
-    hasChanges.value = modelValue.value !== undefined && modelValue.value !== ''
+    hasChanges.value = value !== undefined && value !== ''
   } else {
-    if (modelValue.value instanceof Array && initModelValue.value instanceof Array) {
+    if (value instanceof Array && initModelValue.value instanceof Array) {
       const oldValue = initModelValue.value
-      const newValue = modelValue.value
+      const newValue = value
 
       hasChanges.value = newValue.length !== oldValue.length || newValue.some(item => !oldValue.includes(item))
     } else {
-      hasChanges.value = modelValue.value !== initModelValue.value
+      hasChanges.value = value !== initModelValue.value
     }
   }
 }
 
-const validate = (silent?: boolean): string | undefined => {
-  if (required.value && !modelValue.value) {
+const _validate = (value: Parameters<ValidateFn>[0]): string | undefined => {
+  if (required.value && !value) {
     const message = 'A value is required'
-
-    if (!silent) errorMessage.value = message
 
     return message
   }
 
-  if (props.forbiddenRegexp && typeof modelValue.value === 'string') {
-    const match = modelValue.value.match(props.forbiddenRegexp)
+  if (props.forbiddenRegexp && typeof value === 'string') {
+    const match = value.match(props.forbiddenRegexp)
 
     if (match?.length) {
       const message = 'Value contains forbidden chars: ' + match
@@ -107,8 +99,6 @@ const validate = (silent?: boolean): string | undefined => {
         })
         .join(', ')
 
-      if (!silent) errorMessage.value = message
-
       return message
     }
   }
@@ -116,12 +106,31 @@ const validate = (silent?: boolean): string | undefined => {
   let message
 
   if (props.validate instanceof Array) {
-    message = props.validate.map(cb => cb(modelValue.value)).filter(item => item).join(', ') || undefined
+    message = props.validate.map(cb => cb(value)).filter(item => item).join(', ') || undefined
   } else {
-    message = props.validate?.(modelValue.value) || undefined
+    message = props.validate?.(value) || undefined
   }
 
-  if (!silent) errorMessage.value = message
+  return message
+}
+
+const validateOnUpdate = (value: Parameters<ValidateFn>[0]) => {
+  const message = _validate(value)
+  _updateHasChanges(value)
+
+  errorMessage.value = message
+  hasBeenValidated.value = true
+
+  return message
+}
+
+const validate = (silent?: boolean): string | undefined => {
+  const message = _validate(modelValue.value)
+
+  if (!silent) {
+    errorMessage.value = message
+    hasBeenValidated.value = true
+  }
 
   return message
 }
@@ -157,6 +166,10 @@ watch(title, value => {
   }
 }, {immediate: true})
 
+watch(required, () => {
+  if (hasBeenValidated.value) validate()
+})
+
 onBeforeMount(() => {
   if (props.name) {
     initModel()
@@ -174,7 +187,9 @@ onBeforeUnmount(() => {
 })
 
 defineExpose({
-  validateOnUpdate,
+  validateOnUpdate() {
+    return validateOnUpdate(modelValue.value)
+  },
 })
 
 </script>
