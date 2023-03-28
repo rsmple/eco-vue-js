@@ -53,7 +53,10 @@
           <FilePickerItem
             @click:cancel="$emit('clear:placeholder')"
           >
-            <slot name="placeholder" />
+            <slot
+              name="placeholder"
+              :error="errorMessage !== undefined"
+            />
           </FilePickerItem>
         </div>
 
@@ -91,6 +94,7 @@
               <slot
                 name="file"
                 :file="file"
+                :error="errorMessage !== undefined"
               >
                 <div
                   :style="{backgroundImage: `url(${createUrl(file)})`}"
