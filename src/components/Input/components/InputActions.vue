@@ -61,8 +61,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'show:secure'): void
-  (e: 'hide:secure'): void
+  (e: 'show:secure', value: MouseEvent): void
+  (e: 'hide:secure', value: MouseEvent): void
   (e: 'click:clear'): void
   (e: 'click:slot'): void
   (e: 'update:width', value: number): void

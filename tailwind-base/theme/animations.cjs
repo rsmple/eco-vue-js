@@ -39,10 +39,10 @@ module.exports = {
 
     'border-rotate': {
       from: {
-        'stroke-dashoffset': '0',
+        'stroke-dashoffset': 'var(--border-rotate-offset-from, 25)',
       },
       to: {
-        'stroke-dashoffset': '-8%',
+        'stroke-dashoffset': 'var(--border-rotate-offset-to, -100%)',
       },
     },
 
@@ -80,7 +80,7 @@ module.exports = {
     ticker: 'ticker var(--tiker-duration, 0.8s) linear infinite',
     'move-horizontal': 'move-horizontal var(--tiker-duration, 0.8s) linear infinite',
     shake: 'shake .6s linear infinite',
-    'border-rotate': 'border-rotate linear infinite 0.5s',
+    'border-rotate': 'border-rotate linear infinite 10s',
     'dojo-logo-dashoffset': 'dojo-logo-dashoffset 1.6s linear 1;',
     'spinner-dash': 'spinner-dash 1.6s linear infinite',
     'ping-fast': 'ping-big .5s cubic-bezier(0, 0, 0.2, 1)',

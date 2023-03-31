@@ -1,116 +1,124 @@
 <template>
-  <div class="relative mb-6">
+  <div class="mb-6 relative">
     <div
-      class="relative h-64 min-w-[15rem] mb-1"
+      v-if="title || $slots.title?.()?.length"
+      class="text-xs font-semibold text-accent mb-2"
+    >
+      <template v-if="!skeleton">
+        <slot name="title">
+          {{ title }}
+        </slot>
+
+        <span
+          v-if="required"
+          class="text-negative dark:text-negative-dark"
+        >
+          *
+        </span>
+      </template>
+
+      <WSkeleton
+        v-else
+        class="h-4 w-16"
+      />
+    </div>
+
+    <label
+      ref="container"
+      class="relative block height-64 w-full min-w-[15rem] mb-1"
       @dragenter.prevent="setIsActive(true)"
       @dragover.prevent="setIsActive(true)"
       @dragleave.prevent="setIsActive(false)"
       @dragend.prevent="setIsActive(false)"
       @drop.prevent="onDrop"
     >
-      <label
-        class="absolute top-0 left-0 w-full h-full"
-        :class="{'active': isActive, 'has-error': !!errorMessage}"
+      <input
+        ref="input"
+        type="file"
+        class="hidden pointer-events-none"
+        :multiple="multiple"
+        :accept="accept"
+        @change="updateModelValue"
       >
-        <input
-          ref="input"
-          type="file"
-          class="hidden"
-          :multiple="multiple"
-          :accept="accept"
-          @change="updateModelValue"
-        >
 
-        <svg
-          class="absolute top-0 left-0 w-full h-full text-primary-default dark:text-primary-dark rounded-xl opacity-50 group/border"
-          :class="{
-            'opacity-100 border-active': isActive,
-            'text-negative dark:text-negative-dark': !!errorMessage,
-          }"
-          width="100%"
-          height="100%"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect
-            width="100%"
-            height="100%"
-            fill="none"
-            rx="12"
-            ry="12"
-            stroke="currentColor"
-            stroke-width="4"
-            stroke-dasharray="5% 3%"
-            stroke-dashoffset="0"
-            stroke-linecap="square"
-            class="group-[.border-active]/border:animate-border-rotate"
-          />
-        </svg>
+      <FilePickerSvg
+        v-if="containerWidth && containerHeight"
+        :svg-width="containerWidth"
+        :svg-height="containerHeight"
+        :is-active="isActive"
+        :has-error="errorMessage !== undefined"
+        class="absolute top-0 left-0"
+      />
 
-        <div
-          v-if="placeholder"
-          class="flex gap-6 h-full items-center justify-center"
+      <div
+        v-if="placeholder"
+        class="flex gap-6 h-full items-center justify-center"
+      >
+        <FilePickerItem
+          :name="placeholder"
+          :has-error="errorMessage !== undefined"
+          @click:cancel="$emit('clear:placeholder')"
         >
+          <template #positive>
+            <slot name="positive" />
+          </template>
+
+          <template #negative>
+            <slot name="negative" />
+          </template>
+        </FilePickerItem>
+      </div>
+
+      <div
+        v-if="modelValue.length === 0"
+        class="w-full h-full flex flex-col items-center text-base text-accent"
+      >
+        <div class="font-semibold mt-16">
+          Drag and drop files here
+        </div>
+
+        <div class="font-normal mt-4">
+          or
+        </div>
+
+        <WButton
+          :semantic-type="SemanticType.PRIMARY"
+          class="mt-4"
+          @click.stop.prevent="input?.click()"
+        >
+          Browse file
+        </WButton>
+      </div>
+
+      <div
+        v-else
+        class="h-full flex items-center justify-center"
+      >
+        <div class="overflow-x-overlay flex gap-6 items-center">
           <FilePickerItem
-            @click:cancel="$emit('clear:placeholder')"
+            v-for="(file, index) in modelValue"
+            :key="index"
+            :name="file.name"
+            :has-error="errorMessage !== undefined"
+            @click:cancel="unselectFile(index)"
           >
-            <slot
-              name="placeholder"
-              :error="errorMessage !== undefined"
-            />
+            <template #positive>
+              <slot
+                name="positive"
+                :file="file"
+              />
+            </template>
+
+            <template #negative>
+              <slot
+                name="negative"
+                :file="file"
+              />
+            </template>
           </FilePickerItem>
         </div>
-
-        <div
-          v-if="modelValue.length === 0"
-          class="w-full h-full flex flex-col items-center text-base text-accent"
-        >
-          <div class="font-semibold mt-16">
-            Drag and drop files here
-          </div>
-
-          <div class="font-normal mt-4">
-            or
-          </div>
-
-          <WButton
-            :semantic-type="SemanticType.PRIMARY"
-            class="mt-4"
-            @click.stop.prevent="input?.click()"
-          >
-            Browse file
-          </WButton>
-        </div>
-
-        <div
-          v-else
-          class="h-full flex items-center justify-center"
-        >
-          <div class="overflow-x-overlay flex gap-6 items-center">
-            <FilePickerItem
-              v-for="(file, index) in modelValue"
-              :key="index"
-              @click:cancel="unselectFile(index)"
-            >
-              <slot
-                name="file"
-                :file="file"
-                :error="errorMessage !== undefined"
-              >
-                <div
-                  :style="{backgroundImage: `url(${createUrl(file)})`}"
-                  class="square-44 rounded-full bg-cover bg-no-repeat"
-                />
-              </slot>
-
-              <div class="text-base text-accent text-center font-normal truncate">
-                {{ file.name }}
-              </div>
-            </FilePickerItem>
-          </div>
-        </div>
-        
-      </label>
-    </div>
+      </div>
+    </label>
 
     <Transition
       enter-active-class="fade-enter-active"
@@ -133,13 +141,18 @@ import {onMounted, onUnmounted, ref} from 'vue'
 import WButton from '@/components/Button/WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
 import FilePickerItem from './components/FilePickerItem.vue'
+import FilePickerSvg from './components/FilePickerSvg.vue'
+import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 const props = defineProps<{
   modelValue: File[]
-  placeholder?: boolean
+  placeholder?: string
   multiple?: boolean
   accept?: string
   errorMessage?: string
+  title?: string
+  skeleton?: boolean
+  required?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -147,7 +160,10 @@ const emit = defineEmits<{
   (e: 'clear:placeholder'): void
 }>()
 
-const input = ref<HTMLInputElement>()
+const input = ref<HTMLInputElement | undefined>()
+const container = ref<HTMLLabelElement | undefined>()
+const containerWidth = ref<number | undefined>(undefined)
+const containerHeight = ref<number | undefined>(undefined)
 const isActive = ref(false)
 
 const updateModelValue = (): void => {
@@ -174,26 +190,39 @@ const unselectFile = (index: number): void => {
   if (newFiles.length === 0 && input.value) input.value.value = ''
 }
 
-const createUrl = (file: File): string => {
-  return URL.createObjectURL(file)
-}
-
 const preventDefaults = (e: Event) => {
   e.preventDefault()
 }
 
 const events = ['dragenter', 'dragover', 'dragleave', 'drop']
 
+const updateSize = () => {
+  const rect = container.value?.getBoundingClientRect()
+
+  if (!rect) return
+
+  const scale = Math.round((container.value?.offsetWidth || 1) / (rect.width || 1))
+
+  containerWidth.value = Math.round(rect.width * scale)
+  containerHeight.value = Math.round(rect.height * scale)
+}
+
 onMounted(() => {
   events.forEach((eventName) => {
     document.body.addEventListener(eventName, preventDefaults)
   })
+
+  updateSize()
+
+  window.addEventListener('resize', updateSize)
 })
 
 onUnmounted(() => {
   events.forEach((eventName) => {
     document.body.removeEventListener(eventName, preventDefaults)
   })
+
+  window.removeEventListener('resize', updateSize)
 })
 
 </script>

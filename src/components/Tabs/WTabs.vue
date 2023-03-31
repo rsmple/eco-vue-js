@@ -11,7 +11,7 @@
           'text-primary-default dark:text-primary-dark': current === index && isValidMap[index] !== false,
           'text-negative dark:text-negative-dark': isValidMap[index] === false,
         }"
-        @click="updateIndex(index)"
+        @click="handleClickTab(index)"
       >
         {{ names[index] }}
       </div>
@@ -42,6 +42,7 @@
       >
         <TabItem
           v-for="(slot, index) in $slots.default?.()"
+          ref="tabItem"
           :key="index"
           :is-active="index === current"
           class="width-full"
@@ -61,7 +62,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, watch} from 'vue'
+import {onMounted, ref, watch, nextTick} from 'vue'
 import TabItem from './components/TabItem.vue'
 import WForm from '@/components/Form/WForm.vue'
 import {debounce} from '@/utils/utils'
@@ -75,6 +76,7 @@ const isDirect = ref(true)
 const button = ref<HTMLDivElement[]>([])
 const indicatorStyle = ref({})
 const minHeight = ref(0)
+const tabItem = ref<InstanceType<typeof TabItem>[]>([])
 
 const isValidMap = ref<Record<number, boolean>>({})
 
@@ -90,6 +92,14 @@ const updateIsValidMap = (index: number, value: boolean | undefined): void => {
   isValidMap.value = result
 
   if (value === false) switchTab(index)
+}
+
+const handleClickTab = async (index: number) => {
+  tabItem.value[current.value]?.emitHeight?.()
+
+  await nextTick()
+
+  switchTab(index)
 }
 
 const switchTab = debounce((index: number): void => {

@@ -14,6 +14,7 @@
       :name="name"
       :mono="mono"
       :text-secure="textSecure"
+      :placeholder-secure="placeholderSecure"
       allow-clear
       class="w-full"
       @keypress:enter.stop.prevent="emitUpdateModelValue(value)"
@@ -29,7 +30,7 @@
 
       <template #right>
         <component
-          :is="skeleton ? WSkeleton : 'div'"
+          :is="skeleton ? WSkeleton : 'button'"
           class="relative square-11 rounded-lg flex items-center justify-center text-description"
           :class="{
             'cursor-not-allowed': disabled || loading,
@@ -73,6 +74,7 @@ const props = defineProps<{
   name?: string
   mono?: boolean
   textSecure?: boolean
+  placeholderSecure?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -81,14 +83,8 @@ const emit = defineEmits<{
 
 const value = ref(props.modelValue)
 const isEdit = ref(false)
-const input = ref<typeof WInput>()
+const input = ref<InstanceType<typeof WInput> | undefined>()
 const errorMessage = ref<string | undefined>()
-
-watch(toRef(props, 'modelValue'), modelValue => {
-  value.value = modelValue
-
-  isEdit.value = false
-})
 
 const toggle = async () => {
   if (props.disabled || props.loading) return
@@ -98,6 +94,7 @@ const toggle = async () => {
   } else {
     isEdit.value = true
 
+    await nextTick()
     await nextTick()
 
     input.value?.focus()
@@ -118,6 +115,10 @@ const open = () => {
   isEdit.value = true
 }
 
+watch(toRef(props, 'modelValue'), modelValue => {
+  value.value = modelValue
+})
+
 watch(value, (newValue: string | number | undefined): void => {
   if (!props.validate) return
 
@@ -128,16 +129,13 @@ watch(value, (newValue: string | number | undefined): void => {
   }
 })
 
-const emitUpdateModelValue = async (newValue: string | number | undefined) => {
+const emitUpdateModelValue = (newValue: string | number | undefined) => {
   if (props.disabled || props.loading) return
   if (errorMessage.value) return
-  if (newValue === props.modelValue) {
-    isEdit.value = false
+  if (props.placeholderSecure) input.value?.blur()
+  if (props.modelValue === newValue) return
 
-    return
-  }
-
-  emit('update:modelValue', value.value)
+  emit('update:modelValue', newValue)
 }
 
 </script>

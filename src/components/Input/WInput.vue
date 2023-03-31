@@ -72,7 +72,7 @@
             'font-mono': mono,
             'text-secure': textSecure && !isSecureVisible,
           }"
-          :value="modelValue"
+          :value="placeholderSecure && modelValue === undefined && !isFocused ? '******' : modelValue"
           :placeholder="placeholder"
           :type="type"
           :name="name"
@@ -87,21 +87,21 @@
           @keydown.down.exact.stop="!disabled && !readonly && $emit('keypress:down', $event)"
           @keydown.delete.exact="!disabled && !readonly && $emit('keypress:delete', $event)"
           @focus="$emit('focus', $event); setIsFocused(true)"
-          @blur="$emit('blur', $event); setIsFocused(false)"
+          @blur="$emit('blur', $event); setIsFocused(false); isSecureVisible = false"
           @click="$emit('click', $event)"
           @mousedown.stop=""
         />
 
         <InputActions
           :loading="loading"
-          :allow-clear="allowClear && modelValue !== undefined && modelValue !== ''"
+          :allow-clear="allowClear && modelValue !== ''"
           :disabled="disabled || readonly"
           :text-secure="textSecure"
           :is-secure-visible="isSecureVisible"
           class="absolute top-0 right-0 bottom-0"
           @click:clear="clearValue"
           @click:slot="isFocused ? blur() : focus(); $emit('click:internal', $event)"
-          @show:secure="isSecureVisible = true"
+          @show:secure="isSecureVisible = true; $emit('click', $event)"
           @hide:secure="isSecureVisible = false"
           @update:width="paddingRight = $event"
         >
@@ -184,6 +184,7 @@ const props = withDefaults(
     mono?: boolean
     textSecure?: boolean
     spellcheck?: boolean
+    placeholderSecure?: boolean
   }>(),
   {
     size: 40,

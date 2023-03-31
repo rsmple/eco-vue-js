@@ -20,12 +20,20 @@ const emit = defineEmits<{
 
 const element = ref<HTMLDivElement | undefined>()
 
+const emitHeight = (): void => {
+  if (!element.value) return
+
+  emit('update:height', element.value.offsetHeight)
+}
+
 watch(toRef(props, 'isActive'), async value => {
   if (value) await nextTick()
 
-  const height = element.value?.getBoundingClientRect().height
+  emitHeight()
+}, {immediate: true})
 
-  if (height) emit('update:height', height)
+defineExpose({
+  emitHeight,
 })
 
 </script>
