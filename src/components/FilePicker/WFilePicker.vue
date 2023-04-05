@@ -91,7 +91,7 @@
       </div>
 
       <div
-        v-else
+        v-else-if="!placeholder"
         class="h-full flex items-center justify-center"
       >
         <div class="overflow-x-overlay flex gap-6 items-center">
@@ -197,22 +197,16 @@ const preventDefaults = (e: Event) => {
 const events = ['dragenter', 'dragover', 'dragleave', 'drop']
 
 const updateSize = () => {
-  const rect = container.value?.getBoundingClientRect()
-
-  if (!rect) return
-
-  const scale = Math.round((container.value?.offsetWidth || 1) / (rect.width || 1))
-
-  containerWidth.value = Math.round(rect.width * scale)
-  containerHeight.value = Math.round(rect.height * scale)
+  containerWidth.value = container.value?.offsetWidth
+  containerHeight.value = container.value?.offsetHeight
 }
 
 onMounted(() => {
+  updateSize()
+
   events.forEach((eventName) => {
     document.body.addEventListener(eventName, preventDefaults)
   })
-
-  updateSize()
 
   window.addEventListener('resize', updateSize)
 })

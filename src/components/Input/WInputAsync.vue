@@ -44,6 +44,18 @@
           <IconCheck v-else-if="isEdit" />
 
           <IconEdit v-else />
+          
+          <Transition
+            enter-active-class="fade-enter-active"
+            leave-active-class="fade-leave-active"
+            enter-from-class="fade-enter-from"
+            leave-to-class="fade-leave-to"
+          >
+            <div
+              v-if="hasChanges"
+              class="absolute bottom-9 h-2 w-2 rounded-full bg-info dark:bg-info-dark"
+            />
+          </Transition>
         </component>
       </template>
     </WInput>
@@ -51,7 +63,7 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, ref, toRef, watch} from 'vue'
+import {computed, nextTick, ref, toRef, watch} from 'vue'
 import WInput from '@/components/Input/WInput.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import IconEdit from '@/assets/icons/default/IconEdit.svg?component'
@@ -85,6 +97,7 @@ const value = ref(props.modelValue)
 const isEdit = ref(false)
 const input = ref<InstanceType<typeof WInput> | undefined>()
 const errorMessage = ref<string | undefined>()
+const hasChanges = computed(() => props.modelValue !== value.value)
 
 const toggle = async () => {
   if (props.disabled || props.loading) return

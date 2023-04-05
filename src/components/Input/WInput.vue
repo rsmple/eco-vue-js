@@ -85,11 +85,12 @@
           @keypress.enter.exact="!disabled && !readonly && $emit('keypress:enter', $event)"
           @keydown.up.exact.stop="!disabled && !readonly && $emit('keypress:up', $event)"
           @keydown.down.exact.stop="!disabled && !readonly && $emit('keypress:down', $event)"
-          @keydown.delete.exact="!disabled && !readonly && $emit('keypress:delete', $event)"
+          @keydown.delete.exact.stop="!disabled && !readonly && $emit('keypress:delete', $event); handleBackspace($event)"
           @focus="$emit('focus', $event); setIsFocused(true)"
           @blur="$emit('blur', $event); setIsFocused(false); isSecureVisible = false"
-          @click="$emit('click', $event)"
+          @click.stop.prevent="$emit('click', $event)"
           @mousedown.stop=""
+          @select.stop.prevent="$emit('select:input', $event)"
         />
 
         <InputActions
@@ -155,7 +156,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue'
+import {onMounted, ref, nextTick} from 'vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import InputActions from './components/InputActions.vue'
 
@@ -185,6 +186,7 @@ const props = withDefaults(
     textSecure?: boolean
     spellcheck?: boolean
     placeholderSecure?: boolean
+    customBackspaceHandle?: boolean
   }>(),
   {
     size: 40,
@@ -207,11 +209,13 @@ const emit = defineEmits<{
   (e: 'keypress:up', value: KeyboardEvent): void
   (e: 'keypress:down', value: KeyboardEvent): void
   (e: 'keypress:delete', value: KeyboardEvent): void
+  (e: 'keypress:backspace', value: KeyboardEvent): void
   (e: 'click:clear'): void
   (e: 'focus', value: FocusEvent): void
   (e: 'blur', value: FocusEvent): void
   (e: 'click', value: MouseEvent): void
   (e: 'click:internal', value: MouseEvent): void
+  (e: 'select:input', value: Event): void
 }>()
 
 const input = ref<HTMLInputElement>()
@@ -230,6 +234,36 @@ const updateModelValue = (value: string | number | undefined): void => {
   }
 
   emit('update:modelValue', value)
+}
+
+const handleBackspace = (event: KeyboardEvent): void => {
+  if (!props.customBackspaceHandle) return
+
+  event.preventDefault()
+  event.stopPropagation()
+
+  const target = event.target as HTMLInputElement | HTMLTextAreaElement | null
+  const value = target?.value
+
+  if (!value || target.selectionStart === null || target.selectionEnd === null) return
+
+  let substring: string
+  let selectionStart: number
+
+  if (target.selectionStart === target.selectionEnd) {
+    if (target.selectionStart === 0) return
+
+    selectionStart = target.selectionStart - 1
+    substring = value.substring(0, selectionStart) + value.substring(target.selectionEnd)
+  } else {
+    selectionStart = target.selectionStart
+    substring = value.substring(0, selectionStart) + value.substring(target.selectionEnd)
+  }
+  
+  target.value = substring
+  updateModelValue(substring)
+
+  nextTick().then(() => target.setSelectionRange(selectionStart, selectionStart))
 }
 
 const handleInputEvent = (event: Event): void => {

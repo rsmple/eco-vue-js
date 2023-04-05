@@ -13,13 +13,32 @@
         }"
         @click="handleClickTab(index)"
       >
-        {{ names[index] }}
+        <div class="relative">
+          {{ names[index] }}
+  
+          <Transition
+            enter-active-class="fade-enter-active"
+            leave-active-class="fade-leave-active"
+            enter-from-class="fade-enter-from"
+            leave-to-class="fade-leave-to"
+          >
+            <div
+              v-if="hasChangesMap[index]"
+              class="absolute top-0 -right-4 square-2 rounded-full transition-colors duration-500"
+              :class="{
+                'bg-info dark:bg-info-dark': isValidMap[index] !== false,
+                'bg-negative dark:bg-negative-dark': isValidMap[index] === false,
+              }"
+            />
+          </Transition>
+        </div>
       </div>
 
       <div
-        class="absolute bottom-0 h-1 rounded-sm bg-primary-default dark:bg-primary-dark transition-all duration-500"
+        class="absolute bottom-0 h-1 rounded-sm transition-all duration-500"
         :style="indicatorStyle"
         :class="{
+          'bg-primary-default dark:bg-primary-dark': isValidMap[current] !== false,
           'bg-negative dark:bg-negative-dark': isValidMap[current] === false,
         }"
       />
@@ -52,6 +71,7 @@
             :name="index.toString()"
             :title="names[index]"
             @update:is-valid="updateIsValidMap(index, $event)"
+            @update:has-changes="updateHasChangesMap(index, $event)"
           >
             <component :is="slot" />
           </wform>
@@ -79,19 +99,18 @@ const minHeight = ref(0)
 const tabItem = ref<InstanceType<typeof TabItem>[]>([])
 
 const isValidMap = ref<Record<number, boolean>>({})
+const hasChangesMap = ref<Record<number, boolean>>({})
 
 const updateIsValidMap = (index: number, value: boolean | undefined): void => {
-  const result = {...isValidMap.value}
+  if (value !== undefined) isValidMap.value[index] = value
+  else delete isValidMap.value[index]
 
-  if (value === undefined) {
-    delete result[index]
-  } else {
-    result[index] = value
-  }
+  if (value === false && isValidMap.value[current.value] !== false) switchTab(index)
+}
 
-  isValidMap.value = result
-
-  if (value === false) switchTab(index)
+const updateHasChangesMap = (index: number, value: boolean | undefined): void => {
+  if (value !== undefined) hasChangesMap.value[index] = value
+  else delete hasChangesMap.value[index]
 }
 
 const handleClickTab = async (index: number) => {
@@ -119,7 +138,7 @@ const updateIndicator = () => {
   if (!element) return
 
   indicatorStyle.value = {
-    width: element.clientWidth + 'px',
+    width: element.offsetWidth + 'px',
     left: element.offsetLeft + 'px',
   }
 }

@@ -29,7 +29,7 @@ const name = computed(() => props.name)
 const {titleGetter, titleMapUnlistener} = useFormTitleMap(name, toRef(props, 'title'))
 const {errorMessageMapUnlistener, isValid, errorMessage} = useFormErrorMessageMap(name, titleGetter)
 const {hasChangesMapUnlistener, hasChanges} = useFormHasChangesMap(name)
-const {validateMapUnlistener, validate} = useFormValidateMap(name, titleGetter)
+const {validateMapUnlistener, validate} = useFormValidateMap(name, titleGetter, value => emit('update:isValid', value))
 const {invalidateMapUnlistener, invalidate} = useFormInvalidateMap(name)
 const {initModelMapUnlistener, initModel} = useFormInitModelMap(name)
 

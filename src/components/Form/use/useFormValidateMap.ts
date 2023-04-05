@@ -2,7 +2,7 @@ import {inject, onBeforeMount, provide, ref, type Ref} from 'vue'
 import {wFormValidateUpdater} from '../models/injection'
 import {compileMessage, removeKey} from '../models/utils'
 
-export const useFormValidateMap = (name: Ref<string | undefined>, titleGetter: (key: string) => string) => {
+export const useFormValidateMap = (name: Ref<string | undefined>, titleGetter: (key: string) => string, emitIsValid: (value: boolean) => void) => {
   const validateMap = ref<Record<string, (silent?: boolean) => string | undefined>>({})
 
   const validateMapUpdater = (key: string, value: () => string | undefined): void => {
@@ -15,6 +15,8 @@ export const useFormValidateMap = (name: Ref<string | undefined>, titleGetter: (
 
   const validate = (silent?: boolean): string | undefined => {
     const messages = Object.keys(validateMap.value).map(key => compileMessage(titleGetter(key), validateMap.value[key](silent))).filter(item => item)
+
+    if (!silent) emitIsValid(messages.length === 0)
 
     return messages.length === 0 ? undefined : messages.join('\n')
   }
