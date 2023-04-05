@@ -54,7 +54,7 @@
             @update:is-valid="updateIsValidMap(index, $event)"
           >
             <component :is="slot" />
-          </WForm>
+          </wform>
         </TabItem>
       </TransitionGroup>
     </div>
