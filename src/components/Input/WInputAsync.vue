@@ -53,7 +53,7 @@
           >
             <div
               v-if="hasChanges"
-              class="absolute bottom-9 h-2 w-2 rounded-full bg-info dark:bg-info-dark"
+              class="absolute top-0 right-0 h-2 w-2 rounded-full bg-info dark:bg-info-dark"
             />
           </Transition>
         </component>
