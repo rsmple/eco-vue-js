@@ -4,25 +4,24 @@
 
 <script lang="ts" setup>
 import {onMounted, onUnmounted} from 'vue'
+import {getIsScrollDown, getIsScrollUp} from '../models/utils'
 
 const emit = defineEmits<{
   (e: 'scroll:up'): void
   (e: 'scroll:down'): void
 }>()
 
-const TRIGGER_FACTOR = 200
-
 const listener = (event: Event): void => {
   if (event.target !== document) return
 
   if (!document.scrollingElement) return
 
-  if (document.scrollingElement.scrollTop < TRIGGER_FACTOR) {
+  if (getIsScrollUp()) {
     emit('scroll:up')
     return
   }
 
-  if (document.scrollingElement.scrollTop > (document.scrollingElement.scrollHeight - document.scrollingElement.clientHeight) - TRIGGER_FACTOR) {
+  if (getIsScrollDown()) {
     emit('scroll:down')
   }
 }

@@ -25,7 +25,7 @@ export const useInfiniteListHeader = (headerMargin: Ref<number>, updageHeaderPad
   }
 
   watch(isIntersecting, value => {
-    if (!value) {
+    if (!value && headerHeight.value) {
       updageHeaderPadding(headerHeight.value - headerMargin.value)
     } else {
       updageHeaderPadding(0)

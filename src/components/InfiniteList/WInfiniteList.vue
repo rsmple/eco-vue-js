@@ -56,7 +56,7 @@
       :hide-page-title="hidePageTitle"
       :page-label-with-margin="pageLabelWithMargin"
       :style="{'--infinite-list-header-height': headerHeight + 'px'}"
-      class="min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16"
+      class="last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16"
       @update:count="updateCount($event); $emit('update:count', $event)"
       @update:pages-count="updatePagesCount"
       @update:next-page="updateNextPage"
@@ -93,6 +93,7 @@ import {useRefetchNextPages} from './use/useRefetchNextPages'
 import {useInfiniteListHeader} from './use/useInfiniteListHeader'
 import InfiniteListButton from './components/InfiniteListButton.vue'
 import {isEqualObj} from '@/utils/utils'
+import {getIsScrollDown} from './models/utils'
 
 const MAX_PAGES = 5
 
@@ -170,23 +171,23 @@ const updatePagesCount = (value: number): void => {
 
 const updateNextPage = (value: number | null): void => {
   nextPage.value = value
+
+  if (pages.value.length === 1 && getIsScrollDown()) addNextPage(true)
 }
 
 const updatePreviousPage = (value: number | null): void => {
   previousPage.value = value
 
-  if (pages.value.length === 1) {
-    addPreviousPage({updateQuery: false})
-  }
+  if (pages.value.length === 1) addPreviousPage(true)
 }
 
-const addNextPage = () => {
+const addNextPage = (silent?: boolean) => {
   if (!nextPage.value) return
   if (pages.value.includes(nextPage.value)) return
 
   pages.value.push(nextPage.value)
 
-  if (!props.skipPageUpdate) updateQueryParams({page: nextPage.value})
+  if (!silent && !props.skipPageUpdate) updateQueryParams({page: nextPage.value})
 
   if (pages.value.length < MAX_PAGES) return
 
@@ -197,13 +198,13 @@ const addNextPage = () => {
   previousPage.value = firstPage
 }
 
-const addPreviousPage = (options: {updateQuery?: boolean} = {}) => {
+const addPreviousPage = (silent?: boolean) => {
   if (!previousPage.value) return
   if (pages.value.includes(previousPage.value)) return
 
   pages.value.unshift(previousPage.value)
 
-  if (options.updateQuery !== false && !props.skipPageUpdate) updateQueryParams({page: previousPage.value})
+  if (!silent && !props.skipPageUpdate) updateQueryParams({page: previousPage.value})
 
   if (pages.value.length < MAX_PAGES) return
 
