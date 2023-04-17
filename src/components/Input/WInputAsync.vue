@@ -15,6 +15,7 @@
       :mono="mono"
       :text-secure="textSecure"
       :placeholder-secure="placeholderSecure"
+      :max-length="maxLength"
       allow-clear
       class="w-full"
       @keypress:enter.stop.prevent="emitUpdateModelValue(value)"
@@ -87,6 +88,7 @@ const props = defineProps<{
   mono?: boolean
   textSecure?: boolean
   placeholderSecure?: boolean
+  maxLength?: number
 }>()
 
 const emit = defineEmits<{
