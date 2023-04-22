@@ -35,7 +35,7 @@
           <div
             v-for="option in modelValue"
             :key="option"
-            class="relative flex cursor-pointer overflow-hidden items-center"
+            class="relative flex cursor-pointer overflow-hidden items-center max-w-[calc(100%-2.75rem)]"
           >
             <slot
               name="option"
@@ -96,7 +96,7 @@
         }"
       >
         <div
-          v-if="!options.length && search"
+          v-if="!options.length"
           class="p-4 select-none cursor-default"
         >
           {{ emptyStub ?? 'No match' }}

@@ -52,6 +52,7 @@ defineProps<{
   skeleton?: boolean
   allowCreate?: boolean
   errorMessage?: string
+  eager?: boolean
 }>()
 
 const emit = defineEmits<{

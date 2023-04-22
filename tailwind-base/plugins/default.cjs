@@ -314,6 +314,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       'display': 'flex',
       'align-items': 'center',
       'white-space': 'nowrap',
+      'overflow': 'hidden',
     },
 
     '.w-list-row-item, .w-list-header-item': {

@@ -7,9 +7,9 @@
     "
     :class="{
       'text-accent': !isSelected && !isOutOfMonth,
-      'text-description': isOutOfMonth,
-      'cursor-not-allowed': disabled,
+      'text-description': !isSelected && isOutOfMonth,
       'text-default dark:text-default-dark selected': isSelected,
+      'cursor-not-allowed': disabled,
       'hover-enabled': isHoverEnabled,
     }"
     @click="!disabled && $emit('click:day', startOfDay)"
@@ -17,9 +17,7 @@
   >
     <div
       v-show="isBetweenRange || (isFrom || isTo && !(isFrom && isTo))"
-      class="
-        absolute opacity-50 h-[var(--date-picker-day-height)]
-      "
+      class="absolute opacity-50 h-[var(--date-picker-day-height)]"
       :class="{
         'border-y border-solid border-primary-default': isHoverEnabled,
         'bg-primary-default dark:bg-primary-dark': !isHoverEnabled,
