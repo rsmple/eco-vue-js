@@ -23,9 +23,17 @@
         v-for="(modalMeta, index) in modalMetaList"
         :key="modalMeta.key"
         :style="{zIndex: 100 + index + index + 2}"
-        class="fixed top-0 left-0 h-full w-full flex justify-center items-center overscroll-none overflow-y-auto no-scrollbar"
+        class="fixed top-0 left-0 h-full w-full flex justify-center items-center overscroll-none overflow-y-auto no-scrollbar isolate"
       >
         <div class="h-[calc(100%+1px)]" />
+
+        <button
+          v-if="modalMeta.autoclose"
+          class="cursor-pointer absolute top-0 left-0 h-full w-full -z-10"
+          title="Click outside to close modal"
+          @click.stop.prevent="closeModal(modalMeta)"
+        />
+
         <component
           :is="modalMeta.component"
           v-bind="modalMeta.props"
@@ -44,17 +52,21 @@ type ModalMeta = {
   key: number
   component: VueComponent
   props?: Record<string, unknown>
+  cb?: () => void
+  autoclose: boolean
 }
 
 const key = ref(0)
 const modalMetaList = ref<ModalMeta[]>([])
 const isBackdropVisible = ref(false)
 
-const addModal: AddModal = (component: VueComponent, props?: Record<string, unknown>): () => ReturnType<typeof closeModal> => {
+const addModal: AddModal = (component: VueComponent, props?: Record<string, unknown>, cb?: () => void, autoclose = false): () => ReturnType<typeof closeModal> => {
   const modalMeta = {
     component,
     key: key.value++,
     props,
+    cb,
+    autoclose,
   }
 
   modalMetaList.value = [...modalMetaList.value, modalMeta]
@@ -76,6 +88,8 @@ const closeModal = (modalMeta: ModalMeta): void => {
   if (!modalMetaListNew.length) {
     key.value = 0
   }
+
+  modalMeta.cb?.()
 }
 
 let timeout: NodeJS.Timeout | undefined

@@ -9,6 +9,7 @@
 
 <script lang="ts" setup>
 import {ref, watch, toRef, nextTick} from 'vue'
+import {useTabItemActiveListener} from '../use/useTabItemActiveListener'
 
 const props = defineProps<{
   isActive: boolean
@@ -17,6 +18,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:height', value: number): void
 }>()
+
+const {callListeners} = useTabItemActiveListener()
 
 const element = ref<HTMLDivElement | undefined>()
 
@@ -30,6 +33,8 @@ watch(toRef(props, 'isActive'), async value => {
   if (value) await nextTick()
 
   emitHeight()
+
+  if (value) callListeners()
 }, {immediate: true})
 
 defineExpose({

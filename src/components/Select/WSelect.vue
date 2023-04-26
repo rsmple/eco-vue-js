@@ -18,6 +18,8 @@
         :size="searchSize"
         :error-message="errorMessage"
         :required="required"
+        :disabled="disabled"
+        :has-changes="hasChanges"
         class="cursor-pointer"
         @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
         @keypress:enter.stop.prevent="selectCursor"
@@ -104,16 +106,19 @@
 
         <SelectOption
           v-for="(option, index) in options"
+          ref="selectOption"
           :key="option"
           :is-selected="modelValue.includes(option)"
           :is-cursor="index === cursor"
+          :loading="loadingOptionIndex === index && loading"
           class="relative"
           :class="{
             'cursor-progress': loading,
             'w-ripple': !loading,
           }"
-          @select="select(option)"
-          @unselect="unselect(option)"
+          @select="select(option); setLoadingOptionIndex(index)"
+          @unselect="unselect(option); setLoadingOptionIndex(index)"
+          @mouseenter="setCursor(index)"
         >
           <template #default="{selected}">
             <slot
@@ -133,9 +138,15 @@
 
         <SelectOption
           v-if="hasCreateButton"
-          :class="{'cursor-progress': loading}"
-          :is-cursor="options.length === cursor"
+          :is-cursor="cursor === options.length"
+          :loading="loadingOptionIndex === options.length && loading"
+          class="relative"
+          :class="{
+            'cursor-progress': loading,
+            'w-ripple': !loading,
+          }"
           @select="createOption(search)"
+          @mouseenter="setCursor(options.length)"
         >
           <span class="pr-2">
             Create:
@@ -169,6 +180,7 @@ import WInput from '@/components/Input/WInput.vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 import {getIsMobile} from '@/utils/mobile'
+import {debounce} from '@/utils/utils'
 
 const props = defineProps<{
   modelValue: string[]
@@ -183,11 +195,13 @@ const props = defineProps<{
   disableClear?: boolean
   hidePrefix?: boolean
   readonly?: boolean
+  disabled?: boolean
   skeleton?: boolean
   searchSize?: number
   allowCreate?: boolean
   errorMessage?: string
   required?: boolean
+  hasChanges?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -201,35 +215,74 @@ const isOpen = ref(false)
 const dropdownMenu = ref<InstanceType<typeof WDropdownMenu> | undefined>()
 const input = ref<InstanceType<typeof WInput> | undefined>()
 const cursor = ref<number>(-1)
+const isCursorLocked = ref(false)
 const hasCreateButton = computed(() => props.allowCreate && props.search.length && !props.options.includes(props.search))
 const lastIndex = computed(() => hasCreateButton.value ? props.options.length : props.options.length - 1)
 const isMobile = getIsMobile()
 const focused = ref(false)
+const selectOption = ref<InstanceType<typeof SelectOption>[]>([])
+const loadingOptionIndex = ref<number | null>(null)
+
+const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
+
+const setLoadingOptionIndex = (value: number) => {
+  if (isDisabled.value) return
+
+  loadingOptionIndex.value = value
+}
+
+const unlockCursor = debounce(() => {
+  isCursorLocked.value = false
+}, 50)
+
+const lockCursor = () => {
+  isCursorLocked.value = true
+
+  unlockCursor()
+}
+
+const setCursor = (value: number): void => {
+  if (isCursorLocked.value) return
+
+  cursor.value = value
+}
 
 const cursorUp = () => {
-  if (!props.options.length) {
-    cursor.value = -1
-    return
-  }
+  if (isDisabled.value) return
 
-  if (cursor.value < 1) cursor.value = lastIndex.value
-  else cursor.value--
+  lockCursor()
+
+  cursor.value = !props.options.length
+    ? 0
+    : cursor.value < 1
+      ? lastIndex.value
+      : cursor.value - 1
+
+  selectOption.value[cursor.value]?.scrollIntoView()
 }
 
 const cursorDown = () => {
-  if (!props.options.length) {
-    cursor.value = -1
-    return
-  }
+  if (isDisabled.value) return
 
-  if (cursor.value >= lastIndex.value) cursor.value = 0
-  else cursor.value++
+  lockCursor()
+
+  cursor.value = !props.options.length
+    ? 0
+    : cursor.value >= lastIndex.value
+      ? 0
+      : cursor.value + 1
+
+  selectOption.value[cursor.value]?.scrollIntoView()
 }
 
 const selectCursor = () => {
+  if (isDisabled.value) return
+
   const value = cursor.value !== -1 ? props.options[cursor.value] : undefined
 
   if (value) {
+    setLoadingOptionIndex(cursor.value)
+
     if (props.modelValue.includes(value)) unselect(value)
     else select(value)
   } else {
@@ -265,19 +318,22 @@ const close = () => {
 }
 
 const select = (item: string): void => {
-  if (props.loading || props.readonly) return
+  if (isDisabled.value) return
 
   emit('select', item)
 }
 
 const unselect = (item: string): void => {
-  if (props.loading || props.readonly) return
+  if (isDisabled.value) return
 
   emit('unselect', item)
 }
 
 const createOption = (item: string): void => {
-  if (!props.allowCreate || props.loading || props.readonly) return
+  if (isDisabled.value) return
+  if (!props.allowCreate) return
+
+  setLoadingOptionIndex(props.options.length)
 
   emit('create:option', item)
 }

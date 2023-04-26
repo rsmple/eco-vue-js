@@ -5,16 +5,16 @@
     "
     :is="to !== undefined ? RouterLink : tag"
     class="
-      relative rounded-2xl outline-none
+      relative rounded-2xl outline-none isolate
       text-base font-medium cursor-pointer select-none whitespace-nowrap
-      flex justify-center disabled:cursor-not-allowed disabled:opacity-70
+      flex justify-center items-center disabled:cursor-not-allowed disabled:opacity-70
     "
     :class="{
       'p-1.5': minimize,
       'py-2.5 px-6': !minimize,
       [semanticTypeButtonStylesMap[semanticType]]: true,
       'st-outline': outline,
-      'hover:bg-opacity-80 dark:hover:bg-opacity-80 active:bg-opacity-80 dark:active:bg-opacity-80 w-ripple': !loading && !disabled,
+      'w-ripple w-ripple-hover before:text-black-default': !loading && !disabled,
     }"
     :disabled="!loading && disabled"
     :type="type"
@@ -22,7 +22,7 @@
     @keypress.enter.stop.prevent="click"
   >
     <span
-      class="transition-opacity flex items-center"
+      class="transition-opacity flex items-center z-10"
       :class="{'opacity-0': loading}"
     >
       <slot />
@@ -36,7 +36,7 @@
     >
       <WSpinner
         v-if="loading"
-        class="absolute"
+        class="absolute z-10"
         :style="{'--spinner-size': minimize ? '1.25rem' : '1.5rem'}"
       />
     </Transition>

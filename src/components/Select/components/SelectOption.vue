@@ -1,10 +1,10 @@
 <template>
   <div
     ref="element"
-    class="flex w-full select-none cursor-pointer py-2 px-4 first:pt-4 last:pb-4 hover:bg-gray-50 hover:dark:bg-gray-700"
+    class="flex w-full select-none cursor-pointer py-2 px-4 first:pt-4 last:pb-4"
     :class="{
       'bg-primary-light dark:bg-primary-darkest': isSelected,
-      'bg-gray-50 dark:bg-gray-700': isCursor,
+      'before:opacity-5': isCursor,
     }"
     @mousedown.prevent.stop=""
     @click.prevent.stop="toggle"
@@ -20,22 +20,25 @@
       leave-to-class="fade-leave-to"
     >
       <div
-        v-if="isSelected"
-        class="flex items-center justify-center text-primary-default dark:text-primary-dark w-10"
+        v-if="isSelected || loading"
+        class="flex items-center justify-center text-primary-default dark:text-primary-dark w-10 [--spinner-size:1.5rem]"
       >
-        <IconCheck />
+        <IconCheck v-if="isSelected && !loading" />
+        <WSpinner v-else-if="loading" />
       </div>
     </Transition>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {watch, toRef, ref} from 'vue'
+import {ref} from 'vue'
 import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
+import WSpinner from '@/components/Spinner/WSpinner.vue'
 
 const props = defineProps<{
   isSelected?: boolean
   isCursor?: boolean
+  loading?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -52,10 +55,12 @@ const toggle = () => {
   return false
 }
 
-watch(toRef(props, 'isCursor'), value => {
-  if (!value) return
-
+const scrollIntoView = () => {
   element.value?.scrollIntoView({behavior: 'auto', block: 'center'})
+}
+
+defineExpose({
+  scrollIntoView,
 })
 
 </script>

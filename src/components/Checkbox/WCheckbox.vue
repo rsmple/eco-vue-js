@@ -1,6 +1,6 @@
 <template>
-  <div
-    class="flex gap-2 cursor-pointer select-none outline-none w-ripple-trigger w-hover-circle-trigger items-center"
+  <button
+    class="flex gap-2 cursor-pointer select-none outline-none w-ripple-trigger w-hover-circle-trigger items-center w-hover-circle-opacity-[0.08]"
     :class="{
       'cursor-not-allowed opacity-25': disabled,
       'mt-1 mb-4': title,
@@ -8,7 +8,7 @@
     @click.stop.prevent="toggle"
   >
     <div
-      class="relative flex justify-center items-center square-6 border border-solid border-primary-default dark:border-primary-dark "
+      class="relative flex justify-center items-center square-6 border border-solid border-primary-default dark:border-primary-dark text-accent"
       :class="{
         'bg-primary-default dark:bg-primary-dark ': !disabled && value && !radio,
         'rounded-full': radio,
@@ -52,7 +52,7 @@
       no-touch
       class="pointer-events-none"
     />
-  </div>
+  </button>
 </template>
 
 <script lang="ts" setup>

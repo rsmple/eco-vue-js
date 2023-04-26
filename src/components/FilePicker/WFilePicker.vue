@@ -137,12 +137,13 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, onUnmounted, ref} from 'vue'
+import {inject, onMounted, onUnmounted, ref} from 'vue'
 import WButton from '@/components/Button/WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
 import FilePickerItem from './components/FilePickerItem.vue'
 import FilePickerSvg from './components/FilePickerSvg.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+import {wTabItemListener, wTabItemUnlistener} from '@/components/Tabs/models/injection'
 
 const props = defineProps<{
   modelValue: File[]
@@ -201,6 +202,9 @@ const updateSize = () => {
   containerHeight.value = container.value?.offsetHeight
 }
 
+const tabItemListenerInjected = inject(wTabItemListener, null)
+const tabItemUnlistenerInjected = inject(wTabItemUnlistener, null)
+
 onMounted(() => {
   updateSize()
 
@@ -209,6 +213,8 @@ onMounted(() => {
   })
 
   window.addEventListener('resize', updateSize)
+
+  tabItemListenerInjected?.(updateSize)
 })
 
 onUnmounted(() => {
@@ -217,6 +223,8 @@ onUnmounted(() => {
   })
 
   window.removeEventListener('resize', updateSize)
+
+  tabItemUnlistenerInjected?.(updateSize)
 })
 
 </script>

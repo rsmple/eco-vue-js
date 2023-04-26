@@ -16,6 +16,7 @@
       :text-secure="textSecure"
       :placeholder-secure="placeholderSecure"
       :max-length="maxLength"
+      :has-changes="hasChanges"
       allow-clear
       class="w-full"
       @keypress:enter.stop.prevent="emitUpdateModelValue(value)"
@@ -34,8 +35,9 @@
           :is="skeleton ? WSkeleton : 'button'"
           class="relative square-11 rounded-lg flex items-center justify-center text-description"
           :class="{
-            'cursor-not-allowed': disabled || loading,
-            'hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer w-ripple': !disabled && !loading,
+            'cursor-not-allowed': disabled,
+            'cursor-progress': loading,
+            'w-ripple w-ripple-hover': !disabled && !loading,
           }"
           @click="toggle"
           @mousedown.stop.prevent=""
@@ -45,18 +47,6 @@
           <IconCheck v-else-if="isEdit" />
 
           <IconEdit v-else />
-          
-          <Transition
-            enter-active-class="fade-enter-active"
-            leave-active-class="fade-leave-active"
-            enter-from-class="fade-enter-from"
-            leave-to-class="fade-leave-to"
-          >
-            <div
-              v-if="hasChanges"
-              class="absolute top-0 right-0 h-2 w-2 rounded-full bg-info dark:bg-info-dark"
-            />
-          </Transition>
         </component>
       </template>
     </WInput>

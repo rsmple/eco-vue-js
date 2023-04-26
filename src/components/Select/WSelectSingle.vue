@@ -1,38 +1,41 @@
 <template>
-  <WSelect
-    ref="selectComponent"
-    :model-value="modelValue ? [modelValue] : []"
-    :search="search"
-    :options="options"
-    :title="title"
-    :loading="loading"
-    :max-search-length="maxSearchLength"
-    :empty-stub="emptyStub"
-    :option-component="optionComponent"
-    :readonly="readonly"
-    :skeleton="skeleton"
-    :allow-create="allowCreate"
-    :error-message="errorMessage"
-    disable-clear
-    hide-prefix
-    @select="updateModelValue($event)"
-    @unselect="updateModelValue($event)"
-    @update:search="emit('update:search', $event)"
-    @create:option="updateModelValue($event)"
-  >
-    <template #option="{option, selected, model}">
-      <slot
-        name="option"
-        :option="option"
-        :selected="selected"
-        :model="model"
-      />
-    </template>
+  <div>
+    <WSelect
+      ref="selectComponent"
+      :model-value="modelValue ? [modelValue] : []"
+      :search="search"
+      :options="options"
+      :title="title"
+      :loading="loading"
+      :max-search-length="maxSearchLength"
+      :empty-stub="emptyStub"
+      :option-component="optionComponent"
+      :readonly="readonly"
+      :skeleton="skeleton"
+      :allow-create="allowCreate"
+      :error-message="errorMessage"
+      :has-changes="hasChanges"
+      disable-clear
+      hide-prefix
+      @select="updateModelValue($event)"
+      @unselect="updateModelValue($event)"
+      @update:search="emit('update:search', $event)"
+      @create:option="updateModelValue($event)"
+    >
+      <template #option="{option, selected, model}">
+        <slot
+          name="option"
+          :option="option"
+          :selected="selected"
+          :model="model"
+        />
+      </template>
 
-    <template #right>
-      <slot name="right" />
-    </template>
-  </WSelect>
+      <template #right>
+        <slot name="right" />
+      </template>
+    </WSelect>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -52,7 +55,7 @@ defineProps<{
   skeleton?: boolean
   allowCreate?: boolean
   errorMessage?: string
-  eager?: boolean
+  hasChanges?: boolean
 }>()
 
 const emit = defineEmits<{

@@ -3,7 +3,7 @@
     :is="to !== undefined ? RouterLink : tag"
     v-bind="to !== undefined ? {to} : undefined"
     class="
-      relative flex flex-col md:gap-2 p-2 items-center w-full select-none cursor-pointer no-underline outline-none border-none w-ripple
+      relative flex flex-col md:gap-2 p-2 items-center w-full select-none cursor-pointer no-underline outline-none border-none w-ripple w-ripple-hover
       hover:text-primary-default dark:hover:text-primary-dark
     "
     :class="{

@@ -1,11 +1,11 @@
 <template>
   <div class="mb-8">
     <div class="relative flex mb-4">
-      <div
+      <button
         v-for="(_, index) in $slots.default?.()"
         ref="button"
         :key="index"
-        class="flex-1 font-semibold flex items-center justify-center h-10 cursor-pointer relative w-ripple select-none transition-colors duration-500"
+        class="flex-1 font-semibold flex items-center justify-center h-10 cursor-pointer relative w-ripple w-ripple-hover select-none transition-colors duration-500"
         :class="{
           'text-description': current !== index && isValidMap[index] !== false,
           'text-primary-default dark:text-primary-dark': current === index && isValidMap[index] !== false,
@@ -32,7 +32,7 @@
             />
           </Transition>
         </div>
-      </div>
+      </button>
 
       <div
         class="absolute bottom-0 h-1 rounded-sm transition-all duration-500"
@@ -45,7 +45,7 @@
     </div>
 
     <div
-      class="relative transition-[min-height] h-full duration-200"
+      class="relative transition-[min-height] h-full duration-300"
       :style="{minHeight: minHeight ? minHeight + 'px' : 'auto'}"
     >
       <TransitionGroup
@@ -105,7 +105,10 @@ const updateIsValidMap = (index: number, value: boolean | undefined): void => {
   if (value !== undefined) isValidMap.value[index] = value
   else delete isValidMap.value[index]
 
-  if (value === false && isValidMap.value[current.value] !== false) switchTab(index)
+  nextTick()
+    .then(() => {
+      if (value === false && isValidMap.value[current.value] !== false) switchTab(index)
+    })
 }
 
 const updateHasChangesMap = (index: number, value: boolean | undefined): void => {

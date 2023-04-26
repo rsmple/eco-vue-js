@@ -5,19 +5,26 @@
   >
     <div
       v-if="title || $slots.title?.()?.length"
-      class="text-xs font-semibold text-accent mb-2"
+      class="text-xs font-semibold text-accent mb-2 duration-500"
     >
       <template v-if="!skeleton">
         <slot name="title">
           {{ title }}
         </slot>
 
-        <span
-          v-if="required"
-          class="text-negative dark:text-negative-dark"
+        <Transition
+          enter-active-class="fade-enter-active"
+          leave-active-class="fade-leave-active"
+          enter-from-class="fade-enter-from"
+          leave-to-class="fade-leave-to"
         >
-          *
-        </span>
+          <span
+            v-if="required"
+            class="text-negative dark:text-negative-dark"
+          >
+            *
+          </span>
+        </Transition>
       </template>
 
       <WSkeleton
@@ -29,90 +36,131 @@
     <div class="flex gap-4">
       <div
         v-if="!skeleton"
-        class="
+        class="relative w-full isolate"
+      >
+        <div
+          class="
           relative flex flex-wrap bg-default dark:bg-default-dark border border-solid border-gray-300 dark:border-gray-700 rounded-xl
           transition-colors duration-75 cursor-text overflow-hidden min-h-[44px] w-full
         "
-        :class="{
-          'focus-within:border-primary-default dark:focus-within:border-primary-dark': !disabled && !readonly,
-          'opacity-80 cursor-not-allowed': disabled,
-          'pl-1 py-1 gap-1': $slots.suffix?.()?.length,
-          'border-negative dark:border-negative-dark': errorMessage,
-        }"
-        :style="{paddingRight: paddingRight + 'px'}"
-        @click="focus"
-        @mousedown.prevent=""
-      >
-        <div
-          v-if="icon"
-          class="absolute top-0 left-0 h-full flex items-center justify-center px-3 text-description select-none"
+          :class="{
+            'focus-within:border-primary-default dark:focus-within:border-primary-dark': !disabled && !readonly,
+            'opacity-80 cursor-not-allowed': disabled,
+            'pl-1 py-1 gap-1': $slots.suffix?.()?.length,
+            'border-negative dark:border-negative-dark': errorMessage,
+          }"
+          :style="{paddingRight: paddingRight + 'px'}"
+          @click="focus"
+          @mousedown.prevent=""
         >
+          <div
+            v-if="icon"
+            class="absolute top-0 left-0 h-full flex items-center justify-center px-3 text-description select-none"
+          >
+            <component
+              :is="icon"
+              class="w-5 h-5"
+            />
+          </div>
+
+          <slot name="prefix" />
+
           <component
-            :is="icon"
-            class="w-5 h-5"
-          />
-        </div>
-
-        <slot name="prefix" />
-
-        <component
-          :is="textarea ? 'textarea' : 'input'"
-          ref="input"
-          class="
+            :is="textarea ? 'textarea' : 'input'"
+            ref="input"
+            class="
             text-base text-accent font-normal outline-0 border-none bg-default dark:bg-default-dark select-all flex-1 max-w-full
             disabled:opacity-80 disabled:cursor-not-allowed placeholder:text-gray-400 dark:placeholder:text-gray-500 appearance-none
           "
-          :class="{
-            'py-0 pr-1 pl-3': !textarea && !hideInput,
-            'h-[34px]': $slots.suffix?.()?.length,
-            'h-[42px]': !$slots.suffix?.()?.length,
-            'h-[var(--textarea-height,160px)] w-full resize-none p-3': textarea,
-            'pl-11': icon,
-            'w-0 max-w-0 p-0 absolute': hideInput,
-            'font-mono': mono,
-            'text-secure': textSecure && !isSecureVisible,
-          }"
-          :value="placeholderSecure && modelValue === undefined && !isFocused ? '******' : modelValue"
-          :placeholder="placeholder"
-          :type="type"
-          :name="name"
-          :disabled="disabled"
-          :readonly="readonly"
-          :autocomplete="autocomplete"
-          :size="size || undefined"
-          :spellcheck="spellcheck ? 'true' : 'false'"
-          @input="handleInputEvent"
-          @keypress.enter.exact="!disabled && !readonly && $emit('keypress:enter', $event)"
-          @keydown.up.exact.stop="!disabled && !readonly && $emit('keypress:up', $event)"
-          @keydown.down.exact.stop="!disabled && !readonly && $emit('keypress:down', $event)"
-          @keydown.delete.exact.stop="!disabled && !readonly && $emit('keypress:delete', $event); handleBackspace($event)"
-          @focus="$emit('focus', $event); setIsFocused(true)"
-          @blur="$emit('blur', $event); setIsFocused(false); isSecureVisible = false"
-          @click.stop.prevent="$emit('click', $event)"
-          @mousedown.stop=""
-          @select.stop.prevent="$emit('select:input', $event)"
-        />
+            :class="{
+              'py-0 pr-1 pl-3': !textarea && !hideInput,
+              'h-[34px]': $slots.suffix?.()?.length,
+              'h-[42px]': !$slots.suffix?.()?.length,
+              'h-[var(--textarea-height,160px)] w-full resize-none p-3': textarea,
+              'pl-11': icon,
+              'w-0 max-w-0 p-0 absolute': hideInput,
+              'font-mono': mono,
+              'text-secure': textSecure && !isSecureVisible,
+            }"
+            :value="placeholderSecure && modelValue === undefined && !isFocused ? '******' : modelValue"
+            :placeholder="placeholder"
+            :type="type"
+            :name="name"
+            :disabled="disabled"
+            :readonly="readonly"
+            :autocomplete="autocomplete"
+            :size="size || undefined"
+            :spellcheck="spellcheck ? 'true' : 'false'"
+            @input="handleInputEvent"
+            @keypress.enter.exact="!disabled && !readonly && $emit('keypress:enter', $event)"
+            @keydown.up.exact.stop="!disabled && !readonly && $emit('keypress:up', $event)"
+            @keydown.down.exact.stop="!disabled && !readonly && $emit('keypress:down', $event)"
+            @keydown.delete.exact.stop="!disabled && !readonly && $emit('keypress:delete', $event); handleBackspace($event)"
+            @focus="$emit('focus', $event); setIsFocused(true)"
+            @blur="$emit('blur', $event); setIsFocused(false); isSecureVisible = false"
+            @click.stop.prevent="$emit('click', $event)"
+            @mousedown.stop=""
+            @select.stop.prevent="$emit('select:input', $event)"
+          />
 
-        <InputActions
-          :loading="loading"
-          :allow-clear="allowClear && modelValue !== ''"
-          :disabled="disabled || readonly"
-          :text-secure="textSecure"
-          :is-secure-visible="isSecureVisible"
-          class="absolute top-0 right-0 bottom-0"
-          @click:clear="clearValue"
-          @click:slot="isFocused ? blur() : focus(); $emit('click:internal', $event)"
-          @show:secure="isSecureVisible = true; $emit('click', $event)"
-          @hide:secure="isSecureVisible = false"
-          @update:width="paddingRight = $event"
-        >
-          <template
-            v-if="$slots.suffix?.()?.length"
-            #default
+          <InputActions
+            :loading="loading"
+            :allow-clear="allowClear && modelValue !== ''"
+            :disabled="disabled || readonly"
+            :text-secure="textSecure"
+            :is-secure-visible="isSecureVisible"
+            class="absolute top-0 right-0 bottom-0"
+            @click:clear="clearValue"
+            @click:slot="isFocused ? blur() : focus(); $emit('click:internal', $event)"
+            @show:secure="isSecureVisible = true; $emit('click', $event)"
+            @hide:secure="isSecureVisible = false"
+            @update:width="paddingRight = $event"
           >
-            <slot name="suffix" />
-          </template>
-        </InputActions>
+            <template
+              v-if="$slots.suffix?.()?.length"
+              #default
+            >
+              <slot name="suffix" />
+            </template>
+          </InputActions>
+        </div>
+
+        <Transition
+          enter-active-class="fade-enter-active"
+          leave-active-class="fade-leave-active"
+          enter-from-class="fade-enter-from"
+          leave-to-class="fade-leave-to"
+        >
+          <span
+            v-if="hasChanges"
+            class="square-2 rounded-full transition-colors absolute top-0 right-0 z-10"
+            :class="{
+              'bg-info dark:bg-info-dark': isFocused || errorMessage === undefined,
+              'bg-negative dark:bg-negative-dark': !isFocused && errorMessage !== undefined,
+            }"
+          />
+        </Transition>
+
+        <Transition
+          enter-active-class="fade-enter-active"
+          leave-active-class="fade-leave-active"
+          enter-from-class="fade-enter-from"
+          leave-to-class="fade-leave-to"
+        >
+          <div
+            v-if="errorMessage"
+            class="text-xs font-normal text-negative dark:text-negative-dark absolute right-0 pt-0.5 text-end"
+          >
+            {{ errorMessage }}
+          </div>
+
+          <div
+            v-else-if="maxLength !== undefined && isFocused"
+            class="text-xs font-normal text-description absolute right-0 pt-0.5 whitespace-nowrap"
+          >
+            {{ String(modelValue || '').length }} / {{ maxLength }}
+          </div>
+        </Transition>
       </div>
 
       <WSkeleton
@@ -124,27 +172,6 @@
 
       <slot name="right" />
     </div>
-
-    <Transition
-      enter-active-class="fade-enter-active"
-      leave-active-class="fade-leave-active"
-      enter-from-class="fade-enter-from"
-      leave-to-class="fade-leave-to"
-    >
-      <div
-        v-if="errorMessage"
-        class="text-xs font-normal text-negative dark:text-negative-dark absolute right-0 pt-0.5"
-      >
-        {{ errorMessage }}
-      </div>
-
-      <div
-        v-else-if="maxLength !== undefined && isFocused"
-        class="text-xs font-normal text-description absolute right-0 pt-0.5"
-      >
-        {{ String(modelValue || '').length }} / {{ maxLength }}
-      </div>
-    </Transition>
 
     <div
       v-if="description"
@@ -187,6 +214,7 @@ const props = withDefaults(
     spellcheck?: boolean
     placeholderSecure?: boolean
     customBackspaceHandle?: boolean
+    hasChanges?: boolean
   }>(),
   {
     size: 40,

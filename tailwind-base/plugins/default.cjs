@@ -148,17 +148,9 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         'border-style': 'solid',
         'border-width': '2px',
         'background-clip': 'padding-box',
-        'background-color': theme('colors.gray.300'),
-        'opacity': '0.6',
+        'background-color': 'var(--w-scroll-bar-color)',
         '&:hover': {
-          'opacity': '1',
-        },
-        '.dark &': {
-          'background-color': theme('colors.gray.600'),
-          'opacity': '0.4',
-          '&:hover': {
-            'opacity': '1',
-          },
+          'background-color': 'var(--w-scroll-bar-color-hover)',
         },
       },
       '&::-webkit-scrollbar-track, & ::-webkit-scrollbar-track, &::-webkit-scrollbar-corner, & ::-webkit-scrollbar-corner, &::-webkit-resizer, & ::-webkit-resizer': {
@@ -174,6 +166,24 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       },
     },
   })
+
+  matchUtilities(
+    {
+      'w-scroll-bar-color': (value) => {
+        return {
+          '--w-scroll-bar-color': value,
+        }
+      },
+      'w-scroll-bar-color-hover': (value) => {
+        return {
+          '--w-scroll-bar-color-hover': value,
+        }
+      },
+    },
+    {
+      values: theme('colors'),
+    },
+  )
 
   addUtilities({
     '.rounded-inherit': {
@@ -241,13 +251,13 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       },
 
       '&:active::before, .w-ripple-trigger:active &::before': {
-        'opacity': '0.10',
+        'opacity': 'calc(var(--w-ripple-opacity, 0.10) * 2)',
       },
     },
 
     '.w-ripple-hover:hover': {
       '& .w-ripple:not(:active)::before, &.w-ripple:not(:active)::before': {
-        'opacity': '0.05',
+        'opacity': 'var(--w-ripple-opacity, 0.10)',
       },
     },
   })
@@ -274,16 +284,34 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       },
 
       '&:hover::after, .w-hover-circle-trigger:hover &::after': {
-        'opacity': '0.05',
-        'transform': 'scaleX(2) scaleY(2)',
+        'opacity': 'var(--w-hover-circle-opacity, 0.10)',
+        'transform': 'scaleX(2.2) scaleY(2.2)',
       },
 
       '&:active::after, .w-hover-circle-trigger:active &::after': {
-        'opacity': '0.05',
+        'opacity': 'var(--w-hover-circle-opacity, 0.10)',
         'transform': 'scaleX(1.8) scaleY(1.8)',
       },
     },
   })
+
+  matchUtilities(
+    {
+      'w-ripple-opacity': (value) => {
+        return {
+          '--w-ripple-opacity': value,
+        }
+      },
+      'w-hover-circle-opacity': (value) => {
+        return {
+          '--w-hover-circle-opacity': value,
+        }
+      },
+    },
+    {
+      values: theme('opacity'),
+    },
+  )
 
   addUtilities({
     '.w-progress-striped': {
