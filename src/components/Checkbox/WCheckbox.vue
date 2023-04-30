@@ -2,6 +2,7 @@
   <button
     class="flex gap-2 cursor-pointer select-none outline-none w-ripple-trigger w-hover-circle-trigger items-center w-hover-circle-opacity-[0.08]"
     :class="{
+      'cursor-progress': loading,
       'cursor-not-allowed opacity-25': disabled,
       'mt-1 mb-4': title,
     }"
@@ -19,8 +20,13 @@
       tabindex="0"
       @keypress.enter.stop.prevent="toggle"
     >
+      <WSpinner
+        v-if="loading"
+        class="w-spinner-size-4 text-primary-default dark:text-primary-dark"
+      />
+
       <div
-        v-if="radio"
+        v-else-if="radio"
         v-show="value"
         class="square-4 bg-primary-default dark:bg-primary-dark rounded-full"
       />
@@ -59,6 +65,7 @@
 import {computed} from 'vue'
 import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
+import WSpinner from '@/components/Spinner/WSpinner.vue'
 
 const props = defineProps<{
   modelValue: boolean | null
@@ -66,6 +73,7 @@ const props = defineProps<{
   disabled?: boolean
   readonly?: boolean
   radio?: boolean
+  loading?: boolean
   intermediate?: boolean
   tooltipText?: string
 }>()
@@ -80,7 +88,7 @@ const value = computed<boolean | null>({
 })
 
 const toggle = (): void => {
-  if (props.disabled || props.readonly) return
+  if (props.disabled || props.readonly || props.loading) return
 
   value.value = !value.value
 }

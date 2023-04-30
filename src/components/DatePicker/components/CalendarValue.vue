@@ -6,8 +6,7 @@
       text-default dark:text-default-dark
     "
     :class="{
-      'no-value': !value,
-      'w-ripple cursor-pointer': clickable,
+      'w-ripple w-ripple-hover cursor-pointer': clickable,
     }"
     @click="updateCurrentDate"
   >

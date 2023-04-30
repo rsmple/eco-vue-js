@@ -70,7 +70,7 @@
       </div>
 
       <div
-        v-if="modelValue.length === 0"
+        v-else-if="modelValue.length === 0"
         class="w-full h-full flex flex-col items-center text-base text-accent"
       >
         <div class="font-semibold mt-16">
@@ -91,7 +91,7 @@
       </div>
 
       <div
-        v-else-if="!placeholder"
+        v-else
         class="h-full flex items-center justify-center"
       >
         <div class="overflow-x-overlay flex gap-6 items-center">

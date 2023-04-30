@@ -1,6 +1,9 @@
 <template>
   <div ref="container">
-    <slot name="toggle" />
+    <slot
+      name="toggle"
+      :unclickable="false"
+    />
 
     <Transition
       enter-active-class="fade-enter-active"
@@ -16,6 +19,8 @@
         :update-align="updateAlign"
         :max-height="maxHeight"
         :max-width="maxWidth"
+        :emit-update="emitUpdate"
+        @update:rect="$emit('update:rect')"
       >
         <slot name="content" />
       </WDropdown>
@@ -33,7 +38,12 @@ defineProps<{
   maxHeight: number
   maxWidth: number
   horizontalAlign: HorizontalAlign
-  updateAlign: boolean
+  updateAlign?: boolean
+  emitUpdate?: boolean
+}>()
+
+defineEmits<{
+  (e: 'update:rect'): void
 }>()
 
 const container = ref<HTMLDivElement>()

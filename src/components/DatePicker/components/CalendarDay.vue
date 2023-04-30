@@ -1,10 +1,6 @@
 <template>
   <div
-    class="
-      flex relative justify-center items-center cursor-pointer my-[1px] select-none
-      height-[var(--date-picker-day-height)] width-[var(--date-picker-day-width)]
-      group w-ripple-trigger
-    "
+    class="flex relative justify-center items-center cursor-pointer my-[1px] select-none height-9 flex-1 w-ripple-trigger"
     :class="{
       'text-accent': !isSelected && !isOutOfMonth,
       'text-description': !isSelected && isOutOfMonth,
@@ -17,7 +13,7 @@
   >
     <div
       v-show="isBetweenRange || (isFrom || isTo && !(isFrom && isTo))"
-      class="absolute opacity-50 h-[var(--date-picker-day-height)]"
+      class="absolute opacity-50 h-9"
       :class="{
         'border-y border-solid border-primary-default': isHoverEnabled,
         'bg-primary-default dark:bg-primary-dark': !isHoverEnabled,
@@ -28,17 +24,13 @@
     />
 
     <div
-      class="
-        relative flex justify-center items-center rounded-full sq
-        square-[var(--date-picker-day-height)]
-      "
+      class="relative flex justify-center items-center rounded-full square-9"
       :class="{
-        'w-ripple': !disabled,
-        'bg-primary-default dark:bg-primary-dark': isSelected,
-        'group-hover:bg-gray-100 dark:group-hover:bg-gray-700': !isSelected && !isBetweenRange,
+        'w-ripple w-ripple-hover': !disabled,
+        'bg-primary-default dark:bg-primary-dark font-semibold': isSelected,
       }"
     >
-      <div class="text-base font-normal group-[.selected]:font-semibold">
+      <div class="text-base font-normal">
         {{ startOfDay.getDate() }}
       </div>
     </div>

@@ -36,15 +36,17 @@
     <div class="flex gap-4">
       <div
         v-if="!skeleton"
-        class="relative w-full isolate"
+        class="relative w-[calc(100%-(3.75rem*var(--input-right-count)))] isolate"
+        :style="{'--input-right-count': $slots.right?.().filter(item => item['type'] === 'button').length ?? 0}"
       >
         <div
           class="
-          relative flex flex-wrap bg-default dark:bg-default-dark border border-solid border-gray-300 dark:border-gray-700 rounded-xl
-          transition-colors duration-75 cursor-text overflow-hidden min-h-[44px] w-full
-        "
+            relative flex flex-wrap bg-default dark:bg-default-dark border border-solid border-gray-300 dark:border-gray-700 rounded-xl
+            transition-colors duration-75 overflow-hidden min-h-[44px] w-full
+          "
           :class="{
             'focus-within:border-primary-default dark:focus-within:border-primary-dark': !disabled && !readonly,
+            'cursor-text': !disabled,
             'opacity-80 cursor-not-allowed': disabled,
             'pl-1 py-1 gap-1': $slots.suffix?.()?.length,
             'border-negative dark:border-negative-dark': errorMessage,

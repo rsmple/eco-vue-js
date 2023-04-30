@@ -1,36 +1,40 @@
 <template>
-  <div class="[--date-picker-day-height:36px] [--date-picker-day-width:calc(100%/7)]">
-    <div class="flex gap-8 mb-4">
+  <div>
+    <div class="flex mb-4">
       <CalendarValue
         title="From:"
         :value="dateRange?.from"
         :current-date="currentDate"
         auto-focus
-        class="w-[calc(50% - 16px)]"
+        class="w-[calc(50%-1rem)]"
         @update:current-date="setCurrentDate"
       />
+
+      <div class="flex-1" />
 
       <CalendarValue
         title="To:"
         :value="dateRange?.to"
         :current-date="currentDate"
-        class="w-[calc(50% - 16px)]"
+        class="w-[calc(50%-1rem)]"
         @update:current-date="setCurrentDate"
       />
     </div>
 
     <div class="bg-default dark:bg-default-dark border border-solid border-gray-300 dark:border-gray-700 rounded-xl p-3">
-      <div class="flex gap-8 mb-4">
+      <div class="flex mb-4">
         <CalendarToggle
-          class="w-[calc(50% - 16px)]"
+          class="w-[calc(50%-1rem)]"
           @click:previous="setCurrentDate(addMonth(currentDate, -1))"
           @click:next="setCurrentDate(addMonth(currentDate, 1))"
         >
           {{ monthShortFormatter.format(currentDate).toLocaleUpperCase() }}
         </CalendarToggle>
 
+        <div class="flex-1" />
+
         <CalendarToggle
-          class="w-[calc(50% - 16px)]"
+          class="w-[calc(50%-1rem)]"
           @click:previous="setCurrentDate(addYear(currentDate, -1))"
           @click:next="setCurrentDate(addYear(currentDate, 1))"
         >

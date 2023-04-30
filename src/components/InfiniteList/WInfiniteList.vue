@@ -20,14 +20,14 @@
     <div
       v-for="(slot, index) in $slots.header?.()"
       :key="index"
-      class="flex w-[calc(100vw-var(--nav-bar-width)-var(--inner-margin))]"
+      class="flex sm:w-[calc(100vw-var(--nav-bar-width)-var(--inner-margin))]"
     >
       <component
         :is="slot"
-        class="w-[calc(100vw-var(--inner-width-diff))]"
+        class="sm:w-[calc(100vw-var(--inner-width-diff))]"
       />
 
-      <div class="pr-[calc(var(--actions-bar-width)+var(--inner-margin))]" />
+      <div class="sm-not:hidden sm:pr-[calc(var(--actions-bar-width)+var(--inner-margin))]" />
     </div>
   </div>
 

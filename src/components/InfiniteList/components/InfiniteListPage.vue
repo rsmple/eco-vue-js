@@ -9,8 +9,8 @@
         class="block text-description text-base font-normal no-underline hover:underline"
         :to="{query: queryParams, hash: $route.hash}"
         :class="{
-          'py-2': !pageLabelWithMargin,
-          'ml-16 pb-4 pt-6': pageLabelWithMargin
+          'py-2 sm-not:ml-5': !pageLabelWithMargin,
+          'ml-16 sm-not:ml-[3.75rem] pb-4 pt-6': pageLabelWithMargin
         }"
         replace
         @click="copyRoute"

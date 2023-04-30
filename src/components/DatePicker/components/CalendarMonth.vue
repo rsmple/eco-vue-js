@@ -4,12 +4,7 @@
       <div
         v-for="(title, index) in weekDayTitles"
         :key="index"
-        class="
-          flex justify-center items-center
-          h-[var(--date-picker-day-height)] w-[var(--date-picker-day-width)]
-          min-h-[var(--date-picker-day-height)] min-w-[var(--date-picker-day-width)]
-          max-h-[var(--date-picker-day-height)] max-w-[var(--date-picker-day-width)]
-        "
+        class="flex justify-center items-center height-9 flex-1"
       >
         <div>
           {{ title.toLocaleUpperCase() }}

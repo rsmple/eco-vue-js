@@ -5,7 +5,7 @@
   >
     <button
       v-if="allowClear && !disabled"
-      class="relative w-ripple w-ripple-hover h-full w-11 p-[0.6875rem] flex justify-center text-description cursor-pointer select-none"
+      class="relative w-ripple w-ripple-hover h-full w-11 p-[0.6875rem] flex justify-center text-description select-none"
       @mousedown.prevent.stop=""
       @click="$emit('click:clear')"
     >
@@ -14,7 +14,12 @@
 
     <button
       v-if="textSecure"
-      class="relative w-ripple w-ripple-hover h-full w-11 p-[0.6875rem] flex justify-center cursor-pointer select-none"
+      :disabled="disabled"
+      :class="{
+        'cursor-pointer': !disabled,
+        'cursor-not-allowed': disabled,
+      }"
+      class="relative w-ripple w-ripple-hover h-full w-11 p-[0.6875rem] flex justify-center select-none"
       @click="isSecureVisible ? $emit('hide:secure') : $emit('show:secure')"
     >
       <IconEyeSlash
@@ -29,14 +34,19 @@
 
     <div
       v-if="loading"
-      class="h-full w-11 flex items-center justify-center text-description"
+      class="h-full w-11 flex items-center justify-center text-description cursor-progress"
     >
       <WSpinner class="[--spinner-size:1.5rem]" />
     </div>
 
     <button
       v-else-if="$slots.default?.()?.length"
-      class="h-full w-11 flex items-center justify-center cursor-pointer"
+      :disabled="disabled"
+      :class="{
+        'cursor-pointer': !disabled,
+        'cursor-not-allowed': disabled,
+      }"
+      class="h-full w-11 flex items-center justify-center"
       @click.stop="$emit('click:slot')"
     >
       <slot name="default" />

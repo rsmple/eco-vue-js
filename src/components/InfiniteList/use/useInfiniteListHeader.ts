@@ -1,6 +1,7 @@
+import {getIsMobile} from '@/main'
 import {onBeforeUnmount, onMounted, ref, watch, type Ref} from 'vue'
 
-const headerElementHeight = 128
+const headerElementHeight = getIsMobile() ? 60 : 128
 
 const observerOptions = {
   root: null,
@@ -17,9 +18,9 @@ export const useInfiniteListHeader = (headerMargin: Ref<number>, updageHeaderPad
   let observer: IntersectionObserver | null = null
 
   const observerCb = (entries: IntersectionObserverEntry[]) => {
-    entries.forEach(entry => {
+    isIntersecting.value = entries.some(entry => {
       if (entry.target === indicator.value) {
-        isIntersecting.value = entry.isIntersecting || entry.boundingClientRect.top > window.innerHeight
+        return entry.isIntersecting || entry.boundingClientRect.top > window.innerHeight
       }
     })
   }

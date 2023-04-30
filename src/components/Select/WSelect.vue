@@ -20,7 +20,10 @@
         :required="required"
         :disabled="disabled"
         :has-changes="hasChanges"
-        class="cursor-pointer"
+        :class="{
+          'cursor-pointer': !disabled,
+          'cursor-not-allowed': disabled,
+        }"
         @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
         @keypress:enter.stop.prevent="selectCursor"
         @keypress:up.prevent="cursorUp"
@@ -37,7 +40,11 @@
           <div
             v-for="option in modelValue"
             :key="option"
-            class="relative flex cursor-pointer overflow-hidden items-center max-w-[calc(100%-2.75rem)]"
+            class="relative flex overflow-hidden items-center max-w-[calc(100%-2.75rem)]"
+            :class="{
+              'cursor-pointer': !disabled,
+              'cursor-not-allowed': disabled,
+            }"
           >
             <slot
               name="option"
@@ -78,6 +85,7 @@
 
         <template #suffix>
           <IconArrow
+            v-if="!disabled"
             class="square-3 text-gray-400 dark:text-gray-600 transition-transform"
             :class="{'rotate-180': isOpen}"
           />

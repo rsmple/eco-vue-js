@@ -32,6 +32,11 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
           '--split-to-chunks-gap': value,
         }
       },
+      'w-spinner-size': (value) => {
+        return {
+          '--spinner-size': value,
+        }
+      },
     },
     {
       values: theme('width'),
@@ -347,10 +352,10 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
 
     '.w-list-row-item, .w-list-header-item': {
       'padding-right': '1.5rem',
-      '&:first-of-type': {
+      '&:first-child, &.first-item': {
         'padding-left': '1rem',
       },
-      '&:last-of-type': {
+      '&:last-child': {
         'padding-right': '1rem',
       },
     },
@@ -366,12 +371,12 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         'background-color': theme('colors.primary.darkest'),
         'border-color': theme('colors.gray.700'),
       },
-      '&:first-of-type': {
+      '&:first-child': {
         'border-left-width': '1px',
         'border-top-left-radius': '1rem',
         'border-bottom-left-radius': '1rem',
       },
-      '&:last-of-type': {
+      '&:last-child': {
         'border-right-width': '1px',
         'border-top-right-radius': '1rem',
         'border-bottom-right-radius': '1rem',

@@ -1,8 +1,8 @@
 <template>
-  <div class="[--calendar-toggle-height:32px] flex items-center h-[var(--calendar-toggle-height)] w-full my-2">
+  <div class="flex items-center h-8 w-full my-2">
     <div
       class="
-        relative flex justify-center items-center h-[var(--calendar-toggle-height)] w-[var(--calendar-toggle-height)]
+        relative flex justify-center items-center square-8
         rounded-xl cursor-pointer select-none w-ripple mr-auto
         hover:bg-primary-default hover:dark:bg-primary-dark hover:text-default text-description
       "
@@ -17,7 +17,7 @@
 
     <div
       class="
-        relative flex justify-center items-center h-[var(--calendar-toggle-height)] w-[var(--calendar-toggle-height)]
+        relative flex justify-center items-center square-8
         rounded-xl cursor-pointer select-none w-ripple ml-auto
         hover:bg-primary-default hover:dark:bg-primary-dark hover:text-default text-description
       "
