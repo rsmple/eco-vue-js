@@ -316,6 +316,8 @@ const captureDoubleDelete = () => {
 }
 
 const open = () => {
+  if (isDisabled.value) return
+
   isOpen.value = true
 }
 

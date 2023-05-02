@@ -344,10 +344,10 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       'padding-bottom': '0.3125rem',
       'padding-left': '0.5rem',
       'padding-right': '0.5rem',
-      'display': 'flex',
       'align-items': 'center',
       'white-space': 'nowrap',
       'overflow': 'hidden',
+      'text-overflow': 'ellipsis',
     },
 
     '.w-list-row-item, .w-list-header-item': {
