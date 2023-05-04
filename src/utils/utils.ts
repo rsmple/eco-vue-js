@@ -47,6 +47,20 @@ export function debounce<T extends DebounceCb>(cb: T, delay = 200): T {
   } as T
 }
 
+export function throttle<T extends DebounceCb>(cb: T, delay = 200): T {
+  let timeout: NodeJS.Timeout | undefined
+
+  return function (this: unknown, ...args: Parameters<T>) {
+    if (timeout) return
+
+    cb.apply(this, args)
+
+    timeout = setTimeout(() => {
+      timeout = undefined
+    }, delay)
+  } as T
+}
+
 export const isEqualObj = (obj1: Record<string, unknown>, obj2: Record<string, unknown>): boolean => {
   return Object.keys(obj1).every(key => obj1[key] === obj2[key]) && Object.keys(obj2).every(key => obj1[key] === obj2[key])
 }

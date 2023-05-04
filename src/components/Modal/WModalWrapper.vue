@@ -3,20 +3,23 @@
     class="bg-default dark:bg-default-dark shadow-md rounded-3xl w-[var(--modal-wrapper-width,35rem)] max-h-full overflow-hidden group"
     :class="{
       'max-w-[calc(100%-var(--inner-margin)*2)] -mx--inner-margin': !maximized,
-      'm-0 max-w-full rounded-none': maximized,
-      maximized,
+      'max-w-full rounded-none mb-8': maximized,
     }"
   >
     <div
       ref="title"
-      class="text-accent text-2xl font-semibold text-center py-8 px-8 group-[.maximized]:px-4"
+      class="text-accent font-semibold text-center px-[var(--modal-wrapper-padding,2rem)]"
+      :class="{
+        'py-2 text-xl': maximized,
+        'py-8 text-2xl': !maximized,
+      }"
     >
       <slot name="title" />
     </div>
 
     <div
       ref="container"
-      class="overflow-y-overlay overflow-x-hidden px-8 group-[.maximized]:px-4 overflow-scroll max-h-[calc(100vh-var(--modal-wrapper-margin-y)-2rem)]"
+      class="overflow-y-overlay overflow-x-hidden max-h-[calc(100vh-var(--modal-wrapper-margin-y)-2rem)] px-[var(--modal-wrapper-padding,2rem)]"
       :style="{'--modal-wrapper-margin-y': marginY + 'px'}"
     >
       <slot />
@@ -24,7 +27,7 @@
 
     <div
       ref="actions"
-      class="flex justify-center py-8 gap-y-6 gap-x-8 flex-col sm:flex-row px-8 group-[.maximized]:px-4"
+      class="flex justify-center p-[var(--modal-wrapper-padding,2rem)] gap-[var(--modal-wrapper-padding,2rem)] flex-col sm:flex-row"
     >
       <slot name="actions" />
     </div>

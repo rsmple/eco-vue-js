@@ -1,8 +1,7 @@
 <template>
   <component
-    v-bind="!to ? {target, href} : {}"
+    v-bind="!to ? {target, href} : {to}"
     :is="to ? RouterLink : 'a'"
-    :to="to"
     class="cursor-pointer overflow-hidden no-underline hover:underline font-normal truncate whitespace-normal"
     :class="{
       'text-base': !small,
@@ -10,7 +9,13 @@
       [semanticTypeTextStylesMap[semanticType]]: true,
     }"
   >
-    <span class="inline mr-1">
+    <span
+      class="inline"
+      :class="{
+        'mr-1': !small,
+        'mr-0.5': small,
+      }"
+    >
       <IconLink
         class="inline -mt-1 rounded-lg p-[1px]"
         :class="{

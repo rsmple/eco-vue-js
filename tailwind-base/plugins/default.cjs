@@ -37,6 +37,11 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
           '--spinner-size': value,
         }
       },
+      'w-modal-wrapper-padding': (value) => {
+        return {
+          '--modal-wrapper-padding': value,
+        }
+      },
     },
     {
       values: theme('width'),
@@ -380,6 +385,27 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         'border-right-width': '1px',
         'border-top-right-radius': '1rem',
         'border-bottom-right-radius': '1rem',
+      },
+    },
+
+    '.w-skeleton': {
+      'position': 'relative',
+      'width': 'var(--skeleton-width,70%)',
+      'border-radius': 'var(--skeleton-rounded,0.5rem)',
+      'overflow': 'hidden',
+      'cursor': 'progress',
+      '&:before': {
+        'content': '""',
+        'position': 'absolute',
+        'top': '0',
+        'width': '100%',
+        'height': '100%',
+        'background-image': 'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.3), rgba(255,255,255,0))',
+        'animation': 'ticker var(--tiker-duration, 0.8s) linear infinite',
+
+        '.dark &': {
+          'background-image': 'linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.01),rgba(255,255,255,0))',
+        },
       },
     },
   })
