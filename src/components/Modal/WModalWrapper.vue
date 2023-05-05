@@ -32,7 +32,7 @@
       ref="actions"
       class="flex justify-center p-[var(--modal-wrapper-padding,2rem)] gap-[var(--modal-wrapper-padding,2rem)] w-full bg-default dark:bg-default-dark"
       :class="{
-        'fixed': maximized,
+        'fixed bottom-0 left-0 w-full': maximized,
         'sm-not:flex-col': !maximized,
       }"
     >
