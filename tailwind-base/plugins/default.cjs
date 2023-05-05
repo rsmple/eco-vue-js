@@ -94,6 +94,8 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
   addVariant('supports-backdrop', '@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))')
   addVariant('supports-overlay', '@supports (overflow: overlay)')
   addVariant('supports-overlay-not', '@supports (not (overflow: overlay))')
+  addVariant('touch', '.touch &')
+  addVariant('touch-not', '.touch-not &')
 
   addBase({
     'input': {
@@ -105,10 +107,6 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       '.dark &':{
         '--input-autofill-bg': theme('colors.default-dark'),
         '--input-autofull-text': theme('colors.gray.100'),
-      },
-
-      '&::-webkit-textfield-decoration-container': {
-        'pointer-events': 'none',
       },
 
       '&[autocomplete="off"]': {
@@ -138,6 +136,11 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       '&[type=number]': {
         '-moz-appearance': 'textfield',
         'appearance': 'textfield',
+      },
+
+      '&::-webkit-textfield-decoration-container, &:focus::-webkit-textfield-decoration-container': {
+        'visibility': 'hidden',
+        'pointer-events': 'none',
       },
     },
   })
@@ -335,7 +338,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         'height': '100%',
         'background-repeat': 'repeat',
         'background-size': '40px 40px',
-        'animation': 'move-horizontal var(--tiker-duration, 0.8s) linear infinite',
+        'animation': theme('animation.move-horizontal'),
       },
       '.dark &::before': {
         'background-image': 'linear-gradient(135deg, hsla(0,0%,10%,.125) 25%, transparent 0, transparent 50%, hsla(0,0%,10%,.125) 0, hsla(0,0%,10%,.125) 75%, transparent 0, transparent)',
@@ -347,8 +350,8 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
     '.w-select-field': {
       'padding-top': '0.3125rem',
       'padding-bottom': '0.3125rem',
-      'padding-left': '0.5rem',
-      'padding-right': '0.5rem',
+      'padding-left': '0.75rem',
+      'padding-right': '0.75rem',
       'align-items': 'center',
       'white-space': 'nowrap',
       'overflow': 'hidden',
@@ -401,7 +404,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         'width': '100%',
         'height': '100%',
         'background-image': 'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.3), rgba(255,255,255,0))',
-        'animation': 'ticker var(--tiker-duration, 0.8s) linear infinite',
+        'animation': theme('animation.ticker'),
 
         '.dark &': {
           'background-image': 'linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.01),rgba(255,255,255,0))',

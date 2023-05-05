@@ -2,7 +2,7 @@
   <div
     class="bg-default dark:bg-default-dark shadow-md rounded-3xl w-[var(--modal-wrapper-width,35rem)] max-h-full overflow-hidden group"
     :class="{
-      'max-w-[calc(100%-var(--modal-wrapper-padding,2rem)*2)] -mx--inner-margin': !maximized,
+      'max-w-[calc(100%-var(--modal-wrapper-padding,2rem)*2)] max-h-[calc(100%-var(--modal-wrapper-padding,2rem)*2)]': !maximized,
       'max-w-full rounded-none h-full': maximized,
     }"
   >
@@ -19,10 +19,10 @@
 
     <div
       ref="container"
-      class="overflow-y-overlay overflow-x-hidden max-h-[calc(100vh-var(--modal-wrapper-margin-y))] px-[var(--modal-wrapper-padding,2rem)]"
+      class="overflow-y-overlay overflow-x-hidden max-h-[calc(100vh-var(--modal-wrapper-margin-y)-var(--modal-wrapper-padding,2rem)*2)] px-[var(--modal-wrapper-padding,2rem)]"
       :style="{'--modal-wrapper-margin-y': marginY + 'px'}"
       :class="{
-        'h-full': maximized,
+        'h-full pb-[var(--modal-wrapper-margin-y)]': maximized,
       }"
     >
       <slot />
@@ -62,7 +62,11 @@ onMounted(async () => {
   }
 
   if (title.value && actions.value) {
-    marginY.value = title.value.offsetHeight + (!props.maximized ? actions.value.offsetHeight : 0)
+    if (props.maximized) {
+      marginY.value = actions.value.offsetHeight
+    } else {
+      marginY.value = title.value.offsetHeight + actions.value.offsetHeight
+    }
   }
 })
 

@@ -101,7 +101,7 @@
             @focus="$emit('focus', $event); setIsFocused(true)"
             @blur="$emit('blur', $event); setIsFocused(false); isSecureVisible = false"
             @click.stop.prevent="$emit('click', $event)"
-            @mousedown.stop=""
+            @mousedown="!allowMousedown && $event.stopPropagation(); $emit('mousedown', $event)"
             @select.stop.prevent="$emit('select:input', $event)"
           />
 
@@ -217,6 +217,7 @@ const props = withDefaults(
     placeholderSecure?: boolean
     customBackspaceHandle?: boolean
     hasChanges?: boolean
+    allowMousedown?: boolean
   }>(),
   {
     size: 40,
@@ -244,6 +245,7 @@ const emit = defineEmits<{
   (e: 'focus', value: FocusEvent): void
   (e: 'blur', value: FocusEvent): void
   (e: 'click', value: MouseEvent): void
+  (e: 'mousedown', value: MouseEvent): void
   (e: 'click:internal', value: MouseEvent): void
   (e: 'select:input', value: Event): void
 }>()
