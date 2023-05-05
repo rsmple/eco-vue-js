@@ -23,7 +23,7 @@
         v-for="(modalMeta, index) in modalMetaList"
         :key="modalMeta.key"
         :style="{zIndex: 100 + index + index + 2}"
-        class="fixed top-0 left-0 h-full w-full flex justify-center items-center overscroll-none overflow-y-auto no-scrollbar isolate"
+        class="fixed top-0 left-0 bottom-0 right-0 flex justify-center items-center overscroll-none overflow-y-auto no-scrollbar isolate"
       >
         <div class="h-[calc(100%+1px)]" />
 
