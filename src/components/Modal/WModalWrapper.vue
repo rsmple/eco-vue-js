@@ -62,7 +62,7 @@ onMounted(async () => {
   }
 
   if (title.value && actions.value) {
-    marginY.value = title.value.offsetHeight + (props.maximized ? actions.value.offsetHeight : 0)
+    marginY.value = title.value.offsetHeight + (!props.maximized ? actions.value.offsetHeight : 0)
   }
 })
 
