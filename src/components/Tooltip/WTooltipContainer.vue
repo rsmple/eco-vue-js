@@ -12,14 +12,14 @@
       :max-height="120"
       :max-width="240"
       emit-update
-      class="z-[10000] [--arrow-size:8px]"
+      class="z-[10000] [--arrow-size:8px] transition-[top,bottom,left,right]"
       @update:rect="close"
     >
       <div
         ref="container"
         class="flex justify-center items-center flex-col drop-shadow-md dark:drop-shadow-none"
         @mouseover="setTooltipMeta(tooltipMeta)"
-        @mouseleave="close()"
+        @mouseleave="setTooltipMeta(null)"
       >
         <div
           class="

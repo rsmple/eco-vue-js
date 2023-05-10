@@ -38,7 +38,7 @@ export function dateToQueryString(date: Date): string {
 export function dateFormat(date: Date): string {
   const month = date.getMonth() + 1
   const day = date.getDate()
-  return `${day.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.${date.getFullYear()}`
+  return `${ day.toString().padStart(2, '0') }.${ month.toString().padStart(2, '0') }.${ date.getFullYear() }`
 }
 
 export function timeFormat(date: Date): string {
@@ -46,35 +46,86 @@ export function timeFormat(date: Date): string {
 }
 
 export function datetimeFormat(date: Date): string {
-  return `${dateFormat(date)} ${timeFormat(date)}`
+  return `${ dateFormat(date) } ${ timeFormat(date) }`
 }
 
-export function durationHumanize(durationSeconds: number): string {
+export function durationHumanize(durationSeconds: number, full?: boolean): string {
+  const cb = full ? getDurationStringFull : getDurationString
+
   const seconds = durationSeconds % 60
-  if (durationSeconds === seconds) return getDurationString(seconds)
+  if (durationSeconds === seconds) return cb(seconds)
 
   const durationMinutes = (durationSeconds - seconds) / 60
   const minutes = durationMinutes % 60
-  if (durationMinutes === minutes) return getDurationString(seconds, minutes)
+  if (durationMinutes === minutes) return cb(seconds, minutes)
 
   const durationHours = (durationMinutes - minutes) / 60
   const hours = durationHours % 24
-  if (durationHours === hours) return getDurationString(seconds, minutes, hours)
+  if (durationHours === hours) return cb(seconds, minutes, hours)
 
   const durationDays = (durationHours - hours) / 24
+  const days = durationDays % 365
+  if (durationDays === days) {
+    if (days < 30) return cb(seconds, minutes, hours, days)
 
-  return getDurationString(seconds, minutes, hours, durationDays)
+    const newDays = days % 30
+    const months = (days - newDays) / 30
+
+    return cb(seconds, minutes, hours, newDays, months)
+  } else {
+    const durationYears = (durationDays - days) / 365
+
+    if (days < 30) return cb(seconds, minutes, hours, days, 0, durationYears)
+
+    const newDays = days % 30
+    const months = (days - newDays) / 30
+
+    return cb(seconds, minutes, hours, newDays, months, durationYears)
+  }
 }
 
-function getDurationString(seconds: number, minutes?: number, hours?: number, days?: number) {
+function getDurationString(seconds: number, minutes?: number, hours?: number, days?: number, months?: number, years?: number) {
   const parts: string[] = []
 
-  if (days) parts.push(`${days} d`)
-  if (hours) parts.push(`${hours} h`)
-  if (minutes && !days) parts.push(`${minutes} m`)
-  if (seconds && !days && !hours) parts.push(`${seconds} s`)
+  if (years) parts.push(`${ years } Y`)
+  if (months) parts.push(`${ months } M`)
+  if (days) parts.push(`${ days } d`)
+  if (hours) parts.push(`${ hours } h`)
+  if (minutes && !days) parts.push(`${ minutes } m`)
+  if (seconds && !days && !hours) parts.push(`${ seconds } s`)
 
   return parts.join(' ')
+}
+
+function getDurationStringFull(seconds: number, minutes?: number, hours?: number, days?: number, months?: number, years?: number) {
+  const parts: string[] = []
+
+  if (years) parts.push(`${ years } year${ years === 1 ? '' : 's' }`)
+  if (months) parts.push(`${ months } month${ months === 1 ? '' : 's' }`)
+  if (days) parts.push(`${ days } day${ days === 1 ? '' : 's' }`)
+  if (hours) parts.push(`${ hours } hour${ hours === 1 ? '' : 's' }`)
+  if (minutes && !days) parts.push(`${ minutes } minute${ minutes === 1 ? '' : 's' }`)
+  if (seconds && !days && !hours) parts.push(`${ seconds } second${ seconds === 1 ? '' : 's' }`)
+
+  return parts.join(' ')
+}
+
+const minute = 60
+const hour = 60 * minute
+const day = 24 * hour
+const month = 30 * day
+const year = 365 * day
+
+export function getDurationRound(seconds: number): number {
+  if (seconds < 0) return 0
+  if (seconds <= 60) return Math.ceil(seconds / 10) * 10
+  if (seconds <= 10 * minute) return Math.ceil(seconds / minute) * minute
+  if (seconds <= 30 * minute) return Math.ceil(seconds / (minute * 10)) * minute * 10
+  if (seconds <= 12 * hour) return Math.ceil(seconds / hour) * hour
+  if (seconds <= 10 * day) return Math.ceil(seconds / day) * day
+  if (seconds <= 30 * day) return Math.ceil(seconds / (day * 10)) * day * 10
+  if (seconds <= 5.5 * month) return Math.ceil(seconds / month) * month
+  return Math.ceil(seconds / year) * year
 }
 
 export function getStartOfMonth(date: Date = new Date()): Date {
