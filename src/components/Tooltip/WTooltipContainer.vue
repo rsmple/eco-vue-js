@@ -15,52 +15,54 @@
       class="z-[10000] [--arrow-size:8px] transition-[top,bottom,left,right]"
       @update:rect="close"
     >
-      <div
-        ref="container"
-        class="flex justify-center items-center flex-col drop-shadow-md dark:drop-shadow-none"
-        @mouseover="setTooltipMeta(tooltipMeta)"
-        @mouseleave="setTooltipMeta(null)"
-      >
+      <template #default="{left, right}">
         <div
-          class="
+          ref="container"
+          class="flex justify-center items-center flex-col drop-shadow-md dark:drop-shadow-none"
+          @mouseover="setTooltipMeta(tooltipMeta)"
+          @mouseleave="setTooltipMeta(null)"
+        >
+          <div
+            class="
               w-[calc(var(--arrow-size)/2)] z-10
               border-[transparent] border-solid [border-width:var(--arrow-size)] group-[.dropdown-top]/dropdown:order-2
             "
-          :class="{
-            'group-[.dropdown-top]/dropdown:border-t-black-default dark:group-[.dropdown-top]/dropdown:border-t-gray-800 group-[:not(.dropdown-top)]/dropdown:border-b-black-default dark:group-[:not(.dropdown-top)]/dropdown:border-b-gray-800': !tooltipMeta.light,
-            'group-[.dropdown-top]/dropdown:border-t-default dark:group-[.dropdown-top]/dropdown:border-t-gray-800 group-[:not(.dropdown-top)]/dropdown:border-b-default dark:group-[:not(.dropdown-top)]/dropdown:border-b-gray-800': tooltipMeta.light,
-          }"
-        />
-
-        <div
-          class="py-3 px-4 rounded-xl text-xs font-medium text-center"
-          :class="{
-            'bg-black-default dark:bg-gray-800 text-default': !tooltipMeta.light,
-            'bg-default dark:bg-gray-800 text-accent': tooltipMeta.light,
-          }"
-          :style="containerStyles"
-        >
-          <template v-if="tooltipMeta.slot">
-            <component
-              :is="tooltipMeta.slot"
-              :key="tooltipMeta.key"
-            />
-          </template>
+            :class="{
+              'group-[.dropdown-top]/dropdown:border-t-black-default dark:group-[.dropdown-top]/dropdown:border-t-gray-800 group-[:not(.dropdown-top)]/dropdown:border-b-black-default dark:group-[:not(.dropdown-top)]/dropdown:border-b-gray-800': !tooltipMeta.light,
+              'group-[.dropdown-top]/dropdown:border-t-default dark:group-[.dropdown-top]/dropdown:border-t-gray-800 group-[:not(.dropdown-top)]/dropdown:border-b-default dark:group-[:not(.dropdown-top)]/dropdown:border-b-gray-800': tooltipMeta.light,
+            }"
+          />
 
           <div
-            v-else-if="tooltipMeta.text"
-            class="whitespace-nowrap"
+            class="py-3 px-4 rounded-xl text-xs font-medium text-center transition-[margin]"
+            :class="{
+              'bg-black-default dark:bg-gray-800 text-default': !tooltipMeta.light,
+              'bg-default dark:bg-gray-800 text-accent': tooltipMeta.light,
+            }"
+            :style="getMarginStylesCached(left, right)"
           >
-            {{ tooltipMeta.text }}
+            <template v-if="tooltipMeta.slot">
+              <component
+                :is="tooltipMeta.slot"
+                :key="tooltipMeta.key"
+              />
+            </template>
+
+            <div
+              v-else-if="tooltipMeta.text"
+              class="whitespace-nowrap"
+            >
+              {{ tooltipMeta.text }}
+            </div>
           </div>
         </div>
-      </div>
+      </template>
     </WDropdown>
   </Transition>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, onUnmounted, ref, type CSSProperties, onBeforeMount, onBeforeUnmount, nextTick} from 'vue'
+import {onMounted, onUnmounted, ref, onBeforeMount, onBeforeUnmount, nextTick} from 'vue'
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {initTooltip, type SetTooltipMeta, type TooltipMeta} from '@/utils/Tooltip'
@@ -69,7 +71,7 @@ const MARGIN = 12
 
 const tooltipMeta = ref<TooltipMeta | null>(null)
 const container = ref<HTMLDivElement | undefined>()
-const containerStyles = ref<CSSProperties | undefined>()
+const containerWidth = ref<number>(0)
 let timeout: NodeJS.Timeout | undefined
 
 const setTooltipMeta: SetTooltipMeta = (meta: TooltipMeta | null) => {
@@ -77,22 +79,19 @@ const setTooltipMeta: SetTooltipMeta = (meta: TooltipMeta | null) => {
 
   if (!meta) {
     timeout = setTimeout(() => {
-      containerStyles.value = undefined
       tooltipMeta.value = null
       timeout = undefined
     }, 100)
   } else if (tooltipMeta.value !== meta) {
     tooltipMeta.value = meta
 
-    containerStyles.value = undefined
-    nextTick().then(() => nextTick().then(() => updateContainerStyles(container.value)))
+    nextTick(() => nextTick(() => updateContainerStyles(container.value)))
   }
 }
 
 const close = () => {
   clearTimeoutOnClose()
 
-  containerStyles.value = undefined
   tooltipMeta.value = null
 }
 
@@ -105,33 +104,54 @@ const clearTimeoutOnClose = () => {
 
 const updateContainerStyles = (value: HTMLDivElement | undefined) => {
   if (!value) {
-    containerStyles.value = undefined
-    return
+    containerWidth.value = 0
+  } else {
+    containerWidth.value = value.getBoundingClientRect().width
+  }
+}
+
+const getMarginStyles = (left?: string, right?: string) => {
+  if (!containerWidth.value) return
+
+  const l = left ? Number.parseFloat(left.substring(0, left.indexOf('px'))) : undefined
+
+  if (l !== undefined) {
+    const containerLeft = l - (containerWidth.value / 2) - MARGIN
+
+    if (containerLeft < 0) return {marginLeft: (0 - containerLeft) + 'px', marginRight: containerLeft + 'px'}
+
+    const containerRight = window.innerWidth - l - (containerWidth.value / 2) - MARGIN
+
+    if (containerRight < 0) return {marginRight: (0 - containerRight) + 'px', marginLeft: containerRight + 'px'}
+
+    return {}
   }
 
-  const rect = value.getBoundingClientRect()
+  const r = right ? Number.parseFloat(right.substring(0, right.indexOf('px'))) : undefined
+  
+  if (r !== undefined) {
+    const containerLeft = window.innerWidth - r - (containerWidth.value / 2) - MARGIN
 
-  if (rect.left < MARGIN) {
-    const margin = MARGIN - rect.left
-    containerStyles.value = {
-      marginLeft: margin + 'px',
-      marginRight: (margin * -1) + 'px',
-    }
-    return
+    if (containerLeft < 0) return {marginLeft: (0 - containerLeft) + 'px', marginRight: containerLeft + 'px'}
+
+    const containerRight = r - (containerWidth.value / 2) - MARGIN
+
+    if (containerRight < 0) return {marginRight: (0 - containerRight) + 'px', marginLeft: containerRight + 'px'}
+
+    return {}
   }
+}
 
-  const right = window.innerWidth - rect.right
+const marginStyleCache = ref()
 
-  if (right < MARGIN) {
-    const margin = MARGIN - right
-    containerStyles.value = {
-      marginRight: margin + 'px',
-      marginLeft: (margin * -1) + 'px',
-    }
-    return
-  }
+const getMarginStylesCached = (left?: string, right?: string) => {
+  const styles = getMarginStyles(left, right)
 
-  containerStyles.value = undefined
+  if (!styles) return marginStyleCache.value
+
+  marginStyleCache.value = styles
+
+  return styles
 }
 
 onBeforeMount(() => {

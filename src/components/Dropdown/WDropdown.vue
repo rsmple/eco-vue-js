@@ -8,7 +8,10 @@
       'w-0 flex justify-center': horizontalAlign === HorizontalAlign.CENTER,
     }"
   >
-    <slot />
+    <slot
+      :left="styles.left"
+      :right="styles.right"
+    />
   </div>
 </template>
 
