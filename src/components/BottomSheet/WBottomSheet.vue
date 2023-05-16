@@ -7,10 +7,10 @@
 
     <Teleport to="body">
       <Transition
-        enter-active-class="fade-enter-active"
-        leave-active-class="fade-leave-active"
-        enter-from-class="fade-enter-from"
-        leave-to-class="fade-leave-to"
+        enter-active-class="transition-opacity"
+        leave-active-class="transition-opacity"
+        enter-from-class="opacity-0"
+        leave-to-class="opacity-0"
         @after-enter="show"
       >
         <div

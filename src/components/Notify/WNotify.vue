@@ -1,9 +1,9 @@
 <template>
   <TransitionGroup
-    enter-active-class="list-enter-active"
-    leave-active-class="list-leave-active"
-    enter-from-class="list-enter-from"
-    leave-to-class="list-leave-to"
+    enter-active-class="transition-[margin,opacity,transform] duration-500"
+    leave-active-class="transition-[margin,opacity,transform] duration-500"
+    enter-from-class="opacity-0 translate-y-5"
+    leave-to-class="opacity-0 -mb-[var(--list-item-height,5.5rem)]"
     tag="div"
     class="fixed top-2 right-0 z-[10000]"
   >

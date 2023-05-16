@@ -16,6 +16,7 @@ import WFormValidator from '@/components/Form/WFormValidator.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 import WInput from '@/components/Input/WInput.vue'
 import WInputAsync from '@/components/Input/WInputAsync.vue'
+import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 import WLink from '@/components/Link/WLink.vue'
 import WLinkArrow from '@/components/Link/WLinkArrow.vue'
 import WModal from '@/components/Modal/WModal.vue'
@@ -49,6 +50,7 @@ export default {
     app.component('WInfiniteList', WInfiniteList)
     app.component('WInput', WInput)
     app.component('WInputAsync', WInputAsync)
+    app.component('WInputSuggest', WInputSuggest)
     app.component('WLink', WLink)
     app.component('WLinkArrow', WLinkArrow)
     app.component('WModal', WModal)
@@ -82,6 +84,7 @@ export {
   WInfiniteList,
   WInput,
   WInputAsync,
+  WInputSuggest,
   WLink,
   WLinkArrow,
   WModal,

@@ -17,10 +17,10 @@
           {{ names[index] }}
   
           <Transition
-            enter-active-class="fade-enter-active"
-            leave-active-class="fade-leave-active"
-            enter-from-class="fade-enter-from"
-            leave-to-class="fade-leave-to"
+            enter-active-class="transition-opacity"
+            leave-active-class="transition-opacity"
+            enter-from-class="opacity-0"
+            leave-to-class="opacity-0"
           >
             <div
               v-if="hasChangesMap[index]"
@@ -46,18 +46,13 @@
 
     <div
       class="relative transition-[min-height] h-full duration-300"
-      :style="{minHeight: minHeight ? minHeight + 'px' : 'auto'}"
+      :style="{minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
     >
       <TransitionGroup
-        enter-active-class="swipe-horizontal-enter-active"
-        leave-active-class="swipe-horizontal-leave-active"
-        v-bind="isDirect ? {
-          enterFromClass: 'swipe-horizontal-direct-enter-from',
-          leaveToClass: 'swipe-horizontal-direct-leave-to',
-        } : {
-          enterFromClass: 'swipe-horizontal-reverse-enter-from',
-          leaveToClass: 'swipe-horizontal-reverse-leave-to',
-        }"
+        enter-active-class="top-0 left-0 transition-[top,left,transform] duration-[250ms] ease-linear"
+        leave-active-class="top-0 left-0 transition-[top,left,transform] duration-[250ms] ease-linear absolute"
+        enter-from-class="translate-x-[calc((100%+2*var(--inner-margin))*var(--direction-factor))]"
+        leave-to-class="left-[calc((100%+2*var(--inner-margin))*var(--direction-factor)*-1)] top-0"
       >
         <TabItem
           v-for="(slot, index) in $slots.default?.()"

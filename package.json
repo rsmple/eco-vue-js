@@ -138,6 +138,9 @@
     "./dist/components/Input/WInputAsync.vue": {
       "import": "./dist/components/Input/WInputAsync.vue.js"
     },
+    "./dist/components/Input/WInputSuggest.vue": {
+      "import": "./dist/components/Input/WInputSuggest.vue.js"
+    },
     "./dist/components/Link/WLink.vue": {
       "import": "./dist/components/Link/WLink.vue.js"
     },

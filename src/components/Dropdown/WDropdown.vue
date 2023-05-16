@@ -2,7 +2,7 @@
   <div
     ref="dropdown"
     :style="styles"
-    class="fixed h-auto z-[2] group/dropdown"
+    class="fixed h-auto group/dropdown"
     :class="{
       'dropdown-top': isTop,
       'w-0 flex justify-center': horizontalAlign === HorizontalAlign.CENTER,

@@ -1,194 +1,161 @@
 <template>
-  <component
-    :is="isMobile ? WBottomSheet : WDropdownMenu"
-    ref="dropdownMenu"
-    v-bind="isMobile ? {isOpen, onClose: close} : {isOpen, maxHeight: 320, maxWidth: 480, horizontalAlign: HorizontalAlign.FILL, updateAlign: true}"
+  <WInputSuggest
+    ref="input"
+    :title="title"
+    :description="description"
+    :model-value="search"
+    :max-length="maxSearchLength"
+    :loading="loading"
+    :hide-input="isMobile ? !focused : !isOpen"
+    :readonly="readonly"
+    :skeleton="skeleton"
+    :size="searchSize"
+    :error-message="errorMessage"
+    :required="required"
+    :disabled="disabled"
+    :has-changes="hasChanges"
+    :hide-prefix="hidePrefix ? isMobile ? focused : isOpen : false"
+    @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
+
+    @keypress:enter.stop.prevent="selectCursor"
+    @keypress:up.prevent="cursorUp"
+    @keypress:down.prevent="cursorDown"
+    @keypress:delete="captureDoubleDelete"
+
+    @open="isOpen = true"
+    @close="isOpen = false"
   >
-    <template #toggle="{unclickable}">
-      <WInput
-        ref="input"
-        :title="title"
-        :description="description"
-        :model-value="search"
-        :max-length="maxSearchLength"
-        :loading="loading"
-        :hide-input="isMobile ? !focused : !isOpen"
-        :readonly="(readonly || unclickable)"
-        :skeleton="skeleton"
-        :size="searchSize"
-        :error-message="errorMessage"
-        :required="required"
-        :disabled="disabled"
-        :has-changes="hasChanges"
+    <template #prefix>
+      <div
+        v-for="option in modelValue"
+        :key="option"
+        class="relative flex overflow-hidden items-center max-w-[calc(100%-2.75rem)]"
         :class="{
           'cursor-pointer': !disabled,
           'cursor-not-allowed': disabled,
         }"
-        @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
-        @keypress:enter.stop.prevent="selectCursor"
-        @keypress:up.prevent="cursorUp"
-        @keypress:down.prevent="cursorDown"
-        @keypress:delete="captureDoubleDelete"
-        @focus="open(); focused = true"
-        @blur="!isMobile && close(); focused = false"
-        @click:internal="isMobile && unclickable && open()"
       >
-        <template
-          v-if="hidePrefix ? isMobile ? !focused : !isOpen : true"
-          #prefix
+        <slot
+          name="option"
+          :option="option"
+          :selected="true"
+          :model="true"
         >
-          <div
-            v-for="option in modelValue"
-            :key="option"
-            class="relative flex overflow-hidden items-center max-w-[calc(100%-2.75rem)]"
-            :class="{
-              'cursor-pointer': !disabled,
-              'cursor-not-allowed': disabled,
-            }"
-          >
-            <slot
-              name="option"
-              :option="option"
-              :selected="true"
-              :model="true"
+          <template v-if="optionComponent">
+            <component
+              :is="optionComponent"
+              :model-value="option"
+              :is-selected="true"
             >
-              <template v-if="optionComponent">
-                <component
-                  :is="optionComponent"
-                  :model-value="option"
-                  :is-selected="true"
-                >
-                  <div
-                    v-if="!disableClear"
-                    class="w-ripple relative flex square-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center hover:bg-opacity-5 hover:bg-black-default"
-                    :class="{'cursor-progress': loading}"
-                    @mousedown.stop.prevent=""
-                    @click.stop.prevent="!loading && unselect(option)"
-                  >
-                    <IconCancel class="square-3 text-description" />
-                  </div>
-                </component>
-              </template>
-            </slot>
+              <div
+                v-if="!disableClear"
+                class="w-ripple relative flex square-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center hover:bg-opacity-5 hover:bg-black-default"
+                :class="{'cursor-progress': loading}"
+                @mousedown.stop.prevent=""
+                @click.stop.prevent="!loading && unselect(option)"
+              >
+                <IconCancel class="square-3 text-description" />
+              </div>
+            </component>
+          </template>
+        </slot>
 
-            <div
-              v-if="!optionComponent && !disableClear"
-              class="w-ripple relative flex square-5 rounded-full items-center justify-center hover:bg-opacity-5 hover:bg-black-default"
-              :class="{'cursor-progress': loading}"
-              @mousedown.stop.prevent=""
-              @click.stop.prevent="!loading && unselect(option)"
-            >
-              <IconCancel class="square-3 text-description" />
-            </div>
-          </div>
-        </template>
+        <div
+          v-if="!optionComponent && !disableClear"
+          class="w-ripple relative flex square-5 rounded-full items-center justify-center hover:bg-opacity-5 hover:bg-black-default"
+          :class="{'cursor-progress': loading}"
+          @mousedown.stop.prevent=""
+          @click.stop.prevent="!loading && unselect(option)"
+        >
+          <IconCancel class="square-3 text-description" />
+        </div>
+      </div>
+    </template>
 
-        <template #suffix>
-          <IconArrow
-            v-if="!disabled"
-            class="square-3 text-gray-400 dark:text-gray-600 transition-transform"
-            :class="{'rotate-180': isOpen}"
-          />
-        </template>
-
-        <template #right>
-          <slot name="right" />
-        </template>
-      </WInput>
+    <template #right>
+      <slot name="right" />
     </template>
 
     <template #content>
       <div
-        class="bg-default dark:bg-default-dark"
-        :class="{
-          'max-h-full': isMobile,
-          'rounded-xl shadow-md max-h-72 overflow-x-hidden overflow-y-overlay overscroll-contain mt-4 mb-1 dark:border dark:border-solid dark:border-gray-800': !isMobile,
-        }"
+        v-if="!options.length"
+        class="p-4 select-none cursor-default"
       >
-        <div
-          v-if="!options.length"
-          class="p-4 select-none cursor-default"
-        >
-          {{ emptyStub ?? 'No match' }}
-        </div>
+        {{ emptyStub ?? 'No match' }}
+      </div>
 
-        <SelectOption
-          v-for="(option, index) in options"
-          ref="selectOption"
-          :key="option"
-          :is-selected="modelValue.includes(option)"
-          :is-cursor="index === cursor"
-          :loading="loadingOptionIndex === index && loading"
-          class="relative"
-          :class="{
-            'cursor-progress': loading,
-            'w-ripple': !loading,
-          }"
-          @select="select(option); setLoadingOptionIndex(index)"
-          @unselect="unselect(option); setLoadingOptionIndex(index)"
-          @mouseenter="setCursor(index)"
-        >
-          <template #default="{selected}">
-            <slot
-              name="option"
-              :option="option"
-              :selected="selected"
-              :model="false"
-            >
-              <component
-                :is="optionComponent"
-                :model-value="option"
-                :is-selected="selected"
-              />
-            </slot>
-          </template>
-        </SelectOption>
-
-        <SelectOption
-          v-if="hasCreateButton"
-          :is-cursor="cursor === options.length"
-          :loading="loadingOptionIndex === options.length && loading"
-          class="relative"
-          :class="{
-            'cursor-progress': loading,
-            'w-ripple': !loading,
-          }"
-          @select="createOption(search)"
-          @mouseenter="setCursor(options.length)"
-        >
-          <span class="pr-2">
-            Create:
-          </span>
-
+      <SelectOption
+        v-for="(option, index) in options"
+        ref="selectOption"
+        :key="option"
+        :is-selected="modelValue.includes(option)"
+        :is-cursor="index === cursor"
+        :loading="loadingOptionIndex === index && loading"
+        class="relative"
+        :class="{
+          'cursor-progress': loading,
+          'w-ripple': !loading,
+        }"
+        @select="select(option); setLoadingOptionIndex(index)"
+        @unselect="unselect(option); setLoadingOptionIndex(index)"
+        @mouseenter="setCursor(index)"
+      >
+        <template #default="{selected}">
           <slot
             name="option"
-            :option="search"
-            :selected="false"
+            :option="option"
+            :selected="selected"
             :model="false"
           >
             <component
               :is="optionComponent"
-              :model-value="search"
-              :is-selected="false"
+              :model-value="option"
+              :is-selected="selected"
             />
           </slot>
-        </SelectOption>
-      </div>
+        </template>
+      </SelectOption>
+
+      <SelectOption
+        v-if="hasCreateButton"
+        :is-cursor="cursor === options.length"
+        :loading="loadingOptionIndex === options.length && loading"
+        class="relative"
+        :class="{
+          'cursor-progress': loading,
+          'w-ripple': !loading,
+        }"
+        @select="createOption(search)"
+        @mouseenter="setCursor(options.length)"
+      >
+        <span class="pr-2">
+          Create:
+        </span>
+
+        <slot
+          name="option"
+          :option="search"
+          :selected="false"
+          :model="false"
+        >
+          <component
+            :is="optionComponent"
+            :model-value="search"
+            :is-selected="false"
+          />
+        </slot>
+      </SelectOption>
     </template>
-  </component>
+  </WInputSuggest>
 </template>
 
 <script lang="ts" setup>
 import {ref, watch, toRef, nextTick, computed} from 'vue'
-import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
-import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import SelectOption from './components/SelectOption.vue'
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
-import WInput from '@/components/Input/WInput.vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
-import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 import {getIsMobile} from '@/utils/mobile'
 import {debounce} from '@/utils/utils'
+import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 const props = defineProps<{
   modelValue: string[]
@@ -220,8 +187,7 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = ref(false)
-const dropdownMenu = ref<InstanceType<typeof WDropdownMenu> | undefined>()
-const input = ref<InstanceType<typeof WInput> | undefined>()
+const input = ref<InstanceType<typeof WInputSuggest> | undefined>()
 const cursor = ref<number>(-1)
 const isCursorLocked = ref(false)
 const hasCreateButton = computed(() => props.allowCreate && props.search.length && !props.options.includes(props.search))
@@ -315,18 +281,6 @@ const captureDoubleDelete = () => {
   }
 }
 
-const open = () => {
-  if (isDisabled.value) return
-
-  isOpen.value = true
-}
-
-const close = () => {
-  isOpen.value = false
-
-  emit('update:search', '')
-}
-
 const select = (item: string): void => {
   if (isDisabled.value) return
 
@@ -359,7 +313,7 @@ const blur = () => {
 watch(toRef(props, 'modelValue'), async () => {
   await nextTick()
 
-  dropdownMenu.value?.updateDropdown?.()
+  input.value?.updateDropdown()
 })
 
 defineExpose({

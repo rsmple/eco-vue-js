@@ -5,26 +5,35 @@
       :unclickable="false"
     />
 
-    <Transition
-      enter-active-class="fade-enter-active"
-      leave-active-class="fade-leave-active"
-      enter-from-class="fade-enter-from"
-      leave-to-class="fade-leave-to"
+    <Teleport
+      to="body"
+      :disabled="!teleport"
     >
-      <WDropdown
-        v-if="container && isOpen"
-        ref="dropdown"
-        :parent-element="container"
-        :horizontal-align="horizontalAlign"
-        :update-align="updateAlign"
-        :max-height="maxHeight"
-        :max-width="maxWidth"
-        :emit-update="emitUpdate"
-        @update:rect="$emit('update:rect')"
+      <Transition
+        enter-active-class="transition-opacity"
+        leave-active-class="transition-opacity"
+        enter-from-class="opacity-0"
+        leave-to-class="opacity-0"
       >
-        <slot name="content" />
-      </WDropdown>
-    </Transition>
+        <WDropdown
+          v-if="container && isOpen"
+          ref="dropdown"
+          :parent-element="container"
+          :horizontal-align="horizontalAlign"
+          :update-align="updateAlign"
+          :max-height="maxHeight"
+          :max-width="maxWidth"
+          :emit-update="emitUpdate"
+          :class="{
+            'z-[2]': !teleport,
+            'z-30': teleport,
+          }"
+          @update:rect="$emit('update:rect')"
+        >
+          <slot name="content" />
+        </WDropdown>
+      </Transition>
+    </teleport>
   </div>
 </template>
 
@@ -40,6 +49,7 @@ defineProps<{
   horizontalAlign: HorizontalAlign
   updateAlign?: boolean
   emitUpdate?: boolean
+  teleport?: boolean
 }>()
 
 defineEmits<{

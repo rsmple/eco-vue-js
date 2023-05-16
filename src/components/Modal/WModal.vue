@@ -1,10 +1,10 @@
 <template>
   <div class="z-[1000]">
     <Transition
-      enter-active-class="fade-enter-active"
-      leave-active-class="fade-leave-active"
-      enter-from-class="fade-enter-from"
-      leave-to-class="fade-leave-to"
+      enter-active-class="transition-opacity"
+      leave-active-class="transition-opacity"
+      enter-from-class="opacity-0"
+      leave-to-class="opacity-0"
     >
       <div
         v-if="isBackdropVisible"
@@ -14,10 +14,10 @@
     </Transition>
 
     <TransitionGroup
-      enter-active-class="pop-up-enter-active"
-      leave-active-class="pop-up-leave-active"
-      enter-from-class="pop-up-enter-from"
-      leave-to-class="pop-up-leave-to"
+      enter-active-class="transition-all duration-500"
+      leave-active-class="transition-all duration-500"
+      enter-from-class="scale-50 translate-y-5 opacity-0"
+      leave-to-class="scale-50 opacity-0"
     >
       <div
         v-for="(modalMeta, index) in modalMetaList"
