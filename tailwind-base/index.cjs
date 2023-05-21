@@ -92,9 +92,9 @@ module.exports = {
       },
     },
     fontFamily: {
-      sans: ['MontSerrat', 'Arial'],
-      roboto: ['Roboto'],
-      mono: ['RobotoMono'],
+      sans: ['MontSerrat', 'system-ui'],
+      roboto: ['Roboto', 'system-ui'],
+      mono: ['RobotoMono', 'system-ui'],
     },
   },
   plugins: [

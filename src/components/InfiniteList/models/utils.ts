@@ -1,14 +1,14 @@
 
 const TRIGGER_FACTOR = 200
 
-export const getIsScrollUp = (): boolean => {
-  if (!document.scrollingElement) return false
+export const getIsScrollUp = (element: Element | null): boolean => {
+  if (!element) return false
 
-  return document.scrollingElement.scrollTop < TRIGGER_FACTOR
+  return element.scrollTop < TRIGGER_FACTOR
 }
 
-export const getIsScrollDown = (): boolean => {
-  if (!document.scrollingElement) return false
+export const getIsScrollDown = (element: Element | null): boolean => {
+  if (!element) return false
 
-  return document.scrollingElement.scrollTop > (document.scrollingElement.scrollHeight - document.scrollingElement.clientHeight) - TRIGGER_FACTOR
+  return element.scrollTop > (element.scrollHeight - element.clientHeight) - TRIGGER_FACTOR
 }

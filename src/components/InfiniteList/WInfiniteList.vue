@@ -47,14 +47,14 @@
       :query-params="{...queryParams, page}"
       :use-query-fn="useQueryFn"
       :is-invalid-page="isInvalidPage"
-      :is-enabled="isEnabled"
-      :content-component="pageContentComponent"
-      :key-getter="keyGetter"
-      :skeleton-length="skeletonLength ? skeletonLength > ((page - 1) * 24) ? Math.min(skeletonLength - ((page - 1) * 24), 24) : 24 : undefined"
+      :skeleton-length="skeletonLength !== undefined ? Math.min(skeletonLength - ((page - 1) * pageLength), pageLength) : undefined"
       :first-page="index === 0"
       :last-page="index === pages.length - 1"
       :hide-page-title="hidePageTitle"
-      :page-label-with-margin="pageLabelWithMargin"
+      :selected="selected"
+      :wrap="wrap"
+      :no-gap="noGap"
+      :transition="transition"
       :style="{'--infinite-list-header-height': headerHeight + 'px'}"
       class="last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16"
       @update:count="updateCount($event); $emit('update:count', $event)"
@@ -65,6 +65,7 @@
       @error:invalid-page="removePage"
       @refetch="refetchNextPages(index)"
       @update-from-header:scroll="headerTop > 0 && updateScroll(headerTop)"
+      @update:selected="$emit('update:selected', $event)"
     >
       <template #default="{item, setter, skeleton, refetch}">
         <slot
@@ -101,30 +102,33 @@ const props = withDefaults(
   defineProps<{
     useQueryFn: UseDefaultQueryFn
     isInvalidPage: (error: unknown) => boolean
-    isEnabled?: boolean
-    pageContentComponent?: VueComponent
-    keyGetter?: (data: unknown, index: number) => string | number
     parseQuery?: (query: LocationQueryRaw) => QueryParams
     skeletonLength?: number
     hidePageTitle?: boolean
     headerMargin?: number
-    pageLabelWithMargin?: boolean
     skipScrollTarget?: boolean
     skipPageUpdate?: boolean
+    selected?: number[]
+    wrap?: boolean
+    noGap?: boolean
+    transition?: boolean
+    pageLength?: number
   }>(),
   {
     isEnabled: true,
-    pageContentComponent: undefined,
     keyGetter: undefined,
     parseQuery: undefined,
-    skeletonLength: 24,
+    skeletonLength: undefined,
     headerMargin: 0,
+    selected: undefined,
+    pageLength: 24,
   },
 )
 
 const emit = defineEmits<{
   (e: 'update:header-padding', value: number): void
   (e: 'update:count', value: number): void
+  (e: 'update:selected', values: number[]): void
 }>()
 
 const route = useRoute()
@@ -172,7 +176,7 @@ const updatePagesCount = (value: number): void => {
 const updateNextPage = (value: number | null): void => {
   nextPage.value = value
 
-  if (pages.value.length === 1 && getIsScrollDown()) addNextPage(true)
+  if (pages.value.length === 1 && getIsScrollDown(document.scrollingElement)) addNextPage(true)
 }
 
 const updatePreviousPage = (value: number | null): void => {

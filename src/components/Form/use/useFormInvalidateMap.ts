@@ -3,9 +3,9 @@ import {wFormInvalidateUpdater} from '../models/injection'
 import {removeKey} from '../models/utils'
 
 export const useFormInvalidateMap = (name: Ref<string | undefined>) => {
-  const invalidateMap = ref<Record<string, (messages: Record<string, string>) => void>>({})
+  const invalidateMap = ref<Record<string, (messages: Record<string, string | string[]>) => void>>({})
 
-  const invalidateMapUpdater = (key: string, value: (messages: Record<string, string>) => void): void => {
+  const invalidateMapUpdater = (key: string, value: (messages: Record<string, string | string[]>) => void): void => {
     invalidateMap.value = {...invalidateMap.value, [key]: value}
   }
 
@@ -13,8 +13,8 @@ export const useFormInvalidateMap = (name: Ref<string | undefined>) => {
     invalidateMap.value = removeKey(invalidateMap.value, key)
   }
 
-  const invalidate = (payload: Record<string, string>): void => {
-    Object.keys(payload).forEach(key => {
+  const invalidate = (payload: Record<string, string | string[]>): void => {
+    Object.keys(invalidateMap.value).forEach(key => {
       invalidateMap.value[key]?.(payload)
     })
   }

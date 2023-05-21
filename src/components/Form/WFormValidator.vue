@@ -149,10 +149,13 @@ const validate = (silent?: boolean): string | undefined => {
   return message
 }
 
-const invalidate = (messages: Record<string, string>): void => {
+const invalidate = (messages: Record<string, string | string[]>): void => {
   if (!props.name) return
 
-  errorMessage.value = messages[props.name]
+  const message = messages[props.name]
+
+  if (typeof message === 'string') errorMessage.value = message
+  else errorMessage.value = message.join(', ')
 }
 
 const initModel = (): void => {

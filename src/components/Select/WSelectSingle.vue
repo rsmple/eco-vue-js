@@ -15,12 +15,14 @@
       :allow-create="allowCreate"
       :error-message="errorMessage"
       :has-changes="hasChanges"
+      :show-marker="showMarker"
       disable-clear
       hide-prefix
       @select="updateModelValue($event)"
       @unselect="updateModelValue($event)"
       @update:search="emit('update:search', $event)"
       @create:option="updateModelValue($event)"
+      @show:marker="$emit('show:marker')"
     >
       <template #option="{option, selected, model}">
         <slot
@@ -56,11 +58,13 @@ defineProps<{
   allowCreate?: boolean
   errorMessage?: string
   hasChanges?: boolean
+  showMarker?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
   (e: 'update:search', value: string): void
+  (e: 'show:marker'): void
 }>()
 
 const selectComponent = ref<InstanceType<typeof WSelect> | undefined>()

@@ -16,12 +16,12 @@ const listener = (event: Event): void => {
 
   if (!document.scrollingElement) return
 
-  if (getIsScrollUp()) {
+  if (getIsScrollUp(document.scrollingElement)) {
     emit('scroll:up')
     return
   }
 
-  if (getIsScrollDown()) {
+  if (getIsScrollDown(document.scrollingElement)) {
     emit('scroll:down')
   }
 }

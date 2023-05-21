@@ -3,59 +3,86 @@
     ref="element"
     class="relative"
   >
-    <template v-if="queryParams.page && data?.results?.length !== 0">
-      <RouterLink
-        v-if="!hidePageTitle"
-        class="block text-description text-base font-normal no-underline hover:underline"
-        :to="{query: queryParams, hash: $route.hash}"
+    <template v-if="queryParams.page && data?.results?.length !== 0 && skeletonLength !== 0">
+      <div
+        class="flex"
         :class="{
-          'py-2 sm-not:ml-5': !pageLabelWithMargin,
-          'ml-16 sm-not:ml-[3.75rem] pb-4 pt-6': pageLabelWithMargin
+          'pb-4 pt-6': selected !== undefined || !hidePageTitle,
+          'sm:pt-6': selected === undefined && !hidePageTitle,
         }"
-        replace
-        @click="copyRoute"
       >
-        Page: {{ queryParams.page }}
-      </RouterLink>
+        <InfiniteListPageSelection
+          v-if="selected !== undefined"
+          :selected="selected"
+          :items="data?.results ?? []"
+          :disabled="!data?.results"
+          @update:selected="$emit('update:selected', $event)"
+        />
+
+        <InfiniteListPageTitle
+          v-if="!hidePageTitle"
+          :query-params="queryParams"
+          :selected="selected"
+        />
+      </div>
 
       <div
-        v-else
-        class="h-6"
-      />
-
-      <component
-        :is="contentComponent || 'div'"
-        v-bind="contentComponent ? {items: data?.results ?? [], skeleton: !data?.results} : undefined"
-        @update:items="updateItems($event)"
+        class="flex items-start justify-start"
+        :class="{
+          'sm-not:flex-col sm:flex-wrap': wrap,
+          'flex-col': !wrap,
+          'sm:gap-4': !noGap,
+        }"
       >
-        <TransitionGroup
-          v-if="data?.results"
-          v-bind="{
-            leaveActiveClass: 'slide-leave-active',
-            leaveToClass: 'slide-leave-to',
-          }"
-        >
-          <slot
-            v-for="(item, index) in data.results"
-            :key="keyGetter?.(item, index) ?? index"
-            :item="item"
-            :setter="getItemSetter(index)"
-            :refetch="emitRefetch"
-            :skeleton="false"
-          />
-        </TransitionGroup>
+        <template v-if="data?.results">
+          <TransitionGroup
+            v-if="transition"
+            enter-active-class="transition-[grid-template-rows] overflow-hidden grid"
+            enter-from-class="grid-rows-[0fr]"
+            enter-to-class="grid-rows-[1fr]"
+            leave-active-class="transition-[grid-template-rows] overflow-hidden grid"
+            leave-from-class="grid-rows-[1fr]"
+            leave-to-class="grid-rows-[0fr]"
+          >
+            <div
+              v-for="(item, index) in data.results"
+              :key="item.id"
+              class="w-full"
+            >
+              <div class="[overflow:inherit]">
+                <slot
+                  :item="item"
+                  :setter="getItemSetter(index)"
+                  :refetch="emitRefetch"
+                  :skeleton="false"
+                />
+              </div>
+            </div>
+          </TransitionGroup>
+
+          <template v-else>
+            <slot
+              v-for="(item, index) in data.results"
+              :key="item.id"
+              :item="item"
+              :setter="getItemSetter(index)"
+              :refetch="emitRefetch"
+              :skeleton="false"
+            />
+          </template>
+        </template>
 
         <template v-else>
           <slot
-            v-for="(item, index) in Array(skeletonLength ?? 0).fill(undefined).map((_, i) => ({id: i}))"
+            v-for="index in skeletonLength"
             :key="index"
-            :item="item"
+            :item="{id: index}"
             :setter="getItemSetter(index)"
             :refetch="emitRefetch"
             :skeleton="true"
           />
         </template>
-      </component>
+      </div>
     </template>
 
     <div
@@ -69,29 +96,28 @@
 
 <script lang="ts" setup>
 import {toRef, computed, watch, ref, onMounted, nextTick} from 'vue'
-import {RouterLink, useRoute, useRouter} from 'vue-router'
-import {Notify} from '@/utils/Notify'
 import type {QueryParams, UseDefaultQueryFn} from '../models/types'
+import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
+import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
 
 const props = withDefaults(
   defineProps<{
     queryParams: QueryParams
     useQueryFn: UseDefaultQueryFn
     isInvalidPage: (error: unknown) => boolean
-    isEnabled?: boolean
-    contentComponent?: VueComponent
-    keyGetter?: (data: unknown, index: number) => string | number
     skeletonLength?: number
     firstPage: boolean
     lastPage: boolean
     hidePageTitle?: boolean
-    pageLabelWithMargin?: boolean
+    selected?: number[]
+    wrap?: boolean
+    noGap?: boolean
+    transition?: boolean
   }>(),
   {
-    isEnabled: true,
-    contentComponent: undefined,
     keyGetter: undefined,
     skeletonLength: 24,
+    selected: undefined,
   },
 )
 
@@ -104,27 +130,18 @@ const emit = defineEmits<{
   (e: 'error:invalidPage', value: number): void
   (e: 'refetch'): void
   (e: 'update-from-header:scroll'): void
+  (e: 'update:selected', values: number[]): void
 }>()
-
-const route = useRoute()
-const router = useRouter()
 
 const queryParams = toRef(props, 'queryParams')
 const element = ref<HTMLElement>()
-const enabled = toRef(props, 'isEnabled')
 
-const {data, error, setData, refetch} = props.useQueryFn(queryParams, {enabled})
+const {data, error, setData, refetch} = props.useQueryFn(queryParams)
 
 const count = computed(() => data.value?.count)
 const pagesCount = computed(() => data.value?.pages_count)
 const nextPage = computed(() => data.value?.next)
 const previousPage = computed(() => data.value?.previous)
-
-const copyRoute = (): void => {
-  navigator.clipboard
-    .writeText(location.origin + router.resolve({query: queryParams.value, hash: route.hash}).href)
-    .then(() => Notify.success({title: 'Page url copied'}))
-}
 
 const getItemSetter = <Item = unknown>(index: number) => {
   return (newItem?: Item): void => {
@@ -140,15 +157,6 @@ const getItemSetter = <Item = unknown>(index: number) => {
 
     setData(newData)
   }
-}
-
-const updateItems = <Item = unknown>(items: Item[]): void => {
-  if (!data.value) return
-
-  setData({
-    ...data.value,
-    results: [...items],
-  })
 }
 
 const emitRefetch = () => {

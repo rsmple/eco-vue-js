@@ -116,6 +116,11 @@
         </template>
       </SelectOption>
 
+      <SelectListMarker
+        v-if="showMarker"
+        @update:intersecting="$event && $emit('show:marker')"
+      />
+
       <SelectOption
         v-if="hasCreateButton"
         :is-cursor="cursor === options.length"
@@ -156,6 +161,7 @@ import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 import {getIsMobile} from '@/utils/mobile'
 import {debounce} from '@/utils/utils'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
+import SelectListMarker from './components/SelectListMarker.vue'
 
 const props = defineProps<{
   modelValue: string[]
@@ -177,6 +183,7 @@ const props = defineProps<{
   errorMessage?: string
   required?: boolean
   hasChanges?: boolean
+  showMarker?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -184,6 +191,7 @@ const emit = defineEmits<{
   (e: 'unselect', item: string): void
   (e: 'update:search', value: string): void
   (e: 'create:option', value: string): void
+  (e: 'show:marker'): void
 }>()
 
 const isOpen = ref(false)
