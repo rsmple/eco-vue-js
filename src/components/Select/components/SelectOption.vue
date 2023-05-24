@@ -1,10 +1,12 @@
 <template>
   <div
     ref="element"
-    class="flex w-full select-none cursor-pointer py-2 px-4 first:pt-4 last:pb-4"
+    class="relative flex w-full select-none cursor-pointer py-2 px-4"
     :class="{
       'bg-primary-light dark:bg-primary-darkest': isSelected,
-      'before:opacity-5': isCursor,
+      'before:opacity-5': isCursor && !skeleton,
+      'cursor-progress': loading || skeleton,
+      'w-ripple': !loading && !skeleton,
     }"
     @mousedown.prevent.stop=""
     @click.prevent.stop="toggle"
@@ -31,7 +33,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue'
+import {onUnmounted, ref, toRef, watch} from 'vue'
 import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 
@@ -39,11 +41,23 @@ const props = defineProps<{
   isSelected?: boolean
   isCursor?: boolean
   loading?: boolean
+  skeleton?: boolean
+  scroll?: boolean
+  first?: boolean
+  last?: boolean
+  previous?: number
+  next?: number
+  isNoCursor?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'select'): void
   (e: 'unselect'): void
+  (e: 'update:is-cursor'): void
+  (e: 'update:cursor'): void
+  (e: 'update:previous', value: number | undefined): void
+  (e: 'update:next', value: number | undefined): void
+  (e: 'unmounted'): void
 }>()
 
 const element = ref<HTMLDivElement>()
@@ -58,6 +72,30 @@ const toggle = () => {
 const scrollIntoView = () => {
   element.value?.scrollIntoView({behavior: 'auto', block: 'center'})
 }
+
+watch(toRef(props, 'isCursor'), value => {
+  if (!value) return
+
+  emit('update:is-cursor')
+
+  if (props.scroll) scrollIntoView()
+}, {immediate: true})
+
+watch(toRef(props, 'isNoCursor'), value => {
+  if (value && props.first && !props.skeleton) emit('update:cursor')
+}, {immediate: true})
+
+watch(toRef(props, 'previous'), value => {
+  if (props.isCursor && !props.skeleton) emit('update:previous', value)
+}, {immediate: true})
+
+watch(toRef(props, 'next'), value => {
+  if (props.isCursor && !props.skeleton) emit('update:next', value)
+}, {immediate: true})
+
+onUnmounted(() => {
+  if (props.isCursor) emit('unmounted')
+})
 
 defineExpose({
   scrollIntoView,

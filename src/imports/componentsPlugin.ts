@@ -14,6 +14,7 @@ import WFilePicker from '@/components/FilePicker/WFilePicker.vue'
 import WForm from '@/components/Form/WForm.vue'
 import WFormValidator from '@/components/Form/WFormValidator.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
+import WInfiniteListPages from '@/components/InfiniteList/WInfiniteListPages.vue'
 import WInput from '@/components/Input/WInput.vue'
 import WInputAsync from '@/components/Input/WInputAsync.vue'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
@@ -23,6 +24,7 @@ import WModal from '@/components/Modal/WModal.vue'
 import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
 import WNotify from '@/components/Notify/WNotify.vue'
 import WSelect from '@/components/Select/WSelect.vue'
+import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 import WSelectSingle from '@/components/Select/WSelectSingle.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
@@ -48,6 +50,7 @@ export default {
     app.component('WForm', WForm)
     app.component('WFormValidator', WFormValidator)
     app.component('WInfiniteList', WInfiniteList)
+    app.component('WInfiniteListPages', WInfiniteListPages)
     app.component('WInput', WInput)
     app.component('WInputAsync', WInputAsync)
     app.component('WInputSuggest', WInputSuggest)
@@ -57,6 +60,7 @@ export default {
     app.component('WModalWrapper', WModalWrapper)
     app.component('WNotify', WNotify)
     app.component('WSelect', WSelect)
+    app.component('WSelectAsync', WSelectAsync)
     app.component('WSelectSingle', WSelectSingle)
     app.component('WSkeleton', WSkeleton)
     app.component('WSpinner', WSpinner)
@@ -82,6 +86,7 @@ export {
   WForm,
   WFormValidator,
   WInfiniteList,
+  WInfiniteListPages,
   WInput,
   WInputAsync,
   WInputSuggest,
@@ -91,6 +96,7 @@ export {
   WModalWrapper,
   WNotify,
   WSelect,
+  WSelectAsync,
   WSelectSingle,
   WSkeleton,
   WSpinner,

@@ -3,12 +3,12 @@
     ref="element"
     class="relative"
   >
-    <template v-if="queryParams.page && data?.results?.length !== 0 && skeletonLength !== 0">
+    <template v-if="queryParams.page && data?.results.length !== 0">
       <div
         class="flex"
         :class="{
           'pb-4 pt-6': selected !== undefined || !hidePageTitle,
-          'sm:pt-6': selected === undefined && !hidePageTitle,
+          'sm:pt-6': selected === undefined && hidePageTitle && !noGap,
         }"
       >
         <InfiniteListPageSelection
@@ -47,7 +47,7 @@
             <div
               v-for="(item, index) in data.results"
               :key="item.id"
-              class="w-full"
+              class="w-full group"
             >
               <div class="[overflow:inherit]">
                 <slot
@@ -55,6 +55,10 @@
                   :setter="getItemSetter(index)"
                   :refetch="emitRefetch"
                   :skeleton="false"
+                  :next="data?.results[index + 1]"
+                  :previous="data?.results[index - 1]"
+                  :first="firstPage && index === 0"
+                  :last="lastPage && index === data.results.length - 1"
                 />
               </div>
             </div>
@@ -68,6 +72,10 @@
               :setter="getItemSetter(index)"
               :refetch="emitRefetch"
               :skeleton="false"
+              :next="data?.results[index + 1]"
+              :previous="data?.results[index - 1]"
+              :first="firstPage && index === 0"
+              :last="lastPage && index === data.results.length - 1"
             />
           </template>
         </template>
@@ -80,6 +88,10 @@
             :setter="getItemSetter(index)"
             :refetch="emitRefetch"
             :skeleton="true"
+            :next="undefined"
+            :previous="undefined"
+            :first="firstPage && index === 1"
+            :last="lastPage && index === skeletonLength"
           />
         </template>
       </div>
@@ -105,7 +117,7 @@ const props = withDefaults(
     queryParams: QueryParams
     useQueryFn: UseDefaultQueryFn
     isInvalidPage: (error: unknown) => boolean
-    skeletonLength?: number
+    skeletonLength: number
     firstPage: boolean
     lastPage: boolean
     hidePageTitle?: boolean
@@ -116,7 +128,6 @@ const props = withDefaults(
   }>(),
   {
     keyGetter: undefined,
-    skeletonLength: 24,
     selected: undefined,
   },
 )
@@ -133,10 +144,9 @@ const emit = defineEmits<{
   (e: 'update:selected', values: number[]): void
 }>()
 
-const queryParams = toRef(props, 'queryParams')
 const element = ref<HTMLElement>()
 
-const {data, error, setData, refetch} = props.useQueryFn(queryParams)
+const {data, error, setData, refetch} = props.useQueryFn(toRef(props, 'queryParams'))
 
 const count = computed(() => data.value?.count)
 const pagesCount = computed(() => data.value?.pages_count)
@@ -170,6 +180,16 @@ const refetchPage = async () => {
   if (props.firstPage && previousPage.value !== undefined) emit('update:previousPage', previousPage.value)
 }
 
+const getFirst = () => {
+  if (!data.value) return undefined
+  return data.value.results[0]
+}
+
+const getLast = () => {
+  if (!data.value) return undefined
+  return data.value.results[data.value.results.length - 1]
+}
+
 watch(count, value => {
   if (value !== undefined) emit('update:count', value)
 }, {immediate: true})
@@ -192,7 +212,7 @@ watch(error, (error: unknown): void => {
 
 let height = 0
 
-onMounted(async () => {
+onMounted(() => {
   height = element.value?.getBoundingClientRect()?.height ?? 0
 
   if (height === 0) return
@@ -221,6 +241,8 @@ watch(data, async (_, oldValue) => {
 })
 
 defineExpose({
+  getFirst,
+  getLast,
   refetch: refetchPage,
 })
 

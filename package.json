@@ -132,6 +132,9 @@
     "./dist/components/InfiniteList/WInfiniteList.vue": {
       "import": "./dist/components/InfiniteList/WInfiniteList.vue.js"
     },
+    "./dist/components/InfiniteList/WInfiniteListPages.vue": {
+      "import": "./dist/components/InfiniteList/WInfiniteListPages.vue.js"
+    },
     "./dist/components/Input/WInput.vue": {
       "import": "./dist/components/Input/WInput.vue.js"
     },
@@ -158,6 +161,9 @@
     },
     "./dist/components/Select/WSelect.vue": {
       "import": "./dist/components/Select/WSelect.vue.js"
+    },
+    "./dist/components/Select/WSelectAsync.vue": {
+      "import": "./dist/components/Select/WSelectAsync.vue.js"
     },
     "./dist/components/Select/WSelectSingle.vue": {
       "import": "./dist/components/Select/WSelectSingle.vue.js"

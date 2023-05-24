@@ -62,6 +62,7 @@
 
     <template #content>
       <div
+        ref="content"
         class="bg-default dark:bg-default-dark w-full"
         :class="{
           'max-h-full pb-20': isMobile,
@@ -75,6 +76,7 @@
           >
             <component
               :is="slot"
+              :scrolling-element="isMobile ? content?.parentElement : content"
               @close="close"
             />
           </template>
@@ -130,6 +132,7 @@ const dropdownMenu = ref<InstanceType<typeof WDropdownMenu> | undefined>()
 const input = ref<InstanceType<typeof WInput> | undefined>()
 const isMobile = getIsMobile()
 const focused = ref(false)
+const content = ref<HTMLDivElement | undefined>()
 
 const isDisabled = computed(() => props.readonly || props.disabled)
 

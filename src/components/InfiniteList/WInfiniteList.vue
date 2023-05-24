@@ -1,13 +1,5 @@
 <template>
-  <div
-    ref="indicator"
-    class="relative"
-  >
-    <div
-      ref="target"
-      class="absolute -h--header-height w-full bottom-0 pointer-events-none"
-    />
-  </div>
+  <div ref="indicator" />
 
   <div
     ref="header"
@@ -31,241 +23,108 @@
     </div>
   </div>
 
-  <InfiniteListScroll
-    @scroll:down="addNextPage"
-    @scroll:up="addPreviousPage"
+  <WInfiniteListPages
+    :query-params="queryParams"
+    :use-query-fn="useQueryFn"
+    :is-invalid-page="isInvalidPage"
+    :scrolling-element="scrollingElement"
+
+    :skip-scroll-target="skipScrollTarget"
+    :skeleton-length="skeletonLength"
+    :hide-page-title="hidePageTitle"
+    :selected="selected"
+    :wrap="wrap"
+    :no-gap="noGap"
+    :transition="transition"
+    :page-length="pageLength"
+    :header-top="headerTopIgnore ? 0 : headerTop"
+    :header-height="headerHeight"
+    :min-height="minHeight"
+
+    @update:count="$emit('update:count', $event)"
+    @update:selected="$emit('update:selected', $event)"
+    @update:page="$emit('update:page', $event)"
   >
-    <InfiniteListButton
-      v-if="isPreviousButtonVisible"
-      @click="addPreviousPage()"
-    />
-
-    <InfiniteListPage
-      v-for="(page, index) in pages"
-      ref="pageComponent"
-      :key="page"
-      :query-params="{...queryParams, page}"
-      :use-query-fn="useQueryFn"
-      :is-invalid-page="isInvalidPage"
-      :skeleton-length="skeletonLength !== undefined ? Math.min(skeletonLength - ((page - 1) * pageLength), pageLength) : undefined"
-      :first-page="index === 0"
-      :last-page="index === pages.length - 1"
-      :hide-page-title="hidePageTitle"
-      :selected="selected"
-      :wrap="wrap"
-      :no-gap="noGap"
-      :transition="transition"
-      :style="{'--infinite-list-header-height': headerHeight + 'px'}"
-      class="last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16"
-      @update:count="updateCount($event); $emit('update:count', $event)"
-      @update:pages-count="updatePagesCount"
-      @update:next-page="updateNextPage"
-      @update:previous-page="updatePreviousPage"
-      @update:scroll="updateScroll"
-      @error:invalid-page="removePage"
-      @refetch="refetchNextPages(index)"
-      @update-from-header:scroll="headerTop > 0 && updateScroll(headerTop)"
-      @update:selected="$emit('update:selected', $event)"
-    >
-      <template #default="{item, setter, skeleton, refetch}">
-        <slot
-          :item="item"
-          :setter="setter"
-          :skeleton="skeleton"
-          :refetch="refetch"
-        />
-      </template>
-    </InfiniteListPage>
-
-    <InfiniteListButton
-      v-if="count !== 0 && nextPage"
-      @click="addNextPage"
-    />
-  </InfiniteListScroll>
+    <template #default="{item, setter, skeleton, refetch, previous, next, first, last}">
+      <slot
+        :item="item"
+        :setter="setter"
+        :skeleton="skeleton"
+        :refetch="refetch"
+        :previous="previous"
+        :next="next"
+        :first="first"
+        :last="last"
+      />
+    </template>
+  </WInfiniteListPages>
 </template>
 
 <script lang="ts" setup>
-import {ref, computed, watch, toRef, nextTick} from 'vue'
-import {useRoute, useRouter, type LocationQueryRaw} from 'vue-router'
-import InfiniteListScroll from './components/InfiniteListScroll.vue'
-import InfiniteListPage from './components/InfiniteListPage.vue'
+import {onBeforeUnmount, ref, watch} from 'vue'
 import type {QueryParams, UseDefaultQueryFn} from './models/types'
-import {useRefetchNextPages} from './use/useRefetchNextPages'
 import {useInfiniteListHeader} from './use/useInfiniteListHeader'
-import InfiniteListButton from './components/InfiniteListButton.vue'
-import {isEqualObj} from '@/utils/utils'
-import {getIsScrollDown} from './models/utils'
-
-const MAX_PAGES = 5
+import WInfiniteListPages from './WInfiniteListPages.vue'
 
 const props = withDefaults(
   defineProps<{
     useQueryFn: UseDefaultQueryFn
     isInvalidPage: (error: unknown) => boolean
-    parseQuery?: (query: LocationQueryRaw) => QueryParams
+    queryParams: QueryParams
     skeletonLength?: number
     hidePageTitle?: boolean
     headerMargin?: number
     skipScrollTarget?: boolean
-    skipPageUpdate?: boolean
     selected?: number[]
     wrap?: boolean
     noGap?: boolean
     transition?: boolean
     pageLength?: number
+    scrollingElement?: Element | null
+    headerTopIgnore?: boolean
+    minHeight?: boolean
   }>(),
   {
-    isEnabled: true,
-    keyGetter: undefined,
-    parseQuery: undefined,
     skeletonLength: undefined,
     headerMargin: 0,
     selected: undefined,
-    pageLength: 24,
+    pageLength: undefined,
+    scrollingElement: undefined,
   },
 )
 
 const emit = defineEmits<{
+  (e: 'update:page', value: number | undefined): void
   (e: 'update:header-padding', value: number): void
   (e: 'update:count', value: number): void
   (e: 'update:selected', values: number[]): void
+  (e: 'close'): void
 }>()
 
-const route = useRoute()
-const router = useRouter()
-
-const queryParams = computed<QueryParams>(() => props.parseQuery ? props.parseQuery(route.query) : (route.query as QueryParams))
-const queryParamsStrict = computed(() => {
-  const params: Omit<QueryParams, 'page'> = {...queryParams.value}
-
-  delete params.page
-
-  return params
-})
-
-const pages = ref<number[]>([queryParams.value.page ?? 1])
-const pagesCount = ref(1)
-const count = ref(0)
-const nextPage = ref<number | null>()
-const previousPage = ref<number | null>()
-const target = ref<HTMLDivElement | undefined>()
-
-const isPreviousButtonVisible = computed<boolean>(() => {
-  if (pages.value.length === 1 && pages.value[0] > 1) return true
-  if (count.value === 0) return false
-  if (previousPage.value) return true
-
-  return false
-})
+const infiniteList = ref<InstanceType<typeof WInfiniteListPages> | undefined>()
 
 const updateHeaderPadding = (value: number): void => {
   emit('update:header-padding', value)
 }
 
-const {indicator, header, headerTop, headerHeight, isIntersecting} = useInfiniteListHeader(toRef(props, 'headerMargin'), updateHeaderPadding)
-const {pageComponent, refetchNextPages} = useRefetchNextPages()
+const {indicator, header, headerTop, headerHeight, isIntersecting} = useInfiniteListHeader(props.scrollingElement)
 
-const updateCount = (value: number): void => {
-  count.value = value
-}
+watch(isIntersecting, value => {
+  if (!value && headerHeight.value) {
+    updateHeaderPadding(headerHeight.value - props.headerMargin)
+  } else {
+    updateHeaderPadding(0)
+  }
+})
 
-const updatePagesCount = (value: number): void => {
-  pagesCount.value = value
-}
-
-const updateNextPage = (value: number | null): void => {
-  nextPage.value = value
-
-  if (pages.value.length === 1 && getIsScrollDown(document.scrollingElement)) addNextPage(true)
-}
-
-const updatePreviousPage = (value: number | null): void => {
-  previousPage.value = value
-
-  if (pages.value.length === 1) addPreviousPage(true)
-}
-
-const addNextPage = (silent?: boolean) => {
-  if (!nextPage.value) return
-  if (pages.value.includes(nextPage.value)) return
-
-  pages.value.push(nextPage.value)
-
-  if (!silent && !props.skipPageUpdate) updateQueryParams({page: nextPage.value})
-
-  if (pages.value.length < MAX_PAGES) return
-
-  const firstPage = pages.value.shift()
-
-  if (firstPage === undefined) return
-
-  previousPage.value = firstPage
-}
-
-const addPreviousPage = (silent?: boolean) => {
-  if (!previousPage.value) return
-  if (pages.value.includes(previousPage.value)) return
-
-  pages.value.unshift(previousPage.value)
-
-  if (!silent && !props.skipPageUpdate) updateQueryParams({page: previousPage.value})
-
-  if (pages.value.length < MAX_PAGES) return
-
-  const lastPage = pages.value.pop()
-
-  if (lastPage === undefined) return
-
-  nextPage.value = lastPage
-}
-
-const updateScroll = (height: number): void => {
-  const element = document.scrollingElement
-
-  if (!element) return
-
-  element.scrollTop = element.scrollTop + height
-}
-
-const removePage = (page: number): void => {
-  const index = pages.value.indexOf(page)
-
-  if (index === -1) return
-
-  pages.value.splice(index, pages.value.length - index)
-
-  if (!pages.value.length) pages.value = [1]
-
-  updateQueryParams({page: pages.value[pages.value.length - 1]})
-}
-
-const updateQueryParams = (queryParams: QueryParams): void => {
-  router.replace({hash: route.hash, query: {...route.query, ...queryParams}})
-}
-
-const resetPage = async () => {
-  const isRefetch = pages.value.includes(1)
-
-  updateQueryParams({page: undefined} as unknown as QueryParams)
-  pages.value = [1]
-  nextPage.value = null
-  previousPage.value = null
-
-  if (!props.skipScrollTarget && target.value) target.value.scrollIntoView({block: 'start'})
-
-  await nextTick()
-
-  if (isRefetch) pageComponent.value[0]?.refetch()
-}
-
-watch(queryParamsStrict, (newValue, oldValue) => {
-  if (isEqualObj(newValue, oldValue)) return
-
-  resetPage()
+onBeforeUnmount(() => {
+  updateHeaderPadding(0)
 })
 
 defineExpose({
-  resetPage,
+  resetPage() {
+    infiniteList.value?.resetPage()
+  },
 })
 
 </script>

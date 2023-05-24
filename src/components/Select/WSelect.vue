@@ -47,28 +47,36 @@
               :model-value="option"
               :is-selected="true"
             >
-              <div
+              <button
                 v-if="!disableClear"
-                class="w-ripple relative flex square-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center hover:bg-opacity-5 hover:bg-black-default"
-                :class="{'cursor-progress': loading}"
+                class="relative flex square-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center"
+                :class="{
+                  'cursor-not-allowed': disabled,
+                  'cursor-progress': loading,
+                  'cursor-pointer w-ripple w-ripple-hover ': !loading && !disabled,
+                }"
                 @mousedown.stop.prevent=""
                 @click.stop.prevent="!loading && unselect(option)"
               >
                 <IconCancel class="square-3 text-description" />
-              </div>
+              </button>
             </component>
           </template>
         </slot>
 
-        <div
+        <button
           v-if="!optionComponent && !disableClear"
-          class="w-ripple relative flex square-5 rounded-full items-center justify-center hover:bg-opacity-5 hover:bg-black-default"
-          :class="{'cursor-progress': loading}"
+          class="relative flex square-5 rounded-full items-center justify-center"
+          :class="{
+            'cursor-not-allowed': disabled,
+            'cursor-progress': loading,
+            'cursor-pointer w-ripple w-ripple-hover ': !loading && !disabled,
+          }"
           @mousedown.stop.prevent=""
           @click.stop.prevent="!loading && unselect(option)"
         >
           <IconCancel class="square-3 text-description" />
-        </div>
+        </button>
       </div>
     </template>
 
@@ -86,11 +94,11 @@
 
       <SelectOption
         v-for="(option, index) in options"
-        ref="selectOption"
         :key="option"
         :is-selected="modelValue.includes(option)"
         :is-cursor="index === cursor"
         :loading="loadingOptionIndex === index && loading"
+        :scroll="isCursorLocked"
         class="relative"
         :class="{
           'cursor-progress': loading,
@@ -125,11 +133,7 @@
         v-if="hasCreateButton"
         :is-cursor="cursor === options.length"
         :loading="loadingOptionIndex === options.length && loading"
-        class="relative"
-        :class="{
-          'cursor-progress': loading,
-          'w-ripple': !loading,
-        }"
+        :scroll="isCursorLocked"
         @select="createOption(search)"
         @mouseenter="setCursor(options.length)"
       >
@@ -202,7 +206,6 @@ const hasCreateButton = computed(() => props.allowCreate && props.search.length 
 const lastIndex = computed(() => hasCreateButton.value ? props.options.length : props.options.length - 1)
 const isMobile = getIsMobile()
 const focused = ref(false)
-const selectOption = ref<InstanceType<typeof SelectOption>[]>([])
 const loadingOptionIndex = ref<number | null>(null)
 
 const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
@@ -239,8 +242,6 @@ const cursorUp = () => {
     : cursor.value < 1
       ? lastIndex.value
       : cursor.value - 1
-
-  selectOption.value[cursor.value]?.scrollIntoView()
 }
 
 const cursorDown = () => {
@@ -253,8 +254,6 @@ const cursorDown = () => {
     : cursor.value >= lastIndex.value
       ? 0
       : cursor.value + 1
-
-  selectOption.value[cursor.value]?.scrollIntoView()
 }
 
 const selectCursor = () => {

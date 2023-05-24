@@ -1,5 +1,5 @@
 import {getIsMobile} from '@/main'
-import {onBeforeUnmount, onMounted, ref, watch, type Ref} from 'vue'
+import {onBeforeUnmount, onMounted, ref} from 'vue'
 
 const headerElementHeight = getIsMobile() ? 60 : 128
 
@@ -9,7 +9,7 @@ const observerOptions = {
   threshold: 1.0,
 }
 
-export const useInfiniteListHeader = (headerMargin: Ref<number>, updageHeaderPadding: (value: number) => void) => {
+export const useInfiniteListHeader = (scrollingElement: Element | null = document.scrollingElement) => {
   const indicator = ref<HTMLDivElement>()
   const header = ref<HTMLDivElement>()
   const headerHeight = ref<number>(0)
@@ -25,19 +25,11 @@ export const useInfiniteListHeader = (headerMargin: Ref<number>, updageHeaderPad
     })
   }
 
-  watch(isIntersecting, value => {
-    if (!value && headerHeight.value) {
-      updageHeaderPadding(headerHeight.value - headerMargin.value)
-    } else {
-      updageHeaderPadding(0)
-    }
-  })
-
   onMounted(() => {
     if (header.value) {
       const rect = header.value.getBoundingClientRect()
       headerHeight.value = rect.height
-      headerTop.value = rect.top - headerElementHeight
+      headerTop.value = rect.top + (scrollingElement?.scrollTop ?? 0) - headerElementHeight
     }
 
     if (indicator.value) {
@@ -49,7 +41,6 @@ export const useInfiniteListHeader = (headerMargin: Ref<number>, updageHeaderPad
 
   onBeforeUnmount(() => {
     observer?.disconnect()
-    updageHeaderPadding(0)
   })
 
   return {
