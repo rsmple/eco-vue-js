@@ -2,7 +2,7 @@
   <div
     v-for="option in data?.results"
     :key="option.id"
-    class="relative flex overflow-hidden items-center max-w-[calc(100%-2.75rem)]"
+    class="relative flex overflow-hidden items-center max-w-[calc(100%-2.75rem)] text-description"
     :class="{
       'cursor-pointer': !disabled,
       'cursor-not-allowed': disabled,
@@ -26,12 +26,12 @@
             :class="{
               'cursor-not-allowed': disabled,
               'cursor-progress': loading,
-              'cursor-pointer w-ripple w-ripple-hover ': !loading && !disabled,
+              'cursor-pointer w-ripple w-ripple-hover': !loading && !disabled,
             }"
             @mousedown.stop.prevent=""
             @click.stop.prevent="!loading && $emit('unselect', option.id)"
           >
-            <IconCancel class="square-3 text-description" />
+            <IconCancel class="square-3" />
           </button>
         </component>
       </template>
@@ -48,7 +48,7 @@
       @mousedown.stop.prevent=""
       @click.stop.prevent="!loading && $emit('unselect', option.id)"
     >
-      <IconCancel class="square-3 text-description" />
+      <IconCancel class="square-3" />
     </button>
   </div>
 </template>

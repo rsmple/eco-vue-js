@@ -94,9 +94,10 @@
               >
                 <component
                   :is="optionComponent"
-                  :model-value="item"
-                  :is-selected="selected"
+                  :option="item"
+                  :selected="selected"
                   :skeleton="listSkeleton"
+                  :model="false"
                 />
               </slot>
             </template>

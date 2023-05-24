@@ -29,7 +29,7 @@
       <div
         v-for="option in modelValue"
         :key="option"
-        class="relative flex overflow-hidden items-center max-w-[calc(100%-2.75rem)]"
+        class="relative flex overflow-hidden items-center max-w-[calc(100%-2.75rem)] text-description"
         :class="{
           'cursor-pointer': !disabled,
           'cursor-not-allowed': disabled,
@@ -44,8 +44,9 @@
           <template v-if="optionComponent">
             <component
               :is="optionComponent"
-              :model-value="option"
-              :is-selected="true"
+              :option="option"
+              :selected="true"
+              :model="true"
             >
               <button
                 v-if="!disableClear"
@@ -58,7 +59,7 @@
                 @mousedown.stop.prevent=""
                 @click.stop.prevent="!loading && unselect(option)"
               >
-                <IconCancel class="square-3 text-description" />
+                <IconCancel class="square-3" />
               </button>
             </component>
           </template>
@@ -75,7 +76,7 @@
           @mousedown.stop.prevent=""
           @click.stop.prevent="!loading && unselect(option)"
         >
-          <IconCancel class="square-3 text-description" />
+          <IconCancel class="square-3" />
         </button>
       </div>
     </template>
@@ -117,8 +118,9 @@
           >
             <component
               :is="optionComponent"
-              :model-value="option"
-              :is-selected="selected"
+              :option="option"
+              :selected="selected"
+              :model="false"
             />
           </slot>
         </template>
@@ -149,8 +151,9 @@
         >
           <component
             :is="optionComponent"
-            :model-value="search"
-            :is-selected="false"
+            :option="search"
+            :selected="false"
+            :model="false"
           />
         </slot>
       </SelectOption>
