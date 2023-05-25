@@ -12,8 +12,8 @@
         :model-value="modelValue"
         :max-length="maxLength"
         :loading="loading"
-        :hide-input="hideInput"
-        :readonly="(readonly || unclickable)"
+        :hide-input="hideInput || (hideInputUnclickable && unclickable)"
+        :readonly="readonly || unclickable"
         :skeleton="skeleton"
         :size="size"
         :error-message="errorMessage"
@@ -33,8 +33,8 @@
         @keypress:down="$emit('keypress:down', $event)"
         @keypress:delete="$emit('keypress:delete', $event)"
 
-        @focus="open(); focused = true"
-        @blur="!isMobile && !persist && close(); focused = false"
+        @focus="open(); $emit('focus')"
+        @blur="!isMobile && !persist && close(); $emit('blur')"
         
         @click:internal="isMobile && unclickable && open()"
         @click:clear="$emit('click:clear')"
@@ -104,6 +104,7 @@ const props = defineProps<{
   allowClear?: boolean
   hidePrefix?: boolean
   hideInput?: boolean
+  hideInputUnclickable?: boolean
   readonly?: boolean
   disabled?: boolean
   skeleton?: boolean
@@ -125,13 +126,14 @@ const emit = defineEmits<{
   (e: 'open'): void
   (e: 'close'): void
   (e: 'click:clear'): void
+  (e: 'focus', value: FocusEvent): void
+  (e: 'blur', value: FocusEvent): void
 }>()
 
 const isOpen = ref(false)
 const dropdownMenu = ref<InstanceType<typeof WDropdownMenu> | undefined>()
 const input = ref<InstanceType<typeof WInput> | undefined>()
 const isMobile = getIsMobile()
-const focused = ref(false)
 const content = ref<HTMLDivElement | undefined>()
 
 const isDisabled = computed(() => props.readonly || props.disabled)

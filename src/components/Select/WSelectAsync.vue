@@ -7,6 +7,7 @@
     :max-length="maxSearchLength"
     :loading="loading || isFetchingPrefix"
     :hide-input="isMobile ? !focused : !isOpen"
+    hide-input-unclickable
     :readonly="readonly"
     :skeleton="skeleton"
     :size="searchSize"
@@ -23,7 +24,9 @@
     @keypress:delete="captureDoubleDelete"
 
     @open="isOpen = true"
-    @close="isOpen = false"
+    @close="close(); $emit('update:search', '')"
+    @focus="focused = true"
+    @blur="focused = false"
   >
     <template #prefix>
       <SelectAsyncPrefix
@@ -161,6 +164,11 @@ const loadingOptionIndex = ref<number | null>(null)
 const isFetchingPrefix = ref(false)
 
 const isDisabled = computed(() => props.loading || isFetchingPrefix.value || props.readonly || props.disabled)
+
+const close = () => {
+  isOpen.value = false
+  focused.value = false
+}
 
 const setLoadingOptionIndex = (value: number) => {
   if (isDisabled.value) return
