@@ -155,7 +155,7 @@ const invalidate = (messages: Record<string, string | string[]>): void => {
   const message = messages[props.name]
 
   if (typeof message === 'string') errorMessage.value = message
-  else errorMessage.value = message.join(', ')
+  else if (message instanceof Array) errorMessage.value = message.join(', ')
 }
 
 const initModel = (): void => {
