@@ -78,6 +78,10 @@
             :previous="previous?.id"
             :next="next?.id"
             :is-no-cursor="cursor === undefined"
+            :class="{
+              'pt-4': first,
+              'pb-4': last,
+            }"
             @select="select(item.id); setLoadingOptionIndex(item.id)"
             @unselect="unselect(item.id); setLoadingOptionIndex(item.id)"
             @mouseenter="!listSkeleton && setCursor(item.id)"

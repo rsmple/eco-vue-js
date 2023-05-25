@@ -103,11 +103,7 @@
         :is-cursor="index === cursor"
         :loading="loadingOptionIndex === index && loading"
         :scroll="isCursorLocked"
-        class="relative"
-        :class="{
-          'cursor-progress': loading,
-          'w-ripple': !loading,
-        }"
+        class="first:pt-4 last:pb-4"
         @select="select(option); setLoadingOptionIndex(index)"
         @unselect="unselect(option); setLoadingOptionIndex(index)"
         @mouseenter="setCursor(index)"
@@ -129,16 +125,12 @@
         </template>
       </SelectOption>
 
-      <SelectListMarker
-        v-if="showMarker"
-        @update:intersecting="$event && $emit('show:marker')"
-      />
-
       <SelectOption
         v-if="hasCreateButton"
         :is-cursor="cursor === options.length"
         :loading="loadingOptionIndex === options.length && loading"
         :scroll="isCursorLocked"
+        class="first:pt-4 last:pb-4"
         @select="createOption(search)"
         @mouseenter="setCursor(options.length)"
       >
@@ -171,7 +163,6 @@ import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 import {getIsMobile} from '@/utils/mobile'
 import {debounce} from '@/utils/utils'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
-import SelectListMarker from './components/SelectListMarker.vue'
 
 const props = defineProps<{
   modelValue: string[]
@@ -193,7 +184,6 @@ const props = defineProps<{
   errorMessage?: string
   required?: boolean
   hasChanges?: boolean
-  showMarker?: boolean
 }>()
 
 const emit = defineEmits<{
