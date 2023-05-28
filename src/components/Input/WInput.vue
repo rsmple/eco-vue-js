@@ -1,6 +1,9 @@
 <template>
   <div
     class="relative mt-1 mb-[var(--input-b-margin,1.125rem)]"
+    :class="{
+      'opacity-70 cursor-not-allowed': disabled,
+    }"
     @click="$emit('click:internal', $event)"
   >
     <div
@@ -47,7 +50,6 @@
           :class="{
             'focus-within:border-primary-default dark:focus-within:border-primary-dark': !disabled && !readonly,
             'cursor-text': !disabled,
-            'opacity-80 cursor-not-allowed': disabled,
             'pl-1 py-1 gap-1': $slots.suffix?.()?.length,
             'border-negative dark:border-negative-dark': errorMessage,
           }"

@@ -1,6 +1,11 @@
 <template>
   <div class="mt-1 mb-4">
-    <div class="text-accent text-xs font-semibold mb-2">
+    <div
+      class="text-accent text-xs font-semibold mb-2"
+      :class="{
+        'opacity-50': disabled,
+      }"
+    >
       {{ title }}
     </div>
 
@@ -23,6 +28,7 @@ defineProps<{
   modelValue?: string
   title: string
   skeleton?: boolean
+  disabled?: boolean
 }>()
 
 </script>

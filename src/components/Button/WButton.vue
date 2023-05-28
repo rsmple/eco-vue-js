@@ -6,28 +6,22 @@
     :is="to !== undefined ? RouterLink : tag"
     class="
       relative rounded-2xl outline-none isolate
-      text-base font-medium cursor-pointer select-none whitespace-nowrap
-      flex justify-center items-center disabled:cursor-not-allowed disabled:opacity-70
+      text-base font-medium select-none whitespace-nowrap
+      flex justify-center items-center
     "
-    :class="{
-      'p-1.5': minimize,
-      'py-2.5 px-6': !minimize,
+    :class="{ 
       [semanticTypeButtonStylesMap[semanticType]]: true,
-      'st-outline': outline,
-      'w-ripple w-ripple-hover before:text-black-default': !loading && !disabled,
+      'cursor-pointer w-ripple w-ripple-hover before:text-black-default': !loading && !disabled,
+      'cursor-progress': loading,
+      'cursor-not-allowed opacity-70': disabled,
+      'px-6 h-11': !minimize,
+      'px-1.5 h-7': minimize,
     }"
     :disabled="!loading && disabled"
     :type="type"
     @click="click"
     @keypress.enter.stop.prevent="click"
   >
-    <span
-      class="transition-opacity flex items-center z-10"
-      :class="{'opacity-0': loading}"
-    >
-      <slot />
-    </span>
-
     <Transition
       enter-active-class="transition-opacity"
       leave-active-class="transition-opacity"
@@ -36,9 +30,15 @@
     >
       <WSpinner
         v-if="loading"
-        class="absolute z-10"
-        :style="{'--spinner-size': minimize ? '1.25rem' : '1.5rem'}"
+        class="absolute z-10 w-spinner-size-6"
       />
+
+      <div
+        v-else
+        class="flex justify-center items-center gap-2 flex-1 z-10"
+      >
+        <slot />
+      </div>
     </Transition>
   </component>
 </template>
@@ -61,7 +61,6 @@ const props = withDefaults(
     href?: string
     target?: '_self' | '_blank' | '_parent' | '_top'
     minimize?: boolean
-    outline?: boolean
   }>(),
   {
     semanticType: SemanticType.PRIMARY,

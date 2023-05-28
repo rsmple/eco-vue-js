@@ -17,6 +17,7 @@
       :placeholder-secure="placeholderSecure"
       :max-length="maxLength"
       :has-changes="hasChanges"
+      :disabled="disabled"
       allow-clear
       class="w-full"
       @keypress:enter.stop.prevent="emitUpdateModelValue(value)"

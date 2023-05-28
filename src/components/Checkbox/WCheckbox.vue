@@ -3,7 +3,7 @@
     class="flex gap-2 cursor-pointer select-none outline-none w-ripple-trigger w-hover-circle-trigger items-center w-hover-circle-opacity-[0.08]"
     :class="{
       'cursor-progress': loading,
-      'cursor-not-allowed opacity-25': disabled,
+      'cursor-not-allowed opacity-70': disabled,
       'mt-1 mb-4': title,
     }"
     @click.stop.prevent="toggle"

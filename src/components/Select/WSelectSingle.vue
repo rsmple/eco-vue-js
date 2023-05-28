@@ -11,6 +11,7 @@
       :empty-stub="emptyStub"
       :option-component="optionComponent"
       :readonly="readonly"
+      :disabled="disabled"
       :skeleton="skeleton"
       :allow-create="allowCreate"
       :error-message="errorMessage"
@@ -54,6 +55,7 @@ defineProps<{
   maxSearchLength?: number
   optionComponent?: VueComponent
   readonly?: boolean
+  disabled?: boolean
   skeleton?: boolean
   allowCreate?: boolean
   errorMessage?: string
