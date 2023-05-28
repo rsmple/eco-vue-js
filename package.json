@@ -105,6 +105,9 @@
     "./dist/components/Checkbox/WCheckbox.vue": {
       "import": "./dist/components/Checkbox/WCheckbox.vue.js"
     },
+    "./dist/components/ClickOutside/WClickOutside.vue": {
+      "import": "./dist/components/ClickOutside/WClickOutside.vue.js"
+    },
     "./dist/components/Counter/WCounter.vue": {
       "import": "./dist/components/Counter/WCounter.vue.js"
     },

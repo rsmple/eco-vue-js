@@ -60,7 +60,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
 
             return {
               ...current,
-              [`@media (min-width: ${value * (index + 2) + 25.25}${unit})`]: {
+              [`@media (min-width: ${value * (index + 2) + (index < 1 ? 2 : 25.25)}${unit})`]: {
                 width: widthValue,
                 minWidth: widthValue,
               },

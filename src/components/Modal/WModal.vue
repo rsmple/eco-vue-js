@@ -29,7 +29,7 @@
 
         <button
           v-if="modalMeta.autoclose"
-          class="cursor-pointer absolute top-0 left-0 h-full w-full -z-10"
+          class="cursor-pointer absolute top-0 left-0 h-full w-full -z-10 outline-none"
           title="Click outside to close modal"
           @click.stop.prevent="closeModal(modalMeta)"
         />

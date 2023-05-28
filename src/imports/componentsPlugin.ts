@@ -5,6 +5,7 @@ import WButton from '@/components/Button/WButton.vue'
 import WButtonAction from '@/components/Button/WButtonAction.vue'
 import WButtonCopy from '@/components/Button/WButtonCopy.vue'
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
+import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WCounter from '@/components/Counter/WCounter.vue'
 import WDatePicker from '@/components/DatePicker/WDatePicker.vue'
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
@@ -41,6 +42,7 @@ export default {
     app.component('WButtonAction', WButtonAction)
     app.component('WButtonCopy', WButtonCopy)
     app.component('WCheckbox', WCheckbox)
+    app.component('WClickOutside', WClickOutside)
     app.component('WCounter', WCounter)
     app.component('WDatePicker', WDatePicker)
     app.component('WDropdown', WDropdown)
@@ -77,6 +79,7 @@ export {
   WButtonAction,
   WButtonCopy,
   WCheckbox,
+  WClickOutside,
   WCounter,
   WDatePicker,
   WDropdown,

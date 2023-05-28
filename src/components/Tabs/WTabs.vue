@@ -5,7 +5,7 @@
         v-for="(_, index) in $slots.default?.()"
         ref="button"
         :key="index"
-        class="flex-1 font-semibold flex items-center justify-center h-10 cursor-pointer relative w-ripple w-ripple-hover select-none transition-colors duration-500"
+        class="flex-1 font-semibold flex items-center justify-center h-10 cursor-pointer relative w-ripple w-ripple-hover select-none transition-colors duration-500 outline-none"
         :class="{
           'text-description': current !== index && isValidMap[index] !== false,
           'text-primary-default dark:text-primary-dark': current === index && isValidMap[index] !== false,

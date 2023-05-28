@@ -17,7 +17,6 @@
         'border-gray-300 dark:border-gray-700': disabled,
         'w-ripple w-hover-circle': !disabled && !readonly,
       }"
-      tabindex="0"
       @keypress.enter.stop.prevent="toggle"
     >
       <WSpinner

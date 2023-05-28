@@ -23,7 +23,7 @@
     </div>
 
     <button
-      class="absolute top-0 right-0 w-ripple flex square-5 rounded-full items-center justify-center hover:bg-opacity-5 hover:bg-black-default"
+      class="absolute top-0 right-0 w-ripple flex square-5 rounded-full items-center justify-center hover:bg-opacity-5 hover:bg-black-default outline-none"
       @click.stop.prevent="$emit('click:cancel')"
     >
       <IconCancel class="square-3 text-description" />

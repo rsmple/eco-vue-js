@@ -31,6 +31,12 @@ export const getAllScrollParents = (node?: Element, max = 10): Array<Element> =>
   return arr
 }
 
+export const hasParent = (parent: Element, current: Element): boolean => {
+  if (current === parent) return true
+  else if (!current.parentElement) return false
+  else return hasParent(parent, current.parentElement)
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DebounceCb = (...args: any[]) => void
 

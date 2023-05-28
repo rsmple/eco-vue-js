@@ -5,7 +5,7 @@
   >
     <button
       v-if="allowClear && !disabled"
-      class="relative w-ripple w-ripple-hover h-full w-11 p-[0.6875rem] flex justify-center text-description select-none"
+      class="relative w-ripple w-ripple-hover h-full w-11 p-[0.6875rem] flex justify-center text-description select-none outline-none"
       @mousedown.prevent.stop=""
       @click="$emit('click:clear')"
     >
@@ -19,7 +19,7 @@
         'cursor-pointer': !disabled,
         'cursor-not-allowed': disabled,
       }"
-      class="relative w-ripple w-ripple-hover h-full w-11 p-[0.6875rem] flex justify-center select-none"
+      class="relative w-ripple w-ripple-hover h-full w-11 p-[0.6875rem] flex justify-center select-none outline-none"
       @click="isSecureVisible ? $emit('hide:secure') : $emit('show:secure')"
     >
       <IconEyeSlash
@@ -46,7 +46,7 @@
         'cursor-pointer': !disabled,
         'cursor-not-allowed': disabled,
       }"
-      class="h-full w-11 flex items-center justify-center"
+      class="h-full w-11 flex items-center justify-center outline-none"
       @click.stop="$emit('click:slot')"
     >
       <slot name="default" />

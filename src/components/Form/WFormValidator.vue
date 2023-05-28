@@ -18,6 +18,7 @@ const props = defineProps<{
   title?: string
   validate?: ValidateFn | ValidateFn[]
   forbiddenRegexp?: RegExp
+  requiredSymbols?: string
 }>()
 
 const emit = defineEmits<{
@@ -60,6 +61,8 @@ const errorMessage = ref<string | undefined>()
 const hasChanges = ref<boolean>(false)
 const hasBeenValidated = ref<boolean>(false)
 
+const requiredSymbols = computed<string[]>(() => props.requiredSymbols?.split('') ?? [])
+
 const _updateHasChanges = (value: Parameters<ValidateFn>[0]): void => {
   if (initModelValue.value === undefined) {
     hasChanges.value = value !== undefined && value !== ''
@@ -86,7 +89,7 @@ const _validate = (value: Parameters<ValidateFn>[0]): string | undefined => {
     const match = value.match(props.forbiddenRegexp)
 
     if (match?.length) {
-      const message = 'Value contains forbidden chars: ' + match
+      const message = 'The following symbols are not allowed: ' + match
         .filter((item, index) => match.indexOf(item) === index)
         .map(item => {
           switch (item) {
@@ -102,6 +105,24 @@ const _validate = (value: Parameters<ValidateFn>[0]): string | undefined => {
 
       return message
     }
+  }
+
+  if (props.requiredSymbols && typeof value === 'string') {
+    const match = requiredSymbols.value
+      .filter(item => !value.includes(item))
+      .map(item => {
+        switch (item) {
+          case ' ':
+            return 'whitespace'
+          case '\n':
+            return 'line break'
+          default:
+            return `" ${item} "`
+        }
+      })
+      .join(', ')
+
+    if (match.length) return 'Please include the required symbols: ' + match
   }
 
   let message

@@ -53,7 +53,7 @@
             >
               <button
                 v-if="!disableClear"
-                class="relative flex square-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center"
+                class="relative flex square-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center outline-none"
                 :class="{
                   'cursor-not-allowed': disabled,
                   'cursor-progress': loading,
@@ -70,7 +70,7 @@
 
         <button
           v-if="!optionComponent && !disableClear"
-          class="relative flex square-5 rounded-full items-center justify-center"
+          class="relative flex square-5 rounded-full items-center justify-center outline-none"
           :class="{
             'cursor-not-allowed': disabled,
             'cursor-progress': loading,
