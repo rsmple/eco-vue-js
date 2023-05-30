@@ -14,8 +14,8 @@
       'cursor-pointer w-ripple w-ripple-hover before:text-black-default': !loading && !disabled,
       'cursor-progress': loading,
       'cursor-not-allowed opacity-70': disabled,
-      'px-6 h-11': !minimize,
-      'px-1.5 h-7': minimize,
+      'px-6 h-11 min-h-[2.75rem]': !minimize,
+      'px-1.5 h-7 min-h-[1.75rem]': minimize,
     }"
     :disabled="!loading && disabled"
     :type="type"
