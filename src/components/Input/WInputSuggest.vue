@@ -1,89 +1,97 @@
 <template>
-  <component
-    :is="isMobile ? WBottomSheet : WDropdownMenu"
-    ref="dropdownMenu"
-    v-bind="isMobile ? {isOpen, onClose: close} : {isOpen, maxHeight: 320, maxWidth: 600, horizontalAlign: HorizontalAlign.FILL, updateAlign: true, teleport}"
-  >
-    <template #toggle="{unclickable}">
-      <WInput
-        ref="input"
-        :title="title"
-        :description="description"
-        :model-value="modelValue"
-        :max-length="maxLength"
-        :loading="loading"
-        :hide-input="hideInput || (hideInputUnclickable && unclickable)"
-        :readonly="readonly || unclickable"
-        :skeleton="skeleton"
-        :size="size"
-        :error-message="errorMessage"
-        :required="required"
-        :disabled="disabled"
-        :has-changes="hasChanges"
-        :allow-clear="allowClear"
-        :icon="icon"
-        :class="{
-          'cursor-pointer': !disabled,
-          'cursor-not-allowed': disabled,
-        }"
-        @update:model-value="!loading && $emit('update:modelValue', $event as string ?? '')"
+  <div>
+    <component
+      :is="isMobile ? WBottomSheet : WDropdownMenu"
+      ref="dropdownMenu"
+      v-bind="isMobile ? {isOpen, onClose: close} : {isOpen, maxHeight: 320, maxWidth: 600, horizontalAlign: HorizontalAlign.FILL, updateAlign: true, teleport}"
+    >
+      <template #toggle="{unclickable}">
+        <WInput
+          ref="input"
+          :title="title"
+          :model-value="modelValue"
+          :max-length="maxLength"
+          :loading="loading"
+          :hide-input="hideInput || (hideInputUnclickable && unclickable)"
+          :readonly="readonly || unclickable"
+          :skeleton="skeleton"
+          :size="size"
+          :error-message="errorMessage"
+          :required="required"
+          :disabled="disabled"
+          :has-changes="hasChanges"
+          :allow-clear="allowClear"
+          :icon="icon"
+          :class="{
+            'cursor-pointer': !disabled,
+            'cursor-not-allowed': disabled,
+          }"
+          @update:model-value="!loading && $emit('update:modelValue', $event as string ?? '')"
 
-        @keypress:enter="$emit('keypress:enter', $event)"
-        @keypress:up="$emit('keypress:up', $event)"
-        @keypress:down="$emit('keypress:down', $event)"
-        @keypress:delete="$emit('keypress:delete', $event)"
+          @keypress:enter="$emit('keypress:enter', $event)"
+          @keypress:up="$emit('keypress:up', $event)"
+          @keypress:down="$emit('keypress:down', $event)"
+          @keypress:delete="$emit('keypress:delete', $event)"
 
-        @focus="open(); $emit('focus')"
-        @blur="!isMobile && !persist && close(); $emit('blur')"
+          @focus="open(); $emit('focus')"
+          @blur="!isMobile && !persist && close(); $emit('blur')"
         
-        @click:internal="isMobile && unclickable && open()"
-        @click:clear="$emit('click:clear')"
-      >
-        <template
-          v-if="!hidePrefix"
-          #prefix
+          @click:internal="isMobile && unclickable && open()"
+          @click:clear="$emit('click:clear')"
         >
-          <slot name="prefix" />
-        </template>
-
-        <template #suffix>
-          <IconArrow
-            v-if="!disabled"
-            class="square-3 text-description transition-transform"
-            :class="{'rotate-180': isOpen}"
-          />
-        </template>
-
-        <template #right>
-          <slot name="right" />
-        </template>
-      </WInput>
-    </template>
-
-    <template #content>
-      <div
-        ref="content"
-        class="bg-default dark:bg-default-dark w-full"
-        :class="{
-          'max-h-full pb-20': isMobile,
-          'rounded-xl shadow-md max-h-72 overflow-x-hidden overflow-y-overlay overscroll-contain mb-1 mt-4 dark:border dark:border-solid dark:border-gray-800': !isMobile,
-        }"
-      >
-        <template v-if="$slots.content?.().length">
           <template
-            v-for="(slot, index) in $slots.content?.()"
-            :key="index"
+            v-if="!hidePrefix"
+            #prefix
           >
-            <component
-              :is="slot"
-              :scrolling-element="isMobile ? content?.parentElement : content"
-              @close="close"
+            <slot name="prefix" />
+          </template>
+
+          <template #suffix>
+            <IconArrow
+              v-if="!disabled"
+              class="square-3 text-description transition-transform"
+              :class="{'rotate-180': isOpen}"
             />
           </template>
-        </template>
-      </div>
-    </template>
-  </component>
+
+          <template #right>
+            <slot name="right" />
+          </template>
+        </WInput>
+      </template>
+
+      <template #content>
+        <div
+          ref="content"
+          class="bg-default dark:bg-default-dark w-full"
+          :class="{
+            'max-h-full pb-20': isMobile,
+            'rounded-xl shadow-md max-h-72 overflow-x-hidden overflow-y-overlay overscroll-contain mb-1 mt-4 dark:border dark:border-solid dark:border-gray-800': !isMobile,
+          }"
+        >
+          <template v-if="$slots.content?.().length">
+            <template
+              v-for="(slot, index) in $slots.content?.()"
+              :key="index"
+            >
+              <component
+                :is="slot"
+                :scrolling-element="isMobile ? content?.parentElement : content"
+                @close="close"
+              />
+            </template>
+          </template>
+        </div>
+      </template>
+    </component>
+
+    <div
+      v-if="description"
+      class="text-xs font-normal text-description pb-4 whitespace-pre-wrap break-words"
+    >
+      {{ description }}
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>

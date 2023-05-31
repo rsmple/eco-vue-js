@@ -29,7 +29,7 @@
 
           <div
             ref="content"
-            class="h-4/5 max-h-[80%] bg-default dark:bg-default-dark rounded-t-3xl shadow-md snap-end"
+            class="height-[90%] bg-default dark:bg-default-dark rounded-t-3xl shadow-md snap-end"
           >
             <div
               ref="toggle"

@@ -179,7 +179,7 @@
 
     <div
       v-if="description"
-      class="text-xs font-normal text-description pt-4 pb-2 whitespace-pre-wrap break-words"
+      class="text-xs font-normal text-description pt-4 whitespace-pre-wrap break-words"
     >
       {{ description }}
     </div>

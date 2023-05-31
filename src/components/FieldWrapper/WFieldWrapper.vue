@@ -18,6 +18,13 @@
         </span>
       </slot>
     </div>
+
+    <div
+      v-if="description"
+      class="text-xs font-normal text-description pt-4 whitespace-pre-wrap break-words"
+    >
+      {{ description }}
+    </div>
   </div>
 </template>
 
@@ -27,6 +34,7 @@ import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 defineProps<{
   modelValue?: string
   title: string
+  description?: string
   skeleton?: boolean
   disabled?: boolean
 }>()
