@@ -1,5 +1,6 @@
 <template>
   <button
+    ref="element"
     class="flex gap-2 cursor-pointer select-none outline-none w-ripple-trigger w-hover-circle-trigger items-center w-hover-circle-opacity-[0.08]"
     :class="{
       'cursor-progress': loading,
@@ -40,6 +41,14 @@
         v-show="value"
         class="square-4 text-default dark:text-default-dark"
       />
+
+      <WTooltip
+        v-if="tooltipText"
+        :text="tooltipText"
+        :trigger="element"
+        no-touch
+        class="pointer-events-none"
+      />
     </div>
 
     <div
@@ -50,18 +59,11 @@
         {{ title }}
       </slot>
     </div>
-
-    <WTooltip
-      v-if="tooltipText"
-      :text="tooltipText"
-      no-touch
-      class="pointer-events-none"
-    />
   </button>
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue'
+import {computed, ref} from 'vue'
 import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
@@ -80,6 +82,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
 }>()
+
+const element = ref<HTMLButtonElement | undefined>()
 
 const value = computed<boolean | null>({
   get: (): boolean | null => props.modelValue,

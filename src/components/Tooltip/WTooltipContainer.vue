@@ -15,31 +15,35 @@
       class="z-[10000] [--arrow-size:8px] transition-[top,bottom,left,right]"
       @update:rect="close"
     >
-      <template #default="{left, right}">
+      <template #default="{left, right, istop}">
         <div
           ref="container"
-          class="flex justify-center items-center flex-col drop-shadow-md dark:drop-shadow-none"
-          @mouseover="setTooltipMeta(tooltipMeta)"
-          @mouseleave="setTooltipMeta(null)"
+          class="flex justify-center items-center flex-col drop-shadow-md dark:drop-shadow-none pointer-events-none"
         >
           <div
             class="
-              w-[calc(var(--arrow-size)/2)] z-10
-              border-[transparent] border-solid [border-width:var(--arrow-size)] group-[.dropdown-top]/dropdown:order-2
+              w-[calc(var(--arrow-size)/2)] z-10 pointer-events-auto
+              border-[transparent] border-solid [border-width:var(--arrow-size)]
             "
             :class="{
-              'group-[.dropdown-top]/dropdown:border-t-black-default dark:group-[.dropdown-top]/dropdown:border-t-gray-800 group-[:not(.dropdown-top)]/dropdown:border-b-black-default dark:group-[:not(.dropdown-top)]/dropdown:border-b-gray-800': !tooltipMeta.light,
-              'group-[.dropdown-top]/dropdown:border-t-default dark:group-[.dropdown-top]/dropdown:border-t-gray-800 group-[:not(.dropdown-top)]/dropdown:border-b-default dark:group-[:not(.dropdown-top)]/dropdown:border-b-gray-800': tooltipMeta.light,
+              'text-black-default dark:text-gray-800': !tooltipMeta.light,
+              'text-default dark:text-gray-800': tooltipMeta.light,
+              'border-t-current order-2': istop,
+              'border-b-current': !istop,
             }"
+            @mouseover="setTooltipMeta(tooltipMeta)"
+            @mouseleave="setTooltipMeta(null)"
           />
 
           <div
-            class="py-3 px-4 rounded-xl text-xs font-medium text-center transition-[margin]"
+            class="py-3 px-4 rounded-xl text-xs font-medium text-center transition-[margin] pointer-events-auto"
             :class="{
               'bg-black-default dark:bg-gray-800 text-default': !tooltipMeta.light,
               'bg-default dark:bg-gray-800 text-accent': tooltipMeta.light,
             }"
             :style="getMarginStylesCached(left, right)"
+            @mouseover="setTooltipMeta(tooltipMeta)"
+            @mouseleave="setTooltipMeta(null)"
           >
             <template v-if="tooltipMeta.slot">
               <component

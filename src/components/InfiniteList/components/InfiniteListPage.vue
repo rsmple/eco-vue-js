@@ -7,7 +7,6 @@
       <div
         class="flex"
         :class="{
-          'pb-4 pt-6': selected !== undefined || !hidePageTitle,
           'sm:pt-6': selected === undefined && hidePageTitle && !noGap,
         }"
       >
@@ -16,13 +15,15 @@
           :selected="selected"
           :items="data?.results ?? []"
           :disabled="!data?.results"
+
+          class="sm:w-list-row-item sm-not:px-[calc(var(--inner-margin)-2px)] pb-4 pt-6"
           @update:selected="$emit('update:selected', $event)"
         />
 
         <InfiniteListPageTitle
           v-if="!hidePageTitle"
           :query-params="queryParams"
-          :selected="selected"
+          class="pb-4 pt-6"
         />
       </div>
 
@@ -43,6 +44,7 @@
             leave-active-class="transition-[grid-template-rows] overflow-hidden grid"
             leave-from-class="grid-rows-[1fr]"
             leave-to-class="grid-rows-[0fr]"
+            :css="!resetting"
           >
             <div
               v-for="(item, index) in data.results"
@@ -101,7 +103,7 @@
       v-else
       class="py-16 px-8 text-accent text-base font-normal text-center"
     >
-      Nothing to show
+      {{ emptyStub }}
     </div>
   </div>
 </template>
@@ -125,10 +127,14 @@ const props = withDefaults(
     wrap?: boolean
     noGap?: boolean
     transition?: boolean
+    resetting?: boolean
+    emptyStub?: string
   }>(),
   {
     keyGetter: undefined,
     selected: undefined,
+    previous: undefined,
+    emptyStub: 'Nothing to show',
   },
 )
 
@@ -142,11 +148,12 @@ const emit = defineEmits<{
   (e: 'refetch'): void
   (e: 'update-from-header:scroll'): void
   (e: 'update:selected', values: number[]): void
+  (e: 'fetched'): void
 }>()
 
 const element = ref<HTMLElement>()
 
-const {data, error, setData, refetch} = props.useQueryFn(toRef(props, 'queryParams'))
+const {data, error, setData, refetch, isFetching} = props.useQueryFn(toRef(props, 'queryParams'))
 
 const count = computed(() => data.value?.count)
 const pagesCount = computed(() => data.value?.pages_count)
@@ -209,6 +216,12 @@ watch(previousPage, value => {
 watch(error, (error: unknown): void => {
   if (props.isInvalidPage(error)) emit('error:invalidPage', props.queryParams.page)
 }, {immediate: true})
+
+watch(isFetching, value => {
+  if (value) return
+
+  emit('fetched')
+})
 
 let height = 0
 

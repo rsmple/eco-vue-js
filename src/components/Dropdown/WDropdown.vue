@@ -11,6 +11,7 @@
     <slot
       :left="styles.left"
       :right="styles.right"
+      :istop="isTop"
     />
   </div>
 </template>

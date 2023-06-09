@@ -1,13 +1,11 @@
 <template>
-  <div class="sm:w-list-row-item sm-not:px-[calc(var(--inner-margin)-2px)]">
-    <WCheckbox
-      :model-value="chekboxValue"
-      :disabled="disabled"
-      :tooltip-text="tooltipText"
-      intermediate
-      @update:model-value="selectOrUnselect"
-    />
-  </div>
+  <WCheckbox
+    :model-value="chekboxValue"
+    :disabled="disabled"
+    :tooltip-text="tooltipText"
+    intermediate
+    @update:model-value="selectOrUnselect"
+  />
 </template>
 
 <script lang="ts" setup>

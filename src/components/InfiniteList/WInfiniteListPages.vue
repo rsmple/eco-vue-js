@@ -25,6 +25,8 @@
       :wrap="wrap"
       :no-gap="noGap"
       :transition="transition"
+      :resetting="isResettingPage"
+      :empty-stub="emptyStub"
 
       :class="{
         'last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16': !minHeight,
@@ -40,6 +42,7 @@
       @error:invalid-page="removePage"
       @refetch="refetchNextPages(index)"
       @update:selected="$emit('update:selected', $event)"
+      @fetched="isResettingPage = false"
     >
       <template #default="{item, setter, skeleton, refetch, previous, next, first, last}">
         <slot
@@ -51,6 +54,7 @@
           :next="next ?? pageComponent[index + 1]?.getFirst() ?? pageComponent[0]?.getFirst()"
           :first="first"
           :last="last"
+          :resetting="isResettingPage"
         />
       </template>
     </InfiniteListPage>
@@ -63,7 +67,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, computed, watch, nextTick} from 'vue'
+import {ref, computed, watch, toRef} from 'vue'
 import InfiniteListScroll from './components/InfiniteListScroll.vue'
 import InfiniteListPage from './components/InfiniteListPage.vue'
 import type {QueryParams, UseDefaultQueryFn} from './models/types'
@@ -91,6 +95,8 @@ const props = withDefaults(
     headerTop?: number
     headerHeight?: number
     minHeight?: boolean
+    excludeParams?: string[]
+    emptyStub?: string
   }>(),
   {
     skeletonLength: undefined,
@@ -99,6 +105,8 @@ const props = withDefaults(
     scrollingElement: null,
     headerTop: 0,
     headerHeight: 0,
+    excludeParams: undefined,
+    emptyStub: undefined,
   },
 )
 
@@ -108,19 +116,12 @@ const emit = defineEmits<{
   (e: 'update:selected', values: number[]): void
 }>()
 
-const queryParamsStrict = computed(() => {
-  const params: Omit<QueryParams, 'page'> = {...props.queryParams}
-
-  delete params.page
-
-  return params
-})
-
 const pages = ref<number[]>([props.queryParams.page ?? 1])
 const pagesCount = ref(1)
 const count = ref(0)
 const nextPage = ref<number | null>()
 const previousPage = ref<number | null>()
+const isResettingPage = ref(false)
 
 const getSkeletonLength = (pagesBefore: number): number => {
   if (props.skeletonLength === undefined) return props.pageLength
@@ -214,8 +215,8 @@ const removePage = (page: number): void => {
   emit('update:page', pages.value[pages.value.length - 1])
 }
 
-const resetPage = async () => {
-  const isRefetch = pages.value.includes(1)
+const resetPage = () => {
+  isResettingPage.value = true
 
   emit('update:page', undefined)
   pages.value = [1]
@@ -223,14 +224,10 @@ const resetPage = async () => {
   previousPage.value = null
 
   if (!props.skipScrollTarget) (props.scrollingElement ?? document.scrollingElement)?.scrollTo(0, props.headerTop)
-
-  await nextTick()
-
-  if (isRefetch) pageComponent.value[0]?.refetch()
 }
 
-watch(queryParamsStrict, (newValue, oldValue) => {
-  if (isEqualObj(newValue, oldValue)) return
+watch(toRef(props, 'queryParams'), (newValue, oldValue) => {
+  if (isEqualObj(newValue, oldValue, ['page', ...(props.excludeParams ?? [])])) return
 
   resetPage()
 })

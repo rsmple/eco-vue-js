@@ -18,9 +18,9 @@
     :hide-prefix="hidePrefix ? isMobile ? focused : isOpen : false"
     @update:model-value="!loading && !isFetchingPrefix && $emit('update:search', $event as string ?? '')"
 
-    @keypress:enter.stop.prevent="selectCursor"
-    @keypress:up.prevent="cursorUp"
-    @keypress:down.prevent="cursorDown"
+    @keypress:enter.stop.prevent="list?.selectCursor()"
+    @keypress:up.prevent="list?.cursorUp()"
+    @keypress:down.prevent="list?.cursorDown()"
     @keypress:delete="captureDoubleDelete"
 
     @open="isOpen = true"
@@ -56,74 +56,49 @@
     </template>
 
     <template #content>
-      <WInfiniteList
+      <SelectAsyncList
+        ref="list"
+        :model-value="modelValue"
         :use-query-fn="useQueryFn"
         :query-params="queryParams"
         :is-invalid-page="isInvalidPage"
-        hide-page-title
-        no-gap
-        header-top-ignore
-        min-height
-        @update:count="count = $event"
+        :loading="loading || isFetchingPrefix"
+        :disabled="isDisabled"
+        :empty-stub="emptyStub ?? 'No match'"
+        :allow-update-selected="allowUpdateSelected"
+        @select="select"
+        @unselect="unselect"
+        @update:selected="updateSelected"
       >
-        <template #default="{item, skeleton: listSkeleton, previous, next, first, last}">
-          <SelectOption
-            :is-selected="!listSkeleton && modelValue.includes(item.id)"
-            :is-cursor="!listSkeleton && item.id === cursor"
-            :loading="(loading || isFetchingPrefix) && loadingOptionIndex === item.id"
-            :skeleton="listSkeleton"
-            :scroll="isCursorLocked"
-            :first="first"
-            :last="last"
-            :previous="previous?.id"
-            :next="next?.id"
-            :is-no-cursor="cursor === undefined"
-            :class="{
-              'pt-4': first,
-              'pb-4': last,
-            }"
-            @select="select(item.id); setLoadingOptionIndex(item.id)"
-            @unselect="unselect(item.id); setLoadingOptionIndex(item.id)"
-            @mouseenter="!listSkeleton && setCursor(item.id)"
-            @update:cursor="setCursor(item.id)"
-            @update:is-cursor="updateCursors(previous?.id, next?.id)"
-            @update:previous="cursorPrevious = $event"
-            @update:next="cursorNext = $event"
-            @unmounted="cursor = undefined"
+        <template #default="{option, selected, skeleton: skeletonList}">
+          <slot
+            name="option"
+            :option="option"
+            :selected="selected"
+            :skeleton="skeletonList"
+            :model="false"
           >
-            <template #default="{selected}">
-              <slot
-                name="option"
-                :option="item"
-                :selected="selected"
-                :model="false"
-                :skeleton="listSkeleton"
-              >
-                <component
-                  :is="optionComponent"
-                  :option="item"
-                  :selected="selected"
-                  :skeleton="listSkeleton"
-                  :model="false"
-                />
-              </slot>
-            </template>
-          </SelectOption>
+            <component
+              :is="optionComponent"
+              :option="option"
+              :selected="selected"
+              :skeleton="skeletonList"
+              :model="false"
+            />
+          </slot>
         </template>
-      </WInfiniteList>
+      </SelectAsyncList>
     </template>
   </WInputSuggest>
 </template>
 
 <script lang="ts" setup>
 import {ref, nextTick, computed} from 'vue'
-import SelectOption from './components/SelectOption.vue'
 import {getIsMobile} from '@/utils/mobile'
-import {debounce} from '@/utils/utils'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
-import WInfiniteList from '../InfiniteList/WInfiniteList.vue'
 import type {QueryParams, UseDefaultQueryFn} from '../InfiniteList/models/types'
 import SelectAsyncPrefix from './components/SelectAsyncPrefix.vue'
+import SelectAsyncList from './components/SelectAsyncList.vue'
 
 const props = defineProps<{
   modelValue: number[]
@@ -147,24 +122,21 @@ const props = defineProps<{
   errorMessage?: string
   required?: boolean
   hasChanges?: boolean
+  allowUpdateSelected?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'select', item: number): void
   (e: 'unselect', item: number): void
   (e: 'update:search', value: string): void
+  (e: 'update:modelValue', value: number[]): void
 }>()
 
 const isOpen = ref(false)
 const input = ref<InstanceType<typeof WInputSuggest> | undefined>()
-const cursor = ref<number | undefined>(undefined)
-const cursorPrevious = ref<number | undefined>(undefined)
-const cursorNext = ref<number | undefined>(undefined)
-const isCursorLocked = ref(false)
+const list = ref<InstanceType<typeof SelectAsyncList> | undefined>()
 const isMobile = getIsMobile()
 const focused = ref(false)
-const count = ref(0)
-const loadingOptionIndex = ref<number | null>(null)
 const isFetchingPrefix = ref(false)
 
 const isDisabled = computed(() => props.loading || isFetchingPrefix.value || props.readonly || props.disabled)
@@ -172,60 +144,6 @@ const isDisabled = computed(() => props.loading || isFetchingPrefix.value || pro
 const close = () => {
   isOpen.value = false
   focused.value = false
-}
-
-const setLoadingOptionIndex = (value: number) => {
-  if (isDisabled.value) return
-
-  loadingOptionIndex.value = value
-}
-
-const unlockCursor = debounce(() => {
-  isCursorLocked.value = false
-}, 50)
-
-const lockCursor = () => {
-  isCursorLocked.value = true
-
-  unlockCursor()
-}
-
-const setCursor = (value: number): void => {
-  if (isCursorLocked.value) return
-
-  cursor.value = value
-}
-
-const updateCursors = (previous: number | undefined, next: number | undefined) => {
-  cursorPrevious.value = previous
-  cursorNext.value = next
-}
-
-const cursorUp = () => {
-  if (isDisabled.value || cursorPrevious.value === undefined) return
-
-  lockCursor()
-
-  cursor.value = cursorPrevious.value
-}
-
-const cursorDown = () => {
-  if (isDisabled.value || cursorNext.value === undefined) return
-
-  lockCursor()
-
-  cursor.value = cursorNext.value
-}
-
-const selectCursor = () => {
-  if (isDisabled.value) return
-
-  if (cursor.value !== undefined && cursor.value > 0) {
-    setLoadingOptionIndex(cursor.value)
-
-    if (props.modelValue.includes(cursor.value)) unselect(cursor.value)
-    else select(cursor.value)
-  }
 }
 
 let deletePressTimeout: NodeJS.Timeout | null = null
@@ -255,6 +173,12 @@ const unselect = (item: number): void => {
   if (isDisabled.value) return
 
   emit('unselect', item)
+}
+
+const updateSelected = (value: number[]): void => {
+  if (isDisabled.value || !props.allowUpdateSelected) return
+
+  emit('update:modelValue', value)
 }
 
 const focus = () => {

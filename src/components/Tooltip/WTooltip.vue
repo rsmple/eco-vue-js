@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onBeforeUnmount, ref, useSlots, watch} from 'vue'
+import {computed, onBeforeUnmount, ref, toRef, useSlots, watch} from 'vue'
 import {getIsTouchDevice} from '@/utils/mobile'
 import {Tooltip} from '@/utils/Tooltip'
 import {getIncrement} from './models/utils'
@@ -24,6 +24,7 @@ const slots = useSlots()
 
 const isTouchDevice = getIsTouchDevice()
 const container = ref<HTMLDivElement>()
+const isOpen = ref(false)
 
 const parent = computed(() => container.value?.parentElement ?? null)
 const triggerElement = computed(() => props.trigger ?? parent.value)
@@ -33,6 +34,8 @@ const open = () => {
 
   if (!parent.value) return
   if (!slot && !props.text) return
+
+  isOpen.value = true
 
   if (props.overflowOnly) {
     const rect = parent.value.getBoundingClientRect()
@@ -44,6 +47,8 @@ const open = () => {
 }
 
 const close = () => {
+  isOpen.value = false
+
   Tooltip.close()
 }
 
@@ -52,6 +57,10 @@ watch(triggerElement, (newValue, oldValue) => {
   oldValue?.removeEventListener('mouseleave', close)
   newValue?.addEventListener('mouseenter', open)
   newValue?.addEventListener('mouseleave', close)
+})
+
+watch(toRef(props, 'text'), () => {
+  if (isOpen.value) open()
 })
 
 onBeforeUnmount(() => {

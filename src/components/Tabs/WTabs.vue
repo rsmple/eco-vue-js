@@ -2,7 +2,7 @@
   <div class="mb-8">
     <div class="relative flex mb-4">
       <button
-        v-for="(_, index) in $slots.default?.()"
+        v-for="(_, index) in slots ?? $slots.default?.()"
         ref="button"
         :key="index"
         class="flex-1 font-semibold flex items-center justify-center h-10 cursor-pointer relative w-ripple w-ripple-hover select-none transition-colors duration-500 outline-none"
@@ -55,7 +55,7 @@
         leave-to-class="left-[calc((100%+2*var(--inner-margin))*var(--direction-factor)*-1)] top-0"
       >
         <TabItem
-          v-for="(slot, index) in $slots.default?.()"
+          v-for="(slot, index) in slots ?? $slots.default?.()"
           ref="tabItem"
           :key="index"
           :is-active="index === current"
@@ -77,13 +77,14 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, watch, nextTick} from 'vue'
+import {onMounted, ref, watch, nextTick, type VNode} from 'vue'
 import TabItem from './components/TabItem.vue'
 import WForm from '@/components/Form/WForm.vue'
 import {debounce} from '@/utils/utils'
 
 defineProps<{
   names: string[]
+  slots?: VNode[]
 }>()
 
 const current = ref(0)

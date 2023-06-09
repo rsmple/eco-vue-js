@@ -26,6 +26,7 @@ import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
 import WNotify from '@/components/Notify/WNotify.vue'
 import WSelect from '@/components/Select/WSelect.vue'
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
+import WSelectAsyncList from '@/components/Select/WSelectAsyncList.vue'
 import WSelectSingle from '@/components/Select/WSelectSingle.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
@@ -63,6 +64,7 @@ export default {
     app.component('WNotify', WNotify)
     app.component('WSelect', WSelect)
     app.component('WSelectAsync', WSelectAsync)
+    app.component('WSelectAsyncList', WSelectAsyncList)
     app.component('WSelectSingle', WSelectSingle)
     app.component('WSkeleton', WSkeleton)
     app.component('WSpinner', WSpinner)
@@ -100,6 +102,7 @@ export {
   WNotify,
   WSelect,
   WSelectAsync,
+  WSelectAsyncList,
   WSelectSingle,
   WSkeleton,
   WSpinner,

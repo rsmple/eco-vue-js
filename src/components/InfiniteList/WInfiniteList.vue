@@ -40,12 +40,14 @@
     :header-top="headerTopIgnore ? 0 : headerTop"
     :header-height="headerHeight"
     :min-height="minHeight"
+    :exclude-params="excludeParams"
+    :empty-stub="emptyStub"
 
     @update:count="$emit('update:count', $event)"
     @update:selected="$emit('update:selected', $event)"
     @update:page="$emit('update:page', $event)"
   >
-    <template #default="{item, setter, skeleton, refetch, previous, next, first, last}">
+    <template #default="{item, setter, skeleton, refetch, previous, next, first, last, resetting}">
       <slot
         :item="item"
         :setter="setter"
@@ -55,6 +57,7 @@
         :next="next"
         :first="first"
         :last="last"
+        :resetting="resetting"
       />
     </template>
   </WInfiniteListPages>
@@ -83,6 +86,8 @@ const props = withDefaults(
     scrollingElement?: Element | null
     headerTopIgnore?: boolean
     minHeight?: boolean
+    excludeParams?: string[]
+    emptyStub?: string
   }>(),
   {
     skeletonLength: undefined,
@@ -90,6 +95,8 @@ const props = withDefaults(
     selected: undefined,
     pageLength: undefined,
     scrollingElement: undefined,
+    excludeParams: undefined,
+    emptyStub: undefined,
   },
 )
 
