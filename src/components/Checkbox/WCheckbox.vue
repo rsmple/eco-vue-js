@@ -7,7 +7,7 @@
       'cursor-not-allowed opacity-70': disabled,
       'mt-1 mb-4': title,
     }"
-    @click.stop.prevent="toggle"
+    @click="toggle"
   >
     <div
       class="relative flex justify-center items-center square-6 border border-solid border-primary-default dark:border-primary-dark text-accent"

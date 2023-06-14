@@ -412,4 +412,17 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       },
     },
   })
+
+  matchUtilities(
+    {
+      'w-skeleton-rounded': (value) => {
+        return {
+          '--skeleton-rounded': value,
+        }
+      },
+    },
+    {
+      values: theme('borderRadius'),
+    },
+  )
 })

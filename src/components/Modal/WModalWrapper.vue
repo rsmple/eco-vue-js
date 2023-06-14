@@ -8,7 +8,7 @@
   >
     <div
       ref="title"
-      class="text-accent font-semibold text-center p-[var(--modal-wrapper-padding,2rem)] bg-default dark:bg-default-dark"
+      class="text-accent font-semibold text-center p-[var(--modal-wrapper-padding,2rem)] bg-default dark:bg-default-dark flex justify-center items-center"
       :class="{
         'text-xl': maximized,
         'text-2xl': !maximized,
