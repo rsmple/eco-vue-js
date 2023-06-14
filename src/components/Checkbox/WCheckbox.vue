@@ -5,41 +5,60 @@
     :class="{
       'cursor-progress': loading,
       'cursor-not-allowed opacity-70': disabled,
-      'mt-1 mb-4': title,
+      'pt-1 pb-4': title,
     }"
     @click="toggle"
   >
     <div
-      class="relative flex justify-center items-center square-6 border border-solid border-primary-default dark:border-primary-dark text-accent"
+      class="relative flex justify-center items-center square-6 border border-solid isolate"
       :class="{
-        'bg-primary-default dark:bg-primary-dark ': !disabled && value && !radio,
+        'text-default dark:text-default-dark': value && !disabled,
+        'text-primary-default dark:text-primary-dark': !value && !disabled,
+        'text-gray-300 dark:text-gray-700': !value && disabled,
+        'w-ripple w-hover-circle before:text-accent after:text-accent': !disabled && !readonly,
         'rounded-full': radio,
         'rounded-md': !radio,
         'border-gray-300 dark:border-gray-700': disabled,
-        'w-ripple w-hover-circle': !disabled && !readonly,
+        'border-primary-default dark:border-primary-dark': !disabled,
       }"
       @keypress.enter.stop.prevent="toggle"
     >
+      <Transition
+        enter-active-class="transition-[opacity,transform]"
+        leave-active-class="transition-[opacity,transform]"
+        :enter-from-class="radio ? 'opacity-0 scale-[0.25!important]' : 'opacity-0 scale-[0.50!important]'"
+        :leave-to-class="radio ? 'opacity-0 scale-[0.25!important]' : 'opacity-0 scale-[0.50!important]'"
+      >
+        <div
+          v-show="value !== false"
+          class="absolute square-full -z-10 transition-[opacity,transform]"
+          :class="{
+            'scale-[0.33] rounded-full': radio && intermediate && value === null,
+            'scale-[0.66] rounded': !radio && intermediate && value === null,
+            'scale-[0.66] rounded-full': radio && !(intermediate && value === null),
+            'rounded': !radio && !(intermediate && value === null),
+            'bg-primary-default dark:bg-primary-dark': !disabled,
+            'bg-gray-300 dark:bg-gray-700': disabled,
+          }"
+        />
+      </Transition>
+
       <WSpinner
         v-if="loading"
-        class="w-spinner-size-4 text-primary-default dark:text-primary-dark"
+        class="w-spinner-size-4"
       />
 
-      <div
-        v-else-if="radio"
-        v-show="value"
-        class="square-4 bg-primary-default dark:bg-primary-dark rounded-full"
-      />
-
-      <div
-        v-else-if="intermediate && value === null"
-        class="square-4 bg-primary-default dark:bg-primary-dark rounded"
-      />
+      <template v-else-if="icon">
+        <component
+          :is="icon"
+          class="square-4"
+        />
+      </template>
 
       <IconCheck
-        v-else
+        v-else-if="!radio"
         v-show="value"
-        class="square-4 text-default dark:text-default-dark"
+        class="square-4"
       />
 
       <WTooltip
@@ -53,7 +72,7 @@
 
     <div
       v-if="$slots.default?.().length || title"
-      class="font-normal text-base text-accent"
+      class="font-normal text-base text-accent flex items-center gap-1"
     >
       <slot>
         {{ title }}
@@ -73,6 +92,7 @@ const props = defineProps<{
   title?: string
   disabled?: boolean
   readonly?: boolean
+  icon?: SVGComponent
   radio?: boolean
   loading?: boolean
   intermediate?: boolean
