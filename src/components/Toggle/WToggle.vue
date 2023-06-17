@@ -7,7 +7,7 @@
     <div
       class="flex gap-4 w-hover-circle-trigger w-ripple-trigger w-hover-circle-opacity-[0.08] select-none items-center"
       :class="{
-        'cursor-not-allowed opacity-70': disabled,
+        'cursor-not-allowed opacity-50': disabled,
         'cursor-progress': loading,
         'cursor-pointer': !readonly && !loading && !disabled,
       }"

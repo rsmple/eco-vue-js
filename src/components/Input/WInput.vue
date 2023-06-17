@@ -2,7 +2,7 @@
   <div
     class="relative mt-1 mb-[var(--input-b-margin,1.125rem)]"
     :class="{
-      'opacity-70 cursor-not-allowed': disabled,
+      'opacity-50 cursor-not-allowed': disabled,
     }"
     @click="$emit('click:internal', $event)"
   >
