@@ -15,6 +15,9 @@
           :selected="selected"
           :items="data?.results ?? []"
           :disabled="!data?.results"
+          :tooltip-text-persisted="hidePageTitle"
+          :select-only="selectOnly"
+          :unselect-only="unselectOnly"
 
           class="sm:w-list-row-item sm-not:px-[calc(var(--inner-margin)-2px)] pb-4 pt-6"
           @update:selected="$emit('update:selected', $event)"
@@ -129,6 +132,8 @@ const props = withDefaults(
     transition?: boolean
     resetting?: boolean
     emptyStub?: string
+    selectOnly?: boolean
+    unselectOnly?: boolean
   }>(),
   {
     keyGetter: undefined,

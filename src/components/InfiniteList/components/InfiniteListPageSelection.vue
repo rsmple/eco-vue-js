@@ -2,10 +2,17 @@
   <WCheckbox
     :model-value="chekboxValue"
     :disabled="disabled"
-    :tooltip-text="tooltipText"
+    :tooltip-text="!tooltipTextPersisted ? tooltipText : undefined"
     intermediate
+    :class="{
+      'w-full': tooltipTextPersisted,
+    }"
     @update:model-value="selectOrUnselect"
-  />
+  >
+    <template v-if="tooltipTextPersisted">
+      {{ tooltipText }}
+    </template>
+  </WCheckbox>
 </template>
 
 <script lang="ts" setup>
@@ -17,6 +24,9 @@ const props = defineProps<{
   selected: number[]
   items: DefaultData[]
   disabled?: boolean
+  tooltipTextPersisted?: boolean
+  selectOnly?: boolean
+  unselectOnly?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -28,6 +38,9 @@ const selectedItems = computed(() => ids.value.filter(id => props.selected.inclu
 const hasSelected = computed(() => selectedItems.value.length !== 0)
 
 const chekboxValue = computed(() => {
+  if (props.selectOnly) return false
+  if (props.unselectOnly) return true
+
   if (selectedItems.value.length === props.items.length) {
     return hasSelected.value
   } else {

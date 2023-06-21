@@ -9,18 +9,7 @@
       'z-20': !isIntersecting,
     }"
   >
-    <div
-      v-for="(slot, index) in $slots.header?.()"
-      :key="index"
-      class="flex sm:w-[calc(100vw-var(--nav-bar-width)-var(--inner-margin))]"
-    >
-      <component
-        :is="slot"
-        class="sm:w-[calc(100vw-var(--inner-width-diff))]"
-      />
-
-      <div class="sm-not:hidden sm:pr-[calc(var(--actions-bar-width)+var(--inner-margin))]" />
-    </div>
+    <slot name="header" />
   </div>
 
   <WInfiniteListPages
@@ -42,6 +31,8 @@
     :min-height="minHeight"
     :exclude-params="excludeParams"
     :empty-stub="emptyStub"
+    :select-only="selectOnly"
+    :unselect-only="unselectOnly"
 
     @update:count="$emit('update:count', $event)"
     @update:selected="$emit('update:selected', $event)"
@@ -88,6 +79,8 @@ const props = withDefaults(
     minHeight?: boolean
     excludeParams?: string[]
     emptyStub?: string
+    selectOnly?: boolean
+    unselectOnly?: boolean
   }>(),
   {
     skeletonLength: undefined,

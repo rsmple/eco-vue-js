@@ -27,8 +27,10 @@
         :is-invalid-page="isInvalidPage"
         :query-params="queryParams"
         :scrolling-element="list"
-        :exclude-params="['id__in']"
+        :exclude-params="excludeParams"
         :empty-stub="emptyStub"
+        :select-only="selectOnly"
+        :unselect-only="unselectOnly"
         allow-update-selected
         transition
         no-padding
@@ -64,6 +66,9 @@ defineProps<{
   isInvalidPage: (error: unknown) => boolean
   queryParams: QueryParams
   skeleton?: boolean
+  excludeParams?: string[]
+  selectOnly?: boolean
+  unselectOnly?: boolean
 }>()
 
 defineEmits<{

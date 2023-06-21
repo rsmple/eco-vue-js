@@ -8,6 +8,8 @@
     :exclude-params="excludeParams"
     :selected="allowUpdateSelected ? modelValue : undefined"
     :empty-stub="emptyStub"
+    :select-only="selectOnly"
+    :unselect-only="unselectOnly"
     hide-page-title
     no-gap
     header-top-ignore
@@ -72,6 +74,8 @@ const props = defineProps<{
   noPadding?: boolean
   emptyStub?: string
   allowUpdateSelected?: boolean
+  selectOnly?: boolean
+  unselectOnly?: boolean
 }>()
 
 const emit = defineEmits<{

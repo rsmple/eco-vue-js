@@ -27,6 +27,8 @@
       :transition="transition"
       :resetting="isResettingPage"
       :empty-stub="emptyStub"
+      :select-only="selectOnly"
+      :unselect-only="unselectOnly"
 
       :class="{
         'last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16': !minHeight,
@@ -97,6 +99,8 @@ const props = withDefaults(
     minHeight?: boolean
     excludeParams?: string[]
     emptyStub?: string
+    selectOnly?: boolean
+    unselectOnly?: boolean
   }>(),
   {
     skeletonLength: undefined,
