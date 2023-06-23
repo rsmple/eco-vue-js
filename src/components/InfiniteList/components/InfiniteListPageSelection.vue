@@ -1,18 +1,23 @@
 <template>
   <WCheckbox
+    v-if="tooltipTextPersisted"
     :model-value="chekboxValue"
     :disabled="disabled"
-    :tooltip-text="!tooltipTextPersisted ? tooltipText : undefined"
     intermediate
-    :class="{
-      'w-full': tooltipTextPersisted,
-    }"
+    class="w-full"
     @update:model-value="selectOrUnselect"
   >
-    <template v-if="tooltipTextPersisted">
-      {{ tooltipText }}
-    </template>
+    {{ tooltipText }}
   </WCheckbox>
+
+  <WCheckbox
+    v-else
+    :model-value="chekboxValue"
+    :disabled="disabled"
+    :tooltip-text="tooltipText"
+    intermediate
+    @update:model-value="selectOrUnselect"
+  />
 </template>
 
 <script lang="ts" setup>
