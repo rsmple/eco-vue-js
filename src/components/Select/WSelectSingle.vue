@@ -16,7 +16,7 @@
       :allow-create="allowCreate"
       :error-message="errorMessage"
       :has-changes="hasChanges"
-      :show-marker="showMarker"
+      :placeholder="placeholder"
       disable-clear
       hide-prefix
       @select="updateModelValue($event)"
@@ -60,7 +60,7 @@ defineProps<{
   allowCreate?: boolean
   errorMessage?: string
   hasChanges?: boolean
-  showMarker?: boolean
+  placeholder?: string
 }>()
 
 const emit = defineEmits<{

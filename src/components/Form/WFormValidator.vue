@@ -3,9 +3,9 @@
     :is="component"
     :error-message="errorMessage"
     :has-changes="hasChanges"
-    @update:model-value="validateOnUpdate($event)"
-    @select="validateOnSelect"
-    @unselect="validateOnUnselect"
+    @update:model-value="_validateOnUpdate($event)"
+    @select="_validateOnSelect"
+    @unselect="_validateOnUnselect"
   />
 </template>
 
@@ -146,13 +146,17 @@ const validateOnUpdate = (value: Parameters<ValidateFn>[0]) => {
   return message
 }
 
-const validateOnSelect = (value: string) => {
+const _validateOnUpdate = (value: Parameters<ValidateFn>[0]) => {
+  validateOnUpdate(value)
+}
+
+const _validateOnSelect = (value: string) => {
   const newValue = modelValue.value instanceof Array ? modelValue.value.slice() : []
   newValue.push(value)
   validateOnUpdate(newValue)
 }
 
-const validateOnUnselect = (value: string) => {
+const _validateOnUnselect = (value: string) => {
   const newValue = modelValue.value instanceof Array ? modelValue.value.slice() : []
   const index = newValue.indexOf(value)
   if (index !== -1) newValue.splice(index, 1)

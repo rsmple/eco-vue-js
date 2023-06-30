@@ -6,8 +6,7 @@
     :model-value="search"
     :max-length="maxSearchLength"
     :loading="loading"
-    :hide-input="isMobile ? !focused : !isOpen"
-    hide-input-unclickable
+    :hide-input="modelValue.length === 0 ? false : isMobile ? !focused : !isOpen"
     :readonly="readonly"
     :skeleton="skeleton"
     :size="searchSize"
@@ -16,6 +15,7 @@
     :disabled="disabled"
     :has-changes="hasChanges"
     :hide-prefix="hidePrefix ? isMobile ? focused : isOpen : false"
+    :placeholder="placeholder"
     @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
 
     @keypress:enter.stop.prevent="selectCursor"
@@ -184,6 +184,7 @@ const props = defineProps<{
   errorMessage?: string
   required?: boolean
   hasChanges?: boolean
+  placeholder?: string
 }>()
 
 const emit = defineEmits<{

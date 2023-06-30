@@ -16,6 +16,7 @@
     :disabled="disabled"
     :has-changes="hasChanges"
     :hide-prefix="hidePrefix ? isMobile ? focused : isOpen : false"
+    :placeholder="placeholder"
     @update:model-value="!loading && !isFetchingPrefix && $emit('update:search', $event as string ?? '')"
 
     @keypress:enter.stop.prevent="list?.selectCursor()"
@@ -123,6 +124,7 @@ const props = defineProps<{
   required?: boolean
   hasChanges?: boolean
   allowUpdateSelected?: boolean
+  placeholder?: string
 }>()
 
 const emit = defineEmits<{

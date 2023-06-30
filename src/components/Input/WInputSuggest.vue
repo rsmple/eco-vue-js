@@ -12,7 +12,7 @@
           :model-value="modelValue"
           :max-length="maxLength"
           :loading="loading"
-          :hide-input="hideInput || (hideInputUnclickable && unclickable)"
+          :hide-input="hideInput"
           :readonly="readonly || unclickable"
           :skeleton="skeleton"
           :size="size"
@@ -22,6 +22,7 @@
           :has-changes="hasChanges"
           :allow-clear="allowClear"
           :icon="icon"
+          :placeholder="placeholder"
           :class="{
             'cursor-pointer': !disabled,
             'cursor-not-allowed': disabled,
@@ -112,7 +113,6 @@ const props = defineProps<{
   allowClear?: boolean
   hidePrefix?: boolean
   hideInput?: boolean
-  hideInputUnclickable?: boolean
   readonly?: boolean
   disabled?: boolean
   skeleton?: boolean
@@ -123,6 +123,7 @@ const props = defineProps<{
   hasChanges?: boolean
   icon?: SVGComponent
   teleport?: boolean
+  placeholder?: string
 }>()
 
 const emit = defineEmits<{
