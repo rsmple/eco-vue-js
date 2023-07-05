@@ -37,6 +37,7 @@
           @focus="open(); $emit('focus')"
           @blur="!isMobile && !persist && close(); $emit('blur')"
         
+          @click="isMobile && unclickable && open()"
           @click:internal="isMobile && unclickable && open()"
           @click:clear="$emit('click:clear')"
         >

@@ -67,7 +67,6 @@
 
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, ref, watch} from 'vue'
-import {enablePreventScroll} from '@/utils/preventScroll'
 
 defineProps<{
   isOpen: boolean
@@ -116,14 +115,6 @@ const observer = new IntersectionObserver(observerCb, {
 let resumeScroll: (() => void) | undefined
 
 watch(toggle, updatePadding)
-
-watch(container, value => {
-  resumeScroll?.()
-
-  if (value && wrapper.value) {
-    resumeScroll = enablePreventScroll([value, wrapper.value])
-  }
-}, {immediate: true})
 
 let timeout: NodeJS.Timeout
 

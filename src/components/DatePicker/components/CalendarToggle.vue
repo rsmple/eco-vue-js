@@ -11,8 +11,20 @@
       <IconArrow class="rotate-90 -ml-1" />
     </div>
 
-    <div class="text-base text-accent font-medium select-none text-center w-14">
-      <slot />
+    <div class="relative overflow-hidden">
+      <Transition
+        enter-active-class="transition-transform duration-[250ms] w-full"
+        leave-active-class="transition-transform duration-[250ms] w-full absolute top-0"
+        enter-from-class="translate-x-[calc(100%*var(--direction-factor))]"
+        leave-to-class="translate-x-[calc(100%*var(--direction-factor)*-1)]"
+      >
+        <div
+          :key="text"
+          class="text-base text-accent font-medium select-none text-center w-14"
+        >
+          {{ text }}
+        </div>
+      </Transition>
     </div>
 
     <div
@@ -30,6 +42,10 @@
 
 <script lang="ts" setup>
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
+
+defineProps<{
+  text: string
+}>()
 
 defineEmits<{
   (e: 'click:next'): void

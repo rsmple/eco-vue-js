@@ -1,6 +1,6 @@
 
 export const getIsMobile = (): boolean => {
-  return window.innerWidth < 540
+  return window.innerWidth < 640
 }
 
 export const getIsTouchDevice = (): boolean => {

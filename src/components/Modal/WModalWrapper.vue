@@ -43,7 +43,6 @@
 
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, ref} from 'vue'
-import {enablePreventScroll} from '@/utils/preventScroll'
 
 defineProps<{
   maximized?: boolean
@@ -57,10 +56,6 @@ const marginY = ref(276)
 let resumeScroll: (() => void) | undefined
 
 onMounted(async () => {
-  if (container.value) {
-    resumeScroll = enablePreventScroll([container.value])
-  }
-
   if (title.value && actions.value) {
     marginY.value = title.value.offsetHeight + actions.value.offsetHeight
   }

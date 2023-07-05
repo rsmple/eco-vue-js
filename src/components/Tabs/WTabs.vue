@@ -49,10 +49,10 @@
       :style="{minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
     >
       <TransitionGroup
-        enter-active-class="top-0 left-0 transition-[top,left,transform] duration-[250ms] ease-linear"
-        leave-active-class="top-0 left-0 transition-[top,left,transform] duration-[250ms] ease-linear absolute"
-        enter-from-class="translate-x-[calc((100%+2*var(--inner-margin))*var(--direction-factor))]"
-        leave-to-class="left-[calc((100%+2*var(--inner-margin))*var(--direction-factor)*-1)] top-0"
+        enter-active-class="transition-transform duration-[250ms] w-full"
+        leave-active-class="transition-transform duration-[250ms] w-full absolute top-0"
+        enter-from-class="translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]"
+        leave-to-class="translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]"
       >
         <TabItem
           v-for="(slot, index) in slots ?? $slots.default?.()"
