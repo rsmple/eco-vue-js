@@ -97,7 +97,6 @@
 import {ref, nextTick, computed} from 'vue'
 import {getIsMobile} from '@/utils/mobile'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
-import type {QueryParams, UseDefaultQueryFn} from '../InfiniteList/models/types'
 import SelectAsyncPrefix from './components/SelectAsyncPrefix.vue'
 import SelectAsyncList from './components/SelectAsyncList.vue'
 

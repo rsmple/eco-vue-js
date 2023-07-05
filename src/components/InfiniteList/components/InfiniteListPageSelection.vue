@@ -23,7 +23,6 @@
 <script lang="ts" setup>
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 import {computed} from 'vue'
-import type {DefaultData} from '../models/types'
 
 const props = defineProps<{
   selected: number[]

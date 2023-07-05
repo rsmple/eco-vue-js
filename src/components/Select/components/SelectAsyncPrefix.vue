@@ -25,7 +25,6 @@
 
 <script lang="ts" setup>
 import {computed, ref, watch} from 'vue'
-import type {UseDefaultQueryFn} from '@/components/InfiniteList/models/types'
 import SelectAsyncPrefixPage from './SelectAsyncPrefixPage.vue'
 
 const props = defineProps<{

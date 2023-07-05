@@ -56,7 +56,6 @@
 
 <script lang="ts" setup>
 import {onBeforeUnmount, ref, watch} from 'vue'
-import type {QueryParams, UseDefaultQueryFn} from './models/types'
 import {useInfiniteListHeader} from './use/useInfiniteListHeader'
 import WInfiniteListPages from './WInfiniteListPages.vue'
 

@@ -55,7 +55,6 @@
 <script lang="ts" setup>
 import {ref} from 'vue'
 import SelectAsyncList from './components/SelectAsyncList.vue'
-import type {QueryParams, UseDefaultQueryFn} from '@/components/InfiniteList/models/types'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 defineProps<{

@@ -113,7 +113,6 @@
 
 <script lang="ts" setup>
 import {toRef, computed, watch, ref, onMounted, nextTick} from 'vue'
-import type {QueryParams, UseDefaultQueryFn} from '../models/types'
 import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
 import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
 

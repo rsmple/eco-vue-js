@@ -55,7 +55,6 @@
 
 <script lang="ts" setup>
 import {computed, toRef, watch} from 'vue'
-import type {QueryParams, UseDefaultQueryFn} from '@/components/InfiniteList/models/types'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 
 const props = defineProps<{

@@ -58,7 +58,6 @@
 import {ref} from 'vue'
 import SelectOption from './SelectOption.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
-import type {QueryParams, UseDefaultQueryFn} from '@/components/InfiniteList/models/types'
 import {debounce} from '@/utils/utils'
 
 const props = defineProps<{

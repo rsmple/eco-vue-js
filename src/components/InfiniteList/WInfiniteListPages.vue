@@ -72,7 +72,6 @@
 import {ref, computed, watch, toRef} from 'vue'
 import InfiniteListScroll from './components/InfiniteListScroll.vue'
 import InfiniteListPage from './components/InfiniteListPage.vue'
-import type {QueryParams, UseDefaultQueryFn} from './models/types'
 import {useRefetchNextPages} from './use/useRefetchNextPages'
 import InfiniteListButton from './components/InfiniteListButton.vue'
 import {isEqualObj} from '@/utils/utils'

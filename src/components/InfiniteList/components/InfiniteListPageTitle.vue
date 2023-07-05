@@ -12,7 +12,6 @@
 <script lang="ts" setup>
 import {useRoute, useRouter} from 'vue-router'
 import {Notify} from '@/utils/Notify'
-import type {QueryParams} from '../models/types'
 
 const props = defineProps<{
   queryParams: QueryParams

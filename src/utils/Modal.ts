@@ -1,6 +1,8 @@
 import {defineAsyncComponent, markRaw} from 'vue'
 import type {ConfirmModalProps} from '@/components/Modal/modals/Confirm/types'
 
+const ConfirmModal = defineAsyncComponent(() => import('@/components/Modal/modals/Confirm/ConfirmModal.vue'))
+
 export type AddModal = (component: VueComponent, props?: Record<string, unknown>, cb?: () => void, autoclose?: boolean) => (() => void)
 
 let addModal: AddModal | undefined
@@ -20,7 +22,7 @@ export const Modal = {
 
   addConfirm(props: ConfirmModalProps, cb?: () => void): (() => void) | null {
     return addModal?.(
-      markRaw(defineAsyncComponent(() => import('@/components/Modal/modals/Confirm/ConfirmModal.vue'))),
+      markRaw(ConfirmModal),
       props,
       cb,
       true,
