@@ -34,18 +34,18 @@
           @keypress:down="$emit('keypress:down', $event)"
           @keypress:delete="$emit('keypress:delete', $event)"
 
-          @focus="open(); $emit('focus')"
-          @blur="!isMobile && !persist && close(); $emit('blur')"
+          @focus="open(); !unclickable && $emit('focus')"
+          @blur="!isMobile && !persist && close(); !unclickable && $emit('blur')"
         
           @click="isMobile && unclickable && open()"
           @click:internal="isMobile && unclickable && open()"
           @click:clear="$emit('click:clear')"
         >
-          <template
-            v-if="!hidePrefix"
-            #prefix
-          >
-            <slot name="prefix" />
+          <template #prefix>
+            <slot
+              name="prefix"
+              :unclickable="unclickable"
+            />
           </template>
 
           <template #suffix>
@@ -112,7 +112,6 @@ const props = defineProps<{
   loading?: boolean
   maxLength?: number
   allowClear?: boolean
-  hidePrefix?: boolean
   hideInput?: boolean
   readonly?: boolean
   disabled?: boolean

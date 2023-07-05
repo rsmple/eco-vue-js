@@ -6,7 +6,7 @@
       :title="title"
       :description="description"
       :placeholder="placeholder"
-      :readonly="!isEdit"
+      :disabled-actions="!focused && !hasChanges"
       :type="type"
       :error-message="errorMessage"
       :skeleton="skeleton"
@@ -22,7 +22,8 @@
       class="w-full"
       @keypress:enter.stop.prevent="emitUpdateModelValue(value)"
       @click="open"
-      @blur="close"
+      @blur="close(); focused = false"
+      @focus="focused = true"
     >
       <template
         v-if="$slots.title?.().length"
@@ -32,8 +33,13 @@
       </template>
 
       <template #right>
-        <component
-          :is="skeleton ? WSkeleton : 'button'"
+        <WSkeleton
+          v-if="skeleton"
+          class="square-11 w-skeleton-rounded-lg"
+        />
+
+        <button
+          v-else
           class="relative square-11 rounded-lg flex items-center justify-center text-description"
           :class="{
             'cursor-not-allowed': disabled,
@@ -45,17 +51,17 @@
         >
           <WSpinner v-if="loading" />
 
-          <IconCheck v-else-if="isEdit" />
+          <IconCheck v-else-if="hasChanges || focused" />
 
           <IconEdit v-else />
-        </component>
+        </button>
       </template>
     </WInput>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {computed, nextTick, ref, toRef, watch} from 'vue'
+import {computed, ref, toRef, watch} from 'vue'
 import WInput from '@/components/Input/WInput.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import IconEdit from '@/assets/icons/default/IconEdit.svg?component'
@@ -86,8 +92,8 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: string | number | undefined): void
 }>()
 
+const focused = ref(false)
 const value = ref(props.modelValue)
-const isEdit = ref(false)
 const input = ref<InstanceType<typeof WInput> | undefined>()
 const errorMessage = ref<string | undefined>()
 const hasChanges = computed(() => props.modelValue !== value.value)
@@ -95,30 +101,21 @@ const hasChanges = computed(() => props.modelValue !== value.value)
 const toggle = async () => {
   if (props.disabled || props.loading) return
 
-  if (isEdit.value) {
+  if (hasChanges.value) {
     emitUpdateModelValue(value.value)
   } else {
-    isEdit.value = true
-
-    await nextTick()
-    await nextTick()
-
-    input.value?.focus()
+    open()
   }
 }
 
 const close = () => {
-  if (!isEdit.value) return
-
-  isEdit.value = false
-
   value.value = props.modelValue
 }
 
 const open = () => {
   if (props.disabled || props.loading) return
 
-  isEdit.value = true
+  input.value?.focus()
 }
 
 watch(toRef(props, 'modelValue'), modelValue => {

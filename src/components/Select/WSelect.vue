@@ -14,7 +14,6 @@
     :required="required"
     :disabled="disabled"
     :has-changes="hasChanges"
-    :hide-prefix="hidePrefix ? isMobile ? focused : isOpen : false"
     :placeholder="placeholder"
     @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
 
@@ -28,60 +27,62 @@
     @focus="focused = true"
     @blur="focused = false"
   >
-    <template #prefix>
-      <div
-        v-for="option in modelValue"
-        :key="option"
-        class="relative flex overflow-hidden items-center max-w-[calc(100%-2.75rem)] text-description"
-        :class="{
-          'cursor-pointer': !disabled,
-          'cursor-not-allowed': disabled,
-        }"
-      >
-        <slot
-          name="option"
-          :option="option"
-          :selected="true"
-          :model="true"
-        >
-          <template v-if="optionComponent">
-            <component
-              :is="optionComponent"
-              :option="option"
-              :selected="true"
-              :model="true"
-            >
-              <button
-                v-if="!disableClear"
-                class="relative flex square-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center outline-none"
-                :class="{
-                  'cursor-not-allowed': disabled,
-                  'cursor-progress': loading,
-                  'cursor-pointer w-ripple w-ripple-hover ': !loading && !disabled,
-                }"
-                @mousedown.stop.prevent=""
-                @click.stop.prevent="!loading && unselect(option)"
-              >
-                <IconCancel class="square-3" />
-              </button>
-            </component>
-          </template>
-        </slot>
-
-        <button
-          v-if="!optionComponent && !disableClear"
-          class="relative flex square-5 rounded-full items-center justify-center outline-none"
+    <template #prefix="{unclickable}">
+      <template v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true">
+        <div
+          v-for="option in modelValue"
+          :key="option"
+          class="relative flex overflow-hidden items-center max-w-[calc(100%-2.75rem)] text-description"
           :class="{
+            'cursor-pointer': !disabled,
             'cursor-not-allowed': disabled,
-            'cursor-progress': loading,
-            'cursor-pointer w-ripple w-ripple-hover ': !loading && !disabled,
           }"
-          @mousedown.stop.prevent=""
-          @click.stop.prevent="!loading && unselect(option)"
         >
-          <IconCancel class="square-3" />
-        </button>
-      </div>
+          <slot
+            name="option"
+            :option="option"
+            :selected="true"
+            :model="true"
+          >
+            <template v-if="optionComponent">
+              <component
+                :is="optionComponent"
+                :option="option"
+                :selected="true"
+                :model="true"
+              >
+                <button
+                  v-if="!disableClear"
+                  class="relative flex square-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center outline-none"
+                  :class="{
+                    'cursor-not-allowed': disabled,
+                    'cursor-progress': loading,
+                    'cursor-pointer w-ripple w-ripple-hover ': !loading && !disabled,
+                  }"
+                  @mousedown.stop.prevent=""
+                  @click.stop.prevent="!loading && unselect(option)"
+                >
+                  <IconCancel class="square-3" />
+                </button>
+              </component>
+            </template>
+          </slot>
+
+          <button
+            v-if="!optionComponent && !disableClear"
+            class="relative flex square-5 rounded-full items-center justify-center outline-none"
+            :class="{
+              'cursor-not-allowed': disabled,
+              'cursor-progress': loading,
+              'cursor-pointer w-ripple w-ripple-hover ': !loading && !disabled,
+            }"
+            @mousedown.stop.prevent=""
+            @click.stop.prevent="!loading && unselect(option)"
+          >
+            <IconCancel class="square-3" />
+          </button>
+        </div>
+      </template>
     </template>
 
     <template #right>
@@ -192,7 +193,6 @@ const emit = defineEmits<{
   (e: 'unselect', item: string): void
   (e: 'update:search', value: string): void
   (e: 'create:option', value: string): void
-  (e: 'show:marker'): void
 }>()
 
 const isOpen = ref(false)

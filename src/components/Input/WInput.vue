@@ -73,9 +73,9 @@
             :is="textarea ? 'textarea' : 'input'"
             ref="input"
             class="
-            text-base text-accent font-normal outline-0 border-none bg-default dark:bg-default-dark select-all flex-1 max-w-full
-            disabled:opacity-80 disabled:cursor-not-allowed placeholder:text-gray-400 dark:placeholder:text-gray-500 appearance-none
-          "
+              text-base text-accent font-normal outline-0 border-none bg-default dark:bg-default-dark select-all flex-1 max-w-full
+              disabled:opacity-80 disabled:cursor-not-allowed placeholder:text-gray-400 dark:placeholder:text-gray-500 appearance-none
+            "
             :class="{
               'py-0 pr-1 pl-3': !textarea && !hideInput,
               'h-[34px]': $slots.suffix?.()?.length,
@@ -110,7 +110,7 @@
           <InputActions
             :loading="loading"
             :allow-clear="allowClear && modelValue !== ''"
-            :disabled="disabled || readonly"
+            :disabled="disabled || readonly || disabledActions"
             :text-secure="textSecure"
             :is-secure-visible="isSecureVisible"
             class="absolute top-0 right-0 bottom-0"
@@ -220,6 +220,7 @@ const props = withDefaults(
     customBackspaceHandle?: boolean
     hasChanges?: boolean
     allowMousedown?: boolean
+    disabledActions?: boolean
   }>(),
   {
     size: 40,
