@@ -9,7 +9,8 @@
         <WInput
           ref="input"
           :title="title"
-          :model-value="modelValue"
+          :model-value="(modelValue as ModelValue | undefined)"
+          :type="(type as Type | undefined)"
           :max-length="maxLength"
           :loading="loading"
           :hide-input="hideInput"
@@ -27,7 +28,7 @@
             'cursor-pointer': !disabled,
             'cursor-not-allowed': disabled,
           }"
-          @update:model-value="!loading && $emit('update:modelValue', $event as string ?? '')"
+          @update:model-value="!loading && $emit('update:modelValue', $event)"
 
           @keypress:enter="$emit('keypress:enter', $event)"
           @keypress:up="$emit('keypress:up', $event)"
@@ -96,7 +97,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Type extends InputType = 'text'">
 import {ref, computed} from 'vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
@@ -105,8 +106,10 @@ import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 import {getIsMobile} from '@/utils/mobile'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 
+type ModelValue = Type extends 'number' ? number : string
+
 const props = defineProps<{
-  modelValue?: string | number
+  modelValue?: ModelValue | undefined
   title?: string
   description?: string
   loading?: boolean
@@ -124,10 +127,11 @@ const props = defineProps<{
   icon?: SVGComponent
   teleport?: boolean
   placeholder?: string
+  type?: Type
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', event: string): void
+  (e: 'update:modelValue', event: ModelValue): void
   (e: 'keypress:enter', event: KeyboardEvent): void
   (e: 'keypress:up', event: KeyboardEvent): void
   (e: 'keypress:down', event: KeyboardEvent): void
@@ -141,7 +145,7 @@ const emit = defineEmits<{
 
 const isOpen = ref(false)
 const dropdownMenu = ref<InstanceType<typeof WDropdownMenu> | undefined>()
-const input = ref<InstanceType<typeof WInput> | undefined>()
+const input = ref<ComponentInstance<typeof WInput<Type>> | undefined>()
 const isMobile = getIsMobile()
 const content = ref<HTMLDivElement | undefined>()
 
@@ -181,5 +185,11 @@ defineExpose({
   close,
   updateDropdown,
 })
+
+defineSlots<{
+  prefix?: (props: {unclickable?: boolean}) => void
+  right?: (props: Record<string, never>) => void
+  content?: (props: {scrollingElement?: Element}) => void
+}>()
 
 </script>

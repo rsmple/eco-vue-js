@@ -54,7 +54,7 @@
   </WInfiniteList>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Data extends DefaultData">
 import {ref} from 'vue'
 import SelectOption from './SelectOption.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
@@ -62,7 +62,7 @@ import {debounce} from '@/utils/utils'
 
 const props = defineProps<{
   modelValue: number[]
-  useQueryFn: UseDefaultQueryFn
+  useQueryFn: UseDefaultQueryFn<Data>
   queryParams: QueryParams
   isInvalidPage: (error: unknown) => boolean
   scrollingElement?: Element | null
@@ -147,5 +147,9 @@ defineExpose({
   cursorDown,
   selectCursor,
 })
+
+defineSlots<{
+  default?: (props: {option: Data, selected: boolean, skeleton: boolean}) => void
+}>()
 
 </script>

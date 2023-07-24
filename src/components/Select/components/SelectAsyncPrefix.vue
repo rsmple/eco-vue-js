@@ -23,12 +23,12 @@
   </template>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Data extends DefaultData">
 import {computed, ref, watch} from 'vue'
 import SelectAsyncPrefixPage from './SelectAsyncPrefixPage.vue'
 
 const props = defineProps<{
-  useQueryFn: UseDefaultQueryFn
+  useQueryFn: UseDefaultQueryFn<Data>
   modelValue: number[]
   disabled?: boolean
   loading?: boolean
@@ -53,5 +53,9 @@ const idInString = computed(() => props.modelValue.join(','))
 watch(hasFetching, value => {
   emit('update:fetching', value)
 })
+
+defineSlots<{
+  default?: (props: {option: Data, skeleton: boolean}) => void
+}>()
 
 </script>

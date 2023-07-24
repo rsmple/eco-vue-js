@@ -52,7 +52,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Data extends DefaultData">
 import {ref} from 'vue'
 import SelectAsyncList from './components/SelectAsyncList.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
@@ -61,7 +61,7 @@ defineProps<{
   title?: string
   emptyStub?: string
   modelValue: number[]
-  useQueryFn: UseDefaultQueryFn
+  useQueryFn: UseDefaultQueryFn<Data>
   isInvalidPage: (error: unknown) => boolean
   queryParams: QueryParams
   skeleton?: boolean
@@ -78,5 +78,9 @@ defineEmits<{
 }>()
 
 const list = ref<HTMLDivElement | undefined>()
+
+defineSlots<{
+  default?: (props: {option: Data, selected: boolean, skeleton: boolean, model: boolean}) => void
+}>()
 
 </script>

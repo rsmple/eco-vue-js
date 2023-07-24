@@ -38,7 +38,7 @@ import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 
 const props = defineProps<{
-  isSelected?: boolean
+  isSelected: boolean
   isCursor?: boolean
   loading?: boolean
   skeleton?: boolean
@@ -100,5 +100,9 @@ onUnmounted(() => {
 defineExpose({
   scrollIntoView,
 })
+
+defineSlots<{
+  default: (props: {selected: boolean}) => void
+}>()
 
 </script>

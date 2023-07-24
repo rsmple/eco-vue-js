@@ -3,7 +3,7 @@
     :is="component"
     :error-message="errorMessage"
     :has-changes="hasChanges"
-    @update:model-value="_validateOnUpdate($event)"
+    @update:model-value="_validateOnUpdate"
     @select="_validateOnSelect"
     @unselect="_validateOnUnselect"
   />
@@ -34,7 +34,7 @@ const initModelUpdater = inject(wFormInitModelUpdater, undefined)
 const unlistener = inject(wFormUnlistener, undefined)
 
 const slots = useSlots()
-const component = computed(() => slots.default?.()[0])
+const component = computed<VueComponent>(() => slots.default?.()[0])
 
 const modelValue = computed<Parameters<ValidateFn>[0]>(() => {
   const props = component.value?.props
@@ -233,5 +233,9 @@ defineExpose({
     return validateOnUpdate(modelValue.value)
   },
 })
+
+defineSlots<{
+  default: () => void
+}>()
 
 </script>

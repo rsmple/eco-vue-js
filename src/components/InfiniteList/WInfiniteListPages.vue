@@ -68,7 +68,7 @@
   </InfiniteListScroll>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Data extends DefaultData">
 import {ref, computed, watch, toRef} from 'vue'
 import InfiniteListScroll from './components/InfiniteListScroll.vue'
 import InfiniteListPage from './components/InfiniteListPage.vue'
@@ -81,7 +81,7 @@ const MAX_PAGES = 5
 
 const props = withDefaults(
   defineProps<{
-    useQueryFn: UseDefaultQueryFn
+    useQueryFn: UseDefaultQueryFn<Data>
     isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     skeletonLength?: number
@@ -238,5 +238,19 @@ watch(toRef(props, 'queryParams'), (newValue, oldValue) => {
 defineExpose({
   resetPage,
 })
+
+defineSlots<{
+  default?: (props: {
+    item: Data
+    setter: (newItem?: Data | undefined) => void
+    skeleton: boolean
+    refetch: () => void
+    previous?: Data
+    next?: Data
+    first: boolean
+    last: boolean
+    resetting: boolean
+  }) => void
+}>()
 
 </script>

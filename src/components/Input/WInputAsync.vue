@@ -7,7 +7,7 @@
       :description="description"
       :placeholder="placeholder"
       :disabled-actions="!focused && !hasChanges"
-      :type="type"
+      :type="(type as Type | undefined)"
       :error-message="errorMessage"
       :skeleton="skeleton"
       :textarea="textarea"
@@ -60,7 +60,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Type extends InputType = 'text'">
 import {computed, ref, toRef, watch} from 'vue'
 import WInput from '@/components/Input/WInput.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
@@ -68,14 +68,14 @@ import IconEdit from '@/assets/icons/default/IconEdit.svg?component'
 import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
-type ValidateFn = (value: string | number | undefined | string[]) => string | undefined
+type ModelValue = Type extends 'number' ? number : string
 
 const props = defineProps<{
-  modelValue?: string | number
+  modelValue?: ModelValue | undefined
   title?: string
   description?: string
   validate?: ValidateFn | ValidateFn[]
-  type?: string
+  type?: Type
   placeholder?: string
   loading?: boolean
   disabled?: boolean
@@ -89,12 +89,12 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string | number | undefined): void
+  (e: 'update:modelValue', value: ModelValue | undefined): void
 }>()
 
 const focused = ref(false)
-const value = ref(props.modelValue)
-const input = ref<InstanceType<typeof WInput> | undefined>()
+const value = ref<ModelValue | undefined>()
+const input = ref<ComponentInstance<typeof WInput<Type>> | undefined>()
 const errorMessage = ref<string | undefined>()
 const hasChanges = computed(() => props.modelValue !== value.value)
 
@@ -120,9 +120,9 @@ const open = () => {
 
 watch(toRef(props, 'modelValue'), modelValue => {
   value.value = modelValue
-})
+}, {immediate: true})
 
-watch(value, (newValue: string | number | undefined): void => {
+watch(value, (newValue: ModelValue | undefined): void => {
   if (!props.validate) return
 
   if (props.validate instanceof Array) {
@@ -132,7 +132,7 @@ watch(value, (newValue: string | number | undefined): void => {
   }
 })
 
-const emitUpdateModelValue = (newValue: string | number | undefined) => {
+const emitUpdateModelValue = (newValue: ModelValue | undefined) => {
   if (props.disabled || props.loading) return
   if (errorMessage.value) return
   if (props.placeholderSecure) input.value?.blur()

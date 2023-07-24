@@ -57,7 +57,7 @@
               <div class="[overflow:inherit]">
                 <slot
                   :item="item"
-                  :setter="getItemSetter(index)"
+                  :setter="(newItem?: Data) => setItem(index, newItem)"
                   :refetch="emitRefetch"
                   :skeleton="false"
                   :next="data?.results[index + 1]"
@@ -70,34 +70,40 @@
           </TransitionGroup>
 
           <template v-else>
-            <slot
+            <template
               v-for="(item, index) in data.results"
               :key="item.id"
-              :item="item"
-              :setter="getItemSetter(index)"
-              :refetch="emitRefetch"
-              :skeleton="false"
-              :next="data?.results[index + 1]"
-              :previous="data?.results[index - 1]"
-              :first="firstPage && index === 0"
-              :last="lastPage && index === data.results.length - 1"
-            />
+            >
+              <slot
+                :item="item"
+                :setter="(newItem?: Data) => setItem(index, newItem)"
+                :refetch="emitRefetch"
+                :skeleton="false"
+                :next="data?.results[index + 1]"
+                :previous="data?.results[index - 1]"
+                :first="firstPage && index === 0"
+                :last="lastPage && index === data.results.length - 1"
+              />
+            </template>
           </template>
         </template>
 
         <template v-else>
-          <slot
+          <template
             v-for="index in skeletonLength"
             :key="index"
-            :item="{id: index}"
-            :setter="getItemSetter(index)"
-            :refetch="emitRefetch"
-            :skeleton="true"
-            :next="undefined"
-            :previous="undefined"
-            :first="firstPage && index === 1"
-            :last="lastPage && index === skeletonLength"
-          />
+          >
+            <slot
+              :item="({id: index} as Data)"
+              :setter="(newItem?: Data) => setItem(index, newItem)"
+              :refetch="emitRefetch"
+              :skeleton="true"
+              :next="undefined"
+              :previous="undefined"
+              :first="firstPage && index === 1"
+              :last="lastPage && index === skeletonLength"
+            />
+          </template>
         </template>
       </div>
     </template>
@@ -111,7 +117,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Data extends DefaultData">
 import {toRef, computed, watch, ref, onMounted, nextTick} from 'vue'
 import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
 import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
@@ -119,7 +125,7 @@ import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
 const props = withDefaults(
   defineProps<{
     queryParams: QueryParams
-    useQueryFn: UseDefaultQueryFn
+    useQueryFn: UseDefaultQueryFn<Data>
     isInvalidPage: (error: unknown) => boolean
     skeletonLength: number
     firstPage: boolean
@@ -164,20 +170,18 @@ const pagesCount = computed(() => data.value?.pages_count)
 const nextPage = computed(() => data.value?.next)
 const previousPage = computed(() => data.value?.previous)
 
-const getItemSetter = <Item = unknown>(index: number) => {
-  return (newItem?: Item): void => {
-    if (!data.value) return
+const setItem = (index: number, newItem: Data | undefined) => {
+  if (!data.value) return
 
-    const newData: PaginatedResponse = {
-      ...data.value,
-      results: [...data.value.results],
-    }
-
-    if (newItem) newData.results.splice(index, 1, newItem)
-    else newData.results.splice(index, 1)
-
-    setData(newData)
+  const newData: PaginatedResponse = {
+    ...data.value,
+    results: [...data.value.results],
   }
+
+  if (newItem) newData.results.splice(index, 1, newItem)
+  else newData.results.splice(index, 1)
+
+  setData(newData)
 }
 
 const emitRefetch = () => {
@@ -262,5 +266,18 @@ defineExpose({
   getLast,
   refetch: refetchPage,
 })
+
+defineSlots<{
+  default?: (props: {
+    item: Data
+    setter: (newItem?: Data | undefined) => void
+    skeleton: boolean
+    refetch: () => void
+    previous?: Data
+    next?: Data
+    first: boolean
+    last: boolean
+  }) => void
+}>()
 
 </script>

@@ -20,13 +20,13 @@
   />
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Data extends DefaultData">
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 import {computed} from 'vue'
 
 const props = defineProps<{
   selected: number[]
-  items: DefaultData[]
+  items: Data[]
   disabled?: boolean
   tooltipTextPersisted?: boolean
   selectOnly?: boolean

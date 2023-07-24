@@ -54,14 +54,14 @@
   </WInfiniteListPages>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Data extends DefaultData">
 import {onBeforeUnmount, ref, watch} from 'vue'
 import {useInfiniteListHeader} from './use/useInfiniteListHeader'
 import WInfiniteListPages from './WInfiniteListPages.vue'
 
 const props = withDefaults(
   defineProps<{
-    useQueryFn: UseDefaultQueryFn
+    useQueryFn: UseDefaultQueryFn<Data>
     isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     skeletonLength?: number
@@ -100,7 +100,7 @@ const emit = defineEmits<{
   (e: 'close'): void
 }>()
 
-const infiniteList = ref<InstanceType<typeof WInfiniteListPages> | undefined>()
+const infiniteList = ref<ComponentInstance<typeof WInfiniteListPages<Data>> | undefined>()
 
 const updateHeaderPadding = (value: number): void => {
   emit('update:header-padding', value)
@@ -125,5 +125,20 @@ defineExpose({
     infiniteList.value?.resetPage()
   },
 })
+
+defineSlots<{
+  default?: (props: {
+    item: Data
+    setter: (newItem?: Data | undefined) => void
+    skeleton: boolean
+    refetch: () => void
+    previous?: Data
+    next?: Data
+    first: boolean
+    last: boolean
+    resetting: boolean
+  }) => void
+  header?: (props: Record<string, never>) => void
+}>()
 
 </script>

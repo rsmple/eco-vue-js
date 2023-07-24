@@ -88,7 +88,7 @@
             }"
             :value="placeholderSecure && modelValue === undefined && !isFocused ? '******' : modelValue"
             :placeholder="placeholder"
-            :type="type"
+            :type="type ?? 'text'"
             :name="name"
             :disabled="disabled"
             :readonly="readonly"
@@ -186,18 +186,20 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Type extends InputType = 'text'">
 import {onMounted, ref, nextTick} from 'vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import InputActions from './components/InputActions.vue'
 
+type ModelValue = Type extends 'number' ? number : string
+
 const props = withDefaults(
   defineProps<{
-    modelValue?: string | number
+    modelValue?: ModelValue | undefined
     title?: string
     description?: string
     placeholder?: string
-    type?: string
+    type?: Type
     name?: string
     autocomplete?: string
     autofocus?: boolean
@@ -227,7 +229,7 @@ const props = withDefaults(
     title: undefined,
     description: undefined,
     placeholder: undefined,
-    type: 'text',
+    type: undefined,
     name: undefined,
     autocomplete: 'off',
     errorMessage: undefined,
@@ -238,7 +240,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string | number | undefined): void
+  (e: 'update:modelValue', value: ModelValue | undefined): void
   (e: 'keypress:enter', value: KeyboardEvent): void
   (e: 'keypress:up', value: KeyboardEvent): void
   (e: 'keypress:down', value: KeyboardEvent): void
@@ -258,17 +260,14 @@ const isFocused = ref(false)
 const isSecureVisible = ref(false)
 const paddingRight = ref(0)
 
-const updateModelValue = (value: string | number | undefined): void => {
+const updateModelValue = (value: string | undefined): void => {
   if (props.loading || props.disabled || props.readonly) return
 
   if (props.type === 'number') {
-    if (typeof value === 'string' && value.length) emit('update:modelValue', Number.parseFloat(value))
-    else emit('update:modelValue', undefined)
-
-    return
+    emit('update:modelValue', (typeof value === 'string' && value.length ? Number.parseFloat(value) : undefined) as ModelValue)
+  } else {
+    emit('update:modelValue', value as ModelValue)
   }
-
-  emit('update:modelValue', value)
 }
 
 const handleBackspace = (event: KeyboardEvent): void => {
@@ -321,7 +320,7 @@ const handleInputEvent = (event: Event): void => {
 const clearValue = () => {
   if (props.disabled || props.readonly) return
 
-  updateModelValue('')
+  updateModelValue(undefined)
 
   input.value?.focus()
 

@@ -11,9 +11,9 @@ import postcssImport from 'postcss-import'
 export default defineConfig({
   plugins: [
     dts({
-      tsConfigFilePath: 'tsconfig.app.json',
+      tsconfigPath: 'tsconfig.app.json',
       entryRoot: 'src',
-      skipDiagnostics: true,
+      copyDtsFiles: true,
     }),
     vue(),
     svgLoader({defaultImport: 'component'}),

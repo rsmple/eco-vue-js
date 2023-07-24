@@ -94,6 +94,9 @@ const getPackageExports = (list) => {
     '.': {
       'import': './dist/main.js',
     },
+    './dist/types/global.d.ts': {
+      'import': './dist/types/global.d.ts',
+    },
     './tailwind-base/index.cjs': {
       'require': './tailwind-base/index.cjs',
     },

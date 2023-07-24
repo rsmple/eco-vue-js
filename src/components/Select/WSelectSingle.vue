@@ -2,10 +2,11 @@
   <div>
     <WSelect
       ref="selectComponent"
-      :model-value="modelValue ? [modelValue] : []"
+      :model-value="arrayValue"
       :search="search"
       :options="options"
       :title="title"
+      :description="description"
       :loading="loading"
       :max-search-length="maxSearchLength"
       :empty-stub="emptyStub"
@@ -19,11 +20,10 @@
       :placeholder="placeholder"
       disable-clear
       hide-prefix
-      @select="updateModelValue($event)"
-      @unselect="updateModelValue($event)"
+      @select="updateModelValue($event as Item)"
+      @unselect="updateModelValue($event as Item)"
       @update:search="emit('update:search', $event)"
-      @create:option="updateModelValue($event)"
-      @show:marker="$emit('show:marker')"
+      @create:option="createOption($event)"
     >
       <template #option="{option, selected, model}">
         <slot
@@ -41,15 +41,16 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import {ref} from 'vue'
+<script lang="ts" setup generic="Item extends string | number = string">
+import {computed, ref} from 'vue'
 import WSelect from '@/components/Select/WSelect.vue'
 
-defineProps<{
-  modelValue: string | null
+const props = defineProps<{
+  modelValue: Item | null
   search: string
-  options: string[]
+  options: Item[]
   title?: string
+  description?: string
   loading?: boolean
   emptyStub?: string
   maxSearchLength?: number
@@ -61,21 +62,38 @@ defineProps<{
   errorMessage?: string
   hasChanges?: boolean
   placeholder?: string
+  persisted?: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
+  (e: 'update:modelValue', value: Item): void
   (e: 'update:search', value: string): void
-  (e: 'show:marker'): void
+  (e: 'create:option', value: string): void
 }>()
 
-const selectComponent = ref<InstanceType<typeof WSelect> | undefined>()
+const selectComponent = ref<ComponentInstance<typeof WSelect<Item>> | undefined>()
 
-const updateModelValue = (value: string): void => {
+const arrayValue = computed<Item[]>(() => props.modelValue ? [props.modelValue] : [])
+
+const updateModelValue = (value: Item): void => {
   emit('update:modelValue', value)
   emit('update:search', '')
 
+  if (!props.persisted) blur()
+}
+
+const createOption = (value: string): void => {
+  emit('create:option', value)
+
+  if (!props.persisted) blur()
+}
+
+const blur = () => {
   selectComponent.value?.blur()
 }
+
+defineExpose({
+  blur,
+})
 
 </script>

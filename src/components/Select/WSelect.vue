@@ -127,7 +127,8 @@
       </SelectOption>
 
       <SelectOption
-        v-if="hasCreateButton"
+        v-if="allowCreate"
+        :is-selected="false"
         :is-cursor="cursor === options.length"
         :loading="loadingOptionIndex === options.length && loading"
         :scroll="isCursorLocked"
@@ -157,7 +158,7 @@
   </WInputSuggest>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Item extends string | number = string">
 import {ref, watch, toRef, nextTick, computed} from 'vue'
 import SelectOption from './components/SelectOption.vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
@@ -166,9 +167,9 @@ import {debounce} from '@/utils/utils'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 const props = defineProps<{
-  modelValue: string[]
+  modelValue: Item[]
   search: string
-  options: string[]
+  options: Item[]
   title?: string
   description?: string
   loading?: boolean
@@ -189,18 +190,17 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'select', item: string): void
-  (e: 'unselect', item: string): void
+  (e: 'select', item: string | number): void
+  (e: 'unselect', item: string | number): void
   (e: 'update:search', value: string): void
   (e: 'create:option', value: string): void
 }>()
 
 const isOpen = ref(false)
-const input = ref<InstanceType<typeof WInputSuggest> | undefined>()
+const input = ref<ComponentInstance<typeof WInputSuggest> | undefined>()
 const cursor = ref<number>(-1)
 const isCursorLocked = ref(false)
-const hasCreateButton = computed(() => props.allowCreate && props.search.length && !props.options.includes(props.search))
-const lastIndex = computed(() => hasCreateButton.value ? props.options.length : props.options.length - 1)
+const lastIndex = computed(() => props.allowCreate ? props.options.length : props.options.length - 1)
 const isMobile = getIsMobile()
 const focused = ref(false)
 const loadingOptionIndex = ref<number | null>(null)
@@ -290,13 +290,13 @@ const captureDoubleDelete = () => {
   }
 }
 
-const select = (item: string): void => {
+const select = (item: Item): void => {
   if (isDisabled.value) return
 
   emit('select', item)
 }
 
-const unselect = (item: string): void => {
+const unselect = (item: Item): void => {
   if (isDisabled.value) return
 
   emit('unselect', item)

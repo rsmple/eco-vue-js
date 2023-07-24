@@ -7,7 +7,6 @@
     :max-length="maxSearchLength"
     :loading="loading || isFetchingPrefix"
     :hide-input="isMobile ? !focused : !isOpen"
-    hide-input-unclickable
     :readonly="readonly"
     :skeleton="skeleton"
     :size="searchSize"
@@ -15,7 +14,6 @@
     :required="required"
     :disabled="disabled"
     :has-changes="hasChanges"
-    :hide-prefix="hidePrefix ? isMobile ? focused : isOpen : false"
     :placeholder="placeholder"
     @update:model-value="!loading && !isFetchingPrefix && $emit('update:search', $event as string ?? '')"
 
@@ -93,7 +91,7 @@
   </WInputSuggest>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Data extends DefaultData">
 import {ref, nextTick, computed} from 'vue'
 import {getIsMobile} from '@/utils/mobile'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
@@ -103,7 +101,7 @@ import SelectAsyncList from './components/SelectAsyncList.vue'
 const props = defineProps<{
   modelValue: number[]
   search: string
-  useQueryFn: UseDefaultQueryFn
+  useQueryFn: UseDefaultQueryFn<Data>
   isInvalidPage: (error: unknown) => boolean
   queryParams: QueryParams
   title?: string
@@ -134,8 +132,8 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = ref(false)
-const input = ref<InstanceType<typeof WInputSuggest> | undefined>()
-const list = ref<InstanceType<typeof SelectAsyncList> | undefined>()
+const input = ref<ComponentInstance<typeof WInputSuggest> | undefined>()
+const list = ref<ComponentInstance<typeof SelectAsyncList<Data>> | undefined>()
 const isMobile = getIsMobile()
 const focused = ref(false)
 const isFetchingPrefix = ref(false)
@@ -200,5 +198,10 @@ defineExpose({
   focus,
   blur,
 })
+
+defineSlots<{
+  right?: (props: Record<string, never>) => void
+  option?: (props: {option: Data, selected: boolean, skeleton: boolean, model: boolean}) => void
+}>()
 
 </script>

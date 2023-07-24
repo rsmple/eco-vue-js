@@ -53,12 +53,12 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Data extends DefaultData">
 import {computed, toRef, watch} from 'vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 
 const props = defineProps<{
-  useQueryFn: UseDefaultQueryFn
+  useQueryFn: UseDefaultQueryFn<Data>
   queryParams: QueryParams
   disabled?: boolean
   loading?: boolean
@@ -82,8 +82,12 @@ watch(pagesCount, value => {
   emit('update:pages-count', value)
 })
 
-watch(isFetching, value => {
+watch(isFetching, (value: boolean) => {
   emit('update:fetching', value)
 })
+
+defineSlots<{
+  default?: (props: {option: Data, skeleton: boolean}) => void
+}>()
 
 </script>
