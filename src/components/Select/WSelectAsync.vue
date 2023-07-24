@@ -92,7 +92,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData">
-import {ref, nextTick, computed} from 'vue'
+import {ref, nextTick, computed, type Component} from 'vue'
 import {getIsMobile} from '@/utils/mobile'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 import SelectAsyncPrefix from './components/SelectAsyncPrefix.vue'
@@ -101,7 +101,7 @@ import SelectAsyncList from './components/SelectAsyncList.vue'
 const props = defineProps<{
   modelValue: number[]
   search: string
-  useQueryFn: UseDefaultQueryFn<Data>
+  useQueryFn: UsePaginatedQuery<Data>
   isInvalidPage: (error: unknown) => boolean
   queryParams: QueryParams
   title?: string
@@ -109,7 +109,7 @@ const props = defineProps<{
   loading?: boolean
   emptyStub?: string
   maxSearchLength?: number
-  optionComponent?: VueComponent
+  optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
   disableClear?: boolean
   hidePrefix?: boolean
   readonly?: boolean

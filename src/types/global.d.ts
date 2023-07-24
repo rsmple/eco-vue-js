@@ -1,7 +1,4 @@
 
-type DefineComponentFunction = typeof import('vue').defineComponent
-
-declare type VueComponent = import('vue').Raw<typeof import('vue').DefineComponent<any, any, any>>
 declare type SVGComponent = import('vue').Raw<import('vue').FunctionalComponent<import('vue').SVGAttributes, Record<string, never>>>
 
 declare type ComponentInstance<T> = T extends new (...args: any[]) => infer R
@@ -15,7 +12,7 @@ declare type ComponentInstance<T> = T extends new (...args: any[]) => infer R
   : any
   : any
 
-declare type PaginatedResponse<ValueType extends Record<string, unknown> = unknown> = {
+declare type PaginatedResponse<ValueType extends Record<string, unknown> | unknown = unknown> = {
   count: number
   pages_count: number
   next: number | null
@@ -34,12 +31,18 @@ declare module '@whitespots/ui-kit/dist/assets/icons/*' {
   export default src
 }
 
-declare type DefaultData = Record<string, unknown> & {id: number}
+declare type DefaultData = {id: number, [key: string]: unknown}
 
-type Params = Parameters<import('vue-query').QueryClient['setQueriesData']>
+type Params = Parameters<import('@tanstack/vue-query').QueryClient['setQueriesData']>
 
-type Updater = (updater: Params[1], options?: Params[2]) => ReturnType<import('vue-query').QueryClient['setQueriesData']>
+declare type QueryParams = Partial<Record<string, number | string> & {page: number}>
 
-declare type QueryParams = Record<string, number | string> & {page: number}
-declare type UseQueryFn<Data extends DefaultData = DefaultData> = (queryParams: import('vue').Ref<QueryParams>, options?: Parameters<typeof import('vue-query').useQuery<PaginatedResponse<Data>>>[2]) => import('vue-query').UseQueryReturnType<PaginatedResponse<Data>, unknown>
-declare type UseDefaultQueryFn<Data extends DefaultData = DefaultData> = (queryParams: import('vue').Ref<QueryParams>, options?: Parameters<typeof import('vue-query').useQuery<PaginatedResponse<Data>>>[2]) => import('vue-query').UseQueryReturnType<PaginatedResponse<Data>, unknown> & {setData: Updater}
+declare type UseDefaultQuery<TQueryFnData = unknown, TError = unknown, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey> =
+  (...args: Parameters<typeof useQuery<TQueryFnData, TError, TData, TQueryKey>>) => import('@tanstack/vue-query').UseQueryReturnType<TData, TError> & {
+    setData: (updater: TQueryFnData, options?: Params[2]) => ReturnType<import('@tanstack/vue-query').QueryClient['setQueriesData']>
+  }
+
+declare type UsePaginatedQuery<Data extends DefaultData = DefaultData> = (
+  queryParams: import('vue').Ref<QueryParams>,
+  options?: Parameters<UseDefaultQuery<PaginatedResponse<Data>>>[2]
+) => ReturnType<UseDefaultQuery<PaginatedResponse<Data>>>

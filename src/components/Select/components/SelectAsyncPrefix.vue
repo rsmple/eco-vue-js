@@ -24,15 +24,15 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData">
-import {computed, ref, watch} from 'vue'
+import {computed, ref, watch, type Component} from 'vue'
 import SelectAsyncPrefixPage from './SelectAsyncPrefixPage.vue'
 
 const props = defineProps<{
-  useQueryFn: UseDefaultQueryFn<Data>
+  useQueryFn: UsePaginatedQuery<Data>
   modelValue: number[]
   disabled?: boolean
   loading?: boolean
-  optionComponent?: VueComponent
+  optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
   disableClear?: boolean
 }>()
 

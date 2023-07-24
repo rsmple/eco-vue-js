@@ -45,12 +45,12 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeMount, onBeforeUnmount, ref, watch} from 'vue'
+import {onBeforeMount, onBeforeUnmount, ref, watch, type Component} from 'vue'
 import {initModal, type AddModal} from '@/utils/Modal'
 
 type ModalMeta = {
   key: number
-  component: VueComponent
+  component: Component
   props?: Record<string, unknown>
   cb?: () => void
   autoclose: boolean
@@ -60,7 +60,7 @@ const key = ref(0)
 const modalMetaList = ref<ModalMeta[]>([])
 const isBackdropVisible = ref(false)
 
-const addModal: AddModal = (component: VueComponent, props?: Record<string, unknown>, cb?: () => void, autoclose = false): () => ReturnType<typeof closeModal> => {
+const addModal: AddModal = (component: Component, props?: Record<string, unknown>, cb?: () => void, autoclose = false): () => ReturnType<typeof closeModal> => {
   const modalMeta = {
     component,
     key: key.value++,

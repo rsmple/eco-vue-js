@@ -159,7 +159,7 @@
 </template>
 
 <script lang="ts" setup generic="Item extends string | number = string">
-import {ref, watch, toRef, nextTick, computed} from 'vue'
+import {ref, watch, toRef, nextTick, computed, type Component} from 'vue'
 import SelectOption from './components/SelectOption.vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 import {getIsMobile} from '@/utils/mobile'
@@ -175,7 +175,7 @@ const props = defineProps<{
   loading?: boolean
   emptyStub?: string
   maxSearchLength?: number
-  optionComponent?: VueComponent
+  optionComponent?: Component<{option: Item, selected?: boolean, model?: boolean}>
   disableClear?: boolean
   hidePrefix?: boolean
   readonly?: boolean

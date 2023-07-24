@@ -61,7 +61,7 @@ import WInfiniteListPages from './WInfiniteListPages.vue'
 
 const props = withDefaults(
   defineProps<{
-    useQueryFn: UseDefaultQueryFn<Data>
+    useQueryFn: UsePaginatedQuery<Data>
     isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     skeletonLength?: number

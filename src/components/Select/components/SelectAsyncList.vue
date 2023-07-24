@@ -62,7 +62,7 @@ import {debounce} from '@/utils/utils'
 
 const props = defineProps<{
   modelValue: number[]
-  useQueryFn: UseDefaultQueryFn<Data>
+  useQueryFn: UsePaginatedQuery<Data>
   queryParams: QueryParams
   isInvalidPage: (error: unknown) => boolean
   scrollingElement?: Element | null

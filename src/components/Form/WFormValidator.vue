@@ -34,7 +34,7 @@ const initModelUpdater = inject(wFormInitModelUpdater, undefined)
 const unlistener = inject(wFormUnlistener, undefined)
 
 const slots = useSlots()
-const component = computed<VueComponent>(() => slots.default?.()[0])
+const component = computed<ComponentInstance<ThisType<unknown>>>(() => slots.default?.()[0])
 
 const modelValue = computed<Parameters<ValidateFn>[0]>(() => {
   const props = component.value?.props

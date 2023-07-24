@@ -125,7 +125,7 @@ import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
 const props = withDefaults(
   defineProps<{
     queryParams: QueryParams
-    useQueryFn: UseDefaultQueryFn<Data>
+    useQueryFn: UsePaginatedQuery<Data>
     isInvalidPage: (error: unknown) => boolean
     skeletonLength: number
     firstPage: boolean
@@ -173,7 +173,7 @@ const previousPage = computed(() => data.value?.previous)
 const setItem = (index: number, newItem: Data | undefined) => {
   if (!data.value) return
 
-  const newData: PaginatedResponse = {
+  const newData: PaginatedResponse<Data> = {
     ...data.value,
     results: [...data.value.results],
   }
@@ -189,7 +189,7 @@ const emitRefetch = () => {
 }
 
 const refetchPage = async () => {
-  await refetch.value()
+  await refetch()
 
   if (props.lastPage && nextPage.value !== undefined) emit('update:nextPage', nextPage.value)
   if (props.firstPage && previousPage.value !== undefined) emit('update:previousPage', previousPage.value)
@@ -222,7 +222,7 @@ watch(previousPage, value => {
 }, {immediate: true})
 
 watch(error, (error: unknown): void => {
-  if (props.isInvalidPage(error)) emit('error:invalidPage', props.queryParams.page)
+  if (props.isInvalidPage(error)) emit('error:invalidPage' as any, props.queryParams.page as any)
 }, {immediate: true})
 
 watch(isFetching, value => {

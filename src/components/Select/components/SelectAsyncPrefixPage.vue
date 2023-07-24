@@ -54,15 +54,15 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData">
-import {computed, toRef, watch} from 'vue'
+import {computed, toRef, watch, type Component} from 'vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 
 const props = defineProps<{
-  useQueryFn: UseDefaultQueryFn<Data>
+  useQueryFn: UsePaginatedQuery<Data>
   queryParams: QueryParams
   disabled?: boolean
   loading?: boolean
-  optionComponent?: VueComponent
+  optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
   disableClear?: boolean
 }>()
 

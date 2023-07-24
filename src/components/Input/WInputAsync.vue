@@ -136,7 +136,6 @@ const emitUpdateModelValue = (newValue: ModelValue | undefined) => {
   if (props.disabled || props.loading) return
   if (errorMessage.value) return
   if (props.placeholderSecure) input.value?.blur()
-  if (props.modelValue === newValue) return
 
   emit('update:modelValue', newValue)
 }

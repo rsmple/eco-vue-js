@@ -13,8 +13,8 @@
     "write-imports": "node write-imports.js"
   },
   "peerDependencies": {
+    "@tanstack/vue-query": "^4.32.0",
     "vue": "^3.3.4",
-    "vue-query": "^1.26.0",
     "vue-router": "^4.2.2"
   },
   "devDependencies": {

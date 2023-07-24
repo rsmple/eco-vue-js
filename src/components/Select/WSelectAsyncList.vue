@@ -61,7 +61,7 @@ defineProps<{
   title?: string
   emptyStub?: string
   modelValue: number[]
-  useQueryFn: UseDefaultQueryFn<Data>
+  useQueryFn: UsePaginatedQuery<Data>
   isInvalidPage: (error: unknown) => boolean
   queryParams: QueryParams
   skeleton?: boolean

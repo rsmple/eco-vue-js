@@ -33,14 +33,14 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
-      external: ['vue', 'vue-router', 'vue-query'],
+      external: ['vue', 'vue-router', '@tanstack/vue-query'],
       output: {
         preserveModules: true,
         entryFileNames: '[name].js',
         globals: {
           vue: 'Vue',
           'vue-router': 'VueRouter',
-          'vue-query': 'VueQuery',
+          '@tanstack/vue-query': 'VueQuery',
         },
       },
     },

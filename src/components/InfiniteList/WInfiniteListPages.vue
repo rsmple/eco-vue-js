@@ -81,7 +81,7 @@ const MAX_PAGES = 5
 
 const props = withDefaults(
   defineProps<{
-    useQueryFn: UseDefaultQueryFn<Data>
+    useQueryFn: UsePaginatedQuery<Data>
     isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     skeletonLength?: number

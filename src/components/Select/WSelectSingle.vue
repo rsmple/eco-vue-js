@@ -18,6 +18,8 @@
       :error-message="errorMessage"
       :has-changes="hasChanges"
       :placeholder="placeholder"
+      :search-size="searchSize"
+      :required="required"
       disable-clear
       hide-prefix
       @select="updateModelValue($event as Item)"
@@ -42,7 +44,7 @@
 </template>
 
 <script lang="ts" setup generic="Item extends string | number = string">
-import {computed, ref} from 'vue'
+import {computed, ref, toRef, watch, type Component} from 'vue'
 import WSelect from '@/components/Select/WSelect.vue'
 
 const props = defineProps<{
@@ -54,7 +56,7 @@ const props = defineProps<{
   loading?: boolean
   emptyStub?: string
   maxSearchLength?: number
-  optionComponent?: VueComponent
+  optionComponent?: Component<{option: Item, selected?: boolean, model?: boolean}>
   readonly?: boolean
   disabled?: boolean
   skeleton?: boolean
@@ -62,7 +64,8 @@ const props = defineProps<{
   errorMessage?: string
   hasChanges?: boolean
   placeholder?: string
-  persisted?: boolean
+  searchSize?: number
+  required?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -77,20 +80,18 @@ const arrayValue = computed<Item[]>(() => props.modelValue ? [props.modelValue] 
 
 const updateModelValue = (value: Item): void => {
   emit('update:modelValue', value)
-  emit('update:search', '')
-
-  if (!props.persisted) blur()
 }
 
 const createOption = (value: string): void => {
   emit('create:option', value)
-
-  if (!props.persisted) blur()
 }
 
 const blur = () => {
   selectComponent.value?.blur()
+  emit('update:search', '')
 }
+
+watch(toRef(props, 'modelValue'), blur)
 
 defineExpose({
   blur,
