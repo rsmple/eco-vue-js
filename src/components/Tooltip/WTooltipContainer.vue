@@ -66,7 +66,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, onUnmounted, ref, onBeforeMount, onBeforeUnmount, nextTick} from 'vue'
+import {onMounted, onUnmounted, ref, onBeforeMount, onBeforeUnmount} from 'vue'
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {initTooltip, type SetTooltipMeta, type TooltipMeta} from '@/utils/Tooltip'
@@ -87,9 +87,10 @@ const setTooltipMeta: SetTooltipMeta = (meta: TooltipMeta | null) => {
       timeout = undefined
     }, 100)
   } else if (tooltipMeta.value !== meta) {
-    tooltipMeta.value = meta
-
-    nextTick(() => nextTick(() => updateContainerStyles(container.value)))
+    timeout = setTimeout(() => {
+      tooltipMeta.value = meta
+      updateContainerStyles(container.value)
+    }, 25)
   }
 }
 

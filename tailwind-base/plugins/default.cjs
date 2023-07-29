@@ -350,12 +350,14 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
     '.w-select-field': {
       'padding-top': '0.3125rem',
       'padding-bottom': '0.3125rem',
-      'padding-left': '0.75rem',
-      'padding-right': '0.75rem',
       'align-items': 'center',
       'white-space': 'nowrap',
       'overflow': 'hidden',
       'text-overflow': 'ellipsis',
+    },
+    '.group\\/model .w-select-field': {
+      'padding-left': '0.75rem',
+      'padding-right': '0.75rem',
     },
 
     '.w-list-row-item, .w-list-header-item': {

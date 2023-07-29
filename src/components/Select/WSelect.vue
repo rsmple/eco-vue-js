@@ -32,7 +32,7 @@
         <div
           v-for="option in modelValue"
           :key="option"
-          class="relative flex overflow-hidden items-center max-w-[calc(100%-2.75rem)] text-description"
+          class="relative flex overflow-hidden items-center max-w-[calc(100%-2.75rem)] text-description group/model"
           :class="{
             'cursor-pointer': !disabled,
             'cursor-not-allowed': disabled,
@@ -92,9 +92,13 @@
     <template #content>
       <div
         v-if="!options.length"
-        class="p-4 select-none cursor-default"
+        class="py-2 px-[1.0625rem] first:pt-4 last:pb-4"
       >
-        {{ emptyStub ?? 'No match' }}
+        <div
+          class="select-none cursor-default w-select-field sm-not:px-3"
+        >
+          {{ emptyStub ?? 'No match' }}
+        </div>
       </div>
 
       <SelectOption
@@ -127,7 +131,7 @@
       </SelectOption>
 
       <SelectOption
-        v-if="allowCreate"
+        v-if="allowCreate && search !== ''"
         :is-selected="false"
         :is-cursor="cursor === options.length"
         :loading="loadingOptionIndex === options.length && loading"
@@ -136,7 +140,7 @@
         @select="createOption(search)"
         @mouseenter="setCursor(options.length)"
       >
-        <span class="pr-2">
+        <span class="w-select-field pr-2 sm-not:px-3">
           Create:
         </span>
 
