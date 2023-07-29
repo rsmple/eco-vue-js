@@ -22,6 +22,15 @@
     @click="click"
     @keypress.enter.stop.prevent="click"
   >
+    <div
+      class="flex justify-center items-center gap-2 flex-1 z-10"
+      :class="{
+        'opacity-0': loading,
+      }"
+    >
+      <slot />
+    </div>
+
     <Transition
       enter-active-class="transition-opacity"
       leave-active-class="transition-opacity"
@@ -32,13 +41,6 @@
         v-if="loading"
         class="absolute z-10 w-spinner-size-6"
       />
-
-      <div
-        v-else
-        class="flex justify-center items-center gap-2 flex-1 z-10"
-      >
-        <slot />
-      </div>
     </Transition>
   </component>
 </template>

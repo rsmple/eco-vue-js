@@ -18,6 +18,7 @@
       :max-length="maxLength"
       :has-changes="hasChanges"
       :disabled="disabled"
+      :required="required"
       allow-clear
       class="w-full"
       @keypress:enter.stop.prevent="emitUpdateModelValue(value)"
@@ -86,6 +87,7 @@ const props = defineProps<{
   textSecure?: boolean
   placeholderSecure?: boolean
   maxLength?: number
+  required?: boolean
 }>()
 
 const emit = defineEmits<{
