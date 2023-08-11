@@ -2,6 +2,7 @@
   <WInputSuggest
     ref="input"
     :title="title"
+    :mobile-title="mobileTitle"
     :description="description"
     :model-value="search"
     :max-length="maxSearchLength"
@@ -105,6 +106,7 @@ const props = defineProps<{
   isInvalidPage: (error: unknown) => boolean
   queryParams: QueryParams
   title?: string
+  mobileTitle?: string
   description?: string
   loading?: boolean
   emptyStub?: string

@@ -6,6 +6,7 @@
       :search="search"
       :options="options"
       :title="title"
+      :mobile-title="mobileTitle"
       :description="description"
       :loading="loading"
       :max-search-length="maxSearchLength"
@@ -52,6 +53,7 @@ const props = defineProps<{
   search: string
   options: Item[]
   title?: string
+  mobileTitle?: string
   description?: string
   loading?: boolean
   emptyStub?: string

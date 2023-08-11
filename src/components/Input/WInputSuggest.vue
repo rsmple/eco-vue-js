@@ -8,7 +8,7 @@
       <template #toggle="{unclickable}">
         <WInput
           ref="input"
-          :title="title"
+          :title="title ?? (unclickable ? mobileTitle : undefined)"
           :model-value="(modelValue as ModelValue | undefined)"
           :type="(type as Type | undefined)"
           :max-length="maxLength"
@@ -37,7 +37,7 @@
 
           @focus="open(); !unclickable && $emit('focus')"
           @blur="!isMobile && !persist && close(); !unclickable && $emit('blur')"
-        
+
           @click="isMobile && unclickable && open()"
           @click:internal="isMobile && unclickable && open()"
           @click:clear="$emit('click:clear')"
@@ -92,7 +92,11 @@
       v-if="description"
       class="text-xs font-normal text-description pb-4 whitespace-pre-wrap break-words"
     >
-      {{ description }}
+      <WSkeleton v-if="skeleton" />
+
+      <template v-else>
+        {{ description }}
+      </template>
     </div>
   </div>
 </template>
@@ -105,12 +109,14 @@ import WInput from '@/components/Input/WInput.vue'
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 import {getIsMobile} from '@/utils/mobile'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
+import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 type ModelValue = Type extends 'number' ? number : string
 
 const props = defineProps<{
   modelValue?: ModelValue | undefined
   title?: string
+  mobileTitle?: string
   description?: string
   loading?: boolean
   maxLength?: number

@@ -102,9 +102,9 @@
             @keydown.delete.exact.stop="!disabled && !readonly && $emit('keypress:delete', $event); handleBackspace($event)"
             @focus="$emit('focus', $event); setIsFocused(true)"
             @blur="$emit('blur', $event); setIsFocused(false); isSecureVisible = false"
-            @click.stop.prevent="$emit('click', $event)"
+            @click="$emit('click', $event)"
             @mousedown="!allowMousedown && $event.stopPropagation(); $emit('mousedown', $event)"
-            @select.stop.prevent="$emit('select:input', $event)"
+            @select="$emit('select:input', $event)"
           />
 
           <InputActions
@@ -181,7 +181,11 @@
       v-if="description"
       class="text-xs font-normal text-description pt-4 whitespace-pre-wrap break-words"
     >
-      {{ description }}
+      <WSkeleton v-if="skeleton" />
+
+      <template v-else>
+        {{ description }}
+      </template>
     </div>
   </div>
 </template>
