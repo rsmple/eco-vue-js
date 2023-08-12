@@ -2,13 +2,16 @@
   <div
     class="relative mt-1 mb-[var(--input-b-margin,1.125rem)]"
     :class="{
-      'opacity-50 cursor-not-allowed': disabled && !skeleton,
+      'cursor-not-allowed': disabled && !skeleton,
     }"
     @click="$emit('click:internal', $event)"
   >
     <div
       v-if="title || $slots.title?.()?.length"
       class="text-xs font-semibold text-accent mb-2 duration-500"
+      :class="{
+        'opacity-50': disabled,
+      }"
     >
       <template v-if="!skeleton">
         <slot name="title">
@@ -44,7 +47,7 @@
       >
         <div
           class="
-            relative flex flex-wrap bg-default dark:bg-default-dark border border-solid border-gray-300 dark:border-gray-700 rounded-xl
+            relative flex flex-wrap border border-solid rounded-xl bg-default dark:bg-default-dark
             transition-colors duration-75 overflow-hidden min-h-[44px] w-full
           "
           :class="{
@@ -52,6 +55,8 @@
             'cursor-text': !disabled,
             'pl-1 py-1 gap-1': $slots.suffix?.()?.length,
             'border-negative dark:border-negative-dark': errorMessage,
+            'border-gray-300 dark:border-gray-700': !disabled,
+            'border-gray-300/50 dark:border-gray-700/50': disabled,
           }"
           :style="{paddingRight: paddingRight + 'px'}"
           @click="focus"
@@ -73,7 +78,7 @@
             :is="textarea ? 'textarea' : 'input'"
             ref="input"
             class="
-              text-base text-accent font-normal outline-0 border-none bg-default dark:bg-default-dark select-all flex-1 max-w-full
+              text-base font-normal outline-0 border-none bg-[inherit] select-all flex-1 max-w-full
               disabled:opacity-80 disabled:cursor-not-allowed placeholder:text-gray-400 dark:placeholder:text-gray-500 appearance-none
             "
             :class="{
@@ -85,6 +90,8 @@
               'w-0 max-w-0 p-0 absolute': hideInput,
               'font-mono': mono,
               'text-secure': textSecure && !isSecureVisible,
+              'text-black-default dark:text-gray-200': !disabled,
+              'text-black-default/50 dark:text-gray-200/50': disabled,
             }"
             :value="placeholderSecure && modelValue === undefined && !isFocused ? '******' : modelValue"
             :placeholder="placeholder"
@@ -180,6 +187,9 @@
     <div
       v-if="description"
       class="text-xs font-normal text-description pt-4 whitespace-pre-wrap break-words"
+      :class="{
+        'opacity-50': disabled,
+      }"
     >
       <WSkeleton v-if="skeleton" />
 
