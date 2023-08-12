@@ -6,9 +6,9 @@
       :title="title"
       :description="description"
       :placeholder="placeholder"
-      :disabled-actions="!focused && !hasChanges"
+      :disabled-actions="!focused && !hasChangesValue"
       :type="(type as Type | undefined)"
-      :error-message="errorMessage"
+      :error-message="errorMessageValue ?? errorMessage"
       :skeleton="skeleton"
       :textarea="textarea"
       :name="name"
@@ -16,7 +16,7 @@
       :text-secure="textSecure"
       :placeholder-secure="placeholderSecure"
       :max-length="maxLength"
-      :has-changes="hasChanges"
+      :has-changes="hasChanges || hasChangesValue"
       :disabled="disabled"
       :required="required"
       allow-clear
@@ -88,6 +88,8 @@ const props = defineProps<{
   placeholderSecure?: boolean
   maxLength?: number
   required?: boolean
+  hasChanges?: boolean
+  errorMessage?: string
 }>()
 
 const emit = defineEmits<{
@@ -97,13 +99,13 @@ const emit = defineEmits<{
 const focused = ref(false)
 const value = ref<ModelValue | undefined>()
 const input = ref<ComponentInstance<typeof WInput<Type>> | undefined>()
-const errorMessage = ref<string | undefined>()
-const hasChanges = computed(() => props.modelValue !== value.value)
+const errorMessageValue = ref<string | undefined>()
+const hasChangesValue = computed(() => props.modelValue !== value.value)
 
 const toggle = async () => {
   if (props.disabled || props.loading) return
 
-  if (hasChanges.value) {
+  if (hasChangesValue.value) {
     emitUpdateModelValue(value.value)
   } else {
     open()
@@ -128,15 +130,15 @@ watch(value, (newValue: ModelValue | undefined): void => {
   if (!props.validate) return
 
   if (props.validate instanceof Array) {
-    errorMessage.value = props.validate.map(fn => fn(newValue)).filter(item => item).join(', ') || undefined
+    errorMessageValue.value = props.validate.map(fn => fn(newValue)).filter(item => item).join(', ') || undefined
   } else {
-    errorMessage.value = props.validate(newValue) || undefined
+    errorMessageValue.value = props.validate(newValue) || undefined
   }
 })
 
 const emitUpdateModelValue = (newValue: ModelValue | undefined) => {
   if (props.disabled || props.loading) return
-  if (errorMessage.value) return
+  if (errorMessageValue.value) return
   if (props.placeholderSecure) input.value?.blur()
 
   emit('update:modelValue', newValue)

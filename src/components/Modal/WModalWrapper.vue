@@ -19,10 +19,11 @@
 
     <div
       ref="container"
-      class="overflow-y-overlay overflow-x-hidden max-h-[calc(100vh-var(--modal-wrapper-margin-y)-var(--modal-wrapper-padding,2rem)*2)] px-[var(--modal-wrapper-padding,2rem)]"
+      class="overflow-y-overlay overflow-x-hidden sm:px-[var(--modal-wrapper-padding,2rem)]"
       :style="{'--modal-wrapper-margin-y': marginY + 'px'}"
       :class="{
-        'h-full pb-[var(--modal-wrapper-margin-y)]': maximized,
+        'max-h-[calc(100vh-var(--modal-wrapper-margin-y) h-full pb-[var(--modal-wrapper-margin-y)]': maximized,
+        'max-h-[calc(100vh-var(--modal-wrapper-margin-y)-var(--modal-wrapper-padding,2rem)*2)]': !maximized,
       }"
     >
       <slot />

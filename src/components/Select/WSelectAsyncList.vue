@@ -19,7 +19,7 @@
     <div
       v-else
       ref="list"
-      class="h-[24rem] overflow-y-overlay border border-gray-300 dark:border-gray-700 border-solid rounded-2xl"
+      class="h-[24rem] overflow-y-overlay sm:border sm-not:border-y border-gray-300 dark:border-gray-700 border-solid sm:rounded-2xl"
     >
       <SelectAsyncList
         :model-value="modelValue"

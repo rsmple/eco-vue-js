@@ -1,6 +1,6 @@
 <template>
   <div class="mb-8">
-    <div class="relative flex mb-4">
+    <div class="relative flex mb-4 sm-not:-px--inner-margin">
       <button
         v-for="(_, index) in slots ?? $slots.default?.()"
         ref="button"
@@ -35,11 +35,12 @@
       </button>
 
       <div
-        class="absolute bottom-0 h-1 rounded-sm transition-all duration-500"
+        class="absolute bottom-0 h-1 rounded-sm duration-500"
         :style="indicatorStyle"
         :class="{
           'bg-primary-default dark:bg-primary-dark': isValidMap[current] !== false,
           'bg-negative dark:bg-negative-dark': isValidMap[current] === false,
+          'transition-[left,width,background-color]': indicatorStyle !== undefined,
         }"
       />
     </div>
@@ -69,7 +70,7 @@
             @update:has-changes="updateHasChangesMap(index, $event)"
           >
             <component :is="slot" />
-          </wform>
+          </WForm>
         </TabItem>
       </TransitionGroup>
     </div>
@@ -77,10 +78,11 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, watch, nextTick, type VNode} from 'vue'
+import {onMounted, ref, watch, nextTick, type VNode, inject, onUnmounted} from 'vue'
 import TabItem from './components/TabItem.vue'
 import WForm from '@/components/Form/WForm.vue'
 import {debounce} from '@/utils/utils'
+import {wTabItemListener, wTabItemUnlistener} from './models/injection'
 
 defineProps<{
   names: string[]
@@ -90,7 +92,7 @@ defineProps<{
 const current = ref(0)
 const isDirect = ref(true)
 const button = ref<HTMLDivElement[]>([])
-const indicatorStyle = ref({})
+const indicatorStyle = ref<Record<string, string> | undefined>(undefined)
 const minHeight = ref(0)
 const tabItem = ref<InstanceType<typeof TabItem>[]>([])
 
@@ -134,7 +136,7 @@ const updateIndex = (value: number): void => {
 const updateIndicator = () => {
   const element = button.value[current.value]
 
-  if (!element) return
+  if (!element || !element.offsetWidth) return
 
   indicatorStyle.value = {
     width: element.offsetWidth + 'px',
@@ -148,12 +150,21 @@ const updateHeight = (value: number): void => {
   minHeight.value = value
 }
 
+const tabItemListenerInjected = inject(wTabItemListener, null)
+const tabItemUnlistenerInjected = inject(wTabItemUnlistener, null)
+
 watch(current, () => {
   updateIndicator()
 })
 
 onMounted(() => {
   updateIndicator()
+
+  tabItemListenerInjected?.(updateIndicator)
+})
+
+onUnmounted(() => {
+  tabItemUnlistenerInjected?.(updateIndicator)
 })
 
 </script>

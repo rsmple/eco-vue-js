@@ -23,11 +23,11 @@
       @click="isSecureVisible ? $emit('hide:secure') : $emit('show:secure')"
     >
       <IconEyeSlash
-        v-show="!isSecureVisible"
+        v-if="!isSecureVisible"
         class="w-5 h-5 text-description"
       />
       <IconEye
-        v-show="isSecureVisible"
+        v-else
         class="w-5 h-5 text-primary-default dark:text-primary-dark"
       />
     </button>
@@ -81,7 +81,7 @@ const emit = defineEmits<{
 const element = ref<HTMLDivElement | undefined>()
 
 const emitWidth = debounce((): void => {
-  emit('update:width', element.value?.getBoundingClientRect().width ?? 0)
+  emit('update:width', element.value?.offsetWidth ?? 0)
 }, 10)
 
 watch(toRef(props, 'loading'), emitWidth)

@@ -232,6 +232,9 @@ defineExpose({
   validateOnUpdate() {
     return validateOnUpdate(modelValue.value)
   },
+  invalidate(message: string) {
+    errorMessage.value = message
+  },
 })
 
 defineSlots<{
