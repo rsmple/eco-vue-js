@@ -91,6 +91,9 @@
     <div
       v-if="description"
       class="text-xs font-normal text-description pb-4 whitespace-pre-wrap break-words"
+      :class="{
+        'opacity-50': disabled && !skeleton,
+      }"
     >
       <WSkeleton v-if="skeleton" />
 

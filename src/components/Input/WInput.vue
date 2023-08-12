@@ -10,7 +10,7 @@
       v-if="title || $slots.title?.()?.length"
       class="text-xs font-semibold text-accent mb-2 duration-500"
       :class="{
-        'opacity-50': disabled,
+        'opacity-50': disabled && !skeleton,
       }"
     >
       <template v-if="!skeleton">
@@ -188,7 +188,7 @@
       v-if="description"
       class="text-xs font-normal text-description pt-4 whitespace-pre-wrap break-words"
       :class="{
-        'opacity-50': disabled,
+        'opacity-50': disabled && !skeleton,
       }"
     >
       <WSkeleton v-if="skeleton" />

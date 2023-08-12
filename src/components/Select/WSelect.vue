@@ -36,7 +36,7 @@
           class="relative flex overflow-hidden items-center max-w-[calc(100%-2.75rem)] text-description group/model"
           :class="{
             'cursor-pointer': !disabled,
-            'cursor-not-allowed': disabled,
+            'cursor-not-allowed opacity-50': disabled,
           }"
         >
           <slot
