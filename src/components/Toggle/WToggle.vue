@@ -11,7 +11,7 @@
         'cursor-progress': loading,
         'cursor-pointer': !readonly && !loading && !disabled,
       }"
-      @click="!disabled && !loading && !readonly && $emit('update:modelValue', !modelValue)"
+      @click="updateModelValue"
     >
       <div
         v-if="title"
@@ -35,8 +35,9 @@
         <div
           class="absolute square-6 -top-1 rounded-full transition-all"
           :class="{
-            'right-4': !modelValue,
-            'right-0': modelValue,
+            'right-4': modelValue === false,
+            'right-2': modelValue === null,
+            'right-0': modelValue === true,
             'w-hover-circle w-ripple': !disabled && !readonly,
           }"
         >
@@ -65,23 +66,41 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Value extends boolean | null = boolean">
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 
-defineProps<{
-  modelValue: boolean
-  title?: string
-  small?: boolean
-  disabled?: boolean
-  loading?: boolean
-  readonly?: boolean
-  rightLabel?: boolean
-  noMargin?: boolean
-  description?: string
+const props = withDefaults(
+  defineProps<{
+    modelValue: Value
+    title?: string
+    small?: boolean
+    disabled?: boolean
+    loading?: boolean
+    readonly?: boolean
+    rightLabel?: boolean
+    noMargin?: boolean
+    description?: string
+    intermediate?: boolean
+  }>(),
+  {
+    description: undefined,
+    title: undefined,
+    intermediate: false as unknown as undefined,
+  },
+)
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: Value): void
 }>()
 
-defineEmits<{
-  (e: 'update:modelValue', value: boolean): void
-}>()
+const updateModelValue = () => {
+  if (props.disabled || props.loading || props.readonly) return
+
+  if (props.intermediate) {
+    emit('update:modelValue', (props.modelValue === null ? true : props.modelValue === false ? null : false) as Value)
+  } else {
+    emit('update:modelValue', !props.modelValue as Value)
+  }
+}
 
 </script>
