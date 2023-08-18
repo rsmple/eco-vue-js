@@ -78,7 +78,7 @@
             :is="textarea ? 'textarea' : 'input'"
             ref="input"
             class="
-              text-base font-normal outline-0 border-none bg-[inherit] select-all flex-1 max-w-full
+              text-base font-normal outline-0 border-none bg-[inherit] flex-1 max-w-full
               disabled:opacity-80 disabled:cursor-not-allowed placeholder:text-gray-400 dark:placeholder:text-gray-500 appearance-none
             "
             :class="{
@@ -110,7 +110,7 @@
             @focus="$emit('focus', $event); setIsFocused(true)"
             @blur="$emit('blur', $event); setIsFocused(false); isSecureVisible = false"
             @click="$emit('click', $event)"
-            @mousedown="!allowMousedown && $event.stopPropagation(); $emit('mousedown', $event)"
+            @mousedown.stop="$emit('mousedown', $event)"
             @select="$emit('select:input', $event)"
           />
 
@@ -235,7 +235,6 @@ const props = withDefaults(
     placeholderSecure?: boolean
     customBackspaceHandle?: boolean
     hasChanges?: boolean
-    allowMousedown?: boolean
     disabledActions?: boolean
   }>(),
   {
@@ -343,6 +342,8 @@ const clearValue = () => {
 
 const focus = (): void => {
   if (props.disabled || props.readonly) return
+
+  if (isFocused.value) return
 
   input.value?.focus()
 }
