@@ -1,18 +1,11 @@
 <template>
   <div>
-    <div class="grid grid-cols-2 gap-8 mb-4">
+    <div class="mb-4">
       <CalendarValue
-        title="From:"
-        :value="dateRange?.from"
+        :title="title ?? 'Value:'"
+        :value="modelValue"
         :current-date="currentDate"
         auto-focus
-        @update:current-date="setCurrentDate"
-      />
-
-      <CalendarValue
-        title="To:"
-        :value="dateRange?.to"
-        :current-date="currentDate"
         @update:current-date="setCurrentDate"
       />
     </div>
@@ -21,7 +14,7 @@
       class="bg-default dark:bg-default-dark border border-solid border-gray-300 dark:border-gray-700 rounded-xl py-3 overflow-hidden"
       :style="{'--direction-factor': isDirect ? '1' : '-1'}"
     >
-      <div class="grid grid-cols-2 gap-8 px-3 pb-4">
+      <div class="grid grid-cols-2 px-3 pb-4">
         <CalendarToggle
           :text="monthShortFormatter.format(currentDate).toLocaleUpperCase()"
           @click:previous="setCurrentDate(addMonth(currentDate, -1))"
@@ -49,7 +42,6 @@
             :is-hover-enabled="preselectedValue !== null"
             class="px-3"
             @click:day="onClickDay"
-            @hover:day="setRange"
           />
         </Transition>
       </div>
@@ -66,15 +58,16 @@ import CalendarValue from './components/CalendarValue.vue'
 import type {DateRange} from './models/types'
 
 const props = defineProps<{
-  modelValue: DateRange | undefined
+  modelValue: Date | undefined
+  title?: string
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: DateRange | undefined): void
+  (e: 'update:modelValue', value: Date | undefined): void
 }>()
 
 const currentDate = ref(getStartOfMonth())
-const dateRange = ref<DateRange | undefined>(props.modelValue)
+const dateRange = ref<DateRange | undefined>(undefined)
 const preselectedValue = ref<Date | null>(null)
 const isDirect = ref(false)
 
@@ -86,52 +79,17 @@ const setCurrentDate = (value: Date): void => {
 }
 
 const onClickDay = (value: Date): void => {
-  if (!preselectedValue.value) {
-    preselectedValue.value = value
-
-    setRange(value)
-  } else {
-    setRange(value)
-
-    preselectedValue.value = null
-
-    emit('update:modelValue', dateRange.value)
-
-    dateRange.value = undefined
-  }
-}
-
-const setRange = (value: Date): void => {
-  if (!preselectedValue.value) {
-    dateRange.value = {
-      from: new Date(value),
-      to: new Date(value),
-    }
-
-    return
-  }
-
-  if (value > preselectedValue.value) {
-    dateRange.value = {
-      from: new Date(preselectedValue.value),
-      to: new Date(value),
-    }
-  } else {
-    dateRange.value = {
-      from: new Date(value),
-      to: new Date(preselectedValue.value),
-    }
-  }
+  emit('update:modelValue', value)
 }
 
 watch(toRef(props, 'modelValue'), modelValue => {
-  dateRange.value = modelValue
+  dateRange.value = modelValue ? {from: modelValue, to: modelValue} : undefined
 
   if (!modelValue) return
 
-  if (!isSameMonth(modelValue.from, currentDate.value) || !isSameMonth(modelValue.to, currentDate.value)) {
-    setCurrentDate(getStartOfMonth(modelValue.from))
+  if (!isSameMonth(modelValue, currentDate.value)) {
+    setCurrentDate(getStartOfMonth(modelValue))
   }
-})
+}, {immediate: true})
 
 </script>

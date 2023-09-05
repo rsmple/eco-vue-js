@@ -2,6 +2,18 @@ export const weekdayShortFormatter = Intl.DateTimeFormat('en', {weekday: 'short'
 export const monthShortFormatter = Intl.DateTimeFormat('en', {month: 'short'})
 export const dateFormatter = Intl.DateTimeFormat('en', {year: 'numeric', month: 'numeric', day: 'numeric'})
 
+export const dateRegexp = /\d\d\.\d\d\.\d\d\d\d/i
+
+export const parseDate = (value: string): Date | undefined => {
+  if (!dateRegexp.test(value)) return
+
+  const timestamp = Date.parse(value.split('.').reverse().join('.'))
+
+  if (isNaN(timestamp)) return
+
+  return new Date(timestamp)
+}
+
 export enum WeekDay {
   SUNDAY = 0,
   MONDAY = 1,

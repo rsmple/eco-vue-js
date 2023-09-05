@@ -88,7 +88,7 @@ const setParentRect = (updateSize = false): void => {
 }
 
 onBeforeMount(() => {
-  setParentRect()
+  setParentRect(true)
 })
 
 let domListenerContainer: DOMListenerContainer

@@ -8,6 +8,7 @@ import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WCounter from '@/components/Counter/WCounter.vue'
 import WDatePicker from '@/components/DatePicker/WDatePicker.vue'
+import WDatePickerSingle from '@/components/DatePicker/WDatePickerSingle.vue'
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
@@ -18,6 +19,7 @@ import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 import WInfiniteListPages from '@/components/InfiniteList/WInfiniteListPages.vue'
 import WInput from '@/components/Input/WInput.vue'
 import WInputAsync from '@/components/Input/WInputAsync.vue'
+import WInputDate from '@/components/Input/WInputDate.vue'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 import WLink from '@/components/Link/WLink.vue'
 import WLinkArrow from '@/components/Link/WLinkArrow.vue'
@@ -46,6 +48,7 @@ export default {
     app.component('WClickOutside', WClickOutside)
     app.component('WCounter', WCounter)
     app.component('WDatePicker', WDatePicker)
+    app.component('WDatePickerSingle', WDatePickerSingle)
     app.component('WDropdown', WDropdown)
     app.component('WDropdownMenu', WDropdownMenu)
     app.component('WFieldWrapper', WFieldWrapper)
@@ -56,6 +59,7 @@ export default {
     app.component('WInfiniteListPages', WInfiniteListPages)
     app.component('WInput', WInput)
     app.component('WInputAsync', WInputAsync)
+    app.component('WInputDate', WInputDate)
     app.component('WInputSuggest', WInputSuggest)
     app.component('WLink', WLink)
     app.component('WLinkArrow', WLinkArrow)
@@ -84,6 +88,7 @@ export {
   WClickOutside,
   WCounter,
   WDatePicker,
+  WDatePickerSingle,
   WDropdown,
   WDropdownMenu,
   WFieldWrapper,
@@ -94,6 +99,7 @@ export {
   WInfiniteListPages,
   WInput,
   WInputAsync,
+  WInputDate,
   WInputSuggest,
   WLink,
   WLinkArrow,

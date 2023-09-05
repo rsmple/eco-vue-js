@@ -117,6 +117,9 @@
     "./dist/components/DatePicker/WDatePicker.vue": {
       "import": "./dist/components/DatePicker/WDatePicker.vue.js"
     },
+    "./dist/components/DatePicker/WDatePickerSingle.vue": {
+      "import": "./dist/components/DatePicker/WDatePickerSingle.vue.js"
+    },
     "./dist/components/Dropdown/WDropdown.vue": {
       "import": "./dist/components/Dropdown/WDropdown.vue.js"
     },
@@ -146,6 +149,9 @@
     },
     "./dist/components/Input/WInputAsync.vue": {
       "import": "./dist/components/Input/WInputAsync.vue.js"
+    },
+    "./dist/components/Input/WInputDate.vue": {
+      "import": "./dist/components/Input/WInputDate.vue.js"
     },
     "./dist/components/Input/WInputSuggest.vue": {
       "import": "./dist/components/Input/WInputSuggest.vue.js"

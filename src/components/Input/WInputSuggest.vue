@@ -3,7 +3,17 @@
     <component
       :is="isMobile ? WBottomSheet : WDropdownMenu"
       ref="dropdownMenu"
-      v-bind="isMobile ? {isOpen, onClose: close} : {isOpen, maxHeight: 320, maxWidth: 600, horizontalAlign: HorizontalAlign.FILL, updateAlign: true, teleport}"
+      v-bind="isMobile ? {
+        isOpen,
+        onClose: close
+      } : {
+        isOpen,
+        maxHeight: contentMaxHeight ?? 320,
+        maxWidth: contentMaxWidth ?? 600,
+        horizontalAlign: horizontalAlign ?? HorizontalAlign.FILL,
+        updateAlign: true,
+        teleport
+      }"
     >
       <template #toggle="{unclickable}">
         <WInput
@@ -69,7 +79,7 @@
           class="bg-default dark:bg-default-dark w-full"
           :class="{
             'max-h-full pb-20': isMobile,
-            'rounded-xl shadow-md max-h-72 overflow-x-hidden overflow-y-overlay overscroll-contain mb-1 mt-4 dark:border dark:border-solid dark:border-gray-800': !isMobile,
+            'rounded-xl max-h-[inherit] shadow-md overflow-x-hidden overflow-y-overlay overscroll-contain mb-1 mt-4 dark:border dark:border-solid dark:border-gray-800': !isMobile,
           }"
         >
           <template v-if="$slots.content?.().length">
@@ -137,6 +147,9 @@ const props = defineProps<{
   teleport?: boolean
   placeholder?: string
   type?: Type
+  horizontalAlign?: HorizontalAlign
+  contentMaxHeight?: number
+  contentMaxWidth?: number
 }>()
 
 const emit = defineEmits<{
