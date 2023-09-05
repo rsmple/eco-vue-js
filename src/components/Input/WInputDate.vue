@@ -7,7 +7,7 @@
     :content-max-height="520"
     :content-max-width="480"
     @update:model-value="updateInputValue"
-    @close="formatModelValue"
+    @close="formatModelValue(modelValue)"
     @keypress:enter="inputComponent?.blur()"
   >
     <template #content>
@@ -18,7 +18,7 @@
         <WDatePickerSingle
           :model-value="modelValue"
           :title="title"
-          @update:model-value="$emit('update:model-value', $event)"
+          @update:model-value="$emit('update:model-value', $event); formatModelValue($event)"
         />
       </div>
     </template>
@@ -53,8 +53,8 @@ const updateInputValue = (value: string) => {
   if (date) emit('update:model-value', date)
 }
 
-const formatModelValue = () => {
-  inputValue.value = props.modelValue ? dateFormat(props.modelValue) : ''
+const formatModelValue = (value: Date | undefined) => {
+  inputValue.value = value ? dateFormat(value) : ''
 }
 
 </script>

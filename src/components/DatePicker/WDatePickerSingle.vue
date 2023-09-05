@@ -51,7 +51,7 @@
 
 <script lang="ts" setup>
 import {ref, computed, watch, toRef} from 'vue'
-import {getStartOfMonth, addMonth, addYear, monthShortFormatter, isSameMonth} from '@/utils/dateTime'
+import {getStartOfMonth, addMonth, addYear, monthShortFormatter, getStartOfWeek, addDay} from '@/utils/dateTime'
 import CalendarMonth from './components/CalendarMonth.vue'
 import CalendarToggle from './components/CalendarToggle.vue'
 import CalendarValue from './components/CalendarValue.vue'
@@ -82,12 +82,19 @@ const onClickDay = (value: Date): void => {
   emit('update:modelValue', value)
 }
 
+const firstDay = computed(() => getStartOfWeek(currentDate.value))
+const lastDay = computed(() => addDay(firstDay.value, 41))
+
+const isSameCalendarPage = (value: Date) => {
+  return value >= firstDay.value && value <= lastDay.value
+}
+
 watch(toRef(props, 'modelValue'), modelValue => {
   dateRange.value = modelValue ? {from: modelValue, to: modelValue} : undefined
 
   if (!modelValue) return
 
-  if (!isSameMonth(modelValue, currentDate.value)) {
+  if (!isSameCalendarPage(modelValue)) {
     setCurrentDate(getStartOfMonth(modelValue))
   }
 }, {immediate: true})
