@@ -18,6 +18,7 @@
           :tooltip-text-persisted="hidePageTitle"
           :select-only="selectOnly"
           :unselect-only="unselectOnly"
+          :reverse="reverseSelection"
 
           class="sm:w-list-row-item sm-not:px-[calc(var(--inner-margin)-2px)] pb-4 pt-6"
           @update:selected="$emit('update:selected', $event)"
@@ -139,6 +140,7 @@ const props = withDefaults(
     emptyStub?: string
     selectOnly?: boolean
     unselectOnly?: boolean
+    reverseSelection?: boolean
   }>(),
   {
     keyGetter: undefined,

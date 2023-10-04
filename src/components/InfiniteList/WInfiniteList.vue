@@ -33,6 +33,7 @@
     :empty-stub="emptyStub"
     :select-only="selectOnly"
     :unselect-only="unselectOnly"
+    :reverse-selection="reverseSelection"
 
     @update:count="$emit('update:count', $event)"
     @update:selected="$emit('update:selected', $event)"
@@ -80,6 +81,7 @@ const props = withDefaults(
     emptyStub?: string
     selectOnly?: boolean
     unselectOnly?: boolean
+    reverseSelection?: boolean
   }>(),
   {
     skeletonLength: undefined,

@@ -29,6 +29,7 @@
       :empty-stub="emptyStub"
       :select-only="selectOnly"
       :unselect-only="unselectOnly"
+      :reverse-selection="reverseSelection"
 
       :class="{
         'last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16': !minHeight,
@@ -100,6 +101,7 @@ const props = withDefaults(
     emptyStub?: string
     selectOnly?: boolean
     unselectOnly?: boolean
+    reverseSelection?: boolean
   }>(),
   {
     skeletonLength: undefined,

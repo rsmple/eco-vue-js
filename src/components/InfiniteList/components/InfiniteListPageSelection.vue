@@ -1,7 +1,7 @@
 <template>
   <WCheckbox
     v-if="tooltipTextPersisted"
-    :model-value="chekboxValue"
+    :model-value="chekboxValueReversed"
     :disabled="disabled"
     intermediate
     class="w-full"
@@ -12,7 +12,7 @@
 
   <WCheckbox
     v-else
-    :model-value="chekboxValue"
+    :model-value="chekboxValueReversed"
     :disabled="disabled"
     :tooltip-text="tooltipText"
     intermediate
@@ -31,6 +31,7 @@ const props = defineProps<{
   tooltipTextPersisted?: boolean
   selectOnly?: boolean
   unselectOnly?: boolean
+  reverse?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -52,13 +53,13 @@ const chekboxValue = computed(() => {
   }
 })
 
-const tooltipText = computed(() => `${chekboxValue.value === true ? 'Unselect' : 'Select'} page (${props.items.length} item${props.items.length === 1 ? '' : 's'})`)
+const chekboxValueReversed = computed(() => props.disabled ? false : chekboxValue.value === null ? null : props.reverse ? !chekboxValue.value : chekboxValue.value)
+
+const tooltipText = computed(() => `${chekboxValueReversed.value === true ? 'Unselect' : 'Select'} page (${props.items.length} item${props.items.length === 1 ? '' : 's'})`)
 
 const selectOrUnselect = (isSelect: boolean): void => {
-  if (isSelect) {
-    const newSelected = [...props.selected, ...ids.value]
-
-    emit('update:selected', newSelected.filter((id, index) => newSelected.indexOf(id) === index))
+  if (props.reverse ? !isSelect : isSelect) {
+    emit('update:selected', [...props.selected, ...ids.value].filter((id, index, arr) => arr.indexOf(id) === index))
   } else {
     emit('update:selected', props.selected.filter(id => !ids.value.includes(id)))
   }
