@@ -10,7 +10,7 @@
     @click="toggle"
   >
     <div
-      class="relative flex justify-center items-center square-6 border border-solid isolate"
+      class="relative flex justify-center items-center square-6 border border-solid isolate bg-default dark:bg-default-dark"
       :class="{
         'text-default dark:text-default-dark': value && !disabled,
         'text-primary-default dark:text-primary-dark': !value && !disabled,
