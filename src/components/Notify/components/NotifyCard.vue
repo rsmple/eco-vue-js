@@ -1,32 +1,34 @@
 <template>
   <div
     ref="element"
-    class="flex z-[1]"
+    class="flex z-[1] isolate"
     :style="elementStyles"
   >
-    <div class="relative rounded-xl bg-black-default dark:bg-gray-800 py-3 pl-8 pr-4 min-h-[4.5rem] max-w-[calc(100vw-2rem)] sm:max-w-lg flex gap-6 items-center select-none my-2 mr-4 ml-auto shadow-md">
+    <div class="relative rounded-xl bg-black-default dark:bg-gray-800 min-h-[4.5rem] max-w-[calc(100vw-2rem)] sm:max-w-lg flex select-none my-2 mr-4 ml-auto shadow-md">
       <WCounter
         v-show="count > 1"
         class="absolute -top-2.5 -left-2.5 shadow-md"
         :count="count"
       />
 
-      <IconDanger
-        v-if="type === NotifyType.DANGER"
-        class="square-6 text-negative dark:text-negative-dark"
-      />
+      <div class="m-7">
+        <IconDanger
+          v-if="type === NotifyType.DANGER"
+          class="square-6 text-negative dark:text-negative-dark"
+        />
 
-      <IconWarn
-        v-else-if="type === NotifyType.WARN"
-        class="square-6 text-warning dark:text-warning-dark"
-      />
+        <IconWarn
+          v-else-if="type === NotifyType.WARN"
+          class="square-6 text-warning dark:text-warning-dark"
+        />
 
-      <IconSuccess
-        v-else-if="type === NotifyType.SUCCESS"
-        class="square-6 text-positive dark:text-positive-dark"
-      />
+        <IconSuccess
+          v-else-if="type === NotifyType.SUCCESS"
+          class="square-6 text-positive dark:text-positive-dark"
+        />
+      </div>
 
-      <div class="flex-1 mr-2">
+      <div class="flex-1 py-4 grid">
         <div class="text-base text-default font-semibold">
           {{ title }}
         </div>
@@ -37,21 +39,24 @@
         >
           {{ caption ? caption + ' ' : '' }}<span class="break-all">{{ userInput }}</span>
         </div>
+
+        <WButton
+          v-if="to"
+          :to="to"
+          :semantic-type="SemanticType.SECONDARY"
+          class="mt-4 justify-self-start"
+        >
+          {{ linkText }} <IconBack class="rotate-180" />
+        </WButton>
       </div>
 
-      <WButton
-        v-if="to"
-        :to="to"
-        :semantic-type="SemanticType.SECONDARY"
-      >
-        {{ linkText }} <IconBack class="rotate-180 ml-4" />
-      </WButton>
-
       <div
-        class="relative flex justify-center items-center square-8 rounded-full text-description cursor-pointer hover:bg-[#00000024] w-ripple"
+        class="w-ripple-trigger w-ripple-hover text-description cursor-pointer p-6"
         @click="$emit('click:close')"
       >
-        <IconCancel class="square-4" />
+        <div class="relative flex justify-center items-center square-8 rounded-full w-ripple">
+          <IconCancel class="square-4" />
+        </div>
       </div>
     </div>
   </div>
