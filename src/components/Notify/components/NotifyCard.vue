@@ -28,7 +28,7 @@
         />
       </div>
 
-      <div class="flex-1 py-4 grid">
+      <div class="flex-1 py-4 grid items-center">
         <div class="text-base text-default font-semibold">
           {{ title }}
         </div>
