@@ -11,10 +11,13 @@ import WDatePicker from '@/components/DatePicker/WDatePicker.vue'
 import WDatePickerSingle from '@/components/DatePicker/WDatePickerSingle.vue'
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+import WExpansion from '@/components/Expansion/WExpansion.vue'
+import WExpansionItem from '@/components/Expansion/WExpansionItem.vue'
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 import WFilePicker from '@/components/FilePicker/WFilePicker.vue'
 import WForm from '@/components/Form/WForm.vue'
 import WFormValidator from '@/components/Form/WFormValidator.vue'
+import WHeaderBar from '@/components/HeaderBar/WHeaderBar.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 import WInfiniteListPages from '@/components/InfiniteList/WInfiniteListPages.vue'
 import WInput from '@/components/Input/WInput.vue'
@@ -25,6 +28,10 @@ import WLink from '@/components/Link/WLink.vue'
 import WLinkArrow from '@/components/Link/WLinkArrow.vue'
 import WModal from '@/components/Modal/WModal.vue'
 import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
+import WNavBar from '@/components/Nav/WNavBar.vue'
+import WNavItem from '@/components/Nav/WNavItem.vue'
+import WNavItemExpand from '@/components/Nav/WNavItemExpand.vue'
+import WNavItemTransition from '@/components/Nav/WNavItemTransition.vue'
 import WNotify from '@/components/Notify/WNotify.vue'
 import WSelect from '@/components/Select/WSelect.vue'
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
@@ -51,10 +58,13 @@ export default {
     app.component('WDatePickerSingle', WDatePickerSingle)
     app.component('WDropdown', WDropdown)
     app.component('WDropdownMenu', WDropdownMenu)
+    app.component('WExpansion', WExpansion)
+    app.component('WExpansionItem', WExpansionItem)
     app.component('WFieldWrapper', WFieldWrapper)
     app.component('WFilePicker', WFilePicker)
     app.component('WForm', WForm)
     app.component('WFormValidator', WFormValidator)
+    app.component('WHeaderBar', WHeaderBar)
     app.component('WInfiniteList', WInfiniteList)
     app.component('WInfiniteListPages', WInfiniteListPages)
     app.component('WInput', WInput)
@@ -65,6 +75,10 @@ export default {
     app.component('WLinkArrow', WLinkArrow)
     app.component('WModal', WModal)
     app.component('WModalWrapper', WModalWrapper)
+    app.component('WNavBar', WNavBar)
+    app.component('WNavItem', WNavItem)
+    app.component('WNavItemExpand', WNavItemExpand)
+    app.component('WNavItemTransition', WNavItemTransition)
     app.component('WNotify', WNotify)
     app.component('WSelect', WSelect)
     app.component('WSelectAsync', WSelectAsync)
@@ -91,10 +105,13 @@ export {
   WDatePickerSingle,
   WDropdown,
   WDropdownMenu,
+  WExpansion,
+  WExpansionItem,
   WFieldWrapper,
   WFilePicker,
   WForm,
   WFormValidator,
+  WHeaderBar,
   WInfiniteList,
   WInfiniteListPages,
   WInput,
@@ -105,6 +122,10 @@ export {
   WLinkArrow,
   WModal,
   WModalWrapper,
+  WNavBar,
+  WNavItem,
+  WNavItemExpand,
+  WNavItemTransition,
   WNotify,
   WSelect,
   WSelectAsync,

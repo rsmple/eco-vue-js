@@ -34,19 +34,20 @@
           :allow-clear="allowClear"
           :icon="icon"
           :placeholder="placeholder"
+          :no-margin="noMargin"
           :class="{
             'cursor-pointer': !disabled,
             'cursor-not-allowed': disabled,
           }"
-          @update:model-value="!loading && $emit('update:modelValue', $event)"
+          @update:model-value="!loading && $emit('update:modelValue', $event as ModelValue)"
 
           @keypress:enter="$emit('keypress:enter', $event)"
           @keypress:up="$emit('keypress:up', $event)"
           @keypress:down="$emit('keypress:down', $event)"
           @keypress:delete="$emit('keypress:delete', $event)"
 
-          @focus="open(); !unclickable && $emit('focus')"
-          @blur="!isMobile && !persist && close(); !unclickable && $emit('blur')"
+          @focus="open(); !unclickable && $emit('focus', $event)"
+          @blur="!isMobile && !persist && close(); !unclickable && $emit('blur', $event)"
 
           @click="isMobile && unclickable && open()"
           @click:internal="isMobile && unclickable && open()"
@@ -150,6 +151,7 @@ const props = defineProps<{
   horizontalAlign?: HorizontalAlign
   contentMaxHeight?: number
   contentMaxWidth?: number
+  noMargin?: boolean
 }>()
 
 const emit = defineEmits<{

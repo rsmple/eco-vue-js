@@ -20,7 +20,7 @@
         'cursor-not-allowed': disabled,
       }"
       class="relative w-ripple w-ripple-hover h-full w-11 p-[0.6875rem] flex justify-center select-none outline-none"
-      @click="isSecureVisible ? $emit('hide:secure') : $emit('show:secure')"
+      @click="isSecureVisible ? $emit('hide:secure', $event) : $emit('show:secure', $event)"
     >
       <IconEyeSlash
         v-if="!isSecureVisible"
@@ -47,7 +47,7 @@
         'cursor-not-allowed': disabled,
       }"
       class="h-full w-11 flex items-center justify-center outline-none"
-      @click.stop="$emit('click:slot')"
+      @click.stop="$emit('click:slot', $event)"
     >
       <slot name="default" />
     </button>
@@ -74,7 +74,7 @@ const emit = defineEmits<{
   (e: 'show:secure', value: MouseEvent): void
   (e: 'hide:secure', value: MouseEvent): void
   (e: 'click:clear'): void
-  (e: 'click:slot'): void
+  (e: 'click:slot', value: MouseEvent): void
   (e: 'update:width', value: number): void
 }>()
 

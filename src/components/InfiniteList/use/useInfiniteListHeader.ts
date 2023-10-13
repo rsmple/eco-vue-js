@@ -1,7 +1,6 @@
-import {getIsMobile} from '@/main'
 import {onBeforeUnmount, onMounted, ref} from 'vue'
 
-const headerElementHeight = getIsMobile() ? 60 : 128
+const headerElementHeight = 60
 
 const observerOptions = {
   root: null,

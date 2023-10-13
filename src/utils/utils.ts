@@ -70,3 +70,5 @@ export function throttle<T extends DebounceCb>(cb: T, delay = 200): T {
 export const isEqualObj = (obj1: Record<string, unknown>, obj2: Record<string, unknown>, exclude?: string[]): boolean => {
   return [...Object.keys(obj1), ...Object.keys(obj2)].every(key => exclude?.includes(key) || obj1[key] === obj2[key])
 }
+
+export const numberCompactFormatter = Intl.NumberFormat('en', {notation: 'compact'})

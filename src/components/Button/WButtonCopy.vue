@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative inline-block text-description square-5 mx-3 cursor-pointer select-none w-hover-circle"
+    class="relative inline-block text-description square-5 cursor-pointer select-none w-hover-circle"
     @click="doCopy()"
   >
     <IconCopySuccess

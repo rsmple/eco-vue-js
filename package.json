@@ -126,6 +126,12 @@
     "./dist/components/DropdownMenu/WDropdownMenu.vue": {
       "import": "./dist/components/DropdownMenu/WDropdownMenu.vue.js"
     },
+    "./dist/components/Expansion/WExpansion.vue": {
+      "import": "./dist/components/Expansion/WExpansion.vue.js"
+    },
+    "./dist/components/Expansion/WExpansionItem.vue": {
+      "import": "./dist/components/Expansion/WExpansionItem.vue.js"
+    },
     "./dist/components/FieldWrapper/WFieldWrapper.vue": {
       "import": "./dist/components/FieldWrapper/WFieldWrapper.vue.js"
     },
@@ -137,6 +143,9 @@
     },
     "./dist/components/Form/WFormValidator.vue": {
       "import": "./dist/components/Form/WFormValidator.vue.js"
+    },
+    "./dist/components/HeaderBar/WHeaderBar.vue": {
+      "import": "./dist/components/HeaderBar/WHeaderBar.vue.js"
     },
     "./dist/components/InfiniteList/WInfiniteList.vue": {
       "import": "./dist/components/InfiniteList/WInfiniteList.vue.js"
@@ -167,6 +176,18 @@
     },
     "./dist/components/Modal/WModalWrapper.vue": {
       "import": "./dist/components/Modal/WModalWrapper.vue.js"
+    },
+    "./dist/components/Nav/WNavBar.vue": {
+      "import": "./dist/components/Nav/WNavBar.vue.js"
+    },
+    "./dist/components/Nav/WNavItem.vue": {
+      "import": "./dist/components/Nav/WNavItem.vue.js"
+    },
+    "./dist/components/Nav/WNavItemExpand.vue": {
+      "import": "./dist/components/Nav/WNavItemExpand.vue.js"
+    },
+    "./dist/components/Nav/WNavItemTransition.vue": {
+      "import": "./dist/components/Nav/WNavItemTransition.vue.js"
     },
     "./dist/components/Notify/WNotify.vue": {
       "import": "./dist/components/Notify/WNotify.vue.js"

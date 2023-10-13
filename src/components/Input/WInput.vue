@@ -1,8 +1,9 @@
 <template>
   <div
-    class="relative mt-1 mb-[var(--input-b-margin,1.125rem)]"
+    class="relative"
     :class="{
       'cursor-not-allowed': disabled && !skeleton,
+      'mt-1 mb-[1.125rem]': !noMargin,
     }"
     @click="$emit('click:internal', $event)"
   >
@@ -236,6 +237,7 @@ const props = withDefaults(
     customBackspaceHandle?: boolean
     hasChanges?: boolean
     disabledActions?: boolean
+    noMargin?: boolean
   }>(),
   {
     size: 40,

@@ -11,7 +11,7 @@ import postcssImport from 'postcss-import'
 export default defineConfig({
   plugins: [
     dts({
-      tsconfigPath: 'tsconfig.app.json',
+      tsconfigPath: 'tsconfig.vue.json',
       entryRoot: 'src',
       copyDtsFiles: true,
     }),

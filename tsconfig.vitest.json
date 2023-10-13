@@ -1,12 +1,11 @@
 {
-  "extends": "./tsconfig.app.json",
+  "extends": "./tsconfig.vue.json",
   "exclude": [],
   "compilerOptions": {
     "composite": true,
-    "lib": [],
-    "types": [
-      "node",
-      "jsdom"
-    ]
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
   }
 }
