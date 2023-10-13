@@ -41,7 +41,7 @@
       @update:next-page="updateNextPage"
       @update:previous-page="updatePreviousPage"
       @update:scroll="updateScroll"
-      @update-from-header:scroll="headerTop > 0 && updateScroll(headerTop)"
+      @update-from-header:scroll="headerTop > 0 && nextTick(() => updateScroll(headerTop))"
       @error:invalid-page="removePage"
       @refetch="refetchNextPages(index)"
       @update:selected="$emit('update:selected', $event)"
@@ -70,7 +70,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData">
-import {ref, computed, watch, toRef} from 'vue'
+import {ref, computed, watch, toRef, nextTick} from 'vue'
 import InfiniteListScroll from './components/InfiniteListScroll.vue'
 import InfiniteListPage from './components/InfiniteListPage.vue'
 import {useRefetchNextPages} from './use/useRefetchNextPages'

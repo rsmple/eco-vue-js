@@ -6,10 +6,9 @@
         relative h-9 flex gap-2 px-5 sm:px-[1.125rem] items-center
         select-none cursor-pointer no-underline outline-none border-none bg-none
         disabled:text-description disabled:cursor-not-allowed
-        hover:text-primary-default dark:hover:text-primary-dark w-ripple-hover
       "
       :class="{
-        'w-ripple before:text-primary-default dark:before:text-primary-dark': !disableMessage,
+        'w-ripple w-ripple-hover before:text-primary-default dark:before:text-primary-dark hover:text-primary-default dark:hover:text-primary-dark': !disableMessage,
         'text-primary-default dark:text-primary-dark': active,
         'text-accent': !active,
       }"

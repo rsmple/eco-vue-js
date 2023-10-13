@@ -56,7 +56,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData">
-import {onBeforeUnmount, ref, watch} from 'vue'
+import {onBeforeUnmount, onMounted, ref, watch} from 'vue'
 import {useInfiniteListHeader} from './use/useInfiniteListHeader'
 import WInfiniteListPages from './WInfiniteListPages.vue'
 
@@ -115,6 +115,12 @@ watch(isIntersecting, value => {
     updateHeaderPadding(headerHeight.value - props.headerMargin)
   } else {
     updateHeaderPadding(0)
+  }
+})
+
+onMounted(() => {
+  if (props.queryParams.page && props.queryParams.page > 1) {
+    isIntersecting.value = false
   }
 })
 

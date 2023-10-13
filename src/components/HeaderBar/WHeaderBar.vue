@@ -1,19 +1,17 @@
 <template>
   <div class="fixed top-0 right-0 left-0 z-10 h-[3.75rem] print:hidden flex">
-    <Teleport to="body">
-      <div
-        :key="headerPadding"
-        class="fixed top-0 right-0 left-0 bg-default dark:bg-default-dark supports-backdrop:backdrop-blur h-[calc(3.75rem+var(--header-height-padding))] print:hidden"
-        :class="{
-          'supports-backdrop:bg-opacity-40 supports-backdrop:dark:bg-opacity-60': isTransparent,
-        }"
-        :style="{'--header-height-padding': headerPadding + 'px'}"
-      />
-    </Teleport>
+    <div
+      :key="headerPadding"
+      class="fixed top-0 right-0 left-0 bg-default dark:bg-default-dark supports-backdrop:backdrop-blur h-[calc(3.75rem+var(--header-height-padding))] print:hidden"
+      :class="{
+        'supports-backdrop:bg-opacity-40 supports-backdrop:dark:bg-opacity-60': isTransparent,
+      }"
+      :style="{'--header-height-padding': headerPadding + 'px'}"
+    />
 
     <div
       v-show="!isSearchVisible && !search"
-      class="flex flex-1 items-center -pl--inner-margin xl-not:pl-[3.75rem] max-w-full"
+      class="relative flex flex-1 items-center -pl--inner-margin xl-not:pl-[3.75rem] max-w-full"
       :class="{
         '-pr--inner-margin': !searchEnabled
       }"
@@ -38,7 +36,7 @@
     <div
       v-if="searchEnabled"
       v-show="isSearchVisible || search"
-      class="-pl--inner-margin xl-not:pl-[3.75rem] -pr--inner-margin flex flex-1 gap-2 items-center w-full"
+      class="relative -pl--inner-margin xl-not:pl-[3.75rem] -pr--inner-margin flex flex-1 gap-2 items-center w-full"
     >
       <WInputSuggest
         v-if="$route.meta.headerSearchComponent && isMobile"

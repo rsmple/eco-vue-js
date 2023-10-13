@@ -7,7 +7,7 @@
 
     <Teleport
       to="body"
-      :disabled="!teleport"
+      :disabled="!teleport || !isOpen"
     >
       <Transition
         enter-active-class="transition-opacity"

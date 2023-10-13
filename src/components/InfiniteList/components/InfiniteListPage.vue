@@ -224,7 +224,7 @@ watch(previousPage, value => {
 }, {immediate: true})
 
 watch(error, (error: unknown): void => {
-  if (props.isInvalidPage(error)) emit('error:invalidPage' as any, props.queryParams.page as any)
+  if (props.isInvalidPage(error)) emit('error:invalidPage', props.queryParams.page as number)
 }, {immediate: true})
 
 watch(isFetching, value => {
