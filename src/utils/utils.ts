@@ -71,4 +71,6 @@ export const isEqualObj = (obj1: Record<string, unknown>, obj2: Record<string, u
   return [...Object.keys(obj1), ...Object.keys(obj2)].every(key => exclude?.includes(key) || obj1[key] === obj2[key])
 }
 
+export const percentCompactFormatter = Intl.NumberFormat('en', {notation: 'compact', style: 'percent'})
 export const numberCompactFormatter = Intl.NumberFormat('en', {notation: 'compact'})
+export const numberFormatter = Intl.NumberFormat('fr')

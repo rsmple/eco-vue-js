@@ -3,7 +3,7 @@
     <Teleport to="body">
       <div
         :key="headerPadding"
-        class="fixed top-0 right-0 left-0 bg-default dark:bg-default-dark supports-backdrop:backdrop-blur h-[calc(3.75rem+var(--header-height-padding))]"
+        class="fixed top-0 right-0 left-0 bg-default dark:bg-default-dark supports-backdrop:backdrop-blur h-[calc(3.75rem+var(--header-height-padding))] print:hidden"
         :class="{
           'supports-backdrop:bg-opacity-40 supports-backdrop:dark:bg-opacity-60': isTransparent,
         }"

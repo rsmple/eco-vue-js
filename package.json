@@ -105,8 +105,26 @@
     "./dist/components/Button/WButtonCopy.vue": {
       "import": "./dist/components/Button/WButtonCopy.vue.js"
     },
+    "./dist/components/Button/WButtonGroup.vue": {
+      "import": "./dist/components/Button/WButtonGroup.vue.js"
+    },
+    "./dist/components/Button/WButtonMore.vue": {
+      "import": "./dist/components/Button/WButtonMore.vue.js"
+    },
+    "./dist/components/Button/WButtonMoreItem.vue": {
+      "import": "./dist/components/Button/WButtonMoreItem.vue.js"
+    },
+    "./dist/components/Button/WButtonSelection.vue": {
+      "import": "./dist/components/Button/WButtonSelection.vue.js"
+    },
+    "./dist/components/Button/WButtonSelectionAction.vue": {
+      "import": "./dist/components/Button/WButtonSelectionAction.vue.js"
+    },
     "./dist/components/Checkbox/WCheckbox.vue": {
       "import": "./dist/components/Checkbox/WCheckbox.vue.js"
+    },
+    "./dist/components/Chip/WChip.vue": {
+      "import": "./dist/components/Chip/WChip.vue.js"
     },
     "./dist/components/ClickOutside/WClickOutside.vue": {
       "import": "./dist/components/ClickOutside/WClickOutside.vue.js"
@@ -147,11 +165,20 @@
     "./dist/components/HeaderBar/WHeaderBar.vue": {
       "import": "./dist/components/HeaderBar/WHeaderBar.vue.js"
     },
+    "./dist/components/ImageViewer/WImageViewer.vue": {
+      "import": "./dist/components/ImageViewer/WImageViewer.vue.js"
+    },
     "./dist/components/InfiniteList/WInfiniteList.vue": {
       "import": "./dist/components/InfiniteList/WInfiniteList.vue.js"
     },
     "./dist/components/InfiniteList/WInfiniteListPages.vue": {
       "import": "./dist/components/InfiniteList/WInfiniteListPages.vue.js"
+    },
+    "./dist/components/InfoCard/WInfoCard.vue": {
+      "import": "./dist/components/InfoCard/WInfoCard.vue.js"
+    },
+    "./dist/components/InfoCard/WInfoCardNegative.vue": {
+      "import": "./dist/components/InfoCard/WInfoCardNegative.vue.js"
     },
     "./dist/components/Input/WInput.vue": {
       "import": "./dist/components/Input/WInput.vue.js"
@@ -170,6 +197,15 @@
     },
     "./dist/components/Link/WLinkArrow.vue": {
       "import": "./dist/components/Link/WLinkArrow.vue.js"
+    },
+    "./dist/components/ListCard/WListCard.vue": {
+      "import": "./dist/components/ListCard/WListCard.vue.js"
+    },
+    "./dist/components/ListCard/WListCardField.vue": {
+      "import": "./dist/components/ListCard/WListCardField.vue.js"
+    },
+    "./dist/components/MenuItem/WMenuItem.vue": {
+      "import": "./dist/components/MenuItem/WMenuItem.vue.js"
     },
     "./dist/components/Modal/WModal.vue": {
       "import": "./dist/components/Modal/WModal.vue.js"
@@ -212,6 +248,9 @@
     },
     "./dist/components/Tabs/WTabs.vue": {
       "import": "./dist/components/Tabs/WTabs.vue.js"
+    },
+    "./dist/components/Tabs/WTabsColumns.vue": {
+      "import": "./dist/components/Tabs/WTabsColumns.vue.js"
     },
     "./dist/components/Toggle/WToggle.vue": {
       "import": "./dist/components/Toggle/WToggle.vue.js"
