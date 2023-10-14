@@ -83,11 +83,12 @@
               disabled:opacity-80 disabled:cursor-not-allowed placeholder:text-gray-400 dark:placeholder:text-gray-500 appearance-none
             "
             :class="{
-              'py-0 pr-1 pl-3': !textarea && !hideInput,
               'h-[34px]': $slots.suffix?.()?.length,
               'h-[42px]': !$slots.suffix?.()?.length,
               'h-[var(--textarea-height,160px)] w-full resize-none p-3': textarea,
-              'pl-11': icon,
+              'py-0 pr-1': !hideInput && !textarea,
+              'pl-11': !hideInput && !textarea && icon,
+              'pl-3': !hideInput && !textarea && !icon,
               'w-0 max-w-0 p-0 absolute': hideInput,
               'font-mono': mono,
               'text-secure': textSecure && !isSecureVisible,

@@ -18,7 +18,7 @@
     >
       <div class="flex-1 text-xl sm:text-3xl text-accent font-semibold truncate">
         <slot name="title">
-          {{ $route.meta.headerTitle }}
+          {{ title }}
         </slot>
       </div>
 
@@ -39,7 +39,7 @@
       class="relative -pl--inner-margin xl-not:pl-[3.75rem] -pr--inner-margin flex flex-1 gap-2 items-center w-full"
     >
       <WInputSuggest
-        v-if="$route.meta.headerSearchComponent && isMobile"
+        v-if="$slots.search?.()?.length && isMobile"
         ref="input"
         :model-value="search"
         placeholder="Search.."
@@ -91,11 +91,13 @@ import {getIsMobile} from '@/utils/mobile'
 
 const props = withDefaults(
   defineProps<{
+    title?: string
     search?: string
     searchEnabled?: boolean
     headerPadding?: number
   }>(),
   {
+    title: undefined,
     search: undefined,
     headerPadding: 0,
   },
