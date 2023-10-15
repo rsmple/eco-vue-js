@@ -266,13 +266,19 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         'transition-duration': '100ms',
       },
 
-      '&:active::before, .w-ripple-trigger:active &::before': {
+      '&:active::before': {
         'opacity': 'calc(var(--w-ripple-opacity, 0.10) * 2)',
       },
     },
 
-    '.w-ripple-hover:hover': {
-      '& .w-ripple:not(:active)::before, &.w-ripple:not(:active)::before': {
+    '.w-ripple-trigger:active': {
+      '.w-ripple::before, &.w-ripple::before': {
+        'opacity': 'calc(var(--w-ripple-opacity, 0.10) * 2)',
+      },
+    },
+
+    '.w-ripple-hover:not(:active):hover': {
+      '& .w-ripple:not(:active)::before, &.w-ripple::before': {
         'opacity': 'var(--w-ripple-opacity, 0.10)',
       },
     },
