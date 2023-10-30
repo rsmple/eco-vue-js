@@ -7,11 +7,11 @@
       <div
         class="flex"
         :class="{
-          'sm:pt-6': selected === undefined && hidePageTitle && !noGap,
+          'sm:pt-4': (selected === undefined || !allowPageSelection) && hidePageTitle && !noGap,
         }"
       >
         <InfiniteListPageSelection
-          v-if="selected !== undefined"
+          v-if="selected !== undefined && allowPageSelection"
           :selected="selected"
           :items="data?.results ?? []"
           :disabled="!data?.results"
@@ -141,6 +141,7 @@ const props = withDefaults(
     selectOnly?: boolean
     unselectOnly?: boolean
     reverseSelection?: boolean
+    allowPageSelection?: boolean
   }>(),
   {
     keyGetter: undefined,

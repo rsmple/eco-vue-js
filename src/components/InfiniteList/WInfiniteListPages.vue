@@ -30,6 +30,7 @@
       :select-only="selectOnly"
       :unselect-only="unselectOnly"
       :reverse-selection="reverseSelection"
+      :allow-page-selection="allowPageSelection"
 
       :class="{
         'last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16': !minHeight,
@@ -102,6 +103,7 @@ const props = withDefaults(
     selectOnly?: boolean
     unselectOnly?: boolean
     reverseSelection?: boolean
+    allowPageSelection?: boolean
   }>(),
   {
     skeletonLength: undefined,

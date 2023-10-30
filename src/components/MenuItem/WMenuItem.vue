@@ -1,7 +1,7 @@
 <template>
   <component
-    :is="to ? RouterLink : 'button'"
-    v-bind="to ? {to} : undefined"
+    :is="to ? RouterLink : href ? 'a' : 'button'"
+    v-bind="to ? {to} : href ? {href, download} : undefined"
     class="relative px-6 py-2 first:pt-4 last:pb-4 text-description select-none flex gap-4 w-full min-w-36 items-center text-start justify-start outline-none"
     :class="{
       'w-ripple w-ripple-hover hover:text-primary-default dark:hover:text-primary-dark cursor-pointer': !disabled,
@@ -19,6 +19,8 @@ import {type RouteLocationRaw, RouterLink} from 'vue-router'
 defineProps<{
   to?: RouteLocationRaw
   disabled?: boolean
+  href?: string
+  download?: string
 }>()
 
 </script>

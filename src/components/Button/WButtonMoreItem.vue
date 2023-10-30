@@ -1,6 +1,8 @@
 <template>
   <WMenuItem
     :to="to"
+    :href="href"
+    :download="download"
     :disabled="disabled"
   >
     <div class="min-w-[5rem] flex-1 text-start">
@@ -24,6 +26,8 @@ defineProps<{
   text: string
   icon?: SVGComponent
   disabled?: boolean
+  href?: string
+  download?: string
 }>()
 
 </script>

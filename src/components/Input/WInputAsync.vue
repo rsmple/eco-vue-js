@@ -41,11 +41,13 @@
 
         <button
           v-else
-          class="relative square-11 rounded-lg flex items-center justify-center text-description"
+          class="relative square-11 rounded-lg flex items-center justify-center"
           :class="{
             'cursor-not-allowed': disabled,
             'cursor-progress': loading,
             'w-ripple w-ripple-hover': !disabled && !loading,
+            'bg-primary-default dark:bg-primary-dark text-default dark:text-default-dark': focused,
+            'text-description': !focused,
           }"
           @click="toggle"
           @mousedown.stop.prevent=""
@@ -105,7 +107,7 @@ const hasChangesValue = computed(() => props.modelValue !== value.value)
 const toggle = async () => {
   if (props.disabled || props.loading) return
 
-  if (hasChangesValue.value) {
+  if (hasChangesValue.value || (props.textSecure && focused.value)) {
     emitUpdateModelValue(value.value)
   } else {
     open()
