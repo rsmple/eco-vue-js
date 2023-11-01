@@ -43,6 +43,7 @@
 </template>
 
 <script lang="ts" setup>
+import {debounce} from '@/utils/utils'
 import {onBeforeUnmount, onMounted, ref} from 'vue'
 
 defineProps<{
@@ -56,14 +57,22 @@ const marginY = ref(276)
 
 let resumeScroll: (() => void) | undefined
 
-onMounted(async () => {
+const updateMargin = debounce(() => {
   if (title.value && actions.value) {
     marginY.value = title.value.offsetHeight + actions.value.offsetHeight
   }
+}, 200)
+
+onMounted(() => {
+  updateMargin()
+
+  window.addEventListener('resize', updateMargin)
 })
 
 onBeforeUnmount(() => {
   resumeScroll?.()
+
+  window.removeEventListener('resize', updateMargin)
 })
 
 </script>

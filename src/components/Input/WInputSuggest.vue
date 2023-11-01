@@ -121,7 +121,7 @@ import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import WInput from '@/components/Input/WInput.vue'
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
-import {getIsMobile} from '@/utils/mobile'
+import {getIsMobile, getIsTouchDevice} from '@/utils/mobile'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
@@ -170,7 +170,7 @@ const emit = defineEmits<{
 const isOpen = ref(false)
 const dropdownMenu = ref<InstanceType<typeof WDropdownMenu> | undefined>()
 const input = ref<ComponentInstance<typeof WInput<Type>> | undefined>()
-const isMobile = getIsMobile()
+const isMobile = getIsMobile() || getIsTouchDevice()
 const content = ref<HTMLDivElement | undefined>()
 
 const isDisabled = computed(() => props.readonly || props.disabled)
