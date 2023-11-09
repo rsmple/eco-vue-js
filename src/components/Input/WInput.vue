@@ -83,9 +83,8 @@
               disabled:opacity-80 disabled:cursor-not-allowed placeholder:text-gray-400 dark:placeholder:text-gray-500 appearance-none
             "
             :class="{
-              'h-[34px]': $slots.suffix?.()?.length,
-              'h-[42px]': !$slots.suffix?.()?.length,
               'h-[var(--textarea-height,160px)] w-full resize-none p-3': textarea,
+              'h-[var(--input-height,42px)]': !textarea,
               'py-0 pr-1': !hideInput && !textarea,
               'pl-11': !hideInput && !textarea && icon,
               'pl-3': !hideInput && !textarea && !icon,

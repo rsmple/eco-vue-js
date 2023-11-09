@@ -116,8 +116,10 @@ const _validate = (value: Parameters<ValidateFn>[0]): string | undefined => {
             return 'whitespace'
           case '\n':
             return 'line break'
+          case '\t':
+            return 'tabulation'
           default:
-            return `" ${item} "`
+            return `${item}`
         }
       })
       .join(', ')

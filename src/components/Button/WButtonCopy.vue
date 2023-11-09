@@ -35,7 +35,22 @@ const props = defineProps<{
 const copied = ref(false)
 let timeout: NodeJS.Timeout | undefined
 
-const doCopy = () => {
+const checkPermission = async (): Promise<boolean> => {
+  const result = await navigator.permissions.query({name: 'clipboard-write' as PermissionName})
+
+  return result.state === 'granted' || result.state === 'prompt'
+}
+
+const doCopy = async () => {
+  if (!(await checkPermission())) {
+    Notify.error({
+      title: 'Copy failed',
+      caption: 'Writing to clipboard is not permitted',
+    })
+
+    return
+  }
+
   navigator.clipboard.writeText(props.value)
     .then(() => {
       copied.value = true
