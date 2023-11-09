@@ -84,7 +84,8 @@
             "
             :class="{
               'h-[var(--textarea-height,160px)] w-full resize-none p-3': textarea,
-              'h-[var(--input-height,42px)]': !textarea,
+              'h-[var(--input-height,42px)]': !textarea && !$slots.suffix?.()?.length,
+              'h-[var(--input-height,34px)]': !textarea && $slots.suffix?.()?.length,
               'py-0 pr-1': !hideInput && !textarea,
               'pl-11': !hideInput && !textarea && icon,
               'pl-3': !hideInput && !textarea && !icon,
@@ -177,8 +178,12 @@
 
       <WSkeleton
         v-else
-        class="w-full h-11 rounded-xl"
-        :class="{'h-[var(--textarea-height, 160px)]': textarea}"
+        class="w-full w-skeleton-rounded-xl"
+        :class="{
+          'h-[calc(var(--textarea-height,160px)+2px)]': textarea,
+          'h-[calc(var(--input-height,42px)+2px)]': !textarea && !$slots.suffix?.()?.length,
+          'h-[calc(var(--input-height,34px)+10px)]': !textarea && $slots.suffix?.()?.length,
+        }"
         style="--skeleton-width: 100%;"
       />
 

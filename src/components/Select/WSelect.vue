@@ -16,7 +16,6 @@
     :disabled="disabled"
     :has-changes="hasChanges"
     :placeholder="placeholder"
-    class="[--input-height:var(--select-input-height,34px)]"
     @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
 
     @keypress:enter.stop.prevent="selectCursor"
