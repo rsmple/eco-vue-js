@@ -2,10 +2,12 @@ import {inject, onBeforeMount, provide, ref, type Ref} from 'vue'
 import {wFormInvalidateUpdater} from '../models/injection'
 import {removeKey} from '../models/utils'
 
-export const useFormInvalidateMap = (name: Ref<string | undefined>) => {
-  const invalidateMap = ref<Record<string, (messages: Record<string, string | string[]>) => void>>({})
+type InvalidatePayload = Record<string, string | string[]>
 
-  const invalidateMapUpdater = (key: string, value: (messages: Record<string, string | string[]>) => void): void => {
+export const useFormInvalidateMap = (name: Ref<string | undefined>) => {
+  const invalidateMap = ref<Record<string, (messages: InvalidatePayload) => void>>({})
+
+  const invalidateMapUpdater = (key: string, value: (messages: InvalidatePayload) => void): void => {
     invalidateMap.value = {...invalidateMap.value, [key]: value}
   }
 
@@ -13,9 +15,9 @@ export const useFormInvalidateMap = (name: Ref<string | undefined>) => {
     invalidateMap.value = removeKey(invalidateMap.value, key)
   }
 
-  const invalidate = (payload: Record<string, string | string[]>): void => {
+  const invalidate = (payload: InvalidatePayload): void => {
     Object.keys(invalidateMap.value).forEach(key => {
-      invalidateMap.value[key]?.(payload)
+      invalidateMap.value[key]?.(name.value ? payload[name.value] as unknown as InvalidatePayload : payload)
     })
   }
 
