@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-default dark:bg-default-dark overflow-y-auto overscroll-contain w-[var(--modal-wrapper-width,35rem)]"
+    class="bg-default dark:bg-default-dark overflow-y-auto overflow-x-hidden overscroll-contain w-[var(--modal-wrapper-width,35rem)]"
     :class="{
       'max-w-[calc(100%-var(--modal-wrapper-padding,2rem)*2)] max-h-[calc(100%-var(--modal-wrapper-padding,2rem)*2)] shadow-md rounded-3xl': !maximized,
       'max-w-full h-full': maximized,
@@ -16,7 +16,7 @@
       <slot name="title" />
     </div>
 
-    <div class="overflow-y-overlay overflow-x-hidden sm:px-[var(--modal-wrapper-padding,2rem)]">
+    <div class="sm:px-[var(--modal-wrapper-padding,2rem)]">
       <slot />
     </div>
 
