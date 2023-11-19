@@ -2,7 +2,7 @@
   <div>
     <div
       v-if="title"
-      class="text-lg text-accent font-semibold mb-2"
+      class="text-xs text-accent font-semibold mb-2"
     >
       <WSkeleton v-if="skeleton" />
       

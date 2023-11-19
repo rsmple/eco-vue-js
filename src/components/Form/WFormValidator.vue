@@ -237,6 +237,7 @@ defineExpose({
   invalidate(message: string) {
     errorMessage.value = message
   },
+  initModel,
 })
 
 defineSlots<{

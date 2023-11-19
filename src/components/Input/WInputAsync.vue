@@ -34,6 +34,8 @@
       </template>
 
       <template #right>
+        <slot name="right" />
+
         <WSkeleton
           v-if="skeleton"
           class="square-11 w-skeleton-rounded-lg"

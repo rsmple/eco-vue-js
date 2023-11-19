@@ -40,11 +40,11 @@
       />
     </div>
 
-    <div class="flex gap-4">
+    <div class="flex">
       <div
         v-if="!skeleton"
-        class="relative w-[calc(100%-(3.75rem*var(--input-right-count)))] isolate"
-        :style="{'--input-right-count': $slots.right?.().filter(item => item['type'] === 'button').length ?? 0}"
+        class="relative isolate w-[calc(100%-var(--input-right-width))] flex-1"
+        :style="{'--input-right-width': (rightContainer?.offsetWidth ?? 0) + 'px'}"
       >
         <div
           class="
@@ -187,7 +187,13 @@
         style="--skeleton-width: 100%;"
       />
 
-      <slot name="right" />
+      <div
+        v-if="$slots.right?.()?.length"
+        ref="rightContainer"
+        class="pl-4 flex gap-4"
+      >
+        <slot name="right" />
+      </div>
     </div>
 
     <div
@@ -276,6 +282,7 @@ const emit = defineEmits<{
 }>()
 
 const input = ref<HTMLInputElement>()
+const rightContainer = ref<HTMLInputElement>()
 const isFocused = ref(false)
 const isSecureVisible = ref(false)
 const paddingRight = ref(0)

@@ -17,7 +17,7 @@
       <WButton
         v-for="(item, index) in list"
         :key="index"
-        :semantic-type="item === modelValue ? SemanticType.PRIMARY : SemanticType.SECONDARY"
+        :semantic-type="item === modelValue ? semanticType ?? SemanticType.PRIMARY : SemanticType.SECONDARY"
         :loading="item === loading"
         :disabled="(disabled || loading !== undefined) && item !== loading"
         :minimize="minimize"
@@ -25,7 +25,8 @@
           item !== modelValue && '-mx-px'
         ] : [
           index !== list.length -1 ? 'rounded-r-none border-r-0' : item !== modelValue && '-mr-px',
-          index !== 0 ?'rounded-l-none border-l-0' : item !== modelValue && '-ml-px'
+          index !== 0 ?'rounded-l-none border-l-0' : item !== modelValue && '-ml-px',
+          stretch ? 'flex-1' : undefined,
         ]"
         @click="item !== modelValue && $emit('update:modelValue', item)"
       >
@@ -47,6 +48,8 @@ defineProps<{
   loading?: number | string
   minimize?: boolean
   wrap?: boolean
+  semanticType?: SemanticType
+  stretch?: boolean
 }>()
 
 defineEmits<{

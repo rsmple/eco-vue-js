@@ -37,7 +37,10 @@
         />
       </template>
 
-      <template #right>
+      <template
+        v-if="$slots.right?.()?.length"
+        #right
+      >
         <slot name="right" />
       </template>
     </WSelect>
