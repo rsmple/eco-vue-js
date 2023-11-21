@@ -16,6 +16,7 @@
     :disabled="disabled"
     :has-changes="hasChanges"
     :placeholder="placeholder"
+    :no-margin="noMargin"
     @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
 
     @keypress:enter.stop.prevent="selectCursor"
@@ -196,6 +197,7 @@ const props = defineProps<{
   required?: boolean
   hasChanges?: boolean
   placeholder?: string
+  noMargin?: boolean
 }>()
 
 const emit = defineEmits<{

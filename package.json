@@ -237,6 +237,9 @@
     "./dist/components/Select/WSelectAsyncList.vue": {
       "import": "./dist/components/Select/WSelectAsyncList.vue.js"
     },
+    "./dist/components/Select/WSelectAsyncSingle.vue": {
+      "import": "./dist/components/Select/WSelectAsyncSingle.vue.js"
+    },
     "./dist/components/Select/WSelectSingle.vue": {
       "import": "./dist/components/Select/WSelectSingle.vue.js"
     },

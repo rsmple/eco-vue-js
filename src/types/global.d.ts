@@ -35,7 +35,7 @@ declare type DefaultData = {id: number, [key: string]: unknown}
 
 type Params = Parameters<import('@tanstack/vue-query').QueryClient['setQueriesData']>
 
-declare type QueryParams = Partial<Record<string, number | string> & {page: number}>
+declare type QueryParams = Partial<Record<string, number | string> & {page?: number}>
 
 declare type UseDefaultQuery<TQueryFnData = unknown, TError = unknown, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey> =
   (...args: Parameters<typeof useQuery<TQueryFnData, TError, TData, TQueryKey>>) => import('@tanstack/vue-query').UseQueryReturnType<TData, TError> & {

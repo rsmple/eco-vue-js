@@ -19,6 +19,7 @@
       :has-changes="hasChanges || hasChangesValue"
       :disabled="disabled"
       :required="required"
+      :no-margin="noMargin"
       allow-clear
       class="w-full"
       @keypress:enter.stop.prevent="emitUpdateModelValue(value)"
@@ -94,6 +95,7 @@ const props = defineProps<{
   required?: boolean
   hasChanges?: boolean
   errorMessage?: string
+  noMargin?: boolean
 }>()
 
 const emit = defineEmits<{

@@ -1,17 +1,19 @@
 <template>
   <div>
-    <WSelect
+    <WSelectAsync
       ref="selectComponent"
       :model-value="arrayValue"
       :search="search"
-      :options="options"
       :title="title"
       :mobile-title="mobileTitle"
       :description="description"
       :loading="loading"
       :max-search-length="maxSearchLength"
       :empty-stub="emptyStub"
-      :option-component="optionComponent"
+      :query-params="queryParams"
+      :use-query-fn="(useQueryFn as unknown as UsePaginatedQuery<DefaultData>)"
+      :is-invalid-page="isInvalidPage"
+      :option-component="(optionComponent as unknown as Component<{option: DefaultData, selected?: boolean, model?: boolean}>)"
       :readonly="readonly"
       :disabled="disabled"
       :skeleton="skeleton"
@@ -24,8 +26,8 @@
       :no-margin="noMargin"
       disable-clear
       hide-prefix
-      @select="updateModelValue($event as Item)"
-      @unselect="updateModelValue($event as Item)"
+      @select="updateModelValue($event)"
+      @unselect="updateModelValue($event)"
       @update:search="emit('update:search', $event)"
       @create:option="createOption($event)"
     >
@@ -44,25 +46,27 @@
       >
         <slot name="right" />
       </template>
-    </WSelect>
+    </WSelectAsync>
   </div>
 </template>
 
-<script lang="ts" setup generic="Item extends string | number = string">
+<script lang="ts" setup generic="Data extends DefaultData">
 import {computed, ref, toRef, watch, type Component} from 'vue'
-import WSelect from '@/components/Select/WSelect.vue'
+import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 
 const props = defineProps<{
-  modelValue: Item | null
+  modelValue: number | null
   search: string
-  options: Item[]
+  useQueryFn: UsePaginatedQuery<Data>
+  isInvalidPage: (error: unknown) => boolean
+  queryParams: QueryParams
   title?: string
   mobileTitle?: string
   description?: string
   loading?: boolean
   emptyStub?: string
   maxSearchLength?: number
-  optionComponent?: Component<{option: Item, selected?: boolean, model?: boolean}>
+  optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
   readonly?: boolean
   disabled?: boolean
   skeleton?: boolean
@@ -76,16 +80,16 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Item): void
+  (e: 'update:modelValue', value: number): void
   (e: 'update:search', value: string): void
   (e: 'create:option', value: string): void
 }>()
 
-const selectComponent = ref<ComponentInstance<typeof WSelect<Item>> | undefined>()
+const selectComponent = ref<ComponentInstance<typeof WSelectAsync<Data>> | undefined>()
 
-const arrayValue = computed<Item[]>(() => props.modelValue ? [props.modelValue] : [])
+const arrayValue = computed<number[]>(() => props.modelValue ? [props.modelValue] : [])
 
-const updateModelValue = (value: Item): void => {
+const updateModelValue = (value: number): void => {
   emit('update:modelValue', value)
 }
 

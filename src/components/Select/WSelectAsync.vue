@@ -16,6 +16,7 @@
     :disabled="disabled"
     :has-changes="hasChanges"
     :placeholder="placeholder"
+    :no-margin="noMargin"
     @update:model-value="!loading && !isFetchingPrefix && $emit('update:search', $event as string ?? '')"
 
     @keypress:enter.stop.prevent="list?.selectCursor()"
@@ -28,8 +29,9 @@
     @focus="focused = true"
     @blur="focused = false"
   >
-    <template #prefix>
+    <template #prefix="{unclickable}">
       <SelectAsyncPrefix
+        v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true"
         :use-query-fn="useQueryFn"
         :model-value="modelValue"
         :disabled="disabled"
@@ -127,6 +129,7 @@ const props = defineProps<{
   hasChanges?: boolean
   allowUpdateSelected?: boolean
   placeholder?: string
+  noMargin?: boolean
 }>()
 
 const emit = defineEmits<{

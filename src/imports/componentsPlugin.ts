@@ -48,6 +48,7 @@ import WNotify from '@/components/Notify/WNotify.vue'
 import WSelect from '@/components/Select/WSelect.vue'
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 import WSelectAsyncList from '@/components/Select/WSelectAsyncList.vue'
+import WSelectAsyncSingle from '@/components/Select/WSelectAsyncSingle.vue'
 import WSelectSingle from '@/components/Select/WSelectSingle.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
@@ -108,6 +109,7 @@ export default {
     app.component('WSelect', WSelect)
     app.component('WSelectAsync', WSelectAsync)
     app.component('WSelectAsyncList', WSelectAsyncList)
+    app.component('WSelectAsyncSingle', WSelectAsyncSingle)
     app.component('WSelectSingle', WSelectSingle)
     app.component('WSkeleton', WSkeleton)
     app.component('WSpinner', WSpinner)
@@ -168,6 +170,7 @@ export {
   WSelect,
   WSelectAsync,
   WSelectAsyncList,
+  WSelectAsyncSingle,
   WSelectSingle,
   WSkeleton,
   WSpinner,
