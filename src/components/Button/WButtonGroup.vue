@@ -9,7 +9,7 @@
     </div>
 
     <div
-      class="flex"
+      class="flex px-px"
       :class="{
         'flex-wrap gap-2': wrap,
       }"
