@@ -83,7 +83,9 @@
               disabled:opacity-80 disabled:cursor-not-allowed placeholder:text-gray-400 dark:placeholder:text-gray-500 appearance-none
             "
             :class="{
-              'h-[var(--textarea-height,160px)] w-full resize-none p-3': textarea,
+              'min-h-[var(--textarea-height,160px)] w-full p-3': textarea,
+              'resize-y': resize && textarea,
+              'resize-none': !resize && textarea,
               'h-[var(--input-height,42px)]': !textarea && !$slots.suffix?.()?.length,
               'h-[var(--input-height,34px)]': !textarea && $slots.suffix?.()?.length,
               'py-0 pr-1': !hideInput && !textarea,
@@ -249,6 +251,7 @@ const props = withDefaults(
     hasChanges?: boolean
     disabledActions?: boolean
     noMargin?: boolean
+    resize?: boolean
   }>(),
   {
     size: 40,

@@ -20,11 +20,12 @@
       :disabled="disabled"
       :required="required"
       :no-margin="noMargin"
-      allow-clear
+      :allow-clear="!textarea"
+      :resize="resize"
       class="w-full"
-      @keypress:enter.stop.prevent="emitUpdateModelValue(value)"
+      @keypress:enter.stop.prevent="handleEnterPress"
       @click="open"
-      @blur="close(); focused = false"
+      @blur="close"
       @focus="focused = true"
     >
       <template
@@ -67,12 +68,14 @@
 </template>
 
 <script lang="ts" setup generic="Type extends InputType = 'text'">
-import {computed, ref, toRef, watch} from 'vue'
+import {computed, nextTick, ref, toRef, watch} from 'vue'
 import WInput from '@/components/Input/WInput.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import IconEdit from '@/assets/icons/default/IconEdit.svg?component'
 import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+import {Modal} from '@/utils/Modal'
+import {SemanticType} from '@/utils/SemanticType'
 
 type ModelValue = Type extends 'number' ? number : string
 
@@ -96,6 +99,7 @@ const props = defineProps<{
   hasChanges?: boolean
   errorMessage?: string
   noMargin?: boolean
+  resize?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -118,8 +122,34 @@ const toggle = async () => {
   }
 }
 
+let closeModal: (() => void) | null = null
+
 const close = () => {
-  value.value = props.modelValue
+  closeModal?.()
+
+  if (props.textarea && value.value !== props.modelValue) {
+    closeModal = Modal.addConfirm({
+      title: 'Discard changes?',
+      description: 'Leaving the form will undo any edits.',
+      acceptText: 'Discard',
+      acceptSemanticType: SemanticType.WARNING,
+      onAccept: () => {
+        value.value = props.modelValue
+
+        focused.value = false
+      },
+    }, () => {
+      closeModal = null
+
+      nextTick().then(() => {
+        if (focused.value) input.value?.focus()
+      })
+    })
+  } else {
+    value.value = props.modelValue
+
+    focused.value = false
+  }
 }
 
 const open = () => {
@@ -148,6 +178,18 @@ const emitUpdateModelValue = (newValue: ModelValue | undefined) => {
   if (props.placeholderSecure) input.value?.blur()
 
   emit('update:modelValue', newValue)
+}
+
+const handleEnterPress = (event: KeyboardEvent): void => {
+  if (props.textarea) {
+    value.value = ((value.value ?? '') + '\n') as ModelValue
+    return
+  }
+
+  event.stopPropagation()
+  event.preventDefault()
+
+  emitUpdateModelValue(value.value)
 }
 
 </script>

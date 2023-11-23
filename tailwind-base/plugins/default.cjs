@@ -169,7 +169,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
           'background-color': 'var(--w-scroll-bar-color-hover)',
         },
       },
-      '&::-webkit-scrollbar-track, & ::-webkit-scrollbar-track, &::-webkit-scrollbar-corner, & ::-webkit-scrollbar-corner, &::-webkit-resizer, & ::-webkit-resizer': {
+      '&::-webkit-scrollbar-track, & ::-webkit-scrollbar-track, &::-webkit-scrollbar-corner, & ::-webkit-scrollbar-corner': {
         'background': 'transparent',
       },
     },
@@ -179,6 +179,17 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       },
       '@supports (not (overflow: overlay))': {
         'overflow-y': 'auto',
+      },
+    },
+    'textarea::-webkit-resizer': {
+      'transform': 'scale(2)',
+      'transform-origin': 'top left',
+      'background-size': '7px 7px',
+      'background-position': 'top',
+      'background-image': 'linear-gradient(135deg, currentColor 10%, transparent 10%, transparent 50%, currentColor 50%, currentColor 60%, transparent 60%, transparent 100%)',
+      'color': theme('colors.gray.300'),
+      '.dark &': {
+        'color': theme('colors.gray.700'),
       },
     },
   })
