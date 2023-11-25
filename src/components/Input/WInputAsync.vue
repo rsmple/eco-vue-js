@@ -23,7 +23,7 @@
       :allow-clear="!textarea"
       :resize="resize"
       class="w-full"
-      @keypress:enter.stop.prevent="handleEnterPress"
+      @keypress:enter="handleEnterPress"
       @click="open"
       @blur="close"
       @focus="focused = true"
@@ -129,7 +129,7 @@ const close = () => {
 
   if (props.textarea && value.value !== props.modelValue) {
     closeModal = Modal.addConfirm({
-      title: 'Discard changes?',
+      title: `Discard changes${props.title ? ' for ' + props.title : ''}?`,
       description: 'Leaving the form will undo any edits.',
       acceptText: 'Discard',
       acceptSemanticType: SemanticType.WARNING,
@@ -181,10 +181,7 @@ const emitUpdateModelValue = (newValue: ModelValue | undefined) => {
 }
 
 const handleEnterPress = (event: KeyboardEvent): void => {
-  if (props.textarea) {
-    value.value = ((value.value ?? '') + '\n') as ModelValue
-    return
-  }
+  if (props.textarea) return
 
   event.stopPropagation()
   event.preventDefault()
