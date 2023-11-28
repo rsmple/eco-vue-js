@@ -19,7 +19,7 @@
         :key="index"
         :semantic-type="item === modelValue ? semanticType ?? SemanticType.PRIMARY : SemanticType.SECONDARY"
         :loading="item === loading"
-        :disabled="(disabled || loading !== undefined) && item !== loading"
+        :disabled="disabled || (loading !== undefined && item !== loading)"
         :minimize="minimize"
         :class="wrap ? [
           item !== modelValue && '-mx-px'
