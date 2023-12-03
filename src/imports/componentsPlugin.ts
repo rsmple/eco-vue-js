@@ -39,6 +39,7 @@ import WListCard from '@/components/ListCard/WListCard.vue'
 import WListCardField from '@/components/ListCard/WListCardField.vue'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 import WModal from '@/components/Modal/WModal.vue'
+import WModalStepper from '@/components/Modal/WModalStepper.vue'
 import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
 import WNavBar from '@/components/Nav/WNavBar.vue'
 import WNavItem from '@/components/Nav/WNavItem.vue'
@@ -100,6 +101,7 @@ export default {
     app.component('WListCardField', WListCardField)
     app.component('WMenuItem', WMenuItem)
     app.component('WModal', WModal)
+    app.component('WModalStepper', WModalStepper)
     app.component('WModalWrapper', WModalWrapper)
     app.component('WNavBar', WNavBar)
     app.component('WNavItem', WNavItem)
@@ -161,6 +163,7 @@ export {
   WListCardField,
   WMenuItem,
   WModal,
+  WModalStepper,
   WModalWrapper,
   WNavBar,
   WNavItem,

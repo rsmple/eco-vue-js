@@ -124,12 +124,14 @@
             :disabled="disabled || readonly || disabledActions"
             :text-secure="textSecure"
             :is-secure-visible="isSecureVisible"
+            :allow-paste="allowPaste"
             class="absolute top-0 right-0 bottom-0"
             @click:clear="clearValue"
             @click:slot="isFocused ? blur() : focus(); $emit('click:internal', $event)"
             @show:secure="isSecureVisible = true; $emit('click', $event)"
             @hide:secure="isSecureVisible = false"
             @update:width="paddingRight = $event"
+            @click:paste="paste"
           >
             <template
               v-if="$slots.suffix?.()?.length"
@@ -173,7 +175,7 @@
             v-else-if="maxLength !== undefined && isFocused"
             class="text-xs font-normal text-description absolute right-0 pt-0.5 whitespace-nowrap"
           >
-            {{ String(modelValue || '').length }} / {{ maxLength }}
+            {{ numberFormatter.format(String(modelValue || '').length) }} / {{ numberFormatter.format(maxLength) }}
           </div>
         </Transition>
       </div>
@@ -218,6 +220,8 @@
 import {onMounted, ref, nextTick} from 'vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import InputActions from './components/InputActions.vue'
+import {Notify} from '@/utils/Notify'
+import {numberFormatter} from '@/utils/utils'
 
 type ModelValue = Type extends 'number' ? number : string
 
@@ -252,6 +256,7 @@ const props = withDefaults(
     disabledActions?: boolean
     noMargin?: boolean
     resize?: boolean
+    allowPaste?: boolean
   }>(),
   {
     size: 40,
@@ -371,6 +376,52 @@ const blur = (): void => {
 
 const setIsFocused = (value: boolean): void => {
   isFocused.value = value
+}
+
+const checkPermission = async (): Promise<boolean> => {
+  const result = await navigator.permissions.query({name: 'clipboard-read' as PermissionName})
+
+  return result.state === 'granted' || result.state === 'prompt'
+}
+
+const paste = async () => {
+  if (!(await checkPermission())) {
+    Notify.error({
+      title: 'Paste failed',
+      caption: 'Reading from clipboard is not permitted',
+    })
+
+    return
+  }
+
+  navigator.clipboard
+    .readText()
+    .then(value => {
+      if (!value) {
+        Notify.warn({
+          title: 'Nothing to paste',
+        })
+
+        return
+      }
+
+      Notify.success({
+        title: 'Pasted',
+      })
+
+      if (!props.maxLength || props.maxLength <= value.length) updateModelValue(value)
+      else {
+        Notify.error({
+          title: 'Unable to paste',
+          caption: 'The length of the pasted value exceeds the allowed limit',
+        })
+      }
+    })
+    .catch(() => {
+      Notify.error({
+        title: 'Paste failed',
+      })
+    })
 }
 
 onMounted(() => {

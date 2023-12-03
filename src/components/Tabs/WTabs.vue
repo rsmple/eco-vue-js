@@ -1,8 +1,11 @@
 <template>
   <div class="mb-8">
-    <div class="relative flex mb-4 sm-not:-px--inner-margin">
+    <div
+      v-if="names"
+      class="relative flex mb-4 sm-not:-px--inner-margin"
+    >
       <button
-        v-for="(_, index) in slots ?? $slots.default?.()"
+        v-for="(_, index) in defaultSlots"
         ref="button"
         :key="index"
         class="flex-1 font-semibold flex items-center justify-center h-10 cursor-pointer relative w-ripple w-ripple-hover select-none transition-colors duration-500 outline-none"
@@ -56,7 +59,7 @@
         leave-to-class="translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]"
       >
         <TabItem
-          v-for="(slot, index) in slots ?? $slots.default?.()"
+          v-for="(slot, index) in defaultSlots"
           ref="tabItem"
           :key="index"
           :is-active="index === current"
@@ -64,8 +67,9 @@
           @update:height="updateHeight"
         >
           <WForm
+            ref="form"
             :name="index.toString()"
-            :title="names[index]"
+            :title="names?.[index]"
             @update:is-valid="updateIsValidMap(index, $event)"
             @update:has-changes="updateHasChangesMap(index, $event)"
           >
@@ -78,16 +82,24 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, watch, nextTick, type VNode, inject, onUnmounted} from 'vue'
+import {onMounted, ref, watch, nextTick, type VNode, inject, onUnmounted, useSlots, computed} from 'vue'
 import TabItem from './components/TabItem.vue'
 import WForm from '@/components/Form/WForm.vue'
 import {debounce} from '@/utils/utils'
 import {wTabItemListener, wTabItemUnlistener} from './models/injection'
 
-defineProps<{
-  names: string[]
+const props = defineProps<{
+  names?: string[]
   slots?: VNode[]
 }>()
+
+const emit = defineEmits<{
+  (e: 'update:current', value: number): void
+}>()
+
+const slots = useSlots()
+
+const defaultSlots = computed(() => (props.slots ?? slots.default?.() ?? []).filter(item => item.children !== 'v-if'))
 
 const current = ref(0)
 const isDirect = ref(true)
@@ -95,6 +107,7 @@ const button = ref<HTMLDivElement[]>([])
 const indicatorStyle = ref<Record<string, string> | undefined>(undefined)
 const minHeight = ref(0)
 const tabItem = ref<InstanceType<typeof TabItem>[]>([])
+const form = ref<InstanceType<typeof WForm>[]>([])
 
 const isValidMap = ref<Record<number, boolean>>({})
 const hasChangesMap = ref<Record<number, boolean>>({})
@@ -129,11 +142,23 @@ const switchTab = debounce((index: number): void => {
 }, 100)
 
 const updateIndex = (value: number): void => {
+  if (current.value === value || value < 0 || value > defaultSlots.value.length - 1) return
+
   isDirect.value = current.value < value
   current.value = value
 }
 
+const next = (): void => {
+  updateIndex(current.value + 1)
+}
+
+const previous = (): void => {
+  updateIndex(current.value - 1)
+}
+
 const updateIndicator = () => {
+  if (!props.names) return
+
   const element = button.value[current.value]
 
   if (!element || !element.offsetWidth) return
@@ -150,12 +175,18 @@ const updateHeight = (value: number): void => {
   minHeight.value = value
 }
 
+const validate = (index: number): string | undefined => {
+  return form?.value[index].validate()
+}
+
 const tabItemListenerInjected = inject(wTabItemListener, null)
 const tabItemUnlistenerInjected = inject(wTabItemUnlistener, null)
 
-watch(current, () => {
+watch(current, value => {
+  emit('update:current', value)
+
   updateIndicator()
-})
+}, {immediate: true})
 
 onMounted(() => {
   updateIndicator()
@@ -165,6 +196,13 @@ onMounted(() => {
 
 onUnmounted(() => {
   tabItemUnlistenerInjected?.(updateIndicator)
+})
+
+defineExpose({
+  updateIndex,
+  next,
+  previous,
+  validate,
 })
 
 </script>

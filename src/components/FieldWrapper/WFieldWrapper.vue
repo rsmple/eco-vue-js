@@ -9,13 +9,11 @@
       {{ title }}
     </div>
 
-    <div class="text-gray-300 text-base font-normal min-h-[2.75rem] flex items-center border-t border-solid border-gray-300 dark:border-gray-700">
+    <div class="text-base font-normal min-h-[2.75rem] flex items-center border-t border-solid border-gray-300 dark:border-gray-700">
       <WSkeleton v-if="skeleton" />
 
       <slot v-else>
-        <span class="text-black-default dark:text-gray-300">
-          {{ modelValue }}
-        </span>
+        {{ modelValue }}
       </slot>
     </div>
 

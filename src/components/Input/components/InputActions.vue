@@ -1,7 +1,7 @@
 <template>
   <div
     ref="element"
-    class="flex rounded-xl overflow-hidden"
+    class="flex rounded-xl overflow-hidden bg-default dark:bg-default-dark"
   >
     <button
       v-if="allowClear && !disabled"
@@ -10,6 +10,25 @@
       @click="$emit('click:clear')"
     >
       <IconCancel class="w-5 h-5" />
+
+      <WTooltip
+        text="Clear"
+        no-touch
+      />
+    </button>
+
+    <button
+      v-if="allowPaste"
+      class="relative w-ripple w-ripple-hover h-full w-11 p-[0.6875rem] flex justify-center text-description select-none outline-none"
+      @mousedown.prevent.stop=""
+      @click="$emit('click:paste')"
+    >
+      <IconPaste class="w-5 h-5" />
+
+      <WTooltip
+        text="Paste"
+        no-touch
+      />
     </button>
 
     <button
@@ -29,6 +48,11 @@
       <IconEye
         v-else
         class="w-5 h-5 text-primary-default dark:text-primary-dark"
+      />
+
+      <WTooltip
+        :text="isSecureVisible ? 'Hide' : 'Show'"
+        no-touch
       />
     </button>
 
@@ -55,22 +79,27 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, toRef, watch} from 'vue'
+import {inject, onBeforeUnmount, onMounted, ref, toRef, watch} from 'vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 import IconEye from '@/assets/icons/sax/IconEye.svg?component'
 import IconEyeSlash from '@/assets/icons/sax/IconEyeSlash.svg?component'
+import IconPaste from '@/assets/icons/sax/IconPaste.svg?component'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
+import WTooltip from '@/components/Tooltip/WTooltip.vue'
 import {debounce} from '@/utils/utils'
+import {wTabItemListener, wTabItemUnlistener} from '@/components/Tabs/models/injection'
 
 const props = defineProps<{
   loading?: boolean
   allowClear?: boolean
+  allowPaste?: boolean
   disabled?: boolean
   textSecure?: boolean
   isSecureVisible?: boolean
 }>()
 
 const emit = defineEmits<{
+  (e: 'click:paste'): void
   (e: 'show:secure', value: MouseEvent): void
   (e: 'hide:secure', value: MouseEvent): void
   (e: 'click:clear'): void
@@ -80,6 +109,9 @@ const emit = defineEmits<{
 
 const element = ref<HTMLDivElement | undefined>()
 
+const tabItemListenerInjected = inject(wTabItemListener, null)
+const tabItemUnlistenerInjected = inject(wTabItemUnlistener, null)
+
 const emitWidth = debounce((): void => {
   emit('update:width', element.value?.offsetWidth ?? 0)
 }, 10)
@@ -88,9 +120,16 @@ watch(toRef(props, 'loading'), emitWidth)
 watch(toRef(props, 'allowClear'), emitWidth)
 watch(toRef(props, 'disabled'), emitWidth)
 watch(toRef(props, 'textSecure'), emitWidth)
+watch(toRef(props, 'allowPaste'), emitWidth)
 
 onMounted(() => {
   emitWidth()
+
+  tabItemListenerInjected?.(emitWidth)
+})
+
+onBeforeUnmount(() => {
+  tabItemUnlistenerInjected?.(emitWidth)
 })
 
 </script>

@@ -210,6 +210,9 @@
     "./dist/components/Modal/WModal.vue": {
       "import": "./dist/components/Modal/WModal.vue.js"
     },
+    "./dist/components/Modal/WModalStepper.vue": {
+      "import": "./dist/components/Modal/WModalStepper.vue.js"
+    },
     "./dist/components/Modal/WModalWrapper.vue": {
       "import": "./dist/components/Modal/WModalWrapper.vue.js"
     },
