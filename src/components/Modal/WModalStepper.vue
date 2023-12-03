@@ -91,7 +91,7 @@ const slots = useSlots()
 
 const tabs = ref<ComponentInstance<typeof WTabs> | undefined>()
 
-const defaultSlots = computed(() => slots.default?.().filter(item => item.children !== 'v-if') ?? [])
+const defaultSlots = computed(() => slots.default?.().filter(item => typeof item.type !== 'symbol') ?? [])
 
 const current = ref<number>(0)
 

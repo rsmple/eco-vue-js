@@ -79,7 +79,7 @@
 </template>
 
 <script lang="ts" setup>
-import {inject, onBeforeUnmount, onMounted, ref, toRef, watch} from 'vue'
+import {onMounted, ref, toRef, watch} from 'vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 import IconEye from '@/assets/icons/sax/IconEye.svg?component'
 import IconEyeSlash from '@/assets/icons/sax/IconEyeSlash.svg?component'
@@ -87,7 +87,7 @@ import IconPaste from '@/assets/icons/sax/IconPaste.svg?component'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 import {debounce} from '@/utils/utils'
-import {wTabItemListener, wTabItemUnlistener} from '@/components/Tabs/models/injection'
+import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 
 const props = defineProps<{
   loading?: boolean
@@ -109,9 +109,6 @@ const emit = defineEmits<{
 
 const element = ref<HTMLDivElement | undefined>()
 
-const tabItemListenerInjected = inject(wTabItemListener, null)
-const tabItemUnlistenerInjected = inject(wTabItemUnlistener, null)
-
 const emitWidth = debounce((): void => {
   emit('update:width', element.value?.offsetWidth ?? 0)
 }, 10)
@@ -122,14 +119,10 @@ watch(toRef(props, 'disabled'), emitWidth)
 watch(toRef(props, 'textSecure'), emitWidth)
 watch(toRef(props, 'allowPaste'), emitWidth)
 
+useTabActiveListener(emitWidth)
+
 onMounted(() => {
   emitWidth()
-
-  tabItemListenerInjected?.(emitWidth)
-})
-
-onBeforeUnmount(() => {
-  tabItemUnlistenerInjected?.(emitWidth)
 })
 
 </script>

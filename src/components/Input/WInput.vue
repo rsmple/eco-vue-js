@@ -221,7 +221,8 @@ import {onMounted, ref, nextTick} from 'vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import InputActions from './components/InputActions.vue'
 import {Notify} from '@/utils/Notify'
-import {numberFormatter} from '@/utils/utils'
+import {debounce, numberFormatter} from '@/utils/utils'
+import {useTabActiveListener} from '../Tabs/use/useTabActiveListener'
 
 type ModelValue = Type extends 'number' ? number : string
 
@@ -424,8 +425,16 @@ const paste = async () => {
     })
 }
 
-onMounted(() => {
+const autofocusDebounced = debounce(() => {
   if (props.autofocus) focus()
+}, 500)
+
+if (props.autofocus) {
+  useTabActiveListener(autofocusDebounced)
+}
+
+onMounted(() => {
+  if (props.autofocus) autofocusDebounced()
 })
 
 defineExpose({

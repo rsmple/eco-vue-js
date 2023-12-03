@@ -99,7 +99,7 @@ const emit = defineEmits<{
 
 const slots = useSlots()
 
-const defaultSlots = computed(() => (props.slots ?? slots.default?.() ?? []).filter(item => item.children !== 'v-if'))
+const defaultSlots = computed(() => (props.slots ?? slots.default?.() ?? []).filter(item => typeof item.type !== 'symbol'))
 
 const current = ref(0)
 const isDirect = ref(true)
