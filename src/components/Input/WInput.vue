@@ -217,11 +217,11 @@
 </template>
 
 <script lang="ts" setup generic="Type extends InputType = 'text'">
-import {onMounted, ref, nextTick} from 'vue'
+import {onMounted, ref, nextTick, onBeforeUnmount} from 'vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import InputActions from './components/InputActions.vue'
 import {Notify} from '@/utils/Notify'
-import {debounce, numberFormatter} from '@/utils/utils'
+import {numberFormatter} from '@/utils/utils'
 import {useTabActiveListener} from '../Tabs/use/useTabActiveListener'
 
 type ModelValue = Type extends 'number' ? number : string
@@ -425,9 +425,17 @@ const paste = async () => {
     })
 }
 
-const autofocusDebounced = debounce(() => {
-  if (props.autofocus) focus()
-}, 500)
+let timeout: NodeJS.Timeout | undefined
+
+const autofocusDebounced = () => {
+  if (timeout) clearTimeout(timeout)
+
+  timeout = setTimeout(() => {
+    if (props.autofocus) focus()
+
+    timeout = undefined
+  }, 300)
+}
 
 if (props.autofocus) {
   useTabActiveListener(autofocusDebounced)
@@ -435,6 +443,13 @@ if (props.autofocus) {
 
 onMounted(() => {
   if (props.autofocus) autofocusDebounced()
+})
+
+onBeforeUnmount(() => {
+  if (timeout) {
+    clearTimeout(timeout)
+    timeout = undefined
+  }
 })
 
 defineExpose({
