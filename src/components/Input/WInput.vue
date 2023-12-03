@@ -434,7 +434,7 @@ const autofocusDebounced = () => {
     if (props.autofocus) focus()
 
     timeout = undefined
-  }, 300)
+  }, 250)
 }
 
 if (props.autofocus) {

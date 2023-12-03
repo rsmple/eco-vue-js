@@ -85,7 +85,7 @@
 import {onMounted, ref, watch, nextTick, type VNode, inject, onUnmounted, useSlots, computed} from 'vue'
 import TabItem from './components/TabItem.vue'
 import WForm from '@/components/Form/WForm.vue'
-import {debounce} from '@/utils/utils'
+import {throttle} from '@/utils/utils'
 import {wTabItemListener, wTabItemUnlistener} from './models/injection'
 
 const props = defineProps<{
@@ -135,11 +135,11 @@ const handleClickTab = async (index: number) => {
   switchTab(index)
 }
 
-const switchTab = debounce((index: number): void => {
+const switchTab = throttle((index: number): void => {
   if (current.value === index) return
 
   updateIndex(index)
-}, 100)
+}, 250)
 
 const updateIndex = (value: number): void => {
   if (current.value === value || value < 0 || value > defaultSlots.value.length - 1) return
@@ -148,13 +148,13 @@ const updateIndex = (value: number): void => {
   current.value = value
 }
 
-const next = (): void => {
+const next = throttle((): void => {
   updateIndex(current.value + 1)
-}
+}, 250)
 
-const previous = (): void => {
+const previous = throttle((): void => {
   updateIndex(current.value - 1)
-}
+}, 250)
 
 const updateIndicator = () => {
   if (!props.names) return
