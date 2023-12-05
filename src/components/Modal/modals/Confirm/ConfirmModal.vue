@@ -80,7 +80,7 @@ const intermediate = async () => {
       loadingIntermediate.value = false
     })
 
-    await promise
+    await promise.catch(() => undefined)
   }
 
   emit('close:modal')
@@ -98,7 +98,7 @@ const accept = async () => {
       loadingAccept.value = false
     })
 
-    await promise
+    await promise.catch(() => undefined)
   }
 
   emit('close:modal')
