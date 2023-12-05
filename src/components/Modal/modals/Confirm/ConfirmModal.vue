@@ -68,7 +68,7 @@ const emit = defineEmits<{
   (e: 'close:modal'): void
 }>()
 
-const intermediate = async () => {
+const intermediate = () => {
   if (loadingIntermediate.value || loadingAccept.value) return
 
   const promise = props.onIntermediate?.()
@@ -76,17 +76,19 @@ const intermediate = async () => {
   if (promise) {
     loadingIntermediate.value = true
 
-    promise.finally(() => {
-      loadingIntermediate.value = false
-    })
-
-    await promise.catch(() => undefined)
+    promise
+      .then(() => {
+        emit('close:modal')
+      })
+      .finally(() => {
+        loadingIntermediate.value = false
+      })
+  } else {
+    emit('close:modal')
   }
-
-  emit('close:modal')
 }
 
-const accept = async () => {
+const accept = () => {
   if (loadingIntermediate.value || loadingAccept.value) return
 
   const promise = props.onAccept()
@@ -94,14 +96,16 @@ const accept = async () => {
   if (promise) {
     loadingAccept.value = true
 
-    promise.finally(() => {
-      loadingAccept.value = false
-    })
-
-    await promise.catch(() => undefined)
+    promise
+      .then(() => {
+        emit('close:modal')
+      })
+      .finally(() => {
+        loadingAccept.value = false
+      })
+  } else {
+    emit('close:modal')
   }
-
-  emit('close:modal')
 }
 
 const cancel = () => {
