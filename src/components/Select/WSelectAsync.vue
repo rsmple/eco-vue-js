@@ -1,7 +1,7 @@
 <template>
   <WInputSuggest
     ref="input"
-    :title="title + ` ${isFetchingPrefix}`"
+    :title="title"
     :mobile-title="mobileTitle"
     :description="description"
     :model-value="search"
