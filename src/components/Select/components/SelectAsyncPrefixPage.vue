@@ -2,7 +2,7 @@
   <div
     v-for="option in data?.results"
     :key="option.id"
-    class="relative flex overflow-hidden items-center max-w-[calc(100%-2.75rem)] text-description"
+    class="relative flex overflow-hidden items-center text-description"
     :class="{
       'cursor-pointer': !disabled,
       'cursor-not-allowed': disabled,

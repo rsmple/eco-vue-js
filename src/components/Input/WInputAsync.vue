@@ -22,6 +22,7 @@
       :no-margin="noMargin"
       :allow-clear="!textarea"
       :resize="resize"
+      :allow-paste="allowPaste"
       class="w-full"
       @keypress:enter="handleEnterPress"
       @click="open"
@@ -100,6 +101,7 @@ const props = defineProps<{
   errorMessage?: string
   noMargin?: boolean
   resize?: boolean
+  allowPaste?: boolean
 }>()
 
 const emit = defineEmits<{
