@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData">
-import {computed, ref, watch, type Component} from 'vue'
+import {computed, ref, watch, type Component, onBeforeUnmount} from 'vue'
 import SelectAsyncPrefixPage from './SelectAsyncPrefixPage.vue'
 
 const props = defineProps<{
@@ -52,10 +52,14 @@ const idInString = computed(() => props.modelValue.join(','))
 
 watch(hasFetching, value => {
   emit('update:fetching', value)
-})
+}, {immediate: true})
 
 defineSlots<{
   default?: (props: {option: Data, skeleton: boolean}) => void
 }>()
+
+onBeforeUnmount(() => {
+  emit('update:fetching', false)
+})
 
 </script>

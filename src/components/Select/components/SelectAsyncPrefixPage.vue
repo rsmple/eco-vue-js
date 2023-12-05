@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData">
-import {computed, toRef, watch, type Component} from 'vue'
+import {computed, toRef, watch, type Component, onBeforeUnmount} from 'vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 
 const props = defineProps<{
@@ -84,6 +84,10 @@ watch(pagesCount, value => {
 
 watch(isFetching, (value: boolean) => {
   emit('update:fetching', value)
+}, {immediate: true})
+
+onBeforeUnmount(() => {
+  emit('update:fetching', false)
 })
 
 defineSlots<{
