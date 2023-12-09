@@ -22,6 +22,7 @@
       :search-size="searchSize"
       :required="required"
       :no-margin="noMargin"
+      :icon="icon"
       disable-clear
       hide-prefix
       @select="updateModelValue($event as Item)"
@@ -73,6 +74,7 @@ const props = defineProps<{
   searchSize?: number
   required?: boolean
   noMargin?: boolean
+  icon?: SVGComponent
 }>()
 
 const emit = defineEmits<{

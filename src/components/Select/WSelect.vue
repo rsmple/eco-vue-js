@@ -17,6 +17,7 @@
     :has-changes="hasChanges"
     :placeholder="placeholder"
     :no-margin="noMargin"
+    :icon="icon"
     @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
 
     @keypress:enter.stop.prevent="selectCursor"
@@ -198,6 +199,7 @@ const props = defineProps<{
   hasChanges?: boolean
   placeholder?: string
   noMargin?: boolean
+  icon?: SVGComponent
 }>()
 
 const emit = defineEmits<{

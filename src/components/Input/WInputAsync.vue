@@ -23,6 +23,7 @@
       :allow-clear="!textarea"
       :resize="resize"
       :allow-paste="allowPaste"
+      :icon="icon"
       class="w-full"
       @keypress:enter="handleEnterPress"
       @click="open"
@@ -54,7 +55,7 @@
             'bg-primary-default dark:bg-primary-dark text-default dark:text-default-dark': focused,
             'text-description': !focused,
           }"
-          @click="toggle"
+          @click.stop="toggle"
           @mousedown.stop.prevent=""
         >
           <WSpinner v-if="loading" />
@@ -102,6 +103,7 @@ const props = defineProps<{
   noMargin?: boolean
   resize?: boolean
   allowPaste?: boolean
+  icon?: SVGComponent
 }>()
 
 const emit = defineEmits<{
@@ -129,14 +131,20 @@ let closeModal: (() => void) | null = null
 const close = () => {
   closeModal?.()
 
-  if (props.textarea && value.value !== props.modelValue) {
+  if (props.textarea && !props.textSecure && value.value !== props.modelValue) {
     closeModal = Modal.addConfirm({
       title: `Discard changes${props.title ? ' for ' + props.title : ''}?`,
       description: 'Leaving the form will undo any edits.',
       acceptText: 'Discard',
+      intermediateText: 'Save',
       acceptSemanticType: SemanticType.WARNING,
       onAccept: () => {
         value.value = props.modelValue
+
+        focused.value = false
+      },
+      onIntermediate: () => {
+        emitUpdateModelValue(value.value)
 
         focused.value = false
       },
