@@ -14,10 +14,10 @@
     </Transition>
 
     <TransitionGroup
-      enter-active-class="transition-all duration-500"
-      leave-active-class="transition-all duration-500"
-      enter-from-class="scale-50 translate-y-5 opacity-0"
-      leave-to-class="scale-50 opacity-0"
+      enter-active-class="transition-all duration-300"
+      leave-active-class="transition-all duration-300"
+      enter-from-class="translate-y-8 opacity-0"
+      leave-to-class="-translate-y-5 opacity-0"
     >
       <div
         v-for="(modalMeta, index) in modalMetaList"

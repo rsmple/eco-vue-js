@@ -32,6 +32,7 @@ import WInfoCardNegative from '@/components/InfoCard/WInfoCardNegative.vue'
 import WInput from '@/components/Input/WInput.vue'
 import WInputAsync from '@/components/Input/WInputAsync.vue'
 import WInputDate from '@/components/Input/WInputDate.vue'
+import WInputOptions from '@/components/Input/WInputOptions.vue'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 import WLink from '@/components/Link/WLink.vue'
 import WLinkArrow from '@/components/Link/WLinkArrow.vue'
@@ -94,6 +95,7 @@ export default {
     app.component('WInput', WInput)
     app.component('WInputAsync', WInputAsync)
     app.component('WInputDate', WInputDate)
+    app.component('WInputOptions', WInputOptions)
     app.component('WInputSuggest', WInputSuggest)
     app.component('WLink', WLink)
     app.component('WLinkArrow', WLinkArrow)
@@ -156,6 +158,7 @@ export {
   WInput,
   WInputAsync,
   WInputDate,
+  WInputOptions,
   WInputSuggest,
   WLink,
   WLinkArrow,

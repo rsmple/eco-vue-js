@@ -41,6 +41,7 @@ export {default as IconOutlineEdit} from '@/assets/icons/sax/IconOutlineEdit.svg
 export {default as IconOutlineFolderAdd} from '@/assets/icons/sax/IconOutlineFolderAdd.svg?component'
 export {default as IconOutlineRefresh} from '@/assets/icons/sax/IconOutlineRefresh.svg?component'
 export {default as IconOutlineStar} from '@/assets/icons/sax/IconOutlineStar.svg?component'
+export {default as IconPaste} from '@/assets/icons/sax/IconPaste.svg?component'
 export {default as IconProfile} from '@/assets/icons/sax/IconProfile.svg?component'
 export {default as IconRadar} from '@/assets/icons/sax/IconRadar.svg?component'
 export {default as IconRefresh} from '@/assets/icons/sax/IconRefresh.svg?component'

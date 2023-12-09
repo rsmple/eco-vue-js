@@ -189,6 +189,9 @@
     "./dist/components/Input/WInputDate.vue": {
       "import": "./dist/components/Input/WInputDate.vue.js"
     },
+    "./dist/components/Input/WInputOptions.vue": {
+      "import": "./dist/components/Input/WInputOptions.vue.js"
+    },
     "./dist/components/Input/WInputSuggest.vue": {
       "import": "./dist/components/Input/WInputSuggest.vue.js"
     },

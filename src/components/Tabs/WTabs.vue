@@ -55,8 +55,8 @@
       <TransitionGroup
         enter-active-class="transition-transform duration-[250ms] w-full"
         leave-active-class="transition-transform duration-[250ms] w-full absolute top-0"
-        enter-from-class="translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]"
-        leave-to-class="translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]"
+        :enter-from-class="lessTransitions ? 'opacity-0' : 'translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]'"
+        :leave-to-class="lessTransitions ? 'opacity-0' : 'translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]'"
       >
         <TabItem
           v-for="(slot, index) in defaultSlots"
@@ -91,6 +91,7 @@ import {wTabItemListener, wTabItemUnlistener} from './models/injection'
 const props = defineProps<{
   names?: string[]
   slots?: VNode[]
+  lessTransitions?: boolean
 }>()
 
 const emit = defineEmits<{
