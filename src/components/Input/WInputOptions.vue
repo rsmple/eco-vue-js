@@ -187,6 +187,8 @@ const selectCursor = () => {
 
 const select = (option: Option): void => {
   updateModelValue(props.valueGetter(option))
+
+  blur()
 }
 
 const updateModelValue = (value: ModelValue): void => {
