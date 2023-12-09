@@ -194,7 +194,7 @@
       <div
         v-if="$slots.right?.()?.length"
         ref="rightContainer"
-        class="pl-4 flex gap-4"
+        class="pl-4 flex gap-4 sm-not:flex-col"
       >
         <slot name="right" />
       </div>
