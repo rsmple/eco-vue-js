@@ -17,7 +17,7 @@ export const useFormInvalidateMap = (name: Ref<string | undefined>) => {
 
   const invalidate = (payload: InvalidatePayload): void => {
     Object.keys(invalidateMap.value).forEach(key => {
-      invalidateMap.value[key]?.(name.value ? payload[name.value] as unknown as InvalidatePayload : payload)
+      invalidateMap.value[key]?.(name.value ? (payload[name.value] as unknown as InvalidatePayload | undefined ?? payload) : payload)
     })
   }
 
