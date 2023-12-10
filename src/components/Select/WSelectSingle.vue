@@ -23,6 +23,7 @@
       :required="required"
       :no-margin="noMargin"
       :icon="icon"
+      :mono="mono"
       disable-clear
       hide-prefix
       @select="updateModelValue($event as Item)"
@@ -75,6 +76,7 @@ const props = defineProps<{
   required?: boolean
   noMargin?: boolean
   icon?: SVGComponent
+  mono?: boolean
 }>()
 
 const emit = defineEmits<{

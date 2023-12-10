@@ -18,6 +18,7 @@
     :placeholder="placeholder"
     :no-margin="noMargin"
     :icon="icon"
+    :mono="mono"
     @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
 
     @keypress:enter.stop.prevent="selectCursor"
@@ -200,6 +201,7 @@ const props = defineProps<{
   placeholder?: string
   noMargin?: boolean
   icon?: SVGComponent
+  mono?: boolean
 }>()
 
 const emit = defineEmits<{

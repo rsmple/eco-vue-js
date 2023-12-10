@@ -132,6 +132,7 @@ const props = defineProps<{
   placeholder?: string
   noMargin?: boolean
   icon?: SVGComponent
+  mono?: boolean
 }>()
 
 const emit = defineEmits<{

@@ -47,7 +47,7 @@
 
         <button
           v-else
-          class="relative square-11 rounded-lg flex items-center justify-center border-gray-200 dark:border-gray-800"
+          class="relative square-11 rounded-lg flex items-center justify-center bg-default dark:bg-default-dark border border-solid border-gray-200 dark:border-gray-800"
           :class="{
             'cursor-not-allowed': disabled,
             'cursor-progress': loading,

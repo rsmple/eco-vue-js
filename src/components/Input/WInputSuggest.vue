@@ -36,6 +36,7 @@
           :placeholder="placeholder"
           :no-margin="noMargin"
           :allow-paste="allowPaste"
+          :mono="mono"
           :class="{
             'cursor-pointer': !disabled,
             'cursor-not-allowed': disabled,
@@ -157,6 +158,7 @@ const props = defineProps<{
   contentMaxWidth?: number
   noMargin?: boolean
   allowPaste?: boolean
+  mono?: boolean
 }>()
 
 const emit = defineEmits<{

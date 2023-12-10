@@ -17,6 +17,7 @@
     :placeholder="placeholder"
     :no-margin="noMargin"
     :icon="icon"
+    :mono="mono"
     :type="(type as Type)"
     @update:model-value="updateModelValue"
 
@@ -110,6 +111,7 @@ const props = defineProps<{
   placeholder?: string
   noMargin?: boolean
   icon?: SVGComponent
+  mono?: boolean
 }>()
 
 const emit = defineEmits<{
