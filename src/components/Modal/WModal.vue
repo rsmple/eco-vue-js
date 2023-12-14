@@ -28,16 +28,16 @@
         <div class="h-[calc(100%+1px)]" />
 
         <button
-          v-if="modalMeta.autoclose"
           class="cursor-pointer absolute top-0 left-0 h-full w-full -z-10 outline-none"
           title="Click outside to close modal"
-          @click.stop.prevent="closeModal(modalMeta)"
+          @click.stop.prevent="closeModalWithConfirm(modalMeta)"
         />
 
         <component
           :is="modalMeta.component"
           v-bind="modalMeta.props"
           @close:modal="closeModal(modalMeta)"
+          @update:has-changes="hasChangesMap[modalMeta.key] = $event"
         />
       </div>
     </TransitionGroup>
@@ -45,8 +45,9 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeMount, onBeforeUnmount, ref, watch, type Component} from 'vue'
-import {initModal, type AddModal} from '@/utils/Modal'
+import {onBeforeMount, onBeforeUnmount, ref, watch, type Component, reactive} from 'vue'
+import {initModal, type AddModal, Modal} from '@/utils/Modal'
+import {SemanticType} from '@/utils/SemanticType'
 
 type ModalMeta = {
   key: number
@@ -59,6 +60,7 @@ type ModalMeta = {
 const key = ref(0)
 const modalMetaList = ref<ModalMeta[]>([])
 const isBackdropVisible = ref(false)
+const hasChangesMap = reactive<Record<number, boolean>>({})
 
 const addModal: AddModal = (component: Component, props?: Record<string, unknown>, cb?: () => void, autoclose = false): () => ReturnType<typeof closeModal> => {
   const modalMeta = {
@@ -84,12 +86,34 @@ const closeModal = (modalMeta: ModalMeta): void => {
   modalMetaListNew.splice(index, 1)
 
   modalMetaList.value = modalMetaListNew
+  delete hasChangesMap[modalMeta.key]
 
   if (!modalMetaListNew.length) {
     key.value = 0
   }
 
   modalMeta.cb?.()
+}
+
+let closeConfirm: (() => void) | null = null
+
+const closeModalWithConfirm = (modalMeta: ModalMeta): void => {
+  if (modalMeta.autoclose || !hasChangesMap[modalMeta.key]) {
+    closeModal(modalMeta)
+    return
+  }
+
+  closeConfirm?.()
+
+  closeConfirm = Modal.addConfirm({
+    title: 'Are you sure want to close modal?',
+    description: 'Closing the modal will undo any changes',
+    acceptSemanticType: SemanticType.WARNING,
+    acceptText: 'Close',
+    onAccept() {
+      closeModal(modalMeta)
+    },
+  }, () => closeConfirm = null)
 }
 
 let timeout: NodeJS.Timeout | undefined

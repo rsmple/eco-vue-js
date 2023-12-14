@@ -21,6 +21,7 @@
       ref="tabs"
       :slots="defaultSlots"
       @update:current="current = $event"
+      @update:has-changes="$emit('update:has-changes', $event)"
     />
 
     <template #actions>
@@ -68,7 +69,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, useSlots} from 'vue'
+import {computed, ref, useSlots, watch} from 'vue'
 import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
 import WButton from '@/components/Button/WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
@@ -85,6 +86,8 @@ const emit = defineEmits<{
   (e: 'submit'): void
   (e: 'next', current: number): void
   (e: 'previous', current: number): void
+  (e: 'update:current', value: number): void
+  (e: 'update:has-changes', value: boolean): void
 }>()
 
 const slots = useSlots()
@@ -114,5 +117,14 @@ const next = (): void => {
 
   tabs.value?.next()
 }
+
+watch(current, value => {
+  emit('update:current', value)
+}, {immediate: true})
+
+defineExpose({
+  next,
+  previous,
+})
 
 </script>

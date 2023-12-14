@@ -45,19 +45,21 @@ const props = defineProps<{
   scroll?: boolean
   first?: boolean
   last?: boolean
-  previous?: number
-  next?: number
+  previous?: number | null
+  next?: number | null
   isNoCursor?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'select'): void
   (e: 'unselect'): void
-  (e: 'update:is-cursor'): void
+  (e: 'update:is-cursor', value: {previous: number | null | undefined, next: number | null | undefined}): void
   (e: 'update:cursor'): void
-  (e: 'update:previous', value: number | undefined): void
-  (e: 'update:next', value: number | undefined): void
+  (e: 'update:previous', value: number | null | undefined): void
+  (e: 'update:next', value: number | null | undefined): void
   (e: 'unmounted'): void
+  (e: 'update:first'): void
+  (e: 'update:last'): void
 }>()
 
 const element = ref<HTMLDivElement>()
@@ -76,7 +78,7 @@ const scrollIntoView = () => {
 watch(toRef(props, 'isCursor'), value => {
   if (!value) return
 
-  emit('update:is-cursor')
+  emit('update:is-cursor', {previous: props.previous, next: props.next})
 
   if (props.scroll) scrollIntoView()
 }, {immediate: true})
@@ -87,6 +89,18 @@ watch(toRef(props, 'isNoCursor'), value => {
 
 watch(toRef(props, 'previous'), value => {
   if (props.isCursor && !props.skeleton) emit('update:previous', value)
+}, {immediate: true})
+
+watch(toRef(props, 'next'), value => {
+  if (props.isCursor && !props.skeleton) emit('update:next', value)
+}, {immediate: true})
+
+watch(toRef(props, 'first'), value => {
+  if (value) emit('update:first')
+}, {immediate: true})
+
+watch(toRef(props, 'last'), value => {
+  if (value) emit('update:last')
 }, {immediate: true})
 
 watch(toRef(props, 'next'), value => {

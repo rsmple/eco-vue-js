@@ -29,6 +29,7 @@
       @click="open"
       @blur="close"
       @focus="focused = true"
+      @paste="handlePaste"
     >
       <template
         v-if="$slots.title?.().length"
@@ -197,6 +198,12 @@ const handleEnterPress = (event: KeyboardEvent): void => {
   event.preventDefault()
 
   emitUpdateModelValue(value.value)
+}
+
+const handlePaste = () => {
+  if (hasChangesValue.value || (props.textSecure && focused.value)) {
+    emitUpdateModelValue(value.value)
+  }
 }
 
 </script>

@@ -72,9 +72,11 @@
         :disabled="isDisabled"
         :empty-stub="emptyStub ?? 'No match'"
         :allow-update-selected="allowUpdateSelected"
+        :allow-create="allowCreate && search !== ''"
         @select="select"
         @unselect="unselect"
         @update:selected="updateSelected"
+        @create:option="create"
       >
         <template #default="{option, selected, skeleton: skeletonList}">
           <slot
@@ -90,6 +92,7 @@
               :selected="selected"
               :skeleton="skeletonList"
               :model="false"
+              :search="search"
             />
           </slot>
         </template>
@@ -140,6 +143,7 @@ const emit = defineEmits<{
   (e: 'unselect', item: number): void
   (e: 'update:search', value: string): void
   (e: 'update:modelValue', value: number[]): void
+  (e: 'create:option', value: string): void
 }>()
 
 const isOpen = ref(false)
@@ -185,6 +189,12 @@ const unselect = (item: number): void => {
   emit('unselect', item)
 }
 
+const create = (): void => {
+  if (isDisabled.value) return
+
+  emit('create:option', props.search)
+}
+
 const updateSelected = (value: number[]): void => {
   if (isDisabled.value || !props.allowUpdateSelected) return
 
@@ -212,7 +222,7 @@ defineExpose({
 
 defineSlots<{
   right?: (props: Record<string, never>) => void
-  option?: (props: {option: Data, selected: boolean, skeleton: boolean, model: boolean}) => void
+  option?: (props: {option: Data | null, selected: boolean, skeleton: boolean, model: boolean}) => void
 }>()
 
 </script>

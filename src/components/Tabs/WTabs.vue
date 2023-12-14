@@ -14,7 +14,7 @@
           'text-primary-default dark:text-primary-dark': current === index && isValidMap[index] !== false,
           'text-negative dark:text-negative-dark': isValidMap[index] === false,
         }"
-        @click="handleClickTab(index)"
+        @click="switchTab(index)"
       >
         <div class="relative">
           {{ names[index] }}
@@ -82,10 +82,10 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, watch, nextTick, type VNode, inject, onUnmounted, useSlots, computed} from 'vue'
+import {onMounted, ref, watch, nextTick, type VNode, inject, onUnmounted, useSlots, computed, reactive} from 'vue'
 import TabItem from './components/TabItem.vue'
 import WForm from '@/components/Form/WForm.vue'
-import {throttle} from '@/utils/utils'
+import {debounce, throttle} from '@/utils/utils'
 import {wTabItemListener, wTabItemUnlistener} from './models/injection'
 
 const props = defineProps<{
@@ -96,6 +96,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:current', value: number): void
+  (e: 'update:has-changes', value: boolean): void
 }>()
 
 const slots = useSlots()
@@ -110,52 +111,52 @@ const minHeight = ref(0)
 const tabItem = ref<InstanceType<typeof TabItem>[]>([])
 const form = ref<InstanceType<typeof WForm>[]>([])
 
-const isValidMap = ref<Record<number, boolean>>({})
-const hasChangesMap = ref<Record<number, boolean>>({})
+const isValidMap = reactive<Record<number, boolean>>({})
+const hasChangesMap = reactive<Record<number, boolean>>({})
+
+const hasChanges = computed<boolean>(() => Object.values(hasChangesMap).includes(true))
 
 const updateIsValidMap = (index: number, value: boolean | undefined): void => {
-  if (value !== undefined) isValidMap.value[index] = value
-  else delete isValidMap.value[index]
+  if (value !== undefined) isValidMap[index] = value
+  else delete isValidMap[index]
 
   nextTick()
     .then(() => {
-      if (value === false && isValidMap.value[current.value] !== false) switchTab(index)
+      if (value === false && isValidMap[current.value] !== false) switchTab(index)
     })
 }
 
 const updateHasChangesMap = (index: number, value: boolean | undefined): void => {
-  if (value !== undefined) hasChangesMap.value[index] = value
-  else delete hasChangesMap.value[index]
-}
-
-const handleClickTab = async (index: number) => {
-  tabItem.value[current.value]?.emitHeight?.()
-
-  await nextTick()
-
-  switchTab(index)
+  if (value !== undefined) hasChangesMap[index] = value
+  else delete hasChangesMap[index]
 }
 
 const switchTab = throttle((index: number): void => {
   if (current.value === index) return
 
   updateIndex(index)
-}, 250)
+}, 200)
 
-const updateIndex = (value: number): void => {
+const updateIndex = (value: number) => {
+  tabItem.value[current.value]?.emitHeight?.()
+
+  setIndexDebounced(value)
+}
+
+const setIndexDebounced = debounce((value: number) => {
   if (current.value === value || value < 0 || value > defaultSlots.value.length - 1) return
 
   isDirect.value = current.value < value
   current.value = value
+}, 100)
+
+const next = (): void => {
+  switchTab(current.value + 1)
 }
 
-const next = throttle((): void => {
-  updateIndex(current.value + 1)
-}, 250)
-
-const previous = throttle((): void => {
-  updateIndex(current.value - 1)
-}, 250)
+const previous = (): void => {
+  switchTab(current.value - 1)
+}
 
 const updateIndicator = () => {
   if (!props.names) return
@@ -187,6 +188,10 @@ watch(current, value => {
   emit('update:current', value)
 
   updateIndicator()
+}, {immediate: true})
+
+watch(hasChanges, value => {
+  emit('update:has-changes', value)
 }, {immediate: true})
 
 onMounted(() => {

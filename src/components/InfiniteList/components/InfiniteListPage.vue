@@ -111,9 +111,15 @@
 
     <div
       v-else
-      class="py-16 px-8 text-accent text-base font-normal text-center"
+      class="text-accent text-base font-normal"
+      :class="{
+        'py-16 px-8 text-center flex justify-center': !minHeight,
+        'pt-4 pb-2 px-[1.0625rem]': minHeight,
+      }"
     >
-      {{ emptyStub }}
+      <div class="select-none cursor-default w-select-field sm-not:px-3">
+        {{ emptyStub }}
+      </div>
     </div>
   </div>
 </template>
@@ -142,6 +148,7 @@ const props = withDefaults(
     unselectOnly?: boolean
     reverseSelection?: boolean
     allowPageSelection?: boolean
+    minHeight?: boolean
   }>(),
   {
     keyGetter: undefined,

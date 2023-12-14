@@ -101,7 +101,6 @@ const emit = defineEmits<{
   (e: 'update:header-padding', value: number): void
   (e: 'update:count', value: number): void
   (e: 'update:selected', values: number[]): void
-  (e: 'close'): void
 }>()
 
 const infiniteList = ref<ComponentInstance<typeof WInfiniteListPages<Data>> | undefined>()

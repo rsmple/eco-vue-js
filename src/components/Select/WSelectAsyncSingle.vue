@@ -26,10 +26,10 @@
       :no-margin="noMargin"
       :icon="icon"
       :mono="mono"
-      disable-clear
+      :disable-clear="!allowClear"
       hide-prefix
       @select="updateModelValue($event)"
-      @unselect="updateModelValue($event)"
+      @unselect="updateModelValue(allowClear ? null : $event)"
       @update:search="emit('update:search', $event)"
       @create:option="createOption($event)"
     >
@@ -81,10 +81,11 @@ const props = defineProps<{
   noMargin?: boolean
   icon?: SVGComponent
   mono?: boolean
+  allowClear?: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: number): void
+  (e: 'update:modelValue', value: number | null): void
   (e: 'update:search', value: string): void
   (e: 'create:option', value: string): void
 }>()
@@ -93,7 +94,7 @@ const selectComponent = ref<ComponentInstance<typeof WSelectAsync<Data>> | undef
 
 const arrayValue = computed<number[]>(() => props.modelValue ? [props.modelValue] : [])
 
-const updateModelValue = (value: number): void => {
+const updateModelValue = (value: number | null): void => {
   emit('update:modelValue', value)
 }
 

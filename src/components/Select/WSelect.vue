@@ -101,9 +101,7 @@
         v-if="!options.length"
         class="py-2 px-[1.0625rem] first:pt-4 last:pb-4"
       >
-        <div
-          class="select-none cursor-default w-select-field sm-not:px-3"
-        >
+        <div class="select-none cursor-default w-select-field sm-not:px-3">
           {{ emptyStub ?? 'No match' }}
         </div>
       </div>

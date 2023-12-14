@@ -80,7 +80,7 @@ defineEmits<{
 const list = ref<HTMLDivElement | undefined>()
 
 defineSlots<{
-  default?: (props: {option: Data, selected: boolean, skeleton: boolean, model: boolean}) => void
+  default?: (props: {option: Data | null, selected: boolean, skeleton: boolean, model: boolean}) => void
 }>()
 
 </script>

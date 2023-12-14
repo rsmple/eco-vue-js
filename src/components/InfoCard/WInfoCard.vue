@@ -5,7 +5,10 @@
       'bg-gray-100 dark:bg-gray-800': !noBg,
     }"
   >
-    <IconNegativeInfo class="square-8 sm-not:square-7 sm-not:-ml-1 inline-block text-description rotate-180" />
+    <IconNegativeInfo
+      v-if="!noIcon"
+      class="square-8 sm-not:square-7 sm-not:-ml-1 inline-block text-description rotate-180"
+    />
 
     <div class="py-1">
       <slot />
@@ -18,6 +21,7 @@ import IconNegativeInfo from '@/assets/icons/sax/IconNegativeInfo.svg?component'
 
 defineProps<{
   noBg?: boolean
+  noIcon?: boolean
 }>()
 
 </script>

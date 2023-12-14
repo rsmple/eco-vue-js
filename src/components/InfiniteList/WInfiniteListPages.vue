@@ -31,10 +31,10 @@
       :unselect-only="unselectOnly"
       :reverse-selection="reverseSelection"
       :allow-page-selection="allowPageSelection"
+      :min-height="minHeight"
 
       :class="{
         'last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16': !minHeight,
-        'last:min-h-[18.125rem]': minHeight,
       }"
 
       @update:count="updateCount($event); $emit('update:count', $event)"

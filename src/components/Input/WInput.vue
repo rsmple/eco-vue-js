@@ -288,6 +288,7 @@ const emit = defineEmits<{
   (e: 'mousedown', value: MouseEvent): void
   (e: 'click:internal', value: MouseEvent): void
   (e: 'select:input', value: Event): void
+  (e: 'paste'): void
 }>()
 
 const input = ref<HTMLInputElement>()
@@ -406,12 +407,15 @@ const paste = async () => {
         return
       }
 
-      Notify.success({
-        title: 'Pasted',
-      })
+      if (!props.maxLength || props.maxLength <= value.length) {
+        updateModelValue(value)
 
-      if (!props.maxLength || props.maxLength <= value.length) updateModelValue(value)
-      else {
+        Notify.success({
+          title: 'Pasted',
+        })
+
+        nextTick().then(() => emit('paste'))
+      } else {
         Notify.error({
           title: 'Unable to paste',
           caption: 'The length of the pasted value exceeds the allowed limit',
