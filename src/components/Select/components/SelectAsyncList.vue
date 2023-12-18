@@ -7,7 +7,7 @@
       :scrolling-element="scrollingElement"
       :transition="transition"
       :exclude-params="excludeParams"
-      :selected="allowUpdateSelected ? modelValue : undefined"
+      :selected="modelValue"
       :empty-stub="emptyStub"
       :select-only="selectOnly"
       :unselect-only="unselectOnly"
@@ -106,7 +106,6 @@ const props = defineProps<{
   excludeParams?: string[]
   noPadding?: boolean
   emptyStub?: string
-  allowUpdateSelected?: boolean
   selectOnly?: boolean
   unselectOnly?: boolean
   allowCreate?: boolean

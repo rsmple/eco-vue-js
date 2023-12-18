@@ -41,6 +41,7 @@
         :disable-clear="disableClear"
         @unselect="unselect"
         @update:fetching="!$event && updateDropdown(); isFetchingPrefix = $event"
+        @update:model-value="updateSelected"
       >
         <template #default="{option, skeleton: skeletonPrefix}">
           <slot
@@ -71,12 +72,11 @@
         :loading="loading || isFetchingPrefix"
         :disabled="isDisabled"
         :empty-stub="emptyStub ?? 'No match'"
-        :allow-update-selected="allowUpdateSelected"
         :allow-create="allowCreate && search !== ''"
         @select="select"
         @unselect="unselect"
-        @update:selected="updateSelected"
         @create:option="create"
+        @update:model-value="updateSelected"
       >
         <template #default="{option, selected, skeleton: skeletonList}">
           <slot
@@ -131,7 +131,6 @@ const props = defineProps<{
   errorMessage?: string
   required?: boolean
   hasChanges?: boolean
-  allowUpdateSelected?: boolean
   placeholder?: string
   noMargin?: boolean
   icon?: SVGComponent
@@ -196,7 +195,7 @@ const create = (): void => {
 }
 
 const updateSelected = (value: number[]): void => {
-  if (isDisabled.value || !props.allowUpdateSelected) return
+  if (isDisabled.value) return
 
   emit('update:modelValue', value)
 }

@@ -20,30 +20,32 @@
           :model="true"
           :skeleton="!data"
         >
-          <button
-            v-if="!disableClear"
-            class="relative flex square-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center outline-none"
-            :class="{
-              'cursor-not-allowed': disabled,
-              'cursor-progress': loading,
-              'cursor-pointer w-ripple w-ripple-hover': !loading && !disabled,
-            }"
-            @mousedown.stop.prevent=""
-            @click.stop.prevent="!loading && $emit('unselect', option.id)"
+          <template
+            v-if="!disableClear && !disabled"
+            #default
           >
-            <IconCancel class="square-3" />
-          </button>
+            <button
+              class="relative flex square-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center outline-none"
+              :class="{
+                'cursor-progress': loading,
+                'cursor-pointer w-ripple w-ripple-hover': !loading,
+              }"
+              @mousedown.stop.prevent=""
+              @click.stop.prevent="!loading && $emit('unselect', option.id)"
+            >
+              <IconCancel class="square-3" />
+            </button>
+          </template>
         </component>
       </template>
     </slot>
 
     <button
-      v-if="!optionComponent && !disableClear"
+      v-if="!optionComponent && !disableClear && !disabled"
       class="relative flex square-5 rounded-full items-center justify-center outline-none"
       :class="{
-        'cursor-not-allowed': disabled,
         'cursor-progress': loading,
-        'cursor-pointer w-ripple w-ripple-hover ': !loading && !disabled,
+        'cursor-pointer w-ripple w-ripple-hover ': !loading,
       }"
       @mousedown.stop.prevent=""
       @click.stop.prevent="!loading && $emit('unselect', option.id)"
