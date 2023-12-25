@@ -32,6 +32,18 @@ const listener = (event: Event): void => {
   }
 }
 
+const checkIsScrollUp = () => {
+  if (getIsScrollDown(props.scrollingElement ?? document.scrollingElement)) {
+    emit('scroll:down')
+  }
+}
+
+const checkIsScrollDown = () => {
+  if (getIsScrollDown(props.scrollingElement ?? document.scrollingElement)) {
+    emit('scroll:down')
+  }
+}
+
 watch(element, (newValue, oldValue) => {
   oldValue?.removeEventListener('scroll', listener)
   newValue?.addEventListener('scroll', listener)
@@ -43,6 +55,11 @@ onMounted(() => {
 
 onUnmounted(() => {
   element.value.removeEventListener('scroll', listener)
+})
+
+defineExpose({
+  checkIsScrollUp,
+  checkIsScrollDown,
 })
 
 </script>

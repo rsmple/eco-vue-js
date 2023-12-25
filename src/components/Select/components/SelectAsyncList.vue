@@ -12,7 +12,6 @@
       :select-only="selectOnly"
       :unselect-only="unselectOnly"
       hide-page-title
-      no-gap
       header-top-ignore
       min-height
       @update:count="$emit('update:count', $event); count = $event"

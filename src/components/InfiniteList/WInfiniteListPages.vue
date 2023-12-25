@@ -1,5 +1,6 @@
 <template>
   <InfiniteListScroll
+    ref="infiniteScroll"
     :scrolling-element="scrollingElement"
     :style="{'--infinite-list-header-height': headerHeight + 'px'}"
     @scroll:down="addNextPage"
@@ -32,6 +33,7 @@
       :reverse-selection="reverseSelection"
       :allow-page-selection="allowPageSelection"
       :min-height="minHeight"
+      :page-class="pageClass"
 
       :class="{
         'last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16': !minHeight,
@@ -39,8 +41,8 @@
 
       @update:count="updateCount($event); $emit('update:count', $event)"
       @update:pages-count="updatePagesCount"
-      @update:next-page="updateNextPage"
-      @update:previous-page="updatePreviousPage"
+      @update:next-page="updateNextPage($event); infiniteScroll?.checkIsScrollDown()"
+      @update:previous-page="updatePreviousPage($event); infiniteScroll?.checkIsScrollUp()"
       @update:scroll="updateScroll"
       @update-from-header:scroll="headerTop > 0 && nextTick(() => updateScroll(headerTop))"
       @error:invalid-page="removePage"
@@ -104,6 +106,7 @@ const props = withDefaults(
     unselectOnly?: boolean
     reverseSelection?: boolean
     allowPageSelection?: boolean
+    pageClass?: string
   }>(),
   {
     skeletonLength: undefined,
@@ -114,6 +117,7 @@ const props = withDefaults(
     headerHeight: 0,
     excludeParams: undefined,
     emptyStub: undefined,
+    pageClass: undefined,
   },
 )
 
@@ -122,6 +126,8 @@ const emit = defineEmits<{
   (e: 'update:count', value: number): void
   (e: 'update:selected', values: number[]): void
 }>()
+
+const infiniteScroll = ref<ComponentInstance<typeof InfiniteListScroll> | undefined>()
 
 const pages = ref<number[]>([props.queryParams.page ?? 1])
 const pagesCount = ref(1)

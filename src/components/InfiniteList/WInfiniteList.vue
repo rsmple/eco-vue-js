@@ -35,6 +35,7 @@
     :unselect-only="unselectOnly"
     :reverse-selection="reverseSelection"
     :allow-page-selection="allowPageSelection"
+    :page-class="pageClass"
 
     @update:count="$emit('update:count', $event)"
     @update:selected="$emit('update:selected', $event)"
@@ -84,6 +85,7 @@ const props = withDefaults(
     unselectOnly?: boolean
     reverseSelection?: boolean
     allowPageSelection?: boolean
+    pageClass?: string
   }>(),
   {
     skeletonLength: undefined,
@@ -93,6 +95,7 @@ const props = withDefaults(
     scrollingElement: undefined,
     excludeParams: undefined,
     emptyStub: undefined,
+    pageClass: undefined,
   },
 )
 

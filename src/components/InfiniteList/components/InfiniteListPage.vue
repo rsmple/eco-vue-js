@@ -31,14 +31,7 @@
         />
       </div>
 
-      <div
-        class="flex items-start justify-start"
-        :class="{
-          'sm-not:flex-col sm:flex-wrap': wrap,
-          'flex-col': !wrap,
-          'sm:gap-4': !noGap,
-        }"
-      >
+      <div :class="pageClass">
         <template v-if="data?.results">
           <TransitionGroup
             v-if="transition"
@@ -149,12 +142,14 @@ const props = withDefaults(
     reverseSelection?: boolean
     allowPageSelection?: boolean
     minHeight?: boolean
+    pageClass?: string
   }>(),
   {
     keyGetter: undefined,
     selected: undefined,
     previous: undefined,
     emptyStub: 'Nothing to show',
+    pageClass: undefined,
   },
 )
 
