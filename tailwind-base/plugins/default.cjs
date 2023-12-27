@@ -447,4 +447,10 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       values: theme('borderRadius'),
     },
   )
+
+  addBase({
+    '.text-balance': {
+      'text-wrap': 'balance',
+    },
+  })
 })

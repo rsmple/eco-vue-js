@@ -202,7 +202,7 @@
 
     <div
       v-if="description"
-      class="text-xs font-normal text-description pt-4 whitespace-pre-wrap break-words"
+      class="text-xs font-normal text-description pt-4 whitespace-pre-wrap break-words text-balance"
       :class="{
         'opacity-50': disabled && !skeleton,
       }"

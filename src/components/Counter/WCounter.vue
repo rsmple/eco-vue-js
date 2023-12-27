@@ -1,19 +1,25 @@
 <template>
   <div
-    class="h-5 w-5 rounded-full bg-negative dark:bg-negative-dark text-default text-xs font-medium flex items-center justify-center"
-    :class="{'animate-shake': isShake}"
+    class="px-1 bg-negative dark:bg-negative-dark text-default text-xs font-medium flex items-center justify-center"
+    :class="{
+      'animate-shake': isShake,
+      'h-4 min-w-[1rem] rounded-lg': small,
+      'h-5 min-w-[1.25rem] rounded-[0.625rem]': !small,
+    }"
   >
-    {{ count }}
+    {{ numberCompactFormatter.format(count) }}
   </div>
 </template>
 
 <script setup lang="ts">
 import {ref, toRef, watch} from 'vue'
+import {numberCompactFormatter} from '@/utils/utils'
 
 const props = withDefaults(
   defineProps<{
     count: number
     trigger?: number
+    small?: boolean
   }>(),
   {
     trigger: 2,
