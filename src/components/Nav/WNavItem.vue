@@ -90,7 +90,7 @@ const isActive = computed<boolean>(() => {
   return isEqualObj(route.query, routeTo.value.query, ['ordering', 'page'])
 })
 
-const isBigCount = computed<boolean>(() => (props.count !== undefined && props.count >= 1000) || (props.counter !== undefined && props.counter >= 1000))
+const isBigCount = computed<boolean>(() => props.counter !== undefined && props.counter >= 1000)
 
 watch(isActive, value => emit('update:isActive', {[props.title]: value}), {immediate: true})
 
