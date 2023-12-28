@@ -50,8 +50,10 @@
   "type": "module",
   "files": [
     "dist",
-    "tailwind-base"
+    "tailwind-base",
+    "LICENSE"
   ],
+  "license": "MIT",
   "main": "./dist/main.js",
   "module": "./dist/main.js",
   "exports": {
