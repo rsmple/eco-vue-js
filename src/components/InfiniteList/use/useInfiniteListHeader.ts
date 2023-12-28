@@ -1,3 +1,4 @@
+import {isClientSide} from '@/main'
 import {onBeforeUnmount, onMounted, ref} from 'vue'
 
 const headerElementHeight = 60
@@ -31,6 +32,7 @@ export const useInfiniteListHeader = (scrollingElement: Element | null = documen
   }
 
   onMounted(() => {
+    if (!isClientSide) return
     if (header.value) {
       const rect = header.value.getBoundingClientRect()
       headerHeight.value = rect.height

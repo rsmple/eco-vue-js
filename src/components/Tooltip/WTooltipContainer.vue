@@ -70,6 +70,7 @@ import {onMounted, onUnmounted, ref, onBeforeMount, onBeforeUnmount} from 'vue'
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {initTooltip, type SetTooltipMeta, type TooltipMeta} from '@/utils/Tooltip'
+import {isClientSide} from '@/utils/utils'
 
 const MARGIN = 12
 
@@ -116,7 +117,7 @@ const updateContainerStyles = (value: HTMLDivElement | undefined) => {
 }
 
 const getMarginStyles = (left?: string, right?: string) => {
-  if (!containerWidth.value) return
+  if (!isClientSide || !containerWidth.value) return
 
   const l = left ? Number.parseFloat(left.substring(0, left.indexOf('px'))) : undefined
 

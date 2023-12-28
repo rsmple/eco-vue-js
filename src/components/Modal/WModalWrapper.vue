@@ -9,7 +9,7 @@
     }"
   >
     <div class="sticky top-0 z-[1] bg-default dark:bg-default-dark">
-      <div class="text-accent font-semibold text-center p-[var(--modal-wrapper-padding,2rem)] flex justify-center items-center text-2xl sm-not:text-xl">
+      <div class="text-accent font-semibold text-center p-[var(--modal-wrapper-padding,2rem)] flex justify-center items-center text-2xl sm-not:text-xl text-balance">
         <slot name="title" />
       </div>
 

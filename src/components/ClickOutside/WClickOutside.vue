@@ -6,7 +6,7 @@
 
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, ref} from 'vue'
-import {hasParent} from '@/utils/utils'
+import {hasParent, isClientSide} from '@/utils/utils'
 
 const emit = defineEmits<{
   (e: 'click'): void
@@ -19,12 +19,16 @@ const clickListener = (event: MouseEvent) => {
 }
 
 onMounted(() => {
+  if (!isClientSide) return
+
   setTimeout(() => {
     document.addEventListener('click', clickListener)
   })
 })
 
 onBeforeUnmount(() => {
+  if (!isClientSide) return
+
   document.removeEventListener('click', clickListener)
 })
 

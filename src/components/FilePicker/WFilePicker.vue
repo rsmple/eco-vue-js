@@ -144,6 +144,7 @@ import FilePickerItem from './components/FilePickerItem.vue'
 import FilePickerSvg from './components/FilePickerSvg.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import {useTabActiveListener} from '../Tabs/use/useTabActiveListener'
+import {isClientSide} from '@/utils/utils'
 
 const props = defineProps<{
   modelValue: File[]
@@ -205,6 +206,8 @@ const updateSize = () => {
 useTabActiveListener(updateSize)
 
 onMounted(() => {
+  if (!isClientSide) return
+
   updateSize()
 
   events.forEach((eventName) => {
@@ -215,6 +218,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  if (!isClientSide) return
+
   events.forEach((eventName) => {
     document.body.removeEventListener(eventName, preventDefaults)
   })

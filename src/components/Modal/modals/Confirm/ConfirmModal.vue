@@ -4,7 +4,7 @@
       {{ title }}
     </template>
 
-    <div class="text-base text-accent font-normal text-center min-h-[1.25rem] mb-8 sm-not:-px--inner-margin">
+    <div class="text-base text-accent font-normal text-center min-h-[1.25rem] mb-8 sm-not:-px--inner-margin text-balance">
       {{ description }}
     </div>
 

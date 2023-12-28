@@ -45,13 +45,14 @@
 <script lang="ts" setup>
 import {ref} from 'vue'
 import IconMenu from '@/assets/icons/sax/IconMenu.svg?component'
+import {isClientSide} from '@/utils/utils'
 
 const emit = defineEmits<{
   (e: 'update:isOpen', value: boolean): void
 }>()
 
 const getHasBackdrop = () => {
-  return window.innerWidth < 1280
+  return isClientSide && window.innerWidth < 1280
 }
 
 const hasBackdrop = ref(getHasBackdrop())

@@ -19,7 +19,7 @@
 <script lang="ts" setup>
 import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch, toRef} from 'vue'
 import DOMListenerContainer from '@/utils/DOMListenerContainer'
-import {getAllScrollParents} from '@/utils/utils'
+import {getAllScrollParents, isClientSide} from '@/utils/utils'
 import {horizontalGetterOrderMap, searchStyleGetter, VerticalGetter, type HorizontalGetter} from './utils/DropdownStyle'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 
@@ -95,6 +95,8 @@ let domListenerContainer: DOMListenerContainer
 let requestAnimationFrameId: number | null = null
 
 onMounted(() => {
+  if (!isClientSide) return
+
   domListenerContainer = new DOMListenerContainer(
     [document, window, ...getAllScrollParents(dropdown.value)],
     ['scroll', 'touchmove', 'resize'],
