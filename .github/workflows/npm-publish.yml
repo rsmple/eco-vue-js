@@ -18,11 +18,6 @@ jobs:
       - run: npm ci
       - run: npm run lint:no-fix
       - run: npm run build
-      - uses: actions/upload-artifact@v3
-        with:
-          name: dist
-          path: dist/
-          retention-days: 5
 
   publish-npm:
     needs: build
