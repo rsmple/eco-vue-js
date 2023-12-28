@@ -1,5 +1,9 @@
 {
   "name": "@texturered/eco-vue-js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/texturered/eco-vue-js.git"
+  },
   "version": "0.3.56",
   "scripts": {
     "dev": "vite",
