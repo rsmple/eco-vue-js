@@ -7,7 +7,7 @@ UI-Kit is a design system project for [Whitespots](https://whitespots.io/) proje
 
 ### Installation
 ```
-npm i @whitespots/ui-kit
+npm i @texturered/eco-vue-js
 ```
 
 ### Tailwind configuration
@@ -15,14 +15,14 @@ npm i @whitespots/ui-kit
 1. Add the following lines to the `content` section in your [Tailwind configuration file](https://tailwindcss.com/docs/content-configuration):
     ```
     content: [
-      './node_modules/@whitespots/ui-kit/dist/components/**/*.vue.js}',
-      './node_modules/@whitespots/ui-kit/dist/components/**/*.js}',
+      './node_modules/@texturered/eco-vue-js/dist/components/**/*.vue.js}',
+      './node_modules/@texturered/eco-vue-js/dist/components/**/*.js}',
     ]
     ```
 2. Add the library's [Tailwind preset](https://tailwindcss.com/docs/presets) to your configuration file:
     ```
     presets: [
-      require('@whitespots/ui-kit/tailwind-base/index.cjs'),
+      require('@texturered/eco-vue-js/tailwind-base/index.cjs'),
     ]
     ```
 
@@ -30,7 +30,7 @@ npm i @whitespots/ui-kit
 
 Here's an example of how to import the WButton component:
 ```
-import WButton from '@whitespots/ui-kit/dist/components/Button/WButton.vue'
+import WButton from '@texturered/eco-vue-js/dist/components/Button/WButton.vue'
 ```
 
 ### Import icons
@@ -39,7 +39,7 @@ The icons in the library are functional Vue components generated from SVG files 
 
 Here's an example of how to import an icon named IconCheck:
 ```
-import IconCheck from '@whitespots/ui-kit/dist/assets/icons/default/IconCheck'
+import IconCheck from '@texturered/eco-vue-js/dist/assets/icons/default/IconCheck'
 ```
 
 ## Development
