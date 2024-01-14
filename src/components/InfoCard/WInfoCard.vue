@@ -10,7 +10,7 @@
       class="square-8 sm-not:square-7 sm-not:-ml-1 inline-block text-description rotate-180"
     />
 
-    <div class="py-1 text-balance">
+    <div class="py-1 text-pretty">
       <slot />
     </div>
   </div>

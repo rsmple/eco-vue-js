@@ -18,7 +18,7 @@
     </button>
 
     <button
-      v-if="allowPaste"
+      v-if="allowPaste && !disabled"
       class="relative w-ripple w-ripple-hover h-full w-11 p-[0.6875rem] flex justify-center text-description select-none outline-none"
       @mousedown.prevent.stop=""
       @click="$emit('click:paste')"
@@ -34,11 +34,11 @@
     <button
       v-if="textSecure"
       :disabled="disabled"
+      class="relative h-full w-11 p-[0.6875rem] flex justify-center select-none outline-none"
       :class="{
-        'cursor-pointer': !disabled,
+        'cursor-pointer w-ripple w-ripple-hover': !disabled,
         'cursor-not-allowed': disabled,
       }"
-      class="relative w-ripple w-ripple-hover h-full w-11 p-[0.6875rem] flex justify-center select-none outline-none"
       @click="isSecureVisible ? $emit('hide:secure', $event) : $emit('show:secure', $event)"
     >
       <IconEyeSlash
