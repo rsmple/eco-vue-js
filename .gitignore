@@ -28,6 +28,4 @@ coverage
 *.sln
 *.sw?
 
-whitespots-ui-kit-*.*.*.tgz 
-texturered-eco-vue-js-*.*.*.tgz 
 eco-vue-js-*.*.*.tgz

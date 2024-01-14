@@ -25,7 +25,7 @@ declare type ValidateFn = (value: string | number | undefined | string[]) => str
 
 declare type InputType = 'number' | 'text' | 'tel' | 'search' | 'password' | 'email' | 'search' | 'url'
 
-declare module '@texturered/eco-vue-js/dist/assets/icons/*' {
+declare module 'eco-vue-js/dist/assets/icons/*' {
   import type {FunctionalComponent, SVGAttributes} from 'vue'
   const src: FunctionalComponent<SVGAttributes>
   export default src
