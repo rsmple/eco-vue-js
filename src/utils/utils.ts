@@ -76,3 +76,9 @@ export const numberCompactFormatter = Intl.NumberFormat('en', {notation: 'compac
 export const numberFormatter = Intl.NumberFormat('fr')
 
 export const isClientSide: boolean = typeof window !== 'undefined'
+
+let iterator = 1
+
+export const genId = () => {
+  return iterator++
+}

@@ -4,18 +4,21 @@
       'mt-1 mb-4': !noMargin,
     }"
   >
-    <div
-      class="flex gap-4 w-hover-circle-trigger w-ripple-trigger w-hover-circle-opacity-[0.08] select-none items-center"
+    <button
+      class="grid gap-4 w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-[0.08] select-none items-center w-full text-start focus:outline-none"
       :class="{
         'cursor-not-allowed opacity-50': disabled,
         'cursor-progress': loading,
         'cursor-pointer': !readonly && !loading && !disabled,
+        'grid-cols-[1fr,auto]': !rightLabel,
+        'grid-cols-[auto,1fr]': rightLabel,
       }"
+      :disabled="disabled"
       @click="updateModelValue"
     >
       <div
         v-if="title"
-        class="font-semibold text-accent flex-1"
+        class="font-semibold text-accent"
         :class="{
           'order-1': rightLabel,
           'text-xs': small,
@@ -38,7 +41,7 @@
             'right-4': modelValue === false,
             'right-2': modelValue === null,
             'right-0': modelValue === true,
-            'w-hover-circle w-ripple': !disabled && !readonly,
+            'w-ripple w-hover-circle': !disabled && !readonly,
           }"
         >
           <div
@@ -55,7 +58,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </button>
 
     <div
       v-if="description"

@@ -40,16 +40,16 @@
       />
     </div>
 
-    <div class="flex">
-      <div
+    <div class="grid grid-cols-[1fr,auto]">
+      <label
         v-if="!skeleton"
-        class="relative isolate w-[calc(100%-var(--input-right-width))] flex-1"
-        :style="{'--input-right-width': (rightContainer?.offsetWidth ?? 0) + 'px'}"
+        class="relative isolate"
+        :for="inputId"
       >
         <div
           class="
             relative flex flex-wrap border border-solid rounded-xl bg-default dark:bg-default-dark
-            transition-colors duration-75 overflow-hidden min-h-[44px] w-full
+            transition-colors duration-75 overflow-hidden min-h-11 w-full
           "
           :class="{
             'focus-within:border-primary-default dark:focus-within:border-primary-dark': !disabled && !readonly,
@@ -78,6 +78,7 @@
 
           <component
             :is="textarea ? 'textarea' : 'input'"
+            :id="inputId"
             ref="input"
             class="
               text-base font-normal outline-0 border-none bg-[inherit] flex-1 max-w-full
@@ -178,7 +179,7 @@
             {{ numberFormatter.format(String(modelValue || '').length) }} / {{ numberFormatter.format(maxLength) }}
           </div>
         </Transition>
-      </div>
+      </label>
 
       <WSkeleton
         v-else
@@ -221,7 +222,7 @@ import {onMounted, ref, nextTick, onBeforeUnmount} from 'vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import InputActions from './components/InputActions.vue'
 import {Notify} from '@/utils/Notify'
-import {numberFormatter} from '@/utils/utils'
+import {genId, numberFormatter} from '@/utils/utils'
 import {useTabActiveListener} from '../Tabs/use/useTabActiveListener'
 
 type ModelValue = Type extends 'number' ? number : string
@@ -260,7 +261,7 @@ const props = withDefaults(
     allowPaste?: boolean
   }>(),
   {
-    size: 40,
+    size: 20,
     title: undefined,
     description: undefined,
     placeholder: undefined,
@@ -291,8 +292,9 @@ const emit = defineEmits<{
   (e: 'paste'): void
 }>()
 
+const inputId = `w-input-${genId()}`
+
 const input = ref<HTMLInputElement>()
-const rightContainer = ref<HTMLInputElement>()
 const isFocused = ref(false)
 const isSecureVisible = ref(false)
 const paddingRight = ref(0)

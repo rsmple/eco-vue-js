@@ -9,7 +9,7 @@
       text-base font-medium select-none whitespace-nowrap
       flex justify-center items-center
     "
-    :class="{ 
+    :class="{
       [semanticTypeButtonStylesMap[semanticType]]: true,
       'cursor-pointer w-ripple w-ripple-hover before:text-black-default': !loading && !disabled,
       'cursor-progress': loading,

@@ -288,7 +288,13 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       },
     },
 
-    '.w-ripple-hover:not(:active):hover': {
+    '.w-ripple-hover:not(:active):hover, .w-ripple-trigger:not(:active):hover .w-ripple-hover': {
+      '& .w-ripple:not(:active)::before, &.w-ripple::before': {
+        'opacity': 'var(--w-ripple-opacity, 0.10)',
+      },
+    },
+
+    '.w-ripple-hover:not(:active):focus, .w-ripple-trigger:not(:active):focus .w-ripple-hover': {
       '& .w-ripple:not(:active)::before, &.w-ripple::before': {
         'opacity': 'var(--w-ripple-opacity, 0.10)',
       },
@@ -316,7 +322,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         'transition-duration': '200ms',
       },
 
-      '&:hover::after, .w-hover-circle-trigger:hover &::after': {
+      '&:hover::after, .w-hover-circle-trigger:hover &::after, &:focus::after, .w-hover-circle-trigger:focus &::after': {
         'opacity': 'var(--w-hover-circle-opacity, 0.10)',
         'transform': 'scaleX(2.2) scaleY(2.2)',
       },

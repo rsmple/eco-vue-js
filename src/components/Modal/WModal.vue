@@ -27,11 +27,7 @@
       >
         <div class="h-[calc(100%+1px)]" />
 
-        <button
-          class="cursor-pointer absolute top-0 left-0 h-full w-full -z-10 outline-none"
-          title="Click outside to close modal"
-          @click.stop.prevent="closeModalWithConfirm(modalMeta)"
-        />
+        <ModalCloseButton @click.stop.prevent="closeModalWithConfirm(modalMeta)" />
 
         <component
           :is="modalMeta.component"
@@ -48,6 +44,7 @@
 import {onBeforeMount, onBeforeUnmount, ref, watch, type Component, reactive} from 'vue'
 import {initModal, type AddModal, Modal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
+import ModalCloseButton from './components/ModalCloseButton.vue'
 
 type ModalMeta = {
   key: number
