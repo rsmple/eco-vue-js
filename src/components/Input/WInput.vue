@@ -43,7 +43,7 @@
     <div class="grid grid-cols-[1fr,auto]">
       <label
         v-if="!skeleton"
-        class="relative isolate"
+        class="relative isolate overflow-hidden"
         :for="inputId"
       >
         <div
@@ -261,7 +261,7 @@ const props = withDefaults(
     allowPaste?: boolean
   }>(),
   {
-    size: 20,
+    size: 10,
     title: undefined,
     description: undefined,
     placeholder: undefined,
