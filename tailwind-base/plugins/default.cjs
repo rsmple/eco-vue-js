@@ -288,13 +288,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       },
     },
 
-    '.w-ripple-hover:not(:active):hover, .w-ripple-trigger:not(:active):hover .w-ripple-hover': {
-      '& .w-ripple:not(:active)::before, &.w-ripple::before': {
-        'opacity': 'var(--w-ripple-opacity, 0.10)',
-      },
-    },
-
-    '.w-ripple-hover:not(:active):focus, .w-ripple-trigger:not(:active):focus .w-ripple-hover': {
+    '.w-ripple-hover:not(:active):hover, .w-ripple-trigger:not(:active):hover .w-ripple-hover, .w-ripple-hover:not(:active):focus, .w-ripple-trigger:not(:active):focus .w-ripple-hover': {
       '& .w-ripple:not(:active)::before, &.w-ripple::before': {
         'opacity': 'var(--w-ripple-opacity, 0.10)',
       },
