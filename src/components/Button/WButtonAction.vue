@@ -28,7 +28,7 @@
       </template>
     </slot>
 
-    <div class="font-normal text-center md:text-base text-[10px] whitespace-nowrap">
+    <div class="font-normal text-center md:text-base text-[0.625rem] whitespace-nowrap">
       {{ title }}
     </div>
   </component>
