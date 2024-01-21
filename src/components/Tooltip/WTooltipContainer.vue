@@ -9,7 +9,7 @@
       v-if="tooltipMeta"
       :parent-element="tooltipMeta.parent"
       :horizontal-align="HorizontalAlign.CENTER"
-      :max-height="120"
+      :max-height="200"
       :max-width="240"
       emit-update
       class="z-[10000] [--arrow-size:8px] transition-[top,bottom,left,right]"
