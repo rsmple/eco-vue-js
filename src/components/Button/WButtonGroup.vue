@@ -32,13 +32,13 @@
         ]"
         @click="getValue(item) !== modelValue && $emit('update:modelValue', getValue(item))"
       >
-        <slot :item="(item as typeof valueGetter extends never ? Model : Entity)" />
+        <slot :item="(item as ValueGetter extends undefined ? Model : Entity)" />
       </WButton>
     </div>
   </div>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string | null | boolean, Entity extends Record<string, unknown>">
+<script lang="ts" setup generic="Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends ((value: Entity) => Model) | undefined = undefined">
 import WButton from './WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
 
@@ -46,7 +46,7 @@ type PropsForModel = {
   modelValue: Model
   title?: string
   list: Model[]
-  valueGetter: never
+  valueGetter?: ValueGetter | undefined
   disabled?: boolean
   loading?: number | string
   minimize?: boolean
@@ -59,7 +59,7 @@ type PropsForEntity = {
   modelValue: Model
   title?: string
   list: Entity[]
-  valueGetter: (value: Entity) => Model
+  valueGetter: ValueGetter | ((value: Entity) => Model)
   disabled?: boolean
   loading?: number | string
   minimize?: boolean
@@ -68,14 +68,14 @@ type PropsForEntity = {
   stretch?: boolean
 }
 
-const props = defineProps<PropsForModel | PropsForEntity>()
+const props = defineProps<PropsForEntity | PropsForModel>()
 
 defineEmits<{
   (e: 'update:modelValue', value: Model): void
 }>()
 
 const getValue = (item: Model | Entity): Model => {
-  if ('valueGetter' in props && typeof item === 'object') {
+  if (props.valueGetter && typeof item === 'object') {
     return props.valueGetter(item as Entity)
   } else {
     return item as Model
