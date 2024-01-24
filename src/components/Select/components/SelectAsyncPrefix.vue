@@ -7,6 +7,7 @@
       :disable-clear="disableClear"
       :loading="loading"
       :disabled="disabled"
+      :preview-data="previewData"
       @unselect="$emit('unselect', $event)"
       @update:fetching="$emit('update:fetching', $event)"
     >
@@ -55,6 +56,7 @@ const props = defineProps<{
   loading?: boolean
   optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
   disableClear?: boolean
+  previewData?: Data[]
 }>()
 
 const emit = defineEmits<{

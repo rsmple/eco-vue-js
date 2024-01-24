@@ -27,6 +27,7 @@
       :icon="icon"
       :mono="mono"
       :disable-clear="!allowClear"
+      :preview-data="previewData ? [previewData] as Data[] : undefined"
       hide-prefix
       @select="updateModelValue($event)"
       @unselect="updateModelValue(allowClear ? null : $event)"
@@ -82,6 +83,7 @@ const props = defineProps<{
   icon?: SVGComponent
   mono?: boolean
   allowClear?: boolean
+  previewData?: Data
 }>()
 
 const emit = defineEmits<{

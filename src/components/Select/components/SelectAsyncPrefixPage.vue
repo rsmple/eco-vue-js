@@ -1,6 +1,6 @@
 <template>
   <div
-    v-for="option in data?.results"
+    v-for="option in (previewData ?? data?.results)"
     :key="option.id"
     class="relative flex overflow-hidden items-center text-description"
     :class="{
@@ -10,7 +10,7 @@
   >
     <slot
       :option="option"
-      :skeleton="!data"
+      :skeleton="false"
     >
       <template v-if="optionComponent">
         <component
@@ -18,7 +18,7 @@
           :option="option"
           :selected="true"
           :model="true"
-          :skeleton="!data"
+          :skeleton="false"
         >
           <template
             v-if="!disableClear && !disabled"
@@ -66,6 +66,7 @@ const props = defineProps<{
   loading?: boolean
   optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
   disableClear?: boolean
+  previewData?: Data[]
 }>()
 
 const emit = defineEmits<{
@@ -74,7 +75,16 @@ const emit = defineEmits<{
   (e: 'update:fetching', value: boolean): void
 }>()
 
-const {data, isFetching} = props.useQueryFn(toRef(props, 'queryParams'))
+const queryEnabled = computed<boolean>(() => !props.previewData)
+
+const {data, isFetching} = props.useQueryFn(toRef(props, 'queryParams'), {
+  enabled: queryEnabled,
+  refetchInterval: false,
+  refetchOnMount: false,
+  refetchOnReconnect: false,
+  refetchIntervalInBackground: false,
+  refetchOnWindowFocus: false,
+})
 
 const pagesCount = computed(() => data.value?.pages_count)
 

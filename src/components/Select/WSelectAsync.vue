@@ -39,6 +39,7 @@
         :loading="loading || isFetchingPrefix"
         :option-component="optionComponent"
         :disable-clear="disableClear"
+        :preview-data="previewData"
         @unselect="unselect"
         @update:fetching="!$event && updateDropdown(); isFetchingPrefix = $event"
         @update:model-value="updateSelected"
@@ -135,6 +136,7 @@ const props = defineProps<{
   noMargin?: boolean
   icon?: SVGComponent
   mono?: boolean
+  previewData?: Data[]
 }>()
 
 const emit = defineEmits<{
