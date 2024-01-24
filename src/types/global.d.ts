@@ -37,12 +37,12 @@ type Params = Parameters<import('@tanstack/vue-query').QueryClient['setQueriesDa
 
 declare type QueryParams = Partial<Record<string, number | string> & {page?: number}>
 
-declare type UseDefaultQuery<TQueryFnData = unknown, TError = unknown, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey> =
+declare type UseDefaultQuery<TQueryFnData = unknown, TError = unknown, TData = TQueryFnData, TQueryKey extends import('@tanstack/vue-query').QueryKey = import('@tanstack/vue-query').QueryKey> =
   (...args: Parameters<typeof useQuery<TQueryFnData, TError, TData, TQueryKey>>) => import('@tanstack/vue-query').UseQueryReturnType<TData, TError> & {
     setData: (updater: TQueryFnData, options?: Params[2]) => ReturnType<import('@tanstack/vue-query').QueryClient['setQueriesData']>
   }
 
 declare type UsePaginatedQuery<Data extends DefaultData = DefaultData> = (
   queryParams: import('vue').Ref<QueryParams>,
-  options?: Parameters<UseDefaultQuery<PaginatedResponse<Data>>>[2]
+  options?: Partial<Parameters<UseDefaultQuery<PaginatedResponse<Data>>>[0]>
 ) => ReturnType<UseDefaultQuery<PaginatedResponse<Data>>>

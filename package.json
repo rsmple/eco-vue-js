@@ -17,7 +17,7 @@
     "write-imports": "node write-imports.js"
   },
   "peerDependencies": {
-    "@tanstack/vue-query": "^4.32.0",
+    "@tanstack/vue-query": "^5.17.19",
     "vue": "^3.4.15",
     "vue-router": "^4.2.5"
   },
