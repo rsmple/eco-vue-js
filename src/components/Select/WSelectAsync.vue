@@ -74,6 +74,7 @@
         :disabled="isDisabled"
         :empty-stub="emptyStub ?? 'No match'"
         :allow-create="allowCreate && search !== ''"
+        :hide-option-icon="hideOptionIcon"
         @select="select"
         @unselect="unselect"
         @create:option="create"
@@ -137,6 +138,7 @@ const props = defineProps<{
   icon?: SVGComponent
   mono?: boolean
   previewData?: Data[]
+  hideOptionIcon?: boolean
 }>()
 
 const emit = defineEmits<{

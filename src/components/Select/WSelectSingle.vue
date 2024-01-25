@@ -25,6 +25,7 @@
       :icon="icon"
       :mono="mono"
       :disable-clear="!allowClear"
+      :hide-option-icon="hideOptionIcon"
       hide-prefix
       @select="updateModelValue($event as Item)"
       @unselect="updateModelValue(allowClear ? null : ($event as Item))"
@@ -78,6 +79,7 @@ const props = defineProps<{
   icon?: SVGComponent
   mono?: boolean
   allowClear?: boolean
+  hideOptionIcon?: boolean
 }>()
 
 const emit = defineEmits<{

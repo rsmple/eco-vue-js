@@ -1,7 +1,7 @@
 <template>
   <div
     ref="element"
-    class="relative flex w-full select-none cursor-pointer py-2 px-[1.0625rem]"
+    class="relative grid grid-cols-[1fr,2.5rem] w-full select-none cursor-pointer py-2 px-[1.0625rem]"
     :class="{
       'bg-primary-light dark:bg-primary-darkest': isSelected,
       'before:opacity-5': isCursor && !skeleton,
@@ -11,7 +11,12 @@
     @mousedown.prevent.stop=""
     @click.prevent.stop="toggle"
   >
-    <div class="flex items-center max-w-[calc(100%-2.5rem)] flex-1 overflow-hidden">
+    <div
+      class="flex items-center flex-1 overflow-hidden"
+      :class="{
+        'col-span-2': hideOptionIcon,
+      }"
+    >
       <slot :selected="isSelected" />
     </div>
 
@@ -22,8 +27,8 @@
       leave-to-class="opacity-0"
     >
       <div
-        v-if="isSelected || loading"
-        class="flex items-center justify-center text-primary-default dark:text-primary-dark w-10 [--spinner-size:1.5rem]"
+        v-if="!hideOptionIcon && (isSelected || loading)"
+        class="flex items-center justify-center text-primary-default dark:text-primary-dark [--spinner-size:1.5rem]"
       >
         <IconCheck v-if="isSelected && !loading" />
         <WSpinner v-else-if="loading" />
@@ -48,6 +53,7 @@ const props = defineProps<{
   previous?: number | null
   next?: number | null
   isNoCursor?: boolean
+  hideOptionIcon?: boolean
 }>()
 
 const emit = defineEmits<{

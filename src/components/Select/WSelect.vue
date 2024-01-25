@@ -113,6 +113,7 @@
         :is-cursor="index === cursor"
         :loading="loadingOptionIndex === index && loading"
         :scroll="isCursorLocked"
+        :hide-option-icon="hideOptionIcon"
         class="first:pt-4 last:pb-4"
         @select="select(option); setLoadingOptionIndex(index)"
         @unselect="unselect(option); setLoadingOptionIndex(index)"
@@ -141,6 +142,7 @@
         :is-cursor="cursor === options.length"
         :loading="loadingOptionIndex === options.length && loading"
         :scroll="isCursorLocked"
+        :hide-option-icon="hideOptionIcon"
         class="first:pt-4 last:pb-4"
         @select="createOption(search)"
         @mouseenter="setCursor(options.length)"
@@ -200,6 +202,7 @@ const props = defineProps<{
   noMargin?: boolean
   icon?: SVGComponent
   mono?: boolean
+  hideOptionIcon?: boolean
 }>()
 
 const emit = defineEmits<{

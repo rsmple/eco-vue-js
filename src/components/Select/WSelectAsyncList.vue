@@ -31,6 +31,7 @@
         :empty-stub="emptyStub"
         :select-only="selectOnly"
         :unselect-only="unselectOnly"
+        :hide-option-icon="hideOptionIcon"
         allow-update-selected
         transition
         no-padding
@@ -68,6 +69,7 @@ defineProps<{
   excludeParams?: string[]
   selectOnly?: boolean
   unselectOnly?: boolean
+  hideOptionIcon?: boolean
 }>()
 
 defineEmits<{

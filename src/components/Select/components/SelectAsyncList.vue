@@ -29,6 +29,7 @@
           :previous="first && props.allowCreate ? null : previous?.id"
           :next="last && props.allowCreate ? null : next?.id"
           :is-no-cursor="cursor === undefined"
+          :hide-option-icon="hideOptionIcon"
           :class="{
             'pt-4': !noPadding && first,
             'pb-4': !noPadding && last && !allowCreate,
@@ -65,6 +66,7 @@
       :next="firstItem"
       :first="count === 0"
       :is-no-cursor="cursor === undefined"
+      :hide-option-icon="hideOptionIcon"
       class="first:pt-4 last:pb-4"
       @mouseenter="setCursor(null)"
       @update:cursor="setCursor(null)"
@@ -108,6 +110,7 @@ const props = defineProps<{
   selectOnly?: boolean
   unselectOnly?: boolean
   allowCreate?: boolean
+  hideOptionIcon?: boolean
 }>()
 
 const emit = defineEmits<{

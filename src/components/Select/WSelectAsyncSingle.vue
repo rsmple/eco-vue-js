@@ -28,6 +28,7 @@
       :mono="mono"
       :disable-clear="!allowClear"
       :preview-data="previewData ? [previewData] as Data[] : undefined"
+      :hide-option-icon="hideOptionIcon"
       hide-prefix
       @select="updateModelValue($event)"
       @unselect="updateModelValue(allowClear ? null : $event)"
@@ -84,6 +85,7 @@ const props = defineProps<{
   mono?: boolean
   allowClear?: boolean
   previewData?: Data
+  hideOptionIcon?: boolean
 }>()
 
 const emit = defineEmits<{

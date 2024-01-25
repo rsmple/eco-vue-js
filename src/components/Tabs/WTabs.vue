@@ -92,6 +92,7 @@ const props = defineProps<{
   names?: string[]
   slots?: VNode[]
   lessTransitions?: boolean
+  initTab?: number
 }>()
 
 const emit = defineEmits<{
@@ -103,7 +104,7 @@ const slots = useSlots()
 
 const defaultSlots = computed(() => (props.slots ?? slots.default?.() ?? []).filter(item => typeof item.type !== 'symbol'))
 
-const current = ref(0)
+const current = ref(props.initTab ?? 0)
 const isDirect = ref(true)
 const button = ref<HTMLDivElement[]>([])
 const indicatorStyle = ref<Record<string, string> | undefined>(undefined)
