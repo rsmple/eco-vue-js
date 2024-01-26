@@ -5,7 +5,6 @@
     class="fixed h-auto group/dropdown"
     :class="{
       'dropdown-top': isTop,
-      'w-0 flex justify-center': horizontalAlign === HorizontalAlign.CENTER,
     }"
   >
     <slot
@@ -60,19 +59,19 @@ const styles = computed(() => {
   }
 })
 
-const setParentRect = (updateSize = false): void => {
+const setParentRect = (updateSize = false, updateAlign = false): void => {
   const newRect = props.parentElement.getBoundingClientRect()
 
   const isLeftChanged = newRect.left !== parentRect?.left
   const isTopChanged = newRect.top !== parentRect?.top || newRect.bottom !== parentRect?.bottom
 
-  if (!horizontalGetter || (isLeftChanged && props.updateAlign)) {
+  if (!horizontalGetter || (isLeftChanged && (props.updateAlign || updateAlign))) {
     horizontalGetter = searchStyleGetter(order.value, newRect, props.maxWidth)
 
     if (updateSize) widthStyle.value = horizontalGetter.widthStyleGetter(newRect, props.maxWidth)
   }
 
-  if (!verticalGetter || (isTopChanged && props.updateAlign)) {
+  if (!verticalGetter || (isTopChanged && (props.updateAlign || updateAlign))) {
     const order = horizontalGetter.verticalGetterOrder
 
     verticalGetter = searchStyleGetter(order, newRect, props.maxHeight)
@@ -121,7 +120,7 @@ onBeforeUnmount(() => {
 })
 
 watch(toRef(props, 'parentElement'), () => {
-  setParentRect()
+  setParentRect(false, true)
 })
 
 defineExpose({

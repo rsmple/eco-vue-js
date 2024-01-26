@@ -9,74 +9,48 @@
       v-if="tooltipMeta"
       :parent-element="tooltipMeta.parent"
       :horizontal-align="HorizontalAlign.CENTER"
-      :max-height="200"
+      :max-height="tooltipMeta?.maxHeight ?? 120"
       :max-width="240"
       emit-update
-      class="z-[10000] [--arrow-size:8px] transition-[top,bottom,left,right]"
+      class="z-[10000] sm:transition-[top,bottom,left,right] will-change-[top,bottom,left,right] isolate"
       @update:rect="close"
     >
       <template #default="{left, right, istop}">
-        <div
-          ref="container"
-          class="flex justify-center items-center flex-col drop-shadow-md dark:drop-shadow-none pointer-events-none"
+        <TooltipContainer
+          :tooltip-meta="tooltipMeta"
+          :left="left"
+          :right="right"
+          :is-top="istop"
+          @over="setTooltipMeta(tooltipMeta)"
+          @leave="setTooltipMeta(null)"
         >
-          <div
-            class="
-              w-[calc(var(--arrow-size)/2)] z-10 pointer-events-auto
-              border-[transparent] border-solid [border-width:var(--arrow-size)]
-            "
-            :class="{
-              'text-black-default dark:text-gray-800': !tooltipMeta.light,
-              'text-default dark:text-gray-800': tooltipMeta.light,
-              'border-t-current order-2': istop,
-              'border-b-current': !istop,
-            }"
-            @mouseover="setTooltipMeta(tooltipMeta)"
-            @mouseleave="setTooltipMeta(null)"
-          />
+          <template v-if="tooltipMeta.slot">
+            <component
+              :is="tooltipMeta.slot"
+              :key="tooltipMeta.key"
+            />
+          </template>
 
           <div
-            class="py-3 px-4 rounded-xl text-xs font-medium text-center transition-[margin] pointer-events-auto"
-            :class="{
-              'bg-black-default dark:bg-gray-800 text-default': !tooltipMeta.light,
-              'bg-default dark:bg-gray-800 text-accent': tooltipMeta.light,
-            }"
-            :style="getMarginStylesCached(left, right)"
-            @mouseover="setTooltipMeta(tooltipMeta)"
-            @mouseleave="setTooltipMeta(null)"
+            v-else-if="tooltipMeta.text"
+            class="whitespace-nowrap"
           >
-            <template v-if="tooltipMeta.slot">
-              <component
-                :is="tooltipMeta.slot"
-                :key="tooltipMeta.key"
-              />
-            </template>
-
-            <div
-              v-else-if="tooltipMeta.text"
-              class="whitespace-nowrap"
-            >
-              {{ tooltipMeta.text }}
-            </div>
+            {{ tooltipMeta.text }}
           </div>
-        </div>
+        </TooltipContainer>
       </template>
     </WDropdown>
   </Transition>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, onUnmounted, ref, onBeforeMount, onBeforeUnmount} from 'vue'
+import {onMounted, onUnmounted, ref, onBeforeMount, onBeforeUnmount, markRaw} from 'vue'
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {initTooltip, type SetTooltipMeta, type TooltipMeta} from '@/utils/Tooltip'
-import {isClientSide} from '@/utils/utils'
-
-const MARGIN = 12
+import TooltipContainer from './components/TooltipContainer.vue'
 
 const tooltipMeta = ref<TooltipMeta | null>(null)
-const container = ref<HTMLDivElement | undefined>()
-const containerWidth = ref<number>(0)
 let timeout: NodeJS.Timeout | undefined
 
 const setTooltipMeta: SetTooltipMeta = (meta: TooltipMeta | null) => {
@@ -89,8 +63,8 @@ const setTooltipMeta: SetTooltipMeta = (meta: TooltipMeta | null) => {
     }, 100)
   } else if (tooltipMeta.value !== meta) {
     timeout = setTimeout(() => {
-      tooltipMeta.value = meta
-      updateContainerStyles(container.value)
+      tooltipMeta.value = markRaw(meta)
+      timeout = undefined
     }, 25)
   }
 }
@@ -106,58 +80,6 @@ const clearTimeoutOnClose = () => {
 
   clearTimeout(timeout)
   timeout = undefined
-}
-
-const updateContainerStyles = (value: HTMLDivElement | undefined) => {
-  if (!value) {
-    containerWidth.value = 0
-  } else {
-    containerWidth.value = value.getBoundingClientRect().width
-  }
-}
-
-const getMarginStyles = (left?: string, right?: string) => {
-  if (!isClientSide || !containerWidth.value) return
-
-  const l = left ? Number.parseFloat(left.substring(0, left.indexOf('px'))) : undefined
-
-  if (l !== undefined) {
-    const containerLeft = l - (containerWidth.value / 2) - MARGIN
-
-    if (containerLeft < 0) return {marginLeft: (0 - containerLeft) + 'px', marginRight: containerLeft + 'px'}
-
-    const containerRight = window.innerWidth - l - (containerWidth.value / 2) - MARGIN
-
-    if (containerRight < 0) return {marginRight: (0 - containerRight) + 'px', marginLeft: containerRight + 'px'}
-
-    return {}
-  }
-
-  const r = right ? Number.parseFloat(right.substring(0, right.indexOf('px'))) : undefined
-  
-  if (r !== undefined) {
-    const containerLeft = window.innerWidth - r - (containerWidth.value / 2) - MARGIN
-
-    if (containerLeft < 0) return {marginLeft: (0 - containerLeft) + 'px', marginRight: containerLeft + 'px'}
-
-    const containerRight = r - (containerWidth.value / 2) - MARGIN
-
-    if (containerRight < 0) return {marginRight: (0 - containerRight) + 'px', marginLeft: containerRight + 'px'}
-
-    return {}
-  }
-}
-
-const marginStyleCache = ref()
-
-const getMarginStylesCached = (left?: string, right?: string) => {
-  const styles = getMarginStyles(left, right)
-
-  if (!styles) return marginStyleCache.value
-
-  marginStyleCache.value = styles
-
-  return styles
 }
 
 onBeforeMount(() => {

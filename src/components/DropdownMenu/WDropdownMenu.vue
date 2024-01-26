@@ -28,6 +28,7 @@
             'z-[2]': !teleport,
             'z-30': teleport,
           }"
+          class="will-change-[top,bottom]"
           @update:rect="$emit('update:rect')"
         >
           <slot name="content" />

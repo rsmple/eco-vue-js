@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onBeforeUnmount, ref, toRef, useSlots, watch} from 'vue'
+import {computed, markRaw, onBeforeUnmount, ref, toRef, useSlots, watch} from 'vue'
 import {getIsTouchDevice} from '@/utils/mobile'
 import {Tooltip} from '@/utils/Tooltip'
 import {getIncrement} from './models/utils'
@@ -18,6 +18,7 @@ const props = defineProps<{
   overflowOnly?: boolean
   light?: boolean
   trigger?: Element
+  maxHeight?: number
 }>()
 
 const slots = useSlots()
@@ -43,7 +44,14 @@ const open = () => {
     if (parent.value.scrollHeight === Math.round(rect.height) && parent.value.scrollWidth === Math.round(rect.width)) return
   }
 
-  Tooltip.add({parent: parent.value, slot, text: props.text, light: props.light, key: getIncrement()})
+  Tooltip.add({
+    parent: parent.value,
+    slot: slot ? markRaw(slot) : undefined,
+    text: props.text,
+    light: props.light,
+    key: getIncrement(),
+    maxHeight: props.maxHeight,
+  })
 }
 
 const close = () => {
