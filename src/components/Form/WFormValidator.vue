@@ -2,7 +2,7 @@
   <component
     :is="component"
     :error-message="errorMessage"
-    :has-changes="hasChanges"
+    :has-changes="noChanges ? undefined : hasChanges"
     @update:model-value="_validateOnUpdate"
     @select="_validateOnSelect"
     @unselect="_validateOnUnselect"
@@ -19,6 +19,7 @@ const props = defineProps<{
   validate?: ValidateFn | ValidateFn[]
   forbiddenRegexp?: RegExp
   requiredSymbols?: string
+  noChanges?: boolean
 }>()
 
 const emit = defineEmits<{

@@ -30,7 +30,7 @@
           index !== 0 ?'rounded-l-none border-l-0' : getValue(item) !== modelValue && '-ml-px',
           stretch ? 'flex-1' : undefined,
         ]"
-        @click="getValue(item) !== modelValue && $emit('update:modelValue', getValue(item))"
+        @click="(alwaysEmit || getValue(item) !== modelValue) && $emit('update:modelValue', getValue(item))"
       >
         <slot :item="(item as ValueGetter extends undefined ? Model : Entity)" />
       </WButton>
@@ -53,6 +53,7 @@ type PropsForModel = {
   wrap?: boolean
   semanticType?: SemanticType
   stretch?: boolean
+  alwaysEmit?: boolean
 }
 
 type PropsForEntity = {
@@ -66,6 +67,7 @@ type PropsForEntity = {
   wrap?: boolean
   semanticType?: SemanticType
   stretch?: boolean
+  alwaysEmit?: boolean
 }
 
 const props = defineProps<PropsForEntity | PropsForModel>()
