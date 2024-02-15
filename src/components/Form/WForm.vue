@@ -20,16 +20,16 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:isValid', value: boolean | undefined): void
-  (e: 'update:hasChanges', value: boolean): void
+  (e: 'update:is-valid', value: boolean | undefined): void
+  (e: 'update:has-changes', value: boolean): void
 }>()
 
 const name = computed(() => props.name)
 
 const {titleGetter, titleMapUnlistener} = useFormTitleMap(name, toRef(props, 'title'))
-const {errorMessageMapUnlistener, isValid, errorMessage} = useFormErrorMessageMap(name, titleGetter)
+const {errorMessageMapUnlistener, isValid, errorMessage, errorMessageMap} = useFormErrorMessageMap(name, titleGetter)
 const {hasChangesMapUnlistener, hasChanges} = useFormHasChangesMap(name)
-const {validateMapUnlistener, validate} = useFormValidateMap(name, titleGetter, value => emit('update:isValid', value))
+const {validateMapUnlistener, validate} = useFormValidateMap(name, titleGetter, value => emit('update:is-valid', value))
 const {invalidateMapUnlistener, invalidate} = useFormInvalidateMap(name)
 const {initModelMapUnlistener, initModel} = useFormInitModelMap(name)
 
@@ -46,16 +46,16 @@ provide(wFormUnlistener, unlistener)
 
 const unlistenerInjected = inject(wFormUnlistener, undefined)
 
-watch(isValid, value => emit('update:isValid', value))
+watch(errorMessageMap, () => emit('update:is-valid', isValid.value))
 
-watch(hasChanges, value => emit('update:hasChanges', value))
+watch(hasChanges, value => emit('update:has-changes', value))
 
 onBeforeUnmount(() => {
   if (props.name) {
     unlistenerInjected?.(props.name)
   }
 
-  emit('update:isValid', undefined)
+  emit('update:is-valid', undefined)
 })
 
 defineExpose({

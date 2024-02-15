@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, watch} from 'vue'
+import {computed, onUnmounted, watch} from 'vue'
 import {RouterLink, useRoute, useRouter, type RouteLocationRaw} from 'vue-router'
 import {isEqualObj, numberCompactFormatter} from '@/utils/utils'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
@@ -93,5 +93,9 @@ const isActive = computed<boolean>(() => {
 const isBigCount = computed<boolean>(() => props.counter !== undefined && props.counter >= 1000)
 
 watch(isActive, value => emit('update:isActive', {[props.title]: value}), {immediate: true})
+
+onUnmounted(() => {
+  emit('update:isActive', {[props.title]: false})
+})
 
 </script>

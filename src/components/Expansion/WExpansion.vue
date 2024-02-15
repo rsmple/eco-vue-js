@@ -11,7 +11,7 @@
       <div
         v-if="isOpen"
         v-show="isShown"
-        class="duration-[var(--expansion-duration,300ms)]"
+        class="duration-[var(--expansion-duration,200ms)]"
       >
         <div class="[overflow:inherit]">
           <slot />

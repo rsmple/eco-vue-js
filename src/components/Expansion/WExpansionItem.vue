@@ -2,7 +2,7 @@
   <div class="overflow-hidden">
     <component
       :is="$slots.title?.()?.[0] ?? 'button'"
-      class="flex py-4 cursor-pointer select-none w-full"
+      class="grid grid-cols-[1fr,auto] py-4 cursor-pointer select-none w-full text-start items-center"
       @click="$emit('toggle')"
     >
       <div

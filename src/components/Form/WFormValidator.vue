@@ -24,6 +24,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:has-changes', value: boolean): void
+  (e: 'update:is-valid', value: boolean): void
 }>()
 
 const titleUpdater = inject(wFormTitleUpdater, undefined)
@@ -57,7 +58,7 @@ const initModelValue = ref<Parameters<ValidateFn>[0]>()
 const required = computed<boolean | undefined>(() => component.value?.props?.required !== undefined ? component.value?.props?.required !== false : undefined)
 const title = computed<string | undefined>(() => props.title ?? component.value?.props?.title)
 
-const errorMessage = ref<string | undefined>()
+const errorMessage = ref<string | undefined | null>(null)
 
 const hasChanges = ref<boolean>(false)
 const hasBeenValidated = ref<boolean>(false)
@@ -192,9 +193,13 @@ const initModel = (): void => {
 }
 
 watch(errorMessage, value => {
+  if (value === null) return
+
   if (props.name) {
     errorMessageUpdater?.(props.name, value)
   }
+
+  emit('update:is-valid', !value)
 })
 
 watch(hasChanges, value => {

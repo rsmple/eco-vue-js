@@ -32,5 +32,6 @@ export const useFormErrorMessageMap = (name: Ref<string | undefined>, titleGette
     errorMessageMapUnlistener,
     isValid,
     errorMessage,
+    errorMessageMap,
   }
 }
