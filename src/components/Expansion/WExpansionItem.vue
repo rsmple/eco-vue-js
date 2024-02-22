@@ -16,19 +16,21 @@
           />
         </template>
 
-        {{ title }}
+        <span class="pr-4 relative">
+          {{ title }}
 
-        <Transition
-          enter-active-class="transition-opacity"
-          leave-active-class="transition-opacity"
-          enter-from-class="opacity-0"
-          leave-to-class="opacity-0"
-        >
-          <div
-            v-if="hasFlag"
-            class="absolute top-0 right-0 square-2 rounded-full bg-info dark:bg-info-dark"
-          />
-        </Transition>
+          <Transition
+            enter-active-class="transition-opacity"
+            leave-active-class="transition-opacity"
+            enter-from-class="opacity-0"
+            leave-to-class="opacity-0"
+          >
+            <div
+              v-if="hasFlag"
+              class="absolute top-0 right-0 square-2 rounded-full bg-info dark:bg-info-dark"
+            />
+          </Transition>
+        </span>
       </div>
 
       <div class="flex justify-center items-center ml-auto">

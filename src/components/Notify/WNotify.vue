@@ -37,7 +37,12 @@ const NOTIFY_DELAY = 5000
 const list = ref<Array<NotifyConfig & NotifyMeta>>([])
 
 const addNotify: AddNotify = (config: NotifyConfig): void => {
-  const index = list.value.findIndex(item => item.type === config.type && item.title === config.title && item.caption === config.caption)
+  const index = list.value.findIndex(item => item.type === config.type
+    && item.title === config.title
+    && item.caption === config.caption
+    && item.userInput === config.userInput
+    && item.to?.name === config.to?.name,
+  )
 
   const configMeta = {
     ...config,

@@ -9,26 +9,14 @@
       [semanticTypeTextStylesMap[semanticType]]: true,
     }"
   >
-    <span
-      class="inline"
+    <IconLink
+      class="inline -mt-1 rounded-lg p-[1px]"
       :class="{
-        'mr-1': !small,
-        'mr-0.5': small,
+        'square-5 mr-1': !small,
+        'square-3 mr-0.5': small,
+        [semanticTypeIconStylesMap[semanticType]]: true,
       }"
-    >
-      <IconLink
-        class="inline -mt-1 rounded-lg p-[1px]"
-        :class="{
-          'square-5': !small,
-          'square-3': small,
-          [semanticTypeIconStylesMap[semanticType]]: true,
-        }"
-      />
-    </span>
-
-    <slot>
-      {{ text }}
-    </slot>
+    /><slot>{{ text }}</slot>
   </component>
 </template>
 
