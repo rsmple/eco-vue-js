@@ -46,7 +46,7 @@
         :svg-width="containerWidth"
         :svg-height="containerHeight"
         :is-active="isActive"
-        :has-error="errorMessage !== undefined"
+        :has-error="!!errorMessage"
         class="absolute top-0 left-0"
       />
 
@@ -56,7 +56,7 @@
       >
         <FilePickerItem
           :name="placeholder"
-          :has-error="errorMessage !== undefined"
+          :has-error="!!errorMessage"
           @click:cancel="$emit('clear:placeholder')"
         >
           <template #positive>
@@ -99,7 +99,7 @@
             v-for="(file, index) in modelValue"
             :key="index"
             :name="file.name"
-            :has-error="errorMessage !== undefined"
+            :has-error="!!errorMessage"
             @click:cancel="unselectFile(index)"
           >
             <template #positive>

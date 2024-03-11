@@ -15,8 +15,8 @@ npm i eco-vue-js
 1. Add the following lines to the `content` section in your [Tailwind configuration file](https://tailwindcss.com/docs/content-configuration):
     ```
     content: [
-      './node_modules/eco-vue-js/dist/components/**/*.vue.js}',
-      './node_modules/eco-vue-js/dist/components/**/*.js}',
+      './node_modules/eco-vue-js/dist/components/**/*.vue.js',
+      './node_modules/eco-vue-js/dist/components/**/*.js',
     ]
     ```
 2. Add the library's [Tailwind preset](https://tailwindcss.com/docs/presets) to your configuration file:

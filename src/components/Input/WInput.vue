@@ -153,8 +153,8 @@
               v-if="hasChanges"
               class="square-2 rounded-full transition-colors absolute top-0 right-0 z-10"
               :class="{
-                'bg-info dark:bg-info-dark': isFocused || errorMessage === undefined,
-                'bg-negative dark:bg-negative-dark': !isFocused && errorMessage !== undefined,
+                'bg-info dark:bg-info-dark': isFocused || !errorMessage,
+                'bg-negative dark:bg-negative-dark': !isFocused && errorMessage,
               }"
             />
           </Transition>
