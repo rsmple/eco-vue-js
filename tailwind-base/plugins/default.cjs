@@ -98,7 +98,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
   addVariant('touch-not', '.touch-not &')
 
   addBase({
-    'input': {
+    '.w-input': {
       'outline': 'none',
 
       '--input-autofill-bg': theme('colors.default'),

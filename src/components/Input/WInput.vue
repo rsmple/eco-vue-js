@@ -81,7 +81,7 @@
               :id="inputId"
               ref="input"
               class="
-                text-base font-normal outline-0 border-none bg-[inherit] flex-1 max-w-full
+                text-base font-normal outline-0 border-none bg-[inherit] flex-1 max-w-full w-input
                 disabled:opacity-80 disabled:cursor-not-allowed placeholder:text-gray-400 dark:placeholder:text-gray-500 appearance-none
               "
               :class="{
