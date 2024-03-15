@@ -36,6 +36,7 @@
     :reverse-selection="reverseSelection"
     :allow-page-selection="allowPageSelection"
     :page-class="pageClass"
+    :max-pages="maxPages"
 
     @update:count="$emit('update:count', $event)"
     @update:selected="$emit('update:selected', $event)"
@@ -86,6 +87,7 @@ const props = withDefaults(
     reverseSelection?: boolean
     allowPageSelection?: boolean
     pageClass?: string
+    maxPages?: number
   }>(),
   {
     skeletonLength: undefined,
@@ -96,6 +98,7 @@ const props = withDefaults(
     excludeParams: undefined,
     emptyStub: undefined,
     pageClass: undefined,
+    maxPages: undefined,
   },
 )
 

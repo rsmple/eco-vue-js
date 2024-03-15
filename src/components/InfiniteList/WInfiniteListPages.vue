@@ -81,8 +81,6 @@ import InfiniteListButton from './components/InfiniteListButton.vue'
 import {isEqualObj} from '@/utils/utils'
 import {getIsScrollDown} from './models/utils'
 
-const MAX_PAGES = 5
-
 const props = withDefaults(
   defineProps<{
     useQueryFn: UsePaginatedQuery<Data>
@@ -107,6 +105,7 @@ const props = withDefaults(
     reverseSelection?: boolean
     allowPageSelection?: boolean
     pageClass?: string
+    maxPages?: number
   }>(),
   {
     skeletonLength: undefined,
@@ -118,6 +117,7 @@ const props = withDefaults(
     excludeParams: undefined,
     emptyStub: undefined,
     pageClass: undefined,
+    maxPages: 5,
   },
 )
 
@@ -182,7 +182,7 @@ const addNextPage = (silent?: boolean) => {
 
   if (!silent) emit('update:page', nextPage.value)
 
-  if (pages.value.length < MAX_PAGES) return
+  if (pages.value.length < props.maxPages) return
 
   const firstPage = pages.value.shift()
 
@@ -199,7 +199,7 @@ const addPreviousPage = (silent?: boolean) => {
 
   if (!silent) emit('update:page', previousPage.value)
 
-  if (pages.value.length < MAX_PAGES) return
+  if (pages.value.length < props.maxPages) return
 
   const lastPage = pages.value.pop()
 
