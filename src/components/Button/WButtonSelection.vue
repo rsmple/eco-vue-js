@@ -1,7 +1,43 @@
 <template>
-  <div class="flex h-12 pb-3 w-full">
-    <div class="flex flex-1">
-      <slot />
+  <div class="grid grid-cols-[1fr,auto] h-12 pb-3 w-full">
+    <div class="flex">
+      <component
+        :is="slot"
+        v-for="(slot, index) in $slots.default?.()"
+        :key="index"
+        class="border-r border-solid border-gray-300 dark:border-gray-700 last:border-r-0"
+      />
+
+      <WDropdownMenu
+        v-if="$slots.more?.()?.length"
+        :is-open="isOpen"
+        :max-width="200"
+        :max-height="300"
+        :horizontal-align="HorizontalAlign.RIGHT_INNER"
+      >
+        <template #toggle>
+          <WButtonSelectionAction
+            title="More"
+            :icon="markRaw(IconMore)"
+            :disable-message="disableMessageMore"
+            @click="isOpen = !isOpen"
+          />
+        </template>
+
+        <template #content>
+          <WClickOutside
+            class="my-2 grid grid-cols-1 bg-default dark:bg-default-dark shadow-md rounded-xl overflow-hidden dark:outline dark:outline-1 dark:outline-gray-800"
+            @click="isOpen = false"
+          >
+            <component
+              :is="slot"
+              v-for="(slot, index) in $slots.more?.()"
+              :key="index"
+              class="first:pt-2 last:pb-2"
+            />
+          </WClickOutside>
+        </template>
+      </WDropdownMenu>
     </div>
 
     <Transition
@@ -30,16 +66,25 @@
 </template>
 
 <script lang="ts" setup>
+import {ref, markRaw} from 'vue'
 import {numberFormatter} from '@/utils/utils'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
+import IconMore from '@/assets/icons/default/IconMore.svg?component'
+import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+import WButtonSelectionAction from './WButtonSelectionAction.vue'
+import {HorizontalAlign} from '@/utils/HorizontalAlign'
+import WClickOutside from '../ClickOutside/WClickOutside.vue'
 
 defineProps<{
   title?: string
   selectedLength?: number
+  disableMessageMore?: string
 }>()
 
 defineEmits<{
   (e: 'clear:selected'): void
 }>()
+
+const isOpen = ref(false)
 
 </script>
