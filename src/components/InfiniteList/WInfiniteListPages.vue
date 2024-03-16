@@ -34,6 +34,8 @@
       :allow-page-selection="allowPageSelection"
       :min-height="minHeight"
       :page-class="pageClass"
+      :refetch-interval="refetchInterval"
+      :scrolling-element="scrollingElement"
 
       :class="{
         'last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16': !minHeight,
@@ -106,6 +108,7 @@ const props = withDefaults(
     allowPageSelection?: boolean
     pageClass?: string
     maxPages?: number
+    refetchInterval?: number | false
   }>(),
   {
     skeletonLength: undefined,
@@ -118,6 +121,7 @@ const props = withDefaults(
     emptyStub: undefined,
     pageClass: undefined,
     maxPages: 5,
+    refetchInterval: undefined,
   },
 )
 

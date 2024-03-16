@@ -118,7 +118,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData">
-import {toRef, computed, watch, ref, onMounted, nextTick} from 'vue'
+import {toRef, computed, watch, ref, onMounted, nextTick, onBeforeUnmount} from 'vue'
 import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
 import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
 
@@ -143,6 +143,8 @@ const props = withDefaults(
     allowPageSelection?: boolean
     minHeight?: boolean
     pageClass?: string
+    refetchInterval?: number | false
+    scrollingElement?: Element | null
   }>(),
   {
     keyGetter: undefined,
@@ -150,6 +152,8 @@ const props = withDefaults(
     previous: undefined,
     emptyStub: 'Nothing to show',
     pageClass: undefined,
+    refetchInterval: undefined,
+    scrollingElement: undefined,
   },
 )
 
@@ -167,8 +171,14 @@ const emit = defineEmits<{
 }>()
 
 const element = ref<HTMLElement>()
+const isIntersecting = ref(false)
 
-const {data, error, setData, refetch, isFetching} = props.useQueryFn(toRef(props, 'queryParams'))
+const {data, error, setData, refetch, isFetching} = props.useQueryFn(
+  toRef(props, 'queryParams'),
+  {
+    refetchInterval: props.refetchInterval ? computed(() => isIntersecting.value ? props.refetchInterval : undefined) : undefined,
+  },
+)
 
 const count = computed(() => data.value?.count)
 const pagesCount = computed(() => data.value?.pages_count)
@@ -237,8 +247,30 @@ watch(isFetching, value => {
 })
 
 let height = 0
+let intersectionObserver: IntersectionObserver | undefined
+
+const observerCb = (entries: IntersectionObserverEntry[]) => {
+  isIntersecting.value = entries.some(entry => {
+    if (entry.target === element.value) {
+      return entry.isIntersecting
+    }
+  })
+}
 
 onMounted(() => {
+  if (props.refetchInterval && element.value) {
+    intersectionObserver = new IntersectionObserver(
+      observerCb,
+      {
+        root: props.scrollingElement ?? null,
+        rootMargin: '0px',
+        threshold: 0,
+      },
+    )
+
+    intersectionObserver.observe(element.value)
+  }
+
   height = element.value?.getBoundingClientRect()?.height ?? 0
 
   if (height === 0) return
@@ -250,6 +282,11 @@ onMounted(() => {
   }
 
   emit('update:scroll', height)
+})
+
+onBeforeUnmount(() => {
+  intersectionObserver?.disconnect()
+  intersectionObserver = undefined
 })
 
 watch(data, async (_, oldValue) => {

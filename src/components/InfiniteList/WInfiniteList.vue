@@ -37,6 +37,7 @@
     :allow-page-selection="allowPageSelection"
     :page-class="pageClass"
     :max-pages="maxPages"
+    :refetch-interval="refetchInterval"
 
     @update:count="$emit('update:count', $event)"
     @update:selected="$emit('update:selected', $event)"
@@ -88,6 +89,7 @@ const props = withDefaults(
     allowPageSelection?: boolean
     pageClass?: string
     maxPages?: number
+    refetchInterval?: number | false
   }>(),
   {
     skeletonLength: undefined,
@@ -99,6 +101,7 @@ const props = withDefaults(
     emptyStub: undefined,
     pageClass: undefined,
     maxPages: undefined,
+    refetchInterval: undefined,
   },
 )
 
