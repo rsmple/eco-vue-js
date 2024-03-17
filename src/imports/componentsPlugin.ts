@@ -1,5 +1,6 @@
 import type {App} from 'vue'
 
+import WActionsBar from '@/components/ActionsBar/WActionsBar.vue'
 import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import WButton from '@/components/Button/WButton.vue'
 import WButtonAction from '@/components/Button/WButtonAction.vue'
@@ -21,6 +22,7 @@ import WExpansion from '@/components/Expansion/WExpansion.vue'
 import WExpansionItem from '@/components/Expansion/WExpansionItem.vue'
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 import WFilePicker from '@/components/FilePicker/WFilePicker.vue'
+import WFilterWrapper from '@/components/FilterWrapper/WFilterWrapper.vue'
 import WForm from '@/components/Form/WForm.vue'
 import WFormValidator from '@/components/Form/WFormValidator.vue'
 import WHeaderBar from '@/components/HeaderBar/WHeaderBar.vue'
@@ -63,6 +65,7 @@ import WTooltipContainer from '@/components/Tooltip/WTooltipContainer.vue'
 export default {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   install: (app: App | any) => {
+    app.component('WActionsBar', WActionsBar)
     app.component('WBottomSheet', WBottomSheet)
     app.component('WButton', WButton)
     app.component('WButtonAction', WButtonAction)
@@ -84,6 +87,7 @@ export default {
     app.component('WExpansionItem', WExpansionItem)
     app.component('WFieldWrapper', WFieldWrapper)
     app.component('WFilePicker', WFilePicker)
+    app.component('WFilterWrapper', WFilterWrapper)
     app.component('WForm', WForm)
     app.component('WFormValidator', WFormValidator)
     app.component('WHeaderBar', WHeaderBar)
@@ -126,6 +130,7 @@ export default {
 }
 
 export {
+  WActionsBar,
   WBottomSheet,
   WButton,
   WButtonAction,
@@ -147,6 +152,7 @@ export {
   WExpansionItem,
   WFieldWrapper,
   WFilePicker,
+  WFilterWrapper,
   WForm,
   WFormValidator,
   WHeaderBar,

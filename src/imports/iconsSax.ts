@@ -19,6 +19,7 @@ export {default as IconExport} from '@/assets/icons/sax/IconExport.svg?component
 export {default as IconEye} from '@/assets/icons/sax/IconEye.svg?component'
 export {default as IconEyeSlash} from '@/assets/icons/sax/IconEyeSlash.svg?component'
 export {default as IconFilter} from '@/assets/icons/sax/IconFilter.svg?component'
+export {default as IconFilterRemove} from '@/assets/icons/sax/IconFilterRemove.svg?component'
 export {default as IconFinding} from '@/assets/icons/sax/IconFinding.svg?component'
 export {default as IconFolder} from '@/assets/icons/sax/IconFolder.svg?component'
 export {default as IconFolderCross} from '@/assets/icons/sax/IconFolderCross.svg?component'

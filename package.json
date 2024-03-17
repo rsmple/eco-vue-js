@@ -99,6 +99,9 @@
     "./dist/utils/Tooltip": {
       "import": "./dist/utils/Tooltip.js"
     },
+    "./dist/components/ActionsBar/WActionsBar.vue": {
+      "import": "./dist/components/ActionsBar/WActionsBar.vue.js"
+    },
     "./dist/components/BottomSheet/WBottomSheet.vue": {
       "import": "./dist/components/BottomSheet/WBottomSheet.vue.js"
     },
@@ -161,6 +164,9 @@
     },
     "./dist/components/FilePicker/WFilePicker.vue": {
       "import": "./dist/components/FilePicker/WFilePicker.vue.js"
+    },
+    "./dist/components/FilterWrapper/WFilterWrapper.vue": {
+      "import": "./dist/components/FilterWrapper/WFilterWrapper.vue.js"
     },
     "./dist/components/Form/WForm.vue": {
       "import": "./dist/components/Form/WForm.vue.js"
