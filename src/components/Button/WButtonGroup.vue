@@ -38,7 +38,7 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends ((value: Entity) => Model) | undefined = undefined">
+<script lang="ts" setup generic="Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined">
 import WButton from './WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
 

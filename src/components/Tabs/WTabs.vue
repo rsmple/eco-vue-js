@@ -100,9 +100,9 @@ const emit = defineEmits<{
   (e: 'update:has-changes', value: boolean): void
 }>()
 
-const slots = useSlots()
+const usedSlots = useSlots()
 
-const defaultSlots = computed(() => (props.slots ?? slots.default?.() ?? []).filter(item => typeof item.type !== 'symbol'))
+const defaultSlots = computed(() => (props.slots ?? usedSlots.default?.() ?? []).filter(item => typeof item.type !== 'symbol'))
 
 const current = ref(props.initTab ?? 0)
 const isDirect = ref(true)
