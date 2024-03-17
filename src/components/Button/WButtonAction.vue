@@ -7,7 +7,7 @@
     "
     :class="{
       'text-primary-default dark:text-primary-dark': active && semanticType === SemanticType.SECONDARY,
-      [semanticTypeStylesMap[semanticType]]: true,
+      [outline ? semanticTypeOutlineStylesMap[semanticType] : semanticTypeStylesMap[semanticType]]: true,
     }"
     @click="$emit('click', $event)"
   >
@@ -48,6 +48,15 @@ const semanticTypeStylesMap: Record<SemanticType, string> = {
   [SemanticType.INFO]: 'text-default dark:text-default-dark bg-info dark:bg-info-dark',
 }
 
+const semanticTypeOutlineStylesMap: Record<SemanticType, string> = {
+  [SemanticType.SECONDARY]: 'text-description bg-default dark:bg-default-dark hover:text-primary-default dark:hover:text-primary-dark',
+  [SemanticType.PRIMARY]: 'text-primary-default text-primary-dark',
+  [SemanticType.POSITIVE]: 'text-positive dark:text-positive-dark',
+  [SemanticType.WARNING]: 'text-warning dark:text-warning-dark',
+  [SemanticType.NEGARIVE]: 'text-negative dark:text-negative-dark',
+  [SemanticType.INFO]: 'text-info dark:text-info-dark',
+}
+
 withDefaults(
   defineProps<{
     icon?: SVGComponent
@@ -57,6 +66,7 @@ withDefaults(
     to?: RouteLocationRaw
     count?: number
     semanticType?: SemanticType
+    outline?: boolean
   }>(),
   {
     icon: undefined,
