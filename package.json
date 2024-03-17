@@ -17,9 +17,9 @@
     "write-imports": "node write-imports.js"
   },
   "peerDependencies": {
-    "@tanstack/vue-query": "^5.17.19",
-    "vue": "^3.4.21",
-    "vue-router": "^4.2.5"
+    "@tanstack/vue-query": ">=5.17.19",
+    "vue": ">=3.4.21",
+    "vue-router": ">=4.2.5"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "1.7.2",
