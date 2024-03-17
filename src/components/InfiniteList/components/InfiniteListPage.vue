@@ -19,6 +19,7 @@
           :select-only="selectOnly"
           :unselect-only="unselectOnly"
           :reverse="reverseSelection"
+          :value-getter="valueGetter"
 
           class="sm:w-list-row-item sm-not:px-[calc(var(--inner-margin)-2px)] pb-4 pt-6"
           @update:selected="$emit('update:selected', $event)"
@@ -45,7 +46,7 @@
           >
             <div
               v-for="(item, index) in data.results"
-              :key="item.id"
+              :key="valueGetter(item)"
               class="w-full group"
             >
               <div class="[overflow:inherit]">
@@ -66,7 +67,7 @@
           <template v-else>
             <template
               v-for="(item, index) in data.results"
-              :key="item.id"
+              :key="valueGetter(item)"
             >
               <slot
                 :item="item"
@@ -117,7 +118,7 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
 import {toRef, computed, watch, ref, onMounted, nextTick, onBeforeUnmount} from 'vue'
 import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
 import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
@@ -131,7 +132,7 @@ const props = withDefaults(
     firstPage: boolean
     lastPage: boolean
     hidePageTitle?: boolean
-    selected?: number[]
+    selected?: Model[]
     wrap?: boolean
     noGap?: boolean
     transition?: boolean
@@ -145,6 +146,7 @@ const props = withDefaults(
     pageClass?: string
     refetchInterval?: number | false
     scrollingElement?: Element | null
+    valueGetter: (data: Data) => Model
   }>(),
   {
     keyGetter: undefined,
@@ -166,7 +168,7 @@ const emit = defineEmits<{
   (e: 'error:invalidPage', value: number): void
   (e: 'refetch'): void
   (e: 'update-from-header:scroll'): void
-  (e: 'update:selected', values: number[]): void
+  (e: 'update:selected', values: Model[]): void
   (e: 'fetched'): void
 }>()
 

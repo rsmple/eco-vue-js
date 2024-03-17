@@ -32,6 +32,7 @@
         :select-only="selectOnly"
         :unselect-only="unselectOnly"
         :hide-option-icon="hideOptionIcon"
+        :value-getter="valueGetter"
         allow-update-selected
         transition
         no-padding
@@ -53,29 +54,39 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
 import {ref} from 'vue'
 import SelectAsyncList from './components/SelectAsyncList.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
-defineProps<{
-  title?: string
-  emptyStub?: string
-  modelValue: number[]
-  useQueryFn: UsePaginatedQuery<Data>
-  isInvalidPage: (error: unknown) => boolean
-  queryParams: QueryParams
-  skeleton?: boolean
-  excludeParams?: string[]
-  selectOnly?: boolean
-  unselectOnly?: boolean
-  hideOptionIcon?: boolean
-}>()
+withDefaults(
+  defineProps<{
+    title?: string
+    emptyStub?: string
+    modelValue: Model[]
+    useQueryFn: UsePaginatedQuery<Data>
+    isInvalidPage: (error: unknown) => boolean
+    queryParams: QueryParams
+    skeleton?: boolean
+    excludeParams?: string[]
+    selectOnly?: boolean
+    unselectOnly?: boolean
+    hideOptionIcon?: boolean
+    valueGetter?: (data: Data) => Model
+  }>(),
+  {
+    title: undefined,
+    emptyStub: undefined,
+    excludeParams: undefined,
+    valueGetter: (data: Data) => (data.id as Model),
+  },
+)
+
 
 defineEmits<{
-  (e: 'select', value: number): void
-  (e: 'unselect', value: number): void
-  (e: 'update:model-value', value: number[]): void
+  (e: 'select', value: Model): void
+  (e: 'unselect', value: Model): void
+  (e: 'update:model-value', value: Model[]): void
   (e: 'update:count', value: number): void
 }>()
 

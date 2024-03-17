@@ -40,6 +40,8 @@
         :option-component="optionComponent"
         :disable-clear="disableClear"
         :preview-data="previewData"
+        :value-getter="valueGetter ?? ((item: Data) => (item.id as Model))"
+        :value-query-key="valueQueryKey"
         @unselect="unselect"
         @update:fetching="!$event && updateDropdown(); isFetchingPrefix = $event"
         @update:model-value="updateSelected"
@@ -75,6 +77,7 @@
         :empty-stub="emptyStub ?? 'No match'"
         :allow-create="allowCreate && search !== ''"
         :hide-option-icon="hideOptionIcon"
+        :value-getter="valueGetter"
         @select="select"
         @unselect="unselect"
         @create:option="create"
@@ -103,55 +106,74 @@
   </WInputSuggest>
 </template>
 
-<script lang="ts" setup generic="Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
 import {ref, nextTick, computed, type Component} from 'vue'
 import {getIsMobile} from '@/utils/mobile'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 import SelectAsyncPrefix from './components/SelectAsyncPrefix.vue'
 import SelectAsyncList from './components/SelectAsyncList.vue'
 
-const props = defineProps<{
-  modelValue: number[]
-  search: string
-  useQueryFn: UsePaginatedQuery<Data>
-  isInvalidPage: (error: unknown) => boolean
-  queryParams: QueryParams
-  title?: string
-  mobileTitle?: string
-  description?: string
-  loading?: boolean
-  emptyStub?: string
-  maxSearchLength?: number
-  optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
-  disableClear?: boolean
-  hidePrefix?: boolean
-  readonly?: boolean
-  disabled?: boolean
-  skeleton?: boolean
-  searchSize?: number
-  allowCreate?: boolean
-  errorMessage?: string
-  required?: boolean
-  hasChanges?: boolean
-  placeholder?: string
-  noMargin?: boolean
-  icon?: SVGComponent
-  mono?: boolean
-  previewData?: Data[]
-  hideOptionIcon?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    modelValue: Model[]
+    search: string
+    useQueryFn: UsePaginatedQuery<Data>
+    isInvalidPage: (error: unknown) => boolean
+    queryParams: QueryParams
+    title?: string
+    mobileTitle?: string
+    description?: string
+    loading?: boolean
+    emptyStub?: string
+    maxSearchLength?: number
+    optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
+    disableClear?: boolean
+    hidePrefix?: boolean
+    readonly?: boolean
+    disabled?: boolean
+    skeleton?: boolean
+    searchSize?: number
+    allowCreate?: boolean
+    errorMessage?: string
+    required?: boolean
+    hasChanges?: boolean
+    placeholder?: string
+    noMargin?: boolean
+    icon?: SVGComponent
+    mono?: boolean
+    previewData?: Data[]
+    hideOptionIcon?: boolean
+    valueGetter?: (data: Data) => Model
+    valueQueryKey?: string
+  }>(),
+  {
+    title: undefined,
+    mobileTitle: undefined,
+    description: undefined,
+    emptyStub: undefined,
+    maxSearchLength: undefined,
+    optionComponent: undefined,
+    searchSize: undefined,
+    errorMessage: undefined,
+    placeholder: undefined,
+    icon: undefined,
+    previewData: undefined,
+    valueGetter: (data: Data) => (data.id as Model),
+    valueQueryKey: 'id__in',
+  },
+)
 
 const emit = defineEmits<{
-  (e: 'select', item: number): void
-  (e: 'unselect', item: number): void
+  (e: 'select', item: Model): void
+  (e: 'unselect', item: Model): void
   (e: 'update:search', value: string): void
-  (e: 'update:modelValue', value: number[]): void
+  (e: 'update:modelValue', value: Model[]): void
   (e: 'create:option', value: string): void
 }>()
 
 const isOpen = ref(false)
 const input = ref<ComponentInstance<typeof WInputSuggest> | undefined>()
-const list = ref<ComponentInstance<typeof SelectAsyncList<Data>> | undefined>()
+const list = ref<ComponentInstance<typeof SelectAsyncList<Model, Data>> | undefined>()
 const isMobile = getIsMobile()
 const focused = ref(false)
 const isFetchingPrefix = ref(false)
@@ -180,13 +202,13 @@ const captureDoubleDelete = () => {
   }
 }
 
-const select = (item: number): void => {
+const select = (item: Model): void => {
   if (isDisabled.value) return
 
   emit('select', item)
 }
 
-const unselect = (item: number): void => {
+const unselect = (item: Model): void => {
   if (isDisabled.value) return
 
   emit('unselect', item)
@@ -198,7 +220,7 @@ const create = (): void => {
   emit('create:option', props.search)
 }
 
-const updateSelected = (value: number[]): void => {
+const updateSelected = (value: Model[]): void => {
   if (isDisabled.value) return
 
   emit('update:modelValue', value)

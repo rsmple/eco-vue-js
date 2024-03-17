@@ -36,6 +36,7 @@
       :page-class="pageClass"
       :refetch-interval="refetchInterval"
       :scrolling-element="scrollingElement"
+      :value-getter="valueGetter"
 
       :class="{
         'last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16': !minHeight,
@@ -74,7 +75,7 @@
   </InfiniteListScroll>
 </template>
 
-<script lang="ts" setup generic="Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
 import {ref, computed, watch, toRef, nextTick} from 'vue'
 import InfiniteListScroll from './components/InfiniteListScroll.vue'
 import InfiniteListPage from './components/InfiniteListPage.vue'
@@ -91,7 +92,7 @@ const props = withDefaults(
     skeletonLength?: number
     hidePageTitle?: boolean
     skipScrollTarget?: boolean
-    selected?: number[]
+    selected?: Model[]
     wrap?: boolean
     noGap?: boolean
     transition?: boolean
@@ -109,6 +110,7 @@ const props = withDefaults(
     pageClass?: string
     maxPages?: number
     refetchInterval?: number | false
+    valueGetter: (data: Data) => Model
   }>(),
   {
     skeletonLength: undefined,
@@ -128,7 +130,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'update:page', value: number | undefined): void
   (e: 'update:count', value: number): void
-  (e: 'update:selected', values: number[]): void
+  (e: 'update:selected', values: Model[]): void
 }>()
 
 const infiniteScroll = ref<ComponentInstance<typeof InfiniteListScroll> | undefined>()

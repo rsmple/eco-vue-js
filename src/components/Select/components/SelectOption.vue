@@ -37,7 +37,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Model extends number | string">
 import {onUnmounted, ref, toRef, watch} from 'vue'
 import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
@@ -50,8 +50,8 @@ const props = defineProps<{
   scroll?: boolean
   first?: boolean
   last?: boolean
-  previous?: number | null
-  next?: number | null
+  previous?: Model | null
+  next?: Model | null
   isNoCursor?: boolean
   hideOptionIcon?: boolean
 }>()
@@ -59,10 +59,10 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'select'): void
   (e: 'unselect'): void
-  (e: 'update:is-cursor', value: {previous: number | null | undefined, next: number | null | undefined}): void
+  (e: 'update:is-cursor', value: {previous: Model | null | undefined, next: Model | null | undefined}): void
   (e: 'update:cursor'): void
-  (e: 'update:previous', value: number | null | undefined): void
-  (e: 'update:next', value: number | null | undefined): void
+  (e: 'update:previous', value: Model | null | undefined): void
+  (e: 'update:next', value: Model | null | undefined): void
   (e: 'unmounted'): void
   (e: 'update:first'): void
   (e: 'update:last'): void

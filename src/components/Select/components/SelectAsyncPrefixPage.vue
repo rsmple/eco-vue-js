@@ -1,7 +1,7 @@
 <template>
   <div
     v-for="option in (previewData ?? data?.results)"
-    :key="option.id"
+    :key="valueGetter(option)"
     class="relative flex overflow-hidden items-center text-description"
     :class="{
       'cursor-pointer': !disabled,
@@ -31,7 +31,7 @@
                 'cursor-pointer w-ripple w-ripple-hover': !loading,
               }"
               @mousedown.stop.prevent=""
-              @click.stop.prevent="!loading && $emit('unselect', option.id)"
+              @click.stop.prevent="!loading && $emit('unselect', valueGetter(option))"
             >
               <IconCancel class="square-3" />
             </button>
@@ -48,14 +48,14 @@
         'cursor-pointer w-ripple w-ripple-hover ': !loading,
       }"
       @mousedown.stop.prevent=""
-      @click.stop.prevent="!loading && $emit('unselect', option.id)"
+      @click.stop.prevent="!loading && $emit('unselect', valueGetter(option))"
     >
       <IconCancel class="square-3" />
     </button>
   </div>
 </template>
 
-<script lang="ts" setup generic="Data extends DefaultData">
+<script lang="ts" setup generic="Model extends string | number, Data extends DefaultData">
 import {computed, toRef, watch, type Component, onBeforeUnmount} from 'vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 
@@ -67,10 +67,11 @@ const props = defineProps<{
   optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
   disableClear?: boolean
   previewData?: Data[]
+  valueGetter: (value: Data) => Model
 }>()
 
 const emit = defineEmits<{
-  (e: 'unselect', value: number): void
+  (e: 'unselect', value: Model): void
   (e: 'update:pages-count', value: number): void
   (e: 'update:fetching', value: boolean): void
 }>()

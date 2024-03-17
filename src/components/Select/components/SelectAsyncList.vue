@@ -11,6 +11,7 @@
       :empty-stub="emptyStub"
       :select-only="selectOnly"
       :unselect-only="unselectOnly"
+      :value-getter="valueGetter"
       hide-page-title
       header-top-ignore
       min-height
@@ -19,31 +20,31 @@
     >
       <template #default="{item, skeleton, previous, next, first, last, resetting}">
         <SelectOption
-          :is-selected="!skeleton && modelValue.includes(item.id)"
-          :is-cursor="!skeleton && item.id === cursor"
-          :loading="loading && loadingOptionId === item.id"
+          :is-selected="!skeleton && modelValue.includes(valueGetter(item))"
+          :is-cursor="!skeleton && valueGetter(item) === cursor"
+          :loading="loading && loadingOption === valueGetter(item)"
           :skeleton="skeleton"
           :scroll="isCursorLocked"
           :first="first"
           :last="last"
-          :previous="first && props.allowCreate ? null : previous?.id"
-          :next="last && props.allowCreate ? null : next?.id"
+          :previous="first && props.allowCreate ? null : previous ? valueGetter(previous) : undefined"
+          :next="last && props.allowCreate ? null : next ? valueGetter(next) : undefined"
           :is-no-cursor="cursor === undefined"
           :hide-option-icon="hideOptionIcon"
           :class="{
             'pt-4': !noPadding && first,
             'pb-4': !noPadding && last && !allowCreate,
           }"
-          @select="$emit('select', item.id); setLoadingOptionId(item.id)"
-          @unselect="$emit('unselect', item.id); setLoadingOptionId(item.id)"
-          @mouseenter="!skeleton && setCursor(item.id)"
-          @update:cursor="setCursor(item.id)"
-          @update:is-cursor="updateCursors($event.previous, $event.next)"
-          @update:previous="cursorPrevious = $event"
-          @update:next="cursorNext = $event"
-          @unmounted="resetting ? cursor = undefined : cursor = next?.id"
-          @update:first="firstItem = item.id"
-          @update:last="lastItem = item.id"
+          @select="$emit('select', valueGetter(item)); setLoadingOption(valueGetter(item))"
+          @unselect="$emit('unselect', valueGetter(item)); setLoadingOption(valueGetter(item))"
+          @mouseenter="!skeleton && setCursor(valueGetter(item))"
+          @update:cursor="setCursor(valueGetter(item))"
+          @update:is-cursor="updateCursors"
+          @update:previous="cursorPrevious = ($event as UnwrapRef<Model>)"
+          @update:next="cursorNext = ($event as UnwrapRef<Model>)"
+          @unmounted="resetting ? cursor = undefined : cursor = ((next ? valueGetter(next) : undefined) as UnwrapRef<Model>)"
+          @update:first="firstItem = valueGetter(item)"
+          @update:last="lastItem = valueGetter(item)"
         >
           <template #default="{selected}">
             <slot
@@ -60,7 +61,7 @@
       v-if="allowCreate"
       :is-selected="false"
       :is-cursor="cursor === null"
-      :loading="loading && loadingOptionId === null"
+      :loading="loading && loadingOption === null"
       :scroll="isCursorLocked"
       :previous="lastItem"
       :next="firstItem"
@@ -70,10 +71,10 @@
       class="first:pt-4 last:pb-4"
       @mouseenter="setCursor(null)"
       @update:cursor="setCursor(null)"
-      @select="$emit('create:option'); setLoadingOptionId(null)"
-      @update:is-cursor="updateCursors($event.previous, $event.next)"
-      @update:previous="cursorPrevious = $event"
-      @update:next="cursorNext = $event"
+      @select="$emit('create:option'); setLoadingOption(null)"
+      @update:is-cursor="updateCursors"
+      @update:previous="cursorPrevious = ($event as UnwrapRef<Model>)"
+      @update:next="cursorNext = ($event as UnwrapRef<Model>)"
       @unmounted="cursor = undefined"
     >
       <span class="w-select-field pr-2 sm-not:px-3 min-w-[4rem]">
@@ -89,14 +90,14 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Data extends DefaultData">
-import {ref} from 'vue'
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
+import {ref, type UnwrapRef} from 'vue'
 import SelectOption from './SelectOption.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 import {debounce} from '@/utils/utils'
 
 const props = defineProps<{
-  modelValue: number[]
+  modelValue: Model[]
   useQueryFn: UsePaginatedQuery<Data>
   queryParams: QueryParams
   isInvalidPage: (error: unknown) => boolean
@@ -111,27 +112,28 @@ const props = defineProps<{
   unselectOnly?: boolean
   allowCreate?: boolean
   hideOptionIcon?: boolean
+  valueGetter: (data: Data) => Model
 }>()
 
 const emit = defineEmits<{
-  (e: 'select', value: number): void
-  (e: 'unselect', value: number): void
+  (e: 'select', value: Model): void
+  (e: 'unselect', value: Model): void
   (e: 'update:count', value: number): void
-  (e: 'update:modelValue', value: number[]): void
+  (e: 'update:modelValue', value: Model[]): void
   (e: 'create:option'): void
 }>()
 
-const cursor = ref<number | null | undefined>(undefined)
-const cursorPrevious = ref<number | null | undefined>(undefined)
-const cursorNext = ref<number | null | undefined>(undefined)
+const cursor = ref<Model | null | undefined>(undefined)
+const cursorPrevious = ref<Model | null | undefined>(undefined)
+const cursorNext = ref<Model | null | undefined>(undefined)
 const isCursorLocked = ref(false)
-const loadingOptionId = ref<number | null | undefined>(undefined)
-const firstItem = ref<number | undefined>()
-const lastItem = ref<number | undefined>()
+const loadingOption = ref<Model | null | undefined>(undefined)
+const firstItem = ref<Model | undefined>()
+const lastItem = ref<Model | undefined>()
 const count = ref(0)
 
-const setLoadingOptionId = (value: number | null): void => {
-  loadingOptionId.value = value
+const setLoadingOption = (value: Model | null): void => {
+  loadingOption.value = value as UnwrapRef<Model>
 }
 
 const unlockCursor = debounce(() => {
@@ -144,15 +146,15 @@ const lockCursor = () => {
   unlockCursor()
 }
 
-const setCursor = (value: number | null): void => {
+const setCursor = (value: Model | null): void => {
   if (isCursorLocked.value) return
 
-  cursor.value = value
+  cursor.value = value as UnwrapRef<Model>
 }
 
-const updateCursors = (previous: number | null | undefined, next: number | null | undefined) => {
-  cursorPrevious.value = previous
-  cursorNext.value = next
+const updateCursors = (event: {previous: Model | null | undefined, next: Model | null | undefined}) => {
+  cursorPrevious.value = event.previous as UnwrapRef<Model>
+  cursorNext.value = event.next as UnwrapRef<Model>
 }
 
 const cursorUp = () => {
@@ -160,7 +162,7 @@ const cursorUp = () => {
 
   lockCursor()
 
-  cursor.value = cursorPrevious.value === null && !props.allowCreate ? lastItem.value : cursorPrevious.value
+  cursor.value = (cursorPrevious.value === null && !props.allowCreate ? lastItem.value : cursorPrevious.value) as UnwrapRef<Model>
 }
 
 const cursorDown = () => {
@@ -168,7 +170,7 @@ const cursorDown = () => {
 
   lockCursor()
 
-  cursor.value = cursorNext.value === null && !props.allowCreate ? firstItem.value : cursorNext.value
+  cursor.value = (cursorNext.value === null && !props.allowCreate ? firstItem.value : cursorNext.value) as UnwrapRef<Model>
 }
 
 const selectCursor = () => {
@@ -179,11 +181,11 @@ const selectCursor = () => {
     return
   }
 
-  if (cursor.value > 0) {
-    setLoadingOptionId(cursor.value)
+  if (cursor.value) {
+    setLoadingOption(cursor.value as Model)
 
-    if (props.modelValue.includes(cursor.value)) emit('unselect', cursor.value)
-    else emit('select', cursor.value)
+    if (props.modelValue.includes(cursor.value as Model)) emit('unselect', cursor.value as Model)
+    else emit('select', cursor.value as Model)
   }
 }
 

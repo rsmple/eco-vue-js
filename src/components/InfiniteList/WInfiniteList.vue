@@ -38,6 +38,7 @@
     :page-class="pageClass"
     :max-pages="maxPages"
     :refetch-interval="refetchInterval"
+    :value-getter="valueGetter"
 
     @update:count="$emit('update:count', $event)"
     @update:selected="$emit('update:selected', $event)"
@@ -59,7 +60,7 @@
   </WInfiniteListPages>
 </template>
 
-<script lang="ts" setup generic="Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
 import {onBeforeUnmount, onMounted, ref, watch} from 'vue'
 import {useInfiniteListHeader} from './use/useInfiniteListHeader'
 import WInfiniteListPages from './WInfiniteListPages.vue'
@@ -73,7 +74,7 @@ const props = withDefaults(
     hidePageTitle?: boolean
     headerMargin?: number
     skipScrollTarget?: boolean
-    selected?: number[]
+    selected?: Model[]
     wrap?: boolean
     noGap?: boolean
     transition?: boolean
@@ -90,6 +91,7 @@ const props = withDefaults(
     pageClass?: string
     maxPages?: number
     refetchInterval?: number | false
+    valueGetter?: (data: Data) => Model
   }>(),
   {
     skeletonLength: undefined,
@@ -102,6 +104,7 @@ const props = withDefaults(
     pageClass: undefined,
     maxPages: undefined,
     refetchInterval: undefined,
+    valueGetter: (item: Data) => (item.id as Model),
   },
 )
 
@@ -109,10 +112,10 @@ const emit = defineEmits<{
   (e: 'update:page', value: number | undefined): void
   (e: 'update:header-padding', value: number): void
   (e: 'update:count', value: number): void
-  (e: 'update:selected', values: number[]): void
+  (e: 'update:selected', values: Model[]): void
 }>()
 
-const infiniteList = ref<ComponentInstance<typeof WInfiniteListPages<Data>> | undefined>()
+const infiniteList = ref<ComponentInstance<typeof WInfiniteListPages<Model, Data>> | undefined>()
 
 const updateHeaderPadding = (value: number): void => {
   emit('update:header-padding', value)

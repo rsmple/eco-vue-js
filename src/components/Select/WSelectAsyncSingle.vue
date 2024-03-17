@@ -11,9 +11,9 @@
       :max-search-length="maxSearchLength"
       :empty-stub="emptyStub"
       :query-params="queryParams"
-      :use-query-fn="(useQueryFn as unknown as UsePaginatedQuery<DefaultData>)"
+      :use-query-fn="useQueryFn"
       :is-invalid-page="isInvalidPage"
-      :option-component="(optionComponent as unknown as Component<{option: DefaultData, selected?: boolean, model?: boolean}>)"
+      :option-component="optionComponent"
       :readonly="readonly"
       :disabled="disabled"
       :skeleton="skeleton"
@@ -29,9 +29,11 @@
       :disable-clear="!allowClear"
       :preview-data="previewData ? [previewData] as Data[] : undefined"
       :hide-option-icon="hideOptionIcon"
+      :value-getter="valueGetter"
+      :value-query-key="valueQueryKey"
       hide-prefix
       @select="updateModelValue($event)"
-      @unselect="updateModelValue(allowClear ? null : $event)"
+      @unselect="allowClear && updateModelValue(null)"
       @update:search="emit('update:search', $event)"
       @create:option="createOption($event)"
     >
@@ -54,12 +56,12 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
 import {computed, ref, toRef, watch, type Component} from 'vue'
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 
 const props = defineProps<{
-  modelValue: number | null
+  modelValue: Model | null
   search: string
   useQueryFn: UsePaginatedQuery<Data>
   isInvalidPage: (error: unknown) => boolean
@@ -86,19 +88,21 @@ const props = defineProps<{
   allowClear?: boolean
   previewData?: Data
   hideOptionIcon?: boolean
+  valueGetter?: (data: Data) => Model
+  valueQueryKey?: string
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: number | null): void
+  (e: 'update:modelValue', value: Model | null): void
   (e: 'update:search', value: string): void
   (e: 'create:option', value: string): void
 }>()
 
-const selectComponent = ref<ComponentInstance<typeof WSelectAsync<Data>> | undefined>()
+const selectComponent = ref<ComponentInstance<typeof WSelectAsync<Model, Data>> | undefined>()
 
-const arrayValue = computed<number[]>(() => props.modelValue ? [props.modelValue] : [])
+const arrayValue = computed<Model[]>(() => props.modelValue ? [props.modelValue] : [])
 
-const updateModelValue = (value: number | null): void => {
+const updateModelValue = (value: Model | null): void => {
   emit('update:modelValue', value)
 }
 

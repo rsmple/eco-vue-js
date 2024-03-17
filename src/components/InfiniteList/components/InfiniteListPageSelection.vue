@@ -20,26 +20,27 @@
   />
 </template>
 
-<script lang="ts" setup generic="Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 import {computed} from 'vue'
 
 const props = defineProps<{
-  selected: number[]
+  selected: Model[]
   items: Data[]
   disabled?: boolean
   tooltipTextPersisted?: boolean
   selectOnly?: boolean
   unselectOnly?: boolean
   reverse?: boolean
+  valueGetter: (data: Data) => Model
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:selected', values: number[]): void
+  (e: 'update:selected', values: Model[]): void
 }>()
 
-const ids = computed(() => props.items.map(item => item.id))
-const selectedItems = computed(() => ids.value.filter(id => props.selected.includes(id)))
+const models = computed(() => props.items.map(item => props.valueGetter(item)))
+const selectedItems = computed(() => models.value.filter(item => props.selected.includes(item)))
 const hasSelected = computed(() => selectedItems.value.length !== 0)
 
 const chekboxValue = computed(() => {
@@ -59,9 +60,9 @@ const tooltipText = computed(() => `${chekboxValueReversed.value === true ? 'Uns
 
 const selectOrUnselect = (isSelect: boolean): void => {
   if (props.reverse ? !isSelect : isSelect) {
-    emit('update:selected', [...props.selected, ...ids.value].filter((id, index, arr) => arr.indexOf(id) === index))
+    emit('update:selected', [...props.selected, ...models.value].filter((item, index, arr) => arr.indexOf(item) === index))
   } else {
-    emit('update:selected', props.selected.filter(id => !ids.value.includes(id)))
+    emit('update:selected', props.selected.filter(item => !models.value.includes(item)))
   }
 }
 

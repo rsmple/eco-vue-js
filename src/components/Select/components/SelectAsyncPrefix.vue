@@ -1,13 +1,14 @@
 <template>
-  <template v-if="idInString.length !== 0">
+  <template v-if="valueInString.length !== 0">
     <SelectAsyncPrefixPage
       :use-query-fn="useQueryFn"
-      :query-params="{page: 1, id__in: idInString}"
+      :query-params="{page: 1, [valueQueryKey]: valueInString}"
       :option-component="optionComponent"
       :disable-clear="disableClear"
       :loading="loading"
       :disabled="disabled"
       :preview-data="previewData"
+      :value-getter="valueGetter"
       @unselect="$emit('unselect', $event)"
       @update:fetching="$emit('update:fetching', $event)"
     >
@@ -41,7 +42,7 @@
   </template>
 </template>
 
-<script lang="ts" setup generic="Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
 import {computed, ref, watch, type Component, onBeforeUnmount} from 'vue'
 import SelectAsyncPrefixPage from './SelectAsyncPrefixPage.vue'
 import {numberFormatter} from '@/utils/utils'
@@ -51,23 +52,25 @@ const PAGE_LENGTH = 8
 
 const props = defineProps<{
   useQueryFn: UsePaginatedQuery<Data>
-  modelValue: number[]
+  modelValue: Model[]
   disabled?: boolean
   loading?: boolean
   optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
   disableClear?: boolean
   previewData?: Data[]
+  valueGetter: (value: Data) => Model
+  valueQueryKey: string
 }>()
 
 const emit = defineEmits<{
-  (e: 'unselect', value: number): void
+  (e: 'unselect', value: Model): void
   (e: 'update:fetching', value: boolean): void
-  (e: 'update:modelValue', value: number[]): void
+  (e: 'update:modelValue', value: Model[]): void
 }>()
 
 const hasFetching = ref(false)
 
-const idInString = computed(() => props.modelValue.slice(0, PAGE_LENGTH).join(','))
+const valueInString = computed(() => props.modelValue.slice(0, PAGE_LENGTH).join(','))
 
 watch(hasFetching, value => {
   emit('update:fetching', value)
