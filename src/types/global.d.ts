@@ -1,15 +1,20 @@
 
 declare type SVGComponent = import('vue').Raw<import('vue').FunctionalComponent<import('vue').SVGAttributes, Record<string, never>>>
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare type ComponentInstance<T> = T extends new (...args: any[]) => infer R
   ? R
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   : T extends (...args: any[]) => infer R
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ? R extends {__ctx?: infer K}
   ? Exclude<K, void> extends {expose: (...args: infer K) => void}
   ? K[0] & InstanceType<import('vue').DefineComponent>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   : any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   : any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   : any
 
 declare type PaginatedResponse<ValueType extends Record<string, unknown> | unknown = unknown> = {

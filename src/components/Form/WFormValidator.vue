@@ -167,7 +167,7 @@ const _validateOnUnselect = (value: string) => {
   validateOnUpdate(newValue)
 }
 
-const validate = (silent?: boolean): string | undefined => {
+const doValidate = (silent?: boolean): string | undefined => {
   const message = _validate(modelValue.value)
 
   if (!silent) {
@@ -217,14 +217,14 @@ watch(title, value => {
 }, {immediate: true})
 
 watch(required, () => {
-  if (hasBeenValidated.value) validate()
+  if (hasBeenValidated.value) doValidate()
 })
 
 onBeforeMount(() => {
   if (props.name) {
     initModel()
 
-    validateUpdater?.(props.name, validate)
+    validateUpdater?.(props.name, doValidate)
     invalidateUpdater?.(props.name, invalidate)
     initModelUpdater?.(props.name, initModel)
   }
