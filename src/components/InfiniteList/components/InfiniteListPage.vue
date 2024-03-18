@@ -181,9 +181,6 @@ const {data, error, setData, refetch, isFetching} = props.useQueryFn(
     refetchInterval: props.refetchInterval ? computed(() => isIntersecting.value ? props.refetchInterval : undefined) : undefined,
   },
 )
-
-const count = computed(() => data.value?.count)
-const pagesCount = computed(() => data.value?.pages_count)
 const nextPage = computed(() => data.value?.next)
 const previousPage = computed(() => data.value?.previous)
 
@@ -222,20 +219,11 @@ const getLast = () => {
   return data.value.results[data.value.results.length - 1]
 }
 
-watch(count, value => {
-  if (value !== undefined) emit('update:count', value)
-}, {immediate: true})
-
-watch(pagesCount, value => {
-  if (value) emit('update:pagesCount', value)
-}, {immediate: true})
-
-watch(nextPage, value => {
-  if (props.lastPage && value !== undefined) emit('update:nextPage', value)
-}, {immediate: true})
-
-watch(previousPage, value => {
-  if (props.firstPage && value !== undefined) emit('update:previousPage', value)
+watch(data, value => {
+  if (props.firstPage && value?.previous !== undefined) emit('update:previousPage', value.previous)
+  if (props.lastPage && value?.next !== undefined) emit('update:nextPage', value.next)
+  if (value?.pages_count) emit('update:pagesCount', value.pages_count)
+  if (value?.count !== undefined) emit('update:count', value.count)
 }, {immediate: true})
 
 watch(error, (error: unknown): void => {

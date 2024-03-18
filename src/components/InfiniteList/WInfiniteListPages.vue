@@ -42,7 +42,7 @@
         'last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16': !minHeight,
       }"
 
-      @update:count="updateCount($event); $emit('update:count', $event)"
+      @update:count="updateCount"
       @update:pages-count="updatePagesCount"
       @update:next-page="updateNextPage($event); infiniteScroll?.checkIsScrollDown()"
       @update:previous-page="updatePreviousPage($event); infiniteScroll?.checkIsScrollUp()"
@@ -250,6 +250,8 @@ watch(toRef(props, 'queryParams'), (newValue, oldValue) => {
 
   resetPage()
 })
+
+watch(count, value => emit('update:count', value), {immediate: true})
 
 defineExpose({
   resetPage,
