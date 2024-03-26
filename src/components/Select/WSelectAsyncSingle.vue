@@ -28,6 +28,7 @@
       :mono="mono"
       :disable-clear="!allowClear"
       :preview-data="previewData ? [previewData] as Data[] : undefined"
+      :created-data="createdData ? [createdData] as Data[] : undefined"
       :hide-option-icon="hideOptionIcon"
       :value-getter="valueGetter"
       :value-query-key="valueQueryKey"
@@ -87,6 +88,7 @@ const props = defineProps<{
   mono?: boolean
   allowClear?: boolean
   previewData?: Data
+  createdData?: Data
   hideOptionIcon?: boolean
   valueGetter?: (data: Data) => Model
   valueQueryKey?: string

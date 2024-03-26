@@ -1,6 +1,6 @@
 <template>
   <div
-    v-for="option in (previewData ?? data?.results)"
+    v-for="option in [...createdData ?? [], ...(previewData ?? data?.results ?? [])]"
     :key="valueGetter(option)"
     class="relative flex overflow-hidden items-center text-description"
     :class="{
@@ -67,6 +67,7 @@ const props = defineProps<{
   optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
   disableClear?: boolean
   previewData?: Data[]
+  createdData?: Data[]
   valueGetter: (value: Data) => Model
 }>()
 

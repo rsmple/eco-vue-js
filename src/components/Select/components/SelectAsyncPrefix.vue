@@ -8,6 +8,7 @@
       :loading="loading"
       :disabled="disabled"
       :preview-data="previewData"
+      :created-data="createdData"
       :value-getter="valueGetter"
       @unselect="$emit('unselect', $event)"
       @update:fetching="$emit('update:fetching', $event)"
@@ -58,6 +59,7 @@ const props = defineProps<{
   optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
   disableClear?: boolean
   previewData?: Data[]
+  createdData?: Data[]
   valueGetter: (value: Data) => Model
   valueQueryKey: string
 }>()

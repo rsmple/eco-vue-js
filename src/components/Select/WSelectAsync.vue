@@ -40,6 +40,7 @@
         :option-component="optionComponent"
         :disable-clear="disableClear"
         :preview-data="previewData"
+        :created-data="createdData"
         :value-getter="valueGetter ?? ((item: Data) => (item.id as Model))"
         :value-query-key="valueQueryKey"
         @unselect="unselect"
@@ -142,6 +143,7 @@ const props = withDefaults(
     icon?: SVGComponent
     mono?: boolean
     previewData?: Data[]
+    createdData?: Data[]
     hideOptionIcon?: boolean
     valueGetter?: (data: Data) => Model
     valueQueryKey?: string
@@ -158,6 +160,7 @@ const props = withDefaults(
     placeholder: undefined,
     icon: undefined,
     previewData: undefined,
+    createdData: undefined,
     valueGetter: (data: Data) => (data.id as Model),
     valueQueryKey: 'id__in',
   },
