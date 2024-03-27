@@ -1,16 +1,18 @@
 <template>
-  <div ref="indicator" />
+  <template v-if="!minHeight">
+    <div ref="indicator" />
 
-  <div
-    ref="header"
-    class="sticky top-[var(--header-height)]"
-    :class="{
-      'z-[1]': isIntersecting,
-      'z-20': !isIntersecting,
-    }"
-  >
-    <slot name="header" />
-  </div>
+    <div
+      ref="header"
+      class="sticky top-[var(--header-height)]"
+      :class="{
+        'z-[1]': isIntersecting,
+        'z-20': !isIntersecting,
+      }"
+    >
+      <slot name="header" />
+    </div>
+  </template>
 
   <WInfiniteListPages
     :query-params="queryParams"

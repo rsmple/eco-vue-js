@@ -15,6 +15,7 @@
       hide-page-title
       header-top-ignore
       min-height
+      no-gap
       @update:count="$emit('update:count', $event); count = $event"
       @update:selected="!disabled && $emit('update:modelValue', $event)"
     >
