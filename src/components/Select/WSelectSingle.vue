@@ -90,10 +90,12 @@ const emit = defineEmits<{
 
 const selectComponent = ref<ComponentInstance<typeof WSelect<Item>> | undefined>()
 
-const arrayValue = computed<Item[]>(() => props.modelValue ? [props.modelValue] : [])
+const arrayValue = computed<Item[]>(() => props.modelValue !== null ? [props.modelValue] : [])
 
 const updateModelValue = (value: Item | null): void => {
   emit('update:modelValue', value)
+
+  blur()
 }
 
 const createOption = (value: string): void => {
