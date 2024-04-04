@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, provide, inject, watch, onBeforeUnmount, toRef} from 'vue'
+import {provide, inject, watch, onBeforeUnmount, toRef} from 'vue'
 import {wFormUnlistener} from './models/injection'
 import {useFormErrorMessageMap} from './use/useFormErrorMessageMap'
 import {useFormHasChangesMap} from './use/useFormHasChangesMap'
@@ -24,7 +24,7 @@ const emit = defineEmits<{
   (e: 'update:has-changes', value: boolean): void
 }>()
 
-const name = computed(() => props.name)
+const name = toRef(props, 'name')
 
 const {titleGetter, titleMapUnlistener} = useFormTitleMap(name, toRef(props, 'title'))
 const {errorMessageMapUnlistener, isValid, errorMessage, errorMessageMap} = useFormErrorMessageMap(name, titleGetter)

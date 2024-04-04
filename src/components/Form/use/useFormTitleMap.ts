@@ -14,7 +14,7 @@ export const useFormTitleMap = (name: Ref<string | undefined>, title: Ref<string
   }
 
   const titleGetter = (key: string) => {
-    return titleMap.value[key] ?? key
+    return titleMap.value[key]
   }
 
   provide(wFormTitleUpdater, titleMapUpdater)

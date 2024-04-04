@@ -178,8 +178,16 @@ const updateHeight = (value: number): void => {
   minHeight.value = value
 }
 
-const validate = (index: number): string | undefined => {
-  return form?.value[index].validate()
+const validate = (index: number, ...args: Parameters<InstanceType<typeof WForm>['validate']>): ReturnType<InstanceType<typeof WForm>['validate']> => {
+  return form?.value[index].validate(...args)
+}
+
+const invalidate = (index: number, ...args: Parameters<InstanceType<typeof WForm>['invalidate']>): ReturnType<InstanceType<typeof WForm>['invalidate']> => {
+  return form?.value[index].invalidate(...args)
+}
+
+const initModel = (index: number, ...args: Parameters<InstanceType<typeof WForm>['initModel']>): ReturnType<InstanceType<typeof WForm>['initModel']> => {
+  return form?.value[index].initModel(...args)
 }
 
 const tabItemListenerInjected = inject(wTabItemListener, null)
@@ -210,6 +218,8 @@ defineExpose({
   next,
   previous,
   validate,
+  invalidate,
+  initModel,
 })
 
 </script>
