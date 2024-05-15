@@ -11,7 +11,7 @@
     <WDropdownMenu
       :is-open="isOpen"
       :max-height="210"
-      :max-width="160"
+      :max-width="320"
       :horizontal-align="HorizontalAlign.LEFT_INNER"
       :update-align="false"
       teleport
