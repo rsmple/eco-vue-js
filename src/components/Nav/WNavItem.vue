@@ -8,8 +8,8 @@
     }"
   >
     <div class="[overflow:inherit]">
-      <div class="flex items-center py-4 px-5">
-        <div class="h-full w-10 flex items-center">
+      <div class="grid grid-cols-[2.5rem,1fr,3rem] items-center py-4 px-5">
+        <div class="flex items-center">
           <template v-if="icon">
             <component
               :is="icon"
@@ -23,14 +23,11 @@
           />
         </div>
 
-        <div class="h-6 text-base font-normal tracking-wide mr-auto whitespace-nowrap">
+        <div class="text-base font-normal tracking-wide whitespace-nowrap">
           {{ title }}
         </div>
 
-        <div
-          v-if="count !== undefined"
-          class="h-6 text-base font-normal tracking-wide w-12 text-center flex justify-center"
-        >
+        <div class="text-base font-normal tracking-wide text-center flex justify-center">
           <span
             v-if="!skeleton"
             class="relative"
