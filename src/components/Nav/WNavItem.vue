@@ -23,8 +23,20 @@
           />
         </div>
 
-        <div class="text-base font-normal tracking-wide whitespace-nowrap">
+        <div class="text-base font-normal tracking-wide whitespace-nowrap relative">
           {{ title }}
+          
+          <WCounter
+            v-if="counter !== undefined && counter !== 0 && count === undefined"
+            :count="counter"
+            :trigger="1"
+            small
+            class="absolute -top-3"
+            :class="{
+              'left-[calc(100%-0.25rem)]': !isBigCount,
+              'left-[calc(100%-1rem)]': isBigCount,
+            }"
+          />
         </div>
 
         <div class="text-base font-normal tracking-wide text-center flex justify-center">
@@ -35,7 +47,7 @@
             {{ typeof count === 'number' ? numberCompactFormatter.format(count) : '' }}
 
             <WCounter
-              v-if="counter !== undefined && counter !== 0"
+              v-if="counter !== undefined && counter !== 0 && count !== undefined"
               :count="counter"
               :trigger="1"
               small
