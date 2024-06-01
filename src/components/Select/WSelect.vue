@@ -206,8 +206,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'select', item: string | number): void
-  (e: 'unselect', item: string | number): void
+  (e: 'select', item: Item): void
+  (e: 'unselect', item: Item): void
   (e: 'update:search', value: string): void
   (e: 'create:option', value: string): void
 }>()

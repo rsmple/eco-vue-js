@@ -51,9 +51,11 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Item extends string | number = string">
+<script lang="ts" setup generic="Item extends string | number, AllowClear extends boolean = false">
 import {computed, ref, toRef, watch, type Component} from 'vue'
 import WSelect from '@/components/Select/WSelect.vue'
+
+type EmitType = AllowClear extends true ? Item | null : NonNullable<Item>
 
 const props = defineProps<{
   modelValue: Item | null
@@ -78,12 +80,12 @@ const props = defineProps<{
   noMargin?: boolean
   icon?: SVGComponent
   mono?: boolean
-  allowClear?: boolean
+  allowClear?: AllowClear
   hideOptionIcon?: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Item | null): void
+  (e: 'update:modelValue', value: EmitType): void
   (e: 'update:search', value: string): void
   (e: 'create:option', value: string): void
 }>()
@@ -93,7 +95,7 @@ const selectComponent = ref<ComponentInstance<typeof WSelect<Item>> | undefined>
 const arrayValue = computed<Item[]>(() => props.modelValue !== null ? [props.modelValue] : [])
 
 const updateModelValue = (value: Item | null): void => {
-  emit('update:modelValue', value)
+  emit('update:modelValue', value as EmitType)
 
   blur()
 }
