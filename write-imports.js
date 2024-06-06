@@ -133,6 +133,9 @@ const getPackageExports = (list) => {
     './dist/utils/Tooltip': {
       'import': './dist/utils/Tooltip.js',
     },
+    './dist/utils/useDefaultQuery': {
+      'import': './dist/utils/useDefaultQuery.js',
+    },
   }
 
   list.forEach(item => {

@@ -71,7 +71,7 @@
         ref="list"
         :model-value="modelValue"
         :use-query-fn="useQueryFn"
-        :query-params="queryParams"
+        :query-params="(queryParams as QueryParams)"
         :is-invalid-page="isInvalidPage"
         :loading="loading || isFetchingPrefix"
         :disabled="isDisabled"
@@ -79,6 +79,7 @@
         :allow-create="allowCreate && search !== ''"
         :hide-option-icon="hideOptionIcon"
         :value-getter="valueGetter"
+        :query-options="queryOptions"
         @select="select"
         @unselect="unselect"
         @create:option="create"
@@ -107,7 +108,7 @@
   </WInputSuggest>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
 import {ref, nextTick, computed, type Component} from 'vue'
 import {getIsMobile} from '@/utils/mobile'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
@@ -118,7 +119,7 @@ const props = withDefaults(
   defineProps<{
     modelValue: Model[]
     search: string
-    useQueryFn: UsePaginatedQuery<Data>
+    useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
     isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     title?: string
@@ -147,6 +148,7 @@ const props = withDefaults(
     hideOptionIcon?: boolean
     valueGetter?: (data: Data) => Model
     valueQueryKey?: string
+    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
   }>(),
   {
     title: undefined,
@@ -176,7 +178,7 @@ const emit = defineEmits<{
 
 const isOpen = ref(false)
 const input = ref<ComponentInstance<typeof WInputSuggest> | undefined>()
-const list = ref<ComponentInstance<typeof SelectAsyncList<Model, Data>> | undefined>()
+const list = ref<ComponentInstance<typeof SelectAsyncList<Model, Data, ApiError, QueryParams>> | undefined>()
 const isMobile = getIsMobile()
 const focused = ref(false)
 const isFetchingPrefix = ref(false)

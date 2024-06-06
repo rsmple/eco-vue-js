@@ -3,7 +3,7 @@
     ref="element"
     class="relative"
   >
-    <template v-if="queryParams.page && data?.results.length !== 0">
+    <template v-if="(queryParams as Record<'page', number>).page && data?.results.length !== 0">
       <div
         class="flex"
         :class="{
@@ -27,7 +27,7 @@
 
         <InfiniteListPageTitle
           v-if="!hidePageTitle"
-          :query-params="queryParams"
+          :query-params="(queryParams as QueryParams)"
           class="pb-4 pt-6"
         />
       </div>
@@ -118,7 +118,7 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
 import {toRef, computed, watch, ref, onMounted, nextTick, onBeforeUnmount} from 'vue'
 import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
 import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
@@ -126,7 +126,7 @@ import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
 const props = withDefaults(
   defineProps<{
     queryParams: QueryParams
-    useQueryFn: UsePaginatedQuery<Data>
+    useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
     isInvalidPage: (error: unknown) => boolean
     skeletonLength: number
     firstPage: boolean
@@ -147,6 +147,7 @@ const props = withDefaults(
     refetchInterval?: number | false
     scrollingElement?: Element | null
     valueGetter: (data: Data) => Model
+    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
   }>(),
   {
     keyGetter: undefined,
@@ -178,6 +179,7 @@ const isIntersecting = ref(false)
 const {data, error, setData, refetch, isFetching} = props.useQueryFn(
   toRef(props, 'queryParams'),
   {
+    ...props.queryOptions ?? {},
     refetchInterval: props.refetchInterval ? computed(() => isIntersecting.value ? props.refetchInterval : undefined) : undefined,
   },
 )
@@ -222,12 +224,12 @@ const getLast = () => {
 watch(data, value => {
   if (props.firstPage && value?.previous !== undefined) emit('update:previousPage', value.previous)
   if (props.lastPage && value?.next !== undefined) emit('update:nextPage', value.next)
-  if (value?.pages_count) emit('update:pagesCount', value.pages_count)
+  if (value?.pages_count !== undefined) emit('update:pagesCount', value.pages_count)
   if (value?.count !== undefined) emit('update:count', value.count)
 }, {immediate: true})
 
 watch(error, (error: unknown): void => {
-  if (props.isInvalidPage(error)) emit('error:invalidPage', props.queryParams.page as number)
+  if (props.isInvalidPage(error)) emit('error:invalidPage', (props.queryParams as {page?: number}).page ?? 1)
 }, {immediate: true})
 
 watch(isFetching, value => {
@@ -266,7 +268,7 @@ onMounted(() => {
   if (height === 0) return
   if (!props.firstPage) return
   if (props.lastPage) {
-    if (props.queryParams.page !== 1) nextTick().then(() => emit('update-from-header:scroll'))
+    if ((props.queryParams as {page?: number}).page !== 1) nextTick().then(() => emit('update-from-header:scroll'))
 
     return
   }

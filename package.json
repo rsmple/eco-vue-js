@@ -99,6 +99,9 @@
     "./dist/utils/Tooltip": {
       "import": "./dist/utils/Tooltip.js"
     },
+    "./dist/utils/useDefaultQuery": {
+      "import": "./dist/utils/useDefaultQuery.js"
+    },
     "./dist/components/ActionsBar/WActionsBar.vue": {
       "import": "./dist/components/ActionsBar/WActionsBar.vue.js"
     },

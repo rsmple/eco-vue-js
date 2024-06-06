@@ -15,7 +15,7 @@
       v-for="(page, index) in pages"
       ref="pageComponent"
       :key="page"
-      :query-params="{...queryParams, page}"
+      :query-params="{...(queryParams as QueryParams), page}"
       :use-query-fn="useQueryFn"
       :is-invalid-page="isInvalidPage"
       :skeleton-length="getSkeletonLength(page - 1)"
@@ -37,6 +37,7 @@
       :refetch-interval="refetchInterval"
       :scrolling-element="scrollingElement"
       :value-getter="valueGetter"
+      :query-options="queryOptions"
 
       :class="{
         'last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16': !minHeight,
@@ -75,7 +76,7 @@
   </InfiniteListScroll>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
 import {ref, computed, watch, toRef, nextTick} from 'vue'
 import InfiniteListScroll from './components/InfiniteListScroll.vue'
 import InfiniteListPage from './components/InfiniteListPage.vue'
@@ -86,7 +87,7 @@ import {getIsScrollDown} from './models/utils'
 
 const props = withDefaults(
   defineProps<{
-    useQueryFn: UsePaginatedQuery<Data>
+    useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
     isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     skeletonLength?: number
@@ -101,7 +102,7 @@ const props = withDefaults(
     headerTop?: number
     headerHeight?: number
     minHeight?: boolean
-    excludeParams?: string[]
+    excludeParams?: (keyof QueryParams)[]
     emptyStub?: string
     selectOnly?: boolean
     unselectOnly?: boolean
@@ -111,6 +112,7 @@ const props = withDefaults(
     maxPages?: number
     refetchInterval?: number | false
     valueGetter: (data: Data) => Model
+    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
   }>(),
   {
     skeletonLength: undefined,
@@ -135,7 +137,7 @@ const emit = defineEmits<{
 
 const infiniteScroll = ref<ComponentInstance<typeof InfiniteListScroll> | undefined>()
 
-const pages = ref<number[]>([props.queryParams.page ?? 1])
+const pages = ref<number[]>([(props.queryParams as {page?: number}).page ?? 1])
 const pagesCount = ref(1)
 const count = ref(0)
 const nextPage = ref<number | null>()
@@ -246,7 +248,7 @@ const resetPage = () => {
 }
 
 watch(toRef(props, 'queryParams'), (newValue, oldValue) => {
-  if (isEqualObj(newValue, oldValue, ['page', ...(props.excludeParams ?? [])])) return
+  if (isEqualObj(newValue, oldValue, ['page', ...(props.excludeParams ?? []) as string[]])) return
 
   resetPage()
 })

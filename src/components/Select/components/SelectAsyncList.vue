@@ -2,7 +2,7 @@
   <div class="min-h-[4.125rem]">
     <WInfiniteList
       :use-query-fn="useQueryFn"
-      :query-params="queryParams"
+      :query-params="(queryParams as QueryParams)"
       :is-invalid-page="isInvalidPage"
       :scrolling-element="scrollingElement"
       :transition="transition"
@@ -12,6 +12,7 @@
       :select-only="selectOnly"
       :unselect-only="unselectOnly"
       :value-getter="valueGetter"
+      :query-options="queryOptions"
       hide-page-title
       header-top-ignore
       min-height
@@ -91,7 +92,7 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
 import {ref, type UnwrapRef} from 'vue'
 import SelectOption from './SelectOption.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
@@ -99,14 +100,14 @@ import {debounce} from '@/utils/utils'
 
 const props = defineProps<{
   modelValue: Model[]
-  useQueryFn: UsePaginatedQuery<Data>
+  useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
   queryParams: QueryParams
   isInvalidPage: (error: unknown) => boolean
   scrollingElement?: Element | null
   loading?: boolean
   disabled?: boolean
   transition?: boolean
-  excludeParams?: string[]
+  excludeParams?: (keyof QueryParams)[]
   noPadding?: boolean
   emptyStub?: string
   selectOnly?: boolean
@@ -114,6 +115,7 @@ const props = defineProps<{
   allowCreate?: boolean
   hideOptionIcon?: boolean
   valueGetter: (data: Data) => Model
+  queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
 }>()
 
 const emit = defineEmits<{

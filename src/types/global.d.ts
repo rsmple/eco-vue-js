@@ -40,14 +40,16 @@ declare type DefaultData = {id: number, [key: string]: unknown}
 
 type Params = Parameters<import('@tanstack/vue-query').QueryClient['setQueriesData']>
 
-declare type QueryParams = Partial<Record<string, unknown> & {page?: number}>
+declare type ApiErrorDefault = unknown
 
-declare type UseDefaultQuery<TQueryFnData = unknown, TError = unknown, TData = TQueryFnData, TQueryKey extends import('@tanstack/vue-query').QueryKey = import('@tanstack/vue-query').QueryKey> =
-  (...args: Parameters<typeof useQuery<TQueryFnData, TError, TData, TQueryKey>>) => import('@tanstack/vue-query').UseQueryReturnType<TData, TError> & {
-    setData: (updater: TQueryFnData, options?: Params[2]) => ReturnType<import('@tanstack/vue-query').QueryClient['setQueriesData']>
-  }
+declare type UseQueryDefault<TQueryFnData = unknown, TError = ApiErrorDefault, TData = TQueryFnData, TQueryKey extends import('@tanstack/vue-query').QueryKey = import('@tanstack/vue-query').QueryKey> =
+  typeof import('@/utils/useDefaultQuery').useDefaultQuery<TQueryFnData, TError, TData, TQueryKey>
 
-declare type UsePaginatedQuery<Data extends DefaultData = DefaultData> = (
-  queryParams: import('vue').Ref<QueryParams>,
-  options?: Partial<Parameters<UseDefaultQuery<PaginatedResponse<Data>>>[0]>
-) => ReturnType<UseDefaultQuery<PaginatedResponse<Data>>>
+declare type QueryOptions<Data, Error = ApiErrorDefault> = Partial<Parameters<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Data, Error>>[0]>
+
+declare type UseQueryEmpty<Model, ApiError> = (options?: QueryOptions<Model, ApiError>) => ReturnType<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Model, ApiError>>
+
+declare type UseQueryWithParams<Model, ApiError, QueryParams> =
+  (queryParams: import('vue').MaybeRef<QueryParams>, options?: QueryOptions<Model, ApiError>) => ReturnType<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Model, ApiError>>
+
+declare type UseQueryPaginated<Model, ApiError, QueryParams> = UseQueryWithParams<PaginatedResponse<Model>, ApiError, QueryParams>

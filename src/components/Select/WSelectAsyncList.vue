@@ -25,7 +25,7 @@
         :model-value="modelValue"
         :use-query-fn="useQueryFn"
         :is-invalid-page="isInvalidPage"
-        :query-params="queryParams"
+        :query-params="(queryParams as QueryParams)"
         :scrolling-element="list"
         :exclude-params="excludeParams"
         :empty-stub="emptyStub"
@@ -33,6 +33,7 @@
         :unselect-only="unselectOnly"
         :hide-option-icon="hideOptionIcon"
         :value-getter="valueGetter"
+        :query-options="queryOptions"
         allow-update-selected
         transition
         no-padding
@@ -54,7 +55,7 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
 import {ref} from 'vue'
 import SelectAsyncList from './components/SelectAsyncList.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
@@ -64,15 +65,16 @@ withDefaults(
     title?: string
     emptyStub?: string
     modelValue: Model[]
-    useQueryFn: UsePaginatedQuery<Data>
+    useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
     isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     skeleton?: boolean
-    excludeParams?: string[]
+    excludeParams?: (keyof QueryParams)[]
     selectOnly?: boolean
     unselectOnly?: boolean
     hideOptionIcon?: boolean
     valueGetter?: (data: Data) => Model
+    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
   }>(),
   {
     title: undefined,

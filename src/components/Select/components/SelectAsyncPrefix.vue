@@ -2,7 +2,7 @@
   <template v-if="valueInString.length !== 0">
     <SelectAsyncPrefixPage
       :use-query-fn="useQueryFn"
-      :query-params="{page: 1, [valueQueryKey]: valueInString}"
+      :query-params="({page: 1, [valueQueryKey]: valueInString} as QueryParams)"
       :option-component="optionComponent"
       :disable-clear="disableClear"
       :loading="loading"
@@ -10,6 +10,7 @@
       :preview-data="previewData"
       :created-data="createdData"
       :value-getter="valueGetter"
+      :query-options="queryOptions"
       @unselect="$emit('unselect', $event)"
       @update:fetching="$emit('update:fetching', $event)"
     >
@@ -43,7 +44,7 @@
   </template>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
 import {computed, ref, watch, type Component, onBeforeUnmount} from 'vue'
 import SelectAsyncPrefixPage from './SelectAsyncPrefixPage.vue'
 import {numberFormatter} from '@/utils/utils'
@@ -52,7 +53,7 @@ import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 const PAGE_LENGTH = 8
 
 const props = defineProps<{
-  useQueryFn: UsePaginatedQuery<Data>
+  useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
   modelValue: Model[]
   disabled?: boolean
   loading?: boolean
@@ -62,6 +63,7 @@ const props = defineProps<{
   createdData?: Data[]
   valueGetter: (value: Data) => Model
   valueQueryKey: string
+  queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
 }>()
 
 const emit = defineEmits<{

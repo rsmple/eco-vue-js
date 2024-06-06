@@ -55,12 +55,12 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Model extends string | number, Data extends DefaultData">
+<script lang="ts" setup generic="Model extends string | number, Data extends DefaultData, ApiError, QueryParams">
 import {computed, toRef, watch, type Component, onBeforeUnmount} from 'vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 
 const props = defineProps<{
-  useQueryFn: UsePaginatedQuery<Data>
+  useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
   queryParams: QueryParams
   disabled?: boolean
   loading?: boolean
@@ -69,6 +69,7 @@ const props = defineProps<{
   previewData?: Data[]
   createdData?: Data[]
   valueGetter: (value: Data) => Model
+  queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
 }>()
 
 const emit = defineEmits<{
@@ -80,6 +81,7 @@ const emit = defineEmits<{
 const queryEnabled = computed<boolean>(() => !props.previewData)
 
 const {data, isFetching} = props.useQueryFn(toRef(props, 'queryParams'), {
+  ...props.queryOptions ?? {},
   enabled: queryEnabled,
   refetchInterval: false,
   refetchOnMount: false,

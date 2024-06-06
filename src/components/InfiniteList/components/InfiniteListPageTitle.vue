@@ -5,11 +5,11 @@
     replace
     @click="copyRoute"
   >
-    Page: {{ queryParams.page }}
+    Page: {{ (queryParams as Record<'page', number>).page ?? 1 }}
   </RouterLink>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="QueryParams">
 import {type LocationQueryRaw, useRoute, useRouter} from 'vue-router'
 import {Notify} from '@/utils/Notify'
 

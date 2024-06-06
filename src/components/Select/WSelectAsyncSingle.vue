@@ -10,7 +10,7 @@
       :loading="loading"
       :max-search-length="maxSearchLength"
       :empty-stub="emptyStub"
-      :query-params="queryParams"
+      :query-params="(queryParams as QueryParams)"
       :use-query-fn="useQueryFn"
       :is-invalid-page="isInvalidPage"
       :option-component="optionComponent"
@@ -32,6 +32,7 @@
       :hide-option-icon="hideOptionIcon"
       :value-getter="valueGetter"
       :value-query-key="valueQueryKey"
+      :query-options="queryOptions"
       hide-prefix
       @select="updateModelValue($event)"
       @unselect="allowClear && updateModelValue(null)"
@@ -57,14 +58,14 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
 import {computed, ref, toRef, watch, type Component} from 'vue'
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 
 const props = defineProps<{
   modelValue: Model | null
   search: string
-  useQueryFn: UsePaginatedQuery<Data>
+  useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
   isInvalidPage: (error: unknown) => boolean
   queryParams: QueryParams
   title?: string
@@ -92,6 +93,7 @@ const props = defineProps<{
   hideOptionIcon?: boolean
   valueGetter?: (data: Data) => Model
   valueQueryKey?: string
+  queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
 }>()
 
 const emit = defineEmits<{
@@ -100,7 +102,7 @@ const emit = defineEmits<{
   (e: 'create:option', value: string): void
 }>()
 
-const selectComponent = ref<ComponentInstance<typeof WSelectAsync<Model, Data>> | undefined>()
+const selectComponent = ref<ComponentInstance<typeof WSelectAsync<Model, Data, ApiError, QueryParams>> | undefined>()
 
 const arrayValue = computed<Model[]>(() => props.modelValue ? [props.modelValue] : [])
 

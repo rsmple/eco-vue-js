@@ -15,7 +15,7 @@
   </template>
 
   <WInfiniteListPages
-    :query-params="queryParams"
+    :query-params="(queryParams as QueryParams)"
     :use-query-fn="useQueryFn"
     :is-invalid-page="isInvalidPage"
     :scrolling-element="scrollingElement"
@@ -41,6 +41,7 @@
     :max-pages="maxPages"
     :refetch-interval="refetchInterval"
     :value-getter="valueGetter"
+    :query-options="queryOptions"
 
     @update:count="$emit('update:count', $event)"
     @update:selected="$emit('update:selected', $event)"
@@ -62,14 +63,14 @@
   </WInfiniteListPages>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
 import {onBeforeUnmount, onMounted, ref, watch} from 'vue'
 import {useInfiniteListHeader} from './use/useInfiniteListHeader'
 import WInfiniteListPages from './WInfiniteListPages.vue'
 
 const props = withDefaults(
   defineProps<{
-    useQueryFn: UsePaginatedQuery<Data>
+    useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
     isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     skeletonLength?: number
@@ -84,7 +85,7 @@ const props = withDefaults(
     scrollingElement?: Element | null
     headerTopIgnore?: boolean
     minHeight?: boolean
-    excludeParams?: string[]
+    excludeParams?: (keyof QueryParams)[]
     emptyStub?: string
     selectOnly?: boolean
     unselectOnly?: boolean
@@ -94,6 +95,7 @@ const props = withDefaults(
     maxPages?: number
     refetchInterval?: number | false
     valueGetter?: (data: Data) => Model
+    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
   }>(),
   {
     skeletonLength: undefined,
@@ -117,7 +119,7 @@ const emit = defineEmits<{
   (e: 'update:selected', values: Model[]): void
 }>()
 
-const infiniteList = ref<ComponentInstance<typeof WInfiniteListPages<Model, Data>> | undefined>()
+const infiniteList = ref<ComponentInstance<typeof WInfiniteListPages<Model, Data, ApiError, QueryParams>> | undefined>()
 
 const updateHeaderPadding = (value: number): void => {
   emit('update:header-padding', value)
@@ -134,7 +136,7 @@ watch(isIntersecting, value => {
 })
 
 onMounted(() => {
-  if (props.queryParams.page && props.queryParams.page > 1) {
+  if ((props.queryParams as {page?: number}).page && (props.queryParams as {page: number}).page > 1) {
     isIntersecting.value = false
   }
 })
