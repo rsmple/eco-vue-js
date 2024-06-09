@@ -3,7 +3,7 @@ import {debounce} from '@/utils/utils'
 import type InfiniteListPage from './components/InfiniteListPage.vue'
 
 export const useRefetchNextPages = () => {
-  const pageComponent = ref<InstanceType<typeof InfiniteListPage>[]>([])
+  const pageComponent = ref<ComponentInstance<typeof InfiniteListPage>[]>([])
   let refetchLastPage: number | null = null
 
   const refetchNextPagesDebounced = debounce((index: number): void => {

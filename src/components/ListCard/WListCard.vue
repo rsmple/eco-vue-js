@@ -19,10 +19,16 @@
       
     <WCheckbox
       v-if="allowSelect && !mobile"
-      :model-value="selected ?? false"
+      :model-value="selectedBetween ? null : selected ?? false"
       :disabled="disabled"
+      :allow-shift="allowShift"
       class="sm:w-list-row-item sm-not:hidden"
-      @update:model-value="$emit('update:selected', $event)"
+      :class="{
+        'opacity-50': allowSelectHover,
+      }"
+      @update:model-value="allowSelectHover ? $emit('update-shift:selected', $event) : $emit('update:selected', $event)"
+      @update-shift:model-value="$emit('update-shift:selected', $event)"
+      @mouseover="allowSelectHover ? $emit('update-hover:selected', !selected) : undefined"
     />
 
     <slot />
@@ -63,14 +69,20 @@ import IconMinusCircle from '@/assets/icons/sax/IconMinusCircle.svg?component'
 defineProps<{
   disabled?: boolean
   selected?: boolean
+  selectedBetween?: boolean
+  selectedHover?: boolean
   hideMore?: boolean
   mobile?: boolean
   allowSelect?: boolean
+  allowSelectHover?: boolean
   moreBottom?: boolean
+  allowShift?: boolean
 }>()
 
 defineEmits<{
   (e: 'update:selected', value: boolean): void
+  (e: 'update-shift:selected', value: boolean): void
+  (e: 'update-hover:selected', value: boolean): void
 }>()
 
 </script>

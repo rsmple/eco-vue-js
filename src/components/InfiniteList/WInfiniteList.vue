@@ -10,11 +10,12 @@
         'z-20': !isIntersecting,
       }"
     >
-      <slot name="header" />
+      <slot name="header" :goto="goto" />
     </div>
   </template>
 
   <WInfiniteListPages
+    ref="infiniteListPages"
     :query-params="(queryParams as QueryParams)"
     :use-query-fn="useQueryFn"
     :is-invalid-page="isInvalidPage"
@@ -47,7 +48,7 @@
     @update:selected="$emit('update:selected', $event)"
     @update:page="$emit('update:page', $event)"
   >
-    <template #default="{item, setter, skeleton, refetch, previous, next, first, last, resetting}">
+    <template #default="{item, setter, skeleton, refetch, previous, next, first, last, resetting, page, index}">
       <slot
         :item="item"
         :setter="setter"
@@ -58,6 +59,8 @@
         :first="first"
         :last="last"
         :resetting="resetting"
+        :page="page"
+        :index="index"
       />
     </template>
   </WInfiniteListPages>
@@ -119,10 +122,14 @@ const emit = defineEmits<{
   (e: 'update:selected', values: Model[]): void
 }>()
 
-const infiniteList = ref<ComponentInstance<typeof WInfiniteListPages<Model, Data, ApiError, QueryParams>> | undefined>()
+const infiniteListPages = ref<ComponentInstance<typeof WInfiniteListPages<Model, Data, ApiError, QueryParams>> | undefined>()
 
 const updateHeaderPadding = (value: number): void => {
   emit('update:header-padding', value)
+}
+
+const goto = (page: number, itemIndex?: number) => {
+  infiniteListPages.value?.goto(page, itemIndex)
 }
 
 const {indicator, header, headerTop, headerHeight, isIntersecting} = useInfiniteListHeader(props.scrollingElement)
@@ -147,7 +154,7 @@ onBeforeUnmount(() => {
 
 defineExpose({
   resetPage() {
-    infiniteList.value?.resetPage()
+    infiniteListPages.value?.resetPage()
   },
 })
 
@@ -162,8 +169,12 @@ defineSlots<{
     first: boolean
     last: boolean
     resetting: boolean
+    page: number
+    index: number
   }) => void
-  header?: (props: Record<string, never>) => void
+  header?: (props: {
+    goto: typeof goto
+  }) => void
 }>()
 
 </script>

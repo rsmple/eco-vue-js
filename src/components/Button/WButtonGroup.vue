@@ -14,6 +14,7 @@
       class="flex px-px"
       :class="{
         'flex-wrap gap-2': wrap,
+        'flex-col gap-2 items-start': col,
       }"
     >
       <WButton
@@ -23,7 +24,7 @@
         :loading="getValue(item) === loading"
         :disabled="disabled || (loading !== undefined && getValue(item) !== loading)"
         :minimize="minimize"
-        :class="wrap ? [
+        :class="(wrap || col) ? [
           getValue(item) !== modelValue && '-mx-px'
         ] : [
           index !== list.length -1 ? 'rounded-r-none border-r-0' : getValue(item) !== modelValue && '-mr-px',
@@ -42,32 +43,27 @@
 import WButton from './WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
 
-type PropsForModel = {
+interface Props {
   modelValue: Model
   title?: string
-  list: Model[]
-  valueGetter?: ValueGetter | undefined
   disabled?: boolean
   loading?: number | string
   minimize?: boolean
   wrap?: boolean
+  col?: boolean
   semanticType?: SemanticType
   stretch?: boolean
   alwaysEmit?: boolean
 }
 
-type PropsForEntity = {
-  modelValue: Model
-  title?: string
+interface PropsForModel extends Props {
+  list: Model[]
+  valueGetter?: ValueGetter | undefined
+}
+
+interface PropsForEntity extends Props {
   list: Entity[]
   valueGetter: ValueGetter | ((value: Entity) => Model)
-  disabled?: boolean
-  loading?: number | string
-  minimize?: boolean
-  wrap?: boolean
-  semanticType?: SemanticType
-  stretch?: boolean
-  alwaysEmit?: boolean
 }
 
 const props = defineProps<PropsForEntity | PropsForModel>()

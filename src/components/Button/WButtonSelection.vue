@@ -51,7 +51,9 @@
         class="flex gap-3 sm-not:gap-1"
       >
         <div class="flex items-center font-normal text-base sm-not:text-xs text-description whitespace-nowrap">
-          <span class="sm-not:hidden">Selected&nbsp;</span><span class="text-primary-default dark:text-primary-dark font-semibold">{{ numberFormatter.format(selectedLength) }}</span><span class="sm-not:text-xs">&nbsp;{{ title ?? 'item' }}{{ selectedLength === 1 ? '' : 's' }}</span>
+          <template v-if="selectedLength">
+            <span class="sm-not:hidden">Selected&nbsp;</span><span class="text-primary-default dark:text-primary-dark font-semibold">{{ numberFormatter.format(selectedLength) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedLength === 1 ? '' : 's' }}</span>
+          </template>
         </div>
 
         <div
@@ -75,11 +77,16 @@ import WButtonSelectionAction from './WButtonSelectionAction.vue'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import WClickOutside from '../ClickOutside/WClickOutside.vue'
 
-defineProps<{
-  title?: string
-  selectedLength?: number
-  disableMessageMore?: string
-}>()
+withDefaults(
+  defineProps<{
+    title?: string
+    selectedLength?: number
+    disableMessageMore?: string
+  }>(),
+  {
+    title: 'item'
+  }
+)
 
 defineEmits<{
   (e: 'clear:selected'): void

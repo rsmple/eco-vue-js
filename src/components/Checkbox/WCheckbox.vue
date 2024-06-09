@@ -12,9 +12,9 @@
     <div
       class="relative flex justify-center items-center square-6 border border-solid isolate bg-default dark:bg-default-dark"
       :class="{
-        'text-default dark:text-default-dark': value && !disabled,
-        'text-primary-default dark:text-primary-dark': !value && !disabled,
-        'text-gray-300 dark:text-gray-700': !value && disabled,
+        'text-default dark:text-default-dark': modelValue && !disabled,
+        'text-primary-default dark:text-primary-dark': !modelValue && !disabled,
+        'text-gray-300 dark:text-gray-700': !modelValue && disabled,
         'w-ripple w-hover-circle before:text-accent after:text-accent': !disabled && !readonly,
         'rounded-full': radio,
         'rounded-md': !radio,
@@ -30,13 +30,13 @@
         :leave-to-class="radio ? 'opacity-0 scale-[0.25!important]' : 'opacity-0 scale-[0.50!important]'"
       >
         <div
-          v-show="value !== false"
+          v-show="modelValue !== false"
           class="absolute square-full -z-10 transition-[opacity,transform]"
           :class="{
-            'scale-[0.33] rounded-full': radio && intermediate && value === null,
-            'scale-[0.66] rounded': !radio && intermediate && value === null,
-            'scale-[0.66] rounded-full': radio && !(intermediate && value === null),
-            'rounded': !radio && !(intermediate && value === null),
+            'scale-[0.33] rounded-full': radio && intermediate && modelValue === null,
+            'scale-[0.66] rounded': !radio && intermediate && modelValue === null,
+            'scale-[0.66] rounded-full': radio && !(intermediate && modelValue === null),
+            'rounded': !radio && !(intermediate && modelValue === null),
             'bg-primary-default dark:bg-primary-dark': !disabled,
             'bg-gray-300 dark:bg-gray-700': disabled,
           }"
@@ -57,7 +57,7 @@
 
       <IconCheck
         v-else-if="!radio"
-        v-show="value"
+        v-show="modelValue"
         class="square-4"
       />
 
@@ -82,7 +82,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {ref} from 'vue'
 import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
@@ -97,23 +97,25 @@ const props = defineProps<{
   loading?: boolean
   intermediate?: boolean
   tooltipText?: string
+  allowShift?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
+  (e: 'update-shift:modelValue', value: boolean): void
 }>()
 
 const element = ref<HTMLButtonElement | undefined>()
 
-const value = computed<boolean | null>({
-  get: (): boolean | null => props.modelValue,
-  set: (value: boolean | null): void => emit('update:modelValue', value === true),
-})
-
-const toggle = (): void => {
+const toggle = (e: MouseEvent | KeyboardEvent): void => {
   if (props.disabled || props.readonly || props.loading) return
 
-  value.value = !value.value
+  if (props.allowShift && e.shiftKey) {
+    emit('update-shift:modelValue', !props.modelValue)
+    return
+  } else {
+    emit('update:modelValue', !props.modelValue)
+  }
 }
 
 </script>

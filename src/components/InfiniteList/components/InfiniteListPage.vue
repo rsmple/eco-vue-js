@@ -2,8 +2,12 @@
   <div
     ref="element"
     class="relative"
+    :class="{
+      'last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16': !minHeight,
+      'last:min-h-full': minHeight && !data,
+    }"
   >
-    <template v-if="(queryParams as Record<'page', number>).page && data?.results.length !== 0">
+    <template v-if="page && data?.results.length !== 0">
       <div
         class="flex"
         :class="{
@@ -48,6 +52,7 @@
               v-for="(item, index) in data.results"
               :key="valueGetter(item)"
               class="w-full group"
+              ref="resultElement"
             >
               <div class="[overflow:inherit]">
                 <slot
@@ -59,6 +64,8 @@
                   :previous="data?.results[index - 1]"
                   :first="firstPage && index === 0"
                   :last="lastPage && index === data.results.length - 1"
+                  :page="page"
+                  :index="index"
                 />
               </div>
             </div>
@@ -78,6 +85,8 @@
                 :previous="data?.results[index - 1]"
                 :first="firstPage && index === 0"
                 :last="lastPage && index === data.results.length - 1"
+                :page="page"
+                :index="index"
               />
             </template>
           </template>
@@ -97,6 +106,8 @@
               :previous="undefined"
               :first="firstPage && index === 1"
               :last="lastPage && index === skeletonLength"
+              :page="page"
+              :index="index"
             />
           </template>
         </template>
@@ -162,11 +173,11 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'update:count', value: number): void
-  (e: 'update:pagesCount', value: number): void
-  (e: 'update:nextPage', value: number | null): void
-  (e: 'update:previousPage', value: number | null): void
+  (e: 'update:pages-count', value: number): void
+  (e: 'update:next-page', value: number | null): void
+  (e: 'update:previous-page', value: number | null): void
   (e: 'update:scroll', value: number): void
-  (e: 'error:invalidPage', value: number): void
+  (e: 'remove:page', value: number): void
   (e: 'refetch'): void
   (e: 'update-from-header:scroll'): void
   (e: 'update:selected', values: Model[]): void
@@ -174,6 +185,7 @@ const emit = defineEmits<{
 }>()
 
 const element = ref<HTMLElement>()
+const resultElement = ref<HTMLDivElement[]>([])
 const isIntersecting = ref(false)
 
 const {data, error, setData, refetch, isFetching} = props.useQueryFn(
@@ -185,6 +197,8 @@ const {data, error, setData, refetch, isFetching} = props.useQueryFn(
 )
 const nextPage = computed(() => data.value?.next)
 const previousPage = computed(() => data.value?.previous)
+
+const page = computed<number | null>(() => props.queryParams instanceof Object && 'page' in props.queryParams && Number.isInteger(props.queryParams.page) ? (props.queryParams.page as number) : null)
 
 const setItem = (index: number, newItem: Data | undefined) => {
   if (!data.value) return
@@ -207,8 +221,8 @@ const emitRefetch = () => {
 const refetchPage = async () => {
   await refetch()
 
-  if (props.lastPage && nextPage.value !== undefined) emit('update:nextPage', nextPage.value)
-  if (props.firstPage && previousPage.value !== undefined) emit('update:previousPage', previousPage.value)
+  if (props.lastPage && nextPage.value !== undefined) emit('update:next-page', nextPage.value)
+  if (props.firstPage && previousPage.value !== undefined) emit('update:previous-page', previousPage.value)
 }
 
 const getFirst = () => {
@@ -221,15 +235,26 @@ const getLast = () => {
   return data.value.results[data.value.results.length - 1]
 }
 
+const scrollTo = (index?: number) => {
+  if (index) {
+    if (index !== -1 && resultElement.value[index]) {
+      resultElement.value[index].scrollIntoView({block: 'center', behavior: 'smooth'})
+      return
+    }
+  }
+
+  element.value?.scrollIntoView({block: 'center', behavior: 'smooth'})
+}
+
 watch(data, value => {
-  if (props.firstPage && value?.previous !== undefined) emit('update:previousPage', value.previous)
-  if (props.lastPage && value?.next !== undefined) emit('update:nextPage', value.next)
-  if (value?.pages_count !== undefined) emit('update:pagesCount', value.pages_count)
+  if (props.firstPage && value?.previous !== undefined) emit('update:previous-page', value.previous)
+  if (props.lastPage && value?.next !== undefined) emit('update:next-page', value.next)
+  if (value?.pages_count !== undefined) emit('update:pages-count', value.pages_count)
   if (value?.count !== undefined) emit('update:count', value.count)
 }, {immediate: true})
 
 watch(error, (error: unknown): void => {
-  if (props.isInvalidPage(error)) emit('error:invalidPage', (props.queryParams as {page?: number}).page ?? 1)
+  if (props.isInvalidPage(error) && page.value !== null) emit('remove:page', page.value)
 }, {immediate: true})
 
 watch(isFetching, value => {
@@ -268,7 +293,7 @@ onMounted(() => {
   if (height === 0) return
   if (!props.firstPage) return
   if (props.lastPage) {
-    if ((props.queryParams as {page?: number}).page !== 1) nextTick().then(() => emit('update-from-header:scroll'))
+    if (page.value !== 1) nextTick().then(() => emit('update-from-header:scroll'))
 
     return
   }
@@ -279,6 +304,8 @@ onMounted(() => {
 onBeforeUnmount(() => {
   intersectionObserver?.disconnect()
   intersectionObserver = undefined
+
+  if (page.value !== null) emit('remove:page', page.value)
 })
 
 watch(data, async (_, oldValue) => {
@@ -299,6 +326,7 @@ defineExpose({
   getFirst,
   getLast,
   refetch: refetchPage,
+  scrollTo,
 })
 
 defineSlots<{
@@ -311,6 +339,8 @@ defineSlots<{
     next?: Data
     first: boolean
     last: boolean
+    page: number
+    index: number
   }) => void
 }>()
 

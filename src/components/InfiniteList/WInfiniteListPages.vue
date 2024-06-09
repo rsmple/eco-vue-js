@@ -39,22 +39,18 @@
       :value-getter="valueGetter"
       :query-options="queryOptions"
 
-      :class="{
-        'last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16': !minHeight,
-      }"
-
       @update:count="updateCount"
       @update:pages-count="updatePagesCount"
       @update:next-page="updateNextPage($event); infiniteScroll?.checkIsScrollDown()"
       @update:previous-page="updatePreviousPage($event); infiniteScroll?.checkIsScrollUp()"
       @update:scroll="updateScroll"
       @update-from-header:scroll="headerTop > 0 && nextTick(() => updateScroll(headerTop))"
-      @error:invalid-page="removePage"
+      @remove:page="removePage"
       @refetch="refetchNextPages(index)"
       @update:selected="$emit('update:selected', $event)"
       @fetched="isResettingPage = false"
     >
-      <template #default="{item, setter, skeleton, refetch, previous, next, first, last}">
+      <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page, index}">
         <slot
           :item="item"
           :setter="setter"
@@ -65,6 +61,8 @@
           :first="first"
           :last="last"
           :resetting="isResettingPage"
+          :page="page"
+          :index="index"
         />
       </template>
     </InfiniteListPage>
@@ -225,6 +223,9 @@ const updateScroll = (height: number): void => {
 }
 
 const removePage = (page: number): void => {
+  if (previousPage.value === page) previousPage.value = null
+  if (nextPage.value === page) nextPage.value = null
+
   const index = pages.value.indexOf(page)
 
   if (index === -1) return
@@ -236,11 +237,26 @@ const removePage = (page: number): void => {
   emit('update:page', pages.value[pages.value.length - 1])
 }
 
-const resetPage = () => {
+const goto = async (page = 1, itemIndex?: number) => {
+  const index = pages.value.indexOf(page)
+  if (index !== -1) {
+    pageComponent.value[index].scrollTo(itemIndex)
+
+    return
+  }
+
+  resetPage(page)
+}
+
+const resetPage = async (page = 1) => {
   isResettingPage.value = true
 
-  emit('update:page', undefined)
-  pages.value = [1]
+  emit('update:page', page === 1 ? undefined : page)
+  pages.value = []
+
+  await nextTick()
+
+  pages.value = [page]
   nextPage.value = null
   previousPage.value = null
 
@@ -257,6 +273,7 @@ watch(count, value => emit('update:count', value), {immediate: true})
 
 defineExpose({
   resetPage,
+  goto,
 })
 
 defineSlots<{
@@ -270,6 +287,8 @@ defineSlots<{
     first: boolean
     last: boolean
     resetting: boolean
+    page: number
+    index: number
   }) => void
 }>()
 
