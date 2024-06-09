@@ -84,8 +84,10 @@ withDefaults(
     disableMessageMore?: string
   }>(),
   {
-    title: 'item'
-  }
+    title: 'item',
+    selectedLength: undefined,
+    disableMessageMore: undefined,
+  },
 )
 
 defineEmits<{

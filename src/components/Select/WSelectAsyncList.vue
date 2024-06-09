@@ -81,6 +81,7 @@ withDefaults(
     emptyStub: undefined,
     excludeParams: undefined,
     valueGetter: (data: Data) => (data.id as Model),
+    queryOptions: undefined,
   },
 )
 

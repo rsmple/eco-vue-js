@@ -50,7 +50,7 @@
       @update:selected="$emit('update:selected', $event)"
       @fetched="isResettingPage = false"
     >
-      <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page, index}">
+      <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page: itemPage, index: itemIndex}">
         <slot
           :item="item"
           :setter="setter"
@@ -61,8 +61,8 @@
           :first="first"
           :last="last"
           :resetting="isResettingPage"
-          :page="page"
-          :index="index"
+          :page="itemPage"
+          :index="itemIndex"
         />
       </template>
     </InfiniteListPage>
@@ -124,6 +124,7 @@ const props = withDefaults(
     pageClass: undefined,
     maxPages: 5,
     refetchInterval: undefined,
+    queryOptions: undefined,
   },
 )
 

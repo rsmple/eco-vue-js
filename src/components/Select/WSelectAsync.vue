@@ -165,6 +165,7 @@ const props = withDefaults(
     createdData: undefined,
     valueGetter: (data: Data) => (data.id as Model),
     valueQueryKey: 'id__in',
+    queryOptions: undefined,
   },
 )
 

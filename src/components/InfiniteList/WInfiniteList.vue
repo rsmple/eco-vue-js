@@ -10,7 +10,10 @@
         'z-20': !isIntersecting,
       }"
     >
-      <slot name="header" :goto="goto" />
+      <slot
+        name="header"
+        :goto="goto"
+      />
     </div>
   </template>
 
@@ -112,6 +115,7 @@ const props = withDefaults(
     maxPages: undefined,
     refetchInterval: undefined,
     valueGetter: (item: Data) => (item.id as Model),
+    queryOptions: undefined,
   },
 )
 

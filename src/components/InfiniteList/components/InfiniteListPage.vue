@@ -51,8 +51,8 @@
             <div
               v-for="(item, index) in data.results"
               :key="valueGetter(item)"
-              class="w-full group"
               ref="resultElement"
+              class="w-full group"
             >
               <div class="[overflow:inherit]">
                 <slot
@@ -168,6 +168,7 @@ const props = withDefaults(
     pageClass: undefined,
     refetchInterval: undefined,
     scrollingElement: undefined,
+    queryOptions: undefined,
   },
 )
 
