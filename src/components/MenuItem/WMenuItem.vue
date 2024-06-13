@@ -14,13 +14,14 @@
 </template>
 
 <script lang="ts" setup>
-import {type RouteLocationRaw, RouterLink} from 'vue-router'
+import {RouterLink} from 'vue-router'
 
-defineProps<{
-  to?: RouteLocationRaw
+interface Props extends /* @vue-ignore */ Partial<LinkProps> {
   disabled?: boolean
   href?: string
   download?: string
-}>()
+}
+
+defineProps<Props>()
 
 </script>

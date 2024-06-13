@@ -18,16 +18,16 @@
 </template>
 
 <script lang="ts" setup>
-import type {RouteLocationRaw} from 'vue-router'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
-defineProps<{
-  to?: RouteLocationRaw
+interface Props extends /* @vue-ignore */ Partial<LinkProps> {
   text: string
   icon?: SVGComponent
   disabled?: boolean
   href?: string
   download?: string
-}>()
+}
+
+defineProps<Props>()
 
 </script>

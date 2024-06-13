@@ -68,21 +68,22 @@
 
 <script lang="ts" setup>
 import {computed, onUnmounted, watch} from 'vue'
-import {RouterLink, useRoute, useRouter, type RouteLocationRaw} from 'vue-router'
+import {RouterLink, useRoute, useRouter} from 'vue-router'
 import {isEqualObj, numberCompactFormatter} from '@/utils/utils'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WCounter from '@/components/Counter/WCounter.vue'
 
-const props = defineProps<{
+interface Props extends /* @vue-ignore */ LinkProps {
   icon?: SVGComponent
-  to: RouteLocationRaw
   title: string
   count?: number
   counter?: number
   noQuery?: boolean
   skeleton?: boolean
   hasActive?: boolean
-}>()
+}
+
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
   (e: 'update:isActive', value: Record<string, boolean>): void

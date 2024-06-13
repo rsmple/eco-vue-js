@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts" setup>
-import {type RouteLocationRaw, RouterLink} from 'vue-router'
+import {RouterLink} from 'vue-router'
 import WCounter from '@/components/Counter/WCounter.vue'
 import {SemanticType} from '@/main'
 
@@ -57,17 +57,18 @@ const semanticTypeOutlineStylesMap: Record<SemanticType, string> = {
   [SemanticType.INFO]: 'text-info dark:text-info-dark',
 }
 
+interface Props extends /* @vue-ignore */ Partial<LinkProps> {
+  icon?: SVGComponent
+  title: string
+  active?: boolean
+  tag?: 'button' | 'a'
+  count?: number
+  semanticType?: SemanticType
+  outline?: boolean
+}
+
 withDefaults(
-  defineProps<{
-    icon?: SVGComponent
-    title: string
-    active?: boolean
-    tag?: 'button' | 'a'
-    to?: RouteLocationRaw
-    count?: number
-    semanticType?: SemanticType
-    outline?: boolean
-  }>(),
+  defineProps<Props>(),
   {
     icon: undefined,
     tag: 'button',

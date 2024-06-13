@@ -21,20 +21,21 @@
 </template>
 
 <script lang="ts" setup>
-import {RouterLink, type RouteLocationRaw} from 'vue-router'
+import {RouterLink} from 'vue-router'
 import IconLink from '@/assets/icons/sax/IconLink.svg?component'
 import {SemanticType} from '@/utils/SemanticType'
 import {semanticTypeIconStylesMap, semanticTypeTextStylesMap} from '@/components/Button/models/semanticTypeStylesMap'
 
+interface Props extends /* @vue-ignore */ Partial<LinkProps> {
+  href?: string
+  target?: '_self' | '_blank' | '_parent' | '_top'
+  text?: string
+  semanticType?: SemanticType
+  small?: boolean
+}
+
 withDefaults(
-  defineProps<{
-    to?: RouteLocationRaw
-    href?: string
-    target?: '_self' | '_blank' | '_parent' | '_top'
-    text?: string
-    semanticType?: SemanticType
-    small?: boolean
-  }>(),
+  defineProps<Props>(),
   {
     semanticType: SemanticType.PRIMARY,
     to: undefined,

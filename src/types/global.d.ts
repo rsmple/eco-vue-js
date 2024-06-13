@@ -40,12 +40,20 @@ declare type DefaultData = {id: number, [key: string]: unknown}
 
 type Params = Parameters<import('@tanstack/vue-query').QueryClient['setQueriesData']>
 
-declare type ApiErrorDefault = unknown
+declare interface LinkProps {
+  to: import('vue-router').RouterLinkProps['to']
+}
 
-declare type UseQueryDefault<TQueryFnData = unknown, TError = ApiErrorDefault, TData = TQueryFnData, TQueryKey extends import('@tanstack/vue-query').QueryKey = import('@tanstack/vue-query').QueryKey> =
+declare interface DefaultQueryError {}
+
+declare interface DefaultQueryConfig {
+  ApiError: DefaultQueryError
+}
+
+declare type UseQueryDefault<TQueryFnData = unknown, TError = DefaultQueryConfig['ApiError'], TData = TQueryFnData, TQueryKey extends import('@tanstack/vue-query').QueryKey = import('@tanstack/vue-query').QueryKey> =
   typeof import('@/utils/useDefaultQuery').useDefaultQuery<TQueryFnData, TError, TData, TQueryKey>
 
-declare type QueryOptions<Data, Error = ApiErrorDefault> = Partial<Parameters<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Data, Error>>[0]>
+declare type QueryOptions<Data, Error = DefaultQueryConfig['ApiError']> = Partial<Parameters<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Data, Error>>[0]>
 
 declare type UseQueryEmpty<Model, ApiError> = (options?: QueryOptions<Model, ApiError>) => ReturnType<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Model, ApiError>>
 

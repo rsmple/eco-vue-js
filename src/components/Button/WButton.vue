@@ -48,22 +48,23 @@
 <script lang="ts" setup>
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import {SemanticType} from '@/utils/SemanticType'
-import {type RouteLocationRaw, RouterLink} from 'vue-router'
+import {RouterLink} from 'vue-router'
 import {semanticTypeButtonStylesMap} from './models/semanticTypeStylesMap'
 
+interface Props extends /* @vue-ignore */ Partial<LinkProps> {
+  semanticType?: SemanticType
+  disabled?: boolean
+  loading?: boolean
+  tag?: 'a' | 'button'
+  type?: string
+  replace?: boolean
+  href?: string
+  target?: '_self' | '_blank' | '_parent' | '_top'
+  minimize?: boolean
+}
+
 const props = withDefaults(
-  defineProps<{
-    semanticType?: SemanticType
-    disabled?: boolean
-    loading?: boolean
-    tag?: 'a' | 'button'
-    type?: string
-    to?: RouteLocationRaw
-    replace?: boolean
-    href?: string
-    target?: '_self' | '_blank' | '_parent' | '_top'
-    minimize?: boolean
-  }>(),
+  defineProps<Props>(),
   {
     semanticType: SemanticType.PRIMARY,
     tag: 'button',

@@ -36,20 +36,20 @@
 
 <script lang="ts" setup>
 import {computed, ref} from 'vue'
-import type {RouteLocationRaw} from 'vue-router'
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 import WNavItem from './WNavItem.vue'
 import WExpansion from '@/components/Expansion/WExpansion.vue'
 import WNavItemTransition from './WNavItemTransition.vue'
 
-defineProps<{
+interface Props extends /* @vue-ignore */ LinkProps {
   icon?: SVGComponent
-  to: RouteLocationRaw
   title: string
   count?: number
   skeleton?: boolean
   newLabel?: boolean
-}>()
+}
+
+defineProps<Props>()
 
 const isOpen = ref(false)
 
