@@ -19,8 +19,9 @@
 
 <script lang="ts" setup>
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
+import type {LinkProps} from '@/types/types'
 
-interface Props extends /* @vue-ignore */ Partial<LinkProps> {
+interface Props extends LinkProps {
   text: string
   icon?: SVGComponent
   disabled?: boolean
@@ -28,6 +29,14 @@ interface Props extends /* @vue-ignore */ Partial<LinkProps> {
   download?: string
 }
 
-defineProps<Props>()
+withDefaults(
+  defineProps<Props>(),
+  {
+    icon: undefined,
+    href: undefined,
+    download: undefined,
+    to: undefined,
+  },
+)
 
 </script>

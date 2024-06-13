@@ -1,3 +1,4 @@
+import type {DefaultQueryConfig} from '@/types/types'
 import {useQuery, useQueryClient, type QueryClient, type UseQueryReturnType, type QueryKey} from '@tanstack/vue-query'
 
 type Params = Parameters<QueryClient['setQueriesData']>

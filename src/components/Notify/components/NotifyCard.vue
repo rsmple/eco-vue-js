@@ -74,8 +74,9 @@ import WCounter from '@/components/Counter/WCounter.vue'
 import WButton from '@/components/Button/WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
+import type {LinkProps} from '@/types/types'
 
-interface Props extends /* @vue-ignore */ Partial<LinkProps> {
+interface Props extends LinkProps {
   title: string,
   caption?: string,
   userInput?: string,
@@ -83,7 +84,14 @@ interface Props extends /* @vue-ignore */ Partial<LinkProps> {
   count: number,
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(
+  defineProps<Props>(),
+  {
+    caption: undefined,
+    userInput: undefined,
+    to: undefined,
+  },
+)
 
 defineEmits<{
   (e: 'click:close'): void

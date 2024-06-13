@@ -16,8 +16,9 @@
 <script lang="ts" setup>
 import {RouterLink} from 'vue-router'
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
+import type {LinkProps} from '@/types/types'
 
-interface Props extends /* @vue-ignore */ LinkProps {
+interface Props extends LinkProps {
   text?: string
 }
 

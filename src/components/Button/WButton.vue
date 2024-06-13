@@ -50,8 +50,9 @@ import WSpinner from '@/components/Spinner/WSpinner.vue'
 import {SemanticType} from '@/utils/SemanticType'
 import {RouterLink} from 'vue-router'
 import {semanticTypeButtonStylesMap} from './models/semanticTypeStylesMap'
+import type {LinkProps} from '@/types/types'
 
-interface Props extends /* @vue-ignore */ Partial<LinkProps> {
+interface Props extends LinkProps {
   semanticType?: SemanticType
   disabled?: boolean
   loading?: boolean

@@ -40,16 +40,6 @@ declare type DefaultData = {id: number, [key: string]: unknown}
 
 type Params = Parameters<import('@tanstack/vue-query').QueryClient['setQueriesData']>
 
-declare interface LinkProps {
-  to: import('vue-router').RouterLinkProps['to']
-}
-
-declare interface DefaultQueryError {}
-
-declare interface DefaultQueryConfig {
-  ApiError: DefaultQueryError
-}
-
 declare type UseQueryDefault<TQueryFnData = unknown, TError = DefaultQueryConfig['ApiError'], TData = TQueryFnData, TQueryKey extends import('@tanstack/vue-query').QueryKey = import('@tanstack/vue-query').QueryKey> =
   typeof import('@/utils/useDefaultQuery').useDefaultQuery<TQueryFnData, TError, TData, TQueryKey>
 

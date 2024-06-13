@@ -72,8 +72,9 @@ import {RouterLink, useRoute, useRouter} from 'vue-router'
 import {isEqualObj, numberCompactFormatter} from '@/utils/utils'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WCounter from '@/components/Counter/WCounter.vue'
+import type {LinkProps} from '@/types/types'
 
-interface Props extends /* @vue-ignore */ LinkProps {
+interface Props extends LinkProps {
   icon?: SVGComponent
   title: string
   count?: number

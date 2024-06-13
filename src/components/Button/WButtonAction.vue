@@ -37,7 +37,8 @@
 <script lang="ts" setup>
 import {RouterLink} from 'vue-router'
 import WCounter from '@/components/Counter/WCounter.vue'
-import {SemanticType} from '@/main'
+import {SemanticType} from '@/utils/SemanticType'
+import type {LinkProps} from '@/types/types'
 
 const semanticTypeStylesMap: Record<SemanticType, string> = {
   [SemanticType.SECONDARY]: 'text-description bg-default dark:bg-default-dark hover:text-primary-default dark:hover:text-primary-dark',
@@ -57,7 +58,7 @@ const semanticTypeOutlineStylesMap: Record<SemanticType, string> = {
   [SemanticType.INFO]: 'text-info dark:text-info-dark',
 }
 
-interface Props extends /* @vue-ignore */ Partial<LinkProps> {
+interface Props extends LinkProps {
   icon?: SVGComponent
   title: string
   active?: boolean

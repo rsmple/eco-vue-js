@@ -15,13 +15,21 @@
 
 <script lang="ts" setup>
 import {RouterLink} from 'vue-router'
+import type {LinkProps} from '@/types/types'
 
-interface Props extends /* @vue-ignore */ Partial<LinkProps> {
+interface Props extends LinkProps {
   disabled?: boolean
   href?: string
   download?: string
 }
 
-defineProps<Props>()
+withDefaults(
+  defineProps<Props>(),
+  {
+    href: undefined,
+    download: undefined,
+    to: undefined,
+  },
+)
 
 </script>

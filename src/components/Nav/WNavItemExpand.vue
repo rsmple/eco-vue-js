@@ -40,8 +40,9 @@ import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 import WNavItem from './WNavItem.vue'
 import WExpansion from '@/components/Expansion/WExpansion.vue'
 import WNavItemTransition from './WNavItemTransition.vue'
+import type {LinkProps} from '@/types/types'
 
-interface Props extends /* @vue-ignore */ LinkProps {
+interface Props extends LinkProps {
   icon?: SVGComponent
   title: string
   count?: number
