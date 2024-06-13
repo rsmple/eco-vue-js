@@ -41,7 +41,7 @@ const addNotify: AddNotify = (config: NotifyConfig): void => {
     && item.title === config.title
     && item.caption === config.caption
     && item.userInput === config.userInput
-    && item.to?.name === config.to?.name,
+    && (item.to as {name: string})?.name === (config.to as {name: string})?.name,
   )
 
   const configMeta = {

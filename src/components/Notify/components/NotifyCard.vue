@@ -64,7 +64,7 @@
 
 <script lang="ts" setup>
 import {computed, ref, watch, type StyleValue} from 'vue'
-import {useRouter, type RouteLocationNamedRaw} from 'vue-router'
+import {useRouter} from 'vue-router'
 import {NotifyType} from '../models/NotifyType'
 import IconDanger from '@/assets/icons/default/IconDanger.svg?component'
 import IconWarn from '@/assets/icons/default/IconWarn.svg?component'
@@ -75,14 +75,15 @@ import WButton from '@/components/Button/WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
 
-const props = defineProps<{
+interface Props extends /* @vue-ignore */ Partial<LinkProps> {
   title: string,
   caption?: string,
   userInput?: string,
   type: NotifyType,
   count: number,
-  to?: RouteLocationNamedRaw,
-}>()
+}
+
+const props = defineProps<Props>()
 
 defineEmits<{
   (e: 'click:close'): void

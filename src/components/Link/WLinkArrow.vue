@@ -14,12 +14,13 @@
 </template>
 
 <script lang="ts" setup>
-import {RouterLink, type RouteLocationNamedRaw} from 'vue-router'
+import {RouterLink} from 'vue-router'
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
 
-defineProps<{
-  to: RouteLocationNamedRaw
+interface Props extends /* @vue-ignore */ LinkProps {
   text?: string
-}>()
+}
+
+defineProps<Props>()
 
 </script>
