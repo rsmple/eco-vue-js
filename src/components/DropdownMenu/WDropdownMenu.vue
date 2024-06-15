@@ -25,8 +25,8 @@
           :max-width="maxWidth"
           :emit-update="emitUpdate"
           :class="{
-            'z-[2]': !teleport,
-            'z-30': teleport,
+            'z-[2]': !teleport && !noZIndex,
+            'z-30': teleport && !noZIndex,
           }"
           class="will-change-[top,bottom]"
           @update:rect="$emit('update:rect')"
@@ -51,6 +51,7 @@ defineProps<{
   updateAlign?: boolean
   emitUpdate?: boolean
   teleport?: boolean
+  noZIndex?: boolean
 }>()
 
 defineEmits<{

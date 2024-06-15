@@ -1,11 +1,13 @@
 <template>
   <button
     ref="element"
-    class="flex gap-2 cursor-pointer select-none outline-none w-ripple-trigger w-hover-circle-trigger items-center w-hover-circle-opacity-[0.08]"
+    class="flex gap-2 cursor-pointer select-none outline-none w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-[0.08]"
     :class="{
       'cursor-progress': loading,
       'cursor-not-allowed opacity-70': disabled,
       'pt-1 pb-4': title,
+      'items-start pt-2': alignTop,
+      'items-center': !alignTop,
     }"
     @click="toggle"
   >
@@ -98,6 +100,7 @@ const props = defineProps<{
   intermediate?: boolean
   tooltipText?: string
   allowShift?: boolean
+  alignTop?: boolean
 }>()
 
 const emit = defineEmits<{

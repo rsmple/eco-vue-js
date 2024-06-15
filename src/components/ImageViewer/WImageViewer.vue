@@ -60,6 +60,8 @@ const props = defineProps<{
 let closeModal: null | (() => void) = null
 
 const openModal = (): void => {
+  if (!props.modelValue) return
+
   closeModal?.()
 
   closeModal = Modal.addAutoclosable(

@@ -37,24 +37,31 @@
       </div>
 
       <div :class="pageClass">
-        <template v-if="data?.results">
-          <TransitionGroup
-            v-if="transition"
-            enter-active-class="transition-[grid-template-rows] overflow-hidden grid"
-            enter-from-class="grid-rows-[0fr]"
-            enter-to-class="grid-rows-[1fr]"
-            leave-active-class="transition-[grid-template-rows] overflow-hidden grid"
-            leave-from-class="grid-rows-[1fr]"
-            leave-to-class="grid-rows-[0fr]"
-            :css="!resetting"
+        <component
+          :is="transition ? TransitionGroup : EmptyComponent"
+          v-if="data?.results"
+          v-bind="transition ? {
+            ['enter-active-class']:'transition-[grid-template-rows] overflow-hidden grid',
+            ['enter-from-class']:'grid-rows-[0fr]',
+            ['enter-to-class']:'grid-rows-[1fr]',
+            ['leave-active-class']:'transition-[grid-template-rows] overflow-hidden grid',
+            ['leave-from-class']:'grid-rows-[1fr]',
+            ['leave-to-class']:'grid-rows-[0fr]',
+            css: !resetting,
+          } : undefined"
+        >
+          <template
+            v-for="(item, index) in data.results"
+            :key="valueGetter(item)"
           >
-            <div
-              v-for="(item, index) in data.results"
-              :key="valueGetter(item)"
-              ref="resultElement"
-              class="w-full group"
+            <component
+              :is="transition ? 'div' : EmptyComponent"
+              v-bind="transition ? {class: 'w-full'} : undefined"
             >
-              <div class="[overflow:inherit]">
+              <component 
+                :is="transition ? 'div' : EmptyComponent"
+                v-bind="transition ? {class: '[overflow:inherit]'} : undefined"
+              >
                 <slot
                   :item="item"
                   :setter="(newItem?: Data) => setItem(index, newItem)"
@@ -67,30 +74,10 @@
                   :page="page"
                   :index="index"
                 />
-              </div>
-            </div>
-          </TransitionGroup>
-
-          <template v-else>
-            <template
-              v-for="(item, index) in data.results"
-              :key="valueGetter(item)"
-            >
-              <slot
-                :item="item"
-                :setter="(newItem?: Data) => setItem(index, newItem)"
-                :refetch="emitRefetch"
-                :skeleton="false"
-                :next="data?.results[index + 1]"
-                :previous="data?.results[index - 1]"
-                :first="firstPage && index === 0"
-                :last="lastPage && index === data.results.length - 1"
-                :page="page"
-                :index="index"
-              />
-            </template>
+              </component>
+            </component>
           </template>
-        </template>
+        </component>
 
         <template v-else>
           <template
@@ -130,9 +117,10 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
-import {toRef, computed, watch, ref, onMounted, nextTick, onBeforeUnmount} from 'vue'
+import {toRef, computed, watch, ref, onMounted, nextTick, onBeforeUnmount, TransitionGroup} from 'vue'
 import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
 import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
+import EmptyComponent from './EmptyComponent.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -143,22 +131,23 @@ const props = withDefaults(
     firstPage: boolean
     lastPage: boolean
     hidePageTitle?: boolean
-    selected?: Model[]
     wrap?: boolean
     noGap?: boolean
     transition?: boolean
     resetting?: boolean
     emptyStub?: string
-    selectOnly?: boolean
-    unselectOnly?: boolean
-    reverseSelection?: boolean
-    allowPageSelection?: boolean
     minHeight?: boolean
     pageClass?: string
     refetchInterval?: number | false
     scrollingElement?: Element | null
-    valueGetter: (data: Data) => Model
     queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
+
+    selected?: Model[]
+    valueGetter: (data: Data) => Model
+    selectOnly?: boolean
+    unselectOnly?: boolean
+    reverseSelection?: boolean
+    allowPageSelection?: boolean
   }>(),
   {
     keyGetter: undefined,

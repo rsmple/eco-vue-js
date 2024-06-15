@@ -41,25 +41,29 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeMount, onBeforeUnmount, ref, watch, type Component, reactive} from 'vue'
-import {initModal, type AddModal, Modal} from '@/utils/Modal'
+import {onBeforeMount, onBeforeUnmount, ref, watch, reactive} from 'vue'
+import {initModal, Modal, type ModalComponent} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
 import ModalCloseButton from './components/ModalCloseButton.vue'
 
-type ModalMeta = {
+type ModalMeta<ModalProps> = {
   key: number
-  component: Component
-  props?: Record<string, unknown>
+  component: ModalComponent<unknown>
+  props?: ModalProps
   cb?: () => void
   autoclose: boolean
 }
 
 const key = ref(0)
-const modalMetaList = ref<ModalMeta[]>([])
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const modalMetaList = ref<ModalMeta<any>[]>([])
 const isBackdropVisible = ref(false)
 const hasChangesMap = reactive<Record<number, boolean>>({})
 
-const addModal: AddModal = (component: Component, props?: Record<string, unknown>, cb?: () => void, autoclose = false): () => ReturnType<typeof closeModal> => {
+type Cb = () => void
+type CloseModal = () => ReturnType<typeof closeModal>
+
+const addModal = (component: ModalComponent<unknown>, props?: unknown, cb?: Cb, autoclose = false): CloseModal => {
   const modalMeta = {
     component,
     key: key.value++,
@@ -73,7 +77,7 @@ const addModal: AddModal = (component: Component, props?: Record<string, unknown
   return () => closeModal(modalMeta)
 }
 
-const closeModal = (modalMeta: ModalMeta): void => {
+const closeModal = (modalMeta: ModalMeta<unknown>): void => {
   const index = modalMetaList.value.indexOf(modalMeta)
 
   if (index === -1) return
@@ -94,7 +98,7 @@ const closeModal = (modalMeta: ModalMeta): void => {
 
 let closeConfirm: (() => void) | null = null
 
-const closeModalWithConfirm = (modalMeta: ModalMeta): void => {
+const closeModalWithConfirm = (modalMeta: ModalMeta<unknown>): void => {
   if (modalMeta.autoclose || !hasChangesMap[modalMeta.key]) {
     closeModal(modalMeta)
     return

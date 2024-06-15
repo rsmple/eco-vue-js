@@ -1,22 +1,36 @@
-import {defineAsyncComponent, markRaw, type Component} from 'vue'
+import {defineAsyncComponent, markRaw, type Component, type ComponentOptions, type MethodOptions} from 'vue'
 import type {ConfirmModalProps} from '@/components/Modal/modals/Confirm/types'
 
 const ConfirmModal = defineAsyncComponent(() => import('@/components/Modal/modals/Confirm/ConfirmModal.vue'))
 
-export type AddModal = (component: Component, props?: Record<string, unknown>, cb?: () => void, autoclose?: boolean) => (() => void)
+export type ModalComponent<Props> = Component<
+  Props,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any,
+  ComponentOptions,
+  MethodOptions,
+  {
+    'close:modal': () => void,
+  }
+>
 
-let addModal: AddModal | undefined
+export type AddModal<Props> = (component: ModalComponent<Props>, props?: Props, cb?: () => void, autoclose?: boolean) => (() => void)
 
-export const initModal = (value: AddModal | undefined) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let addModal: AddModal<any> | undefined
+
+export const initModal = <Props>(value: AddModal<Props> | undefined) => {
   addModal = value
 }
 
 export const Modal = {
-  add(component: Component, props?: Record<string, unknown>, cb?: () => void): (() => void) | null {
+  add<Props>(component: ModalComponent<Props>, props?: Props, cb?: () => void): (() => void) | null {
     return addModal?.(component, props, cb, false) ?? null
   },
 
-  addAutoclosable(component: Component, props?: Record<string, unknown>, cb?: () => void): (() => void) | null {
+  addAutoclosable<Props>(component: ModalComponent<Props>, props?: Props, cb?: () => void): (() => void) | null {
     return addModal?.(component, props, cb, true) ?? null
   },
 

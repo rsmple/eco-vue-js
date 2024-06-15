@@ -12,7 +12,7 @@
     >
       <slot
         name="header"
-        :goto="goto"
+        v-bind="{selectAllValue, goto}"
       />
     </div>
   </template>
@@ -27,7 +27,6 @@
     :skip-scroll-target="skipScrollTarget"
     :skeleton-length="skeletonLength"
     :hide-page-title="hidePageTitle"
-    :selected="selected"
     :wrap="wrap"
     :no-gap="noGap"
     :transition="transition"
@@ -37,42 +36,58 @@
     :min-height="minHeight"
     :exclude-params="excludeParams"
     :empty-stub="emptyStub"
+    :page-class="pageClass"
+    :max-pages="maxPages"
+    :refetch-interval="refetchInterval"
+    :query-options="queryOptions"
+
+    :selected="selected"
+    :value-getter="valueGetter"
     :select-only="selectOnly"
     :unselect-only="unselectOnly"
     :reverse-selection="reverseSelection"
     :allow-page-selection="allowPageSelection"
-    :page-class="pageClass"
-    :max-pages="maxPages"
-    :refetch-interval="refetchInterval"
-    :value-getter="valueGetter"
-    :query-options="queryOptions"
+    @update:selected="$emit('select', $event)"
 
     @update:count="$emit('update:count', $event)"
-    @update:selected="$emit('update:selected', $event)"
     @update:page="$emit('update:page', $event)"
   >
     <template #default="{item, setter, skeleton, refetch, previous, next, first, last, resetting, page, index}">
-      <slot
-        :item="item"
-        :setter="setter"
-        :skeleton="skeleton"
-        :refetch="refetch"
-        :previous="previous"
-        :next="next"
-        :first="first"
-        :last="last"
-        :resetting="resetting"
-        :page="page"
-        :index="index"
-      />
+      <InfiniteListPageSelectItem
+        :selected="skeleton ? false : getIsSelected(valueGetter(item))"
+        :selected-between="skeleton ? false : getIsSelectedBetween(valueGetter(item), page, index)"
+        @update:selected="
+          toggleSelected(valueGetter(item), reverse && !selectedRange ? !$event : $event);
+          setSelectedCursor($event ? {page, index, id: valueGetter(item)} : null);
+        "
+        @update:selected-range="setSelectedRange({page, index, id: valueGetter(item)})"
+        @update:selected-range-hover="setRangeHover({page, index, id: valueGetter(item)})"
+      >
+        <slot
+          :item="item"
+          :setter="setter"
+          :skeleton="skeleton"
+          :refetch="refetch"
+          :previous="previous"
+          :next="next"
+          :first="first"
+          :last="last"
+          :resetting="resetting"
+          :page="page"
+          :index="index"
+        />
+      </InfiniteListPageSelectItem>
     </template>
   </WInfiniteListPages>
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
-import {onBeforeUnmount, onMounted, ref, watch} from 'vue'
+import {onBeforeUnmount, onMounted, provide, ref, toRef, watch} from 'vue'
 import {useInfiniteListHeader} from './use/useInfiniteListHeader'
 import WInfiniteListPages from './WInfiniteListPages.vue'
+import InfiniteListPageSelectItem from './components/InfiniteListPageSelectItem.vue'
+import {useSelected} from './use/useSelected'
+import {wInfiniteListSelection} from './models/injection'
 
 const props = withDefaults(
   defineProps<{
@@ -83,31 +98,39 @@ const props = withDefaults(
     hidePageTitle?: boolean
     headerMargin?: number
     skipScrollTarget?: boolean
-    selected?: Model[]
     wrap?: boolean
     noGap?: boolean
     transition?: boolean
-    pageLength?: number
     scrollingElement?: Element | null
     headerTopIgnore?: boolean
     minHeight?: boolean
     excludeParams?: (keyof QueryParams)[]
     emptyStub?: string
+    pageClass?: string
+    maxPages?: number
+    refetchInterval?: number | false
+    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
+
+    pageLength?: number
+    count?: number
+
+    allowSelect?: boolean
+    allowSelectRange?: boolean
+
+    valueGetter?: (data: Data) => Model
+    selected?: Model[]
+    selectedRange?: SelectedRange<Model>
+    reverse?: boolean
+
     selectOnly?: boolean
     unselectOnly?: boolean
     reverseSelection?: boolean
     allowPageSelection?: boolean
-    pageClass?: string
-    maxPages?: number
-    refetchInterval?: number | false
-    valueGetter?: (data: Data) => Model
-    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
   }>(),
   {
     skeletonLength: undefined,
     headerMargin: 0,
-    selected: undefined,
-    pageLength: undefined,
+    selected: () => [],
     scrollingElement: undefined,
     excludeParams: undefined,
     emptyStub: undefined,
@@ -116,6 +139,10 @@ const props = withDefaults(
     refetchInterval: undefined,
     valueGetter: (item: Data) => (item.id as Model),
     queryOptions: undefined,
+
+    pageLength: 24,
+    count: 0,
+    selectedRange: undefined,
   },
 )
 
@@ -123,7 +150,10 @@ const emit = defineEmits<{
   (e: 'update:page', value: number | undefined): void
   (e: 'update:header-padding', value: number): void
   (e: 'update:count', value: number): void
-  (e: 'update:selected', values: Model[]): void
+
+  (e: 'select', values: Model[]): void
+  (e: 'select-reverse', values: Model[]): void
+  (e: 'select-range', value: SelectedRange<Model>): void
 }>()
 
 const infiniteListPages = ref<ComponentInstance<typeof WInfiniteListPages<Model, Data, ApiError, QueryParams>> | undefined>()
@@ -137,6 +167,36 @@ const goto = (page: number, itemIndex?: number) => {
 }
 
 const {indicator, header, headerTop, headerHeight, isIntersecting} = useInfiniteListHeader(props.scrollingElement)
+
+const {
+  setSelectedRange,
+  getIsSelected,
+  getIsSelectedBetween,
+  allowSelectHover,
+  setRangeHover,
+  setSelectedCursor,
+  toggleSelected,
+  selectedCount,
+  selectAllValue,
+} = useSelected<Model>(
+  toRef(props, 'count'),
+  toRef(props, 'pageLength'),
+  toRef(props, 'selected'),
+  toRef(props, 'reverse'),
+  toRef(props, 'selectedRange'),
+
+  (value) => emit('select', value),
+  (value) => emit('select-reverse', value),
+  (value) => emit('select-range', value),
+)
+
+provide(wInfiniteListSelection, {
+  allowSelect: toRef(props, 'allowSelect'),
+  allowSelectRange: toRef(props, 'allowSelectRange'),
+  allowSelectHover,
+  selectedCount,
+  clearSelected: () => emit('select', []),
+})
 
 watch(isIntersecting, value => {
   if (!value && headerHeight.value) {
@@ -178,6 +238,7 @@ defineSlots<{
   }) => void
   header?: (props: {
     goto: typeof goto
+    selectAllValue: typeof selectAllValue.value
   }) => void
 }>()
 

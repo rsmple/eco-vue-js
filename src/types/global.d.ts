@@ -51,3 +51,16 @@ declare type UseQueryWithParams<Model, ApiError, QueryParams> =
   (queryParams: import('vue').MaybeRef<QueryParams>, options?: QueryOptions<Model, ApiError>) => ReturnType<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Model, ApiError>>
 
 declare type UseQueryPaginated<Model, ApiError, QueryParams> = UseQueryWithParams<PaginatedResponse<Model>, ApiError, QueryParams>
+
+
+declare interface SelectedPage<Value> {
+  page: number
+  index: number
+  id: Value
+}
+
+declare type SelectedRange<Value> = [
+  SelectedPage<Value>,
+  SelectedPage<Value>,
+]
+

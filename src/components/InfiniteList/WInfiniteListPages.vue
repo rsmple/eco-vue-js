@@ -22,22 +22,24 @@
       :first-page="index === 0"
       :last-page="index === pages.length - 1"
       :hide-page-title="hidePageTitle"
-      :selected="selected"
       :wrap="wrap"
       :no-gap="noGap"
       :transition="transition"
       :resetting="isResettingPage"
       :empty-stub="emptyStub"
-      :select-only="selectOnly"
-      :unselect-only="unselectOnly"
-      :reverse-selection="reverseSelection"
-      :allow-page-selection="allowPageSelection"
       :min-height="minHeight"
       :page-class="pageClass"
       :refetch-interval="refetchInterval"
       :scrolling-element="scrollingElement"
-      :value-getter="valueGetter"
       :query-options="queryOptions"
+
+      :selected="selected"
+      :value-getter="valueGetter"
+      :select-only="selectOnly"
+      :unselect-only="unselectOnly"
+      :reverse-selection="reverseSelection"
+      :allow-page-selection="allowPageSelection"
+      @update:selected="$emit('update:selected', $event)"
 
       @update:count="updateCount"
       @update:pages-count="updatePagesCount"
@@ -47,7 +49,6 @@
       @update-from-header:scroll="headerTop > 0 && nextTick(() => updateScroll(headerTop))"
       @remove:page="removePage"
       @refetch="refetchNextPages(index)"
-      @update:selected="$emit('update:selected', $event)"
       @fetched="isResettingPage = false"
     >
       <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page: itemPage, index: itemIndex}">
@@ -91,7 +92,6 @@ const props = withDefaults(
     skeletonLength?: number
     hidePageTitle?: boolean
     skipScrollTarget?: boolean
-    selected?: Model[]
     wrap?: boolean
     noGap?: boolean
     transition?: boolean
@@ -102,15 +102,17 @@ const props = withDefaults(
     minHeight?: boolean
     excludeParams?: (keyof QueryParams)[]
     emptyStub?: string
+    pageClass?: string
+    maxPages?: number
+    refetchInterval?: number | false
+    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
+
+    selected?: Model[]
+    valueGetter: (data: Data) => Model
     selectOnly?: boolean
     unselectOnly?: boolean
     reverseSelection?: boolean
     allowPageSelection?: boolean
-    pageClass?: string
-    maxPages?: number
-    refetchInterval?: number | false
-    valueGetter: (data: Data) => Model
-    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
   }>(),
   {
     skeletonLength: undefined,

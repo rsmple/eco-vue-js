@@ -15,6 +15,7 @@
       :horizontal-align="HorizontalAlign.LEFT_INNER"
       :update-align="false"
       teleport
+      no-z-index
     >
       <template #toggle>
         <div
@@ -30,7 +31,7 @@
       </template>
 
       <template #content>
-        <WClickOutside 
+        <WClickOutside
           class="-mr-[1.375rem] sm-not:-mr-6 bg-default dark:bg-default-dark rounded-xl shadow-md my-4 overflow-hidden dark:border dark:border-solid dark:border-gray-800"
           @click="close"
         >

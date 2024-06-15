@@ -5,6 +5,7 @@
         :is="slot"
         v-for="(slot, index) in $slots.default?.()"
         :key="index"
+        :disable-message="disableMessageValue"
         class="border-r border-solid border-gray-300 dark:border-gray-700 last:border-r-0"
       />
 
@@ -19,7 +20,7 @@
           <WButtonSelectionAction
             title="More"
             :icon="markRaw(IconMore)"
-            :disable-message="disableMessageMore"
+            :disable-message="disableMessageValue"
             @click="isOpen = !isOpen"
           />
         </template>
@@ -33,6 +34,7 @@
               :is="slot"
               v-for="(slot, index) in $slots.more?.()"
               :key="index"
+              :disable-message="disableMessageValue"
               class="first:pt-2 last:pb-2"
             />
           </WClickOutside>
@@ -47,18 +49,16 @@
       leave-to-class="opacity-0"
     >
       <div
-        v-if="selectedLength"
+        v-if="selectedCount"
         class="flex gap-3 sm-not:gap-1"
       >
         <div class="flex items-center font-normal text-base sm-not:text-xs text-description whitespace-nowrap">
-          <template v-if="selectedLength">
-            <span class="sm-not:hidden">Selected&nbsp;</span><span class="text-primary-default dark:text-primary-dark font-semibold">{{ numberFormatter.format(selectedLength) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedLength === 1 ? '' : 's' }}</span>
-          </template>
+          <span class="sm-not:hidden">Selected&nbsp;</span><span class="text-primary-default dark:text-primary-dark font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedCount === 1 ? '' : 's' }}</span>
         </div>
 
         <div
           class="relative text-description sm-not:-px--inner-margin px-[1.125rem] flex items-center cursor-pointer select-none w-ripple w-ripple-hover"
-          @click="$emit('clear:selected')"
+          @click="clearSelected"
         >
           <IconCancel />
         </div>
@@ -68,7 +68,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, markRaw} from 'vue'
+import {ref, markRaw, inject, computed, watch} from 'vue'
 import {numberFormatter} from '@/utils/utils'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 import IconMore from '@/assets/icons/default/IconMore.svg?component'
@@ -76,24 +76,40 @@ import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import WButtonSelectionAction from './WButtonSelectionAction.vue'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import WClickOutside from '../ClickOutside/WClickOutside.vue'
+import {wInfiniteListSelection} from '../InfiniteList/models/injection'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     title?: string
-    selectedLength?: number
-    disableMessageMore?: string
+    disableMessage?: string
   }>(),
   {
     title: 'item',
-    selectedLength: undefined,
-    disableMessageMore: undefined,
+    disableMessage: 'No selected items',
   },
 )
 
-defineEmits<{
-  (e: 'clear:selected'): void
+const emit = defineEmits<{
+  (e: 'update:selectionCount', value: number): void
 }>()
 
 const isOpen = ref(false)
+
+const {
+  selectedCount,
+  clearSelected,
+} = inject(wInfiniteListSelection, {})
+
+const disableMessageValue = computed<string | undefined>(() => selectedCount?.value === 0 ? props.disableMessage : undefined)
+
+if (selectedCount) {
+  watch(selectedCount, value => {
+    emit('update:selectionCount', value)
+  })
+}
+
+defineExpose({
+  clearSelected,
+})
 
 </script>
