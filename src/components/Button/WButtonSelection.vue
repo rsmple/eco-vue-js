@@ -105,7 +105,7 @@ const disableMessageValue = computed<string | undefined>(() => selectedCount?.va
 if (selectedCount) {
   watch(selectedCount, value => {
     emit('update:selectionCount', value)
-  })
+  }, {immediate: true})
 }
 
 defineExpose({
