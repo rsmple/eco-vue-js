@@ -28,8 +28,8 @@
 
     @open="isOpen = true"
     @close="close(); $emit('update:search', '')"
-    @focus="focused = true"
-    @blur="focused = false"
+    @focus="focused = true; $emit('focus', $event)"
+    @blur="focused = false; $emit('blur', $event)"
   >
     <template #prefix="{unclickable}">
       <template v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true">
@@ -210,6 +210,8 @@ const emit = defineEmits<{
   (e: 'unselect', item: Item): void
   (e: 'update:search', value: string): void
   (e: 'create:option', value: string): void
+  (e: 'focus', value: FocusEvent): void
+  (e: 'blur', value: FocusEvent): void
 }>()
 
 const isOpen = ref(false)

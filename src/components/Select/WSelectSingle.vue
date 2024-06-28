@@ -31,6 +31,7 @@
       @unselect="updateModelValue(allowClear ? null : ($event as Item))"
       @update:search="emit('update:search', $event)"
       @create:option="createOption($event)"
+      @focus="searchModel && typeof modelValue === 'string' ? $emit('update:search', modelValue) : undefined"
     >
       <template #option="{option, selected, model}">
         <slot
@@ -82,6 +83,7 @@ const props = defineProps<{
   mono?: boolean
   allowClear?: AllowClear
   hideOptionIcon?: boolean
+  searchModel?: boolean
 }>()
 
 const emit = defineEmits<{

@@ -1,7 +1,7 @@
 <template>
   <div
     ref="element"
-    class="relative grid grid-cols-[1fr,2.5rem] w-full select-none cursor-pointer py-2 px-[1.0625rem]"
+    class="relative grid grid-cols-[1fr,2.5rem] w-full py-2 px-[1.0625rem]"
     :class="{
       'bg-primary-light dark:bg-primary-darkest': isSelected,
       'before:opacity-5': !loading && isCursor && !skeleton,

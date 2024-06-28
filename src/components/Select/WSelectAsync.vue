@@ -80,6 +80,7 @@
         :hide-option-icon="hideOptionIcon"
         :value-getter="valueGetter"
         :query-options="queryOptions"
+        class="h-80"
         @select="select"
         @unselect="unselect"
         @create:option="create"
