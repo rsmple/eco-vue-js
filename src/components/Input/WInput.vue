@@ -116,7 +116,7 @@
               @blur="$emit('blur', $event); setIsFocused(false); isSecureVisible = false"
               @click="$emit('click', $event)"
               @mousedown.stop="$emit('mousedown', $event)"
-              @select="$emit('select:input', $event)"
+              @select.stop="$emit('select:input', $event)"
             />
 
             <InputActions
