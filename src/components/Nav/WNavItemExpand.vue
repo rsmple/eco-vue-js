@@ -1,32 +1,42 @@
 <template>
   <div>
     <WNavItem
-      :to="to"
+      :to="to ?? slotsDefault?.[0]?.props?.to"
       :title="title"
       :icon="icon"
-      :new-label="newLabel"
       :skeleton="skeleton"
       :count="count"
-      :has-active="hasActive || isOpen"
-      @update:is-active="isOpen = $event[title]"
+      :counter="counter"
+      :has-active="hasActiveCached"
+      :indent="indent"
+      :expand="!to"
+      :query-fields="queryFields"
+      @update:is-active="isOpen = $event[1]; $event[1] && $emit('update:isActive', [title, $event[1]])"
     >
       <template #icon>
+        <slot name="icon" />
+      </template>
+
+      <template #right>
         <IconArrow
-          class="square-4 mx-1 transition-transform"
-          :class="{'rotate-180': hasActive || isOpen}"
+          class="square-3 transition-transform"
+          :class="{
+            '-rotate-90': !hasActiveCached,
+          }"
         />
       </template>
     </WNavItem>
 
-    <WExpansion :is-shown="isOpen || hasActive">
+    <WExpansion :is-shown="hasActiveCached">
       <WNavItemTransition>
         <template
-          v-for="(slot, index) in $slots.default?.()"
+          v-for="(slot, index) in slotsDefault"
           :key="index"
         >
           <component
             :is="slot"
-            @update:is-active="updateIsActive"
+            indent
+            @update:is-active="isActiveChildrenMap[$event[0]] = $event[1]"
           />
         </template>
       </WNavItemTransition>
@@ -35,30 +45,49 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {computed, onBeforeUnmount, reactive, ref, useSlots, watch} from 'vue'
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 import WNavItem from './WNavItem.vue'
 import WExpansion from '@/components/Expansion/WExpansion.vue'
 import WNavItemTransition from './WNavItemTransition.vue'
 import type {LinkProps} from '@/types/types'
+import {debounce} from '@/main'
 
-interface Props extends LinkProps {
+interface Props extends Partial<LinkProps> {
   icon?: SVGComponent
   title: string
   count?: number
+  counter?: number
   skeleton?: boolean
-  newLabel?: boolean
+  indent?: boolean
+  queryFields?: string[]
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+const slots = useSlots()
+
+const slotsDefault = computed(() => slots.default?.())
+
+const emit = defineEmits<{
+  (e: 'update:isActive', value: [string, boolean]): void
+}>()
 
 const isOpen = ref(false)
+const hasActiveCached = ref(false)
 
-const isActiveChildrenMap = ref<Record<string, boolean>>({})
-const hasActive = computed<boolean>(() => Object.values(isActiveChildrenMap.value).includes(true))
+const isActiveChildrenMap = reactive<Record<string, boolean>>({})
+const hasActive = computed<boolean>(() => isOpen.value || Object.values(isActiveChildrenMap).includes(true))
 
-const updateIsActive = (value: Record<string, boolean>): void => {
-  isActiveChildrenMap.value = {...isActiveChildrenMap.value, ...value}
-}
+const updateHasActiveCache = debounce((value) => {
+  hasActiveCached.value = value
+
+  emit('update:isActive', [props.title, value])
+}, 10)
+
+watch(hasActive, updateHasActiveCache, {immediate: true})
+
+onBeforeUnmount(() => {
+  emit('update:isActive', [props.title, false])
+})
 
 </script>

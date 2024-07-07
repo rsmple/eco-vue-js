@@ -71,9 +71,11 @@ export const isEqualArr = (arr1: unknown[], arr2: unknown[]): boolean => {
   return arr1.length === arr2.length && arr1.every(item => arr2.includes(item))
 }
 
-export const isEqualObj = (obj1: Record<string, unknown>, obj2: Record<string, unknown>, exclude?: string[]): boolean => {
+export const isEqualObj = (obj1: Record<string, unknown>, obj2: Record<string, unknown>, exclude?: string[], include?: string[]): boolean => {
   return Object.keys({...obj1, ...obj2})
     .every(key => {
+      if (include && !include.includes(key)) return true
+
       if (exclude?.includes(key) || obj1[key] === obj2[key]) return true
 
       if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) return isEqualArr(obj1[key] as unknown[], obj2[key] as unknown[])

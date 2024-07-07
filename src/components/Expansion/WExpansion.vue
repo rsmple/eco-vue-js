@@ -13,7 +13,7 @@
         v-show="isShown"
         class="duration-[var(--expansion-duration,200ms)]"
       >
-        <div class="[overflow:inherit]">
+        <div class="[overflow:inherit] grid grid-cols-1">
           <slot />
         </div>
       </div>
