@@ -106,6 +106,7 @@ interface Props extends LinkProps {
   hasActive?: boolean
   expand?: boolean
   indent?: boolean
+  queryFields?: string[]
 }
 
 const props = defineProps<Props>()
@@ -122,7 +123,7 @@ const routeTo = computed(() => router.resolve(props.to))
 const isActive = computed<boolean>(() => {
   if (routeTo.value?.name !== route.name) return false
 
-  return isEqualObj(route.query, routeTo.value.query, EXCLUDE_QUERY_FIELDS)
+  return isEqualObj(route.query, routeTo.value.query, EXCLUDE_QUERY_FIELDS, props.queryFields)
 })
 
 const isBigCount = computed<boolean>(() => props.counter !== undefined && props.counter >= 1000)

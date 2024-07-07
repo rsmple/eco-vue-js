@@ -10,6 +10,7 @@
       :has-active="hasActiveCached"
       :indent="indent"
       :expand="!to"
+      :query-fields="queryFields"
       @update:is-active="isOpen = $event[1]; $event[1] && $emit('update:isActive', [title, $event[1]])"
     >
       <template #icon>
@@ -59,6 +60,7 @@ interface Props extends Partial<LinkProps> {
   counter?: number
   skeleton?: boolean
   indent?: boolean
+  queryFields?: string[]
 }
 
 const props = defineProps<Props>()
