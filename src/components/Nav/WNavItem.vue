@@ -3,8 +3,8 @@
     :to="to"
     class="relative no-underline block w-ripple w-ripple-hover"
     :class="{
-      'text-primary-default dark:text-primary-dark': isActive || hasActive,
-      'text-accent': !isActive && !hasActive,
+      'text-primary-default dark:text-primary-dark': isTextColor,
+      'text-accent': !isTextColor,
       'pl-7': indent
     }"
   >
@@ -28,9 +28,9 @@
     >
       <div
         v-if="indent && !expand && isActive"
-        class="h-full absolute left-7 top-0 w-1.5 grid items-center"
+        class="h-full absolute left-7 top-0 flex items-center"
       >
-        <div class="bg-primary-default dark:bg-primary-dark aspect-square rounded-full" />
+        <div class="bg-[var(--w-nav-item-dot-color)] square-1.5 rounded-full" />
       </div>
     </Transition>
 
@@ -125,6 +125,8 @@ const isActive = computed<boolean>(() => {
 
   return isEqualObj(route.query, routeTo.value.query, EXCLUDE_QUERY_FIELDS, props.queryFields)
 })
+
+const isTextColor = computed(() => props.hasActive ? !props.indent : isActive.value)
 
 const isBigCount = computed<boolean>(() => props.counter !== undefined && props.counter >= 1000)
 
