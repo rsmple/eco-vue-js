@@ -35,7 +35,7 @@
     </Transition>
 
     <div class="[overflow:inherit]">
-      <div class="grid grid-cols-[2rem,auto,1fr,1rem] items-center py-4 px-5">
+      <div class="grid grid-cols-[2rem,auto,1fr,1rem] items-center py-3 px-5">
         <div class="flex items-center">
           <template v-if="icon">
             <component
