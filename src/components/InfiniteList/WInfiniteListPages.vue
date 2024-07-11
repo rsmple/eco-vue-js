@@ -9,6 +9,7 @@
     <InfiniteListButton
       v-if="isPreviousButtonVisible"
       @click="addPreviousPage()"
+      @check="infiniteScroll?.checkIsScrollUp"
     />
 
     <InfiniteListPage
@@ -43,8 +44,8 @@
 
       @update:count="updateCount"
       @update:pages-count="updatePagesCount"
-      @update:next-page="updateNextPage($event); infiniteScroll?.checkIsScrollDown()"
-      @update:previous-page="updatePreviousPage($event); infiniteScroll?.checkIsScrollUp()"
+      @update:next-page="updateNextPage($event)"
+      @update:previous-page="updatePreviousPage($event)"
       @update:scroll="updateScroll"
       @update-from-header:scroll="headerTop > 0 && nextTick(() => updateScroll(headerTop))"
       @remove:page="removePage"
@@ -71,6 +72,7 @@
     <InfiniteListButton
       v-if="count !== 0 && nextPage"
       @click="addNextPage"
+      @check="infiniteScroll?.checkIsScrollDown"
     />
   </InfiniteListScroll>
 </template>
@@ -226,16 +228,13 @@ const updateScroll = (height: number): void => {
 }
 
 const removePage = (page: number): void => {
-  if (previousPage.value === page) previousPage.value = null
-  if (nextPage.value === page) nextPage.value = null
-
   const index = pages.value.indexOf(page)
 
   if (index === -1) return
 
-  pages.value.splice(index, pages.value.length - index)
+  const newPages = pages.value.slice(0, pages.value.length - index)
 
-  if (!pages.value.length) pages.value = [1]
+  pages.value = newPages.length === 0 ? [1] : newPages
 
   emit('update:page', pages.value[pages.value.length - 1])
 }
@@ -273,6 +272,14 @@ watch(toRef(props, 'queryParams'), (newValue, oldValue) => {
 })
 
 watch(count, value => emit('update:count', value), {immediate: true})
+
+watch(pagesCount, value => {
+  if (pages.value[pages.value.length - 1] > value) {
+    const newPages = pages.value.filter(page => page <= value)
+
+    pages.value = newPages.length === 0 ? [1] : newPages
+  }
+}, {immediate: true})
 
 defineExpose({
   resetPage,

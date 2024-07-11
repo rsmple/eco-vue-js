@@ -12,9 +12,15 @@
 <script lang="ts" setup>
 import {SemanticType} from '@/utils/SemanticType'
 import WButton from '@/components/Button/WButton.vue'
+import {onMounted} from 'vue'
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'click'): void
+  (e: 'check'): void
 }>()
+
+onMounted(() => {
+  emit('check')
+})
 
 </script>
