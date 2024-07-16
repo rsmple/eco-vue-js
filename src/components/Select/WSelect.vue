@@ -19,6 +19,7 @@
     :no-margin="noMargin"
     :icon="icon"
     :mono="mono"
+    :autofocus="autofocus"
     @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
 
     @keypress:enter.stop.prevent="selectCursor"
@@ -202,6 +203,7 @@ const props = defineProps<{
   noMargin?: boolean
   icon?: SVGComponent
   mono?: boolean
+  autofocus?: boolean
   hideOptionIcon?: boolean
 }>()
 

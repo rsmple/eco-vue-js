@@ -18,6 +18,7 @@
     :placeholder="placeholder"
     :no-margin="noMargin"
     :icon="icon"
+    :autofocus="autofocus"
     @update:model-value="!loading && !isFetchingPrefix && $emit('update:search', $event as string ?? '')"
 
     @keypress:enter.stop.prevent="list?.selectCursor()"
@@ -33,7 +34,7 @@
     <template #prefix="{unclickable}">
       <SelectAsyncPrefix
         v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true"
-        :use-query-fn="useQueryFn"
+        :use-query-fn="useQueryFnPrefix ?? useQueryFn"
         :model-value="modelValue"
         :disabled="disabled"
         :loading="loading || isFetchingPrefix"
@@ -121,6 +122,7 @@ const props = withDefaults(
     modelValue: Model[]
     search: string
     useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
+    useQueryFnPrefix?: UseQueryPaginated<Data, ApiError, QueryParams>
     isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     title?: string
@@ -144,6 +146,7 @@ const props = withDefaults(
     noMargin?: boolean
     icon?: SVGComponent
     mono?: boolean
+    autofocus?: boolean
     previewData?: Data[]
     createdData?: Data[]
     hideOptionIcon?: boolean
@@ -167,6 +170,7 @@ const props = withDefaults(
     valueGetter: (data: Data) => (data.id as Model),
     valueQueryKey: 'id__in',
     queryOptions: undefined,
+    useQueryFnPrefix: undefined,
   },
 )
 

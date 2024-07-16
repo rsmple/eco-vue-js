@@ -37,6 +37,7 @@
           :no-margin="noMargin"
           :allow-paste="allowPaste"
           :mono="mono"
+          :autofocus="autofocus"
           :class="{
             'cursor-pointer': !disabled,
             'cursor-not-allowed': disabled,
@@ -159,6 +160,7 @@ const props = defineProps<{
   noMargin?: boolean
   allowPaste?: boolean
   mono?: boolean
+  autofocus?: boolean
 }>()
 
 const emit = defineEmits<{

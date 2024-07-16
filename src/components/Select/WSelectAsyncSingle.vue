@@ -26,6 +26,7 @@
       :no-margin="noMargin"
       :icon="icon"
       :mono="mono"
+      :autofocus="autofocus"
       :disable-clear="!allowClear"
       :preview-data="previewData ? [previewData] as Data[] : undefined"
       :created-data="createdData ? [createdData] as Data[] : undefined"
@@ -87,6 +88,7 @@ const props = defineProps<{
   noMargin?: boolean
   icon?: SVGComponent
   mono?: boolean
+  autofocus?: boolean
   allowClear?: boolean
   previewData?: Data
   createdData?: Data

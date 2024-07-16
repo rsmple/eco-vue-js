@@ -24,6 +24,7 @@
       :no-margin="noMargin"
       :icon="icon"
       :mono="mono"
+      :autofocus="autofocus"
       :disable-clear="!allowClear"
       :hide-option-icon="hideOptionIcon"
       hide-prefix
@@ -81,6 +82,7 @@ const props = defineProps<{
   noMargin?: boolean
   icon?: SVGComponent
   mono?: boolean
+  autofocus?: boolean
   allowClear?: AllowClear
   hideOptionIcon?: boolean
   searchModel?: boolean
