@@ -5,7 +5,7 @@
     :max-width="contentMaxWidth ?? 320"
     :horizontal-align="horizontalAlign ?? HorizontalAlign.LEFT_INNER"
     update-align
-    teleport
+    :teleport="teleport"
   >
     <template #toggle>
       <div class="flex">
@@ -14,6 +14,7 @@
           v-for="(item, index) in $slots.button?.()"
           :key="index"
           join
+          class="flex-1"
         />
 
         <WButton
@@ -61,6 +62,7 @@ defineProps<{
   contentMaxWidth?: number
   horizontalAlign?: HorizontalAlign
   disabled?: boolean
+  teleport?: boolean
 }>()
 
 const isOpen = ref(false)
