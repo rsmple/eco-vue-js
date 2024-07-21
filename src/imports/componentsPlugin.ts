@@ -5,6 +5,7 @@ import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import WButton from '@/components/Button/WButton.vue'
 import WButtonAction from '@/components/Button/WButtonAction.vue'
 import WButtonCopy from '@/components/Button/WButtonCopy.vue'
+import WButtonDropdown from '@/components/Button/WButtonDropdown.vue'
 import WButtonGroup from '@/components/Button/WButtonGroup.vue'
 import WButtonMore from '@/components/Button/WButtonMore.vue'
 import WButtonMoreItem from '@/components/Button/WButtonMoreItem.vue'
@@ -70,6 +71,7 @@ export default {
     app.component('WButton', WButton)
     app.component('WButtonAction', WButtonAction)
     app.component('WButtonCopy', WButtonCopy)
+    app.component('WButtonDropdown', WButtonDropdown)
     app.component('WButtonGroup', WButtonGroup)
     app.component('WButtonMore', WButtonMore)
     app.component('WButtonMoreItem', WButtonMoreItem)
@@ -135,6 +137,7 @@ export {
   WButton,
   WButtonAction,
   WButtonCopy,
+  WButtonDropdown,
   WButtonGroup,
   WButtonMore,
   WButtonMoreItem,

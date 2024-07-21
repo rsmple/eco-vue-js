@@ -6,16 +6,18 @@
     :is="to !== undefined ? RouterLink : tag"
     class="
       relative rounded-2xl outline-none isolate
-      text-base font-medium select-none whitespace-nowrap
+      font-medium select-none whitespace-nowrap
       flex justify-center items-center
     "
     :class="{
       [semanticTypeButtonStylesMap[semanticType]]: true,
-      'cursor-pointer w-ripple w-ripple-hover before:text-black-default': !loading && !disabled,
+      [semanticTypeButtonBorderStylesMap[semanticType]]: true,
+      'cursor-pointer w-ripple w-ripple-hover before:text-black-default w-ripple-opacity-20 dark:w-ripple-opacity-30': !loading && !disabled,
       'cursor-progress': loading,
       'cursor-not-allowed opacity-70': disabled,
-      'px-6 h-11 min-h-[2.75rem]': !minimize,
+      'px-4 h-11 min-h-[2.75rem]': !minimize,
       'px-1.5 h-7 min-h-[1.75rem]': minimize,
+      '[&:not(:first-child)]:rounded-l-none [&:not(:first-child)]:border-l-0 [&:not(:last-child)]:rounded-r-none [&:not(:last-child)]:border-r-0': join
     }"
     :disabled="!loading && disabled"
     :type="type"
@@ -49,7 +51,7 @@
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import {SemanticType} from '@/utils/SemanticType'
 import {RouterLink} from 'vue-router'
-import {semanticTypeButtonStylesMap} from './models/semanticTypeStylesMap'
+import {semanticTypeButtonStylesMap, semanticTypeButtonBorderStylesMap} from './models/semanticTypeStylesMap'
 import type {LinkProps} from '@/types/types'
 
 interface Props extends LinkProps {
@@ -62,6 +64,7 @@ interface Props extends LinkProps {
   href?: string
   target?: '_self' | '_blank' | '_parent' | '_top'
   minimize?: boolean
+  join?: boolean
 }
 
 const props = withDefaults(

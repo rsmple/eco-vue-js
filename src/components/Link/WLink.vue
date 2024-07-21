@@ -14,7 +14,7 @@
       :class="{
         'square-5 mr-1': !small,
         'square-3 mr-0.5': small,
-        [semanticTypeIconStylesMap[semanticType]]: true,
+        [semanticTypeButtonStylesMap[semanticType]]: true,
       }"
     /><slot>{{ text }}</slot>
   </component>
@@ -24,7 +24,7 @@
 import {RouterLink} from 'vue-router'
 import IconLink from '@/assets/icons/sax/IconLink.svg?component'
 import {SemanticType} from '@/utils/SemanticType'
-import {semanticTypeIconStylesMap, semanticTypeTextStylesMap} from '@/components/Button/models/semanticTypeStylesMap'
+import {semanticTypeButtonStylesMap, semanticTypeTextStylesMap} from '@/components/Button/models/semanticTypeStylesMap'
 import type {LinkProps} from '@/types/types'
 
 interface Props extends LinkProps {

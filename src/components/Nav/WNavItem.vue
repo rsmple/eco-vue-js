@@ -5,7 +5,7 @@
     :class="{
       'text-primary-default dark:text-primary-dark': isTextColor,
       'text-accent': !isTextColor,
-      'pl-7': indent
+      'pl-3': indent
     }"
   >
     <Transition

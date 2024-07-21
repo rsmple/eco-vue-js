@@ -11,7 +11,7 @@
     </div>
 
     <div
-      class="flex px-px"
+      class="flex"
       :class="{
         'flex-wrap gap-2': wrap,
         'flex-col gap-2 items-start': col,
@@ -24,13 +24,10 @@
         :loading="getValue(item) === loading"
         :disabled="disabled || (loading !== undefined && getValue(item) !== loading)"
         :minimize="minimize"
-        :class="(wrap || col) ? [
-          getValue(item) !== modelValue && '-mx-px'
-        ] : [
-          index !== list.length -1 ? 'rounded-r-none border-r-0' : getValue(item) !== modelValue && '-mr-px',
-          index !== 0 ?'rounded-l-none border-l-0' : getValue(item) !== modelValue && '-ml-px',
-          stretch ? 'flex-1' : undefined,
-        ]"
+        :join="!wrap"
+        :class="{
+          'flex-1': stretch,
+        }"
         @click="(alwaysEmit || getValue(item) !== modelValue) && $emit('update:modelValue', getValue(item))"
       >
         <slot :item="(item as ValueGetter extends undefined ? Model : Entity)" />

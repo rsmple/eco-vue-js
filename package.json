@@ -120,6 +120,9 @@
     "./dist/components/Button/WButtonCopy.vue": {
       "import": "./dist/components/Button/WButtonCopy.vue.js"
     },
+    "./dist/components/Button/WButtonDropdown.vue": {
+      "import": "./dist/components/Button/WButtonDropdown.vue.js"
+    },
     "./dist/components/Button/WButtonGroup.vue": {
       "import": "./dist/components/Button/WButtonGroup.vue.js"
     },
