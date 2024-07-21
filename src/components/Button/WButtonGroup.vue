@@ -14,7 +14,8 @@
       class="flex"
       :class="{
         'flex-wrap gap-2': wrap,
-        'flex-col gap-2 items-start': col,
+        'flex-col gap-2': col,
+        'items-start': col && !stretch,
       }"
     >
       <WButton
@@ -24,7 +25,7 @@
         :loading="getValue(item) === loading"
         :disabled="disabled || (loading !== undefined && getValue(item) !== loading)"
         :minimize="minimize"
-        :join="!wrap"
+        :join="!wrap && !col"
         :class="{
           'flex-1': stretch,
         }"
