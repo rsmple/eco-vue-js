@@ -189,7 +189,7 @@ const isMobile = getIsMobile()
 const focused = ref(false)
 const isFetchingPrefix = ref(false)
 
-const isDisabled = computed(() => props.loading || isFetchingPrefix.value || props.readonly || props.disabled)
+const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
 
 const close = () => {
   isOpen.value = false

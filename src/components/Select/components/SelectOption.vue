@@ -70,11 +70,11 @@ const emit = defineEmits<{
 
 const element = ref<HTMLDivElement>()
 
-const toggle = () => {
+const toggle = (): void => {
+  if (props.skeleton || props.loading) return
+
   if (props.isSelected) emit('unselect')
   else emit('select')
-
-  return false
 }
 
 const scrollIntoView = () => {
