@@ -34,59 +34,25 @@
   >
     <template #prefix="{unclickable}">
       <template v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true">
-        <div
+        <SelectOptionPrefix
           v-for="option in modelValue"
           :key="option"
-          class="relative flex overflow-hidden items-center text-description group/model"
-          :class="{
-            'cursor-pointer': !disabled,
-            'cursor-not-allowed opacity-50': disabled,
-          }"
+          :option="option"
+          :option-component="optionComponent"
+          :loading="loading"
+          :disabled="disabled"
+          :disable-clear="disableClear"
+          @unselect="unselect(option)"
         >
-          <slot
-            name="option"
-            :option="option"
-            :selected="true"
-            :model="true"
-          >
-            <template v-if="optionComponent">
-              <component
-                :is="optionComponent"
-                :option="option"
-                :selected="true"
-                :model="true"
-              >
-                <button
-                  v-if="!disableClear"
-                  class="relative flex square-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center outline-none"
-                  :class="{
-                    'cursor-not-allowed': disabled,
-                    'cursor-progress': loading,
-                    'cursor-pointer w-ripple w-ripple-hover ': !loading && !disabled,
-                  }"
-                  @mousedown.stop.prevent=""
-                  @click.stop.prevent="!loading && unselect(option)"
-                >
-                  <IconCancel class="square-3" />
-                </button>
-              </component>
-            </template>
-          </slot>
-
-          <button
-            v-if="!optionComponent && !disableClear"
-            class="relative flex square-5 rounded-full items-center justify-center outline-none"
-            :class="{
-              'cursor-not-allowed': disabled,
-              'cursor-progress': loading,
-              'cursor-pointer w-ripple w-ripple-hover ': !loading && !disabled,
-            }"
-            @mousedown.stop.prevent=""
-            @click.stop.prevent="!loading && unselect(option)"
-          >
-            <IconCancel class="square-3" />
-          </button>
-        </div>
+          <template #option>
+            <slot
+              name="option"
+              :option="option"
+              :selected="true"
+              :model="true"
+            />
+          </template>
+        </SelectOptionPrefix>
       </template>
     </template>
 
@@ -173,7 +139,7 @@
 <script lang="ts" setup generic="Item extends string | number = string">
 import {ref, watch, toRef, nextTick, computed, type Component} from 'vue'
 import SelectOption from './components/SelectOption.vue'
-import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
+import SelectOptionPrefix from './components/SelectOptionPrefix.vue'
 import {getIsMobile} from '@/utils/mobile'
 import {debounce} from '@/utils/utils'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
@@ -349,5 +315,14 @@ defineExpose({
   focus,
   blur,
 })
+
+defineSlots<{
+  option?: (props: {
+    option: Item | string
+    selected: boolean
+    model: boolean
+  }) => void,
+  right?: () => void
+}>()
 
 </script>
