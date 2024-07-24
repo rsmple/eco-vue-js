@@ -9,6 +9,19 @@
   >
     <template #toggle>
       <div class="flex">
+        <WButton
+          v-if="leftToggle"
+          :semantic-type="semanticType"
+          :disabled="disabled"
+          join
+          @click="isOpen = !isOpen"
+        >
+          <IconArrow
+            class="square-4 transition-transform"
+            :class="{'rotate-180': isOpen}"
+          />
+        </WButton>
+
         <component
           :is="item"
           v-for="(item, index) in $slots.button?.()"
@@ -18,6 +31,7 @@
         />
 
         <WButton
+          v-if="!leftToggle"
           :semantic-type="semanticType"
           :disabled="disabled"
           join
@@ -61,6 +75,7 @@ defineProps<{
   contentMaxHeight?: number
   contentMaxWidth?: number
   horizontalAlign?: HorizontalAlign
+  leftToggle?: boolean
   disabled?: boolean
   teleport?: boolean
 }>()
