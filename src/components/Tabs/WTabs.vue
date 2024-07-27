@@ -98,7 +98,7 @@ import {debounce, throttle} from '@/utils/utils'
 import {wTabItemListener, wTabItemUnlistener} from './models/injection'
 
 const props = defineProps<{
-  names?: string[]
+  names?: string[] | Record<number, string>
   icons?: SVGComponent[] | Record<number, SVGComponent>
   slots?: VNode[]
   lessTransitions?: boolean
