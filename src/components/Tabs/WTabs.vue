@@ -2,13 +2,16 @@
   <div class="mb-8">
     <div
       v-if="names"
-      class="relative flex mb-4 sm-not:-px--inner-margin"
+      class="relative flex mb-4 sm-not:-px--inner-margin overflow-x-auto overscroll-x-contain no-scrollbar snap-x snap-always snap-mandatory"
     >
       <button
         v-for="(_, index) in defaultSlots"
         ref="button"
         :key="index"
-        class="flex-1 font-semibold flex items-center justify-center h-10 cursor-pointer relative w-ripple w-ripple-hover select-none transition-colors duration-500 outline-none"
+        class="
+          flex-1 font-semibold flex items-center justify-center h-10 cursor-pointer snap-center
+          relative w-ripple w-ripple-hover select-none transition-colors duration-500 outline-none
+        "
         :class="{
           'text-description': current !== index && isValidMap[index] !== false,
           'text-primary-default dark:text-primary-dark': current === index && isValidMap[index] !== false,
@@ -16,7 +19,13 @@
         }"
         @click="switchTab(index)"
       >
-        <div class="relative">
+        <div class="relative whitespace-nowrap px-4">
+          <component
+            :is="icons?.[index]"
+            v-if="icons?.[index]"
+            class="inline -mt-1"
+          />
+
           {{ names[index] }}
   
           <Transition
@@ -90,6 +99,7 @@ import {wTabItemListener, wTabItemUnlistener} from './models/injection'
 
 const props = defineProps<{
   names?: string[]
+  icons?: SVGComponent[] | Record<number, SVGComponent>
   slots?: VNode[]
   lessTransitions?: boolean
   initTab?: number
@@ -106,11 +116,11 @@ const defaultSlots = computed(() => (props.slots ?? usedSlots.default?.() ?? [])
 
 const current = ref(props.initTab ?? 0)
 const isDirect = ref(true)
-const button = ref<HTMLDivElement[]>([])
+const button = ref<HTMLButtonElement[]>([])
 const indicatorStyle = ref<Record<string, string> | undefined>(undefined)
 const minHeight = ref(0)
-const tabItem = ref<InstanceType<typeof TabItem>[]>([])
-const form = ref<InstanceType<typeof WForm>[]>([])
+const tabItem = ref<ComponentInstance<typeof TabItem>[]>([])
+const form = ref<ComponentInstance<typeof WForm>[]>([])
 
 const isValidMap = reactive<Record<number, boolean>>({})
 const hasChangesMap = reactive<Record<number, boolean>>({})
@@ -178,15 +188,15 @@ const updateHeight = (value: number): void => {
   minHeight.value = value
 }
 
-const validate = (index: number, ...args: Parameters<InstanceType<typeof WForm>['validate']>): ReturnType<InstanceType<typeof WForm>['validate']> => {
+const validate = (index: number, ...args: Parameters<ComponentInstance<typeof WForm>['validate']>): ReturnType<ComponentInstance<typeof WForm>['validate']> => {
   return form?.value[index].validate(...args)
 }
 
-const invalidate = (index: number, ...args: Parameters<InstanceType<typeof WForm>['invalidate']>): ReturnType<InstanceType<typeof WForm>['invalidate']> => {
+const invalidate = (index: number, ...args: Parameters<ComponentInstance<typeof WForm>['invalidate']>): ReturnType<ComponentInstance<typeof WForm>['invalidate']> => {
   return form?.value[index].invalidate(...args)
 }
 
-const initModel = (index: number, ...args: Parameters<InstanceType<typeof WForm>['initModel']>): ReturnType<InstanceType<typeof WForm>['initModel']> => {
+const initModel = (index: number, ...args: Parameters<ComponentInstance<typeof WForm>['initModel']>): ReturnType<ComponentInstance<typeof WForm>['initModel']> => {
   return form?.value[index].initModel(...args)
 }
 
@@ -197,6 +207,8 @@ watch(current, value => {
   emit('update:current', value)
 
   updateIndicator()
+
+  button.value[value]?.scrollIntoView({behavior: 'smooth', block: 'nearest' ,inline: 'center'})
 }, {immediate: true})
 
 watch(hasChanges, value => {
