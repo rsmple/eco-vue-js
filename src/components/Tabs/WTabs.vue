@@ -208,7 +208,7 @@ watch(current, value => {
 
   updateIndicator()
 
-  button.value[value]?.scrollIntoView({behavior: 'smooth', block: 'nearest' ,inline: 'center'})
+  button.value[value]?.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'})
 }, {immediate: true})
 
 watch(hasChanges, value => {
@@ -217,6 +217,8 @@ watch(hasChanges, value => {
 
 onMounted(() => {
   updateIndicator()
+
+  button.value[current.value]?.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'})
 
   tabItemListenerInjected?.(updateIndicator)
 })
