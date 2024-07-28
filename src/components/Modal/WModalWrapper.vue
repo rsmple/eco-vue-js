@@ -21,7 +21,7 @@
     </div>
 
     <div
-      class="sticky bottom-0 flex justify-center p-[var(--modal-wrapper-padding,2rem)] gap-[var(--modal-wrapper-padding,2rem)] w-full bg-default dark:bg-default-dark"
+      class="sticky bottom-0 z-[1] flex justify-center p-[var(--modal-wrapper-padding,2rem)] gap-[var(--modal-wrapper-padding,2rem)] w-full bg-default dark:bg-default-dark"
       :class="{
         'sm-not:flex-col': !maximized,
       }"
