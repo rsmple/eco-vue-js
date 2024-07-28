@@ -31,7 +31,12 @@
           class="will-change-[top,bottom]"
           @update:rect="$emit('update:rect')"
         >
-          <slot name="content" />
+          <template #default="defaultScope">
+            <slot
+              name="content"
+              v-bind="defaultScope"
+            />
+          </template>
         </WDropdown>
       </Transition>
     </teleport>

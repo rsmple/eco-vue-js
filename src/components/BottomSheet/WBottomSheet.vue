@@ -29,7 +29,7 @@
 
           <div
             ref="content"
-            class="height-[90%] bg-default dark:bg-default-dark rounded-t-3xl shadow-md snap-end"
+            class="height-[90%] bg-default dark:bg-default-dark rounded-t-3xl shadow-md snap-end grid grid-rows-[auto,1fr] grid-cols-[1fr] relative"
           >
             <div
               ref="toggle"
@@ -53,11 +53,12 @@
 
             <div
               ref="container"
-              class="max-h-[calc(100%-var(--bottom-sheet-toggle-height))] overflow-x-hidden overflow-y-auto overscroll-contain"
-              :style="{'--bottom-sheet-toggle-height': toggleHeight + 'px'}"
+              class="overflow-x-hidden overflow-y-auto overscroll-contain"
             >
               <slot name="content" />
             </div>
+
+            <div class="absolute top-full h-[100vh] w-full bg-[inherit]" />
           </div>
         </div>
       </Transition>
@@ -66,7 +67,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeUnmount, onMounted, ref, watch} from 'vue'
+import {onBeforeUnmount, ref, watch} from 'vue'
 
 defineProps<{
   isOpen: boolean
@@ -82,7 +83,6 @@ const container = ref<HTMLDivElement | undefined>()
 const backdrop = ref<HTMLDivElement | undefined>()
 const content = ref<HTMLDivElement | undefined>()
 
-const toggleHeight = ref(0)
 const swipeStarted = ref(false)
 
 const hide = () => {
@@ -91,12 +91,6 @@ const hide = () => {
 
 const show = () => {
   content.value?.scrollIntoView({behavior: 'smooth', block: 'end'})
-}
-
-const updatePadding = () => {
-  if (!toggle.value) return
-
-  toggleHeight.value = toggle.value.getBoundingClientRect().height + 16
 }
 
 const observerCb = (entries: IntersectionObserverEntry[]) => {
@@ -112,10 +106,6 @@ const observer = new IntersectionObserver(observerCb, {
   threshold: 0.9,
 })
 
-let resumeScroll: (() => void) | undefined
-
-watch(toggle, updatePadding)
-
 let timeout: NodeJS.Timeout
 
 watch(backdrop, (value, oldValue) => {
@@ -130,19 +120,8 @@ watch(backdrop, (value, oldValue) => {
   }
 })
 
-onMounted(() => {
-  updatePadding()
-})
-
 onBeforeUnmount(() => {
-  resumeScroll?.()
   observer.disconnect()
-})
-
-defineExpose({
-  updateDropdown: () => {
-    updatePadding()
-  },
 })
 
 </script>

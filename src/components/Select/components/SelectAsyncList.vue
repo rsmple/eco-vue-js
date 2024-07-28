@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-[4.125rem]">
+  <div>
     <WInfiniteList
       :use-query-fn="useQueryFn"
       :query-params="(queryParams as QueryParams)"
@@ -13,6 +13,8 @@
       :unselect-only="unselectOnly"
       :value-getter="valueGetter"
       :query-options="queryOptions"
+      :skeleton-length="count || 1"
+      :last-child="!allowCreate"
       hide-page-title
       header-top-ignore
       min-height

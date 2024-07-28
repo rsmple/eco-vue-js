@@ -106,7 +106,9 @@
       class="text-accent text-base font-normal"
       :class="{
         'py-16 px-8 text-center flex justify-center': !minHeight,
-        'pt-4 pb-2 px-[1.0625rem]': minHeight,
+        'pt-4 px-[1.0625rem]': minHeight,
+        'pb-4': minHeight && lastChild,
+        'pb-2': minHeight && !lastChild,
       }"
     >
       <div class="select-none cursor-default w-select-field sm-not:px-3">
@@ -137,6 +139,7 @@ const props = withDefaults(
     resetting?: boolean
     emptyStub?: string
     minHeight?: boolean
+    lastChild?: boolean
     pageClass?: string
     refetchInterval?: number | false
     scrollingElement?: Element | null

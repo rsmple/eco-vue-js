@@ -53,7 +53,7 @@
           @blur="!isMobile && !persist && close(); !unclickable && $emit('blur', $event)"
 
           @click="isMobile && unclickable && open()"
-          @click:internal="isMobile && unclickable && open()"
+          @click:suffix="isMobile && unclickable && open()"
           @click:clear="$emit('click:clear')"
         >
           <template #prefix>
@@ -80,13 +80,14 @@
         </WInput>
       </template>
 
-      <template #content>
+      <template #content="contentScope">
         <div
           ref="content"
           class="bg-default dark:bg-default-dark w-full"
           :class="{
-            'max-h-full pb-20': isMobile,
-            'rounded-xl max-h-[inherit] shadow-md overflow-x-hidden overflow-y-overlay overscroll-contain mb-1 mt-4 dark:border dark:border-solid dark:border-gray-800': !isMobile,
+            'pb-[50vh]': isMobile,
+            'rounded-xl max-h-[inherit] shadow-md overflow-x-hidden overflow-y-overlay overscroll-contain dark:border dark:border-solid dark:border-gray-800': !isMobile,
+            'mt-4': 'istop' in contentScope && contentScope.istop === false && (errorMessage || maxLength),
           }"
         >
           <template v-if="$slots.content?.().length">

@@ -4,7 +4,7 @@
     class="flex rounded-xl overflow-hidden bg-default dark:bg-default-dark"
   >
     <button
-      v-if="allowClear && !disabled"
+      v-if="allowClear && !disabled && !readonly"
       class="relative w-ripple w-ripple-hover h-full w-11 p-[0.6875rem] flex justify-center text-description select-none outline-none"
       @mousedown.prevent.stop=""
       @click="$emit('click:clear')"
@@ -18,7 +18,7 @@
     </button>
 
     <button
-      v-if="allowPaste && !disabled"
+      v-if="allowPaste && !disabled && !readonly"
       class="relative w-ripple w-ripple-hover h-full w-11 p-[0.6875rem] flex justify-center text-description select-none outline-none"
       @mousedown.prevent.stop=""
       @click="$emit('click:paste')"
@@ -33,11 +33,11 @@
 
     <button
       v-if="textSecure"
-      :disabled="disabled"
+      :disabled="disabled || readonly"
       class="relative h-full w-11 p-[0.6875rem] flex justify-center select-none outline-none"
       :class="{
-        'cursor-pointer w-ripple w-ripple-hover': !disabled,
-        'cursor-not-allowed': disabled,
+        'cursor-pointer w-ripple w-ripple-hover': !disabled && !readonly,
+        'cursor-not-allowed': disabled || readonly,
       }"
       @click="isSecureVisible ? $emit('hide:secure', $event) : $emit('show:secure', $event)"
     >
@@ -94,6 +94,7 @@ const props = defineProps<{
   allowClear?: boolean
   allowPaste?: boolean
   disabled?: boolean
+  readonly?: boolean
   textSecure?: boolean
   isSecureVisible?: boolean
 }>()

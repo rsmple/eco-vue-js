@@ -29,6 +29,7 @@
       :resetting="isResettingPage"
       :empty-stub="emptyStub"
       :min-height="minHeight"
+      :last-child="lastChild"
       :page-class="pageClass"
       :refetch-interval="refetchInterval"
       :scrolling-element="scrollingElement"
@@ -102,6 +103,7 @@ const props = withDefaults(
     headerTop?: number
     headerHeight?: number
     minHeight?: boolean
+    lastChild?: boolean
     excludeParams?: (keyof QueryParams)[]
     emptyStub?: string
     pageClass?: string

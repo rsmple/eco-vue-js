@@ -34,6 +34,7 @@
     :header-top="headerTopIgnore ? 0 : headerTop"
     :header-height="headerHeight"
     :min-height="minHeight"
+    :last-child="lastChild"
     :exclude-params="excludeParams"
     :empty-stub="emptyStub"
     :page-class="pageClass"
@@ -104,6 +105,7 @@ const props = withDefaults(
     scrollingElement?: Element | null
     headerTopIgnore?: boolean
     minHeight?: boolean
+    lastChild?: boolean
     excludeParams?: (keyof QueryParams)[]
     emptyStub?: string
     pageClass?: string

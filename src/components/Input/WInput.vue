@@ -5,7 +5,7 @@
       'cursor-not-allowed': disabled && !skeleton,
       'mt-1 mb-[1.125rem]': !noMargin,
     }"
-    @click="$emit('click:internal', $event)"
+    @click="$emit('click:suffix', $event)"
   >
     <label :for="inputId">
       <div
@@ -122,13 +122,14 @@
             <InputActions
               :loading="loading"
               :allow-clear="allowClear && modelValue !== ''"
-              :disabled="disabled || readonly || disabledActions"
+              :disabled="disabled || disabledActions"
+              :readonly="readonly"
               :text-secure="textSecure"
               :is-secure-visible="isSecureVisible"
               :allow-paste="allowPaste"
               class="absolute top-0 right-0 bottom-0"
               @click:clear="clearValue"
-              @click:slot="isFocused ? blur() : focus(); $emit('click:internal', $event)"
+              @click:slot="isFocused ? blur() : focus(); $emit('click:suffix', $event)"
               @show:secure="isSecureVisible = true; $emit('click', $event)"
               @hide:secure="isSecureVisible = false"
               @update:width="paddingRight = $event"
@@ -288,7 +289,7 @@ const emit = defineEmits<{
   (e: 'blur', value: FocusEvent): void
   (e: 'click', value: MouseEvent): void
   (e: 'mousedown', value: MouseEvent): void
-  (e: 'click:internal', value: MouseEvent): void
+  (e: 'click:suffix', value: MouseEvent): void
   (e: 'select:input', value: Event): void
   (e: 'paste'): void
 }>()
