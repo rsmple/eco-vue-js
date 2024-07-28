@@ -224,7 +224,7 @@ const addPreviousPage = (silent?: boolean) => {
 const updateScroll = (height: number): void => {
   const element = props.scrollingElement ?? document.scrollingElement
 
-  if (!element) return
+  if (!element || element.scrollTop === 0) return
 
   element.scrollTop = element.scrollTop + height
 }
