@@ -77,10 +77,10 @@
         >
           <WForm
             ref="form"
-            :name="index.toString()"
+            :name="namesFrom?.[index] ?? index.toString()"
             :title="names?.[index]"
             @update:is-valid="updateIsValidMap(index, $event)"
-            @update:has-changes="updateHasChangesMap(index, $event)"
+            @update:has-changes="hasChangesMap[index] = $event"
           >
             <component :is="slot" />
           </WForm>
@@ -99,6 +99,7 @@ import {wTabItemListener, wTabItemUnlistener} from './models/injection'
 
 const props = defineProps<{
   names?: string[] | Record<number, string>
+  namesFrom?: string[] | Record<number, string>
   icons?: SVGComponent[] | Record<number, SVGComponent>
   slots?: VNode[]
   lessTransitions?: boolean
@@ -122,24 +123,18 @@ const minHeight = ref(0)
 const tabItem = ref<ComponentInstance<typeof TabItem>[]>([])
 const form = ref<ComponentInstance<typeof WForm>[]>([])
 
-const isValidMap = reactive<Record<number, boolean>>({})
-const hasChangesMap = reactive<Record<number, boolean>>({})
+const isValidMap = reactive<Record<number, boolean | undefined>>({})
+const hasChangesMap = reactive<Record<number, boolean | undefined>>({})
 
 const hasChanges = computed<boolean>(() => Object.values(hasChangesMap).includes(true))
 
 const updateIsValidMap = (index: number, value: boolean | undefined): void => {
-  if (value !== undefined) isValidMap[index] = value
-  else delete isValidMap[index]
+  isValidMap[index] = value
 
   nextTick()
     .then(() => {
       if (value === false && isValidMap[current.value] !== false) switchTab(index)
     })
-}
-
-const updateHasChangesMap = (index: number, value: boolean | undefined): void => {
-  if (value !== undefined) hasChangesMap[index] = value
-  else delete hasChangesMap[index]
 }
 
 const switchTab = throttle((index: number): void => {

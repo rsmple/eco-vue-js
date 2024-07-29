@@ -1,6 +1,7 @@
 <template>
   <component
     :is="component"
+    ref="componentRef"
     :error-message="errorMessage"
     :has-changes="noChanges ? undefined : hasChanges"
     @update:model-value="_validateOnUpdate"
@@ -12,6 +13,10 @@
 <script lang="ts" setup>
 import {computed, ref, useSlots, watch, inject, onBeforeMount, onBeforeUnmount} from 'vue'
 import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
+import type {ValidatePath} from './use/useFormValidateMap'
+import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
+import {scrollToValidator} from './models/utils'
+import {useIsInsideTab} from '@/components/Tabs/use/useIsInsideTab'
 
 const props = defineProps<{
   name?: string
@@ -35,8 +40,11 @@ const invalidateUpdater = inject(wFormInvalidateUpdater, undefined)
 const initModelUpdater = inject(wFormInitModelUpdater, undefined)
 const unlistener = inject(wFormUnlistener, undefined)
 
+const {isInsideTab} = useIsInsideTab()
+
 const slots = useSlots()
 const component = computed<ComponentInstance<ThisType<unknown>>>(() => slots.default?.()[0])
+const componentRef = ref<ComponentInstance<ThisType<unknown>> | undefined>()
 
 const modelValue = computed<Parameters<ValidateFn>[0]>(() => {
   const props = component.value?.props
@@ -167,12 +175,16 @@ const _validateOnUnselect = (value: string) => {
   validateOnUpdate(newValue)
 }
 
-const doValidate = (silent?: boolean): string | undefined => {
+const doValidate = (silent?: boolean, path?: ValidatePath): string | undefined => {
+  if (props.name && path && !path[props.name]) return
+
   const message = _validate(modelValue.value)
 
   if (!silent) {
     errorMessage.value = message
     hasBeenValidated.value = true
+
+    if (!isInsideTab) scrollTo()
   }
 
   return message
@@ -191,6 +203,16 @@ const initModel = (): void => {
   initModelValue.value = modelValue.value
   hasChanges.value = false
 }
+
+const scrollTo = () => {
+  if (!errorMessage.value) return
+
+  const element = componentRef.value.$el
+
+  if (element instanceof HTMLDivElement) scrollToValidator(element)
+}
+
+useTabActiveListener(scrollTo)
 
 watch(errorMessage, value => {
   if (value === null) return

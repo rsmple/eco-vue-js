@@ -1,3 +1,4 @@
+import {throttle} from '@/main'
 
 export const removeKey = <T extends Record<string, unknown>>(entity: T, key: string): T => {
   const result = {...entity}
@@ -20,3 +21,11 @@ export const compileMessage = (title: string | undefined, message: string | unde
     return `${ fieldMessageStart }${ title }: ${ message }`
   }
 }
+
+export const scrollToValidator = throttle((element: HTMLElement): void => {
+  element.scrollIntoView({
+    behavior: 'smooth',
+    block: 'center',
+    inline: 'nearest',
+  })
+}, 300)

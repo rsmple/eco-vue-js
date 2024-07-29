@@ -87,7 +87,7 @@
           :class="{
             'pb-[50vh]': isMobile,
             'rounded-xl max-h-[inherit] shadow-md overflow-x-hidden overflow-y-overlay overscroll-contain dark:border dark:border-solid dark:border-gray-800': !isMobile,
-            'mt-4': 'istop' in contentScope && contentScope.istop === false && (errorMessage || maxLength),
+            'mt-5': 'istop' in contentScope && contentScope.istop === false && (errorMessage || maxLength),
           }"
         >
           <template v-if="$slots.content?.().length">
