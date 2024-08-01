@@ -53,7 +53,7 @@
         v-if="allowSelect && mobile"
         :text="selected ? 'Unselect' : 'Select'"
         :icon="selected ? markRaw(IconMinusCircle) : markRaw(IconAddCircle)"
-        @click="$emit('update:selected', !selected)"
+        @click="updateSelected?.(!selected)"
       />
 
       <slot name="more" />
@@ -101,13 +101,13 @@ const {
 if (selected) {
   watch(selected, value => {
     emit('update:selected', value)
-  })
+  }, {immediate: true})
 }
 
 if (allowSelectHover) {
   watch(allowSelectHover, value => {
     emit('update:selected-hover', value)
-  })
+  }, {immediate: true})
 }
 
 defineExpose({

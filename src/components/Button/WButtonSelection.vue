@@ -50,18 +50,18 @@
     >
       <div
         v-if="selectedCount"
-        class="flex gap-3 sm-not:gap-1"
+        class="grid grid-cols-[1fr,auto] gap-3 sm-not:gap-1"
       >
-        <div class="flex items-center font-normal text-base sm-not:text-xs text-description whitespace-nowrap">
+        <div class="self-center font-normal text-base sm-not:text-xs text-description whitespace-nowrap truncate">
           <span class="sm-not:hidden">Selected&nbsp;</span><span class="text-primary-default dark:text-primary-dark font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedCount === 1 ? '' : 's' }}</span>
         </div>
 
-        <div
-          class="relative text-description sm-not:-px--inner-margin px-[1.125rem] flex items-center cursor-pointer select-none w-ripple w-ripple-hover"
+        <button
+          class="relative text-description flex items-center justify-self-end cursor-pointer select-none w-ripple w-ripple-hover"
           @click="clearSelected"
         >
-          <IconCancel />
-        </div>
+          <IconCancel class="square-5 sm-not:-mx--inner-margin mx-[1.125rem]" />
+        </button>
       </div>
     </Transition>
   </div>
