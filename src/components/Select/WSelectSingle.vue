@@ -83,7 +83,7 @@ const props = defineProps<{
   icon?: SVGComponent
   mono?: boolean
   autofocus?: boolean
-  allowClear?: AllowClear
+  allowClear?: boolean & AllowClear
   hideOptionIcon?: boolean
   searchModel?: boolean
 }>()
