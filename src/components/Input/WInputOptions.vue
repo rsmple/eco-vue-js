@@ -1,24 +1,8 @@
 <template>
   <WInputSuggest
     ref="input"
-    :title="title"
-    :mobile-title="mobileTitle"
-    :description="description"
-    :model-value="(modelValue as ModelValue)"
-    :max-length="maxSearchLength"
-    :loading="loading"
-    :readonly="readonly"
-    :skeleton="skeleton"
-    :size="searchSize"
-    :error-message="errorMessage"
-    :required="required"
-    :disabled="disabled"
-    :has-changes="hasChanges"
-    :placeholder="placeholder"
-    :no-margin="noMargin"
-    :icon="icon"
-    :mono="mono"
-    :type="(type as Type)"
+    v-bind="props"
+    :class="$attrs.class"
     @update:model-value="updateModelValue"
 
     @keypress:enter.stop.prevent="selectCursor"
@@ -30,6 +14,20 @@
     @focus="focused = true"
     @blur="focused = false"
   >
+    <template
+      v-if="$slots.title"
+      #title
+    >
+      <slot name="title" />
+    </template>
+
+    <template
+      v-if="$slots.subtitle"
+      #subtitle
+    >
+      <slot name="subtitle" />
+    </template>
+
     <template
       v-if="$slots.right?.()?.length"
       #right
@@ -81,45 +79,22 @@
 </template>
 
 <script lang="ts" setup generic="Type extends InputType = 'text', Option extends Record<string, any> & {id: number} = Record<string, any> & {id: number}">
-import {ref, watch, toRef, nextTick, computed, type Component} from 'vue'
+import {ref, watch, toRef, nextTick, computed} from 'vue'
 import SelectOption from '@/components/Select/components/SelectOption.vue'
 import {debounce} from '@/utils/utils'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
+import type {InputOptionsProps} from './types'
 
-type ModelValue = Type extends 'number' ? number : string
+type ModelValue = Required<InputOptionsProps<Type, Option>>['modelValue']
 
-const props = defineProps<{
-  modelValue: ModelValue
-  options: Option[]
-  valueGetter: (option: Option) => ModelValue
-  title?: string
-  type?: Type | undefined
-  mobileTitle?: string
-  description?: string
-  loading?: boolean
-  emptyStub?: string
-  maxSearchLength?: number
-  optionComponent?: Component<{option: Option, selected?: boolean, model?: boolean}>
-  disableClear?: boolean
-  readonly?: boolean
-  disabled?: boolean
-  skeleton?: boolean
-  searchSize?: number
-  errorMessage?: string
-  required?: boolean
-  hasChanges?: boolean
-  placeholder?: string
-  noMargin?: boolean
-  icon?: SVGComponent
-  mono?: boolean
-}>()
+const props = defineProps<InputOptionsProps<Type, Option>>()
 
 const emit = defineEmits<{
   (e: 'update:model-value', value: ModelValue): void
 }>()
 
 const isOpen = ref(false)
-const input = ref<ComponentInstance<typeof WInputSuggest> | undefined>()
+const input = ref<ComponentInstance<typeof WInputSuggest<Type>> | undefined>()
 const cursor = ref<number>(-1)
 const isCursorLocked = ref(false)
 const lastIndex = computed(() => props.options.length)

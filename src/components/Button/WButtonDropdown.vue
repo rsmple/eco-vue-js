@@ -1,9 +1,9 @@
 <template>
   <WDropdownMenu 
     :is-open="isOpen"
-    :max-height="contentMaxHeight ?? 200"
-    :max-width="contentMaxWidth ?? 320"
-    :horizontal-align="horizontalAlign ?? HorizontalAlign.LEFT_INNER"
+    :max-height="maxHeight"
+    :max-width="maxWidth"
+    :horizontal-align="horizontalAlign"
     update-align
     :teleport="teleport"
   >
@@ -63,22 +63,22 @@
 </template>
 
 <script lang="ts" setup>
-import {HorizontalAlign, type SemanticType} from '@/main'
+import {HorizontalAlign} from '@/main'
 import WButton from './WButton.vue'
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 import {ref} from 'vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
+import type {ButtonDropdownProps} from './types'
 
-defineProps<{
-  semanticType?: SemanticType
-  contentMaxHeight?: number
-  contentMaxWidth?: number
-  horizontalAlign?: HorizontalAlign
-  leftToggle?: boolean
-  disabled?: boolean
-  teleport?: boolean
-}>()
+withDefaults(
+  defineProps<ButtonDropdownProps>(),
+  {
+    maxHeight: 200,
+    maxWidth: 320,
+    horizontalAlign: HorizontalAlign.LEFT_INNER,
+  },
+)
 
 const isOpen = ref(false)
 

@@ -85,7 +85,6 @@ withDefaults(
   },
 )
 
-
 defineEmits<{
   (e: 'select', value: Model): void
   (e: 'unselect', value: Model): void

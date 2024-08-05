@@ -13,9 +13,11 @@ const extend = {
 
 module.exports = {
   height: {
+    '8.5': '2.125rem',
     18: '4.5rem',
   },
   width: {
+    '8.5': '2.125rem',
     18: '4.5rem',
   },
   maxWidth: extend,

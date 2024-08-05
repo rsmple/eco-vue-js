@@ -1,92 +1,61 @@
 <template>
-  <div>
-    <WSelect
-      ref="selectComponent"
-      :model-value="arrayValue"
-      :search="search"
-      :options="options"
-      :title="title"
-      :mobile-title="mobileTitle"
-      :description="description"
-      :loading="loading"
-      :max-search-length="maxSearchLength"
-      :empty-stub="emptyStub"
-      :option-component="optionComponent"
-      :readonly="readonly"
-      :disabled="disabled"
-      :skeleton="skeleton"
-      :allow-create="allowCreate"
-      :error-message="errorMessage"
-      :has-changes="hasChanges"
-      :placeholder="placeholder"
-      :search-size="searchSize"
-      :required="required"
-      :no-margin="noMargin"
-      :icon="icon"
-      :mono="mono"
-      :autofocus="autofocus"
-      :disable-clear="!allowClear"
-      :hide-option-icon="hideOptionIcon"
-      hide-prefix
-      @select="updateModelValue($event as Item)"
-      @unselect="updateModelValue(allowClear ? null : ($event as Item))"
-      @update:search="emit('update:search', $event)"
-      @create:option="createOption($event)"
-      @focus="searchModel && typeof modelValue === 'string' ? $emit('update:search', modelValue) : undefined"
+  <WSelect
+    ref="selectComponent"
+    v-bind="{
+      ...props,
+      modelValue: arrayValue,
+      disableClear: !allowClear,
+      hidePrefix: true,
+    }"
+    :class="$attrs.class"
+    @select="updateModelValue($event as Option)"
+    @unselect="updateModelValue(allowClear ? null : ($event as Option))"
+    @update:search="emit('update:search', $event)"
+    @create:option="createOption($event)"
+    @focus="searchModel && typeof modelValue === 'string' ? $emit('update:search', modelValue) : undefined"
+  >
+    <template
+      v-if="$slots.title"
+      #title
     >
-      <template #option="{option, selected, model}">
-        <slot
-          name="option"
-          :option="option"
-          :selected="selected"
-          :model="model"
-        />
-      </template>
+      <slot name="title" />
+    </template>
 
-      <template
-        v-if="$slots.right?.()?.length"
-        #right
-      >
-        <slot name="right" />
-      </template>
-    </WSelect>
-  </div>
+    <template
+      v-if="$slots.subtitle"
+      #subtitle
+    >
+      <slot name="subtitle" />
+    </template>
+
+    <template #option="{option, selected, model}">
+      <slot
+        name="option"
+        :option="option"
+        :selected="selected"
+        :model="model"
+      />
+    </template>
+
+    <template
+      v-if="$slots.right?.()?.length"
+      #right
+    >
+      <slot name="right" />
+    </template>
+  </WSelect>
 </template>
 
-<script lang="ts" setup generic="Item extends string | number, AllowClear extends boolean = false">
-import {computed, ref, toRef, watch, type Component} from 'vue'
+<script lang="ts" setup generic="Option extends string | number, AllowClear extends boolean = false">
+import {computed, ref, toRef, watch} from 'vue'
 import WSelect from '@/components/Select/WSelect.vue'
+import type {SelectSingleProps} from './types'
 
-type EmitType = AllowClear extends true ? Item | null : NonNullable<Item>
+type EmitType = AllowClear extends true ? Option | null : NonNullable<Option>
 
-const props = defineProps<{
-  modelValue: Item | null
-  search: string
-  options: Item[]
-  title?: string
-  mobileTitle?: string
-  description?: string
-  loading?: boolean
-  emptyStub?: string
-  maxSearchLength?: number
-  optionComponent?: Component<{option: Item, selected?: boolean, model?: boolean}>
-  readonly?: boolean
-  disabled?: boolean
-  skeleton?: boolean
-  allowCreate?: boolean
-  errorMessage?: string
-  hasChanges?: boolean
-  placeholder?: string
-  searchSize?: number
-  required?: boolean
-  noMargin?: boolean
-  icon?: SVGComponent
-  mono?: boolean
-  autofocus?: boolean
-  allowClear?: boolean & AllowClear
-  hideOptionIcon?: boolean
-  searchModel?: boolean
-}>()
+defineOptions({inheritAttrs: false})
+
+const props = defineProps<SelectSingleProps<Option, AllowClear>>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: EmitType): void
@@ -94,11 +63,11 @@ const emit = defineEmits<{
   (e: 'create:option', value: string): void
 }>()
 
-const selectComponent = ref<ComponentInstance<typeof WSelect<Item>> | undefined>()
+const selectComponent = ref<ComponentInstance<typeof WSelect<Option>> | undefined>()
 
-const arrayValue = computed<Item[]>(() => props.modelValue !== null ? [props.modelValue] : [])
+const arrayValue = computed<Option[]>(() => props.modelValue !== null ? [props.modelValue] : [])
 
-const updateModelValue = (value: Item | null): void => {
+const updateModelValue = (value: Option | null): void => {
   emit('update:modelValue', value as EmitType)
 
   blur()

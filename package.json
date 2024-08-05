@@ -105,6 +105,9 @@
     "./dist/utils/useDefaultQuery": {
       "import": "./dist/utils/useDefaultQuery.js"
     },
+    "./dist/utils/useCopy": {
+      "import": "./dist/utils/useCopy.js"
+    },
     "./dist/components/ActionsBar/WActionsBar.vue": {
       "import": "./dist/components/ActionsBar/WActionsBar.vue.js"
     },
@@ -138,6 +141,9 @@
     "./dist/components/Button/WButtonSelectionAction.vue": {
       "import": "./dist/components/Button/WButtonSelectionAction.vue.js"
     },
+    "./dist/components/Button/types": {
+      "import": "./dist/components/Button/types.d.ts"
+    },
     "./dist/components/Checkbox/WCheckbox.vue": {
       "import": "./dist/components/Checkbox/WCheckbox.vue.js"
     },
@@ -159,8 +165,14 @@
     "./dist/components/Dropdown/WDropdown.vue": {
       "import": "./dist/components/Dropdown/WDropdown.vue.js"
     },
+    "./dist/components/Dropdown/types": {
+      "import": "./dist/components/Dropdown/types.d.ts"
+    },
     "./dist/components/DropdownMenu/WDropdownMenu.vue": {
       "import": "./dist/components/DropdownMenu/WDropdownMenu.vue.js"
+    },
+    "./dist/components/DropdownMenu/types": {
+      "import": "./dist/components/DropdownMenu/types.d.ts"
     },
     "./dist/components/Expansion/WExpansion.vue": {
       "import": "./dist/components/Expansion/WExpansion.vue.js"
@@ -170,6 +182,9 @@
     },
     "./dist/components/FieldWrapper/WFieldWrapper.vue": {
       "import": "./dist/components/FieldWrapper/WFieldWrapper.vue.js"
+    },
+    "./dist/components/FieldWrapper/types": {
+      "import": "./dist/components/FieldWrapper/types.d.ts"
     },
     "./dist/components/FilePicker/WFilePicker.vue": {
       "import": "./dist/components/FilePicker/WFilePicker.vue.js"
@@ -215,6 +230,9 @@
     },
     "./dist/components/Input/WInputSuggest.vue": {
       "import": "./dist/components/Input/WInputSuggest.vue.js"
+    },
+    "./dist/components/Input/types": {
+      "import": "./dist/components/Input/types.d.ts"
     },
     "./dist/components/Link/WLink.vue": {
       "import": "./dist/components/Link/WLink.vue.js"
@@ -269,6 +287,9 @@
     },
     "./dist/components/Select/WSelectSingle.vue": {
       "import": "./dist/components/Select/WSelectSingle.vue.js"
+    },
+    "./dist/components/Select/types": {
+      "import": "./dist/components/Select/types.d.ts"
     },
     "./dist/components/Skeleton/WSkeleton.vue": {
       "import": "./dist/components/Skeleton/WSkeleton.vue.js"

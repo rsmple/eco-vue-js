@@ -46,25 +46,16 @@
 <script lang="ts" setup>
 import {ref} from 'vue'
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
-import type {HorizontalAlign} from '@/utils/HorizontalAlign'
+import type {DropdownMenuProps} from './types'
 
-defineProps<{
-  isOpen: boolean
-  maxHeight: number
-  maxWidth: number
-  horizontalAlign: HorizontalAlign
-  updateAlign?: boolean
-  emitUpdate?: boolean
-  teleport?: boolean
-  noZIndex?: boolean
-}>()
+defineProps<DropdownMenuProps>()
 
 defineEmits<{
   (e: 'update:rect'): void
 }>()
 
 const container = ref<HTMLDivElement>()
-const dropdown = ref<InstanceType<typeof WDropdown> | undefined>()
+const dropdown = ref<ComponentInstance<typeof WDropdown> | undefined>()
 
 defineExpose({
   updateDropdown: () => {

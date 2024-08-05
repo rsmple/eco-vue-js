@@ -1,104 +1,80 @@
 <template>
-  <div
-    class="relative"
-    :class="{
-      'cursor-not-allowed': disabled && !skeleton,
-      'mt-1 mb-[1.125rem]': !noMargin,
-    }"
+  <WFieldWrapper
+    v-bind="props"
+    :class="$attrs.class"
     @click="$emit('click:suffix', $event)"
   >
-    <label :for="inputId">
+    <template
+      v-if="$slots.title"
+      #title
+    >
+      <slot name="title" />
+    </template>
+
+    <template
+      v-if="$slots.subtitle"
+      #subtitle
+    >
+      <slot name="subtitle" />
+    </template>
+
+    <template #field="{id, setFocused, focused}">
       <div
-        v-if="title || $slots.title?.()?.length"
-        class="text-xs font-semibold text-accent mb-2 duration-500"
+        class="
+          relative border border-solid rounded-xl bg-default dark:bg-default-dark
+          transition-colors duration-75 overflow-hidden min-h-11 grid grid-cols-[auto,1fr,auto]
+        "
         :class="{
-          'opacity-50': disabled && !skeleton,
+          'focus-within:border-primary-default dark:focus-within:border-primary-dark': !disabled && !readonly,
+          'cursor-text': !disabled,
+          'border-negative dark:border-negative-dark': errorMessage,
+          'border-gray-300 dark:border-gray-700': !disabled,
+          'border-gray-300/50 dark:border-gray-700/50': disabled,
         }"
+        @click="focus"
+        @mousedown.prevent=""
       >
-        <template v-if="!skeleton">
-          <slot name="title">
-            {{ title }}
-          </slot>
-
-          <Transition
-            enter-active-class="transition-opacity"
-            leave-active-class="transition-opacity"
-            enter-from-class="opacity-0"
-            leave-to-class="opacity-0"
-          >
-            <span
-              v-if="required"
-              class="text-negative dark:text-negative-dark"
-            >
-              *
-            </span>
-          </Transition>
-        </template>
-
-        <WSkeleton
-          v-else
-          class="h-4 w-16"
-        />
-      </div>
-
-      <div class="grid grid-cols-[1fr,auto]">
         <div
-          v-if="!skeleton"
-          class="relative isolate grid grid-cols-1"
+          v-if="icon"
+          class="flex items-center w-11 h-full justify-center text-description select-none"
         >
-          <div
-            class="
-              relative flex flex-wrap border border-solid rounded-xl bg-default dark:bg-default-dark
-              transition-colors duration-75 overflow-hidden min-h-11 w-full
-            "
-            :class="{
-              'focus-within:border-primary-default dark:focus-within:border-primary-dark': !disabled && !readonly,
-              'cursor-text': !disabled,
-              'pl-1 py-1 gap-1': $slots.suffix?.()?.length,
-              'pl-11': icon,
-              'border-negative dark:border-negative-dark': errorMessage,
-              'border-gray-300 dark:border-gray-700': !disabled,
-              'border-gray-300/50 dark:border-gray-700/50': disabled,
-            }"
-            :style="{paddingRight: paddingRight + 'px'}"
-            @click="focus"
-            @mousedown.prevent=""
-          >
-            <div
-              v-if="icon"
-              class="absolute top-0 left-0 h-full flex items-center justify-center px-3 text-description select-none"
-            >
-              <component
-                :is="icon"
-                class="w-5 h-5"
-              />
-            </div>
+          <component
+            :is="icon"
+            class="square-5"
+          />
+        </div>
 
+        <div class="col-start-2 grid grid-cols-1 group/input">
+          <div
+            class="flex flex-wrap"
+            :class="{
+              'py-1 gap-1 first:pl-1 last:pr-1': $slots.prefix,
+            }"
+          >
             <slot name="prefix" />
 
             <component
               :is="textarea ? 'textarea' : 'input'"
-              :id="inputId"
+              :id="id"
               ref="input"
               class="
                 text-base font-normal outline-0 border-none bg-[inherit] flex-1 max-w-full w-input
                 disabled:opacity-80 disabled:cursor-not-allowed placeholder:text-gray-400 dark:placeholder:text-gray-500 appearance-none
               "
               :class="{
-                'min-h-[var(--textarea-height,160px)] w-full p-3': textarea,
+                'min-h-[var(--textarea-height,10rem)] w-full py-3': textarea,
                 'resize-y': resize && textarea,
                 'resize-none': !resize && textarea,
-                'h-[var(--input-height,42px)]': !textarea && !$slots.suffix?.()?.length,
-                'h-[var(--input-height,34px)]': !textarea && $slots.suffix?.()?.length,
-                'py-0 pr-1': !hideInput && !textarea,
-                'pl-3': !hideInput && !textarea && !icon,
+                'h-[var(--input-height,2.625rem)]': !textarea && !$slots.suffix,
+                'h-[var(--input-height,2.125rem)]': !textarea && $slots.suffix,
+                'group-first/input:pl-3 first:pl-0 [&:not(:first-child)]:pl-3 group-last/input:pr-3': !hideInput,
                 'w-0 max-w-0 p-0 absolute': hideInput,
                 'font-mono': mono,
                 'text-secure': textSecure && !isSecureVisible,
                 'text-black-default dark:text-gray-200': !disabled,
                 'text-black-default/50 dark:text-gray-200/50': disabled,
               }"
-              :value="placeholderSecure && modelValue === undefined && !isFocused ? '******' : modelValue"
+              :value="placeholderSecure && modelValue === undefined && !focused ? '******' : modelValue"
               :placeholder="placeholder"
               :type="type ?? 'text'"
               :name="name"
@@ -112,168 +88,68 @@
               @keydown.up.exact.stop="!disabled && !readonly && $emit('keypress:up', $event)"
               @keydown.down.exact.stop="!disabled && !readonly && $emit('keypress:down', $event)"
               @keydown.delete.exact.stop="!disabled && !readonly && $emit('keypress:delete', $event); handleBackspace($event)"
-              @focus="$emit('focus', $event); setIsFocused(true)"
-              @blur="$emit('blur', $event); setIsFocused(false); isSecureVisible = false"
+              @focus="$emit('focus', $event); setFocused(true)"
+              @blur="$emit('blur', $event); setFocused(false); isSecureVisible = false"
               @click="$emit('click', $event)"
               @mousedown.stop="$emit('mousedown', $event)"
               @select.stop="$emit('select:input', $event)"
             />
-
-            <InputActions
-              :loading="loading"
-              :allow-clear="allowClear && modelValue !== ''"
-              :disabled="disabled || disabledActions"
-              :readonly="readonly"
-              :text-secure="textSecure"
-              :is-secure-visible="isSecureVisible"
-              :allow-paste="allowPaste"
-              class="absolute top-0 right-0 bottom-0"
-              @click:clear="clearValue"
-              @click:slot="isFocused ? blur() : focus(); $emit('click:suffix', $event)"
-              @show:secure="isSecureVisible = true; $emit('click', $event)"
-              @hide:secure="isSecureVisible = false"
-              @update:width="paddingRight = $event"
-              @click:paste="paste"
-            >
-              <template
-                v-if="$slots.suffix?.()?.length"
-                #default
-              >
-                <slot name="suffix" />
-              </template>
-            </InputActions>
           </div>
-
-          <Transition
-            enter-active-class="transition-opacity"
-            leave-active-class="transition-opacity"
-            enter-from-class="opacity-0"
-            leave-to-class="opacity-0"
-          >
-            <span
-              v-if="hasChanges"
-              class="square-2 rounded-full transition-colors absolute top-0 right-0 z-10"
-              :class="{
-                'bg-info dark:bg-info-dark': isFocused || !errorMessage,
-                'bg-negative dark:bg-negative-dark': !isFocused && errorMessage,
-              }"
-            />
-          </Transition>
-
-          <Transition
-            enter-active-class="transition-opacity"
-            leave-active-class="transition-opacity"
-            enter-from-class="opacity-0"
-            leave-to-class="opacity-0"
-          >
-            <div
-              v-if="errorMessage"
-              class="text-xs font-normal text-negative dark:text-negative-dark absolute right-0 top-full pt-0.5 text-end"
-            >
-              {{ errorMessage }}
-            </div>
-
-            <div
-              v-else-if="maxLength !== undefined && isFocused"
-              class="text-xs font-normal text-description absolute right-0 top-full pt-0.5 whitespace-nowrap"
-            >
-              {{ numberFormatter.format(String(modelValue || '').length) }} / {{ numberFormatter.format(maxLength) }}
-            </div>
-          </Transition>
         </div>
 
-        <WSkeleton
-          v-else
-          class="w-full w-skeleton-rounded-xl"
-          :class="{
-            'h-[calc(var(--textarea-height,160px)+2px)]': textarea,
-            'h-[calc(var(--input-height,42px)+2px)]': !textarea && !$slots.suffix?.()?.length,
-            'h-[calc(var(--input-height,34px)+10px)]': !textarea && $slots.suffix?.()?.length,
-          }"
-          style="--skeleton-width: 100%;"
-        />
-
-        <div
-          v-if="$slots.right?.()?.length"
-          ref="rightContainer"
-          class="pl-4 flex gap-4 sm-not:flex-col"
+        <InputActions
+          :model-value="(modelValue as ModelValue)"
+          :loading="loading"
+          :allow-clear="allowClear && modelValue !== ''"
+          :disabled="disabled || disabledActions"
+          :readonly="readonly"
+          :text-secure="textSecure"
+          :is-secure-visible="isSecureVisible"
+          :allow-paste="allowPaste"
+          :allow-copy="allowCopy"
+          :focused="focused"
+          @click:clear="clearValue"
+          @click:slot="focused ? blur() : focus(); $emit('click:suffix', $event)"
+          @show:secure="isSecureVisible = true; $emit('click', $event)"
+          @hide:secure="isSecureVisible = false"
+          @click:paste="paste"
         >
-          <slot name="right" />
-        </div>
+          <template
+            v-if="$slots.suffix"
+            #default
+          >
+            <slot name="suffix" />
+          </template>
+        </InputActions>
       </div>
+    </template>
 
-      <div
-        v-if="description"
-        class="text-xs font-normal text-description pt-4 whitespace-pre-wrap break-words text-pretty"
-        :class="{
-          'opacity-50': disabled && !skeleton,
-        }"
-      >
-        <WSkeleton v-if="skeleton" />
-
-        <template v-else>
-          {{ description }}
-        </template>
-      </div>
-    </label>
-  </div>
+    <template 
+      v-if="$slots.right"
+      #right
+    >
+      <slot name="right" />
+    </template>
+  </WFieldWrapper>
 </template>
 
 <script lang="ts" setup generic="Type extends InputType = 'text'">
 import {onMounted, ref, nextTick, onBeforeUnmount} from 'vue'
-import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import InputActions from './components/InputActions.vue'
 import {Notify} from '@/utils/Notify'
-import {genId, numberFormatter} from '@/utils/utils'
-import {useTabActiveListener} from '../Tabs/use/useTabActiveListener'
+import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
+import type {InputProps} from './types'
+import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 
-type ModelValue = Type extends 'number' ? number : string
+type ModelValue = Required<InputProps<Type>>['modelValue']
+
+defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
-  defineProps<{
-    modelValue?: ModelValue | undefined
-    title?: string
-    description?: string
-    placeholder?: string
-    type?: Type
-    name?: string
-    autocomplete?: string
-    autofocus?: boolean
-    textarea?: boolean
-    disabled?: boolean
-    allowClear?: boolean
-    errorMessage?: string
-    readonly?: boolean
-    icon?: SVGComponent
-    maxLength?: number
-    loading?: boolean
-    required?: boolean
-    hideInput?: boolean
-    skeleton?: boolean
-    size?: number
-    mono?: boolean
-    textSecure?: boolean
-    spellcheck?: boolean
-    placeholderSecure?: boolean
-    customBackspaceHandle?: boolean
-    hasChanges?: boolean
-    disabledActions?: boolean
-    noMargin?: boolean
-    resize?: boolean
-    allowPaste?: boolean
-  }>(),
+  defineProps<InputProps<Type>>(),
   {
     size: 10,
-    title: undefined,
-    description: undefined,
-    placeholder: undefined,
-    type: undefined,
-    name: undefined,
     autocomplete: 'off',
-    errorMessage: undefined,
-    icon: undefined,
-    maxLength: undefined,
-    modelValue: undefined,
   },
 )
 
@@ -294,12 +170,8 @@ const emit = defineEmits<{
   (e: 'paste'): void
 }>()
 
-const inputId = `w-input-${genId()}`
-
 const input = ref<HTMLInputElement>()
-const isFocused = ref(false)
 const isSecureVisible = ref(false)
-const paddingRight = ref(0)
 
 const updateModelValue = (value: string | undefined): void => {
   if (props.loading || props.disabled || props.readonly) return
@@ -361,7 +233,8 @@ const handleInputEvent = (event: Event): void => {
 const clearValue = () => {
   if (props.disabled || props.readonly) return
 
-  updateModelValue(undefined)
+  if (typeof props.modelValue === 'string') updateModelValue('')
+  else updateModelValue(undefined)
 
   input.value?.focus()
 
@@ -371,17 +244,11 @@ const clearValue = () => {
 const focus = (): void => {
   if (props.disabled || props.readonly) return
 
-  if (isFocused.value) return
-
   input.value?.focus()
 }
 
 const blur = (): void => {
   input.value?.blur()
-}
-
-const setIsFocused = (value: boolean): void => {
-  isFocused.value = value
 }
 
 const checkPermission = async (): Promise<boolean> => {

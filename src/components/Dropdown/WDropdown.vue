@@ -20,16 +20,9 @@ import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch, toRef} 
 import DOMListenerContainer from '@/utils/DOMListenerContainer'
 import {getAllScrollParents, isClientSide} from '@/utils/utils'
 import {horizontalGetterOrderMap, searchStyleGetter, VerticalGetter, type HorizontalGetter} from './utils/DropdownStyle'
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
+import type {DropdownProps} from './types'
 
-const props = defineProps<{
-  maxHeight: number
-  maxWidth: number
-  horizontalAlign: HorizontalAlign
-  parentElement: Element
-  updateAlign?: boolean
-  emitUpdate?: boolean
-}>()
+const props = defineProps<DropdownProps>()
 
 const emit = defineEmits<{
   (e: 'update:rect'): void

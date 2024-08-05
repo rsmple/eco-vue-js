@@ -1,105 +1,65 @@
 <template>
-  <div>
-    <WSelectAsync
-      ref="selectComponent"
-      :model-value="arrayValue"
-      :search="search"
-      :title="title"
-      :mobile-title="mobileTitle"
-      :description="description"
-      :loading="loading"
-      :max-search-length="maxSearchLength"
-      :empty-stub="emptyStub"
-      :query-params="(queryParams as QueryParams)"
-      :use-query-fn="useQueryFn"
-      :is-invalid-page="isInvalidPage"
-      :option-component="optionComponent"
-      :readonly="readonly"
-      :disabled="disabled"
-      :skeleton="skeleton"
-      :allow-create="allowCreate"
-      :error-message="errorMessage"
-      :has-changes="hasChanges"
-      :placeholder="placeholder"
-      :search-size="searchSize"
-      :required="required"
-      :no-margin="noMargin"
-      :icon="icon"
-      :mono="mono"
-      :autofocus="autofocus"
-      :disable-clear="!allowClear"
-      :preview-data="previewData ? [previewData] as Data[] : undefined"
-      :created-data="createdData ? [createdData] as Data[] : undefined"
-      :hide-option-icon="hideOptionIcon"
-      :value-getter="valueGetter"
-      :value-query-key="valueQueryKey"
-      :query-options="queryOptions"
-      hide-prefix
-      @select="updateModelValue($event)"
-      @unselect="allowClear && updateModelValue(null)"
-      @update:search="emit('update:search', $event)"
-      @create:option="createOption($event)"
+  <WSelectAsync
+    ref="selectComponent"
+    v-bind="{
+      ...props,
+      modelValue: arrayValue,
+      disableClear: !allowClear,
+      previewData: previewData ? [previewData] as Data[] : undefined,
+      createdData: createdData ? [createdData] as Data[] : undefined,
+      hidePrefix: true,
+    }"
+    :class="$attrs.class"
+    @select="updateModelValue($event as EmitType)"
+    @unselect="allowClear && updateModelValue(null as EmitType)"
+    @update:search="emit('update:search', $event)"
+    @create:option="createOption($event)"
+  >
+    <template
+      v-if="$slots.title"
+      #title
     >
-      <template #option="{option, selected, model}">
-        <slot
-          name="option"
-          :option="option"
-          :selected="selected"
-          :model="model"
-        />
-      </template>
+      <slot name="title" />
+    </template>
 
-      <template
-        v-if="$slots.right?.()?.length"
-        #right
-      >
-        <slot name="right" />
-      </template>
-    </WSelectAsync>
-  </div>
+    <template
+      v-if="$slots.subtitle"
+      #subtitle
+    >
+      <slot name="subtitle" />
+    </template>
+
+    <template #option="{option, selected, model}">
+      <slot
+        name="option"
+        :option="option"
+        :selected="selected"
+        :model="model"
+      />
+    </template>
+
+    <template
+      v-if="$slots.right?.()?.length"
+      #right
+    >
+      <slot name="right" />
+    </template>
+  </WSelectAsync>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
-import {computed, ref, toRef, watch, type Component} from 'vue'
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams, AllowClear extends boolean = false">
+import {computed, ref, toRef, watch} from 'vue'
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
+import type {SelectAsyncSingleProps} from './types'
 
-const props = defineProps<{
-  modelValue: Model | null
-  search: string
-  useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
-  isInvalidPage: (error: unknown) => boolean
-  queryParams: QueryParams
-  title?: string
-  mobileTitle?: string
-  description?: string
-  loading?: boolean
-  emptyStub?: string
-  maxSearchLength?: number
-  optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
-  readonly?: boolean
-  disabled?: boolean
-  skeleton?: boolean
-  allowCreate?: boolean
-  errorMessage?: string
-  hasChanges?: boolean
-  placeholder?: string
-  searchSize?: number
-  required?: boolean
-  noMargin?: boolean
-  icon?: SVGComponent
-  mono?: boolean
-  autofocus?: boolean
-  allowClear?: boolean
-  previewData?: Data
-  createdData?: Data
-  hideOptionIcon?: boolean
-  valueGetter?: (data: Data) => Model
-  valueQueryKey?: string
-  queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
-}>()
+type EmitType = AllowClear extends true ? Model | null : NonNullable<Model>
+
+defineOptions({inheritAttrs: false})
+
+const props = defineProps<SelectAsyncSingleProps<Model, Data, ApiError, QueryParams, AllowClear>>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Model | null): void
+  (e: 'update:modelValue', value: EmitType): void
   (e: 'update:search', value: string): void
   (e: 'create:option', value: string): void
 }>()
@@ -108,7 +68,7 @@ const selectComponent = ref<ComponentInstance<typeof WSelectAsync<Model, Data, A
 
 const arrayValue = computed<Model[]>(() => props.modelValue ? [props.modelValue] : [])
 
-const updateModelValue = (value: Model | null): void => {
+const updateModelValue = (value: EmitType): void => {
   emit('update:modelValue', value)
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="$attrs.class">
     <component
       :is="isMobile ? WBottomSheet : WDropdownMenu"
       ref="dropdownMenu"
@@ -8,9 +8,9 @@
         onClose: close
       } : {
         isOpen,
-        maxHeight: contentMaxHeight ?? 320,
-        maxWidth: contentMaxWidth ?? 600,
-        horizontalAlign: horizontalAlign ?? HorizontalAlign.FILL,
+        maxHeight,
+        maxWidth,
+        horizontalAlign,
         updateAlign: true,
         teleport
       }"
@@ -18,29 +18,16 @@
       <template #toggle="{unclickable}">
         <WInput
           ref="input"
-          :title="title ?? (unclickable ? mobileTitle : undefined)"
-          :model-value="(modelValue as ModelValue | undefined)"
-          :type="(type as Type | undefined)"
-          :max-length="maxLength"
-          :loading="loading"
-          :hide-input="hideInput"
-          :readonly="readonly || unclickable"
-          :skeleton="skeleton"
-          :size="size"
-          :error-message="errorMessage"
-          :required="required"
-          :disabled="disabled"
-          :has-changes="hasChanges"
-          :allow-clear="allowClear"
-          :icon="icon"
-          :placeholder="placeholder"
-          :no-margin="noMargin"
-          :allow-paste="allowPaste"
-          :mono="mono"
-          :autofocus="autofocus"
+          v-bind="{
+            ...props,
+            title: unclickable ? mobileTitle ?? title : title,
+            readonly: readonly || unclickable,
+            description: undefined,
+          }"
           :class="{
             'cursor-pointer': !disabled,
             'cursor-not-allowed': disabled,
+            'mb-3': isMobile && !unclickable,
           }"
           @update:model-value="!loading && $emit('update:modelValue', $event as ModelValue)"
 
@@ -56,6 +43,20 @@
           @click:suffix="isMobile && unclickable && open()"
           @click:clear="$emit('click:clear')"
         >
+          <template
+            v-if="$slots.title"
+            #title
+          >
+            <slot name="title" />
+          </template>
+
+          <template
+            v-if="$slots.subtitle"
+            #subtitle
+          >
+            <slot name="subtitle" />
+          </template>
+
           <template #prefix>
             <slot
               name="prefix"
@@ -131,38 +132,20 @@ import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 import {getIsMobile, getIsTouchDevice} from '@/utils/mobile'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+import type {InputSuggestProps} from './types'
 
-type ModelValue = Type extends 'number' ? number : string
+type ModelValue = Required<InputSuggestProps<Type>>['modelValue']
 
-const props = defineProps<{
-  modelValue?: ModelValue | undefined
-  title?: string
-  mobileTitle?: string
-  description?: string
-  loading?: boolean
-  maxLength?: number
-  allowClear?: boolean
-  hideInput?: boolean
-  readonly?: boolean
-  disabled?: boolean
-  skeleton?: boolean
-  persist?: boolean
-  size?: number
-  errorMessage?: string
-  required?: boolean
-  hasChanges?: boolean
-  icon?: SVGComponent
-  teleport?: boolean
-  placeholder?: string
-  type?: Type
-  horizontalAlign?: HorizontalAlign
-  contentMaxHeight?: number
-  contentMaxWidth?: number
-  noMargin?: boolean
-  allowPaste?: boolean
-  mono?: boolean
-  autofocus?: boolean
-}>()
+defineOptions({inheritAttrs: false})
+
+const props = withDefaults(
+  defineProps<InputSuggestProps<Type>>(),
+  {
+    maxHeight: 320,
+    maxWidth: 600,
+    horizontalAlign: HorizontalAlign.FILL,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'update:modelValue', event: ModelValue): void
@@ -221,6 +204,8 @@ defineExpose({
 })
 
 defineSlots<{
+  title?: () => void
+  subtitle?: () => void
   prefix?: (props: {unclickable?: boolean}) => void
   right?: (props: Record<string, never>) => void
   content?: (props: {scrollingElement?: Element}) => void

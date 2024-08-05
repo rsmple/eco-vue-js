@@ -35,11 +35,23 @@ const getComponentPaths = root => {
   return fs
     .readdir(dirPath)
     .then(files => files
-      .filter(name => name.startsWith('W') && name.endsWith('.vue'))
-      .map(name => ({
-        name: name.slice(0, -4),
-        path: path.join(dirPath, name),
-      })),
+      .reduce((result, name) => {
+        if (name.startsWith('W') && name.endsWith('.vue')) {
+          result.push({
+            name: name.slice(0, -4),
+            path: path.join(dirPath, name),
+          })
+        }
+
+        if (name === 'types.ts') {
+          result.push({
+            name: name.slice(0, -3),
+            path: path.join(dirPath, name.slice(0, -3) + '.d.ts'),
+          })
+        }
+
+        return result
+      }, []),
     )
 }
 
@@ -139,11 +151,19 @@ const getPackageExports = (list) => {
     './dist/utils/useDefaultQuery': {
       'import': './dist/utils/useDefaultQuery.js',
     },
+    './dist/utils/useCopy': {
+      'import': './dist/utils/useCopy.js',
+    },
   }
 
   list.forEach(item => {
     const distPath = `./dist${item.path.substring(item.path.indexOf('/components'))}`
-    result[distPath] = {'import': distPath + '.js'}
+
+    if (item.path.endsWith('.d.ts')) {
+      result[distPath.slice(0, -5)] = {'import': distPath}
+    } else {
+      result[distPath] = {'import': distPath + '.js'}
+    }
   })
 
   return result
@@ -161,7 +181,7 @@ const writeComponents = async () => {
   const list = await getComponentsList()
 
   await Promise.all([
-    writePlugin(list),
+    writePlugin(list.filter(item => item.name !== 'types')),
     writePackageExports(list),
   ])
 }

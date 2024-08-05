@@ -1,70 +1,60 @@
 <template>
-  <div>
-    <div
-      v-if="title || $slots.title?.().length"
-      class="text-xs font-semibold text-accent mb-2"
-      :class="{'opacity-60': disabled}"
+  <WFieldWrapper
+    v-bind="props"
+    :class="$attrs.class"
+  >
+    <template
+      v-if="$slots.title"
+      #title
     >
-      <slot name="title">
-        {{ title }}
-      </slot>
-    </div>
+      <slot name="title" />
+    </template>
 
-    <div
-      class="flex"
-      :class="{
-        'flex-wrap gap-2': wrap,
-        'flex-col gap-2': col,
-        'items-start': col && !stretch,
-      }"
-    >
-      <WButton
-        v-for="(item, index) in list"
-        :key="index"
-        :semantic-type="getValue(item) === modelValue ? semanticType ?? SemanticType.PRIMARY : SemanticType.SECONDARY"
-        :loading="getValue(item) === loading"
-        :disabled="disabled || (loading !== undefined && getValue(item) !== loading)"
-        :minimize="minimize"
-        :join="!wrap && !col"
+    <template #field>
+      <div
+        class="flex"
         :class="{
-          'flex-1': stretch,
+          'flex-wrap gap-2': wrap,
+          'flex-col gap-2': col,
+          'items-start': col && !stretch,
         }"
-        @click="(alwaysEmit || getValue(item) !== modelValue) && $emit('update:modelValue', getValue(item))"
       >
-        <slot :item="(item as ValueGetter extends undefined ? Model : Entity)" />
-      </WButton>
-    </div>
-  </div>
+        <WButton
+          v-for="(item, index) in list"
+          :key="index"
+          :semantic-type="getValue(item as Model | Entity) === modelValue ? semanticType ?? SemanticType.PRIMARY : SemanticType.SECONDARY"
+          :loading="getValue(item as Model | Entity) === loading"
+          :disabled="disabled || (loading !== undefined && getValue(item as Model | Entity) !== loading)"
+          :minimize="minimize"
+          :join="!wrap && !col"
+          :class="{
+            'flex-1': stretch,
+          }"
+          @click="(alwaysEmit || getValue(item as Model | Entity) !== modelValue) && $emit('update:modelValue', getValue(item as Model | Entity))"
+        >
+          <slot :item="(item as ValueGetter extends undefined ? Model : Entity)" />
+        </WButton>
+      </div>
+    </template>
+
+    <template 
+      v-if="$slots.right"
+      #right
+    >
+      <slot name="right" />
+    </template>
+  </WFieldWrapper>
 </template>
 
 <script lang="ts" setup generic="Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined">
 import WButton from './WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
+import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
+import type {ButtonGroupProps} from './types'
 
-interface Props {
-  modelValue: Model
-  title?: string
-  disabled?: boolean
-  loading?: number | string
-  minimize?: boolean
-  wrap?: boolean
-  col?: boolean
-  semanticType?: SemanticType
-  stretch?: boolean
-  alwaysEmit?: boolean
-}
+defineOptions({inheritAttrs: false})
 
-interface PropsForModel extends Props {
-  list: Model[]
-  valueGetter?: ValueGetter | undefined
-}
-
-interface PropsForEntity extends Props {
-  list: Entity[]
-  valueGetter: ValueGetter | ((value: Entity) => Model)
-}
-
-const props = defineProps<PropsForEntity | PropsForModel>()
+const props = defineProps<ButtonGroupProps<Model, Entity, ValueGetter>>()
 
 defineEmits<{
   (e: 'update:modelValue', value: Model): void

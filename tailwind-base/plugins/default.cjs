@@ -96,6 +96,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
   addVariant('supports-overlay-not', '@supports (not (overflow: overlay))')
   addVariant('touch', '.touch &')
   addVariant('touch-not', '.touch-not &')
+  addVariant('focus-within-not', '&:not(:focus-within)')
 
   addBase({
     '.w-input': {
@@ -204,6 +205,11 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       'w-scroll-bar-color-hover': (value) => {
         return {
           '--w-scroll-bar-color-hover': value,
+        }
+      },
+      'w-has-changes-color': (value) => {
+        return {
+          '--has-changes-bg': value,
         }
       },
     },

@@ -1,25 +1,12 @@
 <template>
   <WInputSuggest
     ref="input"
-    :title="title"
-    :mobile-title="mobileTitle"
-    :description="description"
-    :model-value="search"
-    :max-length="maxSearchLength"
-    :loading="loading"
-    :hide-input="modelValue.length === 0 ? false : isMobile ? !focused : !isOpen"
-    :readonly="readonly"
-    :skeleton="skeleton"
-    :size="searchSize"
-    :error-message="errorMessage"
-    :required="required"
-    :disabled="disabled"
-    :has-changes="hasChanges"
-    :placeholder="placeholder"
-    :no-margin="noMargin"
-    :icon="icon"
-    :mono="mono"
-    :autofocus="autofocus"
+    v-bind="{
+      ...props,
+      modelValue: search,
+      hideInput: modelValue.length === 0 ? false : isMobile ? !focused : !isOpen,
+    }"
+    :class="$attrs.class"
     @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
 
     @keypress:enter.stop.prevent="selectCursor"
@@ -32,6 +19,20 @@
     @focus="focused = true; $emit('focus', $event)"
     @blur="focused = false; $emit('blur', $event)"
   >
+    <template
+      v-if="$slots.title"
+      #title
+    >
+      <slot name="title" />
+    </template>
+
+    <template
+      v-if="$slots.subtitle"
+      #subtitle
+    >
+      <slot name="subtitle" />
+    </template>
+
     <template #prefix="{unclickable}">
       <template v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true">
         <SelectOptionPrefix
@@ -136,46 +137,22 @@
   </WInputSuggest>
 </template>
 
-<script lang="ts" setup generic="Item extends string | number = string">
-import {ref, watch, toRef, nextTick, computed, type Component} from 'vue'
+<script lang="ts" setup generic="Option extends string | number = string">
+import {ref, watch, toRef, nextTick, computed} from 'vue'
 import SelectOption from './components/SelectOption.vue'
 import SelectOptionPrefix from './components/SelectOptionPrefix.vue'
 import {getIsMobile} from '@/utils/mobile'
 import {debounce} from '@/utils/utils'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
+import type {SelectProps} from './types'
 
-const props = defineProps<{
-  modelValue: Item[]
-  search: string
-  options: Item[]
-  title?: string
-  mobileTitle?: string
-  description?: string
-  loading?: boolean
-  emptyStub?: string
-  maxSearchLength?: number
-  optionComponent?: Component<{option: Item, selected?: boolean, model?: boolean}>
-  disableClear?: boolean
-  hidePrefix?: boolean
-  readonly?: boolean
-  disabled?: boolean
-  skeleton?: boolean
-  searchSize?: number
-  allowCreate?: boolean
-  errorMessage?: string
-  required?: boolean
-  hasChanges?: boolean
-  placeholder?: string
-  noMargin?: boolean
-  icon?: SVGComponent
-  mono?: boolean
-  autofocus?: boolean
-  hideOptionIcon?: boolean
-}>()
+defineOptions({inheritAttrs: false})
+
+const props = defineProps<SelectProps<Option>>()
 
 const emit = defineEmits<{
-  (e: 'select', item: Item): void
-  (e: 'unselect', item: Item): void
+  (e: 'select', item: Option): void
+  (e: 'unselect', item: Option): void
   (e: 'update:search', value: string): void
   (e: 'create:option', value: string): void
   (e: 'focus', value: FocusEvent): void
@@ -183,7 +160,7 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = ref(false)
-const input = ref<ComponentInstance<typeof WInputSuggest> | undefined>()
+const input = ref<ComponentInstance<typeof WInputSuggest<'text'>> | undefined>()
 const cursor = ref<number>(-1)
 const isCursorLocked = ref(false)
 const lastIndex = computed(() => props.allowCreate ? props.options.length : props.options.length - 1)
@@ -276,13 +253,13 @@ const captureDoubleDelete = () => {
   }
 }
 
-const select = (item: Item): void => {
+const select = (item: Option): void => {
   if (isDisabled.value) return
 
   emit('select', item)
 }
 
-const unselect = (item: Item): void => {
+const unselect = (item: Option): void => {
   if (isDisabled.value) return
 
   emit('unselect', item)
@@ -317,8 +294,10 @@ defineExpose({
 })
 
 defineSlots<{
+  title?: () => void
+  subtitle?: () => void
   option?: (props: {
-    option: Item | string
+    option: Option | string
     selected: boolean
     model: boolean
   }) => void,

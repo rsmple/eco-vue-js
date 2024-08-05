@@ -1,24 +1,13 @@
 <template>
   <WInputSuggest
     ref="input"
-    :title="title"
-    :mobile-title="mobileTitle"
-    :description="description"
-    :model-value="search"
-    :max-length="maxSearchLength"
-    :loading="loading || isFetchingPrefix"
-    :hide-input="isMobile ? !focused : !isOpen"
-    :readonly="readonly"
-    :skeleton="skeleton"
-    :size="searchSize"
-    :error-message="errorMessage"
-    :required="required"
-    :disabled="disabled"
-    :has-changes="hasChanges"
-    :placeholder="placeholder"
-    :no-margin="noMargin"
-    :icon="icon"
-    :autofocus="autofocus"
+    v-bind="{
+      ...props,
+      modelValue: search,
+      loading: loading || isFetchingPrefix,
+      hideInput: isMobile ? !focused : !isOpen,
+    }"
+    :class="$attrs.class"
     @update:model-value="!loading && !isFetchingPrefix && $emit('update:search', $event as string ?? '')"
 
     @keypress:enter.stop.prevent="list?.selectCursor()"
@@ -31,6 +20,20 @@
     @focus="focused = true"
     @blur="focused = false"
   >
+    <template
+      v-if="$slots.title"
+      #title
+    >
+      <slot name="title" />
+    </template>
+
+    <template
+      v-if="$slots.subtitle"
+      #subtitle
+    >
+      <slot name="subtitle" />
+    </template>
+
     <template #prefix="{unclickable}">
       <SelectAsyncPrefix
         v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true"
@@ -42,7 +45,7 @@
         :disable-clear="disableClear"
         :preview-data="previewData"
         :created-data="createdData"
-        :value-getter="valueGetter ?? ((item: Data) => (item.id as Model))"
+        :value-getter="valueGetter"
         :value-query-key="valueQueryKey"
         @unselect="unselect"
         @update:fetching="!$event && updateDropdown(); isFetchingPrefix = $event"
@@ -76,7 +79,7 @@
         :is-invalid-page="isInvalidPage"
         :loading="loading || isFetchingPrefix"
         :disabled="isDisabled"
-        :empty-stub="emptyStub ?? 'No match'"
+        :empty-stub="emptyStub"
         :allow-create="allowCreate && search !== ''"
         :hide-option-icon="hideOptionIcon"
         :value-getter="valueGetter"
@@ -110,66 +113,21 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
-import {ref, nextTick, computed, type Component} from 'vue'
+import {ref, nextTick, computed} from 'vue'
 import {getIsMobile} from '@/utils/mobile'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 import SelectAsyncPrefix from './components/SelectAsyncPrefix.vue'
 import SelectAsyncList from './components/SelectAsyncList.vue'
+import type {SelectAsyncProps} from './types'
+
+defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
-  defineProps<{
-    modelValue: Model[]
-    search: string
-    useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
-    useQueryFnPrefix?: UseQueryPaginated<Data, ApiError, QueryParams>
-    isInvalidPage: (error: unknown) => boolean
-    queryParams: QueryParams
-    title?: string
-    mobileTitle?: string
-    description?: string
-    loading?: boolean
-    emptyStub?: string
-    maxSearchLength?: number
-    optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
-    disableClear?: boolean
-    hidePrefix?: boolean
-    readonly?: boolean
-    disabled?: boolean
-    skeleton?: boolean
-    searchSize?: number
-    allowCreate?: boolean
-    errorMessage?: string
-    required?: boolean
-    hasChanges?: boolean
-    placeholder?: string
-    noMargin?: boolean
-    icon?: SVGComponent
-    mono?: boolean
-    autofocus?: boolean
-    previewData?: Data[]
-    createdData?: Data[]
-    hideOptionIcon?: boolean
-    valueGetter?: (data: Data) => Model
-    valueQueryKey?: string
-    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
-  }>(),
+  defineProps<SelectAsyncProps<Model, Data, ApiError, QueryParams>>(),
   {
-    title: undefined,
-    mobileTitle: undefined,
-    description: undefined,
-    emptyStub: undefined,
-    maxSearchLength: undefined,
-    optionComponent: undefined,
-    searchSize: undefined,
-    errorMessage: undefined,
-    placeholder: undefined,
-    icon: undefined,
-    previewData: undefined,
-    createdData: undefined,
+    emptyStub: 'No match',
     valueGetter: (data: Data) => (data.id as Model),
     valueQueryKey: 'id__in',
-    queryOptions: undefined,
-    useQueryFnPrefix: undefined,
   },
 )
 
@@ -182,7 +140,7 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = ref(false)
-const input = ref<ComponentInstance<typeof WInputSuggest> | undefined>()
+const input = ref<ComponentInstance<typeof WInputSuggest<'text'>> | undefined>()
 const list = ref<ComponentInstance<typeof SelectAsyncList<Model, Data, ApiError, QueryParams>> | undefined>()
 const isMobile = getIsMobile()
 const focused = ref(false)
@@ -256,6 +214,8 @@ defineExpose({
 })
 
 defineSlots<{
+  title?: () => void
+  subtitle?: () => void
   right?: (props: Record<string, never>) => void
   option?: (props: {option: Data | null, selected: boolean, skeleton: boolean, model: boolean}) => void
 }>()
