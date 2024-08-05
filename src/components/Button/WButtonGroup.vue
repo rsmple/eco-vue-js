@@ -50,11 +50,11 @@
 import WButton from './WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
-import type {ButtonGroupProps} from './types'
+import type {ButtonGroupPropsForEntity, ButtonGroupPropsForModel} from './types'
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<ButtonGroupProps<Model, Entity, ValueGetter>>()
+const props = defineProps<ButtonGroupPropsForEntity<Model, Entity, ValueGetter> | ButtonGroupPropsForModel<Model, Entity, ValueGetter>>()
 
 defineEmits<{
   (e: 'update:modelValue', value: Model): void

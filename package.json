@@ -258,6 +258,9 @@
     "./dist/components/Modal/WModalWrapper.vue": {
       "import": "./dist/components/Modal/WModalWrapper.vue.js"
     },
+    "./dist/components/Modal/types": {
+      "import": "./dist/components/Modal/types.d.ts"
+    },
     "./dist/components/Nav/WNavBar.vue": {
       "import": "./dist/components/Nav/WNavBar.vue.js"
     },

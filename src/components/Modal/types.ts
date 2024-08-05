@@ -1,6 +1,6 @@
 import type {SemanticType} from '@/utils/SemanticType'
 
-export type ConfirmModalProps = {
+export interface ConfirmModalProps {
   title: string
   description: string
   acceptText?: string
