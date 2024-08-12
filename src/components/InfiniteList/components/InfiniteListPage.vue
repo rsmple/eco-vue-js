@@ -39,7 +39,7 @@
       <div :class="pageClass">
         <component
           :is="transition ? TransitionGroup : EmptyComponent"
-          v-if="data?.results"
+          v-if="hasData && data?.results"
           v-bind="transition ? {
             ['enter-active-class']:'transition-[grid-template-rows] overflow-hidden grid',
             ['enter-from-class']:'grid-rows-[0fr]',
@@ -180,6 +180,7 @@ const emit = defineEmits<{
 const element = ref<HTMLElement>()
 const resultElement = ref<HTMLDivElement[]>([])
 const isIntersecting = ref(false)
+const hasData = ref(false)
 
 const {data, error, setData, refetch, isFetching} = props.useQueryFn(
   toRef(props, 'queryParams'),
@@ -239,11 +240,24 @@ const scrollTo = (index?: number) => {
   element.value?.scrollIntoView({block: 'center', behavior: 'smooth'})
 }
 
+let timeout: NodeJS.Timeout | null = null
+
 watch(data, value => {
   if (props.firstPage && value?.previous !== undefined) emit('update:previous-page', value.previous)
   if (props.lastPage && value?.next !== undefined) emit('update:next-page', value.next)
   if (value?.pages_count !== undefined) emit('update:pages-count', value.pages_count)
   if (value?.count !== undefined) emit('update:count', value.count)
+
+  if (timeout) clearTimeout(timeout)
+
+  if (value === undefined) {
+    hasData.value = false
+  } else {
+    timeout = setTimeout(() => {
+      hasData.value = true
+      timeout = null
+    }, 100)
+  }
 }, {immediate: true})
 
 watch(error, (error: unknown): void => {

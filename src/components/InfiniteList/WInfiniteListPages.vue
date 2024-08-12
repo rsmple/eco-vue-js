@@ -270,6 +270,8 @@ const resetPage = async (page = 1) => {
 watch(toRef(props, 'queryParams'), (newValue, oldValue) => {
   if (isEqualObj(newValue, oldValue, ['page', ...(props.excludeParams ?? []) as string[]])) return
 
+  if (pages.value.length === 1 && pages.value[0] === 1) return
+
   resetPage()
 })
 
