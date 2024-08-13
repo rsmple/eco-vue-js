@@ -115,9 +115,11 @@
         @select="createOption(search)"
         @mouseenter="setCursor(options.length)"
       >
-        <span class="w-select-field pr-2 sm-not:px-3">
-          Create:
-        </span>
+        <template #prefix>
+          <span class="w-select-field pr-2 sm-not:px-3">
+            Create:
+          </span>
+        </template>
 
         <slot
           name="option"

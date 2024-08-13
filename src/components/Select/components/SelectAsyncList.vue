@@ -81,9 +81,11 @@
       @update:next="cursorNext = ($event as UnwrapRef<Model>)"
       @unmounted="cursor = undefined"
     >
-      <span class="w-select-field pr-2 sm-not:px-3 min-w-[4rem]">
-        Create:
-      </span>
+      <template #prefix>
+        <span class="w-select-field pr-2 sm-not:px-3">
+          Create:
+        </span>
+      </template>
 
       <slot
         :option="null"

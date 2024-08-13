@@ -1,7 +1,7 @@
 <template>
   <div
     ref="element"
-    class="relative grid grid-cols-[1fr,2.5rem] w-full py-2 px-[1.0625rem]"
+    class="relative grid grid-cols-[auto,1fr,2.5rem] w-full py-2 px-[1.0625rem]"
     :class="{
       'bg-primary-light dark:bg-primary-darkest': isSelected,
       'before:opacity-5': !loading && isCursor && !skeleton,
@@ -11,8 +11,10 @@
     @mousedown.prevent.stop=""
     @click.prevent.stop="toggle"
   >
+    <slot name="prefix" />
+
     <div
-      class="flex items-center overflow-hidden"
+      class="flex items-center overflow-hidden col-start-2"
       :class="{
         'col-span-2': hideOptionIcon,
       }"
@@ -28,7 +30,7 @@
     >
       <div
         v-if="!hideOptionIcon && (isSelected || loading)"
-        class="flex items-center justify-center text-primary-default dark:text-primary-dark [--spinner-size:1.5rem]"
+        class="flex items-center justify-center text-primary-default dark:text-primary-dark [--spinner-size:1.5rem] col-start-3"
       >
         <IconCheck v-if="isSelected && !loading" />
         <WSpinner v-else-if="loading" />
@@ -123,6 +125,7 @@ defineExpose({
 
 defineSlots<{
   default: (props: {selected: boolean}) => void
+  prefix: () => void
 }>()
 
 </script>
