@@ -7,6 +7,7 @@
     @update:model-value="_validateOnUpdate"
     @select="_validateOnSelect"
     @unselect="_validateOnUnselect"
+    @init-model="initModel"
   />
 </template>
 
