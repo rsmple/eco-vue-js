@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import {provide, toRef} from 'vue'
+import {onUnmounted, provide, toRef} from 'vue'
 import {wInfiniteListSelectionItem} from '../models/injection'
 
 const props = defineProps<{
@@ -24,6 +24,10 @@ provide(wInfiniteListSelectionItem, {
   updateSelected: (value) => emit('update:selected', value),
   updateSelectedRange: () => emit('update:selected-range'),
   updateSelectedRangeHover: () => emit('update:selected-range-hover'),
+})
+
+onUnmounted(() => {
+  emit('update:selected', false)
 })
 
 </script>
