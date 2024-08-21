@@ -1,12 +1,14 @@
 import type {InputSuggestProps} from '@/components/Input/types'
 import type {Component} from 'vue'
 
+export type SelectOptionProps<Option> = {option: Option, selected?: boolean, model?: boolean}
+
 export interface SelectProps<Option extends string | number> extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'hideInput'> {
   modelValue: Option[]
   search: string
   options: Option[]
   emptyStub?: string
-  optionComponent?: Component<{option: Option, selected?: boolean, model?: boolean}>
+  optionComponent?: Component<SelectOptionProps<Option>>
   disableClear?: boolean
   hidePrefix?: boolean
   allowCreate?: boolean
@@ -15,7 +17,7 @@ export interface SelectProps<Option extends string | number> extends Omit<InputS
 
 export interface SelectPrefixProps<Option extends string | number> {
   option: Option
-  optionComponent?: Component<{option: Option, selected?: boolean, model?: boolean}>
+  optionComponent?: Component<SelectOptionProps<Option>>
   disabled?: boolean
   loading?: boolean
   disableClear?: boolean
@@ -33,7 +35,7 @@ export interface SelectAsyncProps<Model extends number | string, Data extends De
   useQueryFnPrefix?: UseQueryPaginated<Data, ApiError, QueryParams>
   isInvalidPage: (error: unknown) => boolean
   queryParams: QueryParams
-  optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
+  optionComponent?: Component<SelectOptionProps<Data>>
   previewData?: Data[]
   createdData?: Data[]
   valueGetter?: (data: Data) => Model
@@ -46,7 +48,7 @@ export interface SelectAsyncPrefixProps<Model extends number | string, Data exte
   modelValue: Model[]
   disabled?: boolean
   loading?: boolean
-  optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
+  optionComponent?: Component<SelectOptionProps<Data>>
   disableClear?: boolean
   previewData?: Data[]
   createdData?: Data[]
@@ -60,7 +62,7 @@ export interface SelectAsyncPrefixPageProps<Model extends number | string, Data 
   queryParams: QueryParams
   disabled?: boolean
   loading?: boolean
-  optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
+  optionComponent?: Component<SelectOptionProps<Data>>
   disableClear?: boolean
   previewData?: Data[]
   createdData?: Data[]
