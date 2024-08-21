@@ -47,16 +47,16 @@
   </WSelectAsync>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams, AllowClear extends boolean = false">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false">
 import {computed, ref, toRef, watch} from 'vue'
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
-import type {SelectAsyncSingleProps} from './types'
+import type {SelectAsyncSingleProps, SelectOptionComponent} from './types'
 
 type EmitType = AllowClear extends true ? Model | null : NonNullable<Model>
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<SelectAsyncSingleProps<Model, Data, ApiError, QueryParams, AllowClear>>()
+const props = defineProps<SelectAsyncSingleProps<Model, Data, ApiError, QueryParams, OptionComponent, AllowClear>>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: EmitType): void
@@ -64,7 +64,7 @@ const emit = defineEmits<{
   (e: 'create:option', value: string): void
 }>()
 
-const selectComponent = ref<ComponentInstance<typeof WSelectAsync<Model, Data, ApiError, QueryParams>> | undefined>()
+const selectComponent = ref<ComponentInstance<typeof WSelectAsync<Model, Data, ApiError, QueryParams, OptionComponent>> | undefined>()
 
 const arrayValue = computed<Model[]>(() => props.modelValue ? [props.modelValue] : [])
 

@@ -14,8 +14,8 @@
     >
       <template v-if="optionComponent">
         <component
-          v-bind="optionComponentProps"
-          :is="optionComponent"
+          v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
+          :is="(optionComponent as SelectOptionComponent<Data>)"
           :option="option"
           :selected="true"
           :model="true"
@@ -56,12 +56,12 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Model extends string | number, Data extends DefaultData, ApiError, QueryParams">
+<script lang="ts" setup generic="Model extends string | number, Data extends DefaultData, ApiError, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
 import {computed, toRef, watch, onBeforeUnmount} from 'vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
-import type {SelectAsyncPrefixPageProps} from '../types'
+import type {SelectAsyncPrefixPageProps, SelectOptionComponent, SelectOptionComponentProps} from '../types'
 
-const props = defineProps<SelectAsyncPrefixPageProps<Model, Data, ApiError, QueryParams>>()
+const props = defineProps<SelectAsyncPrefixPageProps<Model, Data, ApiError, QueryParams, OptionComponent>>()
 
 const emit = defineEmits<{
   (e: 'unselect', value: Model): void

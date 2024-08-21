@@ -46,16 +46,16 @@
   </WSelect>
 </template>
 
-<script lang="ts" setup generic="Option extends string | number, AllowClear extends boolean = false">
+<script lang="ts" setup generic="Option extends string | number, OptionComponent extends SelectOptionComponent<Option>, AllowClear extends boolean = false">
 import {computed, ref, toRef, watch} from 'vue'
 import WSelect from '@/components/Select/WSelect.vue'
-import type {SelectSingleProps} from './types'
+import type {SelectSingleProps, SelectOptionComponent} from './types'
 
 type EmitType = AllowClear extends true ? Option | null : NonNullable<Option>
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<SelectSingleProps<Option, AllowClear>>()
+const props = defineProps<SelectSingleProps<Option, OptionComponent, AllowClear>>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: EmitType): void
@@ -63,7 +63,7 @@ const emit = defineEmits<{
   (e: 'create:option', value: string): void
 }>()
 
-const selectComponent = ref<ComponentInstance<typeof WSelect<Option>> | undefined>()
+const selectComponent = ref<ComponentInstance<typeof WSelect<Option, OptionComponent>> | undefined>()
 
 const arrayValue = computed<Option[]>(() => props.modelValue !== null ? [props.modelValue] : [])
 

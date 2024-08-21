@@ -3,8 +3,8 @@
     <SelectAsyncPrefixPage
       :use-query-fn="useQueryFn"
       :query-params="({page: 1, [valueQueryKey]: valueInString} as QueryParams)"
-      :option-component="optionComponent"
-      :option-component-props="optionComponentProps"
+      :option-component="(optionComponent as SelectOptionComponent<Data>)"
+      :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
       :disable-clear="disableClear"
       :loading="loading"
       :disabled="disabled"
@@ -45,16 +45,16 @@
   </template>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
 import {computed, ref, watch, onBeforeUnmount} from 'vue'
 import SelectAsyncPrefixPage from './SelectAsyncPrefixPage.vue'
 import {numberFormatter} from '@/utils/utils'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
-import type {SelectAsyncPrefixProps} from '../types'
+import type {SelectAsyncPrefixProps, SelectOptionComponent, SelectOptionComponentProps} from '../types'
 
 const PAGE_LENGTH = 8
 
-const props = defineProps<SelectAsyncPrefixProps<Model, Data, ApiError, QueryParams>>()
+const props = defineProps<SelectAsyncPrefixProps<Model, Data, ApiError, QueryParams, OptionComponent>>()
 
 const emit = defineEmits<{
   (e: 'unselect', value: Model): void

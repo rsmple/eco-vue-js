@@ -41,8 +41,8 @@
         :model-value="modelValue"
         :disabled="disabled"
         :loading="loading || isFetchingPrefix"
-        :option-component="optionComponent"
-        :option-component-props="optionComponentProps"
+        :option-component="(optionComponent as SelectOptionComponent<Data>)"
+        :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
         :disable-clear="disableClear"
         :preview-data="previewData"
         :created-data="createdData"
@@ -99,6 +99,7 @@
             :model="false"
           >
             <component
+              v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
               :is="optionComponent"
               :option="option"
               :selected="selected"
@@ -113,18 +114,18 @@
   </WInputSuggest>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
 import {ref, nextTick, computed} from 'vue'
 import {getIsMobile} from '@/utils/mobile'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 import SelectAsyncPrefix from './components/SelectAsyncPrefix.vue'
 import SelectAsyncList from './components/SelectAsyncList.vue'
-import type {SelectAsyncProps} from './types'
+import type {SelectAsyncProps, SelectOptionComponent, SelectOptionComponentProps} from './types'
 
 defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
-  defineProps<SelectAsyncProps<Model, Data, ApiError, QueryParams>>(),
+  defineProps<SelectAsyncProps<Model, Data, ApiError, QueryParams, OptionComponent>>(),
   {
     emptyStub: 'No match',
     valueGetter: (data: Data) => (data.id as Model),

@@ -39,8 +39,8 @@
           v-for="option in modelValue"
           :key="option"
           :option="option"
-          :option-component="optionComponent"
-          :option-component-props="optionComponentProps"
+          :option-component="(optionComponent as SelectOptionComponent<Option>)"
+          :option-component-props="(optionComponentProps as SelectProps<Option, OptionComponent>['optionComponentProps'])"
           :loading="loading"
           :disabled="disabled"
           :disable-clear="disableClear"
@@ -96,7 +96,7 @@
             :model="false"
           >
             <component
-              v-bind="optionComponentProps"
+              v-bind="(optionComponentProps as SelectOptionComponentProps<Option, OptionComponent>)"
               :is="optionComponent"
               :option="option"
               :selected="selected"
@@ -130,7 +130,7 @@
           :model="false"
         >
           <component
-            v-bind="optionComponentProps"
+            v-bind="(optionComponentProps as SelectOptionComponentProps<Option, OptionComponent>)"
             :is="optionComponent"
             :option="search"
             :selected="false"
@@ -142,18 +142,18 @@
   </WInputSuggest>
 </template>
 
-<script lang="ts" setup generic="Option extends string | number = string">
+<script lang="ts" setup generic="Option extends string | number, OptionComponent extends SelectOptionComponent<Option>">
 import {ref, watch, toRef, nextTick, computed} from 'vue'
 import SelectOption from './components/SelectOption.vue'
 import SelectOptionPrefix from './components/SelectOptionPrefix.vue'
 import {getIsMobile} from '@/utils/mobile'
 import {debounce} from '@/utils/utils'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
-import type {SelectProps} from './types'
+import type {SelectProps, SelectOptionComponent, SelectOptionComponentProps} from './types'
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<SelectProps<Option>>()
+const props = defineProps<SelectProps<Option, OptionComponent>>()
 
 const emit = defineEmits<{
   (e: 'select', item: Option): void
