@@ -13,6 +13,14 @@ export interface SelectProps<Option extends string | number> extends Omit<InputS
   hideOptionIcon?: boolean
 }
 
+export interface SelectPrefixProps<Option extends string | number> {
+  option: Option
+  optionComponent?: Component<{option: Option, selected?: boolean, model?: boolean}>
+  disabled?: boolean
+  loading?: boolean
+  disableClear?: boolean
+}
+
 export interface SelectSingleProps<Option extends string | number, AllowClear extends boolean> extends Omit<SelectProps<Option>, 'modelValue' | 'disableClear'> {
   modelValue: Option | null
   allowClear?: boolean & AllowClear
@@ -30,6 +38,33 @@ export interface SelectAsyncProps<Model extends number | string, Data extends De
   createdData?: Data[]
   valueGetter?: (data: Data) => Model
   valueQueryKey?: string
+  queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
+}
+
+export interface SelectAsyncPrefixProps<Model extends number | string, Data extends DefaultData, ApiError, QueryParams> {
+  useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
+  modelValue: Model[]
+  disabled?: boolean
+  loading?: boolean
+  optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
+  disableClear?: boolean
+  previewData?: Data[]
+  createdData?: Data[]
+  valueGetter: (value: Data) => Model
+  valueQueryKey: string
+  queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
+}
+
+export interface SelectAsyncPrefixPageProps<Model extends number | string, Data extends DefaultData, ApiError, QueryParams> {
+  useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
+  queryParams: QueryParams
+  disabled?: boolean
+  loading?: boolean
+  optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
+  disableClear?: boolean
+  previewData?: Data[]
+  createdData?: Data[]
+  valueGetter: (value: Data) => Model
   queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
 }
 

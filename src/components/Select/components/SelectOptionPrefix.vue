@@ -47,17 +47,11 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Item extends string | number = string">
-import type {Component} from 'vue'
+<script lang="ts" setup generic="Option extends string | number = string">
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
+import type {SelectPrefixProps} from '../types'
 
-defineProps<{
-  option: Item
-  optionComponent?: Component<{option: Item, selected?: boolean, model?: boolean}>
-  disabled?: boolean
-  loading?: boolean
-  disableClear?: boolean
-}>()
+defineProps<SelectPrefixProps<Option>>()
 
 defineEmits<{
   (e: 'unselect'): void

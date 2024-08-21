@@ -56,21 +56,11 @@
 </template>
 
 <script lang="ts" setup generic="Model extends string | number, Data extends DefaultData, ApiError, QueryParams">
-import {computed, toRef, watch, type Component, onBeforeUnmount} from 'vue'
+import {computed, toRef, watch, onBeforeUnmount} from 'vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
+import type {SelectAsyncPrefixPageProps} from '../types'
 
-const props = defineProps<{
-  useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
-  queryParams: QueryParams
-  disabled?: boolean
-  loading?: boolean
-  optionComponent?: Component<{option: Data, selected?: boolean, model?: boolean}>
-  disableClear?: boolean
-  previewData?: Data[]
-  createdData?: Data[]
-  valueGetter: (value: Data) => Model
-  queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
-}>()
+const props = defineProps<SelectAsyncPrefixPageProps<Model, Data, ApiError, QueryParams>>()
 
 const emit = defineEmits<{
   (e: 'unselect', value: Model): void
