@@ -4,6 +4,7 @@
       :use-query-fn="useQueryFn"
       :query-params="({page: 1, [valueQueryKey]: valueInString} as QueryParams)"
       :option-component="optionComponent"
+      :option-component-props="optionComponentProps"
       :disable-clear="disableClear"
       :loading="loading"
       :disabled="disabled"

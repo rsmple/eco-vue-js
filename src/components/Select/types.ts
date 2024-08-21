@@ -3,8 +3,9 @@ import type {Component} from 'vue'
 
 export type SelectOptionProps<Option> = {option: Option, selected?: boolean, model?: boolean}
 
-export interface SelectOptionComponentProps<Option> {
-  optionComponent?: Component<SelectOptionProps<Option>>
+export interface SelectOptionComponentProps<Option, OptionComponent extends Component<SelectOptionProps<Option>> = Component<SelectOptionProps<Option>>> {
+  optionComponent?: OptionComponent
+  optionComponentProps?: OptionComponent extends Component<infer Props> ? Omit<Props, keyof SelectOptionProps<Option>> : never
 }
 
 export interface SelectProps<Option extends string | number>
@@ -35,7 +36,7 @@ export interface SelectSingleProps<Option extends string | number, AllowClear ex
 }
 
 export interface SelectAsyncProps<Model extends number | string, Data extends DefaultData, ApiError, QueryParams>
-  extends Omit<SelectProps<Model>, 'options' | 'optionComponent'>,
+  extends Omit<SelectProps<Model>, 'options' | 'optionComponent' | 'optionComponentProps'>,
   SelectOptionComponentProps<Data> {
   useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
   useQueryFnPrefix?: UseQueryPaginated<Data, ApiError, QueryParams>

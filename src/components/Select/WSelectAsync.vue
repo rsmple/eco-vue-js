@@ -42,6 +42,7 @@
         :disabled="disabled"
         :loading="loading || isFetchingPrefix"
         :option-component="optionComponent"
+        :option-component-props="optionComponentProps"
         :disable-clear="disableClear"
         :preview-data="previewData"
         :created-data="createdData"

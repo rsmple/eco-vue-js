@@ -40,6 +40,7 @@
           :key="option"
           :option="option"
           :option-component="optionComponent"
+          :option-component-props="optionComponentProps"
           :loading="loading"
           :disabled="disabled"
           :disable-clear="disableClear"
@@ -95,6 +96,7 @@
             :model="false"
           >
             <component
+              v-bind="optionComponentProps"
               :is="optionComponent"
               :option="option"
               :selected="selected"
@@ -128,6 +130,7 @@
           :model="false"
         >
           <component
+            v-bind="optionComponentProps"
             :is="optionComponent"
             :option="search"
             :selected="false"

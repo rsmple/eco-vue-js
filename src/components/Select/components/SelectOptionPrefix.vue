@@ -9,6 +9,7 @@
     <slot name="option">
       <template v-if="optionComponent">
         <component
+          v-bind="optionComponentProps"
           :is="optionComponent"
           :option="option"
           :selected="true"
