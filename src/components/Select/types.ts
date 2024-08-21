@@ -20,9 +20,9 @@ export interface SelectProps<Option extends string | number>
   hideOptionIcon?: boolean
 }
 
-export interface SelectPrefixProps<Option extends string | number> {
+export interface SelectPrefixProps<Option extends string | number>
+  extends SelectOptionComponentProps<Option> {
   option: Option
-  optionComponent?: Component<SelectOptionProps<Option>>
   disabled?: boolean
   loading?: boolean
   disableClear?: boolean
