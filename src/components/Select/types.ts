@@ -3,12 +3,17 @@ import type {Component} from 'vue'
 
 export type SelectOptionProps<Option> = {option: Option, selected?: boolean, model?: boolean}
 
-export interface SelectProps<Option extends string | number> extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'hideInput'> {
+export interface SelectOptionComponentProps<Option> {
+  optionComponent?: Component<SelectOptionProps<Option>>
+}
+
+export interface SelectProps<Option extends string | number>
+  extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'hideInput'>,
+  SelectOptionComponentProps<Option> {
   modelValue: Option[]
   search: string
   options: Option[]
   emptyStub?: string
-  optionComponent?: Component<SelectOptionProps<Option>>
   disableClear?: boolean
   hidePrefix?: boolean
   allowCreate?: boolean
@@ -30,12 +35,12 @@ export interface SelectSingleProps<Option extends string | number, AllowClear ex
 }
 
 export interface SelectAsyncProps<Model extends number | string, Data extends DefaultData, ApiError, QueryParams>
-  extends Omit<SelectProps<Model>, 'options' | 'optionComponent'> {
+  extends Omit<SelectProps<Model>, 'options' | 'optionComponent'>,
+  SelectOptionComponentProps<Data> {
   useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
   useQueryFnPrefix?: UseQueryPaginated<Data, ApiError, QueryParams>
   isInvalidPage: (error: unknown) => boolean
   queryParams: QueryParams
-  optionComponent?: Component<SelectOptionProps<Data>>
   previewData?: Data[]
   createdData?: Data[]
   valueGetter?: (data: Data) => Model
@@ -43,12 +48,12 @@ export interface SelectAsyncProps<Model extends number | string, Data extends De
   queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
 }
 
-export interface SelectAsyncPrefixProps<Model extends number | string, Data extends DefaultData, ApiError, QueryParams> {
+export interface SelectAsyncPrefixProps<Model extends number | string, Data extends DefaultData, ApiError, QueryParams>
+  extends SelectOptionComponentProps<Data> {
   useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
   modelValue: Model[]
   disabled?: boolean
   loading?: boolean
-  optionComponent?: Component<SelectOptionProps<Data>>
   disableClear?: boolean
   previewData?: Data[]
   createdData?: Data[]
@@ -57,12 +62,12 @@ export interface SelectAsyncPrefixProps<Model extends number | string, Data exte
   queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
 }
 
-export interface SelectAsyncPrefixPageProps<Model extends number | string, Data extends DefaultData, ApiError, QueryParams> {
+export interface SelectAsyncPrefixPageProps<Model extends number | string, Data extends DefaultData, ApiError, QueryParams>
+  extends SelectOptionComponentProps<Data> {
   useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
   queryParams: QueryParams
   disabled?: boolean
   loading?: boolean
-  optionComponent?: Component<SelectOptionProps<Data>>
   disableClear?: boolean
   previewData?: Data[]
   createdData?: Data[]
