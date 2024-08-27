@@ -186,7 +186,6 @@ const {data, error, setData, refetch, isFetching} = props.useQueryFn(
   toRef(props, 'queryParams'),
   {
     ...props.queryOptions ?? {},
-    placeholderData: undefined,
     refetchInterval: props.refetchInterval ? computed(() => isIntersecting.value ? props.refetchInterval : undefined) : undefined,
   },
 )

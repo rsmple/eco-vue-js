@@ -37,9 +37,9 @@
     <div class="[overflow:inherit]">
       <div class="grid grid-cols-[2rem,auto,1fr,1rem] items-center py-3 px-5">
         <div class="flex items-center">
-          <template v-if="icon">
+          <template v-if="icon ?? routeTo.meta.icon">
             <component
-              :is="icon"
+              :is="icon ?? routeTo.meta.icon"
               class="square-6"
             />
           </template>
@@ -51,7 +51,7 @@
         </div>
 
         <div class="text-base font-normal tracking-wide whitespace-nowrap relative">
-          {{ title }}
+          {{ titleLocal }}
         </div>
 
         <div class="text-base font-normal tracking-wide text-center flex justify-start relative">
@@ -99,7 +99,7 @@ const EXCLUDE_QUERY_FIELDS = ['ordering', 'page']
 
 interface Props extends LinkProps {
   icon?: SVGComponent
-  title: string
+  title?: string
   count?: number
   counter?: number
   skeleton?: boolean
@@ -120,6 +120,8 @@ const router = useRouter()
 
 const routeTo = computed(() => router.resolve(props.to))
 
+const titleLocal = computed<string>(() => props.title ?? (typeof routeTo.value.meta.titleShort === 'string' ? routeTo.value.meta.titleShort : typeof routeTo.value.meta.title === 'string' ? routeTo.value.meta.title : ''))
+
 const isActive = computed<boolean>(() => {
   if (routeTo.value?.name !== route.name) return false
 
@@ -130,10 +132,10 @@ const isTextColor = computed(() => props.hasActive ? !props.indent : isActive.va
 
 const isBigCount = computed<boolean>(() => props.counter !== undefined && props.counter >= 1000)
 
-watch(isActive, value => emit('update:isActive', [props.title, value]), {immediate: true})
+watch(isActive, value => emit('update:isActive', [titleLocal.value, value]), {immediate: true})
 
 onBeforeUnmount(() => {
-  emit('update:isActive', [props.title, false])
+  emit('update:isActive', [titleLocal.value, false])
 })
 
 </script>

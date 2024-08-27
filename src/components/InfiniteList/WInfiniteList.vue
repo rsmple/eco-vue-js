@@ -54,7 +54,8 @@
     @update:page="$emit('update:page', $event)"
   >
     <template #default="{item, setter, skeleton, refetch, previous, next, first, last, resetting, page, index}">
-      <InfiniteListPageSelectItem
+      <component
+        :is="skeleton ? EmptyComponent : InfiniteListPageSelectItem"
         :selected="skeleton ? false : getIsSelected(valueGetter(item))"
         :selected-between="skeleton ? false : getIsSelectedBetween(valueGetter(item), page, index)"
         @update:selected="
@@ -77,7 +78,7 @@
           :page="page"
           :index="index"
         />
-      </InfiniteListPageSelectItem>
+      </component>
     </template>
   </WInfiniteListPages>
 </template>
@@ -89,6 +90,7 @@ import WInfiniteListPages from './WInfiniteListPages.vue'
 import InfiniteListPageSelectItem from './components/InfiniteListPageSelectItem.vue'
 import {useSelected} from './use/useSelected'
 import {wInfiniteListSelection} from './models/injection'
+import EmptyComponent from './components/EmptyComponent.vue'
 
 const props = withDefaults(
   defineProps<{

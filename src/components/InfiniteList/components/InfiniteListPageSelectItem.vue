@@ -27,7 +27,7 @@ provide(wInfiniteListSelectionItem, {
 })
 
 onUnmounted(() => {
-  emit('update:selected', false)
+  if (props.selected) emit('update:selected', false)
 })
 
 </script>
