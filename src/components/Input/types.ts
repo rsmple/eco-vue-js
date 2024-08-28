@@ -45,3 +45,9 @@ export interface InputOptionsProps<Type extends InputType, Option> extends Input
   emptyStub?: string
   optionComponent?: Component<{option: Option, selected?: boolean, model?: boolean}>
 }
+
+export interface InputDateProps extends Omit<InputSuggestProps<'text'>, 'modelValue'> {
+  modelValue?: Date | undefined
+  minDate?: Date
+  maxDate?: Date
+}

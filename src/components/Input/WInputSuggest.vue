@@ -73,7 +73,7 @@
           </template>
 
           <template
-            v-if="$slots.right?.()?.length"
+            v-if="$slots.right"
             #right
           >
             <slot name="right" />

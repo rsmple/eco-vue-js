@@ -1,23 +1,25 @@
 <template>
   <div
-    class="flex relative justify-center items-center cursor-pointer my-[1px] select-none height-9 flex-1 w-ripple-trigger"
+    class="flex relative justify-center items-center my-[1px] select-none height-9 flex-1 w-ripple-trigger"
     :class="{
       'text-accent': !isSelected && !isOutOfMonth,
       'text-description': !isSelected && isOutOfMonth,
       'text-default dark:text-default-dark selected': isSelected,
-      'cursor-not-allowed': disabled,
+      'cursor-not-allowed': isDisabled,
+      'cursor-pointer': !isDisabled,
       'hover-enabled': isHoverEnabled,
     }"
-    @click="!disabled && $emit('click:day', startOfDay)"
-    @mouseenter="!disabled && isHoverEnabled && $emit('hover:day', startOfDay)"
+    @click="!isDisabled && $emit('click:day', startOfDay)"
+    @mouseenter="!isDisabled && isHoverEnabled && $emit('hover:day', startOfDay)"
   >
     <div
-      v-show="isBetweenRange || (isFrom || isTo && !(isFrom && isTo))"
+      v-show="isBetweenRange || (isFrom || isTo && !(isFrom && isTo)) || isDisabled"
       class="absolute opacity-50 h-9"
       :class="{
-        'border-y border-solid border-primary-default': isHoverEnabled,
-        'bg-primary-default dark:bg-primary-dark': !isHoverEnabled,
-        'w-full': isBetweenRange,
+        'border-y border-solid border-primary-default': isHoverEnabled && !isDisabled,
+        'bg-primary-default dark:bg-primary-dark': !isHoverEnabled && !isDisabled,
+        'bg-gray-200 dark:bg-gray-700': isDisabled,
+        'w-full': isBetweenRange || isDisabled,
         'w-1/2 left-1/2': isFrom && !isTo,
         'w-1/2 right-1/2': !isFrom && isTo,
       }"
@@ -26,7 +28,8 @@
     <div
       class="relative flex justify-center items-center rounded-full square-9"
       :class="{
-        'w-ripple w-ripple-hover': !disabled,
+        'w-ripple w-ripple-hover': !isDisabled,
+        'opacity-50': isDisabled,
         'bg-primary-default dark:bg-primary-dark font-semibold': isSelected,
       }"
     >
@@ -48,8 +51,10 @@ const props = defineProps<{
   dateRange?: DateRange
   isBetween: boolean
   isWeekOutOfMonth: boolean
-  disabled?: boolean
   isHoverEnabled: boolean
+  disabled?: boolean
+  minDate?: Date
+  maxDate?: Date
 }>()
 
 defineEmits<{
@@ -100,6 +105,16 @@ const isBetweenRange = computed(() => {
   if (isSelected.value) return false
 
   return isBeforeTo.value && isAfterFrom.value
+})
+
+const isDisabled = computed(() => {
+  if (props.disabled) return true
+
+  if (props.minDate) return props.minDate > props.startOfDay
+
+  if (props.maxDate) return props.maxDate < props.startOfDay
+
+  return false
 })
 
 </script>

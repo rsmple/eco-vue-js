@@ -47,6 +47,8 @@
             :start-of-month="currentDate"
             :date-range="dateRange"
             :is-hover-enabled="preselectedValue !== null"
+            :min-date="minDate"
+            :max-date="maxDate"
             class="px-3"
             @click:day="onClickDay"
             @hover:day="setRange"
@@ -67,6 +69,8 @@ import type {DateRange} from './models/types'
 
 const props = defineProps<{
   modelValue: DateRange | undefined
+  minDate?: Date
+  maxDate?: Date
 }>()
 
 const emit = defineEmits<{

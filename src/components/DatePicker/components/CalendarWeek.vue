@@ -9,6 +9,9 @@
       :is-between="isBetweenRange"
       :is-week-out-of-month="isWeekOutOfMonth"
       :is-hover-enabled="isHoverEnabled"
+      :min-date="minDate"
+      :max-date="maxDate"
+      :disabled="isDisabled"
       @click:day="$emit('click:day', $event)"
       @hover:day="$emit('hover:day', $event)"
     />
@@ -26,6 +29,9 @@ const props = defineProps<{
   dateRange?: DateRange
   isBetween: boolean
   isHoverEnabled: boolean
+  minDate?: Date
+  maxDate?: Date
+  disabled?: boolean
 }>()
 
 defineEmits<{
@@ -84,6 +90,16 @@ const isEmpty = computed(() => {
   if (!props.dateRange) return true
 
   return (isBeforeFrom.value && isBeforeTo.value) || (isAfterFrom.value && isAfterTo.value)
+})
+
+const isDisabled = computed(() => {
+  if (props.disabled) return true
+
+  if (props.minDate) return props.minDate > endOfWeek.value
+
+  if (props.maxDate) return props.maxDate < props.startOfWeek
+
+  return false
 })
 
 </script>

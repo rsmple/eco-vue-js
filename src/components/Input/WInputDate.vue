@@ -24,6 +24,13 @@
       <slot name="subtitle" />
     </template>
 
+    <template
+      v-if="$slots.right"
+      #right
+    >
+      <slot name="right" />
+    </template>
+
     <template #content>
       <div
         class="sm:p-6 sm:w-[28rem] sm-not:w-screen sm-not:px-3"
@@ -32,6 +39,8 @@
         <WDatePickerSingle
           :model-value="modelValue"
           :title="title"
+          :min-date="minDate"
+          :max-date="maxDate"
           @update:model-value="$emit('update:model-value', $event); formatModelValue($event)"
         />
       </div>
@@ -40,26 +49,24 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue'
+import {ref, watch} from 'vue'
 import WDatePickerSingle from '@/components/DatePicker/WDatePickerSingle.vue'
 import {dateFormat, parseDate} from '@/utils/dateTime'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
-import type {InputSuggestProps} from './types'
-
-interface Props extends Omit<InputSuggestProps<'text'>, 'modelValue'> {
-  modelValue?: Date | undefined
-}
+import type {InputDateProps} from './types'
 
 defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
-  defineProps<Props>(),
+  defineProps<InputDateProps>(),
   {
     modelValue: undefined,
-    maxHeight: 520,
+    maxHeight: 440,
     maxWidth: 480,
     horizontalAlign: HorizontalAlign.RIGHT_INNER,
+    minDate: undefined,
+    maxDate: undefined,
   },
 )
 
@@ -76,11 +83,27 @@ const updateInputValue = (value: string) => {
 
   const date = parseDate(value)
 
-  if (date) emit('update:model-value', date)
+  if (!date) return
+
+  if (props.minDate && props.minDate > date) {
+    emit('update:model-value', props.minDate)
+    return
+  }
+
+  if (props.maxDate && props.maxDate < date) {
+    emit('update:model-value', props.maxDate)
+    return
+  }
+
+  emit('update:model-value', date)
 }
 
 const formatModelValue = (value: Date | undefined) => {
   inputValue.value = value ? dateFormat(value) : ''
 }
+
+watch(() => props.modelValue, value => {
+  inputValue.value = value ? dateFormat(value) : ''
+})
 
 </script>

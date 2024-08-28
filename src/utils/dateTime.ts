@@ -196,6 +196,14 @@ export function getStartOfDay(date: Date = new Date()): Date {
   return startOfDay
 }
 
+export function getStartOfNextDay(date: Date = new Date()): Date {
+  const startOfDay = getStartOfDay(date)
+
+  startOfDay.setDate(startOfDay.getDate() + 1)
+
+  return startOfDay
+}
+
 export function isSameDate(a: Date, b: Date): boolean {
   return a.getDate() === b.getDate() && isSameMonth(a, b)
 }
