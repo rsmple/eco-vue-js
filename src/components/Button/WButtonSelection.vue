@@ -1,12 +1,11 @@
 <template>
   <div class="grid grid-cols-[1fr,auto] h-12 pb-3 w-full">
     <div class="flex">
-      <component
-        :is="slot"
-        v-for="(slot, index) in $slots.default?.()"
-        :key="index"
-        :disable-message="disableMessageValue"
-        class="border-r border-solid border-gray-300 dark:border-gray-700 last:border-r-0"
+      <slot
+        v-bind="{
+          disableMessage: disableMessageValue,
+          cssClass: 'border-r border-solid border-gray-300 dark:border-gray-700 last:border-r-0'
+        }"
       />
 
       <WDropdownMenu
@@ -30,12 +29,12 @@
             class="my-2 grid grid-cols-1 bg-default dark:bg-default-dark shadow-md rounded-xl overflow-hidden dark:outline dark:outline-1 dark:outline-gray-800"
             @click="isOpen = false"
           >
-            <component
-              :is="slot"
-              v-for="(slot, index) in $slots.more?.()"
-              :key="index"
-              :disable-message="disableMessageValue"
-              class="first:pt-2 last:pb-2"
+            <slot
+              name="more"
+              v-bind="{
+                disableMessage: disableMessageValue,
+                cssClass: 'first:pt-2 last:pb-2'
+              }"
             />
           </WClickOutside>
         </template>
