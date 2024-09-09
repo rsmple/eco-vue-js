@@ -95,3 +95,37 @@ let iterator = 1
 export const genId = () => {
   return iterator++
 }
+
+export const isId = (value: unknown): value is number => {
+  return typeof value === 'number' && Number.isInteger(value) && value > 0
+}
+
+export const parseId = (value: unknown): number => {
+  if (typeof value === 'number' && isId(value)) return value
+
+  if (typeof value !== 'string') return NaN
+
+  const parsed = Number.parseInt(value)
+
+  if (isId(parsed)) return parsed
+
+  return NaN
+}
+
+export const isPage = (value: unknown): value is number => isId(value)
+
+export const isIndex = (value: unknown): value is number => {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0
+}
+
+export const parseIndex = (value: unknown): number => {
+  if (typeof value === 'number' && isIndex(value)) return value
+
+  if (typeof value !== 'string') return NaN
+
+  const parsed = Number.parseInt(value)
+
+  if (isIndex(parsed)) return parsed
+
+  return NaN
+}

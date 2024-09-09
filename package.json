@@ -108,6 +108,12 @@
     "./dist/utils/useCopy": {
       "import": "./dist/utils/useCopy.js"
     },
+    "./dist/utils/order": {
+      "import": "./dist/utils/order.js"
+    },
+    "./dist/utils/useSelected": {
+      "import": "./dist/utils/useSelected.js"
+    },
     "./dist/components/ActionsBar/WActionsBar.vue": {
       "import": "./dist/components/ActionsBar/WActionsBar.vue.js"
     },
@@ -240,11 +246,23 @@
     "./dist/components/Link/WLinkArrow.vue": {
       "import": "./dist/components/Link/WLinkArrow.vue.js"
     },
-    "./dist/components/ListCard/WListCard.vue": {
-      "import": "./dist/components/ListCard/WListCard.vue.js"
+    "./dist/components/List/WList.vue": {
+      "import": "./dist/components/List/WList.vue.js"
     },
-    "./dist/components/ListCard/WListCardField.vue": {
-      "import": "./dist/components/ListCard/WListCardField.vue.js"
+    "./dist/components/List/WListCard.vue": {
+      "import": "./dist/components/List/WListCard.vue.js"
+    },
+    "./dist/components/List/WListCardField.vue": {
+      "import": "./dist/components/List/WListCardField.vue.js"
+    },
+    "./dist/components/List/WListHeader.vue": {
+      "import": "./dist/components/List/WListHeader.vue.js"
+    },
+    "./dist/components/List/WListHeaderItem.vue": {
+      "import": "./dist/components/List/WListHeaderItem.vue.js"
+    },
+    "./dist/components/List/types": {
+      "import": "./dist/components/List/types.d.ts"
     },
     "./dist/components/MenuItem/WMenuItem.vue": {
       "import": "./dist/components/MenuItem/WMenuItem.vue.js"

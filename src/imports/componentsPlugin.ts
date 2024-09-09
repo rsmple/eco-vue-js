@@ -39,8 +39,11 @@ import WInputOptions from '@/components/Input/WInputOptions.vue'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 import WLink from '@/components/Link/WLink.vue'
 import WLinkArrow from '@/components/Link/WLinkArrow.vue'
-import WListCard from '@/components/ListCard/WListCard.vue'
-import WListCardField from '@/components/ListCard/WListCardField.vue'
+import WList from '@/components/List/WList.vue'
+import WListCard from '@/components/List/WListCard.vue'
+import WListCardField from '@/components/List/WListCardField.vue'
+import WListHeader from '@/components/List/WListHeader.vue'
+import WListHeaderItem from '@/components/List/WListHeaderItem.vue'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 import WModal from '@/components/Modal/WModal.vue'
 import WModalStepper from '@/components/Modal/WModalStepper.vue'
@@ -105,8 +108,11 @@ export default {
     app.component('WInputSuggest', WInputSuggest)
     app.component('WLink', WLink)
     app.component('WLinkArrow', WLinkArrow)
+    app.component('WList', WList)
     app.component('WListCard', WListCard)
     app.component('WListCardField', WListCardField)
+    app.component('WListHeader', WListHeader)
+    app.component('WListHeaderItem', WListHeaderItem)
     app.component('WMenuItem', WMenuItem)
     app.component('WModal', WModal)
     app.component('WModalStepper', WModalStepper)
@@ -171,8 +177,11 @@ export {
   WInputSuggest,
   WLink,
   WLinkArrow,
+  WList,
   WListCard,
   WListCardField,
+  WListHeader,
+  WListHeaderItem,
   WMenuItem,
   WModal,
   WModalStepper,

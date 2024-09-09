@@ -154,6 +154,12 @@ const getPackageExports = (list) => {
     './dist/utils/useCopy': {
       'import': './dist/utils/useCopy.js',
     },
+    './dist/utils/order': {
+      'import': './dist/utils/order.js',
+    },
+    './dist/utils/useSelected': {
+      'import': './dist/utils/useSelected.js',
+    },
   }
 
   list.forEach(item => {

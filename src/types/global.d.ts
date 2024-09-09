@@ -64,3 +64,28 @@ declare type SelectedRange<Value> = [
   SelectedPage<Value>,
 ]
 
+declare type UnionToIntersection<T> =
+  (T extends T ? (arg: T) => 0 : never) extends
+  (arg: infer I) => 0
+  ? I
+  : never
+
+declare type LastInUnion<U> =
+  UnionToIntersection<
+    U extends U ? (arg: U) => 0 : never
+  > extends (arg: infer Last) => 0
+  ? Last
+  : never
+
+declare type UnionToTuple<
+  U,
+  Last = LastInUnion<U>
+> =
+  [U] extends [never]
+  ? []
+  : [
+    ...UnionToTuple<Exclude<U, Last>>,
+    Last,
+  ]
+
+declare type ObjectKeys<O> = UnionToTuple<keyof O>
