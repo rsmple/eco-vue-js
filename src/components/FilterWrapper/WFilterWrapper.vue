@@ -1,20 +1,26 @@
 <template>
-  <div class="grid grid-cols-1 content-start pb-16">
-    <template
-      v-for="(slot, index) in $slots.default?.()"
-      :key="index"
-    >
-      <component
-        :is="slot"
-        :is-open="index === selectedIndex"
-        @toggle="setSelectedIndex(index)"
-        @update:has-changes="hasChangesMap[index.toString()] = $event"
-      />
-    </template>
+  <div class="flex flex-col pb-16">
+    <div class="text-accent text-2xl font-semibold -h--header-height -mx--inner-margin flex items-center">
+      Filters
+    </div>
 
-    <div class="h-0.5 bg-gray-400 rounded my-8" />
+    <div>
+      <template
+        v-for="(slot, index) in $slots.default?.()"
+        :key="index"
+      >
+        <component
+          :is="slot"
+          :is-open="index === selectedIndex"
+          @toggle="setSelectedIndex(index)"
+          @update:has-changes="hasChangesMap[index.toString()] = $event"
+        />
+      </template>
+    </div>
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="h-0.5 bg-gray-400 rounded my-8 -mx--inner-margin" />
+
+    <div class="grid grid-cols-2 gap-4 -px--inner-margin">
       <slot name="bottom" />
     
       <WButton
