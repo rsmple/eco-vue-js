@@ -1,4 +1,4 @@
-import {computed, ref, unref, type Ref} from 'vue'
+import {computed, onBeforeUnmount, ref, unref, type Ref} from 'vue'
 
 const isRightOrder = <Value>(value: SelectedRange<Value>): boolean => {
   return value[0].page < value[1].page || (value[0].page === value[1].page && value[0].index <= value[1].index)
@@ -41,6 +41,7 @@ export const useSelected = <Value>(
   const isSelecting = ref(false)
   const rangeCursor = ref<SelectedPage<Value> | null>(null)
   const rangeHover = ref<SelectedPage<Value> | null>(null)
+  const disabled = ref(false)
 
   const allowSelectHover = computed(() => rangeCursor.value !== null && isSelecting.value)
 
@@ -139,6 +140,8 @@ export const useSelected = <Value>(
   }
 
   const toggleSelected = (id: Value, value: boolean): void => {
+    if (disabled.value) return
+
     if (reverse.value && count?.value === selected.value.length + 1) {
       select([])
       cursorReset()
@@ -194,6 +197,10 @@ export const useSelected = <Value>(
     } else {
       return _count !== undefined && selected.value.length >= _count ? true : selected.value.length ? null : false
     }
+  })
+
+  onBeforeUnmount(() => {
+    disabled.value = true
   })
 
   return {
