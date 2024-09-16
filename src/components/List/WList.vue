@@ -52,9 +52,9 @@
         class="sm-not:hidden"
         :query-params="queryParams"
         :allow-select="allowSelect"
-        :tooltip-text="selectAllTextGetter(selectAllValue !== true, count ?? 0)"
+        :tooltip-text="selectAllTextGetter(selectAllValue !== true, count ?? listCount)"
 
-        :count="count"
+        :count="count ?? listCount"
         :selection="selectAllValue"
         @toggle:selection="$event ? setSelectedReverse([]) : setSelected([])"
       >
