@@ -76,12 +76,12 @@ import {SemanticType} from '@/utils/SemanticType'
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
 import type {LinkProps} from '@/types/types'
 
-interface Props extends LinkProps {
-  title: string,
-  caption?: string,
-  userInput?: string,
-  type: NotifyType,
-  count: number,
+interface Props extends Partial<LinkProps> {
+  title: string
+  caption?: string
+  userInput?: string
+  type: NotifyType
+  count: number
 }
 
 const props = withDefaults(

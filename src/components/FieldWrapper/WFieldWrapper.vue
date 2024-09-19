@@ -149,11 +149,10 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue'
+import {ref, useId} from 'vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 import WButtonCopy from '@/components/Button/WButtonCopy.vue'
-import {genId} from '@/utils/utils'
 import {numberFormatter} from '@/utils/utils'
 import type {FieldWrapperProps} from './types'
 
@@ -165,7 +164,7 @@ defineEmits<{
   (e: 'click', value: MouseEvent): void
 }>()
 
-const id = `field_${genId()}`
+const id = useId()
 
 const focused = ref(false)
 

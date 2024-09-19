@@ -44,9 +44,9 @@
           @mouseenter="!skeleton && setCursor(valueGetter(item))"
           @update:cursor="setCursor(valueGetter(item))"
           @update:is-cursor="updateCursors"
-          @update:previous="cursorPrevious = ($event as UnwrapRef<Model>)"
-          @update:next="cursorNext = ($event as UnwrapRef<Model>)"
-          @unmounted="resetting ? cursor = undefined : cursor = ((next ? valueGetter(next) : undefined) as UnwrapRef<Model>)"
+          @update:previous="cursorPrevious = ($event as typeof cursorPrevious)"
+          @update:next="cursorNext = ($event as typeof cursorNext)"
+          @unmounted="cursor = ((resetting ? undefined : next ? valueGetter(next) : undefined) as typeof cursor)"
           @update:first="firstItem = valueGetter(item)"
           @update:last="lastItem = valueGetter(item)"
         >
@@ -77,9 +77,9 @@
       @update:cursor="setCursor(null)"
       @select="$emit('create:option'); setLoadingOption(null)"
       @update:is-cursor="updateCursors"
-      @update:previous="cursorPrevious = ($event as UnwrapRef<Model>)"
-      @update:next="cursorNext = ($event as UnwrapRef<Model>)"
-      @unmounted="cursor = undefined"
+      @update:previous="cursorPrevious = ($event as typeof cursorPrevious)"
+      @update:next="cursorNext = ($event as typeof cursorNext)"
+      @unmounted="cursor = (undefined as typeof cursor)"
     >
       <template #prefix>
         <span class="w-select-field pr-2 sm-not:px-3">

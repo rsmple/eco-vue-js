@@ -21,7 +21,7 @@
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 import type {LinkProps} from '@/types/types'
 
-interface Props extends LinkProps {
+interface Props extends Partial<LinkProps> {
   text: string
   icon?: SVGComponent
   disabled?: boolean

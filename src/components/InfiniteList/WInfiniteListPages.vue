@@ -55,7 +55,7 @@
     >
       <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page: itemPage, index: itemIndex}">
         <slot
-          :item="item"
+          :item="(item as Data)"
           :setter="setter"
           :skeleton="skeleton"
           :refetch="refetch"

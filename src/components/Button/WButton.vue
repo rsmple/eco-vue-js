@@ -54,7 +54,7 @@ import {RouterLink} from 'vue-router'
 import {semanticTypeButtonStylesMap, semanticTypeButtonBorderStylesMap} from './models/semanticTypeStylesMap'
 import type {LinkProps} from '@/types/types'
 
-interface Props extends LinkProps {
+interface Props extends Partial<LinkProps> {
   semanticType?: SemanticType
   disabled?: boolean
   loading?: boolean

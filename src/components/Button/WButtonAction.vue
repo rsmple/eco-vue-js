@@ -58,7 +58,7 @@ const semanticTypeOutlineStylesMap: Record<SemanticType, string> = {
   [SemanticType.INFO]: 'text-info dark:text-info-dark',
 }
 
-interface Props extends LinkProps {
+interface Props extends Partial<LinkProps> {
   icon?: SVGComponent
   title: string
   active?: boolean
