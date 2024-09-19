@@ -5,9 +5,10 @@
       ...props,
       modelValue: search,
       hideInput: modelValue.length === 0 ? false : isMobile ? !focused : !isOpen,
+      loading: loading || isLoading,
     }"
     :class="$attrs.class"
-    @update:model-value="!loading && $emit('update:search', $event as string ?? '')"
+    @update:model-value="!loading && !isLoading && (search = $event as string ?? '')"
 
     @keypress:enter.stop.prevent="selectCursor"
     @keypress:up.prevent="cursorUp"
@@ -15,7 +16,7 @@
     @keypress:delete="captureDoubleDelete"
 
     @open="isOpen = true"
-    @close="close(); $emit('update:search', '')"
+    @close="close(); search = ''"
     @focus="focused = true; $emit('focus', $event)"
     @blur="focused = false; $emit('blur', $event)"
   >
@@ -36,15 +37,16 @@
     <template #prefix="{unclickable}">
       <template v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true">
         <SelectOptionPrefix
-          v-for="option in modelValue"
-          :key="option"
+          v-for="(option, index) in prefixList"
+          :key="valueGetter(option)"
           :option="option"
-          :option-component="(optionComponent as SelectOptionComponent<Option>)"
-          :option-component-props="(optionComponentProps as SelectProps<Option, OptionComponent>['optionComponentProps'])"
-          :loading="loading"
+          :option-component="(optionComponent as SelectOptionComponent<Data>)"
+          :option-component-props="(optionComponentProps as SelectProps<Model, Data, OptionComponent>['optionComponentProps'])"
+          :index="index"
+          :loading="loading || isLoading"
           :disabled="disabled"
           :disable-clear="disableClear"
-          @unselect="unselect(option)"
+          @unselect="unselect(valueGetter(option))"
         >
           <template #option>
             <slot
@@ -52,6 +54,7 @@
               :option="option"
               :selected="true"
               :model="true"
+              :index="index"
             />
           </template>
         </SelectOptionPrefix>
@@ -67,7 +70,7 @@
 
     <template #content>
       <div
-        v-if="!options.length"
+        v-if="!filteredOptions.length"
         class="py-2 px-[1.0625rem] first:pt-4 last:pb-4"
       >
         <div class="select-none cursor-default w-select-field sm-not:px-3">
@@ -76,16 +79,16 @@
       </div>
 
       <SelectOption
-        v-for="(option, index) in options"
-        :key="option"
-        :is-selected="modelValue.includes(option)"
+        v-for="(option, index) in filteredOptions"
+        :key="valueGetter(option)"
+        :is-selected="modelValue.includes(valueGetter(option))"
         :is-cursor="index === cursor"
         :loading="loadingOptionIndex === index && loading"
         :scroll="isCursorLocked"
         :hide-option-icon="hideOptionIcon"
         class="first:pt-4 last:pb-4"
-        @select="select(option); setLoadingOptionIndex(index)"
-        @unselect="unselect(option); setLoadingOptionIndex(index)"
+        @select="select(valueGetter(option)); setLoadingOptionIndex(index)"
+        @unselect="unselect(valueGetter(option)); setLoadingOptionIndex(index)"
         @mouseenter="setCursor(index)"
       >
         <template #default="{selected}">
@@ -96,7 +99,7 @@
             :model="false"
           >
             <component
-              v-bind="(optionComponentProps as SelectOptionComponentProps<Option, OptionComponent>)"
+              v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
               :is="optionComponent"
               :option="option"
               :selected="selected"
@@ -109,13 +112,13 @@
       <SelectOption
         v-if="allowCreate && search !== ''"
         :is-selected="false"
-        :is-cursor="cursor === options.length"
-        :loading="loadingOptionIndex === options.length && loading"
+        :is-cursor="cursor === filteredOptions.length"
+        :loading="loadingOptionIndex === filteredOptions.length && loading"
         :scroll="isCursorLocked"
         :hide-option-icon="hideOptionIcon"
         class="first:pt-4 last:pb-4"
         @select="createOption(search)"
-        @mouseenter="setCursor(options.length)"
+        @mouseenter="setCursor(filteredOptions.length)"
       >
         <template #prefix>
           <span class="w-select-field pr-2 sm-not:px-3">
@@ -130,7 +133,7 @@
           :model="false"
         >
           <component
-            v-bind="(optionComponentProps as SelectOptionComponentProps<Option, OptionComponent>)"
+            v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
             :is="optionComponent"
             :option="search"
             :selected="false"
@@ -142,7 +145,7 @@
   </WInputSuggest>
 </template>
 
-<script lang="ts" setup generic="Option extends string | number, OptionComponent extends SelectOptionComponent<Option>">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>">
 import {ref, watch, toRef, nextTick, computed} from 'vue'
 import SelectOption from './components/SelectOption.vue'
 import SelectOptionPrefix from './components/SelectOptionPrefix.vue'
@@ -153,12 +156,11 @@ import type {SelectProps, SelectOptionComponent, SelectOptionComponentProps} fro
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<SelectProps<Option, OptionComponent>>()
+const props = defineProps<SelectProps<Model, Data, OptionComponent>>()
 
 const emit = defineEmits<{
-  (e: 'select', item: Option): void
-  (e: 'unselect', item: Option): void
-  (e: 'update:search', value: string): void
+  (e: 'select', item: Model): void
+  (e: 'unselect', item: Model): void
   (e: 'create:option', value: string): void
   (e: 'focus', value: FocusEvent): void
   (e: 'blur', value: FocusEvent): void
@@ -168,12 +170,19 @@ const isOpen = ref(false)
 const input = ref<ComponentInstance<typeof WInputSuggest<'text'>> | undefined>()
 const cursor = ref<number>(-1)
 const isCursorLocked = ref(false)
-const lastIndex = computed(() => props.allowCreate ? props.options.length : props.options.length - 1)
+const search = ref('')
+
+const {data, isLoading} = props.useQueryFnOptions()
+
+const filteredOptions = computed(() => !data.value ? [] : search.value === '' ? data.value : data.value.filter(option => props.searchFn(option, search.value)))
+const lastIndex = computed(() => props.allowCreate ? filteredOptions.value.length : filteredOptions.value.length - 1)
 const isMobile = getIsMobile()
 const focused = ref(false)
 const loadingOptionIndex = ref<number | null>(null)
 
 const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
+
+const prefixList = computed(() => props.modelValue.map(value => data.value?.find(item => props.valueGetter(item) === value)).filter(item => item !== undefined))
 
 const close = () => {
   isOpen.value = false
@@ -207,7 +216,7 @@ const cursorUp = () => {
 
   lockCursor()
 
-  cursor.value = !props.options.length
+  cursor.value = !filteredOptions.value.length
     ? 0
     : cursor.value < 1
       ? lastIndex.value
@@ -219,7 +228,7 @@ const cursorDown = () => {
 
   lockCursor()
 
-  cursor.value = !props.options.length
+  cursor.value = !filteredOptions.value.length
     ? 0
     : cursor.value >= lastIndex.value
       ? 0
@@ -229,7 +238,7 @@ const cursorDown = () => {
 const selectCursor = () => {
   if (isDisabled.value) return
 
-  const value = cursor.value !== -1 ? props.options[cursor.value] : undefined
+  const value = cursor.value !== -1 ? props.valueGetter(filteredOptions.value[cursor.value]) : undefined
 
   if (value) {
     setLoadingOptionIndex(cursor.value)
@@ -237,14 +246,14 @@ const selectCursor = () => {
     if (props.modelValue.includes(value)) unselect(value)
     else select(value)
   } else {
-    if (props.search) createOption(props.search)
+    if (search.value) createOption(search.value)
   }
 }
 
 let deletePressTimeout: NodeJS.Timeout | null = null
 
 const captureDoubleDelete = () => {
-  if (!props.modelValue.length || props.search.length) return
+  if (!props.modelValue.length || search.value.length) return
 
   if (deletePressTimeout) {
     unselect(props.modelValue[props.modelValue.length - 1])
@@ -258,25 +267,31 @@ const captureDoubleDelete = () => {
   }
 }
 
-const select = (item: Option): void => {
+const select = (item: Model): void => {
   if (isDisabled.value) return
 
   emit('select', item)
+
+  search.value = ''
 }
 
-const unselect = (item: Option): void => {
+const unselect = (item: Model): void => {
   if (isDisabled.value) return
 
   emit('unselect', item)
+
+  search.value = ''
 }
 
 const createOption = (item: string): void => {
   if (isDisabled.value) return
   if (!props.allowCreate) return
 
-  setLoadingOptionIndex(props.options.length)
+  setLoadingOptionIndex(filteredOptions.value.length)
 
   emit('create:option', item)
+
+  search.value = ''
 }
 
 const focus = () => {
@@ -302,7 +317,8 @@ defineSlots<{
   title?: () => void
   subtitle?: () => void
   option?: (props: {
-    option: Option | string
+    option: Data | string
+    index?: number
     selected: boolean
     model: boolean
   }) => void,

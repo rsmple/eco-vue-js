@@ -1,11 +1,16 @@
 import type {FieldWrapperProps} from '@/components/FieldWrapper/types'
 import type {SemanticType} from '@/utils/SemanticType'
 import type {DropdownMenuProps} from '@/components/DropdownMenu/types'
+import type {Component} from 'vue'
 
-interface Props<Model extends number | string | null | boolean>
+export type ButtonGroupOptionProps<Option> = {option: Option, selected?: boolean}
+
+export type ButtonGroupOptionComponent<Option> = Component<ButtonGroupOptionProps<Option>>
+
+interface ButtonGroupPropsBase<Model extends number | string | null | boolean>
   extends Omit<FieldWrapperProps, 'modelValue'> {
   modelValue: Model
-  loading?: number | string
+  loading?: Model
   minimize?: boolean
   wrap?: boolean
   col?: boolean
@@ -14,17 +19,21 @@ interface Props<Model extends number | string | null | boolean>
   alwaysEmit?: boolean
 }
 
-export interface ButtonGroupPropsForModel<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>
-  extends Props<Model> {
+interface ButtonGroupPropsForModel<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>
+  extends ButtonGroupPropsBase<Model> {
   list: Model[]
   valueGetter?: ValueGetter | undefined
+  optionComponent?: ButtonGroupOptionComponent<Model>
 }
 
-export interface ButtonGroupPropsForEntity<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>
-  extends Props<Model> {
+interface ButtonGroupPropsForEntity<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>
+  extends ButtonGroupPropsBase<Model> {
   list: Entity[]
   valueGetter: ValueGetter | ((value: Entity) => Model)
+  optionComponent?: ButtonGroupOptionComponent<Entity>
 }
+
+export type ButtonGroupProps<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined> = ButtonGroupPropsForEntity<Model, Entity, ValueGetter> | ButtonGroupPropsForModel<Model, Entity, ValueGetter>
 
 export interface ButtonDropdownProps extends Omit<DropdownMenuProps, 'isOpen' | 'updateAlign' | 'emitUpdate'> {
   semanticType?: SemanticType

@@ -32,7 +32,18 @@
           }"
           @click="(alwaysEmit || getValue(item as Model | Entity) !== modelValue) && $emit('update:modelValue', getValue(item as Model | Entity))"
         >
-          <slot :item="(item as ValueGetter extends undefined ? Model : Entity)" />
+          <slot
+            name="option"
+            :option="(item as ValueGetter extends undefined ? Model : Entity)"
+            :selected="getValue(item) === modelValue"
+          >
+            <component
+              :is="optionComponent"
+              v-if="optionComponent"
+              :option="item"
+              :selected="getValue(item) === modelValue"
+            />
+          </slot>
         </WButton>
       </div>
     </template>
@@ -50,11 +61,11 @@
 import WButton from './WButton.vue'
 import {SemanticType} from '@/utils/SemanticType'
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
-import type {ButtonGroupPropsForEntity, ButtonGroupPropsForModel} from './types'
+import type {ButtonGroupProps} from './types'
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<ButtonGroupPropsForEntity<Model, Entity, ValueGetter> | ButtonGroupPropsForModel<Model, Entity, ValueGetter>>()
+const props = defineProps<ButtonGroupProps<Model, Entity, ValueGetter>>()
 
 defineEmits<{
   (e: 'update:modelValue', value: Model): void

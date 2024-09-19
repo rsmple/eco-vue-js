@@ -118,7 +118,7 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import {toRef, computed, watch, ref, onMounted, nextTick, onBeforeUnmount, TransitionGroup} from 'vue'
 import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
 import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
@@ -127,7 +127,7 @@ import EmptyComponent from './EmptyComponent.vue'
 const props = withDefaults(
   defineProps<{
     queryParams: QueryParams
-    useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
+    useQueryFn: UseQueryPaginated<Data, QueryParams>
     isInvalidPage: (error: unknown) => boolean
     skeletonLength: number
     firstPage: boolean
@@ -143,7 +143,7 @@ const props = withDefaults(
     pageClass?: string
     refetchInterval?: number | false
     scrollingElement?: Element | null
-    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
+    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
 
     selected?: Model[]
     valueGetter: (data: Data) => Model

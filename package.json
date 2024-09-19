@@ -105,6 +105,9 @@
     "./dist/utils/useDefaultQuery": {
       "import": "./dist/utils/useDefaultQuery.js"
     },
+    "./dist/utils/useQueryUpdater": {
+      "import": "./dist/utils/useQueryUpdater.js"
+    },
     "./dist/utils/useCopy": {
       "import": "./dist/utils/useCopy.js"
     },
@@ -113,6 +116,12 @@
     },
     "./dist/utils/useSelected": {
       "import": "./dist/utils/useSelected.js"
+    },
+    "./dist/utils/api": {
+      "import": "./dist/utils/api.js"
+    },
+    "./dist/utils/validate": {
+      "import": "./dist/utils/validate.js"
     },
     "./dist/components/ActionsBar/WActionsBar.vue": {
       "import": "./dist/components/ActionsBar/WActionsBar.vue.js"
@@ -203,6 +212,21 @@
     },
     "./dist/components/Form/WFormValidator.vue": {
       "import": "./dist/components/Form/WFormValidator.vue.js"
+    },
+    "./dist/components/FormAsync/WFormAsyncButtonGroup.vue": {
+      "import": "./dist/components/FormAsync/WFormAsyncButtonGroup.vue.js"
+    },
+    "./dist/components/FormAsync/WFormAsyncInput.vue": {
+      "import": "./dist/components/FormAsync/WFormAsyncInput.vue.js"
+    },
+    "./dist/components/FormAsync/WFormAsyncSelectSingle.vue": {
+      "import": "./dist/components/FormAsync/WFormAsyncSelectSingle.vue.js"
+    },
+    "./dist/components/FormAsync/WFormAsyncToggle.vue": {
+      "import": "./dist/components/FormAsync/WFormAsyncToggle.vue.js"
+    },
+    "./dist/components/FormAsync/types": {
+      "import": "./dist/components/FormAsync/types.d.ts"
     },
     "./dist/components/HeaderBar/WHeaderBar.vue": {
       "import": "./dist/components/HeaderBar/WHeaderBar.vue.js"
@@ -326,6 +350,9 @@
     },
     "./dist/components/Toggle/WToggle.vue": {
       "import": "./dist/components/Toggle/WToggle.vue.js"
+    },
+    "./dist/components/Toggle/types": {
+      "import": "./dist/components/Toggle/types.d.ts"
     },
     "./dist/components/Tooltip/WTooltip.vue": {
       "import": "./dist/components/Tooltip/WTooltip.vue.js"

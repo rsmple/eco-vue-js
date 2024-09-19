@@ -78,7 +78,7 @@
   </InfiniteListScroll>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import {ref, computed, watch, toRef, nextTick} from 'vue'
 import InfiniteListScroll from './components/InfiniteListScroll.vue'
 import InfiniteListPage from './components/InfiniteListPage.vue'
@@ -89,7 +89,7 @@ import {getIsScrollDown} from './models/utils'
 
 const props = withDefaults(
   defineProps<{
-    useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
+    useQueryFn: UseQueryPaginated<Data, QueryParams>
     isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     skeletonLength?: number
@@ -109,7 +109,7 @@ const props = withDefaults(
     pageClass?: string
     maxPages?: number
     refetchInterval?: number | false
-    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
+    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
 
     selected?: Model[]
     valueGetter: (data: Data) => Model

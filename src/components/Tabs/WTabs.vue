@@ -2,7 +2,7 @@
   <div class="mb-8">
     <div
       v-if="names"
-      class="relative flex mb-4 sm-not:-px--inner-margin overflow-x-auto overscroll-x-contain no-scrollbar snap-x snap-always snap-mandatory"
+      class="relative flex mb-4 overflow-x-auto overscroll-x-contain no-scrollbar snap-x snap-always snap-mandatory"
     >
       <button
         v-for="(_, index) in defaultSlots"
@@ -77,7 +77,7 @@
         >
           <WForm
             ref="form"
-            :name="namesFrom?.[index] ?? index.toString()"
+            :name="namesForm?.[index] ?? index.toString()"
             :title="names?.[index]"
             @update:is-valid="updateIsValidMap(index, $event)"
             @update:has-changes="hasChangesMap[index] = $event"
@@ -99,7 +99,7 @@ import {wTabItemListener, wTabItemUnlistener} from './models/injection'
 
 const props = defineProps<{
   names?: string[] | Record<number, string>
-  namesFrom?: string[] | Record<number, string>
+  namesForm?: string[] | Record<number, string>
   icons?: SVGComponent[] | Record<number, SVGComponent>
   slots?: VNode[]
   lessTransitions?: boolean

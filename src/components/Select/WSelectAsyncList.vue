@@ -55,7 +55,7 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import {ref} from 'vue'
 import SelectAsyncList from './components/SelectAsyncList.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
@@ -65,7 +65,7 @@ withDefaults(
     title?: string
     emptyStub?: string
     modelValue: Model[]
-    useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
+    useQueryFn: UseQueryPaginated<Data, QueryParams>
     isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     skeleton?: boolean
@@ -74,7 +74,7 @@ withDefaults(
     unselectOnly?: boolean
     hideOptionIcon?: boolean
     valueGetter?: (data: Data) => Model
-    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
+    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
   }>(),
   {
     title: undefined,

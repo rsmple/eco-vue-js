@@ -8,8 +8,8 @@
       hidePrefix: true,
     }"
     :class="$attrs.class"
-    @select="updateModelValue($event as Option)"
-    @unselect="updateModelValue(allowClear ? null : ($event as Option))"
+    @select="updateModelValue($event)"
+    @unselect="updateModelValue(allowClear ? null : $event)"
     @update:search="emit('update:search', $event)"
     @create:option="createOption($event)"
     @focus="searchModel && typeof modelValue === 'string' ? $emit('update:search', modelValue) : undefined"
@@ -46,16 +46,16 @@
   </WSelect>
 </template>
 
-<script lang="ts" setup generic="Option extends string | number, OptionComponent extends SelectOptionComponent<Option>, AllowClear extends boolean = false">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false">
 import {computed, ref, toRef, watch} from 'vue'
 import WSelect from '@/components/Select/WSelect.vue'
 import type {SelectSingleProps, SelectOptionComponent} from './types'
 
-type EmitType = AllowClear extends true ? Option | null : NonNullable<Option>
+type EmitType = AllowClear extends true ? Model | null : NonNullable<Model>
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<SelectSingleProps<Option, OptionComponent, AllowClear>>()
+const props = defineProps<SelectSingleProps<Model, Data, OptionComponent, AllowClear>>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: EmitType): void
@@ -63,11 +63,11 @@ const emit = defineEmits<{
   (e: 'create:option', value: string): void
 }>()
 
-const selectComponent = ref<ComponentInstance<typeof WSelect<Option, OptionComponent>> | undefined>()
+const selectComponent = ref<ComponentInstance<typeof WSelect<Model, Data, OptionComponent>> | undefined>()
 
-const arrayValue = computed<Option[]>(() => props.modelValue !== null ? [props.modelValue] : [])
+const arrayValue = computed<Model[]>(() => props.modelValue !== null ? [props.modelValue] : [])
 
-const updateModelValue = (value: Option | null): void => {
+const updateModelValue = (value: Model | null): void => {
   emit('update:modelValue', value as EmitType)
 
   blur()

@@ -9,9 +9,10 @@
     <slot name="option">
       <template v-if="optionComponent">
         <component
-          v-bind="(optionComponentProps as SelectPrefixProps<Option, OptionComponent>['optionComponentProps'])"
-          :is="(optionComponent as SelectOptionComponent<Option>)"
-          :option="option"
+          v-bind="(optionComponentProps as SelectPrefixProps<Data, OptionComponent>['optionComponentProps'])"
+          :is="(optionComponent as SelectOptionComponent<Data>)"
+          :option="(option as Data)"
+          :index="index"
           :selected="true"
           :model="true"
         >
@@ -48,11 +49,11 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Option extends string | number, OptionComponent extends SelectOptionComponent<Option>">
+<script lang="ts" setup generic="Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>">
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 import type {SelectPrefixProps, SelectOptionComponent} from '../types'
 
-defineProps<SelectPrefixProps<Option, OptionComponent>>()
+defineProps<SelectPrefixProps<Data, OptionComponent>>()
 
 defineEmits<{
   (e: 'unselect'): void

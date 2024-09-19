@@ -110,7 +110,7 @@
   </WInfiniteList>
 </template>
 
-<script lang="ts" setup generic="Data extends DefaultData, ApiError, QueryParams">
+<script lang="ts" setup generic="Data extends DefaultData, QueryParams">
 import {computed, ref} from 'vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 import {getIsMobile} from '@/utils/mobile'
@@ -129,7 +129,7 @@ const isMobile = getIsMobile()
 const props = defineProps<{
   count?: number
   fields: ListField<Data, QueryParams>[]
-  useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
+  useQueryFn: UseQueryPaginated<Data, QueryParams>
   queryParams: QueryParams
   bulkDisableMessage?: string
   selectionTitle: string

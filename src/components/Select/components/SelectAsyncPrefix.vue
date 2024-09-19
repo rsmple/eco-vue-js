@@ -15,9 +15,10 @@
       @unselect="$emit('unselect', $event)"
       @update:fetching="$emit('update:fetching', $event)"
     >
-      <template #default="{option, skeleton}">
+      <template #default="{option, skeleton, index}">
         <slot
           :option="option"
+          :index="index"
           :skeleton="skeleton"
         />
       </template>
@@ -45,7 +46,7 @@
   </template>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
 import {computed, ref, watch, onBeforeUnmount} from 'vue'
 import SelectAsyncPrefixPage from './SelectAsyncPrefixPage.vue'
 import {numberFormatter} from '@/utils/utils'
@@ -54,7 +55,7 @@ import type {SelectAsyncPrefixProps, SelectOptionComponent, SelectOptionComponen
 
 const PAGE_LENGTH = 8
 
-const props = defineProps<SelectAsyncPrefixProps<Model, Data, ApiError, QueryParams, OptionComponent>>()
+const props = defineProps<SelectAsyncPrefixProps<Model, Data, QueryParams, OptionComponent>>()
 
 const emit = defineEmits<{
   (e: 'unselect', value: Model): void
@@ -71,7 +72,7 @@ watch(hasFetching, value => {
 }, {immediate: true})
 
 defineSlots<{
-  default?: (props: {option: Data, skeleton: boolean}) => void
+  default?: (props: {option: Data, skeleton: boolean, index: number}) => void
 }>()
 
 onBeforeUnmount(() => {

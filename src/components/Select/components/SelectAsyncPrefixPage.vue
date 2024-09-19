@@ -1,6 +1,6 @@
 <template>
   <div
-    v-for="option in [...createdData ?? [], ...(previewData ?? data?.results ?? [])]"
+    v-for="(option, index) in [...createdData ?? [], ...(previewData ?? data?.results ?? [])]"
     :key="valueGetter(option)"
     class="relative flex overflow-hidden items-center text-description"
     :class="{
@@ -10,6 +10,7 @@
   >
     <slot
       :option="option"
+      :index="index"
       :skeleton="false"
     >
       <template v-if="optionComponent">
@@ -17,6 +18,7 @@
           v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
           :is="(optionComponent as SelectOptionComponent<Data>)"
           :option="option"
+          :index="index"
           :selected="true"
           :model="true"
           :skeleton="false"
@@ -56,12 +58,12 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Model extends string | number, Data extends DefaultData, ApiError, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
+<script lang="ts" setup generic="Model extends string | number, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
 import {computed, toRef, watch, onBeforeUnmount} from 'vue'
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 import type {SelectAsyncPrefixPageProps, SelectOptionComponent, SelectOptionComponentProps} from '../types'
 
-const props = defineProps<SelectAsyncPrefixPageProps<Model, Data, ApiError, QueryParams, OptionComponent>>()
+const props = defineProps<SelectAsyncPrefixPageProps<Model, Data, QueryParams, OptionComponent>>()
 
 const emit = defineEmits<{
   (e: 'unselect', value: Model): void
@@ -98,7 +100,7 @@ onBeforeUnmount(() => {
 })
 
 defineSlots<{
-  default?: (props: {option: Data, skeleton: boolean}) => void
+  default?: (props: {option: Data, skeleton: boolean, index: number}) => void
 }>()
 
 </script>

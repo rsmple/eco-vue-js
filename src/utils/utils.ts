@@ -129,3 +129,19 @@ export const parseIndex = (value: unknown): number => {
 
   return NaN
 }
+
+export const get = <FieldType, Data extends Record<string, FieldType | Data>>(data: Data, path: keyof ObjectPaths<Data, FieldType>): FieldType | undefined => (path as string).split('.').reduce((result, current) => result?.[current] as Data, data) as FieldType | undefined
+
+export const set = <FieldType, Data extends Record<string, FieldType | Data>>(data: Data, path: keyof ObjectPaths<Data, FieldType>, value: FieldType): Data => {
+  (path as string).split('.').reduce<Data>((acc, current, index, array) => {
+    if (index !== array.length - 1) {
+      if (!acc[current]) (acc as Record<string, object>)[current] = {}
+    } else {
+      (acc as Record<string, FieldType>)[current] = value
+    }
+
+    return acc
+  }, data)
+
+  return data
+}

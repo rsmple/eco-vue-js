@@ -2,6 +2,7 @@
   <div
     :class="{
       'mt-1 mb-4': !noMargin,
+      [typeof $attrs.class === 'string' ? $attrs.class : '']: true,
     }"
   >
     <button
@@ -71,20 +72,12 @@
 
 <script lang="ts" setup generic="Value extends boolean | null = boolean">
 import WSpinner from '@/components/Spinner/WSpinner.vue'
+import type {ToggleProps} from './types'
+
+defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
-  defineProps<{
-    modelValue: Value
-    title?: string
-    small?: boolean
-    disabled?: boolean
-    loading?: boolean
-    readonly?: boolean
-    rightLabel?: boolean
-    noMargin?: boolean
-    description?: string
-    intermediate?: boolean
-  }>(),
+  defineProps<ToggleProps<Value>>(),
   {
     description: undefined,
     title: undefined,

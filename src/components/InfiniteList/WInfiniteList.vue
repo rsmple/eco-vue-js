@@ -83,7 +83,7 @@
   </WInfiniteListPages>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import {onBeforeUnmount, onMounted, provide, ref, toRef, watch} from 'vue'
 import {useInfiniteListHeader} from './use/useInfiniteListHeader'
 import WInfiniteListPages from './WInfiniteListPages.vue'
@@ -94,7 +94,7 @@ import EmptyComponent from './components/EmptyComponent.vue'
 
 const props = withDefaults(
   defineProps<{
-    useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
+    useQueryFn: UseQueryPaginated<Data, QueryParams>
     isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     skeletonLength?: number
@@ -113,7 +113,7 @@ const props = withDefaults(
     pageClass?: string
     maxPages?: number
     refetchInterval?: number | false
-    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
+    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
 
     pageLength?: number
     count?: number
@@ -160,7 +160,7 @@ const emit = defineEmits<{
   (e: 'select-range', value: SelectedRange<Model>): void
 }>()
 
-const infiniteListPages = ref<ComponentInstance<typeof WInfiniteListPages<Model, Data, ApiError, QueryParams>> | undefined>()
+const infiniteListPages = ref<ComponentInstance<typeof WInfiniteListPages<Model, Data, QueryParams>> | undefined>()
 
 const updateHeaderPadding = (value: number): void => {
   emit('update:header-padding', value)

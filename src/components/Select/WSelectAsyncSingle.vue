@@ -12,7 +12,6 @@
     :class="$attrs.class"
     @select="updateModelValue($event as EmitType)"
     @unselect="allowClear && updateModelValue(null as EmitType)"
-    @update:search="emit('update:search', $event)"
     @create:option="createOption($event)"
   >
     <template
@@ -47,7 +46,7 @@
   </WSelectAsync>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false">
 import {computed, ref, toRef, watch} from 'vue'
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 import type {SelectAsyncSingleProps, SelectOptionComponent} from './types'
@@ -56,15 +55,14 @@ type EmitType = AllowClear extends true ? Model | null : NonNullable<Model>
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<SelectAsyncSingleProps<Model, Data, ApiError, QueryParams, OptionComponent, AllowClear>>()
+const props = defineProps<SelectAsyncSingleProps<Model, Data, QueryParams, OptionComponent, AllowClear>>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: EmitType): void
-  (e: 'update:search', value: string): void
   (e: 'create:option', value: string): void
 }>()
 
-const selectComponent = ref<ComponentInstance<typeof WSelectAsync<Model, Data, ApiError, QueryParams, OptionComponent>> | undefined>()
+const selectComponent = ref<ComponentInstance<typeof WSelectAsync<Model, Data, QueryParams, OptionComponent>> | undefined>()
 
 const arrayValue = computed<Model[]>(() => props.modelValue ? [props.modelValue] : [])
 
@@ -78,7 +76,6 @@ const createOption = (value: string): void => {
 
 const blur = () => {
   selectComponent.value?.blur()
-  emit('update:search', '')
 }
 
 watch(toRef(props, 'modelValue'), blur)

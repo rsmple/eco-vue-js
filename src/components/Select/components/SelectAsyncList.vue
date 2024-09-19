@@ -96,7 +96,7 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, ApiError, QueryParams">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import {ref, type UnwrapRef} from 'vue'
 import SelectOption from './SelectOption.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
@@ -104,7 +104,7 @@ import {debounce} from '@/utils/utils'
 
 const props = defineProps<{
   modelValue: Model[]
-  useQueryFn: UseQueryPaginated<Data, ApiError, QueryParams>
+  useQueryFn: UseQueryPaginated<Data, QueryParams>
   queryParams: QueryParams
   isInvalidPage: (error: unknown) => boolean
   scrollingElement?: Element | null
@@ -119,7 +119,7 @@ const props = defineProps<{
   allowCreate?: boolean
   hideOptionIcon?: boolean
   valueGetter: (data: Data) => Model
-  queryOptions?: Partial<Parameters<UseQueryPaginated<Data, ApiError, QueryParams>>[1]>
+  queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
 }>()
 
 const emit = defineEmits<{

@@ -18,6 +18,7 @@ import type {ValidatePath} from './use/useFormValidateMap'
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 import {scrollToValidator} from './models/utils'
 import {useIsInsideTab} from '@/components/Tabs/use/useIsInsideTab'
+import {validateRequired} from '@/utils/validate'
 
 const props = defineProps<{
   name?: string
@@ -90,11 +91,8 @@ const _updateHasChanges = (value: Parameters<ValidateFn>[0]): void => {
 }
 
 const _validate = (value: Parameters<ValidateFn>[0]): string | undefined => {
-  if (required.value && !value) {
-    const message = 'A value is required'
-
-    return message
-  }
+  const requiredMessage = required.value ? validateRequired(value) : undefined
+  if (requiredMessage) return requiredMessage
 
   if (props.forbiddenRegexp && typeof value === 'string') {
     const match = value.match(props.forbiddenRegexp)

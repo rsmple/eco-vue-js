@@ -151,6 +151,9 @@ const getPackageExports = (list) => {
     './dist/utils/useDefaultQuery': {
       'import': './dist/utils/useDefaultQuery.js',
     },
+    './dist/utils/useQueryUpdater': {
+      'import': './dist/utils/useQueryUpdater.js',
+    },
     './dist/utils/useCopy': {
       'import': './dist/utils/useCopy.js',
     },
@@ -159,6 +162,12 @@ const getPackageExports = (list) => {
     },
     './dist/utils/useSelected': {
       'import': './dist/utils/useSelected.js',
+    },
+    './dist/utils/api': {
+      'import': './dist/utils/api.js',
+    },
+    './dist/utils/validate': {
+      'import': './dist/utils/validate.js',
     },
   }
 
