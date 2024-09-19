@@ -17,7 +17,7 @@
 import {RouterLink} from 'vue-router'
 import type {LinkProps} from '@/types/types'
 
-interface Props extends LinkProps {
+interface Props extends Partial<LinkProps> {
   disabled?: boolean
   href?: string
   download?: string

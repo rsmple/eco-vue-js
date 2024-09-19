@@ -27,7 +27,7 @@ import {SemanticType} from '@/utils/SemanticType'
 import {semanticTypeButtonStylesMap, semanticTypeTextStylesMap} from '@/components/Button/models/semanticTypeStylesMap'
 import type {LinkProps} from '@/types/types'
 
-interface Props extends LinkProps {
+interface Props extends Partial<LinkProps> {
   href?: string
   target?: '_self' | '_blank' | '_parent' | '_top'
   text?: string
