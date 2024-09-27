@@ -57,7 +57,7 @@ const {data, setData, isLoadingError} = props.noParams === true
   : (props.useQueryFn as UseQueryWithParams<Model, QueryParams>)(toRef(props, 'queryParams'), {enabled: toRef(props, 'queryEnabled')})
 const submitting = ref(false)
 
-const modelValue = computed<FieldType | undefined>(() => get(data.value as Model ?? {}, props.field) as FieldType | undefined)
+const modelValue = computed<FieldType | undefined>(() => get<FieldType, PayloadType>(data.value ?? {}, props.field))
 
 const validateFn = computed<ValidateFn[]>(() => {
   const result = Array.isArray(props.validate)
@@ -76,7 +76,7 @@ const save = (value: FieldType) => {
 
   submitting.value = true
 
-  return props.apiMethod(set({}, props.field, (value ?? null as FieldType | null)) as PayloadType)
+  return props.apiMethod(set<FieldType, PayloadType>({}, props.field, value))
     .then(response => {
       setData(response.data)
 
