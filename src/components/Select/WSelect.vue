@@ -172,7 +172,9 @@ const cursor = ref<number>(-1)
 const isCursorLocked = ref(false)
 const search = ref('')
 
-const {data, isLoading} = props.useQueryFnOptions()
+const {data, isLoading} = props.useQueryFnOptions({
+  enabled: computed(() => !props.disabled),
+})
 
 const filteredOptions = computed(() => !data.value ? [] : search.value === '' ? data.value : data.value.filter(option => props.searchFn(option, search.value)))
 const lastIndex = computed(() => props.allowCreate ? filteredOptions.value.length : filteredOptions.value.length - 1)
@@ -302,6 +304,10 @@ const blur = () => {
   input.value?.blur()
 }
 
+const setSearch = (value: string): void => {
+  search.value = value
+}
+
 watch(toRef(props, 'modelValue'), async () => {
   await nextTick()
 
@@ -311,6 +317,7 @@ watch(toRef(props, 'modelValue'), async () => {
 defineExpose({
   focus,
   blur,
+  setSearch,
 })
 
 defineSlots<{

@@ -8,7 +8,7 @@ export const useDefaultQuery = <
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
 >
-  (...args: Parameters<typeof useQuery<TQueryFnData, ApiError<TQueryFnData>, TData, TQueryKey>>): UseQueryReturnType<TData, ApiError<TQueryFnData>> & {
+  (...args: Parameters<typeof useQuery<TQueryFnData, ApiError, TData, TQueryKey>>): UseQueryReturnType<TData, ApiError> & {
     setData: (updater: TQueryFnData, options?: Params[2]) => ReturnType<QueryClient['setQueriesData']>
   } => {
   const queryClient = args[1] ?? useQueryClient()
@@ -16,7 +16,7 @@ export const useDefaultQuery = <
   const setData = (updater: TQueryFnData, options?: Params[2]) => queryClient.setQueriesData({queryKey: 'queryKey' in args[0] ? args[0].queryKey : undefined}, updater, options)
 
   return {
-    ...useQuery<TQueryFnData, ApiError<TQueryFnData>, TData, TQueryKey>(...args),
+    ...useQuery<TQueryFnData, ApiError, TData, TQueryKey>(...args),
     setData,
   }
 }

@@ -189,7 +189,7 @@ const doValidate = (silent?: boolean, path?: ValidatePath): string | undefined =
   return message
 }
 
-const invalidate = (messages: Record<string, string | string[]>): void => {
+const invalidate = (messages: Record<string, string | string[] | undefined>): void => {
   if (!props.name) return
 
   const message = messages[props.name]

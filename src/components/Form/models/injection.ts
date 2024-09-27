@@ -8,7 +8,7 @@ export const wFormHasChangesUpdater = Symbol('wFormHasChangesUpdater') as Inject
 
 export const wFormValidateUpdater = Symbol('wFormValidateUpdater') as InjectionKey<(key: string, value: () => string | undefined) => void>
 
-export const wFormInvalidateUpdater = Symbol('wFormValidateUpdater') as InjectionKey<(key: string, value: (messages: Record<string, string | string[]>) => void) => void>
+export const wFormInvalidateUpdater = Symbol('wFormValidateUpdater') as InjectionKey<(key: string, value: (messages: Record<string, string | string[] | undefined>) => void) => void>
 
 export const wFormInitModelUpdater = Symbol('wFormInitModelUpdater') as InjectionKey<(key: string, value: () => void) => void>
 

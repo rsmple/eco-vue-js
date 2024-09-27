@@ -46,11 +46,11 @@ export interface SelectAsyncProps<Model extends number | string, Data extends De
   useQueryFnOptions: UseQueryPaginated<Data, QueryParams>
   useQueryFnPrefix?: UseQueryPaginated<Data, QueryParams>
   isInvalidPage: (error: unknown) => boolean
-  queryParams: QueryParams
+  queryParamsOptions: QueryParams
+  searchField?: keyof QueryParams
   previewData?: Data[]
   createdData?: Data[]
   valueQueryKey?: string
-  queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
 }
 
 export interface SelectAsyncPrefixProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
@@ -64,7 +64,6 @@ export interface SelectAsyncPrefixProps<Model extends number | string, Data exte
   createdData?: Data[]
   valueGetter: (value: Data) => Model
   valueQueryKey: string
-  queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
 }
 
 export interface SelectAsyncPrefixPageProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
@@ -77,7 +76,6 @@ export interface SelectAsyncPrefixPageProps<Model extends number | string, Data 
   previewData?: Data[]
   createdData?: Data[]
   valueGetter: (value: Data) => Model
-  queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
 }
 
 export interface SelectAsyncSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean>

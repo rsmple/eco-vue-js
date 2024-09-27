@@ -2,7 +2,7 @@ import {inject, onBeforeMount, provide, ref, type Ref} from 'vue'
 import {wFormInvalidateUpdater} from '../models/injection'
 import {removeKey} from '../models/utils'
 
-type InvalidatePayload = Record<string, string | string[]>
+type InvalidatePayload = Record<string, string | string[] | undefined>
 
 export const useFormInvalidateMap = (name: Ref<string | undefined>) => {
   const invalidateMap = ref<Record<string, (messages: InvalidatePayload) => void>>({})

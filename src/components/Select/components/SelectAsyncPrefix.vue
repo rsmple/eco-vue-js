@@ -11,7 +11,6 @@
       :preview-data="previewData"
       :created-data="createdData"
       :value-getter="valueGetter"
-      :query-options="queryOptions"
       @unselect="$emit('unselect', $event)"
       @update:fetching="$emit('update:fetching', $event)"
     >

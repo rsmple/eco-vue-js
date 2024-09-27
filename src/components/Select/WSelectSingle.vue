@@ -10,9 +10,8 @@
     :class="$attrs.class"
     @select="updateModelValue($event)"
     @unselect="updateModelValue(allowClear ? null : $event)"
-    @update:search="emit('update:search', $event)"
     @create:option="createOption($event)"
-    @focus="searchModel && typeof modelValue === 'string' ? $emit('update:search', modelValue) : undefined"
+    @focus="searchModel && typeof modelValue === 'string' ? selectComponent?.setSearch(modelValue) : undefined"
   >
     <template
       v-if="$slots.title"
@@ -59,7 +58,6 @@ const props = defineProps<SelectSingleProps<Model, Data, OptionComponent, AllowC
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: EmitType): void
-  (e: 'update:search', value: string): void
   (e: 'create:option', value: string): void
 }>()
 
@@ -79,7 +77,6 @@ const createOption = (value: string): void => {
 
 const blur = () => {
   selectComponent.value?.blur()
-  emit('update:search', '')
 }
 
 watch(toRef(props, 'modelValue'), blur)

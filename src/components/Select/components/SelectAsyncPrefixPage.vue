@@ -74,7 +74,6 @@ const emit = defineEmits<{
 const queryEnabled = computed<boolean>(() => !props.previewData)
 
 const {data, isFetching} = props.useQueryFn(toRef(props, 'queryParams'), {
-  ...props.queryOptions ?? {},
   enabled: queryEnabled,
   refetchInterval: false,
   refetchOnMount: false,
