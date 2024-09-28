@@ -4,7 +4,7 @@
     v-bind="{
       ...props,
       modelValue: search,
-      loading: loading || isFetchingPrefix,
+      loading: loading || isFetchingPrefix || loadingCreate,
       hideInput: isMobile ? !focused : !isOpen,
     }"
     :class="$attrs.class"
@@ -82,9 +82,10 @@
         :loading="loading || isFetchingPrefix"
         :disabled="isDisabled"
         :empty-stub="emptyStub"
-        :allow-create="allowCreate && search !== ''"
+        :allow-create="createOption && search !== ''"
         :hide-option-icon="hideOptionIcon"
         :value-getter="valueGetter"
+        :loading-create="loadingCreate"
         @select="select"
         @unselect="unselect"
         @create:option="create"
@@ -137,7 +138,6 @@ const emit = defineEmits<{
   (e: 'select', item: Model): void
   (e: 'unselect', item: Model): void
   (e: 'update:modelValue', value: Model[]): void
-  (e: 'create:option', value: string): void
 }>()
 
 const isOpen = ref(false)
@@ -147,6 +147,7 @@ const isMobile = getIsMobile()
 const focused = ref(false)
 const isFetchingPrefix = ref(false)
 const search = ref('')
+const loadingCreate = ref(false)
 
 const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
 const enabled = computed(() => !props.disabled)
@@ -189,12 +190,21 @@ const unselect = (item: Model): void => {
   search.value = ''
 }
 
-const create = (): void => {
+const create = async () => {
   if (isDisabled.value) return
+  if (!props.createOption) return
 
-  emit('create:option', search.value)
+  loadingCreate.value = true
 
-  search.value = ''
+  const option = await props.createOption(search.value)
+
+  if (option) {
+    select(props.valueGetter(option))
+
+    search.value = ''
+  }
+
+  loadingCreate.value = false
 }
 
 const updateSelected = (value: Model[]): void => {

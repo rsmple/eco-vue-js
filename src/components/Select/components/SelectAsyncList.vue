@@ -65,7 +65,7 @@
       v-if="allowCreate"
       :is-selected="false"
       :is-cursor="cursor === null"
-      :loading="loading && loadingOption === null"
+      :loading="loading && (loadingCreate || loadingOption === null)"
       :scroll="isCursorLocked"
       :previous="lastItem"
       :next="firstItem"
@@ -120,6 +120,7 @@ const props = defineProps<{
   hideOptionIcon?: boolean
   valueGetter: (data: Data) => Model
   queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
+  loadingCreate?: boolean
 }>()
 
 const emit = defineEmits<{

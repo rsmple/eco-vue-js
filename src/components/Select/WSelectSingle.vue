@@ -10,7 +10,6 @@
     :class="$attrs.class"
     @select="updateModelValue($event)"
     @unselect="updateModelValue(allowClear ? null : $event)"
-    @create:option="createOption($event)"
     @focus="searchModel && typeof modelValue === 'string' ? selectComponent?.setSearch(modelValue) : undefined"
   >
     <template
@@ -58,7 +57,6 @@ const props = defineProps<SelectSingleProps<Model, Data, OptionComponent, AllowC
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: EmitType): void
-  (e: 'create:option', value: string): void
 }>()
 
 const selectComponent = ref<ComponentInstance<typeof WSelect<Model, Data, OptionComponent>> | undefined>()
@@ -69,10 +67,6 @@ const updateModelValue = (value: Model | null): void => {
   emit('update:modelValue', value as EmitType)
 
   blur()
-}
-
-const createOption = (value: string): void => {
-  emit('create:option', value)
 }
 
 const blur = () => {

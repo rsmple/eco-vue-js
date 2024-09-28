@@ -5,7 +5,7 @@
       ...props,
       modelValue: search,
       hideInput: modelValue.length === 0 ? false : isMobile ? !focused : !isOpen,
-      loading: loading || isLoading,
+      loading: loading || isLoading || loadingCreate,
     }"
     :class="$attrs.class"
     @update:model-value="!loading && !isLoading && (search = $event as string ?? '')"
@@ -110,10 +110,10 @@
       </SelectOption>
 
       <SelectOption
-        v-if="allowCreate && search !== ''"
+        v-if="createOption && search !== ''"
         :is-selected="false"
         :is-cursor="cursor === filteredOptions.length"
-        :loading="loadingOptionIndex === filteredOptions.length && loading"
+        :loading="(loadingCreate || loadingOptionIndex === filteredOptions.length) && loading"
         :scroll="isCursorLocked"
         :hide-option-icon="hideOptionIcon"
         class="first:pt-4 last:pb-4"
@@ -161,7 +161,6 @@ const props = defineProps<SelectProps<Model, Data, OptionComponent>>()
 const emit = defineEmits<{
   (e: 'select', item: Model): void
   (e: 'unselect', item: Model): void
-  (e: 'create:option', value: string): void
   (e: 'focus', value: FocusEvent): void
   (e: 'blur', value: FocusEvent): void
 }>()
@@ -177,10 +176,11 @@ const enabled = computed(() => !props.disabled)
 const {data, isLoading} = props.useQueryFnOptions({enabled})
 
 const filteredOptions = computed(() => !data.value ? [] : searchPrepared.value === '' ? data.value : data.value.filter(option => props.searchFn(option, searchPrepared.value)))
-const lastIndex = computed(() => props.allowCreate ? filteredOptions.value.length : filteredOptions.value.length - 1)
+const lastIndex = computed(() => props.createOption ? filteredOptions.value.length : filteredOptions.value.length - 1)
 const isMobile = getIsMobile()
 const focused = ref(false)
 const loadingOptionIndex = ref<number | null>(null)
+const loadingCreate = ref(false)
 
 const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
 
@@ -285,15 +285,22 @@ const unselect = (item: Model): void => {
   search.value = ''
 }
 
-const createOption = (item: string): void => {
+const createOption = async (value: string) => {
   if (isDisabled.value) return
-  if (!props.allowCreate) return
+  if (!props.createOption) return
 
-  setLoadingOptionIndex(filteredOptions.value.length)
+  loadingCreate.value = true
 
-  emit('create:option', item)
+  const option = await props.createOption(value)
 
-  search.value = ''
+  if (option) {
+    setLoadingOptionIndex(filteredOptions.value.length)
+    select(props.valueGetter(option))
+
+    search.value = ''
+  }
+
+  loadingCreate.value = false
 }
 
 const focus = () => {

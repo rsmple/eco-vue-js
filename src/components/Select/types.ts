@@ -21,7 +21,7 @@ export interface SelectProps<Model extends number | string, Data extends Default
   emptyStub?: string
   disableClear?: boolean
   hidePrefix?: boolean
-  allowCreate?: boolean
+  createOption?: (search: string) => (Data | undefined) | Promise<Data | undefined>
   hideOptionIcon?: boolean
 }
 

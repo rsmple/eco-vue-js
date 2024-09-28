@@ -12,7 +12,6 @@
     :class="$attrs.class"
     @select="updateModelValue($event as EmitType)"
     @unselect="allowClear && updateModelValue(null as EmitType)"
-    @create:option="createOption($event)"
   >
     <template
       v-if="$slots.title"
@@ -59,7 +58,6 @@ const props = defineProps<SelectAsyncSingleProps<Model, Data, QueryParams, Optio
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: EmitType): void
-  (e: 'create:option', value: string): void
 }>()
 
 const selectComponent = ref<ComponentInstance<typeof WSelectAsync<Model, Data, QueryParams, OptionComponent>> | undefined>()
@@ -68,10 +66,6 @@ const arrayValue = computed<Model[]>(() => props.modelValue ? [props.modelValue]
 
 const updateModelValue = (value: EmitType): void => {
   emit('update:modelValue', value)
-}
-
-const createOption = (value: string): void => {
-  emit('create:option', value)
 }
 
 const blur = () => {
