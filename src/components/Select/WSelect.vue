@@ -312,8 +312,8 @@ if (props.useQueryFnDefault) {
   const {data: defaultData} = props.useQueryFnDefault({enabled})
 
   watch(defaultData, value => {
-    if (value) select(props.valueGetter(value))
-  })
+    if (value && props.modelValue.length === 0) select(props.valueGetter(value))
+  }, {immediate: true})
 }
 
 watch(toRef(props, 'modelValue'), async () => {
