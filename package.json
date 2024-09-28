@@ -219,6 +219,9 @@
     "./dist/components/FormAsync/WFormAsyncInput.vue": {
       "import": "./dist/components/FormAsync/WFormAsyncInput.vue.js"
     },
+    "./dist/components/FormAsync/WFormAsyncSelect.vue": {
+      "import": "./dist/components/FormAsync/WFormAsyncSelect.vue.js"
+    },
     "./dist/components/FormAsync/WFormAsyncSelectSingle.vue": {
       "import": "./dist/components/FormAsync/WFormAsyncSelectSingle.vue.js"
     },

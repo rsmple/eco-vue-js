@@ -1,7 +1,11 @@
 import type {InputAsyncProps} from '@/components/Input/types'
 import type {ToggleProps} from '@/components/Toggle/types'
-import type {SelectOptionComponent, SelectSingleProps} from '@/components/Select/types'
+import type {SelectOptionComponent, SelectProps, SelectSingleProps} from '@/components/Select/types'
 import type {ButtonGroupProps} from '../Button/types'
+
+/**
+ * Input
+ */
 
 interface FormAsyncInputBaseProps<Model, FieldType extends string | number> extends Omit<InputAsyncProps<FieldType extends number ? 'number' : Exclude<InputType, 'number'>>, 'modelValue' | 'placeholderSecure'> {
   queryEnabled?: boolean
@@ -25,6 +29,10 @@ interface FormAsyncInputPropsWithoutParams<Model, FieldType extends string | num
 export type FormAsyncInputProps<Model, FieldType extends string | number, QueryParams> = FormAsyncInputPropsWithParams<Model, FieldType, QueryParams> | FormAsyncInputPropsWithoutParams<Model, FieldType>
 
 
+
+/**
+ * Toggle
+ */
 
 interface FormAsyncToggleBaseProps<Model, FieldType extends boolean | null> extends Omit<ToggleProps<FieldType>, 'modelValue'> {
   queryEnabled?: boolean
@@ -50,6 +58,58 @@ interface FormAsyncTogglePropsWithoutParams<Model, FieldType extends boolean | n
 export type FormAsyncToggleProps<Model, FieldType extends boolean | null, QueryParams> = FormAsyncTogglePropsWithParams<Model, FieldType, QueryParams> | FormAsyncTogglePropsWithoutParams<Model, FieldType>
 
 
+
+/**
+ * Select
+ */
+
+interface FormAsyncSelectBaseProps<
+  Model,
+  FieldType extends string | number,
+  Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>,
+> extends Omit<SelectProps<FieldType, Data, OptionComponent>, 'modelValue'> {
+  queryEnabled?: boolean
+  field: keyof ObjectPaths<Model, FieldType[], true>
+  apiMethod: (payload: PartialNested<Model>) => Promise<RequestResponse<Model>>
+  confimGetter?: (value: FieldType, isSelect: boolean) => ConfirmProps | undefined
+}
+
+interface FormAsyncSelectPropsWithParams<
+  Model,
+  FieldType extends string | number,
+  QueryParams,
+  Data extends DefaultData,
+  OptionComponent extends SelectOptionComponent<Data>,
+> extends FormAsyncSelectBaseProps<Model, FieldType, Data, OptionComponent> {
+  useQueryFn: UseQueryWithParams<Model, QueryParams>
+  noParams?: never
+  queryParams: QueryParams
+}
+
+interface FormAsyncSelectPropsWithoutParams<
+  Model,
+  FieldType extends string | number,
+  Data extends DefaultData,
+  OptionComponent extends SelectOptionComponent<Data>,
+> extends FormAsyncSelectBaseProps<Model, FieldType, Data, OptionComponent> {
+  useQueryFn: UseQueryEmpty<Model>
+  noParams: true
+  queryParams?: never
+}
+
+export type FormAsyncSelectProps<
+  Model,
+  FieldType extends string | number,
+  QueryParams, Data extends DefaultData,
+  OptionComponent extends SelectOptionComponent<Data>,
+> = FormAsyncSelectPropsWithParams<Model, FieldType, QueryParams, Data, OptionComponent> | FormAsyncSelectPropsWithoutParams<Model, FieldType, Data, OptionComponent>
+
+
+
+
+/**
+ * SelectSingle
+ */
 
 interface FormAsyncSelectSingleBaseProps<
   Model,
@@ -88,7 +148,7 @@ interface FormAsyncSelectSinglePropsWithoutParams<
   queryParams?: never
 }
 
-export type FormAsyncSelectProps<
+export type FormAsyncSelectSingleProps<
   Model,
   FieldType extends string | number,
   QueryParams, Data extends DefaultData,
@@ -98,6 +158,9 @@ export type FormAsyncSelectProps<
 
 
 
+/**
+ * ButtonGroup
+ */
 
 interface FormAsyncButtonGroupBaseProps<
   Model,

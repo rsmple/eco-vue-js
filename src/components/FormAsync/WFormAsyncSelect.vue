@@ -1,5 +1,5 @@
 <template>
-  <WSelectSingle
+  <WSelect
     v-bind="{
       ...props,
       modelValue: modelValue,
@@ -7,7 +7,8 @@
       disabled: disabled || isLoadingError,
       loading: loading || submitting,
     }"
-    @update:model-value="showModal(($event ?? null) as FieldType)"
+    @select="showModal($event, true)"
+    @unselect="showModal($event, false)"
   >
     <template
       v-if="$slots.title"
@@ -29,14 +30,14 @@
     >
       <slot name="right" />
     </template>
-  </WSelectSingle>
+  </WSelect>
 </template>
 
-<script lang="ts" setup generic="Model, FieldType extends string | number, QueryParams, Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false">
+<script lang="ts" setup generic="Model, FieldType extends string | number, QueryParams, Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>">
 import {computed, onBeforeUnmount, ref, toRef} from 'vue'
-import type {FormAsyncSelectSingleProps} from './types'
+import type {FormAsyncSelectProps} from './types'
 import type {SelectOptionComponent} from '@/components/Select/types'
-import WSelectSingle from '@/components/Select/WSelectSingle.vue'
+import WSelect from '@/components/Select/WSelect.vue'
 import {get, set} from '@/utils/utils'
 import {Notify} from '@/utils/Notify'
 import {handleApiError} from '@/utils/api'
@@ -44,7 +45,7 @@ import {Modal} from '@/utils/Modal'
 
 type PayloadType = PartialNested<Model>
 
-const props = defineProps<FormAsyncSelectSingleProps<Model, FieldType, QueryParams, Data, OptionComponent, AllowClear>>()
+const props = defineProps<FormAsyncSelectProps<Model, FieldType, QueryParams, Data, OptionComponent>>()
 
 const emit = defineEmits<{
   (e: 'success', value: Model): void
@@ -55,14 +56,18 @@ const {data, setData, isLoadingError} = props.noParams === true
   : (props.useQueryFn as UseQueryWithParams<Model, QueryParams>)(toRef(props, 'queryParams'), {enabled: toRef(props, 'queryEnabled')})
 const submitting = ref(false)
 
-const modelValue = computed<FieldType | null>(() => get<FieldType, PayloadType>(data.value ?? {}, props.field) ?? null)
+const modelValue = computed<FieldType[]>(() => get<FieldType[], PayloadType>(data.value ?? {}, props.field) ?? [])
 
-const save = (value: FieldType) => {
+const save = (value: FieldType, isSelect: boolean) => {
   if (submitting.value) return
 
   submitting.value = true
 
-  return props.apiMethod(set<FieldType, PayloadType>({}, props.field, value))
+  return props.apiMethod(set<FieldType[], PayloadType>(
+    {},
+    props.field,
+    isSelect ? [...modelValue.value, value] : modelValue.value.filter(item => item !== value),
+  ))
     .then(response => {
       setData(response.data)
 
@@ -78,20 +83,20 @@ const save = (value: FieldType) => {
 
 let closeModal: (() => void) | null = null
 
-const showModal = (value: FieldType) => {
+const showModal = (value: FieldType, isSelect: boolean) => {
   closeModal?.()
 
-  const confirmProps = props.confimGetter?.(value)
+  const confirmProps = props.confimGetter?.(value, isSelect)
 
   if (!confirmProps) {
-    save(value)
+    save(value, isSelect)
     return
   }
 
   closeModal = Modal.addConfirm({
     ...confirmProps,
     onAccept: () => {
-      return save(value)
+      return save(value, isSelect)
     },
   }, () => closeModal = null)
 }

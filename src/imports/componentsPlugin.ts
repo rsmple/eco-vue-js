@@ -28,6 +28,7 @@ import WForm from '@/components/Form/WForm.vue'
 import WFormValidator from '@/components/Form/WFormValidator.vue'
 import WFormAsyncButtonGroup from '@/components/FormAsync/WFormAsyncButtonGroup.vue'
 import WFormAsyncInput from '@/components/FormAsync/WFormAsyncInput.vue'
+import WFormAsyncSelect from '@/components/FormAsync/WFormAsyncSelect.vue'
 import WFormAsyncSelectSingle from '@/components/FormAsync/WFormAsyncSelectSingle.vue'
 import WFormAsyncToggle from '@/components/FormAsync/WFormAsyncToggle.vue'
 import WHeaderBar from '@/components/HeaderBar/WHeaderBar.vue'
@@ -101,6 +102,7 @@ export default {
     app.component('WFormValidator', WFormValidator)
     app.component('WFormAsyncButtonGroup', WFormAsyncButtonGroup)
     app.component('WFormAsyncInput', WFormAsyncInput)
+    app.component('WFormAsyncSelect', WFormAsyncSelect)
     app.component('WFormAsyncSelectSingle', WFormAsyncSelectSingle)
     app.component('WFormAsyncToggle', WFormAsyncToggle)
     app.component('WHeaderBar', WHeaderBar)
@@ -174,6 +176,7 @@ export {
   WFormValidator,
   WFormAsyncButtonGroup,
   WFormAsyncInput,
+  WFormAsyncSelect,
   WFormAsyncSelectSingle,
   WFormAsyncToggle,
   WHeaderBar,
