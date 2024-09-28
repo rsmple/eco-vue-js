@@ -171,12 +171,12 @@ const input = ref<ComponentInstance<typeof WInputSuggest<'text'>> | undefined>()
 const cursor = ref<number>(-1)
 const isCursorLocked = ref(false)
 const search = ref('')
+const searchPrepared = computed(() => search.value.trim().toLocaleLowerCase())
+const enabled = computed(() => !props.disabled)
 
-const {data, isLoading} = props.useQueryFnOptions({
-  enabled: computed(() => !props.disabled),
-})
+const {data, isLoading} = props.useQueryFnOptions({enabled})
 
-const filteredOptions = computed(() => !data.value ? [] : search.value === '' ? data.value : data.value.filter(option => props.searchFn(option, search.value)))
+const filteredOptions = computed(() => !data.value ? [] : searchPrepared.value === '' ? data.value : data.value.filter(option => props.searchFn(option, searchPrepared.value)))
 const lastIndex = computed(() => props.allowCreate ? filteredOptions.value.length : filteredOptions.value.length - 1)
 const isMobile = getIsMobile()
 const focused = ref(false)
@@ -306,6 +306,14 @@ const blur = () => {
 
 const setSearch = (value: string): void => {
   search.value = value
+}
+
+if (props.useQueryFnDefault) {
+  const {data: defaultData} = props.useQueryFnDefault({enabled})
+
+  watch(defaultData, value => {
+    if (value) select(props.valueGetter(value))
+  })
 }
 
 watch(toRef(props, 'modelValue'), async () => {

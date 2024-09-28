@@ -115,7 +115,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
-import {ref, nextTick, computed} from 'vue'
+import {ref, nextTick, computed, watch} from 'vue'
 import {getIsMobile} from '@/utils/mobile'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 import SelectAsyncPrefix from './components/SelectAsyncPrefix.vue'
@@ -149,6 +149,7 @@ const isFetchingPrefix = ref(false)
 const search = ref('')
 
 const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
+const enabled = computed(() => !props.disabled)
 
 const close = () => {
   isOpen.value = false
@@ -216,6 +217,14 @@ const updateDropdown = async () => {
   await nextTick()
 
   input.value?.updateDropdown()
+}
+
+if (props.useQueryFnDefault) {
+  const {data: defaultData} = props.useQueryFnDefault({enabled})
+
+  watch(defaultData, value => {
+    if (value) select(props.valueGetter(value))
+  })
 }
 
 defineExpose({
