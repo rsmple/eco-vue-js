@@ -22,6 +22,7 @@ export interface SelectProps<Model extends number | string, Data extends Default
   disableClear?: boolean
   hidePrefix?: boolean
   createOption?: (search: string) => (Data | undefined) | Promise<Data | undefined>
+  filterOptions?: (option: Data) => boolean
   hideOptionIcon?: boolean
 }
 
@@ -42,7 +43,7 @@ export interface SelectSingleProps<Model extends number | string, Data extends D
 }
 
 export interface SelectAsyncProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
-  extends Omit<SelectProps<Model, Data, Component>, 'options' | 'optionComponent' | 'optionComponentProps' | 'searchFn' | 'useQueryFnOptions'>,
+  extends Omit<SelectProps<Model, Data, Component>, 'options' | 'optionComponent' | 'optionComponentProps' | 'searchFn' | 'useQueryFnOptions' | 'filterOptions'>,
   SelectOptionComponentProps<Data, OptionComponent> {
   useQueryFnOptions: UseQueryPaginated<Data, QueryParams>
   useQueryFnPrefix?: UseQueryPaginated<Data, QueryParams>

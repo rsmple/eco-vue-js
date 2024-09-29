@@ -70,7 +70,7 @@
 
     <template #content>
       <div
-        v-if="!filteredOptions.length"
+        v-if="!optionsFiltered.length"
         class="py-2 px-[1.0625rem] first:pt-4 last:pb-4"
       >
         <div class="select-none cursor-default w-select-field sm-not:px-3">
@@ -79,7 +79,7 @@
       </div>
 
       <SelectOption
-        v-for="(option, index) in filteredOptions"
+        v-for="(option, index) in optionsFiltered"
         :key="valueGetter(option)"
         :is-selected="modelValue.includes(valueGetter(option))"
         :is-cursor="index === cursor"
@@ -112,13 +112,13 @@
       <SelectOption
         v-if="createOption && search !== ''"
         :is-selected="false"
-        :is-cursor="cursor === filteredOptions.length"
-        :loading="(loadingCreate || loadingOptionIndex === filteredOptions.length) && loading"
+        :is-cursor="cursor === optionsFiltered.length"
+        :loading="(loadingCreate || loadingOptionIndex === optionsFiltered.length) && loading"
         :scroll="isCursorLocked"
         :hide-option-icon="hideOptionIcon"
         class="first:pt-4 last:pb-4"
         @select="createOption(search)"
-        @mouseenter="setCursor(filteredOptions.length)"
+        @mouseenter="setCursor(optionsFiltered.length)"
       >
         <template #prefix>
           <span class="w-select-field pr-2 sm-not:px-3">
@@ -175,8 +175,9 @@ const enabled = computed(() => !props.disabled)
 
 const {data, isLoading} = props.useQueryFnOptions({enabled})
 
-const filteredOptions = computed(() => !data.value ? [] : searchPrepared.value === '' ? data.value : data.value.filter(option => props.searchFn(option, searchPrepared.value)))
-const lastIndex = computed(() => props.createOption ? filteredOptions.value.length : filteredOptions.value.length - 1)
+const optionsPrepared = computed(() => !data.value ? [] : props.filterOptions ? data.value.filter(option => props.filterOptions?.(option) ?? true) : data.value)
+const optionsFiltered = computed(() => searchPrepared.value === '' ? optionsPrepared.value : optionsPrepared.value.filter(option => props.searchFn(option, searchPrepared.value)))
+const lastIndex = computed(() => props.createOption ? optionsFiltered.value.length : optionsFiltered.value.length - 1)
 const isMobile = getIsMobile()
 const focused = ref(false)
 const loadingOptionIndex = ref<number | null>(null)
@@ -218,7 +219,7 @@ const cursorUp = () => {
 
   lockCursor()
 
-  cursor.value = !filteredOptions.value.length
+  cursor.value = !optionsFiltered.value.length
     ? 0
     : cursor.value < 1
       ? lastIndex.value
@@ -230,7 +231,7 @@ const cursorDown = () => {
 
   lockCursor()
 
-  cursor.value = !filteredOptions.value.length
+  cursor.value = !optionsFiltered.value.length
     ? 0
     : cursor.value >= lastIndex.value
       ? 0
@@ -240,7 +241,7 @@ const cursorDown = () => {
 const selectCursor = () => {
   if (isDisabled.value) return
 
-  const value = cursor.value !== -1 ? props.valueGetter(filteredOptions.value[cursor.value]) : undefined
+  const value = cursor.value !== -1 ? props.valueGetter(optionsFiltered.value[cursor.value]) : undefined
 
   if (value) {
     setLoadingOptionIndex(cursor.value)
@@ -294,7 +295,7 @@ const createOption = async (value: string) => {
   const option = await props.createOption(value)
 
   if (option) {
-    setLoadingOptionIndex(filteredOptions.value.length)
+    setLoadingOptionIndex(optionsFiltered.value.length)
     select(props.valueGetter(option))
 
     search.value = ''
