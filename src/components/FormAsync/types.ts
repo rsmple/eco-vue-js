@@ -1,6 +1,6 @@
 import type {InputAsyncProps} from '@/components/Input/types'
 import type {ToggleProps} from '@/components/Toggle/types'
-import type {SelectOptionComponent, SelectProps, SelectSingleProps} from '@/components/Select/types'
+import type {SelectAsyncSingleProps, SelectOptionComponent, SelectProps, SelectSingleProps} from '@/components/Select/types'
 import type {ButtonGroupProps} from '../Button/types'
 
 /**
@@ -155,6 +155,63 @@ export type FormAsyncSelectSingleProps<
   OptionComponent extends SelectOptionComponent<Data>,
   AllowClear extends boolean = false
 > = FormAsyncSelectSinglePropsWithParams<Model, FieldType, QueryParams, Data, OptionComponent, AllowClear> | FormAsyncSelectSinglePropsWithoutParams<Model, FieldType, Data, OptionComponent, AllowClear>
+
+
+
+
+/**
+ * SelectInfiniteSingle
+ */
+
+interface FormAsyncSelectInfiniteSingleBaseProps<
+  Model,
+  FieldType extends string | number,
+  QueryParamsOptions,
+  Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>,
+  AllowClear extends boolean = false
+> extends Omit<SelectAsyncSingleProps<FieldType, Data, QueryParamsOptions, OptionComponent, AllowClear>, 'modelValue'> {
+  queryEnabled?: boolean
+  field: keyof ObjectPaths<Model, FieldType, true>
+  apiMethod: (payload: PartialNested<Model>) => Promise<RequestResponse<Model>>
+  confimGetter?: (value: FieldType) => ConfirmProps | undefined
+}
+
+interface FormAsyncSelectInfiniteSinglePropsWithParams<
+  Model,
+  FieldType extends string | number,
+  QueryParamsOptions,
+  QueryParams,
+  Data extends DefaultData,
+  OptionComponent extends SelectOptionComponent<Data>,
+  AllowClear extends boolean = false
+> extends FormAsyncSelectInfiniteSingleBaseProps<Model, FieldType, QueryParamsOptions, Data, OptionComponent, AllowClear> {
+  useQueryFn: UseQueryWithParams<Model, QueryParams>
+  noParams?: never
+  queryParams: QueryParams
+}
+
+interface FormAsyncSelectInfiniteSinglePropsWithoutParams<
+  Model,
+  FieldType extends string | number,
+  QueryParamsOptions,
+  Data extends DefaultData,
+  OptionComponent extends SelectOptionComponent<Data>,
+  AllowClear extends boolean = false
+> extends FormAsyncSelectInfiniteSingleBaseProps<Model, FieldType, QueryParamsOptions, Data, OptionComponent, AllowClear> {
+  useQueryFn: UseQueryEmpty<Model>
+  noParams: true
+  queryParams?: never
+}
+
+export type FormAsyncSelectInfiniteSingleProps<
+  Model,
+  FieldType extends string | number,
+  QueryParamsOptions,
+  QueryParams,
+  Data extends DefaultData,
+  OptionComponent extends SelectOptionComponent<Data>,
+  AllowClear extends boolean = false
+> = FormAsyncSelectInfiniteSinglePropsWithParams<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent, AllowClear> | FormAsyncSelectInfiniteSinglePropsWithoutParams<Model, FieldType, QueryParamsOptions, Data, OptionComponent, AllowClear>
 
 
 

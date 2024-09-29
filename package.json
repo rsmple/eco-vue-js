@@ -222,6 +222,9 @@
     "./dist/components/FormAsync/WFormAsyncSelect.vue": {
       "import": "./dist/components/FormAsync/WFormAsyncSelect.vue.js"
     },
+    "./dist/components/FormAsync/WFormAsyncSelectInfiniteSingle.vue": {
+      "import": "./dist/components/FormAsync/WFormAsyncSelectInfiniteSingle.vue.js"
+    },
     "./dist/components/FormAsync/WFormAsyncSelectSingle.vue": {
       "import": "./dist/components/FormAsync/WFormAsyncSelectSingle.vue.js"
     },
