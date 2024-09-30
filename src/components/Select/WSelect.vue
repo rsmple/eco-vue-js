@@ -41,7 +41,7 @@
           :key="valueGetter(option)"
           :option="option"
           :option-component="(optionComponent as SelectOptionComponent<Data>)"
-          :option-component-props="(optionComponentProps as SelectProps<Model, Data, OptionComponent>['optionComponentProps'])"
+          :option-component-props="(optionComponentProps as SelectProps<Model, Data, QueryParamsOptions, OptionComponent>['optionComponentProps'])"
           :index="index"
           :loading="loading || isLoading"
           :disabled="disabled"
@@ -145,7 +145,7 @@
   </WInputSuggest>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>">
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>">
 import {ref, watch, toRef, nextTick, computed} from 'vue'
 import SelectOption from './components/SelectOption.vue'
 import SelectOptionPrefix from './components/SelectOptionPrefix.vue'
@@ -153,16 +153,18 @@ import {getIsMobile} from '@/utils/mobile'
 import {debounce} from '@/utils/utils'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 import type {SelectProps, SelectOptionComponent, SelectOptionComponentProps} from './types'
+import {ApiError} from '@/utils/api'
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<SelectProps<Model, Data, OptionComponent>>()
+const props = defineProps<SelectProps<Model, Data, QueryParamsOptions, OptionComponent>>()
 
 const emit = defineEmits<{
   (e: 'select', item: Model): void
   (e: 'unselect', item: Model): void
   (e: 'focus', value: FocusEvent): void
   (e: 'blur', value: FocusEvent): void
+  (e: 'update:query-options-error', value: string | undefined): void
 }>()
 
 const isOpen = ref(false)
@@ -173,7 +175,9 @@ const search = ref('')
 const searchPrepared = computed(() => search.value.trim().toLocaleLowerCase())
 const enabled = computed(() => !props.disabled)
 
-const {data, isLoading} = props.useQueryFnOptions({enabled})
+const {data, isLoading, error: queryError} = props.noParamsOptions
+  ? (props.useQueryFnOptions as UseQueryEmpty<Data[]>)({enabled})
+  : props.useQueryFnOptions(toRef(props, 'queryParamsOptions'), {enabled})
 
 const optionsPrepared = computed(() => !data.value ? [] : props.filterOptions ? data.value.filter(option => props.filterOptions?.(option) ?? true) : data.value)
 const optionsFiltered = computed(() => searchPrepared.value === '' ? optionsPrepared.value : optionsPrepared.value.filter(option => props.searchFn(option, searchPrepared.value)))
@@ -329,6 +333,14 @@ watch(toRef(props, 'modelValue'), async () => {
 
   input.value?.updateDropdown()
 })
+
+watch(queryError, error => {
+  if (error instanceof ApiError && error.response?.data?.detail) {
+    emit('update:query-options-error', error.response.data.detail)
+  } else {
+    emit('update:query-options-error', undefined)
+  }
+}, {immediate: true})
 
 defineExpose({
   focus,

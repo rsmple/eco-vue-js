@@ -10,11 +10,25 @@ export interface SelectOptionComponentProps<Option, OptionComponent extends Sele
   optionComponentProps?: OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never
 }
 
-export interface SelectProps<Model extends number | string, Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>>
-  extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'hideInput'>,
-  SelectOptionComponentProps<Data, OptionComponent> {
-  modelValue: Model[]
+interface SelectPropsNoParams<Data extends DefaultData> {
   useQueryFnOptions: UseQueryEmpty<Data[]>
+  queryParamsOptions?: never
+  noParamsOptions: true
+}
+
+interface SelectPropsWithParams<Data extends DefaultData, QueryParams> {
+  useQueryFnOptions: UseQueryWithParams<Data[], QueryParams>
+  queryParamsOptions: QueryParams
+  noParamsOptions?: never
+}
+
+type SelectPropsOptions<Data extends DefaultData, QueryParams> = SelectPropsNoParams<Data> | SelectPropsWithParams<Data, QueryParams>
+
+export interface SelectProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
+  extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'hideInput'>,
+  SelectOptionComponentProps<Data, OptionComponent>,
+  Omit<SelectPropsOptions<Data, QueryParams>, 'modelValue'> {
+  modelValue: Model[]
   valueGetter: (value: Data) => Model
   searchFn: (option: Data, search: string) => boolean
   useQueryFnDefault?: UseQueryEmpty<Data>
@@ -35,15 +49,15 @@ export interface SelectPrefixProps<Data extends DefaultData, OptionComponent ext
   disableClear?: boolean
 }
 
-export interface SelectSingleProps<Model extends number | string, Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean>
-  extends Omit<SelectProps<Model, Data, OptionComponent>, 'modelValue' | 'disableClear'> {
+export interface SelectSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean>
+  extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear'> {
   modelValue: Model | null
   allowClear?: boolean & AllowClear
   searchModel?: boolean
 }
 
 export interface SelectAsyncProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
-  extends Omit<SelectProps<Model, Data, Component>, 'options' | 'optionComponent' | 'optionComponentProps' | 'searchFn' | 'useQueryFnOptions' | 'filterOptions'>,
+  extends Omit<SelectProps<Model, Data, QueryParams, Component>, 'options' | 'optionComponent' | 'optionComponentProps' | 'searchFn' | 'useQueryFnOptions' | 'queryParamsOptions' | 'filterOptions'>,
   SelectOptionComponentProps<Data, OptionComponent> {
   useQueryFnOptions: UseQueryPaginated<Data, QueryParams>
   useQueryFnPrefix?: UseQueryPaginated<Data, QueryParams>

@@ -33,7 +33,7 @@
   </WSelect>
 </template>
 
-<script lang="ts" setup generic="Model, FieldType extends string | number, QueryParams, Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>">
+<script lang="ts" setup generic="Model, FieldType extends string | number, QueryParamsOptions, QueryParams, Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>">
 import {computed, onBeforeUnmount, ref, toRef} from 'vue'
 import type {FormAsyncSelectProps} from './types'
 import type {SelectOptionComponent} from '@/components/Select/types'
@@ -45,7 +45,7 @@ import {Modal} from '@/utils/Modal'
 
 type PayloadType = PartialNested<Model>
 
-const props = defineProps<FormAsyncSelectProps<Model, FieldType, QueryParams, Data, OptionComponent>>()
+const props = defineProps<FormAsyncSelectProps<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent>>()
 
 const emit = defineEmits<{
   (e: 'success', value: Model): void

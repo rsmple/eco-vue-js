@@ -66,8 +66,10 @@ export type FormAsyncToggleProps<Model, FieldType extends boolean | null, QueryP
 interface FormAsyncSelectBaseProps<
   Model,
   FieldType extends string | number,
-  Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>,
-> extends Omit<SelectProps<FieldType, Data, OptionComponent>, 'modelValue'> {
+  QueryParamsOptions,
+  Data extends DefaultData,
+  OptionComponent extends SelectOptionComponent<Data>,
+> extends Omit<SelectProps<FieldType, Data, QueryParamsOptions, OptionComponent>, 'modelValue'> {
   queryEnabled?: boolean
   field: keyof ObjectPaths<Model, FieldType[], true>
   apiMethod: (payload: PartialNested<Model>) => Promise<RequestResponse<Model>>
@@ -77,10 +79,11 @@ interface FormAsyncSelectBaseProps<
 interface FormAsyncSelectPropsWithParams<
   Model,
   FieldType extends string | number,
+  QueryParamsOptions,
   QueryParams,
   Data extends DefaultData,
   OptionComponent extends SelectOptionComponent<Data>,
-> extends FormAsyncSelectBaseProps<Model, FieldType, Data, OptionComponent> {
+> extends FormAsyncSelectBaseProps<Model, FieldType, QueryParamsOptions, Data, OptionComponent> {
   useQueryFn: UseQueryWithParams<Model, QueryParams>
   noParams?: never
   queryParams: QueryParams
@@ -89,9 +92,10 @@ interface FormAsyncSelectPropsWithParams<
 interface FormAsyncSelectPropsWithoutParams<
   Model,
   FieldType extends string | number,
+  QueryParamsOptions,
   Data extends DefaultData,
   OptionComponent extends SelectOptionComponent<Data>,
-> extends FormAsyncSelectBaseProps<Model, FieldType, Data, OptionComponent> {
+> extends FormAsyncSelectBaseProps<Model, FieldType, QueryParamsOptions, Data, OptionComponent> {
   useQueryFn: UseQueryEmpty<Model>
   noParams: true
   queryParams?: never
@@ -100,9 +104,11 @@ interface FormAsyncSelectPropsWithoutParams<
 export type FormAsyncSelectProps<
   Model,
   FieldType extends string | number,
-  QueryParams, Data extends DefaultData,
+  QueryParamsOptions,
+  QueryParams,
+  Data extends DefaultData,
   OptionComponent extends SelectOptionComponent<Data>,
-> = FormAsyncSelectPropsWithParams<Model, FieldType, QueryParams, Data, OptionComponent> | FormAsyncSelectPropsWithoutParams<Model, FieldType, Data, OptionComponent>
+> = FormAsyncSelectPropsWithParams<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent> | FormAsyncSelectPropsWithoutParams<Model, FieldType, QueryParamsOptions, Data, OptionComponent>
 
 
 
@@ -114,9 +120,11 @@ export type FormAsyncSelectProps<
 interface FormAsyncSelectSingleBaseProps<
   Model,
   FieldType extends string | number,
-  Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>,
+  QueryParamsOptions,
+  Data extends DefaultData,
+  OptionComponent extends SelectOptionComponent<Data>,
   AllowClear extends boolean = false
-> extends Omit<SelectSingleProps<FieldType, Data, OptionComponent, AllowClear>, 'modelValue'> {
+> extends Omit<SelectSingleProps<FieldType, Data, QueryParamsOptions, OptionComponent, AllowClear>, 'modelValue'> {
   queryEnabled?: boolean
   field: keyof ObjectPaths<Model, FieldType, true>
   apiMethod: (payload: PartialNested<Model>) => Promise<RequestResponse<Model>>
@@ -126,11 +134,12 @@ interface FormAsyncSelectSingleBaseProps<
 interface FormAsyncSelectSinglePropsWithParams<
   Model,
   FieldType extends string | number,
+  QueryParamsOptions,
   QueryParams,
   Data extends DefaultData,
   OptionComponent extends SelectOptionComponent<Data>,
   AllowClear extends boolean = false
-> extends FormAsyncSelectSingleBaseProps<Model, FieldType, Data, OptionComponent, AllowClear> {
+> extends FormAsyncSelectSingleBaseProps<Model, FieldType, QueryParamsOptions, Data, OptionComponent, AllowClear> {
   useQueryFn: UseQueryWithParams<Model, QueryParams>
   noParams?: never
   queryParams: QueryParams
@@ -139,10 +148,11 @@ interface FormAsyncSelectSinglePropsWithParams<
 interface FormAsyncSelectSinglePropsWithoutParams<
   Model,
   FieldType extends string | number,
+  QueryParamsOptions,
   Data extends DefaultData,
   OptionComponent extends SelectOptionComponent<Data>,
   AllowClear extends boolean = false
-> extends FormAsyncSelectSingleBaseProps<Model, FieldType, Data, OptionComponent, AllowClear> {
+> extends FormAsyncSelectSingleBaseProps<Model, FieldType, QueryParamsOptions, Data, OptionComponent, AllowClear> {
   useQueryFn: UseQueryEmpty<Model>
   noParams: true
   queryParams?: never
@@ -151,10 +161,11 @@ interface FormAsyncSelectSinglePropsWithoutParams<
 export type FormAsyncSelectSingleProps<
   Model,
   FieldType extends string | number,
+  QueryParamsOptions,
   QueryParams, Data extends DefaultData,
   OptionComponent extends SelectOptionComponent<Data>,
   AllowClear extends boolean = false
-> = FormAsyncSelectSinglePropsWithParams<Model, FieldType, QueryParams, Data, OptionComponent, AllowClear> | FormAsyncSelectSinglePropsWithoutParams<Model, FieldType, Data, OptionComponent, AllowClear>
+> = FormAsyncSelectSinglePropsWithParams<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent, AllowClear> | FormAsyncSelectSinglePropsWithoutParams<Model, FieldType, QueryParamsOptions, Data, OptionComponent, AllowClear>
 
 
 
