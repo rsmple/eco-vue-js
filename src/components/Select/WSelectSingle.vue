@@ -27,12 +27,13 @@
       <slot name="subtitle" />
     </template>
 
-    <template #option="{option, selected, model}">
+    <template #option="{option, selected, model, search}">
       <slot
         name="option"
         :option="option"
         :selected="selected"
         :model="model"
+        :search="search"
       />
     </template>
 

@@ -98,6 +98,7 @@
             :selected="selected"
             :skeleton="skeletonList"
             :model="false"
+            :search="search"
           >
             <component
               v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
@@ -246,7 +247,7 @@ defineSlots<{
   title?: () => void
   subtitle?: () => void
   right?: (props: Record<string, never>) => void
-  option?: (props: {option: Data | null, index?: number, selected: boolean, skeleton: boolean, model: boolean}) => void
+  option?: (props: {option: Data | null, index?: number, selected: boolean, skeleton: boolean, model: boolean, search?: string}) => void
 }>()
 
 </script>

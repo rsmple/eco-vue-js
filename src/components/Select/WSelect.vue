@@ -128,14 +128,16 @@
 
         <slot
           name="option"
-          :option="search"
+          :option="null"
+          :search="search"
           :selected="false"
           :model="false"
         >
           <component
             v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
             :is="optionComponent"
-            :option="search"
+            :option="null"
+            :search="search"
             :selected="false"
             :model="false"
           />
@@ -352,10 +354,11 @@ defineSlots<{
   title?: () => void
   subtitle?: () => void
   option?: (props: {
-    option: Data | string
+    option: Data | null
     index?: number
     selected: boolean
     model: boolean
+    search?: string
   }) => void,
   right?: () => void
 }>()
