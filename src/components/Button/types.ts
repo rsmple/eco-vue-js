@@ -35,7 +35,8 @@ interface ButtonGroupPropsForEntity<Model extends number | string | null | boole
 
 export type ButtonGroupProps<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined> = ButtonGroupPropsForEntity<Model, Entity, ValueGetter> | ButtonGroupPropsForModel<Model, Entity, ValueGetter>
 
-export interface ButtonDropdownProps extends Omit<DropdownMenuProps, 'isOpen' | 'updateAlign' | 'emitUpdate'> {
+export interface ButtonDropdownProps extends Omit<DropdownMenuProps, 'isOpen' | 'updateAlign' | 'emitUpdate' | 'horizontalAlign' | 'maxHeight' | 'maxWidth'>,
+  Partial<Pick<DropdownMenuProps, 'horizontalAlign' | 'maxHeight' | 'maxWidth'>> {
   semanticType?: SemanticType
   leftToggle?: boolean
   disabled?: boolean
