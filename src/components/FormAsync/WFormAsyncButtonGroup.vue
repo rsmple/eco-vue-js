@@ -16,6 +16,7 @@
       #option="{option, selected}"
     >
       <slot
+        name="option"
         :option="option"
         :selected="selected"
       />
