@@ -1,6 +1,6 @@
 import type {InputAsyncProps} from '@/components/Input/types'
 import type {ToggleProps} from '@/components/Toggle/types'
-import type {SelectAsyncSingleProps, SelectOptionComponent, SelectProps, SelectSingleProps} from '@/components/Select/types'
+import type {SelectAsyncSingleProps, SelectOptionComponent, SelectProps, SelectSingleProps, SelectStringifiedProps} from '@/components/Select/types'
 import type {ButtonGroupProps} from '../Button/types'
 
 /**
@@ -166,6 +166,59 @@ export type FormAsyncSelectSingleProps<
   OptionComponent extends SelectOptionComponent<Data>,
   AllowClear extends boolean = false
 > = FormAsyncSelectSinglePropsWithParams<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent, AllowClear> | FormAsyncSelectSinglePropsWithoutParams<Model, FieldType, QueryParamsOptions, Data, OptionComponent, AllowClear>
+
+
+
+
+/**
+ * SelectStringified
+ */
+
+interface FormAsyncSelectStringifiedBaseProps<
+  Model,
+  FieldType extends string,
+  QueryParamsOptions,
+  Data extends DefaultData,
+  OptionComponent extends SelectOptionComponent<Data>,
+> extends Omit<SelectStringifiedProps<FieldType, Data, QueryParamsOptions, OptionComponent>, 'modelValue'> {
+  queryEnabled?: boolean
+  field: keyof ObjectPaths<Model, FieldType, true>
+  apiMethod: (payload: PartialNested<Model>) => Promise<RequestResponse<Model>>
+  confimGetter?: (value: FieldType) => ConfirmProps | undefined
+}
+
+interface FormAsyncSelectStringifiedPropsWithParams<
+  Model,
+  FieldType extends string,
+  QueryParamsOptions,
+  QueryParams,
+  Data extends DefaultData,
+  OptionComponent extends SelectOptionComponent<Data>,
+> extends FormAsyncSelectStringifiedBaseProps<Model, FieldType, QueryParamsOptions, Data, OptionComponent> {
+  useQueryFn: UseQueryWithParams<Model, QueryParams>
+  noParams?: never
+  queryParams: QueryParams
+}
+
+interface FormAsyncSelectStringifiedPropsWithoutParams<
+  Model,
+  FieldType extends string,
+  QueryParamsOptions,
+  Data extends DefaultData,
+  OptionComponent extends SelectOptionComponent<Data>,
+> extends FormAsyncSelectStringifiedBaseProps<Model, FieldType, QueryParamsOptions, Data, OptionComponent> {
+  useQueryFn: UseQueryEmpty<Model>
+  noParams: true
+  queryParams?: never
+}
+
+export type FormAsyncSelectStringifiedProps<
+  Model,
+  FieldType extends string,
+  QueryParamsOptions,
+  QueryParams, Data extends DefaultData,
+  OptionComponent extends SelectOptionComponent<Data>,
+> = FormAsyncSelectStringifiedPropsWithParams<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent> | FormAsyncSelectStringifiedPropsWithoutParams<Model, FieldType, QueryParamsOptions, Data, OptionComponent>
 
 
 

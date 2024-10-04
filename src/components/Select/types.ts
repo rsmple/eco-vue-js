@@ -14,15 +14,24 @@ interface SelectPropsNoParams<Data extends DefaultData> {
   useQueryFnOptions: UseQueryEmpty<Data[]>
   queryParamsOptions?: never
   noParamsOptions: true
+  options?: never
 }
 
 interface SelectPropsWithParams<Data extends DefaultData, QueryParams> {
   useQueryFnOptions: UseQueryWithParams<Data[], QueryParams>
   queryParamsOptions: QueryParams
   noParamsOptions?: never
+  options?: never
 }
 
-type SelectPropsOptions<Data extends DefaultData, QueryParams> = SelectPropsNoParams<Data> | SelectPropsWithParams<Data, QueryParams>
+interface SelectPropsWithOptions<Data extends DefaultData> {
+  options: Data[]
+  useQueryFnOptions?: never
+  queryParamsOptions?: never
+  noParamsOptions?: never
+}
+
+type SelectPropsOptions<Data extends DefaultData, QueryParams> = SelectPropsNoParams<Data> | SelectPropsWithParams<Data, QueryParams> | SelectPropsWithOptions<Data>
 
 export interface SelectProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
   extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'hideInput'>,
@@ -56,8 +65,14 @@ export interface SelectSingleProps<Model extends number | string, Data extends D
   searchModel?: boolean
 }
 
+export interface SelectStringifiedProps<Model extends string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
+  extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue'> {
+  modelValue: Model | null
+  divider: string
+}
+
 export interface SelectAsyncProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
-  extends Omit<SelectProps<Model, Data, QueryParams, Component>, 'options' | 'optionComponent' | 'optionComponentProps' | 'searchFn' | 'useQueryFnOptions' | 'queryParamsOptions' | 'filterOptions'>,
+  extends Omit<SelectProps<Model, Data, QueryParams, Component>, 'options' | 'optionComponent' | 'optionComponentProps' | 'searchFn' | 'useQueryFnOptions' | 'queryParamsOptions' | 'options' | 'filterOptions'>,
   SelectOptionComponentProps<Data, OptionComponent> {
   useQueryFnOptions: UseQueryPaginated<Data, QueryParams>
   useQueryFnPrefix?: UseQueryPaginated<Data, QueryParams>

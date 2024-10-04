@@ -148,7 +148,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>">
-import {ref, watch, toRef, nextTick, computed} from 'vue'
+import {ref, watch, toRef, nextTick, computed, type Ref} from 'vue'
 import SelectOption from './components/SelectOption.vue'
 import SelectOptionPrefix from './components/SelectOptionPrefix.vue'
 import {getIsMobile} from '@/utils/mobile'
@@ -177,9 +177,15 @@ const search = ref('')
 const searchPrepared = computed(() => search.value.trim().toLocaleLowerCase())
 const enabled = computed(() => !props.disabled)
 
-const {data, isLoading, error: queryError} = props.noParamsOptions
-  ? (props.useQueryFnOptions as UseQueryEmpty<Data[]>)({enabled})
-  : props.useQueryFnOptions(toRef(props, 'queryParamsOptions'), {enabled})
+const {data, isLoading, error: queryError} = props.useQueryFnOptions
+  ? props.noParamsOptions
+    ? (props.useQueryFnOptions as UseQueryEmpty<Data[]>)({enabled})
+    : props.useQueryFnOptions(toRef(props, 'queryParamsOptions'), {enabled})
+  : {
+    data: toRef(props, 'options') as Ref<Data[] | undefined>,
+    isLoading: ref(false),
+    error: ref(undefined),
+  }
 
 const optionsPrepared = computed(() => !data.value ? [] : props.filterOptions ? data.value.filter(option => props.filterOptions?.(option) ?? true) : data.value)
 const optionsFiltered = computed(() => searchPrepared.value === '' ? optionsPrepared.value : optionsPrepared.value.filter(option => props.searchFn(option, searchPrepared.value)))
