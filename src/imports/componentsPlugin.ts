@@ -31,6 +31,7 @@ import WFormAsyncInput from '@/components/FormAsync/WFormAsyncInput.vue'
 import WFormAsyncSelect from '@/components/FormAsync/WFormAsyncSelect.vue'
 import WFormAsyncSelectInfiniteSingle from '@/components/FormAsync/WFormAsyncSelectInfiniteSingle.vue'
 import WFormAsyncSelectSingle from '@/components/FormAsync/WFormAsyncSelectSingle.vue'
+import WFormAsyncSelectStringified from '@/components/FormAsync/WFormAsyncSelectStringified.vue'
 import WFormAsyncToggle from '@/components/FormAsync/WFormAsyncToggle.vue'
 import WHeaderBar from '@/components/HeaderBar/WHeaderBar.vue'
 import WImageViewer from '@/components/ImageViewer/WImageViewer.vue'
@@ -64,6 +65,7 @@ import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 import WSelectAsyncList from '@/components/Select/WSelectAsyncList.vue'
 import WSelectAsyncSingle from '@/components/Select/WSelectAsyncSingle.vue'
 import WSelectSingle from '@/components/Select/WSelectSingle.vue'
+import WSelectStringified from '@/components/Select/WSelectStringified.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTabs from '@/components/Tabs/WTabs.vue'
@@ -106,6 +108,7 @@ export default {
     app.component('WFormAsyncSelect', WFormAsyncSelect)
     app.component('WFormAsyncSelectInfiniteSingle', WFormAsyncSelectInfiniteSingle)
     app.component('WFormAsyncSelectSingle', WFormAsyncSelectSingle)
+    app.component('WFormAsyncSelectStringified', WFormAsyncSelectStringified)
     app.component('WFormAsyncToggle', WFormAsyncToggle)
     app.component('WHeaderBar', WHeaderBar)
     app.component('WImageViewer', WImageViewer)
@@ -139,6 +142,7 @@ export default {
     app.component('WSelectAsyncList', WSelectAsyncList)
     app.component('WSelectAsyncSingle', WSelectAsyncSingle)
     app.component('WSelectSingle', WSelectSingle)
+    app.component('WSelectStringified', WSelectStringified)
     app.component('WSkeleton', WSkeleton)
     app.component('WSpinner', WSpinner)
     app.component('WTabs', WTabs)
@@ -181,6 +185,7 @@ export {
   WFormAsyncSelect,
   WFormAsyncSelectInfiniteSingle,
   WFormAsyncSelectSingle,
+  WFormAsyncSelectStringified,
   WFormAsyncToggle,
   WHeaderBar,
   WImageViewer,
@@ -214,6 +219,7 @@ export {
   WSelectAsyncList,
   WSelectAsyncSingle,
   WSelectSingle,
+  WSelectStringified,
   WSkeleton,
   WSpinner,
   WTabs,

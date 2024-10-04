@@ -228,6 +228,9 @@
     "./dist/components/FormAsync/WFormAsyncSelectSingle.vue": {
       "import": "./dist/components/FormAsync/WFormAsyncSelectSingle.vue.js"
     },
+    "./dist/components/FormAsync/WFormAsyncSelectStringified.vue": {
+      "import": "./dist/components/FormAsync/WFormAsyncSelectStringified.vue.js"
+    },
     "./dist/components/FormAsync/WFormAsyncToggle.vue": {
       "import": "./dist/components/FormAsync/WFormAsyncToggle.vue.js"
     },
@@ -338,6 +341,9 @@
     },
     "./dist/components/Select/WSelectSingle.vue": {
       "import": "./dist/components/Select/WSelectSingle.vue.js"
+    },
+    "./dist/components/Select/WSelectStringified.vue": {
+      "import": "./dist/components/Select/WSelectStringified.vue.js"
     },
     "./dist/components/Select/types": {
       "import": "./dist/components/Select/types.d.ts"
