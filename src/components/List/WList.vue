@@ -4,7 +4,6 @@
     :query-params="(queryParams as QueryParams)"
     :skeleton-length="count ?? listCount"
     :header-margin="isMobile ? 0 : 24"
-    :is-invalid-page="isInvalidPage"
     hide-page-title
     transition
     page-class="grid sm:gap-4"
@@ -137,7 +136,6 @@ const props = defineProps<{
   menu: MenuComponent<Data>[]
   readonlyGetter?: (item: Data) => boolean
   cardClass?: string
-  isInvalidPage: (error: unknown) => boolean
   selectAllTextGetter: (isUnselect: boolean, count: number) => string
 }>()
 

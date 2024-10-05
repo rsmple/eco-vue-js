@@ -78,7 +78,6 @@
         :model-value="modelValue"
         :use-query-fn="useQueryFnOptions"
         :query-params="({...queryParamsOptions, [searchField ?? 'search']: search} as QueryParams)"
-        :is-invalid-page="isInvalidPage"
         :loading="loading || isFetchingPrefix"
         :disabled="isDisabled"
         :empty-stub="emptyStub"

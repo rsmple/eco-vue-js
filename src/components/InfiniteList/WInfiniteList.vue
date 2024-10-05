@@ -21,7 +21,6 @@
     ref="infiniteListPages"
     :query-params="(queryParams as QueryParams)"
     :use-query-fn="useQueryFn"
-    :is-invalid-page="isInvalidPage"
     :scrolling-element="scrollingElement"
 
     :skip-scroll-target="skipScrollTarget"
@@ -95,7 +94,6 @@ import EmptyComponent from './components/EmptyComponent.vue'
 const props = withDefaults(
   defineProps<{
     useQueryFn: UseQueryPaginated<Data, QueryParams>
-    isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     skeletonLength?: number
     hidePageTitle?: boolean

@@ -123,12 +123,12 @@ import {toRef, computed, watch, ref, onMounted, nextTick, onBeforeUnmount, Trans
 import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
 import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
 import EmptyComponent from './EmptyComponent.vue'
+import {ApiError} from '@/main'
 
 const props = withDefaults(
   defineProps<{
     queryParams: QueryParams
     useQueryFn: UseQueryPaginated<Data, QueryParams>
-    isInvalidPage: (error: unknown) => boolean
     skeletonLength: number
     firstPage: boolean
     lastPage: boolean
@@ -260,8 +260,8 @@ watch(data, value => {
   }
 }, {immediate: true})
 
-watch(error, (error: unknown): void => {
-  if (props.isInvalidPage(error) && page.value !== null) emit('remove:page', page.value)
+watch(error, error => {
+  if (error instanceof ApiError && error.response?.status === 404 && page.value !== null) emit('remove:page', page.value)
 }, {immediate: true})
 
 watch(isFetching, value => {

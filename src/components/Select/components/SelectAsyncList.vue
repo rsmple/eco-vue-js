@@ -3,7 +3,6 @@
     <WInfiniteList
       :use-query-fn="useQueryFn"
       :query-params="(queryParams as QueryParams)"
-      :is-invalid-page="isInvalidPage"
       :scrolling-element="scrollingElement"
       :transition="transition"
       :exclude-params="excludeParams"
@@ -106,7 +105,6 @@ const props = defineProps<{
   modelValue: Model[]
   useQueryFn: UseQueryPaginated<Data, QueryParams>
   queryParams: QueryParams
-  isInvalidPage: (error: unknown) => boolean
   scrollingElement?: Element | null
   loading?: boolean
   disabled?: boolean

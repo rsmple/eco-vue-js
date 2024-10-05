@@ -24,7 +24,6 @@
       <SelectAsyncList
         :model-value="modelValue"
         :use-query-fn="useQueryFn"
-        :is-invalid-page="isInvalidPage"
         :query-params="(queryParams as QueryParams)"
         :scrolling-element="list"
         :exclude-params="excludeParams"
@@ -66,7 +65,6 @@ withDefaults(
     emptyStub?: string
     modelValue: Model[]
     useQueryFn: UseQueryPaginated<Data, QueryParams>
-    isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     skeleton?: boolean
     excludeParams?: (keyof QueryParams)[]

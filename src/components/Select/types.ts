@@ -76,7 +76,6 @@ export interface SelectAsyncProps<Model extends number | string, Data extends De
   SelectOptionComponentProps<Data, OptionComponent> {
   useQueryFnOptions: UseQueryPaginated<Data, QueryParams>
   useQueryFnPrefix?: UseQueryPaginated<Data, QueryParams>
-  isInvalidPage: (error: unknown) => boolean
   queryParamsOptions: QueryParams
   searchField?: keyof QueryParams
   previewData?: Data[]

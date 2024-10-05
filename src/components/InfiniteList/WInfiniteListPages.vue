@@ -18,7 +18,6 @@
       :key="page"
       :query-params="{...(queryParams as QueryParams), page}"
       :use-query-fn="useQueryFn"
-      :is-invalid-page="isInvalidPage"
       :skeleton-length="getSkeletonLength(page - 1)"
       :first-page="index === 0"
       :last-page="index === pages.length - 1"
@@ -90,7 +89,6 @@ import {getIsScrollDown} from './models/utils'
 const props = withDefaults(
   defineProps<{
     useQueryFn: UseQueryPaginated<Data, QueryParams>
-    isInvalidPage: (error: unknown) => boolean
     queryParams: QueryParams
     skeletonLength?: number
     hidePageTitle?: boolean
