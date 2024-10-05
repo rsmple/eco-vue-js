@@ -9,6 +9,7 @@
     @select="updateModelValue($event, true)"
     @unselect="updateModelValue($event, false)"
     @update:query-options-error="$emit('update:query-options-error', $event)"
+    @init-model="$emit('init-model')"
   >
     <template
       v-if="$slots.title"
@@ -44,7 +45,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>">
-import {computed, ref, toRef, watch} from 'vue'
+import {computed, ref} from 'vue'
 import WSelect from '@/components/Select/WSelect.vue'
 import type {SelectStringifiedProps, SelectOptionComponent} from './types'
 
@@ -55,6 +56,7 @@ const props = defineProps<SelectStringifiedProps<Model, Data, QueryParamsOptions
 const emit = defineEmits<{
   (e: 'update:model-value', value: Model | null): void
   (e: 'update:query-options-error', value: string | undefined): void
+  (e: 'init-model'): void
 }>()
 
 const selectComponent = ref<ComponentInstance<typeof WSelect<Model, Data, QueryParamsOptions, OptionComponent>> | undefined>()
@@ -80,8 +82,6 @@ const updateModelValue = (value: string, isSelect: boolean): void => {
 const blur = () => {
   selectComponent.value?.blur()
 }
-
-watch(toRef(props, 'modelValue'), blur)
 
 defineExpose({
   blur,

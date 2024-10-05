@@ -16,7 +16,7 @@ interface ButtonGroupPropsBase<Model extends number | string | null | boolean>
   col?: boolean
   semanticType?: SemanticType
   stretch?: boolean
-  alwaysEmit?: boolean
+  allowClear?: boolean
 }
 
 interface ButtonGroupPropsForModel<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>

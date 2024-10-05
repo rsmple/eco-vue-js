@@ -74,7 +74,7 @@
         class="py-2 px-[1.0625rem] first:pt-4 last:pb-4"
       >
         <div class="select-none cursor-default w-select-field sm-not:px-3">
-          {{ emptyStub ?? 'No match' }}
+          {{ !search && emptyStub ? emptyStub : 'No match' }}
         </div>
       </div>
 
@@ -110,14 +110,14 @@
       </SelectOption>
 
       <SelectOption
-        v-if="createOption && search !== ''"
+        v-if="createOption && search !== '' && !optionsFiltered.some(option => valueGetter(option) === search)"
         :is-selected="false"
         :is-cursor="cursor === optionsFiltered.length"
         :loading="(loadingCreate || loadingOptionIndex === optionsFiltered.length) && loading"
         :scroll="isCursorLocked"
         :hide-option-icon="hideOptionIcon"
         class="first:pt-4 last:pb-4"
-        @select="createOption(search)"
+        @select="create(search)"
         @mouseenter="setCursor(optionsFiltered.length)"
       >
         <template #prefix>
@@ -167,18 +167,19 @@ const emit = defineEmits<{
   (e: 'focus', value: FocusEvent): void
   (e: 'blur', value: FocusEvent): void
   (e: 'update:query-options-error', value: string | undefined): void
+  (e: 'init-model'): void
 }>()
 
 const isOpen = ref(false)
 const input = ref<ComponentInstance<typeof WInputSuggest<'text'>> | undefined>()
-const cursor = ref<number>(-1)
+const cursor = ref<number>(0)
 const isCursorLocked = ref(false)
 const search = ref('')
 const searchPrepared = computed(() => search.value.trim().toLocaleLowerCase())
 const enabled = computed(() => !props.disabled)
 
 const {data, isLoading, error: queryError} = props.useQueryFnOptions
-  ? props.noParamsOptions
+  ? !props.queryParamsOptions
     ? (props.useQueryFnOptions as UseQueryEmpty<Data[]>)({enabled})
     : props.useQueryFnOptions(toRef(props, 'queryParamsOptions'), {enabled})
   : {
@@ -187,8 +188,14 @@ const {data, isLoading, error: queryError} = props.useQueryFnOptions
     error: ref(undefined),
   }
 
+const createdOptions = ref([]) as Ref<Data[]>
 const optionsPrepared = computed(() => !data.value ? [] : props.filterOptions ? data.value.filter(option => props.filterOptions?.(option) ?? true) : data.value)
-const optionsFiltered = computed(() => searchPrepared.value === '' ? optionsPrepared.value : optionsPrepared.value.filter(option => props.searchFn(option, searchPrepared.value)))
+const optionsWithCreated = computed(() => [
+  ...optionsPrepared.value,
+  ...createdOptions.value.filter(option => !optionsPrepared.value.some(item => props.valueGetter(item) === props.valueGetter(option))),
+])
+
+const optionsFiltered = computed(() => searchPrepared.value === '' ? optionsWithCreated.value : optionsWithCreated.value.filter(option => props.searchFn(option, searchPrepared.value)))
 const lastIndex = computed(() => props.createOption ? optionsFiltered.value.length : optionsFiltered.value.length - 1)
 const isMobile = getIsMobile()
 const focused = ref(false)
@@ -197,7 +204,7 @@ const loadingCreate = ref(false)
 
 const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
 
-const prefixList = computed(() => props.modelValue.map(value => data.value?.find(item => props.valueGetter(item) === value)).filter(item => item !== undefined))
+const prefixList = computed(() => props.modelValue.map(value => optionsWithCreated.value?.find(item => props.valueGetter(item) === value)).filter(item => item !== undefined))
 
 const close = () => {
   isOpen.value = false
@@ -253,16 +260,22 @@ const cursorDown = () => {
 const selectCursor = () => {
   if (isDisabled.value) return
 
-  const value = cursor.value !== -1 ? props.valueGetter(optionsFiltered.value[cursor.value]) : undefined
+  if (cursor.value === optionsFiltered.value.length) {
+    if (search.value && props.createOption) create(search.value)
 
-  if (value) {
-    setLoadingOptionIndex(cursor.value)
-
-    if (props.modelValue.includes(value)) unselect(value)
-    else select(value)
-  } else {
-    if (search.value) createOption(search.value)
+    return
   }
+
+  const option = cursor.value !== -1 ? optionsFiltered.value[cursor.value] : undefined
+
+  const value = option ? props.valueGetter(option) : undefined
+
+  if (!value) return
+
+  setLoadingOptionIndex(cursor.value)
+
+  if (props.modelValue.includes(value)) unselect(value)
+  else select(value)
 }
 
 let deletePressTimeout: NodeJS.Timeout | null = null
@@ -296,9 +309,13 @@ const unselect = (item: Model): void => {
   emit('unselect', item)
 
   search.value = ''
+
+  const index = createdOptions.value.findIndex(option => props.valueGetter(option) === item)
+
+  if (index !== -1) createdOptions.value.splice(index, 1)
 }
 
-const createOption = async (value: string) => {
+const create = async (value: string) => {
   if (isDisabled.value) return
   if (!props.createOption) return
 
@@ -307,6 +324,7 @@ const createOption = async (value: string) => {
   const option = await props.createOption(value)
 
   if (option) {
+    createdOptions.value.push(option as Data)
     setLoadingOptionIndex(optionsFiltered.value.length)
     select(props.valueGetter(option))
 
@@ -332,11 +350,14 @@ if (props.useQueryFnDefault) {
   const {data: defaultData} = props.useQueryFnDefault({enabled})
 
   watch(defaultData, value => {
-    if (value && props.modelValue.length === 0) select(props.valueGetter(value))
+    if (value && props.modelValue.length === 0) {
+      select(props.valueGetter(value))
+      emit('init-model')
+    }
   }, {immediate: true})
 }
 
-watch(toRef(props, 'modelValue'), async () => {
+watch(() => props.modelValue, async () => {
   await nextTick()
 
   input.value?.updateDropdown()
@@ -349,6 +370,10 @@ watch(queryError, error => {
     emit('update:query-options-error', undefined)
   }
 }, {immediate: true})
+
+watch(() => optionsFiltered.value.length, length => {
+  if (length < cursor.value) cursor.value = length
+})
 
 defineExpose({
   focus,

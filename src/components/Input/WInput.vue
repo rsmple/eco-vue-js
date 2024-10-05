@@ -44,13 +44,13 @@
           />
         </div>
 
-        <div class="col-start-2 grid grid-cols-1 group/input">
-          <div
-            class="flex flex-wrap"
-            :class="{
-              'py-1 gap-1 first:pl-1 last:pr-1': $slots.prefix,
-            }"
-          >
+        <div
+          class="col-start-2 grid grid-cols-1 group/input"
+          :class="{
+            'py-1 first:pl-1 last:pr-1': $slots.prefix,
+          }"
+        >
+          <div class="flex flex-wrap gap-1">
             <slot name="prefix" />
 
             <component

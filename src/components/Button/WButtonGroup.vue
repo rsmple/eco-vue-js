@@ -30,7 +30,7 @@
           :class="{
             'flex-1': stretch,
           }"
-          @click="(alwaysEmit || getValue(item as Model | Entity) !== modelValue) && $emit('update:modelValue', getValue(item as Model | Entity))"
+          @click="updateModelValue(getValue(item as Model | Entity))"
         >
           <slot
             name="option"
@@ -67,8 +67,8 @@ defineOptions({inheritAttrs: false})
 
 const props = defineProps<ButtonGroupProps<Model, Entity, ValueGetter>>()
 
-defineEmits<{
-  (e: 'update:modelValue', value: Model): void
+const emit = defineEmits<{
+  (e: 'update:model-value', value: Model): void
 }>()
 
 const getValue = (item: Model | Entity): Model => {
@@ -77,6 +77,11 @@ const getValue = (item: Model | Entity): Model => {
   } else {
     return item as Model
   }
+}
+
+const updateModelValue = (value: Model): void => {
+  if (value !== props.modelValue) emit('update:model-value', value)
+  else if (props.allowClear) emit('update:model-value', null as Model)
 }
 
 </script>

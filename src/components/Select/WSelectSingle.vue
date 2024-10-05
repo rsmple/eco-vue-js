@@ -12,6 +12,7 @@
     @unselect="updateModelValue(allowClear ? null : $event)"
     @focus="searchModel && typeof modelValue === 'string' ? selectComponent?.setSearch(modelValue) : undefined"
     @update:query-options-error="$emit('update:query-options-error', $event)"
+    @init-model="$emit('init-model')"
   >
     <template
       v-if="$slots.title"
@@ -60,6 +61,7 @@ const props = defineProps<SelectSingleProps<Model, Data, QueryParamsOptions, Opt
 const emit = defineEmits<{
   (e: 'update:model-value', value: EmitType): void
   (e: 'update:query-options-error', value: string | undefined): void
+  (e: 'init-model'): void
 }>()
 
 const selectComponent = ref<ComponentInstance<typeof WSelect<Model, Data, QueryParamsOptions, OptionComponent>> | undefined>()

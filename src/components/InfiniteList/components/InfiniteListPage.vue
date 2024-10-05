@@ -111,7 +111,7 @@
         'pb-2': minHeight && !lastChild,
       }"
     >
-      <div class="select-none cursor-default w-select-field sm-not:px-3">
+      <div class="select-none cursor-default py-1.25 sm-not:px-3">
         {{ emptyStub }}
       </div>
     </div>

@@ -77,11 +77,11 @@
         ref="list"
         :model-value="modelValue"
         :use-query-fn="useQueryFnOptions"
-        :query-params="({...queryParamsOptions, [searchField ?? 'search']: search} as QueryParams)"
+        :query-params="queryParams"
         :loading="loading || isFetchingPrefix"
         :disabled="isDisabled"
-        :empty-stub="emptyStub"
-        :allow-create="createOption && search !== ''"
+        :empty-stub="!search && emptyStub ? emptyStub : undefined"
+        :allow-create="createOption && search !== '' && !hasSearchOption"
         :hide-option-icon="hideOptionIcon"
         :value-getter="valueGetter"
         :loading-create="loadingCreate"
@@ -138,6 +138,7 @@ const emit = defineEmits<{
   (e: 'select', item: Model): void
   (e: 'unselect', item: Model): void
   (e: 'update:modelValue', value: Model[]): void
+  (e: 'init-model'): void
 }>()
 
 const isOpen = ref(false)
@@ -151,6 +152,12 @@ const loadingCreate = ref(false)
 
 const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
 const enabled = computed(() => !props.disabled)
+const queryParams = computed(() => ({...props.queryParamsOptions, [props.searchField ?? 'search']: search.value}))
+const queryParamsFirstPage = computed(() => ({...queryParams.value, page: 1}))
+
+const {data: firstPageData} = props.useQueryFnOptions(queryParamsFirstPage, {enabled: false})
+
+const hasSearchOption = computed(() => firstPageData.value?.results.some(option => props.valueGetter(option) === search.value))
 
 const close = () => {
   isOpen.value = false
@@ -233,7 +240,10 @@ if (props.useQueryFnDefault) {
   const {data: defaultData} = props.useQueryFnDefault({enabled})
 
   watch(defaultData, value => {
-    if (value && props.modelValue.length === 0) select(props.valueGetter(value))
+    if (value && props.modelValue.length === 0) {
+      select(props.valueGetter(value))
+      emit('init-model')
+    }
   }, {immediate: true})
 }
 

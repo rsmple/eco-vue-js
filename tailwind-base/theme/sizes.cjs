@@ -1,5 +1,6 @@
 
 const extend = {
+  '1.25': '0.3125rem',
   6: '1.5rem',
   10: '2.5rem',
   11: '2.75rem',
@@ -22,4 +23,6 @@ module.exports = {
   },
   maxWidth: extend,
   minWidth: extend,
+  padding: extend,
+  margin: extend,
 }

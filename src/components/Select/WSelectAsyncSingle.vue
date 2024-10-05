@@ -12,6 +12,7 @@
     :class="$attrs.class"
     @select="updateModelValue($event as EmitType)"
     @unselect="allowClear && updateModelValue(null as EmitType)"
+    @init-model="$emit('init-model')"
   >
     <template
       v-if="$slots.title"
@@ -59,6 +60,7 @@ const props = defineProps<SelectAsyncSingleProps<Model, Data, QueryParams, Optio
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: EmitType): void
+  (e: 'init-model'): void
 }>()
 
 const selectComponent = ref<ComponentInstance<typeof WSelectAsync<Model, Data, QueryParams, OptionComponent>> | undefined>()

@@ -13,14 +13,12 @@ export interface SelectOptionComponentProps<Option, OptionComponent extends Sele
 interface SelectPropsNoParams<Data extends DefaultData> {
   useQueryFnOptions: UseQueryEmpty<Data[]>
   queryParamsOptions?: never
-  noParamsOptions: true
   options?: never
 }
 
 interface SelectPropsWithParams<Data extends DefaultData, QueryParams> {
   useQueryFnOptions: UseQueryWithParams<Data[], QueryParams>
   queryParamsOptions: QueryParams
-  noParamsOptions?: never
   options?: never
 }
 
@@ -28,7 +26,6 @@ interface SelectPropsWithOptions<Data extends DefaultData> {
   options: Data[]
   useQueryFnOptions?: never
   queryParamsOptions?: never
-  noParamsOptions?: never
 }
 
 type SelectPropsOptions<Data extends DefaultData, QueryParams> = SelectPropsNoParams<Data> | SelectPropsWithParams<Data, QueryParams> | SelectPropsWithOptions<Data>
