@@ -246,8 +246,8 @@
     "./dist/components/InfiniteList/WInfiniteList.vue": {
       "import": "./dist/components/InfiniteList/WInfiniteList.vue.js"
     },
-    "./dist/components/InfiniteList/WInfiniteListPages.vue": {
-      "import": "./dist/components/InfiniteList/WInfiniteListPages.vue.js"
+    "./dist/components/InfiniteList/WInfiniteListWrapper.vue": {
+      "import": "./dist/components/InfiniteList/WInfiniteListWrapper.vue.js"
     },
     "./dist/components/InfoCard/WInfoCard.vue": {
       "import": "./dist/components/InfoCard/WInfoCard.vue.js"

@@ -1,95 +1,94 @@
 <template>
-  <template v-if="!minHeight">
-    <div ref="indicator" />
-
-    <div
-      ref="header"
-      class="sticky top-[var(--header-height)]"
-      :class="{
-        'z-[1]': isIntersecting,
-        'z-20': !isIntersecting,
-      }"
-    >
+  <component
+    :is="minHeight ? EmptyComponent : WInfiniteListWrapper"
+    :scrolling-element="scrollingElement"
+    :header-margin="headerMargin"
+    :init-is-intersecting="props.queryParams instanceof Object && 'page' in props.queryParams && Number.isInteger(props.queryParams.page) && (props.queryParams.page as number) > 1 ? false : undefined"
+    @update:header-padding="$emit('update:header-padding', $event)"
+  >
+    <template #header>
       <slot
         name="header"
         v-bind="{selectAllValue, goto}"
       />
-    </div>
-  </template>
-
-  <WInfiniteListPages
-    ref="infiniteListPages"
-    :query-params="(queryParams as QueryParams)"
-    :use-query-fn="useQueryFn"
-    :scrolling-element="scrollingElement"
-
-    :skip-scroll-target="skipScrollTarget"
-    :skeleton-length="skeletonLength"
-    :hide-page-title="hidePageTitle"
-    :wrap="wrap"
-    :no-gap="noGap"
-    :transition="transition"
-    :page-length="pageLength"
-    :header-top="headerTopIgnore ? 0 : headerTop"
-    :header-height="headerHeight"
-    :min-height="minHeight"
-    :last-child="lastChild"
-    :exclude-params="excludeParams"
-    :empty-stub="emptyStub"
-    :page-class="pageClass"
-    :max-pages="maxPages"
-    :refetch-interval="refetchInterval"
-    :query-options="queryOptions"
-
-    :selected="selected"
-    :value-getter="valueGetter"
-    :select-only="selectOnly"
-    :unselect-only="unselectOnly"
-    :reverse-selection="reverseSelection"
-    :allow-page-selection="allowPageSelection"
-    @update:selected="$emit('select', $event)"
-
-    @update:count="$emit('update:count', $event)"
-    @update:page="$emit('update:page', $event)"
-  >
-    <template #default="{item, setter, skeleton, refetch, previous, next, first, last, resetting, page, index}">
-      <component
-        :is="skeleton ? EmptyComponent : InfiniteListPageSelectItem"
-        :selected="skeleton ? false : getIsSelected(valueGetter(item))"
-        :selected-between="skeleton ? false : getIsSelectedBetween(valueGetter(item), page, index)"
-        @update:selected="
-          toggleSelected(valueGetter(item), reverse && !selectedRange ? !$event : $event);
-          setSelectedCursor($event ? {page, index, id: valueGetter(item)} : null);
-        "
-        @update:selected-range="setSelectedRange({page, index, id: valueGetter(item)})"
-        @update:selected-range-hover="setRangeHover({page, index, id: valueGetter(item)})"
-      >
-        <slot
-          :item="item"
-          :setter="setter"
-          :skeleton="skeleton"
-          :refetch="refetch"
-          :previous="previous"
-          :next="next"
-          :first="first"
-          :last="last"
-          :resetting="resetting"
-          :page="page"
-          :index="index"
-        />
-      </component>
     </template>
-  </WInfiniteListPages>
+
+    <template #default="defaultScope">
+      <InfiniteListPages
+        ref="infiniteListPages"
+        :query-params="(queryParams as QueryParams)"
+        :use-query-fn="useQueryFn"
+        :scrolling-element="scrollingElement"
+
+        :skip-scroll-target="skipScrollTarget"
+        :skeleton-length="skeletonLength"
+        :hide-page-title="hidePageTitle"
+        :wrap="wrap"
+        :no-gap="noGap"
+        :transition="transition"
+        :page-length="pageLength"
+        :header-top="headerTopIgnore ? 0 : 'headerTop' in defaultScope ? defaultScope.headerTop : 0"
+        :header-height="'headerHeight' in defaultScope ? defaultScope.headerHeight : 0"
+        :min-height="minHeight"
+        :last-child="lastChild"
+        :exclude-params="excludeParams"
+        :empty-stub="emptyStub"
+        :page-class="pageClass"
+        :max-pages="maxPages"
+        :refetch-interval="refetchInterval"
+        :query-options="queryOptions"
+
+        :selected="selected"
+        :value-getter="valueGetter"
+        :select-only="selectOnly"
+        :unselect-only="unselectOnly"
+        :reverse-selection="reverseSelection"
+        :allow-page-selection="allowPageSelection"
+        @update:selected="$emit('select', $event)"
+
+        @update:count="$emit('update:count', $event)"
+        @update:page="$emit('update:page', $event)"
+      >
+        <template #default="{item, setter, skeleton, refetch, previous, next, first, last, resetting, page, index}">
+          <component
+            :is="skeleton ? EmptyComponent : InfiniteListPageSelectItem"
+            :selected="skeleton ? false : getIsSelected(valueGetter(item))"
+            :selected-between="skeleton ? false : getIsSelectedBetween(valueGetter(item), page, index)"
+            @update:selected="
+              toggleSelected(valueGetter(item), reverse && !selectedRange ? !$event : $event);
+              setSelectedCursor($event ? {page, index, id: valueGetter(item)} : null);
+            "
+            @update:selected-range="setSelectedRange({page, index, id: valueGetter(item)})"
+            @update:selected-range-hover="setRangeHover({page, index, id: valueGetter(item)})"
+          >
+            <slot
+              :item="item"
+              :setter="setter"
+              :skeleton="skeleton"
+              :refetch="refetch"
+              :previous="previous"
+              :next="next"
+              :first="first"
+              :last="last"
+              :resetting="resetting"
+              :page="page"
+              :index="index"
+            />
+          </component>
+        </template>
+      </InfiniteListPages>
+    </template>
+  </component>
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {onBeforeUnmount, onMounted, provide, ref, toRef, watch} from 'vue'
-import {useInfiniteListHeader} from './use/useInfiniteListHeader'
-import WInfiniteListPages from './WInfiniteListPages.vue'
+import {onBeforeUnmount, provide, ref, toRef} from 'vue'
+import InfiniteListPages from './components/InfiniteListPages.vue'
 import InfiniteListPageSelectItem from './components/InfiniteListPageSelectItem.vue'
 import {useSelected} from './use/useSelected'
 import {wInfiniteListSelection} from './models/injection'
 import EmptyComponent from './components/EmptyComponent.vue'
+import WInfiniteListWrapper from './WInfiniteListWrapper.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -158,7 +157,7 @@ const emit = defineEmits<{
   (e: 'select-range', value: SelectedRange<Model>): void
 }>()
 
-const infiniteListPages = ref<ComponentInstance<typeof WInfiniteListPages<Model, Data, QueryParams>> | undefined>()
+const infiniteListPages = ref<ComponentInstance<typeof InfiniteListPages<Model, Data, QueryParams>> | undefined>()
 
 const updateHeaderPadding = (value: number): void => {
   emit('update:header-padding', value)
@@ -167,8 +166,6 @@ const updateHeaderPadding = (value: number): void => {
 const goto = (page: number, itemIndex?: number) => {
   infiniteListPages.value?.goto(page, itemIndex)
 }
-
-const {indicator, header, headerTop, headerHeight, isIntersecting} = useInfiniteListHeader(props.scrollingElement)
 
 const {
   setSelectedRange,
@@ -198,20 +195,6 @@ provide(wInfiniteListSelection, {
   allowSelectHover,
   selectedCount,
   clearSelected: () => emit('select', []),
-})
-
-watch(isIntersecting, value => {
-  if (!value && headerHeight.value) {
-    updateHeaderPadding(headerHeight.value - props.headerMargin)
-  } else {
-    updateHeaderPadding(0)
-  }
-})
-
-onMounted(() => {
-  if ((props.queryParams as {page?: number}).page && (props.queryParams as {page: number}).page > 1) {
-    isIntersecting.value = false
-  }
 })
 
 onBeforeUnmount(() => {

@@ -9,12 +9,12 @@ const observerOptions = {
   threshold: 1.0,
 }
 
-export const useInfiniteListHeader = (scrollingElement: Element | null = document.scrollingElement) => {
+export const useInfiniteListHeader = (scrollingElement: Element | null = document.scrollingElement, initIsIntersecting = true) => {
   const indicator = ref<HTMLDivElement>()
   const header = ref<HTMLDivElement>()
   const headerHeight = ref<number>(0)
   const headerTop = ref<number>(0)
-  const isIntersecting = ref(true)
+  const isIntersecting = ref(initIsIntersecting)
   let observer: IntersectionObserver | null = null
   let isFirst = true
 

@@ -61,7 +61,7 @@
             name="field"
           >
             <div
-              class="text-base font-normal min-h-[2.75rem] flex items-center border-t -mt-px border-solid border-gray-300 dark:border-gray-700"
+              class="text-base font-normal min-h-[2.75rem] flex items-center border-t border-solid border-gray-300 dark:border-gray-700"
               :class="{
                 'font-mono': mono,
               }"

@@ -45,7 +45,7 @@
           :index="index"
           :loading="loading || isLoading"
           :disabled="disabled"
-          :disable-clear="disableClear"
+          :disable-clear="disableClear || readonly"
           @unselect="unselect(valueGetter(option))"
         >
           <template #option>

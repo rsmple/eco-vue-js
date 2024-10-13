@@ -43,7 +43,7 @@
         :loading="loading || isFetchingPrefix"
         :option-component="(optionComponent as SelectOptionComponent<Data>)"
         :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
-        :disable-clear="disableClear"
+        :disable-clear="disableClear || readonly"
         :preview-data="previewData"
         :created-data="createdData"
         :value-getter="valueGetter"

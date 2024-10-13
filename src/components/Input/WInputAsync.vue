@@ -32,40 +32,45 @@
       <slot name="subtitle" />
     </template>
 
-    <template #right>
+    <template
+      v-if="!readonly || $slots.right"
+      #right
+    >
       <slot name="right" />
 
-      <WSkeleton
-        v-if="skeleton"
-        class="square-11 w-skeleton-rounded-lg"
-      />
-
-      <button
-        v-else
-        class="relative square-11 rounded-lg flex items-center justify-center bg-default dark:bg-default-dark border border-solid border-gray-200 dark:border-gray-800"
-        :class="{
-          'cursor-not-allowed': disabled,
-          'cursor-progress': loading,
-          'w-ripple w-ripple-hover': !disabled && !loading,
-          'bg-primary-default dark:bg-primary-dark text-default dark:text-default-dark': canSave,
-          'text-description': !canSave,
-        }"
-        @click.stop.prevent="toggle"
-        @mousedown.stop.prevent=""
-      >
-        <WSpinner v-if="loading" />
-
-        <IconCheck v-else-if="canSave" />
-
-        <IconSlash v-else-if="focused" />
-
-        <IconEdit v-else />
-
-        <WTooltip
-          v-if="!loading && focused"
-          :text="canSave ? 'Save' : 'Cancel'"
+      <template v-if="!readonly">
+        <WSkeleton
+          v-if="skeleton"
+          class="square-11 w-skeleton-rounded-lg"
         />
-      </button>
+
+        <button
+          v-else
+          class="relative square-11 rounded-lg flex items-center justify-center bg-default dark:bg-default-dark border border-solid border-gray-200 dark:border-gray-800"
+          :class="{
+            'cursor-not-allowed': disabled,
+            'cursor-progress': loading,
+            'w-ripple w-ripple-hover': !disabled && !loading,
+            'bg-primary-default dark:bg-primary-dark text-default dark:text-default-dark': canSave,
+            'text-description': !canSave,
+          }"
+          @click.stop.prevent="toggle"
+          @mousedown.stop.prevent=""
+        >
+          <WSpinner v-if="loading" />
+
+          <IconCheck v-else-if="canSave" />
+
+          <IconSlash v-else-if="focused" />
+
+          <IconEdit v-else />
+
+          <WTooltip
+            v-if="!loading && focused"
+            :text="canSave ? 'Save' : 'Cancel'"
+          />
+        </button>
+      </template>
     </template>
   </WInput>
 </template>

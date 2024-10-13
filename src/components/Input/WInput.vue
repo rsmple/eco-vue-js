@@ -18,7 +18,28 @@
       <slot name="subtitle" />
     </template>
 
-    <template #field="{id, setFocused, focused}">
+    <template
+      v-if="readonly"
+      #default
+    >
+      <div class="flex flex-wrap gap-1">
+        <slot name="prefix" />
+        <div
+          v-if="!hideInput"
+          :class="{
+            'font-mono': mono,
+            'text-secure': textSecure && !isSecureVisible,
+          }"
+        >
+          {{ modelValue }}
+        </div>
+      </div>
+    </template>
+
+    <template
+      v-else
+      #field="{id, setFocused, focused}"
+    >
       <div
         class="
           relative border border-solid rounded-xl bg-default dark:bg-default-dark

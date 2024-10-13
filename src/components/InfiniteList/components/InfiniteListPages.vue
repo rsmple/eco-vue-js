@@ -79,12 +79,12 @@
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import {ref, computed, watch, toRef, nextTick} from 'vue'
-import InfiniteListScroll from './components/InfiniteListScroll.vue'
-import InfiniteListPage from './components/InfiniteListPage.vue'
-import {useRefetchNextPages} from './use/useRefetchNextPages'
-import InfiniteListButton from './components/InfiniteListButton.vue'
+import InfiniteListScroll from './InfiniteListScroll.vue'
+import InfiniteListPage from './InfiniteListPage.vue'
+import {useRefetchNextPages} from '../use/useRefetchNextPages'
+import InfiniteListButton from './InfiniteListButton.vue'
 import {isEqualObj} from '@/utils/utils'
-import {getIsScrollDown} from './models/utils'
+import {getIsScrollDown} from '../models/utils'
 
 const props = withDefaults(
   defineProps<{
