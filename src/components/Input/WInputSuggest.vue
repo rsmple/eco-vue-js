@@ -21,7 +21,7 @@
           v-bind="{
             ...props,
             title: unclickable ? mobileTitle ?? title : title,
-            readonly: readonly || unclickable,
+            unclickable,
             description: undefined,
           }"
           :class="{

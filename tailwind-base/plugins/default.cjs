@@ -91,6 +91,27 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
     },
   )
 
+  addUtilities({
+    '.max-w-inner': {
+      'max-width': 'calc(100vw - var(--actions-bar-width) - var(--nav-bar-width) - var(--inner-margin) - var(--inner-margin) - var(--scroll-bar-width))',
+    },
+    '.max-w-inner-no-actions': {
+      'max-width': 'calc(100vw - var(--nav-bar-width) - var(--inner-margin) - var(--inner-margin) - var(--scroll-bar-width))',
+    },
+    '.w-inner': {
+      'width': 'calc(100vw - var(--actions-bar-width) - var(--nav-bar-width) - var(--inner-margin) - var(--inner-margin) - var(--scroll-bar-width))',
+    },
+    '.min-w-inner': {
+      'min-width': 'calc(100vw - var(--actions-bar-width) - var(--nav-bar-width) - var(--inner-margin) - var(--inner-margin) - var(--scroll-bar-width))',
+    },
+    '.left-inner': {
+      'left': 'calc(var(--nav-bar-width) + var(--inner-margin))',
+    },
+    '.right-inner': {
+      'right': 'calc(var(--actions-bar-width) + var(--inner-margin))',
+    },
+  })
+
   addVariant('supports-backdrop', '@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))')
   addVariant('supports-overlay', '@supports (overflow: overlay)')
   addVariant('supports-overlay-not', '@supports (not (overflow: overlay))')
@@ -266,7 +287,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
 
   addUtilities({
     '.w-ripple': {
-      '&::before': {
+      '&::before, &-has-only::before': {
         'content': '""',
         'position': 'absolute',
         'top': '0',
@@ -294,8 +315,20 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       },
     },
 
+    '.w-ripple-trigger-has:has(.w-ripple-has:active)': {
+      '.w-ripple-has-only::before, &.w-ripple-has-only::before': {
+        'opacity': 'calc(var(--w-ripple-opacity, 0.10) * 2)',
+      },
+    },
+
     '.w-ripple-hover:not(:active):hover, .w-ripple-trigger:not(:active):hover .w-ripple-hover, .w-ripple-hover:not(:active):focus, .w-ripple-trigger:not(:active):focus .w-ripple-hover': {
       '& .w-ripple:not(:active)::before, &.w-ripple::before': {
+        'opacity': 'var(--w-ripple-opacity, 0.10)',
+      },
+    },
+
+    '.w-ripple-trigger-has:has(.w-ripple-has:not(:active):hover) .w-ripple-hover, .w-ripple-trigger-has:has(.w-ripple-has:not(:active):focus) .w-ripple-hover': {
+      '& .w-ripple-has-only:not(:active)::before, &.w-ripple-has-only::before': {
         'opacity': 'var(--w-ripple-opacity, 0.10)',
       },
     },
@@ -384,39 +417,6 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
     '.group\\/model .w-select-field': {
       'padding-left': '0.75rem',
       'padding-right': '0.75rem',
-    },
-
-    '.w-list-row-item, .w-list-header-item': {
-      'padding-right': '1.5rem',
-      '&:first-child, &.first-item': {
-        'padding-left': '1rem',
-      },
-      '&:last-child': {
-        'padding-right': '1rem',
-      },
-    },
-
-    '.w-list-header-item': {
-      'height': '3rem',
-      'border-top-width': '1px',
-      'border-bottom-width': '1px',
-      'border-style': 'solid',
-      'background-color': theme('colors.primary.light'),
-      'border-color': theme('colors.gray.300'),
-      '.dark &': {
-        'background-color': theme('colors.primary.darkest'),
-        'border-color': theme('colors.gray.700'),
-      },
-      '&:first-child': {
-        'border-left-width': '1px',
-        'border-top-left-radius': '1rem',
-        'border-bottom-left-radius': '1rem',
-      },
-      '&:last-child': {
-        'border-right-width': '1px',
-        'border-top-right-radius': '1rem',
-        'border-bottom-right-radius': '1rem',
-      },
     },
 
     '.w-skeleton': {

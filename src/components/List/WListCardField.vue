@@ -1,30 +1,27 @@
 <template>
-  <div class="flex items-center sm:h-16">
-    <div class="w-full relative">
-      <WSkeleton v-if="skeleton" />
+  <div class="grid grid-cols-1 items-center sm:h-16 sm:pr-6">
+    <WSkeleton v-if="skeleton" />
 
-      <template v-else>
-        <slot>
-          &nbsp;
-          <div class="absolute top-0 w-full truncate">
-            <slot name="inner">
-              {{ modelValue }}
-            </slot>
+    <template v-else>
+      <slot>
+        <div class="truncate">
+          <slot name="inner">
+            {{ modelValue }}
+          </slot>
 
-            <WTooltip
-              no-touch
-              overflow-only
-            >
-              <div class="min-w-[12rem] max-w-xl overflow-hidden">
-                <slot name="inner">
-                  {{ modelValue }}
-                </slot>
-              </div>
-            </WTooltip>
-          </div>
-        </slot>
-      </template>
-    </div>
+          <WTooltip
+            no-touch
+            overflow-only
+          >
+            <div class="min-w-[12rem] max-w-xl overflow-hidden">
+              <slot name="inner">
+                {{ modelValue }}
+              </slot>
+            </div>
+          </WTooltip>
+        </div>
+      </slot>
+    </template>
   </div>
 </template>
 

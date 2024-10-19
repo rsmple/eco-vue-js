@@ -41,12 +41,12 @@
           :is="transition ? TransitionGroup : EmptyComponent"
           v-if="hasData && data?.results"
           v-bind="transition ? {
-            ['enter-active-class']:'transition-[grid-template-rows] overflow-hidden grid',
-            ['enter-from-class']:'grid-rows-[0fr]',
-            ['enter-to-class']:'grid-rows-[1fr]',
-            ['leave-active-class']:'transition-[grid-template-rows] overflow-hidden grid',
-            ['leave-from-class']:'grid-rows-[1fr]',
-            ['leave-to-class']:'grid-rows-[0fr]',
+            'enter-active-class': 'transition-[grid-template-rows] overflow-hidden grid',
+            'enter-from-class': 'grid-rows-[0fr]',
+            'enter-to-class': 'grid-rows-[1fr]',
+            'leave-active-class': 'transition-[grid-template-rows] overflow-hidden grid',
+            'leave-from-class': 'grid-rows-[1fr]',
+            'leave-to-class': 'grid-rows-[0fr]',
             css: !resetting,
           } : undefined"
         >

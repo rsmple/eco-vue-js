@@ -1,9 +1,14 @@
 <template>
   <div
     class="
-      grid relative w-full sm:flex
+      relative w-full grid sm:flex isolate sm:mt-4 first:mt-0
       sm-not:group-even:bg-gray-50 sm-not:dark:group-even:bg-primary-darkest/25 sm-not:pt-2
+      sm-not:-px--inner-margin
     "
+    :class="{
+      [cardClass ?? '']: true,
+      'w-ripple-trigger-has': allowOpen,
+    }"
   >
     <Transition
       enter-active-class="transition-transform duration-200"
@@ -17,52 +22,104 @@
       />
     </Transition>
 
-    <WCheckbox
-      v-if="allowSelect && !mobile"
-      :model-value="selectedBetween ? null : selected ?? false"
-      :disabled="disabled"
-      :allow-shift="allowSelectRange"
-      :align-top="alignTop"
-      class="sm:w-list-row-item sm-not:hidden"
+    <div
+      v-if="!mobile"
+      class="sticky z-[1] left-inner sm-not:hidden bg-default dark:bg-default-dark"
       :class="{
-        'opacity-50': allowSelectHover,
+        'width-16': allowSelect,
+        'width-4': !allowSelect,
       }"
-      @update:model-value="allowSelectHover ? updateSelectedRange?.() : updateSelected?.($event)"
-      @update-shift:model-value="updateSelectedRange?.()"
-      @mouseover="allowSelectHover ? updateSelectedRangeHover?.() : undefined"
-    />
-
-    <slot :toggle="updateSelected" />
-
-    <WButtonMore 
-      v-if="!hideMore"
-      class="
-        sm-not:absolute sm-not:right-0 sm-not:-mx--inner-margin sm-not:bottom-0 sm-not:items-start
-        sm:w-list-row-item
-        flex pl-4
-      "
-      :class="{
-        'sm-not:top-5': !moreBottom,
-        'sm-not:top-12': moreBottom,
-        'items-start pt-2': alignTop,
-        'items-center': !alignTop,
-      }"
-      :disabled="disabled"
     >
-      <WButtonMoreItem
-        v-if="allowSelect && mobile"
-        :text="selected ? 'Unselect' : 'Select'"
-        :icon="selected ? markRaw(IconMinusCircle) : markRaw(IconAddCircle)"
-        @click="updateSelected?.(!selected)"
+      <div class="absolute top-0 -z-[1] right-full h-full w-[calc(var(--nav-bar-width)+var(--inner-margin))] bg-default dark:bg-default-dark" />
+
+      <div
+        class="h-full"
+        :class="{
+          'sm:border sm:border-r-0 border-gray-300 dark:border-gray-700 sm:rounded-tl-3xl': hasBorder,
+          'sm:rounded-bl-3xl': hasBorder && !isOpen,
+          'sm:border-b-[transparent] sm:dark:border-b-[transparent]': hasBorder && isOpen,
+          'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': allowOpen
+        }"
+      >
+        <WCheckbox
+          v-if="allowSelect"
+          :model-value="selectedBetween ? null : selected ?? false"
+          :disabled="disabled"
+          :allow-shift="allowSelectRange"
+          :align-top="alignTop"
+          class="px-4 h-full"
+          :class="{
+            'opacity-50': allowSelectHover,
+          }"
+          @update:model-value="allowSelectHover ? updateSelectedRange?.() : updateSelected?.($event)"
+          @update-shift:model-value="updateSelectedRange?.()"
+          @mouseover="allowSelectHover ? updateSelectedRangeHover?.() : undefined"
+        />
+      </div>
+    </div>
+
+    <slot v-bind="{toggle, isOpen}" />
+
+    <div
+      class="sm:sticky sm:z-[1] sm:right-inner sm:bg-default sm:dark:bg-default-dark"
+      :class="{
+        'width-14': !hideMore,
+        'width-4': hideMore,
+      }"
+    >
+      <div
+        v-if="!mobile"
+        class="absolute top-0 -z-[1] left-full h-full w-[calc(var(--actions-bar-width)+var(--inner-margin))] bg-default dark:bg-default-dark sm-not:hidden"
       />
 
-      <slot name="more" />
-    </WButtonMore>
+      <div
+        class="h-full"
+        :class="{
+          'sm:border sm:border-l-0 border-gray-300 dark:border-gray-700 sm:rounded-tr-3xl': hasBorder,
+          'sm:rounded-br-3xl': hasBorder && !isOpen,
+          'sm:border-b-[transparent] sm:dark:border-b-[transparent]': hasBorder && isOpen,
+          'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': allowOpen,
+        }"
+      >
+        <WButtonMore
+          v-if="!hideMore"
+          class="sm-not:absolute sm-not:right-0 sm-not:bottom-0 flex px-4 sm:h-full"
+          :class="{
+            'sm-not:top-5': !moreBottom,
+            'sm-not:top-10': moreBottom,
+            'items-start pt-2': alignTop,
+            'items-center': !alignTop,
+          }"
+          :disabled="disabled"
+        >
+          <WButtonMoreItem
+            v-if="allowSelect && mobile"
+            :text="selected ? 'Unselect' : 'Select'"
+            :icon="selected ? markRaw(IconMinusCircle) : markRaw(IconAddCircle)"
+            @click="updateSelected?.(!selected)"
+          />
+
+          <slot name="more" />
+        </WButtonMore>
+      </div>
+    </div>
   </div>
+
+  <template v-if="$slots.expansion">
+    <div
+      v-if="isOpen"
+      class="sm:sticky sm:w-inner sm:left-inner"
+      :class="{
+        'sm:px-5 sm:border sm:border-t-0 border-gray-300 dark:border-gray-700 sm:rounded-b-3xl': hasBorder,
+      }"
+    >
+      <slot name="expansion" />
+    </div>
+  </template>
 </template>
 
 <script lang="ts" setup>
-import {inject, markRaw, watch} from 'vue'
+import {inject, markRaw, ref, watch} from 'vue'
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 import WButtonMore from '@/components/Button/WButtonMore.vue'
 import WButtonMoreItem from '@/components/Button/WButtonMoreItem.vue'
@@ -76,12 +133,21 @@ defineProps<{
   mobile?: boolean
   moreBottom?: boolean
   alignTop?: boolean
+  hasBorder?: boolean
+  cardClass?: string
+  allowOpen?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:selected', value: boolean): void
   (e: 'update:selected-hover', value: boolean): void
 }>()
+
+const isOpen = ref(false)
+
+const toggle = () => {
+  isOpen.value = !isOpen.value
+}
 
 const {
   allowSelect,

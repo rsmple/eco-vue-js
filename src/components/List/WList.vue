@@ -5,8 +5,6 @@
     :skeleton-length="count ?? listCount"
     :header-margin="isMobile ? 0 : 24"
     hide-page-title
-    transition
-    page-class="grid sm:gap-4"
 
     :allow-select="allowSelect"
     allow-select-range
@@ -44,6 +42,25 @@
             />
           </template>
         </template>
+
+        <template
+          v-if="bulkMore"
+          #more="scope"
+        >
+          <template
+            v-for="(item, index) in bulkMore"
+            :key="index"
+          >
+            <component
+              :is="item"
+              :selection-count="selectionCount"
+              :query-params-getter="getQueryParamsBulk"
+              :disable-message="scope?.disableMessage"
+              :class="scope?.cssClass"
+              @clear:selected="setSelected([])"
+            />
+          </template>
+        </template>
       </WButtonSelection>
 
       <WListHeader
@@ -57,15 +74,20 @@
         :selection="selectAllValue"
         @toggle:selection="$event ? setSelectedReverse([]) : setSelected([])"
       >
-        <WListHeaderItem
+        <template
           v-for="(field, index) in fields"
           :key="index"
-          :title="typeof field.title === 'string' ? field.title : field.title((queryParams as QueryParams))"
-          :field="field.field"
-          :class="[field.cssClass, index === fields.length - 1 ? 'z-[1]' : undefined]"
-          :ordering="ordering"
-          :disabled="!field.field"
-        />
+        >
+          <template v-if="field.visibleGetter?.(queryParams) ?? true">
+            <WListHeaderItem
+              :title="typeof field.title === 'string' ? field.title : field.title(queryParams)"
+              :field="typeof field.field === 'string' ? field.field : field.field?.(queryParams)"
+              :class="[field.cssClass, index === fields.length - 1 ? 'z-[1]' : undefined]"
+              :ordering="ordering"
+              :disabled="!field.field"
+            />
+          </template>
+        </template>
       </WListHeader>
     </template>
 
@@ -73,18 +95,47 @@
       <WListCard
         :disabled="skeleton"
         :mobile="isMobile"
-        :class="cardClass"
+        :card-class="cardClass"
+        :has-border="hasBorder"
+        :more-bottom="moreBottom"
+        :allow-open="fields.some(item => item.allowOpen) && !skeleton"
       >
+        <template #default="{toggle, isOpen}">
+          <template
+            v-for="(field, index) in fields"
+            :key="index"
+          >
+            <template v-if="field.visibleGetter?.(queryParams) ?? true">
+              <component
+                :is="field.component"
+                :item="item"
+                :readonly="readonlyGetter?.(item)"
+                :skeleton="skeleton"
+                :mobile="isMobile"
+                :class="{
+                  [field.cssClass ?? '']: true,
+                  'cursor-pointer w-ripple w-ripple-hover w-ripple-has w-ripple-opacity-[0.04]': field.allowOpen && !skeleton,
+                  'sm:border-y border-gray-300 dark:border-gray-700': hasBorder,
+                  'sm:border-b-[transparent] sm:dark:border-b-[transparent]': hasBorder && isOpen,
+                }"
+                @update:item="setter"
+                @delete:item="setter(); refetch()"
+                @click="field.allowOpen && !skeleton && toggle()"
+              />
+            </template>
+          </template>
+        </template>
+
         <template
-          v-for="(field, index) in fields"
-          :key="index"
+          v-if="expansion"
+          #expansion
         >
           <component
-            :is="field.component"
+            :is="expansion"
             :item="item"
             :readonly="readonlyGetter?.(item)"
-            :class="field.cssClass"
             :skeleton="skeleton"
+            :mobile="isMobile"
             @update:item="setter"
             @delete:item="setter(); refetch()"
           />
@@ -115,7 +166,7 @@ import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 import {getIsMobile} from '@/utils/mobile'
 import {getPosition, useSelected} from '@/utils/useSelected'
 import WListCard from './WListCard.vue'
-import type {BulkComponent, ListField, MenuComponent} from './types'
+import type {BulkComponent, FieldComponent, ListField, MenuComponent} from './types'
 import WListHeader from './WListHeader.vue'
 import WListHeaderItem from './WListHeaderItem.vue'
 import {parseOrdering, type OrderItem} from '@/utils/order'
@@ -128,15 +179,19 @@ const isMobile = getIsMobile()
 const props = defineProps<{
   count?: number
   fields: ListField<Data, QueryParams>[]
+  expansion?: FieldComponent<Data>
   useQueryFn: UseQueryPaginated<Data, QueryParams>
   queryParams: QueryParams
   bulkDisableMessage?: string
   selectionTitle: string
   bulk?: BulkComponent<QueryParams>[]
+  bulkMore?: BulkComponent<QueryParams>[]
   menu: MenuComponent<Data>[]
   readonlyGetter?: (item: Data) => boolean
   cardClass?: string
   selectAllTextGetter: (isUnselect: boolean, count: number) => string
+  hasBorder?: boolean
+  moreBottom?: boolean
 }>()
 
 defineEmits<{

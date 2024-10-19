@@ -6,6 +6,8 @@
     leave-active-class="transition-[grid-template-rows] overflow-hidden grid"
     leave-from-class="grid-rows-[1fr]"
     leave-to-class="grid-rows-[0fr]"
+    @before-enter="$emit('update:visible', true)"
+    @after-leave="$emit('update:visible', false)"
   >
     <KeepAlive>
       <div
@@ -34,5 +36,8 @@ withDefaults(
   },
 )
 
+defineEmits<{
+  (e: 'update:visible', value: boolean): void
+}>()
 
 </script>

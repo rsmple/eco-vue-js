@@ -46,7 +46,7 @@
           transition-colors duration-75 overflow-hidden min-h-11 grid grid-cols-[auto,1fr,auto]
         "
         :class="{
-          'focus-within:border-primary-default dark:focus-within:border-primary-dark': !disabled && !readonly,
+          'focus-within:border-primary-default dark:focus-within:border-primary-dark': !disabled && !readonly && !unclickable,
           'cursor-text': !disabled,
           'border-negative dark:border-negative-dark': errorMessage,
           'border-gray-300 dark:border-gray-700': !disabled,
@@ -100,7 +100,7 @@
               :type="type ?? 'text'"
               :name="name"
               :disabled="disabled"
-              :readonly="readonly"
+              :readonly="readonly || unclickable"
               :autocomplete="autocomplete"
               :size="size || undefined"
               :spellcheck="spellcheck ? 'true' : 'false'"
@@ -123,7 +123,7 @@
           :loading="loading"
           :allow-clear="allowClear && modelValue !== ''"
           :disabled="disabled || disabledActions"
-          :readonly="readonly"
+          :readonly="readonly || unclickable"
           :text-secure="textSecure"
           :is-secure-visible="isSecureVisible"
           :allow-paste="allowPaste"
@@ -195,7 +195,7 @@ const input = ref<HTMLInputElement>()
 const isSecureVisible = ref(false)
 
 const updateModelValue = (value: string | undefined): void => {
-  if (props.loading || props.disabled || props.readonly) return
+  if (props.loading || props.disabled || props.readonly || props.unclickable) return
 
   if (props.type === 'number') {
     emit('update:modelValue', (typeof value === 'string' && value.length ? Number.parseFloat(value) : undefined) as ModelValue)
@@ -252,7 +252,7 @@ const handleInputEvent = (event: Event): void => {
 }
 
 const clearValue = () => {
-  if (props.disabled || props.readonly) return
+  if (props.disabled || props.readonly || props.unclickable) return
 
   if (typeof props.modelValue === 'string') updateModelValue('')
   else updateModelValue(undefined)
@@ -263,7 +263,7 @@ const clearValue = () => {
 }
 
 const focus = (): void => {
-  if (props.disabled || props.readonly) return
+  if (props.disabled || props.readonly || props.unclickable) return
 
   input.value?.focus()
 }

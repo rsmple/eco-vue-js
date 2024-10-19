@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-list-header-item flex gap-2 select-none items-center text-description font-semibold h-11"
+    class="pr-6 flex gap-2 select-none items-center text-description font-semibold"
     :class="{
       'cursor-pointer': !disabled,
     }"
