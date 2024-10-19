@@ -1,46 +1,54 @@
 <template>
-  <div
-    class="pr-6 flex gap-2 select-none items-center text-description font-semibold"
-    :class="{
-      'cursor-pointer': !disabled,
-    }"
-    @click="setOrdering"
+  <component
+    :is="allowResize ? HeaderItemResizer : 'div'"
+    class="select-none text-description pr-6"
+    @update:width="$emit('update:width', $event)"
   >
-    <div
-      class="whitespace-nowrap"
+    <component
+      :is="disabled ? 'div' : 'button'"
+      class="h-full w-full flex gap-2 group font-semibold items-center" 
       :class="{
-        'hover:underline': !disabled,
+        'cursor-pointer': !disabled,
       }"
-    >
-      <slot>
-        {{ title }}
-      </slot>
-    </div>
-
-    <Transition
-      enter-active-class="transition-opacity"
-      leave-active-class="transition-opacity"
-      enter-from-class="opacity-0"
-      leave-to-class="opacity-0"
+      @click="setOrdering"
     >
       <div
-        v-if="index !== -1"
-        class="flex gap-1 w-7 items-center"
+        class="whitespace-nowrap"
+        :class="{
+          'group-hover:underline': !disabled,
+        }"
       >
-        <IconBack
-          class="w-4 h-4 transition-transform"
-          :class="{
-            'rotate-90': ordering[index]?.order === 'ASC',
-            '-rotate-90': ordering[index]?.order === 'DESC',
-          }"
-        />
-
-        <div v-if="ordering.length > 1">
-          {{ index + 1 }}
-        </div>
+        <slot>
+          {{ title }}
+        </slot>
       </div>
-    </Transition>
-  </div>
+
+      <Transition
+        v-if="!disabled"
+        enter-active-class="transition-opacity"
+        leave-active-class="transition-opacity"
+        enter-from-class="opacity-0"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="index !== -1"
+          class="flex gap-1 items-center"
+        >
+          <IconBack
+            class="square-3 transition-transform"
+            :class="{
+              'rotate-90': ordering[index]?.order === 'ASC',
+              '-rotate-90': ordering[index]?.order === 'DESC',
+            }"
+          />
+
+          <div v-if="ordering.length > 1">
+            {{ index + 1 }}
+          </div>
+        </div>
+      </Transition>
+    </component>
+  </component>
 </template>
 
 <script lang="ts" setup generic="Field">
@@ -48,12 +56,18 @@ import {computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
 import {encodeOrdering, Order, type OrderItem} from '@/utils/order'
+import HeaderItemResizer from './components/HeaderItemResizer.vue'
 
 const props = defineProps<{
   title?: string
   field: Field
   ordering: OrderItem<Field>[]
   disabled?: boolean
+  allowResize?: boolean
+}>()
+
+defineEmits<{
+  (e: 'update:width', value: number): void
 }>()
 
 const route = useRoute()

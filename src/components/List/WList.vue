@@ -85,6 +85,11 @@
               :class="[field.cssClass, index === fields.length - 1 ? 'z-[1]' : undefined]"
               :ordering="ordering"
               :disabled="!field.field"
+              :allow-resize="field.allowResize"
+              :style="{
+                minWidth: !isMobile && fieldConfig[index]?.width ? fieldConfig[index].width + 'px' : undefined
+              }"
+              @update:width="fieldConfig[index].width = $event"
             />
           </template>
         </template>
@@ -117,6 +122,9 @@
                   'cursor-pointer w-ripple w-ripple-hover w-ripple-has w-ripple-opacity-[0.04]': field.allowOpen && !skeleton,
                   'sm:border-y border-gray-300 dark:border-gray-700': hasBorder,
                   'sm:border-b-[transparent] sm:dark:border-b-[transparent]': hasBorder && isOpen,
+                }"
+                :style="{
+                  minWidth: !isMobile && fieldConfig[index]?.width ? fieldConfig[index].width + 'px' : undefined
                 }"
                 @update:item="setter"
                 @delete:item="setter(); refetch()"
@@ -172,6 +180,10 @@ import WListHeaderItem from './WListHeaderItem.vue'
 import {parseOrdering, type OrderItem} from '@/utils/order'
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 
+type FieldConfig = {
+  width: number
+}
+
 const PAGE_LENGTH = 24
 
 const isMobile = getIsMobile()
@@ -200,6 +212,8 @@ defineEmits<{
 
 const listCount = ref(0)
 const selectionCount = ref(0)
+
+const fieldConfig = ref<FieldConfig[]>(props.fields.map(() => ({width: 0})))
 
 const allowSelect = computed(() => props.bulk !== undefined)
 

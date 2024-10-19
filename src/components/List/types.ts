@@ -14,6 +14,7 @@ export type ListField<Data, QueryParams = unknown> = {
   field?: Extract<keyof Data, string> | ((params: QueryParams) => Extract<keyof Data, string>)
   visibleGetter?: (params: QueryParams) => boolean
   allowOpen?: boolean
+  allowResize?: boolean
 }
 
 export type MenuComponent<Data> = Component<{
