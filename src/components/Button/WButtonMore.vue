@@ -5,7 +5,7 @@
       'w-hover-circle-trigger cursor-pointer': !disabled,
       'cursor-not-allowed opacity-50': disabled,
     }"
-    class="outline-none"
+    class="outline-none w-full h-full flex items-center justify-center"
     @click="toggle"
   >
     <WDropdownMenu
@@ -19,14 +19,14 @@
     >
       <template #toggle>
         <div
-          class="relative rounded-full square-6 sm-not:square-5 sm-not:my-0.5 flex items-center justify-center outline-none"
+          class="relative p-px"
           :class="{
             'w-hover-circle': !disabled,
             'text-description': !isOpen,
             'text-primary-default dark:text-primary-dark': isOpen,
           }"
         >
-          <IconMore class="rotate-90" />
+          <component :is="icon ?? IconMore" />
         </div>
       </template>
 
@@ -35,7 +35,7 @@
           class="-mr-[1.375rem] sm-not:-mr-6 bg-default dark:bg-default-dark rounded-xl shadow-md my-4 overflow-hidden dark:border dark:border-solid dark:border-gray-800"
           @click="close"
         >
-          <slot />
+          <slot :close="close" />
         </WClickOutside>
       </template>
     </WDropdownMenu>
@@ -50,6 +50,7 @@ import IconMore from '@/assets/icons/default/IconMore.svg?component'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 
 const props = defineProps<{
+  icon?: SVGComponent
   disabled?: boolean
 }>()
 

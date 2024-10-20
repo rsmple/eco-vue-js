@@ -35,7 +35,9 @@
           'width-14': !hideMore,
           'width-4': hideMore,
         }"
-      />
+      >
+        <slot name="settings" />
+      </div>
     </div>
   </div>
 </template>

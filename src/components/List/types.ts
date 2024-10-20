@@ -10,6 +10,7 @@ export type FieldComponent<Data> = Component<{
 export type ListField<Data, QueryParams = unknown> = {
   component: Raw<FieldComponent<Data>>
   title: string | ((params: QueryParams) => string)
+  label: string
   cssClass?: string
   field?: Extract<keyof Data, string> | ((params: QueryParams) => Extract<keyof Data, string>)
   visibleGetter?: (params: QueryParams) => boolean
@@ -27,3 +28,9 @@ export type BulkComponent<QueryParams> = Component<{
   selectionCount: number
   disableMessage?: string
 }>
+
+export type FieldConfig = {
+  width: number
+  visible: boolean
+  order: number
+}

@@ -12,7 +12,8 @@
         maxWidth,
         horizontalAlign,
         updateAlign: true,
-        teleport
+        teleport,
+        noZIndex,
       }"
     >
       <template #toggle="{unclickable}">

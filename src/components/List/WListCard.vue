@@ -61,7 +61,7 @@
     <slot v-bind="{toggle, isOpen}" />
 
     <div
-      class="sm:sticky sm:z-[1] sm:right-inner sm:bg-default sm:dark:bg-default-dark"
+      class="sm:sticky sm:z-[1] sm:right-inner sm:bg-default sm:dark:bg-default-dark sm:ml-auto"
       :class="{
         'width-14': !hideMore,
         'width-4': hideMore,

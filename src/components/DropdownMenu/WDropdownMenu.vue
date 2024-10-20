@@ -16,9 +16,9 @@
         leave-to-class="opacity-0"
       >
         <WDropdown
-          v-if="container && isOpen"
+          v-if="containerRef && isOpen"
           ref="dropdown"
-          :parent-element="container"
+          :parent-element="(containerRef as HTMLDivElement)"
           :horizontal-align="horizontalAlign"
           :update-align="updateAlign"
           :max-height="maxHeight"
@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue'
+import {useTemplateRef} from 'vue'
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 import type {DropdownMenuProps} from './types'
 
@@ -54,12 +54,12 @@ defineEmits<{
   (e: 'update:rect'): void
 }>()
 
-const container = ref<HTMLDivElement>()
-const dropdown = ref<ComponentInstance<typeof WDropdown> | undefined>()
+const containerRef = useTemplateRef('container')
+const dropdownRef = useTemplateRef('dropdown')
 
 defineExpose({
   updateDropdown: () => {
-    dropdown.value?.update()
+    dropdownRef.value?.update()
   },
 })
 

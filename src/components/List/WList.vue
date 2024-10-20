@@ -75,23 +75,30 @@
         @toggle:selection="$event ? setSelectedReverse([]) : setSelected([])"
       >
         <template
-          v-for="(field, index) in fields"
-          :key="index"
+          v-for="field in fieldsFiltered"
+          :key="field.label"
         >
-          <template v-if="field.visibleGetter?.(queryParams) ?? true">
-            <WListHeaderItem
-              :title="typeof field.title === 'string' ? field.title : field.title(queryParams)"
-              :field="typeof field.field === 'string' ? field.field : field.field?.(queryParams)"
-              :class="[field.cssClass, index === fields.length - 1 ? 'z-[1]' : undefined]"
-              :ordering="ordering"
-              :disabled="!field.field"
-              :allow-resize="field.allowResize"
-              :style="{
-                minWidth: !isMobile && fieldConfig[index]?.width ? fieldConfig[index].width + 'px' : undefined
-              }"
-              @update:width="fieldConfig[index].width = $event"
-            />
-          </template>
+          <WListHeaderItem
+            :title="typeof field.title === 'string' ? field.title : field.title(queryParams)"
+            :field="typeof field.field === 'string' ? field.field : field.field?.(queryParams)"
+            :class="field.cssClass"
+            :ordering="ordering"
+            :disabled="!field.field"
+            :allow-resize="field.allowResize"
+            :style="{
+              minWidth: !isMobile && fieldsConfig[field.label]?.width ? fieldsConfig[field.label].width + 'px' : undefined,
+            }"
+            @update:width="fieldsConfig[field.label].width = $event"
+          />
+        </template>
+
+        <template #settings>
+          <HeaderSettings
+            :fields="fields"
+            :fields-config="fieldsConfig"
+            :query-params="queryParams"
+            @update:fields-config="fieldsConfig = {...fieldsConfig, ...$event}"
+          />
         </template>
       </WListHeader>
     </template>
@@ -107,30 +114,28 @@
       >
         <template #default="{toggle, isOpen}">
           <template
-            v-for="(field, index) in fields"
-            :key="index"
+            v-for="field in fieldsFiltered"
+            :key="field.label"
           >
-            <template v-if="field.visibleGetter?.(queryParams) ?? true">
-              <component
-                :is="field.component"
-                :item="item"
-                :readonly="readonlyGetter?.(item)"
-                :skeleton="skeleton"
-                :mobile="isMobile"
-                :class="{
-                  [field.cssClass ?? '']: true,
-                  'cursor-pointer w-ripple w-ripple-hover w-ripple-has w-ripple-opacity-[0.04]': field.allowOpen && !skeleton,
-                  'sm:border-y border-gray-300 dark:border-gray-700': hasBorder,
-                  'sm:border-b-[transparent] sm:dark:border-b-[transparent]': hasBorder && isOpen,
-                }"
-                :style="{
-                  minWidth: !isMobile && fieldConfig[index]?.width ? fieldConfig[index].width + 'px' : undefined
-                }"
-                @update:item="setter"
-                @delete:item="setter(); refetch()"
-                @click="field.allowOpen && !skeleton && toggle()"
-              />
-            </template>
+            <component
+              :is="field.component"
+              :item="item"
+              :readonly="readonlyGetter?.(item)"
+              :skeleton="skeleton"
+              :mobile="isMobile"
+              :class="{
+                [field.cssClass ?? '']: true,
+                'cursor-pointer w-ripple w-ripple-hover w-ripple-has w-ripple-opacity-[0.04]': field.allowOpen && !skeleton,
+                'sm:border-y border-gray-300 dark:border-gray-700': hasBorder,
+                'sm:border-b-[transparent] sm:dark:border-b-[transparent]': hasBorder && isOpen,
+              }"
+              :style="{
+                minWidth: !isMobile && fieldsConfig[field.label]?.width ? fieldsConfig[field.label].width + 'px' : undefined,
+              }"
+              @update:item="setter"
+              @delete:item="setter(); refetch()"
+              @click="field.allowOpen && !skeleton && toggle()"
+            />
           </template>
         </template>
 
@@ -174,15 +179,12 @@ import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 import {getIsMobile} from '@/utils/mobile'
 import {getPosition, useSelected} from '@/utils/useSelected'
 import WListCard from './WListCard.vue'
-import type {BulkComponent, FieldComponent, ListField, MenuComponent} from './types'
+import type {BulkComponent, FieldComponent, FieldConfig, ListField, MenuComponent} from './types'
 import WListHeader from './WListHeader.vue'
 import WListHeaderItem from './WListHeaderItem.vue'
 import {parseOrdering, type OrderItem} from '@/utils/order'
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
-
-type FieldConfig = {
-  width: number
-}
+import HeaderSettings from './components/HeaderSettings.vue'
 
 const PAGE_LENGTH = 24
 
@@ -213,7 +215,25 @@ defineEmits<{
 const listCount = ref(0)
 const selectionCount = ref(0)
 
-const fieldConfig = ref<FieldConfig[]>(props.fields.map(() => ({width: 0})))
+const fieldsConfig = ref<Record<string, FieldConfig>>(props.fields.reduce<Record<string, FieldConfig>>((result, field, index) => {
+  result[field.label] = {
+    width: 0,
+    visible: true,
+    order: index,
+  }
+
+  return result
+}, {}))
+
+const fieldsVisible = computed(() => props.fields.filter(field => field.visibleGetter?.(props.queryParams) ?? true))
+
+const fieldsFiltered = computed(() => {
+  if (isMobile) return fieldsVisible.value
+
+  return fieldsVisible.value
+    .filter(field => fieldsConfig.value[field.label].visible)
+    .sort((a, b) => fieldsConfig.value[a.label].order - fieldsConfig.value[b.label].order)
+})
 
 const allowSelect = computed(() => props.bulk !== undefined)
 
