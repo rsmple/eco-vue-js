@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, markRaw, onBeforeUnmount, ref, toRef, useSlots, watch} from 'vue'
+import {computed, markRaw, onBeforeUnmount, ref, toRef, useSlots, useTemplateRef, watch} from 'vue'
 import {getIsTouchDevice} from '@/utils/mobile'
 import {Tooltip} from '@/utils/Tooltip'
 import {getIncrement} from './models/utils'
@@ -24,10 +24,10 @@ const props = defineProps<{
 const slots = useSlots()
 
 const isTouchDevice = getIsTouchDevice()
-const container = ref<HTMLDivElement>()
+const containerRef = useTemplateRef('container')
 const isOpen = ref(false)
 
-const parent = computed(() => container.value?.parentElement ?? null)
+const parent = computed(() => containerRef.value?.parentElement ?? null)
 const triggerElement = computed(() => props.trigger ?? parent.value)
 
 const open = () => {

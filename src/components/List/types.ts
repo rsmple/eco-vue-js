@@ -14,7 +14,6 @@ export type ListField<Data, QueryParams = unknown> = {
   cssClass?: string
   field?: Extract<keyof Data, string> | ((params: QueryParams) => Extract<keyof Data, string>)
   visibleGetter?: (params: QueryParams) => boolean
-  allowOpen?: boolean
   allowResize?: boolean
 }
 

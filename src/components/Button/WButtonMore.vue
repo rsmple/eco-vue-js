@@ -5,7 +5,7 @@
       'w-hover-circle-trigger cursor-pointer': !disabled,
       'cursor-not-allowed opacity-50': disabled,
     }"
-    class="outline-none w-full h-full flex items-center justify-center"
+    class="outline-none flex items-center justify-center"
     @click="toggle"
   >
     <WDropdownMenu

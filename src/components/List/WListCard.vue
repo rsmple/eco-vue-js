@@ -1,12 +1,10 @@
 <template>
   <div
     class="
-      relative w-full grid sm:flex isolate sm:mt-4 first:mt-0
+      relative grid sm-not:grid-cols-1 sm:flex isolate sm:mt-4 first:mt-0
       sm-not:group-even:bg-gray-50 sm-not:dark:group-even:bg-primary-darkest/25 sm-not:pt-2
-      sm-not:-px--inner-margin
     "
     :class="{
-      [cardClass ?? '']: true,
       'w-ripple-trigger-has': allowOpen,
     }"
   >
@@ -58,10 +56,26 @@
       </div>
     </div>
 
-    <slot v-bind="{toggle, isOpen}" />
-
     <div
-      class="sm:sticky sm:z-[1] sm:right-inner sm:bg-default sm:dark:bg-default-dark sm:ml-auto"
+      class="grid sm:flex sm:flex-1 sm-not:-px--inner-margin isolate"
+      :class="{
+        [cardClass ?? '']: true,
+        'sm:border-y border-gray-300 dark:border-gray-700': hasBorder,
+        'sm:border-b-[transparent] sm:dark:border-b-[transparent]': hasBorder && isOpen,
+        'isolate': allowOpen,
+      }"
+    >
+      <slot v-bind="{toggle, isOpen}" />
+
+      <button
+        v-if="allowOpen"
+        class="cursor-pointer w-ripple w-ripple-hover w-ripple-has w-ripple-opacity-[0.04] absolute top-0 left-0 h-full w-full -z-[1]"
+        @click="toggle"
+      />
+    </div>
+      
+    <div
+      class="sm:sticky sm:z-[1] sm:right-inner sm:bg-default sm:dark:bg-default-dark"
       :class="{
         'width-14': !hideMore,
         'width-4': hideMore,
@@ -78,7 +92,7 @@
           'sm:border sm:border-l-0 border-gray-300 dark:border-gray-700 sm:rounded-tr-3xl': hasBorder,
           'sm:rounded-br-3xl': hasBorder && !isOpen,
           'sm:border-b-[transparent] sm:dark:border-b-[transparent]': hasBorder && isOpen,
-          'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': allowOpen,
+          'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': !mobile && allowOpen,
         }"
       >
         <WButtonMore

@@ -215,6 +215,9 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         'color': theme('colors.gray.700'),
       },
     },
+    '*:focus-visible': {
+      'outline': 'none',
+    },
   })
 
   matchUtilities(

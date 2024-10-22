@@ -110,33 +110,25 @@
         :card-class="cardClass"
         :has-border="hasBorder"
         :more-bottom="moreBottom"
-        :allow-open="fields.some(item => item.allowOpen) && !skeleton"
+        :allow-open="allowOpen && !skeleton"
       >
-        <template #default="{toggle, isOpen}">
-          <template
-            v-for="field in fieldsFiltered"
-            :key="field.label"
-          >
-            <component
-              :is="field.component"
-              :item="item"
-              :readonly="readonlyGetter?.(item)"
-              :skeleton="skeleton"
-              :mobile="isMobile"
-              :class="{
-                [field.cssClass ?? '']: true,
-                'cursor-pointer w-ripple w-ripple-hover w-ripple-has w-ripple-opacity-[0.04]': field.allowOpen && !skeleton,
-                'sm:border-y border-gray-300 dark:border-gray-700': hasBorder,
-                'sm:border-b-[transparent] sm:dark:border-b-[transparent]': hasBorder && isOpen,
-              }"
-              :style="{
-                minWidth: !isMobile && fieldsConfig[field.label]?.width ? fieldsConfig[field.label].width + 'px' : undefined,
-              }"
-              @update:item="setter"
-              @delete:item="setter(); refetch()"
-              @click="field.allowOpen && !skeleton && toggle()"
-            />
-          </template>
+        <template
+          v-for="field in fieldsFiltered"
+          :key="field.label"
+        >
+          <component
+            :is="field.component"
+            :item="item"
+            :readonly="readonlyGetter?.(item)"
+            :skeleton="skeleton"
+            :mobile="isMobile"
+            :class="field.cssClass"
+            :style="{
+              minWidth: !isMobile && fieldsConfig[field.label]?.width ? fieldsConfig[field.label].width + 'px' : undefined,
+            }"
+            @update:item="setter"
+            @delete:item="setter(); refetch()"
+          />
         </template>
 
         <template
@@ -236,6 +228,7 @@ const fieldsFiltered = computed(() => {
 })
 
 const allowSelect = computed(() => props.bulk !== undefined)
+const allowOpen = computed(() => props.expansion !== undefined)
 
 const {
   selected,

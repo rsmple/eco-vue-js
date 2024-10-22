@@ -2,6 +2,7 @@
   <WButtonMore
     :icon="markRaw(IconTableSettings)"
     :disabled="disabled"
+    class="h-full w-full"
   >
     <div class="p-4">
       <div class="flex flex-col">
