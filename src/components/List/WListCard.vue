@@ -122,7 +122,7 @@
   <template v-if="$slots.expansion">
     <div
       v-if="isOpen"
-      class="sm:sticky sm:w-inner sm:left-inner"
+      class="sm:sticky sm:w-inner sm:left-inner sm:-mt-px"
       :class="{
         'sm:px-5 sm:border sm:border-t-0 border-gray-300 dark:border-gray-700 sm:rounded-b-3xl': hasBorder,
       }"
