@@ -23,6 +23,7 @@ import DOMListenerContainer from '@/utils/DOMListenerContainer'
 
 const emit = defineEmits<{
   (e: 'update:width', value: number): void
+  (e: 'save:width'): void
 }>()
 
 const listenerContainer = new DOMListenerContainer()
@@ -59,6 +60,8 @@ const endDrag = () => {
 
   started = null
   widthSaved = null
+
+  emit('save:width')
 }
 
 onMounted(() => {

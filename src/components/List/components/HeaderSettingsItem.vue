@@ -24,7 +24,7 @@
 
     <button
       class="relative w-ripple w-ripple-hover px-2 flex items-center"
-      @click="$emit('update:fields-config', {[field.label]: {...fieldConfig, visible: !fieldConfig.visible}})"
+      @click="$emit('update:fields-config-map', {[field.label]: {...fieldConfig, visible: !fieldConfig.visible}})"
     >
       <component
         :is="fieldConfig.visible ? IconEye : IconEyeSlash"
@@ -49,7 +49,7 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:fields-config', value: Record<string, FieldConfig>): void
+  (e: 'update:fields-config-map', value: Record<string, FieldConfig>): void
   (e: 'drag:start'): void
   (e: 'drag:enter'): void
   (e: 'drag:end'): void

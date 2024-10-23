@@ -29,7 +29,10 @@ export type BulkComponent<QueryParams> = Component<{
 }>
 
 export type FieldConfig = {
-  width: number
+  width: number | null
   visible: boolean
   order: number
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type FieldConfigMap<Fields extends ListField<any, any>[]> = Record<Fields[number]['label'], FieldConfig>

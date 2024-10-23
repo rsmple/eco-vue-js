@@ -1,3 +1,4 @@
+import type {FieldConfig, FieldConfigMap, ListField} from '@/components/List/types'
 
 const overflowScrollRegexp = /auto|scroll|overlay/
 
@@ -147,4 +148,12 @@ export const set = <FieldType, Data extends Record<string, unknown>>(data: Data,
   }, data)
 
   return data
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getDefaultFieldConfigMap = <Fields extends ListField<any, any>[]>(fields: Fields, visible: Fields[number]['label'][]): FieldConfigMap<Fields> => {
+  return fields.reduce<Record<string, FieldConfig>>((result, field, order) => {
+    result[field.label] = {width: null, visible: visible.includes(field.label), order}
+    return result
+  }, {}) as FieldConfigMap<Fields>
 }
