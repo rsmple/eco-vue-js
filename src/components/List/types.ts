@@ -17,6 +17,32 @@ export type ListField<Data, QueryParams = unknown> = {
   allowResize?: boolean
 }
 
+export type ListFieldNested<Data, QueryParams = unknown> = {
+  cssClass?: string
+  fields: ListFields<Data, QueryParams>
+}
+
+type FieldNestedEntity<Data, QueryParams = unknown, Key extends keyof PickByType<Data, NonNullable<unknown>> = keyof PickByType<Data, NonNullable<unknown>>> = {
+  keyEntity: Key,
+  fields: ListFields<Data[Key], QueryParams>
+}
+
+export interface ListFieldNestedEntity<Data, QueryParams = unknown> extends FieldNestedEntity<Data, QueryParams> {
+  cssClass?: string
+}
+
+type FieldNestedArray<Data, QueryParams = unknown, Key extends keyof PickByType<Data, Array<unknown>> = keyof PickByType<Data, Array<unknown>>> = {
+  keyArray: Key,
+  fields: Data[Key] extends Array<infer Inner> ? ListFields<Inner, QueryParams> : []
+}
+
+export interface ListFieldNestedArray<Data, QueryParams = unknown> extends FieldNestedArray<Data, QueryParams> {
+  cssClass?: string
+  cssClassArray?: string
+}
+
+export type ListFields<Data, QueryParams = unknown> = (ListField<Data, QueryParams> | ListFieldNested<Data, QueryParams> | ListFieldNestedEntity<Data, QueryParams> | ListFieldNestedArray<Data, QueryParams>)[]
+
 export type MenuComponent<Data> = Component<{
   item: Data
   readonly?: boolean
@@ -34,5 +60,15 @@ export type FieldConfig = {
   order: number
 }
 
+type GetFieldLabelsTuple<Fields> = Fields extends [infer Head, ...infer Tail]
+  ? Head extends {label: infer Label}
+  ? [Label, ...GetFieldLabelsTuple<Tail>]
+  : Head extends {fields: infer InnerFields}
+  ? [...GetFieldLabelsTuple<InnerFields>, ...GetFieldLabelsTuple<Tail>]
+  : GetFieldLabelsTuple<Tail>
+  : []
+
+export type GetFieldLabels<Fields extends ListFields<unknown>> = GetFieldLabelsTuple<Fields>[number]
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type FieldConfigMap<Fields extends ListField<any, any>[]> = Record<Fields[number]['label'], FieldConfig>
+export type FieldConfigMap<Fields extends ListFields<any, any>> = Record<GetFieldLabels<Fields>, FieldConfig>

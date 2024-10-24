@@ -1,24 +1,26 @@
 <template>
   <div
     :draggable="isDraggable"
-    class="grid grid-cols-[auto,1fr,auto] text-description select-none bg-default dark:bg-default-dark"
+    class="grid grid-cols-[1.75rem,1fr,auto] text-description select-none bg-default dark:bg-default-dark"
     :class="{
       'opacity-[0.001]': isDragging,
       'opacity-50': !fieldConfig.visible && !isDragging,
     }"
-    @dragstart="startDrag"
-    @dragend="endDrag"
-    @dragenter="!isDraggable && $emit('drag:enter')"
+    :style="{order}"
+    @dragstart="!disabledDrag && startDrag()"
+    @dragend="!disabledDrag && endDrag()"
+    @dragenter="!isDraggable && $emit('drag:enter', order)"
     @dragover.stop.prevent=""
   >
     <button
-      class="relative w-ripple w-ripple-hover px-2 flex items-center"
+      v-if="!disabledDrag"
+      class="relative w-ripple w-ripple-hover flex items-center justify-center"
       @mousedown="initDrag"
     >
       <IconDrag class="rotate-90" />
     </button>
 
-    <div class="px-2 py-1 self-center font-semibold">
+    <div class="px-2 py-1 self-center font-semibold col-start-2">
       {{ typeof field.title === 'string' ? field.title : field.title(queryParams) }}
     </div>
 
@@ -41,17 +43,19 @@ import type {FieldConfig, ListField} from '../types'
 import IconEye from '@/assets/icons/sax/IconEye.svg?component'
 import IconEyeSlash from '@/assets/icons/sax/IconEyeSlash.svg?component'
 
-defineProps<{
+const props = defineProps<{
   field: ListField<Data, QueryParams>
   fieldConfig: FieldConfig
   queryParams: QueryParams
   disabled?: boolean
+  disabledDrag?: boolean
+  order: number
 }>()
 
 const emit = defineEmits<{
   (e: 'update:fields-config-map', value: Record<string, FieldConfig>): void
-  (e: 'drag:start'): void
-  (e: 'drag:enter'): void
+  (e: 'drag:start', order: number): void
+  (e: 'drag:enter', order: number): void
   (e: 'drag:end'): void
 }>()
 
@@ -65,7 +69,7 @@ const initDrag = () => {
 const startDrag = () => {
   isDragging.value = true
 
-  emit('drag:start')
+  emit('drag:start', props.order)
 }
 
 const endDrag = () => {

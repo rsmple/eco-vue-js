@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-1 items-center sm:h-16 sm:pr-6"
+    class="grid grid-cols-1 sm:min-h-16 sm:pr-6 sm:last:-mr-6"
     :class="{'pointer-events-none': allowOpen}"
   >
     <WSkeleton v-if="skeleton" />

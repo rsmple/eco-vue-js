@@ -119,6 +119,8 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
   addVariant('touch-not', '.touch-not &')
   addVariant('focus-within-not', '&:not(:focus-within)')
   addVariant('resizer', '&::-webkit-resizer')
+  addVariant('last-not', '&:not(:last-child)')
+  addVariant('first-not', '&:not(:first-child)')
 
   addBase({
     '.w-input': {

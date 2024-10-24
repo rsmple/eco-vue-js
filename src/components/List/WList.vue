@@ -74,23 +74,24 @@
         :selection="selectAllValue"
         @toggle:selection="$event ? setSelectedReverse([]) : setSelected([])"
       >
-        <template
-          v-for="field in fieldsFiltered"
-          :key="field.label"
-        >
-          <WListHeaderItem
-            :title="typeof field.title === 'string' ? field.title : field.title(queryParams)"
-            :field="typeof field.field === 'string' ? field.field : field.field?.(queryParams)"
-            :class="field.cssClass"
-            :ordering="ordering"
-            :disabled="!field.field"
-            :allow-resize="field.allowResize"
-            :style="{
-              minWidth: !isMobile && fieldConfigMap[field.label]?.width ? fieldConfigMap[field.label].width + 'px' : undefined,
-            }"
-            @update:width="fieldConfigMap[field.label].width = $event"
-            @save:width="fieldConfigMap = fieldConfigMap"
-          />
+        <template #default>
+          <HeaderFieldNested :fields="fieldsFiltered">
+            <template #default="{field}">
+              <WListHeaderItem
+                :title="typeof field.title === 'string' ? field.title : field.title(queryParams)"
+                :field="typeof field.field === 'string' ? field.field : field.field?.(queryParams)"
+                :class="field.cssClass"
+                :ordering="ordering"
+                :disabled="!field.field"
+                :allow-resize="field.allowResize"
+                :style="{
+                  minWidth: !isMobile && fieldConfigMap[field.label]?.width ? fieldConfigMap[field.label].width + 'px' : undefined,
+                }"
+                @update:width="fieldConfigMap[field.label].width = $event"
+                @save:width="fieldConfigMap = fieldConfigMap"
+              />
+            </template>
+          </HeaderFieldNested>
         </template>
 
         <template #settings>
@@ -113,24 +114,33 @@
         :has-border="hasBorder"
         :more-bottom="moreBottom"
         :allow-open="allowOpen && !skeleton"
+        :align-top="alignTop"
       >
-        <template
-          v-for="field in fieldsFiltered"
-          :key="field.label"
-        >
-          <component
-            :is="field.component"
+        <template #default>
+          <ListCardFieldNested
+            :fields="fieldsFiltered"
             :item="item"
-            :readonly="readonlyGetter?.(item)"
-            :skeleton="skeleton"
-            :mobile="isMobile"
-            :class="field.cssClass"
-            :style="{
-              minWidth: !isMobile && fieldConfigMap[field.label]?.width ? fieldConfigMap[field.label].width + 'px' : undefined,
-            }"
-            @update:item="setter"
-            @delete:item="setter(); refetch()"
-          />
+          >
+            <template #default="defaultScope">
+              <component
+                :is="defaultScope.field.component"
+                :item="defaultScope.item"
+                :readonly="readonlyGetter?.(defaultScope.item)"
+                :skeleton="skeleton"
+                :mobile="isMobile"
+                :class="{
+                  [defaultScope.field.cssClass ?? '']: true,
+                  'items-center': !alignTop,
+                  'items-start': alignTop
+                }"
+                :style="{
+                  minWidth: !isMobile && fieldConfigMap[defaultScope.field.label]?.width ? fieldConfigMap[defaultScope.field.label].width + 'px' : undefined,
+                }"
+                @update:item="setter"
+                @delete:item="setter(); refetch()"
+              />
+            </template>
+          </ListCardFieldNested>
         </template>
 
         <template
@@ -167,19 +177,21 @@
   </WInfiniteList>
 </template>
 
-<script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListField<Data, QueryParams>[]">
+<script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>">
 import {computed, ref, toRef} from 'vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 import {getIsMobile} from '@/utils/mobile'
 import {getPosition, useSelected} from '@/utils/useSelected'
 import WListCard from './WListCard.vue'
-import type {BulkComponent, FieldComponent, FieldConfigMap, ListField, MenuComponent} from './types'
+import type {BulkComponent, FieldComponent, FieldConfigMap, ListFields, MenuComponent} from './types'
 import WListHeader from './WListHeader.vue'
 import WListHeaderItem from './WListHeaderItem.vue'
 import {parseOrdering, type OrderItem} from '@/utils/order'
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import HeaderSettings from './components/HeaderSettings.vue'
-import {useFieldConfigMap} from './use/useFieldConfigMap'
+import {filterFields, getFirstFieldLabel, useFieldConfigMap} from './use/useFieldConfigMap'
+import ListCardFieldNested from './components/ListCardFieldNested.vue'
+import HeaderFieldNested from './components/HeaderFieldNested.vue'
 
 const PAGE_LENGTH = 24
 
@@ -203,6 +215,7 @@ const props = defineProps<{
   moreBottom?: boolean
   configKey: string
   defaultConfigMap: FieldConfigMap<Fields>
+  alignTop?: boolean
 }>()
 
 defineEmits<{
@@ -212,16 +225,15 @@ defineEmits<{
 const listCount = ref(0)
 const selectionCount = ref(0)
 
-const fieldsVisible = computed(() => props.fields.filter(field => field.visibleGetter?.(props.queryParams) ?? true))
+const fieldsVisible = computed(() => filterFields(props.fields, field => field.visibleGetter?.(props.queryParams) ?? true))
 
 const {fieldConfigMap, hasSaved, reset} = useFieldConfigMap(toRef(props, 'configKey'), fieldsVisible, toRef(props, 'defaultConfigMap'))
 
 const fieldsFiltered = computed(() => {
   if (isMobile) return fieldsVisible.value
 
-  return fieldsVisible.value
-    .filter(field => fieldConfigMap.value[field.label]?.visible)
-    .sort((a, b) => fieldConfigMap.value[a.label].order - fieldConfigMap.value[b.label].order)
+  return filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible)
+    .sort((a, b) => fieldConfigMap.value[getFirstFieldLabel(a)].order - fieldConfigMap.value[getFirstFieldLabel(b)].order)
 })
 
 const allowSelect = computed(() => props.bulk !== undefined)

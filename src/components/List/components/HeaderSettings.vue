@@ -2,25 +2,26 @@
   <WButtonMore
     :icon="markRaw(IconTableSettings)"
     :disabled="disabled"
-    class="h-full w-full"
+    class="h-full w-full items-center"
   >
     <div class="p-4">
       <div class="flex flex-col">
-        <HeaderSettingsItem
-          v-for="field in fields"
-          :key="field.label"
-          :field="field"
-          :field-config="fieldConfigMap[field.label]"
-          :query-params="queryParams"
-          :disabled="disabled"
-          :style="{
-            order: getOrder(field),
-          }"
-          @drag:start="dragItem = field.label"
-          @drag:enter="dragEnter(field)"
-          @drag:end="drop"
-          @update:fields-config-map="$emit('update:field-config-map', {...fieldConfigMap, ...$event})"
-        />
+        <HeaderFieldNested :fields="fields">
+          <template #default="{field, nested, first, last}">
+            <HeaderSettingsItem
+              :field="field"
+              :field-config="fieldConfigMap[field.label]"
+              :query-params="queryParams"
+              :disabled="disabled"
+              :disabled-drag="nested"
+              :order="getOrder(field)"
+              @drag:start="dragStart(field.label, $event)"
+              @drag:enter="dragEnter($event, nested, first, last)"
+              @drag:end="drop"
+              @update:fields-config-map="$emit('update:field-config-map', {...fieldConfigMap, ...$event})"
+            />
+          </template>
+        </HeaderFieldNested>
       </div>
 
       <div class="border-b border-solid border-gray-200 dark:border-gray-700 my-4" />
@@ -44,11 +45,12 @@
 import WButtonMore from '@/components/Button/WButtonMore.vue'
 import {markRaw, ref} from 'vue'
 import IconTableSettings from '@/assets/icons/sax/IconTableSettings.svg?component'
-import type {FieldConfig, ListField} from '../types'
+import type {FieldConfig, ListField, ListFields} from '../types'
 import HeaderSettingsItem from './HeaderSettingsItem.vue'
+import HeaderFieldNested from './HeaderFieldNested.vue'
 
 const props = defineProps<{
-  fields: ListField<Data, QueryParams>[]
+  fields: ListFields<Data, QueryParams>
   fieldConfigMap: Record<string, FieldConfig>
   queryParams: QueryParams
   hasSaved?: boolean
@@ -73,8 +75,25 @@ const getOrder = (field: ListField<Data, QueryParams>): number => {
   return props.fieldConfigMap[field.label].order
 }
 
-const dragEnter = (field: ListField<Data, QueryParams>): void => {
-  dragItemNewOrder.value = getOrder(field)
+const dragStart = (label: string, order: number): void => {
+  dragItem.value = label
+  dragItemNewOrder.value = order
+}
+
+const dragEnter = (order: number, nested: boolean, first: boolean, last: boolean): void => {
+  if (nested) {
+    if (dragItemNewOrder.value === null) return
+
+    if (first) {
+      if (order < dragItemNewOrder.value) dragItemNewOrder.value = order
+    } else if (last) {
+      if (order > dragItemNewOrder.value) dragItemNewOrder.value = order
+    }
+
+    return
+  }
+
+  dragItemNewOrder.value = order
 }
 
 const dragEnd = () => {
@@ -83,10 +102,24 @@ const dragEnd = () => {
 }
 
 const drop = () => {
-  const newConfig = props.fields.reduce<Record<string, FieldConfig>>((result, field) => {
-    result[field.label] = {...props.fieldConfigMap[field.label], order: getOrder(field)}
-    return result
-  }, {})
+  const newConfig: Record<string, FieldConfig> = {}
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const processConfig = <F extends ListFields<any, any>>(fields: F) => {
+    fields.forEach((field) => {
+      if ('label' in field) newConfig[field.label] = {...props.fieldConfigMap[field.label], order: getOrder(field)}
+
+      if ('fields' in field) processConfig(field.fields)
+    }, {})
+  }
+
+  processConfig(props.fields)
+
+  Object.values(newConfig)
+    .sort((a, b) => a.order - b.order)
+    .forEach((item, index) => {
+      item.order = index
+    })
 
   if (Object.keys(newConfig).some(key => props.fieldConfigMap[key].order !== newConfig[key].order)) emit('update:field-config-map', newConfig)
 
