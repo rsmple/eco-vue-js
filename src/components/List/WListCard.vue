@@ -48,6 +48,7 @@
           class="px-4 h-full"
           :class="{
             'opacity-50': allowSelectHover,
+            'pt-3': alignTop,
           }"
           @update:model-value="allowSelectHover ? updateSelectedRange?.() : updateSelected?.($event)"
           @update-shift:model-value="updateSelectedRange?.()"
@@ -101,7 +102,7 @@
           :class="{
             'sm-not:top-5': !moreBottom,
             'sm-not:top-10': moreBottom,
-            'items-start pt-2': alignTop,
+            'items-start pt-3': alignTop,
             'items-center': !alignTop,
           }"
           :disabled="disabled"

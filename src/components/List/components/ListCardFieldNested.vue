@@ -4,27 +4,30 @@
     :key="getFirstFieldLabel(field)"
   >
     <template v-if="'fields' in field">
-      <div
-        v-if="'keyArray' in field"
-        :class="field.cssClassArray"
-        class="sm:mr-6"
-      >
-        <div
-          v-for="inner in item[field.keyArray]"
-          :key="(inner as Data).id"
-          :class="field.cssClass"
-          class="flex"
+      <template v-if="'keyArray' in field">
+        <component
+          :is="field.componentArray ?? 'div'"
+          v-bind="field.componentArray ? {item} : (undefined as never)"
+          :class="field.cssClassArray"
+          class="sm:mr-6"
         >
-          <ListCardFieldNested
-            :fields="(field.fields as ListFields<Data, QueryParams>)"
-            :item="(inner as Data)"
+          <div
+            v-for="inner in item[field.keyArray]"
+            :key="(inner as Data).id"
+            :class="field.cssClass"
+            class="flex"
           >
-            <template #default="defaultScope">
-              <slot v-bind="defaultScope" />
-            </template>
-          </ListCardFieldNested>
-        </div>
-      </div>
+            <ListCardFieldNested
+              :fields="(field.fields as ListFields<Data, QueryParams>)"
+              :item="(inner as Data)"
+            >
+              <template #default="defaultScope">
+                <slot v-bind="defaultScope" />
+              </template>
+            </ListCardFieldNested>
+          </div>
+        </component>
+      </template>
 
       <div
         v-else

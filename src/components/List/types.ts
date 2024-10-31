@@ -39,6 +39,7 @@ type FieldNestedArray<Data, QueryParams = unknown, Key extends keyof PickByType<
 export interface ListFieldNestedArray<Data, QueryParams = unknown> extends FieldNestedArray<Data, QueryParams> {
   cssClass?: string
   cssClassArray?: string
+  componentArray?: Raw<FieldComponent<Data>>
 }
 
 export type ListFields<Data, QueryParams = unknown> = (ListField<Data, QueryParams> | ListFieldNested<Data, QueryParams> | ListFieldNestedEntity<Data, QueryParams> | ListFieldNestedArray<Data, QueryParams>)[]

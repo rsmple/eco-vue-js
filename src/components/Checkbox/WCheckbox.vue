@@ -6,7 +6,7 @@
       'cursor-progress': loading,
       'cursor-not-allowed opacity-70': disabled,
       'pt-1 pb-4': title,
-      'items-start pt-2': alignTop,
+      'items-start': alignTop,
       'items-center': !alignTop,
     }"
     @click="toggle"

@@ -37,26 +37,20 @@
         }"
       >
         <div
-          class="absolute square-6 -top-1 rounded-full transition-all"
+          class="absolute square-6 -top-1 rounded-full transition-[right] shadow-md z-10 flex items-center justify-center border border-solid"
           :class="{
             'right-4': modelValue === false,
             'right-2': modelValue === null,
             'right-0': modelValue === true,
             'w-ripple w-hover-circle': !disabled && !readonly,
+            'bg-default dark:bg-gray-100 border-default dark:border-gray-100': !modelValue || loading,
+            'bg-primary-default dark:bg-primary-dark border-primary-default dark:border-primary-dark': modelValue && !loading,
           }"
         >
-          <div
-            class="h-full w-full rounded-full shadow-md z-10 flex items-center justify-center text-description"
-            :class="{
-              'bg-default dark:bg-gray-100': !modelValue || loading,
-              'bg-primary-default dark:bg-primary-dark': modelValue && !loading,
-            }"
-          >
-            <WSpinner
-              v-if="loading"
-              class="[--spinner-size:1.25rem]"
-            />
-          </div>
+          <WSpinner
+            v-if="loading"
+            class="[--spinner-size:1.25rem] text-description"
+          />
         </div>
       </div>
     </button>
