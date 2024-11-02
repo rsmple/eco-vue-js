@@ -14,7 +14,7 @@
   >
     <button
       v-if="!disabledDrag"
-      class="relative w-ripple w-ripple-hover flex items-center justify-center"
+      class="relative w-ripple w-ripple-hover flex items-center justify-center cursor-grab active:cursor-grabbing"
       @mousedown="initDrag"
     >
       <IconDrag class="rotate-90" />

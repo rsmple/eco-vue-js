@@ -21,9 +21,9 @@ export class ApiErrorCancel<Data extends RequestData = NonNullable<unknown>> ext
 
 export const handleApiError = <Error>(
   error: Error,
-  form?: {invalidate: ComponentInstance<typeof WForm>['invalidate']},
+  form?: {invalidate: ComponentInstance<typeof WForm>['invalidate']} | null,
   field?: string,
-  formValidator?: {invalidate: ComponentInstance<typeof WFormValidator>['invalidate']},
+  formValidator?: {invalidate: ComponentInstance<typeof WFormValidator>['invalidate']} | null,
 ): Promise<Error> => {
   if (error instanceof ApiError && !(error instanceof ApiErrorCancel)) {
     const caption = (error.response?.data as ErrorResponse<NonNullable<unknown>>)?.detail

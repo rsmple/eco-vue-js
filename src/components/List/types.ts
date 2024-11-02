@@ -42,7 +42,24 @@ export interface ListFieldNestedArray<Data, QueryParams = unknown> extends Field
   componentArray?: Raw<FieldComponent<Data>>
 }
 
-export type ListFields<Data, QueryParams = unknown> = (ListField<Data, QueryParams> | ListFieldNested<Data, QueryParams> | ListFieldNestedEntity<Data, QueryParams> | ListFieldNestedArray<Data, QueryParams>)[]
+type FieldNestedArrayGetter<Data, QueryParams = unknown, Inner = unknown> = {
+  getterArray: (data: Data) => Inner[],
+  fields: ListFields<Inner, QueryParams>
+}
+
+export interface ListFieldNestedArrayGetter<Data, QueryParams = unknown> extends FieldNestedArrayGetter<Data, QueryParams> {
+  cssClass?: string
+  cssClassArray?: string
+  componentArray?: Raw<FieldComponent<Data>>
+}
+
+export type ListFields<Data, QueryParams = unknown> = (
+  ListField<Data, QueryParams> |
+  ListFieldNested<Data, QueryParams> |
+  ListFieldNestedEntity<Data, QueryParams> |
+  ListFieldNestedArray<Data, QueryParams> |
+  ListFieldNestedArrayGetter<Data, QueryParams>
+)[]
 
 export type MenuComponent<Data> = Component<{
   item: Data

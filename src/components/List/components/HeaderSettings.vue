@@ -5,7 +5,7 @@
     class="h-full w-full items-center"
   >
     <div class="p-4">
-      <div class="flex flex-col">
+      <div class="grid grid-cols-1">
         <HeaderFieldNested :fields="fields">
           <template #default="{field, nested, first, last}">
             <HeaderSettingsItem

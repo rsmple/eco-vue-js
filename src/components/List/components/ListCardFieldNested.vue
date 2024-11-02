@@ -4,7 +4,7 @@
     :key="getFirstFieldLabel(field)"
   >
     <template v-if="'fields' in field">
-      <template v-if="'keyArray' in field">
+      <template v-if="'keyArray' in field || 'getterArray' in field">
         <component
           :is="field.componentArray ?? 'div'"
           v-bind="field.componentArray ? {item} : (undefined as never)"
@@ -12,7 +12,7 @@
           class="sm:mr-6"
         >
           <div
-            v-for="inner in item[field.keyArray]"
+            v-for="inner in ('keyArray' in field ? item[field.keyArray] : field.getterArray(item))"
             :key="(inner as Data).id"
             :class="field.cssClass"
             class="flex"

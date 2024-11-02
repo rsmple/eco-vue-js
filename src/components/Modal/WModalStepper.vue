@@ -27,7 +27,7 @@
     <template #actions>
       <WButton
         v-if="current === 0"
-        :disabled="loading"
+        :disabled="loading || disabled"
         :semantic-type="SemanticType.SECONDARY"
         class="w-full"
         @click="$emit('close:modal')"
@@ -37,7 +37,7 @@
 
       <WButton
         v-else
-        :disabled="loading"
+        :disabled="loading || disabled"
         :semantic-type="SemanticType.SECONDARY"
         class="w-full"
         @click="previous"
@@ -49,6 +49,7 @@
         v-if="current === defaultSlots.length - 1"
         :semantic-type="SemanticType.PRIMARY"
         :loading="loading"
+        :disabled="disabled || disabledNext"
         class="w-full"
         @click="$emit('submit')"
       >
@@ -59,6 +60,7 @@
         v-else
         :semantic-type="SemanticType.PRIMARY"
         :loading="loading"
+        :disabled="disabled || disabledNext"
         class="w-full"
         @click="next"
       >
@@ -79,6 +81,8 @@ import {Notify} from '@/utils/Notify'
 defineProps<{
   names?: string[]
   loading?: boolean
+  disabled?: boolean
+  disabledNext?: boolean
 }>()
 
 const emit = defineEmits<{
