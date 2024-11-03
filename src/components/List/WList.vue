@@ -21,6 +21,11 @@
     @update:count="listCount = $event"
   >
     <template #header="{selectAllValue}">
+      <slot
+        name="header"
+        :count="listCount"
+      />
+
       <WButtonSelection
         v-if="allowSelect"
         :title="selectionTitle"

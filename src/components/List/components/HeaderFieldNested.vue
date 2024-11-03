@@ -7,12 +7,23 @@
       <HeaderFieldNested :fields="(field.fields as ListFields<Data, QueryParams>)">
         <template #default="defaultScope">
           <slot
+            v-if="defaultScope.length !== 1"
             :field="defaultScope.field"
             :nested="true"
             :index="defaultScope.index"
             :length="defaultScope.length"
             :first="defaultScope.first"
             :last="defaultScope.last"
+          />
+
+          <slot
+            v-else
+            :field="defaultScope.field"
+            :nested="true"
+            :index="index"
+            :length="fields.length"
+            :first="index === 0"
+            :last="index === fields.length - 1"
           />
         </template>
       </HeaderFieldNested>
