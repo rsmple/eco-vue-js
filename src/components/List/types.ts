@@ -7,6 +7,16 @@ export type FieldComponent<Data> = Component<{
   mobile?: boolean
 }>
 
+export type FieldComponentItem<Data> = Component<{
+  item: Data
+  skeleton?: boolean
+  readonly?: boolean
+  mobile?: boolean
+  index?: number
+  first?: boolean
+  last?: boolean
+}>
+
 export type ListField<Data, QueryParams = unknown> = {
   component: Raw<FieldComponent<Data>>
   title: string | ((params: QueryParams) => string)
@@ -34,6 +44,7 @@ export interface ListFieldNestedEntity<Data, QueryParams = unknown> extends Fiel
 type FieldNestedArray<Data, QueryParams = unknown, Key extends keyof PickByType<Data, Array<unknown>> = keyof PickByType<Data, Array<unknown>>> = {
   keyArray: Key,
   fields: Data[Key] extends Array<infer Inner> ? ListFields<Inner, QueryParams> : []
+  componentItem?: Data[Key] extends Array<infer Inner> ? Raw<FieldComponentItem<Inner>> : never
 }
 
 export interface ListFieldNestedArray<Data, QueryParams = unknown> extends FieldNestedArray<Data, QueryParams> {
@@ -43,11 +54,12 @@ export interface ListFieldNestedArray<Data, QueryParams = unknown> extends Field
 }
 
 type FieldNestedArrayGetter<Data, QueryParams = unknown, Inner = unknown> = {
-  getterArray: (data: Data) => Inner[],
+  getterArray: (data: Data) => Inner[]
   fields: ListFields<Inner, QueryParams>
+  componentItem?: Raw<FieldComponentItem<Inner>>
 }
 
-export interface ListFieldNestedArrayGetter<Data, QueryParams = unknown> extends FieldNestedArrayGetter<Data, QueryParams> {
+export interface ListFieldNestedArrayGetter<Data, QueryParams = unknown, Inner = unknown> extends FieldNestedArrayGetter<Data, QueryParams, Inner> {
   cssClass?: string
   cssClassArray?: string
   componentArray?: Raw<FieldComponent<Data>>

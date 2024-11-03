@@ -131,7 +131,7 @@
                 :class="{
                   [defaultScope.field.cssClass ?? '']: true,
                   'items-center': !alignTop,
-                  'items-start': alignTop
+                  'items-start': alignTop,
                 }"
                 :style="{
                   minWidth: !isMobile && fieldConfigMap[defaultScope.field.label]?.width ? fieldConfigMap[defaultScope.field.label].width + 'px' : undefined,
