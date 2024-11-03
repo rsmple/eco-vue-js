@@ -177,3 +177,11 @@ declare type ObjectFromEntries<List> = {
 }
 
 declare type ObjectPaths<Model, FieldType, IncludeNull = false> = ObjectFromEntries<PathsEntries<Model, FieldType, IncludeNull>[number]>
+
+declare type IsTuple<T> = [T] extends [never]
+  ? false
+  : T extends unknown[]
+  ? number extends T['length']
+  ? false
+  : true
+  : false

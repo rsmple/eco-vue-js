@@ -8,7 +8,7 @@
         <component
           :is="field.componentArray ?? 'div'"
           v-bind="field.componentArray ? {item} : (undefined as never)"
-          :class="{[field.cssClassArray ?? '']: true, 'sm:mr-6': !nested}"
+          :class="field.cssClassArray"
         >
           <ListCardFieldNestedItem :items="(('keyArray' in field ? item[field.keyArray] : field.getterArray(item)) as Data[])">
             <template #default="{inner, index, last, first}">
@@ -38,12 +38,12 @@
 
       <div
         v-else
-        :class="{[field.cssClass ?? '']: true, 'sm:mr-6': !nested}"
+        :class="field.cssClass"
         class="flex"
       >
         <ListCardFieldNested
           :fields="(field.fields as ListFields<Data, QueryParams>)"
-          :item="'keyEntity' in field ? (item[field.keyEntity] as Data) : item"
+          :item="'keyEntity' in field ? (item[field.keyEntity] as Data) : 'getterEntity' in field ? (field.getterEntity(item) as Data) : item"
           nested
         >
           <template #default="defaultScope">

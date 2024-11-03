@@ -20,7 +20,7 @@
       <IconDrag class="rotate-90" />
     </button>
 
-    <div class="px-2 py-1 self-center font-semibold col-start-2">
+    <div class="px-2 py-1 self-center font-semibold col-start-2 truncate">
       {{ typeof field.title === 'string' ? field.title : field.title(queryParams) }}
     </div>
 

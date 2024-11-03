@@ -103,6 +103,10 @@ export const useFieldConfigMap = <Fields extends ListFields<any, any>>(key: Mayb
     })
   }
 
+  if (isRef(defaultConfigMap)) watch(defaultConfigMap, newValue => {
+    value.value = parseFieldConfigMap(getFieldConfigMap(unref(key)), unref(fields), newValue)
+  })
+
   return {
     fieldConfigMap,
     hasSaved,

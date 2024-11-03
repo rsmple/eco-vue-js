@@ -1,11 +1,12 @@
 <template>
   <div
     class="
-      relative grid sm-not:grid-cols-1 sm:flex isolate sm:mt-4 first:mt-0
+      relative grid sm-not:grid-cols-1 sm:flex isolate
       sm-not:group-even:bg-gray-50 sm-not:dark:group-even:bg-primary-darkest/25 sm-not:pt-2
     "
     :class="{
       'w-ripple-trigger-has': allowOpen,
+      [cardWrapperClass ?? '']: true,
     }"
   >
     <Transition
@@ -150,6 +151,7 @@ defineProps<{
   alignTop?: boolean
   hasBorder?: boolean
   cardClass?: string
+  cardWrapperClass?: string
   allowOpen?: boolean
 }>()
 

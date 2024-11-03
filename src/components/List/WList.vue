@@ -111,6 +111,7 @@
         :disabled="skeleton"
         :mobile="isMobile"
         :card-class="cardClass"
+        :card-wrapper-class="cardWrapperClass"
         :has-border="hasBorder"
         :more-bottom="moreBottom"
         :allow-open="allowOpen && !skeleton"
@@ -210,6 +211,7 @@ const props = defineProps<{
   menu: MenuComponent<Data>[]
   readonlyGetter?: (item: Data) => boolean
   cardClass?: string
+  cardWrapperClass?: string
   selectAllTextGetter: (isUnselect: boolean, count: number) => string
   hasBorder?: boolean
   moreBottom?: boolean

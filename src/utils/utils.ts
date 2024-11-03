@@ -151,7 +151,7 @@ export const set = <FieldType, Data extends Record<string, unknown>>(data: Data,
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getDefaultFieldConfigMap = <Fields extends ListFields<any, any>>(fields: Fields, visible: GetFieldLabels<Fields>[]): FieldConfigMap<Fields> => {
+export const getDefaultFieldConfigMap = <Fields extends ListFields<any, any>>(fields: Fields, visible: true extends IsTuple<Fields> ? GetFieldLabels<Fields>[] : string[]): FieldConfigMap<Fields> => {
   const result: Record<string, FieldConfig> = {}
   let order = 0
 

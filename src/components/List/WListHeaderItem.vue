@@ -6,7 +6,7 @@
   >
     <component
       :is="disabled ? 'div' : 'button'"
-      class="h-full w-full flex gap-2 group font-semibold items-center" 
+      class="h-full w-full flex gap-2 group font-semibold items-center overflow-hidden" 
       :class="{
         'cursor-pointer': !disabled,
       }"

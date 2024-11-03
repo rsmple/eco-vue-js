@@ -1,7 +1,10 @@
 <template>
   <div
-    class="grid grid-cols-1 sm:pr-6 sm:last:-mr-6"
-    :class="{'pointer-events-none': allowOpen}"
+    class="grid grid-cols-1"
+    :class="{
+      'pointer-events-none': allowOpen,
+      'sm:pr-6': !noPadding,
+    }"
   >
     <WSkeleton v-if="skeleton" />
 
@@ -24,6 +27,7 @@ defineProps<{
   modelValue?: string | number
   skeleton?: boolean
   allowOpen?: boolean
+  noPadding?: boolean
 }>()
 
 </script>

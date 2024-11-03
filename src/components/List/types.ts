@@ -41,6 +41,16 @@ export interface ListFieldNestedEntity<Data, QueryParams = unknown> extends Fiel
   cssClass?: string
 }
 
+type FieldNestedEntityGetter<Data, QueryParams = unknown, Inner = unknown> = {
+  getterEntity: (data: Data) => Inner
+  fields: ListFields<Inner, QueryParams>
+  componentItem?: Raw<FieldComponentItem<Inner>>
+}
+
+export interface ListFieldNestedEntityGetter<Data, QueryParams = unknown, Inner = unknown> extends FieldNestedEntityGetter<Data, QueryParams, Inner> {
+  cssClass?: string
+}
+
 type FieldNestedArray<Data, QueryParams = unknown, Key extends keyof PickByType<Data, Array<unknown>> = keyof PickByType<Data, Array<unknown>>> = {
   keyArray: Key,
   fields: Data[Key] extends Array<infer Inner> ? ListFields<Inner, QueryParams> : []
@@ -66,11 +76,15 @@ export interface ListFieldNestedArrayGetter<Data, QueryParams = unknown, Inner =
 }
 
 export type ListFields<Data, QueryParams = unknown> = (
-  ListField<Data, QueryParams> |
-  ListFieldNested<Data, QueryParams> |
-  ListFieldNestedEntity<Data, QueryParams> |
-  ListFieldNestedArray<Data, QueryParams> |
-  ListFieldNestedArrayGetter<Data, QueryParams>
+  | ListField<Data, QueryParams>
+
+  | ListFieldNested<Data, QueryParams>
+
+  | ListFieldNestedEntity<Data, QueryParams>
+  | ListFieldNestedEntityGetter<Data, QueryParams>
+
+  | ListFieldNestedArray<Data, QueryParams>
+  | ListFieldNestedArrayGetter<Data, QueryParams>
 )[]
 
 export type MenuComponent<Data> = Component<{
