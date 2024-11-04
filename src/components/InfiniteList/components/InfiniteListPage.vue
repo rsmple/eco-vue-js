@@ -205,7 +205,7 @@ const setItem = (index: number, newItem: Data | undefined) => {
   if (newItem) newData.results.splice(index, 1, newItem)
   else newData.results.splice(index, 1)
 
-  setData(newData)
+  setData(newData, {index, newItem})
 }
 
 const emitRefetch = () => {

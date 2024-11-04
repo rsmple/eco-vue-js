@@ -2,19 +2,24 @@ import type {Component, Raw} from 'vue'
 
 export type FieldComponent<Data> = Component<{
   item: Data
-  skeleton?: boolean
-  readonly?: boolean
-  mobile?: boolean
+  skeleton: boolean
+  readonly: boolean
+  mobile: boolean
+}>
+
+export type FieldComponentNested<Data> = Component<{
+  item: Data
+  skeleton: boolean
+  mobile: boolean
 }>
 
 export type FieldComponentItem<Data> = Component<{
   item: Data
-  skeleton?: boolean
-  readonly?: boolean
-  mobile?: boolean
-  index?: number
-  first?: boolean
-  last?: boolean
+  skeleton: boolean
+  mobile: boolean
+  index: number
+  first: boolean
+  last: boolean
 }>
 
 export type ListField<Data, QueryParams = unknown> = {
@@ -60,7 +65,7 @@ type FieldNestedArray<Data, QueryParams = unknown, Key extends keyof PickByType<
 export interface ListFieldNestedArray<Data, QueryParams = unknown> extends FieldNestedArray<Data, QueryParams> {
   cssClass?: string
   cssClassArray?: string
-  componentArray?: Raw<FieldComponent<Data>>
+  componentArray?: Raw<FieldComponentNested<Data>>
 }
 
 type FieldNestedArrayGetter<Data, QueryParams = unknown, Inner = unknown> = {
@@ -72,7 +77,7 @@ type FieldNestedArrayGetter<Data, QueryParams = unknown, Inner = unknown> = {
 export interface ListFieldNestedArrayGetter<Data, QueryParams = unknown, Inner = unknown> extends FieldNestedArrayGetter<Data, QueryParams, Inner> {
   cssClass?: string
   cssClassArray?: string
-  componentArray?: Raw<FieldComponent<Data>>
+  componentArray?: Raw<FieldComponentNested<Data>>
 }
 
 export type ListFields<Data, QueryParams = unknown> = (
@@ -89,13 +94,15 @@ export type ListFields<Data, QueryParams = unknown> = (
 
 export type MenuComponent<Data> = Component<{
   item: Data
-  readonly?: boolean
+  readonly: boolean
+  updateItem: (newItem?: Data | undefined) => void
+  deleteItem: () => void
 }>
 
 export type BulkComponent<QueryParams> = Component<{
   queryParamsGetter: () => QueryParams
   selectionCount: number
-  disableMessage?: string
+  disableMessage: string | undefined
 }>
 
 export type FieldConfig = {

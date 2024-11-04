@@ -7,14 +7,14 @@
       <template v-if="'keyArray' in field || 'getterArray' in field">
         <component
           :is="field.componentArray ?? 'div'"
-          v-bind="field.componentArray ? {item} : (undefined as never)"
+          v-bind="field.componentArray ? {item, skeleton, mobile} : (undefined as never)"
           :class="field.cssClassArray"
         >
           <ListCardFieldNestedItem :items="(('keyArray' in field ? item[field.keyArray] : field.getterArray(item)) as Data[])">
             <template #default="{inner, index, last, first}">
               <component
                 :is="field.componentItem ?? EmptyComponent"
-                v-bind="field.componentItem ? {item, index, last, first} : (undefined as never)"
+                v-bind="field.componentItem ? {item, skeleton, mobile, index, last, first} : (undefined as never)"
               >
                 <div
                   class="flex"
@@ -23,6 +23,8 @@
                   <ListCardFieldNested
                     :fields="(field.fields as ListFields<Data, QueryParams>)"
                     :item="(inner as Data)"
+                    :skeleton="skeleton"
+                    :mobile="mobile"
                     nested
                   >
                     <template #default="defaultScope">
@@ -44,6 +46,8 @@
         <ListCardFieldNested
           :fields="(field.fields as ListFields<Data, QueryParams>)"
           :item="'keyEntity' in field ? (item[field.keyEntity] as Data) : 'getterEntity' in field ? (field.getterEntity(item) as Data) : item"
+          :skeleton="skeleton"
+          :mobile="mobile"
           nested
         >
           <template #default="defaultScope">
@@ -71,6 +75,8 @@ defineProps<{
   fields: ListFields<Data, QueryParams>
   item: Data
   nested?: boolean
+  skeleton: boolean
+  mobile: boolean
 }>()
 
 defineSlots<{

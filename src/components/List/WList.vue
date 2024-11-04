@@ -126,12 +126,14 @@
           <ListCardFieldNested
             :fields="fieldsFiltered"
             :item="item"
+            :skeleton="skeleton"
+            :mobile="isMobile"
           >
             <template #default="defaultScope">
               <component
                 :is="defaultScope.field.component"
                 :item="defaultScope.item"
-                :readonly="readonlyGetter?.(defaultScope.item)"
+                :readonly="readonlyGetter?.(defaultScope.item) ?? false"
                 :skeleton="skeleton"
                 :mobile="isMobile"
                 :class="{
@@ -156,7 +158,7 @@
           <component
             :is="expansion"
             :item="item"
-            :readonly="readonlyGetter?.(item)"
+            :readonly="readonlyGetter?.(item) ?? false"
             :skeleton="skeleton"
             :mobile="isMobile"
             @update:item="setter"
@@ -172,7 +174,12 @@
             <component
               :is="menuItem"
               :item="item"
-              :readonly="readonlyGetter?.(item)"
+              :readonly="readonlyGetter?.(item) ?? false"
+              :update-item="setter"
+              :delete-item="() => {
+                setter()
+                refetch()
+              }"
               @update:item="setter"
               @delete:item="setter(); refetch()"
             />
@@ -198,8 +205,7 @@ import HeaderSettings from './components/HeaderSettings.vue'
 import {filterFields, getFirstFieldLabel, useFieldConfigMap} from './use/useFieldConfigMap'
 import ListCardFieldNested from './components/ListCardFieldNested.vue'
 import HeaderFieldNested from './components/HeaderFieldNested.vue'
-
-const PAGE_LENGTH = 24
+import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
 
 const isMobile = getIsMobile()
 

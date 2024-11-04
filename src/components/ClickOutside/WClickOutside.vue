@@ -15,7 +15,9 @@ const emit = defineEmits<{
 const element = ref<HTMLDivElement | undefined>()
 
 const clickListener = (event: MouseEvent) => {
-  if (element.value && event.target instanceof Element && !hasParent(element.value, event.target)) emit('click')
+  if (!element.value || !(event.target instanceof Element) || hasParent(element.value, event.target)) return
+
+  emit('click')
 }
 
 onMounted(() => {
