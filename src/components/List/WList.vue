@@ -89,9 +89,8 @@
                 :ordering="ordering"
                 :disabled="!field.field"
                 :allow-resize="field.allowResize"
-                :style="{
-                  minWidth: !isMobile && fieldConfigMap[field.label]?.width ? fieldConfigMap[field.label].width + 'px' : undefined,
-                }"
+                :item-class="field.cssClassHeader"
+                :width-style="getFieldStyles(field.label)"
                 @update:width="fieldConfigMap[field.label].width = $event"
                 @save:width="fieldConfigMap = fieldConfigMap"
               />
@@ -141,9 +140,7 @@
                   'items-center': !alignTop,
                   'items-start': alignTop,
                 }"
-                :style="{
-                  minWidth: !isMobile && fieldConfigMap[defaultScope.field.label]?.width ? fieldConfigMap[defaultScope.field.label].width + 'px' : undefined,
-                }"
+                :style="getFieldStyles(defaultScope.field.label)"
                 @update:item="setter"
                 @delete:item="setter(); refetch()"
               />
@@ -191,7 +188,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>">
-import {computed, ref, toRef} from 'vue'
+import {computed, ref, toRef, type StyleValue} from 'vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 import {getIsMobile} from '@/utils/mobile'
 import {getPosition, useSelected} from '@/utils/useSelected'
@@ -294,6 +291,17 @@ const getQueryParamsBulk =  (): QueryParams => {
   }
 
   return props.queryParams
+}
+
+const getFieldStyles = (label: string): StyleValue | undefined => {
+  if (isMobile || !fieldConfigMap.value[label]?.width) return undefined
+
+  const value = fieldConfigMap.value[label].width + 'px'
+
+  return {
+    minWidth: value,
+    maxWidth: value,
+  }
 }
 
 </script>

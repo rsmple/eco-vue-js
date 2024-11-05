@@ -8,7 +8,6 @@
     <button
       class="absolute top-0 right-1 h-full w-6 flex items-center opacity-50 hover:opacity-100 cursor-col-resize"
       @mousedown.stop.prevent="startDrag"
-      @mouseup.stop.prevent="endDrag"
       @click.stop.prevent
     >
       <IconDrag />
@@ -17,9 +16,16 @@
 </template>
 
 <script lang="ts" setup generic="Field">
-import {onBeforeUnmount, onMounted, useTemplateRef} from 'vue'
+import {onBeforeUnmount, useTemplateRef, watch} from 'vue'
 import IconDrag from '@/assets/icons/sax/IconDrag.svg?component'
 import DOMListenerContainer from '@/utils/DOMListenerContainer'
+
+const MIN_WIDTH = 64
+const MAX_WIDTH = 2000
+
+const props = defineProps<{
+  hasStyles: boolean
+}>()
 
 const emit = defineEmits<{
   (e: 'update:width', value: number): void
@@ -45,7 +51,7 @@ const startDrag = (clickEvent: MouseEvent) => {
       return
     }
 
-    emit('update:width', widthSaved + event.clientX - started)
+    emit('update:width', Math.min(Math.max(widthSaved + event.clientX - started, MIN_WIDTH), MAX_WIDTH))
   })
 
   listenerContainer.addEventListener(document, 'mouseup', event => {
@@ -64,13 +70,13 @@ const endDrag = () => {
   emit('save:width')
 }
 
-onMounted(() => {
-  setTimeout(() => {
+watch(() => props.hasStyles, value => {
+  if (!value) setTimeout(() => {
     if (!elementRef.value) return
 
     emit('update:width', elementRef.value.offsetWidth)
-  }, 1000)
-})
+  }, 0)
+}, {immediate: true})
 
 onBeforeUnmount(() => {
   listenerContainer.destroy()

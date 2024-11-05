@@ -1,19 +1,22 @@
 <template>
   <component
     :is="allowResize ? HeaderItemResizer : 'div'"
+    v-bind="allowResize ? {hasStyles: widthStyle !== undefined} : (undefined as never)"
     class="select-none text-description pr-6"
+    :style="widthStyle"
     @update:width="$emit('update:width', $event)"
   >
     <component
       :is="disabled ? 'div' : 'button'"
-      class="h-full w-full flex gap-2 group font-semibold items-center overflow-hidden" 
+      class="h-full w-full flex gap-2 group" 
       :class="{
         'cursor-pointer': !disabled,
+        [itemClass ?? '']: true,
+        'font-semibold items-center whitespace-nowrap overflow-hidden': !itemClass,
       }"
       @click="setOrdering"
     >
       <div
-        class="whitespace-nowrap"
         :class="{
           'group-hover:underline': !disabled,
         }"
@@ -52,7 +55,7 @@
 </template>
 
 <script lang="ts" setup generic="Field">
-import {computed} from 'vue'
+import {computed, type StyleValue} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
 import {encodeOrdering, Order, type OrderItem} from '@/utils/order'
@@ -64,6 +67,8 @@ const props = defineProps<{
   ordering: OrderItem<Field>[]
   disabled?: boolean
   allowResize?: boolean
+  itemClass?: string
+  widthStyle: StyleValue | undefined
 }>()
 
 defineEmits<{
