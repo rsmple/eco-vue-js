@@ -10,11 +10,11 @@
     }"
   >
     <IconLink
-      class="inline -mt-1 rounded-lg p-[1px]"
+      class="inline rounded-lg p-px"
       :class="{
-        'square-5 mr-1': !small,
-        'square-3 mr-0.5': small,
-        [semanticTypeButtonStylesMap[semanticType]]: true,
+        'square-5 mr-1 -mt-1': !small,
+        'square-3.5 mr-0.5 -mt-0.5': small,
+        [semanticTypeChipsStylesMap[semanticType]]: true,
       }"
     /><slot>{{ text }}</slot>
   </component>
@@ -24,7 +24,7 @@
 import {RouterLink} from 'vue-router'
 import IconLink from '@/assets/icons/sax/IconLink.svg?component'
 import {SemanticType} from '@/utils/SemanticType'
-import {semanticTypeButtonStylesMap, semanticTypeTextStylesMap} from '@/components/Button/models/semanticTypeStylesMap'
+import {semanticTypeChipsStylesMap, semanticTypeTextStylesMap} from '@/components/Button/models/semanticTypeStylesMap'
 import type {LinkProps} from '@/types/types'
 
 interface Props extends Partial<LinkProps> {

@@ -243,8 +243,6 @@ const fieldsVisible = computed(() => filterFields(props.fields, field => field.v
 const {fieldConfigMap, hasSaved, reset} = useFieldConfigMap(toRef(props, 'configKey'), fieldsVisible, toRef(props, 'defaultConfigMap'))
 
 const fieldsFiltered = computed(() => {
-  if (isMobile) return fieldsVisible.value
-
   return filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible)
     .sort((a, b) => fieldConfigMap.value[getFirstFieldLabel(a)].order - fieldConfigMap.value[getFirstFieldLabel(b)].order)
 })

@@ -9,6 +9,11 @@ export const semanticTypeButtonStylesMap: Record<SemanticType, string> = {
   [SemanticType.INFO]: 'bg-info dark:bg-info-dark text-secondary-default dark:text-default-dark',
 }
 
+export const semanticTypeChipsStylesMap: Record<SemanticType, string> = {
+  ...semanticTypeButtonStylesMap,
+  [SemanticType.SECONDARY]: 'bg-gray-200 dark:bg-gray-800 text-description',
+}
+
 export const semanticTypeButtonBorderStylesMap: Record<SemanticType, string> = {
   [SemanticType.PRIMARY]: 'border border-solid border-primary-default dark:border-primary-dark',
   [SemanticType.SECONDARY]: 'border border-solid border-gray-300 dark:border-gray-700',

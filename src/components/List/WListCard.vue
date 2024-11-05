@@ -99,7 +99,7 @@
       >
         <WButtonMore
           v-if="!hideMore"
-          class="sm-not:absolute sm-not:right-0 sm-not:bottom-0 flex px-4 sm:h-full"
+          class="sm-not:absolute sm-not:right-0 flex px-4 h-14 sm:h-full"
           :class="{
             'sm-not:top-5': !moreBottom,
             'sm-not:top-10': moreBottom,

@@ -32,7 +32,7 @@ export const makeQueryPaginated = <Data, QueryParams extends {page?: number}>(ke
         return new Promise((resolve, reject) => {
           const currentList = getter(unref(queryParams))
           const current = Math.max(unref(queryParams).page ?? 1, 1)
-          const pages_count = Math.floor(currentList.length / pageLength) + 1
+          const pages_count = Math.max(Math.ceil(currentList.length / pageLength), 1)
 
           if (current > pages_count) reject(new ApiError({status: 404} as RequestResponse<unknown>))
           else resolve({
