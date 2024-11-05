@@ -42,7 +42,7 @@
       :allow-page-selection="allowPageSelection"
       @update:selected="$emit('update:selected', $event)"
 
-      @update:count="updateCount"
+      @update:count="updateCount($event); $emit('update:count', $event)"
       @update:pages-count="updatePagesCount"
       @update:next-page="updateNextPage($event)"
       @update:previous-page="updatePreviousPage($event)"
@@ -272,8 +272,6 @@ watch(toRef(props, 'queryParams'), (newValue, oldValue) => {
 
   resetPage()
 })
-
-watch(count, value => emit('update:count', value), {immediate: true})
 
 watch(pagesCount, value => {
   if (pages.value[pages.value.length - 1] > value) {

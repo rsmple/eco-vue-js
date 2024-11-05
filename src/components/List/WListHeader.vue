@@ -11,7 +11,7 @@
         }"
       >
         <WCheckbox
-          v-if="allowSelect && selection !== undefined && count !== 0"
+          v-if="allowSelect && selection !== undefined && count !== 0 && count !== undefined"
           :disabled="disabled"
           :model-value="selection"
           :tooltip-text="tooltipText"

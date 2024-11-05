@@ -2,7 +2,7 @@
   <WInfiniteList
     :use-query-fn="useQueryFn"
     :query-params="(queryParams as QueryParams)"
-    :skeleton-length="count ?? listCount"
+    :skeleton-length="count ?? listCount ?? PAGE_LENGTH"
     :header-margin="isMobile ? 0 : 24"
     hide-page-title
 
@@ -73,7 +73,7 @@
         class="sm-not:hidden"
         :query-params="queryParams"
         :allow-select="allowSelect"
-        :tooltip-text="selectAllTextGetter(selectAllValue !== true, count ?? listCount)"
+        :tooltip-text="selectAllTextGetter(selectAllValue !== true, count ?? listCount ?? 0)"
 
         :count="count ?? listCount"
         :selection="selectAllValue"
@@ -232,7 +232,7 @@ defineEmits<{
   (e: 'update:header-padding', value: number): void
 }>()
 
-const listCount = ref(0)
+const listCount = ref<number | undefined>(undefined)
 const selectionCount = ref(0)
 
 const fieldsVisible = computed(() => filterFields(props.fields, field => field.visibleGetter?.(props.queryParams) ?? true))

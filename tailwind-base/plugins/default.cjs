@@ -427,11 +427,12 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
 
     '.w-skeleton': {
       'position': 'relative',
-      'width': 'var(--skeleton-width,70%)',
+      'width': 'var(--skeleton-width,var(--skeleton-width-internal,70%))',
+      'height': 'var(--skeleton-height)',
       'border-radius': 'var(--skeleton-rounded,0.5rem)',
       'overflow': 'hidden',
       'cursor': 'progress',
-      '&:before': {
+      '&:not(.w-skeleton-static):before': {
         'content': '""',
         'position': 'absolute',
         'top': '0',
@@ -443,6 +444,12 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         '.dark &': {
           'background-image': 'linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.01),rgba(255,255,255,0))',
         },
+      },
+    },
+    '.w-skeleton-static': {
+      '& .w-skeleton:before, &.w-skeleton:before': {
+        'display': 'none',
+        'animation': 'none',
       },
     },
   })
@@ -457,6 +464,32 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
     },
     {
       values: theme('borderRadius'),
+    },
+  )
+
+  matchUtilities(
+    {
+      'w-skeleton-w': (value) => {
+        return {
+          '--skeleton-width': value,
+        }
+      },
+    },
+    {
+      values: theme('width'),
+    },
+  )
+
+  matchUtilities(
+    {
+      'w-skeleton-h': (value) => {
+        return {
+          '--skeleton-height': value,
+        }
+      },
+    },
+    {
+      values: theme('height'),
     },
   )
 })

@@ -10,7 +10,7 @@
           v-bind="field.componentArray ? {item, skeleton, mobile} : (undefined as never)"
           :class="field.cssClassArray"
         >
-          <ListCardFieldNestedItem :items="(('keyArray' in field ? item[field.keyArray] : field.getterArray(item)) as Data[])">
+          <ListCardFieldNestedItem :items="skeleton ? [item] : (('keyArray' in field ? item[field.keyArray] : field.getterArray(item)) as Data[])">
             <template #default="{inner, index, last, first}">
               <component
                 :is="field.componentItem ?? EmptyComponent"
