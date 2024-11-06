@@ -100,11 +100,13 @@ export const useFieldConfigMap = <Fields extends ListFields<any, any>>(key: Mayb
   if (isRef(key)) {
     watch(key, newKey => {
       value.value = parseFieldConfigMap(getFieldConfigMap(unref(newKey)), unref(fields), unref(defaultConfigMap))
+      hasSaved.value = localStorage.getItem(unref(key)) !== null
     })
   }
 
   if (isRef(defaultConfigMap)) watch(defaultConfigMap, newValue => {
     value.value = parseFieldConfigMap(getFieldConfigMap(unref(key)), unref(fields), newValue)
+    hasSaved.value = localStorage.getItem(unref(key)) !== null
   })
 
   return {
