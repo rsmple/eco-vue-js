@@ -106,7 +106,7 @@
             'items-start pt-3': alignTop,
             'items-center': !alignTop,
           }"
-          :disabled="disabled"
+          :disabled="disabled || disableMore"
         >
           <WButtonMoreItem
             v-if="allowSelect && mobile"
@@ -153,6 +153,7 @@ defineProps<{
   cardClass?: string
   cardWrapperClass?: string
   allowOpen?: boolean
+  disableMore?: boolean
 }>()
 
 const emit = defineEmits<{

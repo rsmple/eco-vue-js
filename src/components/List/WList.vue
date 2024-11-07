@@ -113,6 +113,7 @@
     <template #default="{item, skeleton, setter, refetch}">
       <WListCard
         :disabled="skeleton"
+        :disable-more="disableMore"
         :mobile="isMobile"
         :card-class="cardClass"
         :card-wrapper-class="cardWrapperClass"
@@ -132,7 +133,7 @@
               <component
                 :is="defaultScope.field.component"
                 :item="defaultScope.item"
-                :readonly="readonlyGetter?.(defaultScope.item) ?? false"
+                :readonly="readonly || (readonlyGetter?.(defaultScope.item) ?? false)"
                 :skeleton="skeleton"
                 :mobile="isMobile"
                 :class="{
@@ -155,7 +156,7 @@
           <component
             :is="expansion"
             :item="item"
-            :readonly="readonlyGetter?.(item) ?? false"
+            :readonly="readonly || (readonlyGetter?.(item) ?? false)"
             :skeleton="skeleton"
             :mobile="isMobile"
             @update:item="setter"
@@ -171,7 +172,7 @@
             <component
               :is="menuItem"
               :item="item"
-              :readonly="readonlyGetter?.(item) ?? false"
+              :readonly="readonly || (readonlyGetter?.(item) ?? false)"
               :update-item="setter"
               :delete-item="() => {
                 setter()
@@ -226,6 +227,8 @@ const props = defineProps<{
   configKey: string
   defaultConfigMap: FieldConfigMap<Fields>
   alignTop?: boolean
+  disableMore?: boolean
+  readonly?: boolean
 }>()
 
 defineEmits<{
