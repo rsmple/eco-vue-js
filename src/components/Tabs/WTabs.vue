@@ -1,21 +1,32 @@
 <template>
-  <div class="mb-8">
+  <div
+    class="mb-8 grid gap-4"
+    :class="{
+      'grid grid-cols-1': !side,
+      'grid grid-cols-[auto,1fr] items-start': side,
+    }"
+  >
     <div
       v-if="names"
-      class="relative flex mb-4 overflow-x-auto overscroll-x-contain no-scrollbar snap-x snap-always snap-mandatory"
+      class="relative flex overflow-x-auto overscroll-x-contain no-scrollbar snap-x snap-always snap-mandatory"
+      :class="{
+        'flex-col': side,
+      }"
     >
       <button
         v-for="(_, index) in defaultSlots"
         ref="button"
         :key="index"
         class="
-          flex-1 font-semibold flex items-center justify-center h-10 cursor-pointer snap-center
+          flex-1 font-semibold flex items-center cursor-pointer snap-center
           relative w-ripple w-ripple-hover select-none transition-colors duration-500 outline-none
         "
         :class="{
           'text-description': current !== index && isValidMap[index] !== false,
           'text-primary-default dark:text-primary-dark': current === index && isValidMap[index] !== false,
           'text-negative dark:text-negative-dark': isValidMap[index] === false,
+          'h-10 text-center justify-center': !side,
+          'py-3 text-start pr-4': side,
         }"
         @click="switchTab(index)"
       >
@@ -36,7 +47,7 @@
           >
             <div
               v-if="hasChangesMap[index]"
-              class="absolute top-0 -right-4 square-2 rounded-full transition-colors duration-500"
+              class="absolute top-0 right-0 square-2 rounded-full transition-colors duration-500"
               :class="{
                 'bg-info dark:bg-info-dark': isValidMap[index] !== false,
                 'bg-negative dark:bg-negative-dark': isValidMap[index] === false,
@@ -47,12 +58,13 @@
       </button>
 
       <div
-        class="absolute bottom-0 h-1 rounded-sm duration-500"
+        class="absolute rounded-sm duration-500"
         :style="indicatorStyle"
         :class="{
           'bg-primary-default dark:bg-primary-dark': isValidMap[current] !== false,
           'bg-negative dark:bg-negative-dark': isValidMap[current] === false,
-          'transition-[left,width,background-color]': indicatorStyle !== undefined,
+          'transition-[left,width,background-color]': !side && indicatorStyle !== undefined,
+          'transition-[top,height,background-color]': side && indicatorStyle !== undefined,
         }"
       />
     </div>
@@ -62,10 +74,10 @@
       :style="{minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
     >
       <TransitionGroup
-        enter-active-class="transition-transform duration-[250ms] w-full"
-        leave-active-class="transition-transform duration-[250ms] w-full absolute top-0"
-        :enter-from-class="lessTransitions ? 'opacity-0' : 'translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]'"
-        :leave-to-class="lessTransitions ? 'opacity-0' : 'translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]'"
+        enter-active-class="transition-[transform,opacity] duration-[250ms] w-full"
+        leave-active-class="transition-[transform,opacity] duration-[250ms] w-full absolute top-0"
+        :enter-from-class="lessTransitions || side ? 'opacity-0' : 'translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]'"
+        :leave-to-class="lessTransitions || side ? 'opacity-0' : 'translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]'"
       >
         <TabItem
           v-for="(slot, index) in defaultSlots"
@@ -73,7 +85,7 @@
           :key="index"
           :is-active="index === current"
           class="width-full"
-          @update:height="updateHeight"
+          @update:height="!disableMinHeight && updateHeight($event)"
         >
           <WForm
             ref="form"
@@ -104,6 +116,8 @@ const props = defineProps<{
   slots?: VNode[]
   lessTransitions?: boolean
   initTab?: number
+  side?: boolean
+  disableMinHeight?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -164,16 +178,27 @@ const previous = (): void => {
   switchTab(current.value - 1)
 }
 
-const updateIndicator = () => {
+const updateIndicator = (): void => {
   if (!props.names) return
 
   const element = button.value[current.value]
 
   if (!element || !element.offsetWidth) return
 
-  indicatorStyle.value = {
-    width: element.offsetWidth + 'px',
-    left: element.offsetLeft + 'px',
+  if (props.side) {
+    indicatorStyle.value = {
+      height: element.offsetHeight + 'px',
+      top: element.offsetTop + 'px',
+      left: '0',
+      width: '0.25rem',
+    }
+  } else {
+    indicatorStyle.value = {
+      width: element.offsetWidth + 'px',
+      left: element.offsetLeft + 'px',
+      bottom: '0',
+      height: '0.25rem',
+    }
   }
 }
 
