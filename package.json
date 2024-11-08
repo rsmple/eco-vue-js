@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/rsmple/eco-vue-js.git"
   },
-  "version": "0.8.35",
+  "version": "0.8.36",
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check build-only",
