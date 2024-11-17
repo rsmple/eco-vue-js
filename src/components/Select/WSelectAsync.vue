@@ -17,8 +17,8 @@
 
     @open="isOpen = true"
     @close="close(); search = ''"
-    @focus="focused = true"
-    @blur="focused = false"
+    @focus="focused = true; $emit('focus', $event)"
+    @blur="focused = false; $emit('blur', $event)"
   >
     <template
       v-if="$slots.title"
@@ -139,6 +139,8 @@ const emit = defineEmits<{
   (e: 'unselect', item: Model): void
   (e: 'update:modelValue', value: Model[]): void
   (e: 'init-model'): void
+  (e: 'focus', value: FocusEvent): void
+  (e: 'blur', value: FocusEvent): void
 }>()
 
 const isOpen = ref(false)
@@ -157,7 +159,11 @@ const queryParamsFirstPage = computed(() => ({...queryParams.value, page: 1}))
 
 const {data: firstPageData} = props.useQueryFnOptions(queryParamsFirstPage, {enabled: false})
 
-const hasSearchOption = computed(() => firstPageData.value?.results.some(option => props.valueGetter(option) === search.value))
+const hasSearchOption = computed(() => {
+  if (props.createdData?.some(option => props.valueGetter(option) === search.value)) return true
+
+  return firstPageData.value?.results.some(option => props.valueGetter(option) === search.value)
+})
 
 const close = () => {
   isOpen.value = false
@@ -236,6 +242,10 @@ const updateDropdown = async () => {
   input.value?.updateDropdown()
 }
 
+const setSearch = (value: string): void => {
+  search.value = value
+}
+
 if (props.useQueryFnDefault) {
   const {data: defaultData} = props.useQueryFnDefault({enabled})
 
@@ -250,6 +260,7 @@ if (props.useQueryFnDefault) {
 defineExpose({
   focus,
   blur,
+  setSearch,
 })
 
 defineSlots<{

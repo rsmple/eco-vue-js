@@ -1,6 +1,6 @@
 <template>
   <div
-    v-for="(option, index) in [...createdData ?? [], ...(previewData ?? data?.results ?? [])]"
+    v-for="(option, index) in options"
     :key="valueGetter(option)"
     class="relative flex overflow-hidden items-center text-description"
     :class="{
@@ -83,6 +83,15 @@ const {data, isFetching} = props.useQueryFn(toRef(props, 'queryParams'), {
 })
 
 const pagesCount = computed(() => data.value?.pages_count)
+
+const options = computed<Data[]>(() => {
+  if (!props.createdData) return props.previewData ?? data.value?.results ?? []
+
+  return [
+    ...props.createdData ?? [],
+    ...(props.previewData ?? data.value?.results ?? []),
+  ].filter((option, index, array) => array.findIndex(item => props.valueGetter(item) === props.valueGetter(option)) === index)
+})
 
 watch(pagesCount, value => {
   if (value === undefined) return

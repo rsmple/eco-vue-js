@@ -44,6 +44,7 @@ export interface SelectProps<Model extends number | string, Data extends Default
   createOption?: (search: string) => (Data | undefined) | Promise<Data | undefined>
   filterOptions?: (option: Data) => boolean
   hideOptionIcon?: boolean
+  createdData?: Data[]
 }
 
 export interface SelectPrefixProps<Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>>
@@ -56,10 +57,11 @@ export interface SelectPrefixProps<Data extends DefaultData, OptionComponent ext
 }
 
 export interface SelectSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean>
-  extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear'> {
+  extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'createdData'> {
   modelValue: Model | null
   allowClear?: boolean & AllowClear
   searchModel?: boolean
+  createdData?: Data
 }
 
 export interface SelectStringifiedProps<Model extends string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
@@ -76,7 +78,6 @@ export interface SelectAsyncProps<Model extends number | string, Data extends De
   queryParamsOptions: QueryParams
   searchField?: keyof QueryParams
   previewData?: Data[]
-  createdData?: Data[]
   valueQueryKey?: string
 }
 

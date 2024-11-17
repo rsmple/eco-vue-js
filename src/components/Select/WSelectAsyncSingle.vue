@@ -12,6 +12,7 @@
     :class="$attrs.class"
     @select="updateModelValue($event as EmitType)"
     @unselect="allowClear && updateModelValue(null as EmitType)"
+    @focus="searchModel && typeof modelValue === 'string' ? selectComponentRef?.setSearch(modelValue) : undefined"
     @init-model="$emit('init-model')"
   >
     <template
@@ -48,7 +49,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false">
-import {computed, ref, toRef, watch} from 'vue'
+import {computed, toRef, useTemplateRef, watch} from 'vue'
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 import type {SelectAsyncSingleProps, SelectOptionComponent} from './types'
 
@@ -63,7 +64,7 @@ const emit = defineEmits<{
   (e: 'init-model'): void
 }>()
 
-const selectComponent = ref<ComponentInstance<typeof WSelectAsync<Model, Data, QueryParams, OptionComponent>> | undefined>()
+const selectComponentRef = useTemplateRef('selectComponent')
 
 const arrayValue = computed<Model[]>(() => props.modelValue ? [props.modelValue] : [])
 
@@ -72,7 +73,7 @@ const updateModelValue = (value: EmitType): void => {
 }
 
 const blur = () => {
-  selectComponent.value?.blur()
+  selectComponentRef.value?.blur()
 }
 
 watch(toRef(props, 'modelValue'), blur)

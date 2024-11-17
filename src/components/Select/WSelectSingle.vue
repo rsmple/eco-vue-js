@@ -5,6 +5,7 @@
       ...props,
       modelValue: arrayValue,
       disableClear: !allowClear,
+      createdData: createdData ? [createdData] as Data[] : undefined,
       hidePrefix: true,
     }"
     :class="$attrs.class"

@@ -190,10 +190,18 @@ const {data, isLoading, error: queryError} = props.useQueryFnOptions
 
 const createdOptions = ref([]) as Ref<Data[]>
 const optionsPrepared = computed(() => !data.value ? [] : props.filterOptions ? data.value.filter(option => props.filterOptions?.(option) ?? true) : data.value)
-const optionsWithCreated = computed(() => [
-  ...optionsPrepared.value,
-  ...createdOptions.value.filter(option => !optionsPrepared.value.some(item => props.valueGetter(item) === props.valueGetter(option))),
-])
+const optionsWithCreated = computed(() => {
+  if (!props.createdData) {
+    if (createdOptions.value.length) return [...optionsPrepared.value, ...createdOptions.value]
+    else return optionsPrepared.value
+  }
+
+  return [
+    ...optionsPrepared.value,
+    ...props.createdData ?? [],
+    ...createdOptions.value,
+  ].filter((option, index, array) => array.findIndex(item => props.valueGetter(item) === props.valueGetter(option)) === index)
+})
 
 const optionsFiltered = computed(() => searchPrepared.value === '' ? optionsWithCreated.value : optionsWithCreated.value.filter(option => props.searchFn(option, searchPrepared.value)))
 const lastIndex = computed(() => props.createOption ? optionsFiltered.value.length : optionsFiltered.value.length - 1)
