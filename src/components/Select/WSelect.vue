@@ -110,7 +110,7 @@
       </SelectOption>
 
       <SelectOption
-        v-if="createOption && search !== '' && !optionsFiltered.some(option => valueGetter(option) === search)"
+        v-if="hasCreateOption"
         :is-selected="false"
         :is-cursor="cursor === optionsFiltered.length"
         :loading="(loadingCreate || loadingOptionIndex === optionsFiltered.length) && loading"
@@ -213,6 +213,8 @@ const loadingCreate = ref(false)
 const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
 
 const prefixList = computed(() => props.modelValue.map(value => optionsWithCreated.value?.find(item => props.valueGetter(item) === value)).filter(item => item !== undefined))
+
+const hasCreateOption = computed(() => props.createOption && search.value !== '' && !optionsFiltered.value.some(option => props.valueGetter(option) === search.value))
 
 const close = () => {
   isOpen.value = false

@@ -18,10 +18,10 @@
       header-top-ignore
       min-height
       no-gap
-      @update:count="$emit('update:count', $event); count = $event"
+      @update:count="$emit('update:count', $event); count = $event; updateCursor(undefined)"
       @update:selected="!disabled && $emit('update:modelValue', $event)"
     >
-      <template #default="{item, skeleton, previous, next, first, last, resetting}">
+      <template #default="{item, skeleton, previous, next, first, last}">
         <SelectOption
           :is-selected="!skeleton && modelValue.includes(valueGetter(item))"
           :is-cursor="!skeleton && valueGetter(item) === cursor"
@@ -45,7 +45,7 @@
           @update:is-cursor="updateCursors"
           @update:previous="cursorPrevious = ($event as typeof cursorPrevious)"
           @update:next="cursorNext = ($event as typeof cursorNext)"
-          @unmounted="cursor = ((resetting ? undefined : next ? valueGetter(next) : undefined) as typeof cursor)"
+          @unmounted="updateCursor(undefined)"
           @update:first="firstItem = valueGetter(item)"
           @update:last="lastItem = valueGetter(item)"
         >
@@ -78,7 +78,7 @@
       @update:is-cursor="updateCursors"
       @update:previous="cursorPrevious = ($event as typeof cursorPrevious)"
       @update:next="cursorNext = ($event as typeof cursorNext)"
-      @unmounted="cursor = (undefined as typeof cursor)"
+      @unmounted="updateCursor(undefined)"
     >
       <template #prefix>
         <span class="w-select-field pr-2 sm-not:px-3">
@@ -152,15 +152,19 @@ const lockCursor = () => {
   unlockCursor()
 }
 
-const setCursor = (value: Model | null): void => {
+const updateCursor = (value: Model | null | undefined): void => {
+  cursor.value = value
+}
+
+const setCursor = (value: Model | null | undefined): void => {
   if (isCursorLocked.value) return
 
-  cursor.value = value as UnwrapRef<Model>
+  cursor.value = value
 }
 
 const updateCursors = (event: {previous: Model | null | undefined, next: Model | null | undefined}) => {
-  cursorPrevious.value = event.previous as UnwrapRef<Model>
-  cursorNext.value = event.next as UnwrapRef<Model>
+  cursorPrevious.value = event.previous
+  cursorNext.value = event.next
 }
 
 const cursorUp = () => {

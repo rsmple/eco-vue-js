@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string">
-import {onUnmounted, ref, toRef, watch} from 'vue'
+import {onUnmounted, ref, watch, watchEffect} from 'vue'
 import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 
@@ -83,7 +83,7 @@ const scrollIntoView = () => {
   element.value?.scrollIntoView({behavior: 'auto', block: 'center'})
 }
 
-watch(toRef(props, 'isCursor'), value => {
+watch(() => props.isCursor, value => {
   if (!value) return
 
   emit('update:is-cursor', {previous: props.previous, next: props.next})
@@ -91,27 +91,29 @@ watch(toRef(props, 'isCursor'), value => {
   if (props.scroll) scrollIntoView()
 }, {immediate: true})
 
-watch(toRef(props, 'isNoCursor'), value => {
-  if (value && props.first && !props.skeleton) emit('update:cursor')
-}, {immediate: true})
+watchEffect(() => {
+  if (props.isNoCursor && props.first && !props.skeleton) {
+    emit('update:cursor')
+  }
+})
 
-watch(toRef(props, 'previous'), value => {
+watch(() => props.previous, value => {
   if (props.isCursor && !props.skeleton) emit('update:previous', value)
 }, {immediate: true})
 
-watch(toRef(props, 'next'), value => {
+watch(() => props.next, value => {
   if (props.isCursor && !props.skeleton) emit('update:next', value)
 }, {immediate: true})
 
-watch(toRef(props, 'first'), value => {
+watch(() => props.first, value => {
   if (value) emit('update:first')
 }, {immediate: true})
 
-watch(toRef(props, 'last'), value => {
+watch(() => props.last, value => {
   if (value) emit('update:last')
 }, {immediate: true})
 
-watch(toRef(props, 'next'), value => {
+watch(() => props.next, value => {
   if (props.isCursor && !props.skeleton) emit('update:next', value)
 }, {immediate: true})
 
