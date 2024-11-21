@@ -105,7 +105,7 @@
       v-else
       class="text-accent text-base font-normal"
       :class="{
-        'py-16 px-8 text-center flex justify-center': !minHeight,
+        'py-16 px-8 text-center flex justify-center sm:sticky sm:left-inner sm:max-w-inner': !minHeight,
         'pt-4 px-[1.0625rem]': minHeight,
         'pb-4': minHeight && lastChild,
         'pb-2': minHeight && !lastChild,
@@ -143,7 +143,7 @@ const props = withDefaults(
     pageClass?: string
     refetchInterval?: number | false
     scrollingElement?: Element | null
-    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
+    queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
 
     selected?: Model[]
     valueGetter: (data: Data) => Model

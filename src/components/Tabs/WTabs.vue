@@ -8,6 +8,7 @@
   >
     <div
       v-if="names"
+      ref="buttonContainer"
       class="relative flex overflow-x-auto overscroll-x-contain no-scrollbar snap-x snap-always snap-mandatory"
       :class="{
         'flex-col': side,
@@ -103,7 +104,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, watch, nextTick, type VNode, inject, onUnmounted, useSlots, computed, reactive} from 'vue'
+import {onMounted, ref, watch, nextTick, type VNode, inject, onUnmounted, useSlots, computed, reactive, useTemplateRef} from 'vue'
 import TabItem from './components/TabItem.vue'
 import WForm from '@/components/Form/WForm.vue'
 import {debounce, throttle} from '@/utils/utils'
@@ -136,6 +137,7 @@ const indicatorStyle = ref<Record<string, string> | undefined>(undefined)
 const minHeight = ref(0)
 const tabItem = ref<ComponentInstance<typeof TabItem>[]>([])
 const form = ref<ComponentInstance<typeof WForm>[]>([])
+const buttonContainerRef = useTemplateRef('buttonContainer')
 
 const isValidMap = reactive<Record<number, boolean | undefined>>({})
 const hasChangesMap = reactive<Record<number, boolean | undefined>>({})
@@ -228,7 +230,13 @@ watch(current, value => {
 
   updateIndicator()
 
-  button.value[value]?.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'})
+  if (buttonContainerRef.value && button.value[value]) {
+    if (props.side) {
+      buttonContainerRef.value.scrollTo({top: (button.value[value].offsetTop - buttonContainerRef.value.offsetTop) / 2, behavior: 'smooth'})
+    } else {
+      buttonContainerRef.value.scrollTo({left: (button.value[value].offsetLeft - buttonContainerRef.value.offsetLeft) / 2, behavior: 'smooth'})
+    }
+  }
 }, {immediate: true})
 
 watch(hasChanges, value => {
@@ -237,8 +245,6 @@ watch(hasChanges, value => {
 
 onMounted(() => {
   updateIndicator()
-
-  button.value[current.value]?.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'})
 
   tabItemListenerInjected?.(updateIndicator)
 })

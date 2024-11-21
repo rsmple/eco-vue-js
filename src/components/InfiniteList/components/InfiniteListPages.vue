@@ -92,7 +92,6 @@ const props = withDefaults(
     queryParams: QueryParams
     skeletonLength?: number
     hidePageTitle?: boolean
-    skipScrollTarget?: boolean
     wrap?: boolean
     noGap?: boolean
     transition?: boolean
@@ -107,7 +106,7 @@ const props = withDefaults(
     pageClass?: string
     maxPages?: number
     refetchInterval?: number | false
-    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
+    queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
 
     selected?: Model[]
     valueGetter: (data: Data) => Model
@@ -261,8 +260,6 @@ const resetPage = async (page = 1) => {
   pages.value = [page]
   nextPage.value = null
   previousPage.value = null
-
-  if (!props.skipScrollTarget) (props.scrollingElement ?? document.scrollingElement)?.scrollTo(0, props.headerTop)
 }
 
 watch(toRef(props, 'queryParams'), (newValue, oldValue) => {

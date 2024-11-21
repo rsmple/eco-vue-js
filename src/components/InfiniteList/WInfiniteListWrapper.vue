@@ -5,7 +5,6 @@
     ref="header"
     class="sticky top-[var(--header-height)]"
     :class="{
-      'z-[1]': isIntersecting,
       'z-20': !isIntersecting,
     }"
   >

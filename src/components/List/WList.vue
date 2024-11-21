@@ -2,6 +2,7 @@
   <WInfiniteList
     :use-query-fn="useQueryFn"
     :query-params="(queryParams as QueryParams)"
+    :query-options="queryOptions"
     :skeleton-length="count ?? listCount ?? PAGE_LENGTH"
     :header-margin="isMobile ? 0 : 24"
     hide-page-title
@@ -213,6 +214,7 @@ const props = defineProps<{
   expansion?: FieldComponent<Data>
   useQueryFn: UseQueryPaginated<Data, QueryParams>
   queryParams: QueryParams
+  queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
   bulkDisableMessage?: string
   selectionTitle: string
   bulk?: BulkComponent<QueryParams>[]

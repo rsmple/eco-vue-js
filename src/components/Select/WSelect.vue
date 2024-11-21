@@ -192,8 +192,11 @@ const createdOptions = ref([]) as Ref<Data[]>
 const optionsPrepared = computed(() => !data.value ? [] : props.filterOptions ? data.value.filter(option => props.filterOptions?.(option) ?? true) : data.value)
 const optionsWithCreated = computed(() => {
   if (!props.createdData) {
-    if (createdOptions.value.length) return [...optionsPrepared.value, ...createdOptions.value]
-    else return optionsPrepared.value
+    if (!createdOptions.value.length) return optionsPrepared.value
+    else return [
+      ...optionsPrepared.value,
+      ...createdOptions.value,
+    ].filter((option, index, array) => array.findIndex(item => props.valueGetter(item) === props.valueGetter(option)) === index)
   }
 
   return [

@@ -20,7 +20,6 @@
         :use-query-fn="useQueryFn"
         :scrolling-element="scrollingElement"
 
-        :skip-scroll-target="skipScrollTarget"
         :skeleton-length="skeletonLength"
         :hide-page-title="hidePageTitle"
         :wrap="wrap"
@@ -97,7 +96,6 @@ const props = withDefaults(
     skeletonLength?: number
     hidePageTitle?: boolean
     headerMargin?: number
-    skipScrollTarget?: boolean
     wrap?: boolean
     noGap?: boolean
     transition?: boolean
@@ -110,7 +108,7 @@ const props = withDefaults(
     pageClass?: string
     maxPages?: number
     refetchInterval?: number | false
-    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
+    queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
 
     pageLength?: number
     count?: number
