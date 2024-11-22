@@ -41,7 +41,7 @@
       <template v-if="!readonly">
         <WSkeleton
           v-if="skeleton"
-          class="square-11 w-skeleton-rounded-lg"
+          class="w-skeleton-w-11 w-skeleton-h-11 w-skeleton-rounded-lg"
         />
 
         <button

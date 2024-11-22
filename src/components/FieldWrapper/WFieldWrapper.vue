@@ -42,7 +42,7 @@
 
         <WSkeleton
           v-else
-          class="h-4 w-16"
+          class="w-skeleton-h-4 w-skeleton-w-16"
         />
       </div>
 
@@ -114,7 +114,7 @@
 
         <WSkeleton
           v-else
-          class="min-w-full w-skeleton-rounded-xl h-[calc(var(--field-height,2.125rem)+0.625rem)]"
+          class="w-skeleton-w-full w-skeleton-rounded-xl w-skeleton-h-[calc(var(--field-height,2.125rem)+0.625rem)]"
         />
 
         <div

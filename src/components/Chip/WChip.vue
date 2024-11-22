@@ -1,7 +1,7 @@
 <template>
   <WSkeleton 
     v-if="skeleton"
-    class="h-5 max-w-28"
+    class="w-skeleton-h-5 max-w-28"
   />
 
   <div

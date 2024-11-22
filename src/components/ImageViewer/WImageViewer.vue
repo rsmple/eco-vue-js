@@ -39,7 +39,7 @@
 
     <WSkeleton
       v-else
-      class="width-40 h-28 rounded-lg"
+      class="w-skeleton-w-40 w-skeleton-h-28 w-skeleton-rounded-lg"
     />
   </div>
 </template>

@@ -13,7 +13,7 @@
 
     <WSkeleton
       v-if="skeleton"
-      class="w-skeleton-rounded-2xl h-[24rem] min-w-full"
+      class="w-skeleton-rounded-2xl w-skeleton-h-[24rem] w-skeleton-w-full"
     />
 
     <div

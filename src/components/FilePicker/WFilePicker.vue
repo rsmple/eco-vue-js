@@ -19,7 +19,7 @@
 
       <WSkeleton
         v-else
-        class="h-4 w-16"
+        class="w-skeleton-h-4 w-skeleton-w-16"
       />
     </div>
 
