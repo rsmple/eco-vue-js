@@ -4,22 +4,23 @@ import {unref, type MaybeRef} from 'vue'
 
 type Params = Parameters<QueryClient['setQueriesData']>
 
+type SetData<TQueryFnData = unknown> = (updater: TQueryFnData, options?: Params[2]) => ReturnType<QueryClient['setQueriesData']>
+
+type UseQueryReturnTypeSetData<TQueryFnData = unknown, TData = TQueryFnData> = UseQueryReturnType<TData, ApiError> & {
+  setData: SetData<TQueryFnData>
+}
+
 export const useDefaultQuery = <
   TQueryFnData = unknown,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
->
-  (...args: Parameters<typeof useQuery<TQueryFnData, ApiError, TData, TQueryKey>>): UseQueryReturnType<TData, ApiError> & {
-    setData: (updater: TQueryFnData, options?: Params[2]) => ReturnType<QueryClient['setQueriesData']>
-  } => {
+>(...args: Parameters<typeof useQuery<TQueryFnData, ApiError, TData, TQueryKey>>): UseQueryReturnTypeSetData<TQueryFnData, TData> => {
+  const query = useQuery<TQueryFnData, ApiError, TData, TQueryKey>(...args) as UseQueryReturnTypeSetData<TQueryFnData, TData>
   const queryClient = args[1] ?? useQueryClient()
 
-  const setData = (updater: TQueryFnData, options?: Params[2]) => queryClient.setQueriesData({queryKey: 'queryKey' in args[0] ? args[0].queryKey : undefined}, updater, options)
+  query.setData = (updater: TQueryFnData, options?: Params[2]) => queryClient.setQueriesData({queryKey: 'queryKey' in args[0] ? args[0].queryKey : undefined}, updater, options)
 
-  return {
-    ...useQuery<TQueryFnData, ApiError, TData, TQueryKey>(...args),
-    setData,
-  }
+  return query
 }
 
 export const PAGE_LENGTH = 24
@@ -49,33 +50,31 @@ export const makeQueryPaginated = <Data, QueryParams extends {page?: number}>(ke
       ...options,
     })
 
-    return {
-      ...query,
-      setData: (data: PaginatedResponse<Data>, options?: Parameters<typeof query.setData>[1]) => {
-        if (setter && unref(options)?.index !== undefined) {
-          const index = unref(unref(options)?.index)
+    query.setData = (data: PaginatedResponse<Data>, options?: Parameters<typeof query.setData>[1]) => {
+      if (setter && unref(options)?.index !== undefined) {
+        const index = unref(unref(options)?.index)
 
-          if (index !== undefined) {
-            const newList = getter({} as QueryParams).slice()
-            const oldItem = query.data.value?.results[index]
+        if (index !== undefined) {
+          const newList = getter({} as QueryParams).slice()
+          const oldItem = query.data.value?.results[index]
 
-            if (oldItem !== undefined) {
-              const itemIndex = newList.findIndex(item => (item as DefaultData).id === (oldItem as DefaultData).id)
-              const newItem = unref(unref(options)?.newItem)
+          if (oldItem !== undefined) {
+            const itemIndex = newList.findIndex(item => (item as DefaultData).id === (oldItem as DefaultData).id)
+            const newItem = unref(unref(options)?.newItem)
 
-              if (index !== -1) {
-                if (newItem === undefined) newList.splice(itemIndex, 1)
-                else newList.splice(itemIndex, 1, newItem as Data)
+            if (index !== -1) {
+              if (newItem === undefined) newList.splice(itemIndex, 1)
+              else newList.splice(itemIndex, 1, newItem as Data)
 
-                setter(newList)
-              }
+              setter(newList)
             }
           }
         }
+      }
 
-
-        return query.setData(data, options)
-      },
+      return query.setData(data, options)
     }
+
+    return query
   }
 }
