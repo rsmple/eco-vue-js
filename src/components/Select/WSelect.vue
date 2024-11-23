@@ -185,7 +185,7 @@ const {data, isLoading, error: queryError} = props.useQueryFnOptions
   : {
     data: toRef(props, 'options') as Ref<Data[] | undefined>,
     isLoading: ref(false),
-    error: ref(undefined),
+    error: ref<ApiError | undefined>(undefined),
   }
 
 const createdOptions = ref([]) as Ref<Data[]>

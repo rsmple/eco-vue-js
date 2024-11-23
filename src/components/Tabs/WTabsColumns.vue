@@ -2,7 +2,7 @@
   <WTabs
     v-if="isMobile"
     :names="names"
-    :slots="$slots.default?.()"
+    :custom-slots="$slots.default?.()"
   />
 
   <div

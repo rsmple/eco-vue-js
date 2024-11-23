@@ -117,7 +117,7 @@ class Fill extends HorizontalGetter {
     return 0
   }
 
-  widthStyleGetter(parentRect: DOMRect) {
+  widthStyleGetter() {
     return {}
   }
 }
@@ -135,7 +135,7 @@ class Center extends HorizontalGetter {
     return 0
   }
 
-  widthStyleGetter(parentRect: DOMRect) {
+  widthStyleGetter() {
     return {
       width: '0px',
     }

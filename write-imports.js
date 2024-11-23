@@ -214,6 +214,7 @@ const run = async () => {
     writeIcons(),
   ])
 
+  // eslint-disable-next-line no-console
   console.log('Successfully written')
 }
 

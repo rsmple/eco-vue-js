@@ -5,7 +5,7 @@
   >
     <component
       :is="iconCopy"
-      class="-mt-[1px]"
+      class="-mt-px"
       :class="{
         'text-primary-default dark:text-primary-dark': copied
       }"

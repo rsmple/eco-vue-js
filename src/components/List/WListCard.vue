@@ -29,7 +29,7 @@
         'width-4': !allowSelect,
       }"
     >
-      <div class="absolute top-0 -z-[1] right-full h-full w-[calc(var(--nav-bar-width)+var(--inner-margin))] bg-default dark:bg-default-dark" />
+      <div class="absolute top-0 z-[-1] right-full h-full w-[calc(var(--nav-bar-width)+var(--inner-margin))] bg-default dark:bg-default-dark" />
 
       <div
         class="h-full"
@@ -71,7 +71,7 @@
 
       <button
         v-if="allowOpen"
-        class="cursor-pointer w-ripple w-ripple-hover w-ripple-has w-ripple-opacity-[0.04] absolute top-0 left-0 h-full w-full -z-[1]"
+        class="cursor-pointer w-ripple w-ripple-hover w-ripple-has w-ripple-opacity-[0.04] absolute top-0 left-0 h-full w-full z-[-1]"
         @click="toggle"
       />
     </div>
@@ -85,7 +85,7 @@
     >
       <div
         v-if="!mobile"
-        class="absolute top-0 -z-[1] left-full h-full w-[calc(var(--actions-bar-width)+var(--inner-margin))] bg-default dark:bg-default-dark sm-not:hidden"
+        class="absolute top-0 z-[-1] left-full h-full w-[calc(var(--actions-bar-width)+var(--inner-margin))] bg-default dark:bg-default-dark sm-not:hidden"
       />
 
       <div

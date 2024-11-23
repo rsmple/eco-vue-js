@@ -114,7 +114,7 @@ const props = defineProps<{
   names?: string[] | Record<number, string>
   namesForm?: string[] | Record<number, string>
   icons?: SVGComponent[] | Record<number, SVGComponent>
-  slots?: VNode[]
+  customSlots?: VNode[]
   lessTransitions?: boolean
   initTab?: number
   side?: boolean
@@ -126,9 +126,9 @@ const emit = defineEmits<{
   (e: 'update:has-changes', value: boolean): void
 }>()
 
-const usedSlots = useSlots()
+const slots = useSlots()
 
-const defaultSlots = computed(() => (props.slots ?? usedSlots.default?.() ?? []).filter(item => typeof item.type !== 'symbol'))
+const defaultSlots = computed(() => (props.customSlots ?? slots.default?.() ?? []).filter(item => typeof item.type !== 'symbol'))
 
 const current = ref(props.initTab ?? 0)
 const isDirect = ref(true)

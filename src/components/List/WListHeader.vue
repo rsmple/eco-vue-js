@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-12">
     <div class="sticky z-[1] left-inner bg-default dark:bg-default-dark">
-      <div class="absolute top-0 -z-[1] right-full h-full w-[calc(var(--nav-bar-width)+var(--inner-margin))] bg-default dark:bg-default-dark" />
+      <div class="absolute top-0 z-[-1] right-full h-full w-[calc(var(--nav-bar-width)+var(--inner-margin))] bg-default dark:bg-default-dark" />
 
       <div
         class="bg-primary-light dark:bg-primary-darkest border-y border-solid border-gray-300 dark:border-gray-700 rounded-l-2xl border-l h-full"
@@ -27,7 +27,7 @@
     </div>
 
     <div class="sticky z-[1] right-inner bg-default dark:bg-default-dark">
-      <div class="absolute top-0 -z-[1] left-full h-full w-[calc(var(--actions-bar-width)+var(--inner-margin))] bg-default dark:bg-default-dark" />
+      <div class="absolute top-0 z-[-1] left-full h-full w-[calc(var(--actions-bar-width)+var(--inner-margin))] bg-default dark:bg-default-dark" />
 
       <div
         class="bg-primary-light dark:bg-primary-darkest border-y border-solid border-gray-300 dark:border-gray-700 rounded-r-2xl border-r h-full"

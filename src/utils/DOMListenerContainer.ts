@@ -29,10 +29,10 @@ export default class DOMListenerContainer {
     })
   }
 
-  addEventListeners(elements: Array<Element | Window | Document>, types: (keyof GlobalEventHandlersEventMap | 'mousewheel')[], listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void {
+  addEventListeners(elements: Array<Element | Window | Document>, types: (keyof GlobalEventHandlersEventMap | 'mousewheel')[], listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions = false): void {
     elements.forEach(element => {
       types.forEach(type => {
-        this.addEventListener(element, type, listener, false)
+        this.addEventListener(element, type, listener, options)
       })
     })
   }

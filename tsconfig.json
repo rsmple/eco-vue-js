@@ -6,9 +6,6 @@
     },
     {
       "path": "./tsconfig.vue.json"
-    },
-    {
-      "path": "./tsconfig.vitest.json"
     }
   ]
 }

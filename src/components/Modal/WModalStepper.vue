@@ -19,7 +19,7 @@
 
     <WTabs
       ref="tabs"
-      :slots="defaultSlots"
+      :custom-slots="defaultSlots"
       @update:current="current = $event"
       @update:has-changes="$emit('update:has-changes', $event)"
     />
