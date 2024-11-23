@@ -38,6 +38,8 @@ module.exports = {
 
       severity: require('./theme/severity.cjs'),
       score: require('./theme/score.cjs'),
+
+      transparent: 'transparent',
     },
     extend: {
       ...require('./theme/sizes.cjs'),
