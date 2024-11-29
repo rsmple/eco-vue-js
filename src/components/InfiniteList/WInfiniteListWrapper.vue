@@ -6,6 +6,7 @@
     class="sticky top-[var(--header-height)]"
     :class="{
       'z-20': !isIntersecting,
+      'z-[1]': isIntersecting,
     }"
   >
     <slot name="header" />

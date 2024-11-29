@@ -31,6 +31,7 @@
         v-if="allowSelect"
         :title="selectionTitle"
         :disable-message="bulkDisableMessage"
+        class="z-[1]"
         @update:selection-count="selectionCount = $event"
       >
         <template #default="{disableMessage, cssClass}">
