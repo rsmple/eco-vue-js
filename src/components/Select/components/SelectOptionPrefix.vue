@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative grid grid-cols-[1fr,auto] items-center text-description group/model"
+    class="text-description group/model relative grid grid-cols-[1fr,auto] items-center"
     :class="{
       'cursor-pointer': !disabled,
       'cursor-not-allowed opacity-50': disabled,
@@ -18,11 +18,11 @@
         >
           <button
             v-if="!disableClear"
-            class="relative flex square-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center outline-none"
+            class="square-5 relative -my-1 -mr-2 ml-1 flex items-center justify-center rounded-full outline-none"
             :class="{
               'cursor-not-allowed': disabled,
               'cursor-progress': loading,
-              'cursor-pointer w-ripple w-ripple-hover ': !loading && !disabled,
+              'w-ripple w-ripple-hover cursor-pointer ': !loading && !disabled,
             }"
             @mousedown.stop.prevent=""
             @click.stop.prevent="!loading && $emit('unselect')"
@@ -35,11 +35,11 @@
 
     <button
       v-if="!optionComponent && !disableClear"
-      class="relative flex square-5 rounded-full items-center justify-center outline-none"
+      class="square-5 relative flex items-center justify-center rounded-full outline-none"
       :class="{
         'cursor-not-allowed': disabled,
         'cursor-progress': loading,
-        'cursor-pointer w-ripple w-ripple-hover ': !loading && !disabled,
+        'w-ripple w-ripple-hover cursor-pointer ': !loading && !disabled,
       }"
       @mousedown.stop.prevent=""
       @click.stop.prevent="!loading && $emit('unselect')"
@@ -50,13 +50,13 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>">
+import type {SelectOptionComponent, SelectPrefixProps} from '../types'
+
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
-import type {SelectPrefixProps, SelectOptionComponent} from '../types'
 
 defineProps<SelectPrefixProps<Data, OptionComponent>>()
 
 defineEmits<{
   (e: 'unselect'): void
 }>()
-
 </script>

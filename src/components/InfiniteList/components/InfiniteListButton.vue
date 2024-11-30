@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-full p-12 justify-center items-center">
+  <div class="flex w-full items-center justify-center p-12">
     <WButton
       :semantic-type="SemanticType.SECONDARY"
       @click="$emit('click')"
@@ -10,9 +10,11 @@
 </template>
 
 <script lang="ts" setup>
-import {SemanticType} from '@/utils/SemanticType'
-import WButton from '@/components/Button/WButton.vue'
 import {onMounted} from 'vue'
+
+import WButton from '@/components/Button/WButton.vue'
+
+import {SemanticType} from '@/utils/SemanticType'
 
 const emit = defineEmits<{
   (e: 'click'): void
@@ -22,5 +24,4 @@ const emit = defineEmits<{
 onMounted(() => {
   emit('check')
 })
-
 </script>

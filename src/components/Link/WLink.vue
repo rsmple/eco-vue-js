@@ -2,7 +2,7 @@
   <component
     v-bind="!to ? {target, href} : {to}"
     :is="to ? RouterLink : 'a'"
-    class="cursor-pointer overflow-hidden no-underline hover:underline font-normal truncate whitespace-normal"
+    class="cursor-pointer overflow-hidden truncate whitespace-normal font-normal no-underline hover:underline"
     :class="{
       'text-base': !small,
       'text-xs': small,
@@ -12,8 +12,8 @@
     <IconLink
       class="inline rounded-lg p-px"
       :class="{
-        'square-5 mr-1 -mt-1': !small,
-        'square-3.5 mr-0.5 -mt-0.5': small,
+        'square-5 -mt-1 mr-1': !small,
+        'square-3.5 -mt-0.5 mr-0.5': small,
         [semanticTypeChipsStylesMap[semanticType]]: true,
       }"
     /><slot>{{ text }}</slot>
@@ -21,11 +21,14 @@
 </template>
 
 <script lang="ts" setup>
-import {RouterLink} from 'vue-router'
-import IconLink from '@/assets/icons/sax/IconLink.svg?component'
-import {SemanticType} from '@/utils/SemanticType'
-import {semanticTypeChipsStylesMap, semanticTypeTextStylesMap} from '@/components/Button/models/semanticTypeStylesMap'
 import type {LinkProps} from '@/types/types'
+
+import {RouterLink} from 'vue-router'
+
+import IconLink from '@/assets/icons/sax/IconLink.svg?component'
+
+import {semanticTypeChipsStylesMap, semanticTypeTextStylesMap} from '@/components/Button/models/semanticTypeStylesMap'
+import {SemanticType} from '@/utils/SemanticType'
 
 interface Props extends Partial<LinkProps> {
   href?: string
@@ -45,5 +48,4 @@ withDefaults(
     text: undefined,
   },
 )
-
 </script>

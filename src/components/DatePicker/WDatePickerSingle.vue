@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-default dark:bg-default-dark border border-solid border-gray-300 dark:border-gray-700 rounded-xl py-3 overflow-hidden"
+    class="bg-default dark:bg-default-dark overflow-hidden rounded-xl border border-solid border-gray-300 py-3 dark:border-gray-700"
     :style="{'--direction-factor': isDirect ? '1' : '-1'}"
   >
     <div class="grid grid-cols-2 gap-8 px-3 pb-4">
@@ -40,11 +40,14 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, computed, watch, toRef} from 'vue'
-import {getStartOfMonth, addMonth, addYear, monthShortFormatter, getStartOfWeek, addDay} from '@/utils/dateTime'
+import type {DateRange} from './models/types'
+
+import {computed, ref, toRef, watch} from 'vue'
+
+import {addDay, addMonth, addYear, getStartOfMonth, getStartOfWeek, monthShortFormatter} from '@/utils/dateTime'
+
 import CalendarMonth from './components/CalendarMonth.vue'
 import CalendarToggle from './components/CalendarToggle.vue'
-import type {DateRange} from './models/types'
 
 const props = defineProps<{
   modelValue: Date | undefined
@@ -89,5 +92,4 @@ watch(toRef(props, 'modelValue'), modelValue => {
     setCurrentDate(getStartOfMonth(modelValue))
   }
 }, {immediate: true})
-
 </script>

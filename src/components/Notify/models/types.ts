@@ -1,5 +1,5 @@
-import type {LinkProps} from '@/types/types'
 import type {NotifyType} from './NotifyType'
+import type {LinkProps} from '@/types/types'
 
 export interface NotifyConfig extends Partial<LinkProps> {
   title: string

@@ -46,7 +46,7 @@
 
         <button
           v-else
-          class="relative square-11 rounded-lg flex items-center justify-center bg-default dark:bg-default-dark border border-solid border-gray-200 dark:border-gray-800"
+          class="square-11 bg-default dark:bg-default-dark relative flex items-center justify-center rounded-lg border border-solid border-gray-200 dark:border-gray-800"
           :class="{
             'cursor-not-allowed': disabled,
             'cursor-progress': loading,
@@ -76,17 +76,21 @@
 </template>
 
 <script lang="ts" setup generic="Type extends InputType = 'text'">
+import type {InputAsyncProps} from './types'
+
 import {computed, nextTick, ref, toRef, watch} from 'vue'
+
 import WInput from '@/components/Input/WInput.vue'
-import WSpinner from '@/components/Spinner/WSpinner.vue'
-import IconEdit from '@/assets/icons/sax/IconEdit.svg?component'
-import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
-import IconSlash from '@/assets/icons/sax/IconSlash.svg?component'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+import WSpinner from '@/components/Spinner/WSpinner.vue'
+import WTooltip from '@/components/Tooltip/WTooltip.vue'
+
+import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
+import IconEdit from '@/assets/icons/sax/IconEdit.svg?component'
+import IconSlash from '@/assets/icons/sax/IconSlash.svg?component'
+
 import {Modal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
-import type {InputAsyncProps} from './types'
-import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 type ModelValue = Required<InputAsyncProps<Type>>['modelValue']
 
@@ -136,7 +140,7 @@ const close = () => {
 
   if (props.textarea && !props.textSecure && value.value !== props.modelValue) {
     closeModal = Modal.addConfirm({
-      title: `Discard changes${props.title ? ' for ' + props.title : ''}?`,
+      title: `Discard changes${ props.title ? ' for ' + props.title : '' }?`,
       description: 'Leaving the form will undo any edits.',
       acceptText: 'Discard',
       intermediateText: 'Save',
@@ -213,5 +217,4 @@ const handlePaste = () => {
     emitUpdateModelValue(value.value)
   }
 }
-
 </script>

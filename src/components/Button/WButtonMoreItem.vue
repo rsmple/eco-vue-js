@@ -5,7 +5,7 @@
     :download="download"
     :disabled="disabled"
   >
-    <div class="min-w-[5rem] flex-1 text-start">
+    <div class="min-w-20 flex-1 text-start">
       {{ text }}
     </div>
 
@@ -18,8 +18,9 @@
 </template>
 
 <script lang="ts" setup>
-import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 import type {LinkProps} from '@/types/types'
+
+import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
 interface Props extends Partial<LinkProps> {
   text: string
@@ -38,5 +39,4 @@ withDefaults(
     to: undefined,
   },
 )
-
 </script>

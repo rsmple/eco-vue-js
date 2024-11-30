@@ -49,9 +49,11 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false">
+import type {SelectOptionComponent, SelectSingleProps} from './types'
+
 import {computed, ref, toRef, watch} from 'vue'
+
 import WSelect from '@/components/Select/WSelect.vue'
-import type {SelectSingleProps, SelectOptionComponent} from './types'
 
 type EmitType = AllowClear extends true ? Model | null : NonNullable<Model>
 
@@ -84,5 +86,4 @@ watch(toRef(props, 'modelValue'), blur)
 defineExpose({
   blur,
 })
-
 </script>

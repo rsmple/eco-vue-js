@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onBeforeMount, ref, watch, toRef} from 'vue'
+import {computed, onBeforeMount, ref, toRef, watch} from 'vue'
 
 const props = defineProps<{
   svgWidth: number
@@ -82,5 +82,4 @@ watch(toRef(props, 'svgWidth'), calcFaction)
 onBeforeMount(() => {
   calcFaction()
 })
-
 </script>

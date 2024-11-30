@@ -1,4 +1,3 @@
-
 export enum SemanticType {
   PRIMARY = 'primary',
   SECONDARY = 'secondary',

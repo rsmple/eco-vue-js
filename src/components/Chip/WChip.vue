@@ -6,7 +6,7 @@
 
   <div
     v-else
-    class="text-xs font-semibold bg-gray-100 dark:bg-gray-800 rounded-md w-min px-2 py-0.5"
+    class="w-min rounded-md bg-gray-100 px-2 py-0.5 text-xs font-semibold dark:bg-gray-800"
     :class="classMap[semanticType ?? SemanticType.SECONDARY]"
   >
     <slot>
@@ -16,8 +16,9 @@
 </template>
 
 <script lang="ts" setup>
-import {SemanticType} from '@/utils/SemanticType'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+
+import {SemanticType} from '@/utils/SemanticType'
 
 defineProps<{
   text?: string
@@ -33,5 +34,4 @@ const classMap: Record<SemanticType, string> = {
   [SemanticType.WARNING]: 'text-warning dark:text-warning-dark',
   [SemanticType.INFO]: 'text-info dark:text-info-dark',
 }
-
 </script>

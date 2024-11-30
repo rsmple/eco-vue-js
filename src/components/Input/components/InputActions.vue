@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="loading || $slots.default || textSecure || allowCopy || ((allowPaste || allowClear) && !disabled && !readonly)"
-    class="flex rounded-xl overflow-hidden bg-default dark:bg-default-dark"
+    class="bg-default dark:bg-default-dark flex overflow-hidden rounded-xl"
   >
     <InputActionsButton
       v-if="allowClear && !disabled && !readonly"
@@ -35,7 +35,7 @@
 
     <div
       v-if="loading"
-      class="h-full w-11 flex items-center justify-center text-description cursor-progress"
+      class="text-description flex h-full w-11 cursor-progress items-center justify-center"
     >
       <WSpinner class="[--spinner-size:1.5rem]" />
     </div>
@@ -52,12 +52,16 @@
 
 <script lang="ts" setup>
 import {markRaw, toRef} from 'vue'
+
+import WSpinner from '@/components/Spinner/WSpinner.vue'
+
 import IconClose from '@/assets/icons/sax/IconClose.svg?component'
 import IconEye from '@/assets/icons/sax/IconEye.svg?component'
 import IconEyeSlash from '@/assets/icons/sax/IconEyeSlash.svg?component'
 import IconPaste from '@/assets/icons/sax/IconPaste.svg?component'
-import WSpinner from '@/components/Spinner/WSpinner.vue'
+
 import {useCopy} from '@/utils/useCopy'
+
 import InputActionsButton from './InputActionsButton.vue'
 
 const props = defineProps<{
@@ -82,5 +86,4 @@ defineEmits<{
 }>()
 
 const {doCopy, iconCopy} = useCopy(toRef(props, 'modelValue'))
-
 </script>

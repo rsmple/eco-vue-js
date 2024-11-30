@@ -25,16 +25,16 @@
 
     <div
       v-if="modelValue.length > PAGE_LENGTH"
-      class="flex overflow-hidden items-center text-accent gap-1 px-1"
+      class="text-accent flex items-center gap-1 overflow-hidden px-1"
     >
       <div>... {{ numberFormatter.format(modelValue.length) }} items</div>
 
       <button
         v-if="!disableClear && !disabled"
-        class="relative flex square-5 rounded-full items-center justify-center outline-none"
+        class="square-5 relative flex items-center justify-center rounded-full outline-none"
         :class="{
           'cursor-progress': loading,
-          'cursor-pointer w-ripple w-ripple-hover ': !loading,
+          'w-ripple w-ripple-hover cursor-pointer ': !loading,
         }"
         @mousedown.stop.prevent=""
         @click.stop.prevent="!loading && $emit('update:modelValue', [])"
@@ -46,11 +46,15 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
-import {computed, ref, watch, onBeforeUnmount} from 'vue'
-import SelectAsyncPrefixPage from './SelectAsyncPrefixPage.vue'
-import {numberFormatter} from '@/utils/utils'
-import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 import type {SelectAsyncPrefixProps, SelectOptionComponent, SelectOptionComponentProps} from '../types'
+
+import {computed, onBeforeUnmount, ref, watch} from 'vue'
+
+import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
+
+import {numberFormatter} from '@/utils/utils'
+
+import SelectAsyncPrefixPage from './SelectAsyncPrefixPage.vue'
 
 const PAGE_LENGTH = 8
 
@@ -77,5 +81,4 @@ defineSlots<{
 onBeforeUnmount(() => {
   emit('update:fetching', false)
 })
-
 </script>

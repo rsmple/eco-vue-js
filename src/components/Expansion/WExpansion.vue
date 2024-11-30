@@ -15,7 +15,7 @@
         v-show="isShown"
         class="duration-[var(--expansion-duration,200ms)]"
       >
-        <div class="[overflow:inherit] grid grid-cols-1">
+        <div class="grid grid-cols-1 [overflow:inherit]">
           <slot />
         </div>
       </div>
@@ -24,7 +24,6 @@
 </template>
 
 <script lang="ts" setup>
-
 withDefaults(
   defineProps<{
     isOpen?: boolean
@@ -39,5 +38,4 @@ withDefaults(
 defineEmits<{
   (e: 'update:visible', value: boolean): void
 }>()
-
 </script>

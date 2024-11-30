@@ -4,7 +4,7 @@
       {{ title }}
     </template>
 
-    <div class="text-base text-accent font-normal text-center min-h-[1.25rem] mb-8 sm-not:-px--inner-margin text-balance">
+    <div class="text-accent sm-not:-px--inner-margin mb-8 min-h-5 text-balance text-center text-base font-normal">
       {{ description }}
     </div>
 
@@ -44,8 +44,10 @@
 
 <script lang="ts" setup>
 import {ref} from 'vue'
-import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
+
 import WButton from '@/components/Button/WButton.vue'
+import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
+
 import {SemanticType} from '@/utils/SemanticType'
 
 const props = defineProps<{
@@ -113,5 +115,4 @@ const cancel = () => {
 
   emit('close:modal')
 }
-
 </script>

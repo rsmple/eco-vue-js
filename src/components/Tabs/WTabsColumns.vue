@@ -23,13 +23,13 @@
 </template>
 
 <script lang="ts" setup>
-import {getIsMobile} from '@/utils/mobile'
 import WTabs from '@/components/Tabs/WTabs.vue'
+
+import {getIsMobile} from '@/utils/mobile'
 
 defineProps<{
   names: string[]
 }>()
 
 const isMobile = getIsMobile()
-
 </script>

@@ -1,4 +1,4 @@
-import {computed, onBeforeUnmount, ref, unref, type Ref} from 'vue'
+import {type Ref, computed, onBeforeUnmount, ref, unref} from 'vue'
 
 const isRightOrder = <Value>(value: SelectedRange<Value>): boolean => {
   return value[0].page < value[1].page || (value[0].page === value[1].page && value[0].index <= value[1].index)

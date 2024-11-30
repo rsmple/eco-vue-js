@@ -71,9 +71,9 @@
     <template #content>
       <div
         v-if="!optionsFiltered.length"
-        class="py-2 px-[1.0625rem] first:pt-4 last:pb-4"
+        class="px-[1.0625rem] py-2 first:pt-4 last:pb-4"
       >
-        <div class="select-none cursor-default w-select-field sm-not:px-3">
+        <div class="w-select-field sm-not:px-3 cursor-default select-none">
           {{ !search && emptyStub ? emptyStub : 'No match' }}
         </div>
       </div>
@@ -121,7 +121,7 @@
         @mouseenter="setCursor(optionsFiltered.length)"
       >
         <template #prefix>
-          <span class="w-select-field pr-2 sm-not:px-3">
+          <span class="w-select-field sm-not:px-3 pr-2">
             Create:
           </span>
         </template>
@@ -148,14 +148,18 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>">
-import {ref, watch, toRef, nextTick, computed, type Ref} from 'vue'
-import SelectOption from './components/SelectOption.vue'
-import SelectOptionPrefix from './components/SelectOptionPrefix.vue'
+import type {SelectOptionComponent, SelectOptionComponentProps, SelectProps} from './types'
+
+import {type Ref, computed, nextTick, ref, toRef, watch} from 'vue'
+
+import WInputSuggest from '@/components/Input/WInputSuggest.vue'
+
+import {ApiError} from '@/utils/api'
 import {getIsMobile} from '@/utils/mobile'
 import {debounce} from '@/utils/utils'
-import WInputSuggest from '@/components/Input/WInputSuggest.vue'
-import type {SelectProps, SelectOptionComponent, SelectOptionComponentProps} from './types'
-import {ApiError} from '@/utils/api'
+
+import SelectOption from './components/SelectOption.vue'
+import SelectOptionPrefix from './components/SelectOptionPrefix.vue'
 
 defineOptions({inheritAttrs: false})
 
@@ -406,5 +410,4 @@ defineSlots<{
   }) => void,
   right?: () => void
 }>()
-
 </script>

@@ -3,7 +3,7 @@
     :is="to !== undefined ? RouterLink : tag"
     v-bind="to !== undefined ? {to} : undefined"
     class="
-      relative flex flex-col md:gap-2 p-2 items-center w-full select-none cursor-pointer no-underline outline-none border-none w-ripple w-ripple-hover
+      w-ripple w-ripple-hover relative flex w-full cursor-pointer select-none flex-col items-center border-none p-2 no-underline outline-none md:gap-2
     "
     :class="{
       'text-primary-default dark:text-primary-dark': active && semanticType === SemanticType.SECONDARY,
@@ -14,7 +14,7 @@
     <WCounter
       v-if="count !== undefined"
       v-show="count > 0"
-      class="absolute top-0 left-[calc(50%-20px)]"
+      class="absolute left-[calc(50%-20px)] top-0"
       :count="count"
       :trigger="1"
     />
@@ -28,17 +28,20 @@
       </template>
     </slot>
 
-    <div class="font-normal text-center md:text-base text-[0.625rem] whitespace-nowrap">
+    <div class="whitespace-nowrap text-center text-[0.625rem] font-normal md:text-base">
       {{ title }}
     </div>
   </component>
 </template>
 
 <script lang="ts" setup>
-import {RouterLink} from 'vue-router'
-import WCounter from '@/components/Counter/WCounter.vue'
-import {SemanticType} from '@/utils/SemanticType'
 import type {LinkProps} from '@/types/types'
+
+import {RouterLink} from 'vue-router'
+
+import WCounter from '@/components/Counter/WCounter.vue'
+
+import {SemanticType} from '@/utils/SemanticType'
 
 const semanticTypeStylesMap: Record<SemanticType, string> = {
   [SemanticType.SECONDARY]: 'text-description bg-default dark:bg-default-dark hover:text-primary-default dark:hover:text-primary-dark',
@@ -82,5 +85,4 @@ withDefaults(
 defineEmits<{
   (e: 'click', event: MouseEvent): void
 }>()
-
 </script>

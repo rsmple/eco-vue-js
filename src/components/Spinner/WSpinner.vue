@@ -1,6 +1,6 @@
 <template>
   <svg
-    class="animate-spin square-[var(--spinner-size,2rem)]"
+    class="square-[var(--spinner-size,2rem)] animate-spin"
     width="20"
     height="20"
     viewBox="25 25 50 50"

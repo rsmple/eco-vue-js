@@ -81,7 +81,7 @@
       @unmounted="updateCursor(undefined)"
     >
       <template #prefix>
-        <span class="w-select-field pr-2 sm-not:px-3">
+        <span class="w-select-field sm-not:px-3 pr-2">
           Create:
         </span>
       </template>
@@ -96,10 +96,13 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {ref, type UnwrapRef} from 'vue'
-import SelectOption from './SelectOption.vue'
+import {type UnwrapRef, ref} from 'vue'
+
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
+
 import {debounce} from '@/utils/utils'
+
+import SelectOption from './SelectOption.vue'
 
 const props = defineProps<{
   modelValue: Model[]
@@ -208,5 +211,4 @@ defineExpose({
 defineSlots<{
   default?: (props: {option: Data | null, selected: boolean, skeleton: boolean}) => void
 }>()
-
 </script>

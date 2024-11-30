@@ -35,14 +35,17 @@
 </template>
 
 <script lang="ts" setup generic="Model, FieldType extends string | number, QueryParams">
-import {computed, onBeforeUnmount, ref, toRef} from 'vue'
-import WInputAsync from '@/components/Input/WInputAsync.vue'
-import {Notify} from '@/utils/Notify'
-import {validateRequired} from '@/utils/validate'
-import {Modal} from '@/utils/Modal'
-import {handleApiError} from '@/utils/api'
 import type {FormAsyncInputProps} from './types'
+
+import {computed, onBeforeUnmount, ref, toRef} from 'vue'
+
+import WInputAsync from '@/components/Input/WInputAsync.vue'
+
+import {Modal} from '@/utils/Modal'
+import {Notify} from '@/utils/Notify'
+import {handleApiError} from '@/utils/api'
 import {get, set} from '@/utils/utils'
+import {validateRequired} from '@/utils/validate'
 
 type PayloadType = PartialNested<Model>
 
@@ -114,5 +117,4 @@ onBeforeUnmount(() => {
   closeModal?.()
   closeModal = null
 })
-
 </script>

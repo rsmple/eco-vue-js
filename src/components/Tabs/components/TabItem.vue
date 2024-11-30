@@ -8,7 +8,8 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, watch, toRef, nextTick} from 'vue'
+import {nextTick, ref, toRef, watch} from 'vue'
+
 import {useTabItemActiveListener} from '../use/useTabItemActiveListener'
 
 const props = defineProps<{
@@ -40,5 +41,4 @@ watch(toRef(props, 'isActive'), async value => {
 defineExpose({
   emitHeight,
 })
-
 </script>

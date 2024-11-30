@@ -1,5 +1,6 @@
 import {computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
+
 import {isId, isIndex, isPage} from './utils'
 
 const keysLengthPage: ObjectKeys<SelectedPage<number>>['length'] = 3
@@ -34,8 +35,6 @@ export const getPosition = <T>(range: SelectedPage<T>, pageLength: number): numb
 const stringifySelectedRange = <T>(value: SelectedRange<T>): string => stringifySelectedPage(value[0]) + '-' + stringifySelectedPage(value[1])
 
 const DIVIDER = ','
-
-
 
 export const useSelected = () => {
   const route = useRoute()

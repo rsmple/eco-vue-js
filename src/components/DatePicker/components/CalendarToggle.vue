@@ -1,14 +1,14 @@
 <template>
-  <div class="flex items-center h-8 w-full my-2">
+  <div class="my-2 flex h-8 w-full items-center">
     <div
       class="
-        relative flex justify-center items-center square-8
-        rounded-xl cursor-pointer select-none w-ripple mr-auto
-        hover:bg-primary-default hover:dark:bg-primary-dark hover:text-default text-description
+        square-8 w-ripple hover:bg-primary-default hover:dark:bg-primary-dark hover:text-default
+        text-description relative mr-auto flex cursor-pointer
+        select-none items-center justify-center rounded-xl
       "
       @click="$emit('click:previous')"
     >
-      <IconArrow class="rotate-90 -ml-1" />
+      <IconArrow class="-ml-1 rotate-90" />
     </div>
 
     <div class="relative overflow-hidden">
@@ -20,7 +20,7 @@
       >
         <div
           :key="text"
-          class="text-base text-accent font-medium select-none text-center w-14"
+          class="text-accent w-14 select-none text-center text-base font-medium"
         >
           {{ text }}
         </div>
@@ -29,13 +29,13 @@
 
     <div
       class="
-        relative flex justify-center items-center square-8
-        rounded-xl cursor-pointer select-none w-ripple ml-auto
-        hover:bg-primary-default hover:dark:bg-primary-dark hover:text-default text-description
+        square-8 w-ripple hover:bg-primary-default hover:dark:bg-primary-dark hover:text-default
+        text-description relative ml-auto flex cursor-pointer
+        select-none items-center justify-center rounded-xl
       "
       @click="$emit('click:next')"
     >
-      <IconArrow class="-rotate-90 -mr-1" />
+      <IconArrow class="-mr-1 -rotate-90" />
     </div>
   </div>
 </template>
@@ -51,5 +51,4 @@ defineEmits<{
   (e: 'click:next'): void
   (e: 'click:previous'): void
 }>()
-
 </script>

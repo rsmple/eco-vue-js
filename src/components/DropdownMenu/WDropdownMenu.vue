@@ -44,9 +44,11 @@
 </template>
 
 <script lang="ts" setup>
-import {useTemplateRef} from 'vue'
-import WDropdown from '@/components/Dropdown/WDropdown.vue'
 import type {DropdownMenuProps} from './types'
+
+import {useTemplateRef} from 'vue'
+
+import WDropdown from '@/components/Dropdown/WDropdown.vue'
 
 defineProps<DropdownMenuProps>()
 
@@ -62,5 +64,4 @@ defineExpose({
     dropdownRef.value?.update()
   },
 })
-
 </script>

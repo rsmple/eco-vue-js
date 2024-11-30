@@ -8,8 +8,10 @@
 
 <script lang="ts" setup>
 import {computed, markRaw, onBeforeUnmount, ref, toRef, useSlots, useTemplateRef, watch} from 'vue'
-import {getIsTouchDevice} from '@/utils/mobile'
+
 import {Tooltip} from '@/utils/Tooltip'
+import {getIsTouchDevice} from '@/utils/mobile'
+
 import {getIncrement} from './models/utils'
 
 const props = defineProps<{
@@ -77,5 +79,4 @@ onBeforeUnmount(() => {
 
   close()
 })
-
 </script>

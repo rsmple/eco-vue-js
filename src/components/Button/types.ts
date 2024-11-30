@@ -1,6 +1,6 @@
+import type {DropdownMenuProps} from '@/components/DropdownMenu/types'
 import type {FieldWrapperProps} from '@/components/FieldWrapper/types'
 import type {SemanticType} from '@/utils/SemanticType'
-import type {DropdownMenuProps} from '@/components/DropdownMenu/types'
 import type {Component} from 'vue'
 
 export type ButtonGroupOptionProps<Option> = {option: Option, selected?: boolean}

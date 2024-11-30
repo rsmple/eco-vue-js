@@ -1,12 +1,12 @@
-import {fileURLToPath, URL} from 'node:url'
-
-import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
-import dts from 'vite-plugin-dts'
-import svgLoader from 'vite-svg-loader'
-import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
 import postcssImport from 'postcss-import'
+import tailwindcss from 'tailwindcss'
+import {defineConfig} from 'vite'
+import dts from 'vite-plugin-dts'
+import svgLoader from 'vite-svg-loader'
+
+import {URL, fileURLToPath} from 'node:url'
 
 export default defineConfig({
   plugins: [

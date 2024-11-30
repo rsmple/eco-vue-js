@@ -116,12 +116,16 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
-import {ref, nextTick, computed, watch} from 'vue'
-import {getIsMobile} from '@/utils/mobile'
-import WInputSuggest from '@/components/Input/WInputSuggest.vue'
-import SelectAsyncPrefix from './components/SelectAsyncPrefix.vue'
-import SelectAsyncList from './components/SelectAsyncList.vue'
 import type {SelectAsyncProps, SelectOptionComponent, SelectOptionComponentProps} from './types'
+
+import {computed, nextTick, ref, watch} from 'vue'
+
+import WInputSuggest from '@/components/Input/WInputSuggest.vue'
+
+import {getIsMobile} from '@/utils/mobile'
+
+import SelectAsyncList from './components/SelectAsyncList.vue'
+import SelectAsyncPrefix from './components/SelectAsyncPrefix.vue'
 
 defineOptions({inheritAttrs: false})
 
@@ -269,5 +273,4 @@ defineSlots<{
   right?: (props: Record<string, never>) => void
   option?: (props: {option: Data | null, index?: number, selected: boolean, skeleton: boolean, model: boolean, search?: string}) => void
 }>()
-
 </script>

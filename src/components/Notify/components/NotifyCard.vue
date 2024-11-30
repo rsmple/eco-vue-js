@@ -1,13 +1,13 @@
 <template>
   <div
     ref="element"
-    class="flex z-[1] isolate"
+    class="isolate z-[1] flex"
     :style="elementStyles"
   >
-    <div class="relative rounded-xl bg-black-default dark:bg-gray-800 min-h-[4.5rem] max-w-[calc(100vw-2rem)] sm:max-w-lg flex select-none my-2 mr-4 ml-auto shadow-md">
+    <div class="bg-black-default relative my-2 ml-auto mr-4 flex min-h-[4.5rem] max-w-[calc(100vw-2rem)] select-none rounded-xl shadow-md sm:max-w-lg dark:bg-gray-800">
       <WCounter
         v-show="count > 1"
-        class="absolute -top-2.5 -left-2.5 shadow-md"
+        class="absolute -left-2.5 -top-2.5 shadow-md"
         :count="count"
       />
 
@@ -28,14 +28,14 @@
         />
       </div>
 
-      <div class="flex-1 py-4 grid items-center">
-        <div class="text-base text-default font-semibold">
+      <div class="grid flex-1 items-center py-4">
+        <div class="text-default text-base font-semibold">
           {{ title }}
         </div>
 
         <div
           v-if="caption || userInput"
-          class="text-base text-default font-normal break-words whitespace-pre-wrap"
+          class="text-default whitespace-pre-wrap break-words text-base font-normal"
         >
           {{ caption ? caption + ' ' : '' }}<span class="break-all">{{ userInput }}</span>
         </div>
@@ -54,7 +54,7 @@
         class="w-ripple-trigger w-ripple-hover text-description cursor-pointer p-6"
         @click="$emit('click:close')"
       >
-        <div class="relative flex justify-center items-center square-8 rounded-full w-ripple">
+        <div class="square-8 w-ripple relative flex items-center justify-center rounded-full">
           <IconCancel class="square-4" />
         </div>
       </div>
@@ -63,18 +63,23 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch, type StyleValue} from 'vue'
-import {useRouter} from 'vue-router'
-import {NotifyType} from '../models/NotifyType'
-import IconDanger from '@/assets/icons/default/IconDanger.svg?component'
-import IconWarn from '@/assets/icons/default/IconWarn.svg?component'
-import IconSuccess from '@/assets/icons/default/IconSuccess.svg?component'
-import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
-import WCounter from '@/components/Counter/WCounter.vue'
-import WButton from '@/components/Button/WButton.vue'
-import {SemanticType} from '@/utils/SemanticType'
-import IconBack from '@/assets/icons/default/IconBack.svg?component'
 import type {LinkProps} from '@/types/types'
+
+import {type StyleValue, computed, ref, watch} from 'vue'
+import {useRouter} from 'vue-router'
+
+import WButton from '@/components/Button/WButton.vue'
+import WCounter from '@/components/Counter/WCounter.vue'
+
+import IconBack from '@/assets/icons/default/IconBack.svg?component'
+import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
+import IconDanger from '@/assets/icons/default/IconDanger.svg?component'
+import IconSuccess from '@/assets/icons/default/IconSuccess.svg?component'
+import IconWarn from '@/assets/icons/default/IconWarn.svg?component'
+
+import {SemanticType} from '@/utils/SemanticType'
+
+import {NotifyType} from '../models/NotifyType'
 
 interface Props extends Partial<LinkProps> {
   title: string
@@ -117,5 +122,4 @@ watch(element, value => {
 
   height.value = value.getBoundingClientRect().height || undefined
 })
-
 </script>

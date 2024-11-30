@@ -2,7 +2,7 @@
   <div
     class="relative"
     :class="{
-      'mt-1 mb-[1.125rem]': !noMargin,
+      'mb-[1.125rem] mt-1': !noMargin,
       [typeof $attrs.class === 'string' ? $attrs.class : '']: true,
     }"
     @click="$emit('click', $event)"
@@ -15,7 +15,7 @@
     >
       <div
         v-if="title || $slots.title?.()?.length"
-        class="text-xs font-semibold text-accent mb-2 duration-500"
+        class="text-accent mb-2 text-xs font-semibold duration-500"
         :class="{
           'opacity-50': disabled && !skeleton,
         }"
@@ -51,7 +51,7 @@
       <div class="grid grid-cols-[1fr,auto]">
         <div
           v-if="!skeleton"
-          class="relative grid grid-cols-1 w-has-changes-color-info dark:w-has-changes-color-info-dark"
+          class="w-has-changes-color-info dark:w-has-changes-color-info-dark relative grid grid-cols-1"
           :class="{
             'focus-within-not:w-has-changes-color-negative dark:focus-within-not:w-has-changes-color-negative-dark': errorMessage,
           }"
@@ -61,7 +61,7 @@
             name="field"
           >
             <div
-              class="text-base font-normal min-h-[2.75rem] flex items-center border-t border-solid border-gray-300 dark:border-gray-700"
+              class="flex min-h-11 items-center border-t border-solid border-gray-300 text-base font-normal dark:border-gray-700"
               :class="{
                 'font-mono': mono,
               }"
@@ -86,7 +86,7 @@
           >
             <span
               v-if="hasChanges"
-              class="square-2 rounded-full transition-colors absolute top-0 right-0 bg-[var(--has-changes-bg)]"
+              class="square-2 absolute right-0 top-0 rounded-full bg-[var(--has-changes-bg)] transition-colors"
             />
           </Transition>
 
@@ -98,14 +98,14 @@
           >
             <div
               v-if="errorMessage"
-              class="text-xs font-normal text-negative dark:text-negative-dark absolute right-0 top-full pt-0.5 text-end"
+              class="text-negative dark:text-negative-dark absolute right-0 top-full pt-0.5 text-end text-xs font-normal"
             >
               {{ errorMessage }}
             </div>
 
             <div
               v-else-if="maxLength !== undefined && focused"
-              class="text-xs font-normal text-description absolute right-0 top-full pt-0.5 whitespace-nowrap"
+              class="text-description absolute right-0 top-full whitespace-nowrap pt-0.5 text-xs font-normal"
             >
               {{ numberFormatter.format(`${typeof modelValue === 'number' ? modelValue : (modelValue || '')}`.length) }} / {{ numberFormatter.format(maxLength) }}
             </div>
@@ -120,7 +120,7 @@
         <div
           v-if="$slots.right?.()?.length"
           ref="rightContainer"
-          class="pl-4 flex gap-4 sm-not:flex-col"
+          class="sm-not:flex-col flex gap-4 pl-4"
         >
           <slot name="right" />
         </div>
@@ -129,7 +129,7 @@
 
     <div
       v-if="description"
-      class="text-xs font-normal text-description pt-4 whitespace-pre-wrap break-words text-pretty"
+      class="text-description whitespace-pre-wrap text-pretty break-words pt-4 text-xs font-normal"
       :class="{
         'opacity-50': disabled && !skeleton,
       }"
@@ -149,12 +149,15 @@
 </template>
 
 <script lang="ts" setup>
+import type {FieldWrapperProps} from './types'
+
 import {ref, useId} from 'vue'
+
+import WButtonCopy from '@/components/Button/WButtonCopy.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
-import WButtonCopy from '@/components/Button/WButtonCopy.vue'
+
 import {numberFormatter} from '@/utils/utils'
-import type {FieldWrapperProps} from './types'
 
 defineOptions({inheritAttrs: false})
 
@@ -171,5 +174,4 @@ const focused = ref(false)
 const setFocused = (value: boolean): void => {
   focused.value = value
 }
-
 </script>

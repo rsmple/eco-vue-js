@@ -5,7 +5,7 @@
       'w-hover-circle-trigger cursor-pointer': !disabled,
       'cursor-not-allowed opacity-50': disabled,
     }"
-    class="outline-none flex justify-center"
+    class="flex justify-center outline-none"
     @click="toggle"
   >
     <WDropdownMenu
@@ -33,8 +33,8 @@
       <template #content>
         <WClickOutside
           class="
-            mr-[-1.375rem] sm-not:-mr-6 bg-default dark:bg-default-dark rounded-xl shadow-md
-            my-4 overflow-hidden dark:border dark:border-solid dark:border-gray-800 text-start font-normal
+            sm-not:-mr-6 bg-default dark:bg-default-dark my-4 mr-[-1.375rem] overflow-hidden
+            rounded-xl text-start font-normal shadow-md dark:border dark:border-solid dark:border-gray-800
           "
           @click="close"
         >
@@ -47,10 +47,13 @@
 
 <script lang="ts" setup>
 import {ref} from 'vue'
-import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
-import IconMore from '@/assets/icons/default/IconMore.svg?component'
+
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
+import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+
+import IconMore from '@/assets/icons/default/IconMore.svg?component'
+
+import {HorizontalAlign} from '@/utils/HorizontalAlign'
 
 const props = defineProps<{
   icon?: SVGComponent
@@ -68,5 +71,4 @@ const toggle = (): void => {
 const close = (): void => {
   isOpen.value = false
 }
-
 </script>

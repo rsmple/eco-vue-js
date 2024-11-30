@@ -1,7 +1,7 @@
 <template>
   <div
     ref="element"
-    class="relative grid grid-cols-[auto,1fr,2.5rem] w-full py-2 px-[1.0625rem]"
+    class="relative grid w-full grid-cols-[auto,1fr,2.5rem] px-[1.0625rem] py-2"
     :class="{
       'bg-primary-light dark:bg-primary-darkest': isSelected,
       'before:opacity-5': !loading && isCursor && !skeleton,
@@ -14,7 +14,7 @@
     <slot name="prefix" />
 
     <div
-      class="flex items-center overflow-hidden col-start-2"
+      class="col-start-2 flex items-center overflow-hidden"
       :class="{
         'col-span-2': hideOptionIcon,
       }"
@@ -30,7 +30,7 @@
     >
       <div
         v-if="!hideOptionIcon && (isSelected || loading)"
-        class="flex items-center justify-center text-primary-default dark:text-primary-dark [--spinner-size:1.5rem] col-start-3"
+        class="text-primary-default dark:text-primary-dark col-start-3 flex items-center justify-center [--spinner-size:1.5rem]"
       >
         <IconCheck v-if="isSelected && !loading" />
         <WSpinner v-else-if="loading" />
@@ -41,8 +41,10 @@
 
 <script lang="ts" setup generic="Model extends number | string">
 import {onUnmounted, ref, watch, watchEffect} from 'vue'
-import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
+
 import WSpinner from '@/components/Spinner/WSpinner.vue'
+
+import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 
 const props = defineProps<{
   isSelected: boolean
@@ -129,5 +131,4 @@ defineSlots<{
   default: (props: {selected: boolean}) => void
   prefix: () => void
 }>()
-
 </script>

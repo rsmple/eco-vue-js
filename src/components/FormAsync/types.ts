@@ -1,7 +1,7 @@
-import type {InputAsyncProps} from '@/components/Input/types'
-import type {ToggleProps} from '@/components/Toggle/types'
-import type {SelectAsyncSingleProps, SelectOptionComponent, SelectProps, SelectSingleProps, SelectStringifiedProps} from '@/components/Select/types'
 import type {ButtonGroupProps} from '../Button/types'
+import type {InputAsyncProps} from '@/components/Input/types'
+import type {SelectAsyncSingleProps, SelectOptionComponent, SelectProps, SelectSingleProps, SelectStringifiedProps} from '@/components/Select/types'
+import type {ToggleProps} from '@/components/Toggle/types'
 
 /**
  * Input
@@ -27,8 +27,6 @@ interface FormAsyncInputPropsWithoutParams<Model, FieldType extends string | num
 }
 
 export type FormAsyncInputProps<Model, FieldType extends string | number, QueryParams> = FormAsyncInputPropsWithParams<Model, FieldType, QueryParams> | FormAsyncInputPropsWithoutParams<Model, FieldType>
-
-
 
 /**
  * Toggle
@@ -56,8 +54,6 @@ interface FormAsyncTogglePropsWithoutParams<Model, FieldType extends boolean | n
 }
 
 export type FormAsyncToggleProps<Model, FieldType extends boolean | null, QueryParams> = FormAsyncTogglePropsWithParams<Model, FieldType, QueryParams> | FormAsyncTogglePropsWithoutParams<Model, FieldType>
-
-
 
 /**
  * Select
@@ -109,9 +105,6 @@ export type FormAsyncSelectProps<
   Data extends DefaultData,
   OptionComponent extends SelectOptionComponent<Data>,
 > = FormAsyncSelectPropsWithParams<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent> | FormAsyncSelectPropsWithoutParams<Model, FieldType, QueryParamsOptions, Data, OptionComponent>
-
-
-
 
 /**
  * SelectSingle
@@ -167,9 +160,6 @@ export type FormAsyncSelectSingleProps<
   AllowClear extends boolean = false
 > = FormAsyncSelectSinglePropsWithParams<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent, AllowClear> | FormAsyncSelectSinglePropsWithoutParams<Model, FieldType, QueryParamsOptions, Data, OptionComponent, AllowClear>
 
-
-
-
 /**
  * SelectStringified
  */
@@ -219,9 +209,6 @@ export type FormAsyncSelectStringifiedProps<
   QueryParams, Data extends DefaultData,
   OptionComponent extends SelectOptionComponent<Data>,
 > = FormAsyncSelectStringifiedPropsWithParams<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent> | FormAsyncSelectStringifiedPropsWithoutParams<Model, FieldType, QueryParamsOptions, Data, OptionComponent>
-
-
-
 
 /**
  * SelectInfiniteSingle
@@ -276,8 +263,6 @@ export type FormAsyncSelectInfiniteSingleProps<
   OptionComponent extends SelectOptionComponent<Data>,
   AllowClear extends boolean = false
 > = FormAsyncSelectInfiniteSinglePropsWithParams<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent, AllowClear> | FormAsyncSelectInfiniteSinglePropsWithoutParams<Model, FieldType, QueryParamsOptions, Data, OptionComponent, AllowClear>
-
-
 
 /**
  * ButtonGroup

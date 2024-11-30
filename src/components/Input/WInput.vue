@@ -42,8 +42,8 @@
     >
       <div
         class="
-          relative border border-solid rounded-xl bg-default dark:bg-default-dark
-          transition-colors duration-75 overflow-hidden min-h-11 grid grid-cols-[auto,1fr,auto]
+          bg-default dark:bg-default-dark relative grid min-h-11 grid-cols-[auto,1fr,auto]
+          overflow-hidden rounded-xl border border-solid transition-colors duration-75
         "
         :class="{
           'focus-within:border-primary-default dark:focus-within:border-primary-dark': !disabled && !readonly && !unclickable,
@@ -57,7 +57,7 @@
       >
         <div
           v-if="icon"
-          class="flex items-center w-11 h-full justify-center text-description select-none"
+          class="text-description flex h-full w-11 select-none items-center justify-center"
         >
           <component
             :is="icon"
@@ -66,7 +66,7 @@
         </div>
 
         <div
-          class="col-start-2 grid grid-cols-1 group/input"
+          class="group/input col-start-2 grid grid-cols-1"
           :class="{
             'py-1 first:pl-1 last:pr-1': $slots.prefix,
           }"
@@ -79,8 +79,8 @@
               :id="id"
               ref="input"
               class="
-                text-base font-normal outline-0 border-none bg-[inherit] flex-1 max-w-full w-input
-                disabled:opacity-80 disabled:cursor-not-allowed placeholder:text-gray-400 dark:placeholder:text-gray-500 appearance-none
+                w-input max-w-full flex-1 appearance-none border-none bg-[inherit] text-base font-normal
+                outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed disabled:opacity-80 dark:placeholder:text-gray-500
               "
               :class="{
                 'min-h-[var(--textarea-height,10rem)] w-full py-3': textarea,
@@ -88,8 +88,8 @@
                 'resize-none': !resize && textarea,
                 'h-[var(--input-height,2.625rem)]': !textarea && !$slots.suffix,
                 'h-[var(--input-height,2.125rem)]': !textarea && $slots.suffix,
-                'group-first/input:pl-3 first:pl-0 [&:not(:first-child)]:pl-3 group-last/input:pr-3': !hideInput,
-                'w-0 max-w-0 p-0 absolute': hideInput,
+                'first:pl-0 group-first/input:pl-3 group-last/input:pr-3 [&:not(:first-child)]:pl-3': !hideInput,
+                'absolute w-0 max-w-0 p-0': hideInput,
                 'font-mono': mono,
                 'text-secure': textSecure && !isSecureVisible,
                 'text-black-default dark:text-gray-200': !disabled,
@@ -155,12 +155,16 @@
 </template>
 
 <script lang="ts" setup generic="Type extends InputType = 'text'">
-import {onMounted, ref, nextTick, onBeforeUnmount} from 'vue'
-import InputActions from './components/InputActions.vue'
-import {Notify} from '@/utils/Notify'
-import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 import type {InputProps} from './types'
+
+import {nextTick, onBeforeUnmount, onMounted, ref} from 'vue'
+
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
+
+import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
+import {Notify} from '@/utils/Notify'
+
+import InputActions from './components/InputActions.vue'
 
 type ModelValue = Required<InputProps<Type>>['modelValue']
 
@@ -352,5 +356,4 @@ defineExpose({
   focus,
   blur,
 })
-
 </script>

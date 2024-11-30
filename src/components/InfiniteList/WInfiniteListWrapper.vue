@@ -17,6 +17,7 @@
 
 <script lang="ts" setup>
 import {onBeforeUnmount, watch} from 'vue'
+
 import {useInfiniteListHeader} from './use/useInfiniteListHeader'
 
 const props = withDefaults(
@@ -52,5 +53,4 @@ watch(isIntersecting, value => {
 onBeforeUnmount(() => {
   updateHeaderPadding(0)
 })
-
 </script>

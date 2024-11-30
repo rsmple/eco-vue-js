@@ -1,8 +1,8 @@
 <template>
-  <div class="fixed top-0 right-0 left-0 z-10 h-[3.75rem] print:hidden flex">
+  <div class="fixed inset-x-0 top-0 z-10 flex h-[3.75rem] print:hidden">
     <div
       :key="headerPadding"
-      class="fixed top-0 right-0 left-0 bg-default dark:bg-default-dark supports-backdrop:backdrop-blur h-[calc(3.75rem+var(--header-height-padding))] print:hidden"
+      class="bg-default dark:bg-default-dark supports-backdrop:backdrop-blur fixed inset-x-0 top-0 h-[calc(3.75rem+var(--header-height-padding))] print:hidden"
       :class="{
         'supports-backdrop:bg-opacity-40 supports-backdrop:dark:bg-opacity-60': isTransparent,
       }"
@@ -11,12 +11,12 @@
 
     <div
       v-show="!isSearchVisible && !search"
-      class="relative flex flex-1 items-center -pl--inner-margin xl-not:pl-[3.75rem] max-w-full"
+      class="-pl--inner-margin xl-not:pl-[3.75rem] relative flex max-w-full flex-1 items-center"
       :class="{
         '-pr--inner-margin': !searchEnabled
       }"
     >
-      <div class="flex-1 text-xl sm:text-3xl text-accent font-semibold truncate">
+      <div class="text-accent flex-1 truncate text-xl font-semibold sm:text-3xl">
         <slot name="title">
           {{ title }}
         </slot>
@@ -24,10 +24,10 @@
 
       <button
         v-if="searchEnabled"
-        class="w-hover-circle-trigger flex items-center h-full -px--inner-margin select-none outline-none"
+        class="w-hover-circle-trigger -px--inner-margin flex h-full select-none items-center outline-none"
         @click="openSearch"
       >
-        <div class="relative w-hover-circle">
+        <div class="w-hover-circle relative">
           <IconSearch class="square-6 sm-not:square-5 text-accent" />
         </div>
       </button>
@@ -36,7 +36,7 @@
     <div
       v-if="searchEnabled"
       v-show="isSearchVisible || search"
-      class="relative -pl--inner-margin xl-not:pl-[3.75rem] -pr--inner-margin flex flex-1 gap-2 items-center w-full"
+      class="-pl--inner-margin xl-not:pl-[3.75rem] -pr--inner-margin relative flex w-full flex-1 items-center gap-2"
     >
       <WInputSuggest
         v-if="$slots.search?.()?.length && isMobile"
@@ -83,10 +83,13 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, onMounted, nextTick, markRaw, watch, toRef, onBeforeUnmount} from 'vue'
-import IconSearch from '@/assets/icons/sax/IconSearch.svg?component'
+import {markRaw, nextTick, onBeforeUnmount, onMounted, ref, toRef, watch} from 'vue'
+
 import WInput from '@/components/Input/WInput.vue'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
+
+import IconSearch from '@/assets/icons/sax/IconSearch.svg?component'
+
 import {getIsMobile} from '@/utils/mobile'
 
 const props = withDefaults(
@@ -145,5 +148,4 @@ onBeforeUnmount(() => {
   clearTimeout(timeout)
   timeout = undefined
 })
-
 </script>

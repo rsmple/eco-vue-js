@@ -1,9 +1,9 @@
 <template>
   <div
     class="
-      bg-gradient-to-tr from-primary-default to-[#C376FF] dark:from-primary-dark dark:to-[#9b3be6]
-      relative w-full rounded-xl py-3 px-4 select-none
-      text-default dark:text-default-dark
+      from-primary-default dark:from-primary-dark text-default dark:text-default-dark relative
+      w-full select-none rounded-xl bg-gradient-to-tr to-[#C376FF] px-4
+      py-3 dark:to-[#9b3be6]
     "
     :class="{
       'w-ripple w-ripple-hover cursor-pointer': clickable,
@@ -27,7 +27,8 @@
 
 <script lang="ts" setup>
 import {computed, onBeforeMount} from 'vue'
-import {dateFormat, isSameMonth, getStartOfMonth} from '@/utils/dateTime'
+
+import {dateFormat, getStartOfMonth, isSameMonth} from '@/utils/dateTime'
 
 const props = defineProps<{
   title: string
@@ -53,5 +54,4 @@ onBeforeMount(() => {
     updateCurrentDate()
   }
 })
-
 </script>

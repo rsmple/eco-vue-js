@@ -66,10 +66,13 @@
 </template>
 
 <script setup lang="ts" generic="Data extends DefaultData, QueryParams">
-import EmptyComponent from '@/components/InfiniteList/components/EmptyComponent.vue'
 import type {ListField, ListFields} from '../types'
-import {getFirstFieldLabel} from '../use/useFieldConfigMap'
+
+import EmptyComponent from '@/components/InfiniteList/components/EmptyComponent.vue'
+
 import ListCardFieldNestedItem from './ListCardFieldNestedItem.vue'
+
+import {getFirstFieldLabel} from '../use/useFieldConfigMap'
 
 defineProps<{
   fields: ListFields<Data, QueryParams>
@@ -82,5 +85,4 @@ defineProps<{
 defineSlots<{
   default: (props: {field: ListField<Data, QueryParams>, item: Data}) => void
 }>()
-
 </script>

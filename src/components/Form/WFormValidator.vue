@@ -12,13 +12,16 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, useSlots, watch, inject, onBeforeMount, onBeforeUnmount} from 'vue'
-import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
 import type {ValidatePath} from './use/useFormValidateMap'
-import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
-import {scrollToValidator} from './models/utils'
+
+import {computed, inject, onBeforeMount, onBeforeUnmount, ref, useSlots, watch} from 'vue'
+
 import {useIsInsideTab} from '@/components/Tabs/use/useIsInsideTab'
+import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 import {validateRequired} from '@/utils/validate'
+
+import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
+import {scrollToValidator} from './models/utils'
 
 const props = defineProps<{
   name?: string
@@ -107,7 +110,7 @@ const _validate = (value: Parameters<ValidateFn>[0]): string | undefined => {
             case '\n':
               return 'line break'
             default:
-              return `" ${item} "`
+              return `" ${ item } "`
           }
         })
         .join(', ')
@@ -128,7 +131,7 @@ const _validate = (value: Parameters<ValidateFn>[0]): string | undefined => {
           case '\t':
             return 'tabulation'
           default:
-            return `${item}`
+            return `${ item }`
         }
       })
       .join(', ')
@@ -270,5 +273,4 @@ defineExpose({
 defineSlots<{
   default: () => void
 }>()
-
 </script>

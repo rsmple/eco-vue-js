@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex relative justify-center items-center my-[1px] select-none height-9 flex-1 w-ripple-trigger"
+    class="height-9 w-ripple-trigger relative my-px flex flex-1 select-none items-center justify-center"
     :class="{
       'text-accent': !isSelected && !isOutOfMonth,
       'text-description': !isSelected && isOutOfMonth,
@@ -14,19 +14,19 @@
   >
     <div
       v-show="isBetweenRange || (isFrom || isTo && !(isFrom && isTo)) || isDisabled"
-      class="absolute opacity-50 h-9"
+      class="absolute h-9 opacity-50"
       :class="{
-        'border-y border-solid border-primary-default': isHoverEnabled && !isDisabled,
+        'border-primary-default border-y border-solid': isHoverEnabled && !isDisabled,
         'bg-primary-default dark:bg-primary-dark': !isHoverEnabled && !isDisabled,
         'bg-gray-200 dark:bg-gray-700': isDisabled,
         'w-full': isBetweenRange || isDisabled,
-        'w-1/2 left-1/2': isFrom && !isTo,
-        'w-1/2 right-1/2': !isFrom && isTo,
+        'left-1/2 w-1/2': isFrom && !isTo,
+        'right-1/2 w-1/2': !isFrom && isTo,
       }"
     />
 
     <div
-      class="relative flex justify-center items-center rounded-full square-9"
+      class="square-9 relative flex items-center justify-center rounded-full"
       :class="{
         'w-ripple w-ripple-hover': !isDisabled,
         'opacity-50': isDisabled,
@@ -41,9 +41,11 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue'
-import {isSameDate} from '@/utils/dateTime'
 import type {DateRange} from '../models/types'
+
+import {computed} from 'vue'
+
+import {isSameDate} from '@/utils/dateTime'
 
 const props = defineProps<{
   startOfMonth: Date
@@ -116,5 +118,4 @@ const isDisabled = computed(() => {
 
   return false
 })
-
 </script>

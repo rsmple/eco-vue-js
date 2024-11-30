@@ -191,21 +191,25 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>">
-import {computed, ref, toRef, type StyleValue} from 'vue'
-import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
-import {getIsMobile} from '@/utils/mobile'
-import {getPosition, useSelected} from '@/utils/useSelected'
-import WListCard from './WListCard.vue'
 import type {BulkComponent, FieldComponent, FieldConfigMap, ListFields, MenuComponent} from './types'
+
+import {type StyleValue, computed, ref, toRef} from 'vue'
+
+import WButtonSelection from '@/components/Button/WButtonSelection.vue'
+import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
+
+import {getIsMobile} from '@/utils/mobile'
+import {type OrderItem, parseOrdering} from '@/utils/order'
+import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
+import {getPosition, useSelected} from '@/utils/useSelected'
+
+import WListCard from './WListCard.vue'
 import WListHeader from './WListHeader.vue'
 import WListHeaderItem from './WListHeaderItem.vue'
-import {parseOrdering, type OrderItem} from '@/utils/order'
-import WButtonSelection from '@/components/Button/WButtonSelection.vue'
-import HeaderSettings from './components/HeaderSettings.vue'
-import {filterFields, getFirstFieldLabel, useFieldConfigMap} from './use/useFieldConfigMap'
-import ListCardFieldNested from './components/ListCardFieldNested.vue'
 import HeaderFieldNested from './components/HeaderFieldNested.vue'
-import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
+import HeaderSettings from './components/HeaderSettings.vue'
+import ListCardFieldNested from './components/ListCardFieldNested.vue'
+import {filterFields, getFirstFieldLabel, useFieldConfigMap} from './use/useFieldConfigMap'
 
 const isMobile = getIsMobile()
 
@@ -309,5 +313,4 @@ const getFieldStyles = (label: string): StyleValue | undefined => {
     maxWidth: value,
   }
 }
-
 </script>

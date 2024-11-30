@@ -1,5 +1,5 @@
 <template>
-  <div class="relative height-52 width-44 flex flex-col gap-2">
+  <div class="height-52 width-44 relative flex flex-col gap-2">
     <div
       v-if="!hasError"
       class="square-44 flex items-center justify-center"
@@ -18,12 +18,12 @@
       </slot>
     </div>
 
-    <div class="text-base text-accent text-center font-normal truncate">
+    <div class="text-accent truncate text-center text-base font-normal">
       {{ name }}
     </div>
 
     <button
-      class="absolute top-0 right-0 w-ripple flex square-5 rounded-full items-center justify-center hover:bg-opacity-5 hover:bg-black-default outline-none"
+      class="w-ripple square-5 hover:bg-black-default absolute right-0 top-0 flex items-center justify-center rounded-full outline-none hover:bg-opacity-5"
       @click.stop.prevent="$emit('click:cancel')"
     >
       <IconCancel class="square-3 text-description" />
@@ -44,5 +44,4 @@ defineProps<{
 defineEmits<{
   (e: 'click:cancel'): void
 }>()
-
 </script>

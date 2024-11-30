@@ -6,7 +6,7 @@
     <slot />
 
     <button
-      class="absolute top-0 right-1 h-full w-6 flex items-center opacity-50 hover:opacity-100 cursor-col-resize"
+      class="absolute right-1 top-0 flex h-full w-6 cursor-col-resize items-center opacity-50 hover:opacity-100"
       @mousedown.stop.prevent="startDrag"
       @click.stop.prevent
     >
@@ -17,7 +17,9 @@
 
 <script lang="ts" setup generic="Field">
 import {onBeforeUnmount, useTemplateRef, watch} from 'vue'
+
 import IconDrag from '@/assets/icons/sax/IconDrag.svg?component'
+
 import DOMListenerContainer from '@/utils/DOMListenerContainer'
 
 const MIN_WIDTH = 64
@@ -81,5 +83,4 @@ watch(() => props.hasStyles, value => {
 onBeforeUnmount(() => {
   listenerContainer.destroy()
 })
-
 </script>

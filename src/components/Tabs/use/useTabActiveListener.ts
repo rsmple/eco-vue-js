@@ -1,4 +1,5 @@
 import {inject, onBeforeUnmount, onMounted} from 'vue'
+
 import {wTabItemListener, wTabItemUnlistener} from '../models/injection'
 
 export const useTabActiveListener = (listener: () => void) => {

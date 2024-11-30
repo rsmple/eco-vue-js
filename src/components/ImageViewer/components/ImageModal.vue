@@ -2,7 +2,7 @@
   <div class="relative flex flex-col items-center">
     <div class="relative">
       <button
-        class="p-3 rounded-full absolute -top-14 right-3 sm:-right-14 w-ripple w-ripple-hover outline-none"
+        class="w-ripple w-ripple-hover absolute -top-14 right-3 rounded-full p-3 outline-none sm:-right-14"
         @click="$emit('close:modal')"
       >
         <IconCancel class="text-description" />
@@ -10,11 +10,11 @@
       <img
         :src="modelValue"
         :alt="name"
-        class="shadow-md dark:shadow-sm dark:shadow-gray-600 max-w-[100vw] max-h-[90vh]"
+        class="max-h-[90vh] max-w-[100vw] shadow-md dark:shadow-sm dark:shadow-gray-600"
       >
     </div>
 
-    <div class="text-center mt-3">
+    <div class="mt-3 text-center">
       {{ name }}
     </div>
   </div>
@@ -22,6 +22,7 @@
 
 <script lang="ts" setup>
 import {computed} from 'vue'
+
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 
 const props = defineProps<{
@@ -34,5 +35,4 @@ defineEmits<{
 }>()
 
 const name = computed(() => props.modelValue.substring(props.modelValue.lastIndexOf('/') + 1))
-
 </script>

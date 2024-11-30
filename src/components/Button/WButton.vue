@@ -5,18 +5,18 @@
     "
     :is="to !== undefined ? RouterLink : tag"
     class="
-      relative rounded-2xl outline-none isolate
-      font-medium select-none whitespace-nowrap
-      flex justify-center items-center
+      relative isolate flex select-none
+      items-center justify-center whitespace-nowrap
+      rounded-2xl font-medium outline-none
     "
     :class="{
       [semanticTypeButtonStylesMap[semanticType]]: true,
       [semanticTypeButtonBorderStylesMap[semanticType]]: true,
-      'cursor-pointer w-ripple w-ripple-hover before:text-black-default w-ripple-opacity-20 dark:w-ripple-opacity-30': !loading && !disabled,
+      'w-ripple w-ripple-hover before:text-black-default w-ripple-opacity-20 dark:w-ripple-opacity-30 cursor-pointer': !loading && !disabled,
       'cursor-progress': loading,
       'cursor-not-allowed opacity-70': disabled,
-      'px-4 h-11 min-h-[2.75rem]': !minimize,
-      'px-1.5 h-7 min-h-[1.75rem]': minimize,
+      'h-11 min-h-11 px-4': !minimize,
+      'h-7 min-h-7 px-1.5': minimize,
       '[&:not(:first-child)]:rounded-l-none [&:not(:first-child)]:border-l-0 [&:not(:last-child)]:rounded-r-none [&:not(:last-child)]:border-r-0': join
     }"
     :disabled="!loading && disabled"
@@ -25,7 +25,7 @@
     @keypress.enter.stop.prevent="click"
   >
     <div
-      class="flex justify-center items-center gap-2 flex-1 z-10"
+      class="z-10 flex flex-1 items-center justify-center gap-2"
       :class="{
         'opacity-0': loading,
       }"
@@ -41,18 +41,22 @@
     >
       <WSpinner
         v-if="loading"
-        class="absolute z-10 w-spinner-size-6"
+        class="w-spinner-size-6 absolute z-10"
       />
     </Transition>
   </component>
 </template>
 
 <script lang="ts" setup>
-import WSpinner from '@/components/Spinner/WSpinner.vue'
-import {SemanticType} from '@/utils/SemanticType'
-import {RouterLink} from 'vue-router'
-import {semanticTypeButtonStylesMap, semanticTypeButtonBorderStylesMap} from './models/semanticTypeStylesMap'
 import type {LinkProps} from '@/types/types'
+
+import {RouterLink} from 'vue-router'
+
+import WSpinner from '@/components/Spinner/WSpinner.vue'
+
+import {SemanticType} from '@/utils/SemanticType'
+
+import {semanticTypeButtonBorderStylesMap, semanticTypeButtonStylesMap} from './models/semanticTypeStylesMap'
 
 interface Props extends Partial<LinkProps> {
   semanticType?: SemanticType
@@ -88,5 +92,4 @@ const click = (event: MouseEvent | KeyboardEvent): void => {
 
   emit('click', event)
 }
-
 </script>

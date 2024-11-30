@@ -82,12 +82,13 @@
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import {onBeforeUnmount, provide, ref, toRef} from 'vue'
-import InfiniteListPages from './components/InfiniteListPages.vue'
-import InfiniteListPageSelectItem from './components/InfiniteListPageSelectItem.vue'
-import {useSelected} from './use/useSelected'
-import {wInfiniteListSelection} from './models/injection'
-import EmptyComponent from './components/EmptyComponent.vue'
+
 import WInfiniteListWrapper from './WInfiniteListWrapper.vue'
+import EmptyComponent from './components/EmptyComponent.vue'
+import InfiniteListPageSelectItem from './components/InfiniteListPageSelectItem.vue'
+import InfiniteListPages from './components/InfiniteListPages.vue'
+import {wInfiniteListSelection} from './models/injection'
+import {useSelected} from './use/useSelected'
 
 const props = withDefaults(
   defineProps<{
@@ -224,5 +225,4 @@ defineSlots<{
     selectAllValue: typeof selectAllValue.value
   }) => void
 }>()
-
 </script>

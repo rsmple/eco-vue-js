@@ -1,18 +1,18 @@
 <template>
   <button
     ref="element"
-    class="flex gap-2 cursor-pointer select-none outline-none w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-[0.08]"
+    class="w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-[0.08] flex cursor-pointer select-none gap-2 outline-none"
     :class="{
       'cursor-progress': loading,
       'cursor-not-allowed opacity-70': disabled,
-      'pt-1 pb-4': title,
+      'pb-4 pt-1': title,
       'items-start': alignTop,
       'items-center': !alignTop,
     }"
     @click="toggle"
   >
     <div
-      class="relative flex justify-center items-center square-6 border border-solid isolate bg-default dark:bg-default-dark"
+      class="square-6 bg-default dark:bg-default-dark relative isolate flex items-center justify-center border border-solid"
       :class="{
         'text-default dark:text-default-dark': modelValue && !disabled,
         'text-primary-default dark:text-primary-dark': !modelValue && !disabled,
@@ -33,7 +33,7 @@
       >
         <div
           v-show="modelValue !== false"
-          class="absolute square-full -z-10 transition-[opacity,transform]"
+          class="square-full absolute -z-10 transition-[opacity,transform]"
           :class="{
             'scale-[0.33] rounded-full': radio && intermediate && modelValue === null,
             'scale-[0.66] rounded': !radio && intermediate && modelValue === null,
@@ -74,7 +74,7 @@
 
     <div
       v-if="$slots.default?.().length || title"
-      class="font-normal text-base text-accent flex items-center gap-1"
+      class="text-accent flex items-center gap-1 text-base font-normal"
     >
       <slot>
         {{ title }}
@@ -85,9 +85,11 @@
 
 <script lang="ts" setup>
 import {ref} from 'vue'
-import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
-import WTooltip from '@/components/Tooltip/WTooltip.vue'
+
 import WSpinner from '@/components/Spinner/WSpinner.vue'
+import WTooltip from '@/components/Tooltip/WTooltip.vue'
+
+import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 
 const props = defineProps<{
   modelValue: boolean | null
@@ -120,5 +122,4 @@ const toggle = (e: MouseEvent | KeyboardEvent): void => {
     emit('update:modelValue', !props.modelValue)
   }
 }
-
 </script>

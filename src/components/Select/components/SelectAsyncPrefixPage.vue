@@ -2,7 +2,7 @@
   <div
     v-for="(option, index) in options"
     :key="valueGetter(option)"
-    class="relative flex overflow-hidden items-center text-description"
+    class="text-description relative flex items-center overflow-hidden"
     :class="{
       'cursor-pointer': !disabled,
       'cursor-not-allowed': disabled,
@@ -28,10 +28,10 @@
             #default
           >
             <button
-              class="relative flex square-5 rounded-full -my-1 -mr-2 ml-1 items-center justify-center outline-none"
+              class="square-5 relative -my-1 -mr-2 ml-1 flex items-center justify-center rounded-full outline-none"
               :class="{
                 'cursor-progress': loading,
-                'cursor-pointer w-ripple w-ripple-hover': !loading,
+                'w-ripple w-ripple-hover cursor-pointer': !loading,
               }"
               @mousedown.stop.prevent=""
               @click.stop.prevent="!loading && $emit('unselect', valueGetter(option))"
@@ -45,10 +45,10 @@
 
     <button
       v-if="!optionComponent && !disableClear && !disabled"
-      class="relative flex square-5 rounded-full items-center justify-center outline-none"
+      class="square-5 relative flex items-center justify-center rounded-full outline-none"
       :class="{
         'cursor-progress': loading,
-        'cursor-pointer w-ripple w-ripple-hover ': !loading,
+        'w-ripple w-ripple-hover cursor-pointer ': !loading,
       }"
       @mousedown.stop.prevent=""
       @click.stop.prevent="!loading && $emit('unselect', valueGetter(option))"
@@ -59,9 +59,11 @@
 </template>
 
 <script lang="ts" setup generic="Model extends string | number, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
-import {computed, toRef, watch, onBeforeUnmount} from 'vue'
-import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 import type {SelectAsyncPrefixPageProps, SelectOptionComponent, SelectOptionComponentProps} from '../types'
+
+import {computed, onBeforeUnmount, toRef, watch} from 'vue'
+
+import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 
 const props = defineProps<SelectAsyncPrefixPageProps<Model, Data, QueryParams, OptionComponent>>()
 
@@ -110,5 +112,4 @@ onBeforeUnmount(() => {
 defineSlots<{
   default?: (props: {option: Data, skeleton: boolean, index: number}) => void
 }>()
-
 </script>

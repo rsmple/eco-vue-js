@@ -19,8 +19,10 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue'
 import type {DateRange} from '../models/types'
+
+import {computed} from 'vue'
+
 import CalendarDay from './CalendarDay.vue'
 
 const props = defineProps<{
@@ -101,5 +103,4 @@ const isDisabled = computed(() => {
 
   return false
 })
-
 </script>

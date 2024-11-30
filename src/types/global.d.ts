@@ -1,4 +1,3 @@
-
 declare type SVGComponent = import('vue').Raw<import('vue').FunctionalComponent<import('vue').SVGAttributes, Record<string, never>>>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,6 +31,7 @@ declare type InputType = 'number' | 'text' | 'tel' | 'search' | 'password' | 'em
 
 declare module 'eco-vue-js/dist/assets/icons/*' {
   import type {FunctionalComponent, SVGAttributes} from 'vue'
+
   const src: FunctionalComponent<SVGAttributes>
   export default src
 }

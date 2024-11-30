@@ -33,14 +33,17 @@
 </template>
 
 <script lang="ts" setup generic="Model, FieldType extends string, QueryParamsOptions, QueryParams, Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>">
-import {computed, onBeforeUnmount, ref, toRef} from 'vue'
 import type {FormAsyncSelectStringifiedProps} from './types'
 import type {SelectOptionComponent} from '@/components/Select/types'
+
+import {computed, onBeforeUnmount, ref, toRef} from 'vue'
+
 import WSelectStringified from '@/components/Select/WSelectStringified.vue'
-import {get, set} from '@/utils/utils'
+
+import {Modal} from '@/utils/Modal'
 import {Notify} from '@/utils/Notify'
 import {handleApiError} from '@/utils/api'
-import {Modal} from '@/utils/Modal'
+import {get, set} from '@/utils/utils'
 
 type PayloadType = PartialNested<Model>
 
@@ -100,5 +103,4 @@ onBeforeUnmount(() => {
   closeModal?.()
   closeModal = null
 })
-
 </script>

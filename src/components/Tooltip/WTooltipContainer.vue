@@ -12,7 +12,7 @@
       :max-height="tooltipMeta?.maxHeight ?? 120"
       :max-width="240"
       emit-update
-      class="z-[10000] sm:transition-[top,bottom,left,right] will-change-[top,bottom,left,right] isolate"
+      class="isolate z-[10000] will-change-[top,bottom,left,right] sm:transition-[top,bottom,left,right]"
       @update:rect="close"
     >
       <template #default="{left, right, istop}">
@@ -44,10 +44,13 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, onUnmounted, ref, onBeforeMount, onBeforeUnmount, markRaw} from 'vue'
+import {markRaw, onBeforeMount, onBeforeUnmount, onMounted, onUnmounted, ref} from 'vue'
+
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
+
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
-import {initTooltip, type SetTooltipMeta, type TooltipMeta} from '@/utils/Tooltip'
+import {type SetTooltipMeta, type TooltipMeta, initTooltip} from '@/utils/Tooltip'
+
 import TooltipContainer from './components/TooltipContainer.vue'
 
 const tooltipMeta = ref<TooltipMeta | null>(null)
@@ -97,5 +100,4 @@ onBeforeUnmount(() => {
 onUnmounted(() => {
   window.removeEventListener('touch', close)
 })
-
 </script>

@@ -12,4 +12,11 @@ export default [
   },
 
   ...plugin.configs.recommended,
+
+  {
+    files: ['**/*.{ts,js,vue}'],
+    rules: {
+      'custom-rules/modal-import-async': 'off',
+    },
+  },
 ]

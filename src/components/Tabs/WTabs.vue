@@ -9,7 +9,7 @@
     <div
       v-if="names"
       ref="buttonContainer"
-      class="relative flex overflow-x-auto overscroll-x-contain no-scrollbar snap-x snap-always snap-mandatory"
+      class="no-scrollbar relative flex snap-x snap-mandatory snap-always overflow-x-auto overscroll-x-contain"
       :class="{
         'flex-col': side,
       }"
@@ -19,15 +19,15 @@
         ref="button"
         :key="index"
         class="
-          flex-1 font-semibold flex items-center cursor-pointer snap-center
-          relative w-ripple w-ripple-hover select-none transition-colors duration-500 outline-none
+          w-ripple w-ripple-hover relative flex flex-1 cursor-pointer
+          select-none snap-center items-center font-semibold outline-none transition-colors duration-500
         "
         :class="{
           'text-description': current !== index && isValidMap[index] !== false,
           'text-primary-default dark:text-primary-dark': current === index && isValidMap[index] !== false,
           'text-negative dark:text-negative-dark': isValidMap[index] === false,
-          'h-10 text-center justify-center': !side,
-          'py-3 text-start pr-4': side,
+          'h-10 justify-center text-center': !side,
+          'py-3 pr-4 text-start': side,
         }"
         @click="switchTab(index)"
       >
@@ -35,7 +35,7 @@
           <component
             :is="icons?.[index]"
             v-if="icons?.[index]"
-            class="inline -mt-1"
+            class="-mt-1 inline"
           />
 
           {{ names[index] }}
@@ -48,7 +48,7 @@
           >
             <div
               v-if="hasChangesMap[index]"
-              class="absolute top-0 right-0 square-2 rounded-full transition-colors duration-500"
+              class="square-2 absolute right-0 top-0 rounded-full transition-colors duration-500"
               :class="{
                 'bg-info dark:bg-info-dark': isValidMap[index] !== false,
                 'bg-negative dark:bg-negative-dark': isValidMap[index] === false,
@@ -71,7 +71,7 @@
     </div>
 
     <div
-      class="relative transition-[min-height] h-full duration-300"
+      class="relative h-full transition-[min-height] duration-300"
       :style="{minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
     >
       <TransitionGroup
@@ -104,10 +104,13 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, watch, nextTick, type VNode, inject, onUnmounted, useSlots, computed, reactive, useTemplateRef} from 'vue'
-import TabItem from './components/TabItem.vue'
+import {type VNode, computed, inject, nextTick, onMounted, onUnmounted, reactive, ref, useSlots, useTemplateRef, watch} from 'vue'
+
 import WForm from '@/components/Form/WForm.vue'
+
 import {debounce, throttle} from '@/utils/utils'
+
+import TabItem from './components/TabItem.vue'
 import {wTabItemListener, wTabItemUnlistener} from './models/injection'
 
 const props = defineProps<{
@@ -261,5 +264,4 @@ defineExpose({
   invalidate,
   initModel,
 })
-
 </script>

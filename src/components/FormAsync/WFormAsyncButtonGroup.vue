@@ -25,14 +25,17 @@
 </template>
 
 <script lang="ts" setup generic="Model, FieldType extends string | number | boolean | null, QueryParams, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): FieldType}['fn'] | undefined = undefined">
-import {computed, onBeforeUnmount, ref, toRef} from 'vue'
-import {Notify} from '@/utils/Notify'
-import WButtonGroup from '@/components/Button/WButtonGroup.vue'
 import type {FormAsyncButtonGroupProps} from './types'
-import {get, set} from '@/utils/utils'
-import {handleApiError} from '@/utils/api'
-import {Modal} from '@/utils/Modal'
 import type {ButtonGroupOptionComponent} from '../Button/types'
+
+import {computed, onBeforeUnmount, ref, toRef} from 'vue'
+
+import WButtonGroup from '@/components/Button/WButtonGroup.vue'
+
+import {Modal} from '@/utils/Modal'
+import {Notify} from '@/utils/Notify'
+import {handleApiError} from '@/utils/api'
+import {get, set} from '@/utils/utils'
 
 type PayloadType = PartialNested<Model>
 
@@ -86,5 +89,4 @@ onBeforeUnmount(() => {
   closeModal?.()
   closeModal = null
 })
-
 </script>

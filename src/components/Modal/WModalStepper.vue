@@ -7,7 +7,7 @@
     </template>
 
     <template #subtitle>
-      <div class="bg-gray-200 dark:bg-gray-700 h-1 w-full">
+      <div class="h-1 w-full bg-gray-200 dark:bg-gray-700">
         <div
           class="bg-primary-default dark:bg-primary-dark h-full transition-[width]"
           :style="{
@@ -72,11 +72,13 @@
 
 <script lang="ts" setup>
 import {computed, ref, useSlots, watch} from 'vue'
-import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
+
 import WButton from '@/components/Button/WButton.vue'
-import {SemanticType} from '@/utils/SemanticType'
+import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
 import WTabs from '@/components/Tabs/WTabs.vue'
+
 import {Notify} from '@/utils/Notify'
+import {SemanticType} from '@/utils/SemanticType'
 
 defineProps<{
   names?: string[]
@@ -130,5 +132,4 @@ defineExpose({
   next,
   previous,
 })
-
 </script>

@@ -1,7 +1,7 @@
 <template>
   <RouterLink
     :to="to"
-    class="relative no-underline block w-ripple w-ripple-hover"
+    class="w-ripple w-ripple-hover relative block no-underline"
     :class="{
       'text-primary-default dark:text-primary-dark': isTextColor,
       'text-accent': !isTextColor,
@@ -16,7 +16,7 @@
     >
       <div
         v-if="!indent && (isActive || hasActive)"
-        class="bg-primary-default dark:bg-primary-dark w-1 h-full absolute left-0 top-0"
+        class="bg-primary-default dark:bg-primary-dark absolute left-0 top-0 h-full w-1"
       />
     </Transition>
 
@@ -28,14 +28,14 @@
     >
       <div
         v-if="indent && !expand && isActive"
-        class="h-full absolute left-7 top-0 flex items-center"
+        class="absolute left-7 top-0 flex h-full items-center"
       >
-        <div class="bg-[var(--w-nav-item-dot-color)] square-1.5 rounded-full" />
+        <div class="square-1.5 rounded-full bg-[var(--w-nav-item-dot-color)]" />
       </div>
     </Transition>
 
     <div class="[overflow:inherit]">
-      <div class="grid grid-cols-[2rem,auto,1fr,1rem] items-center py-3 px-5">
+      <div class="grid grid-cols-[2rem,auto,1fr,1rem] items-center px-5 py-3">
         <div class="flex items-center">
           <template v-if="icon ?? routeTo.meta.icon">
             <component
@@ -50,11 +50,11 @@
           />
         </div>
 
-        <div class="text-base font-normal tracking-wide whitespace-nowrap relative">
+        <div class="relative whitespace-nowrap text-base font-normal tracking-wide">
           {{ titleLocal }}
         </div>
 
-        <div class="text-base font-normal tracking-wide text-center flex justify-start relative">
+        <div class="relative flex justify-start text-center text-base font-normal tracking-wide">
           &nbsp;
           <span
             v-if="!skeleton"
@@ -88,12 +88,15 @@
 </template>
 
 <script lang="ts" setup>
+import type {LinkProps} from '@/types/types'
+
 import {computed, onBeforeUnmount, watch} from 'vue'
 import {RouterLink, useRoute, useRouter} from 'vue-router'
-import {isEqualObj, numberCompactFormatter} from '@/utils/utils'
-import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+
 import WCounter from '@/components/Counter/WCounter.vue'
-import type {LinkProps} from '@/types/types'
+import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+
+import {isEqualObj, numberCompactFormatter} from '@/utils/utils'
 
 const EXCLUDE_QUERY_FIELDS = ['ordering', 'page']
 
@@ -137,5 +140,4 @@ watch(isActive, value => emit('update:isActive', [titleLocal.value, value]), {im
 onBeforeUnmount(() => {
   emit('update:isActive', [titleLocal.value, false])
 })
-
 </script>

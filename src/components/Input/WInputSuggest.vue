@@ -88,7 +88,7 @@
           class="bg-default dark:bg-default-dark w-full"
           :class="{
             'pb-[50vh]': isMobile,
-            'rounded-xl max-h-[inherit] shadow-md overflow-x-hidden overflow-y-overlay overscroll-contain dark:border dark:border-solid dark:border-gray-800': !isMobile,
+            'overflow-y-overlay max-h-[inherit] overflow-x-hidden overscroll-contain rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
             'mt-5': 'istop' in contentScope && contentScope.istop === false && (errorMessage || maxLength),
           }"
         >
@@ -110,7 +110,7 @@
 
     <div
       v-if="description"
-      class="text-xs font-normal text-description pb-4 whitespace-pre-wrap break-words"
+      class="text-description whitespace-pre-wrap break-words pb-4 text-xs font-normal"
       :class="{
         'opacity-50': disabled && !skeleton,
       }"
@@ -125,15 +125,19 @@
 </template>
 
 <script lang="ts" setup generic="Type extends InputType = 'text'">
-import {ref, computed} from 'vue'
-import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
-import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
-import WInput from '@/components/Input/WInput.vue'
-import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
-import {getIsMobile, getIsTouchDevice} from '@/utils/mobile'
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
-import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import type {InputSuggestProps} from './types'
+
+import {computed, ref} from 'vue'
+
+import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
+import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+import WInput from '@/components/Input/WInput.vue'
+import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+
+import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
+
+import {HorizontalAlign} from '@/utils/HorizontalAlign'
+import {getIsMobile, getIsTouchDevice} from '@/utils/mobile'
 
 type ModelValue = Required<InputSuggestProps<Type>>['modelValue']
 
@@ -211,5 +215,4 @@ defineSlots<{
   right?: (props: Record<string, never>) => void
   content?: (props: {scrollingElement?: Element}) => void
 }>()
-
 </script>

@@ -9,8 +9,8 @@
       v-if="isOpen && hasBackdrop"
       title="Click to close"
       class="
-        fixed top-0 left-0 h-full w-full backdrop-blur bg-primary-light/40 dark:bg-primary-darkest/40
-        z-30 overflow-y-auto overflow-x-hidden no-scrollbar overscroll-contain print:hidden
+        bg-primary-light/40 dark:bg-primary-darkest/40 no-scrollbar fixed left-0 top-0 z-30 size-full
+        overflow-y-auto overflow-x-hidden overscroll-contain backdrop-blur print:hidden
       "
       @click.stop.prevent="close"
     >
@@ -20,21 +20,21 @@
 
   <div
     class="
-      fixed z-30 top-0 left-0 h-full grid overflow-hidden transition-[grid-template-columns] duration-200
-      shadow-md xl:shadow-none xl:grid-cols-[1fr] xl-not:bg-default xl-not:dark:bg-default-dark print:hidden 
+      xl-not:bg-default xl-not:dark:bg-default-dark fixed left-0 top-0 z-30 grid h-full overflow-hidden
+      shadow-md transition-[grid-template-columns] duration-200 xl:grid-cols-[1fr] xl:shadow-none print:hidden 
     "
     :class="{
       'xl-not:grid-cols-[0fr]': !isOpen,
       'grid-cols-[1fr]': isOpen,
     }"
   >
-    <div class="overflow-hidden mt-[3.75rem] bg-default dark:bg-default-dark">
+    <div class="bg-default dark:bg-default-dark mt-[3.75rem] overflow-hidden">
       <slot />
     </div>
   </div>
 
   <div
-    class="fixed top-0 left-0 xl:hidden flex square-[3.75rem] items-center justify-center cursor-pointer w-ripple z-30 print:hidden"
+    class="square-[3.75rem] w-ripple fixed left-0 top-0 z-30 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
     :class="{'text-primary-default': isOpen}"
     @click.stop="toggle"
   >
@@ -44,7 +44,9 @@
 
 <script lang="ts" setup>
 import {ref} from 'vue'
+
 import IconMenu from '@/assets/icons/sax/IconMenu.svg?component'
+
 import {isClientSide} from '@/utils/utils'
 
 const emit = defineEmits<{
@@ -71,6 +73,4 @@ const close = (): void => {
 
   emit('update:isOpen', false)
 }
-
-
 </script>

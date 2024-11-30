@@ -1,8 +1,8 @@
 <template>
-  <div class="mb-6 relative">
+  <div class="relative mb-6">
     <div
       v-if="title || $slots.title?.()?.length"
-      class="text-xs font-semibold text-accent mb-2"
+      class="text-accent mb-2 text-xs font-semibold"
     >
       <template v-if="!skeleton">
         <slot name="title">
@@ -25,7 +25,7 @@
 
     <label
       ref="container"
-      class="relative block height-64 w-full min-w-[15rem] mb-1"
+      class="height-64 relative mb-1 block w-full min-w-60"
       @dragenter.prevent="setIsActive(true)"
       @dragover.prevent="setIsActive(true)"
       @dragleave.prevent="setIsActive(false)"
@@ -35,7 +35,7 @@
       <input
         ref="input"
         type="file"
-        class="hidden pointer-events-none"
+        class="pointer-events-none hidden"
         :multiple="multiple"
         :accept="accept"
         @change="updateModelValue"
@@ -47,12 +47,12 @@
         :svg-height="containerHeight"
         :is-active="isActive"
         :has-error="!!errorMessage"
-        class="absolute top-0 left-0"
+        class="absolute left-0 top-0"
       />
 
       <div
         v-if="placeholder"
-        class="flex gap-6 h-full items-center justify-center"
+        class="flex h-full items-center justify-center gap-6"
       >
         <FilePickerItem
           :name="placeholder"
@@ -71,13 +71,13 @@
 
       <div
         v-else-if="modelValue.length === 0"
-        class="w-full h-full flex flex-col items-center text-base text-accent"
+        class="text-accent flex size-full flex-col items-center text-base"
       >
-        <div class="font-semibold mt-16">
+        <div class="mt-16 font-semibold">
           Drag and drop files here
         </div>
 
-        <div class="font-normal mt-4">
+        <div class="mt-4 font-normal">
           or
         </div>
 
@@ -92,9 +92,9 @@
 
       <div
         v-else
-        class="h-full flex items-center justify-center"
+        class="flex h-full items-center justify-center"
       >
-        <div class="overflow-x-overlay flex gap-6 items-center">
+        <div class="overflow-x-overlay flex items-center gap-6">
           <FilePickerItem
             v-for="(file, index) in modelValue"
             :key="index"
@@ -128,7 +128,7 @@
     >
       <div
         v-if="errorMessage"
-        class="absolute right-0 text-xs text-negative dark:text-negative-dark font-normal"
+        class="text-negative dark:text-negative-dark absolute right-0 text-xs font-normal"
       >
         {{ errorMessage }}
       </div>
@@ -138,13 +138,17 @@
 
 <script lang="ts" setup>
 import {onMounted, onUnmounted, ref} from 'vue'
+
 import WButton from '@/components/Button/WButton.vue'
+import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+
 import {SemanticType} from '@/utils/SemanticType'
+import {isClientSide} from '@/utils/utils'
+
 import FilePickerItem from './components/FilePickerItem.vue'
 import FilePickerSvg from './components/FilePickerSvg.vue'
-import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+
 import {useTabActiveListener} from '../Tabs/use/useTabActiveListener'
-import {isClientSide} from '@/utils/utils'
 
 const props = defineProps<{
   modelValue: File[]
@@ -226,5 +230,4 @@ onUnmounted(() => {
 
   window.removeEventListener('resize', updateSize)
 })
-
 </script>

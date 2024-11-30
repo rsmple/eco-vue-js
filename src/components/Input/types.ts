@@ -1,6 +1,6 @@
+import type {DropdownMenuProps} from '../DropdownMenu/types'
 import type {FieldWrapperProps} from '@/components/FieldWrapper/types'
 import type {Component} from 'vue'
-import type {DropdownMenuProps} from '../DropdownMenu/types'
 
 export interface InputProps<Type extends InputType> extends Omit<FieldWrapperProps, 'modelValue'> {
   modelValue?: (Type extends 'number' ? number : string) | undefined

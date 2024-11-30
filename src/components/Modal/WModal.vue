@@ -9,7 +9,7 @@
       <div
         v-if="isBackdropVisible"
         :style="{zIndex: 100 + modalMetaList.length + modalMetaList.length - 1}"
-        class="fixed top-0 left-0 h-full w-full backdrop-blur bg-primary-light dark:bg-primary-darkest bg-opacity-40 dark:bg-opacity-40"
+        class="bg-primary-light dark:bg-primary-darkest fixed left-0 top-0 size-full bg-opacity-40 backdrop-blur dark:bg-opacity-40"
       />
     </Transition>
 
@@ -23,7 +23,7 @@
         v-for="(modalMeta, index) in modalMetaList"
         :key="modalMeta.key"
         :style="{zIndex: 100 + index + index + 2}"
-        class="fixed top-0 left-0 bottom-0 right-0 flex justify-center items-center overscroll-none overflow-y-auto no-scrollbar isolate"
+        class="no-scrollbar fixed inset-0 isolate flex items-center justify-center overflow-y-auto overscroll-none"
       >
         <div class="h-[calc(100%+1px)]" />
 
@@ -41,9 +41,11 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeMount, onBeforeUnmount, ref, watch, reactive} from 'vue'
-import {initModal, Modal, type ModalComponent} from '@/utils/Modal'
+import {onBeforeMount, onBeforeUnmount, reactive, ref, watch} from 'vue'
+
+import {Modal, type ModalComponent, initModal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
+
 import ModalCloseButton from './components/ModalCloseButton.vue'
 
 type ModalMeta<ModalProps> = {
@@ -139,5 +141,4 @@ onBeforeMount(() => {
 onBeforeUnmount(() => {
   initModal(undefined)
 })
-
 </script>

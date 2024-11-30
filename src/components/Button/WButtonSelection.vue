@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-[1fr,auto] h-12 pb-3 w-full sm:sticky sm:left-inner sm:w-inner">
+  <div class="sm:left-inner sm:w-inner grid h-12 w-full grid-cols-[1fr,auto] pb-3 sm:sticky">
     <div class="flex">
       <slot
         v-bind="{
@@ -26,7 +26,7 @@
 
         <template #content>
           <WClickOutside
-            class="my-2 grid grid-cols-1 bg-default dark:bg-default-dark shadow-md rounded-xl overflow-hidden dark:outline dark:outline-1 dark:outline-gray-800"
+            class="bg-default dark:bg-default-dark my-2 grid grid-cols-1 overflow-hidden rounded-xl shadow-md dark:outline dark:outline-1 dark:outline-gray-800"
             @click="isOpen = false"
           >
             <slot
@@ -49,14 +49,14 @@
     >
       <div
         v-if="selectedCount"
-        class="grid grid-cols-[1fr,auto] gap-3 sm-not:gap-1"
+        class="sm-not:gap-1 grid grid-cols-[1fr,auto] gap-3"
       >
-        <div class="self-center font-normal text-base sm-not:text-xs text-description whitespace-nowrap truncate">
+        <div class="sm-not:text-xs text-description self-center truncate whitespace-nowrap text-base font-normal">
           <span class="sm-not:hidden">Selected&nbsp;</span><span class="text-primary-default dark:text-primary-dark font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedCount === 1 ? '' : 's' }}</span>
         </div>
 
         <button
-          class="relative text-description flex items-center justify-self-end cursor-pointer select-none w-ripple w-ripple-hover"
+          class="text-description w-ripple w-ripple-hover relative flex cursor-pointer select-none items-center justify-self-end"
           @click="clearSelected"
         >
           <IconCancel class="square-5 sm-not:-mx--inner-margin mx-[1.125rem]" />
@@ -67,13 +67,18 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, markRaw, inject, computed, watch} from 'vue'
-import {numberFormatter} from '@/utils/utils'
+import {computed, inject, markRaw, ref, watch} from 'vue'
+
+import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+
 import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 import IconMore from '@/assets/icons/default/IconMore.svg?component'
-import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
-import WButtonSelectionAction from './WButtonSelectionAction.vue'
+
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
+import {numberFormatter} from '@/utils/utils'
+
+import WButtonSelectionAction from './WButtonSelectionAction.vue'
+
 import WClickOutside from '../ClickOutside/WClickOutside.vue'
 import {wInfiniteListSelection} from '../InfiniteList/models/injection'
 
@@ -110,5 +115,4 @@ if (selectedCount) {
 defineExpose({
   clearSelected,
 })
-
 </script>

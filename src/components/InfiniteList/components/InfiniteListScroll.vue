@@ -6,6 +6,7 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, onUnmounted, watch} from 'vue'
+
 import {getIsScrollDown, getIsScrollUp} from '../models/utils'
 
 const props = defineProps<{
@@ -61,5 +62,4 @@ defineExpose({
   checkIsScrollUp,
   checkIsScrollDown,
 })
-
 </script>

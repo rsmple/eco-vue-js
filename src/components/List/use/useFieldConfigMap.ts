@@ -1,5 +1,6 @@
-import {computed, isRef, ref, unref, watch, type MaybeRef} from 'vue'
 import type {FieldConfig, FieldConfigMap, ListField, ListFields} from '../types'
+
+import {type MaybeRef, computed, isRef, ref, unref, watch} from 'vue'
 
 const fieldConfigKeyLength: ObjectKeys<FieldConfig>['length'] = 3
 

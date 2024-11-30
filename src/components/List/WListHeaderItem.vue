@@ -2,17 +2,17 @@
   <component
     :is="allowResize ? HeaderItemResizer : 'div'"
     v-bind="allowResize ? {hasStyles: widthStyle !== undefined} : (undefined as never)"
-    class="select-none text-description pr-6"
+    class="text-description select-none pr-6"
     :style="widthStyle"
     @update:width="$emit('update:width', $event)"
   >
     <component
       :is="disabled ? 'div' : 'button'"
-      class="h-full w-full flex gap-2 group" 
+      class="group flex size-full gap-2" 
       :class="{
         'cursor-pointer': !disabled,
         [itemClass ?? '']: true,
-        'font-semibold items-center whitespace-nowrap overflow-hidden': !itemClass,
+        'items-center overflow-hidden whitespace-nowrap font-semibold': !itemClass,
       }"
       @click="setOrdering"
     >
@@ -35,7 +35,7 @@
       >
         <div
           v-if="index !== -1"
-          class="flex gap-1 items-center"
+          class="flex items-center gap-1"
         >
           <IconBack
             class="square-3 transition-transform"
@@ -55,10 +55,13 @@
 </template>
 
 <script lang="ts" setup generic="Field">
-import {computed, type StyleValue} from 'vue'
+import {type StyleValue, computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
+
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
-import {encodeOrdering, Order, type OrderItem} from '@/utils/order'
+
+import {Order, type OrderItem, encodeOrdering} from '@/utils/order'
+
 import HeaderItemResizer from './components/HeaderItemResizer.vue'
 
 const props = defineProps<{
@@ -108,5 +111,4 @@ const setOrdering = (): void => {
 
   updateQuery(newOrdering)
 }
-
 </script>

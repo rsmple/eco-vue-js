@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="flex text-xs text-accent font-semibold mb-2">
+    <div class="text-accent mb-2 flex text-xs font-semibold">
       <div
         v-for="(title, index) in weekDayTitles"
         :key="index"
-        class="flex justify-center items-center height-9 flex-1"
+        class="height-9 flex flex-1 items-center justify-center"
       >
         <div>
           {{ title.toLocaleUpperCase() }}
@@ -30,10 +30,13 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue'
-import CalendarWeek from './CalendarWeek.vue'
-import {getStartOfWeek, WeekDay, weekdayShortFormatter} from '@/utils/dateTime'
 import type {DateRange} from '../models/types'
+
+import {computed} from 'vue'
+
+import {WeekDay, getStartOfWeek, weekdayShortFormatter} from '@/utils/dateTime'
+
+import CalendarWeek from './CalendarWeek.vue'
 
 const props = defineProps<{
   startOfMonth: Date
@@ -131,5 +134,4 @@ const isDisabled = computed(() => {
 
   return false
 })
-
 </script>

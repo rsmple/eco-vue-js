@@ -1,4 +1,3 @@
-
 const TRIGGER_FACTOR = 200
 
 export const getIsScrollUp = (element: Element | null): boolean => {

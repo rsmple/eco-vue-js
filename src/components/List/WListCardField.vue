@@ -29,5 +29,4 @@ defineProps<{
   allowOpen?: boolean
   noPadding?: boolean
 }>()
-
 </script>

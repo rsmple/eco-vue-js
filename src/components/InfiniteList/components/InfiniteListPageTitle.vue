@@ -1,6 +1,6 @@
 <template>
   <RouterLink
-    class="block text-description text-base font-normal no-underline hover:underline sm-not:first:-mx--inner-margin"
+    class="text-description sm-not:first:-mx--inner-margin block text-base font-normal no-underline hover:underline"
     :to="{query: queryParams as LocationQueryRaw, hash: $route.hash}"
     replace
     @click="copyRoute"
@@ -11,6 +11,7 @@
 
 <script lang="ts" setup generic="QueryParams">
 import {type LocationQueryRaw, useRoute, useRouter} from 'vue-router'
+
 import {Notify} from '@/utils/Notify'
 
 const props = defineProps<{
@@ -29,6 +30,4 @@ const copyRoute = (): void => {
     .writeText(location.origin + router.resolve({query: props.queryParams as LocationQueryRaw, hash: route.hash}).href)
     .then(() => Notify.success({title: 'Page url copied'}))
 }
-
 </script>
-

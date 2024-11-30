@@ -2,11 +2,11 @@
   <div class="overflow-hidden">
     <component
       :is="$slots.title?.()?.[0] ?? 'button'"
-      class="grid grid-cols-[1fr,auto] py-4 cursor-pointer select-none w-full text-start items-center"
+      class="grid w-full cursor-pointer select-none grid-cols-[1fr,auto] items-center py-4 text-start"
       @click="$emit('toggle')"
     >
       <div
-        class="relative text-base text-accent font-semibold pr-4 flex gap-2"
+        class="text-accent relative flex gap-2 pr-4 text-base font-semibold"
         :class="{'text-xs': minTitle, 'text-base': !minTitle}"
       >
         <template v-if="icon">
@@ -16,7 +16,7 @@
           />
         </template>
 
-        <span class="pr-4 relative">
+        <span class="relative pr-4">
           {{ title }}
 
           <Transition
@@ -27,13 +27,13 @@
           >
             <div
               v-if="hasFlag"
-              class="absolute top-0 right-0 square-2 rounded-full bg-info dark:bg-info-dark"
+              class="square-2 bg-info dark:bg-info-dark absolute right-0 top-0 rounded-full"
             />
           </Transition>
         </span>
       </div>
 
-      <div class="flex justify-center items-center ml-auto">
+      <div class="ml-auto flex items-center justify-center">
         <IconArrow
           class="text-accent transition-transform"
           :class="{'rotate-180': isOpen}"
@@ -49,6 +49,7 @@
 
 <script lang="ts" setup>
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
+
 import WExpansion from './WExpansion.vue'
 
 defineProps<{
@@ -62,5 +63,4 @@ defineProps<{
 defineEmits<{
   (e: 'toggle'): void
 }>()
-
 </script>

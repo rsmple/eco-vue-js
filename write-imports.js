@@ -1,5 +1,5 @@
-import path from 'path'
 import fs from 'fs/promises'
+import path from 'path'
 
 const getIconPaths = root => {
   const dirPath = path.resolve(root)
@@ -75,28 +75,28 @@ const getComponentsList = async () => {
 
 const getImports = list => {
   return list
-    .map(item => `import ${item.name} from '@${ item.path.substring(item.path.indexOf('/components')) }'`)
+    .map(item => `import ${ item.name } from '@${ item.path.substring(item.path.indexOf('/components')) }'`)
     .join('\n')
 }
 
 const getVuePlugin = list => {
   const result = list
-    .map(item => `    app.component('${item.name}', ${item.name})`)
+    .map(item => `    app.component('${ item.name }', ${ item.name })`)
     .join('\n')
   
-  return `export default {\n  // eslint-disable-next-line @typescript-eslint/no-explicit-any\n  install: (app: App | any) => {\n${result}\n  },\n}`
+  return `export default {\n  // eslint-disable-next-line @typescript-eslint/no-explicit-any\n  install: (app: App | any) => {\n${ result }\n  },\n}`
 }
 
 const getExports = list => {
   const result = list
-    .map(item => `  ${item.name}`)
+    .map(item => `  ${ item.name }`)
     .join(',\n')
 
-  return `export {\n${result},\n}`
+  return `export {\n${ result },\n}`
 }
 
 const writePlugin = async (list) => {
-  const result = `import type {App} from 'vue'\n\n${getImports(list)}\n\n${getVuePlugin(list)}\n\n${getExports(list)}`
+  const result = `import type {App} from 'vue'\n\n${ getImports(list) }\n\n${ getVuePlugin(list) }\n\n${ getExports(list) }`
 
   return fs.writeFile('src/imports/componentsPlugin.ts', result)
 }
@@ -172,7 +172,7 @@ const getPackageExports = (list) => {
   }
 
   list.forEach(item => {
-    const distPath = `./dist${item.path.substring(item.path.indexOf('/components'))}`
+    const distPath = `./dist${ item.path.substring(item.path.indexOf('/components')) }`
 
     if (item.path.endsWith('.d.ts')) {
       result[distPath.slice(0, -5)] = {'import': distPath}

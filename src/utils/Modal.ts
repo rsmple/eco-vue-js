@@ -1,5 +1,6 @@
-import {defineAsyncComponent, markRaw, type Component, type ComponentOptions, type MethodOptions} from 'vue'
 import type {ConfirmModalProps} from '@/components/Modal/types'
+
+import {type Component, type ComponentOptions, type MethodOptions, defineAsyncComponent, markRaw} from 'vue'
 
 const ConfirmModal = defineAsyncComponent(() => import('@/components/Modal/modals/Confirm/ConfirmModal.vue'))
 

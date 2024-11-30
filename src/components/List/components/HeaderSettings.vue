@@ -2,7 +2,7 @@
   <WButtonMore
     :icon="markRaw(IconTableSettings)"
     :disabled="disabled"
-    class="h-full w-full items-center"
+    class="size-full items-center"
   >
     <div class="p-4">
       <div class="grid grid-cols-1">
@@ -24,10 +24,10 @@
         </HeaderFieldNested>
       </div>
 
-      <div class="border-b border-solid border-gray-200 dark:border-gray-700 my-4" />
+      <div class="my-4 border-b border-solid border-gray-200 dark:border-gray-700" />
       
       <button
-        class="relative py-1 px-2 rounded-lg bg-gray-100 dark:bg-gray-800"
+        class="relative rounded-lg bg-gray-100 px-2 py-1 dark:bg-gray-800"
         :class="{
           'w-ripple w-ripple-hover': hasSaved,
           'cursor-not-allowed opacity-50': !hasSaved,
@@ -42,12 +42,16 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
-import WButtonMore from '@/components/Button/WButtonMore.vue'
-import {markRaw, ref} from 'vue'
-import IconTableSettings from '@/assets/icons/sax/IconTableSettings.svg?component'
 import type {FieldConfig, ListField, ListFields} from '../types'
-import HeaderSettingsItem from './HeaderSettingsItem.vue'
+
+import {markRaw, ref} from 'vue'
+
+import WButtonMore from '@/components/Button/WButtonMore.vue'
+
+import IconTableSettings from '@/assets/icons/sax/IconTableSettings.svg?component'
+
 import HeaderFieldNested from './HeaderFieldNested.vue'
+import HeaderSettingsItem from './HeaderSettingsItem.vue'
 
 const props = defineProps<{
   fields: ListFields<Data, QueryParams>
@@ -125,5 +129,4 @@ const drop = () => {
 
   dragEnd()
 }
-
 </script>

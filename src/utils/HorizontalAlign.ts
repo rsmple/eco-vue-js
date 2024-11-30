@@ -1,4 +1,3 @@
-
 export enum HorizontalAlign {
   LEFT_OUTER = 'LEFT_OUTER',
   LEFT_INNER = 'LEFT_INNER',

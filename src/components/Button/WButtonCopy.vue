@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative inline-block text-description square-5 cursor-pointer select-none w-hover-circle"
+    class="text-description square-5 w-hover-circle relative inline-block cursor-pointer select-none"
     @click="doCopy()"
   >
     <component
@@ -21,7 +21,9 @@
 
 <script lang="ts" setup>
 import {toRef} from 'vue'
+
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
+
 import {useCopy} from '@/utils/useCopy'
 
 const props = defineProps<{
@@ -29,5 +31,4 @@ const props = defineProps<{
 }>()
 
 const {doCopy, iconCopy, copied} = useCopy(toRef(props, 'value'))
-
 </script>

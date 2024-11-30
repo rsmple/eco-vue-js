@@ -1,4 +1,5 @@
 import type {AddNotify, NotifyConfig} from '@/components/Notify/models/types'
+
 import {NotifyType} from '@/components/Notify/models/NotifyType'
 
 let addNotify: AddNotify | undefined

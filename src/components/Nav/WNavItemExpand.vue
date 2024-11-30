@@ -45,13 +45,18 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onBeforeUnmount, reactive, ref, useSlots, watch} from 'vue'
-import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
-import WNavItem from './WNavItem.vue'
-import WExpansion from '@/components/Expansion/WExpansion.vue'
-import WNavItemTransition from './WNavItemTransition.vue'
 import type {LinkProps} from '@/types/types'
+
+import {computed, onBeforeUnmount, reactive, ref, useSlots, watch} from 'vue'
+
+import WExpansion from '@/components/Expansion/WExpansion.vue'
+
+import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
+
 import {debounce} from '@/main'
+
+import WNavItem from './WNavItem.vue'
+import WNavItemTransition from './WNavItemTransition.vue'
 
 interface Props extends Partial<LinkProps> {
   icon?: SVGComponent
@@ -89,5 +94,4 @@ watch(hasActive, updateHasActiveCache, {immediate: true})
 onBeforeUnmount(() => {
   emit('update:isActive', [props.title, false])
 })
-
 </script>

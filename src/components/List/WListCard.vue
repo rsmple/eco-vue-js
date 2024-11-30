@@ -1,8 +1,8 @@
 <template>
   <div
     class="
-      relative grid sm-not:grid-cols-1 sm:flex isolate
-      sm-not:group-even:bg-gray-50 sm-not:dark:group-even:bg-primary-darkest/25 sm-not:pt-2
+      sm-not:grid-cols-1 sm-not:group-even:bg-gray-50 sm-not:dark:group-even:bg-primary-darkest/25 sm-not:pt-2 relative
+      isolate grid sm:flex
     "
     :class="{
       'w-ripple-trigger-has': allowOpen,
@@ -17,26 +17,26 @@
     >
       <div
         v-if="mobile && selected"
-        class="bg-primary-default dark:bg-primary-dark w-2 h-full hidden sm-not:block absolute left-0 top-0"
+        class="bg-primary-default dark:bg-primary-dark sm-not:block absolute left-0 top-0 hidden h-full w-2"
       />
     </Transition>
 
     <div
       v-if="!mobile"
-      class="sticky z-[1] left-inner sm-not:hidden bg-default dark:bg-default-dark"
+      class="left-inner sm-not:hidden bg-default dark:bg-default-dark sticky z-[1]"
       :class="{
         'width-16': allowSelect,
         'width-4': !allowSelect,
       }"
     >
-      <div class="absolute top-0 z-[-1] right-full h-full w-[calc(var(--nav-bar-width)+var(--inner-margin))] bg-default dark:bg-default-dark" />
+      <div class="bg-default dark:bg-default-dark absolute right-full top-0 z-[-1] h-full w-[calc(var(--nav-bar-width)+var(--inner-margin))]" />
 
       <div
         class="h-full"
         :class="{
-          'sm:border sm:border-r-0 border-gray-300 dark:border-gray-700 sm:rounded-tl-3xl': hasBorder,
+          'border-gray-300 sm:rounded-tl-3xl sm:border sm:border-r-0 dark:border-gray-700': hasBorder,
           'sm:rounded-bl-3xl': hasBorder && !isOpen,
-          'sm:border-b-[transparent] sm:dark:border-b-[transparent]': hasBorder && isOpen,
+          'sm:border-b-transparent sm:dark:border-b-transparent': hasBorder && isOpen,
           'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': allowOpen
         }"
       >
@@ -46,7 +46,7 @@
           :disabled="disabled"
           :allow-shift="allowSelectRange"
           :align-top="alignTop"
-          class="px-4 h-full"
+          class="h-full px-4"
           :class="{
             'opacity-50': allowSelectHover,
             'pt-3': alignTop,
@@ -59,11 +59,11 @@
     </div>
 
     <div
-      class="grid sm:flex sm:flex-1 sm-not:-px--inner-margin isolate"
+      class="sm-not:-px--inner-margin isolate grid sm:flex sm:flex-1"
       :class="{
         [cardClass ?? '']: true,
-        'sm:border-y border-gray-300 dark:border-gray-700': hasBorder,
-        'sm:border-b-[transparent] sm:dark:border-b-[transparent]': hasBorder && isOpen,
+        'border-gray-300 sm:border-y dark:border-gray-700': hasBorder,
+        'sm:border-b-transparent sm:dark:border-b-transparent': hasBorder && isOpen,
         'isolate': allowOpen,
       }"
     >
@@ -71,13 +71,13 @@
 
       <button
         v-if="allowOpen"
-        class="cursor-pointer w-ripple w-ripple-hover w-ripple-has w-ripple-opacity-[0.04] absolute top-0 left-0 h-full w-full z-[-1]"
+        class="w-ripple w-ripple-hover w-ripple-has w-ripple-opacity-[0.04] absolute left-0 top-0 z-[-1] size-full cursor-pointer"
         @click="toggle"
       />
     </div>
       
     <div
-      class="sm:sticky sm:z-[1] sm:right-inner sm:bg-default sm:dark:bg-default-dark"
+      class="sm:right-inner sm:bg-default sm:dark:bg-default-dark sm:sticky sm:z-[1]"
       :class="{
         'width-14': !hideMore,
         'width-4': hideMore,
@@ -85,21 +85,21 @@
     >
       <div
         v-if="!mobile"
-        class="absolute top-0 z-[-1] left-full h-full w-[calc(var(--actions-bar-width)+var(--inner-margin))] bg-default dark:bg-default-dark sm-not:hidden"
+        class="bg-default dark:bg-default-dark sm-not:hidden absolute left-full top-0 z-[-1] h-full w-[calc(var(--actions-bar-width)+var(--inner-margin))]"
       />
 
       <div
         class="h-full"
         :class="{
-          'sm:border sm:border-l-0 border-gray-300 dark:border-gray-700 sm:rounded-tr-3xl': hasBorder,
+          'border-gray-300 sm:rounded-tr-3xl sm:border sm:border-l-0 dark:border-gray-700': hasBorder,
           'sm:rounded-br-3xl': hasBorder && !isOpen,
-          'sm:border-b-[transparent] sm:dark:border-b-[transparent]': hasBorder && isOpen,
+          'sm:border-b-transparent sm:dark:border-b-transparent': hasBorder && isOpen,
           'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': !mobile && allowOpen,
         }"
       >
         <WButtonMore
           v-if="!hideMore"
-          class="sm-not:absolute sm-not:right-0 flex px-4 h-14 sm:h-full"
+          class="sm-not:absolute sm-not:right-0 flex h-14 px-4 sm:h-full"
           :class="{
             'sm-not:top-5': !moreBottom,
             'sm-not:top-10': moreBottom,
@@ -124,9 +124,9 @@
   <template v-if="$slots.expansion">
     <div
       v-if="isOpen"
-      class="sm:sticky sm:w-inner sm:left-inner sm:-mt-px"
+      class="sm:w-inner sm:left-inner sm:sticky sm:-mt-px"
       :class="{
-        'sm:px-5 sm:border sm:border-t-0 border-gray-300 dark:border-gray-700 sm:rounded-b-3xl': hasBorder,
+        'border-gray-300 sm:rounded-b-3xl sm:border sm:border-t-0 sm:px-5 dark:border-gray-700': hasBorder,
       }"
     >
       <slot name="expansion" />
@@ -136,11 +136,14 @@
 
 <script lang="ts" setup>
 import {inject, markRaw, ref, watch} from 'vue'
-import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
+
 import WButtonMore from '@/components/Button/WButtonMore.vue'
 import WButtonMoreItem from '@/components/Button/WButtonMoreItem.vue'
+import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
+
 import IconAddCircle from '@/assets/icons/sax/IconAddCircle.svg?component'
 import IconMinusCircle from '@/assets/icons/sax/IconMinusCircle.svg?component'
+
 import {wInfiniteListSelection, wInfiniteListSelectionItem} from '@/components/InfiniteList/models/injection'
 
 defineProps<{
@@ -197,5 +200,4 @@ if (allowSelectHover) {
 defineExpose({
   updateSelected,
 })
-
 </script>

@@ -1,4 +1,4 @@
-import {useQueryClient, type QueryFilters} from '@tanstack/vue-query'
+import {type QueryFilters, useQueryClient} from '@tanstack/vue-query'
 
 export const paginatedResponseUpdater = <Data extends DefaultData>(oldData: PaginatedResponse<Data> | undefined, newValues: Data[], selected: number[], reverseSelection = false): PaginatedResponse<Data> | undefined => {
   if (!oldData) return undefined

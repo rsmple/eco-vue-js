@@ -1,7 +1,7 @@
 <template>
   <div
     :draggable="isDraggable"
-    class="grid grid-cols-[1.75rem,1fr,auto] text-description select-none bg-default dark:bg-default-dark"
+    class="text-description bg-default dark:bg-default-dark grid select-none grid-cols-[1.75rem,1fr,auto]"
     :class="{
       'opacity-[0.001]': isDragging,
       'opacity-50': !fieldConfig.visible && !isDragging,
@@ -14,18 +14,18 @@
   >
     <button
       v-if="!disabledDrag"
-      class="relative w-ripple w-ripple-hover flex items-center justify-center cursor-grab active:cursor-grabbing"
+      class="w-ripple w-ripple-hover relative flex cursor-grab items-center justify-center active:cursor-grabbing"
       @mousedown="initDrag"
     >
       <IconDrag class="rotate-90" />
     </button>
 
-    <div class="px-2 py-1 self-center font-semibold col-start-2 truncate">
+    <div class="col-start-2 self-center truncate px-2 py-1 font-semibold">
       {{ typeof field.title === 'string' ? field.title : field.title(queryParams) }}
     </div>
 
     <button
-      class="relative w-ripple w-ripple-hover px-2 flex items-center"
+      class="w-ripple w-ripple-hover relative flex items-center px-2"
       @click="$emit('update:fields-config-map', {[field.label]: {...fieldConfig, visible: !fieldConfig.visible}})"
     >
       <component
@@ -37,9 +37,11 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
-import {ref} from 'vue'
-import IconDrag from '@/assets/icons/sax/IconDrag.svg?component'
 import type {FieldConfig, ListField} from '../types'
+
+import {ref} from 'vue'
+
+import IconDrag from '@/assets/icons/sax/IconDrag.svg?component'
 import IconEye from '@/assets/icons/sax/IconEye.svg?component'
 import IconEyeSlash from '@/assets/icons/sax/IconEyeSlash.svg?component'
 
@@ -78,5 +80,4 @@ const endDrag = () => {
 
   emit('drag:end')
 }
-
 </script>

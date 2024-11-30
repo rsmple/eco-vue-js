@@ -21,8 +21,9 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData">
-import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 import {computed} from 'vue'
+
+import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 
 const props = defineProps<{
   selected: Model[]
@@ -56,7 +57,7 @@ const chekboxValue = computed(() => {
 
 const chekboxValueReversed = computed(() => props.disabled ? false : chekboxValue.value === null ? null : props.reverse ? !chekboxValue.value : chekboxValue.value)
 
-const tooltipText = computed(() => `${chekboxValueReversed.value === true ? 'Unselect' : 'Select'} page (${props.items.length} item${props.items.length === 1 ? '' : 's'})`)
+const tooltipText = computed(() => `${ chekboxValueReversed.value === true ? 'Unselect' : 'Select' } page (${ props.items.length } item${ props.items.length === 1 ? '' : 's' })`)
 
 const selectOrUnselect = (isSelect: boolean): void => {
   if (props.reverse ? !isSelect : isSelect) {
@@ -65,6 +66,4 @@ const selectOrUnselect = (isSelect: boolean): void => {
     emit('update:selected', props.selected.filter(item => !models.value.includes(item)))
   }
 }
-
 </script>
-

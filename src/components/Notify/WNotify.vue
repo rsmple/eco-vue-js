@@ -5,7 +5,7 @@
     enter-from-class="opacity-0 translate-y-5"
     leave-to-class="opacity-0 -mb-[var(--list-item-height,5.5rem)]"
     tag="div"
-    class="fixed top-2 right-0 z-[10000]"
+    class="fixed right-0 top-2 z-[10000]"
   >
     <NotifyCard
       v-for="config in list"
@@ -22,10 +22,13 @@
 </template>
 
 <script lang="ts" setup>
-import {initNotify} from '@/utils/Notify'
-import {onBeforeMount, onBeforeUnmount, ref} from 'vue'
-import NotifyCard from './components/NotifyCard.vue'
 import type {AddNotify, NotifyConfig} from './models/types'
+
+import {onBeforeMount, onBeforeUnmount, ref} from 'vue'
+
+import {initNotify} from '@/utils/Notify'
+
+import NotifyCard from './components/NotifyCard.vue'
 
 type NotifyMeta = {
   count: number
@@ -79,5 +82,4 @@ onBeforeMount(() => {
 onBeforeUnmount(() => {
   initNotify(undefined)
 })
-
 </script>

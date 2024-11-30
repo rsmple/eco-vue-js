@@ -78,13 +78,16 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {ref, computed, watch, toRef, nextTick} from 'vue'
-import InfiniteListScroll from './InfiniteListScroll.vue'
-import InfiniteListPage from './InfiniteListPage.vue'
-import {useRefetchNextPages} from '../use/useRefetchNextPages'
-import InfiniteListButton from './InfiniteListButton.vue'
+import {computed, nextTick, ref, toRef, watch} from 'vue'
+
 import {isEqualObj} from '@/utils/utils'
+
+import InfiniteListButton from './InfiniteListButton.vue'
+import InfiniteListPage from './InfiniteListPage.vue'
+import InfiniteListScroll from './InfiniteListScroll.vue'
+
 import {getIsScrollDown} from '../models/utils'
+import {useRefetchNextPages} from '../use/useRefetchNextPages'
 
 const props = withDefaults(
   defineProps<{
@@ -298,5 +301,4 @@ defineSlots<{
     index: number
   }) => void
 }>()
-
 </script>

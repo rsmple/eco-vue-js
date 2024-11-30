@@ -1,4 +1,3 @@
-
 export interface ToggleProps<Value extends boolean | null> {
   modelValue: Value
   title?: string

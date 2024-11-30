@@ -2,7 +2,7 @@
   <div
     ref="dropdown"
     :style="styles"
-    class="fixed h-auto group/dropdown"
+    class="group/dropdown fixed h-auto"
     :class="{
       'dropdown-top': isTop,
     }"
@@ -16,11 +16,14 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch, toRef} from 'vue'
+import type {DropdownProps} from './types'
+
+import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, toRef, watch} from 'vue'
+
 import DOMListenerContainer from '@/utils/DOMListenerContainer'
 import {getAllScrollParents, isClientSide} from '@/utils/utils'
-import {horizontalGetterOrderMap, searchStyleGetter, VerticalGetter, type HorizontalGetter} from './utils/DropdownStyle'
-import type {DropdownProps} from './types'
+
+import {type HorizontalGetter, VerticalGetter, horizontalGetterOrderMap, searchStyleGetter} from './utils/DropdownStyle'
 
 const props = defineProps<DropdownProps>()
 
@@ -121,5 +124,4 @@ defineExpose({
     setParentRect()
   },
 })
-
 </script>

@@ -58,10 +58,13 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined">
-import WButton from './WButton.vue'
-import {SemanticType} from '@/utils/SemanticType'
-import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 import type {ButtonGroupProps} from './types'
+
+import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
+
+import {SemanticType} from '@/utils/SemanticType'
+
+import WButton from './WButton.vue'
 
 defineOptions({inheritAttrs: false})
 
@@ -83,5 +86,4 @@ const updateModelValue = (value: Model): void => {
   if (value !== props.modelValue) emit('update:model-value', value)
   else if (props.allowClear) emit('update:model-value', null as Model)
 }
-
 </script>

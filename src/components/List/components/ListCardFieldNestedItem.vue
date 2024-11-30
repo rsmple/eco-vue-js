@@ -8,9 +8,7 @@
 </template>
 
 <script setup lang="ts" generic="Data">
-
 defineProps<{
   items: Data[]
 }>()
-
 </script>

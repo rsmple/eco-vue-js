@@ -1,6 +1,7 @@
-import {useQuery, useQueryClient, type QueryClient, type UseQueryReturnType, type QueryKey} from '@tanstack/vue-query'
+import {type QueryClient, type QueryKey, type UseQueryReturnType, useQuery, useQueryClient} from '@tanstack/vue-query'
+import {type MaybeRef, unref} from 'vue'
+
 import {ApiError} from './api'
-import {unref, type MaybeRef} from 'vue'
 
 type Params = Parameters<QueryClient['setQueriesData']>
 

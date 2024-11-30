@@ -2,12 +2,12 @@
   <button
     :disabled="disabled"
     :class="{
-      'cursor-pointer w-ripple w-ripple-hover': !disabled,
+      'w-ripple w-ripple-hover cursor-pointer': !disabled,
       'cursor-not-allowed': disabled,
       'items-center': !top,
       'items-start': top,
     }"
-    class="h-full w-11 py-[0.6875rem] flex justify-center relative text-description select-none"
+    class="text-description relative flex h-full w-11 select-none justify-center py-[0.6875rem]"
     @mousedown.prevent.stop
     @click.stop="$emit('click', $event)"
   >
@@ -39,5 +39,4 @@ defineProps<{
 defineEmits<{
   (e: 'click', value: MouseEvent): void
 }>()
-
 </script>

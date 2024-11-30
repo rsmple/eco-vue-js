@@ -1,11 +1,11 @@
 <template>
-  <div class="flex justify-center items-center flex-col drop-shadow-md dark:drop-shadow-none pointer-events-none">
+  <div class="pointer-events-none flex flex-col items-center justify-center drop-shadow-md dark:drop-shadow-none">
     <div
-      class="w-1 z-10 pointer-events-auto border-[transparent] border-solid border-[0.5rem]"
+      class="pointer-events-auto z-10 w-1 border-[0.5rem] border-solid border-transparent"
       :class="{
         'text-black-default dark:text-gray-800': !tooltipMeta.light,
         'text-default dark:text-gray-800': tooltipMeta.light,
-        'border-t-current order-2': isTop,
+        'order-2 border-t-current': isTop,
         'border-b-current': !isTop,
       }"
       @mouseover="$emit('over')"
@@ -14,10 +14,10 @@
 
     <div
       ref="container"
-      class="py-3 px-4 rounded-xl text-xs font-medium text-center pointer-events-auto translate-x-[var(--t-translate-x)] max-w-[calc(100vw-1.5rem)]"
+      class="pointer-events-auto max-w-[calc(100vw-1.5rem)] translate-x-[var(--t-translate-x)] rounded-xl px-4 py-3 text-center text-xs font-medium"
       :class="{
-        'bg-black-default dark:bg-gray-800 text-default': !tooltipMeta.light,
-        'bg-default dark:bg-gray-800 text-accent': tooltipMeta.light,
+        'bg-black-default text-default dark:bg-gray-800': !tooltipMeta.light,
+        'bg-default text-accent dark:bg-gray-800': tooltipMeta.light,
       }"
       :style="{
         '--t-translate-x': transformX + 'px',
@@ -31,8 +31,10 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, onMounted, ref, toRef, watch} from 'vue'
 import type {TooltipMeta} from '@/utils/Tooltip'
+
+import {nextTick, onMounted, ref, toRef, watch} from 'vue'
+
 import {isClientSide} from '@/utils/utils'
 
 const MARGIN = 12
@@ -99,5 +101,4 @@ watch(toRef(props, 'tooltipMeta'), () => {
 onMounted(() => {
   setTransformX()
 })
-
 </script>

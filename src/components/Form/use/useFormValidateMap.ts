@@ -1,4 +1,5 @@
-import {inject, onBeforeMount, provide, ref, type Ref} from 'vue'
+import {type Ref, inject, onBeforeMount, provide, ref} from 'vue'
+
 import {wFormValidateUpdater} from '../models/injection'
 import {compileMessage, removeKey} from '../models/utils'
 

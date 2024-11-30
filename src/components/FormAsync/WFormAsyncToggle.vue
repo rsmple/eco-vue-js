@@ -12,12 +12,15 @@
 </template>
 
 <script lang="ts" setup generic="Model, FieldType extends boolean | null, QueryParams">
-import {computed, onBeforeUnmount, ref, toRef} from 'vue'
-import WToggle from '@/components/Toggle/WToggle.vue'
-import {Notify} from '@/utils/Notify'
-import {Modal} from '@/utils/Modal'
-import {handleApiError} from '@/utils/api'
 import type {FormAsyncToggleProps} from './types'
+
+import {computed, onBeforeUnmount, ref, toRef} from 'vue'
+
+import WToggle from '@/components/Toggle/WToggle.vue'
+
+import {Modal} from '@/utils/Modal'
+import {Notify} from '@/utils/Notify'
+import {handleApiError} from '@/utils/api'
 import {get, set} from '@/utils/utils'
 
 type PayloadType = PartialNested<Model>
@@ -91,5 +94,4 @@ onBeforeUnmount(() => {
   closeModal?.()
   closeModal = null
 })
-
 </script>

@@ -43,6 +43,7 @@
 
 <script setup lang="ts" generic="Data, QueryParams">
 import type {ListField, ListFields} from '../types'
+
 import {getFirstFieldLabel} from '../use/useFieldConfigMap'
 
 defineProps<{
@@ -59,5 +60,4 @@ defineSlots<{
     last: boolean
   }) => void
 }>()
-
 </script>

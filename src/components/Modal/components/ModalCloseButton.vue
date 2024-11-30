@@ -1,7 +1,7 @@
 <template>
   <button
     ref="closeButton"
-    class="cursor-pointer absolute top-0 left-0 h-full w-full -z-10 outline-none"
+    class="absolute left-0 top-0 -z-10 size-full cursor-pointer outline-none"
     title="Click outside to close modal"
     @click="$emit('click', $event)"
   />
@@ -19,5 +19,4 @@ const closeButton = ref<HTMLButtonElement | undefined>()
 onMounted(() => {
   closeButton.value?.focus()
 })
-
 </script>

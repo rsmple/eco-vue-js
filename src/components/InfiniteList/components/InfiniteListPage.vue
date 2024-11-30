@@ -105,13 +105,13 @@
       v-else
       class="text-accent text-base font-normal"
       :class="{
-        'py-16 px-8 text-center flex justify-center sm:sticky sm:left-inner sm:max-w-inner': !minHeight,
-        'pt-4 px-[1.0625rem]': minHeight,
+        'sm:left-inner sm:max-w-inner flex justify-center px-8 py-16 text-center sm:sticky': !minHeight,
+        'px-[1.0625rem] pt-4': minHeight,
         'pb-4': minHeight && lastChild,
         'pb-2': minHeight && !lastChild,
       }"
     >
-      <div class="select-none cursor-default py-1.25 sm-not:px-3">
+      <div class="py-1.25 sm-not:px-3 cursor-default select-none">
         {{ emptyStub }}
       </div>
     </div>
@@ -119,11 +119,13 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {toRef, computed, watch, ref, onMounted, nextTick, onBeforeUnmount, TransitionGroup} from 'vue'
-import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
-import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
-import EmptyComponent from './EmptyComponent.vue'
+import {TransitionGroup, computed, nextTick, onBeforeUnmount, onMounted, ref, toRef, watch} from 'vue'
+
 import {ApiError} from '@/main'
+
+import EmptyComponent from './EmptyComponent.vue'
+import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
+import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -350,5 +352,4 @@ defineSlots<{
     index: number
   }) => void
 }>()
-
 </script>

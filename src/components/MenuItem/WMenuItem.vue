@@ -2,10 +2,10 @@
   <component
     :is="to ? RouterLink : href ? 'a' : 'button'"
     v-bind="to ? {to} : href ? {href, download} : undefined"
-    class="relative px-6 py-2 first:pt-4 last:pb-4 text-description select-none flex gap-4 w-full min-w-36 items-center text-start justify-start outline-none"
+    class="text-description relative flex w-full min-w-36 select-none items-center justify-start gap-4 px-6 py-2 text-start outline-none first:pt-4 last:pb-4"
     :class="{
       'w-ripple w-ripple-hover hover:text-primary-default dark:hover:text-primary-dark cursor-pointer': !disabled,
-      'opacity-50 cursor-not-allowed': disabled,
+      'cursor-not-allowed opacity-50': disabled,
     }"
     :disabled="disabled"
   >
@@ -14,8 +14,9 @@
 </template>
 
 <script lang="ts" setup>
-import {RouterLink} from 'vue-router'
 import type {LinkProps} from '@/types/types'
+
+import {RouterLink} from 'vue-router'
 
 interface Props extends Partial<LinkProps> {
   disabled?: boolean
@@ -31,5 +32,4 @@ withDefaults(
     to: undefined,
   },
 )
-
 </script>

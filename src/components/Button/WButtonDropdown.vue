@@ -48,8 +48,8 @@
     <template #content>
       <WClickOutside
         class="
-          bg-default dark:bg-default-dark w-full rounded-xl max-h-[inherit] shadow-md
-          overflow-x-hidden overflow-y-overlay overscroll-contain my-1 dark:border dark:border-solid dark:border-gray-800
+          bg-default dark:bg-default-dark overflow-y-overlay my-1 max-h-[inherit] w-full
+          overflow-x-hidden overscroll-contain rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800
         "
         @click="close"
       >
@@ -63,13 +63,18 @@
 </template>
 
 <script lang="ts" setup>
-import {HorizontalAlign} from '@/main'
-import WButton from './WButton.vue'
-import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
-import {ref} from 'vue'
-import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
-import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import type {ButtonDropdownProps} from './types'
+
+import {ref} from 'vue'
+
+import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
+import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+
+import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
+
+import {HorizontalAlign} from '@/main'
+
+import WButton from './WButton.vue'
 
 withDefaults(
   defineProps<ButtonDropdownProps>(),
@@ -85,5 +90,4 @@ const isOpen = ref(false)
 const close = () => {
   isOpen.value = false
 }
-
 </script>

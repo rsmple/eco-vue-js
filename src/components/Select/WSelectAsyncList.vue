@@ -2,7 +2,7 @@
   <div>
     <div
       v-if="title"
-      class="text-xs text-accent font-semibold mb-2"
+      class="text-accent mb-2 text-xs font-semibold"
     >
       <WSkeleton v-if="skeleton" />
       
@@ -19,7 +19,7 @@
     <div
       v-else
       ref="list"
-      class="h-[24rem] overflow-y-overlay sm:border sm-not:border-y border-gray-300 dark:border-gray-700 border-solid sm:rounded-2xl"
+      class="overflow-y-overlay sm-not:border-y h-96 border-solid border-gray-300 sm:rounded-2xl sm:border dark:border-gray-700"
     >
       <SelectAsyncList
         :model-value="modelValue"
@@ -56,8 +56,10 @@
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import {ref} from 'vue'
-import SelectAsyncList from './components/SelectAsyncList.vue'
+
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+
+import SelectAsyncList from './components/SelectAsyncList.vue'
 
 withDefaults(
   defineProps<{
@@ -95,5 +97,4 @@ const list = ref<HTMLDivElement | undefined>()
 defineSlots<{
   default?: (props: {option: Data | null, selected: boolean, skeleton: boolean, model: boolean}) => void
 }>()
-
 </script>

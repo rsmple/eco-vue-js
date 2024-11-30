@@ -1,10 +1,10 @@
 <template>
   <div
-    class="px-1 bg-negative dark:bg-negative-dark text-default text-xs font-medium flex items-center justify-center"
+    class="bg-negative dark:bg-negative-dark text-default flex items-center justify-center px-1 text-xs font-medium"
     :class="{
       'animate-shake': isShake,
-      'h-4 min-w-[1rem] rounded-lg': small,
-      'h-5 min-w-[1.25rem] rounded-[0.625rem]': !small,
+      'h-4 min-w-4 rounded-lg': small,
+      'h-5 min-w-5 rounded-[0.625rem]': !small,
     }"
   >
     {{ numberCompactFormatter.format(count) }}
@@ -13,6 +13,7 @@
 
 <script setup lang="ts">
 import {ref, toRef, watch} from 'vue'
+
 import {numberCompactFormatter} from '@/utils/utils'
 
 const props = withDefaults(
@@ -43,5 +44,4 @@ watch(toRef(props, 'count'), value => {
     }, 600)
   }
 })
-
 </script>

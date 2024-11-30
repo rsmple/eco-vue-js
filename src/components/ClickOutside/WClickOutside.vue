@@ -6,6 +6,7 @@
 
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, ref} from 'vue'
+
 import {hasParent, isClientSide} from '@/utils/utils'
 
 const emit = defineEmits<{
@@ -33,5 +34,4 @@ onBeforeUnmount(() => {
 
   document.removeEventListener('click', clickListener)
 })
-
 </script>

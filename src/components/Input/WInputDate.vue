@@ -33,7 +33,7 @@
 
     <template #content>
       <div
-        class="sm:p-6 sm:w-[28rem] sm-not:w-screen sm-not:px-3"
+        class="sm-not:w-screen sm-not:px-3 sm:w-[28rem] sm:p-6"
         @mousedown.prevent=""
       >
         <WDatePickerSingle
@@ -49,12 +49,15 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, watch} from 'vue'
-import WDatePickerSingle from '@/components/DatePicker/WDatePickerSingle.vue'
-import {dateFormat, parseDate} from '@/utils/dateTime'
-import WInputSuggest from '@/components/Input/WInputSuggest.vue'
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import type {InputDateProps} from './types'
+
+import {ref, watch} from 'vue'
+
+import WDatePickerSingle from '@/components/DatePicker/WDatePickerSingle.vue'
+import WInputSuggest from '@/components/Input/WInputSuggest.vue'
+
+import {HorizontalAlign} from '@/utils/HorizontalAlign'
+import {dateFormat, parseDate} from '@/utils/dateTime'
 
 defineOptions({inheritAttrs: false})
 
@@ -105,5 +108,4 @@ const formatModelValue = (value: Date | undefined) => {
 watch(() => props.modelValue, value => {
   inputValue.value = value ? dateFormat(value) : ''
 })
-
 </script>

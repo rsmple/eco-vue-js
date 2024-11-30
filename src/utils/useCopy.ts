@@ -1,7 +1,9 @@
-import {computed, markRaw, ref, unref, type MaybeRef} from 'vue'
-import {Notify} from './Notify'
+import {type MaybeRef, computed, markRaw, ref, unref} from 'vue'
+
 import IconCopy from '@/assets/icons/sax/IconCopy.svg?component'
 import IconCopySuccess from '@/assets/icons/sax/IconCopySuccess.svg?component'
+
+import {Notify} from './Notify'
 
 export const useCopy = (value: MaybeRef<string | number | undefined>) => {
   const copied = ref(false)

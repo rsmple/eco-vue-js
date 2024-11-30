@@ -4,6 +4,7 @@
 
 <script lang="ts" setup>
 import {onUnmounted, provide, toRef} from 'vue'
+
 import {wInfiniteListSelectionItem} from '../models/injection'
 
 const props = defineProps<{
@@ -29,5 +30,4 @@ provide(wInfiniteListSelectionItem, {
 onUnmounted(() => {
   if (props.selected) emit('update:selected', false)
 })
-
 </script>

@@ -1,21 +1,22 @@
 <template>
-  <div class="p-4 rounded-2xl bg-gray-100 dark:bg-gray-800 mt-2">
-    <div class="text-accent mb-2 font-normal text-balance">
+  <div class="mt-2 rounded-2xl bg-gray-100 p-4 dark:bg-gray-800">
+    <div class="text-accent mb-2 text-balance font-normal">
       <IconDanger
-        class="inline -mt-1 mr-2"
+        class="-mt-1 mr-2 inline"
         :class="stylesMap[semanticType ?? SemanticType.NEGARIVE]"
       />{{ title }}
     </div>
 
-    <span class="text-description font-normal text-balance">
+    <span class="text-description text-balance font-normal">
       <slot />
     </span>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {SemanticType} from '@/utils/SemanticType'
 import IconDanger from '@/assets/icons/default/IconDanger.svg?component'
+
+import {SemanticType} from '@/utils/SemanticType'
 
 const stylesMap: Record<SemanticType, string> = {
   [SemanticType.PRIMARY]: 'text-primary-default dark:text-primary-dark',
@@ -30,5 +31,4 @@ defineProps<{
   title: string
   semanticType?: SemanticType
 }>()
-
 </script>

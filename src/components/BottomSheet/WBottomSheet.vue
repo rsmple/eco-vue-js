@@ -17,8 +17,8 @@
           v-if="isOpen"
           ref="wrapper"
           class="
-            fixed top-0 left-0 h-full w-full z-[1000] backdrop-blur bg-primary-light dark:bg-primary-darkest bg-opacity-40 dark:bg-opacity-40
-            overscroll-contain overflow-y-auto no-scrollbar snap-y snap-mandatory snap-always scroll-smooth overflow-scroll
+            bg-primary-light dark:bg-primary-darkest no-scrollbar fixed left-0 top-0 z-[1000] size-full snap-y snap-mandatory snap-always
+            overflow-scroll overflow-y-auto overscroll-contain scroll-smooth bg-opacity-40 backdrop-blur dark:bg-opacity-40
           "
         >
           <div
@@ -29,13 +29,13 @@
 
           <div
             ref="content"
-            class="height-[90%] bg-default dark:bg-default-dark rounded-t-3xl shadow-md snap-end grid grid-rows-[auto,1fr] grid-cols-[1fr] relative"
+            class="height-[90%] bg-default dark:bg-default-dark relative grid snap-end grid-cols-[1fr] grid-rows-[auto,1fr] rounded-t-3xl shadow-md"
           >
             <div
               ref="toggle"
               class="px-3"
             >
-              <div class="h-9 flex justify-center items-center">
+              <div class="flex h-9 items-center justify-center">
                 <div
                   class="h-1 w-12 rounded-sm"
                   :class="{
@@ -53,12 +53,12 @@
 
             <div
               ref="container"
-              class="overflow-x-hidden overflow-y-auto overscroll-contain"
+              class="overflow-y-auto overflow-x-hidden overscroll-contain"
             >
               <slot name="content" />
             </div>
 
-            <div class="absolute top-full h-[100vh] w-full bg-[inherit]" />
+            <div class="absolute top-full h-screen w-full bg-[inherit]" />
           </div>
         </div>
       </Transition>
@@ -123,5 +123,4 @@ watch(backdrop, (value, oldValue) => {
 onBeforeUnmount(() => {
   observer.disconnect()
 })
-
 </script>

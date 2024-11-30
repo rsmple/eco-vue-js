@@ -1,6 +1,8 @@
-import {ref} from 'vue'
-import {debounce} from '@/utils/utils'
 import type InfiniteListPage from './components/InfiniteListPage.vue'
+
+import {ref} from 'vue'
+
+import {debounce} from '@/utils/utils'
 
 export const useRefetchNextPages = () => {
   const pageComponent = ref<ComponentInstance<typeof InfiniteListPage>[]>([])

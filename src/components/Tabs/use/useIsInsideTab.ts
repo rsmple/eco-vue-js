@@ -1,4 +1,5 @@
 import {inject} from 'vue'
+
 import {wTabItemListener} from '../models/injection'
 
 export const useIsInsideTab = () => {

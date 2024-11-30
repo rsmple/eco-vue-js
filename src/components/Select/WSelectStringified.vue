@@ -45,9 +45,11 @@
 </template>
 
 <script lang="ts" setup generic="Model extends string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>">
+import type {SelectOptionComponent, SelectStringifiedProps} from './types'
+
 import {computed, ref} from 'vue'
+
 import WSelect from '@/components/Select/WSelect.vue'
-import type {SelectStringifiedProps, SelectOptionComponent} from './types'
 
 defineOptions({inheritAttrs: false})
 
@@ -86,5 +88,4 @@ const blur = () => {
 defineExpose({
   blur,
 })
-
 </script>

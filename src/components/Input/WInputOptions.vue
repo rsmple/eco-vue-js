@@ -38,10 +38,10 @@
     <template #content>
       <div
         v-if="!options.length"
-        class="py-2 px-[1.0625rem] first:pt-4 last:pb-4"
+        class="px-[1.0625rem] py-2 first:pt-4 last:pb-4"
       >
         <div
-          class="select-none cursor-default w-select-field sm-not:px-3"
+          class="w-select-field sm-not:px-3 cursor-default select-none"
         >
           {{ emptyStub ?? 'No suggestion' }}
         </div>
@@ -79,11 +79,14 @@
 </template>
 
 <script lang="ts" setup generic="Type extends InputType = 'text', Option extends Record<string, any> & {id: number} = Record<string, any> & {id: number}">
-import {ref, watch, toRef, nextTick, computed} from 'vue'
+import type {InputOptionsProps} from './types'
+
+import {computed, nextTick, ref, toRef, watch} from 'vue'
+
+import WInputSuggest from '@/components/Input/WInputSuggest.vue'
+
 import SelectOption from '@/components/Select/components/SelectOption.vue'
 import {debounce} from '@/utils/utils'
-import WInputSuggest from '@/components/Input/WInputSuggest.vue'
-import type {InputOptionsProps} from './types'
 
 type ModelValue = Required<InputOptionsProps<Type, Option>>['modelValue']
 
@@ -192,5 +195,4 @@ defineExpose({
   focus,
   blur,
 })
-
 </script>
