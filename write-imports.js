@@ -115,6 +115,9 @@ const getPackageExports = (list) => {
     './tailwind-base/index.cjs': {
       'require': './tailwind-base/index.cjs',
     },
+    './eslint/plugin': {
+      'import': './eslint/plugin.js',
+    },
     './dist/assets/icons/default/*': {
       'import': './dist/assets/icons/default/*.svg.js',
     },
