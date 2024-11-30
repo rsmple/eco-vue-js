@@ -11,7 +11,7 @@
     :class="$attrs.class"
     @select="updateModelValue($event)"
     @unselect="updateModelValue(allowClear ? null : $event)"
-    @focus="searchModel && typeof modelValue === 'string' ? selectComponent?.setSearch(modelValue) : undefined"
+    @focus="searchModel && typeof modelValue === 'string' ? selectComponentRef?.setSearch(modelValue) : undefined"
     @update:query-options-error="$emit('update:query-options-error', $event)"
     @init-model="$emit('init-model')"
   >
@@ -51,7 +51,7 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false">
 import type {SelectOptionComponent, SelectSingleProps} from './types'
 
-import {computed, ref, toRef, watch} from 'vue'
+import {computed, toRef, useTemplateRef, watch} from 'vue'
 
 import WSelect from '@/components/Select/WSelect.vue'
 
@@ -67,7 +67,7 @@ const emit = defineEmits<{
   (e: 'init-model'): void
 }>()
 
-const selectComponent = ref<ComponentInstance<typeof WSelect<Model, Data, QueryParamsOptions, OptionComponent>> | undefined>()
+const selectComponentRef = useTemplateRef('selectComponent')
 
 const arrayValue = computed<Model[]>(() => props.modelValue !== null ? [props.modelValue] : [])
 
@@ -78,7 +78,7 @@ const updateModelValue = (value: Model | null): void => {
 }
 
 const blur = () => {
-  selectComponent.value?.blur()
+  selectComponentRef.value?.blur()
 }
 
 watch(toRef(props, 'modelValue'), blur)

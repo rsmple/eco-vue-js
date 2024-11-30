@@ -81,7 +81,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {onBeforeUnmount, provide, ref, toRef} from 'vue'
+import {onBeforeUnmount, provide, toRef, useTemplateRef} from 'vue'
 
 import WInfiniteListWrapper from './WInfiniteListWrapper.vue'
 import EmptyComponent from './components/EmptyComponent.vue'
@@ -156,14 +156,14 @@ const emit = defineEmits<{
   (e: 'select-range', value: SelectedRange<Model>): void
 }>()
 
-const infiniteListPages = ref<ComponentInstance<typeof InfiniteListPages<Model, Data, QueryParams>> | undefined>()
+const infiniteListPagesRef = useTemplateRef('infiniteListPages')
 
 const updateHeaderPadding = (value: number): void => {
   emit('update:header-padding', value)
 }
 
 const goto = (page: number, itemIndex?: number) => {
-  infiniteListPages.value?.goto(page, itemIndex)
+  infiniteListPagesRef.value?.goto(page, itemIndex)
 }
 
 const {
@@ -202,7 +202,7 @@ onBeforeUnmount(() => {
 
 defineExpose({
   resetPage() {
-    infiniteListPages.value?.resetPage()
+    infiniteListPagesRef.value?.resetPage()
   },
 })
 

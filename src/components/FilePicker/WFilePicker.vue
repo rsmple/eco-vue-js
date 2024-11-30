@@ -84,7 +84,7 @@
         <WButton
           :semantic-type="SemanticType.PRIMARY"
           class="mt-4"
-          @click.stop.prevent="input?.click()"
+          @click.stop.prevent="inputRef?.click()"
         >
           Browse file
         </WButton>
@@ -137,7 +137,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, onUnmounted, ref} from 'vue'
+import {onMounted, onUnmounted, ref, useTemplateRef} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
@@ -166,14 +166,14 @@ const emit = defineEmits<{
   (e: 'clear:placeholder'): void
 }>()
 
-const input = ref<HTMLInputElement | undefined>()
-const container = ref<HTMLLabelElement | undefined>()
+const inputRef = useTemplateRef('input')
+const containerRef = useTemplateRef('container')
 const containerWidth = ref<number | undefined>(undefined)
 const containerHeight = ref<number | undefined>(undefined)
 const isActive = ref(false)
 
 const updateModelValue = (): void => {
-  emit('update:modelValue', input.value?.files?.length ? Array.from(input.value.files) : [])
+  emit('update:modelValue', inputRef.value?.files?.length ? Array.from(inputRef.value.files) : [])
 }
 
 const setIsActive = (value: boolean): void => {
@@ -193,7 +193,7 @@ const unselectFile = (index: number): void => {
 
   emit('update:modelValue', newFiles)
 
-  if (newFiles.length === 0 && input.value) input.value.value = ''
+  if (newFiles.length === 0 && inputRef.value) inputRef.value.value = ''
 }
 
 const preventDefaults = (e: Event) => {
@@ -203,8 +203,8 @@ const preventDefaults = (e: Event) => {
 const events = ['dragenter', 'dragover', 'dragleave', 'drop']
 
 const updateSize = () => {
-  containerWidth.value = container.value?.offsetWidth
-  containerHeight.value = container.value?.offsetHeight
+  containerWidth.value = containerRef.value?.offsetWidth
+  containerHeight.value = containerRef.value?.offsetHeight
 }
 
 useTabActiveListener(updateSize)

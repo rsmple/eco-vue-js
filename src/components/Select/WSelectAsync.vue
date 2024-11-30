@@ -10,9 +10,9 @@
     :class="$attrs.class"
     @update:model-value="!loading && !isFetchingPrefix && (search = $event as string ?? '')"
 
-    @keypress:enter.stop.prevent="list?.selectCursor()"
-    @keypress:up.prevent="list?.cursorUp()"
-    @keypress:down.prevent="list?.cursorDown()"
+    @keypress:enter.stop.prevent="listRef?.selectCursor()"
+    @keypress:up.prevent="listRef?.cursorUp()"
+    @keypress:down.prevent="listRef?.cursorDown()"
     @keypress:delete="captureDoubleDelete"
 
     @open="isOpen = true"
@@ -118,7 +118,7 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
 import type {SelectAsyncProps, SelectOptionComponent, SelectOptionComponentProps} from './types'
 
-import {computed, nextTick, ref, watch} from 'vue'
+import {computed, nextTick, ref, useTemplateRef, watch} from 'vue'
 
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
@@ -148,8 +148,8 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = ref(false)
-const input = ref<ComponentInstance<typeof WInputSuggest<'text'>> | undefined>()
-const list = ref<ComponentInstance<typeof SelectAsyncList<Model, Data, QueryParams>> | undefined>()
+const inputRef = useTemplateRef('input')
+const listRef = useTemplateRef('list')
 const isMobile = getIsMobile()
 const focused = ref(false)
 const isFetchingPrefix = ref(false)
@@ -233,17 +233,17 @@ const updateSelected = (value: Model[]): void => {
 }
 
 const focus = () => {
-  input.value?.focus()
+  inputRef.value?.focus()
 }
 
 const blur = () => {
-  input.value?.blur()
+  inputRef.value?.blur()
 }
 
 const updateDropdown = async () => {
   await nextTick()
 
-  input.value?.updateDropdown()
+  inputRef.value?.updateDropdown()
 }
 
 const setSearch = (value: string): void => {

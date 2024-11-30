@@ -66,7 +66,7 @@
       <WTooltip
         v-if="tooltipText"
         :text="tooltipText"
-        :trigger="element"
+        :trigger="(elementRef as HTMLButtonElement)"
         no-touch
         class="pointer-events-none"
       />
@@ -84,7 +84,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue'
+import {useTemplateRef} from 'vue'
 
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
@@ -110,7 +110,7 @@ const emit = defineEmits<{
   (e: 'update-shift:modelValue', value: boolean): void
 }>()
 
-const element = ref<HTMLButtonElement | undefined>()
+const elementRef = useTemplateRef('element')
 
 const toggle = (e: MouseEvent | KeyboardEvent): void => {
   if (props.disabled || props.readonly || props.loading) return

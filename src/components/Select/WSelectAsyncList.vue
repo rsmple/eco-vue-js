@@ -25,7 +25,7 @@
         :model-value="modelValue"
         :use-query-fn="useQueryFn"
         :query-params="(queryParams as QueryParams)"
-        :scrolling-element="list"
+        :scrolling-element="listRef"
         :exclude-params="excludeParams"
         :empty-stub="emptyStub"
         :select-only="selectOnly"
@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {ref} from 'vue'
+import {useTemplateRef} from 'vue'
 
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
@@ -92,7 +92,7 @@ defineEmits<{
   (e: 'update:count', value: number): void
 }>()
 
-const list = ref<HTMLDivElement | undefined>()
+const listRef = useTemplateRef('list')
 
 defineSlots<{
   default?: (props: {option: Data | null, selected: boolean, skeleton: boolean, model: boolean}) => void

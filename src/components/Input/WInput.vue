@@ -157,7 +157,7 @@
 <script lang="ts" setup generic="Type extends InputType = 'text'">
 import type {InputProps} from './types'
 
-import {nextTick, onBeforeUnmount, onMounted, ref} from 'vue'
+import {nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef} from 'vue'
 
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 
@@ -195,7 +195,7 @@ const emit = defineEmits<{
   (e: 'paste'): void
 }>()
 
-const input = ref<HTMLInputElement>()
+const inputRef = useTemplateRef<HTMLInputElement>('input')
 const isSecureVisible = ref(false)
 
 const updateModelValue = (value: string | undefined): void => {
@@ -261,7 +261,7 @@ const clearValue = () => {
   if (typeof props.modelValue === 'string') updateModelValue('')
   else updateModelValue(undefined)
 
-  input.value?.focus()
+  inputRef.value?.focus()
 
   emit('click:clear')
 }
@@ -269,11 +269,11 @@ const clearValue = () => {
 const focus = (): void => {
   if (props.disabled || props.readonly || props.unclickable) return
 
-  input.value?.focus()
+  inputRef.value?.focus()
 }
 
 const blur = (): void => {
-  input.value?.blur()
+  inputRef.value?.blur()
 }
 
 const checkPermission = async (): Promise<boolean> => {

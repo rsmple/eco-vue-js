@@ -9,7 +9,7 @@
     <InfiniteListButton
       v-if="isPreviousButtonVisible"
       @click="addPreviousPage()"
-      @check="infiniteScroll?.checkIsScrollUp"
+      @check="infiniteScrollRef?.checkIsScrollUp()"
     />
 
     <InfiniteListPage
@@ -72,13 +72,13 @@
     <InfiniteListButton
       v-if="count !== 0 && nextPage"
       @click="addNextPage"
-      @check="infiniteScroll?.checkIsScrollDown"
+      @check="infiniteScrollRef?.checkIsScrollDown()"
     />
   </InfiniteListScroll>
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {computed, nextTick, ref, toRef, watch} from 'vue'
+import {computed, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import {isEqualObj} from '@/utils/utils'
 
@@ -140,7 +140,7 @@ const emit = defineEmits<{
   (e: 'update:selected', values: Model[]): void
 }>()
 
-const infiniteScroll = ref<ComponentInstance<typeof InfiniteListScroll> | undefined>()
+const infiniteScrollRef = useTemplateRef('infiniteScroll')
 
 const pages = ref<number[]>([(props.queryParams as {page?: number}).page ?? 1])
 const pagesCount = ref(1)

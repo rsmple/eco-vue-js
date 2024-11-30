@@ -119,7 +119,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {TransitionGroup, computed, nextTick, onBeforeUnmount, onMounted, ref, toRef, watch} from 'vue'
+import {TransitionGroup, computed, nextTick, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import {ApiError} from '@/main'
 
@@ -179,7 +179,7 @@ const emit = defineEmits<{
   (e: 'fetched'): void
 }>()
 
-const element = ref<HTMLElement>()
+const elementRef = useTemplateRef('element')
 const resultElement = ref<HTMLDivElement[]>([])
 const isIntersecting = ref(false)
 const hasData = ref(false)
@@ -239,7 +239,7 @@ const scrollTo = (index?: number) => {
     }
   }
 
-  element.value?.scrollIntoView({block: 'center', behavior: 'smooth'})
+  elementRef.value?.scrollIntoView({block: 'center', behavior: 'smooth'})
 }
 
 let timeout: NodeJS.Timeout | null = null
@@ -277,14 +277,14 @@ let intersectionObserver: IntersectionObserver | undefined
 
 const observerCb = (entries: IntersectionObserverEntry[]) => {
   isIntersecting.value = entries.some(entry => {
-    if (entry.target === element.value) {
+    if (entry.target === elementRef.value) {
       return entry.isIntersecting
     }
   })
 }
 
 onMounted(() => {
-  if (props.refetchInterval && element.value) {
+  if (props.refetchInterval && elementRef.value) {
     intersectionObserver = new IntersectionObserver(
       observerCb,
       {
@@ -294,10 +294,10 @@ onMounted(() => {
       },
     )
 
-    intersectionObserver.observe(element.value)
+    intersectionObserver.observe(elementRef.value)
   }
 
-  height = element.value?.getBoundingClientRect()?.height ?? 0
+  height = elementRef.value?.getBoundingClientRect()?.height ?? 0
 
   if (height === 0) return
   if (!props.firstPage) return
@@ -322,7 +322,7 @@ watch(data, async (_, oldValue) => {
 
   await nextTick()
 
-  const newHeight = (element.value?.getBoundingClientRect().height ?? 0) - height
+  const newHeight = (elementRef.value?.getBoundingClientRect().height ?? 0) - height
 
   if (newHeight === 0) return
   if (!props.firstPage) return

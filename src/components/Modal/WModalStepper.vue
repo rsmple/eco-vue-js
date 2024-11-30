@@ -71,7 +71,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, useSlots, watch} from 'vue'
+import {computed, ref, useSlots, useTemplateRef, watch} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
 import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
@@ -98,7 +98,7 @@ const emit = defineEmits<{
 
 const slots = useSlots()
 
-const tabs = ref<ComponentInstance<typeof WTabs> | undefined>()
+const tabsRef = useTemplateRef('tabs')
 
 const defaultSlots = computed(() => slots.default?.().filter(item => typeof item.type !== 'symbol') ?? [])
 
@@ -107,13 +107,13 @@ const current = ref<number>(0)
 const previous = (): void => {
   emit('previous', current.value)
 
-  tabs.value?.previous()
+  tabsRef.value?.previous()
 }
 
 const next = (): void => {
   emit('next', current.value)
 
-  const errorMessage = tabs.value?.validate(current.value)
+  const errorMessage = tabsRef.value?.validate(current.value)
 
   if (errorMessage) {
     Notify.warn({title: 'Form contains invalid values', caption: errorMessage.length < 200 ? errorMessage : undefined})
@@ -121,7 +121,7 @@ const next = (): void => {
     return
   }
 
-  tabs.value?.next()
+  tabsRef.value?.next()
 }
 
 watch(current, value => {

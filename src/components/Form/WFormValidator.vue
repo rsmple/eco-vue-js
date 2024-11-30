@@ -1,7 +1,7 @@
 <template>
   <component
     :is="component"
-    ref="componentRef"
+    ref="component"
     :error-message="errorMessage"
     :has-changes="noChanges ? undefined : hasChanges"
     @update:model-value="_validateOnUpdate"
@@ -14,7 +14,7 @@
 <script lang="ts" setup>
 import type {ValidatePath} from './use/useFormValidateMap'
 
-import {computed, inject, onBeforeMount, onBeforeUnmount, ref, useSlots, watch} from 'vue'
+import {computed, inject, onBeforeMount, onBeforeUnmount, ref, useSlots, useTemplateRef, watch} from 'vue'
 
 import {useIsInsideTab} from '@/components/Tabs/use/useIsInsideTab'
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
@@ -49,7 +49,7 @@ const {isInsideTab} = useIsInsideTab()
 
 const slots = useSlots()
 const component = computed<ComponentInstance<ThisType<unknown>>>(() => slots.default?.()[0])
-const componentRef = ref<ComponentInstance<ThisType<unknown>> | undefined>()
+const componentRef = useTemplateRef<ComponentInstance<ThisType<unknown>>>('component')
 
 const modelValue = computed<Parameters<ValidateFn>[0]>(() => {
   const props = component.value?.props

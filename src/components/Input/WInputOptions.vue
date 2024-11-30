@@ -81,7 +81,7 @@
 <script lang="ts" setup generic="Type extends InputType = 'text', Option extends Record<string, any> & {id: number} = Record<string, any> & {id: number}">
 import type {InputOptionsProps} from './types'
 
-import {computed, nextTick, ref, toRef, watch} from 'vue'
+import {computed, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
@@ -97,7 +97,7 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = ref(false)
-const input = ref<ComponentInstance<typeof WInputSuggest<Type>> | undefined>()
+const inputRef = useTemplateRef('input')
 const cursor = ref<number>(-1)
 const isCursorLocked = ref(false)
 const lastIndex = computed(() => props.options.length)
@@ -178,17 +178,17 @@ const updateModelValue = (value: ModelValue): void => {
 }
 
 const focus = () => {
-  input.value?.focus()
+  inputRef.value?.focus()
 }
 
 const blur = () => {
-  input.value?.blur()
+  inputRef.value?.blur()
 }
 
 watch(toRef(props, 'modelValue'), async () => {
   await nextTick()
 
-  input.value?.updateDropdown()
+  inputRef.value?.updateDropdown()
 })
 
 defineExpose({

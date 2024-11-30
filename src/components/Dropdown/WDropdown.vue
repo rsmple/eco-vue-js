@@ -18,7 +18,7 @@
 <script lang="ts" setup>
 import type {DropdownProps} from './types'
 
-import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, toRef, watch} from 'vue'
+import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import DOMListenerContainer from '@/utils/DOMListenerContainer'
 import {getAllScrollParents, isClientSide} from '@/utils/utils'
@@ -31,7 +31,7 @@ const emit = defineEmits<{
   (e: 'update:rect'): void
 }>()
 
-const dropdown = ref<HTMLDivElement>()
+const dropdownRef = useTemplateRef('dropdown')
 
 let parentRect: DOMRect | null = null
 let horizontalGetter: HorizontalGetter | null = null
@@ -90,10 +90,10 @@ let domListenerContainer: DOMListenerContainer
 let requestAnimationFrameId: number | null = null
 
 onMounted(() => {
-  if (!isClientSide) return
+  if (!isClientSide || !dropdownRef.value) return
 
   domListenerContainer = new DOMListenerContainer(
-    [document, window, ...getAllScrollParents(dropdown.value)],
+    [document, window, ...getAllScrollParents(dropdownRef.value)],
     ['scroll', 'touchmove', 'resize'],
     () => {
       if (requestAnimationFrameId) window.cancelAnimationFrame(requestAnimationFrameId)

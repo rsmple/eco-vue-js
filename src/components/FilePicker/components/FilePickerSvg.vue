@@ -10,7 +10,7 @@
     :height="svgHeight"
   >
     <rect
-      ref="svgRect"
+      ref="rect"
       :x="strokeWidth / 2"
       :y="strokeWidth / 2"
       :width="rectWidth"
@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onBeforeMount, ref, toRef, watch} from 'vue'
+import {computed, onBeforeMount, ref, toRef, useTemplateRef, watch} from 'vue'
 
 const props = defineProps<{
   svgWidth: number
@@ -48,14 +48,14 @@ const lengthList = Array(8).fill(undefined).map((_, index) => (7 + index * 2) * 
 
 const borderRaduis = ref(12)
 const strokeWidth = ref(4)
-const svgRect = ref<SVGRectElement | undefined>()
+const rectRef = useTemplateRef('rect')
 const fraction = ref(48)
 const fractionShift = ref(0)
 
 const rectWidth = computed(() => props.svgWidth - strokeWidth.value)
 const rectHeight = computed(() => props.svgHeight - strokeWidth.value)
 const roundedHalf = computed(() => 12 * Math.PI / 2)
-const pathLength = computed(() => svgRect.value?.getTotalLength() ?? 480)
+const pathLength = computed(() => rectRef.value?.getTotalLength() ?? 480)
 const segmentLength = computed(() => pathLength.value / fraction.value)
 const dashoffset = computed(() => (segmentLength.value + roundedHalf.value) / 2)
 

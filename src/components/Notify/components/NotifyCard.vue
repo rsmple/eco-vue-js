@@ -65,7 +65,7 @@
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
 
-import {type StyleValue, computed, ref, watch} from 'vue'
+import {type StyleValue, computed, ref, useTemplateRef, watch} from 'vue'
 import {useRouter} from 'vue-router'
 
 import WButton from '@/components/Button/WButton.vue'
@@ -102,7 +102,7 @@ defineEmits<{
   (e: 'click:close'): void
 }>()
 
-const element = ref<HTMLElement | undefined>()
+const elementRef = useTemplateRef('element')
 const height = ref<number | undefined>()
 
 const router = useRouter()
@@ -117,7 +117,7 @@ const elementStyles = computed<StyleValue | undefined>(() => {
   }
 })
 
-watch(element, value => {
+watch(elementRef, value => {
   if (!value) return
 
   height.value = value.getBoundingClientRect().height || undefined

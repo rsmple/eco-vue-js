@@ -15,7 +15,6 @@
       >
         <div
           v-if="isOpen"
-          ref="wrapper"
           class="
             bg-primary-light dark:bg-primary-darkest no-scrollbar fixed left-0 top-0 z-[1000] size-full snap-y snap-mandatory snap-always
             overflow-scroll overflow-y-auto overscroll-contain scroll-smooth bg-opacity-40 backdrop-blur dark:bg-opacity-40
@@ -31,10 +30,7 @@
             ref="content"
             class="height-[90%] bg-default dark:bg-default-dark relative grid snap-end grid-cols-[1fr] grid-rows-[auto,1fr] rounded-t-3xl shadow-md"
           >
-            <div
-              ref="toggle"
-              class="px-3"
-            >
+            <div class="px-3">
               <div class="flex h-9 items-center justify-center">
                 <div
                   class="h-1 w-12 rounded-sm"
@@ -51,10 +47,7 @@
               />
             </div>
 
-            <div
-              ref="container"
-              class="overflow-y-auto overflow-x-hidden overscroll-contain"
-            >
+            <div class="overflow-y-auto overflow-x-hidden overscroll-contain">
               <slot name="content" />
             </div>
 
@@ -67,7 +60,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeUnmount, ref, watch} from 'vue'
+import {onBeforeUnmount, ref, useTemplateRef, watch} from 'vue'
 
 defineProps<{
   isOpen: boolean
@@ -77,25 +70,22 @@ const emit = defineEmits<{
   (e: 'close'): void
 }>()
 
-const toggle = ref<HTMLDivElement | undefined>()
-const wrapper = ref<HTMLDivElement | undefined>()
-const container = ref<HTMLDivElement | undefined>()
-const backdrop = ref<HTMLDivElement | undefined>()
-const content = ref<HTMLDivElement | undefined>()
+const backdropRef = useTemplateRef('backdrop')
+const contentRef = useTemplateRef('content')
 
 const swipeStarted = ref(false)
 
 const hide = () => {
-  backdrop.value?.scrollIntoView({behavior: 'smooth', block: 'start'})
+  backdropRef.value?.scrollIntoView({behavior: 'smooth', block: 'start'})
 }
 
 const show = () => {
-  content.value?.scrollIntoView({behavior: 'smooth', block: 'end'})
+  contentRef.value?.scrollIntoView({behavior: 'smooth', block: 'end'})
 }
 
 const observerCb = (entries: IntersectionObserverEntry[]) => {
   entries.forEach(entry => {
-    if (entry.target === backdrop.value && entry.isIntersecting) {
+    if (entry.target === backdropRef.value && entry.isIntersecting) {
       emit('close')
     }
   })
@@ -108,7 +98,7 @@ const observer = new IntersectionObserver(observerCb, {
 
 let timeout: NodeJS.Timeout
 
-watch(backdrop, (value, oldValue) => {
+watch(backdropRef, (value, oldValue) => {
   if (oldValue) observer.unobserve(oldValue)
 
   if (value) {

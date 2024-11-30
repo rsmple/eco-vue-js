@@ -8,15 +8,15 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue'
+import {onMounted, useTemplateRef} from 'vue'
 
 defineEmits<{
   (e: 'click', value: MouseEvent): void
 }>()
 
-const closeButton = ref<HTMLButtonElement | undefined>()
+const closeButtonRef = useTemplateRef('closeButton')
 
 onMounted(() => {
-  closeButton.value?.focus()
+  closeButtonRef.value?.focus()
 })
 </script>

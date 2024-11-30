@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, ref, toRef, watch} from 'vue'
+import {nextTick, toRef, useTemplateRef, watch} from 'vue'
 
 import {useTabItemActiveListener} from '../use/useTabItemActiveListener'
 
@@ -22,12 +22,12 @@ const emit = defineEmits<{
 
 const {callListeners} = useTabItemActiveListener()
 
-const element = ref<HTMLDivElement | undefined>()
+const elementRef = useTemplateRef('element')
 
 const emitHeight = (): void => {
-  if (!element.value) return
+  if (!elementRef.value) return
 
-  emit('update:height', element.value.offsetHeight)
+  emit('update:height', elementRef.value.offsetHeight)
 }
 
 watch(toRef(props, 'isActive'), async value => {

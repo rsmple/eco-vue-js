@@ -8,7 +8,7 @@
     :class="$attrs.class"
     @update:model-value="updateInputValue"
     @close="formatModelValue(modelValue)"
-    @keypress:enter="inputComponent?.blur()"
+    @keypress:enter="inputComponentRef?.blur()"
   >
     <template
       v-if="$slots.title"
@@ -51,7 +51,7 @@
 <script lang="ts" setup>
 import type {InputDateProps} from './types'
 
-import {ref, watch} from 'vue'
+import {ref, useTemplateRef, watch} from 'vue'
 
 import WDatePickerSingle from '@/components/DatePicker/WDatePickerSingle.vue'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
@@ -77,7 +77,7 @@ const emit = defineEmits<{
   (e: 'update:model-value', value: Date | undefined): void
 }>()
 
-const inputComponent = ref<ComponentInstance<typeof WInputSuggest<'text'>> | undefined>()
+const inputComponentRef = useTemplateRef('inputComponent')
 
 const inputValue = ref<string>(props.modelValue ? dateFormat(props.modelValue) : '')
 

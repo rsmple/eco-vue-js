@@ -150,7 +150,7 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>">
 import type {SelectOptionComponent, SelectOptionComponentProps, SelectProps} from './types'
 
-import {type Ref, computed, nextTick, ref, toRef, watch} from 'vue'
+import {type Ref, computed, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
@@ -175,7 +175,7 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = ref(false)
-const input = ref<ComponentInstance<typeof WInputSuggest<'text'>> | undefined>()
+const inputRef = useTemplateRef('input')
 const cursor = ref<number>(0)
 const isCursorLocked = ref(false)
 const search = ref('')
@@ -352,11 +352,11 @@ const create = async (value: string) => {
 }
 
 const focus = () => {
-  input.value?.focus()
+  inputRef.value?.focus()
 }
 
 const blur = () => {
-  input.value?.blur()
+  inputRef.value?.blur()
 }
 
 const setSearch = (value: string): void => {
@@ -377,7 +377,7 @@ if (props.useQueryFnDefault) {
 watch(() => props.modelValue, async () => {
   await nextTick()
 
-  input.value?.updateDropdown()
+  inputRef.value?.updateDropdown()
 })
 
 watch(queryError, error => {

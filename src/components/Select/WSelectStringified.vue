@@ -47,7 +47,7 @@
 <script lang="ts" setup generic="Model extends string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>">
 import type {SelectOptionComponent, SelectStringifiedProps} from './types'
 
-import {computed, ref} from 'vue'
+import {computed, useTemplateRef} from 'vue'
 
 import WSelect from '@/components/Select/WSelect.vue'
 
@@ -61,7 +61,7 @@ const emit = defineEmits<{
   (e: 'init-model'): void
 }>()
 
-const selectComponent = ref<ComponentInstance<typeof WSelect<Model, Data, QueryParamsOptions, OptionComponent>> | undefined>()
+const selectComponentRef = useTemplateRef('selectComponent')
 
 const arrayValue = computed<string[]>(() => props.modelValue !== null ? props.modelValue.split(props.divider) : [])
 
@@ -82,7 +82,7 @@ const updateModelValue = (value: string, isSelect: boolean): void => {
 }
 
 const blur = () => {
-  selectComponent.value?.blur()
+  selectComponentRef.value?.blur()
 }
 
 defineExpose({

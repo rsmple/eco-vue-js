@@ -135,11 +135,11 @@ const defaultSlots = computed(() => (props.customSlots ?? slots.default?.() ?? [
 
 const current = ref(props.initTab ?? 0)
 const isDirect = ref(true)
-const button = ref<HTMLButtonElement[]>([])
+const buttonRef = useTemplateRef<HTMLButtonElement[]>('button')
 const indicatorStyle = ref<Record<string, string> | undefined>(undefined)
 const minHeight = ref(0)
-const tabItem = ref<ComponentInstance<typeof TabItem>[]>([])
-const form = ref<ComponentInstance<typeof WForm>[]>([])
+const tabItemRef = useTemplateRef('tabItem')
+const formRef = useTemplateRef('form')
 const buttonContainerRef = useTemplateRef('buttonContainer')
 
 const isValidMap = reactive<Record<number, boolean | undefined>>({})
@@ -163,7 +163,7 @@ const switchTab = throttle((index: number): void => {
 }, 200)
 
 const updateIndex = (value: number) => {
-  tabItem.value[current.value]?.emitHeight?.()
+  tabItemRef.value?.[current.value]?.emitHeight?.()
 
   setIndexDebounced(value)
 }
@@ -186,7 +186,7 @@ const previous = (): void => {
 const updateIndicator = (): void => {
   if (!props.names) return
 
-  const element = button.value[current.value]
+  const element = buttonRef.value?.[current.value]
 
   if (!element || !element.offsetWidth) return
 
@@ -214,15 +214,15 @@ const updateHeight = (value: number): void => {
 }
 
 const validate = (index: number, ...args: Parameters<ComponentInstance<typeof WForm>['validate']>): ReturnType<ComponentInstance<typeof WForm>['validate']> => {
-  return form?.value[index].validate(...args)
+  return formRef.value?.[index]?.validate(...args)
 }
 
 const invalidate = (index: number, ...args: Parameters<ComponentInstance<typeof WForm>['invalidate']>): ReturnType<ComponentInstance<typeof WForm>['invalidate']> => {
-  return form?.value[index].invalidate(...args)
+  return formRef.value?.[index]?.invalidate(...args)
 }
 
 const initModel = (index: number, ...args: Parameters<ComponentInstance<typeof WForm>['initModel']>): ReturnType<ComponentInstance<typeof WForm>['initModel']> => {
-  return form?.value[index].initModel(...args)
+  return formRef.value?.[index]?.initModel(...args)
 }
 
 const tabItemListenerInjected = inject(wTabItemListener, null)
@@ -233,11 +233,11 @@ watch(current, value => {
 
   updateIndicator()
 
-  if (buttonContainerRef.value && button.value[value]) {
+  if (buttonContainerRef.value && buttonRef.value?.[value]) {
     if (props.side) {
-      buttonContainerRef.value.scrollTo({top: (button.value[value].offsetTop - buttonContainerRef.value.offsetTop) / 2, behavior: 'smooth'})
+      buttonContainerRef.value.scrollTo({top: (buttonRef.value[value].offsetTop - buttonContainerRef.value.offsetTop) / 2, behavior: 'smooth'})
     } else {
-      buttonContainerRef.value.scrollTo({left: (button.value[value].offsetLeft - buttonContainerRef.value.offsetLeft) / 2, behavior: 'smooth'})
+      buttonContainerRef.value.scrollTo({left: (buttonRef.value[value].offsetLeft - buttonContainerRef.value.offsetLeft) / 2, behavior: 'smooth'})
     }
   }
 }, {immediate: true})

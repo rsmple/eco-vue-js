@@ -49,7 +49,7 @@
         no-margin
         class="w-full"
         :icon="markRaw(IconSearch)"
-        @click:clear="!isMobile && input?.close()"
+        @click:clear="!isMobile && inputRef?.close()"
         @close="closeSearch"
         @update:model-value="$emit('update:search', $event)"
       >
@@ -83,7 +83,7 @@
 </template>
 
 <script lang="ts" setup>
-import {markRaw, nextTick, onBeforeUnmount, onMounted, ref, toRef, watch} from 'vue'
+import {markRaw, nextTick, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import WInput from '@/components/Input/WInput.vue'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
@@ -112,7 +112,7 @@ defineEmits<{
 
 const isMobile = getIsMobile()
 
-const input = ref<ComponentInstance<typeof WInputSuggest> | undefined>()
+const inputRef = useTemplateRef<ComponentInstance<typeof WInputSuggest>>('input')
 
 const isTransparent = ref(false)
 const isSearchVisible = ref(false)
@@ -120,7 +120,7 @@ const isSearchVisible = ref(false)
 const openSearch = (): void => {
   isSearchVisible.value = true
 
-  nextTick().then(() => input.value?.focus())
+  nextTick().then(() => inputRef.value?.focus())
 }
 
 const closeSearch = (): void => {

@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string">
-import {onUnmounted, ref, watch, watchEffect} from 'vue'
+import {onUnmounted, useTemplateRef, watch, watchEffect} from 'vue'
 
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 
@@ -72,7 +72,7 @@ const emit = defineEmits<{
   (e: 'update:last'): void
 }>()
 
-const element = ref<HTMLDivElement>()
+const elementRef = useTemplateRef('element')
 
 const toggle = (): void => {
   if (props.skeleton || props.loading) return
@@ -82,7 +82,7 @@ const toggle = (): void => {
 }
 
 const scrollIntoView = () => {
-  element.value?.scrollIntoView({behavior: 'auto', block: 'center'})
+  elementRef.value?.scrollIntoView({behavior: 'auto', block: 'center'})
 }
 
 watch(() => props.isCursor, value => {

@@ -99,7 +99,7 @@
             >
               <component
                 :is="slot"
-                :scrolling-element="isMobile ? content?.parentElement : content"
+                :scrolling-element="isMobile ? contentRef?.parentElement : contentRef"
                 @close="close"
               />
             </template>
@@ -127,7 +127,7 @@
 <script lang="ts" setup generic="Type extends InputType = 'text'">
 import type {InputSuggestProps} from './types'
 
-import {computed, ref} from 'vue'
+import {computed, ref, useTemplateRef} from 'vue'
 
 import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
@@ -166,10 +166,10 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = ref(false)
-const dropdownMenu = ref<InstanceType<typeof WDropdownMenu> | undefined>()
-const input = ref<ComponentInstance<typeof WInput<Type>> | undefined>()
+const dropdownMenuRef = useTemplateRef('dropdownMenu')
+const inputRef = useTemplateRef('input')
+const contentRef = useTemplateRef('content')
 const isMobile = getIsMobile() || getIsTouchDevice()
-const content = ref<HTMLDivElement | undefined>()
 
 const isDisabled = computed(() => props.readonly || props.disabled)
 
@@ -190,15 +190,15 @@ const close = () => {
 const focus = () => {
   if (isMobile) open()
 
-  input.value?.focus()
+  inputRef.value?.focus()
 }
 
 const blur = () => {
-  input.value?.blur()
+  inputRef.value?.blur()
 }
 
 const updateDropdown = () => {
-  dropdownMenu.value?.updateDropdown?.()
+  if (dropdownMenuRef.value && 'updateDropdown' in dropdownMenuRef.value) dropdownMenuRef.value.updateDropdown()
 }
 
 defineExpose({

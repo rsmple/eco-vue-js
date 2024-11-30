@@ -78,7 +78,7 @@
 <script lang="ts" setup generic="Type extends InputType = 'text'">
 import type {InputAsyncProps} from './types'
 
-import {computed, nextTick, ref, toRef, watch} from 'vue'
+import {computed, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import WInput from '@/components/Input/WInput.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
@@ -105,7 +105,7 @@ const emit = defineEmits<{
 const focused = ref(false)
 const saved = ref(false)
 const value = ref<ModelValue | undefined>()
-const input = ref<ComponentInstance<typeof WInput<Type>> | undefined>()
+const inputRef = useTemplateRef('input')
 const errorMessageValue = ref<string | undefined>()
 const hasChangesValue = computed(() => props.modelValue !== value.value)
 const canSave = computed(() => (props.textSecure && focused.value) || hasChangesValue.value)
@@ -119,7 +119,7 @@ const reset = () => {
 const cancel = () => {
   reset()
 
-  input.value?.blur()
+  inputRef.value?.blur()
 }
 
 const toggle = async () => {
@@ -155,7 +155,7 @@ const close = () => {
       closeModal = null
 
       nextTick().then(() => {
-        if (focused.value) input.value?.focus()
+        if (focused.value) inputRef.value?.focus()
       })
     })
   } else {
@@ -168,14 +168,14 @@ const close = () => {
 const open = () => {
   if (props.disabled || props.loading) return
 
-  input.value?.focus()
+  inputRef.value?.focus()
 }
 
 watch(toRef(props, 'modelValue'), modelValue => {
   value.value = modelValue
 
   if (!props.placeholderSecure && saved.value) {
-    input.value?.blur()
+    inputRef.value?.blur()
 
     saved.value = false
   }
@@ -194,7 +194,7 @@ watch(value, (newValue: ModelValue | undefined): void => {
 const emitUpdateModelValue = (newValue: ModelValue | undefined) => {
   if (props.disabled || props.loading) return
   if (errorMessageValue.value) return
-  if (props.placeholderSecure) input.value?.blur()
+  if (props.placeholderSecure) inputRef.value?.blur()
 
   emit('update:modelValue', newValue)
 
