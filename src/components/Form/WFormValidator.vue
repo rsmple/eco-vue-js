@@ -1,6 +1,6 @@
 <template>
   <component
-    :is="component"
+    :is="componentSlot"
     ref="component"
     :error-message="errorMessage"
     :has-changes="noChanges ? undefined : hasChanges"
@@ -48,11 +48,11 @@ const unlistener = inject(wFormUnlistener, undefined)
 const {isInsideTab} = useIsInsideTab()
 
 const slots = useSlots()
-const component = computed<ComponentInstance<ThisType<unknown>>>(() => slots.default?.()[0])
+const componentSlot = computed<ComponentInstance<ThisType<unknown>>>(() => slots.default?.()[0])
 const componentRef = useTemplateRef<ComponentInstance<ThisType<unknown>>>('component')
 
 const modelValue = computed<Parameters<ValidateFn>[0]>(() => {
-  const props = component.value?.props
+  const props = componentSlot.value?.props
 
   if (!props) return undefined
 
@@ -68,8 +68,8 @@ const modelValue = computed<Parameters<ValidateFn>[0]>(() => {
 })
 
 const initModelValue = ref<Parameters<ValidateFn>[0]>()
-const required = computed<boolean | undefined>(() => component.value?.props?.required !== undefined ? component.value?.props?.required !== false : undefined)
-const title = computed<string | undefined>(() => props.title ?? component.value?.props?.title)
+const required = computed<boolean | undefined>(() => componentSlot.value?.props?.required !== undefined ? componentSlot.value?.props?.required !== false : undefined)
+const title = computed<string | undefined>(() => props.title ?? componentSlot.value?.props?.title)
 
 const errorMessage = ref<string | undefined | null>(null)
 
