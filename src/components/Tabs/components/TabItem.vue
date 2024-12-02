@@ -1,6 +1,6 @@
 <template>
   <div
-    v-show="isActive"
+    v-show="active"
     ref="element"
   >
     <slot />
@@ -8,16 +8,17 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, toRef, useTemplateRef, watch} from 'vue'
+import {nextTick, useTemplateRef, watch} from 'vue'
 
 import {useTabItemActiveListener} from '../use/useTabItemActiveListener'
 
 const props = defineProps<{
-  isActive: boolean
+  active: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:height', value: number): void
+  (e: 'update:active'): void
 }>()
 
 const {callListeners} = useTabItemActiveListener()
@@ -30,7 +31,9 @@ const emitHeight = (): void => {
   emit('update:height', elementRef.value.offsetHeight)
 }
 
-watch(toRef(props, 'isActive'), async value => {
+watch(() => props.active, async value => {
+  if (value) emit('update:active')
+
   if (value) await nextTick()
 
   emitHeight()

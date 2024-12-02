@@ -18,6 +18,7 @@ import {computed, inject, onBeforeMount, onBeforeUnmount, ref, useSlots, useTemp
 
 import {useIsInsideTab} from '@/components/Tabs/use/useIsInsideTab'
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
+import {debounce} from '@/main'
 import {validateRequired} from '@/utils/validate'
 
 import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
@@ -214,7 +215,9 @@ const scrollTo = () => {
   if (element instanceof HTMLDivElement) scrollToValidator(element)
 }
 
-useTabActiveListener(scrollTo)
+const scrollToDebounced = debounce(scrollTo, 300)
+
+useTabActiveListener(scrollToDebounced)
 
 watch(errorMessage, value => {
   if (value === null) return

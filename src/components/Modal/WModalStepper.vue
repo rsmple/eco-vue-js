@@ -2,7 +2,7 @@
   <WModalWrapper maximized>
     <template #title>
       <slot name="title">
-        {{ names?.[current] }}
+        {{ currentTitle }}
       </slot>
     </template>
 
@@ -11,7 +11,7 @@
         <div
           class="bg-primary-default dark:bg-primary-dark h-full transition-[width]"
           :style="{
-            width: (100 * (current + 1) / defaultSlots.length) + '%',
+            width: (100 * (current + 1) / tabsLength) + '%',
           }"
         />
       </div>
@@ -20,8 +20,11 @@
     <WTabs
       ref="tabs"
       :custom-slots="defaultSlots"
-      @update:current="current = $event"
+      no-header
+      @update:current-index="current = $event"
+      @update:current-title="currentTitle = $event"
       @update:has-changes="$emit('update:has-changes', $event)"
+      @update:tabs-length="tabsLength = $event"
     />
 
     <template #actions>
@@ -46,7 +49,7 @@
       </WButton>
 
       <WButton
-        v-if="current === defaultSlots.length - 1"
+        v-if="current === tabsLength - 1"
         :semantic-type="SemanticType.PRIMARY"
         :loading="loading"
         :disabled="disabled || disabledNext"
@@ -81,7 +84,6 @@ import {Notify} from '@/utils/Notify'
 import {SemanticType} from '@/utils/SemanticType'
 
 defineProps<{
-  names?: string[]
   loading?: boolean
   disabled?: boolean
   disabledNext?: boolean
@@ -100,9 +102,11 @@ const slots = useSlots()
 
 const tabsRef = useTemplateRef('tabs')
 
-const defaultSlots = computed(() => slots.default?.().filter(item => typeof item.type !== 'symbol') ?? [])
+const defaultSlots = computed(() => slots.default?.() ?? [])
 
+const tabsLength = ref(0)
 const current = ref<number>(0)
+const currentTitle = ref<string>()
 
 const previous = (): void => {
   emit('previous', current.value)

@@ -70,6 +70,7 @@ import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTabs from '@/components/Tabs/WTabs.vue'
 import WTabsColumns from '@/components/Tabs/WTabsColumns.vue'
+import WTabsItem from '@/components/Tabs/WTabsItem.vue'
 import WToggle from '@/components/Toggle/WToggle.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 import WTooltipContainer from '@/components/Tooltip/WTooltipContainer.vue'
@@ -147,6 +148,7 @@ export default {
     app.component('WSpinner', WSpinner)
     app.component('WTabs', WTabs)
     app.component('WTabsColumns', WTabsColumns)
+    app.component('WTabsItem', WTabsItem)
     app.component('WToggle', WToggle)
     app.component('WTooltip', WTooltip)
     app.component('WTooltipContainer', WTooltipContainer)
@@ -179,6 +181,7 @@ export {
   WFilePicker,
   WFilterWrapper,
   WForm,
+  WFormValidator,
   WFormAsyncButtonGroup,
   WFormAsyncInput,
   WFormAsyncSelect,
@@ -186,7 +189,6 @@ export {
   WFormAsyncSelectSingle,
   WFormAsyncSelectStringified,
   WFormAsyncToggle,
-  WFormValidator,
   WHeaderBar,
   WImageViewer,
   WInfiniteList,
@@ -224,6 +226,7 @@ export {
   WSpinner,
   WTabs,
   WTabsColumns,
+  WTabsItem,
   WToggle,
   WTooltip,
   WTooltipContainer,

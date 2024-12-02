@@ -7,56 +7,49 @@
     }"
   >
     <div
-      v-if="names"
+      v-if="!noHeader"
       ref="buttonContainer"
       class="no-scrollbar relative flex snap-x snap-mandatory snap-always overflow-x-auto overscroll-x-contain"
       :class="{
         'flex-col': side,
       }"
     >
-      <button
-        v-for="(_, index) in defaultSlots"
+      <TabTitleButton
+        v-for="(slot, index) in defaultSlots"
+        :key="slot.props?.name"
         ref="button"
-        :key="index"
-        class="
-          w-ripple w-ripple-hover relative flex flex-1 cursor-pointer
-          select-none snap-center items-center font-semibold outline-none transition-colors duration-500
-        "
-        :class="{
-          'text-description': current !== index && isValidMap[index] !== false,
-          'text-primary-default dark:text-primary-dark': current === index && isValidMap[index] !== false,
-          'text-negative dark:text-negative-dark': isValidMap[index] === false,
-          'h-10 justify-center text-center': !side,
-          'py-3 pr-4 text-start': side,
-        }"
-        @click="switchTab(index)"
+        :active="current === slot.props?.name"
+        :index="index"
+        :title="slot.props?.title"
+        :icon="slot.props?.icon"
+        :has-changes="hasChangesMap[slot.props?.name] === true"
+        :has-error="isValidMap[slot.props?.name] === false"
+        :side="side"
+        @update:indicator-style="indicatorStyle = $event"
+        @update:scroll-position="updateScrollPosition"
+        @click="switchTab(slot.props?.name)"
       >
-        <div class="relative whitespace-nowrap px-4">
-          <component
-            :is="icons?.[index]"
-            v-if="icons?.[index]"
-            class="-mt-1 inline"
-          />
+        <template
+          v-if="(slot.children as Record<string, Component>)?.title"
+          #title
+        >
+          <component :is="(slot.children as Record<string, Component>)?.title" />
+        </template>
 
-          {{ names[index] }}
-  
-          <Transition
-            enter-active-class="transition-opacity"
-            leave-active-class="transition-opacity"
-            enter-from-class="opacity-0"
-            leave-to-class="opacity-0"
-          >
-            <div
-              v-if="hasChangesMap[index]"
-              class="square-2 absolute right-0 top-0 rounded-full transition-colors duration-500"
-              :class="{
-                'bg-info dark:bg-info-dark': isValidMap[index] !== false,
-                'bg-negative dark:bg-negative-dark': isValidMap[index] === false,
-              }"
-            />
-          </Transition>
-        </div>
-      </button>
+        <template
+          v-if="(slot.children as Record<string, Component>)?.suffix"
+          #suffix
+        >
+          <component :is="(slot.children as Record<string, Component>)?.suffix" />
+        </template>
+
+        <template
+          v-if="(slot.children as Record<string, Component>)?.right"
+          #right
+        >
+          <component :is="(slot.children as Record<string, Component>)?.right" />
+        </template>
+      </TabTitleButton>
 
       <div
         class="absolute rounded-sm duration-500"
@@ -81,21 +74,22 @@
         :leave-to-class="lessTransitions || side ? 'opacity-0' : 'translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]'"
       >
         <TabItem
-          v-for="(slot, index) in defaultSlots"
+          v-for="slot in defaultSlots"
           ref="tabItem"
-          :key="index"
-          :is-active="index === current"
+          :key="slot.props?.name"
+          :active="slot.props?.name === current"
           class="width-full"
           @update:height="!disableMinHeight && updateHeight($event)"
+          @update:active="$emit('update:current-title', slot.props?.title)"
         >
           <WForm
             ref="form"
-            :name="namesForm?.[index] ?? index.toString()"
-            :title="names?.[index]"
-            @update:is-valid="updateIsValidMap(index, $event)"
-            @update:has-changes="hasChangesMap[index] = $event"
+            :name="slot.props?.name"
+            :title="slot.props?.title"
+            @update:is-valid="updateIsValidMap(slot.props?.name, $event)"
+            @update:has-changes="hasChangesMap[slot.props?.name] = $event"
           >
-            <component :is="slot" />
+            <component :is="(slot.children as Record<string, Component>)?.default" />
           </WForm>
         </TabItem>
       </TransitionGroup>
@@ -104,107 +98,109 @@
 </template>
 
 <script lang="ts" setup>
-import {type VNode, computed, inject, nextTick, onMounted, onUnmounted, reactive, ref, useSlots, useTemplateRef, watch} from 'vue'
+import {type CSSProperties, type Component, type VNode, computed, inject, nextTick, onMounted, onUnmounted, reactive, ref, useSlots, useTemplateRef, watch} from 'vue'
 
 import WForm from '@/components/Form/WForm.vue'
 
 import {debounce, throttle} from '@/utils/utils'
 
 import TabItem from './components/TabItem.vue'
+import TabTitleButton from './components/TabTitleButton.vue'
 import {wTabItemListener, wTabItemUnlistener} from './models/injection'
 
 const props = defineProps<{
-  names?: string[] | Record<number, string>
-  namesForm?: string[] | Record<number, string>
-  icons?: SVGComponent[] | Record<number, SVGComponent>
   customSlots?: VNode[]
   lessTransitions?: boolean
   initTab?: number
   side?: boolean
   disableMinHeight?: boolean
+  noHeader?: boolean
+  switchToNew?: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:current', value: number): void
+  (e: 'update:current', value: string): void
+  (e: 'update:current-index', value: number): void
   (e: 'update:has-changes', value: boolean): void
+  (e: 'update:current-title', value: string): void
+  (e: 'update:tabs-length', value: number): void
 }>()
 
 const slots = useSlots()
 
-const defaultSlots = computed(() => (props.customSlots ?? slots.default?.() ?? []).filter(item => typeof item.type !== 'symbol'))
+const buttonContainerRef = useTemplateRef('buttonContainer')
 
-const current = ref(props.initTab ?? 0)
+const defaultSlots = computed(() => {
+  const result: VNode[] = []
+
+  ;(props.customSlots ?? slots.default?.() ?? []).forEach(item => {
+    if (Array.isArray(item.children)) result.push(...item.children as VNode[])
+
+    if (typeof item.type === 'symbol') return
+
+    result.push(item)
+  })
+
+  return result
+})
+
+const defaultSlotsKeys = computed<string[]>(() => defaultSlots.value.map(item => item.props?.name))
+
+const current = ref<string>(defaultSlotsKeys.value[props.initTab ?? 0])
+const currentIndex = computed(() => defaultSlotsKeys.value.indexOf(current.value))
 const isDirect = ref(true)
-const buttonRef = useTemplateRef<HTMLButtonElement[]>('button')
-const indicatorStyle = ref<Record<string, string> | undefined>(undefined)
+const buttonRef = useTemplateRef('button')
+const indicatorStyle = ref<CSSProperties | undefined>(undefined)
 const minHeight = ref(0)
 const tabItemRef = useTemplateRef('tabItem')
 const formRef = useTemplateRef('form')
-const buttonContainerRef = useTemplateRef('buttonContainer')
 
-const isValidMap = reactive<Record<number, boolean | undefined>>({})
-const hasChangesMap = reactive<Record<number, boolean | undefined>>({})
+const isValidMap = reactive<Record<string, boolean | undefined>>({})
+const hasChangesMap = reactive<Record<string, boolean | undefined>>({})
 
 const hasChanges = computed<boolean>(() => Object.values(hasChangesMap).includes(true))
 
-const updateIsValidMap = (index: number, value: boolean | undefined): void => {
-  isValidMap[index] = value
+const updateIsValidMap = (key: string, value: boolean | undefined): void => {
+  isValidMap[key] = value
 
   nextTick()
     .then(() => {
-      if (value === false && isValidMap[current.value] !== false) switchTab(index)
+      if (value === false && isValidMap[current.value] !== false) switchTab(key)
     })
 }
 
-const switchTab = throttle((index: number): void => {
-  if (current.value === index) return
+const switchTab = throttle((key: string): void => {
+  if (current.value === key) return
 
-  updateIndex(index)
+  updateCurrent(key)
 }, 200)
 
-const updateIndex = (value: number) => {
-  tabItemRef.value?.[current.value]?.emitHeight?.()
+const updateCurrent = (value: string) => {
+  tabItemRef.value?.[currentIndex.value]?.emitHeight?.()
 
-  setIndexDebounced(value)
+  setCurrentDebounced(value)
 }
 
-const setIndexDebounced = debounce((value: number) => {
-  if (current.value === value || value < 0 || value > defaultSlots.value.length - 1) return
+const updateIndex = (value: number) => {
+  tabItemRef.value?.[currentIndex.value]?.emitHeight?.()
 
-  isDirect.value = current.value < value
+  setCurrentDebounced(defaultSlotsKeys.value[value])
+}
+
+const setCurrentDebounced = debounce((value: string) => {
+  if (current.value === value || !defaultSlotsKeys.value.includes(value)) return
+  if (!(defaultSlots.value[defaultSlotsKeys.value.indexOf(value)].children as Record<string, Component>)?.default) return
+
+  isDirect.value = defaultSlotsKeys.value.indexOf(current.value) < defaultSlotsKeys.value.indexOf(value)
   current.value = value
 }, 100)
 
 const next = (): void => {
-  switchTab(current.value + 1)
+  switchTab(defaultSlotsKeys.value[currentIndex.value + 1])
 }
 
 const previous = (): void => {
-  switchTab(current.value - 1)
-}
-
-const updateIndicator = (): void => {
-  if (!props.names) return
-
-  const element = buttonRef.value?.[current.value]
-
-  if (!element || !element.offsetWidth) return
-
-  if (props.side) {
-    indicatorStyle.value = {
-      height: element.offsetHeight + 'px',
-      top: element.offsetTop + 'px',
-      left: '0',
-      width: '0.25rem',
-    }
-  } else {
-    indicatorStyle.value = {
-      width: element.offsetWidth + 'px',
-      left: element.offsetLeft + 'px',
-      bottom: '0',
-      height: '0.25rem',
-    }
-  }
+  switchTab(defaultSlotsKeys.value[currentIndex.value - 1])
 }
 
 const updateHeight = (value: number): void => {
@@ -225,30 +221,58 @@ const initModel = (index: number, ...args: Parameters<ComponentInstance<typeof W
   return formRef.value?.[index]?.initModel(...args)
 }
 
+const updateIndicator = () => {
+  buttonRef.value?.forEach(item => item?.update())
+}
+
+const updateScrollPosition = (value: {left?: number, top?: number}) => {
+  if (!buttonContainerRef.value) return
+
+  if (props.side) {
+    if (buttonContainerRef.value.scrollHeight <= buttonContainerRef.value.offsetHeight) return
+
+    buttonContainerRef.value.scrollTo({top: ((value.top ?? 0) - buttonContainerRef.value.offsetTop) / 2, behavior: 'smooth'})
+  } else {
+    if (buttonContainerRef.value.scrollWidth <= buttonContainerRef.value.offsetWidth) return
+
+    buttonContainerRef.value.scrollTo({left: ((value.left ?? 0) - buttonContainerRef.value.offsetLeft) / 2, behavior: 'smooth'})
+  }
+}
+
 const tabItemListenerInjected = inject(wTabItemListener, null)
 const tabItemUnlistenerInjected = inject(wTabItemUnlistener, null)
 
 watch(current, value => {
   emit('update:current', value)
+}, {immediate: true})
 
-  updateIndicator()
-
-  if (buttonContainerRef.value && buttonRef.value?.[value]) {
-    if (props.side) {
-      buttonContainerRef.value.scrollTo({top: (buttonRef.value[value].offsetTop - buttonContainerRef.value.offsetTop) / 2, behavior: 'smooth'})
-    } else {
-      buttonContainerRef.value.scrollTo({left: (buttonRef.value[value].offsetLeft - buttonContainerRef.value.offsetLeft) / 2, behavior: 'smooth'})
-    }
-  }
+watch(currentIndex, value => {
+  emit('update:current-index', value)
 }, {immediate: true})
 
 watch(hasChanges, value => {
   emit('update:has-changes', value)
 }, {immediate: true})
 
-onMounted(() => {
-  updateIndicator()
+watch(defaultSlotsKeys, (newValue, oldValue) => {
+  const newIndex = newValue.findIndex(item => !oldValue.includes(item))
 
+  if (props.switchToNew && newIndex !== -1) {
+    switchTab(newValue[newIndex])
+    return
+  }
+
+  if (!newValue.includes(current.value)) {
+    switchTab(newValue[oldValue.indexOf(current.value) - 1])
+    return
+  }
+})
+
+watch(defaultSlotsKeys, value => {
+  emit('update:tabs-length', value.length)
+}, {immediate: true})
+
+onMounted(() => {
   tabItemListenerInjected?.(updateIndicator)
 })
 
@@ -257,6 +281,7 @@ onUnmounted(() => {
 })
 
 defineExpose({
+  updateCurrent,
   updateIndex,
   next,
   previous,

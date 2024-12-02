@@ -367,6 +367,9 @@
     "./dist/components/Tabs/WTabsColumns.vue": {
       "import": "./dist/components/Tabs/WTabsColumns.vue.js"
     },
+    "./dist/components/Tabs/WTabsItem.vue": {
+      "import": "./dist/components/Tabs/WTabsItem.vue.js"
+    },
     "./dist/components/Toggle/WToggle.vue": {
       "import": "./dist/components/Toggle/WToggle.vue.js"
     },
