@@ -6,5 +6,5 @@ export interface LinkProps {
 interface DefaultError extends Error {}
 
 export interface DefaultQueryConfig {
-  ApiError: DefaultError,
+  ApiError: DefaultError
 }

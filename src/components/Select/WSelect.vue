@@ -407,7 +407,7 @@ defineSlots<{
     selected: boolean
     model: boolean
     search?: string
-  }) => void,
+  }) => void
   right?: () => void
 }>()
 </script>

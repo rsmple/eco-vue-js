@@ -13,7 +13,7 @@ export type ModalComponent<Props> = Component<
   ComponentOptions,
   MethodOptions,
   {
-    'close:modal': () => void,
+    'close:modal': () => void
   }
 >
 

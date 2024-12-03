@@ -39,7 +39,7 @@ export type ListFieldNested<Data, QueryParams = unknown> = {
 }
 
 type FieldNestedEntity<Data, QueryParams = unknown, Key extends keyof PickByType<Data, NonNullable<unknown>> = keyof PickByType<Data, NonNullable<unknown>>> = {
-  keyEntity: Key,
+  keyEntity: Key
   fields: ListFields<Data[Key], QueryParams>
 }
 
@@ -58,7 +58,7 @@ export interface ListFieldNestedEntityGetter<Data, QueryParams = unknown, Inner 
 }
 
 type FieldNestedArray<Data, QueryParams = unknown, Key extends keyof PickByType<Data, Array<unknown>> = keyof PickByType<Data, Array<unknown>>> = {
-  keyArray: Key,
+  keyArray: Key
   fields: Data[Key] extends Array<infer Inner> ? ListFields<Inner, QueryParams> : []
   componentItem?: Data[Key] extends Array<infer Inner> ? Raw<FieldComponentItem<Inner>> : never
 }

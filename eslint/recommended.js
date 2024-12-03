@@ -1,3 +1,4 @@
+import stylisticTs from '@stylistic/eslint-plugin-ts'
 import pluginQuery from '@tanstack/eslint-plugin-query'
 import vueTsEslintConfig from '@vue/eslint-config-typescript'
 import importPlugin from 'eslint-plugin-import'
@@ -100,6 +101,12 @@ export default [
     files: ['**/*.{ts,js,vue}'],
     plugins: {
       'unused-imports': unusedImports,
+      '@stylistic/ts': stylisticTs,
+    },
+    languageOptions: {
+      parser: pluginVue.parser,
+      ecmaVersion: 'latest',
+      sourceType: 'module',
     },
     rules: {
       'semi': ['error', 'never'],
@@ -110,9 +117,6 @@ export default [
       'func-call-spacing': 'off',
       'template-curly-spacing': ['error', 'always'],
       'space-before-function-paren': ['error', {anonymous: 'always', named: 'never', asyncArrow: 'always'}],
-      'vue/no-lone-template': ['error', {
-        ignoreAccessible: false,
-      }],
       'no-undef': 'off',
       'default-case-last': 'off',
       'no-console': ['warn'],
@@ -122,6 +126,11 @@ export default [
       'tailwindcss/no-custom-classname': 'off',
       'tailwindcss/migration-from-tailwind-2': 'off',
       'no-multiple-empty-lines': [1, {max: 1, maxEOF: 0, maxBOF: 0}],
+      'keyword-spacing': 1,
+      'key-spacing': 1,
+      '@stylistic/ts/function-call-spacing': 1,
+      '@stylistic/ts/member-delimiter-style': [1, {multiline: {delimiter: 'none'}, singleline: {delimiter: 'comma'}}],
+      '@stylistic/ts/type-annotation-spacing': [1, {'before': false, 'after': true, 'overrides': {'arrow': {'before': true, 'after': true}}}],
     },
   },
 
@@ -166,6 +175,7 @@ export default [
         'singleline': 'always',
         'multiline': 'always',
       }],
+      'vue/no-lone-template': ['error', {ignoreAccessible: false}],
     },
   },
 ]

@@ -107,7 +107,7 @@ const props = withDefaults(
 )
 
 defineEmits<{
-  (e: 'update:search', value: string | undefined):void
+  (e: 'update:search', value: string | undefined): void
 }>()
 
 const isMobile = getIsMobile()
