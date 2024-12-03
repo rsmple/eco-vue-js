@@ -130,7 +130,9 @@ watch(() => props.index, () => {
 })
 
 onMounted(() => {
-  update()
+  document.fonts.ready.then(() => {
+    update()
+  })
 })
 
 defineExpose({
