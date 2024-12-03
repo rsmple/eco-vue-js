@@ -1,6 +1,6 @@
 <template>
   <div
-    class="mb-8 grid gap-4"
+    class="grid gap-4"
     :class="{
       'grid grid-cols-1': !side,
       'grid grid-cols-[auto,1fr] items-start': side,
@@ -64,21 +64,22 @@
     </div>
 
     <div
+      v-if="defaultSlots.some(slot => (slot.children as Record<string, Component>)?.default)"
       class="relative h-full transition-[min-height] duration-300"
       :style="{minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
     >
       <TransitionGroup
         enter-active-class="transition-[transform,opacity] duration-[250ms] w-full"
         leave-active-class="transition-[transform,opacity] duration-[250ms] w-full absolute top-0"
-        :enter-from-class="lessTransitions || side ? 'opacity-0' : 'translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]'"
-        :leave-to-class="lessTransitions || side ? 'opacity-0' : 'translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]'"
+        :enter-from-class="lessTransitions || side ? 'opacity-0' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]'"
+        :leave-to-class="lessTransitions || side ? 'opacity-0' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]'"
       >
         <TabItem
           v-for="slot in defaultSlots"
           ref="tabItem"
           :key="slot.props?.name"
           :active="slot.props?.name === current"
-          class="width-full"
+          :removable="slot.props?.removable"
           @update:height="!disableMinHeight && updateHeight($event)"
           @update:active="$emit('update:current-title', slot.props?.title)"
         >
@@ -98,6 +99,8 @@
 </template>
 
 <script lang="ts" setup>
+import type {TabsProps} from './types'
+
 import {type CSSProperties, type Component, type VNode, computed, inject, nextTick, onMounted, onUnmounted, reactive, ref, useSlots, useTemplateRef, watch} from 'vue'
 
 import WForm from '@/components/Form/WForm.vue'
@@ -108,15 +111,7 @@ import TabItem from './components/TabItem.vue'
 import TabTitleButton from './components/TabTitleButton.vue'
 import {wTabItemListener, wTabItemUnlistener} from './models/injection'
 
-const props = defineProps<{
-  customSlots?: VNode[]
-  lessTransitions?: boolean
-  initTab?: number
-  side?: boolean
-  disableMinHeight?: boolean
-  noHeader?: boolean
-  switchToNew?: boolean
-}>()
+const props = defineProps<TabsProps>()
 
 const emit = defineEmits<{
   (e: 'update:current', value: string): void
@@ -189,7 +184,7 @@ const updateIndex = (value: number) => {
 
 const setCurrentDebounced = debounce((value: string) => {
   if (current.value === value || !defaultSlotsKeys.value.includes(value)) return
-  if (!(defaultSlots.value[defaultSlotsKeys.value.indexOf(value)].children as Record<string, Component>)?.default) return
+  if (defaultSlots.value[defaultSlotsKeys.value.indexOf(value)].props?.disabled !== undefined) return
 
   isDirect.value = defaultSlotsKeys.value.indexOf(current.value) < defaultSlotsKeys.value.indexOf(value)
   current.value = value

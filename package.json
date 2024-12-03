@@ -335,6 +335,9 @@
     "./dist/components/Notify/WNotify.vue": {
       "import": "./dist/components/Notify/WNotify.vue.js"
     },
+    "./dist/components/Progress/WProgress.vue": {
+      "import": "./dist/components/Progress/WProgress.vue.js"
+    },
     "./dist/components/Select/WSelect.vue": {
       "import": "./dist/components/Select/WSelect.vue.js"
     },
@@ -370,6 +373,9 @@
     },
     "./dist/components/Tabs/WTabsItem.vue": {
       "import": "./dist/components/Tabs/WTabsItem.vue.js"
+    },
+    "./dist/components/Tabs/WTabsStepper.vue": {
+      "import": "./dist/components/Tabs/WTabsStepper.vue.js"
     },
     "./dist/components/Toggle/WToggle.vue": {
       "import": "./dist/components/Toggle/WToggle.vue.js"

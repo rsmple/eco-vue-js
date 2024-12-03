@@ -7,6 +7,8 @@ defineProps<{
   title: string
   name: string
   icon?: SVGComponent
+  disabled?: boolean
+  removable?: boolean
 }>()
 
 defineSlots<{

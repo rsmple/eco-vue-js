@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="!removable || active"
     v-show="active"
     ref="element"
   >
@@ -14,6 +15,7 @@ import {useTabItemActiveListener} from '../use/useTabItemActiveListener'
 
 const props = defineProps<{
   active: boolean
+  removable: boolean
 }>()
 
 const emit = defineEmits<{

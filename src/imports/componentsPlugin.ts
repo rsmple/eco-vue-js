@@ -60,6 +60,7 @@ import WNavItem from '@/components/Nav/WNavItem.vue'
 import WNavItemExpand from '@/components/Nav/WNavItemExpand.vue'
 import WNavItemTransition from '@/components/Nav/WNavItemTransition.vue'
 import WNotify from '@/components/Notify/WNotify.vue'
+import WProgress from '@/components/Progress/WProgress.vue'
 import WSelect from '@/components/Select/WSelect.vue'
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 import WSelectAsyncList from '@/components/Select/WSelectAsyncList.vue'
@@ -71,6 +72,7 @@ import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTabs from '@/components/Tabs/WTabs.vue'
 import WTabsColumns from '@/components/Tabs/WTabsColumns.vue'
 import WTabsItem from '@/components/Tabs/WTabsItem.vue'
+import WTabsStepper from '@/components/Tabs/WTabsStepper.vue'
 import WToggle from '@/components/Toggle/WToggle.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 import WTooltipContainer from '@/components/Tooltip/WTooltipContainer.vue'
@@ -138,6 +140,7 @@ export default {
     app.component('WNavItemExpand', WNavItemExpand)
     app.component('WNavItemTransition', WNavItemTransition)
     app.component('WNotify', WNotify)
+    app.component('WProgress', WProgress)
     app.component('WSelect', WSelect)
     app.component('WSelectAsync', WSelectAsync)
     app.component('WSelectAsyncList', WSelectAsyncList)
@@ -149,6 +152,7 @@ export default {
     app.component('WTabs', WTabs)
     app.component('WTabsColumns', WTabsColumns)
     app.component('WTabsItem', WTabsItem)
+    app.component('WTabsStepper', WTabsStepper)
     app.component('WToggle', WToggle)
     app.component('WTooltip', WTooltip)
     app.component('WTooltipContainer', WTooltipContainer)
@@ -181,6 +185,7 @@ export {
   WFilePicker,
   WFilterWrapper,
   WForm,
+  WFormValidator,
   WFormAsyncButtonGroup,
   WFormAsyncInput,
   WFormAsyncSelect,
@@ -188,7 +193,6 @@ export {
   WFormAsyncSelectSingle,
   WFormAsyncSelectStringified,
   WFormAsyncToggle,
-  WFormValidator,
   WHeaderBar,
   WImageViewer,
   WInfiniteList,
@@ -216,6 +220,7 @@ export {
   WNavItemExpand,
   WNavItemTransition,
   WNotify,
+  WProgress,
   WSelect,
   WSelectAsync,
   WSelectAsyncList,
@@ -227,6 +232,7 @@ export {
   WTabs,
   WTabsColumns,
   WTabsItem,
+  WTabsStepper,
   WToggle,
   WTooltip,
   WTooltipContainer,
