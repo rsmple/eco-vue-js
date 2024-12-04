@@ -1,23 +1,22 @@
 <template>
   <WTabs
     ref="tabs"
-    v-bind="{
-      ...props,
-      customSlots: defaultSlots
-    }"
+    v-bind="props"
     no-header
     @update:current="$emit('update:current', $event)"
     @update:current-index="current = $event; $emit('update:current-index', $event)"
     @update:current-title="$emit('update:current-title', $event)"
     @update:has-changes="$emit('update:has-changes', $event)"
     @update:tabs-length="tabsLength = $event"
-  />
+  >
+    <slot />
+  </WTabs>
 </template>
 
 <script lang="ts" setup>
 import type {TabsStepperProps} from './types'
 
-import {computed, ref, useSlots, useTemplateRef, watch} from 'vue'
+import {computed, ref, useTemplateRef, watch} from 'vue'
 
 import WTabs from '@/components/Tabs/WTabs.vue'
 
@@ -35,11 +34,7 @@ const emit = defineEmits<{
   (e: 'update:current-title', value: string): void
 }>()
 
-const slots = useSlots()
-
 const tabsRef = useTemplateRef('tabs')
-
-const defaultSlots = computed(() => props.customSlots ?? slots.default?.() ?? [])
 
 const tabsLength = ref(0)
 const current = ref<number>(0)

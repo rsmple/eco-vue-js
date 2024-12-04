@@ -90,7 +90,7 @@
             @update:is-valid="updateIsValidMap(slot.props?.name, $event)"
             @update:has-changes="hasChangesMap[slot.props?.name] = $event"
           >
-            <component :is="(slot.children as Record<string, Component>)?.default" />
+            <component :is="slot" />
           </WForm>
         </TabItem>
       </TransitionGroup>
@@ -125,18 +125,18 @@ const slots = useSlots()
 
 const buttonContainerRef = useTemplateRef('buttonContainer')
 
-const defaultSlots = computed(() => {
-  const result: VNode[] = []
+const defaultSlotsRaw = computed(() => props.customSlots ?? slots.default?.() ?? [])
 
-  ;(props.customSlots ?? slots.default?.() ?? []).forEach(item => {
-    if (Array.isArray(item.children)) result.push(...item.children as VNode[])
-
-    if (typeof item.type === 'symbol') return
-
-    result.push(item)
+const unwrapSlots = (slots: VNode[]): VNode[] => {
+  return slots.flatMap(slot => {
+    if (Array.isArray(slot?.children)) return unwrapSlots(slot.children as VNode[])
+    else if (typeof slot.type !== 'symbol') return slot
+    else return []
   })
+}
 
-  return result
+const defaultSlots = computed(() => {
+  return unwrapSlots(defaultSlotsRaw.value)
 })
 
 const defaultSlotsKeys = computed<string[]>(() => defaultSlots.value.map(item => item.props?.name))

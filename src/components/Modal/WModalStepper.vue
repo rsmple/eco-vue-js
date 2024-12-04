@@ -12,13 +12,14 @@
 
     <WTabsStepper
       ref="tabsStepper"
-      :custom-slots="defaultSlots"
       @update:first="first = $event"
       @update:last="last = $event"
       @update:current-title="currentTitle = $event"
       @update:has-changes="$emit('update:has-changes', $event)"
       @update:progress="progress = $event"
-    />
+    >
+      <slot />
+    </WTabsStepper>
 
     <template #actions>
       <WButton
@@ -67,7 +68,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, useSlots, useTemplateRef} from 'vue'
+import {ref, useTemplateRef} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
 import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
@@ -88,11 +89,7 @@ defineEmits<{
   (e: 'update:has-changes', value: boolean): void
 }>()
 
-const slots = useSlots()
-
 const tabsStepperRef = useTemplateRef('tabsStepper')
-
-const defaultSlots = computed(() => slots.default?.() ?? [])
 
 const first = ref(true)
 const last = ref(false)
