@@ -26,8 +26,8 @@
           :index="index"
           :title="slot.props?.title"
           :icon="slot.props?.icon"
-          :has-changes="hasChangesMap[slot.props?.name] === true"
-          :has-error="isValidMap[slot.props?.name] === false"
+          :has-changes="formRef?.[defaultSlots.indexOf(slot)]?.hasChanges === true"
+          :has-error="formRef?.[defaultSlots.indexOf(slot)]?.isValid === false"
           :side="side"
           :class="{
             'col-span-2 grid grid-cols-subgrid': side,
@@ -43,9 +43,9 @@
           >
             <component
               v-bind="{
-                hasError: isValidMap[slot.props?.name] === false,
-                hasChanges: hasChangesMap[slot.props?.name] === true,
-                hasValue: hasValueMap[slot.props?.name] === true,
+                hasError: formRef?.[defaultSlots.indexOf(slot)]?.isValid === false,
+                hasChanges: formRef?.[defaultSlots.indexOf(slot)]?.hasChanges === true,
+                hasValue: formRef?.[defaultSlots.indexOf(slot)]?.hasValue === true,
               }"
               :is="(slot.children as Record<string, Component>)?.title"
             />
@@ -57,9 +57,9 @@
           >
             <component
               v-bind="{
-                hasError: isValidMap[slot.props?.name] === false,
-                hasChanges: hasChangesMap[slot.props?.name] === true,
-                hasValue: hasValueMap[slot.props?.name] === true,
+                hasError: formRef?.[defaultSlots.indexOf(slot)]?.isValid === false,
+                hasChanges: formRef?.[defaultSlots.indexOf(slot)]?.hasChanges === true,
+                hasValue: formRef?.[defaultSlots.indexOf(slot)]?.hasValue === true,
               }"
               :is="(slot.children as Record<string, Component>)?.suffix" 
             />
@@ -71,9 +71,9 @@
           >
             <component
               v-bind="{
-                hasError: isValidMap[slot.props?.name] === false,
-                hasChanges: hasChangesMap[slot.props?.name] === true,
-                hasValue: hasValueMap[slot.props?.name] === true,
+                hasError: formRef?.[defaultSlots.indexOf(slot)]?.isValid === false,
+                hasChanges: formRef?.[defaultSlots.indexOf(slot)]?.hasChanges === true,
+                hasValue: formRef?.[defaultSlots.indexOf(slot)]?.hasValue === true,
               }"
               :is="(slot.children as Record<string, Component>)?.right"
             />
@@ -90,8 +90,8 @@
         class="absolute rounded-sm duration-500"
         :style="indicatorStyle"
         :class="{
-          'bg-primary-default dark:bg-primary-dark': isValidMap[current] !== false,
-          'bg-negative dark:bg-negative-dark': isValidMap[current] === false,
+          'bg-primary-default dark:bg-primary-dark': currentIsValud !== false,
+          'bg-negative dark:bg-negative-dark': currentIsValud === false,
           'transition-[left,width,background-color]': !side && indicatorStyle !== undefined,
           'transition-[top,height,background-color]': side && indicatorStyle !== undefined,
         }"
@@ -122,9 +122,7 @@
             ref="form"
             :name="slot.props?.name"
             :title="slot.props?.title"
-            @update:is-valid="updateIsValidMap(slot.props?.name, $event)"
-            @update:has-changes="hasChangesMap[slot.props?.name] = $event"
-            @update:has-value="hasValueMap[slot.props?.name] = $event ?? undefined"
+            @update:is-valid="$event === false && switchOnInvalid(slot.props?.name)"
           >
             <component :is="slot" />
           </WForm>
@@ -137,7 +135,7 @@
 <script lang="ts" setup>
 import type {TabsProps} from './types'
 
-import {type CSSProperties, type Component, type VNode, computed, inject, nextTick, onMounted, onUnmounted, reactive, ref, useSlots, useTemplateRef, watch} from 'vue'
+import {type CSSProperties, type Component, type VNode, computed, inject, onMounted, onUnmounted, ref, useSlots, useTemplateRef, watch} from 'vue'
 
 import WForm from '@/components/Form/WForm.vue'
 
@@ -194,20 +192,11 @@ const minHeight = ref(0)
 const tabItemRef = useTemplateRef('tabItem')
 const formRef = useTemplateRef('form')
 
-const isValidMap = reactive<Record<string, boolean | undefined>>({})
-const hasChangesMap = reactive<Record<string, boolean | undefined>>({})
-const hasValueMap = reactive<Record<string, boolean | undefined>>({})
+const currentIsValud = computed(() => formRef.value?.[defaultSlotsKeys.value.indexOf(current.value)]?.isValid)
 
-const hasChanges = computed<boolean>(() => Object.values(hasChangesMap).includes(true))
-
-const updateIsValidMap = (key: string, value: boolean | undefined): void => {
-  isValidMap[key] = value
-
-  nextTick()
-    .then(() => {
-      if (value === false && isValidMap[current.value] !== false) switchTab(key)
-    })
-}
+const switchOnInvalid = debounce((key: string): void => {
+  if (currentIsValud.value !== false) switchTab(key)
+}, 50)
 
 const switchTab = throttle((key: string): void => {
   if (current.value === key) return
@@ -288,10 +277,6 @@ watch(current, value => {
 
 watch(currentIndex, value => {
   emit('update:current-index', value)
-}, {immediate: true})
-
-watch(hasChanges, value => {
-  emit('update:has-changes', value)
 }, {immediate: true})
 
 watch(defaultSlotsKeys, (newValue, oldValue) => {

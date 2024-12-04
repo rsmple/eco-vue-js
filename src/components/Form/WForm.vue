@@ -1,6 +1,5 @@
 <template>
   <div>
-    {{ {hasValue} }}
     <slot />
   </div>
 </template>
@@ -68,6 +67,8 @@ onBeforeUnmount(() => {
 
 defineExpose({
   isValid,
+  hasChanges,
+  hasValue,
   validate,
   invalidate,
   initModel,
