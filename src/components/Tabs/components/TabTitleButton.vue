@@ -1,7 +1,7 @@
 <template>
   <button
     ref="button"
-    class="text-description grid cursor-pointer select-none snap-center grid-cols-[1fr,auto] font-semibold outline-none transition-colors duration-500"
+    class="text-description grid cursor-pointer select-none snap-center font-semibold outline-none transition-colors duration-500"
     @click="$emit('click', $event)"
   >
     <div
@@ -38,8 +38,8 @@
             </template>
           </Suspense>
           {{ title }}
-          <slot name="suffix" />
         </div>
+        <slot name="suffix" />
       </div>
   
       <Transition

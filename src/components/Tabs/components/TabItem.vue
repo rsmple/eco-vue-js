@@ -1,11 +1,13 @@
 <template>
-  <div
-    v-if="!removable || active"
-    v-show="active"
-    ref="element"
-  >
-    <slot />
-  </div>
+  <KeepAlive>
+    <div
+      v-if="!removable || active"
+      v-show="active"
+      ref="element"
+    >
+      <slot />
+    </div>
+  </KeepAlive>
 </template>
 
 <script lang="ts" setup>

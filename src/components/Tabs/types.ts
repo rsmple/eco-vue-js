@@ -11,3 +11,9 @@ export interface TabsProps {
 }
 
 export type TabsStepperProps = Omit<TabsProps, 'switchToNew' | 'noHeader' | 'side'>
+
+export type TabsItemScopedProps = {
+  hasError: boolean
+  hasChanges: boolean
+  hasValue: boolean
+}

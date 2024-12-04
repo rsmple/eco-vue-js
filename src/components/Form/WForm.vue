@@ -1,5 +1,6 @@
 <template>
   <div>
+    {{ {hasValue} }}
     <slot />
   </div>
 </template>
@@ -10,6 +11,7 @@ import {inject, onBeforeUnmount, provide, toRef, watch} from 'vue'
 import {wFormUnlistener} from './models/injection'
 import {useFormErrorMessageMap} from './use/useFormErrorMessageMap'
 import {useFormHasChangesMap} from './use/useFormHasChangesMap'
+import {useFormHasValueMap} from './use/useFormHasValueMap'
 import {useFormInitModelMap} from './use/useFormInitModelMap'
 import {useFormInvalidateMap} from './use/useFormInvalidateMap'
 import {useFormTitleMap} from './use/useFormTitleMap'
@@ -23,6 +25,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:is-valid', value: boolean | undefined): void
   (e: 'update:has-changes', value: boolean): void
+  (e: 'update:has-value', value: boolean | null): void
 }>()
 
 const name = toRef(props, 'name')
@@ -30,6 +33,7 @@ const name = toRef(props, 'name')
 const {titleGetter, titleMapUnlistener} = useFormTitleMap(name, toRef(props, 'title'))
 const {errorMessageMapUnlistener, isValid, errorMessage, errorMessageMap} = useFormErrorMessageMap(name, titleGetter)
 const {hasChangesMapUnlistener, hasChanges} = useFormHasChangesMap(name)
+const {hasValueMapUnlistener, hasValue} = useFormHasValueMap(name)
 const {validateMapUnlistener, validate} = useFormValidateMap(name, titleGetter, value => emit('update:is-valid', value))
 const {invalidateMapUnlistener, invalidate} = useFormInvalidateMap(name)
 const {initModelMapUnlistener, initModel} = useFormInitModelMap(name)
@@ -38,6 +42,7 @@ const unlistener = (key: string) => {
   titleMapUnlistener(key)
   errorMessageMapUnlistener(key)
   hasChangesMapUnlistener(key)
+  hasValueMapUnlistener(key)
   validateMapUnlistener(key)
   invalidateMapUnlistener(key)
   initModelMapUnlistener(key)
@@ -50,6 +55,8 @@ const unlistenerInjected = inject(wFormUnlistener, undefined)
 watch(errorMessageMap, () => emit('update:is-valid', isValid.value))
 
 watch(hasChanges, value => emit('update:has-changes', value))
+
+watch(hasValue, value => emit('update:has-value', value))
 
 onBeforeUnmount(() => {
   if (props.name) {

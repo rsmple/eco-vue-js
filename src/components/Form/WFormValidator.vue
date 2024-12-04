@@ -21,7 +21,7 @@ import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 import {debounce} from '@/main'
 import {validateRequired} from '@/utils/validate'
 
-import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
+import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormHasValueUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
 import {scrollToValidator} from './models/utils'
 
 const props = defineProps<{
@@ -35,12 +35,14 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:has-changes', value: boolean): void
+  (e: 'update:has-value', value: boolean | null): void
   (e: 'update:is-valid', value: boolean): void
 }>()
 
 const titleUpdater = inject(wFormTitleUpdater, undefined)
 const errorMessageUpdater = inject(wFormErrorMessageUpdater, undefined)
 const hasChangesUpdater = inject(wFormHasChangesUpdater, undefined)
+const hasValueUpdater = inject(wFormHasValueUpdater, undefined)
 const validateUpdater = inject(wFormValidateUpdater, undefined)
 const invalidateUpdater = inject(wFormInvalidateUpdater, undefined)
 const initModelUpdater = inject(wFormInitModelUpdater, undefined)
@@ -77,13 +79,21 @@ const errorMessage = ref<string | undefined | null>(null)
 const hasChanges = ref<boolean>(false)
 const hasBeenValidated = ref<boolean>(false)
 
+const hasValue = computed<boolean | null>(() => {
+  if (!required.value) return null
+
+  if (Array.isArray(modelValue.value)) return modelValue.value.length !== 0
+
+  return modelValue.value !== undefined && modelValue.value !== null && modelValue.value !== ''
+})
+
 const requiredSymbols = computed<string[]>(() => props.requiredSymbols?.split('') ?? [])
 
 const _updateHasChanges = (value: Parameters<ValidateFn>[0]): void => {
   if (initModelValue.value === undefined) {
     hasChanges.value = value !== undefined && value !== ''
   } else {
-    if (value instanceof Array && initModelValue.value instanceof Array) {
+    if (Array.isArray(value) && Array.isArray(initModelValue.value)) {
       const oldValue = initModelValue.value
       const newValue = value
 
@@ -236,6 +246,14 @@ watch(hasChanges, value => {
 
   emit('update:has-changes', value)
 })
+
+watch(hasValue, value => {
+  if (props.name) {
+    hasValueUpdater?.(props.name, value)
+  }
+
+  emit('update:has-value', value)
+}, {immediate: true})
 
 watch(title, value => {
   if (props.name) {

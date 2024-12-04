@@ -9,47 +9,82 @@
     <div
       v-if="!noHeader"
       ref="buttonContainer"
-      class="no-scrollbar relative flex snap-x snap-mandatory snap-always overflow-x-auto overscroll-x-contain"
+      class="no-scrollbar relative snap-x snap-mandatory snap-always overflow-x-auto overscroll-x-contain"
       :class="{
-        'flex-col': side,
+        'grid grid-cols-[1fr,auto]': side,
+        'flex': !side
       }"
     >
-      <TabTitleButton
-        v-for="(slot, index) in defaultSlots"
+      <template
+        v-for="(slot, index) in defaultSlotsAll"
         :key="slot.props?.name"
-        ref="button"
-        :active="current === slot.props?.name"
-        :index="index"
-        :title="slot.props?.title"
-        :icon="slot.props?.icon"
-        :has-changes="hasChangesMap[slot.props?.name] === true"
-        :has-error="isValidMap[slot.props?.name] === false"
-        :side="side"
-        @update:indicator-style="indicatorStyle = $event"
-        @update:scroll-position="updateScrollPosition"
-        @click="switchTab(slot.props?.name)"
       >
-        <template
-          v-if="(slot.children as Record<string, Component>)?.title"
-          #title
+        <TabTitleButton
+          v-if="isTabItem(slot)"
+          ref="button"
+          :active="current === slot.props?.name"
+          :index="index"
+          :title="slot.props?.title"
+          :icon="slot.props?.icon"
+          :has-changes="hasChangesMap[slot.props?.name] === true"
+          :has-error="isValidMap[slot.props?.name] === false"
+          :side="side"
+          :class="{
+            'col-span-2 grid grid-cols-subgrid': side,
+            'grid-cols-[1fr,auto]': !side
+          }"
+          @update:indicator-style="indicatorStyle = $event"
+          @update:scroll-position="updateScrollPosition"
+          @click="switchTab(slot.props?.name)"
         >
-          <component :is="(slot.children as Record<string, Component>)?.title" />
-        </template>
+          <template
+            v-if="(slot.children as Record<string, Component>)?.title"
+            #title
+          >
+            <component
+              v-bind="{
+                hasError: isValidMap[slot.props?.name] === false,
+                hasChanges: hasChangesMap[slot.props?.name] === true,
+                hasValue: hasValueMap[slot.props?.name] === true,
+              }"
+              :is="(slot.children as Record<string, Component>)?.title"
+            />
+          </template>
 
-        <template
-          v-if="(slot.children as Record<string, Component>)?.suffix"
-          #suffix
-        >
-          <component :is="(slot.children as Record<string, Component>)?.suffix" />
-        </template>
+          <template
+            v-if="(slot.children as Record<string, Component>)?.suffix"
+            #suffix
+          >
+            <component
+              v-bind="{
+                hasError: isValidMap[slot.props?.name] === false,
+                hasChanges: hasChangesMap[slot.props?.name] === true,
+                hasValue: hasValueMap[slot.props?.name] === true,
+              }"
+              :is="(slot.children as Record<string, Component>)?.suffix" 
+            />
+          </template>
 
-        <template
-          v-if="(slot.children as Record<string, Component>)?.right"
-          #right
-        >
-          <component :is="(slot.children as Record<string, Component>)?.right" />
-        </template>
-      </TabTitleButton>
+          <template
+            v-if="(slot.children as Record<string, Component>)?.right"
+            #right
+          >
+            <component
+              v-bind="{
+                hasError: isValidMap[slot.props?.name] === false,
+                hasChanges: hasChangesMap[slot.props?.name] === true,
+                hasValue: hasValueMap[slot.props?.name] === true,
+              }"
+              :is="(slot.children as Record<string, Component>)?.right"
+            />
+          </template>
+        </TabTitleButton>
+
+        <component
+          :is="slot"
+          v-else
+        />
+      </template>
 
       <div
         class="absolute rounded-sm duration-500"
@@ -89,6 +124,7 @@
             :title="slot.props?.title"
             @update:is-valid="updateIsValidMap(slot.props?.name, $event)"
             @update:has-changes="hasChangesMap[slot.props?.name] = $event"
+            @update:has-value="hasValueMap[slot.props?.name] = $event ?? undefined"
           >
             <component :is="slot" />
           </WForm>
@@ -135,8 +171,16 @@ const unwrapSlots = (slots: VNode[]): VNode[] => {
   })
 }
 
-const defaultSlots = computed(() => {
+const isTabItem = (slot: VNode): boolean => {
+  return slot.type instanceof Object && '__name' in slot.type && slot.type.__name === 'WTabsItem'
+}
+
+const defaultSlotsAll = computed(() => {
   return unwrapSlots(defaultSlotsRaw.value)
+})
+
+const defaultSlots = computed(() => {
+  return defaultSlotsAll.value.filter(isTabItem)
 })
 
 const defaultSlotsKeys = computed<string[]>(() => defaultSlots.value.map(item => item.props?.name))
@@ -152,6 +196,7 @@ const formRef = useTemplateRef('form')
 
 const isValidMap = reactive<Record<string, boolean | undefined>>({})
 const hasChangesMap = reactive<Record<string, boolean | undefined>>({})
+const hasValueMap = reactive<Record<string, boolean | undefined>>({})
 
 const hasChanges = computed<boolean>(() => Object.values(hasChangesMap).includes(true))
 
