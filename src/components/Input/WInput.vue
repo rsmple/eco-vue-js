@@ -31,7 +31,7 @@
             'text-secure': textSecure && !isSecureVisible,
           }"
         >
-          {{ modelValue }}
+          {{ modelValue || emptyValue }}
         </div>
       </div>
     </template>

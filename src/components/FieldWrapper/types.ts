@@ -10,6 +10,8 @@ export interface FieldWrapperProps {
   skeleton?: boolean
   disabled?: boolean
   required?: boolean
+  mandatory?: boolean
   noMargin?: boolean
   allowCopy?: boolean
+  emptyValue?: string
 }

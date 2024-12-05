@@ -89,7 +89,7 @@
                 :field="typeof field.field === 'string' ? field.field : field.field?.(queryParams)"
                 :class="field.cssClass"
                 :ordering="ordering"
-                :disabled="!field.field"
+                :disabled="noOrdering || !field.field"
                 :allow-resize="field.allowResize"
                 :item-class="field.cssClassHeader"
                 :width-style="getFieldStyles(field.label)"
@@ -236,6 +236,7 @@ const props = defineProps<{
   alignTop?: boolean
   disableMore?: boolean
   readonly?: boolean
+  noOrdering?: boolean
 }>()
 
 defineEmits<{

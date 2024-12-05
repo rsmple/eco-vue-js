@@ -72,6 +72,7 @@ const modelValue = computed<Parameters<ValidateFn>[0]>(() => {
 
 const initModelValue = ref<Parameters<ValidateFn>[0]>()
 const required = computed<boolean | undefined>(() => componentSlot.value?.props?.required !== undefined ? componentSlot.value?.props?.required !== false : undefined)
+const mandatory = computed<boolean | undefined>(() => componentSlot.value?.props?.mandatory !== undefined ? componentSlot.value?.props?.mandatory !== false : undefined)
 const title = computed<string | undefined>(() => props.title ?? componentSlot.value?.props?.title)
 
 const errorMessage = ref<string | undefined | null>(null)
@@ -79,13 +80,15 @@ const errorMessage = ref<string | undefined | null>(null)
 const hasChanges = ref<boolean>(false)
 const hasBeenValidated = ref<boolean>(false)
 
-const hasValue = computed<boolean | null>(() => {
-  if (!required.value) return null
+const hasValueExact = computed<boolean | null>(() => {
+  if (!required.value && !mandatory.value) return null
 
   if (Array.isArray(modelValue.value)) return modelValue.value.length !== 0
 
   return modelValue.value !== undefined && modelValue.value !== null && modelValue.value !== ''
 })
+
+const hasValue = computed<boolean | null>(() => mandatory.value && hasValueExact.value === false ? null : hasValueExact.value)
 
 const requiredSymbols = computed<string[]>(() => props.requiredSymbols?.split('') ?? [])
 

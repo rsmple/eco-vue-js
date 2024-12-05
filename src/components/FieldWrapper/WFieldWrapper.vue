@@ -61,13 +61,14 @@
             name="field"
           >
             <div
-              class="flex min-h-11 items-center border-t border-solid border-gray-300 text-base font-normal dark:border-gray-700"
+              class="flex min-h-11 items-center text-base font-normal"
               :class="{
                 'font-mono': mono,
+                'border-t border-solid border-gray-300 dark:border-gray-700': title || $slots.title,
               }"
             >
               <slot v-bind="{id, setFocused, focused}">
-                {{ typeof modelValue === 'number' ? numberFormatter.format(modelValue) : modelValue === null ? 'N / A' : modelValue }}
+                {{ typeof modelValue === 'number' ? numberFormatter.format(modelValue) : modelValue === null ? (emptyValue ?? 'N / A') : (modelValue || emptyValue) }}
               </slot>
 
               <WButtonCopy
