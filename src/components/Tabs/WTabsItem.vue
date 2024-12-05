@@ -12,6 +12,7 @@ defineProps<{
   disabled?: boolean
   removable?: boolean
   divided?: boolean
+  init?: boolean
 }>()
 
 defineSlots<{

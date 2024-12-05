@@ -183,7 +183,10 @@ const defaultSlots = computed(() => {
 
 const defaultSlotsKeys = computed<string[]>(() => defaultSlots.value.map(item => item.props?.name))
 
-const current = ref<string>(defaultSlotsKeys.value[props.initTab ?? 0])
+const current = ref<string>(props.initTab ?? (props.initTabIndex !== undefined
+  ? defaultSlotsKeys.value[props.initTabIndex]
+  : defaultSlots.value.find(slot => !!slot.props?.init)?.props?.name ?? defaultSlotsKeys.value[0]
+))
 const currentIndex = computed(() => defaultSlotsKeys.value.indexOf(current.value))
 const isDirect = ref(true)
 const buttonRef = useTemplateRef('button')

@@ -3,7 +3,8 @@ import type {VNode} from 'vue'
 export interface TabsProps {
   customSlots?: VNode[]
   lessTransitions?: boolean
-  initTab?: number
+  initTab?: string
+  initTabIndex?: number
   side?: boolean
   disableMinHeight?: boolean
   noHeader?: boolean
