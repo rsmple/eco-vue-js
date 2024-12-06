@@ -1,9 +1,9 @@
 <template>
   <component
     v-bind="
-      tag === 'a' ? {href, target} : to !== undefined ? {to, replace} : undefined
+      disabled ? undefined : tag === 'a' ? {href, target} : to !== undefined ? {to, replace} : undefined
     "
-    :is="to !== undefined ? RouterLink : tag"
+    :is="to !== undefined ? disabled ? 'a' : RouterLink : tag"
     class="
       relative isolate flex select-none
       items-center justify-center whitespace-nowrap
