@@ -51,6 +51,8 @@ export const makeQueryPaginated = <Data, QueryParams extends {page?: number}>(ke
       ...options,
     })
 
+    const setDataOld = query.setData
+
     query.setData = (data: PaginatedResponse<Data>, options?: Parameters<typeof query.setData>[1]) => {
       if (setter && unref(options)?.index !== undefined) {
         const index = unref(unref(options)?.index)
@@ -73,7 +75,7 @@ export const makeQueryPaginated = <Data, QueryParams extends {page?: number}>(ke
         }
       }
 
-      return query.setData(data, options)
+      return setDataOld(data, options)
     }
 
     return query
