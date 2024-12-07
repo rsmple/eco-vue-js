@@ -13,7 +13,8 @@
       class="relative"
       :class="{
         'sm-not:snap-start grid grid-cols-[1fr,auto]': side,
-        'no-scrollbar sm-not:-pl--inner-margin flex snap-x snap-mandatory snap-always overflow-x-auto overscroll-x-contain pr-[30%]': !side
+        'no-scrollbar sm-not:-pl--inner-margin flex snap-x snap-mandatory snap-always overflow-x-auto overscroll-x-contain pr-[50%]': !side,
+        '4xl:pl-[50%]': stepper && !side,
       }"
     >
       <template
