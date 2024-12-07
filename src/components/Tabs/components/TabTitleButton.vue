@@ -9,7 +9,7 @@
   >
     <button
       :disabled="disabled"
-      class="w-ripple-trigger grid select-none snap-center grid-cols-[auto,1fr] font-semibold outline-none transition-colors duration-500"
+      class="w-ripple-trigger grid select-none grid-cols-[auto,1fr] font-semibold outline-none transition-colors duration-500"
       :class="{
         'text-primary-default dark:text-primary-dark': !hasError && active,
         'text-negative dark:text-negative-dark': hasError,
@@ -71,7 +71,12 @@
             'py-3 text-start': side,
           }"
         >
-          <div class="whitespace-nowrap px-4">
+          <div
+            class="whitespace-nowrap px-4"
+            :class="{
+              'sm-not:-pl--inner-margin': side,
+            }"
+          >
             <Suspense v-if="icon !== undefined">
               <component 
                 :is="icon"

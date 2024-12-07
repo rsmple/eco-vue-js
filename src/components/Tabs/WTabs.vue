@@ -1,18 +1,19 @@
 <template>
   <div
+    ref="container"
     class="grid gap-4"
     :class="{
       'grid grid-cols-1': !side,
-      'grid grid-cols-[auto,1fr] items-start': side,
+      'sm-not:grid-cols-[repeat(2,100vw)] grid snap-x snap-mandatory snap-always grid-cols-[auto,1fr] items-start overflow-x-auto overscroll-x-contain': side,
     }"
   >
     <div
       v-if="!noHeader"
       ref="buttonContainer"
-      class="no-scrollbar relative snap-x snap-mandatory snap-always overflow-x-auto overscroll-x-contain"
+      class="relative"
       :class="{
-        'grid grid-cols-[1fr,auto]': side,
-        'flex pr-[30%]': !side
+        'sm-not:snap-start grid grid-cols-[1fr,auto]': side,
+        'no-scrollbar sm-not:-pl--inner-margin flex snap-x snap-mandatory snap-always overflow-x-auto overscroll-x-contain pr-[30%]': !side
       }"
     >
       <template
@@ -36,6 +37,9 @@
           :show-has-value="showHasValue"
           :side="side"
           :no-indicator="noIndicator"
+          :class="{
+            'snap-center': !side,
+          }"
           @update:indicator-style="indicatorStyle = $event"
           @update:scroll-position="updateScrollPosition"
           @click="switchTab(slot.props?.name)"
@@ -93,6 +97,9 @@
     <div
       v-if="defaultSlots.some(slot => (slot.children as Record<string, Component>)?.default)"
       class="relative h-full transition-[min-height] duration-300"
+      :class="{
+        'sm-not:snap-start': side,
+      }"
       :style="{minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
     >
       <TransitionGroup
@@ -127,11 +134,14 @@ import {type CSSProperties, type Component, type VNode, computed, inject, onMoun
 
 import WForm from '@/components/Form/WForm.vue'
 
+import {getIsMobile} from '@/main'
 import {debounce, throttle} from '@/utils/utils'
 
 import TabItem from './components/TabItem.vue'
 import TabTitleButton from './components/TabTitleButton.vue'
 import {wTabItemListener, wTabItemUnlistener} from './models/injection'
+
+const mobile = getIsMobile()
 
 const props = defineProps<TabsProps>()
 
@@ -145,6 +155,7 @@ const emit = defineEmits<{
 
 const slots = useSlots()
 
+const containerRef = useTemplateRef('container')
 const buttonContainerRef = useTemplateRef('buttonContainer')
 
 const defaultSlotsRaw = computed(() => props.customSlots ?? slots.default?.() ?? [])
@@ -215,12 +226,31 @@ const updateIndex = (value: number) => {
   setCurrentDebounced(defaultSlotsKeys.value[value])
 }
 
+let timeout: NodeJS.Timeout | null = null
+
+const scrollToTabContent = () => {
+  if (!mobile || !props.side) return
+
+  if (timeout) {
+    clearTimeout(timeout)
+    timeout = null
+  }
+
+  timeout = setTimeout(() => {
+    containerRef.value?.scrollTo({left: document.documentElement.offsetWidth, behavior: 'smooth'})
+
+    timeout = null
+  }, 300)
+}
+
 const setCurrentDebounced = debounce((value: string) => {
   if (current.value === value || !defaultSlotsKeys.value.includes(value)) return
   if (defaultSlots.value[defaultSlotsKeys.value.indexOf(value)].props?.disabled !== undefined) return
 
   isDirect.value = defaultSlotsKeys.value.indexOf(current.value) < defaultSlotsKeys.value.indexOf(value)
   current.value = value
+
+  scrollToTabContent()
 }, 100)
 
 const next = (): void => {
