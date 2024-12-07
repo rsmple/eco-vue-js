@@ -12,7 +12,7 @@
       class="no-scrollbar relative snap-x snap-mandatory snap-always overflow-x-auto overscroll-x-contain"
       :class="{
         'grid grid-cols-[1fr,auto]': side,
-        'flex': !side
+        'flex pr-[30%]': !side
       }"
     >
       <template
@@ -26,55 +26,46 @@
           :index="index"
           :title="slot.props?.title"
           :icon="slot.props?.icon"
-          :has-changes="formRef?.[defaultSlots.indexOf(slot)]?.hasChanges === true"
-          :has-error="formRef?.[defaultSlots.indexOf(slot)]?.isValid === false"
+          :has-changes="tabItemRef?.[defaultSlots.indexOf(slot)]?.hasChanges === true"
+          :has-error="tabItemRef?.[defaultSlots.indexOf(slot)]?.isValid === false"
+          :has-value="tabItemRef?.[defaultSlots.indexOf(slot)]?.hasValue === true"
+          :first="defaultSlots.indexOf(slot) === 0"
+          :last="defaultSlots.indexOf(slot) === defaultSlots.length - 1"
+          :disabled="stepper ? defaultSlots.indexOf(slot) > hasNoValueFirst : false"
+          :stepper="stepper"
+          :show-has-value="showHasValue"
           :side="side"
-          :class="{
-            'col-span-2 grid grid-cols-subgrid': side,
-            'grid-cols-[1fr,auto]': !side
-          }"
+          :no-indicator="noIndicator"
           @update:indicator-style="indicatorStyle = $event"
           @update:scroll-position="updateScrollPosition"
           @click="switchTab(slot.props?.name)"
         >
           <template
             v-if="(slot.children as Record<string, Component>)?.title"
-            #title
+            #title="scope"
           >
             <component
-              v-bind="{
-                hasError: formRef?.[defaultSlots.indexOf(slot)]?.isValid === false,
-                hasChanges: formRef?.[defaultSlots.indexOf(slot)]?.hasChanges === true,
-                hasValue: formRef?.[defaultSlots.indexOf(slot)]?.hasValue === true,
-              }"
+              v-bind="scope"
               :is="(slot.children as Record<string, Component>)?.title"
             />
           </template>
 
           <template
             v-if="(slot.children as Record<string, Component>)?.suffix"
-            #suffix
+            #suffix="scope"
           >
             <component
-              v-bind="{
-                hasError: formRef?.[defaultSlots.indexOf(slot)]?.isValid === false,
-                hasChanges: formRef?.[defaultSlots.indexOf(slot)]?.hasChanges === true,
-                hasValue: formRef?.[defaultSlots.indexOf(slot)]?.hasValue === true,
-              }"
+              v-bind="scope"
               :is="(slot.children as Record<string, Component>)?.suffix" 
             />
           </template>
 
           <template
             v-if="(slot.children as Record<string, Component>)?.right"
-            #right
+            #right="scope"
           >
             <component
-              v-bind="{
-                hasError: formRef?.[defaultSlots.indexOf(slot)]?.isValid === false,
-                hasChanges: formRef?.[defaultSlots.indexOf(slot)]?.hasChanges === true,
-                hasValue: formRef?.[defaultSlots.indexOf(slot)]?.hasValue === true,
-              }"
+              v-bind="scope"
               :is="(slot.children as Record<string, Component>)?.right"
             />
           </template>
@@ -87,11 +78,12 @@
       </template>
 
       <div
+        v-if="!noIndicator"
         class="absolute rounded-sm duration-500"
         :style="indicatorStyle"
         :class="{
-          'bg-primary-default dark:bg-primary-dark': currentIsValud !== false,
-          'bg-negative dark:bg-negative-dark': currentIsValud === false,
+          'bg-primary-default dark:bg-primary-dark': currentIsValid !== false,
+          'bg-negative dark:bg-negative-dark': currentIsValid === false,
           'transition-[left,width,background-color]': !side && indicatorStyle !== undefined,
           'transition-[top,height,background-color]': side && indicatorStyle !== undefined,
         }"
@@ -113,19 +105,15 @@
           v-for="slot in defaultSlots"
           ref="tabItem"
           :key="slot.props?.name"
+          :name="slot.props?.name"
+          :title="slot.props?.title"
           :active="slot.props?.name === current"
           :removable="slot.props?.removable"
+          @tab:switch="switchOnInvalid"
           @update:height="!disableMinHeight && updateHeight($event)"
           @update:active="$emit('update:current-title', slot.props?.title)"
         >
-          <WForm
-            ref="form"
-            :name="slot.props?.name"
-            :title="slot.props?.title"
-            @update:is-valid="$event === false && switchOnInvalid(slot.props?.name)"
-          >
-            <component :is="slot" />
-          </WForm>
+          <component :is="slot" />
         </TabItem>
       </TransitionGroup>
     </div>
@@ -193,12 +181,20 @@ const buttonRef = useTemplateRef('button')
 const indicatorStyle = ref<CSSProperties | undefined>(undefined)
 const minHeight = ref(0)
 const tabItemRef = useTemplateRef('tabItem')
-const formRef = useTemplateRef('form')
 
-const currentIsValud = computed(() => formRef.value?.[defaultSlotsKeys.value.indexOf(current.value)]?.isValid)
+const currentIsValid = computed<boolean>(() => tabItemRef.value?.[currentIndex.value]?.isValid ?? true)
+const hasNoValueFirst = computed<number>(() => {
+  if (!props.stepper) return 0
+
+  const index = tabItemRef.value?.findIndex(item => item?.hasValue === false) ?? 0
+
+  if (index === -1) return defaultSlotsKeys.value.length
+
+  return index
+})
 
 const switchOnInvalid = debounce((key: string): void => {
-  if (currentIsValud.value !== false) switchTab(key)
+  if (currentIsValid.value !== false) switchTab(key)
 }, 50)
 
 const switchTab = throttle((key: string): void => {
@@ -242,15 +238,21 @@ const updateHeight = (value: number): void => {
 }
 
 const validate = (index: number, ...args: Parameters<ComponentInstance<typeof WForm>['validate']>): ReturnType<ComponentInstance<typeof WForm>['validate']> => {
-  return formRef.value?.[index]?.validate(...args)
+  return tabItemRef.value?.[index]?.validate(...args)
+}
+
+const validateIfNoError = (index: number, ...args: Parameters<ComponentInstance<typeof WForm>['validate']>): ReturnType<ComponentInstance<typeof WForm>['validate']> => {
+  if (tabItemRef.value?.[index]?.errorMessage) return tabItemRef.value?.[index].errorMessage
+
+  return tabItemRef.value?.[index]?.validate(...args)
 }
 
 const invalidate = (index: number, ...args: Parameters<ComponentInstance<typeof WForm>['invalidate']>): ReturnType<ComponentInstance<typeof WForm>['invalidate']> => {
-  return formRef.value?.[index]?.invalidate(...args)
+  return tabItemRef.value?.[index]?.invalidate(...args)
 }
 
 const initModel = (index: number, ...args: Parameters<ComponentInstance<typeof WForm>['initModel']>): ReturnType<ComponentInstance<typeof WForm>['initModel']> => {
-  return formRef.value?.[index]?.initModel(...args)
+  return tabItemRef.value?.[index]?.initModel(...args)
 }
 
 const updateIndicator = () => {
@@ -263,11 +265,11 @@ const updateScrollPosition = (value: {left?: number, top?: number}) => {
   if (props.side) {
     if (buttonContainerRef.value.scrollHeight <= buttonContainerRef.value.offsetHeight) return
 
-    buttonContainerRef.value.scrollTo({top: ((value.top ?? 0) - buttonContainerRef.value.offsetTop) / 2, behavior: 'smooth'})
+    buttonContainerRef.value.scrollTo({top: value.top! - buttonContainerRef.value.offsetHeight / 2, behavior: 'smooth'})
   } else {
     if (buttonContainerRef.value.scrollWidth <= buttonContainerRef.value.offsetWidth) return
 
-    buttonContainerRef.value.scrollTo({left: ((value.left ?? 0) - buttonContainerRef.value.offsetLeft) / 2, behavior: 'smooth'})
+    buttonContainerRef.value.scrollTo({left: value.left! - buttonContainerRef.value.offsetWidth / 2, behavior: 'smooth'})
   }
 }
 
@@ -314,6 +316,7 @@ defineExpose({
   next,
   previous,
   validate,
+  validateIfNoError,
   invalidate,
   initModel,
 })

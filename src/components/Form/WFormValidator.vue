@@ -31,6 +31,7 @@ const props = defineProps<{
   forbiddenRegexp?: RegExp
   requiredSymbols?: string
   noChanges?: boolean
+  hasValue?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -81,6 +82,8 @@ const hasChanges = ref<boolean>(false)
 const hasBeenValidated = ref<boolean>(false)
 
 const hasValueExact = computed<boolean | null>(() => {
+  if (props.hasValue) return true
+
   if (!required.value && !mandatory.value) return null
 
   if (Array.isArray(modelValue.value)) return modelValue.value.length !== 0
@@ -88,7 +91,7 @@ const hasValueExact = computed<boolean | null>(() => {
   return modelValue.value !== undefined && modelValue.value !== null && modelValue.value !== ''
 })
 
-const hasValue = computed<boolean | null>(() => mandatory.value && hasValueExact.value === false ? null : hasValueExact.value)
+const _hasValue = computed<boolean | null>(() => mandatory.value && hasValueExact.value === false ? null : hasValueExact.value)
 
 const requiredSymbols = computed<string[]>(() => props.requiredSymbols?.split('') ?? [])
 
@@ -250,7 +253,7 @@ watch(hasChanges, value => {
   emit('update:has-changes', value)
 })
 
-watch(hasValue, value => {
+watch(_hasValue, value => {
   if (props.name) {
     hasValueUpdater?.(props.name, value)
   }

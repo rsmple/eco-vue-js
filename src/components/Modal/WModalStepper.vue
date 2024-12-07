@@ -12,6 +12,7 @@
 
     <WTabsStepper
       ref="tabsStepper"
+      no-header
       @update:first="first = $event"
       @update:last="last = $event"
       @update:current-title="currentTitle = $event"

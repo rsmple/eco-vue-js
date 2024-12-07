@@ -2,7 +2,9 @@
   <WTabs
     ref="tabs"
     v-bind="props"
-    no-header
+    stepper
+    no-indicator
+    show-has-value
     @update:current="$emit('update:current', $event)"
     @update:current-index="current = $event; $emit('update:current-index', $event)"
     @update:current-title="$emit('update:current-title', $event)"
@@ -49,7 +51,7 @@ const previous = (): void => {
 }
 
 const next = (): void => {
-  const errorMessage = tabsRef.value?.validate(current.value)
+  const errorMessage = tabsRef.value?.validateIfNoError(current.value)
 
   if (errorMessage) {
     Notify.warn({title: 'Form contains invalid values', caption: errorMessage.length < 200 ? errorMessage : undefined})

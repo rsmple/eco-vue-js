@@ -9,9 +9,12 @@ export interface TabsProps {
   disableMinHeight?: boolean
   noHeader?: boolean
   switchToNew?: boolean
+  noIndicator?: boolean
+  stepper?: boolean
+  showHasValue?: boolean
 }
 
-export type TabsStepperProps = Omit<TabsProps, 'switchToNew' | 'noHeader' | 'side'>
+export type TabsStepperProps = Omit<TabsProps, 'switchToNew' | 'noIndicator' | 'side'>
 
 export type TabsItemScopedProps = {
   hasError: boolean
