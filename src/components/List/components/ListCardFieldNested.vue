@@ -13,7 +13,7 @@
           <ListCardFieldNestedItem :items="skeleton ? [item] : (('keyArray' in field ? item[field.keyArray] : field.getterArray(item)) as Data[])">
             <template #default="{inner, index, last, first}">
               <component
-                :is="field.componentItem ?? EmptyComponent"
+                :is="field.componentItem ?? WEmptyComponent"
                 v-bind="field.componentItem ? {item, skeleton, mobile, index, last, first} : (undefined as never)"
               >
                 <div
@@ -68,7 +68,7 @@
 <script setup lang="ts" generic="Data extends DefaultData, QueryParams">
 import type {ListField, ListFields} from '../types'
 
-import EmptyComponent from '@/components/InfiniteList/components/EmptyComponent.vue'
+import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
 import ListCardFieldNestedItem from './ListCardFieldNestedItem.vue'
 

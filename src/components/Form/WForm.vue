@@ -1,11 +1,13 @@
 <template>
-  <div>
+  <component :is="noTag ? WEmptyComponent : 'div'">
     <slot />
-  </div>
+  </component>
 </template>
 
 <script lang="ts" setup>
 import {inject, onBeforeUnmount, provide, toRef, watch} from 'vue'
+
+import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
 import {wFormUnlistener} from './models/injection'
 import {useFormErrorMessageMap} from './use/useFormErrorMessageMap'
@@ -19,6 +21,7 @@ import {useFormValidateMap} from './use/useFormValidateMap'
 const props = defineProps<{
   name?: string
   title?: string
+  noTag?: boolean
 }>()
 
 const emit = defineEmits<{

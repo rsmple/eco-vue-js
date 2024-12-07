@@ -19,6 +19,7 @@ import WDatePicker from '@/components/DatePicker/WDatePicker.vue'
 import WDatePickerSingle from '@/components/DatePicker/WDatePickerSingle.vue'
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 import WExpansion from '@/components/Expansion/WExpansion.vue'
 import WExpansionItem from '@/components/Expansion/WExpansionItem.vue'
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
@@ -99,6 +100,7 @@ export default {
     app.component('WDatePickerSingle', WDatePickerSingle)
     app.component('WDropdown', WDropdown)
     app.component('WDropdownMenu', WDropdownMenu)
+    app.component('WEmptyComponent', WEmptyComponent)
     app.component('WExpansion', WExpansion)
     app.component('WExpansionItem', WExpansionItem)
     app.component('WFieldWrapper', WFieldWrapper)
@@ -179,6 +181,7 @@ export {
   WDatePickerSingle,
   WDropdown,
   WDropdownMenu,
+  WEmptyComponent,
   WExpansion,
   WExpansionItem,
   WFieldWrapper,

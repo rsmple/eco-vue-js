@@ -14,4 +14,5 @@ export interface FieldWrapperProps {
   noMargin?: boolean
   allowCopy?: boolean
   emptyValue?: string
+  leftError?: boolean
 }

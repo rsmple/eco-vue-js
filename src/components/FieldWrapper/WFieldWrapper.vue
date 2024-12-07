@@ -99,7 +99,11 @@
           >
             <div
               v-if="errorMessage"
-              class="text-negative dark:text-negative-dark absolute right-0 top-full pt-0.5 text-end text-xs font-normal"
+              class="text-negative dark:text-negative-dark absolute top-full pt-0.5 text-xs font-normal"
+              :class="{
+                'right-0 text-end': !leftError,
+                'left-0 text-start': leftError,
+              }"
             >
               {{ errorMessage }}
             </div>

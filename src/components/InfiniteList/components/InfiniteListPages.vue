@@ -65,6 +65,7 @@
           :resetting="isResettingPage"
           :page="itemPage"
           :index="itemIndex"
+          :value="valueGetter(item as Data)"
         />
       </template>
     </InfiniteListPage>
@@ -299,6 +300,7 @@ defineSlots<{
     resetting: boolean
     page: number
     index: number
+    value: Model
   }) => void
 }>()
 </script>

@@ -1,6 +1,6 @@
 <template>
   <component
-    :is="minHeight ? EmptyComponent : WInfiniteListWrapper"
+    :is="minHeight ? WEmptyComponent : WInfiniteListWrapper"
     :scrolling-element="scrollingElement"
     :header-margin="headerMargin"
     :init-is-intersecting="props.queryParams instanceof Object && 'page' in props.queryParams && Number.isInteger(props.queryParams.page) && (props.queryParams.page as number) > 1 ? false : undefined"
@@ -48,17 +48,17 @@
         @update:count="$emit('update:count', $event)"
         @update:page="$emit('update:page', $event)"
       >
-        <template #default="{item, setter, skeleton, refetch, previous, next, first, last, resetting, page, index}">
+        <template #default="{item, value, setter, skeleton, refetch, previous, next, first, last, resetting, page, index}">
           <component
-            :is="skeleton ? EmptyComponent : InfiniteListPageSelectItem"
-            :selected="skeleton ? false : getIsSelected(valueGetter(item))"
-            :selected-between="skeleton ? false : getIsSelectedBetween(valueGetter(item), page, index)"
+            :is="skeleton ? WEmptyComponent : InfiniteListPageSelectItem"
+            :selected="skeleton ? false : getIsSelected(value)"
+            :selected-between="skeleton ? false : getIsSelectedBetween(value, page, index)"
             @update:selected="
-              toggleSelected(valueGetter(item), reverse && !selectedRange ? !$event : $event);
-              setSelectedCursor($event ? {page, index, id: valueGetter(item)} : null);
+              toggleSelected(value, reverse && !selectedRange ? !$event : $event);
+              setSelectedCursor($event ? {page, index, id: value} : null);
             "
-            @update:selected-range="setSelectedRange({page, index, id: valueGetter(item)})"
-            @update:selected-range-hover="setRangeHover({page, index, id: valueGetter(item)})"
+            @update:selected-range="setSelectedRange({page, index, id: value})"
+            @update:selected-range-hover="setRangeHover({page, index, id: value})"
           >
             <slot
               :item="item"
@@ -72,6 +72,7 @@
               :resetting="resetting"
               :page="page"
               :index="index"
+              :value="value"
             />
           </component>
         </template>
@@ -83,8 +84,9 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import {onBeforeUnmount, provide, toRef, useTemplateRef} from 'vue'
 
+import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
+
 import WInfiniteListWrapper from './WInfiniteListWrapper.vue'
-import EmptyComponent from './components/EmptyComponent.vue'
 import InfiniteListPageSelectItem from './components/InfiniteListPageSelectItem.vue'
 import InfiniteListPages from './components/InfiniteListPages.vue'
 import {wInfiniteListSelection} from './models/injection'
@@ -219,6 +221,7 @@ defineSlots<{
     resetting: boolean
     page: number
     index: number
+    value: Model
   }) => void
   header?: (props: {
     goto: typeof goto

@@ -38,7 +38,7 @@
 
       <div :class="pageClass">
         <component
-          :is="transition ? TransitionGroup : EmptyComponent"
+          :is="transition ? TransitionGroup : WEmptyComponent"
           v-if="hasData && data?.results"
           v-bind="transition ? {
             'enter-active-class': 'transition-[grid-template-rows] overflow-hidden grid',
@@ -55,11 +55,11 @@
             :key="valueGetter(item)"
           >
             <component
-              :is="transition ? 'div' : EmptyComponent"
+              :is="transition ? 'div' : WEmptyComponent"
               v-bind="transition ? {class: 'w-full'} : undefined"
             >
               <component 
-                :is="transition ? 'div' : EmptyComponent"
+                :is="transition ? 'div' : WEmptyComponent"
                 v-bind="transition ? {class: '[overflow:inherit]'} : undefined"
               >
                 <slot
@@ -121,9 +121,10 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import {TransitionGroup, computed, nextTick, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
+import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
+
 import {ApiError} from '@/main'
 
-import EmptyComponent from './EmptyComponent.vue'
 import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
 import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
 

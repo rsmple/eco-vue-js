@@ -38,6 +38,7 @@ const emit = defineEmits<{
   (e: 'update:has-changes', value: boolean): void
   (e: 'update:has-value', value: boolean | null): void
   (e: 'update:is-valid', value: boolean): void
+  (e: 'invalidate', value: Record<string, string | string[] | undefined>): void
 }>()
 
 const titleUpdater = inject(wFormTitleUpdater, undefined)
@@ -210,6 +211,8 @@ const doValidate = (silent?: boolean, path?: ValidatePath): string | undefined =
 }
 
 const invalidate = (messages: Record<string, string | string[] | undefined>): void => {
+  emit('invalidate', messages)
+
   if (!props.name) return
 
   const message = messages[props.name]

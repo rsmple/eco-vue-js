@@ -123,8 +123,9 @@
         :more-bottom="moreBottom"
         :allow-open="allowOpen && !skeleton"
         :align-top="alignTop"
+        :form-name="!skeleton ? formNameGetter?.(item) : undefined"
       >
-        <template #default>
+        <template #default="{validate}">
           <ListCardFieldNested
             :fields="fieldsFiltered"
             :item="item"
@@ -146,6 +147,7 @@
                 :style="getFieldStyles(defaultScope.field.label)"
                 @update:item="setter"
                 @delete:item="setter(); refetch()"
+                @validate="validate()"
               />
             </template>
           </ListCardFieldNested>
@@ -237,6 +239,7 @@ const props = defineProps<{
   disableMore?: boolean
   readonly?: boolean
   noOrdering?: boolean
+  formNameGetter?: (data: Data) => string | undefined
 }>()
 
 defineEmits<{

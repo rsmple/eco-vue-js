@@ -58,7 +58,10 @@
       </div>
     </div>
 
-    <div
+    <component
+      :is="formName ? WForm : 'div'"
+      ref="form"
+      v-bind="formName ? {name: formName} : undefined"
       class="sm-not:-px--inner-margin isolate grid sm:flex sm:flex-1"
       :class="{
         [cardClass ?? '']: true,
@@ -67,14 +70,14 @@
         'isolate': allowOpen,
       }"
     >
-      <slot v-bind="{toggle, isOpen}" />
+      <slot v-bind="{toggle, isOpen, validate}" />
 
       <button
         v-if="allowOpen"
         class="w-ripple w-ripple-hover w-ripple-has w-ripple-opacity-[0.04] absolute left-0 top-0 z-[-1] size-full cursor-pointer"
         @click="toggle"
       />
-    </div>
+    </component>
       
     <div
       class="sm:right-inner sm:bg-default sm:dark:bg-default-dark sm:sticky sm:z-[1]"
@@ -135,11 +138,12 @@
 </template>
 
 <script lang="ts" setup>
-import {inject, markRaw, ref, watch} from 'vue'
+import {inject, markRaw, ref, useTemplateRef, watch} from 'vue'
 
 import WButtonMore from '@/components/Button/WButtonMore.vue'
 import WButtonMoreItem from '@/components/Button/WButtonMoreItem.vue'
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
+import WForm from '@/components/Form/WForm.vue'
 
 import IconAddCircle from '@/assets/icons/sax/IconAddCircle.svg?component'
 import IconMinusCircle from '@/assets/icons/sax/IconMinusCircle.svg?component'
@@ -157,6 +161,7 @@ defineProps<{
   cardWrapperClass?: string
   allowOpen?: boolean
   disableMore?: boolean
+  formName?: string
 }>()
 
 const emit = defineEmits<{
@@ -164,11 +169,15 @@ const emit = defineEmits<{
   (e: 'update:selected-hover', value: boolean): void
 }>()
 
+const formRef = useTemplateRef<ComponentInstance<typeof WForm>>('form')
+
 const isOpen = ref(false)
 
 const toggle = () => {
   isOpen.value = !isOpen.value
 }
+
+const validate: ComponentInstance<typeof WForm>['validate'] = (...args) => formRef.value?.validate(...args)
 
 const {
   allowSelect,

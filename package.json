@@ -197,6 +197,9 @@
     "./dist/components/DropdownMenu/types": {
       "import": "./dist/components/DropdownMenu/types.d.ts"
     },
+    "./dist/components/EmptyComponent/WEmptyComponent.vue": {
+      "import": "./dist/components/EmptyComponent/WEmptyComponent.vue.js"
+    },
     "./dist/components/Expansion/WExpansion.vue": {
       "import": "./dist/components/Expansion/WExpansion.vue.js"
     },
@@ -376,6 +379,9 @@
     },
     "./dist/components/Tabs/WTabsStepper.vue": {
       "import": "./dist/components/Tabs/WTabsStepper.vue.js"
+    },
+    "./dist/components/Tabs/types": {
+      "import": "./dist/components/Tabs/types.d.ts"
     },
     "./dist/components/Toggle/WToggle.vue": {
       "import": "./dist/components/Toggle/WToggle.vue.js"
