@@ -1,9 +1,7 @@
 <template>
-  <WTabs
-    v-if="isMobile"
-    :names="names"
-    :custom-slots="$slots.default?.()"
-  />
+  <WTabs v-if="isMobile">
+    <slot />
+  </WTabs>
 
   <div
     v-else
@@ -14,10 +12,7 @@
       v-for="(slot, index) in $slots.default?.()"
       :key="index"
     >
-      <component
-        :is="slot"
-        :title="names[index]"
-      />
+      <component :is="slot" />
     </template>
   </div>
 </template>
@@ -26,10 +21,6 @@
 import WTabs from '@/components/Tabs/WTabs.vue'
 
 import {getIsMobile} from '@/utils/mobile'
-
-defineProps<{
-  names: string[]
-}>()
 
 const isMobile = getIsMobile()
 </script>
