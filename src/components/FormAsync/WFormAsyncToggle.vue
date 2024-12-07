@@ -36,7 +36,7 @@ const {data, setData, isLoadingError} = props.noParams === true
   : (props.useQueryFn as UseQueryWithParams<Model, QueryParams>)(toRef(props, 'queryParams'), {enabled: toRef(props, 'queryEnabled')})
 const loading = ref(false)
 
-const modelValue = computed<FieldType | null>(() => get<FieldType, PayloadType>(data.value ?? {}, props.field) ?? null)
+const modelValue = computed<FieldType | null>(() => get<FieldType, PayloadType>((data.value ?? {}) as PayloadType, props.field) ?? null)
 
 const save = (value: FieldType) => {
   if (loading.value) return
@@ -56,7 +56,7 @@ const save = (value: FieldType) => {
 
   loading.value = true
 
-  props.apiMethod(set<FieldType, PayloadType>({}, props.field, value))
+  props.apiMethod(set<FieldType, PayloadType>({} as PayloadType, props.field, value))
     .then(response => {
       setData(response.data)
 

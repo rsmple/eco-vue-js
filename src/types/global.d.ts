@@ -128,9 +128,13 @@ declare type UnionToTuple<
 
 declare type ObjectKeys<O> = UnionToTuple<keyof O>
 
-declare type PartialNested<T> = {
-  [P in keyof T]?: (T[P] extends Array ? T[P] : T[P] extends object ? PartialNested<T[P]> : T[P]) | undefined
-}
+declare type PartialNested<T> = T extends unknown[]
+  ? T
+  : T extends object
+  ? {
+    [P in keyof T]?: PartialNested<T[P]> | undefined
+  }
+  : T
 
 declare type Flatten<T> =
   T extends []
