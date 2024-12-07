@@ -117,7 +117,7 @@
           :title="slot.props?.title"
           :active="slot.props?.name === current"
           :removable="slot.props?.removable"
-          @tab:switch="switchOnInvalid"
+          @tab:switch="!noSwitchOnInvalid && switchOnInvalid($event)"
           @update:height="!disableMinHeight && updateHeight($event)"
           @update:active="$emit('update:current-title', slot.props?.title)"
         >

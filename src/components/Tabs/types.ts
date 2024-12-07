@@ -12,6 +12,7 @@ export interface TabsProps {
   noIndicator?: boolean
   stepper?: boolean
   showHasValue?: boolean
+  noSwitchOnInvalid?: boolean
 }
 
 export type TabsStepperProps = Omit<TabsProps, 'switchToNew' | 'noIndicator' | 'side'>
