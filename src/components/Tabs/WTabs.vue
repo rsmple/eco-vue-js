@@ -4,7 +4,7 @@
     class="grid gap-4"
     :class="{
       'grid grid-cols-1': !side,
-      'sm-not:grid-cols-[repeat(2,100vw)] grid snap-x snap-mandatory snap-always grid-cols-[auto,1fr] items-start overflow-x-auto overscroll-x-contain': side,
+      'sm-not:grid-cols-[repeat(2,100vw)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain grid grid-cols-[auto,1fr] items-start': side,
     }"
   >
     <div
@@ -14,7 +14,6 @@
       :class="{
         'sm-not:snap-start grid grid-cols-[1fr,auto]': side,
         'no-scrollbar sm-not:-pl--inner-margin flex snap-x snap-mandatory snap-always overflow-x-auto overscroll-x-contain pr-[50%]': !side,
-        '4xl:pl-[50%]': stepper && !side,
       }"
     >
       <template

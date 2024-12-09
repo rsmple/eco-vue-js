@@ -97,6 +97,8 @@ const _hasValue = computed<boolean | null>(() => mandatory.value && hasValueExac
 const requiredSymbols = computed<string[]>(() => props.requiredSymbols?.split('') ?? [])
 
 const _updateHasChanges = (value: Parameters<ValidateFn>[0]): void => {
+  if (props.noChanges) return
+
   if (initModelValue.value === undefined) {
     hasChanges.value = value !== undefined && value !== ''
   } else {
