@@ -104,73 +104,73 @@ const writePlugin = async (list) => {
 const getPackageExports = (list) => {
   const result = {
     '.': {
-      'import': './dist/main.js',
+      import: './dist/main.js',
     },
     './dist/types/global.d.ts': {
-      'import': './dist/types/global.d.ts',
+      import: './dist/types/global.d.ts',
     },
     './dist/types/types.d.ts': {
-      'import': './dist/types/types.d.ts',
+      import: './dist/types/types.d.ts',
     },
     './tailwind-base/index.cjs': {
-      'require': './tailwind-base/index.cjs',
+      require: './tailwind-base/index.cjs',
     },
     './eslint/plugin': {
-      'import': './eslint/plugin.js',
+      import: './eslint/plugin.js',
     },
     './dist/assets/icons/default/*': {
-      'import': './dist/assets/icons/default/*.svg.js',
+      import: './dist/assets/icons/default/*.svg.js',
     },
     './dist/assets/icons/sax/*': {
-      'import': './dist/assets/icons/sax/*.svg.js',
+      import: './dist/assets/icons/sax/*.svg.js',
     },
     './dist/utils/DOMListenerContainer': {
-      'import': './dist/utils/DOMListenerContainer.js',
+      import: './dist/utils/DOMListenerContainer.js',
     },
     './dist/utils/HorizontalAlign': {
-      'import': './dist/utils/HorizontalAlign.js',
+      import: './dist/utils/HorizontalAlign.js',
     },
     './dist/utils/SemanticType': {
-      'import': './dist/utils/SemanticType.js',
+      import: './dist/utils/SemanticType.js',
     },
     './dist/utils/dateTime': {
-      'import': './dist/utils/dateTime.js',
+      import: './dist/utils/dateTime.js',
     },
     './dist/utils/utils': {
-      'import': './dist/utils/utils.js',
+      import: './dist/utils/utils.js',
     },
     './dist/utils/mobile': {
-      'import': './dist/utils/mobile.js',
+      import: './dist/utils/mobile.js',
     },
     './dist/utils/Modal': {
-      'import': './dist/utils/Modal.js',
+      import: './dist/utils/Modal.js',
     },
     './dist/utils/Notify': {
-      'import': './dist/utils/Notify.js',
+      import: './dist/utils/Notify.js',
     },
     './dist/utils/Tooltip': {
-      'import': './dist/utils/Tooltip.js',
+      import: './dist/utils/Tooltip.js',
     },
     './dist/utils/useDefaultQuery': {
-      'import': './dist/utils/useDefaultQuery.js',
+      import: './dist/utils/useDefaultQuery.js',
     },
     './dist/utils/useQueryUpdater': {
-      'import': './dist/utils/useQueryUpdater.js',
+      import: './dist/utils/useQueryUpdater.js',
     },
     './dist/utils/useCopy': {
-      'import': './dist/utils/useCopy.js',
+      import: './dist/utils/useCopy.js',
     },
     './dist/utils/order': {
-      'import': './dist/utils/order.js',
+      import: './dist/utils/order.js',
     },
     './dist/utils/useSelected': {
-      'import': './dist/utils/useSelected.js',
+      import: './dist/utils/useSelected.js',
     },
     './dist/utils/api': {
-      'import': './dist/utils/api.js',
+      import: './dist/utils/api.js',
     },
     './dist/utils/validate': {
-      'import': './dist/utils/validate.js',
+      import: './dist/utils/validate.js',
     },
   }
 
@@ -178,9 +178,9 @@ const getPackageExports = (list) => {
     const distPath = `./dist${ item.path.substring(item.path.indexOf('/components')) }`
 
     if (item.path.endsWith('.d.ts')) {
-      result[distPath.slice(0, -5)] = {'import': distPath}
+      result[distPath.slice(0, -5)] = {import: distPath}
     } else {
-      result[distPath] = {'import': distPath + '.js'}
+      result[distPath] = {import: distPath + '.js'}
     }
   })
 

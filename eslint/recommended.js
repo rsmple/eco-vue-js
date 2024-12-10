@@ -22,8 +22,8 @@ export default [
   {
     files: ['**/*.{ts,js,mts,tsx,json}'],
     rules: {
-      'indent': ['error', 2, {
-        'SwitchCase': 1,
+      indent: ['error', 2, {
+        SwitchCase: 1,
       }],
     },
   },
@@ -31,7 +31,7 @@ export default [
   {
     files: ['**/*.json'],
     rules: {
-      'quotes': ['error', 'double'],
+      quotes: ['error', 'double'],
       '@typescript-eslint/no-unused-expressions': 'off',
       'comma-dangle': ['error', 'never'],
     },
@@ -42,8 +42,8 @@ export default [
     rules: {
       '@typescript-eslint/naming-convention': [
         'error',
-        {'selector': 'enum', 'format': ['PascalCase']},
-        {'selector': 'enumMember', 'format': ['UPPER_CASE', 'snake_case']},
+        {selector: 'enum', format: ['PascalCase']},
+        {selector: 'enumMember', format: ['UPPER_CASE', 'snake_case']},
       ],
     },
   },
@@ -64,18 +64,18 @@ export default [
         1,
         {
           'newlines-between': 'always',
-          'named': true,
-          'groups': ['type', 'external', 'builtin', 'internal', 'sibling', 'parent', 'index'],
+          named: true,
+          groups: ['type', 'external', 'builtin', 'internal', 'sibling', 'parent', 'index'],
           distinctGroup: true,
-          'pathGroups': [
-            {'pattern': 'eco-vue-js/**/W**', 'group': 'builtin', 'position': 'before'},
-            {'pattern': '**/W**', 'group': 'builtin', 'position': 'before'},
-            {'pattern': 'eco-vue-js/**/Icon**', 'group': 'builtin', 'position': 'before'},
-            {'pattern': '**/Icon**', 'group': 'builtin', 'position': 'before'},
-            {'pattern': 'eco-vue-js/**', 'group': 'external', 'position': 'after'},
+          pathGroups: [
+            {pattern: 'eco-vue-js/**/W**', group: 'builtin', position: 'before'},
+            {pattern: '**/W**', group: 'builtin', position: 'before'},
+            {pattern: 'eco-vue-js/**/Icon**', group: 'builtin', position: 'before'},
+            {pattern: '**/Icon**', group: 'builtin', position: 'before'},
+            {pattern: 'eco-vue-js/**', group: 'external', position: 'after'},
           ],
-          'pathGroupsExcludedImportTypes': ['builtin'],
-          'alphabetize': {'order': 'asc', 'caseInsensitive': false},
+          pathGroupsExcludedImportTypes: ['builtin'],
+          alphabetize: {order: 'asc', caseInsensitive: false},
         },
       ],
       'import/no-useless-path-segments': [1, {noUselessIndex: true}],
@@ -88,11 +88,11 @@ export default [
         '@typescript-eslint/parser': ['.ts', '.js'],
       },
       'import/resolver': {
-        'typescript': {
-          'alwaysTryTypes': true,
-          'project': './tsconfig.vue.json',
+        typescript: {
+          alwaysTryTypes: true,
+          project: './tsconfig.vue.json',
         },
-        'node': true,
+        node: true,
       },
     },
   },
@@ -109,10 +109,10 @@ export default [
       sourceType: 'module',
     },
     rules: {
-      'semi': ['error', 'never'],
-      'quotes': ['error', 'single', {allowTemplateLiterals: true}],
+      semi: ['error', 'never'],
+      quotes: ['error', 'single', {allowTemplateLiterals: true}],
       'comma-dangle': ['error', 'always-multiline'],
-      'comma-spacing': ['error', {'before': false, 'after': true}],
+      'comma-spacing': ['error', {before: false, after: true}],
       'object-curly-spacing': ['error', 'never'],
       'func-call-spacing': 'off',
       'template-curly-spacing': ['error', 'always'],
@@ -121,7 +121,7 @@ export default [
       'default-case-last': 'off',
       'no-console': ['warn'],
       'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', {'args': 'after-used', 'caughtErrors': 'none'}],
+      '@typescript-eslint/no-unused-vars': ['error', {args: 'after-used', caughtErrors: 'none'}],
       'unused-imports/no-unused-imports': 'error',
       'tailwindcss/no-custom-classname': 'off',
       'tailwindcss/migration-from-tailwind-2': 'off',
@@ -130,7 +130,8 @@ export default [
       'key-spacing': 1,
       '@stylistic/ts/function-call-spacing': 1,
       '@stylistic/ts/member-delimiter-style': [1, {multiline: {delimiter: 'none'}, singleline: {delimiter: 'comma'}}],
-      '@stylistic/ts/type-annotation-spacing': [1, {'before': false, 'after': true, 'overrides': {'arrow': {'before': true, 'after': true}}}],
+      '@stylistic/ts/type-annotation-spacing': [1, {before: false, after: true, overrides: {arrow: {before: true, after: true}}}],
+      '@stylistic/ts/quote-props': [1, 'as-needed'],
     },
   },
 
@@ -138,21 +139,21 @@ export default [
     files: ['**/*.vue'],
     rules: {
       'vue/script-indent': ['error', 2, {
-        'baseIndent': 0,
-        'switchCase': 1,
-        'ignores': [],
+        baseIndent: 0,
+        switchCase: 1,
+        ignores: [],
       }],
       'vue/component-name-in-template-casing': ['error', 'PascalCase', {registeredComponentsOnly: false}],
       'vue/component-tags-order': ['error', {
-        'order': ['template', 'script[setup]', 'style'],
+        order: ['template', 'script[setup]', 'style'],
       }],
       'vue/multiline-html-element-content-newline': ['error', {
-        'ignoreWhenEmpty': true,
-        'ignores': ['pre', 'textarea', 'span', 'tspan'],
-        'allowEmptyLines': false,
+        ignoreWhenEmpty: true,
+        ignores: ['pre', 'textarea', 'span', 'tspan'],
+        allowEmptyLines: false,
       }],
       'vue/attributes-order': ['error', {
-        'order': [
+        order: [
           'DEFINITION',
           'LIST_RENDERING',
           'CONDITIONALS',
@@ -165,15 +166,15 @@ export default [
           'EVENTS',
           'CONTENT',
         ],
-        'alphabetical': false,
+        alphabetical: false,
       }],
       'vue/prefer-use-template-ref': 'error',
-      'vue/require-macro-variable-name': ['error', {'defineProps': 'props', 'defineEmits': 'emit', 'defineSlots': 'slots', 'useSlots': 'slots', 'useAttrs': 'attrs'}],
+      'vue/require-macro-variable-name': ['error', {defineProps: 'props', defineEmits: 'emit', defineSlots: 'slots', useSlots: 'slots', useAttrs: 'attrs'}],
       'vue/require-typed-ref': 'error',
       'vue/padding-line-between-blocks': ['error', 'always'],
       'vue/block-tag-newline': [1, {
-        'singleline': 'always',
-        'multiline': 'always',
+        singleline: 'always',
+        multiline: 'always',
       }],
       'vue/no-lone-template': ['error', {ignoreAccessible: false}],
     },
