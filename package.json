@@ -377,9 +377,6 @@
     "./dist/components/Tabs/WTabsItem.vue": {
       "import": "./dist/components/Tabs/WTabsItem.vue.js"
     },
-    "./dist/components/Tabs/WTabsStepper.vue": {
-      "import": "./dist/components/Tabs/WTabsStepper.vue.js"
-    },
     "./dist/components/Tabs/types": {
       "import": "./dist/components/Tabs/types.d.ts"
     },

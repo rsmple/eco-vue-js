@@ -36,7 +36,6 @@
           :stepper="stepper"
           :show-has-value="showHasValue"
           :side="side"
-          :no-indicator="noIndicator"
           :class="{
             'snap-center': !side,
           }"
@@ -82,7 +81,7 @@
       </template>
 
       <div
-        v-if="!noIndicator"
+        v-if="!stepper"
         class="absolute rounded-sm duration-500"
         :style="indicatorStyle"
         :class="{
@@ -135,6 +134,7 @@ import {type CSSProperties, type Component, type VNode, computed, inject, onMoun
 import WForm from '@/components/Form/WForm.vue'
 
 import {getIsMobile} from '@/main'
+import {Notify} from '@/utils/Notify'
 import {debounce, throttle} from '@/utils/utils'
 
 import TabItem from './components/TabItem.vue'
@@ -151,6 +151,9 @@ const emit = defineEmits<{
   (e: 'update:has-changes', value: boolean): void
   (e: 'update:current-title', value: string): void
   (e: 'update:tabs-length', value: number): void
+  (e: 'update:progress', value: number): void
+  (e: 'update:first', value: boolean): void
+  (e: 'update:last', value: boolean): void
 }>()
 
 const slots = useSlots()
@@ -204,6 +207,9 @@ const hasNoValueFirst = computed<number>(() => {
   return index
 })
 
+const first = computed<boolean>(() => currentIndex.value === 0)
+const last = computed<boolean>(() => currentIndex.value === defaultSlotsKeys.value.length - 1)
+
 const switchOnInvalid = debounce((key: string): void => {
   if (currentIsValid.value !== false) switchTab(key)
 }, 50)
@@ -254,6 +260,14 @@ const setCurrentDebounced = debounce((value: string) => {
 }, 100)
 
 const next = (): void => {
+  const errorMessage = validateIfNoError(currentIndex.value)
+
+  if (errorMessage) {
+    Notify.warn({title: 'Form contains invalid values', caption: errorMessage.length < 200 ? errorMessage : undefined})
+
+    return
+  }
+
   switchTab(defaultSlotsKeys.value[currentIndex.value + 1])
 }
 
@@ -331,6 +345,22 @@ watch(defaultSlotsKeys, (newValue, oldValue) => {
 watch(defaultSlotsKeys, value => {
   emit('update:tabs-length', value.length)
 }, {immediate: true})
+
+if (props.stepper) {
+  const progress = computed(() => 100 * (currentIndex.value + 1) / defaultSlotsKeys.value.length)
+
+  watch(progress, value => {
+    emit('update:progress', value)
+  }, {immediate: true})
+
+  watch(first, value => {
+    emit('update:first', value)
+  }, {immediate: true})
+
+  watch(last, value => {
+    emit('update:last', value)
+  }, {immediate: true})
+}
 
 onMounted(() => {
   tabItemListenerInjected?.(updateIndicator)

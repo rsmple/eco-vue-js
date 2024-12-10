@@ -147,7 +147,6 @@ const props = defineProps<{
   disabled?: boolean
   stepper?: boolean
   showHasValue?: boolean
-  noIndicator?: boolean
   side?: boolean
 }>()
 
@@ -160,7 +159,7 @@ const emit = defineEmits<{
 const containerRef = useTemplateRef('container')
 
 const updateIndicator = (): void => {
-  if (!props.active || props.noIndicator) return
+  if (!props.active || props.stepper) return
   if (!containerRef.value || !containerRef.value.offsetWidth) return
 
   if (props.side) {

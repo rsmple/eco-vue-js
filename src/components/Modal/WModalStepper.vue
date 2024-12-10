@@ -10,8 +10,9 @@
       <WProgress :model-value="progress" />
     </template>
 
-    <WTabsStepper
+    <WTabs
       ref="tabsStepper"
+      stepper
       no-header
       @update:first="first = $event"
       @update:last="last = $event"
@@ -20,7 +21,7 @@
       @update:progress="progress = $event"
     >
       <slot />
-    </WTabsStepper>
+    </WTabs>
 
     <template #actions>
       <WButton
@@ -74,7 +75,7 @@ import {ref, useTemplateRef} from 'vue'
 import WButton from '@/components/Button/WButton.vue'
 import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
 import WProgress from '@/components/Progress/WProgress.vue'
-import WTabsStepper from '@/components/Tabs/WTabsStepper.vue'
+import WTabs from '@/components/Tabs/WTabs.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
 
