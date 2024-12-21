@@ -1,6 +1,6 @@
 const plugin = require('tailwindcss/plugin')
 
-module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, addBase, theme, addComponents}) {
+module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, addBase, theme, addComponents, config}) {
   matchUtilities(
     {
       square: (value) => {
@@ -128,7 +128,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
 
       '--input-autofill-bg': theme('colors.default'),
       '--input-autofull-text': theme('colors.black.default'),
-      '.dark &':{
+      [config('darkMode')[1][0]]: {
         '--input-autofill-bg': theme('colors.default-dark'),
         '--input-autofull-text': theme('colors.gray.100'),
       },
@@ -213,7 +213,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       'background-position': 'top',
       'background-image': 'linear-gradient(135deg, currentColor 10%, transparent 10%, transparent 50%, currentColor 50%, currentColor 60%, transparent 60%, transparent 100%)',
       'color': theme('colors.gray.300'),
-      '.dark &': {
+      [config('darkMode')[1][0]]: {
         'color': theme('colors.gray.700'),
       },
     },
@@ -275,13 +275,13 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
   addComponents({
     '.text-accent': {
       'color': theme('colors.black.default'),
-      '.dark &': {
+      [config('darkMode')[1][0]]: {
         'color': theme('colors.gray.200'),
       },
     },
     '.text-description': {
       'color': theme('colors.gray.400'),
-      '.dark &': {
+      [config('darkMode')[1][0]]: {
         'color': theme('colors.gray.500'),
       },
     },
@@ -405,9 +405,11 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         'background-size': '40px 40px',
         'animation': theme('animation.move-horizontal'),
       },
-      '.dark &::before': {
-        'background-image': 'linear-gradient(135deg, hsla(0,0%,10%,.125) 25%, transparent 0, transparent 50%, hsla(0,0%,10%,.125) 0, hsla(0,0%,10%,.125) 75%, transparent 0, transparent)',
-      },
+      [config('darkMode')[1][0]]: {
+        '&::before': {
+          'background-image': 'linear-gradient(135deg, hsla(0,0%,10%,.125) 25%, transparent 0, transparent 50%, hsla(0,0%,10%,.125) 0, hsla(0,0%,10%,.125) 75%, transparent 0, transparent)',
+        },
+      }
     },
   })
 
@@ -441,7 +443,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         'background-image': 'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.5), rgba(255,255,255,0))',
         'animation': theme('animation.ticker'),
 
-        '.dark &': {
+        [config('darkMode')[1][0]]: {
           'background-image': 'linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.01),rgba(255,255,255,0))',
         },
       },

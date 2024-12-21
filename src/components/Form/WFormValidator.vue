@@ -79,7 +79,23 @@ const title = computed<string | undefined>(() => props.title ?? componentSlot.va
 
 const errorMessage = ref<string | undefined | null>(null)
 
-const hasChanges = ref<boolean>(false)
+const hasChanges = computed<boolean>(() => {
+  if (props.noChanges) return false
+
+  if (initModelValue.value === undefined) {
+    return modelValue.value !== undefined && modelValue.value !== ''
+  } else {
+    if (Array.isArray(modelValue.value) && Array.isArray(initModelValue.value)) {
+      const oldValue = initModelValue.value
+      const newValue = modelValue.value
+
+      return newValue.length !== oldValue.length || newValue.some(item => !oldValue.includes(item))
+    } else {
+      return modelValue.value !== initModelValue.value
+    }
+  }
+})
+
 const hasBeenValidated = ref<boolean>(false)
 
 const hasValueExact = computed<boolean | null>(() => {
@@ -95,23 +111,6 @@ const hasValueExact = computed<boolean | null>(() => {
 const _hasValue = computed<boolean | null>(() => mandatory.value && hasValueExact.value === false ? null : hasValueExact.value)
 
 const requiredSymbols = computed<string[]>(() => props.requiredSymbols?.split('') ?? [])
-
-const _updateHasChanges = (value: Parameters<ValidateFn>[0]): void => {
-  if (props.noChanges) return
-
-  if (initModelValue.value === undefined) {
-    hasChanges.value = value !== undefined && value !== ''
-  } else {
-    if (Array.isArray(value) && Array.isArray(initModelValue.value)) {
-      const oldValue = initModelValue.value
-      const newValue = value
-
-      hasChanges.value = newValue.length !== oldValue.length || newValue.some(item => !oldValue.includes(item))
-    } else {
-      hasChanges.value = value !== initModelValue.value
-    }
-  }
-}
 
 const _validate = (value: Parameters<ValidateFn>[0]): string | undefined => {
   const requiredMessage = required.value ? validateRequired(value) : undefined
@@ -172,7 +171,6 @@ const _validate = (value: Parameters<ValidateFn>[0]): string | undefined => {
 
 const validateOnUpdate = (value: Parameters<ValidateFn>[0]) => {
   const message = _validate(value)
-  _updateHasChanges(value)
 
   errorMessage.value = message
   hasBeenValidated.value = true
@@ -225,7 +223,6 @@ const invalidate = (messages: Record<string, string | string[] | undefined>): vo
 
 const initModel = (): void => {
   initModelValue.value = modelValue.value
-  hasChanges.value = false
 }
 
 const scrollTo = () => {

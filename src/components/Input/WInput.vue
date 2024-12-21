@@ -74,47 +74,60 @@
           <div class="flex flex-wrap gap-1">
             <slot name="prefix" />
 
-            <component
-              :is="textarea ? 'textarea' : 'input'"
-              :id="id"
-              ref="input"
-              class="
-                w-input max-w-full flex-1 appearance-none border-none bg-[inherit] text-base font-normal
-                outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed disabled:opacity-80 dark:placeholder:text-gray-500
-              "
+            <div
+              class="flex flex-1 items-baseline"
               :class="{
-                'min-h-[var(--textarea-height,10rem)] w-full py-3': textarea,
-                'resize-y': resize && textarea,
-                'resize-none': !resize && textarea,
-                'h-[var(--input-height,2.625rem)]': !textarea && !$slots.suffix,
-                'h-[var(--input-height,2.125rem)]': !textarea && $slots.suffix,
                 'first:pl-0 group-first/input:pl-3 group-last/input:pr-3 [&:not(:first-child)]:pl-3': !hideInput,
                 'absolute w-0 max-w-0 p-0': hideInput,
-                'font-mono': mono,
-                'text-secure': textSecure && !isSecureVisible,
-                'text-black-default dark:text-gray-200': !disabled,
-                'text-black-default/50 dark:text-gray-200/50': disabled,
               }"
-              :value="placeholderSecure && modelValue === undefined && !focused ? '******' : modelValue"
-              :placeholder="placeholder"
-              :type="type ?? 'text'"
-              :name="name"
-              :disabled="disabled"
-              :readonly="readonly || unclickable"
-              :autocomplete="autocomplete"
-              :size="size || undefined"
-              :spellcheck="spellcheck ? 'true' : 'false'"
-              @input="handleInputEvent"
-              @keypress.enter.exact="!disabled && !readonly && $emit('keypress:enter', $event)"
-              @keydown.up.exact.stop="!disabled && !readonly && $emit('keypress:up', $event)"
-              @keydown.down.exact.stop="!disabled && !readonly && $emit('keypress:down', $event)"
-              @keydown.delete.exact.stop="!disabled && !readonly && $emit('keypress:delete', $event); handleBackspace($event)"
-              @focus="$emit('focus', $event); setFocused(true)"
-              @blur="$emit('blur', $event); setFocused(false); isSecureVisible = false"
-              @click="$emit('click', $event)"
-              @mousedown.stop="$emit('mousedown', $event)"
-              @select.stop="$emit('select:input', $event)"
-            />
+            >
+              <slot name="before" />
+
+              <component
+                :is="textarea ? 'textarea' : 'input'"
+                :id="id"
+                ref="input"
+                class="
+                  w-input max-w-full flex-1 appearance-none border-none bg-[inherit] text-base font-normal
+                  outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed disabled:opacity-80 dark:placeholder:text-gray-500
+                "
+                :class="{
+                  'min-h-[var(--textarea-height,10rem)] w-full py-3': textarea,
+                  'resize-y': resize && textarea,
+                  'resize-none': !resize && textarea,
+                  'h-[var(--input-height,2.625rem)]': !textarea && !$slots.suffix,
+                  'h-[var(--input-height,2.125rem)]': !textarea && $slots.suffix,
+                  'font-mono': mono,
+                  'text-secure': textSecure && !isSecureVisible,
+                  'text-black-default dark:text-gray-200': !disabled,
+                  'text-black-default/50 dark:text-gray-200/50': disabled,
+                }"
+                :value="placeholderSecure && modelValue === undefined && !focused ? '******' : modelValue"
+                :placeholder="placeholder"
+                :type="type ?? 'text'"
+                :name="name"
+                :disabled="disabled"
+                :readonly="readonly || unclickable"
+                :autocomplete="autocomplete"
+                :size="size || undefined"
+                :step="step"
+                :min="min"
+                :max="max"
+                :spellcheck="spellcheck ? 'true' : 'false'"
+                @input="handleInputEvent"
+                @keypress.enter.exact="!disabled && !readonly && $emit('keypress:enter', $event)"
+                @keydown.up.exact.stop="!disabled && !readonly && $emit('keypress:up', $event)"
+                @keydown.down.exact.stop="!disabled && !readonly && $emit('keypress:down', $event)"
+                @keydown.delete.exact.stop="!disabled && !readonly && $emit('keypress:delete', $event); handleBackspace($event)"
+                @focus="$emit('focus', $event); setFocused(true)"
+                @blur="$emit('blur', $event); setFocused(false); isSecureVisible = false"
+                @click="$emit('click', $event)"
+                @mousedown.stop="$emit('mousedown', $event)"
+                @select.stop="$emit('select:input', $event)"
+              />
+
+              <slot name="after" />
+            </div>
           </div>
         </div>
 

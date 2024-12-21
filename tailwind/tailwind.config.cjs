@@ -2,7 +2,9 @@
 
 module.exports = {
   mode: 'jit',
-  darkMode: 'class',
+  darkMode: ['variant', [
+    '.dark &:not(:is(.light *))',
+  ]],
   content: [
     './src/**/*.{vue,ts}',
   ],

@@ -13,6 +13,9 @@ export interface InputProps<Type extends InputType> extends Omit<FieldWrapperPro
   icon?: SVGComponent
   size?: number
   maxLength?: number
+  step?: number
+  min?: number
+  max?: number
 
   name?: string
   autocomplete?: 'off' | string
