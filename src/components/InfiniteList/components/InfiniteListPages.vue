@@ -3,6 +3,10 @@
     ref="infiniteScroll"
     :scrolling-element="scrollingElement"
     :style="{'--infinite-list-header-height': headerHeight + 'px'}"
+    :class="{
+      'min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] pb-16': !minHeight,
+      'min-h-full': minHeight,
+    }"
     @scroll:down="addNextPage"
     @scroll:up="addPreviousPage"
   >
@@ -239,6 +243,9 @@ const removePage = (page: number): void => {
 
   pages.value = newPages.length === 0 ? [1] : newPages
 
+  if (pagesCount.value >= page) pagesCount.value = page - 1
+  if (nextPage.value === page) nextPage.value = null
+
   emit('update:page', pages.value[pages.value.length - 1])
 }
 
@@ -259,6 +266,12 @@ const resetPage = async (page = 1) => {
   emit('update:page', page === 1 ? undefined : page)
   pages.value = []
 
+  const element = props.scrollingElement ?? document.scrollingElement
+
+  const value = (infiniteScrollRef.value?.$el.offsetTop ?? 0) - props.headerHeight - 60
+
+  if (element && element.scrollTop > value) element.scrollTop = value
+
   await nextTick()
 
   pages.value = [page]
@@ -268,8 +281,6 @@ const resetPage = async (page = 1) => {
 
 watch(toRef(props, 'queryParams'), (newValue, oldValue) => {
   if (isEqualObj(newValue, oldValue, ['page', ...(props.excludeParams ?? []) as string[]])) return
-
-  if (pages.value.length === 1 && pages.value[0] === 1) return
 
   resetPage()
 })

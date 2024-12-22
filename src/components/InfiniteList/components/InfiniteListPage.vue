@@ -2,10 +2,6 @@
   <div
     ref="element"
     class="relative"
-    :class="{
-      'last:min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] last:pb-16': !minHeight,
-      'last:min-h-full': minHeight && !data,
-    }"
   >
     <template v-if="page && data?.results.length !== 0">
       <div

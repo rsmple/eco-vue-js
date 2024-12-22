@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div ref="container">
     <slot />
   </div>
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, onUnmounted, watch} from 'vue'
+import {computed, onMounted, onUnmounted, useTemplateRef, watch} from 'vue'
 
 import {getIsScrollDown, getIsScrollUp} from '../models/utils'
 
@@ -18,12 +18,14 @@ const emit = defineEmits<{
   (e: 'scroll:down'): void
 }>()
 
+const containerRef = useTemplateRef('container')
+
 const element = computed(() => props.scrollingElement ?? document) 
 
 const listener = (event: Event): void => {
-  if (event.target !== element.value) return
+  if (event.target !== element.value || !containerRef.value) return
 
-  if (getIsScrollUp(props.scrollingElement ?? document.scrollingElement)) {
+  if (getIsScrollUp(props.scrollingElement ?? document.scrollingElement, containerRef.value.offsetTop)) {
     emit('scroll:up')
     return
   }
