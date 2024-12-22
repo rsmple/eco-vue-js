@@ -7,6 +7,7 @@
       disableClear: !allowClear,
       createdData: createdData ? [createdData] as Data[] : undefined,
       hidePrefix: true,
+      filterValue: filterValue === undefined ? modelValue : filterValue,
     }"
     :class="$attrs.class"
     @select="updateModelValue($event)"

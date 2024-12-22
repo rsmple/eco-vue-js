@@ -6,6 +6,7 @@
       modelValue: search,
       hideInput: modelValue.length === 0 ? false : isMobile ? !focused : !isOpen,
       loading: loading || isLoading || loadingCreate,
+      filterValue: filterValue === undefined ? modelValue : filterValue,
     }"
     :class="$attrs.class"
     @update:model-value="!loading && !isLoading && (search = $event as string ?? '')"

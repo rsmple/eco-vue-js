@@ -25,6 +25,16 @@ declare type PaginatedResponse<ValueType extends Record<string, unknown> | unkno
   results: ValueType[]
 }
 
+declare type EncodeQueryParam<T> = string extends T
+? string
+: number extends T
+? T
+: string
+
+declare type EncodeQueryParams<T> = {
+  [Key in keyof T]: EncodeQueryParam<T[Key]>
+}
+
 declare type ValidateFn = (value: string | number | undefined | string[] | boolean | null) => string | undefined
 
 declare type InputType = 'number' | 'text' | 'tel' | 'search' | 'password' | 'email' | 'search' | 'url'

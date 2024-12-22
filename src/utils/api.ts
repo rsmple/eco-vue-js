@@ -43,3 +43,29 @@ export const handleApiError = <Error>(
 
   return Promise.reject(error)
 }
+
+export const encodeQueryParam = <T>(value: T): EncodeQueryParam<T> | undefined => {
+  if (value === undefined) return undefined
+
+  if (Array.isArray(value)) {
+    if (value.length === 0) return undefined
+
+    if (value.every(Number.isInteger) || value.every(item => typeof item === 'string')) return value.join(',') as EncodeQueryParam<T>
+    else return JSON.stringify(value) as EncodeQueryParam<T>
+  } else {
+    if (value instanceof Object) return JSON.stringify(value) as EncodeQueryParam<T>
+    else return `${ value }` as EncodeQueryParam<T>
+  }
+}
+
+export const encodeQueryParams = <T>(params: T): EncodeQueryParams<T> => {
+  const result = {} as EncodeQueryParams<T>
+
+  for (const key in params) {
+    const value = encodeQueryParam(params[key])
+
+    if (value !== undefined) result[key] = value
+  }
+
+  return result
+}

@@ -14,8 +14,8 @@
       }"
     >
       <div
-        v-if="title || $slots.title?.()?.length"
-        class="text-accent mb-2 text-xs font-semibold duration-500"
+        v-if="title || $slots.title"
+        class="text-accent relative mb-2 pr-6 text-xs font-semibold duration-500"
         :class="{
           'opacity-50': disabled && !skeleton,
         }"
@@ -38,6 +38,13 @@
               *
             </span>
           </Transition>
+
+          <FilterButton
+            v-if="filterField && encodedQueryParam"
+            :filter-field="filterField"
+            :encoded-query-param="encodedQueryParam"
+            class="absolute -top-0.5 ml-1"
+          />
         </template>
 
         <WSkeleton
@@ -48,7 +55,12 @@
 
       <slot name="subtitle" />
 
-      <div class="grid grid-cols-[1fr,auto]">
+      <div
+        class="grid grid-cols-[1fr,auto]"
+        :class="{
+          'pr-9': !title && !$slots.title && filterField && encodedQueryParam,
+        }"
+      >
         <div
           v-if="!skeleton"
           class="w-has-changes-color-info dark:w-has-changes-color-info-dark relative grid grid-cols-1"
@@ -123,12 +135,19 @@
         />
 
         <div
-          v-if="$slots.right?.()?.length"
+          v-if="$slots.right"
           ref="rightContainer"
           class="sm-not:flex-col flex gap-4 pl-4"
         >
           <slot name="right" />
         </div>
+
+        <FilterButton
+          v-if="!title && !$slots.title && filterField && encodedQueryParam"
+          :filter-field="filterField"
+          :encoded-query-param="encodedQueryParam"
+          class="absolute right-0 self-center"
+        />
       </div>
     </label>
 
@@ -156,17 +175,20 @@
 <script lang="ts" setup>
 import type {FieldWrapperProps} from './types'
 
-import {ref, useId} from 'vue'
+import {computed, ref, useId} from 'vue'
 
 import WButtonCopy from '@/components/Button/WButtonCopy.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
+import {encodeQueryParam} from '@/main'
 import {numberFormatter} from '@/utils/utils'
+
+import FilterButton from './components/FilterButton.vue'
 
 defineOptions({inheritAttrs: false})
 
-defineProps<FieldWrapperProps>()
+const props = defineProps<FieldWrapperProps>()
 
 defineEmits<{
   (e: 'click', value: MouseEvent): void
@@ -175,6 +197,12 @@ defineEmits<{
 const id = useId()
 
 const focused = ref(false)
+
+const encodedQueryParam = computed(() => {
+  if (!props.filterField) return undefined
+
+  return encodeQueryParam(props.filterValue === undefined ? props.modelValue : props.filterValue)
+})
 
 const setFocused = (value: boolean): void => {
   focused.value = value

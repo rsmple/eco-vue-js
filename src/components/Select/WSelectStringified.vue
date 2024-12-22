@@ -4,6 +4,7 @@
     v-bind="{
       ...props,
       modelValue: arrayValue,
+      filterValue: filterValue === undefined ? arrayValue : filterValue,
     }"
     :class="$attrs.class"
     @select="updateModelValue($event, true)"
