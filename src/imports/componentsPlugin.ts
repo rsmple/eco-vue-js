@@ -61,6 +61,7 @@ import WNavItem from '@/components/Nav/WNavItem.vue'
 import WNavItemExpand from '@/components/Nav/WNavItemExpand.vue'
 import WNavItemTransition from '@/components/Nav/WNavItemTransition.vue'
 import WNotify from '@/components/Notify/WNotify.vue'
+import WNumberFormatter from '@/components/NumberFormatter/WNumberFormatter.vue'
 import WProgress from '@/components/Progress/WProgress.vue'
 import WSelect from '@/components/Select/WSelect.vue'
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
@@ -141,6 +142,7 @@ export default {
     app.component('WNavItemExpand', WNavItemExpand)
     app.component('WNavItemTransition', WNavItemTransition)
     app.component('WNotify', WNotify)
+    app.component('WNumberFormatter', WNumberFormatter)
     app.component('WProgress', WProgress)
     app.component('WSelect', WSelect)
     app.component('WSelectAsync', WSelectAsync)
@@ -221,6 +223,7 @@ export {
   WNavItemExpand,
   WNavItemTransition,
   WNotify,
+  WNumberFormatter,
   WProgress,
   WSelect,
   WSelectAsync,

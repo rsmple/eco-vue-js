@@ -338,6 +338,9 @@
     "./dist/components/Notify/WNotify.vue": {
       "import": "./dist/components/Notify/WNotify.vue.js"
     },
+    "./dist/components/NumberFormatter/WNumberFormatter.vue": {
+      "import": "./dist/components/NumberFormatter/WNumberFormatter.vue.js"
+    },
     "./dist/components/Progress/WProgress.vue": {
       "import": "./dist/components/Progress/WProgress.vue.js"
     },
