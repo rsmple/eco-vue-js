@@ -1,5 +1,11 @@
 <template>
+  <div
+    v-if="skeleton || !encodedQueryParam"
+    class="square-5"
+  />
+
   <button
+    v-else
     class="w-ripple w-ripple-hover rounded p-0.5"
     :class="{
       'text-description': $route.query[filterField] !== encodedQueryParam,
@@ -16,6 +22,7 @@ import IconFilter from '@/assets/icons/sax/IconFilter.svg?component'
 
 defineProps<{
   filterField: string
-  encodedQueryParam: EncodeQueryParam<unknown>
+  encodedQueryParam: EncodeQueryParam<unknown> | undefined
+  skeleton?: boolean
 }>()
 </script>

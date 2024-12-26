@@ -58,7 +58,7 @@
       <div
         class="grid grid-cols-[1fr,auto]"
         :class="{
-          'pr-9': !title && !$slots.title && filterField && encodedQueryParam,
+          'pr-9': !title && !$slots.title && filterField,
         }"
       >
         <div
@@ -142,12 +142,14 @@
           <slot name="right" />
         </div>
 
-        <FilterButton
-          v-if="!title && !$slots.title && filterField && encodedQueryParam"
-          :filter-field="filterField"
-          :encoded-query-param="encodedQueryParam"
-          class="absolute right-0 self-center"
-        />
+        <template v-if="!title && !$slots.title && filterField">
+          <FilterButton
+            :filter-field="filterField"
+            :encoded-query-param="encodedQueryParam"
+            :skeleton="skeleton"
+            class="absolute right-0 self-center"
+          />
+        </template>
       </div>
     </label>
 
@@ -199,7 +201,7 @@ const id = useId()
 const focused = ref(false)
 
 const encodedQueryParam = computed(() => {
-  if (!props.filterField) return undefined
+  if (props.filterField === undefined) return undefined
 
   return encodeQueryParam(props.filterValue === undefined ? props.modelValue : props.filterValue)
 })

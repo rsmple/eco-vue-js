@@ -75,6 +75,7 @@ const modelValue = computed<Parameters<ValidateFn>[0]>(() => {
 const initModelValue = ref<Parameters<ValidateFn>[0]>()
 const required = computed<boolean | undefined>(() => componentSlot.value?.props?.required !== undefined ? componentSlot.value?.props?.required !== false : undefined)
 const mandatory = computed<boolean | undefined>(() => componentSlot.value?.props?.mandatory !== undefined ? componentSlot.value?.props?.mandatory !== false : undefined)
+const skeleton = computed<boolean | undefined>(() => componentSlot.value?.props?.skeleton !== undefined ? componentSlot.value?.props?.skeleton !== false : undefined)
 const title = computed<string | undefined>(() => props.title ?? componentSlot.value?.props?.title)
 
 const errorMessage = ref<string | undefined | null>(null)
@@ -271,6 +272,10 @@ watch(title, value => {
 
 watch(required, () => {
   if (hasBeenValidated.value) doValidate()
+})
+
+watch(skeleton, value => {
+  if (!value) initModel()
 })
 
 onBeforeMount(() => {
