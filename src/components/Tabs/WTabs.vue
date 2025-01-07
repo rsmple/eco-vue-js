@@ -197,7 +197,7 @@ const indicatorStyle = ref<CSSProperties | undefined>(undefined)
 const minHeight = ref(0)
 const tabItemRef = useTemplateRef('tabItem')
 
-const currentIsValid = computed<boolean>(() => typeof formRef.value?.errorMessageMap[currentIndex.value] !== 'string')
+const currentIsValid = computed<boolean>(() => typeof formRef.value?.errorMessageMap[current.value] !== 'string')
 const hasNoValueFirst = computed<number>(() => {
   if (!props.stepper) return 0
 

@@ -5,18 +5,13 @@
 </template>
 
 <script lang="ts" setup>
-import {inject, onBeforeUnmount, provide, toRef, watch} from 'vue'
+import {computed, inject, onBeforeUnmount, provide, toRef, watch} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
-import {wFormUnlistener} from './models/injection'
-import {useFormErrorMessageMap} from './use/useFormErrorMessageMap'
-import {useFormHasChangesMap} from './use/useFormHasChangesMap'
-import {useFormHasValueMap} from './use/useFormHasValueMap'
-import {useFormInitModelMap} from './use/useFormInitModelMap'
-import {useFormInvalidateMap} from './use/useFormInvalidateMap'
-import {useFormTitleMap} from './use/useFormTitleMap'
-import {useFormValidateMap} from './use/useFormValidateMap'
+import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormHasValueUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
+import {type ValidatePath, compileMessage} from './models/utils'
+import {useFormValueMap} from './use/useFormValueMap'
 
 const props = defineProps<{
   name?: string
@@ -32,39 +27,107 @@ const emit = defineEmits<{
 
 const name = toRef(props, 'name')
 
-const {titleGetter, titleMapUnlistener} = useFormTitleMap(name, toRef(props, 'title'))
+const titleMap = useFormValueMap(wFormTitleUpdater, name, toRef(props, 'title'))
 
-const {errorMessageMapUnlistener, isValid, errorMessage, errorMessageMap} = useFormErrorMessageMap(name, titleGetter)
+const titleGetter = (key: string): string => {
+  return titleMap.map.value[key] ?? ''
+}
 
-const {hasChangesMapUnlistener, hasChanges, hasChangesMap} = useFormHasChangesMap(name)
+const errorMessageMap = useFormValueMap(
+  wFormErrorMessageUpdater,
+  name,
+  map => computed(() => Object.keys(map.value).map(key => compileMessage(titleGetter(key), map.value[key])).filter(item => item).join('\n') || undefined),
+)
 
-const {hasValueMapUnlistener, hasValue, hasValueMap} = useFormHasValueMap(name)
+const isValid = computed<boolean>(() => !Object.values(errorMessageMap.map.value).some(item => item))
 
-const {validateMapUnlistener, validate, validateMap} = useFormValidateMap(name, titleGetter, value => emit('update:is-valid', value))
+const hasChangesMap = useFormValueMap(
+  wFormHasChangesUpdater,
+  name,
+  map => computed(() => Object.values(map.value).some(value => value)),
+)
 
-const {invalidateMapUnlistener, invalidate, invalidateMap} = useFormInvalidateMap(name)
+const hasValueMap = useFormValueMap(
+  wFormHasValueUpdater,
+  name,
+  map => computed(() => {
+    const items = Object.values(map.value)
+  
+    if (items.length === 0) return null
+  
+    return items.length !== 0 && items.every(value => value)
+  }),
+)
 
-const {initModelMapUnlistener, initModel, initModelMap} = useFormInitModelMap(name)
+const validateMap = useFormValueMap(
+  wFormValidateUpdater,
+  name,
+  map => (silent?: boolean, path?: ValidatePath): string | undefined => {
+    const messages = Object.keys(map.value)
+      .map(key => {
+        return compileMessage(
+          titleGetter(key),
+          map.value[key](
+            silent,
+            path?.[key] instanceof Object
+              ? path[key] as ValidatePath
+              : path?.[key] === true
+                ? undefined
+                : path,
+          ),
+        )
+      })
+      .filter(item => item)
+  
+    if (!silent) emit('update:is-valid', messages.length === 0)
+  
+    return messages.length === 0 ? undefined : messages.join('\n')
+  },
+)
+
+type InvalidatePayload = Record<string, string | string[] | undefined>
+
+const invalidateMap = useFormValueMap(
+  wFormInvalidateUpdater,
+  name,
+  map => (payload: InvalidatePayload): void => {
+    const value = name.value ? (payload[name.value] as unknown as InvalidatePayload | undefined ?? payload) : payload
+  
+    Object.keys(map.value).forEach(key => {
+      map.value[key]?.(value)
+    })
+  },
+)
+
+const initModelMap = useFormValueMap(
+  wFormInitModelUpdater,
+  name,
+  map => (): void => {
+    Object.keys(map.value).forEach(key => {
+      map.value[key]?.()
+    })
+  },
+)
 
 const unlistener = (key: string) => {
-  titleMapUnlistener(key)
-  errorMessageMapUnlistener(key)
-  hasChangesMapUnlistener(key)
-  hasValueMapUnlistener(key)
-  validateMapUnlistener(key)
-  invalidateMapUnlistener(key)
-  initModelMapUnlistener(key)
+  titleMap.unlistener(key)
+  errorMessageMap.unlistener(key)
+  hasChangesMap.unlistener(key)
+  hasValueMap.unlistener(key)
+  validateMap.unlistener(key)
+  invalidateMap.unlistener(key)
+  initModelMap.unlistener(key)
 }
 
 provide(wFormUnlistener, unlistener)
 
 const unlistenerInjected = inject(wFormUnlistener, undefined)
 
-watch(errorMessageMap, () => emit('update:is-valid', isValid.value))
+watch(errorMessageMap.map, () => emit('update:is-valid', isValid.value))
 
-watch(hasChanges, value => emit('update:has-changes', value))
+watch(hasChangesMap.value, value => emit('update:has-changes', value))
 
-watch(hasValue, value => emit('update:has-value', value))
+watch(hasValueMap.value, value => emit('update:has-value', value))
 
 onBeforeUnmount(() => {
   if (props.name) {
@@ -76,17 +139,17 @@ onBeforeUnmount(() => {
 
 defineExpose({
   isValid,
-  hasChanges,
-  hasChangesMap,
-  hasValue,
-  hasValueMap,
-  validate,
-  validateMap,
-  invalidate,
-  invalidateMap,
-  initModel,
-  initModelMap,
-  errorMessage,
-  errorMessageMap,
+  hasChanges: hasChangesMap.value,
+  hasChangesMap: hasChangesMap.map,
+  hasValue: hasValueMap.value,
+  hasValueMap: hasValueMap.map,
+  validate: validateMap.value,
+  validateMap: validateMap.map,
+  invalidate: invalidateMap.value,
+  invalidateMap: invalidateMap.map,
+  initModel: initModelMap.value,
+  initModelMap: initModelMap.map,
+  errorMessage: errorMessageMap.value,
+  errorMessageMap: errorMessageMap.map,
 })
 </script>
