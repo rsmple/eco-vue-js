@@ -1,39 +1,23 @@
-import {type Ref, inject, onBeforeMount, provide, ref} from 'vue'
+import {type Ref} from 'vue'
+
+import {useFormValueMap} from './useFormValueMap'
 
 import {wFormInitModelUpdater} from '../models/injection'
 
 export const useFormInitModelMap = (name: Ref<string | undefined>) => {
-  const initModelMap = ref<Record<string, () => void>>({})
-
-  const initModelMapUpdater = (key: string, value: () => void): void => {
-    initModelMap.value[key] = value
-
-    if (!name.value) initModelInjected?.(key, value)
-  }
-
-  const initModelMapUnlistener = (key: string) => {
-    if (key in initModelMap.value) delete initModelMap.value[key]
-  }
-
-  const initModel = (): void => {
-    Object.keys(initModelMap.value).forEach(key => {
-      initModelMap.value[key]?.()
-    })
-  }
-
-  provide(wFormInitModelUpdater, initModelMapUpdater)
-
-  const initModelInjected = inject(wFormInitModelUpdater, undefined)
-
-  onBeforeMount(() => {
-    if (name.value) {
-      initModelInjected?.(name.value, initModel)
-    }
-  })
+  const {map, value, unlistener} = useFormValueMap(
+    wFormInitModelUpdater,
+    name,
+    map => (): void => {
+      Object.keys(map.value).forEach(key => {
+        map.value[key]?.()
+      })
+    },
+  )
 
   return {
-    initModelMapUnlistener,
-    initModel,
-    initModelMap,
+    initModelMapUnlistener: unlistener,
+    initModel: value,
+    initModelMap: map,
   }
 }

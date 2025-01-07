@@ -1,3 +1,4 @@
+import type {ValidatePath} from './utils'
 import type {InjectionKey} from 'vue'
 
 export const wFormTitleUpdater = Symbol('wFormTitleUpdater') as InjectionKey<(key: string, value: string | undefined) => void>
@@ -8,7 +9,7 @@ export const wFormHasChangesUpdater = Symbol('wFormHasChangesUpdater') as Inject
 
 export const wFormHasValueUpdater = Symbol('wFormHasValueUpdater') as InjectionKey<(key: string, value: boolean | null) => void>
 
-export const wFormValidateUpdater = Symbol('wFormValidateUpdater') as InjectionKey<(key: string, value: () => string | undefined) => void>
+export const wFormValidateUpdater = Symbol('wFormValidateUpdater') as InjectionKey<(key: string, value: (silent?: boolean, path?: ValidatePath) => string | undefined) => void>
 
 export const wFormInvalidateUpdater = Symbol('wFormValidateUpdater') as InjectionKey<(key: string, value: (messages: Record<string, string | string[] | undefined>) => void) => void>
 

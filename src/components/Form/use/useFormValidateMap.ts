@@ -1,60 +1,40 @@
-import {type Ref, inject, onBeforeMount, provide, ref} from 'vue'
+import {type Ref} from 'vue'
+
+import {useFormValueMap} from './useFormValueMap'
 
 import {wFormValidateUpdater} from '../models/injection'
-import {compileMessage} from '../models/utils'
-
-export type ValidatePath = {
-  [Key in string]: boolean | ValidatePath
-}
+import {type ValidatePath, compileMessage} from '../models/utils'
 
 export const useFormValidateMap = (name: Ref<string | undefined>, titleGetter: (key: string) => string, emitIsValid: (value: boolean) => void) => {
-  const validateMap = ref<Record<string, (silent?: boolean, path?: ValidatePath) => string | undefined>>({})
-
-  const validateMapUpdater = (key: string, value: () => string | undefined): void => {
-    validateMap.value[key] = value
-
-    if (!name.value) validateUpdaterInjected?.(key, value)
-  }
-
-  const validateMapUnlistener = (key: string) => {
-    if (key in validateMap.value) delete validateMap.value[key]
-  }
-
-  const validate = (silent?: boolean, path?: ValidatePath): string | undefined => {
-    const messages = Object.keys(validateMap.value)
-      .map(key => {
-        return compileMessage(
-          titleGetter(key),
-          validateMap.value[key](
-            silent,
-            path?.[key] instanceof Object
-              ? path[key] as ValidatePath
-              : path?.[key] === true
-                ? undefined
-                : path,
-          ),
-        )
-      })
-      .filter(item => item)
-
-    if (!silent) emitIsValid(messages.length === 0)
-
-    return messages.length === 0 ? undefined : messages.join('\n')
-  }
-
-  provide(wFormValidateUpdater, validateMapUpdater)
-
-  const validateUpdaterInjected = inject(wFormValidateUpdater, undefined)
-
-  onBeforeMount(() => {
-    if (name.value) {
-      validateUpdaterInjected?.(name.value, validate)
-    }
-  })
+  const {map, value, unlistener} = useFormValueMap(
+    wFormValidateUpdater,
+    name,
+    map => (silent?: boolean, path?: ValidatePath): string | undefined => {
+      const messages = Object.keys(map.value)
+        .map(key => {
+          return compileMessage(
+            titleGetter(key),
+            map.value[key](
+              silent,
+              path?.[key] instanceof Object
+                ? path[key] as ValidatePath
+                : path?.[key] === true
+                  ? undefined
+                  : path,
+            ),
+          )
+        })
+        .filter(item => item)
+  
+      if (!silent) emitIsValid(messages.length === 0)
+  
+      return messages.length === 0 ? undefined : messages.join('\n')
+    },
+  )
 
   return {
-    validateMapUnlistener,
-    validate,
-    validateMap,
+    validateMapUnlistener: unlistener,
+    validate: value,
+    validateMap: map,
   }
 }

@@ -33,11 +33,17 @@ const emit = defineEmits<{
 const name = toRef(props, 'name')
 
 const {titleGetter, titleMapUnlistener} = useFormTitleMap(name, toRef(props, 'title'))
+
 const {errorMessageMapUnlistener, isValid, errorMessage, errorMessageMap} = useFormErrorMessageMap(name, titleGetter)
+
 const {hasChangesMapUnlistener, hasChanges, hasChangesMap} = useFormHasChangesMap(name)
+
 const {hasValueMapUnlistener, hasValue, hasValueMap} = useFormHasValueMap(name)
+
 const {validateMapUnlistener, validate, validateMap} = useFormValidateMap(name, titleGetter, value => emit('update:is-valid', value))
+
 const {invalidateMapUnlistener, invalidate, invalidateMap} = useFormInvalidateMap(name)
+
 const {initModelMapUnlistener, initModel, initModelMap} = useFormInitModelMap(name)
 
 const unlistener = (key: string) => {

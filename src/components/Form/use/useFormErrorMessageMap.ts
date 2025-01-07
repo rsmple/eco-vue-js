@@ -1,41 +1,23 @@
-import {type Ref, computed, inject, provide, ref, watch} from 'vue'
+import {type Ref, computed} from 'vue'
+
+import {useFormValueMap} from './useFormValueMap'
 
 import {wFormErrorMessageUpdater} from '../models/injection'
 import {compileMessage} from '../models/utils'
 
 export const useFormErrorMessageMap = (name: Ref<string | undefined>, titleGetter: (key: string) => string) => {
-  const errorMessageMap = ref<Record<string, string>>({})
-  const isValid = computed<boolean>(() => !Object.values(errorMessageMap.value).some(item => item))
+  const {map, value, unlistener} = useFormValueMap(
+    wFormErrorMessageUpdater,
+    name,
+    map => computed(() => Object.keys(map.value).map(key => compileMessage(titleGetter(key), map.value[key])).filter(item => item).join('\n') || undefined),
+  )
 
-  const errorMessageMapUpdater = (key: string, value: string | undefined): void => {
-    if (!value) errorMessageMapUnlistener(key)
-    else errorMessageMap.value[key] = value
-
-    if (!name.value) errorMessageUpdaterInjected?.(key, value)
-  }
-
-  const errorMessageMapUnlistener = (key: string) => {
-    if (key in errorMessageMap.value) delete errorMessageMap.value[key]
-  }
-
-  const errorMessage = computed(() => {
-    return Object.keys(errorMessageMap.value).map(key => compileMessage(titleGetter(key), errorMessageMap.value[key])).filter(item => item).join('\n')
-  })
-
-  provide(wFormErrorMessageUpdater, errorMessageMapUpdater)
-
-  const errorMessageUpdaterInjected = inject(wFormErrorMessageUpdater, undefined)
-
-  watch(errorMessage, value => {
-    if (name.value) {
-      errorMessageUpdaterInjected?.(name.value, value)
-    }
-  })
+  const isValid = computed<boolean>(() => !Object.values(map.value).some(item => item))
 
   return {
-    errorMessageMapUnlistener,
+    errorMessageMapUnlistener: unlistener,
     isValid,
-    errorMessage,
-    errorMessageMap,
+    errorMessage: value,
+    errorMessageMap: map,
   }
 }

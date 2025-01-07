@@ -12,9 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-import type {ValidatePath} from './use/useFormValidateMap'
-
-import {computed, inject, onBeforeMount, onBeforeUnmount, ref, useSlots, useTemplateRef, watch} from 'vue'
+import {type VNode, computed, inject, onBeforeMount, onBeforeUnmount, ref, useSlots, useTemplateRef, watch} from 'vue'
 
 import {useIsInsideTab} from '@/components/Tabs/use/useIsInsideTab'
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
@@ -22,7 +20,7 @@ import {debounce} from '@/main'
 import {validateRequired} from '@/utils/validate'
 
 import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormHasValueUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
-import {scrollToValidator} from './models/utils'
+import {type ValidatePath, scrollToValidator} from './models/utils'
 
 const props = defineProps<{
   name?: string
@@ -305,6 +303,6 @@ defineExpose({
 })
 
 defineSlots<{
-  default: () => void
+  default: () => VNode[]
 }>()
 </script>

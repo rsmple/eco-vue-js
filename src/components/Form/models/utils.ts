@@ -29,3 +29,7 @@ export const scrollToValidator = throttle((element: HTMLElement): void => {
     inline: 'nearest',
   })
 }, 300)
+
+export type ValidatePath = {
+  [Key in string]: boolean | ValidatePath
+}
