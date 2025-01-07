@@ -1,17 +1,18 @@
 import {type Ref, inject, onBeforeMount, provide, ref} from 'vue'
 
 import {wFormInitModelUpdater} from '../models/injection'
-import {removeKey} from '../models/utils'
 
 export const useFormInitModelMap = (name: Ref<string | undefined>) => {
   const initModelMap = ref<Record<string, () => void>>({})
 
   const initModelMapUpdater = (key: string, value: () => void): void => {
-    initModelMap.value = {...initModelMap.value, [key]: value}
+    initModelMap.value[key] = value
+
+    if (!name.value) initModelInjected?.(key, value)
   }
 
   const initModelMapUnlistener = (key: string) => {
-    initModelMap.value = removeKey(initModelMap.value, key)
+    if (key in initModelMap.value) delete initModelMap.value[key]
   }
 
   const initModel = (): void => {
@@ -33,5 +34,6 @@ export const useFormInitModelMap = (name: Ref<string | undefined>) => {
   return {
     initModelMapUnlistener,
     initModel,
+    initModelMap,
   }
 }

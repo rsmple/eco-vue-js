@@ -1,18 +1,21 @@
 import {type Ref, computed, inject, provide, ref, watch} from 'vue'
 
 import {wFormErrorMessageUpdater} from '../models/injection'
-import {compileMessage, removeKey} from '../models/utils'
+import {compileMessage} from '../models/utils'
 
 export const useFormErrorMessageMap = (name: Ref<string | undefined>, titleGetter: (key: string) => string) => {
   const errorMessageMap = ref<Record<string, string>>({})
   const isValid = computed<boolean>(() => !Object.values(errorMessageMap.value).some(item => item))
 
   const errorMessageMapUpdater = (key: string, value: string | undefined): void => {
-    errorMessageMap.value = !value ? removeKey(errorMessageMap.value, key) : {...errorMessageMap.value, [key]: value}
+    if (!value) errorMessageMapUnlistener(key)
+    else errorMessageMap.value[key] = value
+
+    if (!name.value) errorMessageUpdaterInjected?.(key, value)
   }
 
   const errorMessageMapUnlistener = (key: string) => {
-    errorMessageMap.value = removeKey(errorMessageMap.value, key)
+    if (key in errorMessageMap.value) delete errorMessageMap.value[key]
   }
 
   const errorMessage = computed(() => {

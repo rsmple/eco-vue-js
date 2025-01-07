@@ -1,18 +1,20 @@
 import {type Ref, computed, inject, provide, ref, watch} from 'vue'
 
 import {wFormHasChangesUpdater} from '../models/injection'
-import {removeKey} from '../models/utils'
 
 export const useFormHasChangesMap = (name: Ref<string | undefined>) => {
   const hasChangesMap = ref<Record<string, true>>({})
   const hasChanges = computed<boolean>(() => Object.keys(hasChangesMap.value).length !== 0)
 
   const hasChangesMapUpdater = (key: string, value: boolean): void => {
-    hasChangesMap.value = !value ? removeKey(hasChangesMap.value, key) : {...hasChangesMap.value, [key]: value}
+    if (!value) hasChangesMapUnlistener(key)
+    else hasChangesMap.value[key] = value
+
+    if (!name.value) hasChangesUpdaterInjected?.(key, value)
   }
 
   const hasChangesMapUnlistener = (key: string) => {
-    hasChangesMap.value = removeKey(hasChangesMap.value, key)
+    if (key in hasChangesMap.value) delete hasChangesMap.value[key]
   }
 
   provide(wFormHasChangesUpdater, hasChangesMapUpdater)
@@ -28,5 +30,6 @@ export const useFormHasChangesMap = (name: Ref<string | undefined>) => {
   return {
     hasChangesMapUnlistener,
     hasChanges,
+    hasChangesMap,
   }
 }

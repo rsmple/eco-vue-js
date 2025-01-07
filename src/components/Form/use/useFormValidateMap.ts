@@ -1,7 +1,7 @@
 import {type Ref, inject, onBeforeMount, provide, ref} from 'vue'
 
 import {wFormValidateUpdater} from '../models/injection'
-import {compileMessage, removeKey} from '../models/utils'
+import {compileMessage} from '../models/utils'
 
 export type ValidatePath = {
   [Key in string]: boolean | ValidatePath
@@ -11,11 +11,13 @@ export const useFormValidateMap = (name: Ref<string | undefined>, titleGetter: (
   const validateMap = ref<Record<string, (silent?: boolean, path?: ValidatePath) => string | undefined>>({})
 
   const validateMapUpdater = (key: string, value: () => string | undefined): void => {
-    validateMap.value = {...validateMap.value, [key]: value}
+    validateMap.value[key] = value
+
+    if (!name.value) validateUpdaterInjected?.(key, value)
   }
 
   const validateMapUnlistener = (key: string) => {
-    validateMap.value = removeKey(validateMap.value, key)
+    if (key in validateMap.value) delete validateMap.value[key]
   }
 
   const validate = (silent?: boolean, path?: ValidatePath): string | undefined => {
@@ -53,5 +55,6 @@ export const useFormValidateMap = (name: Ref<string | undefined>, titleGetter: (
   return {
     validateMapUnlistener,
     validate,
+    validateMap,
   }
 }

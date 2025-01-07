@@ -3,17 +3,9 @@
 </template>
 
 <script setup lang="ts">
-import type {TabsItemScopedProps} from './types'
+import type {TabsItemProps, TabsItemScopedProps} from './types'
 
-defineProps<{
-  title: string
-  name: string
-  icon?: SVGComponent
-  disabled?: boolean
-  removable?: boolean
-  divided?: boolean
-  init?: boolean
-}>()
+defineProps<TabsItemProps>()
 
 defineSlots<{
   default?: () => void

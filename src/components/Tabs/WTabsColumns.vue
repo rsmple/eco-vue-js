@@ -23,4 +23,8 @@ import WTabs from '@/components/Tabs/WTabs.vue'
 import {getIsMobile} from '@/utils/mobile'
 
 const isMobile = getIsMobile()
+
+defineSlots<{
+  default: () => []
+}>()
 </script>

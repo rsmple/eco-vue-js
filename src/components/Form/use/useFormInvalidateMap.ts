@@ -1,7 +1,6 @@
 import {type Ref, inject, onBeforeMount, provide, ref} from 'vue'
 
 import {wFormInvalidateUpdater} from '../models/injection'
-import {removeKey} from '../models/utils'
 
 type InvalidatePayload = Record<string, string | string[] | undefined>
 
@@ -9,11 +8,13 @@ export const useFormInvalidateMap = (name: Ref<string | undefined>) => {
   const invalidateMap = ref<Record<string, (messages: InvalidatePayload) => void>>({})
 
   const invalidateMapUpdater = (key: string, value: (messages: InvalidatePayload) => void): void => {
-    invalidateMap.value = {...invalidateMap.value, [key]: value}
+    invalidateMap.value[key] = value
+
+    if (!name.value) invalidateUpdaterInjected?.(key, value)
   }
 
   const invalidateMapUnlistener = (key: string) => {
-    invalidateMap.value = removeKey(invalidateMap.value, key)
+    if (key in invalidateMap.value) delete invalidateMap.value[key]
   }
 
   const invalidate = (payload: InvalidatePayload): void => {
@@ -37,5 +38,6 @@ export const useFormInvalidateMap = (name: Ref<string | undefined>) => {
   return {
     invalidateMapUnlistener,
     invalidate,
+    invalidateMap,
   }
 }

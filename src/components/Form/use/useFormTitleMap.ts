@@ -1,17 +1,19 @@
 import {type Ref, inject, provide, ref, watch} from 'vue'
 
 import {wFormTitleUpdater} from '../models/injection'
-import {removeKey} from '../models/utils'
 
 export const useFormTitleMap = (name: Ref<string | undefined>, title: Ref<string | undefined>) => {
   const titleMap = ref<Record<string, string>>({})
 
   const titleMapUpdater = (key: string, value: string | undefined): void => {
-    titleMap.value = !value ? removeKey(titleMap.value, key) : {...titleMap.value, [key]: value}
+    if (!value) titleMapUnlistener(key)
+    else titleMap.value[key] = value
+
+    if (!name.value) titleUpdaterInjected?.(key, value)
   }
 
   const titleMapUnlistener = (key: string) => {
-    titleMap.value = removeKey(titleMap.value, key)
+    if (key in titleMap.value) delete titleMap.value[key]
   }
 
   const titleGetter = (key: string) => {

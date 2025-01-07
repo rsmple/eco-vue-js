@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, nextTick, useTemplateRef, watch} from 'vue'
+import {nextTick, toRef, useTemplateRef, watch} from 'vue'
 
 import WForm from '@/components/Form/WForm.vue'
 
@@ -35,15 +35,6 @@ const {callListeners} = useTabItemActiveListener()
 
 const formRef = useTemplateRef('form')
 
-const isValid = computed<boolean>(() => formRef.value?.isValid ?? true)
-const hasChanges = computed<boolean>(() => formRef.value?.hasChanges ?? false)
-const hasValue = computed<boolean | null>(() => formRef.value?.hasValue ?? null)
-const errorMessage = computed<string | undefined>(() => formRef.value?.errorMessage)
-
-const validate: ComponentInstance<typeof WForm>['validate'] = (...args) => formRef.value?.validate(...args)
-const invalidate: ComponentInstance<typeof WForm>['invalidate'] = (...args) => formRef.value?.invalidate(...args)
-const initModel: ComponentInstance<typeof WForm>['initModel'] = () => formRef.value?.initModel()
-
 const emitHeight = (): void => {
   if (!formRef.value) return
 
@@ -62,12 +53,6 @@ watch(() => props.active, async value => {
 
 defineExpose({
   emitHeight,
-  isValid,
-  hasChanges,
-  hasValue,
-  errorMessage,
-  validate,
-  invalidate,
-  initModel,
+  name: toRef(props, 'name'),
 })
 </script>

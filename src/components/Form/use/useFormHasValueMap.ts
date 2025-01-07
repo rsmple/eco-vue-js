@@ -15,6 +15,8 @@ export const useFormHasValueMap = (name: Ref<string | undefined>) => {
   const hasValueMapUpdater = (key: string, value: boolean | null): void => {
     if (value === null) hasValueMapUnlistener(key)
     else hasValueMap.value[key] = value
+
+    if (!name.value) hasValueUpdaterInjected?.(key, value)
   }
 
   const hasValueMapUnlistener = (key: string) => {
@@ -34,5 +36,6 @@ export const useFormHasValueMap = (name: Ref<string | undefined>) => {
   return {
     hasValueMapUnlistener,
     hasValue,
+    hasValueMap,
   }
 }
