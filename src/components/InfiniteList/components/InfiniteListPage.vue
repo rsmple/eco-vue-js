@@ -265,8 +265,6 @@ const errorStatusList: (number | undefined)[] = [404, 400]
 watch(error, error => {
   if (!(error instanceof ApiError)) return
 
-  console.log({d: errorStatusList.includes(error.response?.status)})
-
   if (errorStatusList.includes(error.response?.status) && page.value !== null) emit('remove:page', page.value)
 
   emit('update:error', error)

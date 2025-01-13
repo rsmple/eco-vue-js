@@ -245,8 +245,6 @@ const removePage = (page: number): void => {
 
   const newPages = pages.value.slice(0, index)
 
-  console.log({newPages, index})
-
   pages.value = newPages
 
   if (pagesCount.value >= page) pagesCount.value = page - 1
