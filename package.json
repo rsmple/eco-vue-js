@@ -341,6 +341,15 @@
     "./dist/components/NumberFormatter/WNumberFormatter.vue": {
       "import": "./dist/components/NumberFormatter/WNumberFormatter.vue.js"
     },
+    "./dist/components/Page/WPage.vue": {
+      "import": "./dist/components/Page/WPage.vue.js"
+    },
+    "./dist/components/Page/WPageNumerator.vue": {
+      "import": "./dist/components/Page/WPageNumerator.vue.js"
+    },
+    "./dist/components/Page/WPageTitle.vue": {
+      "import": "./dist/components/Page/WPageTitle.vue.js"
+    },
     "./dist/components/Progress/WProgress.vue": {
       "import": "./dist/components/Progress/WProgress.vue.js"
     },

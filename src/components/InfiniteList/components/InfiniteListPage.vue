@@ -119,7 +119,7 @@ import {TransitionGroup, computed, nextTick, onBeforeUnmount, onMounted, ref, to
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
-import {ApiError} from '@/main'
+import {ApiError} from '@/utils/api'
 
 import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
 import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
@@ -174,6 +174,7 @@ const emit = defineEmits<{
   (e: 'update-from-header:scroll'): void
   (e: 'update:selected', values: Model[]): void
   (e: 'fetched'): void
+  (e: 'update:error', value: ApiError): void
 }>()
 
 const elementRef = useTemplateRef('element')
@@ -259,8 +260,16 @@ watch(data, value => {
   }
 }, {immediate: true})
 
+const errorStatusList: (number | undefined)[] = [404, 400]
+
 watch(error, error => {
-  if (error instanceof ApiError && error.response?.status === 404 && page.value !== null) emit('remove:page', page.value)
+  if (!(error instanceof ApiError)) return
+
+  console.log({d: errorStatusList.includes(error.response?.status)})
+
+  if (errorStatusList.includes(error.response?.status) && page.value !== null) emit('remove:page', page.value)
+
+  emit('update:error', error)
 }, {immediate: true})
 
 watch(isFetching, value => {

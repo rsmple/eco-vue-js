@@ -20,6 +20,7 @@
 
     @update:header-padding="$emit('update:header-padding', $event)"
     @update:count="listCount = $event"
+    @update:error="$emit('update:error', $event)"
   >
     <template #header="{selectAllValue}">
       <slot
@@ -194,6 +195,7 @@
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>">
 import type {BulkComponent, FieldComponent, FieldConfigMap, ListFields, MenuComponent} from './types'
+import type {ApiError} from '@/utils/api'
 
 import {type StyleValue, computed, ref, toRef} from 'vue'
 
@@ -244,6 +246,7 @@ const props = defineProps<{
 
 defineEmits<{
   (e: 'update:header-padding', value: number): void
+  (e: 'update:error', value: ApiError): void
 }>()
 
 const listCount = ref<number | undefined>(undefined)

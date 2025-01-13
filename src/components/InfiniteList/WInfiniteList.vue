@@ -47,6 +47,7 @@
 
         @update:count="$emit('update:count', $event)"
         @update:page="$emit('update:page', $event)"
+        @update:error="$emit('update:error', $event)"
       >
         <template #default="{item, value, setter, skeleton, refetch, previous, next, first, last, resetting, page, index}">
           <component
@@ -82,6 +83,8 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
+import type {ApiError} from '@/utils/api'
+
 import {onBeforeUnmount, provide, toRef, useTemplateRef} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
@@ -156,6 +159,7 @@ const emit = defineEmits<{
   (e: 'select', values: Model[]): void
   (e: 'select-reverse', values: Model[]): void
   (e: 'select-range', value: SelectedRange<Model>): void
+  (e: 'update:error', value: ApiError): void
 }>()
 
 const infiniteListPagesRef = useTemplateRef('infiniteListPages')

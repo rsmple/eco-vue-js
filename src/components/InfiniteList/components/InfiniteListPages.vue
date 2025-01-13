@@ -55,6 +55,7 @@
       @remove:page="removePage"
       @refetch="refetchNextPages(index)"
       @fetched="isResettingPage = false"
+      @update:error="$emit('update:error', $event)"
     >
       <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page: itemPage, index: itemIndex}">
         <slot
@@ -83,6 +84,8 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
+import type {ApiError} from '@/utils/api'
+
 import {computed, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import {isEqualObj} from '@/utils/utils'
@@ -143,6 +146,7 @@ const emit = defineEmits<{
   (e: 'update:page', value: number | undefined): void
   (e: 'update:count', value: number): void
   (e: 'update:selected', values: Model[]): void
+  (e: 'update:error', value: ApiError): void
 }>()
 
 const infiniteScrollRef = useTemplateRef('infiniteScroll')
@@ -239,9 +243,11 @@ const removePage = (page: number): void => {
 
   if (index === -1) return
 
-  const newPages = pages.value.slice(0, pages.value.length - index)
+  const newPages = pages.value.slice(0, index)
 
-  pages.value = newPages.length === 0 ? [1] : newPages
+  console.log({newPages, index})
+
+  pages.value = newPages
 
   if (pagesCount.value >= page) pagesCount.value = page - 1
   if (nextPage.value === page) nextPage.value = null
