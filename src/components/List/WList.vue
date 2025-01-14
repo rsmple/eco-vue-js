@@ -113,7 +113,15 @@
       </WListHeader>
     </template>
 
-    <template #default="{item, skeleton, setter, refetch}">
+    <template #default="{item, skeleton, setter, refetch, previous, index}">
+      <slot
+        v-if="groupBy && (index === 0 || (!skeleton && (!previous || !groupBy(item, previous))))"
+        name="group"
+        :item="item"
+        :previous="previous"
+        :skeleton="skeleton"
+      />
+
       <WListCard
         :disabled="skeleton"
         :disable-more="disableMore"
@@ -242,6 +250,7 @@ const props = defineProps<{
   readonly?: boolean
   noOrdering?: boolean
   formNameGetter?: (data: Data) => string | undefined
+  groupBy?: (a: Data, b: Data) => boolean
 }>()
 
 defineEmits<{

@@ -90,7 +90,7 @@
               :first="firstPage && index === 1"
               :last="lastPage && index === skeletonLength"
               :page="page"
-              :index="index"
+              :index="index - 1"
             />
           </template>
         </template>

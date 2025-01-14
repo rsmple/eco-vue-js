@@ -1,7 +1,7 @@
 <template>
   <div
     class="
-      sm-not:grid-cols-1 sm-not:group-even:bg-gray-50 sm-not:dark:group-even:bg-primary-darkest/25 sm-not:pt-2 relative
+      sm-not:grid-cols-1 sm-not:group-even:bg-gray-50 sm-not:dark:group-even:bg-primary-darkest/25 relative
       isolate grid sm:flex
     "
     :class="{
