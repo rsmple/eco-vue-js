@@ -205,7 +205,7 @@ const close = () => {
       })
     })
   } else if (props.debounce) {
-    emitUpdateModelValue(value.value)
+    if (canSave.value) emitUpdateModelValue(value.value)
   } else {
     value.value = props.modelValue
 
@@ -259,7 +259,7 @@ const handleEnterPress = (event: KeyboardEvent): void => {
   event.stopPropagation()
   event.preventDefault()
 
-  emitUpdateModelValue(value.value)
+  if (canSave.value) emitUpdateModelValue(value.value)
 }
 
 const handlePaste = () => {
@@ -267,19 +267,22 @@ const handlePaste = () => {
 
   if (!value.value) return
 
-  if (hasChangesValue.value || (props.textSecure && focused.value)) {
-    emitUpdateModelValue(value.value)
-  }
+  if (canSave.value) emitUpdateModelValue(value.value)
 }
 
 const saveDebounced = () => {
-  emit('update:modelValue', value.value)
+  if (canSave.value) emit('update:modelValue', value.value)
 
   timeout.value = null
 }
 
 const updateModelValueDebounced = () => {
   if (timeout.value) clearTimeout(timeout.value)
+
+  if (!canSave.value) {
+    timeout.value = null
+    return
+  }
 
   timeout.value = setTimeout(saveDebounced, props.debounce)
 }
