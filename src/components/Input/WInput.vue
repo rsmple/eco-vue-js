@@ -155,6 +155,8 @@
             <slot name="suffix" />
           </template>
         </InputActions>
+
+        <slot name="inner" />
       </div>
     </template>
 

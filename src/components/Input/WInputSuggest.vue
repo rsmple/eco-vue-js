@@ -127,7 +127,7 @@
 <script lang="ts" setup generic="Type extends InputType = 'text'">
 import type {InputSuggestProps} from './types'
 
-import {computed, ref, useTemplateRef} from 'vue'
+import {type VNode, computed, ref, useTemplateRef} from 'vue'
 
 import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
@@ -213,6 +213,6 @@ defineSlots<{
   subtitle?: () => void
   prefix?: (props: {unclickable?: boolean}) => void
   right?: (props: Record<string, never>) => void
-  content?: (props: {scrollingElement?: Element}) => void
+  content?: (props: {scrollingElement?: Element}) => VNode[]
 }>()
 </script>

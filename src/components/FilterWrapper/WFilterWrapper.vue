@@ -38,7 +38,7 @@
 <script lang="ts" setup>
 import type {LocationQueryRaw} from 'vue-router'
 
-import {computed, onUnmounted, ref, watch} from 'vue'
+import {type VNode, computed, onUnmounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 
 import WButton from '@/components/Button/WButton.vue'
@@ -106,4 +106,9 @@ onUnmounted(() => {
 
   closeModal = null
 })
+
+defineSlots<{
+  default: () => VNode[]
+  bottom: () => VNode[]
+}>()
 </script>

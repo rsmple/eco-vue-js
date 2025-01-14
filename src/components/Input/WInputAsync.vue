@@ -33,12 +33,12 @@
     </template>
 
     <template
-      v-if="!readonly || $slots.right"
+      v-if="(!readonly && !hideButton) || $slots.right"
       #right
     >
       <slot name="right" />
 
-      <template v-if="!readonly">
+      <template v-if="!readonly && !hideButton">
         <WSkeleton
           v-if="skeleton"
           class="w-skeleton-w-11 w-skeleton-h-11 w-skeleton-rounded-lg"
@@ -71,6 +71,39 @@
           />
         </button>
       </template>
+    </template>
+
+    <template
+      v-if="debounce"
+      #inner
+    >
+      <div class="absolute inset-x-3 bottom-1 isolate h-0.5">
+        <Transition
+          enter-active-class="transition-opacity"
+          leave-active-class="transition-opacity"
+          enter-from-class="opacity-0"
+          leave-to-class="opacity-0"
+        >
+          <div
+            v-if="timeout"
+            class="absolute inset-0 -z-10 bg-gray-200 dark:bg-gray-700"
+          />
+        </Transition>
+
+        <Transition
+          enter-active-class="transition-[width] ease-linear rounded-sm duration-[var(--debounce-duration)]"
+          enter-from-class="w-0"
+          enter-to-class="w-full"
+          leave-active-class="hidden"
+        >
+          <div
+            v-if="timeout"
+            :key="timeout.toString()"
+            class="bg-primary-default dark:bg-primary-dark relative h-full rounded-sm"
+            :style="{'--debounce-duration': debounce + 'ms'}"
+          />
+        </Transition>
+      </div>
     </template>
   </WInput>
 </template>
@@ -110,7 +143,18 @@ const errorMessageValue = ref<string | undefined>()
 const hasChangesValue = computed(() => props.modelValue !== value.value)
 const canSave = computed(() => (props.textSecure && focused.value) || hasChangesValue.value)
 
+const timeout = ref<NodeJS.Timeout | null>(null)
+
+const doClearTimeout = () => {
+  if (timeout.value) {
+    clearTimeout(timeout.value)
+    timeout.value = null
+  }
+}
+
 const reset = () => {
+  doClearTimeout()
+
   value.value = props.modelValue
 
   focused.value = false
@@ -138,6 +182,8 @@ let closeModal: (() => void) | null = null
 const close = () => {
   closeModal?.()
 
+  doClearTimeout()
+
   if (props.textarea && !props.textSecure && value.value !== props.modelValue) {
     closeModal = Modal.addConfirm({
       title: `Discard changes${ props.title ? ' for ' + props.title : '' }?`,
@@ -158,6 +204,8 @@ const close = () => {
         if (focused.value) inputRef.value?.focus()
       })
     })
+  } else if (props.debounce) {
+    emitUpdateModelValue(value.value)
   } else {
     value.value = props.modelValue
 
@@ -172,6 +220,8 @@ const open = () => {
 }
 
 watch(toRef(props, 'modelValue'), modelValue => {
+  doClearTimeout()
+
   value.value = modelValue
 
   if (!props.placeholderSecure && saved.value) {
@@ -204,6 +254,8 @@ const emitUpdateModelValue = (newValue: ModelValue | undefined) => {
 const handleEnterPress = (event: KeyboardEvent): void => {
   if (props.textarea) return
 
+  doClearTimeout()
+
   event.stopPropagation()
   event.preventDefault()
 
@@ -211,10 +263,28 @@ const handleEnterPress = (event: KeyboardEvent): void => {
 }
 
 const handlePaste = () => {
+  doClearTimeout()
+
   if (!value.value) return
 
   if (hasChangesValue.value || (props.textSecure && focused.value)) {
     emitUpdateModelValue(value.value)
   }
+}
+
+const saveDebounced = () => {
+  emit('update:modelValue', value.value)
+
+  timeout.value = null
+}
+
+const updateModelValueDebounced = () => {
+  if (timeout.value) clearTimeout(timeout.value)
+
+  timeout.value = setTimeout(saveDebounced, props.debounce)
+}
+
+if (props.debounce) {
+  watch(value, updateModelValueDebounced)
 }
 </script>
