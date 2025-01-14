@@ -29,6 +29,7 @@
             'z-30': teleport && !noZIndex,
           }"
           class="will-change-[top,bottom]"
+          :style="{zIndex}"
           @update:rect="$emit('update:rect')"
         >
           <template #default="defaultScope">

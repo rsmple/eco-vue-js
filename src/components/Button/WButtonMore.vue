@@ -14,8 +14,8 @@
       :max-width="320"
       :horizontal-align="HorizontalAlign.LEFT_INNER"
       :update-align="false"
+      :z-index="1"
       teleport
-      no-z-index
     >
       <template #toggle>
         <div
