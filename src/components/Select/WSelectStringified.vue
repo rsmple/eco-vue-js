@@ -68,7 +68,7 @@ const emit = defineEmits<{
 
 const selectComponentRef = useTemplateRef('selectComponent')
 
-const arrayValue = computed<string[]>(() => props.modelValue !== null ? props.modelValue.split(props.divider).filter(item => item !== '') : [])
+const arrayValue = computed<string[]>(() => props.modelValue !== null ? props.modelValue.split(props.divider).filter((item, index, arr) => item !== '' && arr.indexOf(item) === index) : [])
 
 const updateModelValue = (value: string, isSelect: boolean): void => {
   const valueList = value.split(props.divider)
