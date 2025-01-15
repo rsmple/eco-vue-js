@@ -30,7 +30,10 @@
       <slot name="subtitle" />
     </template>
 
-    <template #option="{option, selected, model, search}">
+    <template
+      v-if="$slots.option"
+      #option="{option, selected, model, search}"
+    >
       <slot
         name="option"
         :option="option"

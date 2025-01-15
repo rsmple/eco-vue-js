@@ -14,7 +14,10 @@
       @unselect="$emit('unselect', $event)"
       @update:fetching="$emit('update:fetching', $event)"
     >
-      <template #default="{option, skeleton, index}">
+      <template
+        v-if="$slots.default"
+        #default="{option, skeleton, index}"
+      >
         <slot
           :option="option"
           :index="index"

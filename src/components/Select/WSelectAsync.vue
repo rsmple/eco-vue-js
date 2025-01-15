@@ -53,7 +53,10 @@
         @update:fetching="!$event && updateDropdown(); isFetchingPrefix = $event"
         @update:model-value="updateSelected"
       >
-        <template #default="{option, skeleton: skeletonPrefix, index}">
+        <template
+          v-if="$slots.option"
+          #default="{option, skeleton: skeletonPrefix, index}"
+        >
           <slot
             name="option"
             :option="option"
@@ -67,7 +70,7 @@
     </template>
 
     <template
-      v-if="$slots.right?.()?.length"
+      v-if="$slots.right"
       #right
     >
       <slot name="right" />

@@ -41,7 +41,10 @@
         @update:count="$emit('update:count', $event)"
         @update:model-value="$emit('update:model-value', $event)"
       >
-        <template #default="{option, selected, skeleton: skeletonList}">
+        <template 
+          v-if="$slots.default"
+          #default="{option, selected, skeleton: skeletonList}"
+        >
           <slot
             :option="option"
             :selected="selected"

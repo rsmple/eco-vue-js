@@ -5,6 +5,7 @@
       ...props,
       modelValue: arrayValue,
       filterValue: filterValue === undefined ? arrayValue : filterValue,
+      createdData: createOption ? arrayValue.map(createOption) : undefined,
     }"
     :class="$attrs.class"
     @select="updateModelValue($event, true)"
@@ -26,7 +27,10 @@
       <slot name="subtitle" />
     </template>
 
-    <template #option="{option, selected, model, search}">
+    <template
+      v-if="$slots.option"
+      #option="{option, selected, model, search}"
+    >
       <slot
         name="option"
         :option="option"
@@ -37,7 +41,7 @@
     </template>
 
     <template
-      v-if="$slots.right?.()?.length"
+      v-if="$slots.right"
       #right
     >
       <slot name="right" />
@@ -48,7 +52,7 @@
 <script lang="ts" setup generic="Model extends string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>">
 import type {SelectOptionComponent, SelectStringifiedProps} from './types'
 
-import {computed, useTemplateRef} from 'vue'
+import {type VNode, computed, useTemplateRef} from 'vue'
 
 import WSelect from '@/components/Select/WSelect.vue'
 
@@ -57,14 +61,14 @@ defineOptions({inheritAttrs: false})
 const props = defineProps<SelectStringifiedProps<Model, Data, QueryParamsOptions, OptionComponent>>()
 
 const emit = defineEmits<{
-  (e: 'update:model-value', value: Model | null): void
+  (e: 'update:model-value', value: Model): void
   (e: 'update:query-options-error', value: string | undefined): void
   (e: 'init-model'): void
 }>()
 
 const selectComponentRef = useTemplateRef('selectComponent')
 
-const arrayValue = computed<string[]>(() => props.modelValue !== null ? props.modelValue.split(props.divider) : [])
+const arrayValue = computed<string[]>(() => props.modelValue !== null ? props.modelValue.split(props.divider).filter(item => item !== '') : [])
 
 const updateModelValue = (value: string, isSelect: boolean): void => {
   const valueList = value.split(props.divider)
@@ -72,14 +76,14 @@ const updateModelValue = (value: string, isSelect: boolean): void => {
   let newValue: string
 
   if (isSelect) {
-    newValue = [...arrayValue.value, ...valueList].filter((item, index, arr) => arr.indexOf(item) === index).join(props.divider)
+    newValue = [...arrayValue.value, ...valueList].filter((item, index, arr) => item !== '' && arr.indexOf(item) === index).join(props.divider)
   } else {
     newValue = arrayValue.value.filter(item => !valueList.includes(item)).join(props.divider)
   }
 
   if (newValue === props.modelValue) return
 
-  emit('update:model-value', newValue as Model || null)
+  emit('update:model-value', newValue as Model)
 }
 
 const blur = () => {
@@ -89,4 +93,11 @@ const blur = () => {
 defineExpose({
   blur,
 })
+
+defineSlots<{
+  title?: () => VNode[]
+  subtitle?: () => VNode[]
+  right?: () => VNode[]
+  option?: (props: {option: Data | null, selected: boolean, model: boolean, search: string | undefined}) => VNode[]
+}>()
 </script>

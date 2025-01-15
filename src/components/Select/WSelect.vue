@@ -49,7 +49,10 @@
           :disable-clear="disableClear || readonly"
           @unselect="unselect(valueGetter(option))"
         >
-          <template #option>
+          <template
+            v-if="$slots.option"
+            #option
+          >
             <slot
               name="option"
               :option="option"

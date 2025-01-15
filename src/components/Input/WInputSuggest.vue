@@ -92,9 +92,9 @@
             'mt-5': 'istop' in contentScope && contentScope.istop === false && (errorMessage || maxLength),
           }"
         >
-          <template v-if="$slots.content?.().length">
+          <template v-if="$slots.content">
             <template
-              v-for="(slot, index) in $slots.content?.()"
+              v-for="(slot, index) in $slots.content()"
               :key="index"
             >
               <component
