@@ -1,5 +1,4 @@
-
-module.exports = {
+export default {
   critical: {
     bg: '#ff73bb30',
     text: '#f95f95',

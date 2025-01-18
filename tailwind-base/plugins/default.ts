@@ -1,6 +1,6 @@
-const plugin = require('tailwindcss/plugin')
+import plugin from 'tailwindcss/plugin.js'
 
-module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, addBase, theme, addComponents, config}) {
+const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities, addBase, theme, addComponents, config}) {
   matchUtilities(
     {
       square: (value) => {
@@ -56,11 +56,11 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
 
         return Array(4).fill(undefined).reduce(
           (current, _, index) => {
-            const widthValue = `calc(((100% / ${index + 2}) * var(--split-to-chunks-span, 1)) - (var(--split-to-chunks-gap, 16px) * ${(index + 1)} / ${(index + 2)}))`
+            const widthValue = `calc(((100% / ${ index + 2 }) * var(--split-to-chunks-span, 1)) - (var(--split-to-chunks-gap, 16px) * ${ (index + 1) } / ${ (index + 2) }))`
 
             return {
               ...current,
-              [`@media (min-width: ${value * (index + 2) + (index < 1 ? 2 : 25.25)}${unit})`]: {
+              [`@media (min-width: ${ value * (index + 2) + (index < 1 ? 2 : 25.25) }${ unit })`]: {
                 width: widthValue,
                 minWidth: widthValue,
               },
@@ -99,16 +99,16 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       'max-width': 'calc(100vw - var(--nav-bar-width) - var(--inner-margin) - var(--inner-margin) - var(--scroll-bar-width))',
     },
     '.w-inner': {
-      'width': 'calc(100vw - var(--actions-bar-width) - var(--nav-bar-width) - var(--inner-margin) - var(--inner-margin) - var(--scroll-bar-width))',
+      width: 'calc(100vw - var(--actions-bar-width) - var(--nav-bar-width) - var(--inner-margin) - var(--inner-margin) - var(--scroll-bar-width))',
     },
     '.min-w-inner': {
       'min-width': 'calc(100vw - var(--actions-bar-width) - var(--nav-bar-width) - var(--inner-margin) - var(--inner-margin) - var(--scroll-bar-width))',
     },
     '.left-inner': {
-      'left': 'calc(var(--nav-bar-width) + var(--inner-margin))',
+      left: 'calc(var(--nav-bar-width) + var(--inner-margin))',
     },
     '.right-inner': {
-      'right': 'calc(var(--actions-bar-width) + var(--inner-margin))',
+      right: 'calc(var(--actions-bar-width) + var(--inner-margin))',
     },
   })
 
@@ -124,7 +124,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
 
   addBase({
     '.w-input': {
-      'outline': 'none',
+      outline: 'none',
 
       '--input-autofill-bg': theme('colors.default'),
       '--input-autofull-text': theme('colors.black.default'),
@@ -134,24 +134,24 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       },
 
       '&:focus-visible': {
-        'outline': 'none',
+        outline: 'none',
       },
 
       '&[autocomplete="off"]': {
         '&::-webkit-contacts-auto-fill-button, &::-webkit-credentials-auto-fill-button': {
-          'visibility': 'hidden',
-          'display': 'none !important',
+          visibility: 'hidden',
+          display: 'none !important',
           'pointer-events': 'none',
-          'height': '0',
-          'width': '0',
-          'margin': '0',
+          height: '0',
+          width: '0',
+          margin: '0',
         },
       },
 
       '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
         '-webkit-appearance': 'none',
-        'appearance': 'none',
-        'margin': '0',
+        appearance: 'none',
+        margin: '0',
       },
 
       '&:-webkit-autofill': {
@@ -163,11 +163,11 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
 
       '&[type=number]': {
         '-moz-appearance': 'textfield',
-        'appearance': 'textfield',
+        appearance: 'textfield',
       },
 
       '&::-webkit-textfield-decoration-container, &:focus::-webkit-textfield-decoration-container': {
-        'visibility': 'hidden',
+        visibility: 'hidden',
         'pointer-events': 'none',
       },
     },
@@ -176,12 +176,12 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
   addBase({
     '.w-scrollbar': {
       '&::-webkit-scrollbar, & ::-webkit-scrollbar': {
-        'width': '12px',
-        'height': '12px',
+        width: '12px',
+        height: '12px',
         'z-index': '500',
       },
       '&::-webkit-scrollbar-button, & ::-webkit-scrollbar-button': {
-        'display': 'none',
+        display: 'none',
       },
       '&::-webkit-scrollbar-thumb, & ::-webkit-scrollbar-thumb': {
         'border-radius': '5px',
@@ -195,7 +195,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
         },
       },
       '&::-webkit-scrollbar-track, & ::-webkit-scrollbar-track, &::-webkit-scrollbar-corner, & ::-webkit-scrollbar-corner': {
-        'background': 'transparent',
+        background: 'transparent',
       },
     },
     'html.w-scrollbar': {
@@ -207,18 +207,18 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       },
     },
     'textarea::-webkit-resizer': {
-      'transform': 'scale(2)',
+      transform: 'scale(2)',
       'transform-origin': 'top left',
       'background-size': '7px 7px',
       'background-position': 'top',
       'background-image': 'linear-gradient(135deg, currentColor 10%, transparent 10%, transparent 50%, currentColor 50%, currentColor 60%, transparent 60%, transparent 100%)',
-      'color': theme('colors.gray.300'),
+      color: theme('colors.gray.300'),
       [config('darkMode')[1][0]]: {
-        'color': theme('colors.gray.700'),
+        color: theme('colors.gray.700'),
       },
     },
     '*:focus-visible': {
-      'outline': 'none',
+      outline: 'none',
     },
   })
 
@@ -251,7 +251,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
     },
     '.no-scrollbar': {
       '&::-webkit-scrollbar': {
-         'display': 'none',
+        display: 'none',
       },
     },
     '.overflow-y-overlay': {
@@ -274,15 +274,15 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
 
   addComponents({
     '.text-accent': {
-      'color': theme('colors.black.default'),
+      color: theme('colors.black.default'),
       [config('darkMode')[1][0]]: {
-        'color': theme('colors.gray.200'),
+        color: theme('colors.gray.200'),
       },
     },
     '.text-description': {
-      'color': theme('colors.gray.400'),
+      color: theme('colors.gray.400'),
       [config('darkMode')[1][0]]: {
-        'color': theme('colors.gray.500'),
+        color: theme('colors.gray.500'),
       },
     },
     '.text-secure': {
@@ -294,48 +294,48 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
   addUtilities({
     '.w-ripple': {
       '&::before, &-has-only::before': {
-        'content': '""',
-        'position': 'absolute',
-        'top': '0',
-        'left': '0',
-        'height': '100%',
-        'width': '100%',
+        content: '""',
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        height: '100%',
+        width: '100%',
         'border-radius': 'inherit',
         'background-color': 'currentColor',
         'pointer-events': 'none',
         'user-select': 'none',
-        'opacity': '0',
+        opacity: '0',
         'transition-property': 'opacity',
         'transition-timing-function': 'cubic-bezier(0.4, 0, 0.2, 1)',
         'transition-duration': '100ms',
       },
 
       '&:active::before': {
-        'opacity': 'calc(var(--w-ripple-opacity, 0.10) * 2)',
+        opacity: 'calc(var(--w-ripple-opacity, 0.10) * 2)',
       },
     },
 
     '.w-ripple-trigger:active': {
       '.w-ripple::before, &.w-ripple::before': {
-        'opacity': 'calc(var(--w-ripple-opacity, 0.10) * 2)',
+        opacity: 'calc(var(--w-ripple-opacity, 0.10) * 2)',
       },
     },
 
     '.w-ripple-trigger-has:has(.w-ripple-has:active)': {
       '.w-ripple-has-only::before, &.w-ripple-has-only::before': {
-        'opacity': 'calc(var(--w-ripple-opacity, 0.10) * 2)',
+        opacity: 'calc(var(--w-ripple-opacity, 0.10) * 2)',
       },
     },
 
     '.w-ripple-hover:not(:active):hover, .w-ripple-trigger:not(:active):hover .w-ripple-hover, .w-ripple-hover:not(:active):focus, .w-ripple-trigger:not(:active):focus .w-ripple-hover': {
       '& .w-ripple:not(:active)::before, &.w-ripple::before': {
-        'opacity': 'var(--w-ripple-opacity, 0.10)',
+        opacity: 'var(--w-ripple-opacity, 0.10)',
       },
     },
 
     '.w-ripple-trigger-has:has(.w-ripple-has:not(:active):hover) .w-ripple-hover, .w-ripple-trigger-has:has(.w-ripple-has:not(:active):focus) .w-ripple-hover': {
       '& .w-ripple-has-only:not(:active)::before, &.w-ripple-has-only::before': {
-        'opacity': 'var(--w-ripple-opacity, 0.10)',
+        opacity: 'var(--w-ripple-opacity, 0.10)',
       },
     },
   })
@@ -343,32 +343,32 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
   addUtilities({
     '.w-hover-circle': {
       '&::after': {
-        'content': '""',
-        'position': 'absolute',
-        'top': '0',
-        'left': '0',
-        'height': '100%',
-        'width': '100%',
+        content: '""',
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        height: '100%',
+        width: '100%',
         'border-radius': '9999px',
         'z-index': '1',
         'background-color': 'currentColor',
         'pointer-events': 'none',
         'user-select': 'none',
-        'opacity': '0',
-        'transform': 'scaleX(0.5) scaleY(0.5)',
+        opacity: '0',
+        transform: 'scaleX(0.5) scaleY(0.5)',
         'transition-property': 'opacity transform',
         'transition-timing-function': 'cubic-bezier(0.4, 0, 0.2, 1)',
         'transition-duration': '200ms',
       },
 
       '&:hover::after, .w-hover-circle-trigger:hover &::after, &:focus::after, .w-hover-circle-trigger:focus &::after': {
-        'opacity': 'var(--w-hover-circle-opacity, 0.10)',
-        'transform': 'scaleX(2.2) scaleY(2.2)',
+        opacity: 'var(--w-hover-circle-opacity, 0.10)',
+        transform: 'scaleX(2.2) scaleY(2.2)',
       },
 
       '&:active::after, .w-hover-circle-trigger:active &::after': {
-        'opacity': 'var(--w-hover-circle-opacity, 0.10)',
-        'transform': 'scaleX(1.8) scaleY(1.8)',
+        opacity: 'var(--w-hover-circle-opacity, 0.10)',
+        transform: 'scaleX(1.8) scaleY(1.8)',
       },
     },
   })
@@ -394,22 +394,22 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
   addUtilities({
     '.w-progress-striped': {
       '&::before': {
-        'content': '""',
+        content: '""',
         'background-image': 'linear-gradient(135deg, hsla(0,0%,100%,.125) 25%, transparent 0, transparent 50%, hsla(0,0%,100%,.125) 0, hsla(0,0%,100%,.125) 75%, transparent 0, transparent)',
-        'position': 'absolute',
-        'top': '0',
-        'left': '0',
-        'width': 'calc(100% + 40px)',
-        'height': '100%',
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        width: 'calc(100% + 40px)',
+        height: '100%',
         'background-repeat': 'repeat',
         'background-size': '40px 40px',
-        'animation': theme('animation.move-horizontal'),
+        animation: theme('animation.move-horizontal'),
       },
       [config('darkMode')[1][0]]: {
         '&::before': {
           'background-image': 'linear-gradient(135deg, hsla(0,0%,10%,.125) 25%, transparent 0, transparent 50%, hsla(0,0%,10%,.125) 0, hsla(0,0%,10%,.125) 75%, transparent 0, transparent)',
         },
-      }
+      },
     },
   })
 
@@ -419,7 +419,7 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
       'padding-bottom': '0.3125rem',
       'align-items': 'center',
       'white-space': 'nowrap',
-      'overflow': 'hidden',
+      overflow: 'hidden',
       'text-overflow': 'ellipsis',
     },
     '.group\\/model .w-select-field': {
@@ -428,20 +428,20 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
     },
 
     '.w-skeleton': {
-      'position': 'relative',
-      'width': 'var(--skeleton-width,var(--skeleton-width-internal,70%))',
-      'height': 'var(--skeleton-height)',
+      position: 'relative',
+      width: 'var(--skeleton-width,var(--skeleton-width-internal,70%))',
+      height: 'var(--skeleton-height)',
       'border-radius': 'var(--skeleton-rounded,0.5rem)',
-      'overflow': 'hidden',
-      'cursor': 'progress',
+      overflow: 'hidden',
+      cursor: 'progress',
       '&:not(.w-skeleton-static):before': {
-        'content': '""',
-        'position': 'absolute',
-        'top': '0',
-        'width': '100%',
-        'height': '100%',
+        content: '""',
+        position: 'absolute',
+        top: '0',
+        width: '100%',
+        height: '100%',
         'background-image': 'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.5), rgba(255,255,255,0))',
-        'animation': theme('animation.ticker'),
+        animation: theme('animation.ticker'),
 
         [config('darkMode')[1][0]]: {
           'background-image': 'linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.01),rgba(255,255,255,0))',
@@ -450,8 +450,8 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
     },
     '.w-skeleton-static': {
       '& .w-skeleton:before, &.w-skeleton:before': {
-        'display': 'none',
-        'animation': 'none',
+        display: 'none',
+        animation: 'none',
       },
     },
   })
@@ -495,3 +495,5 @@ module.exports = plugin(function ({matchUtilities, addVariant, addUtilities, add
     },
   )
 })
+
+export default pluginDefault

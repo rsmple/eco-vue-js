@@ -12,17 +12,19 @@ npm i eco-vue-js
 
 ### Tailwind configuration
 
-1. Add the following lines to the `content` section in your [Tailwind configuration file](https://tailwindcss.com/docs/content-configuration):
+1. Add the library's [Tailwind preset](https://tailwindcss.com/docs/presets) to your [Tailwind configuration file](https://tailwindcss.com/docs/content-configuration):
     ```
-    content: [
-      './node_modules/eco-vue-js/dist/components/**/*.vue.js',
-      './node_modules/eco-vue-js/dist/components/**/*.js',
+    import tailwindBase from 'eco-vue-js/tailwind-base'
+
+    presets: [
+      tailwindBase,
     ]
     ```
-2. Add the library's [Tailwind preset](https://tailwindcss.com/docs/presets) to your configuration file:
+
+2. Add the following lines to the `content` section in your configuration file:
     ```
-    presets: [
-      require('eco-vue-js/tailwind-base/index.cjs'),
+    content: [
+      ...tailwindBase.content,
     ]
     ```
 

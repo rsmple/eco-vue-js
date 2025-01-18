@@ -112,8 +112,9 @@ const getPackageExports = (list) => {
     './dist/types/types.d.ts': {
       import: './dist/types/types.d.ts',
     },
-    './tailwind-base/index.cjs': {
-      require: './tailwind-base/index.cjs',
+    './tailwind-base': {
+      import: './tailwind-base/index.ts',
+      require: './tailwind-base/index.ts',
     },
     './eslint/plugin': {
       import: './eslint/plugin.js',

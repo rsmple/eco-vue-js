@@ -20,7 +20,7 @@ export default defineConfig({
   ],
   css: {
     postcss: {
-      plugins: [postcssImport(), tailwindcss({config: './tailwind/tailwind.config.cjs'}), autoprefixer()],
+      plugins: [postcssImport(), tailwindcss({config: './tailwind/tailwind.config.ts'}), autoprefixer()],
     },
   },
   build: {

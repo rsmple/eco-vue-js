@@ -1,6 +1,5 @@
-
 const extend = {
-  '1.25': '0.3125rem',
+  1.25: '0.3125rem',
   6: '1.5rem',
   10: '2.5rem',
   11: '2.75rem',
@@ -12,13 +11,13 @@ const extend = {
   36: '9rem',
 }
 
-module.exports = {
+export default {
   height: {
-    '8.5': '2.125rem',
+    8.5: '2.125rem',
     18: '4.5rem',
   },
   width: {
-    '8.5': '2.125rem',
+    8.5: '2.125rem',
     18: '4.5rem',
   },
   maxWidth: extend,

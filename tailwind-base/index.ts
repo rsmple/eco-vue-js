@@ -1,7 +1,21 @@
-/** @type {import('tailwindcss').Config} */
-const colors = require('tailwindcss/colors')
+import type {Config} from 'tailwindcss'
 
-module.exports = {
+import colors from 'tailwindcss/colors.js'
+
+import pluginDefault from './plugins/default.js'
+import animations from './theme/animations.js'
+import score from './theme/score.js'
+import severity from './theme/severity.js'
+import sizes from './theme/sizes.js'
+
+const tailwindBase = {
+  darkMode: ['variant', [
+    '.dark &:not(:is(.light *))',
+  ]],
+  content: [
+    './node_modules/eco-vue-js/dist/components/**/*.vue.js',
+    './node_modules/eco-vue-js/dist/components/**/*.js',
+  ],
   theme: {
     colors: {
       current: 'currentColor',
@@ -36,34 +50,34 @@ module.exports = {
       info: '#82adff',
       'info-dark': '#407ae5',
 
-      severity: require('./theme/severity.cjs'),
-      score: require('./theme/score.cjs'),
+      severity,
+      score,
 
       transparent: 'transparent',
     },
     extend: {
-      ...require('./theme/sizes.cjs'),
-      ...require('./theme/animations.cjs'),
+      ...sizes,
+      ...animations,
       screens: {
-        'xs': '480px',
-        'sm': '640px',
-        'md': '768px',
-        'lg': '1024px',
-        'xl': '1280px',
+        xs: '480px',
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1280px',
         '2xl': '1536px',
         '3xl': '1728px',
         '4xl': '1920px',
         '5xl': '2560px',
 
-        'xs-not': {'max': '479px'},
-        'sm-not': {'max': '639px'},
-        'md-not': {'max': '767px'},
-        'lg-not': {'max': '1023px'},
-        'xl-not': {'max': '1279px'},
-        '2xl-not': {'max': '1535px'},
-        '3xl-not': {'max': '1727px'},
-        '4xl-not': {'max': '1919px'},
-        '5xl-not': {'max': '2559px'},
+        'xs-not': {max: '479px'},
+        'sm-not': {max: '639px'},
+        'md-not': {max: '767px'},
+        'lg-not': {max: '1023px'},
+        'xl-not': {max: '1279px'},
+        '2xl-not': {max: '1535px'},
+        '3xl-not': {max: '1727px'},
+        '4xl-not': {max: '1919px'},
+        '5xl-not': {max: '2559px'},
       },
       scale: {
         120: '1.2',
@@ -90,7 +104,7 @@ module.exports = {
         3: '3',
       },
       overflow: {
-        'overlay': 'overlay',
+        overlay: 'overlay',
       },
     },
     fontFamily: {
@@ -100,6 +114,8 @@ module.exports = {
     },
   },
   plugins: [
-    require('./plugins/default.cjs'),
+    pluginDefault,
   ],
-}
+} satisfies Config
+
+export default tailwindBase
