@@ -3,7 +3,7 @@ import plugin from 'tailwindcss/plugin.js'
 const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities, addBase, theme, addComponents, config}) {
   matchUtilities(
     {
-      square: (value) => {
+      square: value => {
         return {
           minWidth: value,
           maxWidth: value,
@@ -13,31 +13,31 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
           minHeight: value,
         }
       },
-      height: (value) => {
+      height: value => {
         return {
           height: value,
           maxHeight: value,
           minHeight: value,
         }
       },
-      width: (value) => {
+      width: value => {
         return {
           minWidth: value,
           maxWidth: value,
           width: value,
         }
       },
-      'chunk-gap': (value) => {
+      'chunk-gap': value => {
         return {
           '--split-to-chunks-gap': value,
         }
       },
-      'w-spinner-size': (value) => {
+      'w-spinner-size': value => {
         return {
           '--spinner-size': value,
         }
       },
-      'w-modal-wrapper-padding': (value) => {
+      'w-modal-wrapper-padding': value => {
         return {
           '--modal-wrapper-padding': value,
         }
@@ -80,7 +80,7 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
 
   matchUtilities(
     {
-      'chunk-span': (value) => {
+      'chunk-span': value => {
         return {
           '--split-to-chunks-span': value,
         }
@@ -224,17 +224,17 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
 
   matchUtilities(
     {
-      'w-scroll-bar-color': (value) => {
+      'w-scroll-bar-color': value => {
         return {
           '--w-scroll-bar-color': value,
         }
       },
-      'w-scroll-bar-color-hover': (value) => {
+      'w-scroll-bar-color-hover': value => {
         return {
           '--w-scroll-bar-color-hover': value,
         }
       },
-      'w-has-changes-color': (value) => {
+      'w-has-changes-color': value => {
         return {
           '--has-changes-bg': value,
         }
@@ -300,7 +300,7 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
         left: '0',
         height: '100%',
         width: '100%',
-        'border-radius': 'inherit',
+        'border-radius': 'var(--w-ripple-rounded,inherit)',
         'background-color': 'currentColor',
         'pointer-events': 'none',
         'user-select': 'none',
@@ -375,12 +375,12 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
 
   matchUtilities(
     {
-      'w-ripple-opacity': (value) => {
+      'w-ripple-opacity': value => {
         return {
           '--w-ripple-opacity': value,
         }
       },
-      'w-hover-circle-opacity': (value) => {
+      'w-hover-circle-opacity': value => {
         return {
           '--w-hover-circle-opacity': value,
         }
@@ -431,7 +431,7 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       position: 'relative',
       width: 'var(--skeleton-width,var(--skeleton-width-internal,70%))',
       height: 'var(--skeleton-height)',
-      'border-radius': 'var(--skeleton-rounded,0.5rem)',
+      'border-radius': 'var(--w-skeleton-rounded,0.5rem)',
       overflow: 'hidden',
       cursor: 'progress',
       '&:not(.w-skeleton-static):before': {
@@ -458,20 +458,7 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
 
   matchUtilities(
     {
-      'w-skeleton-rounded': (value) => {
-        return {
-          '--skeleton-rounded': value,
-        }
-      },
-    },
-    {
-      values: theme('borderRadius'),
-    },
-  )
-
-  matchUtilities(
-    {
-      'w-skeleton-w': (value) => {
+      'w-skeleton-w': value => {
         return {
           '--skeleton-width': value,
         }
@@ -484,14 +471,25 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
 
   matchUtilities(
     {
-      'w-skeleton-h': (value) => {
-        return {
-          '--skeleton-height': value,
-        }
-      },
+      'w-skeleton-h': value => ({'--skeleton-height': value}),
+      'w-input-h': value => ({'--w-input-height': value}),
+      'w-textarea-h': value => ({'--w-textarea-height': value}),
+      'w-button-h': value => ({'--w-button-height': value}),
     },
     {
       values: theme('height'),
+    },
+  )
+
+  matchUtilities(
+    {
+      'w-input-rounded': value => ({'--w-input-rounded': value}),
+      'w-button-rounded': value => ({'--w-button-rounded': value}),
+      'w-skeleton-rounded': value => ({'--w-skeleton-rounded': value}),
+      'w-ripple-rounded': value => ({'--w-ripple-rounded': value}),
+    },
+    {
+      values: theme('borderRadius'),
     },
   )
 })

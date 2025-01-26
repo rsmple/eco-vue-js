@@ -7,7 +7,7 @@
       'items-center': !top,
       'items-start': top,
     }"
-    class="text-description relative flex h-full w-11 select-none justify-center py-[0.6875rem]"
+    class="text-description relative flex h-full w-[calc(var(--w-input-height,2.75rem)-0.125rem)] select-none justify-center"
     @mousedown.prevent.stop
     @click.stop="$emit('click', $event)"
   >

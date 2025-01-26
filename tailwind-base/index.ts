@@ -86,6 +86,8 @@ const tailwindBase = {
         200: '2.0',
       },
       borderRadius: {
+        '2.75xl': '1.375rem',
+        '3.5xl': '1.75rem',
         '4xl': '2rem',
       },
       boxShadow: {

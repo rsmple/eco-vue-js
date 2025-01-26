@@ -44,7 +44,7 @@
         <slot name="top" />
 
         <div
-          v-if="hasTop && (hasFilter || hasBottom)"
+          v-if="$slots.top && (hasFilter || slots.bottom)"
           class="mx-1 my-4 h-0.5 rounded bg-gray-400 md:my-8"
         />
 
@@ -64,7 +64,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onUnmounted, ref, useSlots, watch} from 'vue'
+import {type VNode, computed, onUnmounted, ref, useSlots, watch} from 'vue'
 
 import WButtonAction from '@/components/Button/WButtonAction.vue'
 
@@ -86,9 +86,7 @@ const close = () => {
 
 const slots = useSlots()
 
-const hasTop = computed(() => !!slots.top?.()?.length)
-const hasFilter = computed(() => !!slots.filter?.()?.length)
-const hasBottom = computed(() => !!slots.bottom?.()?.length)
+const hasFilter = computed(() => !!slots.filter)
 
 onUnmounted(() => {
   closeModal?.()
@@ -99,4 +97,10 @@ onUnmounted(() => {
 watch(hasFilter, value => {
   if (!value) close()
 })
+
+defineSlots<{
+  top?: () => VNode[]
+  filter?: () => VNode[]
+  bottom?: () => VNode[]
+}>()
 </script>

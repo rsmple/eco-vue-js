@@ -5,18 +5,17 @@
     "
     :is="to !== undefined ? disabled ? 'a' : RouterLink : tag"
     class="
-      relative isolate flex select-none
+      w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-0.0625rem)] relative isolate flex
+      h-[--w-button-height,2.75rem] min-h-[--w-button-height,2.75rem] select-none
       items-center justify-center whitespace-nowrap
-      rounded-2xl font-medium outline-none
+      rounded-[--w-button-rounded,1rem] px-[--w-button-rounded,1rem] font-medium outline-none
     "
     :class="{
-      [semanticTypeButtonStylesMap[semanticType]]: true,
-      [semanticTypeButtonBorderStylesMap[semanticType]]: true,
+      [semanticTypeMap?.[semanticType] ?? semanticTypeButtonStylesMap[semanticType]]: true,
+      [semanticTypeMap?.[semanticType] ?? semanticTypeButtonBorderStylesMap[semanticType]]: true,
       'w-ripple w-ripple-hover before:text-black-default w-ripple-opacity-20 dark:w-ripple-opacity-30 cursor-pointer': !loading && !disabled,
       'cursor-progress': loading,
       'cursor-not-allowed opacity-70': disabled,
-      'h-11 min-h-11 px-4': !minimize,
-      'h-7 min-h-7 px-1.5': minimize,
       '[&:not(:first-child)]:rounded-l-none [&:not(:first-child)]:border-l-0 [&:not(:last-child)]:rounded-r-none [&:not(:last-child)]:border-r-0': join
     }"
     :disabled="!loading && disabled"
@@ -69,6 +68,7 @@ interface Props extends Partial<LinkProps> {
   target?: '_self' | '_blank' | '_parent' | '_top'
   minimize?: boolean
   join?: boolean
+  semanticTypeMap?: Partial<Record<SemanticType, string>>
 }
 
 const props = withDefaults(
@@ -80,6 +80,7 @@ const props = withDefaults(
     type: undefined,
     href: undefined,
     target: undefined,
+    semanticTypeMap: undefined,
   },
 )
 

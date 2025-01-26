@@ -42,8 +42,8 @@
     >
       <div
         class="
-          bg-default dark:bg-default-dark relative grid min-h-11 grid-cols-[auto,1fr,auto]
-          overflow-hidden rounded-xl border border-solid transition-colors duration-75
+          bg-default dark:bg-default-dark relative grid min-h-[--w-input-height,2.75rem] grid-cols-[auto,1fr,auto]
+          overflow-hidden rounded-[--w-input-rounded,0.75rem] border border-solid transition-colors duration-75
         "
         :class="{
           'focus-within:border-primary-default dark:focus-within:border-primary-dark': !disabled && !readonly && !unclickable,
@@ -77,7 +77,7 @@
             <div
               class="flex flex-1 items-baseline"
               :class="{
-                'first:pl-0 group-first/input:pl-3 group-last/input:pr-3 [&:not(:first-child)]:pl-3': !hideInput,
+                'first:pl-0 group-first/input:pl-[--w-input-rounded,0.75rem] group-last/input:pr-[--w-input-rounded,0.75rem] [&:not(:first-child)]:pl-[--w-input-rounded,0.75rem]': !hideInput,
                 'absolute w-0 max-w-0 p-0': hideInput,
               }"
             >
@@ -88,15 +88,15 @@
                 :id="id"
                 ref="input"
                 class="
-                  w-input max-w-full flex-1 appearance-none border-none bg-[inherit] text-base font-normal
+                  w-input max-w-full flex-1 appearance-none border-none bg-[inherit] font-normal
                   outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed disabled:opacity-80 dark:placeholder:text-gray-500
                 "
                 :class="{
-                  'min-h-[var(--textarea-height,10rem)] w-full py-3': textarea,
+                  'min-h-[--w-textarea-height,10rem] w-full py-3': textarea,
                   'resize-y': resize && textarea,
                   'resize-none': !resize && textarea,
-                  'h-[var(--input-height,2.625rem)]': !textarea && !$slots.suffix,
-                  'h-[var(--input-height,2.125rem)]': !textarea && $slots.suffix,
+                  'h-[calc(var(--w-input-height,2.75rem)-0.125rem)]': !textarea && !$slots.suffix,
+                  'h-[calc(var(--w-input-height,2.75rem)-0.625rem)]': !textarea && $slots.suffix,
                   'font-mono': mono,
                   'text-secure': textSecure && !isSecureVisible,
                   'text-black-default dark:text-gray-200': !disabled,

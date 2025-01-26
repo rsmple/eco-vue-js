@@ -27,6 +27,7 @@
           :disabled="disabled || (loading !== undefined && getValue(item as Model | Entity) !== loading)"
           :minimize="minimize"
           :join="!wrap && !col"
+          :semantic-type-map="semanticTypeMap"
           :class="{
             'flex-1': stretch,
           }"

@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="loading || $slots.default || textSecure || allowCopy || ((allowPaste || allowClear) && !disabled && !readonly)"
-    class="bg-default dark:bg-default-dark flex overflow-hidden rounded-xl"
+    class="bg-default dark:bg-default-dark flex overflow-hidden rounded-[--w-input-rounded,0.75rem]"
   >
     <InputActionsButton
       v-if="allowClear && !disabled && !readonly"
