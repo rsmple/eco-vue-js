@@ -7,6 +7,7 @@
       v-if="allowClear && !disabled && !readonly"
       :icon="markRaw(IconClose)"
       tooltip-text="Clear"
+      top
       @click="$emit('click:clear')"
     />
 
@@ -14,6 +15,7 @@
       v-if="allowCopy && !textSecure"
       :icon="markRaw(iconCopy)"
       tooltip-text="Copy"
+      top
       @click="doCopy"
     />
 
@@ -21,6 +23,7 @@
       v-if="allowPaste && !disabled && !readonly"
       :icon="markRaw(IconPaste)"
       tooltip-text="Paste"
+      top
       @click="$emit('click:paste')"
     />
 
@@ -29,7 +32,7 @@
       :icon="isSecureVisible ? markRaw(IconEye) : markRaw(IconEyeSlash)"
       :tooltip-text="isSecureVisible ? 'Hide' : 'Show'"
       :disabled="disabled || readonly"
-      :top="!focused"
+      top
       @click="isSecureVisible ? $emit('hide:secure', $event) : $emit('show:secure', $event)"
     />
 

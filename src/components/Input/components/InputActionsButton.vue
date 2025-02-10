@@ -4,10 +4,10 @@
     :class="{
       'w-ripple w-ripple-hover cursor-pointer': !disabled,
       'cursor-not-allowed': disabled,
-      'items-center': !top,
-      'items-start': top,
+      'h-[calc(var(--w-input-height,2.75rem)-2px)]': top,
+      'h-full': !top,
     }"
-    class="text-description relative flex h-full w-[calc(var(--w-input-height,2.75rem)-0.125rem)] select-none justify-center"
+    class="text-description relative flex w-[calc(var(--w-input-height,2.75rem)-2px)] select-none items-center justify-center"
     @mousedown.prevent.stop
     @click.stop="$emit('click', $event)"
   >

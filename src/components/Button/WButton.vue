@@ -16,7 +16,7 @@
       'w-ripple w-ripple-hover before:text-black-default w-ripple-opacity-20 dark:w-ripple-opacity-30 cursor-pointer': !loading && !disabled,
       'cursor-progress': loading,
       'cursor-not-allowed opacity-70': disabled,
-      '[&:not(:first-child)]:rounded-l-none [&:not(:first-child)]:border-l-0 [&:not(:last-child)]:rounded-r-none [&:not(:last-child)]:border-r-0': join
+      '[&:not(:first-child)]:rounded-l-none [&:not(:first-child)]:border-l-0 [&:not(:first-child)]:before:rounded-l-none [&:not(:last-child)]:rounded-r-none [&:not(:last-child)]:border-r-0 [&:not(:last-child)]:before:rounded-r-none': join
     }"
     :disabled="!loading && disabled"
     :type="type"

@@ -57,7 +57,10 @@
           @click.stop.prevent="toggle"
           @mousedown.stop.prevent=""
         >
-          <WSpinner v-if="loading" />
+          <WSpinner
+            v-if="loading"
+            class="w-spinner-size-5"
+          />
 
           <IconCheck v-else-if="canSave" />
 
