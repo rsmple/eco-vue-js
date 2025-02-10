@@ -69,7 +69,7 @@ interface FormAsyncSelectBaseProps<
   queryEnabled?: boolean
   field: keyof ObjectPaths<Model, FieldType[], true>
   apiMethod: (payload: PartialNested<Model>) => Promise<RequestResponse<Model>>
-  confimGetter?: (value: FieldType, isSelect: boolean) => ConfirmProps | undefined
+  confimGetter?: (value: FieldType) => ConfirmProps | undefined
 }
 
 interface FormAsyncSelectPropsWithParams<

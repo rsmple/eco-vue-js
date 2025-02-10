@@ -7,8 +7,8 @@
       disabled: disabled || isLoadingError,
       loading: loading || submitting,
     }"
-    @select="showModal($event, true)"
-    @unselect="showModal($event, false)"
+    @select="showModal($event)"
+    @unselect="showModal($event)"
   >
     <template
       v-if="$slots.title"
@@ -61,15 +61,20 @@ const submitting = ref(false)
 
 const modelValue = computed<FieldType[]>(() => get<FieldType[], PayloadType>((data.value ?? {}) as PayloadType, props.field) ?? [])
 
-const save = (value: FieldType, isSelect: boolean) => {
+const save = (value: FieldType) => {
   if (submitting.value) return
 
   submitting.value = true
 
+  const newValue = modelValue.value.slice()
+  const index = newValue.indexOf(value)
+  if (index === -1) newValue.push(value)
+  else newValue.splice(index, 1)
+
   return props.apiMethod(set<FieldType[], PayloadType>(
     {} as PayloadType,
     props.field,
-    isSelect ? [...modelValue.value, value] : modelValue.value.filter(item => item !== value),
+    newValue,
   ))
     .then(response => {
       setData(response.data)
@@ -86,20 +91,20 @@ const save = (value: FieldType, isSelect: boolean) => {
 
 let closeModal: (() => void) | null = null
 
-const showModal = (value: FieldType, isSelect: boolean) => {
+const showModal = (value: FieldType) => {
   closeModal?.()
 
-  const confirmProps = props.confimGetter?.(value, isSelect)
+  const confirmProps = props.confimGetter?.(value)
 
   if (!confirmProps) {
-    save(value, isSelect)
+    save(value)
     return
   }
 
   closeModal = Modal.addConfirm({
     ...confirmProps,
     onAccept: () => {
-      return save(value, isSelect)
+      return save(value)
     },
   }, () => closeModal = null)
 }
