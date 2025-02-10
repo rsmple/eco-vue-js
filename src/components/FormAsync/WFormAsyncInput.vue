@@ -49,7 +49,7 @@ import {validateRequired} from '@/utils/validate'
 
 type PayloadType = PartialNested<Model>
 
-const props = defineProps<FormAsyncInputProps<Model, FieldType, QueryParams>>()
+const props = withDefaults(defineProps<FormAsyncInputProps<Model, FieldType, QueryParams>>(), {queryEnabled: undefined})
 
 const emit = defineEmits<{
   (e: 'success', value: Model): void

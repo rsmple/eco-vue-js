@@ -48,7 +48,7 @@ import {get, set} from '@/utils/utils'
 
 type PayloadType = PartialNested<Model>
 
-const props = defineProps<FormAsyncSelectProps<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent>>()
+const props = withDefaults(defineProps<FormAsyncSelectProps<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent>>(), {queryEnabled: undefined})
 
 const emit = defineEmits<{
   (e: 'success', value: Model): void

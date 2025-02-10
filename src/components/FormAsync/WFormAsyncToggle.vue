@@ -25,7 +25,7 @@ import {get, set} from '@/utils/utils'
 
 type PayloadType = PartialNested<Model>
 
-const props = defineProps<FormAsyncToggleProps<Model, FieldType, QueryParams>>()
+const props = withDefaults(defineProps<FormAsyncToggleProps<Model, FieldType, QueryParams>>(), {queryEnabled: undefined})
 
 const emit = defineEmits<{
   (e: 'success', value: Model): void

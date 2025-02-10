@@ -39,7 +39,7 @@ import {get, set} from '@/utils/utils'
 
 type PayloadType = PartialNested<Model>
 
-const props = defineProps<FormAsyncButtonGroupProps<Model, FieldType, QueryParams, Entity, ValueGetter>>()
+const props = withDefaults(defineProps<FormAsyncButtonGroupProps<Model, FieldType, QueryParams, Entity, ValueGetter>>(), {queryEnabled: undefined})
 
 const {data, setData, isLoadingError} = props.noParams === true
   ? (props.useQueryFn as UseQueryEmpty<Model>)({enabled: toRef(props, 'queryEnabled')})
