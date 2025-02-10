@@ -37,17 +37,13 @@
 <script lang="ts" setup generic="Model, FieldType extends string | number, QueryParams">
 import type {FormAsyncInputProps} from './types'
 
-import {computed, onBeforeUnmount, ref, toRef} from 'vue'
+import {computed} from 'vue'
 
 import WInputAsync from '@/components/Input/WInputAsync.vue'
 
-import {Modal} from '@/utils/Modal'
-import {Notify} from '@/utils/Notify'
-import {handleApiError} from '@/utils/api'
-import {get, set} from '@/utils/utils'
 import {validateRequired} from '@/utils/validate'
 
-type PayloadType = PartialNested<Model>
+import {useFormAsync} from './use/useFormAsync'
 
 const props = withDefaults(defineProps<FormAsyncInputProps<Model, FieldType, QueryParams>>(), {queryEnabled: undefined})
 
@@ -55,12 +51,7 @@ const emit = defineEmits<{
   (e: 'success', value: Model): void
 }>()
 
-const {data, setData, isLoadingError} = props.noParams === true
-  ? (props.useQueryFn as UseQueryEmpty<Model>)({enabled: toRef(props, 'queryEnabled')})
-  : (props.useQueryFn as UseQueryWithParams<Model, QueryParams>)(toRef(props, 'queryParams'), {enabled: toRef(props, 'queryEnabled')})
-const submitting = ref(false)
-
-const modelValue = computed<FieldType | undefined>(() => get<FieldType, PayloadType>((data.value ?? {}) as PayloadType, props.field))
+const {isLoadingError, data, modelValue, submitting, showModal} = useFormAsync(props, value => emit('success', value))
 
 const validateFn = computed<ValidateFn[]>(() => {
   const result = Array.isArray(props.validate)
@@ -72,49 +63,5 @@ const validateFn = computed<ValidateFn[]>(() => {
   if (props.required && !props.textSecure) result.push(validateRequired)
 
   return result
-})
-
-const save = (value: FieldType) => {
-  if (submitting.value) return
-
-  submitting.value = true
-
-  return props.apiMethod(set<FieldType, PayloadType>({} as PayloadType, props.field, value))
-    .then(response => {
-      setData(response.data)
-
-      Notify.success({title: 'Saved'})
-
-      emit('success', response.data)
-    })
-    .catch(error => handleApiError(error, undefined, props.field))
-    .finally(() => {
-      submitting.value = false
-    })
-}
-
-let closeModal: (() => void) | null = null
-
-const showModal = (value: FieldType) => {
-  closeModal?.()
-
-  const confirmProps = props.confimGetter?.(value)
-
-  if (!confirmProps) {
-    save(value)
-    return
-  }
-
-  closeModal = Modal.addConfirm({
-    ...confirmProps,
-    onAccept: () => {
-      return save(value)
-    },
-  }, () => closeModal = null)
-}
-
-onBeforeUnmount(() => {
-  closeModal?.()
-  closeModal = null
 })
 </script>

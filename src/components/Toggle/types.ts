@@ -9,4 +9,6 @@ export interface ToggleProps<Value extends boolean | null> {
   noMargin?: boolean
   description?: string
   intermediate?: boolean
+  negate?: boolean
+  validate?: ValidateFn | ValidateFn[]
 }

@@ -10,7 +10,7 @@ export type ButtonGroupOptionComponent<Option> = Component<ButtonGroupOptionProp
 interface ButtonGroupPropsBase<Model extends number | string | null | boolean>
   extends Omit<FieldWrapperProps, 'modelValue'> {
   modelValue: Model
-  loading?: Model
+  loading?: boolean
   minimize?: boolean
   wrap?: boolean
   col?: boolean

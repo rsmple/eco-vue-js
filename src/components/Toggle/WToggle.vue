@@ -32,19 +32,19 @@
       <div
         class="relative my-4 h-4 w-10 min-w-10 max-w-10 rounded-lg"
         :class="{
-          'bg-gray-400 dark:bg-gray-700': !modelValue || loading,
-          'bg-primary-default dark:bg-primary-dark bg-opacity-70 dark:bg-opacity-70': modelValue && !loading,
+          'bg-gray-400 dark:bg-gray-700': !value || loading,
+          'bg-primary-default dark:bg-primary-dark bg-opacity-70 dark:bg-opacity-70': value && !loading,
         }"
       >
         <div
           class="square-6 absolute -top-1 z-10 flex items-center justify-center rounded-full border border-solid shadow-md transition-[right]"
           :class="{
-            'right-4': modelValue === false,
-            'right-2': modelValue === null,
-            'right-0': modelValue === true,
+            'right-4': value === false,
+            'right-2': value === null,
+            'right-0': value === true,
             'w-ripple w-hover-circle': !disabled && !readonly,
-            'bg-default border-default dark:border-gray-100 dark:bg-gray-100': !modelValue || loading,
-            'bg-primary-default dark:bg-primary-dark border-primary-default dark:border-primary-dark': modelValue && !loading,
+            'bg-default border-default dark:border-gray-100 dark:bg-gray-100': !value || loading,
+            'bg-primary-default dark:bg-primary-dark border-primary-default dark:border-primary-dark': value && !loading,
           }"
         >
           <WSpinner
@@ -67,7 +67,11 @@
 <script lang="ts" setup generic="Value extends boolean | null = boolean">
 import type {ToggleProps} from './types'
 
+import {computed} from 'vue'
+
 import WSpinner from '@/components/Spinner/WSpinner.vue'
+
+import {Notify} from '@/utils/Notify'
 
 defineOptions({inheritAttrs: false})
 
@@ -84,13 +88,41 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: Value): void
 }>()
 
-const updateModelValue = () => {
-  if (props.disabled || props.loading || props.readonly) return
+const value = computed<boolean | null>({
+  get: () => {
+    if (props.modelValue === null) return null
 
+    if (props.negate) return !props.modelValue
+
+    return props.modelValue
+  },
+  set: value => {
+    if (props.disabled || props.loading || props.readonly) return
+
+    const newValue = (value === null ? null : props.negate ? !value : value) as Value
+
+    const errorMessage = Array.isArray(props.validate)
+      ? props.validate.map(item => item(newValue)).join(', ')
+      : props.validate?.(newValue)
+
+    if (errorMessage) {
+      Notify.warn({
+        title: 'Error',
+        caption: errorMessage,
+      })
+
+      return
+    }
+
+    emit('update:modelValue', newValue)
+  },
+})
+
+const updateModelValue = () => {
   if (props.intermediate) {
-    emit('update:modelValue', (props.modelValue === null ? true : props.modelValue === false ? null : false) as Value)
+    value.value = value.value === null ? true : value.value === false ? null : false
   } else {
-    emit('update:modelValue', !props.modelValue as Value)
+    value.value = !value.value
   }
 }
 </script>

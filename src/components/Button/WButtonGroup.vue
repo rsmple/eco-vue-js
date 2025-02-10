@@ -23,8 +23,8 @@
           v-for="(item, index) in list"
           :key="index"
           :semantic-type="getValue(item as Model | Entity) === modelValue ? semanticType ?? SemanticType.PRIMARY : SemanticType.SECONDARY"
-          :loading="getValue(item as Model | Entity) === loading"
-          :disabled="disabled || (loading !== undefined && getValue(item as Model | Entity) !== loading)"
+          :loading="loading && getValue(item as Model | Entity) === loadingItem"
+          :disabled="disabled || (loading && getValue(item as Model | Entity) !== loadingItem)"
           :minimize="minimize"
           :join="!wrap && !col"
           :semantic-type-map="semanticTypeMap"
@@ -61,6 +61,8 @@
 <script lang="ts" setup generic="Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined">
 import type {ButtonGroupProps} from './types'
 
+import {ref} from 'vue'
+
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
@@ -75,6 +77,8 @@ const emit = defineEmits<{
   (e: 'update:model-value', value: Model): void
 }>()
 
+const loadingItem = ref<Model | undefined>(undefined)
+
 const getValue = (item: Model | Entity): Model => {
   if (props.valueGetter && typeof item === 'object') {
     return props.valueGetter(item as Entity)
@@ -83,8 +87,14 @@ const getValue = (item: Model | Entity): Model => {
   }
 }
 
+const emitUpdateModelValue = (value: Model): void => {
+  loadingItem.value = value
+
+  emit('update:model-value', value)
+}
+
 const updateModelValue = (value: Model): void => {
-  if (value !== props.modelValue) emit('update:model-value', value)
-  else if (props.allowClear) emit('update:model-value', null as Model)
+  if (value !== props.modelValue) emitUpdateModelValue(value)
+  else if (props.allowClear) emitUpdateModelValue(null as Model)
 }
 </script>
