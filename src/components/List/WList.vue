@@ -4,7 +4,6 @@
     :query-params="(queryParams as QueryParams)"
     :query-options="queryOptions"
     :skeleton-length="count ?? listCount ?? PAGE_LENGTH"
-    :header-margin="isMobile ? 0 : 24"
     hide-page-title
 
     :allow-select="allowSelect"
@@ -14,11 +13,20 @@
     :selected-range="selectedRange"
     :page-length="PAGE_LENGTH"
     :count="count ?? listCount"
+    :page-class="
+      isGrid
+        ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-[--w-list-gap,1rem]'
+        : 'grid grid-cols-1 gap-[--w-list-gap,1rem]'
+    "
+    :style="cardStyles"
+    :class="{
+      'w-card': isGrid,
+      'w-list': !isGrid,
+    }"
     @select="setSelected"
     @select-reverse="setSelectedReverse"
     @select-range="setSelectedRange"
 
-    @update:header-padding="$emit('update:header-padding', $event)"
     @update:count="listCount = $event"
     @update:error="$emit('update:error', $event)"
   >
@@ -29,10 +37,9 @@
       />
 
       <WButtonSelection
-        v-if="allowSelect"
         :title="selectionTitle"
         :disable-message="bulkDisableMessage"
-        class="z-[1]"
+        class="z-[2]"
         @update:selection-count="selectionCount = $event"
       >
         <template #default="{disableMessage, cssClass}">
@@ -69,11 +76,33 @@
             />
           </template>
         </template>
+
+        <template #settings>
+          <div class="flex">
+            <HeaderSort
+              v-if="!noOrdering"
+              :ordering="ordering"
+              :fields="fieldsFiltered"
+              :query-params="queryParams"
+              class="border-r border-solid border-gray-300 dark:border-gray-700"
+            />
+
+            <HeaderSettings
+              v-model:field-config-map="fieldConfigMap"
+              :mode="listConfig.mode"
+              :fields="fieldsVisible"
+              :query-params="queryParams"
+              :has-saved="hasSaved"
+              @click:reset="reset"
+              @update:mode="updateMode"
+            />
+          </div>
+        </template>
       </WButtonSelection>
 
       <WListHeader
-        v-if="!isMobile"
-        class="sm-not:hidden"
+        v-if="!isGrid"
+        class="sm-not:hidden mb-4"
         :query-params="queryParams"
         :allow-select="allowSelect"
         :tooltip-text="selectAllTextGetter(selectAllValue !== true, count ?? listCount ?? 0)"
@@ -95,20 +124,10 @@
                 :item-class="field.cssClassHeader"
                 :width-style="getFieldStyles(field.label)"
                 @update:width="fieldConfigMap[field.label].width = $event"
-                @save:width="fieldConfigMap = fieldConfigMap"
+                @save:width="save"
               />
             </template>
           </HeaderFieldNested>
-        </template>
-
-        <template #settings>
-          <HeaderSettings
-            v-model:field-config-map="fieldConfigMap"
-            :fields="fieldsVisible"
-            :query-params="queryParams"
-            :has-saved="hasSaved"
-            @click:reset="reset"
-          />
         </template>
       </WListHeader>
     </template>
@@ -127,19 +146,20 @@
         :disable-more="disableMore"
         :mobile="isMobile"
         :card-class="cardClass"
-        :card-wrapper-class="cardWrapperClass"
         :has-border="hasBorder"
-        :more-bottom="moreBottom"
         :allow-open="allowOpen && !skeleton"
         :align-top="alignTop"
+        :hide-more="hideMore"
         :form-name="!skeleton ? formNameGetter?.(item) : undefined"
+        :card="isGrid"
+        :to="cardTo?.(item)"
       >
         <template #default="{validate}">
           <ListCardFieldNested
             :fields="fieldsFiltered"
             :item="item"
             :skeleton="skeleton"
-            :mobile="isMobile"
+            :card="isGrid"
           >
             <template #default="defaultScope">
               <component
@@ -147,11 +167,12 @@
                 :item="defaultScope.item"
                 :readonly="readonly || (readonlyGetter?.(defaultScope.item) ?? false)"
                 :skeleton="skeleton"
-                :mobile="isMobile"
+                :card="isGrid"
                 :class="{
                   [defaultScope.field.cssClass ?? '']: true,
                   'items-center': !alignTop,
                   'items-start': alignTop,
+                  'pr-6': !isGrid,
                 }"
                 :style="getFieldStyles(defaultScope.field.label)"
                 @update:item="setter"
@@ -171,7 +192,7 @@
             :item="item"
             :readonly="readonly || (readonlyGetter?.(item) ?? false)"
             :skeleton="skeleton"
-            :mobile="isMobile"
+            :card="isGrid"
             @update:item="setter"
             @delete:item="setter(); refetch()"
           />
@@ -201,8 +222,9 @@
   </WInfiniteList>
 </template>
 
-<script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>">
-import type {BulkComponent, FieldComponent, FieldConfigMap, ListFields, MenuComponent} from './types'
+<script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>, CardColumns extends readonly GridCol[]">
+import type {BulkComponent, CardAreas, FieldComponent, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
+import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
 import {type StyleValue, computed, ref, toRef} from 'vue'
@@ -210,7 +232,7 @@ import {type StyleValue, computed, ref, toRef} from 'vue'
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
-import {getIsMobile} from '@/utils/mobile'
+import {getIsMobile} from '@/main'
 import {type OrderItem, parseOrdering} from '@/utils/order'
 import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
 import {getPosition, useSelected} from '@/utils/useSelected'
@@ -220,8 +242,9 @@ import WListHeader from './WListHeader.vue'
 import WListHeaderItem from './WListHeaderItem.vue'
 import HeaderFieldNested from './components/HeaderFieldNested.vue'
 import HeaderSettings from './components/HeaderSettings.vue'
+import HeaderSort from './components/HeaderSort.vue'
 import ListCardFieldNested from './components/ListCardFieldNested.vue'
-import {filterFields, getFirstFieldLabel, useFieldConfigMap} from './use/useFieldConfigMap'
+import {filterFields, getFirstFieldLabel, useListConfig} from './use/useListConfig'
 
 const isMobile = getIsMobile()
 
@@ -239,10 +262,8 @@ const props = defineProps<{
   menu: MenuComponent<Data>[]
   readonlyGetter?: (item: Data) => boolean
   cardClass?: string
-  cardWrapperClass?: string
   selectAllTextGetter: (isUnselect: boolean, count: number) => string
   hasBorder?: boolean
-  moreBottom?: boolean
   configKey: string
   defaultConfigMap: FieldConfigMap<Fields>
   alignTop?: boolean
@@ -251,19 +272,29 @@ const props = defineProps<{
   noOrdering?: boolean
   formNameGetter?: (data: Data) => string | undefined
   groupBy?: (a: Data, b: Data) => boolean
+  hideMore?: boolean
+  cardColumns: CardColumns
+  cardAreas: CardAreas<Fields, CardColumns['length']>
+  cardTo?: (item: Data) => LinkProps['to']
 }>()
 
 defineEmits<{
-  (e: 'update:header-padding', value: number): void
   (e: 'update:error', value: ApiError): void
 }>()
 
 const listCount = ref<number | undefined>(undefined)
 const selectionCount = ref(0)
 
+const cardStyles = computed<StyleValue>(() => {
+  return {
+    '--w-list-grid-cols': props.cardColumns.join(' '),
+    '--w-list-grid-areas': props.cardAreas.map(inner => `"${ inner.join(' ') }"`).join('\n'),
+  }
+})
+
 const fieldsVisible = computed(() => filterFields(props.fields, field => field.visibleGetter?.(props.queryParams) ?? true))
 
-const {fieldConfigMap, hasSaved, reset} = useFieldConfigMap(toRef(props, 'configKey'), fieldsVisible, toRef(props, 'defaultConfigMap'))
+const {listConfig, fieldConfigMap, isGrid, hasSaved, reset, save, updateMode} = useListConfig(toRef(props, 'configKey'), fieldsVisible, toRef(props, 'defaultConfigMap'))
 
 const fieldsFiltered = computed(() => {
   return filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible)
@@ -320,7 +351,11 @@ const getQueryParamsBulk =  (): QueryParams => {
 }
 
 const getFieldStyles = (label: string): StyleValue | undefined => {
-  if (isMobile || !fieldConfigMap.value[label]?.width) return undefined
+  if (isGrid.value) return {
+    gridArea: label,
+  }
+
+  if (!fieldConfigMap.value[label]?.width) return undefined
 
   const value = fieldConfigMap.value[label].width + 'px'
 

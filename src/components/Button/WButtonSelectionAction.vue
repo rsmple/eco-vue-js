@@ -1,6 +1,6 @@
 <template>
   <button
-    :disabled="disableMessage !== undefined"
+    :disabled="disabled || disableMessage !== undefined"
     class="
       disabled:text-description
       relative cursor-pointer select-none bg-none no-underline
@@ -16,7 +16,10 @@
     <div class="flex h-9 items-center gap-2 px-5 sm:px-[1.125rem]">
       <component :is="icon" />
 
-      <div class="sm-not:hidden whitespace-nowrap text-base font-normal">
+      <div
+        v-if="title"
+        class="sm-not:hidden whitespace-nowrap text-base font-normal"
+      >
         {{ title }}
       </div>
     </div>
@@ -33,9 +36,10 @@
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 defineProps<{
-  title: string
+  title?: string
   icon: SVGComponent
   disableMessage?: string
+  disabled?: boolean
   active?: boolean
 }>()
 

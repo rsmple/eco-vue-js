@@ -32,13 +32,18 @@ export const useInfiniteListHeader = (scrollingElement: Element | null = documen
     })
   }
 
+  const updateHeader = () => {
+    if (!header.value) return
+
+    const rect = header.value.getBoundingClientRect()
+    headerHeight.value = rect.height
+    headerTop.value = rect.top + (scrollingElement?.scrollTop ?? 0) - headerElementHeight
+  }
+
   onMounted(() => {
     if (!isClientSide) return
-    if (header.value) {
-      const rect = header.value.getBoundingClientRect()
-      headerHeight.value = rect.height
-      headerTop.value = rect.top + (scrollingElement?.scrollTop ?? 0) - headerElementHeight
-    }
+    
+    updateHeader()
 
     if (indicator.value) {
       observer = new IntersectionObserver(observerCb, observerOptions)
@@ -57,5 +62,6 @@ export const useInfiniteListHeader = (scrollingElement: Element | null = documen
     headerHeight,
     headerTop,
     isIntersecting,
+    updateHeader,
   }
 }

@@ -1,6 +1,37 @@
 import type {FieldConfig, FieldConfigMap, ListField, ListFields} from '../types'
 
-import {type MaybeRef, computed, isRef, ref, unref, watch} from 'vue'
+import {type MaybeRef, computed, isRef, markRaw, ref, unref, watch} from 'vue'
+
+import IconGrid from '@/assets/icons/sax/IconGrid.svg?component'
+import IconTable from '@/assets/icons/sax/IconTable.svg?component'
+
+export enum ListMode {
+  TABLE = 'table',
+  GRID = 'grid',
+}
+
+export const listModeList = [
+  ListMode.TABLE,
+  ListMode.GRID,
+]
+
+const isListMode = (value: unknown): value is ListMode => {
+  return typeof value === 'string' && listModeList.includes(value as ListMode)
+}
+
+const parseListMode = (value: unknown): ListMode => {
+  return isListMode(value) ? value : ListMode.TABLE
+}
+
+export const listModeIconMap: Record<ListMode, SVGComponent> = {
+  [ListMode.TABLE]: markRaw(IconTable),
+  [ListMode.GRID]: markRaw(IconGrid),
+}
+
+export type ListConfig<Fields extends ListFields<unknown>> = {
+  fields: FieldConfigMap<Fields>
+  mode: ListMode
+}
 
 const fieldConfigKeyLength: ObjectKeys<FieldConfig>['length'] = 3
 
@@ -48,7 +79,14 @@ const parseFieldConfigMap = <Fields extends ListFields<unknown>>(value: unknown,
   return configMap as FieldConfigMap<Fields>
 }
 
-const getFieldConfigMap = (key: string): unknown | undefined => {
+const parseListConfig = <Fields extends ListFields<unknown>>(value: unknown, fields: Fields, defaultConfigMap: FieldConfigMap<Fields>): ListConfig<Fields> => {
+  return {
+    fields: parseFieldConfigMap(value instanceof Object && 'fields' in value ? value.fields : undefined, fields, defaultConfigMap),
+    mode: parseListMode(value instanceof Object && 'mode' in value ? value.mode : undefined),
+  }
+}
+
+const getListConfig = (key: string): unknown | undefined => {
   const value = localStorage.getItem(key)
 
   if (typeof value !== 'string') return undefined
@@ -79,40 +117,64 @@ export const getFirstFieldLabel = <F extends ListFields<any, any>[number]>(field
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useFieldConfigMap = <Fields extends ListFields<any, any>>(key: MaybeRef<string>, fields: MaybeRef<Fields>, defaultConfigMap: MaybeRef<FieldConfigMap<Fields>>) => {
-  const value = ref<FieldConfigMap<Fields>>(parseFieldConfigMap(getFieldConfigMap(unref(key)), unref(fields), unref(defaultConfigMap)))
+export const useListConfig = <Fields extends ListFields<any, any>>(key: MaybeRef<string>, fields: MaybeRef<Fields>, defaultConfigMap: MaybeRef<FieldConfigMap<Fields>>) => {
+  const value = ref<ListConfig<Fields>>(
+    parseListConfig(
+      getListConfig(unref(key)),
+      unref(fields),
+      unref(defaultConfigMap),
+    ),
+  )
   const hasSaved = ref(localStorage.getItem(unref(key)) !== null)
 
+  const listConfig = computed<ListConfig<Fields>>(() => value.value as ListConfig<Fields>)
   const fieldConfigMap = computed<Record<string, FieldConfig>>({
-    get: () => value.value,
+    get: () => value.value.fields as Record<string, FieldConfig>,
     set: newValue => {
-      value.value = newValue
-      hasSaved.value = true
-      localStorage.setItem(unref(key), JSON.stringify(newValue))
+      value.value.fields = newValue as typeof value.value.fields
+
+      save()
     },
   })
 
+  const isGrid = computed(() => value.value.mode === ListMode.GRID)
+
   const reset = () => {
-    value.value = parseFieldConfigMap(undefined, unref(fields), unref(defaultConfigMap))
+    value.value = parseListConfig(undefined, unref(fields), unref(defaultConfigMap))
     hasSaved.value = false
     localStorage.removeItem(unref(key))
   }
 
+  const save = () => {
+    localStorage.setItem(unref(key), JSON.stringify(value.value))
+    hasSaved.value = true
+  }
+
+  const updateMode = (mode: ListMode) => {
+    value.value.mode = mode
+
+    save()
+  }
+
   if (isRef(key)) {
     watch(key, newKey => {
-      value.value = parseFieldConfigMap(getFieldConfigMap(unref(newKey)), unref(fields), unref(defaultConfigMap))
+      value.value = parseListConfig(getListConfig(unref(newKey)), unref(fields), unref(defaultConfigMap))
       hasSaved.value = localStorage.getItem(unref(key)) !== null
     })
   }
 
   if (isRef(defaultConfigMap)) watch(defaultConfigMap, newValue => {
-    value.value = parseFieldConfigMap(getFieldConfigMap(unref(key)), unref(fields), newValue)
+    value.value = parseListConfig(getListConfig(unref(key)), unref(fields), newValue)
     hasSaved.value = localStorage.getItem(unref(key)) !== null
   })
 
   return {
+    listConfig,
     fieldConfigMap,
+    isGrid,
     hasSaved,
     reset,
+    save,
+    updateMode,
   }
 }

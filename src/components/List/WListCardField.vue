@@ -1,9 +1,8 @@
 <template>
   <div
-    class="grid grid-cols-1"
+    class="grid shrink-0 grid-cols-1"
     :class="{
       'pointer-events-none': allowOpen,
-      'sm:pr-6': !noPadding,
     }"
   >
     <WSkeleton v-if="skeleton" />

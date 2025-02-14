@@ -44,7 +44,7 @@
 <script setup lang="ts" generic="Data, QueryParams">
 import type {ListField, ListFields} from '../types'
 
-import {getFirstFieldLabel} from '../use/useFieldConfigMap'
+import {getFirstFieldLabel} from '../use/useListConfig'
 
 defineProps<{
   fields: ListFields<Data, QueryParams>

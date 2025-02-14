@@ -27,7 +27,6 @@
       :last-page="index === pages.length - 1"
       :hide-page-title="hidePageTitle"
       :wrap="wrap"
-      :no-gap="noGap"
       :transition="transition"
       :resetting="isResettingPage"
       :empty-stub="emptyStub"
@@ -104,7 +103,6 @@ const props = withDefaults(
     skeletonLength?: number
     hidePageTitle?: boolean
     wrap?: boolean
-    noGap?: boolean
     transition?: boolean
     pageLength?: number
     scrollingElement?: Element | null

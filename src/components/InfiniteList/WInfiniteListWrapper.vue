@@ -18,33 +18,24 @@
 <script lang="ts" setup>
 import {onBeforeUnmount, watch} from 'vue'
 
+import {useHeaderPadding} from '@/components/HeaderBar/use/useHeaderPadding'
+
 import {useInfiniteListHeader} from './use/useInfiniteListHeader'
 
-const props = withDefaults(
-  defineProps<{
-    headerMargin?: number
-    scrollingElement?: Element | null
-    initIsIntersecting?: boolean
-  }>(),
-  {
-    headerMargin: 0,
-    scrollingElement: undefined,
-  },
-)
-
-const emit = defineEmits<{
-  (e: 'update:header-padding', value: number): void
+const props = defineProps<{
+  scrollingElement?: Element | null
+  initIsIntersecting?: boolean
 }>()
 
-const updateHeaderPadding = (value: number): void => {
-  emit('update:header-padding', value)
-}
+const {updateHeaderPadding} = useHeaderPadding()
 
-const {indicator, header, headerTop, headerHeight, isIntersecting} = useInfiniteListHeader(props.scrollingElement, props.initIsIntersecting)
+const {indicator, header, headerTop, headerHeight, isIntersecting, updateHeader} = useInfiniteListHeader(props.scrollingElement, props.initIsIntersecting)
 
 watch(isIntersecting, value => {
   if (!value && headerHeight.value) {
-    updateHeaderPadding(headerHeight.value - props.headerMargin)
+    updateHeader()
+
+    updateHeaderPadding(headerHeight.value)
   } else {
     updateHeaderPadding(0)
   }

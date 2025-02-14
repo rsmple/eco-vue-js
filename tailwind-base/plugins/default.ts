@@ -121,6 +121,8 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
   addVariant('resizer', '&::-webkit-resizer')
   addVariant('last-not', '&:not(:last-child)')
   addVariant('first-not', '&:not(:first-child)')
+  addVariant('card', ['.w-card &', '&.w-card'])
+  addVariant('list', ['.w-list &', '&.w-list'])
 
   addBase({
     '.w-input': {
@@ -458,11 +460,8 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
 
   matchUtilities(
     {
-      'w-skeleton-w': value => {
-        return {
-          '--skeleton-width': value,
-        }
-      },
+      'w-skeleton-w': value => ({'--skeleton-width': value}),
+      'w-list-card-w': value => ({'--w-list-card-width': value}),
     },
     {
       values: theme('width'),
@@ -487,11 +486,30 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       'w-button-rounded': value => ({'--w-button-rounded': value}),
       'w-skeleton-rounded': value => ({'--w-skeleton-rounded': value}),
       'w-ripple-rounded': value => ({'--w-ripple-rounded': value}),
+      'w-list-rounded': value => ({'--w-list-rounded': value}),
     },
     {
       values: theme('borderRadius'),
     },
   )
+
+  matchUtilities(
+    {
+      'w-list-gap': value => ({'--w-list-gap': value}),
+    },
+    {
+      values: theme('gap'),
+    },
+  )
+
+  addBase({
+    'cols-span-full': {
+      'grid-column': '1 / -1',
+    },
+    'row-span-full': {
+      'grid-row': '1 / -1',
+    },
+  })
 })
 
 export default pluginDefault

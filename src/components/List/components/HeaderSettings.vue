@@ -1,44 +1,77 @@
 <template>
-  <WButtonMore
-    :icon="markRaw(IconTableSettings)"
-    :disabled="disabled"
-    class="size-full items-center"
+  <WDropdownMenu
+    :is-open="isOpen"
+    :max-width="300"
+    :max-height="300"
+    :horizontal-align="HorizontalAlign.RIGHT_INNER"
   >
-    <div class="p-4">
-      <div class="grid grid-cols-1">
-        <HeaderFieldNested :fields="fields">
-          <template #default="{field, nested, first, last}">
-            <HeaderSettingsItem
-              :field="field"
-              :field-config="fieldConfigMap[field.label]"
-              :query-params="queryParams"
-              :disabled="disabled"
-              :disabled-drag="nested"
-              :order="getOrder(field)"
-              @drag:start="dragStart(field.label, $event)"
-              @drag:enter="dragEnter($event, nested, first, last)"
-              @drag:end="drop"
-              @update:fields-config-map="$emit('update:field-config-map', {...fieldConfigMap, ...$event})"
-            />
-          </template>
-        </HeaderFieldNested>
-      </div>
+    <template #toggle>
+      <WButtonSelectionAction
+        :icon="markRaw(IconTableSettings)"
+        :disabled="disabled"
+        :active="isOpen"
+        @click="isOpen = !isOpen"
+      />
+    </template>
 
-      <div class="my-4 border-b border-solid border-gray-200 dark:border-gray-700" />
-      
-      <button
-        class="relative rounded-lg bg-gray-100 px-2 py-1 dark:bg-gray-800"
-        :class="{
-          'w-ripple w-ripple-hover': hasSaved,
-          'cursor-not-allowed opacity-50': !hasSaved,
-        }"
-        :disabled="!hasSaved"
-        @click="hasSaved && $emit('click:reset')"
+    <template #content>
+      <WClickOutside
+        class="bg-default dark:bg-default-dark my-2 grid grid-cols-1 overflow-hidden rounded-xl shadow-md dark:outline dark:outline-1 dark:outline-gray-800"
+        @click="isOpen = false"
       >
-        Reset
-      </button>
-    </div>
-  </WButtonMore>
+        <div class="p-4">
+          <div class="grid grid-cols-[auto,auto,auto]">
+            <div class="flex flex-col gap-4">
+              <HeaderSettingsModeButton
+                v-for="item in listModeList"
+                :key="item"
+                :icon="listModeIconMap[item]"
+                :active="mode === item"
+                @click="$emit('update:mode', item)"
+              />
+            </div>
+
+            <div class="mx-4 border-r border-solid border-gray-200 dark:border-gray-700" />
+
+            <div class="grid grid-cols-1">
+              <HeaderFieldNested :fields="fields">
+                <template #default="{field, nested, first, last}">
+                  <HeaderSettingsItem
+                    :field="field"
+                    :field-config="fieldConfigMap[field.label]"
+                    :query-params="queryParams"
+                    :disabled="disabled"
+                    :disabled-drag="nested"
+                    :order="getOrder(field)"
+                    @drag:start="dragStart(field.label, $event)"
+                    @drag:enter="dragEnter($event, nested, first, last)"
+                    @drag:end="drop"
+                    @update:fields-config-map="$emit('update:field-config-map', {...fieldConfigMap, ...$event})"
+                  />
+                </template>
+              </HeaderFieldNested>
+            </div>
+          </div>
+
+          <div class="my-4 border-b border-solid border-gray-200 dark:border-gray-700" />
+      
+          <div class="flex justify-end">
+            <button
+              class="relative rounded-lg bg-gray-100 px-2 py-1 dark:bg-gray-800"
+              :class="{
+                'w-ripple w-ripple-hover': hasSaved,
+                'cursor-not-allowed opacity-50': !hasSaved,
+              }"
+              :disabled="!hasSaved"
+              @click="hasSaved && $emit('click:reset')"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+      </WClickOutside>
+    </template>
+  </WDropdownMenu>
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
@@ -46,16 +79,24 @@ import type {FieldConfig, ListField, ListFields} from '../types'
 
 import {markRaw, ref} from 'vue'
 
-import WButtonMore from '@/components/Button/WButtonMore.vue'
+import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
+import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
+import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 
 import IconTableSettings from '@/assets/icons/sax/IconTableSettings.svg?component'
 
+import {HorizontalAlign} from '@/main'
+
 import HeaderFieldNested from './HeaderFieldNested.vue'
 import HeaderSettingsItem from './HeaderSettingsItem.vue'
+import HeaderSettingsModeButton from './HeaderSettingsModeButton.vue'
+
+import {type ListMode, listModeIconMap, listModeList} from '../use/useListConfig'
 
 const props = defineProps<{
   fields: ListFields<Data, QueryParams>
   fieldConfigMap: Record<string, FieldConfig>
+  mode: ListMode
   queryParams: QueryParams
   hasSaved?: boolean
   disabled?: boolean
@@ -63,8 +104,11 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:field-config-map', value: Record<string, FieldConfig>): void
+  (e: 'update:mode', value: ListMode): void
   (e: 'click:reset'): void
 }>()
+
+const isOpen = ref(false)
 
 const dragItem = ref<string | null>(null)
 const dragItemNewOrder = ref<number | null>(null)

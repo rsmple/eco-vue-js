@@ -2,9 +2,7 @@
   <component
     :is="minHeight ? WEmptyComponent : WInfiniteListWrapper"
     :scrolling-element="scrollingElement"
-    :header-margin="headerMargin"
     :init-is-intersecting="props.queryParams instanceof Object && 'page' in props.queryParams && Number.isInteger(props.queryParams.page) && (props.queryParams.page as number) > 1 ? false : undefined"
-    @update:header-padding="$emit('update:header-padding', $event)"
   >
     <template #header>
       <slot
@@ -23,7 +21,6 @@
         :skeleton-length="skeletonLength"
         :hide-page-title="hidePageTitle"
         :wrap="wrap"
-        :no-gap="noGap"
         :transition="transition"
         :page-length="pageLength"
         :header-top="headerTopIgnore ? 0 : 'headerTop' in defaultScope ? defaultScope.headerTop : 0"
@@ -37,12 +34,16 @@
         :refetch-interval="refetchInterval"
         :query-options="queryOptions"
 
+        :class="$attrs.class"
+        :style="$attrs.style"
+
         :selected="selected"
         :value-getter="valueGetter"
         :select-only="selectOnly"
         :unselect-only="unselectOnly"
         :reverse-selection="reverseSelection"
         :allow-page-selection="allowPageSelection"
+
         @update:selected="$emit('select', $event)"
 
         @update:count="$emit('update:count', $event)"
@@ -85,7 +86,7 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import type {ApiError} from '@/utils/api'
 
-import {onBeforeUnmount, provide, toRef, useTemplateRef} from 'vue'
+import {provide, toRef, useTemplateRef} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
@@ -101,9 +102,7 @@ const props = withDefaults(
     queryParams: QueryParams
     skeletonLength?: number
     hidePageTitle?: boolean
-    headerMargin?: number
     wrap?: boolean
-    noGap?: boolean
     transition?: boolean
     scrollingElement?: Element | null
     headerTopIgnore?: boolean
@@ -134,7 +133,6 @@ const props = withDefaults(
   }>(),
   {
     skeletonLength: undefined,
-    headerMargin: 0,
     selected: () => [],
     scrollingElement: undefined,
     excludeParams: undefined,
@@ -153,7 +151,6 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'update:page', value: number | undefined): void
-  (e: 'update:header-padding', value: number): void
   (e: 'update:count', value: number): void
 
   (e: 'select', values: Model[]): void
@@ -163,10 +160,6 @@ const emit = defineEmits<{
 }>()
 
 const infiniteListPagesRef = useTemplateRef('infiniteListPages')
-
-const updateHeaderPadding = (value: number): void => {
-  emit('update:header-padding', value)
-}
 
 const goto = (page: number, itemIndex?: number) => {
   infiniteListPagesRef.value?.goto(page, itemIndex)
@@ -200,10 +193,6 @@ provide(wInfiniteListSelection, {
   allowSelectHover,
   selectedCount,
   clearSelected: () => emit('select', []),
-})
-
-onBeforeUnmount(() => {
-  updateHeaderPadding(0)
 })
 
 defineExpose({

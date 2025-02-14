@@ -3,19 +3,11 @@
     v-bind="!to ? {target, href} : {to}"
     :is="to ? RouterLink : 'a'"
     class="cursor-pointer overflow-hidden truncate whitespace-normal font-normal no-underline hover:underline"
-    :class="{
-      'text-base': !small,
-      'text-xs': small,
-      [semanticTypeTextStylesMap[semanticType]]: true,
-    }"
+    :class="semanticTypeTextStylesMap[semanticType]"
   >
     <IconLink
-      class="inline rounded-lg p-px"
-      :class="{
-        'square-5 -mt-1 mr-1': !small,
-        'square-3.5 -mt-0.5 mr-0.5': small,
-        [semanticTypeChipsStylesMap[semanticType]]: true,
-      }"
+      class="square-[1.25em] mr-[0.25em] mt-[-0.25em] inline rounded-[0.5em] p-px"
+      :class="semanticTypeChipsStylesMap[semanticType]"
     /><slot>{{ text }}</slot>
   </component>
 </template>
@@ -35,7 +27,6 @@ interface Props extends Partial<LinkProps> {
   target?: '_self' | '_blank' | '_parent' | '_top'
   text?: string
   semanticType?: SemanticType
-  small?: boolean
 }
 
 withDefaults(

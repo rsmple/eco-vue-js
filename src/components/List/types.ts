@@ -4,19 +4,19 @@ export type FieldComponent<Data> = Component<{
   item: Data
   skeleton: boolean
   readonly: boolean
-  mobile: boolean
+  card: boolean
 }>
 
 export type FieldComponentNested<Data> = Component<{
   item: Data
   skeleton: boolean
-  mobile: boolean
+  card: boolean
 }>
 
 export type FieldComponentItem<Data> = Component<{
   item: Data
   skeleton: boolean
-  mobile: boolean
+  card: boolean
   index: number
   first: boolean
   last: boolean
@@ -124,3 +124,12 @@ export type GetFieldLabels<Fields extends ListFields<unknown>> = GetFieldLabelsT
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FieldConfigMap<Fields extends ListFields<any, any>> = Record<GetFieldLabels<Fields>, FieldConfig>
+
+export const AREA_SELECT = 'area_select'
+export const AREA_MORE = 'area_more'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CardAreas<Fields extends ListFields<any, any>, Length extends number> = (readonly (GetFieldLabels<Fields> | typeof AREA_SELECT | typeof AREA_MORE | '.')[] & { length: Length })[]
+
+type GridColValue = 'auto' | '1fr' | `${ number }rem`
+export type GridCol = GridColValue | `minmax(${ GridColValue }, ${ GridColValue })`

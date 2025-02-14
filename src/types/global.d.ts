@@ -199,3 +199,11 @@ declare type IsTuple<T> = [T] extends [never]
   ? false
   : true
   : false
+
+declare type Join<Data, Separator extends string> = Data extends [infer Head, ...infer Tail]
+  ? Head extends string
+  ? Tail extends readonly string[]
+  ? `${ Head }${ Separator }${ Join<Tail, Separator> }`
+  : Head
+  : Join<Tail, Separator>
+  : ''

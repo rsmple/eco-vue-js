@@ -2,6 +2,7 @@ import type {Config} from 'tailwindcss'
 
 import colors from 'tailwindcss/colors.js'
 
+import pluginContainerQueries from './plugins/container-queries.js'
 import pluginDefault from './plugins/default.js'
 import animations from './theme/animations.js'
 import score from './theme/score.js'
@@ -117,6 +118,7 @@ const tailwindBase = {
   },
   plugins: [
     pluginDefault,
+    pluginContainerQueries,
   ],
 } satisfies Config
 

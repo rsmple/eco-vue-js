@@ -1,9 +1,10 @@
 <template>
   <component
     :is="allowResize ? HeaderItemResizer : 'div'"
+    ref="container"
     v-bind="allowResize ? {hasStyles: widthStyle !== undefined} : (undefined as never)"
-    class="text-description select-none pr-6"
-    :style="widthStyle"
+    class="text-description shrink-0 select-none overflow-hidden pr-6"
+    :style="widthStyle ?? widthStyleInner"
     @update:width="$emit('update:width', $event)"
   >
     <component
@@ -12,9 +13,9 @@
       :class="{
         'cursor-pointer': !disabled,
         [itemClass ?? '']: true,
-        'items-center overflow-hidden whitespace-nowrap font-semibold': !itemClass,
+        'items-center whitespace-nowrap font-semibold': !itemClass,
       }"
-      @click="setOrdering"
+      @click="!disabled && setOrdering()"
     >
       <div
         :class="{
@@ -55,14 +56,14 @@
 </template>
 
 <script lang="ts" setup generic="Field">
-import {type StyleValue, computed} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
+import {type StyleValue, onMounted, ref, toRef, useTemplateRef} from 'vue'
 
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
 
-import {Order, type OrderItem, encodeOrdering} from '@/utils/order'
+import {type OrderItem} from '@/utils/order'
 
 import HeaderItemResizer from './components/HeaderItemResizer.vue'
+import {useOrdering} from './use/useOrdering'
 
 const props = defineProps<{
   title?: string
@@ -78,37 +79,17 @@ defineEmits<{
   (e: 'update:width', value: number): void
 }>()
 
-const route = useRoute()
-const router = useRouter()
+const containerRef = useTemplateRef<ComponentInstance<typeof HeaderItemResizer> | HTMLDivElement>('container')
 
-const index = computed(() => props.ordering.findIndex(item => item.field === props.field))
+const {index, setOrdering} = useOrdering(toRef(props, 'ordering'), toRef(props, 'field'))
 
-const updateQuery = (newOrdering: OrderItem<Field>[]): void => {
-  const newOrderingValue = encodeOrdering(newOrdering)
+const widthStyleInner = ref<StyleValue>()
 
-  if (route.query.ordering === newOrderingValue) return
-
-  router.replace({
-    query: {
-      ...route.query,
-      ordering: newOrderingValue,
-    },
-  })
-}
-
-const setOrdering = (): void => {
-  if (props.disabled) return
-
-  const newOrdering: OrderItem<Field>[] = props.ordering.slice()
-
-  if (index.value === -1) {
-    newOrdering.push({field: props.field, order: Order.ASC})
-  } else if (newOrdering[index.value].order === Order.ASC) {
-    newOrdering[index.value].order = Order.DESC
-  } else {
-    newOrdering.splice(index.value, 1)
+onMounted(() => {
+  if (!props.allowResize && containerRef.value instanceof HTMLDivElement) {
+    widthStyleInner.value = {
+      minWidth: containerRef.value.getBoundingClientRect().width + 'px',
+    }
   }
-
-  updateQuery(newOrdering)
-}
+})
 </script>

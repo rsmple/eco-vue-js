@@ -92,17 +92,17 @@ import IconSearch from '@/assets/icons/sax/IconSearch.svg?component'
 
 import {getIsMobile} from '@/utils/mobile'
 
+import {useHeaderPadding} from './use/useHeaderPadding'
+
 const props = withDefaults(
   defineProps<{
     title?: string
     search?: string
     searchEnabled?: boolean
-    headerPadding?: number
   }>(),
   {
     title: undefined,
     search: undefined,
-    headerPadding: 0,
   },
 )
 
@@ -112,6 +112,7 @@ defineEmits<{
 
 const isMobile = getIsMobile()
 
+const {headerPadding} = useHeaderPadding()
 const inputRef = useTemplateRef<ComponentInstance<typeof WInputSuggest>>('input')
 
 const isTransparent = ref(false)

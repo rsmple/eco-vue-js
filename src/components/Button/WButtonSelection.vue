@@ -41,28 +41,26 @@
       </WDropdownMenu>
     </div>
 
-    <Transition
-      enter-active-class="transition-opacity"
-      leave-active-class="transition-opacity"
-      enter-from-class="opacity-0"
-      leave-to-class="opacity-0"
+    <div
+      v-if="selectedCount"
+      class="sm-not:gap-1 grid grid-cols-[1fr,auto] gap-3"
     >
-      <div
-        v-if="selectedCount"
-        class="sm-not:gap-1 grid grid-cols-[1fr,auto] gap-3"
-      >
-        <div class="sm-not:text-xs text-description self-center truncate whitespace-nowrap text-base font-normal">
-          <span class="sm-not:hidden">Selected&nbsp;</span><span class="text-primary-default dark:text-primary-dark font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedCount === 1 ? '' : 's' }}</span>
-        </div>
-
-        <button
-          class="text-description w-ripple w-ripple-hover relative flex cursor-pointer select-none items-center justify-self-end"
-          @click="clearSelected"
-        >
-          <IconCancel class="square-5 sm-not:-mx--inner-margin mx-[1.125rem]" />
-        </button>
+      <div class="sm-not:text-xs text-description self-center truncate whitespace-nowrap text-base font-normal">
+        <span class="sm-not:hidden">Selected&nbsp;</span><span class="text-primary-default dark:text-primary-dark font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedCount === 1 ? '' : 's' }}</span>
       </div>
-    </Transition>
+
+      <button
+        class="text-description w-ripple w-ripple-hover relative flex cursor-pointer select-none items-center justify-self-end"
+        @click="clearSelected"
+      >
+        <IconCancel class="square-5 sm-not:-mx--inner-margin mx-[1.125rem]" />
+      </button>
+    </div>
+
+    <slot
+      v-else
+      name="settings"
+    />
   </div>
 </template>
 

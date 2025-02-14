@@ -4,12 +4,7 @@
     class="relative"
   >
     <template v-if="page && data?.results.length !== 0">
-      <div
-        class="flex"
-        :class="{
-          'sm:pt-4': (selected === undefined || !allowPageSelection) && hidePageTitle && !noGap,
-        }"
-      >
+      <div class="mt-[--w-list-gap,1rem] flex">
         <InfiniteListPageSelection
           v-if="selected !== undefined && allowPageSelection"
           :selected="selected"
@@ -133,7 +128,6 @@ const props = withDefaults(
     lastPage: boolean
     hidePageTitle?: boolean
     wrap?: boolean
-    noGap?: boolean
     transition?: boolean
     resetting?: boolean
     emptyStub?: string
