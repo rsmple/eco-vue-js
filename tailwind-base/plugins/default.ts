@@ -121,8 +121,10 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
   addVariant('resizer', '&::-webkit-resizer')
   addVariant('last-not', '&:not(:last-child)')
   addVariant('first-not', '&:not(:first-child)')
-  addVariant('card', ['.w-card &', '&.w-card'])
-  addVariant('list', ['.w-list &', '&.w-list'])
+  addVariant('card', ['.w-card &'])
+  addVariant('card-l', ['&.w-card'])
+  addVariant('list', ['.w-list &'])
+  addVariant('list-l', ['&.w-list'])
 
   addBase({
     '.w-input': {

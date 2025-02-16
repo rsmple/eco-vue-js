@@ -61,6 +61,7 @@
       v-else
       :field="field"
       :item="item"
+      :nested="nested === true"
     />
   </template>
 </template>
@@ -83,6 +84,6 @@ defineProps<{
 }>()
 
 defineSlots<{
-  default: (props: {field: ListField<Data, QueryParams>, item: Data}) => void
+  default: (props: {field: ListField<Data, QueryParams>, item: Data, nested: boolean}) => void
 }>()
 </script>

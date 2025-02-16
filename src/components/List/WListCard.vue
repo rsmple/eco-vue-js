@@ -1,10 +1,8 @@
 <template>
   <div
-    class="
-      @container
-      relative isolate
-    "
+    class="relative isolate"
     :class="{
+      [cardWrapperClass ?? '']: true,
       'w-ripple-trigger-has': allowOpen || to,
       'dark:group-even:bg-primary-darkest/25 grid grid-cols-1 group-even:bg-gray-50': card,
       'flex': !card,
@@ -132,7 +130,7 @@
       <div
         class="h-full rounded-r-[--w-list-rounded,unset]"
         :class="{
-          'rounded-tr-[--w-list-rounded,1rem] border border-l-0 border-gray-300 dark:border-gray-700': hasBorder,
+          'rounded-tr-[--w-list-rounded,unset] border border-l-0 border-gray-300 dark:border-gray-700': hasBorder,
           'rounded-br-[unset!important]': isOpen,
           'border-b-transparent dark:border-b-transparent': hasBorder && isOpen,
           'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': allowOpen || to,
@@ -193,6 +191,7 @@ defineProps<{
   alignTop: boolean | undefined
   hasBorder: boolean | undefined
   cardClass: string | undefined
+  cardWrapperClass: string | undefined
   allowOpen: boolean | undefined
   disableMore: boolean | undefined
   formName: string | undefined

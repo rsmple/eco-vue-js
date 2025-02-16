@@ -20,7 +20,7 @@
         @click="isOpen = false"
       >
         <div class="p-4">
-          <div class="grid grid-cols-[auto,auto,auto]">
+          <div class="grid grid-cols-[auto,auto,auto] items-start">
             <div class="flex flex-col gap-4">
               <HeaderSettingsModeButton
                 v-for="item in listModeList"
@@ -31,7 +31,7 @@
               />
             </div>
 
-            <div class="mx-4 border-r border-solid border-gray-200 dark:border-gray-700" />
+            <div class="mx-4 h-full border-r border-solid border-gray-200 dark:border-gray-700" />
 
             <div class="grid grid-cols-1">
               <HeaderFieldNested :fields="fields">

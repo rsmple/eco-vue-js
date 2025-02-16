@@ -26,9 +26,9 @@ export const useOrdering = <Field>(ordering: Ref<OrderItem<Field>[]>, field: Ref
     const newOrdering: OrderItem<Field>[] = ordering.value.slice()
   
     if (index.value === -1) {
-      newOrdering.push({field: field.value, order: Order.ASC})
-    } else if (newOrdering[index.value].order === Order.ASC) {
-      newOrdering[index.value].order = Order.DESC
+      newOrdering.push({field: field.value, order: Order.DESC})
+    } else if (newOrdering[index.value].order === Order.DESC) {
+      newOrdering[index.value].order = Order.ASC
     } else {
       newOrdering.splice(index.value, 1)
     }
