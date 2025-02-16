@@ -1,6 +1,6 @@
 import {onBeforeUnmount, onMounted, ref} from 'vue'
 
-import {isClientSide} from '@/main'
+import {isClientSide} from '@/utils/utils'
 
 const headerElementHeight = 60
 

@@ -183,7 +183,7 @@ import WButtonCopy from '@/components/Button/WButtonCopy.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
-import {encodeQueryParam} from '@/main'
+import {encodeQueryParam} from '@/utils/api'
 import {numberFormatter} from '@/utils/utils'
 
 import FilterButton from './components/FilterButton.vue'

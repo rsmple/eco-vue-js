@@ -1,14 +1,12 @@
-import type {FieldConfig, FieldConfigMap, ListField, ListFields} from '../types'
-
 import {type MaybeRef, computed, isRef, markRaw, ref, unref, watch} from 'vue'
 
 import IconGrid from '@/assets/icons/sax/IconGrid.svg?component'
 import IconTable from '@/assets/icons/sax/IconTable.svg?component'
 
-export enum ListMode {
-  TABLE = 'table',
-  GRID = 'grid',
-}
+import {useIsMobile} from '@/utils/mobile'
+import {ListMode} from '@/utils/utils'
+
+import {type FieldConfig, type FieldConfigMap, type ListConfig, type ListField, type ListFields} from '../types'
 
 export const listModeList = [
   ListMode.TABLE,
@@ -19,18 +17,13 @@ const isListMode = (value: unknown): value is ListMode => {
   return typeof value === 'string' && listModeList.includes(value as ListMode)
 }
 
-const parseListMode = (value: unknown): ListMode => {
-  return isListMode(value) ? value : ListMode.TABLE
+const parseListMode = (value: unknown): ListMode | undefined => {
+  return isListMode(value) ? value : undefined
 }
 
 export const listModeIconMap: Record<ListMode, SVGComponent> = {
   [ListMode.TABLE]: markRaw(IconTable),
   [ListMode.GRID]: markRaw(IconGrid),
-}
-
-export type ListConfig<Fields extends ListFields<unknown>> = {
-  fields: FieldConfigMap<Fields>
-  mode: ListMode
 }
 
 const fieldConfigKeyLength: ObjectKeys<FieldConfig>['length'] = 3
@@ -43,7 +36,7 @@ const isFieldConfig = (value: unknown): value is Partial<FieldConfig> => {
     && (!('order' in value) || typeof value.order === 'number')
 }
 
-const parseFieldConfigMap = <Fields extends ListFields<unknown>>(value: unknown, fields: Fields, defaultConfigMap: FieldConfigMap<Fields>): FieldConfigMap<Fields> => {
+const parseFieldConfigMap = <Fields extends ListFields<unknown>>(value: unknown, fields: Fields, fieldConfigMap: FieldConfigMap<Fields>): FieldConfigMap<Fields> => {
   const configMap: Record<string, FieldConfig> = {}
 
   const processFields = (fieldList: ListFields<unknown>) => {
@@ -54,7 +47,7 @@ const parseFieldConfigMap = <Fields extends ListFields<unknown>>(value: unknown,
       }
 
       const config = value instanceof Object && field.label in value ? value[field.label as keyof typeof value] : undefined
-      const defaultConfig = defaultConfigMap[field.label as keyof typeof defaultConfigMap]
+      const defaultConfig = fieldConfigMap[field.label as keyof typeof fieldConfigMap]
 
       if (!isFieldConfig(config)) {
         configMap[field.label] = {...defaultConfig}
@@ -79,10 +72,10 @@ const parseFieldConfigMap = <Fields extends ListFields<unknown>>(value: unknown,
   return configMap as FieldConfigMap<Fields>
 }
 
-const parseListConfig = <Fields extends ListFields<unknown>>(value: unknown, fields: Fields, defaultConfigMap: FieldConfigMap<Fields>): ListConfig<Fields> => {
+const parseListConfig = <Fields extends ListFields<unknown>>(value: unknown, fields: Fields, fieldConfigMap: FieldConfigMap<Fields>, mode: ListMode = ListMode.TABLE): ListConfig<Fields> => {
   return {
-    fields: parseFieldConfigMap(value instanceof Object && 'fields' in value ? value.fields : undefined, fields, defaultConfigMap),
-    mode: parseListMode(value instanceof Object && 'mode' in value ? value.mode : undefined),
+    fields: parseFieldConfigMap(value instanceof Object && 'fields' in value ? value.fields : undefined, fields, fieldConfigMap),
+    mode: value instanceof Object && 'mode' in value ? parseListMode(value.mode) ?? mode : mode,
   }
 }
 
@@ -117,12 +110,15 @@ export const getFirstFieldLabel = <F extends ListFields<any, any>[number]>(field
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useListConfig = <Fields extends ListFields<any, any>>(key: MaybeRef<string>, fields: MaybeRef<Fields>, defaultConfigMap: MaybeRef<FieldConfigMap<Fields>>) => {
+export const useListConfig = <Fields extends ListFields<any, any>>(key: MaybeRef<string>, fields: MaybeRef<Fields>, defaultConfigMap: MaybeRef<FieldConfigMap<Fields>>, defailtMode: MaybeRef<ListMode>) => {
+  const {isMobile} = useIsMobile()
+
   const value = ref<ListConfig<Fields>>(
     parseListConfig(
       getListConfig(unref(key)),
       unref(fields),
       unref(defaultConfigMap),
+      unref(defailtMode),
     ),
   )
   const hasSaved = ref(localStorage.getItem(unref(key)) !== null)
@@ -137,10 +133,10 @@ export const useListConfig = <Fields extends ListFields<any, any>>(key: MaybeRef
     },
   })
 
-  const isGrid = computed(() => value.value.mode === ListMode.GRID)
+  const isGrid = computed(() => isMobile.value || value.value.mode === ListMode.GRID)
 
   const reset = () => {
-    value.value = parseListConfig(undefined, unref(fields), unref(defaultConfigMap))
+    value.value = parseListConfig(undefined, unref(fields), unref(defaultConfigMap), unref(defailtMode))
     hasSaved.value = false
     localStorage.removeItem(unref(key))
   }
@@ -158,13 +154,13 @@ export const useListConfig = <Fields extends ListFields<any, any>>(key: MaybeRef
 
   if (isRef(key)) {
     watch(key, newKey => {
-      value.value = parseListConfig(getListConfig(unref(newKey)), unref(fields), unref(defaultConfigMap))
+      value.value = parseListConfig(getListConfig(unref(newKey)), unref(fields), unref(defaultConfigMap), unref(defailtMode))
       hasSaved.value = localStorage.getItem(unref(key)) !== null
     })
   }
 
   if (isRef(defaultConfigMap)) watch(defaultConfigMap, newValue => {
-    value.value = parseListConfig(getListConfig(unref(key)), unref(fields), newValue)
+    value.value = parseListConfig(getListConfig(unref(key)), unref(fields), newValue, unref(defailtMode))
     hasSaved.value = localStorage.getItem(unref(key)) !== null
   })
 

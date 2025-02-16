@@ -21,7 +21,10 @@
       >
         <div class="p-4">
           <div class="grid grid-cols-[auto,auto,auto] items-start">
-            <div class="flex flex-col gap-4">
+            <div
+              v-if="!mobile"
+              class="flex flex-col gap-4"
+            >
               <HeaderSettingsModeButton
                 v-for="item in listModeList"
                 :key="item"
@@ -31,7 +34,10 @@
               />
             </div>
 
-            <div class="mx-4 h-full border-r border-solid border-gray-200 dark:border-gray-700" />
+            <div
+              v-if="!mobile"
+              class="mx-4 h-full border-r border-solid border-gray-200 dark:border-gray-700"
+            />
 
             <div class="grid grid-cols-1">
               <HeaderFieldNested :fields="fields">
@@ -76,6 +82,7 @@
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
 import type {FieldConfig, ListField, ListFields} from '../types'
+import type {ListMode} from '@/utils/utils'
 
 import {markRaw, ref} from 'vue'
 
@@ -85,20 +92,21 @@ import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 
 import IconTableSettings from '@/assets/icons/sax/IconTableSettings.svg?component'
 
-import {HorizontalAlign} from '@/main'
+import {HorizontalAlign} from '@/utils/HorizontalAlign'
 
 import HeaderFieldNested from './HeaderFieldNested.vue'
 import HeaderSettingsItem from './HeaderSettingsItem.vue'
 import HeaderSettingsModeButton from './HeaderSettingsModeButton.vue'
 
-import {type ListMode, listModeIconMap, listModeList} from '../use/useListConfig'
+import {listModeIconMap, listModeList} from '../use/useListConfig'
 
 const props = defineProps<{
   fields: ListFields<Data, QueryParams>
   fieldConfigMap: Record<string, FieldConfig>
   mode: ListMode
   queryParams: QueryParams
-  hasSaved?: boolean
+  hasSaved: boolean
+  mobile: boolean
   disabled?: boolean
 }>()
 

@@ -53,7 +53,7 @@ import WExpansion from '@/components/Expansion/WExpansion.vue'
 
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 
-import {debounce} from '@/main'
+import {debounce} from '@/utils/utils'
 
 import WNavItem from './WNavItem.vue'
 import WNavItemTransition from './WNavItemTransition.vue'

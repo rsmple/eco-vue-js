@@ -1,4 +1,4 @@
-import {throttle} from '@/main'
+import {throttle} from '@/utils/utils'
 
 export const removeKey = <T extends Record<string, unknown>>(entity: T, key: string): T => {
   const result = {...entity}

@@ -134,8 +134,8 @@ import {type CSSProperties, type Component, type RendererElement, type RendererN
 
 import WForm from '@/components/Form/WForm.vue'
 
-import {useIsMobile} from '@/main'
 import {Notify} from '@/utils/Notify'
+import {useIsMobile} from '@/utils/mobile'
 import {debounce, throttle} from '@/utils/utils'
 
 import TabItem from './components/TabItem.vue'

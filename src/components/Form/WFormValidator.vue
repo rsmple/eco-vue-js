@@ -16,7 +16,7 @@ import {type VNode, computed, inject, onBeforeMount, onBeforeUnmount, ref, useSl
 
 import {useIsInsideTab} from '@/components/Tabs/use/useIsInsideTab'
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
-import {debounce} from '@/main'
+import {debounce} from '@/utils/utils'
 import {validateRequired} from '@/utils/validate'
 
 import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormHasValueUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'

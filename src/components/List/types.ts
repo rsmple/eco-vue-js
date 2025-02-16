@@ -1,3 +1,4 @@
+import type {ListMode} from '@/utils/utils'
 import type {Component, Raw} from 'vue'
 
 export type FieldComponent<Data> = Component<{
@@ -133,3 +134,9 @@ export type CardAreas<Fields extends ListFields<any, any>, Length extends number
 
 type GridColValue = 'auto' | '1fr' | `${ number }rem`
 export type GridCol = GridColValue | `minmax(${ GridColValue }, ${ GridColValue })`
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ListConfig<Fields extends ListFields<any, any>> = {
+  fields: FieldConfigMap<Fields>
+  mode: ListMode
+}

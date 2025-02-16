@@ -72,7 +72,7 @@ import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 
-import {HorizontalAlign} from '@/main'
+import {HorizontalAlign} from '@/utils/HorizontalAlign'
 
 import WButton from './WButton.vue'
 

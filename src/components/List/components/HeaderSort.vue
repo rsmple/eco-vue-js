@@ -36,6 +36,7 @@
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
 import type {FieldConfig, ListField, ListFields} from '../types'
 import type {OrderItem} from '@/utils/order'
+import type {ListMode} from '@/utils/utils'
 
 import {computed, markRaw, ref} from 'vue'
 
@@ -45,11 +46,9 @@ import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 
 import IconSort from '@/assets/icons/default/IconSort.svg?component'
 
-import {HorizontalAlign} from '@/main'
+import {HorizontalAlign} from '@/utils/HorizontalAlign'
 
 import HeaderSortItem from './HeaderSortItem.vue'
-
-import {type ListMode} from '../use/useListConfig'
 
 type RequiredField = ListField<Data, QueryParams> & Required<Pick<ListField<Data, QueryParams>, 'field'>>
 

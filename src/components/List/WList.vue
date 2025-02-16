@@ -42,7 +42,7 @@
         <WButtonSelection
           :title="selectionTitle"
           :disable-message="bulkDisableMessage"
-          class="z-[3]"
+          class="z-[2]"
           @update:selection-count="selectionCount = $event"
         >
           <template #default="{disableMessage, cssClass}">
@@ -96,6 +96,7 @@
                 :fields="fieldsVisible"
                 :query-params="queryParams"
                 :has-saved="hasSaved"
+                :mobile="isMobile"
                 @click:reset="reset"
                 @update:mode="updateMode"
               />
@@ -237,10 +238,11 @@ import {type StyleValue, computed, ref, toRef} from 'vue'
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
-import {useIsMobile} from '@/main'
+import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, parseOrdering} from '@/utils/order'
 import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
 import {getPosition, useSelected} from '@/utils/useSelected'
+import {ListMode} from '@/utils/utils'
 
 import WListCard from './WListCard.vue'
 import WListHeader from './WListHeader.vue'
@@ -270,6 +272,7 @@ const props = defineProps<{
   hasBorder?: boolean
   configKey: string
   defaultConfigMap: FieldConfigMap<Fields>
+  defaultMode?: ListMode
   alignTop?: boolean
   disableMore?: boolean
   readonly?: boolean
@@ -302,7 +305,15 @@ const cardStyles = computed<StyleValue>(() => {
 
 const fieldsVisible = computed(() => filterFields(props.fields, field => field.visibleGetter?.(props.queryParams) ?? true))
 
-const {listConfig, fieldConfigMap, isGrid, hasSaved, reset, save, updateMode} = useListConfig(toRef(props, 'configKey'), fieldsVisible, toRef(props, 'defaultConfigMap'))
+const {
+  listConfig,
+  fieldConfigMap,
+  isGrid,
+  hasSaved,
+  reset,
+  save,
+  updateMode,
+} = useListConfig(toRef(props, 'configKey'), fieldsVisible, toRef(props, 'defaultConfigMap'), toRef(props, 'defaultMode'))
 
 const fieldsFiltered = computed(() => {
   return filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible)

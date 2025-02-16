@@ -177,3 +177,8 @@ export const getDefaultFieldConfigMap = <Fields extends ListFields<any, any>>(fi
 
   return result as FieldConfigMap<Fields>
 }
+
+export enum ListMode {
+  TABLE = 'table',
+  GRID = 'grid',
+}

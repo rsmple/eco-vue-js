@@ -2,7 +2,10 @@ import type {FormAsyncProps} from '../types'
 
 import {computed, onBeforeUnmount, ref, toRef} from 'vue'
 
-import {Modal, Notify, get, handleApiError, set} from '@/main'
+import {Modal} from '@/utils/Modal'
+import {Notify} from '@/utils/Notify'
+import {handleApiError} from '@/utils/api'
+import {get, set} from '@/utils/utils'
 
 export const useFormAsync = <Model, FieldType, QueryParams>(props: FormAsyncProps<Model, FieldType, QueryParams>, onSuccess: (value: Model) => void) => {
   const enabled = toRef(props, 'queryEnabled')
