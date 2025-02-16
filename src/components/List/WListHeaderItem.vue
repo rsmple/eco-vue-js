@@ -9,7 +9,7 @@
   >
     <component
       :is="disabled ? 'div' : 'button'"
-      class="group flex size-full gap-2" 
+      class="group flex size-full gap-2 overflow-clip" 
       :class="{
         'cursor-pointer': !disabled,
         [itemClass ?? '']: true,
