@@ -20,9 +20,9 @@
 <script lang="ts" setup>
 import WTabs from '@/components/Tabs/WTabs.vue'
 
-import {getIsMobile} from '@/utils/mobile'
+import {useIsMobile} from '@/utils/mobile'
 
-const isMobile = getIsMobile()
+const {isMobile} = useIsMobile()
 
 defineSlots<{
   default: () => []

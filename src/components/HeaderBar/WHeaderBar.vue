@@ -90,7 +90,7 @@ import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 import IconSearch from '@/assets/icons/sax/IconSearch.svg?component'
 
-import {getIsMobile} from '@/utils/mobile'
+import {useIsMobile} from '@/utils/mobile'
 
 import {useHeaderPadding} from './use/useHeaderPadding'
 
@@ -110,7 +110,7 @@ defineEmits<{
   (e: 'update:search', value: string | undefined): void
 }>()
 
-const isMobile = getIsMobile()
+const {isMobile} = useIsMobile()
 
 const {headerPadding} = useHeaderPadding()
 const inputRef = useTemplateRef<ComponentInstance<typeof WInputSuggest>>('input')

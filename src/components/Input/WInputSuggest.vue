@@ -137,7 +137,7 @@ import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
-import {getIsMobile, getIsTouchDevice} from '@/utils/mobile'
+import {useIsMobile} from '@/utils/mobile'
 
 type ModelValue = Required<InputSuggestProps<Type>>['modelValue']
 
@@ -169,7 +169,7 @@ const isOpen = ref(false)
 const dropdownMenuRef = useTemplateRef('dropdownMenu')
 const inputRef = useTemplateRef('input')
 const contentRef = useTemplateRef('content')
-const isMobile = getIsMobile() || getIsTouchDevice()
+const {isMobile} = useIsMobile()
 
 const isDisabled = computed(() => props.readonly || props.disabled)
 
@@ -188,7 +188,7 @@ const close = () => {
 }
 
 const focus = () => {
-  if (isMobile) open()
+  if (isMobile.value) open()
 
   inputRef.value?.focus()
 }

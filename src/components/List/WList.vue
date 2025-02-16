@@ -237,7 +237,7 @@ import {type StyleValue, computed, ref, toRef} from 'vue'
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
-import {getIsMobile} from '@/main'
+import {useIsMobile} from '@/main'
 import {type OrderItem, parseOrdering} from '@/utils/order'
 import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
 import {getPosition, useSelected} from '@/utils/useSelected'
@@ -250,8 +250,6 @@ import HeaderSettings from './components/HeaderSettings.vue'
 import HeaderSort from './components/HeaderSort.vue'
 import ListCardFieldNested from './components/ListCardFieldNested.vue'
 import {filterFields, getFirstFieldLabel, useListConfig} from './use/useListConfig'
-
-const isMobile = getIsMobile()
 
 const props = defineProps<{
   count?: number
@@ -287,6 +285,8 @@ const props = defineProps<{
 defineEmits<{
   (e: 'update:error', value: ApiError): void
 }>()
+
+const {isMobile} = useIsMobile()
 
 const listCount = ref<number | undefined>(undefined)
 const selectionCount = ref(0)

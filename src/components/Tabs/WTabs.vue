@@ -134,15 +134,13 @@ import {type CSSProperties, type Component, type RendererElement, type RendererN
 
 import WForm from '@/components/Form/WForm.vue'
 
-import {getIsMobile} from '@/main'
+import {useIsMobile} from '@/main'
 import {Notify} from '@/utils/Notify'
 import {debounce, throttle} from '@/utils/utils'
 
 import TabItem from './components/TabItem.vue'
 import TabTitleButton from './components/TabTitleButton.vue'
 import {wTabItemListener, wTabItemUnlistener} from './models/injection'
-
-const mobile = getIsMobile()
 
 const props = defineProps<TabsProps>()
 
@@ -156,6 +154,8 @@ const emit = defineEmits<{
   (e: 'update:first', value: boolean): void
   (e: 'update:last', value: boolean): void
 }>()
+
+const {isMobile} = useIsMobile()
 
 const slots = useSlots()
 
@@ -236,7 +236,7 @@ const updateIndex = (value: number) => {
 let timeout: NodeJS.Timeout | null = null
 
 const scrollToTabContent = () => {
-  if (!mobile || !props.side) return
+  if (!isMobile.value || !props.side) return
 
   if (timeout) {
     clearTimeout(timeout)

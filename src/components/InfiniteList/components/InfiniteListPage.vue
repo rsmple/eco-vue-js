@@ -4,7 +4,7 @@
     class="relative"
   >
     <template v-if="page && data?.results.length !== 0">
-      <div class="mt-[--w-list-gap,1rem] flex">
+      <div class="mt-[--w-list-gap,0] flex">
         <InfiniteListPageSelection
           v-if="selected !== undefined && allowPageSelection"
           :selected="selected"

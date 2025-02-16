@@ -159,7 +159,7 @@ import {type Ref, computed, nextTick, ref, toRef, useTemplateRef, watch} from 'v
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 import {ApiError} from '@/utils/api'
-import {getIsMobile} from '@/utils/mobile'
+import {useIsMobile} from '@/utils/mobile'
 import {debounce} from '@/utils/utils'
 
 import SelectOption from './components/SelectOption.vue'
@@ -177,6 +177,8 @@ const emit = defineEmits<{
   (e: 'update:query-options-error', value: string | undefined): void
   (e: 'init-model'): void
 }>()
+
+const {isMobile} = useIsMobile()
 
 const isOpen = ref(false)
 const inputRef = useTemplateRef('input')
@@ -216,7 +218,6 @@ const optionsWithCreated = computed(() => {
 
 const optionsFiltered = computed(() => searchPrepared.value === '' ? optionsWithCreated.value : optionsWithCreated.value.filter(option => props.searchFn(option, searchPrepared.value)))
 const lastIndex = computed(() => props.createOption ? optionsFiltered.value.length : optionsFiltered.value.length - 1)
-const isMobile = getIsMobile()
 const focused = ref(false)
 const loadingOptionIndex = ref<number | null>(null)
 const loadingCreate = ref(false)

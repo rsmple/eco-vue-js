@@ -126,7 +126,7 @@ import {computed, nextTick, ref, useTemplateRef, watch} from 'vue'
 
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
-import {getIsMobile} from '@/utils/mobile'
+import {useIsMobile} from '@/utils/mobile'
 
 import SelectAsyncList from './components/SelectAsyncList.vue'
 import SelectAsyncPrefix from './components/SelectAsyncPrefix.vue'
@@ -151,10 +151,11 @@ const emit = defineEmits<{
   (e: 'blur', value: FocusEvent): void
 }>()
 
+const {isMobile} = useIsMobile()
+
 const isOpen = ref(false)
 const inputRef = useTemplateRef('input')
 const listRef = useTemplateRef('list')
-const isMobile = getIsMobile()
 const focused = ref(false)
 const isFetchingPrefix = ref(false)
 const search = ref('')
