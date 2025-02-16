@@ -4,7 +4,7 @@
     :class="{
       [cardWrapperClass ?? '']: true,
       'w-ripple-trigger-has': allowOpen || to,
-      'dark:group-even:bg-primary-darkest/25 grid grid-cols-1 group-even:bg-gray-50': card,
+      'sm-not:dark:even:bg-primary-darkest/25 sm-not:even:bg-gray-50 grid grid-cols-1': card,
       'flex': !card,
       '-mb-px': !card && isOpen,
     }"
@@ -66,9 +66,9 @@
       :class="{
         [cardClass ?? '']: true,
         'flex flex-1': !card,
-        'grid grid-cols-[--w-list-grid-cols] rounded-[--w-list-rounded,unset] [grid-template-areas:--w-list-grid-areas]': card,
+        'grid grid-cols-[--w-list-grid-cols] [grid-template-areas:--w-list-grid-areas] sm:rounded-[--w-list-rounded,unset]': card,
         'border-gray-300 sm:border-y dark:border-gray-700': hasBorder,
-        'border': card && hasBorder,
+        'sm:border': card && hasBorder,
         'border-b-transparent dark:border-b-transparent': !card && hasBorder && isOpen,
       }"
     >
@@ -154,7 +154,7 @@
   <template v-if="$slots.expansion">
     <div
       v-if="isOpen"
-      class="w-inner left-inner sticky col-span-full"
+      class="sm:w-inner sm:left-inner col-span-full sm:sticky"
       :class="{
         'border-gray-300 dark:border-gray-700': hasBorder,
         'mt-[calc(var(--w-list-gap,1rem)*-1)] border border-t-0 px-5': !card && hasBorder,

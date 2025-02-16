@@ -489,6 +489,7 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       'w-skeleton-rounded': value => ({'--w-skeleton-rounded': value}),
       'w-ripple-rounded': value => ({'--w-ripple-rounded': value}),
       'w-list-rounded': value => ({'--w-list-rounded': value}),
+      'w-option-rounded': value => ({'--w-option-rounded': value}),
     },
     {
       values: theme('borderRadius'),
