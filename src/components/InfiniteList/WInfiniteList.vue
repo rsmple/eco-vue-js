@@ -7,7 +7,7 @@
     <template #header>
       <slot
         name="header"
-        v-bind="{selectAllValue, goto}"
+        v-bind="{goto}"
       />
     </template>
 
@@ -37,46 +37,28 @@
         :class="$attrs.class"
         :style="$attrs.style"
 
-        :selected="selected"
         :value-getter="valueGetter"
-        :select-only="selectOnly"
-        :unselect-only="unselectOnly"
-        :reverse-selection="reverseSelection"
-        :allow-page-selection="allowPageSelection"
-
-        @update:selected="$emit('select', $event)"
 
         @update:count="$emit('update:count', $event)"
         @update:page="$emit('update:page', $event)"
         @update:error="$emit('update:error', $event)"
       >
         <template #default="{item, value, setter, skeleton, refetch, previous, next, first, last, resetting, page, index}">
-          <component
-            :is="skeleton ? WEmptyComponent : InfiniteListPageSelectItem"
-            :selected="skeleton ? false : getIsSelected(value)"
-            :selected-between="skeleton ? false : getIsSelectedBetween(value, page, index)"
-            @update:selected="
-              toggleSelected(value, reverse && !selectedRange ? !$event : $event);
-              setSelectedCursor($event ? {page, index, id: value} : null);
-            "
-            @update:selected-range="setSelectedRange({page, index, id: value})"
-            @update:selected-range-hover="setRangeHover({page, index, id: value})"
-          >
-            <slot
-              :item="item"
-              :setter="setter"
-              :skeleton="skeleton"
-              :refetch="refetch"
-              :previous="previous"
-              :next="next"
-              :first="first"
-              :last="last"
-              :resetting="resetting"
-              :page="page"
-              :index="index"
-              :value="value"
-            />
-          </component>
+          <slot
+            :item="item"
+            :setter="setter"
+            :skeleton="skeleton"
+            :refetch="refetch"
+            :previous="previous"
+            :next="next"
+            :first="first"
+            :last="last"
+            :resetting="resetting"
+            :page="page"
+            :index="index"
+            :position="getPosition(page, index, pageLength)"
+            :value="value"
+          />
         </template>
       </InfiniteListPages>
     </template>
@@ -86,15 +68,14 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import type {ApiError} from '@/utils/api'
 
-import {provide, toRef, useTemplateRef} from 'vue'
+import {useTemplateRef} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
+import {getPosition} from '@/utils/useSelected'
+
 import WInfiniteListWrapper from './WInfiniteListWrapper.vue'
-import InfiniteListPageSelectItem from './components/InfiniteListPageSelectItem.vue'
 import InfiniteListPages from './components/InfiniteListPages.vue'
-import {wInfiniteListSelection} from './models/injection'
-import {useSelected} from './use/useSelected'
 
 const props = withDefaults(
   defineProps<{
@@ -118,22 +99,10 @@ const props = withDefaults(
     pageLength?: number
     count?: number
 
-    allowSelect?: boolean
-    allowSelectRange?: boolean
-
     valueGetter?: (data: Data) => Model
-    selected?: Model[]
-    selectedRange?: SelectedRange<Model>
-    reverse?: boolean
-
-    selectOnly?: boolean
-    unselectOnly?: boolean
-    reverseSelection?: boolean
-    allowPageSelection?: boolean
   }>(),
   {
     skeletonLength: undefined,
-    selected: () => [],
     scrollingElement: undefined,
     excludeParams: undefined,
     emptyStub: undefined,
@@ -145,17 +114,12 @@ const props = withDefaults(
 
     pageLength: 24,
     count: 0,
-    selectedRange: undefined,
   },
 )
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'update:page', value: number | undefined): void
   (e: 'update:count', value: number): void
-
-  (e: 'select', values: Model[]): void
-  (e: 'select-reverse', values: Model[]): void
-  (e: 'select-range', value: SelectedRange<Model>): void
   (e: 'update:error', value: ApiError): void
 }>()
 
@@ -164,36 +128,6 @@ const infiniteListPagesRef = useTemplateRef('infiniteListPages')
 const goto = (page: number, itemIndex?: number) => {
   infiniteListPagesRef.value?.goto(page, itemIndex)
 }
-
-const {
-  setSelectedRange,
-  getIsSelected,
-  getIsSelectedBetween,
-  allowSelectHover,
-  setRangeHover,
-  setSelectedCursor,
-  toggleSelected,
-  selectedCount,
-  selectAllValue,
-} = useSelected<Model>(
-  toRef(props, 'count'),
-  toRef(props, 'pageLength'),
-  toRef(props, 'selected'),
-  toRef(props, 'reverse'),
-  toRef(props, 'selectedRange'),
-
-  (value) => emit('select', value),
-  (value) => emit('select-reverse', value),
-  (value) => emit('select-range', value),
-)
-
-provide(wInfiniteListSelection, {
-  allowSelect: toRef(props, 'allowSelect'),
-  allowSelectRange: toRef(props, 'allowSelectRange'),
-  allowSelectHover,
-  selectedCount,
-  clearSelected: () => emit('select', []),
-})
 
 defineExpose({
   resetPage() {
@@ -214,11 +148,11 @@ defineSlots<{
     resetting: boolean
     page: number
     index: number
+    position: number
     value: Model
   }) => void
   header?: (props: {
     goto: typeof goto
-    selectAllValue: typeof selectAllValue.value
   }) => void
 }>()
 </script>

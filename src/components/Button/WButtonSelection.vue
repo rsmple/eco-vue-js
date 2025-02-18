@@ -51,7 +51,7 @@
 
       <button
         class="text-description w-ripple w-ripple-hover relative flex cursor-pointer select-none items-center justify-self-end"
-        @click="clearSelected"
+        @click="$emit('clear:selection')"
       >
         <IconCancel class="square-5 sm-not:-mx--inner-margin mx-[1.125rem]" />
       </button>
@@ -65,7 +65,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, inject, markRaw, ref, watch} from 'vue'
+import {computed, markRaw, ref} from 'vue'
 
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 
@@ -78,39 +78,25 @@ import {numberFormatter} from '@/utils/utils'
 import WButtonSelectionAction from './WButtonSelectionAction.vue'
 
 import WClickOutside from '../ClickOutside/WClickOutside.vue'
-import {wInfiniteListSelection} from '../InfiniteList/models/injection'
 
 const props = withDefaults(
   defineProps<{
     title?: string
     disableMessage?: string
+    selectedCount?: number
   }>(),
   {
     title: 'item',
     disableMessage: 'No selected items',
+    selectedCount: undefined,
   },
 )
 
-const emit = defineEmits<{
-  (e: 'update:selectionCount', value: number): void
+defineEmits<{
+  (e: 'clear:selection'): void
 }>()
 
 const isOpen = ref(false)
 
-const {
-  selectedCount,
-  clearSelected,
-} = inject(wInfiniteListSelection, {})
-
-const disableMessageValue = computed<string | undefined>(() => selectedCount?.value === 0 ? props.disableMessage : undefined)
-
-if (selectedCount) {
-  watch(selectedCount, value => {
-    emit('update:selectionCount', value)
-  }, {immediate: true})
-}
-
-defineExpose({
-  clearSelected,
-})
+const disableMessageValue = computed<string | undefined>(() => props.selectedCount === 0 ? props.disableMessage : undefined)
 </script>

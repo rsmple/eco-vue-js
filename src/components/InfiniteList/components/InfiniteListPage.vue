@@ -5,21 +5,6 @@
   >
     <template v-if="page && data?.results.length !== 0">
       <div class="mt-[--w-list-gap,0] flex">
-        <InfiniteListPageSelection
-          v-if="selected !== undefined && allowPageSelection"
-          :selected="selected"
-          :items="data?.results ?? []"
-          :disabled="!data?.results"
-          :tooltip-text-persisted="hidePageTitle"
-          :select-only="selectOnly"
-          :unselect-only="unselectOnly"
-          :reverse="reverseSelection"
-          :value-getter="valueGetter"
-
-          class="sm:w-list-row-item sm-not:px-[calc(var(--inner-margin)-2px)] pb-4 pt-6"
-          @update:selected="$emit('update:selected', $event)"
-        />
-
         <InfiniteListPageTitle
           v-if="!hidePageTitle"
           :query-params="(queryParams as QueryParams)"
@@ -116,7 +101,6 @@ import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
 import {ApiError} from '@/utils/api'
 
-import InfiniteListPageSelection from './InfiniteListPageSelection.vue'
 import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
 
 const props = withDefaults(
@@ -138,12 +122,7 @@ const props = withDefaults(
     scrollingElement?: Element | null
     queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
 
-    selected?: Model[]
     valueGetter: (data: Data) => Model
-    selectOnly?: boolean
-    unselectOnly?: boolean
-    reverseSelection?: boolean
-    allowPageSelection?: boolean
   }>(),
   {
     keyGetter: undefined,

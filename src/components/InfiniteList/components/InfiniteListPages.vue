@@ -37,13 +37,7 @@
       :scrolling-element="scrollingElement"
       :query-options="queryOptions"
 
-      :selected="selected"
       :value-getter="valueGetter"
-      :select-only="selectOnly"
-      :unselect-only="unselectOnly"
-      :reverse-selection="reverseSelection"
-      :allow-page-selection="allowPageSelection"
-      @update:selected="$emit('update:selected', $event)"
 
       @update:count="updateCount($event); $emit('update:count', $event)"
       @update:pages-count="updatePagesCount"
@@ -117,16 +111,10 @@ const props = withDefaults(
     refetchInterval?: number | false
     queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
 
-    selected?: Model[]
     valueGetter: (data: Data) => Model
-    selectOnly?: boolean
-    unselectOnly?: boolean
-    reverseSelection?: boolean
-    allowPageSelection?: boolean
   }>(),
   {
     skeletonLength: undefined,
-    selected: undefined,
     pageLength: 24,
     scrollingElement: null,
     headerTop: 0,
@@ -143,7 +131,6 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'update:page', value: number | undefined): void
   (e: 'update:count', value: number): void
-  (e: 'update:selected', values: Model[]): void
   (e: 'update:error', value: ApiError): void
 }>()
 

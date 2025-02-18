@@ -1,91 +1,269 @@
-import {computed} from 'vue'
+import {type MaybeRef, computed, onBeforeUnmount, onMounted, ref, unref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 
-import {isId, isIndex, isPage} from './utils'
+import {isIdArray, isIndex} from '@/utils/utils'
 
-const keysLengthPage: ObjectKeys<SelectedPage<number>>['length'] = 3
-
-export const isSelecionPage = <T>(value: unknown): value is SelectedPage<T> => {
-  return value instanceof Object
-    && Object.keys(value).length === keysLengthPage
-    && 'page' in value && isPage(value.page)
-    && 'index' in value && isIndex(value.index)
-    && 'id' in value && isId(value.id)
+const isSelectedRange = (value: unknown): value is [number, number] => {
+  return Array.isArray(value) && value.length === 2 && value.every(isIndex) && value[0] <= value[1]
 }
 
-const stringifySelectedPage = <T>(value: SelectedPage<T>): string => value.page + ':' + value.index + ':' + value.id
+const keysLengthSelection: ObjectKeys<Selection<number>>['length'] = 3
 
-const keysLengthRange: SelectedRange<number>['length'] = 2
-
-export const isSelectedRange = <T>(value: unknown): value is SelectedRange<T> => {
-  return Array.isArray(value)
-    && value.length === keysLengthRange
-    && isSelecionPage(value[0])
-    && isSelecionPage(value[1])
+const isSelection = (value: unknown): value is Selection<number> => {
+  return value instanceof Object && Object.keys(value).length <= keysLengthSelection
+    && (
+      ('range' in value && isSelectedRange(value.range))
+      || ('id__in' in value && isIdArray(value.id__in))
+      || ('id__not_in' in value && isIdArray(value.id__not_in))
+    )
 }
 
-const isRightOrder = <T>(value: SelectedRange<T>): boolean => {
-  return value[0].page < value[1].page || (value[0].page === value[1].page && value[0].index <= value[1].index)
+const parseSelection = (value: Partial<Selection<number>>): Selection<number> => {
+  return {
+    range: isSelectedRange(value.range) ? value.range : undefined,
+    id__in: isIdArray(value.id__in) ? value.id__in : undefined,
+    id__not_in: isIdArray(value.id__not_in) ? value.id__not_in : undefined,
+  }
 }
 
-export const getPosition = <T>(range: SelectedPage<T>, pageLength: number): number => {
-  return ((range.page - 1) * pageLength) + range.index
+export const getPosition = (page: number, index: number, pageLength: number): number => {
+  return ((page - 1) * pageLength) + index
 }
 
-const stringifySelectedRange = <T>(value: SelectedRange<T>): string => stringifySelectedPage(value[0]) + '-' + stringifySelectedPage(value[1])
+export type Selection<Value> = {
+  id__in?: Value[]
+  id__not_in?: Value[]
+  range?: [number, number]
+}
 
-const DIVIDER = ','
+export type QueryParamsSelection = {
+  slice_indexes?: [number, number]
+  id__in?: number[]
+  id__not_in?: number[]
+}
 
-export const useSelected = () => {
+const isEmpty = <Value>(value: Selection<Value>) => Object.values(value).every(item => !item)
+
+export const useSelected = <Value extends number>(
+  count: MaybeRef<number | undefined>,
+) => {
   const route = useRoute()
   const router = useRouter()
 
-  const selectedRange = computed<SelectedRange<number> | undefined>(() => {
-    if (!route.hash.includes('-')) return undefined
+  const selection = computed<Selection<Value>>(() => {
+    if (!route.hash) return {}
 
-    const parsed = route.hash.substring(1).split('-').map((item): SelectedPage<number> => {
-      const [page, index, id] = item.split(':').map(value => Number.parseInt(value))
-      return {page, index, id}
-    })
+    try {
+      const parsed = JSON.parse(route.hash.substring(1))
 
-    if (!isSelectedRange<number>(parsed)) return undefined
+      if (!(parsed instanceof Object)) return {}
+      
+      const value = parseSelection(parsed)
 
-    if (!isRightOrder(parsed)) parsed.reverse()
+      if (isSelection(value)) return value as Selection<Value>
+    } catch {
+    }
 
-    return parsed
+    return {}
   })
 
-  const setSelectedRange = (value: SelectedRange<number>) => {
-    router.replace({query: route.query, hash: `#${ stringifySelectedRange(value) }`})
+  const resetSelection = (): void => {
+    router.replace({query: route.query, hash: '#'})
   }
 
-  const selected = computed<number[]>(() => {
-    if (typeof route.hash !== 'string') return []
+  const updateSelection = (value: Selection<Value>) => {
+    if (isEmpty(value)) resetSelection()
 
-    if (route.hash.includes('-')) return []
+    router.replace({query: route.query, hash: `#${ JSON.stringify(value) }`})
+  }
+  
+  const selectAll = () => {
+    updateSelection({id__not_in: []})
+  }
 
-    const substring = route.hash[1] === '!' ? route.hash.substring(2) : route.hash.substring(1)
+  const isShift = ref(false)
+  const hoverValue = ref<number | null>(null)
+  const preselectValue = ref<number | null>(null)
+  const disabled = ref(false)
 
-    return substring.split(DIVIDER).map(item => Number.parseInt(item)).filter(item => !isNaN(item))
+  const allowSelectHover = computed(() => isShift.value)
+  const hoverAllowed = computed<number | null>(() => allowSelectHover.value ? hoverValue.value : null)
+
+  const upValue = computed<number | null>(() => {
+    if (selection.value.range) {
+      return Math.min(
+        hoverAllowed.value ?? selection.value.range[0],
+        preselectValue.value ?? selection.value.range[0],
+      )
+    } else if (hoverAllowed.value !== null && preselectValue.value !== null) {
+      return Math.min(
+        hoverAllowed.value,
+        preselectValue.value,
+      )
+    }
+
+    return null
   })
 
-  const reverse = computed<boolean>(() => typeof route.hash === 'string' && route.hash[1] === '!')
+  const downValue = computed<number | null>(() => {
+    if (selection.value.range) {
+      if (hoverAllowed.value !== null && hoverAllowed.value < selection.value.range[0]) return selection.value.range[1]
 
-  const setSelected = (value: number[]): void => {
-    router.replace({query: route.query, hash: `#${ value.join(DIVIDER) }`})
+      return Math.max(
+        hoverAllowed.value ?? selection.value.range[1],
+        preselectValue.value ?? selection.value.range[0],
+      )
+    } else if (hoverAllowed.value !== null && preselectValue.value !== null) {
+      return Math.max(
+        hoverAllowed.value,
+        preselectValue.value,
+      )
+    }
+
+    return null
+  })
+
+  const getIsSelected = (id: Value, position: number): boolean => {
+    if (hoverAllowed.value === position) return true
+
+    if (upValue.value !== null && downValue.value !== null) {
+      if (upValue.value <= position && downValue.value >= position) return true
+
+      if (allowSelectHover.value) return false
+    }
+
+    if (selection.value.id__in) {
+      if (selection.value.id__in.includes(id)) return true
+    }
+
+    if (selection.value.id__not_in) {
+      if (!selection.value.id__not_in.includes(id)) return true
+    }
+
+    return false
   }
 
-  const setSelectedReverse = (value: number[]): void => {
-    router.replace({query: route.query, hash: `#!${ value.join(DIVIDER) }`})
+  const hoverSelected = (position: number) => {
+    if (disabled.value) return
+
+    hoverValue.value = position
   }
+
+  const toggleSelected = (id: Value, position: number): void => {
+    if (disabled.value) return
+
+    if (upValue.value !== null && downValue.value !== null) {
+      let range: [number, number] | undefined
+
+      if (allowSelectHover.value) {
+        range = [Math.min(position, upValue.value), Math.max(position, downValue.value)]
+
+        resetIsSelecting()
+
+        preselectValue.value = null
+      } else if (downValue.value === position && upValue.value === position) {
+        return resetSelection()
+      } else if (upValue.value === position) {
+        range = [position + 1, downValue.value]
+      } else if (downValue.value === position) {
+        range = [upValue.value, position - 1]
+      } else if (upValue.value - 1 === position) {
+        range = [position, downValue.value]
+      } else if (downValue.value + 1 === position) {
+        range = [upValue.value, position]
+      }
+
+      if (range) {
+        updateSelection({range})
+
+        return
+      }
+    }
+
+    preselectValue.value = position
+
+    const key: keyof Selection<Value> = selection.value.id__not_in ? 'id__not_in' : 'id__in'
+    const newValue = selection.value[key]?.slice() ?? []
+    const index = newValue.indexOf(id)
+
+    if (index === -1) newValue.push(id)
+    else newValue.splice(index, 1)
+
+    updateSelection({[key]: newValue})
+
+    if (selection.value.id__in) {
+      if (index === -1) preselectValue.value = position
+      else if (preselectValue.value === position) preselectValue.value = null
+    }
+  }
+
+  const selectionCount = computed(() => {
+    if (selection.value.range) return selection.value.range[1] - selection.value.range[0]
+
+    const _count = unref(count)
+
+    return selection.value.id__not_in && _count !== undefined
+      ? Math.max(_count - selection.value.id__not_in.length, 0)
+      : selection.value.id__in?.length ?? 0
+  })
+
+  const selectAllValue = computed<boolean | null>(() => {
+    if (selection.value.range) return null
+
+    const _count = unref(count)
+
+    if (_count === 0) return false
+
+    if (selection.value.id__not_in) {
+      return selection.value.id__not_in.length === 0 ? true : null
+    } else {
+      return selection.value.id__in?.length ? null : false
+    }
+  })
+
+  const setIsSelecting = (event: KeyboardEvent) => {
+    if (!event.shiftKey) return
+
+    isShift.value = true
+  }
+
+  const resetIsSelecting = () => {
+    isShift.value = false
+  }
+
+  const getQueryParams = (): QueryParamsSelection | undefined => {
+    if (isEmpty(selection.value)) return undefined
+
+    const result: QueryParamsSelection = {}
+
+    if (selection.value.range) result.slice_indexes = selection.value.range.slice() as [number, number]
+    if (selection.value.id__not_in) result.id__not_in = selection.value.id__not_in.slice()
+    if (selection.value.id__in) result.id__in = selection.value.id__in.slice()
+
+    return result
+  }
+
+  onMounted(() => {
+    window.addEventListener('keydown', setIsSelecting)
+    window.addEventListener('keyup', resetIsSelecting)
+  })
+
+  onBeforeUnmount(() => {
+    disabled.value = true
+
+    window.removeEventListener('keydown', setIsSelecting)
+    window.removeEventListener('keyup', resetIsSelecting)
+  })
 
   return {
-    selectedRange,
-    setSelectedRange,
-
-    selected,
-    reverse,
-    setSelected,
-    setSelectedReverse,
+    allowSelectHover,
+    selectionCount,
+    selectAllValue,
+    getIsSelected,
+    hoverSelected,
+    toggleSelected,
+    selectAll,
+    resetSelection,
+    getQueryParams,
   }
 }

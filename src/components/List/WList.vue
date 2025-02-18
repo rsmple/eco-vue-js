@@ -12,11 +12,6 @@
       :skeleton-length="count ?? listCount ?? PAGE_LENGTH"
       hide-page-title
 
-      :allow-select="allowSelect"
-      allow-select-range
-      :selected="selected"
-      :reverse="reverse"
-      :selected-range="selectedRange"
       :page-length="PAGE_LENGTH"
       :count="count ?? listCount"
       :page-class="
@@ -26,14 +21,11 @@
       "
       :style="cardStyles"
       :class="$attrs.class"
-      @select="setSelected"
-      @select-reverse="setSelectedReverse"
-      @select-range="setSelectedRange"
 
       @update:count="listCount = $event"
       @update:error="$emit('update:error', $event)"
     >
-      <template #header="{selectAllValue}">
+      <template #header>
         <slot
           name="header"
           :count="listCount"
@@ -42,8 +34,9 @@
         <WButtonSelection
           :title="selectionTitle"
           :disable-message="bulkDisableMessage"
+          :selected-count="selectionCount"
           class="z-[2]"
-          @update:selection-count="selectionCount = $event"
+          @clear:selection="resetSelection"
         >
           <template #default="{disableMessage, cssClass}">
             <template
@@ -56,7 +49,7 @@
                 :query-params-getter="getQueryParamsBulk"
                 :disable-message="disableMessage"
                 :class="cssClass"
-                @clear:selected="setSelected([])"
+                @clear:selected="resetSelection"
               />
             </template>
           </template>
@@ -75,7 +68,7 @@
                 :query-params-getter="getQueryParamsBulk"
                 :disable-message="scope?.disableMessage"
                 :class="scope?.cssClass"
-                @clear:selected="setSelected([])"
+                @clear:selected="resetSelection"
               />
             </template>
           </template>
@@ -113,7 +106,7 @@
 
           :count="count ?? listCount"
           :selection="selectAllValue"
-          @toggle:selection="$event ? setSelectedReverse([]) : setSelected([])"
+          @toggle:selection="$event ? selectAll() : resetSelection()"
         >
           <template #default>
             <HeaderFieldNested :fields="fieldsFiltered">
@@ -136,7 +129,7 @@
         </WListHeader>
       </template>
 
-      <template #default="{item, skeleton, setter, refetch, previous, index}">
+      <template #default="{item, skeleton, setter, refetch, previous, index, position, value}">
         <slot
           v-if="groupBy && (index === 0 || (!skeleton && (!previous || !groupBy(item, previous))))"
           name="group"
@@ -158,6 +151,12 @@
           :form-name="!skeleton ? formNameGetter?.(item) : undefined"
           :card="isGrid"
           :to="cardTo?.(item)"
+
+          :selected="skeleton ? false : getIsSelected(value as number, position)"
+          :allow-select="allowSelect"
+          :allow-select-hover="allowSelectHover"
+          @toggle:selected="toggleSelected(value as number, position)"
+          @hover:selected="hoverSelected(position)"
         >
           <template #default="{validate}">
             <ListCardFieldNested
@@ -241,7 +240,7 @@ import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, parseOrdering} from '@/utils/order'
 import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
-import {getPosition, useSelected} from '@/utils/useSelected'
+import {useSelected} from '@/utils/useSelected'
 import {ListMode} from '@/utils/utils'
 
 import WListCard from './WListCard.vue'
@@ -292,7 +291,6 @@ defineEmits<{
 const {isMobile} = useIsMobile()
 
 const listCount = ref<number | undefined>(undefined)
-const selectionCount = ref(0)
 
 const cardStyles = computed<StyleValue>(() => {
   if (!props.cardColumns || !props.cardAreas) return
@@ -324,13 +322,16 @@ const allowSelect = computed(() => props.bulk !== undefined)
 const allowOpen = computed(() => props.expansion !== undefined)
 
 const {
-  selected,
-  reverse,
-  setSelected,
-  setSelectedReverse,
-  selectedRange,
-  setSelectedRange,
-} = useSelected()
+  allowSelectHover,
+  selectionCount,
+  selectAllValue,
+  getIsSelected,
+  hoverSelected,
+  toggleSelected,
+  resetSelection,
+  selectAll,
+  getQueryParams,
+} = useSelected<number>(toRef(props, 'count'))
 
 const ordering = computed<OrderItem<keyof Data>[]>(() => {
   if (props.queryParams instanceof Object && 'ordering' in props.queryParams && typeof props.queryParams.ordering === 'string') {
@@ -340,30 +341,12 @@ const ordering = computed<OrderItem<keyof Data>[]>(() => {
   return []
 })
 
-const getQueryParamsBulk =  (): QueryParams => {
-  if (selectedRange.value) {
-    return {
-      ...props.queryParams,
-      slice_indexes: [
-        getPosition(selectedRange.value[0], PAGE_LENGTH),
-        getPosition(selectedRange.value[1], PAGE_LENGTH),
-      ],
-      page: undefined,
-    }
-  }
+const getQueryParamsBulk = (): QueryParams => {
+  const queryParamsSelection = getQueryParams()
 
-  if (selected.value.length) {
-    if (reverse.value) {
-      return {
-        ...props.queryParams,
-        id__not_in: selected.value.slice(),
-      }
-    } else {
-      return {
-        ...props.queryParams,
-        id__in: selected.value.slice(),
-      }
-    }
+  if (queryParamsSelection) return {
+    ...props.queryParams,
+    ...queryParamsSelection,
   }
 
   return props.queryParams

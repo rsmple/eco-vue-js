@@ -8,8 +8,6 @@
       :exclude-params="excludeParams"
       :selected="modelValue"
       :empty-stub="emptyStub"
-      :select-only="selectOnly"
-      :unselect-only="unselectOnly"
       :value-getter="valueGetter"
       :query-options="queryOptions"
       :skeleton-length="count || 1"
@@ -38,8 +36,8 @@
             'pt-4': !noPadding && first,
             'pb-4': !noPadding && last && !allowCreate,
           }"
-          @select="$emit('select', valueGetter(item)); setLoadingOption(valueGetter(item))"
-          @unselect="$emit('unselect', valueGetter(item)); setLoadingOption(valueGetter(item))"
+          @select="emitSelect(valueGetter(item))"
+          @unselect="emitUnselect(valueGetter(item))"
           @mouseenter="!skeleton && setCursor(valueGetter(item))"
           @update:cursor="setCursor(valueGetter(item))"
           @update:is-cursor="updateCursors"
@@ -200,6 +198,22 @@ const selectCursor = () => {
     if (props.modelValue.includes(cursor.value as Model)) emit('unselect', cursor.value as Model)
     else emit('select', cursor.value as Model)
   }
+}
+
+const emitSelect = (value: Model): void => {
+  if (props.disabled || props.loading) return
+  if (props.unselectOnly) return
+
+  emit('select', value)
+  setLoadingOption(value)
+}
+
+const emitUnselect = (value: Model): void => {
+  if (props.disabled || props.loading) return
+  if (props.selectOnly) return
+
+  emit('unselect', value)
+  setLoadingOption(value)
 }
 
 defineExpose({

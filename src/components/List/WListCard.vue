@@ -1,9 +1,10 @@
 <template>
   <div
+    v-bind="allowSelect ? {'onMouseover': () => $emit('hover:selected')} : undefined"
     class="relative isolate"
     :class="{
       [cardWrapperClass ?? '']: true,
-      'w-ripple-trigger-has': allowOpen || to,
+      'w-ripple-trigger-has': isActionShown,
       'sm-not:dark:even:bg-primary-darkest/25 sm-not:even:bg-gray-50 grid grid-cols-1': card,
       'flex': !card,
       '-mb-px': !card && isOpen,
@@ -34,26 +35,30 @@
       <div
         class="h-full rounded-l-[--w-list-rounded,unset]"
         :class="{
-          'border border-r-0 border-gray-300 dark:border-gray-700': hasBorder,
+          'border border-r-0': hasBorder,
+          'border-gray-300 dark:border-gray-700': hasBorder && !selected,
+          'border-primary-default dark:border-primary-dark': hasBorder && selected,
           'rounded-bl-[unset!important]': isOpen,
           'border-b-transparent dark:border-b-transparent': hasBorder && isOpen,
-          'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': allowOpen || to,
+          'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': isActionShown,
         }"
       >
         <WCheckbox
           v-if="allowSelect"
-          :model-value="selectedBetween ? null : selected ?? false"
+          :model-value="selected"
           :disabled="disabled"
-          :allow-shift="allowSelectRange"
           :align-top="alignTop"
           class="h-full px-4"
           :class="{
             'opacity-50': allowSelectHover,
             'pt-3': alignTop,
           }"
-          @update:model-value="allowSelectHover ? updateSelectedRange?.() : updateSelected?.($event)"
-          @update-shift:model-value="updateSelectedRange?.()"
-          @mouseover="allowSelectHover ? updateSelectedRangeHover?.() : undefined"
+          @update:model-value="$emit('toggle:selected')"
+        />
+
+        <div
+          v-if="selected"
+          class="bg-primary-default/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
         />
       </div>
     </div>
@@ -67,37 +72,40 @@
         [cardClass ?? '']: true,
         'flex flex-1': !card,
         'grid grid-cols-[--w-list-grid-cols] [grid-template-areas:--w-list-grid-areas] sm:rounded-[--w-list-rounded,unset]': card,
-        'border-gray-300 sm:border-y dark:border-gray-700': hasBorder,
+        'sm:border-y': hasBorder,
+        'border-gray-300 dark:border-gray-700': hasBorder && !selected,
+        'border-primary-default dark:border-primary-dark': hasBorder && selected,
         'sm:border': card && hasBorder,
         'border-b-transparent dark:border-b-transparent': !card && hasBorder && isOpen,
       }"
     >
       <WCheckbox
         v-if="allowSelect && card"
-        :model-value="selectedBetween ? null : selected ?? false"
+        :model-value="selected"
         :disabled="disabled"
-        :allow-shift="allowSelectRange"
         class="justify-end self-start"
         :class="{
           'opacity-50': allowSelectHover,
         }"
         :style="{gridArea: AREA_SELECT}"
-        @update:model-value="allowSelectHover ? updateSelectedRange?.() : updateSelected?.($event)"
-        @update-shift:model-value="updateSelectedRange?.()"
-        @mouseover="allowSelectHover ? updateSelectedRangeHover?.() : undefined"
+        @update:model-value="$emit('toggle:selected')"
       />
 
       <slot v-bind="{toggle, isOpen, validate}" />
 
-      <component
-        :is="to ? RouterLink : 'button'"
-        v-if="allowOpen || to"
-        v-bind="to ? {to} : undefined"
-        class="w-ripple w-ripple-hover w-ripple-has w-ripple-opacity-[0.04] absolute left-0 top-0 z-[-1] size-full cursor-pointer"
-        :class="{
-          'w-ripple-rounded-[--w-list-rounded,unset] rounded-[--w-list-rounded,unset]': card,
-        }"
-        @click="allowOpen && toggle()"
+      <ListCardAction
+        v-if="isActionShown"
+        v-bind="allowSelectHover
+          ? {tag: 'button', card, onClick: () => $emit('toggle:selected')}
+          : to
+            ? {tag: markRaw(RouterLink), card, class: 'z-[-1]', props: {to}}
+            : {tag: 'button', card, class: 'z-[-1]', onClick: toggle}
+        "
+      />
+
+      <div
+        v-if="selected"
+        class="bg-primary-default/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
       />
 
       <WButtonMore
@@ -110,7 +118,7 @@
           v-if="allowSelect"
           :text="selected ? 'Unselect' : 'Select'"
           :icon="selected ? markRaw(IconMinusCircle) : markRaw(IconAddCircle)"
-          @click="updateSelected?.(!selected)"
+          @click="$emit('toggle:selected')"
         />
 
         <slot name="more" />
@@ -130,10 +138,12 @@
       <div
         class="h-full rounded-r-[--w-list-rounded,unset]"
         :class="{
-          'rounded-tr-[--w-list-rounded,unset] border border-l-0 border-gray-300 dark:border-gray-700': hasBorder,
+          'rounded-tr-[--w-list-rounded,unset] border border-l-0': hasBorder,
+          'border-gray-300 dark:border-gray-700': hasBorder && !selected,
+          'border-primary-default dark:border-primary-dark': hasBorder && selected,
           'rounded-br-[unset!important]': isOpen,
           'border-b-transparent dark:border-b-transparent': hasBorder && isOpen,
-          'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': allowOpen || to,
+          'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': isActionShown,
         }"
       >
         <WButtonMore
@@ -147,6 +157,11 @@
         >
           <slot name="more" />
         </WButtonMore>
+
+        <div
+          v-if="selected"
+          class="bg-primary-default/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
+        />
       </div>
     </div>
   </div>
@@ -156,7 +171,8 @@
       v-if="isOpen"
       class="sm:w-inner sm:left-inner col-span-full sm:sticky"
       :class="{
-        'border-gray-300 dark:border-gray-700': hasBorder,
+        'border-gray-300 dark:border-gray-700': hasBorder && !selected,
+        'border-primary-default dark:border-primary-dark': hasBorder && selected,
         'mt-[calc(var(--w-list-gap,1rem)*-1)] border border-t-0 px-5': !card && hasBorder,
         'rounded-b-[--w-list-rounded,unset]': !card,
       }"
@@ -169,7 +185,7 @@
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
 
-import {inject, markRaw, ref, useTemplateRef, watch} from 'vue'
+import {computed, markRaw, ref, useTemplateRef} from 'vue'
 import {RouterLink} from 'vue-router'
 
 import WButtonMore from '@/components/Button/WButtonMore.vue'
@@ -180,11 +196,10 @@ import WForm from '@/components/Form/WForm.vue'
 import IconAddCircle from '@/assets/icons/sax/IconAddCircle.svg?component'
 import IconMinusCircle from '@/assets/icons/sax/IconMinusCircle.svg?component'
 
-import {wInfiniteListSelection, wInfiniteListSelectionItem} from '@/components/InfiniteList/models/injection'
-
+import ListCardAction from './components/ListCardAction.vue'
 import {AREA_MORE, AREA_SELECT} from './types'
 
-defineProps<{
+const props = defineProps<{
   disabled: boolean | undefined
   hideMore: boolean | undefined
   mobile: boolean | undefined
@@ -195,13 +210,17 @@ defineProps<{
   allowOpen: boolean | undefined
   disableMore: boolean | undefined
   formName: string | undefined
-  card: boolean | undefined
+  card: boolean
   to: LinkProps['to'] | undefined
+
+  selected: boolean
+  allowSelect: boolean
+  allowSelectHover: boolean
 }>()
 
-const emit = defineEmits<{
-  (e: 'update:selected', value: boolean): void
-  (e: 'update:selected-hover', value: boolean): void
+defineEmits<{
+  (e: 'toggle:selected'): void
+  (e: 'hover:selected'): void
 }>()
 
 const formRef = useTemplateRef<ComponentInstance<typeof WForm>>('form')
@@ -214,34 +233,5 @@ const toggle = () => {
 
 const validate: ComponentInstance<typeof WForm>['validate'] = (...args) => formRef.value?.validate(...args)
 
-const {
-  allowSelect,
-  allowSelectRange,
-  allowSelectHover,
-} = inject(wInfiniteListSelection, {})
-
-const {
-  selected,
-  selectedBetween,
-
-  updateSelected,
-  updateSelectedRange,
-  updateSelectedRangeHover,
-} = inject(wInfiniteListSelectionItem, {})
-
-if (selected) {
-  watch(selected, value => {
-    emit('update:selected', value)
-  }, {immediate: true})
-}
-
-if (allowSelectHover) {
-  watch(allowSelectHover, value => {
-    emit('update:selected-hover', value)
-  }, {immediate: true})
-}
-
-defineExpose({
-  updateSelected,
-})
+const isActionShown = computed<boolean>(() => props.allowOpen || props.to !== undefined || props.allowSelectHover)
 </script>

@@ -109,6 +109,10 @@ export const isId = (value: unknown): value is number => {
   return typeof value === 'number' && Number.isInteger(value) && value > 0
 }
 
+export const isIdArray = (value: unknown): value is number[] => {
+  return Array.isArray(value) && value.every(isId)
+}
+
 export const parseId = (value: unknown): number => {
   if (typeof value === 'number' && isId(value)) return value
 

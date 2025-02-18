@@ -101,7 +101,6 @@ const props = defineProps<{
   loading?: boolean
   intermediate?: boolean
   tooltipText?: string
-  allowShift?: boolean
   alignTop?: boolean
 }>()
 
@@ -112,14 +111,9 @@ const emit = defineEmits<{
 
 const elementRef = useTemplateRef('element')
 
-const toggle = (e: MouseEvent | KeyboardEvent): void => {
+const toggle = (): void => {
   if (props.disabled || props.readonly || props.loading) return
 
-  if (props.allowShift && e.shiftKey) {
-    emit('update-shift:modelValue', !props.modelValue)
-    return
-  } else {
-    emit('update:modelValue', !props.modelValue)
-  }
+  emit('update:modelValue', !props.modelValue)
 }
 </script>

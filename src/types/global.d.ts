@@ -62,17 +62,6 @@ declare type UseQueryWithParams<Model, QueryParams> =
 
 declare type UseQueryPaginated<Model, QueryParams> = UseQueryWithParams<PaginatedResponse<Model>, QueryParams>
 
-declare interface SelectedPage<Value> {
-  page: number
-  index: number
-  id: Value
-}
-
-declare type SelectedRange<Value> = [
-  SelectedPage<Value>,
-  SelectedPage<Value>,
-]
-
 declare type ConfirmProps = Omit<import('@/components/Modal/types').ConfirmModalProps, 'onAccept' | 'onCancel' | 'onIntermediate'>
 
 declare type RequestData = Record<string, unknown> | Record<string, unknown>[] | FormData

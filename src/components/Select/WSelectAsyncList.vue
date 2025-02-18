@@ -33,7 +33,6 @@
         :hide-option-icon="hideOptionIcon"
         :value-getter="valueGetter"
         :query-options="queryOptions"
-        allow-update-selected
         transition
         no-padding
         @select="$emit('select', $event)"
