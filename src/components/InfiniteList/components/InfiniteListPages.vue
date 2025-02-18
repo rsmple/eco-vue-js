@@ -41,8 +41,8 @@
 
       @update:count="updateCount($event); $emit('update:count', $event)"
       @update:pages-count="updatePagesCount"
-      @update:next-page="updateNextPage($event)"
-      @update:previous-page="updatePreviousPage($event)"
+      @update:next-page="infiniteScrollRef?.checkIsScrollDown()"
+      @update:previous-page="infiniteScrollRef?.checkIsScrollUp()"
       @update:scroll="updateScroll"
       @update-from-header:scroll="headerTop > 0 && nextTick(() => updateScroll(headerTop))"
       @remove:page="removePage"
@@ -87,7 +87,6 @@ import InfiniteListButton from './InfiniteListButton.vue'
 import InfiniteListPage from './InfiniteListPage.vue'
 import InfiniteListScroll from './InfiniteListScroll.vue'
 
-import {getIsScrollDown} from '../models/utils'
 import {useRefetchNextPages} from '../use/useRefetchNextPages'
 
 const props = withDefaults(
@@ -139,8 +138,8 @@ const infiniteScrollRef = useTemplateRef('infiniteScroll')
 const pages = ref<number[]>([(props.queryParams as {page?: number}).page ?? 1])
 const pagesCount = ref(1)
 const count = ref(0)
-const nextPage = ref<number | null>()
-const previousPage = ref<number | null>()
+const nextPage = computed(() => pages.value[pages.value.length - 1] !== pagesCount.value ? pages.value[pages.value.length - 1] + 1 : null)
+const previousPage = computed(() => pages.value[0] !== 1 ? pages.value[0] - 1 : null)
 const isResettingPage = ref(false)
 
 const getSkeletonLength = (pagesBefore: number): number => {
@@ -169,18 +168,6 @@ const updatePagesCount = (value: number): void => {
   pagesCount.value = value
 }
 
-const updateNextPage = (value: number | null): void => {
-  nextPage.value = value
-
-  if (pages.value.length === 1 && getIsScrollDown(props.scrollingElement)) addNextPage(true)
-}
-
-const updatePreviousPage = (value: number | null): void => {
-  previousPage.value = value
-
-  if (pages.value.length === 1) addPreviousPage(true)
-}
-
 const addNextPage = (silent?: boolean) => {
   if (!nextPage.value) return
   if (pages.value.includes(nextPage.value)) return
@@ -191,11 +178,7 @@ const addNextPage = (silent?: boolean) => {
 
   if (pages.value.length < props.maxPages) return
 
-  const firstPage = pages.value.shift()
-
-  if (firstPage === undefined) return
-
-  previousPage.value = firstPage
+  pages.value.shift()
 }
 
 const addPreviousPage = (silent?: boolean) => {
@@ -208,11 +191,7 @@ const addPreviousPage = (silent?: boolean) => {
 
   if (pages.value.length < props.maxPages) return
 
-  const lastPage = pages.value.pop()
-
-  if (lastPage === undefined) return
-
-  nextPage.value = lastPage
+  pages.value.pop()
 }
 
 const updateScroll = (height: number): void => {
@@ -233,7 +212,6 @@ const removePage = (page: number): void => {
   pages.value = newPages
 
   if (pagesCount.value >= page) pagesCount.value = page - 1
-  if (nextPage.value === page) nextPage.value = null
 
   emit('update:page', pages.value[pages.value.length - 1])
 }
@@ -264,8 +242,6 @@ const resetPage = async (page = 1) => {
   await nextTick()
 
   pages.value = [page]
-  nextPage.value = null
-  previousPage.value = null
 }
 
 watch(toRef(props, 'queryParams'), (newValue, oldValue) => {
