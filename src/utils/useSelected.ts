@@ -198,7 +198,7 @@ export const useSelected = <Value extends number>(
   }
 
   const selectionCount = computed(() => {
-    if (selection.value.range) return selection.value.range[1] - selection.value.range[0]
+    if (selection.value.range) return selection.value.range[1] - selection.value.range[0] + 1
 
     const _count = unref(count)
 
