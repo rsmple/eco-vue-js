@@ -1,4 +1,4 @@
-import {type MaybeRef, computed, onBeforeUnmount, onMounted, ref, unref} from 'vue'
+import {type MaybeRef, type Ref, computed, onBeforeUnmount, ref, unref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 
 import {isIdArray, isIndex} from '@/utils/utils'
@@ -44,9 +44,7 @@ export type QueryParamsSelection = {
 
 const isEmpty = <Value>(value: Selection<Value>) => Object.values(value).every(item => !item)
 
-export const useSelected = <Value extends number>(
-  count: MaybeRef<number | undefined>,
-) => {
+export const useSelected = <Value extends number>(count: MaybeRef<number | undefined>, disabled: Ref<boolean>) => {
   const route = useRoute()
   const router = useRouter()
 
@@ -84,9 +82,9 @@ export const useSelected = <Value extends number>(
   const isShift = ref(false)
   const hoverValue = ref<number | null>(null)
   const preselectValue = ref<number | null>(null)
-  const disabled = ref(false)
+  const unmounted = ref(false)
 
-  const allowSelectHover = computed(() => isShift.value)
+  const allowSelectHover = computed<boolean>(() => !disabled.value && isShift.value)
   const hoverAllowed = computed<number | null>(() => allowSelectHover.value ? hoverValue.value : null)
 
   const upValue = computed<number | null>(() => {
@@ -144,13 +142,13 @@ export const useSelected = <Value extends number>(
   }
 
   const hoverSelected = (position: number) => {
-    if (disabled.value) return
+    if (unmounted.value || disabled.value) return
 
     hoverValue.value = position
   }
 
   const toggleSelected = (id: Value, position: number): void => {
-    if (disabled.value) return
+    if (unmounted.value || disabled.value) return
 
     if (upValue.value !== null && downValue.value !== null) {
       let range: [number, number] | undefined
@@ -243,13 +241,18 @@ export const useSelected = <Value extends number>(
     return result
   }
 
-  onMounted(() => {
-    window.addEventListener('keydown', setIsSelecting)
-    window.addEventListener('keyup', resetIsSelecting)
-  })
+  watch(disabled, value => {
+    if (value) {
+      window.removeEventListener('keydown', setIsSelecting)
+      window.removeEventListener('keyup', resetIsSelecting)
+    } else {
+      window.addEventListener('keydown', setIsSelecting)
+      window.addEventListener('keyup', resetIsSelecting)
+    }
+  }, {immediate: true})
 
   onBeforeUnmount(() => {
-    disabled.value = true
+    unmounted.value = true
 
     window.removeEventListener('keydown', setIsSelecting)
     window.removeEventListener('keyup', resetIsSelecting)

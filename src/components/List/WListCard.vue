@@ -109,7 +109,7 @@
       />
 
       <WButtonMore
-        v-if="card"
+        v-if="card && $slots.more"
         class="-mr-4 flex items-center px-4"
         :disabled="disabled || disableMore"
         :style="{gridArea: AREA_MORE}"
@@ -129,8 +129,8 @@
       v-if="!card"
       class="right-inner bg-default dark:bg-default-dark sticky z-[1]"
       :class="{
-        'width-14': !hideMore,
-        'width-4': hideMore,
+        'width-14': $slots.more,
+        'width-4': !$slots.more,
       }"
     >
       <div class="bg-default dark:bg-default-dark absolute left-full top-0 z-[-1] h-full w-[calc(var(--actions-bar-width)+var(--inner-margin))]" />
@@ -147,7 +147,7 @@
         }"
       >
         <WButtonMore
-          v-if="!hideMore"
+          v-if="$slots.more"
           class="flex h-full px-4"
           :class="{
             'items-start pt-3': alignTop,
@@ -201,7 +201,6 @@ import {AREA_MORE, AREA_SELECT} from './types'
 
 const props = defineProps<{
   disabled: boolean | undefined
-  hideMore: boolean | undefined
   mobile: boolean | undefined
   alignTop: boolean | undefined
   hasBorder: boolean | undefined

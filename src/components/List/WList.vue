@@ -38,7 +38,10 @@
           class="z-[2]"
           @clear:selection="resetSelection"
         >
-          <template #default="{disableMessage, cssClass}">
+          <template
+            v-if="bulk"
+            #default="{disableMessage, cssClass}"
+          >
             <template
               v-for="(item, index) in bulk"
               :key="index"
@@ -55,7 +58,7 @@
           </template>
 
           <template
-            v-if="bulkMore"
+            v-if="bulk && bulkMore"
             #more="scope"
           >
             <template
@@ -147,7 +150,6 @@
           :has-border="hasBorder"
           :allow-open="allowOpen && !skeleton"
           :align-top="alignTop"
-          :hide-more="hideMore"
           :form-name="!skeleton ? formNameGetter?.(item) : undefined"
           :card="isGrid"
           :to="cardTo?.(item)"
@@ -202,7 +204,10 @@
             />
           </template>
 
-          <template #more>
+          <template
+            v-if="menu"
+            #more
+          >
             <template
               v-for="(menuItem, menuIndex) in menu"
               :key="menuIndex"
@@ -263,7 +268,7 @@ const props = defineProps<{
   selectionTitle: string
   bulk?: BulkComponent<QueryParams>[]
   bulkMore?: BulkComponent<QueryParams>[]
-  menu: MenuComponent<Data>[]
+  menu?: MenuComponent<Data>[]
   readonlyGetter?: (item: Data) => boolean
   cardClass?: string
   cardWrapperClass?: string
@@ -278,7 +283,6 @@ const props = defineProps<{
   noOrdering?: boolean
   formNameGetter?: (data: Data) => string | undefined
   groupBy?: (a: Data, b: Data) => boolean
-  hideMore?: boolean
   cardColumns: CardColumns
   cardAreas: CardAreas<Fields, CardColumns['length']>
   cardTo?: (item: Data) => LinkProps['to']
@@ -321,6 +325,8 @@ const fieldsFiltered = computed(() => {
 const allowSelect = computed(() => props.bulk !== undefined)
 const allowOpen = computed(() => props.expansion !== undefined)
 
+const disableSelect = computed(() => !allowSelect.value)
+
 const {
   allowSelectHover,
   selectionCount,
@@ -331,7 +337,7 @@ const {
   resetSelection,
   selectAll,
   getQueryParams,
-} = useSelected<number>(toRef(props, 'count'))
+} = useSelected<number>(toRef(props, 'count'), disableSelect)
 
 const ordering = computed<OrderItem<keyof Data>[]>(() => {
   if (props.queryParams instanceof Object && 'ordering' in props.queryParams && typeof props.queryParams.ordering === 'string') {
