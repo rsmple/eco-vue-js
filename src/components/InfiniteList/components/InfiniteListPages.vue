@@ -26,7 +26,6 @@
       :first-page="index === 0"
       :last-page="index === pages.length - 1"
       :hide-page-title="hidePageTitle"
-      :wrap="wrap"
       :transition="transition"
       :resetting="isResettingPage"
       :empty-stub="emptyStub"
@@ -95,7 +94,6 @@ const props = withDefaults(
     queryParams: QueryParams
     skeletonLength?: number
     hidePageTitle?: boolean
-    wrap?: boolean
     transition?: boolean
     pageLength?: number
     scrollingElement?: Element | null

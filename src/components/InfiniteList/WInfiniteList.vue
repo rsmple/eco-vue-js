@@ -20,7 +20,6 @@
 
         :skeleton-length="skeletonLength"
         :hide-page-title="hidePageTitle"
-        :wrap="wrap"
         :transition="transition"
         :page-length="pageLength"
         :header-top="headerTopIgnore ? 0 : 'headerTop' in defaultScope ? defaultScope.headerTop : 0"
@@ -83,7 +82,6 @@ const props = withDefaults(
     queryParams: QueryParams
     skeletonLength?: number
     hidePageTitle?: boolean
-    wrap?: boolean
     transition?: boolean
     scrollingElement?: Element | null
     headerTopIgnore?: boolean

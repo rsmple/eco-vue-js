@@ -111,7 +111,6 @@ const props = withDefaults(
     firstPage: boolean
     lastPage: boolean
     hidePageTitle?: boolean
-    wrap?: boolean
     transition?: boolean
     resetting?: boolean
     emptyStub?: string
