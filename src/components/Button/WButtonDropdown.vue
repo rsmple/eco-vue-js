@@ -93,6 +93,6 @@ const close = () => {
 
 defineSlots<{
   button?: () => VNode[]
-  content?: () => VNode[]
+  content?: (props: {close: typeof close}) => VNode[]
 }>()
 </script>
