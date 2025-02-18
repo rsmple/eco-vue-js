@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeUnmount, watch} from 'vue'
+import {onUnmounted, watch} from 'vue'
 
 import {useHeaderPadding} from '@/components/HeaderBar/use/useHeaderPadding'
 
@@ -46,7 +46,7 @@ const updateHeaderHeight = () => {
 
 watch(isIntersecting, updateHeaderHeight)
 
-onBeforeUnmount(() => {
+onUnmounted(() => {
   updateHeaderPadding(0)
 })
 </script>

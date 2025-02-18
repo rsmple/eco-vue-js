@@ -2,7 +2,7 @@
   <component
     :is="tag"
     v-bind="props"
-    class="w-ripple w-ripple-hover w-ripple-has w-ripple-opacity-[0.04] absolute inset-0 cursor-pointer"
+    class="w-ripple w-ripple-hover w-ripple-has w-ripple-opacity-[0.04] absolute inset-0 cursor-pointer select-none"
     :class="{
       'w-ripple-rounded-[--w-list-rounded,unset] rounded-[--w-list-rounded,unset]': card,
     }"

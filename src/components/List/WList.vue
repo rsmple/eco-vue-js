@@ -151,9 +151,10 @@
           :has-border="hasBorder"
           :allow-open="allowOpen && !skeleton"
           :align-top="alignTop"
-          :form-name="!skeleton ? formNameGetter?.(item) : undefined"
+          :form-name="skeleton ? undefined : formNameGetter?.(item)"
           :card="isGrid"
-          :to="cardTo?.(item)"
+          :to="skeleton ? undefined : cardTo?.(item)"
+          :skeleton="skeleton"
 
           :selected="skeleton ? false : getIsSelected(value as number, position)"
           :allow-select="allowSelect"

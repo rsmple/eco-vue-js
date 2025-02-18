@@ -8,7 +8,7 @@ import svgLoader from 'vite-svg-loader'
 
 import {URL, fileURLToPath} from 'node:url'
 
-export default defineConfig({
+export default defineConfig(({mode}) => ({
   plugins: [
     dts({
       tsconfigPath: 'tsconfig.vue.json',
@@ -48,10 +48,11 @@ export default defineConfig({
         },
       },
     },
+    watch: mode === 'development' ? {} : null,
   },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-})
+}))

@@ -48,18 +48,18 @@ import IconCheck from 'eco-vue-js/dist/assets/icons/default/IconCheck'
 
 ### Local testing
 
-1. Build library:
+1. Register the library globally:
     ```
-    npm i
-    npm run build
+    npm link
     ```
-2. Create a `.tgz` file and copy absolute path to it:
+2. Run development build with HMR:
     ```
-    npm pack
+    npm ci
+    npm run dev
     ```
-3. Install library from created `.tgz`
+3. Creates a symlink to the built library in project
     ```
-    npm i --save <absolute_path_to_file>
+    npm link eco-vue-js
     ```
 
 ### Updating the bundle

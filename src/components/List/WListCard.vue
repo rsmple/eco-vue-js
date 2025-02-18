@@ -211,6 +211,7 @@ const props = defineProps<{
   formName: string | undefined
   card: boolean
   to: LinkProps['to'] | undefined
+  skeleton: boolean
 
   selected: boolean
   allowSelect: boolean
@@ -232,5 +233,5 @@ const toggle = () => {
 
 const validate: ComponentInstance<typeof WForm>['validate'] = (...args) => formRef.value?.validate(...args)
 
-const isActionShown = computed<boolean>(() => props.allowOpen || props.to !== undefined || props.allowSelectHover)
+const isActionShown = computed<boolean>(() => !props.skeleton && (props.allowOpen || props.to !== undefined || props.allowSelectHover))
 </script>
