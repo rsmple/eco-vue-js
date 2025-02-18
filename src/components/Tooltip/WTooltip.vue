@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, markRaw, onBeforeUnmount, ref, toRef, useSlots, useTemplateRef, watch} from 'vue'
+import {type VNode, computed, markRaw, onBeforeUnmount, ref, toRef, useSlots, useTemplateRef, watch} from 'vue'
 
 import {Tooltip} from '@/utils/Tooltip'
 import {getIsTouchDevice} from '@/utils/mobile'
@@ -79,4 +79,8 @@ onBeforeUnmount(() => {
 
   close()
 })
+
+defineSlots<{
+  default?: () => VNode[]
+}>()
 </script>

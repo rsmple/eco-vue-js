@@ -1,7 +1,7 @@
 <template>
   <div class="relative mb-6">
     <div
-      v-if="title || $slots.title?.()?.length"
+      v-if="title || $slots.title"
       class="text-accent mb-2 text-xs font-semibold"
     >
       <template v-if="!skeleton">

@@ -39,7 +39,7 @@
       class="-pl--inner-margin xl-not:pl-[3.75rem] -pr--inner-margin relative flex w-full flex-1 items-center gap-2"
     >
       <WInputSuggest
-        v-if="$slots.search?.()?.length && isMobile"
+        v-if="$slots.search && isMobile"
         ref="input"
         :model-value="search"
         placeholder="Search.."

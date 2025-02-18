@@ -65,7 +65,7 @@
 <script lang="ts" setup>
 import type {ButtonDropdownProps} from './types'
 
-import {ref} from 'vue'
+import {type VNode, ref} from 'vue'
 
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
@@ -90,4 +90,9 @@ const isOpen = ref(false)
 const close = () => {
   isOpen.value = false
 }
+
+defineSlots<{
+  button?: () => VNode[]
+  content?: () => VNode[]
+}>()
 </script>

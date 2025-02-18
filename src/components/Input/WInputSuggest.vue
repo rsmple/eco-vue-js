@@ -213,6 +213,6 @@ defineSlots<{
   subtitle?: () => void
   prefix?: (props: {unclickable?: boolean}) => void
   right?: (props: Record<string, never>) => void
-  content?: (props: {scrollingElement?: Element}) => VNode[]
+  content?: (props?: {scrollingElement?: Element}) => VNode[]
 }>()
 </script>

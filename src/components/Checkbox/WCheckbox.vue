@@ -73,7 +73,7 @@
     </div>
 
     <div
-      v-if="$slots.default?.().length || title"
+      v-if="$slots.default || title"
       class="text-accent flex items-center gap-1 text-base font-normal"
     >
       <slot>

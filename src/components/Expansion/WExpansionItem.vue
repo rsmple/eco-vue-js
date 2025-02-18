@@ -48,6 +48,8 @@
 </template>
 
 <script lang="ts" setup>
+import type {VNode} from 'vue'
+
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 
 import WExpansion from './WExpansion.vue'
@@ -62,5 +64,10 @@ defineProps<{
 
 defineEmits<{
   (e: 'toggle'): void
+}>()
+
+defineSlots<{
+  default?: () => VNode[]
+  title?: () => VNode[]
 }>()
 </script>

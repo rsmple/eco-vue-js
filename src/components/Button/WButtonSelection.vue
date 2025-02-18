@@ -9,7 +9,7 @@
       />
 
       <WDropdownMenu
-        v-if="$slots.more?.()?.length"
+        v-if="$slots.more"
         :is-open="isOpen"
         :max-width="200"
         :max-height="300"
@@ -65,7 +65,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, markRaw, ref} from 'vue'
+import {type VNode, computed, markRaw, ref} from 'vue'
 
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 
@@ -99,4 +99,10 @@ defineEmits<{
 const isOpen = ref(false)
 
 const disableMessageValue = computed<string | undefined>(() => props.selectedCount === 0 ? props.disableMessage : undefined)
+
+defineSlots<{
+  default?: (props: {disableMessage: string | undefined, cssClass: string}) => VNode[]
+  more?: (props: {disableMessage: string | undefined, cssClass: string}) => VNode[]
+  settings?: () => VNode[]
+}>()
 </script>

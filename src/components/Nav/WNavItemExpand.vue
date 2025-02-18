@@ -47,7 +47,7 @@
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
 
-import {computed, onBeforeUnmount, reactive, ref, useSlots, watch} from 'vue'
+import {type VNode, computed, onBeforeUnmount, reactive, ref, useSlots, watch} from 'vue'
 
 import WExpansion from '@/components/Expansion/WExpansion.vue'
 
@@ -94,4 +94,9 @@ watch(hasActive, updateHasActiveCache, {immediate: true})
 onBeforeUnmount(() => {
   emit('update:isActive', [props.title, false])
 })
+
+defineSlots<{
+  default?: () => VNode[]
+  icon?: () => VNode[]
+}>()
 </script>
