@@ -4,10 +4,10 @@
     :scrolling-element="scrollingElement"
     :init-is-intersecting="props.queryParams instanceof Object && 'page' in props.queryParams && Number.isInteger(props.queryParams.page) && (props.queryParams.page as number) > 1 ? false : undefined"
   >
-    <template #header>
+    <template #header="headerScope">
       <slot
         name="header"
-        v-bind="{goto}"
+        v-bind="{goto, ...headerScope ?? {}}"
       />
     </template>
 
@@ -153,6 +153,7 @@ defineSlots<{
   }) => void
   header?: (props: {
     goto: typeof goto
+    updateHeaderHeight: () => void
   }) => void
 }>()
 </script>

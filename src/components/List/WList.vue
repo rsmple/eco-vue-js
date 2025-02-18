@@ -25,7 +25,7 @@
       @update:count="listCount = $event"
       @update:error="$emit('update:error', $event)"
     >
-      <template #header>
+      <template #header="{updateHeaderHeight}">
         <slot
           name="header"
           :count="listCount"
@@ -110,6 +110,7 @@
           :count="count ?? listCount"
           :selection="selectAllValue"
           @toggle:selection="$event ? selectAll() : resetSelection()"
+          @update:header="updateHeaderHeight"
         >
           <template #default>
             <HeaderFieldNested :fields="fieldsFiltered">

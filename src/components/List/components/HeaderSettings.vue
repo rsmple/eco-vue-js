@@ -1,7 +1,7 @@
 <template>
   <WDropdownMenu
     :is-open="isOpen"
-    :max-width="300"
+    :max-width="400"
     :max-height="300"
     :horizontal-align="HorizontalAlign.RIGHT_INNER"
   >

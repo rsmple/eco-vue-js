@@ -9,7 +9,10 @@
       'z-[2]': isIntersecting,
     }"
   >
-    <slot name="header" />
+    <slot
+      name="header"
+      v-bind="{updateHeaderHeight}"
+    />
   </div>
 
   <slot v-bind="{headerTop, headerHeight}" />
@@ -31,15 +34,17 @@ const {updateHeaderPadding} = useHeaderPadding()
 
 const {indicator, header, headerTop, headerHeight, isIntersecting, updateHeader} = useInfiniteListHeader(props.scrollingElement, props.initIsIntersecting)
 
-watch(isIntersecting, value => {
-  if (!value && headerHeight.value) {
+const updateHeaderHeight = () => {
+  if (!isIntersecting.value && headerHeight.value) {
     updateHeader()
 
     updateHeaderPadding(headerHeight.value)
   } else {
     updateHeaderPadding(0)
   }
-})
+}
+
+watch(isIntersecting, updateHeaderHeight)
 
 onBeforeUnmount(() => {
   updateHeaderPadding(0)

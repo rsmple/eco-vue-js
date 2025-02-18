@@ -43,6 +43,8 @@
 </template>
 
 <script lang="ts" setup>
+import {onMounted, onUnmounted} from 'vue'
+
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 
 defineProps<{
@@ -54,7 +56,16 @@ defineProps<{
   tooltipText: string
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'toggle:selection', value: boolean): void
+  (e: 'update:header'): void
 }>()
+
+onMounted(() => {
+  emit('update:header')
+})
+
+onUnmounted(() => {
+  emit('update:header')
+})
 </script>
