@@ -1,5 +1,5 @@
 import {type QueryClient, type QueryKey, type UseQueryReturnType, useQuery, useQueryClient} from '@tanstack/vue-query'
-import {type MaybeRef, unref} from 'vue'
+import {type MaybeRef, unref, watch} from 'vue'
 
 import {ApiError} from './api'
 
@@ -79,5 +79,19 @@ export const makeQueryPaginated = <Data, QueryParams extends {page?: number}>(ke
     }
 
     return query
+  }
+}
+
+export const wrapUseQueryPaginated = <Data, QueryParams extends {page?: number}>(key: string, queryFn: UseQueryDefault<Data[]>): UseQueryPaginated<Data, QueryParams> => {
+  return (queryParams: MaybeRef<QueryParams>, options: QueryOptions<PaginatedResponse<Data>> = {}) => {
+    const query = queryFn(options as Parameters<UseQueryDefault<Data[]>>[0])
+
+    const newQuery = makeQueryPaginated(key, () => query.data.value ?? [], query.setData)(queryParams, options)
+
+    watch(query.data, () => {
+      newQuery.refetch()
+    })
+
+    return newQuery
   }
 }
