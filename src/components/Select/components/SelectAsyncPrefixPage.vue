@@ -27,34 +27,25 @@
             v-if="!disableClear && !disabled"
             #default
           >
-            <button
-              class="square-5 relative -my-1 -mr-2 ml-1 flex items-center justify-center rounded-full outline-none"
-              :class="{
-                'cursor-progress': loading,
-                'w-ripple w-ripple-hover cursor-pointer': !loading,
-              }"
+            <WButtonUnselect
+              :loading="loading"
+              :disabled="disabled"
+              class="-mr-2 ml-1"
               @mousedown.stop.prevent=""
               @click.stop.prevent="!loading && $emit('unselect', valueGetter(option))"
-            >
-              <IconCancel class="square-3" />
-            </button>
+            />
           </template>
         </component>
       </template>
     </slot>
 
-    <button
-      v-if="!optionComponent && !disableClear && !disabled"
-      class="square-5 relative flex items-center justify-center rounded-full outline-none"
-      :class="{
-        'cursor-progress': loading,
-        'w-ripple w-ripple-hover cursor-pointer ': !loading,
-      }"
+    <WButtonUnselect
+      v-if="!optionComponent && !disableClear"
+      :loading="loading"
+      :disabled="disabled"
       @mousedown.stop.prevent=""
       @click.stop.prevent="!loading && $emit('unselect', valueGetter(option))"
-    >
-      <IconCancel class="square-3" />
-    </button>
+    />
   </div>
 </template>
 
@@ -63,7 +54,7 @@ import type {SelectAsyncPrefixPageProps, SelectOptionComponent, SelectOptionComp
 
 import {computed, onBeforeUnmount, toRef, watch} from 'vue'
 
-import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
+import WButtonUnselect from '@/components/Button/WButtonUnselect.vue'
 
 const props = defineProps<SelectAsyncPrefixPageProps<Model, Data, QueryParams, OptionComponent>>()
 

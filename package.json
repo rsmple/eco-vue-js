@@ -166,6 +166,12 @@
     "./dist/components/Button/WButtonSelectionAction.vue": {
       "import": "./dist/components/Button/WButtonSelectionAction.vue.js"
     },
+    "./dist/components/Button/WButtonSelectionState.vue": {
+      "import": "./dist/components/Button/WButtonSelectionState.vue.js"
+    },
+    "./dist/components/Button/WButtonUnselect.vue": {
+      "import": "./dist/components/Button/WButtonUnselect.vue.js"
+    },
     "./dist/components/Button/types": {
       "import": "./dist/components/Button/types.d.ts"
     },

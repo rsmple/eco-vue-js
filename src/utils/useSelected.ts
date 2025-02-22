@@ -42,7 +42,7 @@ export type QueryParamsSelection = {
   id__not_in?: number[]
 }
 
-const isEmpty = <Value>(value: Selection<Value>) => Object.values(value).every(item => !item)
+const isEmpty = <Value>(value: Selection<Value>) => !value.id__in?.length && !value.id__not_in && !value.range
 
 export const useSelected = <Value extends number>(count: MaybeRef<number | undefined>, disabled: Ref<boolean>) => {
   const route = useRoute()
@@ -70,7 +70,11 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
   }
 
   const updateSelection = (value: Selection<Value>) => {
-    if (isEmpty(value)) resetSelection()
+    if (isEmpty(value)) {
+      resetSelection()
+
+      return
+    }
 
     router.replace({query: route.query, hash: `#${ JSON.stringify(value) }`})
   }

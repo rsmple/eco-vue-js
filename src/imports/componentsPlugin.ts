@@ -11,6 +11,8 @@ import WButtonMore from '@/components/Button/WButtonMore.vue'
 import WButtonMoreItem from '@/components/Button/WButtonMoreItem.vue'
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
+import WButtonSelectionState from '@/components/Button/WButtonSelectionState.vue'
+import WButtonUnselect from '@/components/Button/WButtonUnselect.vue'
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 import WChip from '@/components/Chip/WChip.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
@@ -95,6 +97,8 @@ export default {
     app.component('WButtonMoreItem', WButtonMoreItem)
     app.component('WButtonSelection', WButtonSelection)
     app.component('WButtonSelectionAction', WButtonSelectionAction)
+    app.component('WButtonSelectionState', WButtonSelectionState)
+    app.component('WButtonUnselect', WButtonUnselect)
     app.component('WCheckbox', WCheckbox)
     app.component('WChip', WChip)
     app.component('WClickOutside', WClickOutside)
@@ -179,6 +183,8 @@ export {
   WButtonMoreItem,
   WButtonSelection,
   WButtonSelectionAction,
+  WButtonSelectionState,
+  WButtonUnselect,
   WCheckbox,
   WChip,
   WClickOutside,

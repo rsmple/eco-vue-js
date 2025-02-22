@@ -32,18 +32,13 @@
     >
       <div>... {{ numberFormatter.format(modelValue.length) }} items</div>
 
-      <button
-        v-if="!disableClear && !disabled"
-        class="square-5 relative flex items-center justify-center rounded-full outline-none"
-        :class="{
-          'cursor-progress': loading,
-          'w-ripple w-ripple-hover cursor-pointer ': !loading,
-        }"
+      <WButtonUnselect
+        v-if="!disableClear"
+        :loading="loading"
+        :disabled="disabled"
         @mousedown.stop.prevent=""
         @click.stop.prevent="!loading && $emit('update:modelValue', [])"
-      >
-        <IconCancel class="square-3" />
-      </button>
+      />
     </div>
   </template>
 </template>
@@ -53,7 +48,7 @@ import type {SelectAsyncPrefixProps, SelectOptionComponent, SelectOptionComponen
 
 import {computed, onBeforeUnmount, ref, watch} from 'vue'
 
-import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
+import WButtonUnselect from '@/components/Button/WButtonUnselect.vue'
 
 import {numberFormatter} from '@/utils/utils'
 

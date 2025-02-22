@@ -41,21 +41,12 @@
       </WDropdownMenu>
     </div>
 
-    <div
+    <WButtonSelectionState
       v-if="selectedCount"
-      class="sm-not:gap-1 grid grid-cols-[1fr,auto] gap-3"
+      @click="$emit('clear:selection')"
     >
-      <div class="sm-not:text-xs text-description self-center truncate whitespace-nowrap text-base font-normal">
-        <span class="sm-not:hidden">Selected&nbsp;</span><span class="text-primary-default dark:text-primary-dark font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedCount === 1 ? '' : 's' }}</span>
-      </div>
-
-      <button
-        class="text-description w-ripple w-ripple-hover relative flex cursor-pointer select-none items-center justify-self-end"
-        @click="$emit('clear:selection')"
-      >
-        <IconCancel class="square-5 sm-not:-mx--inner-margin mx-[1.125rem]" />
-      </button>
-    </div>
+      <span class="sm-not:hidden">Selected&nbsp;</span><span class="text-primary-default dark:text-primary-dark font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedCount === 1 ? '' : 's' }}</span>
+    </WButtonSelectionState>
 
     <slot
       v-else
@@ -69,13 +60,13 @@ import {type VNode, computed, markRaw, ref} from 'vue'
 
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 
-import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
 import IconMore from '@/assets/icons/default/IconMore.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {numberFormatter} from '@/utils/utils'
 
 import WButtonSelectionAction from './WButtonSelectionAction.vue'
+import WButtonSelectionState from './WButtonSelectionState.vue'
 
 import WClickOutside from '../ClickOutside/WClickOutside.vue'
 

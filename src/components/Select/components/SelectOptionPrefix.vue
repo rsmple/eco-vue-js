@@ -16,43 +16,32 @@
           :selected="true"
           :model="true"
         >
-          <button
+          <WButtonUnselect
             v-if="!disableClear"
-            class="square-5 relative -my-1 -mr-2 ml-1 flex items-center justify-center rounded-full outline-none"
-            :class="{
-              'cursor-not-allowed': disabled,
-              'cursor-progress': loading,
-              'w-ripple w-ripple-hover cursor-pointer ': !loading && !disabled,
-            }"
+            :loading="loading"
+            :disabled="disabled"
+            class="-mr-2 ml-1"
             @mousedown.stop.prevent=""
-            @click.stop.prevent="!loading && $emit('unselect')"
-          >
-            <IconCancel class="square-3" />
-          </button>
+            @click.stop.prevent="$emit('unselect')"
+          />
         </component>
       </template>
     </slot>
 
-    <button
+    <WButtonUnselect
       v-if="!optionComponent && !disableClear"
-      class="square-5 relative flex items-center justify-center rounded-full outline-none"
-      :class="{
-        'cursor-not-allowed': disabled,
-        'cursor-progress': loading,
-        'w-ripple w-ripple-hover cursor-pointer ': !loading && !disabled,
-      }"
+      :loading="loading"
+      :disabled="disabled"
       @mousedown.stop.prevent=""
-      @click.stop.prevent="!loading && $emit('unselect')"
-    >
-      <IconCancel class="square-3" />
-    </button>
+      @click.stop.prevent="$emit('unselect')"
+    />
   </div>
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>">
 import type {SelectOptionComponent, SelectPrefixProps} from '../types'
 
-import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
+import WButtonUnselect from '@/components/Button/WButtonUnselect.vue'
 
 defineProps<SelectPrefixProps<Data, OptionComponent>>()
 

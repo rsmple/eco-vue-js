@@ -77,7 +77,15 @@
           </template>
 
           <template #settings>
-            <div class="flex">
+            <slot
+              v-if="$slots.selection"
+              name="selection"
+            />
+
+            <div
+              v-else
+              class="flex"
+            >
               <HeaderSort
                 v-if="!noOrdering"
                 :ordering="ordering"
@@ -298,6 +306,8 @@ const {isMobile} = useIsMobile()
 
 const listCount = ref<number | undefined>(undefined)
 
+const countValue = computed(() => props.count ?? listCount.value)
+
 const cardStyles = computed<StyleValue>(() => {
   if (!props.cardColumns || !props.cardAreas) return
 
@@ -339,7 +349,7 @@ const {
   resetSelection,
   selectAll,
   getQueryParams,
-} = useSelected<number>(toRef(props, 'count'), disableSelect)
+} = useSelected<number>(countValue, disableSelect)
 
 const ordering = computed<OrderItem<keyof Data>[]>(() => {
   if (props.queryParams instanceof Object && 'ordering' in props.queryParams && typeof props.queryParams.ordering === 'string') {
