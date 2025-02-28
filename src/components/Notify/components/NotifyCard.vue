@@ -7,7 +7,7 @@
     <div class="bg-black-default relative my-2 ml-auto mr-4 flex min-h-[4.5rem] max-w-[calc(100vw-2rem)] select-none rounded-xl shadow-md sm:max-w-lg dark:bg-gray-800">
       <WCounter
         v-show="count > 1"
-        class="absolute -left-2.5 -top-2.5 shadow-md"
+        class="absolute -left-2.5 -top-2.5 text-xs shadow-md"
         :count="count"
       />
 

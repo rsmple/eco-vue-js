@@ -1,36 +1,38 @@
 <template>
-  <div class="flex flex-col pb-16">
-    <div class="text-accent -h--header-height -mx--inner-margin flex items-center text-2xl font-semibold">
+  <div class="pb-16">
+    <div class="text-accent -h--header-height -mx--inner-margin flex items-center text-xl font-semibold">
       Filters
     </div>
 
     <div>
-      <template
-        v-for="(slot, index) in $slots.default?.()"
-        :key="index"
-      >
-        <component
-          :is="slot"
-          :is-open="index === selectedIndex"
-          @toggle="setSelectedIndex(index)"
-          @update:has-changes="hasChangesMap[index.toString()] = $event"
-        />
-      </template>
-    </div>
+      <div>
+        <template
+          v-for="(slot, index) in $slots.default?.()"
+          :key="index"
+        >
+          <component
+            :is="slot"
+            :is-open="index === selectedIndex"
+            @toggle="setSelectedIndex(index)"
+            @update:has-changes="hasChangesMap[index.toString()] = $event"
+          />
+        </template>
+      </div>
 
-    <div class="-mx--inner-margin my-8 h-0.5 rounded bg-gray-400" />
+      <div class="-mx--inner-margin my-8 h-0.5 rounded bg-gray-400" />
 
-    <div class="-px--inner-margin grid grid-cols-2 gap-4">
-      <slot name="bottom" />
+      <div class="-px--inner-margin grid grid-cols-2 gap-4">
+        <slot name="bottom" />
     
-      <WButton
-        :semantic-type="SemanticType.SECONDARY"
-        :disabled="!changesCount"
-        class="col-start-2"
-        @click="openConfirmReset"
-      >
-        <IconFilterRemove /> Reset Filters
-      </WButton>
+        <WButton
+          :semantic-type="SemanticType.SECONDARY"
+          :disabled="!changesCount"
+          class="col-start-2"
+          @click="openConfirmReset"
+        >
+          <IconFilterRemove /> Reset Filters
+        </WButton>
+      </div>
     </div>
   </div>
 </template>

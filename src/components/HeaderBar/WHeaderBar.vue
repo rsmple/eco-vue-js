@@ -1,8 +1,11 @@
 <template>
-  <div class="fixed inset-x-0 top-0 z-10 flex h-[3.75rem] print:hidden">
+  <div
+    ref="element"
+    class="-h--header-height fixed inset-x-0 top-0 z-10 flex print:hidden"
+  >
     <div
       :key="headerPadding"
-      class="bg-default dark:bg-default-dark supports-backdrop:backdrop-blur fixed inset-x-0 top-0 h-[calc(3.75rem+var(--header-height-padding))] print:hidden"
+      class="bg-default dark:bg-default-dark supports-backdrop:backdrop-blur fixed inset-x-0 top-0 h-[calc(var(--header-height)+var(--header-height-padding))] print:hidden"
       :class="{
         'supports-backdrop:bg-opacity-40 supports-backdrop:dark:bg-opacity-60': isTransparent,
       }"
@@ -16,7 +19,7 @@
         '-pr--inner-margin': !searchEnabled
       }"
     >
-      <div class="text-accent flex-1 truncate text-xl font-semibold sm:text-3xl">
+      <div class="text-accent sm:text-2.5xl flex-1 truncate text-xl font-semibold">
         <slot name="title">
           {{ title }}
         </slot>
@@ -92,7 +95,7 @@ import IconSearch from '@/assets/icons/sax/IconSearch.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
 
-import {useHeaderPadding} from './use/useHeaderPadding'
+import {useHeader} from './use/useHeader'
 
 const props = withDefaults(
   defineProps<{
@@ -112,7 +115,8 @@ defineEmits<{
 
 const {isMobile} = useIsMobile()
 
-const {headerPadding} = useHeaderPadding()
+const {headerPadding, updateHeaderHeight} = useHeader()
+const elementRef = useTemplateRef('element')
 const inputRef = useTemplateRef<ComponentInstance<typeof WInputSuggest>>('input')
 
 const isTransparent = ref(false)
@@ -141,6 +145,8 @@ onMounted(() => {
     isTransparent.value = true
     timeout = undefined
   }, 1500)
+
+  updateHeaderHeight(elementRef.value?.offsetHeight ?? 0)
 })
 
 onBeforeUnmount(() => {

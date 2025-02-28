@@ -6,7 +6,7 @@
     leave-to-class="opacity-0"
   >
     <div
-      v-if="isOpen && hasBackdrop"
+      v-if="isOpen && isTablet"
       title="Click to close"
       class="
         bg-primary-light/40 dark:bg-primary-darkest/40 no-scrollbar fixed left-0 top-0 z-30 size-full
@@ -28,13 +28,13 @@
       'grid-cols-[1fr]': isOpen,
     }"
   >
-    <div class="bg-default dark:bg-default-dark mt-[3.75rem] overflow-hidden">
+    <div class="bg-default dark:bg-default-dark -mt--header-height overflow-hidden">
       <slot />
     </div>
   </div>
 
   <div
-    class="square-[3.75rem] w-ripple fixed left-0 top-0 z-30 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
+    class="-square--header-height w-ripple fixed left-0 top-0 z-30 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
     :class="{'text-primary-default': isOpen}"
     @click.stop="toggle"
   >
@@ -47,30 +47,29 @@ import {ref} from 'vue'
 
 import IconMenu from '@/assets/icons/sax/IconMenu.svg?component'
 
-import {isClientSide} from '@/utils/utils'
+import {useIsMobile} from '@/utils/mobile'
 
 const emit = defineEmits<{
   (e: 'update:isOpen', value: boolean): void
 }>()
 
-const getHasBackdrop = () => {
-  return isClientSide && window.innerWidth < 1280
-}
+const {isTablet} = useIsMobile()
 
-const hasBackdrop = ref(getHasBackdrop())
 const isOpen = ref(false)
 
-const toggle = (): void => {
-  hasBackdrop.value = getHasBackdrop()
-
-  isOpen.value = !isOpen.value
-
+const emitIsOpen = () => {
   emit('update:isOpen', isOpen.value)
 }
 
-const close = (): void => {
+const toggle = () => {
+  isOpen.value = !isOpen.value
+
+  emitIsOpen()
+}
+
+const close = () => {
   isOpen.value = false
 
-  emit('update:isOpen', false)
+  emitIsOpen()
 }
 </script>

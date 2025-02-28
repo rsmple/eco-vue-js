@@ -1,51 +1,47 @@
 <template>
   <div 
     class="
-      height-full bg-default dark:bg-default-dark sm-not:[--actions-bar-filter-width:calc(100vw-var(--actions-bar-width))] fixed right-0 top-0 z-40 grid grid-rows-[3.75rem,1fr] justify-end
-      overflow-hidden shadow-md transition-[grid-template-columns] duration-300 [--actions-toggle-height:4rem]
-      print:hidden
+      height-full bg-default dark:bg-default-dark
+      sm-not:[--actions-bar-filter-width:calc(100vw-var(--w-actions-bar-width))] fixed right-0 top-0 z-40 grid
+      grid-cols-[var(--actions-bar-filter-width-current,0),var(--w-actions-bar-width)] grid-rows-[var(--header-height),1fr]
+      justify-end overflow-hidden shadow-md transition-[grid-template-columns]
+      duration-300 print:hidden
     "
     :class="{
-      'grid-cols-[0,var(--actions-bar-width)]': !isOpen || !hasFilter,
-      'grid-cols-[var(--actions-bar-filter-width,24rem),var(--actions-bar-width,4rem)]': isOpen && hasFilter,
+      '[--actions-bar-filter-width-current:var(--actions-bar-filter-width)]': isOpen && hasFilter,
     }"
   >
     <div
       class="
-        no-scrollbar relative col-span-1 row-span-2 grid grid-cols-[var(--actions-bar-filter-width,24rem)]
-        grid-rows-subgrid justify-self-end overflow-y-auto overflow-x-hidden overscroll-contain
+        no-scrollbar relative col-start-1 row-span-2 grid grid-cols-[--actions-bar-filter-width]
+        justify-self-end overflow-y-auto overflow-x-hidden overscroll-contain
       "
     >
-      <div class="-px--inner-margin col-span-1 row-span-2 grid grid-rows-subgrid">
-        <div class="text-accent flex items-center text-2xl font-semibold">
-          Filters
-        </div>
-
-        <component
-          :is="$slots.filter?.()?.[0]"
-          @update:count="filterCount = $event"
-        />
-      </div>
+      <component
+        :is="filter"
+        v-if="filter"
+        @update:count="updateCount"
+      />
     </div>
 
     <div class="relative row-span-2 grid h-full grid-cols-1 grid-rows-subgrid overflow-x-hidden overscroll-contain">
-      <div
+      <button
         v-if="hasFilter"
-        class="w-ripple relative row-start-1 flex cursor-pointer select-none items-center justify-center"
+        class="w-ripple w-ripple-hover relative row-start-1 flex cursor-pointer select-none items-center justify-center"
         @click="toggle"
       >
         <IconBack
-          class="text-description square-5 transition-transform"
+          class="text-description square-4 transition-transform"
           :class="{'[transform:rotateY(180deg)]': isOpen}"
         />
-      </div>
+      </button>
 
       <div class="row-start-2">
         <slot name="top" />
 
         <div
-          v-if="$slots.top && (hasFilter || slots.bottom)"
-          class="mx-1 my-4 h-0.5 rounded bg-gray-400 md:my-8"
+          v-if="$slots.top && (hasFilter || bottom)"
+          class="mx-1 my-2 h-0.5 rounded bg-gray-400 md:my-4 dark:bg-gray-600"
         />
 
         <WButtonAction
@@ -57,19 +53,27 @@
           @click="toggle"
         />
 
-        <slot name="bottom" />
+        <component
+          :is="bottom"
+          v-if="bottom"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {type VNode, computed, onUnmounted, ref, useSlots, watch} from 'vue'
+import {type Component, type VNode, computed, onUnmounted, ref, watch} from 'vue'
 
 import WButtonAction from '@/components/Button/WButtonAction.vue'
 
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
 import IconFilter from '@/assets/icons/sax/IconFilter.svg?component'
+
+const props = defineProps<{
+  filter?: Component
+  bottom?: Component
+}>()
 
 let closeModal: (() => void) | null = null
 
@@ -84,9 +88,11 @@ const close = () => {
   isOpen.value = false
 }
 
-const slots = useSlots()
+const hasFilter = computed(() => !!props.filter)
 
-const hasFilter = computed(() => !!slots.filter)
+const updateCount = (value: number): void => {
+  filterCount.value = value
+}
 
 onUnmounted(() => {
   closeModal?.()
@@ -100,7 +106,5 @@ watch(hasFilter, value => {
 
 defineSlots<{
   top?: () => VNode[]
-  filter?: () => VNode[]
-  bottom?: () => VNode[]
 }>()
 </script>

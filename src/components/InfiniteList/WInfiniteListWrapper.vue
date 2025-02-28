@@ -3,7 +3,7 @@
 
   <div
     ref="header"
-    class="sticky top-[var(--header-height)]"
+    class="-top--header-height sticky"
     :class="{
       'z-20': !isIntersecting,
       'z-[2]': isIntersecting,
@@ -21,7 +21,7 @@
 <script lang="ts" setup>
 import {onUnmounted, watch} from 'vue'
 
-import {useHeaderPadding} from '@/components/HeaderBar/use/useHeaderPadding'
+import {useHeader} from '@/components/HeaderBar/use/useHeader'
 
 import {useInfiniteListHeader} from './use/useInfiniteListHeader'
 
@@ -30,9 +30,9 @@ const props = defineProps<{
   initIsIntersecting?: boolean
 }>()
 
-const {updateHeaderPadding} = useHeaderPadding()
+const {updateHeaderPadding, headerHeight: headerElementHeight} = useHeader()
 
-const {indicator, header, headerTop, headerHeight, isIntersecting, updateHeader} = useInfiniteListHeader(props.scrollingElement, props.initIsIntersecting)
+const {indicator, header, headerTop, headerHeight, isIntersecting, updateHeader} = useInfiniteListHeader(headerElementHeight, props.scrollingElement, props.initIsIntersecting)
 
 const updateHeaderHeight = () => {
   if (!isIntersecting.value && headerHeight.value) {

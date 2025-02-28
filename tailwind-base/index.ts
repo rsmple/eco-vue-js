@@ -109,6 +109,13 @@ const tailwindBase = {
       overflow: {
         overlay: 'overlay',
       },
+      fontSize: {
+        '4xs': ['0.4375rem', '1.3'],
+        '3xs': ['0.5625rem', '1.3'],
+        '2xs': ['0.625rem', '1.3'],
+        '2.5xl': ['1.625rem', '2rem'],
+        '7.5xl': ['5.25rem', '1.9'],
+      },
     },
     fontFamily: {
       sans: ['MontSerrat', 'system-ui'],

@@ -464,6 +464,7 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
     {
       'w-skeleton-w': value => ({'--skeleton-width': value}),
       'w-list-card-w': value => ({'--w-list-card-width': value}),
+      'grid-cols-fill': value => ({'grid-template-columns': `repeat(auto-fill, minmax(${ value }, 1fr))`}),
     },
     {
       values: theme('width'),
@@ -490,6 +491,7 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       'w-ripple-rounded': value => ({'--w-ripple-rounded': value}),
       'w-list-rounded': value => ({'--w-list-rounded': value}),
       'w-option-rounded': value => ({'--w-option-rounded': value}),
+      'w-modal-wrapper-rounded': value => ({'--w-modal-wrapper-rounded': value}),
     },
     {
       values: theme('borderRadius'),

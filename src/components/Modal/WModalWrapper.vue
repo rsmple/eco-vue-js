@@ -2,7 +2,7 @@
   <div
     class="
       bg-default dark:bg-default-dark max-h-[calc(100%-var(--modal-wrapper-padding,2rem)*2)] w-[var(--modal-wrapper-width,35rem)] max-w-[calc(100%-var(--modal-wrapper-padding,2rem)*2)] overflow-y-auto
-      overflow-x-hidden overscroll-contain rounded-3xl shadow-md
+      overflow-x-hidden overscroll-contain rounded-[--w-modal-wrapper-rounded,1.5rem] shadow-md
     "
     :class="{
       'sm-not:max-w-full sm-not:h-full sm-not:rounded-none sm-not:max-h-full': maximized,

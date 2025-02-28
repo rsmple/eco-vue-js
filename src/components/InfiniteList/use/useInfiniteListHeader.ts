@@ -1,16 +1,8 @@
-import {onBeforeUnmount, onMounted, ref} from 'vue'
+import {type Ref, onBeforeUnmount, onMounted, ref} from 'vue'
 
 import {isClientSide} from '@/utils/utils'
 
-const headerElementHeight = 60
-
-const observerOptions = {
-  root: null,
-  rootMargin: `-${ headerElementHeight }px 100% 0px 0px`,
-  threshold: 1.0,
-}
-
-export const useInfiniteListHeader = (scrollingElement: Element | null = document.scrollingElement, initIsIntersecting = true) => {
+export const useInfiniteListHeader = (headerElementHeight: Ref<number>, scrollingElement: Element | null = document.scrollingElement, initIsIntersecting = true) => {
   const indicator = ref<HTMLDivElement>()
   const header = ref<HTMLDivElement>()
   const headerHeight = ref<number>(0)
@@ -37,7 +29,7 @@ export const useInfiniteListHeader = (scrollingElement: Element | null = documen
 
     const rect = header.value.getBoundingClientRect()
     headerHeight.value = rect.height
-    headerTop.value = rect.top + (scrollingElement?.scrollTop ?? 0) - headerElementHeight
+    headerTop.value = rect.top + (scrollingElement?.scrollTop ?? 0) - headerElementHeight.value
   }
 
   onMounted(() => {
@@ -46,7 +38,11 @@ export const useInfiniteListHeader = (scrollingElement: Element | null = documen
     updateHeader()
 
     if (indicator.value) {
-      observer = new IntersectionObserver(observerCb, observerOptions)
+      observer = new IntersectionObserver(observerCb, {
+        root: null,
+        rootMargin: `-${ headerElementHeight.value }px 100% 0px 0px`,
+        threshold: 1.0,
+      })
 
       observer.observe(indicator.value)
     }

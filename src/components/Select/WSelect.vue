@@ -189,7 +189,7 @@ const searchPrepared = computed(() => search.value.trim().toLocaleLowerCase())
 const enabled = computed(() => !props.disabled)
 
 const {data, isLoading, error: queryError} = props.useQueryFnOptions
-  ? !props.queryParamsOptions
+  ? props.queryParamsOptions === undefined
     ? (props.useQueryFnOptions as UseQueryEmpty<Data[]>)({enabled})
     : props.useQueryFnOptions(toRef(props, 'queryParamsOptions'), {enabled})
   : {

@@ -3,7 +3,7 @@
     :is="to !== undefined ? RouterLink : tag"
     v-bind="to !== undefined ? {to} : undefined"
     class="
-      w-ripple w-ripple-hover relative flex w-full cursor-pointer select-none flex-col items-center border-none p-2 no-underline outline-none md:gap-2
+      w-ripple w-ripple-hover relative grid w-full cursor-pointer select-none justify-items-center gap-1 py-2
     "
     :class="{
       'text-primary-default dark:text-primary-dark': active && semanticType === SemanticType.SECONDARY,
@@ -14,7 +14,7 @@
     <WCounter
       v-if="count !== undefined"
       v-show="count > 0"
-      class="absolute left-[calc(50%-20px)] top-0"
+      class="absolute left-[calc(50%-20px)] top-0 text-xs"
       :count="count"
       :trigger="1"
     />
@@ -23,12 +23,12 @@
       <template v-if="icon">
         <component
           :is="icon"
-          class="square-8"
+          class="square-6"
         />
       </template>
     </slot>
 
-    <div class="whitespace-nowrap text-center text-[0.625rem] font-normal md:text-base">
+    <div class="text-3xs whitespace-nowrap text-center font-normal">
       {{ title }}
     </div>
   </component>
@@ -45,7 +45,7 @@ import {SemanticType} from '@/utils/SemanticType'
 
 const semanticTypeStylesMap: Record<SemanticType, string> = {
   [SemanticType.SECONDARY]: 'text-description bg-default dark:bg-default-dark hover:text-primary-default dark:hover:text-primary-dark',
-  [SemanticType.PRIMARY]: 'text-default dark:text-default-dark bg-primary-default dark:bg-primary-dark',
+  [SemanticType.PRIMARY]: 'text-default bg-primary-default dark:bg-primary-dark',
   [SemanticType.POSITIVE]: 'text-default dark:text-default-dark bg-positive dark:bg-positive-dark',
   [SemanticType.WARNING]: 'text-default dark:text-default-dark bg-warning dark:bg-warning-dark',
   [SemanticType.NEGARIVE]: 'text-default dark:text-default-dark bg-negative dark:bg-negative-dark',

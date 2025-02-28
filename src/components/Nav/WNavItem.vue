@@ -5,7 +5,7 @@
     :class="{
       'text-primary-default dark:text-primary-dark': isTextColor,
       'text-accent': !isTextColor,
-      'pl-3': indent
+      'pl-2': indent
     }"
   >
     <Transition
@@ -35,12 +35,12 @@
     </Transition>
 
     <div class="[overflow:inherit]">
-      <div class="grid grid-cols-[2rem,auto,1fr,1rem] items-center px-5 py-3">
+      <div class="grid grid-cols-[1.5rem,1fr,auto] items-center px-4 py-2.5">
         <div class="flex items-center">
           <template v-if="icon ?? routeTo.meta.icon">
             <component
               :is="icon ?? routeTo.meta.icon"
-              class="square-6"
+              class="square-5"
             />
           </template>
 
@@ -50,35 +50,27 @@
           />
         </div>
 
-        <div class="relative whitespace-nowrap text-base font-normal tracking-wide">
-          {{ titleLocal }}
-        </div>
+        <div class="last-not:pr-1 whitespace-nowrap font-normal tracking-wide">
+          <span class="relative">
+            <span>
+              {{ titleLocal }}
+            </span>&nbsp;<span v-if="!skeleton">
+              {{ typeof count === 'number' ? `(${numberCompactFormatter.format(count)})` : '' }}
 
-        <div class="relative flex justify-start text-center text-base font-normal tracking-wide">
-          &nbsp;
-          <span
-            v-if="!skeleton"
-            class="relative"
-          >
-            {{ typeof count === 'number' ? `(${numberCompactFormatter.format(count)})` : '' }}
+            </span>
+
+            <WSkeleton
+              v-else
+              class="inline-flex max-w-10"
+            />
 
             <WCounter
-              v-if="counter !== undefined && counter !== 0"
+              v-if="!skeleton && counter !== undefined && counter !== 0"
               :count="counter"
               :trigger="1"
-              small
-              class="absolute -top-3"
-              :class="{
-                'left-[calc(100%-0.25rem)]': !isBigCount,
-                'left-[calc(100%-1rem)]': isBigCount,
-              }"
+              class="text-2xs absolute -top-2.5 left-[calc(100%-1em)]"
             />
           </span>
-
-          <WSkeleton
-            v-else
-            class="max-w-10"
-          />
         </div>
 
         <slot name="right" />
@@ -132,8 +124,6 @@ const isActive = computed<boolean>(() => {
 })
 
 const isTextColor = computed(() => props.hasActive ? !props.indent : isActive.value)
-
-const isBigCount = computed<boolean>(() => props.counter !== undefined && props.counter >= 1000)
 
 watch(isActive, value => emit('update:isActive', [titleLocal.value, value]), {immediate: true})
 

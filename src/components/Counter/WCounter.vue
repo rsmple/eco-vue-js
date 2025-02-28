@@ -1,10 +1,8 @@
 <template>
   <div
-    class="bg-negative dark:bg-negative-dark text-default flex items-center justify-center px-1 text-xs font-medium"
+    class="bg-negative dark:bg-negative-dark text-default flex min-w-[1.25em] items-center justify-center rounded-full px-[0.375em] font-medium leading-tight"
     :class="{
       'animate-shake': isShake,
-      'h-4 min-w-4 rounded-lg': small,
-      'h-5 min-w-5 rounded-[0.625rem]': !small,
     }"
   >
     {{ numberCompactFormatter.format(count) }}
