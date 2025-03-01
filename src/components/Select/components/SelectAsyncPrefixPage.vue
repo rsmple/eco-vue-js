@@ -30,7 +30,7 @@
             <WButtonUnselect
               :loading="loading"
               :disabled="disabled"
-              class="-mr-2 ml-1"
+              class="w-option-button ml-1 mr-2"
               @mousedown.stop.prevent=""
               @click.stop.prevent="!loading && $emit('unselect', valueGetter(option))"
             />
@@ -43,6 +43,7 @@
       v-if="!optionComponent && !disableClear"
       :loading="loading"
       :disabled="disabled"
+      class="ml-1 mr-2"
       @mousedown.stop.prevent=""
       @click.stop.prevent="!loading && $emit('unselect', valueGetter(option))"
     />

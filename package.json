@@ -154,6 +154,9 @@
     "./dist/components/Button/WButtonGroup.vue": {
       "import": "./dist/components/Button/WButtonGroup.vue.js"
     },
+    "./dist/components/Button/WButtonInput.vue": {
+      "import": "./dist/components/Button/WButtonInput.vue.js"
+    },
     "./dist/components/Button/WButtonMore.vue": {
       "import": "./dist/components/Button/WButtonMore.vue.js"
     },

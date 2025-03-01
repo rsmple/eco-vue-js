@@ -7,14 +7,14 @@
     <template v-if="icon">
       <component
         :is="icon"
-        class="square-6"
+        class="square-[1.5em]"
       />
     </template>
 
     <div class="col-start-2">
       <span
         class="relative pr-4 font-semibold" 
-        :class="{'text-xs': minTitle, 'text-base': !minTitle}"
+        :class="{'text-xs': minTitle}"
       >
         {{ title }}
 
@@ -34,7 +34,7 @@
 
     <div class="col-start-3 ml-auto flex items-center justify-center">
       <IconArrow
-        class="text-accent transition-transform"
+        class="text-accent square-[1.25em] transition-transform"
         :class="{'rotate-180': isOpen}"
       />
     </div>

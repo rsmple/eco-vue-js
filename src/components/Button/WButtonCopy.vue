@@ -1,6 +1,6 @@
 <template>
   <div
-    class="text-description square-5 w-hover-circle relative inline-block cursor-pointer select-none"
+    class="text-description square-[1.25em] w-hover-circle relative inline-block cursor-pointer select-none"
     @click="doCopy()"
   >
     <component

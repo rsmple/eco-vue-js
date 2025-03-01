@@ -110,8 +110,7 @@
 
         <WListHeader
           v-if="!isGrid"
-          class="sm-not:hidden mb-4"
-          :query-params="queryParams"
+          class="sm-not:hidden mb-[--w-list-gap,1rem]"
           :allow-select="allowSelect"
           :tooltip-text="selectAllTextGetter(selectAllValue !== true, count ?? listCount ?? 0)"
 

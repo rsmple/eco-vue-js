@@ -46,7 +46,7 @@
           overflow-hidden rounded-[--w-input-rounded,0.75rem] border border-solid transition-colors duration-75
         "
         :class="{
-          'focus-within:border-primary-default dark:focus-within:border-primary-dark': !disabled && !readonly && !unclickable,
+          'focus-within:border-primary-default dark:focus-within:border-primary-dark focus-within:outline-primary-default/20 dark:focus-within:outline-primary-dark/20 focus-within:outline focus-within:outline-2': !disabled && !readonly && !unclickable,
           'cursor-text': !disabled,
           'border-negative dark:border-negative-dark': errorMessage,
           'border-gray-300 dark:border-gray-700': !disabled,
@@ -57,28 +57,37 @@
       >
         <div
           v-if="icon"
-          class="text-description flex h-full w-11 select-none items-center justify-center"
+          class="flex h-full w-[--w-input-height,2.75rem] select-none items-center justify-center"
+          :class="{
+            'text-description': !focused,
+            'text-primary-default dark:text-primary-dark': focused,
+          }"
         >
           <component
             :is="icon"
-            class="square-5"
+            class="square-[1.125em]"
           />
         </div>
 
         <div
           class="group/input col-start-2 grid grid-cols-1"
           :class="{
-            'py-1 first:pl-1 last:pr-1': $slots.prefix,
+            'py-[--w-input-gap,0.25rem] first:pl-[--w-input-gap,0.25rem] last:pr-[--w-input-gap,0.25rem]': $slots.prefix,
           }"
         >
-          <div class="flex flex-wrap gap-1">
+          <div
+            class="flex flex-wrap gap-[--w-input-gap,0.25rem]"
+            :class="{
+              '[&:not(:has(.w-option-has-bg))]:-px--w-option-padding': !icon
+            }"
+          >
             <slot name="prefix" />
 
             <div
               class="flex flex-1 items-baseline"
               :class="{
-                'first:pl-0 group-first/input:pl-[--w-input-rounded,0.75rem] group-last/input:pr-[--w-input-rounded,0.75rem] [&:not(:first-child)]:pl-[--w-input-rounded,0.75rem]': !hideInput,
-                'absolute w-0 max-w-0 p-0': hideInput,
+                'absolute w-0 max-w-0': hideInput,
+                'w-option-has-bg-input': $slots.prefix,
               }"
             >
               <slot name="before" />
@@ -92,11 +101,11 @@
                   outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed disabled:opacity-80 dark:placeholder:text-gray-500
                 "
                 :class="{
-                  'min-h-[--w-textarea-height,10rem] w-full py-3': textarea,
+                  '-py--w-option-padding min-h-[--w-textarea-height,10rem] w-full': textarea,
                   'resize-y': resize && textarea,
                   'resize-none': !resize && textarea,
-                  'h-[calc(var(--w-input-height,2.75rem)-0.125rem)]': !textarea && !$slots.suffix,
-                  'h-[calc(var(--w-input-height,2.75rem)-0.625rem)]': !textarea && $slots.suffix,
+                  'h-[calc(var(--w-input-height,2.75rem)-2px)]': !textarea && !$slots.suffix,
+                  'w-option': !textarea && $slots.prefix,
                   'font-mono': mono,
                   'text-secure': textSecure && !isSecureVisible,
                   'text-black-default dark:text-gray-200': !disabled,

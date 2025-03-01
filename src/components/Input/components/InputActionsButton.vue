@@ -14,7 +14,7 @@
     <slot name="default">
       <component
         :is="icon"
-        class="square-5"
+        class="square-[1.125em]"
       />
 
       <WTooltip

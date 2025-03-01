@@ -1,22 +1,21 @@
 <template>
-  <div class="flex h-12">
+  <div class="flex h-[--w-list-header-height,3rem]">
     <div class="left-inner bg-default dark:bg-default-dark sticky z-[1]">
       <div class="bg-default dark:bg-default-dark absolute right-full top-0 z-[-1] h-full w-[calc(var(--nav-bar-width)+var(--inner-margin))]" />
 
       <div
-        class="bg-primary-light dark:bg-primary-darkest h-full rounded-l-2xl border-y border-l border-solid border-gray-300 dark:border-gray-700"
+        class="bg-primary-light dark:bg-primary-darkest h-full rounded-l-[--w-list-header-rounded,1rem] border-y border-l border-solid border-gray-300 dark:border-gray-700"
         :class="{
-          'width-16': allowSelect,
-          'width-4': !allowSelect,
+          'width-[--w-list-header-rounded,1rem]': !allowSelect,
         }"
       >
         <WCheckbox
-          v-if="allowSelect && selection !== undefined && count !== 0 && count !== undefined"
-          :disabled="disabled"
+          v-if="allowSelect && selection !== undefined"
+          :disabled="disabled || count === 0 || count === undefined"
           :model-value="selection"
           :tooltip-text="tooltipText"
           intermediate
-          class="size-full justify-end pr-6"
+          class="size-full px-[--w-list-padding,1rem]"
           @update:model-value="$emit('toggle:selection', $event)"
         />
       </div>
@@ -30,10 +29,10 @@
       <div class="bg-default dark:bg-default-dark absolute left-full top-0 z-[-1] h-full w-[calc(var(--actions-bar-width)+var(--inner-margin))]" />
 
       <div
-        class="bg-primary-light dark:bg-primary-darkest h-full rounded-r-2xl border-y border-r border-solid border-gray-300 dark:border-gray-700"
+        class="bg-primary-light dark:bg-primary-darkest h-full rounded-r-[--w-list-header-rounded,0.75rem] border-y border-r border-solid border-gray-300 dark:border-gray-700"
         :class="{
-          'width-14': !hideMore,
-          'width-4': hideMore,
+          'width-[calc(var(--w-list-padding,1rem)*2+1.25em)]': !hideMore,
+          'width-[--w-list-header-rounded,1rem]': hideMore,
         }"
       >
         <slot name="settings" />

@@ -38,42 +38,18 @@
     >
       <slot name="right" />
 
-      <template v-if="!readonly && !hideButton">
-        <WSkeleton
-          v-if="skeleton"
-          class="w-skeleton-w-11 w-skeleton-h-11 w-skeleton-rounded-lg"
-        />
-
-        <button
-          v-else
-          class="square-11 bg-default dark:bg-default-dark relative flex items-center justify-center rounded-lg border border-solid border-gray-200 dark:border-gray-800"
-          :class="{
-            'cursor-not-allowed': disabled,
-            'cursor-progress': loading,
-            'w-ripple w-ripple-hover': !disabled && !loading,
-            'bg-primary-default dark:bg-primary-dark text-default dark:text-default-dark': canSave,
-            'text-description': !canSave,
-          }"
-          @click.stop.prevent="toggle"
-          @mousedown.stop.prevent=""
-        >
-          <WSpinner
-            v-if="loading"
-            class="w-spinner-size-5"
-          />
-
-          <IconCheck v-else-if="canSave" />
-
-          <IconSlash v-else-if="focused" />
-
-          <IconEdit v-else />
-
-          <WTooltip
-            v-if="!loading && focused"
-            :text="canSave ? 'Save' : 'Cancel'"
-          />
-        </button>
-      </template>
+      <WButtonInput
+        v-if="!readonly && !hideButton"
+        :icon="canSave ? markRaw(IconCheck) : focused ? markRaw(IconSlash) : markRaw(IconEdit)"
+        :tooltip-text="!loading && focused ? canSave ? 'Save' : 'Cancel' : undefined"
+        :loading="loading"
+        :skeleton="skeleton"
+        :disabled="disabled"
+        :class="{
+          'bg-primary-default dark:bg-primary-dark text-default dark:text-default-dark': canSave,
+        }"
+        @click="toggle"
+      />
     </template>
 
     <template
@@ -114,12 +90,10 @@
 <script lang="ts" setup generic="Type extends InputType = 'text'">
 import type {InputAsyncProps} from './types'
 
-import {computed, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
+import {computed, markRaw, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
 
+import WButtonInput from '@/components/Button/WButtonInput.vue'
 import WInput from '@/components/Input/WInput.vue'
-import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
-import WSpinner from '@/components/Spinner/WSpinner.vue'
-import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 import IconEdit from '@/assets/icons/sax/IconEdit.svg?component'

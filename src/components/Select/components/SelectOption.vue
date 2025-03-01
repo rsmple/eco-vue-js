@@ -30,7 +30,7 @@
     >
       <div
         v-if="!hideOptionIcon && (isSelected || loading)"
-        class="text-primary-default dark:text-primary-dark col-start-3 flex items-center justify-center [--spinner-size:1.5rem]"
+        class="text-primary-default dark:text-primary-dark w-spinner-size-[1.5em] col-start-3 flex items-center justify-center"
       >
         <IconCheck v-if="isSelected && !loading" />
         <WSpinner v-else-if="loading" />

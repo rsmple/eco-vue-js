@@ -26,8 +26,7 @@
       v-if="!card"
       class="left-inner bg-default dark:bg-default-dark @not-lg:hidden sticky z-[1]"
       :class="{
-        'width-16': allowSelect,
-        'width-4': !allowSelect,
+        'width-[--w-list-header-rounded,1rem]': !allowSelect,
       }"
     >
       <div class="bg-default dark:bg-default-dark absolute right-full top-0 z-[-1] h-full w-[calc(var(--nav-bar-width)+var(--inner-margin))]" />
@@ -48,7 +47,7 @@
           :model-value="selected"
           :disabled="disabled"
           :align-top="alignTop"
-          class="h-full px-4"
+          class="h-full px-[--w-list-padding,1rem]"
           :class="{
             'opacity-50': allowSelectHover,
             'pt-3': alignTop,
@@ -129,8 +128,8 @@
       v-if="!card"
       class="right-inner bg-default dark:bg-default-dark sticky z-[1]"
       :class="{
-        'width-14': $slots.more,
-        'width-4': !$slots.more,
+        'width-[calc(var(--w-list-padding,1rem)*2+1.25em)]': $slots.more,
+        'width-[--w-list-header-rounded,1rem]': !$slots.more,
       }"
     >
       <div class="bg-default dark:bg-default-dark absolute left-full top-0 z-[-1] h-full w-[calc(var(--actions-bar-width)+var(--inner-margin))]" />
@@ -148,7 +147,7 @@
       >
         <WButtonMore
           v-if="$slots.more"
-          class="flex h-full px-4"
+          class="flex h-full px-[--w-list-padding,1rem]"
           :class="{
             'items-start pt-3': alignTop,
             'items-center': !alignTop,

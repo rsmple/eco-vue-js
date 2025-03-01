@@ -10,6 +10,10 @@ const newValues = {
   '--actions-bar-inner-width': 'var(--actions-bar-inner-width)',
   '--inner-margin': 'var(--inner-margin)',
   '--inner-width-diff': 'var(--inner-width-diff)',
+  '--w-modal-wrapper-padding': 'var(--w-modal-wrapper-padding)',
+  '--w-option-padding': 'var(--w-option-padding)',
+  '--w-input-height': 'var(--w-input-height)',
+  '--w-input-gap': 'var(--w-input-gap)',
 }
 
 const extend = {
@@ -37,4 +41,5 @@ export default {
   padding: extend,
   margin: extend,
   inset: extend,
+  gap: extend,
 }

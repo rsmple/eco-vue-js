@@ -13,12 +13,15 @@
     }"
     @click="$emit('click')"
   >
-    <div class="flex h-9 items-center gap-2 px-5 sm:px-[1.125rem]">
-      <component :is="icon" />
+    <div class="-h--w-input-height flex items-center gap-2 px-[--w-list-padding,1rem]">
+      <component
+        :is="icon"
+        class="square-[1.25em]"
+      />
 
       <div
         v-if="title"
-        class="sm-not:hidden whitespace-nowrap text-base font-normal"
+        class="sm-not:hidden whitespace-nowrap font-normal"
       >
         {{ title }}
       </div>

@@ -49,7 +49,7 @@
 
         <WSkeleton
           v-else
-          class="w-skeleton-h-4 w-skeleton-w-16"
+          class="w-skeleton-w-16"
         />
       </div>
 
@@ -73,7 +73,7 @@
             name="field"
           >
             <div
-              class="flex min-h-11 items-center text-base font-normal"
+              class="flex min-h-[--w-input-height,2.75rem] items-center text-base font-normal"
               :class="{
                 'font-mono': mono,
                 'border-t border-solid border-gray-300 dark:border-gray-700': title || $slots.title,
@@ -131,7 +131,7 @@
 
         <WSkeleton
           v-else
-          class="w-skeleton-w-full w-skeleton-rounded-xl w-skeleton-h-[calc(var(--field-height,2.125rem)+0.625rem)]"
+          class="w-skeleton-w-full w-skeleton-rounded-[--w-input-rounded,0.75rem] w-skeleton-h-[--w-input-height,2.75rem]"
         />
 
         <div

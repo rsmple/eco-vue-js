@@ -7,6 +7,7 @@ import WButtonAction from '@/components/Button/WButtonAction.vue'
 import WButtonCopy from '@/components/Button/WButtonCopy.vue'
 import WButtonDropdown from '@/components/Button/WButtonDropdown.vue'
 import WButtonGroup from '@/components/Button/WButtonGroup.vue'
+import WButtonInput from '@/components/Button/WButtonInput.vue'
 import WButtonMore from '@/components/Button/WButtonMore.vue'
 import WButtonMoreItem from '@/components/Button/WButtonMoreItem.vue'
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
@@ -93,6 +94,7 @@ export default {
     app.component('WButtonCopy', WButtonCopy)
     app.component('WButtonDropdown', WButtonDropdown)
     app.component('WButtonGroup', WButtonGroup)
+    app.component('WButtonInput', WButtonInput)
     app.component('WButtonMore', WButtonMore)
     app.component('WButtonMoreItem', WButtonMoreItem)
     app.component('WButtonSelection', WButtonSelection)
@@ -179,6 +181,7 @@ export {
   WButtonCopy,
   WButtonDropdown,
   WButtonGroup,
+  WButtonInput,
   WButtonMore,
   WButtonMoreItem,
   WButtonSelection,
@@ -200,6 +203,7 @@ export {
   WFilePicker,
   WFilterWrapper,
   WForm,
+  WFormValidator,
   WFormAsyncButtonGroup,
   WFormAsyncInput,
   WFormAsyncSelect,
@@ -207,7 +211,6 @@ export {
   WFormAsyncSelectSingle,
   WFormAsyncSelectStringified,
   WFormAsyncToggle,
-  WFormValidator,
   WHeaderBar,
   WImageViewer,
   WInfiniteList,

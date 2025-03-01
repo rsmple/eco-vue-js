@@ -19,14 +19,17 @@
     >
       <template #toggle>
         <div
-          class="relative p-px"
+          class="relative"
           :class="{
             'w-hover-circle': !disabled,
             'text-description': !isOpen,
             'text-primary-default dark:text-primary-dark': isOpen,
           }"
         >
-          <component :is="icon ?? IconMore" />
+          <component
+            :is="icon ?? IconMore"
+            class="square-[1.25em]"
+          />
         </div>
       </template>
 

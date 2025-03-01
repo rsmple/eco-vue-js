@@ -40,7 +40,7 @@
       v-if="loading"
       class="text-description flex h-full w-11 cursor-progress items-center justify-center"
     >
-      <WSpinner class="[--spinner-size:1.5rem]" />
+      <WSpinner class="w-spinner-size-[1.125em]" />
     </div>
 
     <InputActionsButton

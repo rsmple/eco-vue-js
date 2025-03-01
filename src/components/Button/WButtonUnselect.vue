@@ -1,6 +1,6 @@
 <template>
   <button
-    class="square-5 relative flex items-center justify-center rounded-full outline-none"
+    class="square-[1.25em] relative flex items-center justify-center rounded-full outline-none"
     :class="{
       'cursor-not-allowed': disabled,
       'cursor-progress': loading,
@@ -8,7 +8,7 @@
     }"
     @click="!loading && !disabled && $emit('click', $event)"
   >
-    <IconCancel class="square-3" />
+    <IconCancel class="square-[0.75em]" />
   </button>
 </template>
 

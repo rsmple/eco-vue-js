@@ -27,67 +27,9 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
           width: value,
         }
       },
-      'chunk-gap': value => {
-        return {
-          '--split-to-chunks-gap': value,
-        }
-      },
-      'w-spinner-size': value => {
-        return {
-          '--spinner-size': value,
-        }
-      },
-      'w-modal-wrapper-padding': value => {
-        return {
-          '--modal-wrapper-padding': value,
-        }
-      },
     },
     {
       values: theme('width'),
-    },
-  )
-
-  matchUtilities(
-    {
-      'split-to-chunks': (width) => {
-        const value = Number.parseFloat(width)
-        const unit = width.replace(value.toString(), '')
-
-        return Array(4).fill(undefined).reduce(
-          (current, _, index) => {
-            const widthValue = `calc(((100% / ${ index + 2 }) * var(--split-to-chunks-span, 1)) - (var(--split-to-chunks-gap, 16px) * ${ (index + 1) } / ${ (index + 2) }))`
-
-            return {
-              ...current,
-              [`@media (min-width: ${ value * (index + 2) + (index < 1 ? 2 : 25.25) }${ unit })`]: {
-                width: widthValue,
-                minWidth: widthValue,
-              },
-            }
-          },
-          {
-            width: '100%',
-            minWidth: '100%',
-          },
-        )
-      },
-    },
-    {
-      values: theme('chunks'),
-    },
-  )
-
-  matchUtilities(
-    {
-      'chunk-span': value => {
-        return {
-          '--split-to-chunks-span': value,
-        }
-      },
-    },
-    {
-      values: theme('chunk-span'),
     },
   )
 
@@ -223,6 +165,28 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
     },
     '*:focus-visible': {
       outline: 'none',
+    },
+  })
+
+  addBase({
+    '.w-option': {
+      'min-height': 'var(--w-option-height)',
+      'border-radius': 'var(--w-option-rounded)',
+
+      '--w-skeleton-height': 'var(--w-option-height)',
+      '--w-skeleton-rounded': 'var(--w-option-rounded)',
+    },
+    '.w-option-has-bg, *:has(.w-option-has-bg) + .w-option-has-bg-input, .w-option-has-bg + .w-option-has-bg-input': {
+      'padding-left': 'var(--w-option-padding)',
+      'padding-right': 'var(--w-option-padding)',
+    },
+    '.w-option-has-bg .w-option-button': {
+      'margin-right': 'calc(var(--w-option-rounded) * -1)',
+    },
+    body: {
+      '--w-option-height': 'calc(var(--w-input-height,2.75rem) - (var(--w-input-gap,0.25rem) * 2) - 2px)',
+      '--w-option-rounded': 'calc(var(--w-input-rounded,0.75rem) - var(--w-input-gap,0.25rem))',
+      '--w-option-padding': 'var(--w-input-rounded,0.75rem)',
     },
   })
 
@@ -464,6 +428,13 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
     {
       'w-skeleton-w': value => ({'--skeleton-width': value}),
       'w-list-card-w': value => ({'--w-list-card-width': value}),
+      'w-checkbox-size': value => ({'--w-checkbox-size': value}),
+      'w-input-gap': value => ({'--w-input-gap': value}),
+      'w-spinner-size': value => ({'--w-spinner-size': value}),
+      'w-modal-wrapper-p': value => ({'--w-modal-wrapper-padding': value}),
+      'w-modal-wrapper-w': value => ({'--w-modal-wrapper-width': value}),
+      'w-list-header-h': value => ({'--w-list-header-height': value}),
+      'w-list-padding': value => ({'--w-list-padding': value}),
       'grid-cols-fill': value => ({'grid-template-columns': `repeat(auto-fill, minmax(${ value }, 1fr))`}),
     },
     {
@@ -492,6 +463,7 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       'w-list-rounded': value => ({'--w-list-rounded': value}),
       'w-option-rounded': value => ({'--w-option-rounded': value}),
       'w-modal-wrapper-rounded': value => ({'--w-modal-wrapper-rounded': value}),
+      'w-list-header-rounded': value => ({'--w-list-header-rounded': value}),
     },
     {
       values: theme('borderRadius'),

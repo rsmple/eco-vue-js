@@ -125,6 +125,7 @@ export default [
       'unused-imports/no-unused-imports': 'error',
       'tailwindcss/no-custom-classname': 'off',
       'tailwindcss/migration-from-tailwind-2': 'off',
+      'tailwindcss/enforces-negative-arbitrary-values': 'off',
       'no-multiple-empty-lines': [1, {max: 1, maxEOF: 0, maxBOF: 0}],
       'keyword-spacing': 1,
       'key-spacing': 1,

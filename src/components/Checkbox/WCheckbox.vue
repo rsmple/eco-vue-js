@@ -12,7 +12,7 @@
     @click="toggle"
   >
     <div
-      class="square-6 bg-default dark:bg-default-dark relative isolate flex items-center justify-center border border-solid"
+      class="square-[1.5em] bg-default dark:bg-default-dark relative isolate flex items-center justify-center border border-solid [font-size:--w-checkbox-size]"
       :class="{
         'text-default dark:text-default-dark': modelValue && !disabled,
         'text-primary-default dark:text-primary-dark': !modelValue && !disabled,
@@ -47,24 +47,24 @@
 
       <WSpinner
         v-if="loading"
-        class="w-spinner-size-4"
+        class="w-spinner-size-[1em]"
       />
 
       <template v-else-if="icon">
         <component
           :is="icon"
-          class="square-4"
+          class="square-[1em]"
         />
       </template>
 
       <IconCheck
         v-else-if="!radio"
         v-show="modelValue"
-        class="square-4"
+        class="square-[1em]"
       />
 
       <WTooltip
-        v-if="tooltipText"
+        v-if="tooltipText && !disabled"
         :text="tooltipText"
         :trigger="(elementRef as HTMLButtonElement)"
         no-touch
@@ -74,7 +74,7 @@
 
     <div
       v-if="$slots.default || title"
-      class="text-accent flex items-center gap-1 text-base font-normal"
+      class="text-accent flex items-center gap-1"
     >
       <slot>
         {{ title }}

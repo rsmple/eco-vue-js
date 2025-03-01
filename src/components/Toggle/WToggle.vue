@@ -49,7 +49,7 @@
         >
           <WSpinner
             v-if="loading"
-            class="text-description [--spinner-size:1.25rem]"
+            class="text-description w-spinner-size-5"
           />
         </div>
       </div>

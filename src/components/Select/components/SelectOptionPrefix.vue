@@ -1,37 +1,39 @@
 <template>
+  <template v-if="optionComponent">
+    <component
+      v-bind="(optionComponentProps as SelectPrefixProps<Data, OptionComponent>['optionComponentProps'])"
+      :is="(optionComponent as SelectOptionComponent<Data>)"
+      :option="(option as Data)"
+      :index="index"
+      :selected="true"
+      :model="true"
+    >
+      <WButtonUnselect
+        v-if="!disableClear"
+        :loading="loading"
+        :disabled="disabled"
+        class="w-option-button ml-1 mr-2"
+        @mousedown.stop.prevent=""
+        @click.stop.prevent="$emit('unselect')"
+      />
+    </component>
+  </template>
+
   <div
+    v-else
     class="text-description group/model relative grid grid-cols-[1fr,auto] items-center"
     :class="{
       'cursor-pointer': !disabled,
       'cursor-not-allowed opacity-50': disabled,
     }"
   >
-    <slot name="option">
-      <template v-if="optionComponent">
-        <component
-          v-bind="(optionComponentProps as SelectPrefixProps<Data, OptionComponent>['optionComponentProps'])"
-          :is="(optionComponent as SelectOptionComponent<Data>)"
-          :option="(option as Data)"
-          :index="index"
-          :selected="true"
-          :model="true"
-        >
-          <WButtonUnselect
-            v-if="!disableClear"
-            :loading="loading"
-            :disabled="disabled"
-            class="-mr-2 ml-1"
-            @mousedown.stop.prevent=""
-            @click.stop.prevent="$emit('unselect')"
-          />
-        </component>
-      </template>
-    </slot>
+    <slot name="option" />
 
     <WButtonUnselect
-      v-if="!optionComponent && !disableClear"
+      v-if="!disableClear"
       :loading="loading"
       :disabled="disabled"
+      class="mx-1 mr-2"
       @mousedown.stop.prevent=""
       @click.stop.prevent="$emit('unselect')"
     />
