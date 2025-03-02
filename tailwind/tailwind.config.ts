@@ -1,6 +1,6 @@
 import type {Config} from 'tailwindcss'
 
-import tailwindBase from '../tailwind-base'
+import tailwindBase from '../package/tailwind-base'
 
 export default {
   mode: 'jit',

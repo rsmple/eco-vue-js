@@ -8,6 +8,8 @@ import svgLoader from 'vite-svg-loader'
 
 import {URL, fileURLToPath} from 'node:url'
 
+import {writeImports} from './build/write-imports'
+
 export default defineConfig(({mode}) => ({
   plugins: [
     dts({
@@ -17,6 +19,13 @@ export default defineConfig(({mode}) => ({
     }),
     vue(),
     svgLoader({defaultImport: 'component'}),
+    {
+      name: 'pre-build-hook',
+      enforce: 'pre',
+      buildStart() {
+        return writeImports()
+      },
+    },
   ],
   css: {
     postcss: {
@@ -31,6 +40,7 @@ export default defineConfig(({mode}) => ({
     target: 'esnext',
     minify: false,
     sourcemap: false,
+    outDir: 'package/dist',
     lib: {
       entry: 'src/main.ts',
       name: 'ui-kit',

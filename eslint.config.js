@@ -1,4 +1,4 @@
-import plugin from './eslint/plugin.js'
+import plugin from './package/eslint/plugin.js'
 
 export default [
   {

@@ -1,7 +1,17 @@
 import fs from 'fs/promises'
 import path from 'path'
 
-const getIconPaths = root => {
+type ComponentPath = {name: string, path: string}
+
+const PATH_ICONS_DEFAULT = 'src/assets/icons/default'
+const PATH_ICONS_DEFAULT_PLUGIN = 'src/imports/iconsDefault.ts'
+const PATH_ICONS_SAX = 'src/assets/icons/sax'
+const PATH_ICONS_SAX_PLUGIN =  'src/imports/iconsSax.ts'
+const PATH_COMPONENTS = 'src/components'
+const PATH_COMPONENTS_PLUGIN = 'src/imports/componentsPlugin.ts'
+const PATH_PACKAGE = 'package/package.json'
+
+const getIconPaths = (root: string) => {
   const dirPath = path.resolve(root)
 
   return fs
@@ -9,33 +19,55 @@ const getIconPaths = root => {
     .then(files => files.filter(name => name.startsWith('Icon') && name.endsWith('.svg')).map(name => ({name: name.slice(0, -4), path: path.join(dirPath, name)})))
 }
 
-const getIconImports = (list) => {
+const getIconImports = (list: ComponentPath[]) => {
   const imports = list.map(item => `export {default as ${ item.name }} from '@${ item.path.substring(item.path.indexOf('/assets')) }?component'`)
 
   return imports.join('\n')
 }
 
 const writeIconDefault = async () => {
+  const text = (await fs.readFile(PATH_ICONS_DEFAULT_PLUGIN)).toString()
+  const imports = getIconImports(await getIconPaths(PATH_ICONS_DEFAULT))
+
+  if (text === imports) {
+    console.log('IconDefault is up to date')
+
+    return
+  }
+
+  console.log('Writing IconDefault')
+
   return fs.writeFile(
-    'src/imports/iconsDefault.ts',
-    getIconImports(await getIconPaths('src/assets/icons/default')),
+    PATH_ICONS_DEFAULT_PLUGIN,
+    imports,
   )
 }
 
 const writeIconSax = async () => {
+  const text = (await fs.readFile(PATH_ICONS_SAX_PLUGIN)).toString()
+  const imports = getIconImports(await getIconPaths(PATH_ICONS_SAX))
+
+  if (text === imports) {
+    console.log('IconSax is up to date')
+
+    return
+  }
+
+  console.log('Writing IconSax')
+
   return fs.writeFile(
-    'src/imports/iconsSax.ts',
-    getIconImports(await getIconPaths('src/assets/icons/sax')),
+    PATH_ICONS_SAX_PLUGIN,
+    imports,
   )
 }
 
-const getComponentPaths = root => {
+const getComponentPaths = (root: string) => {
   const dirPath = path.resolve(root)
 
   return fs
     .readdir(dirPath)
     .then(files => files
-      .reduce((result, name) => {
+      .reduce<ComponentPath[]>((result, name) => {
         if (name.startsWith('W') && name.endsWith('.vue')) {
           result.push({
             name: name.slice(0, -4),
@@ -55,16 +87,16 @@ const getComponentPaths = root => {
     )
 }
 
-const getComponentDirs = root => {
+const getComponentDirs = (root: string) => {
   const dirPath = path.resolve(root)
 
   return fs.readdir(dirPath).then(dirs => dirs.map(name => path.join(dirPath, name)))
 }
 
 const getComponentsList = async () => {
-  const dirs = await getComponentDirs('src/components')
+  const dirs = await getComponentDirs(PATH_COMPONENTS)
 
-  const list = []
+  const list: ComponentPath[] = []
 
   for (let i = 0; i < dirs.length; i++) {
     list.push(...await getComponentPaths(dirs[i]))
@@ -73,13 +105,13 @@ const getComponentsList = async () => {
   return list
 }
 
-const getImports = list => {
+const getImports = (list: ComponentPath[]) => {
   return list
     .map(item => `import ${ item.name } from '@${ item.path.substring(item.path.indexOf('/components')) }'`)
     .join('\n')
 }
 
-const getVuePlugin = list => {
+const getVuePlugin = (list: ComponentPath[]) => {
   const result = list
     .map(item => `    app.component('${ item.name }', ${ item.name })`)
     .join('\n')
@@ -87,7 +119,7 @@ const getVuePlugin = list => {
   return `export default {\n  // eslint-disable-next-line @typescript-eslint/no-explicit-any\n  install: (app: App | any) => {\n${ result }\n  },\n}`
 }
 
-const getExports = list => {
+const getExports = (list: ComponentPath[]) => {
   const result = list
     .map(item => `  ${ item.name }`)
     .join(',\n')
@@ -95,14 +127,24 @@ const getExports = list => {
   return `export {\n${ result },\n}`
 }
 
-const writePlugin = async (list) => {
+const writePlugin = async (list: ComponentPath[]) => {
   const result = `import type {App} from 'vue'\n\n${ getImports(list) }\n\n${ getVuePlugin(list) }\n\n${ getExports(list) }`
 
-  return fs.writeFile('src/imports/componentsPlugin.ts', result)
+  const text = (await fs.readFile(PATH_COMPONENTS_PLUGIN)).toString()
+
+  if (text === result) {
+    console.log('Components are up to date')
+
+    return
+  }
+
+  console.log('Writing Components')
+
+  return fs.writeFile(PATH_COMPONENTS_PLUGIN, result)
 }
 
-const getPackageExports = (list) => {
-  const result = {
+const getPackageExports = (list: ComponentPath[]) => {
+  const result: Record<string, {import: string, require?: string}> = {
     '.': {
       import: './dist/main.js',
     },
@@ -188,12 +230,12 @@ const getPackageExports = (list) => {
   return result
 }
 
-const writePackageExports = async (list) => {
+const writePackageExports = async (list: ComponentPath[]) => {
   const obj = await fs.readFile('package.json', 'utf8').then(JSON.parse)
 
   obj.exports = getPackageExports(list)
 
-  fs.writeFile('package.json', JSON.stringify(obj, null, 2) + '\n', 'utf8')
+  fs.writeFile(PATH_PACKAGE, JSON.stringify(obj, null, 2) + '\n', 'utf8')
 }
 
 const writeComponents = async () => {
@@ -212,7 +254,7 @@ const writeIcons = async () => {
   ])
 }
 
-const run = async () => {
+export const writeImports = async () => {
   await Promise.all([
     writeComponents(),
     writeIcons(),
@@ -221,5 +263,3 @@ const run = async () => {
   // eslint-disable-next-line no-console
   console.log('Successfully written')
 }
-
-run()

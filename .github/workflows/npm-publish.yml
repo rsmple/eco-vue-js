@@ -19,6 +19,6 @@ jobs:
       - run: npm ci
       - run: npm run lint-no-fix
       - run: npm run build
-      - run: npm publish --access=public
+      - run: cd package && npm publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
