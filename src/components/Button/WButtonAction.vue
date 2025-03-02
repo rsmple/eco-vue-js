@@ -28,7 +28,7 @@
       </template>
     </slot>
 
-    <div class="text-3xs whitespace-nowrap text-center font-normal">
+    <div class="whitespace-nowrap text-center text-xs font-normal">
       {{ title }}
     </div>
   </component>

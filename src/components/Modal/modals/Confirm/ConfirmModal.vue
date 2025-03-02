@@ -1,10 +1,10 @@
 <template>
-  <WModalWrapper class="w-modal-wrapper-w-[40rem]">
+  <WModalWrapper class="w-modal-wrapper-w-[--w-modal-confirm-width,40rem]">
     <template #title>
       {{ title }}
     </template>
 
-    <div class="text-accent sm-not:-px--inner-margin mb-8 min-h-5 text-balance text-center text-base font-normal">
+    <div class="text-accent sm-not:-px--inner-margin mb-6 min-h-5 text-balance text-center font-normal">
       {{ description }}
     </div>
 

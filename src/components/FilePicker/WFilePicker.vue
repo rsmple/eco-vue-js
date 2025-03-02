@@ -71,7 +71,7 @@
 
       <div
         v-else-if="modelValue.length === 0"
-        class="text-accent flex size-full flex-col items-center text-base"
+        class="text-accent flex size-full flex-col items-center"
       >
         <div class="mt-16 font-semibold">
           Drag and drop files here

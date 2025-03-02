@@ -73,7 +73,7 @@
             name="field"
           >
             <div
-              class="flex min-h-[--w-input-height,2.75rem] items-center text-base font-normal"
+              class="flex min-h-[--w-input-height,2.75rem] items-center font-normal"
               :class="{
                 'font-mono': mono,
                 'border-t border-solid border-gray-300 dark:border-gray-700': title || $slots.title,

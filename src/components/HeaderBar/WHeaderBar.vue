@@ -27,11 +27,11 @@
 
       <button
         v-if="searchEnabled"
-        class="w-hover-circle-trigger -px--inner-margin flex h-full select-none items-center outline-none"
+        class="w-ripple-trigger -pr--inner-margin h-full select-none"
         @click="openSearch"
       >
-        <div class="w-hover-circle relative">
-          <IconSearch class="square-6 sm-not:square-5 text-accent" />
+        <div class="w-ripple w-ripple-hover relative flex h-full items-center px-[--w-list-padding,1rem]">
+          <IconSearch class="square-[1.25em] text-accent" />
         </div>
       </button>
     </div>

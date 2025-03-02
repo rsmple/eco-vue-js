@@ -435,6 +435,7 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       'w-modal-wrapper-w': value => ({'--w-modal-wrapper-width': value}),
       'w-list-header-h': value => ({'--w-list-header-height': value}),
       'w-list-padding': value => ({'--w-list-padding': value}),
+      'w-modal-confirm-w': value => ({'--w-modal-confirm-width': value}),
       'grid-cols-fill': value => ({'grid-template-columns': `repeat(auto-fill, minmax(${ value }, 1fr))`}),
     },
     {

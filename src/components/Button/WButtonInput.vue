@@ -4,8 +4,10 @@
     class="-square--w-input-height w-skeleton-rounded-[--w-input-rounded,0.75rem]"
   />
 
-  <button
+  <component
+    :is="to ? RouterLink : 'button'"
     v-else
+    v-bind="to ? {to} : undefined"
     class="
       -square--w-input-height bg-default dark:bg-default-dark relative flex select-none items-center
       justify-center rounded-[--w-input-rounded,0.75rem] border border-solid border-gray-200 dark:border-gray-800
@@ -35,16 +37,21 @@
       :text="tooltipText"
       no-touch
     />
-  </button>
+  </component>
 </template>
 
 <script setup lang="ts">
+import type {LinkProps} from '@/types/types'
+
+import {RouterLink} from 'vue-router'
+
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 defineProps<{
   icon: SVGComponent
+  to?: LinkProps['to']
   tooltipText?: string
   loading?: boolean
   skeleton?: boolean

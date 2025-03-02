@@ -35,12 +35,12 @@
     </Transition>
 
     <div class="[overflow:inherit]">
-      <div class="grid grid-cols-[1.5rem,1fr,auto] items-center px-4 py-2.5">
+      <div class="grid grid-cols-[1.5rem,1fr,auto] items-center px-4">
         <div class="flex items-center">
           <template v-if="icon ?? routeTo.meta.icon">
             <component
               :is="icon ?? routeTo.meta.icon"
-              class="square-5"
+              class="square-[1.25em]"
             />
           </template>
 
@@ -50,19 +50,20 @@
           />
         </div>
 
-        <div class="last-not:pr-1 whitespace-nowrap font-normal tracking-wide">
+        <div class="last-not:pr-1 whitespace-nowrap font-normal">
           <span class="relative">
-            <span>
-              {{ titleLocal }}
-            </span>&nbsp;<span v-if="!skeleton">
-              {{ typeof count === 'number' ? `(${numberCompactFormatter.format(count)})` : '' }}
+            <span class="tracking-wide">
+              <span class="leading-[2.625]">
+                {{ titleLocal }}
+              </span>&nbsp;<span v-if="!skeleton">
+                {{ typeof count === 'number' ? `(${numberCompactFormatter.format(count)})` : '' }}
+              </span>
 
+              <WSkeleton
+                v-else
+                class="inline-flex max-w-10"
+              />
             </span>
-
-            <WSkeleton
-              v-else
-              class="inline-flex max-w-10"
-            />
 
             <WCounter
               v-if="!skeleton && counter !== undefined && counter !== 0"

@@ -9,7 +9,7 @@
     }"
   >
     <div class="bg-default dark:bg-default-dark sticky top-0 z-[1]">
-      <div class="text-accent sm-not:text-xl -p--w-modal-wrapper-padding flex items-center justify-center text-balance text-center text-2xl font-semibold">
+      <div class="text-accent -p--w-modal-wrapper-padding flex items-center justify-center text-balance text-center text-xl font-semibold">
         <slot name="title" />
       </div>
 
