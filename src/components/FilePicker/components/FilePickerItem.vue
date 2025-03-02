@@ -1,33 +1,31 @@
 <template>
-  <div class="height-52 width-44 relative flex flex-col gap-2">
-    <div
-      v-if="!hasError"
-      class="square-44 flex items-center justify-center"
-    >
-      <slot name="positive">
+  <div class="height-52 grid justify-items-center gap-2">
+    <div class="square-44 relative flex items-center justify-center">
+      <slot
+        v-if="!hasError"
+        name="positive"
+      >
         <IconCheckCircle class="square-36 text-positive dark:text-positive-dark" />
       </slot>
-    </div>
-
-    <div
-      v-else
-      class="square-44 flex items-center justify-center"
-    >
-      <slot name="negative">
+  
+      <slot
+        v-else
+        name="negative"
+      >
         <IconCloseCircle class="square-36 text-negative dark:text-negative-dark" />
       </slot>
+
+      <button
+        class="w-ripple square-5 hover:bg-black-default absolute right-0 top-0 flex items-center justify-center rounded-full outline-none hover:bg-opacity-5"
+        @click.stop.prevent="$emit('click:cancel')"
+      >
+        <IconCancel class="square-3 text-description" />
+      </button>
     </div>
 
-    <div class="text-accent truncate text-center text-base font-normal">
+    <div class="text-accent truncate text-center font-normal">
       {{ name }}
     </div>
-
-    <button
-      class="w-ripple square-5 hover:bg-black-default absolute right-0 top-0 flex items-center justify-center rounded-full outline-none hover:bg-opacity-5"
-      @click.stop.prevent="$emit('click:cancel')"
-    >
-      <IconCancel class="square-3 text-description" />
-    </button>
   </div>
 </template>
 

@@ -28,13 +28,15 @@
     </div>
 
     <div
-      v-if="logoComponent"
+      v-if="logoComponent || $slots.logo"
       class="absolute bottom-[1cm] left-[1cm] flex items-center justify-center gap-3"
       :class="{
         'right-[1cm]': centerLogo,
       }"
     >
-      <component :is="logoComponent" />
+      <slot name="logo">
+        <component :is="logoComponent" />
+      </slot>
     </div>
 
     <div
