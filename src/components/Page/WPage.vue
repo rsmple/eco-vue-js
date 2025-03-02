@@ -1,7 +1,7 @@
 <template>
   <div
     class="
-      not-print:shadow-md bg-default text-black-default light relative grid
+      not-print:shadow-md bg-default text-black-default light relative isolate grid
       h-[29.62cm] w-[21.01cm] break-before-page grid-cols-1 grid-rows-[auto,1fr] overflow-hidden px-[1cm] py-[2cm]
     "
     :class="{
@@ -48,6 +48,15 @@
       v-if="title && topTitle"
       class="absolute inset-x-[1cm] top-[1cm] text-xs font-semibold before:text-gray-400 before:[content:counters(section,'.',decimal-leading-zero)]"
     >&nbsp;{{ title }}</span>
+
+    <div
+      v-if="watermark"
+      class="pointer-events-none absolute inset-0 z-10 flex select-none items-center justify-center"
+    >
+      <div class="rotate-[-60deg] text-center text-[10rem] font-semibold leading-none text-gray-400/10">
+        {{ watermark }}
+      </div>
+    </div>
   </div>
 
   <WPage
@@ -59,6 +68,7 @@
     :logo-component="logoComponent"
     :date="date"
     :empty="empty"
+    :watermark="watermark"
   >
     <template
       v-if="$slots.header"
@@ -87,6 +97,7 @@ const props = defineProps<{
   date?: Date
   prerendered?: HTMLElement[]
   skeleton?: boolean
+  watermark: string | undefined
 }>()
 
 const containerRef = useTemplateRef('container')

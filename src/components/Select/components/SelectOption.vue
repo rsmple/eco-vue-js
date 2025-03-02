@@ -1,12 +1,13 @@
 <template>
   <div
     ref="element"
-    class="relative grid w-full grid-cols-[auto,1fr,2.5rem] px-[1.0625rem] py-2"
+    class="w-select-option relative grid w-full grid-cols-[auto,1fr,2.5rem]"
     :class="{
-      'bg-primary-light dark:bg-primary-darkest': isSelected,
-      'before:opacity-5': !loading && isCursor && !skeleton,
+      'bg-primary-light/30 dark:bg-primary-darkest/30': isSelected,
+      'before:opacity-5': !loading && isCursor && !skeleton && !disabled,
       'cursor-progress': loading || skeleton,
-      'w-ripple': !loading && !skeleton,
+      'w-ripple': !loading && !skeleton && !disabled,
+      'cursor-not-allowed': disabled,
     }"
     @mousedown.prevent.stop=""
     @click.prevent.stop="toggle"
@@ -32,7 +33,10 @@
         v-if="!hideOptionIcon && (isSelected || loading)"
         class="text-primary-default dark:text-primary-dark w-spinner-size-[1.5em] col-start-3 flex items-center justify-center"
       >
-        <IconCheck v-if="isSelected && !loading" />
+        <IconCheck
+          v-if="isSelected && !loading"
+          class="square-[1.5em]"
+        />
         <WSpinner v-else-if="loading" />
       </div>
     </Transition>
@@ -58,6 +62,7 @@ const props = defineProps<{
   next?: Model | null
   isNoCursor?: boolean
   hideOptionIcon?: boolean
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -75,7 +80,7 @@ const emit = defineEmits<{
 const elementRef = useTemplateRef('element')
 
 const toggle = (): void => {
-  if (props.skeleton || props.loading) return
+  if (props.skeleton || props.loading || props.disabled) return
 
   if (props.isSelected) emit('unselect')
   else emit('select')

@@ -33,7 +33,7 @@
 
     <template #content>
       <div
-        class="sm-not:w-screen sm-not:px-3 sm:w-[28rem] sm:p-6"
+        class="sm-not:w-screen sm-not:px-3 sm:w-96"
         @mousedown.prevent=""
       >
         <WDatePickerSingle

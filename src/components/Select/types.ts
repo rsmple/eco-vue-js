@@ -1,7 +1,7 @@
 import type {InputSuggestProps} from '@/components/Input/types'
 import type {Component} from 'vue'
 
-export type SelectOptionProps<Option> = {option: Option, selected?: boolean, model?: boolean, index?: number}
+export type SelectOptionProps<Option> = {option: Option | undefined, selected?: boolean, model?: boolean, index?: number}
 
 export type SelectOptionComponent<Option> = Component<SelectOptionProps<Option>>
 
@@ -49,7 +49,8 @@ export interface SelectProps<Model extends number | string, Data extends Default
 
 export interface SelectPrefixProps<Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>>
   extends SelectOptionComponentProps<Data, OptionComponent> {
-  option: Data
+  option: Data | undefined
+  search: string | number | undefined
   index?: number
   disabled?: boolean
   loading?: boolean

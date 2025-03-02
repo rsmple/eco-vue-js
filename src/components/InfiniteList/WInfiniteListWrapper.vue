@@ -1,9 +1,12 @@
 <template>
-  <div ref="indicator" />
+  <div
+    ref="indicator"
+    class="print:hidden"
+  />
 
   <div
     ref="header"
-    class="-top--header-height sticky"
+    class="-top--header-height sticky print:hidden"
     :class="{
       'z-20': !isIntersecting,
       'z-[2]': isIntersecting,

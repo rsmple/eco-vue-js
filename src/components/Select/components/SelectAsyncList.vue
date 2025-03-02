@@ -1,5 +1,47 @@
 <template>
   <div>
+    <SelectOption
+      v-if="allowCreate"
+      :is-selected="false"
+      :is-cursor="cursor === null"
+      :loading="loading && (loadingCreate || loadingOption === null)"
+      :scroll="isCursorLocked"
+      :previous="lastItem"
+      :next="firstItem"
+      :first="count === 0"
+      :is-no-cursor="cursor === undefined"
+      :hide-option-icon="hideOptionIcon"
+      class="first:pt-4 last:pb-4"
+      @mouseenter="setCursor(null)"
+      @update:cursor="setCursor(null)"
+      @select="$emit('create:option'); setLoadingOption(null)"
+      @update:is-cursor="updateCursors"
+      @update:previous="cursorPrevious = ($event as typeof cursorPrevious)"
+      @update:next="cursorNext = ($event as typeof cursorNext)"
+      @unmounted="updateCursor(undefined)"
+    >
+      <template #prefix>
+        <span class="w-option flex items-center pr-2">
+          Create:
+        </span>
+      </template>
+
+      <slot
+        v-if="search && !isModelValueSearch"
+        :option="null"
+        :selected="false"
+        :skeleton="false"
+        :search="search"
+      />
+
+      <div
+        v-else
+        class="text-description w-option flex items-center"
+      >
+        Start typing..
+      </div>
+    </SelectOption>
+
     <WInfiniteList
       :use-query-fn="useQueryFn"
       :query-params="(queryParams as QueryParams)"
@@ -33,8 +75,8 @@
           :is-no-cursor="cursor === undefined"
           :hide-option-icon="hideOptionIcon"
           :class="{
-            'pt-4': !noPadding && first,
-            'pb-4': !noPadding && last && !allowCreate,
+            'pt-4': !noPadding && first && !allowCreate,
+            'pb-4': !noPadding && last,
           }"
           @select="emitSelect(valueGetter(item))"
           @unselect="emitUnselect(valueGetter(item))"
@@ -56,45 +98,25 @@
           </template>
         </SelectOption>
       </template>
-    </WInfiniteList>
 
-    <SelectOption
-      v-if="allowCreate"
-      :is-selected="false"
-      :is-cursor="cursor === null"
-      :loading="loading && (loadingCreate || loadingOption === null)"
-      :scroll="isCursorLocked"
-      :previous="lastItem"
-      :next="firstItem"
-      :first="count === 0"
-      :is-no-cursor="cursor === undefined"
-      :hide-option-icon="hideOptionIcon"
-      class="first:pt-4 last:pb-4"
-      @mouseenter="setCursor(null)"
-      @update:cursor="setCursor(null)"
-      @select="$emit('create:option'); setLoadingOption(null)"
-      @update:is-cursor="updateCursors"
-      @update:previous="cursorPrevious = ($event as typeof cursorPrevious)"
-      @update:next="cursorNext = ($event as typeof cursorNext)"
-      @unmounted="updateCursor(undefined)"
-    >
-      <template #prefix>
-        <span class="w-select-field sm-not:px-3 pr-2">
-          Create:
-        </span>
+      <template #empty>
+        <div
+          class="w-select-option pb-4"
+          :class="{
+            'pt-4': !noPadding && !allowCreate,
+          }"
+        >
+          <div class="w-option flex cursor-default select-none items-center">
+            {{ !search && emptyStub ? emptyStub : 'No match' }}
+          </div>
+        </div>
       </template>
-
-      <slot
-        :option="null"
-        :selected="false"
-        :skeleton="false"
-      />
-    </SelectOption>
+    </WInfiniteList>
   </div>
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {type UnwrapRef, ref} from 'vue'
+import {type UnwrapRef, computed, ref} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
@@ -120,6 +142,7 @@ const props = defineProps<{
   valueGetter: (data: Data) => Model
   queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
   loadingCreate?: boolean
+  search?: string
 }>()
 
 const emit = defineEmits<{
@@ -138,6 +161,7 @@ const loadingOption = ref<Model | null | undefined>(undefined)
 const firstItem = ref<Model | undefined>()
 const lastItem = ref<Model | undefined>()
 const count = ref(0)
+const isModelValueSearch = computed(() => props.search && props.modelValue.includes(props.search as Model))
 
 const setLoadingOption = (value: Model | null): void => {
   loadingOption.value = value as UnwrapRef<Model>

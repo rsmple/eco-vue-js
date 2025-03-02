@@ -38,24 +38,25 @@
     <template #prefix="{unclickable}">
       <template v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true">
         <SelectOptionPrefix
-          v-for="(option, index) in prefixList"
-          :key="valueGetter(option)"
-          :option="option"
+          v-for="(value, index) in modelValue"
+          :key="value"
+          :option="optionsWithCreated.find(item => valueGetter(item) === value)"
           :option-component="(optionComponent as SelectOptionComponent<Data>)"
           :option-component-props="(optionComponentProps as SelectProps<Model, Data, QueryParamsOptions, OptionComponent>['optionComponentProps'])"
           :index="index"
           :loading="loading || isLoading"
           :disabled="disabled"
           :disable-clear="disableClear || readonly"
-          @unselect="unselect(valueGetter(option))"
+          :search="value"
+          @unselect="unselect(value)"
         >
           <template
             v-if="$slots.option"
-            #option
+            #option="optionScope"
           >
             <slot
               name="option"
-              :option="option"
+              v-bind="optionScope"
               :selected="true"
               :model="true"
               :index="index"
@@ -73,11 +74,55 @@
     </template>
 
     <template #content>
-      <div
-        v-if="!optionsFiltered.length"
-        class="px-[1.0625rem] py-2 first:pt-4 last:pb-4"
+      <SelectOption
+        v-if="hasCreateOption"
+        :is-selected="false"
+        :is-cursor="cursor === optionsFiltered.length"
+        :loading="(loadingCreate || loadingOptionIndex === optionsFiltered.length) && loading"
+        :scroll="isCursorLocked"
+        :hide-option-icon="hideOptionIcon"
+        :disabled="!search || isModelValueSearch"
+        class="first:pt-4 last:pb-4"
+        @select="create(search)"
+        @mouseenter="setCursor(optionsFiltered.length)"
       >
-        <div class="w-select-field sm-not:px-3 cursor-default select-none">
+        <template #prefix>
+          <div class="w-option flex items-center pr-2">
+            Create:
+          </div>
+        </template>
+
+        <slot
+          v-if="search && !isModelValueSearch"
+          name="option"
+          :option="null"
+          :search="search"
+          :selected="false"
+          :model="false"
+        >
+          <component
+            v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
+            :is="optionComponent"
+            :option="null"
+            :search="search"
+            :selected="false"
+            :model="false"
+          />
+        </slot>
+
+        <div
+          v-else
+          class="text-description w-option flex items-center"
+        >
+          Start typing..
+        </div>
+      </SelectOption>
+
+      <div
+        v-if="!optionsFiltered.length && !isModelValueSearch && (!createOption || optionsWithCreated.length)"
+        class="w-select-option first:pt-4 last:pb-4"
+      >
+        <div class="w-option flex cursor-default select-none items-center">
           {{ !search && emptyStub ? emptyStub : 'No match' }}
         </div>
       </div>
@@ -111,41 +156,6 @@
             />
           </slot>
         </template>
-      </SelectOption>
-
-      <SelectOption
-        v-if="hasCreateOption"
-        :is-selected="false"
-        :is-cursor="cursor === optionsFiltered.length"
-        :loading="(loadingCreate || loadingOptionIndex === optionsFiltered.length) && loading"
-        :scroll="isCursorLocked"
-        :hide-option-icon="hideOptionIcon"
-        class="first:pt-4 last:pb-4"
-        @select="create(search)"
-        @mouseenter="setCursor(optionsFiltered.length)"
-      >
-        <template #prefix>
-          <span class="w-select-field sm-not:px-3 pr-2">
-            Create:
-          </span>
-        </template>
-
-        <slot
-          name="option"
-          :option="null"
-          :search="search"
-          :selected="false"
-          :model="false"
-        >
-          <component
-            v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
-            :is="optionComponent"
-            :option="null"
-            :search="search"
-            :selected="false"
-            :model="false"
-          />
-        </slot>
       </SelectOption>
     </template>
   </WInputSuggest>
@@ -185,7 +195,8 @@ const inputRef = useTemplateRef('input')
 const cursor = ref<number>(0)
 const isCursorLocked = ref(false)
 const search = ref('')
-const searchPrepared = computed(() => search.value.trim().toLocaleLowerCase())
+const isModelValueSearch = computed(() => search.value && props.modelValue.includes(search.value as Model))
+const searchPrepared = computed(() => isModelValueSearch.value ? '' : search.value.trim().toLocaleLowerCase())
 const enabled = computed(() => !props.disabled)
 
 const {data, isLoading, error: queryError} = props.useQueryFnOptions
@@ -224,9 +235,7 @@ const loadingCreate = ref(false)
 
 const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
 
-const prefixList = computed(() => props.modelValue.map(value => optionsWithCreated.value?.find(item => props.valueGetter(item) === value)).filter(item => item !== undefined))
-
-const hasCreateOption = computed(() => props.createOption && search.value !== '' && !optionsFiltered.value.some(option => props.valueGetter(option) === search.value))
+const hasCreateOption = computed(() => props.createOption && !optionsFiltered.value.some(option => props.valueGetter(option) === search.value))
 
 const close = () => {
   isOpen.value = false
@@ -407,7 +416,7 @@ defineSlots<{
   title?: () => void
   subtitle?: () => void
   option?: (props: {
-    option: Data | null
+    option: Data | null | undefined
     index?: number
     selected: boolean
     model: boolean

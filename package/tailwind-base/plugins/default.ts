@@ -183,6 +183,9 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
     '.w-option-has-bg .w-option-button': {
       'margin-right': 'calc(var(--w-option-rounded) * -1)',
     },
+    '.w-select-option': {
+      padding: '0.5rem calc(var(--w-option-padding) + var(--w-input-gap) + 1px)',
+    },
     body: {
       '--w-option-height': 'calc(var(--w-input-height,2.75rem) - (var(--w-input-gap,0.25rem) * 2) - 2px)',
       '--w-option-rounded': 'calc(var(--w-input-rounded,0.75rem) - var(--w-input-gap,0.25rem))',

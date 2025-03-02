@@ -3,8 +3,9 @@
     <component
       v-bind="(optionComponentProps as SelectPrefixProps<Data, OptionComponent>['optionComponentProps'])"
       :is="(optionComponent as SelectOptionComponent<Data>)"
-      :option="(option as Data)"
+      :option="option"
       :index="index"
+      :search="option === undefined ? search as string : undefined"
       :selected="true"
       :model="true"
     >
@@ -27,7 +28,11 @@
       'cursor-not-allowed opacity-50': disabled,
     }"
   >
-    <slot name="option" />
+    <slot
+      name="option"
+      :option="option"
+      :search="option === undefined ? search as string : undefined"
+    />
 
     <WButtonUnselect
       v-if="!disableClear"

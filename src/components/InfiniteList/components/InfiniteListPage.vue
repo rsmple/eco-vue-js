@@ -77,20 +77,15 @@
       </div>
     </template>
 
-    <div
+    <slot
       v-else
-      class="text-accent text-base font-normal"
-      :class="{
-        'sm:left-inner sm:max-w-inner flex justify-center px-8 py-16 text-center sm:sticky': !minHeight,
-        'px-[1.0625rem] pt-4': minHeight,
-        'pb-4': minHeight && lastChild,
-        'pb-2': minHeight && !lastChild,
-      }"
+      name="empty"
+      v-bind="{queryParams}"
     >
-      <div class="py-1.25 sm-not:px-3 cursor-default select-none">
+      <div class="text-accent sm:left-inner sm:max-w-inner flex justify-center px-8 py-16 text-center text-base font-normal sm:sticky">
         {{ emptyStub }}
       </div>
-    </div>
+    </slot>
   </div>
 </template>
 
@@ -327,5 +322,6 @@ defineSlots<{
     page: number
     index: number
   }) => void
+  empty?: (props: {queryParams: QueryParams}) => void
 }>()
 </script>

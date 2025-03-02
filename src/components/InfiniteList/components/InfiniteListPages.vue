@@ -65,6 +65,16 @@
           :value="valueGetter(item as Data)"
         />
       </template>
+
+      <template
+        v-if="$slots.empty"
+        #empty="emptyScope"
+      >
+        <slot
+          name="empty"
+          v-bind="emptyScope"
+        />
+      </template>
     </InfiniteListPage>
 
     <InfiniteListButton
@@ -276,5 +286,6 @@ defineSlots<{
     index: number
     value: Model
   }) => void
+  empty?: (props: {queryParams: QueryParams}) => void
 }>()
 </script>
