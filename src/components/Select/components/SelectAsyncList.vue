@@ -94,6 +94,7 @@
               :option="item"
               :selected="selected"
               :skeleton="skeleton"
+              :search="undefined"
             />
           </template>
         </SelectOption>
@@ -247,6 +248,11 @@ defineExpose({
 })
 
 defineSlots<{
-  default?: (props: {option: Data | null, selected: boolean, skeleton: boolean}) => void
+  default?: (props: {
+    option: Data | null
+    selected: boolean
+    skeleton: boolean
+    search: string | undefined
+  }) => void
 }>()
 </script>

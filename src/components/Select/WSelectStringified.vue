@@ -98,6 +98,11 @@ defineSlots<{
   title?: () => VNode[]
   subtitle?: () => VNode[]
   right?: () => VNode[]
-  option?: (props: {option: Data | null, selected: boolean, model: boolean, search: string | undefined}) => VNode[]
+  option?: (props: {
+    option: Data | null | undefined
+    selected: boolean
+    model: boolean
+    search: string | undefined
+  }) => VNode[]
 }>()
 </script>

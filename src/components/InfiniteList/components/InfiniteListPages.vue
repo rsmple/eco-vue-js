@@ -72,7 +72,7 @@
       >
         <slot
           name="empty"
-          v-bind="emptyScope"
+          v-bind="(emptyScope as EmptyProps)"
         />
       </template>
     </InfiniteListPage>
@@ -271,6 +271,8 @@ defineExpose({
   goto,
 })
 
+type EmptyProps = {queryParams: QueryParams}
+
 defineSlots<{
   default?: (props: {
     item: Data
@@ -286,6 +288,6 @@ defineSlots<{
     index: number
     value: Model
   }) => void
-  empty?: (props: {queryParams: QueryParams}) => void
+  empty?: (props: EmptyProps) => void
 }>()
 </script>
