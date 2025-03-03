@@ -66,6 +66,7 @@ import WNavItemTransition from '@/components/Nav/WNavItemTransition.vue'
 import WNotify from '@/components/Notify/WNotify.vue'
 import WNumberFormatter from '@/components/NumberFormatter/WNumberFormatter.vue'
 import WPage from '@/components/Page/WPage.vue'
+import WPageBreadcrumbs from '@/components/Page/WPageBreadcrumbs.vue'
 import WPageNumerator from '@/components/Page/WPageNumerator.vue'
 import WPageTitle from '@/components/Page/WPageTitle.vue'
 import WProgress from '@/components/Progress/WProgress.vue'
@@ -153,6 +154,7 @@ export default {
     app.component('WNotify', WNotify)
     app.component('WNumberFormatter', WNumberFormatter)
     app.component('WPage', WPage)
+    app.component('WPageBreadcrumbs', WPageBreadcrumbs)
     app.component('WPageNumerator', WPageNumerator)
     app.component('WPageTitle', WPageTitle)
     app.component('WProgress', WProgress)
@@ -240,6 +242,7 @@ export {
   WNotify,
   WNumberFormatter,
   WPage,
+  WPageBreadcrumbs,
   WPageNumerator,
   WPageTitle,
   WProgress,

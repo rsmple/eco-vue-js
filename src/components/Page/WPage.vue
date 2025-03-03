@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="element"
     class="
       not-print:shadow-md bg-default text-black-default light relative isolate grid
       h-[29.62cm] w-[21.01cm] break-before-page grid-cols-1 grid-rows-[auto,1fr] overflow-hidden px-[1cm] py-[2cm]
@@ -82,11 +83,13 @@
 </template>
 
 <script lang="ts" setup>
-import {type Component, nextTick, ref, useTemplateRef, watch} from 'vue'
+import {type Component, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch} from 'vue'
 
+import {useHeader} from '@/components/HeaderBar/use/useHeader'
 import {dateFormat} from '@/utils/dateTime'
 
 import WPageTitle from './WPageTitle.vue'
+import {usePageBreadcrumb} from './use/usePageBreadcrumbs'
 
 const INNER_CLASS = 'w-page-inner'
 
@@ -102,9 +105,13 @@ const props = defineProps<{
   watermark: string | undefined
 }>()
 
+const elementRef = useTemplateRef('element')
 const containerRef = useTemplateRef('container')
 
 const overflow = ref<HTMLElement[]>([])
+
+const {setBreadcrumb, resetBreadcrumb, updateBreadcrumbs, setActive} = usePageBreadcrumb()
+const {headerPadding, headerHeight} = useHeader()
 
 const getElements = (item: HTMLElement, inner = false): HTMLElement[] => {
   return Array.from(item.children)
@@ -170,6 +177,45 @@ const moveElements = (value: HTMLElement[]) => {
   nextTick().then(updateOverflow)
 }
 
+const scrollTo = () => {
+  if (!elementRef.value?.parentElement || !document.scrollingElement) return
+
+  document.scrollingElement.scrollTo({top: elementRef.value.offsetTop - headerPadding.value - headerHeight.value})
+
+  // nextTick(() => {
+  //   if (!elementRef.value?.parentElement) return
+
+  //   setActive(Array.from(elementRef.value.parentElement.children).indexOf(elementRef.value))
+  // })
+}
+
+const updateBreadcrumb = async () => {
+  if (props.topTitle || !props.title) return
+
+  await nextTick()
+
+  if (!elementRef.value?.parentElement) return
+
+  setBreadcrumb(
+    props.title,
+    Array.from(elementRef.value.parentElement.children).indexOf(elementRef.value),
+    updateBreadcrumb,
+    scrollTo,
+  )
+}
+
+const observerCb = (entries: IntersectionObserverEntry[]) => {
+  if (!elementRef.value?.parentElement) return
+
+  const isIntersecting = entries.some(entry => {
+    if (entry.target === elementRef.value) {
+      return entry.isIntersecting
+    }
+  })
+
+  if (isIntersecting) setActive(Array.from(elementRef.value.parentElement.children).indexOf(elementRef.value))
+}
+
 watch(() => props.prerendered, async value => {
   if (!value) return
 
@@ -199,4 +245,30 @@ watch(() => props.skeleton, async value => {
   
   updateOverflow()
 }, {immediate: true})
+
+let observer: IntersectionObserver | null = null
+
+onMounted(() => {
+  updateBreadcrumb()
+
+  if (elementRef.value) {
+    observer = new IntersectionObserver(observerCb, {
+      root: null,
+      rootMargin: `${ headerHeight.value * 2 }px 100% 0px 0px`,
+      threshold: 0.5,
+    })
+
+    observer.observe(elementRef.value)
+  }
+
+  updateBreadcrumbs()
+})
+
+onBeforeUnmount(() => {
+  if (!props.topTitle && props.title) resetBreadcrumb(props.title)
+
+  observer?.disconnect()
+
+  updateBreadcrumbs()
+})
 </script>

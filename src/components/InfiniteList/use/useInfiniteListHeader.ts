@@ -9,14 +9,8 @@ export const useInfiniteListHeader = (headerElementHeight: Ref<number>, scrollin
   const headerTop = ref<number>(0)
   const isIntersecting = ref(initIsIntersecting)
   let observer: IntersectionObserver | null = null
-  let isFirst = true
 
   const observerCb = (entries: IntersectionObserverEntry[]) => {
-    if (isFirst) {
-      isFirst = false
-      return
-    }
-
     isIntersecting.value = entries.some(entry => {
       if (entry.target === indicator.value) {
         return entry.isIntersecting || entry.boundingClientRect.top > window.innerHeight
