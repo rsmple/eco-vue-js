@@ -235,19 +235,18 @@ const loadingCreate = ref(false)
 
 const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
 
-const hasCreateOption = computed(() => props.createOption && !optionsFiltered.value.some(option => props.valueGetter(option) === search.value))
+const hasCreateOption = computed(() => props.createOption && (!optionsFiltered.value.some(option => props.valueGetter(option) === search.value) || isModelValueSearch.value))
 
 const close = () => {
-  isOpen.value = false
-  focused.value = false
-
-  if (props.selectOnClose && search.value && !isModelValueSearch.value) {
+  if (props.selectOnClose && focused.value && !isModelValueSearch.value) {
     const optionExact = optionsFiltered.value.find(option => props.valueGetter(option) === search.value)
 
     if (optionExact) select(props.valueGetter(optionExact))
     else create(search.value)
   }
 
+  isOpen.value = false
+  focused.value = false
   search.value = ''
 }
 
@@ -379,6 +378,8 @@ const focus = () => {
 }
 
 const blur = () => {
+  focused.value = false
+
   inputRef.value?.blur()
 }
 

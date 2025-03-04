@@ -85,7 +85,7 @@
         :loading="loading || isFetchingPrefix"
         :disabled="isDisabled"
         :empty-stub="!search && emptyStub ? emptyStub : undefined"
-        :allow-create="createOption && !hasSearchOption"
+        :allow-create="createOption && (!hasSearchOption || isModelValueSearch)"
         :hide-option-icon="hideOptionIcon"
         :value-getter="valueGetter"
         :loading-create="loadingCreate"
