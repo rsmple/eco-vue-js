@@ -153,7 +153,7 @@ const {data, error, setData, refetch, isFetching} = props.useQueryFn(
   toRef(props, 'queryParams'),
   {
     ...props.queryOptions ?? {},
-    refetchInterval: props.refetchInterval ? computed(() => isIntersecting.value ? props.refetchInterval : undefined) : undefined,
+    refetchInterval: props.refetchInterval ? (() => isIntersecting.value ? props.refetchInterval : undefined) : undefined,
   },
 )
 const nextPage = computed(() => data.value?.next)

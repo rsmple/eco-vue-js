@@ -53,7 +53,7 @@ type Params = Parameters<import('@tanstack/vue-query').QueryClient['setQueriesDa
 declare type UseQueryDefault<TQueryFnData = unknown, TData = TQueryFnData, TQueryKey extends import('@tanstack/vue-query').QueryKey = import('@tanstack/vue-query').QueryKey> =
   typeof import('@/utils/useDefaultQuery').useDefaultQuery<TQueryFnData, TData, TQueryKey>
 
-declare type QueryOptions<Data> = Partial<import('vue').UnwrapRef<Parameters<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Data>>[0]>>
+declare type QueryOptions<Data> = Partial<Parameters<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Data>>[0]>
 
 declare type UseQueryEmpty<Model> = (options?: QueryOptions<Model>) => ReturnType<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Model>>
 
