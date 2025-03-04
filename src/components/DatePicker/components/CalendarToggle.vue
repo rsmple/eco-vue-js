@@ -2,7 +2,7 @@
   <div class="my-2 flex h-8 w-full items-center">
     <div
       class="
-        square-8 w-ripple hover:bg-primary-default hover:dark:bg-primary-dark hover:text-default
+        square-8 w-ripple hover:bg-primary-default hover:dark:bg-primary-dark hover:text-default dark:hover:text-default
         text-description relative mr-auto flex cursor-pointer
         select-none items-center justify-center rounded-xl
       "
@@ -20,7 +20,7 @@
       >
         <div
           :key="text"
-          class="text-accent w-14 select-none text-center text-base font-medium"
+          class="text-accent w-14 select-none text-center font-medium"
         >
           {{ text }}
         </div>
@@ -29,7 +29,7 @@
 
     <div
       class="
-        square-8 w-ripple hover:bg-primary-default hover:dark:bg-primary-dark hover:text-default
+        square-8 w-ripple hover:bg-primary-default hover:dark:bg-primary-dark hover:text-default dark:hover:text-default
         text-description relative ml-auto flex cursor-pointer
         select-none items-center justify-center rounded-xl
       "

@@ -40,6 +40,7 @@
           'rounded-bl-[unset!important]': isOpen,
           'border-b-transparent dark:border-b-transparent': hasBorder && isOpen,
           'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': isActionShown,
+          'pl-px': !hasBorder,
         }"
       >
         <WCheckbox
@@ -50,7 +51,7 @@
           class="h-full px-[--w-list-padding,1rem]"
           :class="{
             'opacity-50': allowSelectHover,
-            'pt-3': alignTop,
+            'pt-4.5': alignTop,
           }"
           @update:model-value="$emit('toggle:selected')"
         />
@@ -82,7 +83,7 @@
         v-if="allowSelect && card"
         :model-value="selected"
         :disabled="disabled"
-        class="justify-end self-start"
+        class="-p--inner-margin -my---inner-margin -mr---inner-margin justify-end self-start"
         :class="{
           'opacity-50': allowSelectHover,
         }"
@@ -109,7 +110,7 @@
 
       <WButtonMore
         v-if="card && $slots.more"
-        class="-mr-4 flex items-center px-4"
+        class="-p--inner-margin -my---inner-margin -mr---inner-margin flex items-center"
         :disabled="disabled || disableMore"
         :style="{gridArea: AREA_MORE}"
       >
@@ -149,7 +150,7 @@
           v-if="$slots.more"
           class="flex h-full px-[--w-list-padding,1rem]"
           :class="{
-            'items-start pt-3': alignTop,
+            'pt-4.5 items-start': alignTop,
             'items-center': !alignTop,
           }"
           :disabled="disabled || disableMore"

@@ -10,12 +10,12 @@
     }"
     @click="updateCurrentDate"
   >
-    <div class="mb-0.5 text-base font-normal tracking-wide">
+    <div class="mb-0.5 font-normal tracking-wide">
       {{ title }}
     </div>
 
     <div
-      class="text-base font-semibold tracking-wide"
+      class="font-semibold tracking-wide"
       :class="{
         'opacity-50': !value,
       }"

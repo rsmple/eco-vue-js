@@ -5,7 +5,8 @@
     class="cursor-pointer overflow-hidden truncate whitespace-normal font-normal no-underline hover:underline"
     :class="semanticTypeTextStylesMap[semanticType]"
   >
-    <IconLink
+    <component
+      :is="icon ?? IconLink"
       class="square-[1.25em] mr-[0.25em] mt-[-0.25em] inline rounded-[0.5em] p-px"
       :class="semanticTypeChipsStylesMap[semanticType]"
     /><slot>{{ text }}</slot>
@@ -27,6 +28,7 @@ interface Props extends Partial<LinkProps> {
   target?: '_self' | '_blank' | '_parent' | '_top'
   text?: string
   semanticType?: SemanticType
+  icon?: SVGComponent
 }
 
 withDefaults(
@@ -37,6 +39,7 @@ withDefaults(
     href: undefined,
     target: undefined,
     text: undefined,
+    icon: undefined,
   },
 )
 </script>

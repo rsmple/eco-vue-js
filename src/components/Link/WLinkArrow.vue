@@ -3,13 +3,13 @@
     :to="to"
     class="
       text-description hover:text-primary-default dark:hover:text-primary-dark flex cursor-pointer select-none
-      items-center gap-2 self-end py-2 text-base font-normal no-underline
+      items-center gap-2 self-end py-2 font-normal no-underline
     "
   >
     <slot>
       {{ text }}
     </slot>
-    <IconBack class="rotate-180" />
+    <IconBack class="square-[1.25em] rotate-180" />
   </RouterLink>
 </template>
 

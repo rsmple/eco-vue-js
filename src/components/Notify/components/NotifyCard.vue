@@ -29,13 +29,13 @@
       </div>
 
       <div class="grid flex-1 items-center py-4">
-        <div class="text-default text-base font-semibold">
+        <div class="text-default font-semibold">
           {{ title }}
         </div>
 
         <div
           v-if="caption || userInput"
-          class="text-default whitespace-pre-wrap break-words text-base font-normal"
+          class="text-default whitespace-pre-wrap break-words font-normal"
         >
           {{ caption ? caption + ' ' : '' }}<span class="break-all">{{ userInput }}</span>
         </div>

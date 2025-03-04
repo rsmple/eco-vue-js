@@ -28,23 +28,26 @@
       <slot v-bind="{updateOverflow, INNER_CLASS}" />
     </div>
 
-    <div
-      v-if="logoComponent || $slots.logo"
-      class="absolute bottom-[1cm] left-[1cm] flex items-center justify-center gap-3"
-      :class="{
-        'right-[1cm]': centerLogo,
-      }"
-    >
-      <slot name="logo">
-        <component :is="logoComponent" />
-      </slot>
-    </div>
+    <div class="absolute inset-x-[1cm] bottom-[1cm] grid grid-cols-[1fr,auto,1fr] gap-4">
+      <div
+        v-if="logoComponent || $slots.logo"
+        class="grid grid-cols-[auto,auto] items-center gap-3"
+        :class="{
+          'col-start-2': centerLogo,
+          'col-start-1': !centerLogo,
+        }"
+      >
+        <slot name="logo">
+          <component :is="logoComponent" />
+        </slot>
+      </div>
 
-    <div
-      v-if="!centerLogo && date"
-      class="absolute inset-x-[1cm] bottom-[1cm] text-center text-xs"
-    >
-      {{ dateFormat(date) }}
+      <div
+        v-if="!centerLogo && date"
+        class="col-start-2 text-center text-xs"
+      >
+        {{ dateFormat(date) }}
+      </div>
     </div>
 
     <span
@@ -54,7 +57,7 @@
 
     <div
       v-if="watermark"
-      class="pointer-events-none absolute inset-0 z-10 flex select-none items-center justify-center"
+      class="pointer-events-none absolute inset-0 z-10 flex select-none items-center justify-center overflow-hidden"
     >
       <div class="rotate-[-60deg] text-center text-[10rem] font-semibold leading-none text-gray-400/10">
         {{ watermark }}
@@ -78,6 +81,13 @@
       #header
     >
       <slot name="header" />
+    </template>
+
+    <template
+      v-if="$slots.logo"
+      #logo
+    >
+      <slot name="logo" />
     </template>
   </WPage>
 </template>

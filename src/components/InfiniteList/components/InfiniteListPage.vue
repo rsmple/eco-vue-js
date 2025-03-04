@@ -82,7 +82,7 @@
       name="empty"
       v-bind="{queryParams}"
     >
-      <div class="text-accent sm:left-inner sm:max-w-inner flex justify-center px-8 py-16 text-center text-base font-normal sm:sticky">
+      <div class="text-accent sm:left-inner sm:max-w-inner flex justify-center px-8 py-16 text-center font-normal sm:sticky">
         {{ emptyStub }}
       </div>
     </slot>

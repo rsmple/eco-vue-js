@@ -1,6 +1,6 @@
 <template>
   <RouterLink
-    class="text-description sm-not:first:-mx--inner-margin block text-base font-normal no-underline hover:underline"
+    class="text-description sm-not:first:-mx--inner-margin block font-normal no-underline hover:underline"
     :to="{query: queryParams as LocationQueryRaw, hash: $route.hash}"
     replace
     @click="copyRoute"

@@ -3,7 +3,7 @@
     :disabled="disabled"
     @click="setOrdering"
   >
-    <div class="flex-1 truncate text-base font-normal">
+    <div class="flex-1 truncate font-normal">
       {{ title }}
     </div>
 
@@ -32,7 +32,7 @@
       >
         <div
           v-if="index !== -1 && ordering.length > 1"
-          class="text-base font-semibold"
+          class="font-semibold"
         >
           {{ index + 1 }}
         </div>

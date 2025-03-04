@@ -33,7 +33,7 @@
         'bg-primary-default dark:bg-primary-dark font-semibold': isSelected,
       }"
     >
-      <div class="text-base font-normal">
+      <div class="font-normal">
         {{ startOfDay.getDate() }}
       </div>
     </div>
