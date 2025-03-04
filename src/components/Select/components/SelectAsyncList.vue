@@ -11,7 +11,8 @@
       :first="count === 0"
       :is-no-cursor="cursor === undefined"
       :hide-option-icon="hideOptionIcon"
-      class="first:pt-4 last:pb-4"
+      :disabled="!search || isModelValueSearch"
+      class="first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
       @mouseenter="setCursor(null)"
       @update:cursor="setCursor(null)"
       @select="$emit('create:option'); setLoadingOption(null)"
@@ -70,13 +71,13 @@
           :scroll="isCursorLocked"
           :first="first"
           :last="last"
-          :previous="first && props.allowCreate ? null : previous ? valueGetter(previous) : undefined"
-          :next="last && props.allowCreate ? null : next ? valueGetter(next) : undefined"
+          :previous="first && allowCreate ? null : previous ? valueGetter(previous) : undefined"
+          :next="last && allowCreate ? null : next ? valueGetter(next) : undefined"
           :is-no-cursor="cursor === undefined"
           :hide-option-icon="hideOptionIcon"
           :class="{
-            'pt-4': !noPadding && first && !allowCreate,
-            'pb-4': !noPadding && last,
+            '-pt--w-select-option-padding': !noPadding && first && !allowCreate,
+            '-pb--w-select-option-padding': !noPadding && last,
           }"
           @select="emitSelect(valueGetter(item))"
           @unselect="emitUnselect(valueGetter(item))"
@@ -85,7 +86,7 @@
           @update:is-cursor="updateCursors"
           @update:previous="cursorPrevious = ($event as typeof cursorPrevious)"
           @update:next="cursorNext = ($event as typeof cursorNext)"
-          @unmounted="updateCursor(undefined)"
+          @unmounted="updateCursor(next ? valueGetter(next) : undefined)"
           @update:first="firstItem = valueGetter(item)"
           @update:last="lastItem = valueGetter(item)"
         >
@@ -102,9 +103,9 @@
 
       <template #empty>
         <div
-          class="w-select-option pb-4"
+          class="w-select-option -pb--w-select-option-padding"
           :class="{
-            'pt-4': !noPadding && !allowCreate,
+            '-pt--w-select-option-padding': !noPadding && !allowCreate,
           }"
         >
           <div class="w-option flex cursor-default select-none items-center">

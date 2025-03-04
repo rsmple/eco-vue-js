@@ -45,6 +45,7 @@ export interface SelectProps<Model extends number | string, Data extends Default
   filterOptions?: (option: Data) => boolean
   hideOptionIcon?: boolean
   createdData?: Data[]
+  selectOnClose?: boolean
 }
 
 export interface SelectPrefixProps<Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>>

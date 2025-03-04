@@ -1,7 +1,7 @@
 <template>
   <div
     ref="element"
-    class="w-select-option relative grid w-full grid-cols-[auto,1fr,2.5rem]"
+    class="w-select-option relative grid w-full grid-cols-[auto,1fr,1.25em]"
     :class="{
       'bg-primary-light/30 dark:bg-primary-darkest/30': isSelected,
       'before:opacity-5': !loading && isCursor && !skeleton && !disabled,
@@ -15,7 +15,7 @@
     <slot name="prefix" />
 
     <div
-      class="col-start-2 flex items-center overflow-hidden"
+      class="-pr--w-option-padding col-start-2 flex items-center overflow-hidden"
       :class="{
         'col-span-2': hideOptionIcon,
       }"
@@ -31,11 +31,11 @@
     >
       <div
         v-if="!hideOptionIcon && (isSelected || loading)"
-        class="text-primary-default dark:text-primary-dark w-spinner-size-[1.5em] col-start-3 flex items-center justify-center"
+        class="text-primary-default dark:text-primary-dark w-spinner-size-[1.25em] col-start-3 flex items-center justify-self-end"
       >
         <IconCheck
           v-if="isSelected && !loading"
-          class="square-[1.5em]"
+          class="square-[1.25em]"
         />
         <WSpinner v-else-if="loading" />
       </div>

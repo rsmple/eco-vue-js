@@ -17,7 +17,7 @@
     @keypress:delete="captureDoubleDelete"
 
     @open="isOpen = true"
-    @close="close(); search = ''"
+    @close="close"
     @focus="focused = true; $emit('focus', $event)"
     @blur="focused = false; $emit('blur', $event)"
   >
@@ -82,7 +82,7 @@
         :scroll="isCursorLocked"
         :hide-option-icon="hideOptionIcon"
         :disabled="!search || isModelValueSearch"
-        class="first:pt-4 last:pb-4"
+        class="first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
         @select="create(search)"
         @mouseenter="setCursor(optionsFiltered.length)"
       >
@@ -120,7 +120,7 @@
 
       <div
         v-if="!optionsFiltered.length && !isModelValueSearch && (!createOption || optionsWithCreated.length)"
-        class="w-select-option first:pt-4 last:pb-4"
+        class="w-select-option first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
       >
         <div class="w-option flex cursor-default select-none items-center">
           {{ !search && emptyStub ? emptyStub : 'No match' }}
@@ -135,7 +135,7 @@
         :loading="loadingOptionIndex === index && loading"
         :scroll="isCursorLocked"
         :hide-option-icon="hideOptionIcon"
-        class="first:pt-4 last:pb-4"
+        class="first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
         @select="select(valueGetter(option)); setLoadingOptionIndex(index)"
         @unselect="unselect(valueGetter(option)); setLoadingOptionIndex(index)"
         @mouseenter="setCursor(index)"
@@ -195,7 +195,7 @@ const inputRef = useTemplateRef('input')
 const cursor = ref<number>(0)
 const isCursorLocked = ref(false)
 const search = ref('')
-const isModelValueSearch = computed(() => search.value && props.modelValue.includes(search.value as Model))
+const isModelValueSearch = computed(() => !!search.value && props.modelValue.includes(search.value as Model))
 const searchPrepared = computed(() => isModelValueSearch.value ? '' : search.value.trim().toLocaleLowerCase())
 const enabled = computed(() => !props.disabled)
 
@@ -240,6 +240,15 @@ const hasCreateOption = computed(() => props.createOption && !optionsFiltered.va
 const close = () => {
   isOpen.value = false
   focused.value = false
+
+  if (props.selectOnClose && search.value && !isModelValueSearch.value) {
+    const optionExact = optionsFiltered.value.find(option => props.valueGetter(option) === search.value)
+
+    if (optionExact) select(props.valueGetter(optionExact))
+    else create(search.value)
+  }
+
+  search.value = ''
 }
 
 const setLoadingOptionIndex = (value: number) => {

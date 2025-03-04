@@ -5,11 +5,10 @@
       ...props,
       modelValue: arrayValue,
       disableClear: !allowClear,
-      createdData: createdData
-        ? [createdData] as Data[]
-        : undefined,
+      createdData: createdData ? [createdData] as Data[] : undefined,
       hidePrefix: true,
       filterValue: filterValue === undefined ? modelValue : filterValue,
+      selectOnClose: props.searchModel ? props.searchModel : props.selectOnClose,
     }"
     :class="$attrs.class"
     @select="updateModelValue($event)"

@@ -17,7 +17,7 @@
     @keypress:delete="captureDoubleDelete"
 
     @open="isOpen = true"
-    @close="close(); search = ''"
+    @close="close"
     @focus="focused = true; $emit('focus', $event)"
     @blur="focused = false; $emit('blur', $event)"
   >
@@ -92,7 +92,7 @@
         :search="search"
         @select="select"
         @unselect="unselect"
-        @create:option="create"
+        @create:option="create(search)"
         @update:model-value="updateSelected"
       >
         <template #default="{option, selected, skeleton: skeletonList}">
@@ -163,6 +163,7 @@ const search = ref('')
 const loadingCreate = ref(false)
 
 const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
+const isModelValueSearch = computed(() => !!search.value && props.modelValue.includes(search.value as Model))
 const enabled = computed(() => !props.disabled)
 const queryParams = computed(() => ({...props.queryParamsOptions, [props.searchField ?? 'search']: search.value}))
 const queryParamsFirstPage = computed(() => ({...queryParams.value, page: 1}))
@@ -178,6 +179,15 @@ const hasSearchOption = computed(() => {
 const close = () => {
   isOpen.value = false
   focused.value = false
+
+  if (props.selectOnClose && search.value && !isModelValueSearch.value) {
+    const optionExact = firstPageData.value?.results.find(option => props.valueGetter(option) === search.value)
+
+    if (optionExact) select(props.valueGetter(optionExact))
+    else create(search.value)
+  }
+
+  search.value = ''
 }
 
 let deletePressTimeout: NodeJS.Timeout | null = null
@@ -213,13 +223,13 @@ const unselect = (item: Model): void => {
   search.value = ''
 }
 
-const create = async () => {
+const create = async (value: string) => {
   if (isDisabled.value) return
   if (!props.createOption) return
 
   loadingCreate.value = true
 
-  const option = await props.createOption(search.value)
+  const option = await props.createOption(value)
 
   if (option) {
     select(props.valueGetter(option))

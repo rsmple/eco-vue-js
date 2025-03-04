@@ -34,13 +34,12 @@
         :value-getter="valueGetter"
         :query-options="queryOptions"
         transition
-        no-padding
         @select="$emit('select', $event)"
         @unselect="$emit('unselect', $event)"
         @update:count="$emit('update:count', $event)"
         @update:model-value="$emit('update:model-value', $event)"
       >
-        <template 
+        <template
           v-if="$slots.default"
           #default="{option, selected, skeleton: skeletonList}"
         >

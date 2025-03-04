@@ -184,12 +184,13 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       'margin-right': 'calc(var(--w-option-rounded) * -1)',
     },
     '.w-select-option': {
-      padding: '0.5rem calc(var(--w-option-padding) + var(--w-input-gap) + 1px)',
+      padding: 'calc(var(--w-select-option-padding) / 2) var(--w-select-option-padding)',
     },
     body: {
       '--w-option-height': 'calc(var(--w-input-height,2.75rem) - (var(--w-input-gap,0.25rem) * 2) - 2px)',
       '--w-option-rounded': 'calc(var(--w-input-rounded,0.75rem) - var(--w-input-gap,0.25rem))',
       '--w-option-padding': 'var(--w-input-rounded,0.75rem)',
+      '--w-select-option-padding': 'calc(var(--w-option-padding) + var(--w-input-gap) + 1px)',
     },
   })
 

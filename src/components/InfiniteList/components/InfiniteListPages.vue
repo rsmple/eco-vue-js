@@ -146,7 +146,7 @@ const infiniteScrollRef = useTemplateRef('infiniteScroll')
 const pages = ref<number[]>([(props.queryParams as {page?: number}).page ?? 1])
 const pagesCount = ref(1)
 const count = ref(0)
-const nextPage = computed(() => pages.value[pages.value.length - 1] !== pagesCount.value ? pages.value[pages.value.length - 1] + 1 : null)
+const nextPage = computed(() => pages.value[pages.value.length - 1] < pagesCount.value ? pages.value[pages.value.length - 1] + 1 : null)
 const previousPage = computed(() => pages.value[0] !== 1 ? pages.value[0] - 1 : null)
 const isResettingPage = ref(false)
 
