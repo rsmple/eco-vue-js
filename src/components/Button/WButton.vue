@@ -6,7 +6,7 @@
     :is="to !== undefined ? disabled ? 'a' : RouterLink : tag"
     class="
       w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-0.0625rem)] relative isolate flex
-      h-[--w-button-height,2.75rem] min-h-[--w-button-height,2.75rem] select-none
+      min-h-[--w-button-height,2.75rem] select-none
       items-center justify-center whitespace-nowrap
       rounded-[--w-button-rounded,1rem] px-[--w-button-rounded,1rem] font-medium outline-none
     "
@@ -16,7 +16,7 @@
       'w-ripple w-ripple-hover before:text-black-default w-ripple-opacity-20 dark:w-ripple-opacity-30 cursor-pointer': !loading && !disabled,
       'cursor-progress': loading,
       'cursor-not-allowed opacity-70': disabled,
-      '[&:not(:first-child)]:rounded-l-none [&:not(:first-child)]:border-l-0 [&:not(:first-child)]:before:rounded-l-none [&:not(:last-child)]:rounded-r-none [&:not(:last-child)]:border-r-0 [&:not(:last-child)]:before:rounded-r-none': join
+      'first-not:rounded-l-none first-not:border-l-0 first-not:before:rounded-l-none last-not:rounded-r-none last-not:border-r-0 last-not:before:rounded-r-none': join
     }"
     :disabled="!loading && disabled"
     :type="type"
