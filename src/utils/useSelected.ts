@@ -160,9 +160,8 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
       if (allowSelectHover.value) {
         range = [Math.min(position, upValue.value), Math.max(position, downValue.value)]
 
-        resetIsSelecting()
-
-        preselectValue.value = null
+        if (preselectValue.value === null) resetIsSelecting()
+        else preselectValue.value = null
       } else if (downValue.value === position && upValue.value === position) {
         return resetSelection()
       } else if (upValue.value === position) {
@@ -223,14 +222,27 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
     }
   })
 
+  const applySelect = (event: MouseEvent): void => {
+    if (hoverValue.value === null) return
+
+    event.stopPropagation()
+    event.preventDefault()
+
+    toggleSelected(0 as never, hoverValue.value)
+  }
+
   const setIsSelecting = (event: KeyboardEvent) => {
-    if (!event.shiftKey) return
+    if (!event.shiftKey || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return
 
     isShift.value = true
+
+    window.addEventListener('click', applySelect)
   }
 
   const resetIsSelecting = () => {
     isShift.value = false
+
+    window.removeEventListener('click', applySelect)
   }
 
   const getQueryParams = (): QueryParamsSelection | undefined => {
@@ -249,6 +261,7 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
     if (value) {
       window.removeEventListener('keydown', setIsSelecting)
       window.removeEventListener('keyup', resetIsSelecting)
+      window.removeEventListener('click', applySelect)
     } else {
       window.addEventListener('keydown', setIsSelecting)
       window.addEventListener('keyup', resetIsSelecting)
@@ -260,6 +273,7 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
 
     window.removeEventListener('keydown', setIsSelecting)
     window.removeEventListener('keyup', resetIsSelecting)
+    window.removeEventListener('click', applySelect)
   })
 
   return {
