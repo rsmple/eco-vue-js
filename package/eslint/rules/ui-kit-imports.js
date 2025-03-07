@@ -1,3 +1,5 @@
+import packageJson from 'eco-vue-js/package.json' with { type: 'json' }
+
 export default {
   meta: {
     type: 'suggestion',
@@ -21,7 +23,10 @@ export default {
           const importedName = specifier.imported.name
 
           if (importedName.startsWith('W')) {
-            const replacementImport = `import ${ importedName } from 'eco-vue-js/dist/components/${ importedName.substr(1) }/${ importedName }.vue'`
+            const path = Object.keys(packageJson.exports).find(item => item.includes(importedName))
+
+            const replacementImport = `import ${ importedName } from 'eco-vue-js${ path.substring(1) }'`
+
             context.report({
               node,
               message: `Do not import '${ importedName }' directly. Use the replacement: ${ replacementImport }`,
