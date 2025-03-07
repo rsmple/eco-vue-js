@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import fs from 'fs/promises'
 import path from 'path'
 
@@ -259,7 +260,6 @@ export const writeImports = async () => {
     writeComponents(),
     writeIcons(),
   ])
-
-  // eslint-disable-next-line no-console
+   
   console.log('Successfully written')
 }
