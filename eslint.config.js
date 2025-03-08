@@ -1,4 +1,4 @@
-import plugin from './package/eslint/plugin.js'
+import recommended from './package/eslint/recommended.js'
 
 export default [
   {
@@ -11,12 +11,5 @@ export default [
     ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**', '**/src/imports/**'],
   },
 
-  ...plugin.configs.recommended,
-
-  {
-    files: ['**/*.{ts,js,vue}'],
-    rules: {
-      'custom-rules/modal-import-async': 'off',
-    },
-  },
+  ...recommended,
 ]
