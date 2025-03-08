@@ -150,7 +150,7 @@ export default [
       }],
       'vue/multiline-html-element-content-newline': ['error', {
         ignoreWhenEmpty: true,
-        ignores: ['pre', 'textarea', 'span', 'tspan'],
+        ignores: ['pre', 'textarea', 'span', 'tspan', 'template'],
         allowEmptyLines: false,
       }],
       'vue/attributes-order': ['error', {

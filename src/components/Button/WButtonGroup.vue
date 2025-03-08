@@ -10,6 +10,13 @@
       <slot name="title" />
     </template>
 
+    <template
+      v-if="$slots.subtitle"
+      #subtitle
+    >
+      <slot name="subtitle" />
+    </template>
+
     <template #field>
       <div
         class="flex"

@@ -1,6 +1,7 @@
 export interface FieldWrapperProps {
   modelValue?: string | number | boolean | null
   title?: string
+  titleIcon?: SVGComponent
   description?: string
   errorMessage?: string
   tooltipText?: string

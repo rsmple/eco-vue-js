@@ -19,7 +19,10 @@
     >
       <template v-if="!skeleton">
         <slot name="title">
-          {{ title }}
+          <template v-if="titleIcon"><component
+            :is="titleIcon"
+            class="square-[1.25em] mt-[-0.25em] inline"
+          />&nbsp;</template>{{ title }}
         </slot>
 
         <Transition
