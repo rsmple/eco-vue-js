@@ -1,10 +1,12 @@
+/* eslint-disable */
+
 import packageJson from '../../package.json' with { type: 'json' }
 
 const keys = Object.keys(packageJson.exports)
 
 export default {
   meta: {
-    type: 'suggestion',
+    type: "suggestion",
     docs: {
       description: 'Restrict specific imports and provide replacement',
       category: 'Best Practices',
