@@ -1,4 +1,6 @@
-import packageJson from 'eco-vue-js/package.json' with { type: 'json' }
+import packageJson from '../../package.json' with { type: 'json' }
+
+const keys = Object.keys(packageJson.exports)
 
 export default {
   meta: {
@@ -23,7 +25,7 @@ export default {
           const importedName = specifier.imported.name
 
           if (importedName.startsWith('W')) {
-            const path = Object.keys(packageJson.exports).find(item => item.includes(importedName))
+            const path = keys.find(item => item.includes(importedName))
 
             const replacementImport = `import ${ importedName } from 'eco-vue-js${ path.substring(1) }'`
 
