@@ -232,7 +232,11 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
   }
 
   const setIsSelecting = (event: KeyboardEvent) => {
-    if (!event.shiftKey || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return
+    if (!event.shiftKey || event.ctrlKey || event.altKey || event.metaKey || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+      resetIsSelecting()
+
+      return
+    }
 
     isShift.value = true
 

@@ -1,23 +1,35 @@
 import type {DropdownMenuProps} from '@/components/DropdownMenu/types'
 import type {FieldWrapperProps} from '@/components/FieldWrapper/types'
+import type {LinkProps} from '@/types/types'
 import type {SemanticType} from '@/utils/SemanticType'
 import type {Component} from 'vue'
+
+export interface ButtonProps extends Partial<LinkProps> {
+  semanticType?: SemanticType
+  disabled?: boolean
+  loading?: boolean
+  tag?: 'a' | 'button'
+  type?: string
+  replace?: boolean
+  href?: string
+  target?: '_self' | '_blank' | '_parent' | '_top'
+  join?: boolean
+  semanticTypeMap?: Partial<Record<SemanticType, string>>
+}
 
 export type ButtonGroupOptionProps<Option> = {option: Option, selected?: boolean}
 
 export type ButtonGroupOptionComponent<Option> = Component<ButtonGroupOptionProps<Option>>
 
 interface ButtonGroupPropsBase<Model extends number | string | null | boolean>
-  extends Omit<FieldWrapperProps, 'modelValue'> {
+  extends Omit<FieldWrapperProps, 'modelValue'>,
+  Omit<ButtonProps, 'tag' | 'type' | 'replace' | 'href' | 'target' | 'join'> {
   modelValue: Model
-  loading?: boolean
-  minimize?: boolean
   wrap?: boolean
   col?: boolean
   semanticType?: SemanticType
   stretch?: boolean
   allowClear?: boolean
-  semanticTypeMap?: Partial<Record<SemanticType, string>>
 }
 
 interface ButtonGroupPropsForModel<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>

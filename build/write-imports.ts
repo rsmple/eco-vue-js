@@ -149,6 +149,9 @@ const getPackageExports = (list: ComponentPath[]) => {
     '.': {
       import: './dist/main.js',
     },
+    './package.json': {
+      import: './package.json',
+    },
     './dist/types/global.d.ts': {
       import: './dist/types/global.d.ts',
     },

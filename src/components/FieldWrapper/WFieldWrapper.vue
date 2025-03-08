@@ -1,163 +1,164 @@
 <template>
   <div
     class="relative"
+    v-bind="{class: $attrs.class, style: $attrs.style as StyleValue}"
     :class="{
-      'mb-[1.125rem] mt-1': !noMargin,
-      [typeof $attrs.class === 'string' ? $attrs.class : '']: true,
+      'mb-[1.125rem] mt-1': !noMargin && !subgrid,
+      'col-span-full grid grid-cols-subgrid': subgrid,
     }"
     @click="$emit('click', $event)"
   >
     <label
+      v-if="title || $slots.title"
       :for="id"
+      class="text-accent relative pr-6 text-xs font-semibold leading-loose duration-500"
       :class="{
-        'cursor-not-allowed': disabled && !skeleton,
+        'cursor-not-allowed opacity-50': disabled && !skeleton,
+        'col-start-1': subgrid,
+      }"
+    >
+      <template v-if="!skeleton">
+        <slot name="title">
+          {{ title }}
+        </slot>
+
+        <Transition
+          enter-active-class="transition-opacity"
+          leave-active-class="transition-opacity"
+          enter-from-class="opacity-0"
+          leave-to-class="opacity-0"
+        >
+          <span
+            v-if="required"
+            class="text-negative dark:text-negative-dark"
+          >
+            *
+          </span>
+        </Transition>
+
+        <FilterButton
+          v-if="filterField && encodedQueryParam"
+          :filter-field="filterField"
+          :encoded-query-param="encodedQueryParam"
+          class="absolute -top-0.5 ml-1"
+        />
+      </template>
+
+      <WSkeleton
+        v-else
+        class="w-skeleton-w-16"
+      />
+    </label>
+
+    <slot name="subtitle" />
+
+    <div
+      class="grid"
+      :class="{
+        'pr-9': !title && !$slots.title && filterField,
+        'col-start-2 -col-end-1 row-start-1 -row-end-3 grid-cols-subgrid': subgrid,
+        'grid-cols-[1fr,auto]': !subgrid,
       }"
     >
       <div
-        v-if="title || $slots.title"
-        class="text-accent relative mb-2 pr-6 text-xs font-semibold duration-500"
+        v-if="!skeleton"
+        class="w-has-changes-color-info dark:w-has-changes-color-info-dark relative grid"
         :class="{
-          'opacity-50': disabled && !skeleton,
+          'focus-within-not:w-has-changes-color-negative dark:focus-within-not:w-has-changes-color-negative-dark': errorMessage,
+          'col-span-full grid-cols-subgrid': subgrid,
+          'grid-cols-1': !subgrid,
         }"
       >
-        <template v-if="!skeleton">
-          <slot name="title">
-            {{ title }}
-          </slot>
-
-          <Transition
-            enter-active-class="transition-opacity"
-            leave-active-class="transition-opacity"
-            enter-from-class="opacity-0"
-            leave-to-class="opacity-0"
+        <slot
+          v-bind="{id, setFocused, focused}"
+          name="field"
+        >
+          <div
+            class="flex min-h-[--w-input-height,2.75rem] items-center font-normal"
+            :class="{
+              'font-mono': mono,
+              'border-t border-solid border-gray-300 dark:border-gray-700': title || $slots.title,
+            }"
           >
-            <span
-              v-if="required"
-              class="text-negative dark:text-negative-dark"
-            >
-              *
-            </span>
-          </Transition>
+            <slot v-bind="{id, setFocused, focused}">
+              {{ typeof modelValue === 'number' ? numberFormatter.format(modelValue) : modelValue === null ? (emptyValue ?? 'N / A') : (modelValue || emptyValue) }}
+            </slot>
 
-          <FilterButton
-            v-if="filterField && encodedQueryParam"
-            :filter-field="filterField"
-            :encoded-query-param="encodedQueryParam"
-            class="absolute -top-0.5 ml-1"
+            <WButtonCopy
+              v-if="allowCopy && modelValue"
+              :value="`${modelValue}`"
+              class="ml-2"
+            />
+          </div>
+        </slot>
+
+        <Transition
+          enter-active-class="transition-opacity"
+          leave-active-class="transition-opacity"
+          enter-from-class="opacity-0"
+          leave-to-class="opacity-0"
+        >
+          <span
+            v-if="hasChanges"
+            class="square-2 absolute right-0 top-0 rounded-full bg-[var(--has-changes-bg)] transition-colors"
           />
-        </template>
+        </Transition>
 
-        <WSkeleton
-          v-else
-          class="w-skeleton-w-16"
-        />
+        <Transition
+          enter-active-class="transition-opacity"
+          leave-active-class="transition-opacity"
+          enter-from-class="opacity-0"
+          leave-to-class="opacity-0"
+        >
+          <div
+            v-if="errorMessage"
+            class="text-negative dark:text-negative-dark absolute top-full pt-0.5 text-xs font-normal"
+            :class="{
+              'right-0 text-end': !leftError,
+              'left-0 text-start': leftError,
+            }"
+          >
+            {{ errorMessage }}
+          </div>
+
+          <div
+            v-else-if="maxLength !== undefined && focused"
+            class="text-description absolute right-0 top-full whitespace-nowrap pt-0.5 text-xs font-normal"
+          >
+            {{ numberFormatter.format(`${typeof modelValue === 'number' ? modelValue : (modelValue || '')}`.length) }} / {{ numberFormatter.format(maxLength) }}
+          </div>
+        </Transition>
       </div>
 
-      <slot name="subtitle" />
+      <WSkeleton
+        v-else
+        class="w-skeleton-w-full w-skeleton-rounded-[--w-input-rounded,0.75rem] w-skeleton-h-[--w-input-height,2.75rem]"
+      />
 
       <div
-        class="grid grid-cols-[1fr,auto]"
-        :class="{
-          'pr-9': !title && !$slots.title && filterField,
-        }"
+        v-if="$slots.right"
+        ref="rightContainer"
+        class="sm-not:flex-col flex gap-4 pl-4"
       >
-        <div
-          v-if="!skeleton"
-          class="w-has-changes-color-info dark:w-has-changes-color-info-dark relative grid grid-cols-1"
-          :class="{
-            'focus-within-not:w-has-changes-color-negative dark:focus-within-not:w-has-changes-color-negative-dark': errorMessage,
-          }"
-        >
-          <slot
-            v-bind="{id, setFocused, focused}"
-            name="field"
-          >
-            <div
-              class="flex min-h-[--w-input-height,2.75rem] items-center font-normal"
-              :class="{
-                'font-mono': mono,
-                'border-t border-solid border-gray-300 dark:border-gray-700': title || $slots.title,
-              }"
-            >
-              <slot v-bind="{id, setFocused, focused}">
-                {{ typeof modelValue === 'number' ? numberFormatter.format(modelValue) : modelValue === null ? (emptyValue ?? 'N / A') : (modelValue || emptyValue) }}
-              </slot>
-
-              <WButtonCopy
-                v-if="allowCopy && modelValue"
-                :value="`${modelValue}`"
-                class="ml-2"
-              />
-            </div>
-          </slot>
-
-          <Transition
-            enter-active-class="transition-opacity"
-            leave-active-class="transition-opacity"
-            enter-from-class="opacity-0"
-            leave-to-class="opacity-0"
-          >
-            <span
-              v-if="hasChanges"
-              class="square-2 absolute right-0 top-0 rounded-full bg-[var(--has-changes-bg)] transition-colors"
-            />
-          </Transition>
-
-          <Transition
-            enter-active-class="transition-opacity"
-            leave-active-class="transition-opacity"
-            enter-from-class="opacity-0"
-            leave-to-class="opacity-0"
-          >
-            <div
-              v-if="errorMessage"
-              class="text-negative dark:text-negative-dark absolute top-full pt-0.5 text-xs font-normal"
-              :class="{
-                'right-0 text-end': !leftError,
-                'left-0 text-start': leftError,
-              }"
-            >
-              {{ errorMessage }}
-            </div>
-
-            <div
-              v-else-if="maxLength !== undefined && focused"
-              class="text-description absolute right-0 top-full whitespace-nowrap pt-0.5 text-xs font-normal"
-            >
-              {{ numberFormatter.format(`${typeof modelValue === 'number' ? modelValue : (modelValue || '')}`.length) }} / {{ numberFormatter.format(maxLength) }}
-            </div>
-          </Transition>
-        </div>
-
-        <WSkeleton
-          v-else
-          class="w-skeleton-w-full w-skeleton-rounded-[--w-input-rounded,0.75rem] w-skeleton-h-[--w-input-height,2.75rem]"
-        />
-
-        <div
-          v-if="$slots.right"
-          ref="rightContainer"
-          class="sm-not:flex-col flex gap-4 pl-4"
-        >
-          <slot name="right" />
-        </div>
-
-        <template v-if="!title && !$slots.title && filterField">
-          <FilterButton
-            :filter-field="filterField"
-            :encoded-query-param="encodedQueryParam"
-            :skeleton="skeleton"
-            class="absolute right-0 self-center"
-          />
-        </template>
+        <slot name="right" />
       </div>
-    </label>
+
+      <template v-if="!title && !$slots.title && filterField">
+        <FilterButton
+          :filter-field="filterField"
+          :encoded-query-param="encodedQueryParam"
+          :skeleton="skeleton"
+          class="absolute right-0 self-center"
+        />
+      </template>
+    </div>
 
     <div
       v-if="description"
-      class="text-description whitespace-pre-wrap text-pretty break-words pt-4 text-xs font-normal"
+      class="text-description col-start-1 whitespace-pre-wrap text-pretty break-words text-xs font-normal"
       :class="{
         'opacity-50': disabled && !skeleton,
+        'pt-4': !subgrid,
       }"
     >
       <WSkeleton v-if="skeleton" />
@@ -177,7 +178,7 @@
 <script lang="ts" setup>
 import type {FieldWrapperProps} from './types'
 
-import {computed, ref, useId} from 'vue'
+import {type StyleValue, computed, ref, useId} from 'vue'
 
 import WButtonCopy from '@/components/Button/WButtonCopy.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'

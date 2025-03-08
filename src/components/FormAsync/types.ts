@@ -1,4 +1,5 @@
 import type {ButtonGroupProps} from '../Button/types'
+import type {CheckboxGroupProps} from '../Checkbox/types'
 import type {InputAsyncProps} from '@/components/Input/types'
 import type {SelectAsyncSingleProps, SelectOptionComponent, SelectProps, SelectSingleProps, SelectStringifiedProps} from '@/components/Select/types'
 import type {ToggleProps} from '@/components/Toggle/types'
@@ -112,4 +113,18 @@ export type FormAsyncButtonGroupProps<
   ValueGetter extends {fn(value: Entity): FieldType}['fn'] | undefined = undefined,
 > = 
   & Omit<ButtonGroupProps<FieldType, Entity, ValueGetter>, 'modelValue'>
+  & FormAsyncProps<Model, FieldType, QueryParams>
+
+/**
+  * CheckboxGroup
+*/
+  
+export type FormAsyncCheckboxGroupProps<
+  Model,
+  FieldType extends string | number | boolean | null,
+  QueryParams,
+  Entity extends Record<string, unknown>,
+  ValueGetter extends {fn(value: Entity): FieldType}['fn'] | undefined = undefined,
+> = 
+  & Omit<CheckboxGroupProps<FieldType, Entity, ValueGetter>, 'modelValue'>
   & FormAsyncProps<Model, FieldType, QueryParams>

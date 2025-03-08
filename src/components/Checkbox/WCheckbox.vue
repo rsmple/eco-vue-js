@@ -1,6 +1,7 @@
 <template>
   <button
     ref="element"
+    v-bind="{class: $attrs.class, style: $attrs.style as StyleValue}"
     class="w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-[0.08] flex cursor-pointer select-none gap-2 outline-none"
     :class="{
       'cursor-progress': loading,
@@ -84,29 +85,21 @@
 </template>
 
 <script lang="ts" setup>
-import {useTemplateRef} from 'vue'
+import type {CheckboxProps} from './types'
+
+import {type StyleValue, useTemplateRef} from 'vue'
 
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 
-const props = defineProps<{
-  modelValue: boolean | null
-  title?: string
-  disabled?: boolean
-  readonly?: boolean
-  icon?: SVGComponent
-  radio?: boolean
-  loading?: boolean
-  intermediate?: boolean
-  tooltipText?: string
-  alignTop?: boolean
-}>()
+defineOptions({inheritAttrs: false})
+
+const props = defineProps<CheckboxProps>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
-  (e: 'update-shift:modelValue', value: boolean): void
 }>()
 
 const elementRef = useTemplateRef('element')

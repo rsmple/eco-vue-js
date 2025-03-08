@@ -1,8 +1,16 @@
 <template>
   <component
-    v-bind="
-      disabled ? undefined : tag === 'a' ? {href, target} : to !== undefined ? {to, replace} : undefined
-    "
+    v-bind="{
+      class: $attrs.class,
+      style: $attrs.style as StyleValue,
+      ...(disabled
+        ? {}
+        : tag === 'a'
+          ? {href, target}
+          : to !== undefined
+            ? {to, replace}
+            : {})
+    }"
     :is="to !== undefined ? disabled ? 'a' : RouterLink : tag"
     class="
       w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-0.0625rem)] relative isolate flex
@@ -47,7 +55,8 @@
 </template>
 
 <script lang="ts" setup>
-import type {LinkProps} from '@/types/types'
+import type {ButtonProps} from './types'
+import type {StyleValue} from 'vue'
 
 import {RouterLink} from 'vue-router'
 
@@ -57,22 +66,10 @@ import {SemanticType} from '@/utils/SemanticType'
 
 import {semanticTypeButtonBorderStylesMap, semanticTypeButtonStylesMap} from './models/semanticTypeStylesMap'
 
-interface Props extends Partial<LinkProps> {
-  semanticType?: SemanticType
-  disabled?: boolean
-  loading?: boolean
-  tag?: 'a' | 'button'
-  type?: string
-  replace?: boolean
-  href?: string
-  target?: '_self' | '_blank' | '_parent' | '_top'
-  minimize?: boolean
-  join?: boolean
-  semanticTypeMap?: Partial<Record<SemanticType, string>>
-}
+defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
-  defineProps<Props>(),
+  defineProps<ButtonProps>(),
   {
     semanticType: SemanticType.PRIMARY,
     tag: 'button',

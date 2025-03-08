@@ -5,7 +5,7 @@
       :is="(optionComponent as SelectOptionComponent<Data>)"
       :option="option"
       :index="index"
-      :search="option === undefined ? search as string : undefined"
+      :search="option === undefined ? search?.toString() : undefined"
       :selected="true"
       :model="true"
     >

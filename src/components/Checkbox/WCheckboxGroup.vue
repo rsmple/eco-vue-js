@@ -11,28 +11,24 @@
     </template>
 
     <template #field>
-      <div
-        class="flex"
-        :class="{
-          'flex-wrap gap-2': wrap,
-          'flex-col gap-2': col,
-          'items-start': col && !stretch,
+      <WCheckbox
+        v-for="(item, index) in list"
+        :key="index"
+        v-bind="{
+          ...props,
+          modelValue: getValue(item) === modelValue,
+          title: titleMap?.[getValue(item)!.toString() as GroupModelStringified<Model>],
+          tooltipText: tooltipTextMap?.[getValue(item)!.toString() as GroupModelStringified<Model>],
+          icon: iconMap?.[getValue(item)!.toString() as GroupModelStringified<Model>],
+          loading: loading && getValue(item as Model | Entity) === loadingItem,
+          disabled: disabled || (loading && getValue(item as Model | Entity) !== loadingItem),
         }"
+        :class="classMap?.[getValue(item)!.toString() as GroupModelStringified<Model>]"
+        @update:model-value="updateModelValue(getValue(item as Model | Entity))"
       >
-        <WButton
-          v-for="(item, index) in list"
-          :key="index"
-          v-bind="{
-            ...props,
-            semanticType: getValue(item as Model | Entity) === modelValue ? semanticType ?? SemanticType.PRIMARY : SemanticType.SECONDARY,
-            loading: loading && getValue(item as Model | Entity) === loadingItem,
-            disabled: disabled || (loading && getValue(item as Model | Entity) !== loadingItem),
-            join: !wrap && !col
-          }"
-          :class="{
-            'flex-1': stretch,
-          }"
-          @click="updateModelValue(getValue(item as Model | Entity))"
+        <template
+          v-if="$slots.option || optionComponent"
+          #default
         >
           <slot
             name="option"
@@ -46,8 +42,8 @@
               :selected="getValue(item) === modelValue"
             />
           </slot>
-        </WButton>
-      </div>
+        </template>
+      </WCheckbox>
     </template>
 
     <template 
@@ -60,19 +56,17 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined">
-import type {ButtonGroupProps} from './types'
+import type {CheckboxGroupProps, GroupModelStringified} from './types'
 
 import {ref} from 'vue'
 
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 
-import {SemanticType} from '@/utils/SemanticType'
-
-import WButton from './WButton.vue'
+import WCheckbox from './WCheckbox.vue'
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<ButtonGroupProps<Model, Entity, ValueGetter>>()
+const props = defineProps<CheckboxGroupProps<Model, Entity, ValueGetter>>()
 
 const emit = defineEmits<{
   (e: 'update:model-value', value: Model): void

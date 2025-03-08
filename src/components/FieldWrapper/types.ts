@@ -17,4 +17,5 @@ export interface FieldWrapperProps {
   leftError?: boolean
   filterField?: string
   filterValue?: unknown
+  subgrid?: boolean
 }

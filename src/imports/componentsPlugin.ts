@@ -15,6 +15,7 @@ import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.v
 import WButtonSelectionState from '@/components/Button/WButtonSelectionState.vue'
 import WButtonUnselect from '@/components/Button/WButtonUnselect.vue'
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
+import WCheckboxGroup from '@/components/Checkbox/WCheckboxGroup.vue'
 import WChip from '@/components/Chip/WChip.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WCounter from '@/components/Counter/WCounter.vue'
@@ -31,6 +32,7 @@ import WFilterWrapper from '@/components/FilterWrapper/WFilterWrapper.vue'
 import WForm from '@/components/Form/WForm.vue'
 import WFormValidator from '@/components/Form/WFormValidator.vue'
 import WFormAsyncButtonGroup from '@/components/FormAsync/WFormAsyncButtonGroup.vue'
+import WFormAsyncCheckboxGroup from '@/components/FormAsync/WFormAsyncCheckboxGroup.vue'
 import WFormAsyncInput from '@/components/FormAsync/WFormAsyncInput.vue'
 import WFormAsyncSelect from '@/components/FormAsync/WFormAsyncSelect.vue'
 import WFormAsyncSelectInfiniteSingle from '@/components/FormAsync/WFormAsyncSelectInfiniteSingle.vue'
@@ -103,6 +105,7 @@ export default {
     app.component('WButtonSelectionState', WButtonSelectionState)
     app.component('WButtonUnselect', WButtonUnselect)
     app.component('WCheckbox', WCheckbox)
+    app.component('WCheckboxGroup', WCheckboxGroup)
     app.component('WChip', WChip)
     app.component('WClickOutside', WClickOutside)
     app.component('WCounter', WCounter)
@@ -119,6 +122,7 @@ export default {
     app.component('WForm', WForm)
     app.component('WFormValidator', WFormValidator)
     app.component('WFormAsyncButtonGroup', WFormAsyncButtonGroup)
+    app.component('WFormAsyncCheckboxGroup', WFormAsyncCheckboxGroup)
     app.component('WFormAsyncInput', WFormAsyncInput)
     app.component('WFormAsyncSelect', WFormAsyncSelect)
     app.component('WFormAsyncSelectInfiniteSingle', WFormAsyncSelectInfiniteSingle)
@@ -191,6 +195,7 @@ export {
   WButtonSelectionState,
   WButtonUnselect,
   WCheckbox,
+  WCheckboxGroup,
   WChip,
   WClickOutside,
   WCounter,
@@ -207,6 +212,7 @@ export {
   WForm,
   WFormValidator,
   WFormAsyncButtonGroup,
+  WFormAsyncCheckboxGroup,
   WFormAsyncInput,
   WFormAsyncSelect,
   WFormAsyncSelectInfiniteSingle,
