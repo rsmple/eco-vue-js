@@ -145,7 +145,7 @@ export default [
         ignores: [],
       }],
       'vue/component-name-in-template-casing': ['error', 'PascalCase', {registeredComponentsOnly: false}],
-      'vue/component-tags-order': ['error', {
+      'vue/block-order': ['error', {
         order: ['template', 'script[setup]', 'style'],
       }],
       'vue/multiline-html-element-content-newline': ['error', {

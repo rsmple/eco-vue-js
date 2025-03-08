@@ -192,7 +192,7 @@ const current = ref<string>(props.initTab ?? (props.initTabIndex !== undefined
 ))
 const currentIndex = computed(() => defaultSlotsKeys.value.indexOf(current.value))
 const isDirect = ref(true)
-const buttonRef = useTemplateRef('button')
+const buttonRef = useTemplateRef<ComponentInstance<typeof TabTitleButton>[]>('button')
 const indicatorStyle = ref<CSSProperties | undefined>(undefined)
 const minHeight = ref(0)
 const tabItemRef = useTemplateRef('tabItem')
