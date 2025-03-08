@@ -38,7 +38,6 @@
     "@vitejs/plugin-vue": "5.2.1",
     "@vue/tsconfig": "0.7.0",
     "autoprefixer": "10.4.20",
-    "eco-vue-js": "file:package",
     "eslint": "9.16.0",
     "jsdom": "25.0.1",
     "npm-run-all2": "7.0.1",
