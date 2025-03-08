@@ -237,6 +237,8 @@ const getPackageExports = (list: ComponentPath[]) => {
 const writePackageExports = async (list: ComponentPath[]) => {
   const obj = await fs.readFile('package.json', 'utf8').then(JSON.parse)
 
+  delete obj.devDependencies
+
   obj.exports = getPackageExports(list)
 
   fs.writeFile(PATH_PACKAGE, JSON.stringify(obj, null, 2) + '\n', 'utf8')
