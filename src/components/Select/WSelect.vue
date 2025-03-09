@@ -7,6 +7,7 @@
       hideInput: modelValue.length === 0 ? false : isMobile ? !focused : !isOpen,
       loading: loading || isLoading || loadingCreate,
       filterValue: filterValue === undefined ? modelValue : filterValue,
+      placeholder: placeholder ?? (modelValue.length === 0 ? emptyValue : undefined),
     }"
     :class="$attrs.class"
     @update:model-value="!loading && !isLoading && (search = $event as string ?? '')"
@@ -46,6 +47,7 @@
           :index="index"
           :loading="loading || isLoading"
           :disabled="disabled"
+          :readonly="readonly"
           :disable-clear="disableClear || readonly"
           :search="value"
           @unselect="unselect(value)"

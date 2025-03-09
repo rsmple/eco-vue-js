@@ -52,10 +52,11 @@ export interface SelectPrefixProps<Data extends DefaultData, OptionComponent ext
   extends SelectOptionComponentProps<Data, OptionComponent> {
   option: Data | undefined
   search: string | number | undefined
-  index?: number
-  disabled?: boolean
-  loading?: boolean
-  disableClear?: boolean
+  index: number
+  disabled: boolean | undefined
+  readonly: boolean | undefined
+  loading: boolean | undefined
+  disableClear: boolean | undefined
 }
 
 export interface SelectSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean>

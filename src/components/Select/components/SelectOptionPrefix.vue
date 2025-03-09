@@ -24,7 +24,7 @@
     v-else
     class="text-description group/model relative grid grid-cols-[1fr,auto] items-center"
     :class="{
-      'cursor-pointer': !disabled,
+      'cursor-pointer': !disabled && !readonly,
       'cursor-not-allowed opacity-50': disabled,
     }"
   >

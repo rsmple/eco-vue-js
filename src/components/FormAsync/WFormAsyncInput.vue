@@ -6,6 +6,7 @@
       skeleton: skeleton || !data,
       disabled: disabled || isLoadingError,
       loading: loading || submitting,
+      readonly: readonlyInjected || readonly,
       validate: validateFn,
       placeholderSecure: textSecure ? !!modelValue : undefined,
     }"
@@ -51,7 +52,7 @@ const emit = defineEmits<{
   (e: 'success', value: Model): void
 }>()
 
-const {isLoadingError, data, modelValue, submitting, showModal} = useFormAsync(props, value => emit('success', value))
+const {isLoadingError, data, modelValue, submitting, readonlyInjected, showModal} = useFormAsync(props, value => emit('success', value))
 
 const validateFn = computed<ValidateFn[]>(() => {
   const result = Array.isArray(props.validate)

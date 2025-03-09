@@ -13,7 +13,7 @@
       :for="id"
       class="text-accent relative pr-6 text-xs font-semibold leading-loose duration-500"
       :class="{
-        'cursor-not-allowed opacity-50': disabled && !skeleton,
+        'cursor-not-allowed opacity-50': disabled && !readonly && !skeleton,
         'col-start-1': subgrid,
       }"
     >
@@ -160,7 +160,7 @@
       v-if="description"
       class="text-description col-start-1 whitespace-pre-wrap text-pretty break-words text-xs font-normal"
       :class="{
-        'opacity-50': disabled && !skeleton,
+        'opacity-50': disabled && !readonly && !skeleton,
         'pt-4': !subgrid,
       }"
     >
@@ -172,7 +172,7 @@
     </div>
 
     <WTooltip
-      v-if="tooltipText && !skeleton"
+      v-if="tooltipText && !skeleton && !readonly"
       :text="tooltipText"
     />
   </div>

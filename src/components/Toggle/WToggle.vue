@@ -6,15 +6,17 @@
     }"
   >
     <button
-      class="w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-[0.08] isolate grid w-full select-none items-center gap-4 text-start focus:outline-none"
+      class="w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-[0.08] isolate grid w-full items-center gap-4 text-start focus:outline-none"
       :class="{
         'cursor-not-allowed opacity-50': disabled,
         'cursor-progress': loading,
         'cursor-pointer': !readonly && !loading && !disabled,
+        'cursor-auto select-text': readonly,
+        'select-none': !readonly,
         'grid-cols-[1fr,auto]': !rightLabel,
         'grid-cols-[auto,1fr]': rightLabel,
       }"
-      :disabled="disabled"
+      :disabled="disabled || readonly"
       @click="updateModelValue"
     >
       <div

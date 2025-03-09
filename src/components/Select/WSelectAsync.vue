@@ -7,6 +7,7 @@
       loading: loading || isFetchingPrefix || loadingCreate,
       hideInput: isMobile ? !focused : !isOpen,
       filterValue: filterValue === undefined ? modelValue : filterValue,
+      placeholder: placeholder ?? (modelValue.length === 0 ? emptyValue : undefined),
     }"
     :class="$attrs.class"
     @update:model-value="!loading && !isFetchingPrefix && (search = $event as string ?? '')"

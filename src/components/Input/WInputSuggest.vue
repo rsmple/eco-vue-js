@@ -26,8 +26,8 @@
             description: undefined,
           }"
           :class="{
-            'cursor-pointer': !disabled,
-            'cursor-not-allowed': disabled,
+            'cursor-pointer': !disabled && !readonly,
+            'cursor-not-allowed': disabled && !readonly,
             'mb-3': isMobile && !unclickable,
           }"
           @update:model-value="!loading && $emit('update:modelValue', $event as ModelValue)"
@@ -112,7 +112,7 @@
       v-if="description"
       class="text-description whitespace-pre-wrap break-words pb-4 text-xs font-normal"
       :class="{
-        'opacity-50': disabled && !skeleton,
+        'opacity-50': disabled && !readonly && !skeleton,
       }"
     >
       <WSkeleton v-if="skeleton" />

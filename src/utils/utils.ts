@@ -1,4 +1,5 @@
 import type {FieldConfig, FieldConfigMap, GetFieldLabels, ListFields} from '@/components/List/types'
+import type {InjectionKey, Ref} from 'vue'
 
 const overflowScrollRegexp = /auto|scroll|overlay/
 
@@ -186,3 +187,5 @@ export enum ListMode {
   TABLE = 'table',
   GRID = 'grid',
 }
+
+export const wReadonly = Symbol('wReadonly') as InjectionKey<Ref<boolean>>

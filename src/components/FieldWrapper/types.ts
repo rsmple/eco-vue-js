@@ -10,6 +10,7 @@ export interface FieldWrapperProps {
   hasChanges?: boolean
   skeleton?: boolean
   disabled?: boolean
+  readonly?: boolean
   required?: boolean
   mandatory?: boolean
   noMargin?: boolean

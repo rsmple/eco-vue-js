@@ -28,7 +28,7 @@
           v-if="!hideInput"
           :class="{
             'font-mono': mono,
-            'text-secure': textSecure && !isSecureVisible,
+            'text-secure': textSecure && !isSecureVisible && modelValue,
           }"
         >
           {{ modelValue || emptyValue }}

@@ -1,17 +1,17 @@
 <template>
   <component
     :is="$slots.title?.()?.[0] ?? 'button'"
-    class="w-ripple w-ripple-hover -px--inner-margin relative grid w-full cursor-pointer select-none grid-cols-[auto,1fr,auto] items-center gap-2 py-3 text-start"
+    class="w-ripple w-ripple-hover -px--inner-margin relative grid w-full cursor-pointer select-none grid-cols-[auto,1fr,auto] items-center py-3 text-start"
     @click="$emit('toggle')"
   >
     <template v-if="icon">
       <component
         :is="icon"
-        class="square-[1.5em]"
+        class="square-[1.5em] mr-2"
       />
     </template>
 
-    <div class="col-start-2">
+    <div class="col-start-2 mr-2">
       <span
         class="relative pr-4 font-semibold" 
         :class="{'text-xs': minTitle}"
