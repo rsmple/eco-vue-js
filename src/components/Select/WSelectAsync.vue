@@ -185,7 +185,8 @@ const close = () => {
     const optionExact = firstPageData.value?.results.find(option => props.valueGetter(option) === search.value)
 
     if (optionExact) select(props.valueGetter(optionExact))
-    else create(search.value)
+    else if (search.value) create(search.value)
+    else if (props.modelValue.length) unselect(props.modelValue[props.modelValue.length - 1])
   }
 
   search.value = ''
