@@ -244,7 +244,8 @@ const close = () => {
     const optionExact = optionsFiltered.value.find(option => props.valueGetter(option) === search.value)
 
     if (optionExact) select(props.valueGetter(optionExact))
-    else create(search.value)
+    else if (search.value) create(search.value)
+    else if (props.modelValue.length) unselect(props.modelValue[props.modelValue.length - 1])
   }
 
   isOpen.value = false

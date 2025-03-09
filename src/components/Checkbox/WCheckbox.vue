@@ -2,10 +2,12 @@
   <button
     ref="element"
     v-bind="{class: $attrs.class, style: $attrs.style as StyleValue}"
-    class="w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-[0.08] flex cursor-pointer select-none gap-2 outline-none"
+    class="w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-[0.08] flex select-none gap-2 outline-none"
     :class="{
       'cursor-progress': loading,
       'cursor-not-allowed opacity-70': disabled,
+      'cursor-pointer': !disabled && !loading && !readonly,
+      'cursor-auto': readonly,
       'pb-4 pt-1': title,
       'items-start': alignTop,
       'items-center': !alignTop,

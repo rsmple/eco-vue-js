@@ -1,15 +1,17 @@
 <template>
   <component
-    :is="to !== undefined ? RouterLink : tag"
-    v-bind="to !== undefined ? {to} : undefined"
-    class="
-      w-ripple w-ripple-hover relative grid w-full cursor-pointer select-none justify-items-center gap-1 py-2
-    "
+    :is="to !== undefined ? disabled || skeleton ? 'a' : RouterLink : tag"
+    v-bind="to !== undefined && !disabled && !skeleton ? {to} : undefined"
+    class="relative grid w-full select-none justify-items-center gap-1 py-2"
     :class="{
       'text-primary-default dark:text-primary-dark': active && semanticType === SemanticType.SECONDARY,
-      [outline ? semanticTypeOutlineStylesMap[semanticType] : semanticTypeStylesMap[semanticType]]: true,
+      [skeleton || disabled ? semanticTypeStylesMap[SemanticType.SECONDARY] : outline ? semanticTypeOutlineStylesMap[semanticType] : semanticTypeStylesMap[semanticType]]: true,
+      'cursor-not-allowed opacity-50': disabled,
+      'w-ripple w-ripple-hover cursor-pointer': !disabled && !skeleton,
+      'cursor-progress': skeleton,
     }"
-    @click="$emit('click', $event)"
+    :disabled="disabled || skeleton"
+    @click="!disabled && !skeleton && $emit('click', $event)"
   >
     <WCounter
       v-if="count !== undefined"
@@ -19,7 +21,15 @@
       :trigger="1"
     />
 
-    <slot name="icon">
+    <WSkeleton
+      v-if="skeleton"
+      class="w-skeleton-h-6 w-skeleton-w-6 w-skeleton-rounded-full"
+    />
+
+    <slot
+      v-else
+      name="icon"
+    >
       <template v-if="icon">
         <component
           :is="icon"
@@ -29,7 +39,14 @@
     </slot>
 
     <div class="whitespace-nowrap text-center text-xs font-normal">
-      {{ title }}
+      <WSkeleton
+        v-if="skeleton"
+        class="min-w-10"
+      />
+
+      <template v-else>
+        {{ title }}
+      </template>
     </div>
   </component>
 </template>
@@ -40,6 +57,7 @@ import type {LinkProps} from '@/types/types'
 import {RouterLink} from 'vue-router'
 
 import WCounter from '@/components/Counter/WCounter.vue'
+import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
 
@@ -69,6 +87,8 @@ interface Props extends Partial<LinkProps> {
   count?: number
   semanticType?: SemanticType
   outline?: boolean
+  disabled?: boolean
+  skeleton?: boolean
 }
 
 withDefaults(

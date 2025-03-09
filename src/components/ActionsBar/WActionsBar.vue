@@ -40,7 +40,7 @@
         <slot name="top" />
 
         <div
-          v-if="$slots.top && (hasFilter || bottom)"
+          v-if="$slots.top && (hasFilter || bottom || $slots.bottom)"
           class="mx-1 my-2 h-0.5 rounded bg-gray-400 md:my-4 dark:bg-gray-600"
         />
 
@@ -53,10 +53,12 @@
           @click="toggle"
         />
 
-        <component
-          :is="bottom"
-          v-if="bottom"
-        />
+        <slot name="bottom">
+          <component
+            :is="bottom"
+            v-if="bottom"
+          />
+        </slot>
       </div>
     </div>
   </div>
@@ -106,5 +108,6 @@ watch(hasFilter, value => {
 
 defineSlots<{
   top?: () => VNode[]
+  bottom?: () => VNode[]
 }>()
 </script>
