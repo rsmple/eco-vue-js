@@ -1,12 +1,14 @@
 import type {ListMode} from '@/utils/utils'
 import type {Component, Raw} from 'vue'
 
-export type FieldComponent<Data> = Component<{
+export type FieldProps<Data> = {
   item: Data
   skeleton: boolean
   readonly: boolean
   card: boolean
-}>
+}
+
+export type FieldComponent<Data> = Component<FieldProps<Data>>
 
 export type FieldComponentNested<Data> = Component<{
   item: Data
