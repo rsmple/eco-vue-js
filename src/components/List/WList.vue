@@ -51,6 +51,7 @@
                 :selection-count="selectionCount"
                 :query-params-getter="getQueryParamsBulk"
                 :disable-message="disableMessage"
+                :readonly="readonly ?? false"
                 :class="cssClass"
                 @clear:selected="resetSelection"
               />
@@ -70,6 +71,7 @@
                 :selection-count="selectionCount"
                 :query-params-getter="getQueryParamsBulk"
                 :disable-message="scope?.disableMessage"
+                :readonly="readonly ?? false"
                 :class="scope?.cssClass"
                 @clear:selected="resetSelection"
               />

@@ -34,7 +34,8 @@
             semanticType: getValue(item as Model | Entity) === modelValue ? semanticType ?? SemanticType.PRIMARY : SemanticType.SECONDARY,
             loading: loading && getValue(item as Model | Entity) === loadingItem,
             disabled: disabled || (loading && getValue(item as Model | Entity) !== loadingItem),
-            join: !wrap && !col
+            join: !wrap && !col,
+            tooltipText: undefined,
           }"
           :class="{
             'flex-1': stretch,

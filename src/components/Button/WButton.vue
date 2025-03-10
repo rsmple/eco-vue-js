@@ -51,6 +51,11 @@
         class="w-spinner-size-6 absolute z-10"
       />
     </Transition>
+
+    <WTooltip
+      v-if="tooltipText"
+      :text="tooltipText"
+    />
   </component>
 </template>
 
@@ -61,6 +66,7 @@ import {type StyleValue} from 'vue'
 import {RouterLink} from 'vue-router'
 
 import WSpinner from '@/components/Spinner/WSpinner.vue'
+import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
 

@@ -15,6 +15,7 @@ export interface ButtonProps extends Partial<LinkProps> {
   target?: '_self' | '_blank' | '_parent' | '_top'
   join?: boolean
   semanticTypeMap?: Partial<Record<SemanticType, string>>
+  tooltipText?: string
 }
 
 export type ButtonGroupOptionProps<Option> = {option: Option, selected?: boolean}
@@ -53,4 +54,5 @@ export interface ButtonDropdownProps extends Omit<DropdownMenuProps, 'isOpen' | 
   semanticType?: SemanticType
   leftToggle?: boolean
   disabled?: boolean
+  tooltipText?: string
 }

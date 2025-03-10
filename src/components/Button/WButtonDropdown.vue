@@ -8,40 +8,47 @@
     :teleport="teleport"
   >
     <template #toggle>
-      <div class="flex">
-        <WButton
-          v-if="leftToggle"
-          :semantic-type="semanticType"
-          :disabled="disabled"
-          join
-          @click="isOpen = !isOpen"
-        >
-          <IconArrow
-            class="square-4 transition-transform"
-            :class="{'rotate-180': isOpen}"
-          />
-        </WButton>
+      <div>
+        <div class="flex">
+          <WButton
+            v-if="leftToggle"
+            :semantic-type="semanticType"
+            :disabled="disabled"
+            join
+            @click="isOpen = !isOpen"
+          >
+            <IconArrow
+              class="square-4 transition-transform"
+              :class="{'rotate-180': isOpen}"
+            />
+          </WButton>
 
-        <component
-          :is="item"
-          v-for="(item, index) in $slots.button?.()"
-          :key="index"
-          join
-          class="flex-1"
+          <component
+            :is="item"
+            v-for="(item, index) in $slots.button?.()"
+            :key="index"
+            join
+            class="flex-1"
+          />
+
+          <WButton
+            v-if="!leftToggle"
+            :semantic-type="semanticType"
+            :disabled="disabled"
+            join
+            @click="isOpen = !isOpen"
+          >
+            <IconArrow
+              class="square-4 transition-transform"
+              :class="{'rotate-180': isOpen}"
+            />
+          </WButton>
+        </div>
+
+        <WTooltip
+          v-if="tooltipText"
+          :text="tooltipText"
         />
-
-        <WButton
-          v-if="!leftToggle"
-          :semantic-type="semanticType"
-          :disabled="disabled"
-          join
-          @click="isOpen = !isOpen"
-        >
-          <IconArrow
-            class="square-4 transition-transform"
-            :class="{'rotate-180': isOpen}"
-          />
-        </WButton>
       </div>
     </template>
 
@@ -69,6 +76,7 @@ import {type VNode, ref} from 'vue'
 
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 

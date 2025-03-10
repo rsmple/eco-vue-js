@@ -94,18 +94,23 @@ export type ListFields<Data, QueryParams = unknown> = (
   | ListFieldNestedArrayGetter<Data, QueryParams>
 )[]
 
-export type MenuComponent<Data> = Component<{
+export type MenuProps<Data> = {
   item: Data
   readonly: boolean
   updateItem: (newItem?: Data | undefined) => void
   deleteItem: () => void
-}>
+}
 
-export type BulkComponent<QueryParams> = Component<{
+export type MenuComponent<Data> = Component<MenuProps<Data>>
+
+export type BulkProps<QueryParams> = {
   queryParamsGetter: () => QueryParams
   selectionCount: number
   disableMessage: string | undefined
-}>
+  readonly: boolean
+}
+
+export type BulkComponent<QueryParams> = Component<BulkProps<QueryParams>>
 
 export type FieldConfig = {
   width: number | null
