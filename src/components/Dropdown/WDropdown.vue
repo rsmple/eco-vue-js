@@ -8,9 +8,11 @@
     }"
   >
     <slot
+      v-bind="{isTop}"
       :left="styles.left"
       :right="styles.right"
-      :istop="isTop"
+      :top="styles.top"
+      :bottom="styles.bottom"
     />
   </div>
 </template>

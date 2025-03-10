@@ -7,6 +7,8 @@ export type TooltipMeta = {
   light?: boolean
   key: number
   maxHeight?: number
+  left?: boolean
+  right?: boolean
 }
 
 export type SetTooltipMeta = (meta: TooltipMeta | null) => void

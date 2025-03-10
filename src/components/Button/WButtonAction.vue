@@ -48,6 +48,12 @@
         {{ title }}
       </template>
     </div>
+
+    <WTooltip
+      v-if="tooltipText"
+      :text="tooltipText"
+      left
+    />
   </component>
 </template>
 
@@ -60,6 +66,8 @@ import WCounter from '@/components/Counter/WCounter.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
+
+import WTooltip from '../Tooltip/WTooltip.vue'
 
 const semanticTypeStylesMap: Record<SemanticType, string> = {
   [SemanticType.SECONDARY]: 'text-description bg-default dark:bg-default-dark hover:text-primary-default dark:hover:text-primary-dark',
@@ -89,6 +97,7 @@ interface Props extends Partial<LinkProps> {
   outline?: boolean
   disabled?: boolean
   skeleton?: boolean
+  tooltipText?: string
 }
 
 withDefaults(

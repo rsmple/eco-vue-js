@@ -21,6 +21,8 @@ const props = defineProps<{
   light?: boolean
   trigger?: Element
   maxHeight?: number
+  left?: boolean
+  right?: boolean
 }>()
 
 const slots = useSlots()
@@ -53,6 +55,8 @@ const open = () => {
     light: props.light,
     key: getIncrement(),
     maxHeight: props.maxHeight,
+    left: props.left,
+    right: props.right,
   })
 }
 

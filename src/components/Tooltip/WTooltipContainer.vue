@@ -8,19 +8,23 @@
     <WDropdown
       v-if="tooltipMeta"
       :parent-element="tooltipMeta.parent"
-      :horizontal-align="HorizontalAlign.CENTER"
+      :horizontal-align="tooltipMeta.left ? HorizontalAlign.LEFT_OUTER : tooltipMeta.right ? HorizontalAlign.RIGHT_OUTER : HorizontalAlign.CENTER"
       :max-height="tooltipMeta?.maxHeight ?? 120"
       :max-width="240"
       emit-update
-      class="isolate z-[10000] will-change-[top,bottom,left,right] sm:transition-[top,bottom,left,right]"
+      class="isolate z-[10000]"
       @update:rect="close"
     >
-      <template #default="{left, right, istop}">
+      <template #default="{left, right, top, bottom, isTop}">
         <TooltipContainer
           :tooltip-meta="tooltipMeta"
           :left="left"
           :right="right"
-          :is-top="istop"
+          :top="top"
+          :bottom="bottom"
+          :is-top="isTop"
+          :is-left="tooltipMeta.left"
+          :is-right="tooltipMeta.right"
           @over="setTooltipMeta(tooltipMeta)"
           @leave="setTooltipMeta(null)"
         >
