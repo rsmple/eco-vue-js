@@ -1,16 +1,14 @@
 import type {FormAsyncProps} from '../types'
 
-import {computed, inject, onBeforeUnmount, ref, toRef} from 'vue'
+import {computed, onBeforeUnmount, ref, toRef} from 'vue'
 
 import {Modal} from '@/utils/Modal'
 import {Notify} from '@/utils/Notify'
 import {handleApiError} from '@/utils/api'
-import {get, set, wReadonly} from '@/utils/utils'
+import {get, set} from '@/utils/utils'
 
 export const useFormAsync = <Model, FieldType, QueryParams>(props: FormAsyncProps<Model, FieldType, QueryParams>, onSuccess: (value: Model) => void) => {
   const enabled = toRef(props, 'queryEnabled')
-
-  const readonlyInjected = inject(wReadonly, ref(false))
 
   const {data, setData, isLoadingError} = props.noParams === true
     ? props.useQueryFn({enabled})
@@ -69,7 +67,6 @@ export const useFormAsync = <Model, FieldType, QueryParams>(props: FormAsyncProp
     data,
     modelValue,
     submitting,
-    readonlyInjected,
     showModal,
   }
 }

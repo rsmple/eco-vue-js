@@ -5,7 +5,6 @@
       modelValue: modelValue,
       skeleton: skeleton || !data,
       disabled: disabled || isLoadingError,
-      readonly: readonlyInjected || readonly,
       loading: loading || submitting,
     }"
     @update:model-value="showModal(($event ?? null) as FieldType)"
@@ -47,5 +46,5 @@ const emit = defineEmits<{
   (e: 'success', value: Model): void
 }>()
 
-const {isLoadingError, data, modelValue, submitting, readonlyInjected, showModal} = useFormAsync(props, value => emit('success', value))
+const {isLoadingError, data, modelValue, submitting, showModal} = useFormAsync(props, value => emit('success', value))
 </script>

@@ -72,7 +72,6 @@ import WPageBreadcrumbs from '@/components/Page/WPageBreadcrumbs.vue'
 import WPageNumerator from '@/components/Page/WPageNumerator.vue'
 import WPageTitle from '@/components/Page/WPageTitle.vue'
 import WProgress from '@/components/Progress/WProgress.vue'
-import WProvide from '@/components/Provide/WProvide.vue'
 import WSelect from '@/components/Select/WSelect.vue'
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 import WSelectAsyncList from '@/components/Select/WSelectAsyncList.vue'
@@ -163,7 +162,6 @@ export default {
     app.component('WPageNumerator', WPageNumerator)
     app.component('WPageTitle', WPageTitle)
     app.component('WProgress', WProgress)
-    app.component('WProvide', WProvide)
     app.component('WSelect', WSelect)
     app.component('WSelectAsync', WSelectAsync)
     app.component('WSelectAsyncList', WSelectAsyncList)
@@ -254,7 +252,6 @@ export {
   WPageNumerator,
   WPageTitle,
   WProgress,
-  WProvide,
   WSelect,
   WSelectAsync,
   WSelectAsyncList,

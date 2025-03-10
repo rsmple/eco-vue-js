@@ -4,7 +4,6 @@
     ref="component"
     :error-message="errorMessage"
     :has-changes="noChanges ? undefined : hasChanges"
-    :readonly="readonlyInjected"
     @update:model-value="_validateOnUpdate"
     @select="_validateOnSelect"
     @unselect="_validateOnUnselect"
@@ -17,7 +16,7 @@ import {type VNode, computed, inject, onBeforeMount, onBeforeUnmount, ref, useSl
 
 import {useIsInsideTab} from '@/components/Tabs/use/useIsInsideTab'
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
-import {debounce, wReadonly} from '@/utils/utils'
+import {debounce} from '@/utils/utils'
 import {validateRequired} from '@/utils/validate'
 
 import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormHasValueUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
@@ -39,8 +38,6 @@ const emit = defineEmits<{
   (e: 'update:is-valid', value: boolean): void
   (e: 'invalidate', value: Record<string, string | string[] | undefined>): void
 }>()
-
-const readonlyInjected = inject(wReadonly, ref(false))
 
 const titleUpdater = inject(wFormTitleUpdater, undefined)
 const errorMessageUpdater = inject(wFormErrorMessageUpdater, undefined)

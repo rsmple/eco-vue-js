@@ -6,7 +6,6 @@
       skeleton: skeleton || !data,
       disabled: disabled || isLoadingError,
       loading: loading || submitting,
-      readonly: readonlyInjected || readonly,
     }"
     @select="showModal(getNewValue($event))"
     @unselect="showModal(getNewValue($event))"
@@ -48,7 +47,7 @@ const emit = defineEmits<{
   (e: 'success', value: Model): void
 }>()
 
-const {isLoadingError, data, modelValue, submitting, readonlyInjected, showModal} = useFormAsync(props, value => emit('success', value))
+const {isLoadingError, data, modelValue, submitting, showModal} = useFormAsync(props, value => emit('success', value))
 
 const getNewValue = (value: FieldType[number]): FieldType => {
   const newValue = (modelValue.value?.slice() ?? []) as FieldType[number][]
