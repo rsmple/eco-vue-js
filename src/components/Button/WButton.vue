@@ -27,6 +27,7 @@
       'first-not:rounded-l-none first-not:border-l-0 first-not:before:rounded-l-none last-not:rounded-r-none last-not:border-r-0 last-not:before:rounded-r-none': join
     }"
     :disabled="!loading && disabled"
+    :download="download"
     :type="type"
     @click="click"
     @keypress.enter.stop.prevent="click"

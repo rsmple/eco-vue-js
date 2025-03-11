@@ -16,6 +16,7 @@ export interface ButtonProps extends Partial<LinkProps> {
   join?: boolean
   semanticTypeMap?: Partial<Record<SemanticType, string>>
   tooltipText?: string
+  download?: string
 }
 
 export type ButtonGroupOptionProps<Option> = {option: Option, selected?: boolean}

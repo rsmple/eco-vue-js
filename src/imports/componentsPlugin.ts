@@ -59,6 +59,8 @@ import WListHeader from '@/components/List/WListHeader.vue'
 import WListHeaderItem from '@/components/List/WListHeaderItem.vue'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 import WModal from '@/components/Modal/WModal.vue'
+import WModalExport from '@/components/Modal/WModalExport.vue'
+import WModalImport from '@/components/Modal/WModalImport.vue'
 import WModalStepper from '@/components/Modal/WModalStepper.vue'
 import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
 import WNavBar from '@/components/Nav/WNavBar.vue'
@@ -72,6 +74,7 @@ import WPageBreadcrumbs from '@/components/Page/WPageBreadcrumbs.vue'
 import WPageNumerator from '@/components/Page/WPageNumerator.vue'
 import WPageTitle from '@/components/Page/WPageTitle.vue'
 import WProgress from '@/components/Progress/WProgress.vue'
+import WProgressStriped from '@/components/Progress/WProgressStriped.vue'
 import WSelect from '@/components/Select/WSelect.vue'
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 import WSelectAsyncList from '@/components/Select/WSelectAsyncList.vue'
@@ -149,6 +152,8 @@ export default {
     app.component('WListHeaderItem', WListHeaderItem)
     app.component('WMenuItem', WMenuItem)
     app.component('WModal', WModal)
+    app.component('WModalExport', WModalExport)
+    app.component('WModalImport', WModalImport)
     app.component('WModalStepper', WModalStepper)
     app.component('WModalWrapper', WModalWrapper)
     app.component('WNavBar', WNavBar)
@@ -162,6 +167,7 @@ export default {
     app.component('WPageNumerator', WPageNumerator)
     app.component('WPageTitle', WPageTitle)
     app.component('WProgress', WProgress)
+    app.component('WProgressStriped', WProgressStriped)
     app.component('WSelect', WSelect)
     app.component('WSelectAsync', WSelectAsync)
     app.component('WSelectAsyncList', WSelectAsyncList)
@@ -239,6 +245,8 @@ export {
   WListHeaderItem,
   WMenuItem,
   WModal,
+  WModalExport,
+  WModalImport,
   WModalStepper,
   WModalWrapper,
   WNavBar,
@@ -252,6 +260,7 @@ export {
   WPageNumerator,
   WPageTitle,
   WProgress,
+  WProgressStriped,
   WSelect,
   WSelectAsync,
   WSelectAsyncList,
