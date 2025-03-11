@@ -17,7 +17,35 @@
       <slot name="subtitle" />
     </template>
 
-    <template #field>
+    <template
+      v-if="readonly" 
+      #default
+    >
+      <div class="flex gap-1">
+        <slot
+          v-if="modelValueItem !== undefined"
+          name="option"
+          :option="modelValueItem"
+          :selected="true"
+        >
+          <component
+            :is="optionComponent"
+            v-if="optionComponent"
+            :option="modelValueItem"
+            :selected="true"
+          />
+        </slot>
+
+        <template v-else>
+          {{ emptyValue }}
+        </template>
+      </div>
+    </template>
+
+    <template
+      v-else
+      #field
+    >
       <div
         class="flex"
         :class="{
@@ -70,7 +98,7 @@
 <script lang="ts" setup generic="Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined">
 import type {ButtonGroupProps} from './types'
 
-import {ref} from 'vue'
+import {computed, ref} from 'vue'
 
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 
@@ -95,6 +123,8 @@ const getValue = (item: Model | Entity): Model => {
     return item as Model
   }
 }
+
+const modelValueItem = computed(() => props.list.find(item => getValue(item) === props.modelValue))
 
 const emitUpdateModelValue = (value: Model): void => {
   loadingItem.value = value

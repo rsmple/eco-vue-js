@@ -51,7 +51,7 @@
       </div>
 
       <div
-        class="relative col-start-2"
+        class="relative col-start-2 self-start"
         :class="{
           'mt-3': stepper,
           'w-ripple w-ripple-hover': !disabled

@@ -70,7 +70,7 @@ import {SemanticType} from '@/utils/SemanticType'
 import WTooltip from '../Tooltip/WTooltip.vue'
 
 const semanticTypeStylesMap: Record<SemanticType, string> = {
-  [SemanticType.SECONDARY]: 'text-description bg-default dark:bg-default-dark hover:text-primary-default dark:hover:text-primary-dark',
+  [SemanticType.SECONDARY]: 'text-description bg-default dark:bg-default-dark [not:(:disabled)]:hover:text-primary-default [not:(:disabled)]:dark:hover:text-primary-dark',
   [SemanticType.PRIMARY]: 'text-default bg-primary-default dark:bg-primary-dark',
   [SemanticType.POSITIVE]: 'text-default dark:text-default-dark bg-positive dark:bg-positive-dark',
   [SemanticType.WARNING]: 'text-default dark:text-default-dark bg-warning dark:bg-warning-dark',
@@ -79,7 +79,7 @@ const semanticTypeStylesMap: Record<SemanticType, string> = {
 }
 
 const semanticTypeOutlineStylesMap: Record<SemanticType, string> = {
-  [SemanticType.SECONDARY]: 'text-description bg-default dark:bg-default-dark hover:text-primary-default dark:hover:text-primary-dark',
+  [SemanticType.SECONDARY]: 'text-description bg-default dark:bg-default-dark [not:(:disabled)]:hover:text-primary-default [not:(:disabled)]:dark:hover:text-primary-dark',
   [SemanticType.PRIMARY]: 'text-primary-default text-primary-dark',
   [SemanticType.POSITIVE]: 'text-positive dark:text-positive-dark',
   [SemanticType.WARNING]: 'text-warning dark:text-warning-dark',
