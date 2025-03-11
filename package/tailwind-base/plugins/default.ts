@@ -489,6 +489,10 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       'grid-row': '1 / -1',
     },
   })
+
+  addVariant(
+    'not-print', '@media not print',
+  )
 })
 
 export default pluginDefault

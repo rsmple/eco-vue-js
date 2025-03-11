@@ -42,6 +42,7 @@
 </template>
 
 <script lang="ts" setup generic="Model, QueryParams, PreparedModel">
+import {keepPreviousData} from '@tanstack/vue-query'
 import {computed, ref, watch} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
@@ -79,6 +80,7 @@ const query = props.useQueryFn(queryParams, {
   refetchOnWindowFocus: false,
   refetchIntervalInBackground: false,
   refetchOnReconnect: false,
+  placeholderData: keepPreviousData,
 })
 
 const count = computed(() => Array.isArray(query.data.value) ? query.data.value.length : query.data.value?.count ?? 0)

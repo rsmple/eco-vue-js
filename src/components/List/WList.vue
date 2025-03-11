@@ -115,6 +115,7 @@
           class="sm-not:hidden mb-[--w-list-gap,1rem]"
           :allow-select="allowSelect"
           :tooltip-text="selectAllTextGetter(selectAllValue !== true, count ?? listCount ?? 0)"
+          :hide-more="!menu"
 
           :count="count ?? listCount"
           :selection="selectAllValue"
