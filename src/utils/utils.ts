@@ -1,4 +1,5 @@
 import type {FieldConfig, FieldConfigMap, GetFieldLabels, ListFields} from '@/components/List/types'
+import type {VNode} from 'vue'
 
 const overflowScrollRegexp = /auto|scroll|overlay/
 
@@ -185,4 +186,12 @@ export const getDefaultFieldConfigMap = <Fields extends ListFields<any, any>>(fi
 export enum ListMode {
   TABLE = 'table',
   GRID = 'grid',
+}
+
+export const unwrapSlots = (slots: VNode[]): VNode[] => {
+  return slots.flatMap(slot => {
+    if (Array.isArray(slot?.children)) return unwrapSlots(slot.children as VNode[])
+    else if (typeof slot.type !== 'symbol') return slot
+    else return []
+  })
 }

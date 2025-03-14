@@ -399,10 +399,11 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
     '.w-skeleton': {
       position: 'relative',
       width: 'var(--skeleton-width,var(--skeleton-width-internal,70%))',
-      height: 'var(--skeleton-height)',
+      height: 'var(--skeleton-height,1em)',
       'border-radius': 'var(--w-skeleton-rounded,0.5rem)',
       overflow: 'hidden',
       cursor: 'progress',
+      display: 'inline-block',
       '&:not(.w-skeleton-static):before': {
         content: '""',
         position: 'absolute',

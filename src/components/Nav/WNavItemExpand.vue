@@ -53,7 +53,7 @@ import WExpansion from '@/components/Expansion/WExpansion.vue'
 
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 
-import {debounce} from '@/utils/utils'
+import {debounce, unwrapSlots} from '@/utils/utils'
 
 import WNavItem from './WNavItem.vue'
 import WNavItemTransition from './WNavItemTransition.vue'
@@ -71,7 +71,7 @@ interface Props extends Partial<LinkProps> {
 const props = defineProps<Props>()
 const slots = useSlots()
 
-const slotsDefault = computed(() => slots.default?.())
+const slotsDefault = computed(() => unwrapSlots(slots.default?.() ?? []))
 
 const emit = defineEmits<{
   (e: 'update:isActive', value: [string, boolean]): void

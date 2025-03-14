@@ -136,7 +136,7 @@ import WForm from '@/components/Form/WForm.vue'
 
 import {Notify} from '@/utils/Notify'
 import {useIsMobile} from '@/utils/mobile'
-import {debounce, throttle} from '@/utils/utils'
+import {debounce, throttle, unwrapSlots} from '@/utils/utils'
 
 import TabItem from './components/TabItem.vue'
 import TabTitleButton from './components/TabTitleButton.vue'
@@ -163,14 +163,6 @@ const formRef = useTemplateRef('form')
 const buttonContainerRef = useTemplateRef('buttonContainer')
 
 const defaultSlotsRaw = computed(() => props.customSlots ?? slots.default?.() ?? [])
-
-const unwrapSlots = (slots: VNode[]): VNode[] => {
-  return slots.flatMap(slot => {
-    if (Array.isArray(slot?.children)) return unwrapSlots(slot.children as VNode[])
-    else if (typeof slot.type !== 'symbol') return slot
-    else return []
-  })
-}
 
 const isTabItem = (slot: VNode): slot is VNode<RendererNode, RendererElement, TabsItemProps> & {props: TabsItemProps} => {
   return slot.type instanceof Object && '__name' in slot.type && slot.type.__name === 'WTabsItem'
