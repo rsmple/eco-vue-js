@@ -6,6 +6,7 @@ import {type CSSOptions, defineConfig} from 'vite'
 import dts from 'vite-plugin-dts'
 import svgLoader from 'vite-svg-loader'
 
+import {existsSync, renameSync, rmSync} from 'node:fs'
 import {URL, fileURLToPath} from 'node:url'
 
 import {writeImports} from './build/write-imports'
@@ -26,6 +27,22 @@ export default defineConfig(({mode}) => ({
         return writeImports()
       },
     },
+    {
+      name: 'atomic-dist-swap',
+      closeBundle() {
+        if (mode !== 'development') return
+
+        const tempDir = 'package/dist-temp'
+        const finalDir = 'package/dist'
+
+        if (existsSync(tempDir)) {
+          if (existsSync(finalDir)) {
+            rmSync(finalDir, {recursive: true, force: true})
+          }
+          renameSync(tempDir, finalDir)
+        }
+      },
+    },
   ],
   css: {
     postcss: {
@@ -40,7 +57,7 @@ export default defineConfig(({mode}) => ({
     target: 'esnext',
     minify: false,
     sourcemap: false,
-    outDir: 'package/dist',
+    outDir: mode === 'development' ? 'package/dist-temp' : 'package/dist',
     lib: {
       entry: 'src/main.ts',
       name: 'ui-kit',

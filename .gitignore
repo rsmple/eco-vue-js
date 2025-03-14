@@ -11,6 +11,7 @@ node_modules
 .DS_Store
 dist
 package/dist
+package/dist-temp
 package/package.json
 dist-ssr
 coverage

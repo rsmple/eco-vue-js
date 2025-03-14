@@ -7,7 +7,7 @@
   "version": "0.10.30",
   "scripts": {
     "build": "run-p type-check \"build-only {@}\" --",
-    "dev": "vite build --watch",
+    "dev": "vite build --mode development --watch",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --fix",
