@@ -14,7 +14,7 @@
 
     <div
       v-show="!isSearchVisible && !search"
-      class="-pl--inner-margin xl-not:pl-[3.75rem] relative flex max-w-full flex-1 items-center"
+      class="-pl--inner-margin xl-not:-pl--header-height relative flex max-w-full flex-1 items-center"
       :class="{
         '-pr--inner-margin': !searchEnabled
       }"
@@ -27,10 +27,10 @@
 
       <button
         v-if="searchEnabled"
-        class="w-ripple-trigger -pr--inner-margin h-full select-none"
+        class="w-ripple-trigger sm:-pr--inner-margin h-full select-none"
         @click="openSearch"
       >
-        <div class="w-ripple w-ripple-hover relative flex h-full items-center px-[--w-list-padding,1rem]">
+        <div class="w-ripple w-ripple-hover sm-not:-px--inner-margin relative flex h-full items-center px-[--w-list-padding,1rem]">
           <IconSearch class="square-[1.25em] text-accent" />
         </div>
       </button>
@@ -39,7 +39,7 @@
     <div
       v-if="searchEnabled"
       v-show="isSearchVisible || search"
-      class="-pl--inner-margin xl-not:pl-[3.75rem] -pr--inner-margin relative flex w-full flex-1 items-center gap-2"
+      class="xl-not:pl-[3.75rem] -px--inner-margin relative flex w-full flex-1 items-center gap-2"
     >
       <WInputSuggest
         v-if="$slots.search && isMobile"

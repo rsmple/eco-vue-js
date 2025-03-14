@@ -13,7 +13,7 @@
     }"
     @click="$emit('click')"
   >
-    <div class="-h--w-input-height flex items-center gap-2 px-[--w-list-padding,1rem]">
+    <div class="-h--w-input-height sm-not:-px--inner-margin flex items-center gap-2 px-[--w-list-padding,1rem]">
       <component
         :is="icon"
         class="square-[1.25em]"

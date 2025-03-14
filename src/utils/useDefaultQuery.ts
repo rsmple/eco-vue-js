@@ -26,25 +26,30 @@ export const useDefaultQuery = <
 
 export const PAGE_LENGTH = 24
 
-export const makeQueryPaginated = <Data, QueryParams extends {page?: number}>(key: string, getter: (queryParams: QueryParams) => Data[], setter?: (data: Data[]) => void, pageLength = PAGE_LENGTH): UseQueryPaginated<Data, QueryParams> => {
+export const makeQueryPaginated = <Data, QueryParams extends {page?: number}>(key: string, getter: (queryParams: QueryParams) => Data[] | undefined, setter?: (data: Data[]) => void, pageLength = PAGE_LENGTH): UseQueryPaginated<Data, QueryParams> => {
   return (queryParams: MaybeRef<QueryParams>, options: QueryOptions<PaginatedResponse<Data>> = {}) => {
     const query = useDefaultQuery<PaginatedResponse<Data>>({
       queryKey: [key, queryParams],
-      queryFn: (): Promise<PaginatedResponse<Data>> => new Promise((resolve, reject) => {
-        const currentList = getter(unref(queryParams))
-        const current = Math.max(unref(queryParams).page ?? 1, 1)
-        const pages_count = Math.max(Math.ceil(currentList.length / pageLength), 1)
+      queryFn: (): Promise<PaginatedResponse<Data>> => {
+        return new Promise((resolve, reject) => {
+          const currentList = getter(unref(queryParams))
 
-        if (current > pages_count) reject(new ApiError({status: 404} as RequestResponse<unknown>))
-        else resolve({
-          count: currentList.length,
-          pages_count,
-          current,
-          next: pages_count > current ? current + 1 : null,
-          previous: current !== 1 ? current - 1 : null,
-          results: currentList.slice(pageLength * (current - 1), pageLength * current),
+          if (!currentList) return resolve(null as never)
+  
+          const current = Math.max(unref(queryParams).page ?? 1, 1)
+          const pages_count = Math.max(Math.ceil(currentList.length / pageLength), 1)
+  
+          if (current > pages_count) reject(new ApiError({status: 404} as RequestResponse<unknown>))
+          else resolve({
+            count: currentList.length,
+            pages_count,
+            current,
+            next: pages_count > current ? current + 1 : null,
+            previous: current !== 1 ? current - 1 : null,
+            results: currentList.slice(pageLength * (current - 1), pageLength * current),
+          })
         })
-      }),
+      },
 
       ...options as NonNullable<unknown>,
     })
@@ -56,7 +61,7 @@ export const makeQueryPaginated = <Data, QueryParams extends {page?: number}>(ke
         const index = unref(unref(options)?.index)
 
         if (index !== undefined) {
-          const newList = getter({} as QueryParams).slice()
+          const newList = getter({} as QueryParams)?.slice() ?? []
           const oldItem = query.data.value?.results[index]
 
           if (oldItem !== undefined) {
@@ -84,9 +89,10 @@ export const wrapUseQueryPaginated = <Data, QueryParams extends {page?: number}>
   return (queryParams: MaybeRef<QueryParams>, options: QueryOptions<PaginatedResponse<Data>> = {}) => {
     const query = queryFn(options as Parameters<UseQueryDefault<Data[]>>[0])
 
-    const newQuery = makeQueryPaginated(key, () => query.data.value ?? [], query.setData)(queryParams, options)
+    const newQuery = makeQueryPaginated(key, () => query.data.value, query.setData)(queryParams, options)
 
     watch(query.data, () => {
+      console.log('refetch')
       newQuery.refetch()
     })
 
