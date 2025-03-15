@@ -1,17 +1,26 @@
 <template>
   <div 
-    class="sm-not:-px--inner-margin flex gap-3.5 p-4 leading-7 sm:rounded-3xl"
+    class="sm-not:-px--inner-margin sm-not:-mx---inner-margin p-4 sm:rounded-3xl"
     :class="{
-      'bg-gray-100 dark:bg-gray-800': !noBg,
+      [infoCardSemanticTypeMap[semanticType ?? SemanticType.SECONDARY]]: !noBg,
     }"
   >
-    <IconNegativeInfo
-      v-if="!noIcon"
-      class="square-8 sm-not:square-7 sm-not:-ml-1 text-description inline-block rotate-180"
-    />
+    <slot name="top" />
 
-    <div class="text-pretty py-1">
-      <slot />
+    <div class="-gap--inner-margin grid grid-cols-[auto,1fr]">
+      <component
+        :is="icon ?? IconNegativeInfo"
+        v-if="!noIcon"
+        class="square-6 sm-not:-mx-1 inline-block"
+        :class="{
+          [infoCardIconSemanticTypeMap[semanticType ?? SemanticType.SECONDARY]]: true,
+          'rotate-180': !icon,
+        }"
+      />
+
+      <div class="text-pretty py-1 leading-relaxed">
+        <slot />
+      </div>
     </div>
   </div>
 </template>
@@ -19,8 +28,14 @@
 <script lang="ts" setup>
 import IconNegativeInfo from '@/assets/icons/sax/IconNegativeInfo.svg?component'
 
+import {SemanticType} from '@/utils/SemanticType'
+
+import {infoCardIconSemanticTypeMap, infoCardSemanticTypeMap} from './models/utils'
+
 defineProps<{
   noBg?: boolean
   noIcon?: boolean
+  icon?: SVGComponent
+  semanticType?: SemanticType
 }>()
 </script>
