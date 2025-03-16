@@ -7,23 +7,30 @@
     }"
   >
     <svg
-      viewBox="0 0 16 16"
-      class="square-5 pointer-events-auto z-10"
+      :viewBox="isLeft || isRight ? '0 0 8 16' : '0 0 16 8'"
+      class="pointer-events-auto z-10"
       :class="{
         'text-black-default dark:text-gray-800': !tooltipMeta.light,
         'text-default dark:text-gray-800': tooltipMeta.light,
-        'order-2 -mb-2 rotate-180': isTop,
-        'order-2 -mr-2 rotate-90': isLeft,
-        '-ml-2 -rotate-90': isRight,
-        '-mt-2': !isTop && !isLeft && !isRight,
+        'width-4 order-2': isTop,
+        'width-2 order-2': isLeft,
+        'width-2': isRight,
+        'width-4': !isTop && !isLeft && !isRight,
       }"
       @mouseover="$emit('over')"
       @mouseleave="$emit('leave')"
     >
-      <path
-        d="M7.16933 9.81927C5.84985 12.8991 5.05085 15.1582 0 16H16.0042C10.9498 15.1582 10.1503 12.8991 8.83068 9.81926C8.50615 9.06181 7.49384 9.06181 7.16933 9.81927Z"
-        fill="currentColor"
-      />
+      <g :transform="`rotate(${ isTop ? 180 : isLeft ? 90 : isRight ? -90 : 0 } ${isLeft || isRight ? '4 4' : '8 4'})`">
+        <rect
+          height="8"
+          width="16"
+          fill="none"
+        />
+        <path
+          d="M7.16933 1.81927C5.84985 4.8991 5.05085 7.15819 0 8H16.0042C10.9498 7.15819 10.1503 4.8991 8.83068 1.81926C8.50615 1.06181 7.49384 1.06181 7.16933 1.81927Z"
+          fill="currentColor"
+        />
+      </g>
     </svg>
 
     <div

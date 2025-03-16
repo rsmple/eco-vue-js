@@ -7,6 +7,7 @@
   >
     <WDropdown
       v-if="tooltipMeta"
+      :key="dropdownKey"
       :parent-element="tooltipMeta.parent"
       :horizontal-align="tooltipMeta.left ? HorizontalAlign.LEFT_OUTER : tooltipMeta.right ? HorizontalAlign.RIGHT_OUTER : HorizontalAlign.CENTER"
       :max-height="tooltipMeta?.maxHeight ?? 120"
@@ -48,7 +49,7 @@
 </template>
 
 <script lang="ts" setup>
-import {markRaw, onBeforeMount, onBeforeUnmount, onMounted, onUnmounted, ref} from 'vue'
+import {computed, markRaw, onBeforeMount, onBeforeUnmount, onMounted, onUnmounted, ref} from 'vue'
 
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 
@@ -75,6 +76,8 @@ const setTooltipMeta: SetTooltipMeta = (meta: TooltipMeta | null) => {
     }, 25)
   }
 }
+
+const dropdownKey = computed(() => tooltipMeta.value?.left ? HorizontalAlign.LEFT_OUTER : tooltipMeta.value?.right ? HorizontalAlign.RIGHT_OUTER : HorizontalAlign.CENTER)
 
 const close = () => {
   clearTimeoutOnClose()

@@ -4,7 +4,7 @@
 
 ### Local testing
 
-1. Run development build with HMR:
+1. Run development build with watch mode:
     ```
     npm ci
     npm run dev
