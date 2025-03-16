@@ -52,7 +52,6 @@ const open = () => {
     parent: parent.value,
     slot: slot ? markRaw(slot) : undefined,
     text: props.text,
-    light: props.light,
     key: getIncrement(),
     maxHeight: props.maxHeight,
     left: props.left,

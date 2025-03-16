@@ -4,7 +4,6 @@ export type TooltipMeta = {
   parent: HTMLElement
   slot?: VNode
   text?: string
-  light?: boolean
   key: number
   maxHeight?: number
   left?: boolean

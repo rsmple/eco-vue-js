@@ -10,36 +10,47 @@
       :viewBox="isLeft || isRight ? '0 0 8 16' : '0 0 16 8'"
       class="pointer-events-auto z-10"
       :class="{
-        'text-black-default dark:text-gray-800': !tooltipMeta.light,
-        'text-default dark:text-gray-800': tooltipMeta.light,
-        'width-4 order-2': isTop,
-        'width-2 order-2': isLeft,
-        'width-2': isRight,
-        'width-4': !isTop && !isLeft && !isRight,
+        'width-4 order-2 -mt-px mb-1': isTop,
+        'width-2 order-2 -ml-px mr-1': isLeft,
+        'width-2 -mr-px ml-1': isRight,
+        'width-4 -mb-px mt-1': !isTop && !isLeft && !isRight,
       }"
       @mouseover="$emit('over')"
       @mouseleave="$emit('leave')"
     >
-      <g :transform="`rotate(${ isTop ? 180 : isLeft ? 90 : isRight ? -90 : 0 } ${isLeft || isRight ? '4 4' : '8 4'})`">
+      <g
+        :transform="`rotate(${ isTop ? 0 : isLeft ? -90 : isRight ? 90 : 180 } ${isLeft || isRight ? '4 0' : '0 0'})`"
+        transform-origin="center center"
+      >
         <rect
-          height="8"
           width="16"
+          height="8"
           fill="none"
         />
         <path
-          d="M7.16933 1.81927C5.84985 4.8991 5.05085 7.15819 0 8H16.0042C10.9498 7.15819 10.1503 4.8991 8.83068 1.81926C8.50615 1.06181 7.49384 1.06181 7.16933 1.81927Z"
+          d="M7.03676 5.8704C5.7908 2.94938 4.87965 0.813274 0 0H16.0042C11.1205 0.813374 10.2091 2.9499 8.96281 5.87147C8.91924 5.97361 8.87526 6.07671 8.83068 6.18074C8.50615 6.93819 7.49384 6.93819 7.16933 6.18073C7.1246 6.07634 7.08048 5.97289 7.03676 5.8704Z"
           fill="currentColor"
+          class="text-black-default dark:text-gray-800"
+        />
+        <path
+          d="M0 0.5C5.05085 1.34181 5.84985 3.6009 7.16933 6.68073C7.49384 7.43819 8.50615 7.43819 8.83068 6.68074C10.1503 3.6009 10.9498 1.34181 16.0042 0.5"
+          stroke="currentColor"
+          stroke-width="1"
+          fill="none"
+          class="text-gray-400 dark:text-gray-600"
         />
       </g>
     </svg>
 
     <div
       ref="container"
-      class="pointer-events-auto max-w-[calc(100vw-1.5rem)] translate-x-[var(--t-translate-x)] translate-y-[var(--t-translate-y)] rounded-lg px-3 py-2 text-center text-xs font-medium"
-      :class="{
-        'bg-black-default text-default dark:bg-gray-800': !tooltipMeta.light,
-        'bg-default text-accent dark:bg-gray-800': tooltipMeta.light,
-      }"
+      class="
+        bg-black-default text-default pointer-events-auto
+        max-w-[calc(100vw-1.5rem)] translate-x-[var(--t-translate-x)]
+        translate-y-[var(--t-translate-y)] rounded-lg border
+        border-solid border-gray-400 px-3 py-2 text-center
+        text-xs font-medium shadow-md dark:border-gray-600 dark:bg-gray-800
+      "
       :style="{
         '--t-translate-x': transformX + 'px',
         '--t-translate-y': transformY + 'px',
