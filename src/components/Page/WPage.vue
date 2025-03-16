@@ -191,12 +191,6 @@ const scrollTo = () => {
   if (!elementRef.value?.parentElement || !document.scrollingElement) return
 
   document.scrollingElement.scrollTo({top: elementRef.value.offsetTop - headerPadding.value - headerHeight.value})
-
-  // nextTick(() => {
-  //   if (!elementRef.value?.parentElement) return
-
-  //   setActive(Array.from(elementRef.value.parentElement.children).indexOf(elementRef.value))
-  // })
 }
 
 const updateBreadcrumb = async () => {

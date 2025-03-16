@@ -78,7 +78,7 @@
           <div
             class="flex flex-wrap gap-[--w-input-gap,0.25rem]"
             :class="{
-              '[&:not(:has(.w-option-has-bg))]:-px--w-option-padding': !icon
+              '[&:not(:has(.w-option-has-bg))]:-px--w-option-padding': !icon && !textarea,
             }"
           >
             <slot name="prefix" />
@@ -97,11 +97,11 @@
                 :id="id"
                 ref="input"
                 class="
-                  w-input max-w-full flex-1 appearance-none border-none bg-[inherit] font-normal
+                  w-input max-w-full flex-1 basis-auto appearance-none border-none bg-[inherit] font-normal
                   outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed disabled:opacity-80 dark:placeholder:text-gray-500
                 "
                 :class="{
-                  '-py--w-option-padding min-h-[--w-textarea-height,10rem] w-full': textarea,
+                  '-p--w-option-padding min-h-[--w-textarea-height,10rem] w-full': textarea,
                   'resize-y': resize && textarea,
                   'resize-none': !resize && textarea,
                   'h-[calc(var(--w-input-height,2.75rem)-2px)]': !textarea && !$slots.suffix,

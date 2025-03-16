@@ -12,10 +12,10 @@
       :class="{
         'text-black-default dark:text-gray-800': !tooltipMeta.light,
         'text-default dark:text-gray-800': tooltipMeta.light,
-        'order-2 -mb-1 rotate-180': isTop,
-        'order-2 -mr-1 rotate-90': isLeft,
-        '-ml-1 -rotate-90': isRight,
-        '-mt-1': !isTop && !isLeft && !isRight,
+        'order-2 -mb-2 rotate-180': isTop,
+        'order-2 -mr-2 rotate-90': isLeft,
+        '-ml-2 -rotate-90': isRight,
+        '-mt-2': !isTop && !isLeft && !isRight,
       }"
       @mouseover="$emit('over')"
       @mouseleave="$emit('leave')"

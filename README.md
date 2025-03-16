@@ -4,24 +4,13 @@
 
 ### Local testing
 
-1. Register the library globally:
-    ```
-    npm link
-    ```
-2. Run development build with HMR:
+1. Run development build with HMR:
     ```
     npm ci
     npm run dev
     ```
-3. Creates a symlink to the built library in project
+2. Install intertal library package directory in your project
     ```
-    npm link eco-vue-js
+    npm i --no-save /path-to-library/package
     ```
-
-### Updating the bundle
-
-To automatically add imports for new components or icons added to the library, run the command
-```
-npm run write-imports
-```
-This will update the files in the `/imports` directory and add new exports to the `package.json` file.
+3. PROFIT!

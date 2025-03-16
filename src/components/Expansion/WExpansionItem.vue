@@ -1,8 +1,13 @@
 <template>
   <component
-    :is="$slots.title?.()?.[0] ?? 'button'"
-    class="w-ripple w-ripple-hover -px--inner-margin relative grid w-full cursor-pointer select-none grid-cols-[auto,1fr,auto] items-center py-3 text-start"
-    @click="$emit('toggle')"
+    :is="$slots.title?.()?.[0] ?? 'div'"
+    ref="button"
+    role="button"
+    tabindex="0"
+    class="w-ripple w-ripple-hover -px--inner-margin -mx---inner-margin relative grid cursor-pointer select-none grid-cols-[auto,1fr,auto] items-center py-3 text-start"
+    @click="toggle"
+    @keydown.enter="toggle"
+    @keydown.space="toggle"
   >
     <template v-if="icon">
       <component
@@ -43,14 +48,14 @@
   <WExpansion
     :is-open="isOpen"
     :class="$attrs.class"
-    class="mt-2"
+    class="-px--inner-margin -mx---inner-margin py-2"
   >
     <slot />
   </WExpansion>
 </template>
 
 <script lang="ts" setup>
-import type {VNode} from 'vue'
+import {type VNode, useTemplateRef} from 'vue'
 
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 
@@ -64,7 +69,7 @@ defineProps<{
   minTitle?: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'toggle'): void
 }>()
 
@@ -72,4 +77,14 @@ defineSlots<{
   default?: () => VNode[]
   title?: () => VNode[]
 }>()
+
+const buttonRef = useTemplateRef<HTMLButtonElement | ComponentInstance<unknown>>('button')
+
+const toggle = () => {
+  emit('toggle')
+
+  const element = buttonRef.value?.$el instanceof Element ? buttonRef.value.$el : buttonRef.value
+
+  if (element instanceof HTMLElement) element.blur()
+}
 </script>
