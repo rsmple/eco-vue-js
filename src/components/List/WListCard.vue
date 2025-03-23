@@ -259,7 +259,7 @@ const validate: ComponentInstance<typeof WForm>['validate'] = (...args) => formR
 const isActionShown = computed<boolean>(() => !props.skeleton && (props.allowOpen || props.to !== undefined || props.allowSelectHover || props.hasAction))
 
 const toggleMenu = (event: MouseEvent) => {
-  if (props.disabled || props.disableMore || !containerRef.value || !moreRef.value) return
+  if (props.disabled || props.disableMore || !containerRef.value || !moreRef.value || event.ctrlKey) return
 
   const containerRect = containerRef.value.getBoundingClientRect()
 

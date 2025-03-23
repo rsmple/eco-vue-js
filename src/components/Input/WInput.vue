@@ -1,8 +1,9 @@
 <template>
   <WFieldWrapper
+    ref="fieldWrapper"
     v-bind="props"
     :class="$attrs.class"
-    @click="$emit('click:suffix', $event)"
+    @click="$emit('click:suffix', $event); seamless && focus()"
   >
     <template
       v-if="$slots.title"
@@ -12,7 +13,7 @@
     </template>
 
     <template
-      v-if="$slots.subtitle"
+      v-if="$slots.subtitle && unclickable !== false"
       #subtitle
     >
       <slot name="subtitle" />
@@ -42,7 +43,7 @@
     >
       <div
         class="
-          bg-default dark:bg-default-dark relative grid min-h-[--w-input-height,2.75rem] grid-cols-[auto,1fr,auto]
+          relative grid min-h-[--w-input-height,2.75rem] grid-cols-[auto,1fr,auto]
           overflow-hidden rounded-[--w-input-rounded,0.75rem] border border-solid transition-colors duration-75
         "
         :class="{
@@ -51,6 +52,8 @@
           'border-negative dark:border-negative-dark': errorMessage,
           'border-gray-300 dark:border-gray-700': !disabled,
           'border-gray-300/50 dark:border-gray-700/50': disabled,
+          'border-opacity-0 group-hover/field:border-opacity-100 dark:border-opacity-0 dark:group-hover/field:border-opacity-100': seamless && !focused,
+          'bg-default dark:bg-default-dark': !seamless || focused,
         }"
         @click="focus"
         @mousedown.prevent=""
@@ -70,15 +73,19 @@
         </div>
 
         <div
+          ref="content"
           class="group/input col-start-2 grid grid-cols-1"
           :class="{
             'py-[--w-input-gap,0.25rem] first:pl-[--w-input-gap,0.25rem] last:pr-[--w-input-gap,0.25rem]': $slots.prefix,
+            'no-scrollbar overflow-x-auto overscroll-x-contain': noWrap && (!seamless || focused),
+            'overflow-hidden': noWrap && (seamless && !focused),
           }"
         >
           <div
-            class="flex flex-wrap gap-[--w-input-gap,0.25rem]"
+            class="flex gap-[--w-input-gap,0.25rem]"
             :class="{
               '[&:not(:has(.w-option-has-bg))]:-px--w-option-padding': !icon && !textarea,
+              'flex-wrap': !noWrap,
             }"
           >
             <slot name="prefix" />
@@ -128,8 +135,17 @@
                 @keydown.up.exact.stop="!disabled && !readonly && $emit('keypress:up', $event)"
                 @keydown.down.exact.stop="!disabled && !readonly && $emit('keypress:down', $event)"
                 @keydown.delete.exact.stop="!disabled && !readonly && $emit('keypress:delete', $event); handleBackspace($event)"
-                @focus="$emit('focus', $event); setFocused(true)"
-                @blur="$emit('blur', $event); setFocused(false); isSecureVisible = false"
+                @focus="
+                  $emit('focus', $event);
+                  setFocused(true);
+                  seamless && nextTick(() => contentRef?.scrollTo({left: contentRef?.scrollWidth ?? 0}));
+                "
+                @blur="
+                  $emit('blur', $event);
+                  setFocused(false);
+                  isSecureVisible = false;
+                  seamless && contentRef?.scrollTo({left: 0});
+                "
                 @click="$emit('click', $event)"
                 @mousedown.stop="$emit('mousedown', $event)"
                 @select.stop="$emit('select:input', $event)"
@@ -141,11 +157,12 @@
         </div>
 
         <InputActions
+          v-if="!seamless || focused"
           :model-value="(modelValue as ModelValue)"
           :loading="loading"
           :allow-clear="allowClear && modelValue !== ''"
           :disabled="disabled || disabledActions"
-          :readonly="readonly || unclickable"
+          :readonly="readonly || unclickable === true"
           :text-secure="textSecure"
           :is-secure-visible="isSecureVisible"
           :allow-paste="allowPaste"
@@ -181,7 +198,7 @@
 <script lang="ts" setup generic="Type extends InputType = 'text'">
 import type {InputProps} from './types'
 
-import {nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef} from 'vue'
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef} from 'vue'
 
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 
@@ -219,6 +236,8 @@ const emit = defineEmits<{
   (e: 'paste'): void
 }>()
 
+const fieldWrapperRef = useTemplateRef('fieldWrapper')
+const contentRef = useTemplateRef('content')
 const inputRef = useTemplateRef<HTMLInputElement>('input')
 const isSecureVisible = ref(false)
 
@@ -379,5 +398,6 @@ onBeforeUnmount(() => {
 defineExpose({
   focus,
   blur,
+  fieldRef: computed(() => fieldWrapperRef.value?.fieldRef),
 })
 </script>

@@ -48,7 +48,7 @@
           :loading="loading || isLoading"
           :disabled="disabled"
           :readonly="readonly"
-          :disable-clear="disableClear || readonly"
+          :disable-clear="disableClear || readonly || (seamless && !focused)"
           :search="value"
           @unselect="unselect(value)"
         >

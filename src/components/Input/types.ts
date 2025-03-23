@@ -21,7 +21,7 @@ export interface InputProps<Type extends InputType> extends Omit<FieldWrapperPro
   autocomplete?: 'off' | string
   autofocus?: boolean
   readonly?: boolean
-  unclickable?: boolean
+  unclickable?: boolean | null
   disabledActions?: boolean
   loading?: boolean
 
@@ -32,6 +32,7 @@ export interface InputProps<Type extends InputType> extends Omit<FieldWrapperPro
   allowClear?: boolean
   allowPaste?: boolean
   hideInput?: boolean
+  noWrap?: boolean
 }
 
 export interface InputAsyncProps<Type extends InputType> extends InputProps<Type> {

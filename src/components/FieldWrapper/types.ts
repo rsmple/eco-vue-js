@@ -20,4 +20,5 @@ export interface FieldWrapperProps {
   filterField?: string
   filterValue?: unknown
   subgrid?: boolean
+  seamless?: boolean
 }

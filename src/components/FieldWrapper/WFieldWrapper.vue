@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative"
+    class="group/field relative"
     v-bind="{class: $attrs.class, style: $attrs.style as StyleValue}"
     :class="{
       'mb-[1.125rem] mt-1': !noMargin && !subgrid,
@@ -53,6 +53,7 @@
     <slot name="subtitle" />
 
     <div
+      ref="field"
       class="grid"
       :class="{
         'pr-9': !title && !$slots.title && filterField,
@@ -178,7 +179,7 @@
 <script lang="ts" setup>
 import type {FieldWrapperProps} from './types'
 
-import {type StyleValue, computed, ref, useId} from 'vue'
+import {type StyleValue, computed, readonly, ref, useId, useTemplateRef} from 'vue'
 
 import WButtonCopy from '@/components/Button/WButtonCopy.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
@@ -199,6 +200,8 @@ defineEmits<{
 
 const id = useId()
 
+const fieldRef = useTemplateRef('field')
+
 const focused = ref(false)
 
 const encodedQueryParam = computed(() => {
@@ -210,4 +213,8 @@ const encodedQueryParam = computed(() => {
 const setFocused = (value: boolean): void => {
   focused.value = value
 }
+
+defineExpose({
+  fieldRef,
+})
 </script>
