@@ -2,56 +2,54 @@
   <component
     :is="to !== undefined ? disabled || skeleton ? 'a' : RouterLink : tag"
     v-bind="to !== undefined && !disabled && !skeleton ? {to} : undefined"
-    class="relative grid w-full select-none justify-items-center gap-1 py-2"
+    class="w-ripple-trigger group block h-[3.25rem] w-full px-1 py-0.5"
     :class="{
-      'text-primary-default dark:text-primary-dark': active && semanticType === SemanticType.SECONDARY,
-      [skeleton || disabled ? semanticTypeStylesMap[SemanticType.SECONDARY] : outline ? semanticTypeOutlineStylesMap[semanticType] : semanticTypeStylesMap[semanticType]]: true,
       'cursor-not-allowed opacity-50': disabled,
-      'w-ripple w-ripple-hover cursor-pointer': !disabled && !skeleton,
       'cursor-progress': skeleton,
     }"
     :disabled="disabled || skeleton"
     @click="!disabled && !skeleton && $emit('click', $event)"
   >
-    <WCounter
-      v-if="count !== undefined"
-      v-show="count > 0"
-      class="absolute left-[calc(50%-20px)] top-0 text-xs"
-      :count="count"
-      :trigger="1"
-    />
-
     <WSkeleton
       v-if="skeleton"
-      class="w-skeleton-h-6 w-skeleton-w-6 w-skeleton-rounded-full"
+      class="w-skeleton-w-full w-skeleton-h-auto w-skeleton-rounded-full aspect-square"
     />
 
-    <slot
+    <div
       v-else
-      name="icon"
+      class="relative grid aspect-square w-full select-none items-center justify-center gap-1 rounded-full bg-[200%_auto] [background-position:right]"
+      :class="{
+        'w-ripple w-ripple-hover cursor-pointer': !disabled && !skeleton,
+        'text-primary dark:text-primary-dark': active && semanticType === SemanticType.SECONDARY,
+        [semanticTypeBackgroundMap[semanticType]]: true,
+      }"
     >
-      <template v-if="icon">
-        <component
-          :is="icon"
-          class="square-6"
-        />
-      </template>
-    </slot>
-
-    <div class="whitespace-nowrap text-center text-xs font-normal">
-      <WSkeleton
-        v-if="skeleton"
-        class="min-w-10"
+      <WCounter
+        v-if="count !== undefined"
+        v-show="count > 0"
+        class="absolute left-[calc(50%-20px)] top-0 text-xs"
+        :count="count"
+        :trigger="1"
       />
 
-      <template v-else>
-        {{ title }}
-      </template>
+      <slot name="icon">
+        <template v-if="icon">
+          <component
+            :is="icon"
+            class="square-6 w-svg-stroke-width-sm transition-transform"
+            :class="{
+              'group-hover:scale-120': !disabled,
+            }"
+          />
+        </template>
+      </slot>
+
+      <WShine v-if="!disabled && !isBackdrop" />
     </div>
 
     <WTooltip
-      v-if="tooltipText"
-      :text="tooltipText"
+      v-if="tooltipText || title"
+      :text="tooltipText ?? title"
       left
     />
   </component>
@@ -63,29 +61,12 @@ import type {LinkProps} from '@/types/types'
 import {RouterLink} from 'vue-router'
 
 import WCounter from '@/components/Counter/WCounter.vue'
+import WShine from '@/components/Shine/WShine.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
-import {SemanticType} from '@/utils/SemanticType'
-
-import WTooltip from '../Tooltip/WTooltip.vue'
-
-const semanticTypeStylesMap: Record<SemanticType, string> = {
-  [SemanticType.SECONDARY]: 'text-description bg-default dark:bg-default-dark [not:(:disabled)]:hover:text-primary-default [not:(:disabled)]:dark:hover:text-primary-dark',
-  [SemanticType.PRIMARY]: 'text-default bg-primary-default dark:bg-primary-dark',
-  [SemanticType.POSITIVE]: 'text-default dark:text-default-dark bg-positive dark:bg-positive-dark',
-  [SemanticType.WARNING]: 'text-default dark:text-default-dark bg-warning dark:bg-warning-dark',
-  [SemanticType.NEGARIVE]: 'text-default dark:text-default-dark bg-negative dark:bg-negative-dark',
-  [SemanticType.INFO]: 'text-default dark:text-default-dark bg-info dark:bg-info-dark',
-}
-
-const semanticTypeOutlineStylesMap: Record<SemanticType, string> = {
-  [SemanticType.SECONDARY]: 'text-description bg-default dark:bg-default-dark [not:(:disabled)]:hover:text-primary-default [not:(:disabled)]:dark:hover:text-primary-dark',
-  [SemanticType.PRIMARY]: 'text-primary-default text-primary-dark',
-  [SemanticType.POSITIVE]: 'text-positive dark:text-positive-dark',
-  [SemanticType.WARNING]: 'text-warning dark:text-warning-dark',
-  [SemanticType.NEGARIVE]: 'text-negative dark:text-negative-dark',
-  [SemanticType.INFO]: 'text-info dark:text-info-dark',
-}
+import {useIsBackdrop} from '@/components/Modal/use/useIsBackdrop'
+import {SemanticType, useSemanticTypeBackgroundMap} from '@/utils/SemanticType'
 
 interface Props extends Partial<LinkProps> {
   icon?: SVGComponent
@@ -94,7 +75,6 @@ interface Props extends Partial<LinkProps> {
   tag?: 'button' | 'a'
   count?: number
   semanticType?: SemanticType
-  outline?: boolean
   disabled?: boolean
   skeleton?: boolean
   tooltipText?: string
@@ -108,10 +88,15 @@ withDefaults(
     to: undefined,
     count: undefined,
     semanticType: SemanticType.SECONDARY,
+    tooltipText: undefined,
+    semanticTypeMap: undefined,
   },
 )
 
 defineEmits<{
   (e: 'click', event: MouseEvent): void
 }>()
+
+const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()
+const isBackdrop = useIsBackdrop()
 </script>

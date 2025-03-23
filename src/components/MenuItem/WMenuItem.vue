@@ -4,7 +4,7 @@
     v-bind="to && !disabled ? {to} : href ? {href, download} : undefined"
     class="text-description relative flex w-full min-w-36 select-none items-center justify-start gap-4 px-6 py-2 text-start outline-none first:pt-4 last:pb-4"
     :class="{
-      'w-ripple w-ripple-hover hover:text-primary-default dark:hover:text-primary-dark cursor-pointer': !disabled,
+      'w-ripple w-ripple-hover hover:text-primary dark:hover:text-primary-dark cursor-pointer': !disabled,
       'cursor-not-allowed opacity-50': disabled,
     }"
     :disabled="disabled"

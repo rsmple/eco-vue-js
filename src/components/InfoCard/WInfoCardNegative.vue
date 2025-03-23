@@ -19,7 +19,7 @@ import IconDanger from '@/assets/icons/default/IconDanger.svg?component'
 import {SemanticType} from '@/utils/SemanticType'
 
 const stylesMap: Record<SemanticType, string> = {
-  [SemanticType.PRIMARY]: 'text-primary-default dark:text-primary-dark',
+  [SemanticType.PRIMARY]: 'text-primary dark:text-primary-dark',
   [SemanticType.SECONDARY]: 'text-description',
   [SemanticType.NEGARIVE]: 'text-negative dark:text-negative-dark',
   [SemanticType.POSITIVE]: 'text-positive dark:text-positive-dark',

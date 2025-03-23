@@ -45,7 +45,7 @@
       v-if="selectedCount"
       @click="$emit('clear:selection')"
     >
-      <span class="sm-not:hidden">Selected&nbsp;</span><span class="text-primary-default dark:text-primary-dark font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedCount === 1 ? '' : 's' }}</span>
+      <span class="sm-not:hidden">Selected&nbsp;</span><span class="text-primary dark:text-primary-dark font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedCount === 1 ? '' : 's' }}</span>
     </WButtonSelectionState>
 
     <slot

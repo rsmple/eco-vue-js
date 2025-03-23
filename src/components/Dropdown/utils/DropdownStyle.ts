@@ -43,6 +43,24 @@ class BottomOuter extends VerticalGetter {
   }
 }
 
+class VerticalCenter extends VerticalGetter {
+  isTop = false
+
+  styleGetter(parentRect: DOMRect) {
+    return {top: parentRect.top + parentRect.height / 2 + 'px'}
+  }
+
+  marginGetter() {
+    return 0
+  }
+
+  heightStyleGetter() {
+    return {
+      height: '0px',
+    }
+  }
+}
+
 class TopOuter extends VerticalGetter {
   isTop = true
 
@@ -101,6 +119,10 @@ class RightInner extends HorizontalGetter {
   marginGetter(parentRect: DOMRect, maxWidth: number) {
     return document.documentElement.clientWidth - parentRect.left - maxWidth - EDGE
   }
+}
+
+class RightCenter extends RightOuter {
+  verticalGetterOrder = [new VerticalCenter()]
 }
 
 class Fill extends HorizontalGetter {
@@ -166,12 +188,18 @@ class LeftOuter extends HorizontalGetter {
   }
 }
 
+export class LeftCenter extends LeftOuter {
+  verticalGetterOrder = [new VerticalCenter()]
+}
+
 export const horizontalGetterOrderMap: Record<HorizontalAlign, HorizontalGetter[]> = {
   [HorizontalAlign.RIGHT_OUTER]: [new RightOuter(), new LeftOuter(), new RightInner(), new LeftInner()],
+  [HorizontalAlign.RIGHT_CENTER]: [new RightCenter(), new LeftCenter()],
   [HorizontalAlign.RIGHT_INNER]: [new RightInner(), new LeftInner()],
   [HorizontalAlign.FILL]: [new Fill()],
   [HorizontalAlign.CENTER]: [new Center()],
   [HorizontalAlign.LEFT_INNER]: [new LeftInner(), new RightInner()],
+  [HorizontalAlign.LEFT_CENTER]: [new LeftCenter(), new RightCenter()],
   [HorizontalAlign.LEFT_OUTER]: [new LeftOuter(), new RightOuter(), new LeftInner(), new RightInner()],
 }
 

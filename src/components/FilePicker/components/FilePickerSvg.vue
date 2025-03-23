@@ -4,7 +4,7 @@
       'opacity-50': !isActive,
       'opacity-100': isActive,
       'text-negative dark:text-negative-dark': hasError,
-      'text-primary-default dark:text-primary-dark': !hasError,
+      'text-primary dark:text-primary-dark': !hasError,
     }"
     :width="svgWidth"
     :height="svgHeight"

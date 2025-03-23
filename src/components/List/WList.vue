@@ -297,7 +297,7 @@ const props = defineProps<{
   groupBy?: (a: Data, b: Data) => boolean
   cardColumns: CardColumns
   cardAreas: CardAreas<Fields, CardColumns['length']>
-  cardTo?: (item: Data) => LinkProps['to']
+  cardTo?: (item: Data) => LinkProps['to'] | undefined
 }>()
 
 defineEmits<{

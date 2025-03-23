@@ -475,6 +475,21 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
 
   matchUtilities(
     {
+      'w-svg-stroke-width': value => ({'& path': {'stroke-width': value}}),
+    },
+    {
+      values: {
+        '3xs': '0.5',
+        '2xs': '0.75',
+        xs: '1',
+        sm: '1.25',
+        md: '1.5',
+      },
+    },
+  )
+
+  matchUtilities(
+    {
       'w-list-gap': value => ({'--w-list-gap': value}),
     },
     {

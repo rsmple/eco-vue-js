@@ -36,41 +36,48 @@
         />
       </button>
 
-      <div class="row-start-2">
-        <slot name="top" />
+      <div class="row-start-2 grid grid-rows-[1fr,auto]">
+        <div>
+          <slot name="top" />
 
-        <div
-          v-if="$slots.top && (hasFilter || bottom || $slots.bottom)"
-          class="mx-1 my-2 h-0.5 rounded bg-gray-400 md:my-4 dark:bg-gray-600"
-        />
-
-        <WButtonAction
-          v-if="hasFilter"
-          title="Filters"
-          :icon="IconFilter"
-          :active="isOpen"
-          :count="filterCount"
-          @click="toggle"
-        />
-
-        <slot name="bottom">
-          <component
-            :is="bottom"
-            v-if="bottom"
+          <div
+            v-if="$slots.top && (hasFilter || bottom || $slots.bottom)"
+            class="mx-1 my-2 h-0.5 rounded bg-gray-200 md:my-4 dark:bg-gray-700"
           />
-        </slot>
+
+          <WButtonAction
+            v-if="hasFilter"
+            title="Filters"
+            :icon="markRaw(IconFilter)"
+            :active="isOpen"
+            :count="filterCount"
+            :semantic-type="SemanticType.PRIMARY"
+            @click="toggle"
+          />
+
+          <slot name="bottom">
+            <component
+              :is="bottom"
+              v-if="bottom"
+            />
+          </slot>
+        </div>
+
+        <slot name="footer" />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {type Component, type VNode, computed, onUnmounted, ref, watch} from 'vue'
+import {type Component, type VNode, computed, markRaw, onUnmounted, ref, watch} from 'vue'
 
 import WButtonAction from '@/components/Button/WButtonAction.vue'
 
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
 import IconFilter from '@/assets/icons/sax/IconFilter.svg?component'
+
+import {SemanticType} from '@/main'
 
 const props = defineProps<{
   filter?: Component
@@ -109,5 +116,6 @@ watch(hasFilter, value => {
 defineSlots<{
   top?: () => VNode[]
   bottom?: () => VNode[]
+  footer?: () => VNode[]
 }>()
 </script>

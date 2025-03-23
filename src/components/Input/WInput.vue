@@ -46,7 +46,7 @@
           overflow-hidden rounded-[--w-input-rounded,0.75rem] border border-solid transition-colors duration-75
         "
         :class="{
-          'focus-within:border-primary-default dark:focus-within:border-primary-dark focus-within:outline-primary-default/20 dark:focus-within:outline-primary-dark/20 focus-within:outline focus-within:outline-2': !disabled && !readonly && !unclickable,
+          'focus-within:border-primary dark:focus-within:border-primary-dark focus-within:outline-primary/20 dark:focus-within:outline-primary-dark/20 focus-within:outline focus-within:outline-2': !disabled && !readonly && !unclickable,
           'cursor-text': !disabled,
           'border-negative dark:border-negative-dark': errorMessage,
           'border-gray-300 dark:border-gray-700': !disabled,
@@ -60,7 +60,7 @@
           class="flex h-full w-[--w-input-height,2.75rem] select-none items-center justify-center"
           :class="{
             'text-description': !focused,
-            'text-primary-default dark:text-primary-dark': focused,
+            'text-primary dark:text-primary-dark': focused,
           }"
         >
           <component

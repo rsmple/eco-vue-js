@@ -16,8 +16,8 @@
       v-show="isBetweenRange || (isFrom || isTo && !(isFrom && isTo)) || isDisabled"
       class="absolute h-9 opacity-50"
       :class="{
-        'border-primary-default border-y border-solid': isHoverEnabled && !isDisabled,
-        'bg-primary-default dark:bg-primary-dark': !isHoverEnabled && !isDisabled,
+        'border-primary border-y border-solid': isHoverEnabled && !isDisabled,
+        'bg-primary dark:bg-primary-dark': !isHoverEnabled && !isDisabled,
         'bg-gray-200 dark:bg-gray-700': isDisabled,
         'w-full': isBetweenRange || isDisabled,
         'left-1/2 w-1/2': isFrom && !isTo,
@@ -30,7 +30,7 @@
       :class="{
         'w-ripple w-ripple-hover': !isDisabled,
         'opacity-50': isDisabled,
-        'bg-primary-default dark:bg-primary-dark font-semibold': isSelected,
+        'bg-primary dark:bg-primary-dark font-semibold': isSelected,
       }"
     >
       <div class="font-normal">

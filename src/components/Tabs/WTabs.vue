@@ -86,7 +86,7 @@
         class="absolute rounded-sm duration-500"
         :style="indicatorStyle"
         :class="{
-          'bg-primary-default dark:bg-primary-dark': currentIsValid !== false,
+          'bg-primary dark:bg-primary-dark': currentIsValid !== false,
           'bg-negative dark:bg-negative-dark': currentIsValid === false,
           'transition-[left,width,background-color]': !side && indicatorStyle !== undefined,
           'transition-[top,height,background-color]': side && indicatorStyle !== undefined,

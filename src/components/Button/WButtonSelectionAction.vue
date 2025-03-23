@@ -7,8 +7,8 @@
       outline-none disabled:cursor-not-allowed
     "
     :class="{
-      'w-ripple w-ripple-hover before:text-primary-default dark:before:text-primary-dark hover:text-primary-default dark:hover:text-primary-dark': !disabled && !disableMessage,
-      'text-primary-default dark:text-primary-dark': active,
+      'w-ripple w-ripple-hover before:text-primary dark:before:text-primary-dark hover:text-primary dark:hover:text-primary-dark': !disabled && !disableMessage,
+      'text-primary dark:text-primary-dark': active,
       'text-accent': !active,
     }"
     @click="$emit('click')"

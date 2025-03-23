@@ -81,12 +81,15 @@ import WSelectAsyncList from '@/components/Select/WSelectAsyncList.vue'
 import WSelectAsyncSingle from '@/components/Select/WSelectAsyncSingle.vue'
 import WSelectSingle from '@/components/Select/WSelectSingle.vue'
 import WSelectStringified from '@/components/Select/WSelectStringified.vue'
+import WShine from '@/components/Shine/WShine.vue'
+import WShineEffect from '@/components/Shine/WShineEffect.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTabs from '@/components/Tabs/WTabs.vue'
 import WTabsColumns from '@/components/Tabs/WTabsColumns.vue'
 import WTabsItem from '@/components/Tabs/WTabsItem.vue'
 import WToggle from '@/components/Toggle/WToggle.vue'
+import WToggleTheme from '@/components/Toggle/WToggleTheme.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 import WTooltipContainer from '@/components/Tooltip/WTooltipContainer.vue'
 
@@ -174,12 +177,15 @@ export default {
     app.component('WSelectAsyncSingle', WSelectAsyncSingle)
     app.component('WSelectSingle', WSelectSingle)
     app.component('WSelectStringified', WSelectStringified)
+    app.component('WShine', WShine)
+    app.component('WShineEffect', WShineEffect)
     app.component('WSkeleton', WSkeleton)
     app.component('WSpinner', WSpinner)
     app.component('WTabs', WTabs)
     app.component('WTabsColumns', WTabsColumns)
     app.component('WTabsItem', WTabsItem)
     app.component('WToggle', WToggle)
+    app.component('WToggleTheme', WToggleTheme)
     app.component('WTooltip', WTooltip)
     app.component('WTooltipContainer', WTooltipContainer)
   },
@@ -267,12 +273,15 @@ export {
   WSelectAsyncSingle,
   WSelectSingle,
   WSelectStringified,
+  WShine,
+  WShineEffect,
   WSkeleton,
   WSpinner,
   WTabs,
   WTabsColumns,
   WTabsItem,
   WToggle,
+  WToggleTheme,
   WTooltip,
   WTooltipContainer,
 }

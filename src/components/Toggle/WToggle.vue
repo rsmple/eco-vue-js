@@ -6,15 +6,17 @@
     }"
   >
     <button
-      class="w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-[0.08] isolate grid w-full items-center gap-4 text-start focus:outline-none"
+      class="w-ripple-trigger isolate grid w-full items-center text-start focus:outline-none"
       :class="{
         'cursor-not-allowed opacity-50': disabled,
         'cursor-progress': loading,
         'cursor-pointer': !readonly && !loading && !disabled,
         'cursor-auto select-text': readonly,
         'select-none': !readonly,
-        'grid-cols-[1fr,auto]': !rightLabel,
-        'grid-cols-[auto,1fr]': rightLabel,
+        'grid-cols-[1fr,auto]': title && !rightLabel,
+        'grid-cols-[auto,1fr]': title && rightLabel,
+        'gap-4': title,
+        'justify-center': center,
       }"
       :disabled="disabled || readonly"
       @click="updateModelValue"
@@ -31,28 +33,36 @@
         {{ title }}
       </div>
 
-      <div
-        class="relative my-4 h-4 w-10 min-w-10 max-w-10 rounded-lg"
-        :class="{
-          'bg-gray-400 dark:bg-gray-700': !value || loading,
-          'bg-primary-default dark:bg-primary-dark bg-opacity-70 dark:bg-opacity-70': value && !loading,
-        }"
-      >
+      <div class="-h--w-input-height py-0.75">
         <div
-          class="square-6 absolute -top-1 z-10 flex items-center justify-center rounded-full border border-solid shadow-md transition-[right]"
+          class="width-10 p-0.75 h-full rounded-full bg-[200%_auto] [background-position:right]"
           :class="{
-            'right-4': value === false,
-            'right-2': value === null,
-            'right-0': value === true,
-            'w-ripple w-hover-circle': !disabled && !readonly,
-            'bg-default border-default dark:border-gray-100 dark:bg-gray-100': !value || loading,
-            'bg-primary-default dark:bg-primary-dark border-primary-default dark:border-primary-dark': value && !loading,
+            'bg-gray-300 dark:bg-gray-700': !value || loading,
+            [semanticTypeBackgroundMap[SemanticType.PRIMARY]]: value && !loading,
           }"
         >
-          <WSpinner
-            v-if="loading"
-            class="text-description w-spinner-size-5"
-          />
+          <div class="relative grid size-full grid-cols-3">
+            <div
+              class="bg-default text-primary dark:text-primary-dark absolute z-10 flex aspect-square h-full items-center justify-center rounded-full shadow-md transition-[right]"
+              :class="{
+                'right-[calc(100%-1.25rem)]': value === false,
+                'right-[calc(50%-0.625rem)]': value === null,
+                'right-0': value === true,
+                'w-ripple w-ripple-hover': !disabled && !readonly,
+              }"
+            >
+              <WSpinner
+                v-if="loading"
+                class="text-description w-spinner-size-5"
+              />
+
+              <component
+                :is="icon"
+                v-else-if="icon"
+                class="square-4"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </button>
@@ -74,6 +84,7 @@ import {computed} from 'vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 
 import {Notify} from '@/utils/Notify'
+import {SemanticType, useSemanticTypeBackgroundMap} from '@/utils/SemanticType'
 
 defineOptions({inheritAttrs: false})
 
@@ -89,6 +100,8 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'update:modelValue', value: Value): void
 }>()
+
+const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()
 
 const value = computed<boolean | null>({
   get: () => {

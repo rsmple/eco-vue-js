@@ -14,7 +14,6 @@ export interface ButtonProps extends Partial<LinkProps> {
   href?: string
   target?: '_self' | '_blank' | '_parent' | '_top'
   join?: boolean
-  semanticTypeMap?: Partial<Record<SemanticType, string>>
   tooltipText?: string
   download?: string
 }

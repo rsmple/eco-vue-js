@@ -11,7 +11,7 @@
       :disabled="disabled"
       class="w-ripple-trigger grid select-none grid-cols-[auto,1fr] font-semibold outline-none transition-colors duration-500"
       :class="{
-        'text-primary-default dark:text-primary-dark': !hasError && active,
+        'text-primary dark:text-primary-dark': !hasError && active,
         'text-negative dark:text-negative-dark': hasError,
         'text-positive dark:text-positive-dark': showHasValue && !active && !hasError && hasValue,
         'text-description': !active && !hasError && (showHasValue ? !hasValue : true),

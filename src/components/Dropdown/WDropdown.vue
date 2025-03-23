@@ -2,9 +2,12 @@
   <div
     ref="dropdown"
     :style="styles"
-    class="group/dropdown fixed h-auto"
+    class="group/dropdown fixed grid h-auto"
     :class="{
       'dropdown-top': isTop,
+      'content-center': horizontalAlign === HorizontalAlign.LEFT_CENTER || horizontalAlign === HorizontalAlign.RIGHT_CENTER,
+      'justify-end': isLeftCenter,
+      'justify-center': horizontalAlign === HorizontalAlign.CENTER,
     }"
   >
     <slot
@@ -23,9 +26,10 @@ import type {DropdownProps} from './types'
 import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import DOMListenerContainer from '@/utils/DOMListenerContainer'
+import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {getAllScrollParents, isClientSide} from '@/utils/utils'
 
-import {type HorizontalGetter, VerticalGetter, horizontalGetterOrderMap, searchStyleGetter} from './utils/DropdownStyle'
+import {type HorizontalGetter, LeftCenter, VerticalGetter, horizontalGetterOrderMap, searchStyleGetter} from './utils/DropdownStyle'
 
 const props = defineProps<DropdownProps>()
 
@@ -40,6 +44,7 @@ let horizontalGetter: HorizontalGetter | null = null
 let verticalGetter: VerticalGetter | null = null
 
 const isTop = ref(false)
+const isLeftCenter = ref(false)
 
 const widthStyle = ref<Record<string, string>>({})
 const heightStyle = ref<Record<string, string>>({})
@@ -65,6 +70,8 @@ const setParentRect = (updateSize = false, updateAlign = false): void => {
 
   if (!horizontalGetter || (isLeftChanged && (props.updateAlign || updateAlign))) {
     horizontalGetter = searchStyleGetter(order.value, newRect, props.maxWidth)
+
+    isLeftCenter.value = horizontalGetter instanceof LeftCenter
 
     if (updateSize) widthStyle.value = horizontalGetter.widthStyleGetter(newRect, props.maxWidth)
   }

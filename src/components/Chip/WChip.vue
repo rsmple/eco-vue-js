@@ -27,7 +27,7 @@ defineProps<{
 }>()
 
 const classMap: Record<SemanticType, string> = {
-  [SemanticType.PRIMARY]: 'text-primary-default dark:text-primary-dark',
+  [SemanticType.PRIMARY]: 'text-primary dark:text-primary-dark',
   [SemanticType.SECONDARY]: 'text-description',
   [SemanticType.POSITIVE]: 'text-positive dark:text-positive-dark',
   [SemanticType.NEGARIVE]: 'text-negative dark:text-negative-dark',

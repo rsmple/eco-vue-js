@@ -46,7 +46,7 @@
         :skeleton="skeleton"
         :disabled="disabled"
         :class="{
-          'bg-primary-default dark:bg-primary-dark text-default dark:text-default-dark': canSave,
+          'bg-primary dark:bg-primary-dark text-default dark:text-default-dark': canSave,
         }"
         @click="toggle"
       />
@@ -78,7 +78,7 @@
           <div
             v-if="timeout"
             :key="timeout.toString()"
-            class="bg-primary-default dark:bg-primary-dark relative h-full rounded-sm"
+            class="bg-primary dark:bg-primary-dark relative h-full rounded-sm"
             :style="{'--debounce-duration': debounce + 'ms'}"
           />
         </Transition>

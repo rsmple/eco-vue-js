@@ -35,7 +35,7 @@
 
   <div
     class="-square--header-height w-ripple fixed left-0 top-0 z-30 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
-    :class="{'text-primary-default': isOpen}"
+    :class="{'text-primary': isOpen}"
     @click.stop="toggle"
   >
     <IconMenu />

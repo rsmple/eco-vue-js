@@ -1,3 +1,5 @@
+import {reactive} from 'vue'
+
 export enum SemanticType {
   PRIMARY = 'primary',
   SECONDARY = 'secondary',
@@ -5,4 +7,68 @@ export enum SemanticType {
   POSITIVE = 'positive',
   WARNING = 'warning',
   INFO = 'info',
+}
+
+const semanticTypeConfig = reactive<Record<SemanticType, string>>({
+  [SemanticType.PRIMARY]: 'bg-primary dark:bg-primary-dark text-default',
+  [SemanticType.SECONDARY]: 'bg-default dark:bg-default-dark text-accent',
+  [SemanticType.NEGARIVE]: 'bg-negative dark:bg-negative-dark text-default',
+  [SemanticType.POSITIVE]: 'bg-positive dark:bg-positive-dark text-default',
+  [SemanticType.WARNING]: 'bg-warning dark:bg-warning-dark text-black-default dark:text-default-dark ',
+  [SemanticType.INFO]: 'bg-info dark:bg-info-dark text-default',
+})
+
+export const useSemanticTypeBackgroundMap = () => {
+  return semanticTypeConfig
+}
+
+export const setSemanticTypeBackgroundMap = (value: Partial<Record<SemanticType, string>>) => {
+  Object.assign(semanticTypeConfig, value)
+}
+
+const semanticTypeChipMap = reactive<Record<SemanticType, string>>({
+  ...semanticTypeConfig,
+  [SemanticType.SECONDARY]: 'bg-gray-200 dark:bg-gray-800 text-description',
+})
+
+export const useSemanticTypeChipMap = () => {
+  return semanticTypeChipMap
+}
+
+export const setSemanticTypeChipMap = (value: Partial<Record<SemanticType, string>>) => {
+  Object.assign(semanticTypeChipMap, value)
+}
+
+const semanticTypeBorderMap = reactive<Record<SemanticType, string>>({
+  [SemanticType.PRIMARY]: 'border border-solid border-primary dark:border-primary-dark',
+  [SemanticType.SECONDARY]: 'border border-solid border-gray-300 dark:border-gray-700',
+  [SemanticType.NEGARIVE]: 'border border-solid border-negative dark:border-negative-dark',
+  [SemanticType.POSITIVE]: 'border border-solid border-positive dark:border-positive-dark',
+  [SemanticType.WARNING]: 'border border-solid border-warning dark:border-warning-dark',
+  [SemanticType.INFO]: 'border border-solid border-info dark:border-info-dark',
+})
+
+export const useSemanticTypeBorderMap = () => {
+  return semanticTypeBorderMap
+}
+
+export const setSemanticTypeBorderMap = (value: Partial<Record<SemanticType, string>>) => {
+  Object.assign(semanticTypeBorderMap, value)
+}
+
+const semanticTypeTextStylesMap = reactive<Record<SemanticType, string>>({
+  [SemanticType.PRIMARY]: 'text-primary dark:text-primary-dark',
+  [SemanticType.SECONDARY]: 'text-description',
+  [SemanticType.NEGARIVE]: 'text-negative dark:text-negative-dark',
+  [SemanticType.POSITIVE]: 'text-positive dark:text-positive-dark',
+  [SemanticType.WARNING]: 'text-warning dark:text-warning-dark',
+  [SemanticType.INFO]: 'text-info dark:text-info-dark',
+})
+
+export const useSemanticTypeTextMap = () => {
+  return semanticTypeTextStylesMap
+}
+
+export const setSemanticTypeTextMap = (value: Partial<Record<SemanticType, string>>) => {
+  Object.assign(semanticTypeTextStylesMap, value)
 }

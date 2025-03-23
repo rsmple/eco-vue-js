@@ -13,14 +13,14 @@
     }"
     :is="to !== undefined ? disabled ? 'a' : RouterLink : tag"
     class="
-      w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-0.0625rem)] relative isolate flex
+      w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-1px)] relative isolate flex
       min-h-[--w-button-height,2.75rem] select-none
       items-center justify-center whitespace-nowrap
       rounded-[--w-button-rounded,1rem] px-[--w-button-rounded,1rem] font-medium outline-none
     "
     :class="{
-      [semanticTypeMap?.[semanticType] ?? semanticTypeButtonStylesMap[semanticType]]: true,
-      [semanticTypeMap?.[semanticType] ?? semanticTypeButtonBorderStylesMap[semanticType]]: true,
+      [semanticTypeBackgroundMap[semanticType]]: true,
+      [semanticTypeBorderMap[semanticType]]: true,
       'w-ripple w-ripple-hover before:text-black-default w-ripple-opacity-20 dark:w-ripple-opacity-30 cursor-pointer': !loading && !disabled,
       'cursor-progress': loading,
       'cursor-not-allowed opacity-70': disabled,
@@ -57,6 +57,8 @@
       v-if="tooltipText"
       :text="tooltipText"
     />
+
+    <WShine v-if="!disabled && !loading" />
   </component>
 </template>
 
@@ -66,12 +68,11 @@ import type {ButtonProps} from './types'
 import {type StyleValue} from 'vue'
 import {RouterLink} from 'vue-router'
 
+import WShine from '@/components/Shine/WShine.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
-import {SemanticType} from '@/utils/SemanticType'
-
-import {semanticTypeButtonBorderStylesMap, semanticTypeButtonStylesMap} from './models/semanticTypeStylesMap'
+import {SemanticType, useSemanticTypeBackgroundMap, useSemanticTypeBorderMap} from '@/utils/SemanticType'
 
 defineOptions({inheritAttrs: false})
 
@@ -87,6 +88,9 @@ const props = withDefaults(
     semanticTypeMap: undefined,
   },
 )
+
+const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()
+const semanticTypeBorderMap = useSemanticTypeBorderMap()
 
 const emit = defineEmits<{
   (e: 'click', event: MouseEvent | KeyboardEvent): void

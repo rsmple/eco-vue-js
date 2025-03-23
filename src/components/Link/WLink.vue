@@ -3,12 +3,12 @@
     v-bind="!to ? {target, href} : {to}"
     :is="to ? RouterLink : 'a'"
     class="cursor-pointer overflow-hidden truncate whitespace-normal font-normal no-underline hover:underline"
-    :class="semanticTypeTextStylesMap[semanticType]"
+    :class="semanticTypeTextMap[semanticType]"
   >
     <component
       :is="icon ?? IconLink"
       class="square-[1.25em] mr-[0.25em] mt-[-0.25em] inline rounded-[0.5em] p-px"
-      :class="semanticTypeChipsStylesMap[semanticType]"
+      :class="semanticTypeChipMap[semanticType]"
     /><slot>{{ text }}</slot>
   </component>
 </template>
@@ -20,8 +20,7 @@ import {RouterLink} from 'vue-router'
 
 import IconLink from '@/assets/icons/sax/IconLink.svg?component'
 
-import {semanticTypeChipsStylesMap, semanticTypeTextStylesMap} from '@/components/Button/models/semanticTypeStylesMap'
-import {SemanticType} from '@/utils/SemanticType'
+import {SemanticType, useSemanticTypeChipMap, useSemanticTypeTextMap} from '@/utils/SemanticType'
 
 interface Props extends Partial<LinkProps> {
   href?: string
@@ -42,4 +41,7 @@ withDefaults(
     icon: undefined,
   },
 )
+
+const semanticTypeChipMap = useSemanticTypeChipMap()
+const semanticTypeTextMap = useSemanticTypeTextMap()
 </script>

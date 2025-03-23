@@ -7,7 +7,7 @@
     <div class="mb-4">
       <WProgressStriped
         :model-value="progress * 100"
-        class="bg-primary-default dark:bg-primary-dark"
+        class="bg-primary dark:bg-primary-dark"
       />
 
       <div class="text-description mt-1 text-end text-xs">

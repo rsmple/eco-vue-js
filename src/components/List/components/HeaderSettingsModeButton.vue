@@ -2,7 +2,7 @@
   <button
     class="w-ripple w-ripple-hover relative flex justify-center rounded-2xl p-4"
     :class="{
-      'text-primary-default dark:text-primary-dark bg-primary-default/10 dark:bg-primary-dark/10': active,
+      'text-primary dark:text-primary-dark bg-primary/10 dark:bg-primary-dark/10': active,
       'text-description': !active,
     }"
   >

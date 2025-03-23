@@ -8,6 +8,14 @@ export default {
         transform: 'translateX(100%)',
       },
     },
+    'ticker-rare': {
+      '0%, 45%': {
+        transform: 'translateX(-100%)',
+      },
+      '55%, 100%': {
+        transform: 'translateX(100%)',
+      },
+    },
 
     'move-horizontal': {
       from: {
@@ -77,6 +85,7 @@ export default {
   },
   animation: {
     ticker: 'ticker var(--tiker-duration, 0.8s) linear infinite',
+    'ticker-rare': 'ticker-rare var(--tiker-duration, 10s) linear infinite',
     'move-horizontal': 'move-horizontal var(--tiker-duration, 0.8s) linear infinite',
     shake: 'shake .6s linear infinite',
     'border-rotate': 'border-rotate linear infinite 10s',

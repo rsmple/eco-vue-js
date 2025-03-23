@@ -1,7 +1,7 @@
 <template>
   <div class="h-1 w-full bg-gray-200 dark:bg-gray-700">
     <div
-      class="bg-primary-default dark:bg-primary-dark h-full transition-[width]"
+      class="bg-primary dark:bg-primary-dark h-full transition-[width]"
       :style="{
         width: modelValue + '%',
       }"

@@ -18,13 +18,13 @@
       class="square-[1.5em] bg-default dark:bg-default-dark relative isolate flex items-center justify-center border border-solid [font-size:--w-checkbox-size]"
       :class="{
         'text-default dark:text-default-dark': modelValue && !disabled,
-        'text-primary-default dark:text-primary-dark': !modelValue && !disabled,
+        'text-primary dark:text-primary-dark': !modelValue && !disabled,
         'text-gray-300 dark:text-gray-700': !modelValue && disabled,
         'w-ripple w-hover-circle before:text-accent after:text-accent': !disabled && !readonly,
         'rounded-full': radio,
         'rounded-md': !radio,
         'border-gray-300 dark:border-gray-700': disabled,
-        'border-primary-default dark:border-primary-dark': !disabled,
+        'border-primary dark:border-primary-dark': !disabled,
       }"
       @keypress.enter.stop.prevent="toggle"
     >
@@ -42,7 +42,7 @@
             'scale-[0.66] rounded': !radio && intermediate && modelValue === null,
             'scale-[0.66] rounded-full': radio && !(intermediate && modelValue === null),
             'rounded': !radio && !(intermediate && modelValue === null),
-            'bg-primary-default dark:bg-primary-dark': !disabled,
+            'bg-primary dark:bg-primary-dark': !disabled,
             'bg-gray-300 dark:bg-gray-700': disabled,
           }"
         />

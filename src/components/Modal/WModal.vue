@@ -7,7 +7,7 @@
       leave-to-class="opacity-0"
     >
       <div
-        v-if="isBackdropVisible"
+        v-if="isBackdrop"
         :style="{zIndex: 100 + modalMetaList.length + modalMetaList.length - 1}"
         class="bg-primary-light dark:bg-primary-darkest fixed left-0 top-0 size-full bg-opacity-40 backdrop-blur dark:bg-opacity-40"
       />
@@ -47,6 +47,7 @@ import {Modal, type ModalComponent, initModal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
 
 import ModalCloseButton from './components/ModalCloseButton.vue'
+import {useIsBackdrop} from './use/useIsBackdrop'
 
 type ModalMeta<ModalProps> = {
   key: number
@@ -59,7 +60,7 @@ type ModalMeta<ModalProps> = {
 const key = ref(0)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const modalMetaList = ref<ModalMeta<any>[]>([])
-const isBackdropVisible = ref(false)
+const isBackdrop = useIsBackdrop()
 const hasChangesMap = reactive<Record<number, boolean>>({})
 
 type Cb = () => void
@@ -125,11 +126,11 @@ watch(modalMetaList, value => {
   if (timeout) clearTimeout(timeout)
 
   if (value.length) {
-    isBackdropVisible.value = true
+    isBackdrop.value = true
   } else {
     timeout = setTimeout(() => {
       timeout = undefined
-      isBackdropVisible.value = false
+      isBackdrop.value = false
     }, 100)
   }
 })

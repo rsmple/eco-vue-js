@@ -18,6 +18,7 @@ const newValues = {
 }
 
 const extend = {
+  0.75: '0.1875rem',
   1.25: '0.3125rem',
   4.5: '1.125rem',
   6: '1.5rem',

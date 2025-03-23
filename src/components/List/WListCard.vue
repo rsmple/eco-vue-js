@@ -18,7 +18,7 @@
     >
       <div
         v-if="mobile && selected"
-        class="bg-primary-default dark:bg-primary-dark @sm:hidden absolute left-0 top-0 h-full w-2"
+        class="bg-primary dark:bg-primary-dark @sm:hidden absolute left-0 top-0 h-full w-2"
       />
     </Transition>
 
@@ -36,7 +36,7 @@
         :class="{
           'border border-r-0': hasBorder,
           'border-gray-300 dark:border-gray-700': hasBorder && !selected,
-          'border-primary-default dark:border-primary-dark': hasBorder && selected,
+          'border-primary dark:border-primary-dark': hasBorder && selected,
           'rounded-bl-[unset!important]': isOpen,
           'border-b-transparent dark:border-b-transparent': hasBorder && isOpen,
           'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': isActionShown,
@@ -58,7 +58,7 @@
 
         <div
           v-if="selected"
-          class="bg-primary-default/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
+          class="bg-primary/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
         />
       </div>
     </div>
@@ -74,7 +74,7 @@
         'grid grid-cols-[--w-list-grid-cols] [grid-template-areas:--w-list-grid-areas] sm:rounded-[--w-list-rounded,unset]': card,
         'sm:border-y': hasBorder,
         'border-gray-300 dark:border-gray-700': hasBorder && !selected,
-        'border-primary-default dark:border-primary-dark': hasBorder && selected,
+        'border-primary dark:border-primary-dark': hasBorder && selected,
         'sm:border': card && hasBorder,
         'border-b-transparent dark:border-b-transparent': !card && hasBorder && isOpen,
       }"
@@ -105,7 +105,7 @@
 
       <div
         v-if="selected"
-        class="bg-primary-default/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
+        class="bg-primary/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
       />
 
       <WButtonMore
@@ -140,7 +140,7 @@
         :class="{
           'rounded-tr-[--w-list-rounded,unset] border border-l-0': hasBorder,
           'border-gray-300 dark:border-gray-700': hasBorder && !selected,
-          'border-primary-default dark:border-primary-dark': hasBorder && selected,
+          'border-primary dark:border-primary-dark': hasBorder && selected,
           'rounded-br-[unset!important]': isOpen,
           'border-b-transparent dark:border-b-transparent': hasBorder && isOpen,
           'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': isActionShown,
@@ -160,7 +160,7 @@
 
         <div
           v-if="selected"
-          class="bg-primary-default/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
+          class="bg-primary/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
         />
       </div>
     </div>
@@ -172,7 +172,7 @@
       class="sm:w-inner sm:left-inner col-span-full sm:sticky"
       :class="{
         'border-gray-300 dark:border-gray-700': hasBorder && !selected,
-        'border-primary-default dark:border-primary-dark': hasBorder && selected,
+        'border-primary dark:border-primary-dark': hasBorder && selected,
         'mt-[calc(var(--w-list-gap,1rem)*-1)] border border-t-0 px-5': !card && hasBorder,
         'rounded-b-[--w-list-rounded,unset]': !card,
       }"

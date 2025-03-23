@@ -23,16 +23,10 @@ const tailwindBase = {
       default: '#ffffff',
       'default-dark': colors.zinc['900'], // '#101827',
 
-      primary: {
-        darkest: '#23222e',
-        dark: '#5b4fc4', // '#4d42ad',
-        default: '#9087e2',
-        light: '#f4f3fc',
-      },
-
-      secondary: {
-        default: '#ffffff',
-      },
+      'primary-darkest': '#23222e',
+      'primary-dark': '#5b4fc4',
+      primary: '#9087e2',
+      'primary-light': '#f4f3fc',
 
       black: {
         default: '#333333',

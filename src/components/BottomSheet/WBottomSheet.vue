@@ -36,7 +36,7 @@
                   class="h-1 w-12 rounded-sm"
                   :class="{
                     'bg-gray-300': !swipeStarted,
-                    'bg-primary-default dark:bg-primary-dark': swipeStarted,
+                    'bg-primary dark:bg-primary-dark': swipeStarted,
                   }"
                 />
               </div>

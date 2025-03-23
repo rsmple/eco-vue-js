@@ -3,7 +3,7 @@
     :to="to"
     class="w-ripple w-ripple-hover relative block no-underline"
     :class="{
-      'text-primary-default dark:text-primary-dark': isTextColor,
+      'text-primary dark:text-primary-dark': isTextColor,
       'text-accent': !isTextColor,
       'pl-2': indent
     }"
@@ -16,7 +16,7 @@
     >
       <div
         v-if="!indent && (isActive || hasActive)"
-        class="bg-primary-default dark:bg-primary-dark absolute left-0 top-0 h-full w-1"
+        class="bg-primary dark:bg-primary-dark absolute left-0 top-0 h-full w-1"
       />
     </Transition>
 

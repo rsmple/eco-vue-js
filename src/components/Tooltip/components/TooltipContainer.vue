@@ -1,6 +1,6 @@
 <template>
   <div
-    class="pointer-events-none flex items-center drop-shadow-md dark:drop-shadow-none"
+    class="pointer-events-none flex items-center"
     :class="{
       'flex-col': !isLeft && !isRight,
       'justify-end': isLeft,

@@ -188,6 +188,11 @@ export enum ListMode {
   GRID = 'grid',
 }
 
+export enum Theme {
+  LIGHT = 'light',
+  DARK = 'dark',
+}
+
 export const unwrapSlots = (slots: VNode[]): VNode[] => {
   return slots.flatMap(slot => {
     if (Array.isArray(slot?.children)) return unwrapSlots(slot.children as VNode[])
