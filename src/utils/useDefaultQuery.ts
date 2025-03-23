@@ -92,7 +92,6 @@ export const wrapUseQueryPaginated = <Data, QueryParams extends {page?: number}>
     const newQuery = makeQueryPaginated(key, () => query.data.value, query.setData)(queryParams, options)
 
     watch(query.data, () => {
-      console.log('refetch')
       newQuery.refetch()
     })
 

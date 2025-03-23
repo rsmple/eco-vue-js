@@ -2,14 +2,21 @@
   <component
     :is="to && !disabled ? RouterLink : href ? 'a' : 'button'"
     v-bind="to && !disabled ? {to} : href ? {href, download} : undefined"
-    class="text-description relative flex w-full min-w-36 select-none items-center justify-start gap-4 px-6 py-2 text-start outline-none first:pt-4 last:pb-4"
+    class="text-description w-ripple-trigger block w-full min-w-36 select-none items-center justify-start px-2 text-start outline-none first:pt-2 last:pb-2"
     :class="{
-      'w-ripple w-ripple-hover hover:text-primary dark:hover:text-primary-dark cursor-pointer': !disabled,
+      'hover:text-primary dark:hover:text-primary-dark cursor-pointer': !disabled,
       'cursor-not-allowed opacity-50': disabled,
     }"
     :disabled="disabled"
+    @click="!disabled && $emit('click', $event)"
   >
-    <slot />
+    <div
+      :class="{
+        'w-ripple w-ripple-hover relative flex w-full gap-4 rounded-lg px-2 py-1': !disabled,
+      }"
+    >
+      <slot />
+    </div>
   </component>
 </template>
 
@@ -24,12 +31,9 @@ interface Props extends Partial<LinkProps> {
   download?: string
 }
 
-withDefaults(
-  defineProps<Props>(),
-  {
-    href: undefined,
-    download: undefined,
-    to: undefined,
-  },
-)
+defineProps<Props>()
+
+defineEmits<{
+  (e: 'click', value: MouseEvent): void
+}>()
 </script>

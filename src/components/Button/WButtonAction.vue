@@ -27,7 +27,7 @@
       <WCounter
         v-if="count !== undefined"
         v-show="count > 0"
-        class="absolute left-[calc(50%-20px)] top-0 text-xs"
+        class="absolute left-0 top-0 text-xs"
         :count="count"
         :trigger="1"
       />

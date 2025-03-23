@@ -103,6 +103,11 @@ export type MenuProps<Data> = {
   deleteItem: () => void
 }
 
+export type MenuEmits<Data> = {
+  (e: 'update:item', value: Data): void
+  (e: 'delete:item'): void
+}
+
 export type MenuComponent<Data> = Component<MenuProps<Data>>
 
 export type BulkProps<QueryParams> = {
@@ -146,4 +151,9 @@ export type GridCol = GridColValue | `minmax(${ GridColValue }, ${ GridColValue 
 export type ListConfig<Fields extends ListFields<any, any>> = {
   fields: FieldConfigMap<Fields>
   mode: ListMode
+}
+
+export type CardActionParams<Data> = {
+  item: Data
+  setter: (value: Data) => void
 }

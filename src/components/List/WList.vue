@@ -164,6 +164,7 @@
           :form-name="skeleton ? undefined : formNameGetter?.(item)"
           :card="isGrid"
           :to="skeleton ? undefined : cardTo?.(item)"
+          :has-action="hasAction"
           :skeleton="skeleton"
 
           :selected="skeleton ? false : getIsSelected(value as number, position)"
@@ -171,6 +172,7 @@
           :allow-select-hover="allowSelectHover"
           @toggle:selected="toggleSelected(value as number, position)"
           @hover:selected="hoverSelected(position)"
+          @click:action="$emit('click:action', {item, setter})"
         >
           <template #default="{validate}">
             <ListCardFieldNested
@@ -245,7 +247,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>, CardColumns extends readonly GridCol[]">
-import type {BulkComponent, CardAreas, FieldComponent, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
+import type {BulkComponent, CardActionParams, CardAreas, FieldComponent, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
@@ -298,10 +300,12 @@ const props = defineProps<{
   cardColumns: CardColumns
   cardAreas: CardAreas<Fields, CardColumns['length']>
   cardTo?: (item: Data) => LinkProps['to'] | undefined
+  hasAction?: boolean
 }>()
 
 defineEmits<{
   (e: 'update:error', value: ApiError): void
+  (e: 'click:action', value: CardActionParams<Data>): void
 }>()
 
 const {isMobile} = useIsMobile()

@@ -4,6 +4,7 @@
     :href="href"
     :download="download"
     :disabled="disabled"
+    @click="$emit('click', $event)"
   >
     <div class="min-w-20 flex-1 text-start">
       {{ text }}
@@ -11,7 +12,10 @@
 
     <slot name="icon">
       <template v-if="icon">
-        <component :is="icon" />
+        <component
+          :is="icon"
+          class="square-[1.25em]"
+        />
       </template>
     </slot>
   </WMenuItem>
@@ -30,13 +34,9 @@ interface Props extends Partial<LinkProps> {
   download?: string
 }
 
-withDefaults(
-  defineProps<Props>(),
-  {
-    icon: undefined,
-    href: undefined,
-    download: undefined,
-    to: undefined,
-  },
-)
+defineProps<Props>()
+
+defineEmits<{
+  (e: 'click', value: MouseEvent): void
+}>()
 </script>

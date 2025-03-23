@@ -9,37 +9,29 @@
       to="body"
       :disabled="!teleport || !isOpen"
     >
-      <Transition
-        enter-active-class="transition-opacity"
-        leave-active-class="transition-opacity"
-        enter-from-class="opacity-0"
-        leave-to-class="opacity-0"
+      <WDropdown
+        v-if="containerRef && isOpen"
+        ref="dropdown"
+        :parent-element="parentElement ?? (containerRef as HTMLDivElement)"
+        :horizontal-align="horizontalAlign"
+        :update-align="updateAlign"
+        :max-height="maxHeight"
+        :max-width="maxWidth"
+        :emit-update="emitUpdate"
+        :class="{
+          'z-[2]': !teleport && !noZIndex,
+          'z-30': teleport && !noZIndex,
+        }"
+        :style="{zIndex}"
+        @update:rect="$emit('update:rect')"
       >
-        <WDropdown
-          v-if="containerRef && isOpen"
-          ref="dropdown"
-          :parent-element="(containerRef as HTMLDivElement)"
-          :horizontal-align="horizontalAlign"
-          :update-align="updateAlign"
-          :max-height="maxHeight"
-          :max-width="maxWidth"
-          :emit-update="emitUpdate"
-          :class="{
-            'z-[2]': !teleport && !noZIndex,
-            'z-30': teleport && !noZIndex,
-          }"
-          class="will-change-[top,bottom]"
-          :style="{zIndex}"
-          @update:rect="$emit('update:rect')"
-        >
-          <template #default="defaultScope">
-            <slot
-              name="content"
-              v-bind="defaultScope"
-            />
-          </template>
-        </WDropdown>
-      </Transition>
+        <template #default="defaultScope">
+          <slot
+            name="content"
+            v-bind="defaultScope"
+          />
+        </template>
+      </WDropdown>
     </teleport>
   </div>
 </template>

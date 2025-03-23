@@ -11,7 +11,7 @@
     }"
   >
     <slot
-      v-bind="{isTop}"
+      v-bind="{isTop, isLeft, isRight}"
       :left="styles.left"
       :right="styles.right"
       :top="styles.top"
@@ -29,7 +29,7 @@ import DOMListenerContainer from '@/utils/DOMListenerContainer'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {getAllScrollParents, isClientSide} from '@/utils/utils'
 
-import {type HorizontalGetter, LeftCenter, VerticalGetter, horizontalGetterOrderMap, searchStyleGetter} from './utils/DropdownStyle'
+import {type HorizontalGetter, LeftCenter, LeftInner, LeftOuter, RightInner, RightOuter, VerticalGetter, horizontalGetterOrderMap, searchStyleGetter} from './utils/DropdownStyle'
 
 const props = defineProps<DropdownProps>()
 
@@ -45,6 +45,8 @@ let verticalGetter: VerticalGetter | null = null
 
 const isTop = ref(false)
 const isLeftCenter = ref(false)
+const isLeft = ref(false)
+const isRight = ref(false)
 
 const widthStyle = ref<Record<string, string>>({})
 const heightStyle = ref<Record<string, string>>({})
@@ -72,6 +74,8 @@ const setParentRect = (updateSize = false, updateAlign = false): void => {
     horizontalGetter = searchStyleGetter(order.value, newRect, props.maxWidth)
 
     isLeftCenter.value = horizontalGetter instanceof LeftCenter
+    isLeft.value = horizontalGetter instanceof LeftOuter || horizontalGetter instanceof LeftInner
+    isRight.value = horizontalGetter instanceof RightOuter || horizontalGetter instanceof RightInner
 
     if (updateSize) widthStyle.value = horizontalGetter.widthStyleGetter(newRect, props.maxWidth)
   }

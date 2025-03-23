@@ -1,6 +1,7 @@
 <template>
   <div
     v-bind="allowSelect ? {'onMouseover': () => $emit('hover:selected')} : undefined"
+    ref="container"
     class="relative isolate"
     :class="{
       [cardWrapperClass ?? '']: true,
@@ -9,6 +10,7 @@
       'flex': !card,
       '-mb-px': !card && isOpen,
     }"
+    @contextmenu="toggleMenu"
   >
     <Transition
       enter-active-class="transition-transform duration-200"
@@ -57,7 +59,7 @@
         />
 
         <div
-          v-if="selected"
+          v-if="selected || moreRef?.isOpen"
           class="bg-primary/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
         />
       </div>
@@ -97,22 +99,27 @@
         v-if="isActionShown"
         v-bind="allowSelectHover
           ? {tag: 'button', card, onClick: () => $emit('toggle:selected')}
-          : to
-            ? {tag: markRaw(RouterLink), card, class: 'z-[-1]', props: {to}}
-            : {tag: 'button', card, class: 'z-[-1]', onClick: toggle}
+          : hasAction
+            ? {tag: 'button', card, class: 'z-[-1]', onClick: () => $emit('click:action')}
+            : to
+              ? {tag: markRaw(RouterLink), card, class: 'z-[-1]', props: {to}}
+              : {tag: 'button', card, class: 'z-[-1]', onClick: toggle}
         "
       />
 
       <div
-        v-if="selected"
+        v-if="selected || moreRef?.isOpen"
         class="bg-primary/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
       />
 
       <WButtonMore
         v-if="card && $slots.more"
+        ref="more"
         class="-p--inner-margin -my---inner-margin -mr---inner-margin flex items-center"
         :disabled="disabled || disableMore"
         :style="{gridArea: AREA_MORE}"
+        :anchor="anchorRef ?? undefined"
+        @close="position = null"
       >
         <WButtonMoreItem
           v-if="allowSelect"
@@ -148,22 +155,32 @@
       >
         <WButtonMore
           v-if="$slots.more"
+          ref="more"
           class="flex h-full px-[--w-list-padding,1rem]"
           :class="{
             'pt-4.5 items-start': alignTop,
             'items-center': !alignTop,
           }"
           :disabled="disabled || disableMore"
+          :anchor="anchorRef ?? undefined"
+          @close="position = null"
         >
           <slot name="more" />
         </WButtonMore>
 
         <div
-          v-if="selected"
+          v-if="selected || moreRef?.isOpen"
           class="bg-primary/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
         />
       </div>
     </div>
+
+    <div
+      v-if="position"
+      ref="anchor"
+      class="absolute"
+      :style="position"
+    />
   </div>
 
   <template v-if="$slots.expansion">
@@ -211,6 +228,7 @@ const props = defineProps<{
   formName: string | undefined
   card: boolean
   to: LinkProps['to'] | undefined
+  hasAction: boolean | undefined
   skeleton: boolean
 
   selected: boolean
@@ -221,11 +239,16 @@ const props = defineProps<{
 defineEmits<{
   (e: 'toggle:selected'): void
   (e: 'hover:selected'): void
+  (e: 'click:action'): void
 }>()
 
+const containerRef = useTemplateRef('container')
+const moreRef = useTemplateRef('more')
 const formRef = useTemplateRef<ComponentInstance<typeof WForm>>('form')
 
 const isOpen = ref(false)
+const position = ref<{left: string, top: string} | null>(null)
+const anchorRef = useTemplateRef<HTMLDivElement>('anchor')
 
 const toggle = () => {
   isOpen.value = !isOpen.value
@@ -233,5 +256,17 @@ const toggle = () => {
 
 const validate: ComponentInstance<typeof WForm>['validate'] = (...args) => formRef.value?.validate(...args)
 
-const isActionShown = computed<boolean>(() => !props.skeleton && (props.allowOpen || props.to !== undefined || props.allowSelectHover))
+const isActionShown = computed<boolean>(() => !props.skeleton && (props.allowOpen || props.to !== undefined || props.allowSelectHover || props.hasAction))
+
+const toggleMenu = (event: MouseEvent) => {
+  if (props.disabled || props.disableMore || !containerRef.value || !moreRef.value) return
+
+  const containerRect = containerRef.value.getBoundingClientRect()
+
+  position.value = {left: event.screenX - containerRect.x + 'px', top: event.clientY - containerRect.y + 'px'}
+
+  moreRef.value.open()
+
+  event.preventDefault()
+}
 </script>

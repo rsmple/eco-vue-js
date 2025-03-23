@@ -97,7 +97,7 @@ export abstract class HorizontalGetter implements StyleGetter {
   }
 }
 
-class RightOuter extends HorizontalGetter {
+export class RightOuter extends HorizontalGetter {
   verticalGetterOrder = [new BottomInner(), new TopInner()]
 
   styleGetter(parentRect: DOMRect) {
@@ -109,7 +109,7 @@ class RightOuter extends HorizontalGetter {
   }
 }
 
-class RightInner extends HorizontalGetter {
+export class RightInner extends HorizontalGetter {
   verticalGetterOrder = [new BottomOuter(), new TopOuter()]
 
   styleGetter(parentRect: DOMRect) {
@@ -164,7 +164,7 @@ class Center extends HorizontalGetter {
   }
 }
 
-class LeftInner extends HorizontalGetter {
+export class LeftInner extends HorizontalGetter {
   verticalGetterOrder = [new BottomOuter(), new TopOuter()]
 
   styleGetter(parentRect: DOMRect) {
@@ -176,7 +176,7 @@ class LeftInner extends HorizontalGetter {
   }
 }
 
-class LeftOuter extends HorizontalGetter {
+export class LeftOuter extends HorizontalGetter {
   verticalGetterOrder = [new BottomInner(), new TopInner()]
 
   styleGetter(parentRect: DOMRect) {
