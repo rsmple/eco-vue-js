@@ -29,7 +29,7 @@
           :title="slot.props.title"
           :icon="slot.props.icon"
           :has-changes="formRef?.hasChangesMap[slot.props.name] === true"
-          :has-error="typeof formRef?.errorMessageMap[slot.props.name] === 'string'"
+          :has-error="formRef?.hasShownMap[slot.props.name] === true && typeof formRef?.errorMessageMap[slot.props.name] === 'string'"
           :has-value="formRef?.hasValueMap[slot.props.name] === true"
           :first="defaultSlots.indexOf(slot) === 0"
           :last="defaultSlots.indexOf(slot) === defaultSlots.length - 1"
@@ -189,7 +189,7 @@ const indicatorStyle = ref<CSSProperties | undefined>(undefined)
 const minHeight = ref(0)
 const tabItemRef = useTemplateRef('tabItem')
 
-const currentIsValid = computed<boolean>(() => typeof formRef.value?.errorMessageMap[current.value] !== 'string')
+const currentIsValid = computed<boolean>(() => formRef.value?.hasShownMap[current.value] === false || typeof formRef.value?.errorMessageMap[current.value] !== 'string')
 const hasNoValueFirst = computed<number>(() => {
   if (!props.stepper) return 0
 

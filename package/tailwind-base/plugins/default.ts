@@ -441,6 +441,7 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
     {
       'w-skeleton-h': value => ({'--skeleton-height': value}),
       'w-input-h': value => ({'--w-input-height': value}),
+      'w-input-min-h': value => ({'--w-input-min-height': value}),
       'w-textarea-h': value => ({'--w-textarea-height': value}),
       'w-button-h': value => ({'--w-button-height': value}),
     },

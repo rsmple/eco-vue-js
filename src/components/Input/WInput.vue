@@ -43,7 +43,7 @@
     >
       <div
         class="
-          relative grid min-h-[--w-input-height,2.75rem] grid-cols-[auto,1fr,auto]
+          relative grid min-h-[--w-input-min-height,var(--w-input-height,2.75rem)] grid-cols-[auto,1fr,auto]
           overflow-hidden rounded-[--w-input-rounded,0.75rem] border border-solid transition-colors duration-75
         "
         :class="{

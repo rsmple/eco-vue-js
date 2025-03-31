@@ -2,7 +2,7 @@
   <component
     :is="to !== undefined ? disabled || skeleton ? 'a' : RouterLink : tag"
     v-bind="to !== undefined && !disabled && !skeleton ? {to} : undefined"
-    class="w-ripple-trigger group block h-[3.25rem] w-full px-1 py-0.5"
+    class="w-ripple-trigger group grid w-full grid-cols-1 py-1"
     :class="{
       'cursor-not-allowed opacity-50': disabled,
       'cursor-progress': skeleton,
@@ -12,12 +12,12 @@
   >
     <WSkeleton
       v-if="skeleton"
-      class="w-skeleton-w-full w-skeleton-h-auto w-skeleton-rounded-full aspect-square"
+      class="w-skeleton-w-auto w-skeleton-h-auto w-skeleton-rounded-full mx-1 aspect-square"
     />
 
     <div
       v-else
-      class="relative grid aspect-square w-full select-none items-center justify-center gap-1 rounded-full bg-[200%_auto] [background-position:right]"
+      class="relative mx-1 grid aspect-square select-none items-center justify-center gap-1 rounded-full bg-[200%_auto] [background-position:right]"
       :class="{
         'w-ripple w-ripple-hover cursor-pointer': !disabled && !skeleton,
         'text-primary dark:text-primary-dark': active && semanticType === SemanticType.SECONDARY,
@@ -47,9 +47,23 @@
       <WShine v-if="!disabled && !isBackdrop" />
     </div>
 
+    <div
+      v-if="titleText"
+      class="text-3xs mt-1 text-center"
+      :class="{
+        'self-center': !skeleton,
+      }"
+    >
+      <WSkeleton v-if="skeleton" />
+
+      <template v-else>
+        {{ title }}
+      </template>
+    </div>
+
     <WTooltip
-      v-if="tooltipText || title"
-      :text="tooltipText ?? title"
+      v-if="tooltipText || (!titleText && title)"
+      :text="tooltipText ?? (titleText ? undefined : title)"
       left
     />
   </component>
@@ -78,6 +92,7 @@ interface Props extends Partial<LinkProps> {
   disabled?: boolean
   skeleton?: boolean
   tooltipText?: string
+  titleText?: boolean
 }
 
 withDefaults(

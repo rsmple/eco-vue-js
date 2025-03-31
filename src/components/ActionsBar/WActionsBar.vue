@@ -47,7 +47,7 @@
 
           <WButtonAction
             v-if="hasFilter"
-            title="Filters"
+            :title="textFilter ?? 'Filters'"
             :icon="markRaw(IconFilter)"
             :active="isOpen"
             :count="filterCount"
@@ -82,6 +82,7 @@ import {SemanticType} from '@/main'
 const props = defineProps<{
   filter?: Component
   bottom?: Component
+  textFilter?: string
 }>()
 
 let closeModal: (() => void) | null = null

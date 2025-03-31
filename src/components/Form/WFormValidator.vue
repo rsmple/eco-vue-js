@@ -2,12 +2,13 @@
   <component
     :is="componentSlot"
     ref="component"
-    :error-message="errorMessage"
+    :error-message="isErrorShown ? errorMessage : undefined"
     :has-changes="noChanges ? undefined : hasChanges"
     @update:model-value="_validateOnUpdate"
     @select="_validateOnSelect"
     @unselect="_validateOnUnselect"
     @init-model="initModel"
+    @blur="isErrorShown = true"
   />
 </template>
 
@@ -19,7 +20,7 @@ import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 import {debounce} from '@/utils/utils'
 import {validateRequired} from '@/utils/validate'
 
-import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormHasValueUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
+import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormHasShownUpdater, wFormHasValueUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
 import {type ValidatePath, scrollToValidator} from './models/utils'
 
 const props = defineProps<{
@@ -35,6 +36,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:has-changes', value: boolean): void
   (e: 'update:has-value', value: boolean | null): void
+  (e: 'update:has-shown', value: boolean): void
   (e: 'update:is-valid', value: boolean): void
   (e: 'invalidate', value: Record<string, string | string[] | undefined>): void
 }>()
@@ -43,6 +45,7 @@ const titleUpdater = inject(wFormTitleUpdater, undefined)
 const errorMessageUpdater = inject(wFormErrorMessageUpdater, undefined)
 const hasChangesUpdater = inject(wFormHasChangesUpdater, undefined)
 const hasValueUpdater = inject(wFormHasValueUpdater, undefined)
+const hasShownUpdater = inject(wFormHasShownUpdater, undefined)
 const validateUpdater = inject(wFormValidateUpdater, undefined)
 const invalidateUpdater = inject(wFormInvalidateUpdater, undefined)
 const initModelUpdater = inject(wFormInitModelUpdater, undefined)
@@ -71,6 +74,7 @@ const modelValue = computed<Parameters<ValidateFn>[0]>(() => {
 })
 
 const initModelValue = ref<Parameters<ValidateFn>[0]>()
+const isErrorShown = ref(false)
 const required = computed<boolean | undefined>(() => componentSlot.value?.props?.required !== undefined ? componentSlot.value?.props?.required !== false : undefined)
 const mandatory = computed<boolean | undefined>(() => componentSlot.value?.props?.mandatory !== undefined ? componentSlot.value?.props?.mandatory !== false : undefined)
 const skeleton = computed<boolean | undefined>(() => componentSlot.value?.props?.skeleton !== undefined ? componentSlot.value?.props?.skeleton !== false : undefined)
@@ -94,8 +98,6 @@ const hasChanges = computed<boolean>(() => {
     }
   }
 })
-
-const hasBeenValidated = ref<boolean>(false)
 
 const hasValueExact = computed<boolean | null>(() => {
   if (props.hasValue) return true
@@ -172,7 +174,8 @@ const validateOnUpdate = (value: Parameters<ValidateFn>[0]) => {
   const message = _validate(value)
 
   errorMessage.value = message
-  hasBeenValidated.value = true
+
+  if (!message) isErrorShown.value = false
 
   return message
 }
@@ -198,10 +201,11 @@ const doValidate = (silent?: boolean, path?: ValidatePath): string | undefined =
   if (props.name && path && !path[props.name]) return
 
   const message = _validate(modelValue.value)
+  
+  errorMessage.value = message
 
   if (!silent) {
-    errorMessage.value = message
-    hasBeenValidated.value = true
+    isErrorShown.value = true
 
     if (!isInsideTab) scrollTo()
   }
@@ -221,13 +225,16 @@ const invalidate = (messages: Record<string, string | string[] | undefined>): vo
 }
 
 const initModel = (): void => {
+  isErrorShown.value = false
   initModelValue.value = modelValue.value
+
+  validateOnUpdate(modelValue.value)
 }
 
 const scrollTo = () => {
   if (!errorMessage.value) return
 
-  const element = componentRef.value.$el
+  const element = componentRef.value?.$el
 
   if (element instanceof HTMLDivElement) scrollToValidator(element)
 }
@@ -239,37 +246,35 @@ useTabActiveListener(scrollToDebounced)
 watch(errorMessage, value => {
   if (value === null) return
 
-  if (props.name) {
-    errorMessageUpdater?.(props.name, value)
-  }
+  if (props.name) errorMessageUpdater?.(props.name, value)
 
   emit('update:is-valid', !value)
 })
 
 watch(hasChanges, value => {
-  if (props.name) {
-    hasChangesUpdater?.(props.name, value)
-  }
+  if (props.name) hasChangesUpdater?.(props.name, value)
 
   emit('update:has-changes', value)
 })
 
 watch(_hasValue, value => {
-  if (props.name) {
-    hasValueUpdater?.(props.name, value)
-  }
+  if (props.name) hasValueUpdater?.(props.name, value)
 
   emit('update:has-value', value)
 }, {immediate: true})
 
+watch(isErrorShown, value => {
+  if (props.name) hasShownUpdater?.(props.name, value)
+
+  emit('update:has-shown', value)
+})
+
 watch(title, value => {
-  if (props.name) {
-    titleUpdater?.(props.name, value)
-  }
+  if (props.name) titleUpdater?.(props.name, value)
 }, {immediate: true})
 
 watch(required, () => {
-  if (hasBeenValidated.value) doValidate()
+  doValidate()
 })
 
 watch(skeleton, value => {
@@ -287,13 +292,13 @@ onBeforeMount(() => {
 })
 
 onBeforeUnmount(() => {
-  if (props.name) {
-    unlistener?.(props.name)
-  }
+  if (props.name) unlistener?.(props.name)
 })
 
 defineExpose({
   validateOnUpdate() {
+    isErrorShown.value = true
+
     return validateOnUpdate(modelValue.value)
   },
   invalidate(message: string) {

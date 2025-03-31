@@ -7,7 +7,14 @@
       disabled: !data || isLoadingError || disabled,
     }"
     @update:model-value="showModal"
-  />
+  >
+    <template
+      v-if="$slots.title"
+      #title
+    >
+      <slot name="title" />
+    </template>
+  </WToggle>
 </template>
 
 <script lang="ts" setup generic="Model, FieldType extends boolean | null, QueryParams">

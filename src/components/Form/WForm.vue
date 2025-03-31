@@ -9,7 +9,7 @@ import {computed, inject, onBeforeUnmount, provide, toRef, watch} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
-import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormHasValueUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
+import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormHasShownUpdater, wFormHasValueUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
 import {type ValidatePath, compileMessage} from './models/utils'
 import {useFormValueMap} from './use/useFormValueMap'
 
@@ -23,6 +23,7 @@ const emit = defineEmits<{
   (e: 'update:is-valid', value: boolean | undefined): void
   (e: 'update:has-changes', value: boolean): void
   (e: 'update:has-value', value: boolean | null): void
+  (e: 'update:has-shown', value: boolean): void
 }>()
 
 const name = toRef(props, 'name')
@@ -57,6 +58,12 @@ const hasValueMap = useFormValueMap(
   
     return items.length !== 0 && items.every(value => value)
   }),
+)
+
+const hasShownMap = useFormValueMap(
+  wFormHasShownUpdater,
+  name,
+  map => computed(() => Object.values(map.value).some(value => value)),
 )
 
 const validateMap = useFormValueMap(
@@ -114,6 +121,7 @@ const unlistener = (key: string) => {
   errorMessageMap.unlistener(key)
   hasChangesMap.unlistener(key)
   hasValueMap.unlistener(key)
+  hasShownMap.unlistener(key)
   validateMap.unlistener(key)
   invalidateMap.unlistener(key)
   initModelMap.unlistener(key)
@@ -129,6 +137,8 @@ watch(hasChangesMap.value, value => emit('update:has-changes', value))
 
 watch(hasValueMap.value, value => emit('update:has-value', value))
 
+watch(hasShownMap.value, value => emit('update:has-shown', value))
+
 onBeforeUnmount(() => {
   if (props.name) {
     unlistenerInjected?.(props.name)
@@ -143,6 +153,8 @@ defineExpose({
   hasChangesMap: hasChangesMap.map,
   hasValue: hasValueMap.value,
   hasValueMap: hasValueMap.map,
+  hasShown: hasShownMap.value,
+  hasShownMap: hasShownMap.map,
   validate: validateMap.value,
   validateMap: validateMap.map,
   invalidate: invalidateMap.value,

@@ -30,15 +30,11 @@ export const useFormValueMap = <Value, ValueGetter extends Ref<Value> | ((map: R
 
   if (isRef(value)) {
     watch(value, value => {
-      if (name.value) {
-        updaterInjected?.(name.value, value as Value)
-      }
+      if (name.value) updaterInjected?.(name.value, value as Value)
     }, {immediate: true})
   } else {
     onBeforeMount(() => {
-      if (name.value) {
-        updaterInjected?.(name.value, value)
-      }
+      if (name.value) updaterInjected?.(name.value, value)
     })
   }
 

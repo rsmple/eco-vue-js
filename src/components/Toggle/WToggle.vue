@@ -13,16 +13,16 @@
         'cursor-pointer': !readonly && !loading && !disabled,
         'cursor-auto select-text': readonly,
         'select-none': !readonly,
-        'grid-cols-[1fr,auto]': title && !rightLabel,
-        'grid-cols-[auto,1fr]': title && rightLabel,
-        'gap-4': title,
+        'grid-cols-[1fr,auto]': (title || $slots.title) && !rightLabel,
+        'grid-cols-[auto,1fr]': (title || $slots.title) && rightLabel,
+        'gap-4': title || $slots.title,
         'justify-center': center,
       }"
       :disabled="disabled || readonly"
       @click="updateModelValue"
     >
       <div
-        v-if="title"
+        v-if="title || $slots.title"
         class="text-accent font-semibold"
         :class="{
           'order-1': rightLabel,
@@ -30,7 +30,9 @@
           'text-base': !small,
         }"
       >
-        {{ title }}
+        <slot name="title">
+          {{ title }}
+        </slot>
       </div>
 
       <div class="-h--w-input-height py-0.75">

@@ -4,8 +4,8 @@
       bg-default dark:bg-default-dark w-modal-wrapper
       grid max-h-[calc(100%-var(--inner-margin,2rem)*2)]
       w-[--w-modal-wrapper-width,35rem]
-      max-w-[calc(100%-var(--inner-margin,2rem)*2)] grid-cols-[1fr] overflow-auto overscroll-contain
-      rounded-[--w-modal-wrapper-rounded,1.5rem] shadow-md
+      max-w-[calc(100%-var(--inner-margin,2rem)*2)] grid-cols-[1fr] grid-rows-[auto,1fr,auto] overflow-auto
+      overscroll-contain rounded-[--w-modal-wrapper-rounded,1.5rem] shadow-md
     "
     :class="{
       'sm-not:max-w-full sm-not:h-full sm-not:rounded-none sm-not:max-h-full': maximized,
@@ -17,7 +17,7 @@
   >
     <div
       ref="header"
-      class="bg-default dark:bg-default-dark sticky left-0 top-0 z-[1] w-[--w-modal-wrapper-width,35rem]"
+      class="bg-default dark:bg-default-dark sm-not:w-screen sticky left-0 top-0 z-[1] w-[--w-modal-wrapper-width,35rem]"
     >
       <div class="text-accent -p--w-modal-wrapper-padding flex items-center justify-center text-balance text-center text-xl font-semibold">
         <slot name="title" />
@@ -32,7 +32,7 @@
 
     <div
       ref="footer"
-      class="bg-default dark:bg-default-dark -gap--inner-margin -p--w-modal-wrapper-padding sticky bottom-0 left-0 z-[1] flex w-[--w-modal-wrapper-width,35rem] justify-center"
+      class="bg-default dark:bg-default-dark -gap--inner-margin -p--w-modal-wrapper-padding sm-not:w-screen sticky bottom-0 left-0 z-[1] flex w-[--w-modal-wrapper-width,35rem] justify-center"
       :class="{
         'sm-not:flex-col': !maximized,
       }"
