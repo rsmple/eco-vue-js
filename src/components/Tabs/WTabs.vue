@@ -297,7 +297,7 @@ const validate = (name: string, ...args: Parameters<ComponentInstance<typeof WFo
 }
 
 const validateIfNoError = (name: string, ...args: Parameters<ComponentInstance<typeof WForm>['validate']>): ReturnType<ComponentInstance<typeof WForm>['validate']> => {
-  if (formRef.value?.errorMessageMap[name]) return formRef.value.errorMessageMap[name]
+  if (formRef.value?.errorMessageMap[name] && formRef.value?.hasShownMap[name]) return formRef.value.errorMessageMap[name]
 
   return formRef.value?.validateMap[name]?.(...args)
 }
