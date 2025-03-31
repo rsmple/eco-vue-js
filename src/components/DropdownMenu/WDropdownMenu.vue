@@ -18,11 +18,7 @@
       :max-height="maxHeight"
       :max-width="maxWidth"
       :emit-update="emitUpdate"
-      :class="{
-        'z-[2]': !teleport && !noZIndex,
-        'z-30': teleport && !noZIndex,
-      }"
-      :style="{zIndex}"
+      :style="{zIndex: teleport ? baseZInfex + 2 : 2}"
       @update:rect="$emit('update:rect')"
     >
       <template #default="defaultScope">
@@ -37,10 +33,13 @@
 
 <script lang="ts" setup>
 import type {DropdownMenuProps} from './types'
+import type {DropdownDefaultSlotScope} from '@/components/Dropdown/types'
 
-import {computed, useTemplateRef} from 'vue'
+import {type VNode, computed, inject, useTemplateRef} from 'vue'
 
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
+
+import {wBaseZInfex} from '@/components/Modal/models/injection'
 
 defineProps<DropdownMenuProps>()
 
@@ -48,10 +47,17 @@ defineEmits<{
   (e: 'update:rect'): void
 }>()
 
+const baseZInfex = inject(wBaseZInfex, 0)
+
 const containerRef = useTemplateRef<ComponentInstance<unknown> | HTMLElement>('container')
 const dropdownRef = useTemplateRef('dropdown')
 
 const element = computed(() => containerRef.value instanceof HTMLElement ? containerRef.value : containerRef.value?.$el)
+
+defineSlots<{
+  toggle?: () => VNode[]
+  content?: (props: DropdownDefaultSlotScope) => VNode[]
+}>()
 
 defineExpose({
   updateDropdown: () => {

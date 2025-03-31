@@ -82,7 +82,7 @@
       name="empty"
       v-bind="{queryParams}"
     >
-      <div class="text-accent sm:left-inner sm:max-w-inner flex justify-center px-8 py-16 text-center font-normal sm:sticky">
+      <div class="text-accent sm:-left--left-inner sm:-max-w--width-inner flex justify-center px-8 py-16 text-center font-normal sm:sticky">
         {{ emptyStub }}
       </div>
     </slot>
@@ -90,13 +90,15 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {TransitionGroup, computed, nextTick, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
+import {TransitionGroup, computed, inject, nextTick, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
 import {ApiError} from '@/utils/api'
 
 import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
+
+import {wScrollingElement} from '../models/injection'
 
 const props = withDefaults(
   defineProps<{
@@ -113,7 +115,6 @@ const props = withDefaults(
     lastChild?: boolean
     pageClass?: string
     refetchInterval?: number | false
-    scrollingElement?: Element | null
     queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
 
     valueGetter: (data: Data) => Model
@@ -125,7 +126,6 @@ const props = withDefaults(
     emptyStub: 'Nothing to show',
     pageClass: undefined,
     refetchInterval: undefined,
-    scrollingElement: undefined,
     queryOptions: undefined,
   },
 )
@@ -148,6 +148,8 @@ const elementRef = useTemplateRef('element')
 const resultElement = ref<HTMLDivElement[]>([])
 const isIntersecting = ref(false)
 const hasData = ref(false)
+
+const scrollingElement = inject(wScrollingElement, null)
 
 const {data, error, setData, refetch, isFetching} = props.useQueryFn(
   toRef(props, 'queryParams'),
@@ -259,7 +261,7 @@ onMounted(() => {
     intersectionObserver = new IntersectionObserver(
       observerCb,
       {
-        root: props.scrollingElement ?? null,
+        root: scrollingElement?.value,
         rootMargin: '0px',
         threshold: 0,
       },

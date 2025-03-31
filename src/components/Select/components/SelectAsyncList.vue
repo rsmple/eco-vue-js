@@ -46,7 +46,6 @@
     <WInfiniteList
       :use-query-fn="useQueryFn"
       :query-params="(queryParams as QueryParams)"
-      :scrolling-element="scrollingElement"
       :transition="transition"
       :exclude-params="excludeParams"
       :selected="modelValue"
@@ -130,7 +129,6 @@ const props = defineProps<{
   modelValue: Model[]
   useQueryFn: UseQueryPaginated<Data, QueryParams>
   queryParams: QueryParams
-  scrollingElement?: Element | null
   loading?: boolean
   disabled?: boolean
   transition?: boolean

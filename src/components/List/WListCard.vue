@@ -26,12 +26,12 @@
 
     <div
       v-if="!card"
-      class="left-inner bg-default dark:bg-default-dark @not-lg:hidden sticky z-[1]"
+      class="-left--left-inner bg-default dark:bg-default-dark @not-lg:hidden sticky z-[1]"
       :class="{
         'width-[--w-list-header-rounded,1rem]': !allowSelect,
       }"
     >
-      <div class="bg-default dark:bg-default-dark absolute right-full top-0 z-[-1] h-full w-[calc(var(--nav-bar-width)+var(--inner-margin))]" />
+      <div class="bg-default dark:bg-default-dark -w--left-inner absolute right-full top-0 z-[-1] h-full" />
 
       <div
         class="h-full rounded-l-[--w-list-rounded,unset]"
@@ -134,13 +134,13 @@
       
     <div
       v-if="!card"
-      class="right-inner bg-default dark:bg-default-dark sticky z-[1]"
+      class="-right--right-inner bg-default dark:bg-default-dark sticky z-[1]"
       :class="{
         'width-[calc(var(--w-list-padding,1rem)*2+1.25em)]': $slots.more,
         'width-[--w-list-header-rounded,1rem]': !$slots.more,
       }"
     >
-      <div class="bg-default dark:bg-default-dark absolute left-full top-0 z-[-1] h-full w-[calc(var(--actions-bar-width)+var(--inner-margin))]" />
+      <div class="bg-default dark:bg-default-dark -w--right-inner absolute left-full top-0 z-[-1] h-full" />
 
       <div
         class="h-full rounded-r-[--w-list-rounded,unset]"
@@ -186,7 +186,7 @@
   <template v-if="$slots.expansion">
     <div
       v-if="isOpen"
-      class="sm:w-inner sm:left-inner col-span-full sm:sticky"
+      class="sm:-w--width-inner sm:-left--left-inner col-span-full sm:sticky"
       :class="{
         'border-gray-300 dark:border-gray-700': hasBorder && !selected,
         'border-primary dark:border-primary-dark': hasBorder && selected,

@@ -11,8 +11,9 @@
     @click="!disabled && $emit('click', $event)"
   >
     <div
+      class="relative flex w-full gap-4 rounded-lg px-2 py-1"
       :class="{
-        'w-ripple w-ripple-hover relative flex w-full gap-4 rounded-lg px-2 py-1': !disabled,
+        'w-ripple w-ripple-hover': !disabled,
       }"
     >
       <slot />

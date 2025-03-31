@@ -32,25 +32,17 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       values: theme('width'),
     },
   )
-
-  addUtilities({
-    '.max-w-inner': {
-      'max-width': 'calc(100vw - var(--actions-bar-width) - var(--nav-bar-width) - var(--inner-margin) - var(--inner-margin) - var(--scroll-bar-width))',
+  
+  addBase({
+    body: {
+      '--w-left-inner': 'calc(var(--nav-bar-width) + var(--inner-margin))',
+      '--w-right-inner': 'calc(var(--actions-bar-width) + var(--inner-margin))',
+      '--w-width-inner': 'calc(100vw - var(--actions-bar-width) - var(--nav-bar-width) - var(--inner-margin) - var(--inner-margin) - var(--scroll-bar-width))',
     },
-    '.max-w-inner-no-actions': {
-      'max-width': 'calc(100vw - var(--nav-bar-width) - var(--inner-margin) - var(--inner-margin) - var(--scroll-bar-width))',
-    },
-    '.w-inner': {
-      width: 'calc(100vw - var(--actions-bar-width) - var(--nav-bar-width) - var(--inner-margin) - var(--inner-margin) - var(--scroll-bar-width))',
-    },
-    '.min-w-inner': {
-      'min-width': 'calc(100vw - var(--actions-bar-width) - var(--nav-bar-width) - var(--inner-margin) - var(--inner-margin) - var(--scroll-bar-width))',
-    },
-    '.left-inner': {
-      left: 'calc(var(--nav-bar-width) + var(--inner-margin))',
-    },
-    '.right-inner': {
-      right: 'calc(var(--actions-bar-width) + var(--inner-margin))',
+    '.w-modal-wrapper': {
+      '--w-left-inner': 'var(--w-modal-wrapper-padding)',
+      '--w-right-inner': 'var(--w-modal-wrapper-padding)',
+      '--w-width-inner': 'calc(var(--w-modal-wrapper-width, 35rem) - var(--w-modal-wrapper-padding) - var(--w-modal-wrapper-padding) - var(--scroll-bar-width))',
     },
   })
 

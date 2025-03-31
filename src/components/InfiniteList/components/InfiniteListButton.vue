@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-full items-center justify-center p-12">
+  <div class="sm:-left--left-inner sm:-max-w--width-inner flex w-full items-center justify-center p-12 sm:sticky">
     <WButton
       :semantic-type="SemanticType.SECONDARY"
       @click="$emit('click')"

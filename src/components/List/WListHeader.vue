@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-[--w-list-header-height,3rem]">
-    <div class="left-inner bg-default dark:bg-default-dark sticky z-[1]">
-      <div class="bg-default dark:bg-default-dark absolute right-full top-0 z-[-1] h-full w-[calc(var(--nav-bar-width)+var(--inner-margin))]" />
+    <div class="-left--left-inner bg-default dark:bg-default-dark sticky z-[1]">
+      <div class="bg-default dark:bg-default-dark -w--left-inner absolute right-full top-0 z-[-1] h-full" />
 
       <div
         class="bg-primary-light dark:bg-primary-darkest h-full rounded-l-[--w-list-header-rounded,1rem] border-y border-l border-solid border-gray-300 dark:border-gray-700"
@@ -25,8 +25,8 @@
       <slot />
     </div>
 
-    <div class="right-inner bg-default dark:bg-default-dark sticky z-[1]">
-      <div class="bg-default dark:bg-default-dark absolute left-full top-0 z-[-1] h-full w-[calc(var(--actions-bar-width)+var(--inner-margin))]" />
+    <div class="-right--right-inner bg-default dark:bg-default-dark sticky z-[1]">
+      <div class="bg-default dark:bg-default-dark -w--right-inner absolute left-full top-0 z-[-1] h-full" />
 
       <div
         class="bg-primary-light dark:bg-primary-darkest h-full rounded-r-[--w-list-header-rounded,0.75rem] border-y border-r border-solid border-gray-300 dark:border-gray-700"

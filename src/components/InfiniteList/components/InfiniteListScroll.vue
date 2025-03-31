@@ -5,13 +5,10 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, onUnmounted, useTemplateRef, watch} from 'vue'
+import {computed, inject, onMounted, onUnmounted, useTemplateRef, watch} from 'vue'
 
+import {wScrollingElement} from '../models/injection'
 import {getIsScrollDown, getIsScrollUp} from '../models/utils'
-
-const props = defineProps<{
-  scrollingElement: Element | null
-}>()
 
 const emit = defineEmits<{
   (e: 'scroll:up'): void
@@ -20,29 +17,30 @@ const emit = defineEmits<{
 
 const containerRef = useTemplateRef('container')
 
-const element = computed(() => props.scrollingElement ?? document) 
+const scrollingElement = inject(wScrollingElement, null)
+const element = computed(() => scrollingElement?.value ?? document)
 
 const listener = (event: Event): void => {
   if (event.target !== element.value || !containerRef.value) return
 
-  if (getIsScrollUp(props.scrollingElement ?? document.scrollingElement, containerRef.value.offsetTop)) {
+  if (getIsScrollUp(scrollingElement?.value ?? document.scrollingElement, containerRef.value.offsetTop)) {
     emit('scroll:up')
     return
   }
 
-  if (getIsScrollDown(props.scrollingElement ?? document.scrollingElement)) {
+  if (getIsScrollDown(scrollingElement?.value ?? document.scrollingElement)) {
     emit('scroll:down')
   }
 }
 
 const checkIsScrollUp = () => {
-  if (getIsScrollDown(props.scrollingElement ?? document.scrollingElement)) {
+  if (getIsScrollDown(scrollingElement?.value ?? document.scrollingElement)) {
     emit('scroll:down')
   }
 }
 
 const checkIsScrollDown = () => {
-  if (getIsScrollDown(props.scrollingElement ?? document.scrollingElement)) {
+  if (getIsScrollDown(scrollingElement?.value ?? document.scrollingElement)) {
     emit('scroll:down')
   }
 }

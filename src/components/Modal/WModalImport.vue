@@ -61,10 +61,10 @@ const abortList = ref<(() => void)[]>([])
 const progress = computed<number>(() => {
   if (props.items.length === 0) return 0
 
-  return itemIndex.value / props.items.length
+  return 100 * itemIndex.value / props.items.length
 })
 
-const isDone = computed<boolean>(() => progress.value === 1)
+const isDone = computed<boolean>(() => progress.value === 100)
 
 const abortUpload = (): void => {
   if (!isDone.value) {

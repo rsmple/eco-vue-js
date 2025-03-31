@@ -1,7 +1,6 @@
 <template>
   <component
     :is="minHeight ? WEmptyComponent : WInfiniteListWrapper"
-    :scrolling-element="scrollingElement"
     :init-is-intersecting="props.queryParams instanceof Object && 'page' in props.queryParams && Number.isInteger(props.queryParams.page) && (props.queryParams.page as number) > 1 ? false : undefined"
   >
     <template #header="headerScope">
@@ -16,7 +15,6 @@
         ref="infiniteListPages"
         :query-params="(queryParams as QueryParams)"
         :use-query-fn="useQueryFn"
-        :scrolling-element="scrollingElement"
 
         :skeleton-length="skeletonLength"
         :hide-page-title="hidePageTitle"
@@ -93,7 +91,6 @@ const props = withDefaults(
     skeletonLength?: number
     hidePageTitle?: boolean
     transition?: boolean
-    scrollingElement?: Element | null
     headerTopIgnore?: boolean
     minHeight?: boolean
     lastChild?: boolean
@@ -111,7 +108,6 @@ const props = withDefaults(
   }>(),
   {
     skeletonLength: undefined,
-    scrollingElement: undefined,
     excludeParams: undefined,
     emptyStub: undefined,
     pageClass: undefined,

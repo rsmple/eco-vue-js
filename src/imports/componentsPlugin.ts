@@ -42,6 +42,7 @@ import WFormAsyncToggle from '@/components/FormAsync/WFormAsyncToggle.vue'
 import WHeaderBar from '@/components/HeaderBar/WHeaderBar.vue'
 import WImageViewer from '@/components/ImageViewer/WImageViewer.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
+import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
 import WInfiniteListWrapper from '@/components/InfiniteList/WInfiniteListWrapper.vue'
 import WInfoCard from '@/components/InfoCard/WInfoCard.vue'
 import WInfoCardNegative from '@/components/InfoCard/WInfoCardNegative.vue'
@@ -138,6 +139,7 @@ export default {
     app.component('WHeaderBar', WHeaderBar)
     app.component('WImageViewer', WImageViewer)
     app.component('WInfiniteList', WInfiniteList)
+    app.component('WInfiniteListScrollingElement', WInfiniteListScrollingElement)
     app.component('WInfiniteListWrapper', WInfiniteListWrapper)
     app.component('WInfoCard', WInfoCard)
     app.component('WInfoCardNegative', WInfoCardNegative)
@@ -234,6 +236,7 @@ export {
   WHeaderBar,
   WImageViewer,
   WInfiniteList,
+  WInfiniteListScrollingElement,
   WInfiniteListWrapper,
   WInfoCard,
   WInfoCardNegative,

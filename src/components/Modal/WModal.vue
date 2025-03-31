@@ -41,13 +41,16 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeMount, onBeforeUnmount, reactive, ref, watch} from 'vue'
+import {onBeforeMount, onBeforeUnmount, provide, reactive, ref, watch} from 'vue'
 
 import {Modal, type ModalComponent, initModal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
 
 import ModalCloseButton from './components/ModalCloseButton.vue'
+import {wBaseZInfex, wIsModal} from './models/injection'
 import {useIsBackdrop} from './use/useIsBackdrop'
+
+const MODAL_Z_INDEX = 1000
 
 type ModalMeta<ModalProps> = {
   key: number
@@ -56,6 +59,9 @@ type ModalMeta<ModalProps> = {
   cb?: () => void
   autoclose: boolean
 }
+
+provide(wBaseZInfex, MODAL_Z_INDEX)
+provide(wIsModal, true)
 
 const key = ref(0)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -6,10 +6,12 @@
 
   <div
     ref="header"
-    class="-top--header-height sticky print:hidden"
+    class="sticky print:hidden"
     :class="{
       'z-20': !isIntersecting,
       'z-[2]': isIntersecting,
+      '-top--modal-header-height bg-default dark:bg-default-dark': isModal,
+      '-top--header-height': !isModal,
     }"
   >
     <slot
@@ -22,20 +24,22 @@
 </template>
 
 <script lang="ts" setup>
-import {onUnmounted, watch} from 'vue'
+import {inject, onUnmounted, watch} from 'vue'
 
 import {useHeader} from '@/components/HeaderBar/use/useHeader'
+import {wIsModal} from '@/components/Modal/models/injection'
 
 import {useInfiniteListHeader} from './use/useInfiniteListHeader'
 
 const props = defineProps<{
-  scrollingElement?: Element | null
   initIsIntersecting?: boolean
 }>()
 
+const isModal = inject(wIsModal, false)
+
 const {updateHeaderPadding, headerHeight: headerElementHeight} = useHeader()
 
-const {indicator, header, headerTop, headerHeight, isIntersecting, updateHeader} = useInfiniteListHeader(headerElementHeight, props.scrollingElement, props.initIsIntersecting)
+const {indicator, header, headerTop, headerHeight, isIntersecting, updateHeader} = useInfiniteListHeader(headerElementHeight, props.initIsIntersecting)
 
 const updateHeaderHeight = () => {
   if (!isIntersecting.value && headerHeight.value) {

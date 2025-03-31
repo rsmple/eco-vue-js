@@ -16,16 +16,14 @@
       class="w-skeleton-rounded-2xl w-skeleton-h-[24rem] w-skeleton-w-full"
     />
 
-    <div
+    <WInfiniteListScrollingElement
       v-else
-      ref="list"
       class="overflow-y-overlay sm-not:border-y h-96 border-solid border-gray-300 sm:rounded-2xl sm:border dark:border-gray-700"
     >
       <SelectAsyncList
         :model-value="modelValue"
         :use-query-fn="useQueryFn"
         :query-params="(queryParams as QueryParams)"
-        :scrolling-element="listRef"
         :exclude-params="excludeParams"
         :empty-stub="emptyStub"
         :select-only="selectOnly"
@@ -51,13 +49,12 @@
           />
         </template>
       </SelectAsyncList>
-    </div>
+    </WInfiniteListScrollingElement>
   </div>
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {useTemplateRef} from 'vue'
-
+import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 import SelectAsyncList from './components/SelectAsyncList.vue'
@@ -92,8 +89,6 @@ defineEmits<{
   (e: 'update:model-value', value: Model[]): void
   (e: 'update:count', value: number): void
 }>()
-
-const listRef = useTemplateRef('list')
 
 defineSlots<{
   default?: (props: {option: Data | null, selected: boolean, skeleton: boolean, model: boolean}) => void

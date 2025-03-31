@@ -1,14 +1,18 @@
-import {type Ref, onBeforeUnmount, onMounted, ref} from 'vue'
+import {type Ref, inject, onBeforeUnmount, onMounted, ref} from 'vue'
 
 import {isClientSide} from '@/utils/utils'
 
-export const useInfiniteListHeader = (headerElementHeight: Ref<number>, scrollingElement: Element | null = document.scrollingElement, initIsIntersecting = true) => {
+import {wScrollingElement} from '../models/injection'
+
+export const useInfiniteListHeader = (headerElementHeight: Ref<number>, initIsIntersecting = true) => {
   const indicator = ref<HTMLDivElement>()
   const header = ref<HTMLDivElement>()
   const headerHeight = ref<number>(0)
   const headerTop = ref<number>(0)
   const isIntersecting = ref(initIsIntersecting)
   let observer: IntersectionObserver | null = null
+
+  const scrollingElement = inject(wScrollingElement, null)
 
   const observerCb = (entries: IntersectionObserverEntry[]) => {
     isIntersecting.value = entries.some(entry => {
@@ -23,7 +27,7 @@ export const useInfiniteListHeader = (headerElementHeight: Ref<number>, scrollin
 
     const rect = header.value.getBoundingClientRect()
     headerHeight.value = rect.height
-    headerTop.value = rect.top + (scrollingElement?.scrollTop ?? 0) - headerElementHeight.value
+    headerTop.value = rect.top + (scrollingElement?.value?.scrollTop ?? document.scrollingElement?.scrollTop ?? 0) - headerElementHeight.value
   }
 
   onMounted(() => {

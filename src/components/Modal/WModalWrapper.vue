@@ -1,14 +1,24 @@
 <template>
-  <div
+  <WInfiniteListScrollingElement
     class="
-      bg-default dark:bg-default-dark max-h-[calc(100%-var(--inner-margin,2rem)*2)] w-[var(--w-modal-wrapper-width,35rem)] max-w-[calc(100%-var(--inner-margin,2rem)*2)] overflow-y-auto
-      overflow-x-hidden overscroll-contain rounded-[--w-modal-wrapper-rounded,1.5rem] shadow-md
+      bg-default dark:bg-default-dark w-modal-wrapper
+      grid max-h-[calc(100%-var(--inner-margin,2rem)*2)]
+      w-[--w-modal-wrapper-width,35rem]
+      max-w-[calc(100%-var(--inner-margin,2rem)*2)] grid-cols-[1fr] overflow-auto overscroll-contain
+      rounded-[--w-modal-wrapper-rounded,1.5rem] shadow-md
     "
     :class="{
       'sm-not:max-w-full sm-not:h-full sm-not:rounded-none sm-not:max-h-full': maximized,
     }"
+    :style="{
+      '--w-modal-header-height': (headerRef?.offsetHeight ?? 0) + 'px',
+      '--w-modal-footer-height': (footerRef?.offsetHeight ?? 0) + 'px',
+    }"
   >
-    <div class="bg-default dark:bg-default-dark sticky top-0 z-[1]">
+    <div
+      ref="header"
+      class="bg-default dark:bg-default-dark sticky left-0 top-0 z-[1] w-[--w-modal-wrapper-width,35rem]"
+    >
       <div class="text-accent -p--w-modal-wrapper-padding flex items-center justify-center text-balance text-center text-xl font-semibold">
         <slot name="title" />
       </div>
@@ -21,18 +31,26 @@
     </div>
 
     <div
-      class="bg-default dark:bg-default-dark -gap--inner-margin -p--w-modal-wrapper-padding sticky bottom-0 z-[1] flex w-full justify-center"
+      ref="footer"
+      class="bg-default dark:bg-default-dark -gap--inner-margin -p--w-modal-wrapper-padding sticky bottom-0 left-0 z-[1] flex w-[--w-modal-wrapper-width,35rem] justify-center"
       :class="{
         'sm-not:flex-col': !maximized,
       }"
     >
       <slot name="actions" />
     </div>
-  </div>
+  </WInfiniteListScrollingElement>
 </template>
 
 <script lang="ts" setup>
+import {useTemplateRef} from 'vue'
+
+import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
+
 defineProps<{
   maximized?: boolean
 }>()
+
+const headerRef = useTemplateRef('header')
+const footerRef = useTemplateRef('footer')
 </script>

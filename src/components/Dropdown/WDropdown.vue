@@ -21,9 +21,9 @@
 </template>
 
 <script lang="ts" setup>
-import type {DropdownProps} from './types'
+import type {DropdownDefaultSlotScope, DropdownProps} from './types'
 
-import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
+import {type VNode, computed, onBeforeMount, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import DOMListenerContainer from '@/utils/DOMListenerContainer'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
@@ -106,7 +106,7 @@ onMounted(() => {
   if (!isClientSide || !dropdownRef.value) return
 
   domListenerContainer = new DOMListenerContainer(
-    [document, window, ...getAllScrollParents(dropdownRef.value)],
+    [document, window, ...getAllScrollParents(props.parentElement)],
     ['scroll', 'touchmove', 'resize'],
     () => {
       if (requestAnimationFrameId) window.cancelAnimationFrame(requestAnimationFrameId)
@@ -131,6 +131,10 @@ onBeforeUnmount(() => {
 watch(toRef(props, 'parentElement'), () => {
   setParentRect(false, true)
 })
+
+defineSlots<{
+  default: (props: DropdownDefaultSlotScope) => VNode[]
+}>()
 
 defineExpose({
   update: () => {

@@ -15,6 +15,11 @@ const newValues = {
   '--w-input-height': 'var(--w-input-height)',
   '--w-input-gap': 'var(--w-input-gap)',
   '--w-select-option-padding': 'var(--w-select-option-padding)',
+  '--left-inner': 'var(--w-left-inner)',
+  '--right-inner': 'var(--w-right-inner)',
+  '--width-inner': 'var(--w-width-inner)',
+  '--modal-header-height': 'var(--w-modal-header-height, 0px)',
+  '--modal-footer-height': 'var(--w-modal-footer-height, 0px)',
 }
 
 const extend = {

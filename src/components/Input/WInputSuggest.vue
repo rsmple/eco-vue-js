@@ -12,7 +12,6 @@
       horizontalAlign,
       updateAlign: true,
       teleport,
-      noZIndex,
       parentElement: inputRef?.fieldRef,
     }"
   >
@@ -84,8 +83,8 @@
     </template>
 
     <template #content="contentScope">
-      <div
-        ref="content"
+      <WInfiniteListScrollingElement
+        :parent="isMobile"
         class="bg-default dark:bg-default-dark w-full"
         :class="{
           'pb-[50vh]': isMobile,
@@ -100,12 +99,11 @@
           >
             <component
               :is="slot"
-              :scrolling-element="isMobile ? contentRef?.parentElement : contentRef"
               @close="close"
             />
           </template>
         </template>
-      </div>
+      </WInfiniteListScrollingElement>
     </template>
   </component>
 </template>
@@ -117,6 +115,7 @@ import {type VNode, computed, ref, useTemplateRef} from 'vue'
 
 import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
 import WInput from '@/components/Input/WInput.vue'
 
 import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
@@ -153,7 +152,6 @@ const emit = defineEmits<{
 const isOpen = ref(false)
 const dropdownMenuRef = useTemplateRef('dropdownMenu')
 const inputRef = useTemplateRef('input')
-const contentRef = useTemplateRef('content')
 const {isMobile} = useIsMobile()
 
 const isDisabled = computed(() => props.readonly || props.disabled)

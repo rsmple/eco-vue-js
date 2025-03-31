@@ -15,7 +15,6 @@
       :max-width="320"
       :horizontal-align="anchor ? HorizontalAlign.RIGHT_INNER : HorizontalAlign.LEFT_INNER"
       :update-align="false"
-      :z-index="1"
       :parent-element="anchor"
       teleport
     >

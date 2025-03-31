@@ -1,7 +1,6 @@
 <template>
   <InfiniteListScroll
     ref="infiniteScroll"
-    :scrolling-element="scrollingElement"
     :style="{'--infinite-list-header-height': headerHeight + 'px'}"
     :class="{
       'min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] pb-16': !minHeight,
@@ -33,7 +32,6 @@
       :last-child="lastChild"
       :page-class="pageClass"
       :refetch-interval="refetchInterval"
-      :scrolling-element="scrollingElement"
       :query-options="queryOptions"
 
       :value-getter="valueGetter"
@@ -88,7 +86,7 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import type {ApiError} from '@/utils/api'
 
-import {computed, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
+import {computed, inject, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import {isEqualObj} from '@/utils/utils'
 
@@ -96,6 +94,7 @@ import InfiniteListButton from './InfiniteListButton.vue'
 import InfiniteListPage from './InfiniteListPage.vue'
 import InfiniteListScroll from './InfiniteListScroll.vue'
 
+import {wScrollingElement} from '../models/injection'
 import {useRefetchNextPages} from '../use/useRefetchNextPages'
 
 const props = withDefaults(
@@ -106,7 +105,6 @@ const props = withDefaults(
     hidePageTitle?: boolean
     transition?: boolean
     pageLength?: number
-    scrollingElement?: Element | null
     headerTop?: number
     headerHeight?: number
     minHeight?: boolean
@@ -123,7 +121,6 @@ const props = withDefaults(
   {
     skeletonLength: undefined,
     pageLength: 24,
-    scrollingElement: null,
     headerTop: 0,
     headerHeight: 0,
     excludeParams: undefined,
@@ -142,6 +139,8 @@ const emit = defineEmits<{
 }>()
 
 const infiniteScrollRef = useTemplateRef('infiniteScroll')
+
+const scrollingElement = inject(wScrollingElement, null)
 
 const pages = ref<number[]>([(props.queryParams as {page?: number}).page ?? 1])
 const pagesCount = ref(1)
@@ -203,7 +202,7 @@ const addPreviousPage = (silent?: boolean) => {
 }
 
 const updateScroll = (height: number): void => {
-  const element = props.scrollingElement ?? document.scrollingElement
+  const element = scrollingElement?.value ?? document.scrollingElement
 
   if (!element || element.scrollTop === 0) return
 
@@ -241,7 +240,7 @@ const resetPage = async (page = 1) => {
   emit('update:page', page === 1 ? undefined : page)
   pages.value = []
 
-  const element = props.scrollingElement ?? document.scrollingElement
+  const element = scrollingElement?.value ?? document.scrollingElement
 
   const value = (infiniteScrollRef.value?.$el.offsetTop ?? 0) - props.headerHeight - 60
 
