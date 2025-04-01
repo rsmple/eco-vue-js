@@ -195,8 +195,8 @@ export enum Theme {
 
 export const unwrapSlots = (slots: VNode[]): VNode[] => {
   return slots.flatMap(slot => {
-    if (Array.isArray(slot?.children)) return unwrapSlots(slot.children as VNode[])
-    else if (typeof slot.type !== 'symbol') return slot
+    if (typeof slot.type !== 'symbol') return slot
+    else if (Array.isArray(slot?.children)) return unwrapSlots(slot.children as VNode[])
     else return []
   })
 }

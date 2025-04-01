@@ -107,7 +107,15 @@ const height = ref<number | undefined>()
 
 const router = useRouter()
 
-const linkText = computed(() => props.to ? router.resolve(props.to).meta.title : undefined)
+const linkText = computed(() => {
+  if (!props.to) return undefined
+
+  if (props.to instanceof Object && 'meta' in props.to && props.to.meta instanceof Object && 'title' in props.to.meta) {
+    return props.to.meta.title
+  }
+
+  return router.resolve(props.to).meta.title
+})
 
 const elementStyles = computed<StyleValue | undefined>(() => {
   if (!height.value) return undefined

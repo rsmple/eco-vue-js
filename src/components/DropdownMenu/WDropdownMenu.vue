@@ -1,6 +1,6 @@
 <template>
   <component
-    :is="$slots.toggle?.()?.[0]"
+    :is="unwrapSlots($slots.toggle?.() ?? [])[0]"
     ref="container"
     v-bind="$attrs"
   />
@@ -40,6 +40,7 @@ import {type VNode, computed, inject, useTemplateRef} from 'vue'
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 
 import {wBaseZInfex} from '@/components/Modal/models/injection'
+import {unwrapSlots} from '@/utils/utils'
 
 defineProps<DropdownMenuProps>()
 

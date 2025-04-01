@@ -8,12 +8,12 @@
     @select="_validateOnSelect"
     @unselect="_validateOnUnselect"
     @init-model="initModel"
-    @blur="isErrorShown = true"
+    @blur="showError"
   />
 </template>
 
 <script lang="ts" setup>
-import {type VNode, computed, inject, onBeforeMount, onBeforeUnmount, ref, useSlots, useTemplateRef, watch} from 'vue'
+import {type VNode, computed, inject, nextTick, onBeforeMount, onBeforeUnmount, ref, useSlots, useTemplateRef, watch} from 'vue'
 
 import {useIsInsideTab} from '@/components/Tabs/use/useIsInsideTab'
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
@@ -75,6 +75,7 @@ const modelValue = computed<Parameters<ValidateFn>[0]>(() => {
 
 const initModelValue = ref<Parameters<ValidateFn>[0]>()
 const isErrorShown = ref(false)
+const wasChanged = ref(false)
 const required = computed<boolean | undefined>(() => componentSlot.value?.props?.required !== undefined ? componentSlot.value?.props?.required !== false : undefined)
 const mandatory = computed<boolean | undefined>(() => componentSlot.value?.props?.mandatory !== undefined ? componentSlot.value?.props?.mandatory !== false : undefined)
 const skeleton = computed<boolean | undefined>(() => componentSlot.value?.props?.skeleton !== undefined ? componentSlot.value?.props?.skeleton !== false : undefined)
@@ -175,7 +176,7 @@ const validateOnUpdate = (value: Parameters<ValidateFn>[0]) => {
 
   errorMessage.value = message
 
-  if (!message) isErrorShown.value = false
+  if (!message) nextTick(() => isErrorShown.value = false)
 
   return message
 }
@@ -226,6 +227,7 @@ const invalidate = (messages: Record<string, string | string[] | undefined>): vo
 
 const initModel = (): void => {
   isErrorShown.value = false
+  wasChanged.value = false
   initModelValue.value = modelValue.value
 
   validateOnUpdate(modelValue.value)
@@ -243,6 +245,12 @@ const scrollToDebounced = debounce(scrollTo, 300)
 
 useTabActiveListener(scrollToDebounced)
 
+const showError = () => {
+  if (!errorMessage.value || !wasChanged.value) return
+
+  isErrorShown.value = true
+}
+
 watch(errorMessage, value => {
   if (value === null) return
 
@@ -252,6 +260,8 @@ watch(errorMessage, value => {
 })
 
 watch(hasChanges, value => {
+  if (value) wasChanged.value = true
+
   if (props.name) hasChangesUpdater?.(props.name, value)
 
   emit('update:has-changes', value)

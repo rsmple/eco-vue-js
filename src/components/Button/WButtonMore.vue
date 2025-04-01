@@ -38,7 +38,7 @@
         <WClickOutside
           no-filter
           class="
-           bg-default dark:bg-default-dark overflow-hidden
+            bg-default dark:bg-default-dark overflow-hidden
             rounded-xl text-start font-normal shadow-md dark:border dark:border-solid dark:border-gray-800
           "
           :class="{

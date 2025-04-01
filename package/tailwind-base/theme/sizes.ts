@@ -14,6 +14,7 @@ const newValues = {
   '--w-option-padding': 'var(--w-option-padding)',
   '--w-input-height': 'var(--w-input-height)',
   '--w-input-gap': 'var(--w-input-gap)',
+  '--w-option-height': 'var(--w-option-height)',
   '--w-select-option-padding': 'var(--w-select-option-padding)',
   '--left-inner': 'var(--w-left-inner)',
   '--right-inner': 'var(--w-right-inner)',

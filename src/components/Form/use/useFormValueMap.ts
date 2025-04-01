@@ -4,6 +4,7 @@ export const useFormValueMap = <Value, ValueGetter extends Ref<Value> | ((map: R
   injectionKey: InjectionKey<(key: string, value: Value) => void>,
   name: Ref<string | undefined>,
   valueGetter: ValueGetter,
+  immediate = true,
 ): {
   unlistener(key: string): void
   map: Ref<Record<string, Value>>
@@ -31,7 +32,7 @@ export const useFormValueMap = <Value, ValueGetter extends Ref<Value> | ((map: R
   if (isRef(value)) {
     watch(value, value => {
       if (name.value) updaterInjected?.(name.value, value as Value)
-    }, {immediate: true})
+    }, {immediate})
   } else {
     onBeforeMount(() => {
       if (name.value) updaterInjected?.(name.value, value)

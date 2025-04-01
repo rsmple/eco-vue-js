@@ -64,6 +64,7 @@ const hasShownMap = useFormValueMap(
   wFormHasShownUpdater,
   name,
   map => computed(() => Object.values(map.value).some(value => value)),
+  false,
 )
 
 const validateMap = useFormValueMap(
