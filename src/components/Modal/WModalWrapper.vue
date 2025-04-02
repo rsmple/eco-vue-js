@@ -1,5 +1,6 @@
 <template>
   <WInfiniteListScrollingElement
+    ref="content"
     class="
       bg-default dark:bg-default-dark w-modal-wrapper
       grid max-h-[calc(100%-var(--inner-margin,2rem)*2)]
@@ -13,6 +14,7 @@
     :style="{
       '--w-modal-header-height': (headerRef?.offsetHeight ?? 0) + 'px',
       '--w-modal-footer-height': (footerRef?.offsetHeight ?? 0) + 'px',
+      '--w-modal-content-height': (contentRef?.$el.offsetHeight ?? 0) + 'px'
     }"
   >
     <div
@@ -32,7 +34,7 @@
 
     <div
       ref="footer"
-      class="bg-default dark:bg-default-dark -gap--inner-margin -p--w-modal-wrapper-padding sm-not:w-screen sticky bottom-0 left-0 z-[1] flex w-[--w-modal-wrapper-width,35rem] justify-center"
+      class="bg-default dark:bg-default-dark -gap--inner-margin -p--w-modal-wrapper-padding sm-not:w-screen sticky bottom-0 left-0 z-[2] flex w-[--w-modal-wrapper-width,35rem] justify-center"
       :class="{
         'sm-not:flex-col': !maximized,
       }"
@@ -53,4 +55,5 @@ defineProps<{
 
 const headerRef = useTemplateRef('header')
 const footerRef = useTemplateRef('footer')
+const contentRef = useTemplateRef('content')
 </script>

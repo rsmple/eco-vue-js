@@ -19,8 +19,10 @@ const newValues = {
   '--left-inner': 'var(--w-left-inner)',
   '--right-inner': 'var(--w-right-inner)',
   '--width-inner': 'var(--w-width-inner)',
+  '--height-inner': 'var(--w-height-inner)',
   '--modal-header-height': 'var(--w-modal-header-height, 0px)',
   '--modal-footer-height': 'var(--w-modal-footer-height, 0px)',
+  '--modal-content-height': 'var(--w-modal-content-height, 0px)',
 }
 
 const extend = {
@@ -48,6 +50,8 @@ export default {
   width: extend,
   maxWidth: extend,
   minWidth: extend,
+  maxHeight: extend,
+  minHeight: extend,
   padding: extend,
   margin: extend,
   inset: extend,

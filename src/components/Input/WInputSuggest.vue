@@ -180,6 +180,10 @@ const blur = () => {
   inputRef.value?.blur()
 }
 
+const scrollToInput = () => {
+  inputRef.value?.scrollToInput()
+}
+
 const updateDropdown = () => {
   if (dropdownMenuRef.value && 'updateDropdown' in dropdownMenuRef.value) dropdownMenuRef.value.updateDropdown()
 }
@@ -189,6 +193,7 @@ defineExpose({
   blur,
   close,
   updateDropdown,
+  scrollToInput,
 })
 
 defineSlots<{

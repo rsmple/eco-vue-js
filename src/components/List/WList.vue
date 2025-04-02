@@ -112,7 +112,7 @@
 
         <WListHeader
           v-if="!isGrid"
-          class="sm-not:hidden mb-[--w-list-gap,1rem]"
+          class="sm-not:hidden"
           :allow-select="allowSelect"
           :tooltip-text="selectAllTextGetter(selectAllValue !== true, count ?? listCount ?? 0)"
           :hide-more="!menu"

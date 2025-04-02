@@ -138,7 +138,7 @@
                 @focus="
                   $emit('focus', $event);
                   setFocused(true);
-                  seamless && nextTick(() => contentRef?.scrollTo({left: contentRef?.scrollWidth ?? 0}));
+                  seamless && nextTick(scrollToInput);
                 "
                 @blur="
                   $emit('blur', $event);
@@ -368,6 +368,12 @@ const paste = async () => {
     })
 }
 
+const scrollToInput = () => {
+  if (!contentRef.value || !inputRef.value) return
+
+  contentRef.value.scrollTo({left: contentRef.value.scrollWidth - inputRef.value.offsetWidth - 40})
+}
+
 let timeout: NodeJS.Timeout | undefined
 
 const autofocusDebounced = () => {
@@ -399,5 +405,6 @@ defineExpose({
   focus,
   blur,
   fieldRef: computed(() => fieldWrapperRef.value?.fieldRef),
+  scrollToInput,
 })
 </script>

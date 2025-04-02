@@ -3,7 +3,7 @@
     ref="infiniteScroll"
     :style="{'--infinite-list-header-height': headerHeight + 'px'}"
     :class="{
-      'min-h-[calc(100vh-var(--header-height)-var(--infinite-list-header-height))] pb-16': !minHeight,
+      '-min-h--height-inner pb-16 pt-[--w-list-gap,1rem]': !minHeight,
       'min-h-full': minHeight,
     }"
     @scroll:down="addNextPage"

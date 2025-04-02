@@ -279,6 +279,14 @@ if (props.useQueryFnDefault) {
   }, {immediate: true})
 }
 
+watch(() => props.modelValue, async () => {
+  await nextTick()
+
+  inputRef.value?.updateDropdown()
+
+  if (props.seamless) inputRef.value?.scrollToInput()
+})
+
 defineExpose({
   focus,
   blur,

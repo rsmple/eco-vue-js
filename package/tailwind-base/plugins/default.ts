@@ -34,15 +34,17 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
   )
   
   addBase({
-    body: {
+    '*': {
       '--w-left-inner': 'calc(var(--nav-bar-width) + var(--inner-margin))',
       '--w-right-inner': 'calc(var(--actions-bar-width) + var(--inner-margin))',
       '--w-width-inner': 'calc(100vw - var(--actions-bar-width) - var(--nav-bar-width) - var(--inner-margin) - var(--inner-margin) - var(--scroll-bar-width))',
+      '--w-height-inner': 'calc(100vh - var(--header-height) - var(--infinite-list-header-height, 0px) - var(--scroll-bar-width))',
     },
-    '.w-modal-wrapper': {
+    '.w-modal-wrapper *': {
       '--w-left-inner': 'var(--w-modal-wrapper-padding)',
       '--w-right-inner': 'var(--w-modal-wrapper-padding)',
       '--w-width-inner': 'calc(var(--w-modal-wrapper-width, 35rem) - var(--w-modal-wrapper-padding) - var(--w-modal-wrapper-padding) - var(--scroll-bar-width))',
+      '--w-height-inner': 'calc(var(--w-modal-content-height) - var(--w-modal-header-height) - var(--w-modal-footer-height) - var(--infinite-list-header-height, 0px) - var(--scroll-bar-width))',
     },
   })
 
@@ -178,9 +180,9 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
     '.w-select-option': {
       padding: 'calc(var(--w-select-option-padding) / 2) var(--w-select-option-padding)',
     },
-    body: {
+    '*': {
       '--w-option-height': 'calc(var(--w-input-height,2.75rem) - (var(--w-input-gap,0.25rem) * 2) - 2px)',
-      '--w-option-rounded': 'calc(var(--w-input-rounded,0.75rem) - var(--w-input-gap,0.25rem))',
+      '--w-option-rounded': 'calc(var(--w-input-rounded,0.75rem) - var(--w-input-gap,0.25rem) - 1px)',
       '--w-option-padding': 'var(--w-input-rounded,0.75rem)',
       '--w-select-option-padding': 'calc(var(--w-option-padding) + var(--w-input-gap) + 1px)',
     },
