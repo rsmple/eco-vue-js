@@ -25,7 +25,9 @@ declare type PaginatedResponse<ValueType extends Record<string, unknown> | unkno
   results: ValueType[]
 }
 
-declare type EncodeQueryParam<T> = T extends string
+declare type EncodeQueryParam<T> = T extends undefined
+? undefined
+: T extends string
 ? T
 : T extends number
 ? T

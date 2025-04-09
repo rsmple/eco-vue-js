@@ -94,7 +94,7 @@ export const encodeRouteParams = <T>(params: T): Partial<EncodeQueryParams<T>> =
 export const createUseQueryParams = <QueryParams extends Record<string, unknown>>(config: {[Key in keyof QueryParams]: ParseFn<QueryParams[Key]>}) => {
   const keyList = Object.keys(config) as Array<keyof QueryParams>
 
-  const parse = (queryParams: Partial<QueryParams> | Reactive<Partial<QueryParams>>, value: Partial<EncodeQueryParams<QueryParams>>) => {
+  const parse = (queryParams: Partial<QueryParams> | Reactive<Partial<QueryParams>>, value: EncodeQueryParams<Partial<QueryParams>>) => {
     for (const key of keyList) {
       const resultValue = config[key](value[key])
 
@@ -112,7 +112,7 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
     }
   }
 
-  const fn = (route: {query: Partial<EncodeQueryParams<QueryParams>>}) => {
+  const fn = (route: {query: EncodeQueryParams<Partial<QueryParams>>}) => {
     const router = useRouter()
 
     const queryParams = reactive<Partial<QueryParams>>({})
