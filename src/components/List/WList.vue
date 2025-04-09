@@ -1,4 +1,24 @@
 <template>
+  <template v-if="filter || search">
+    <ListFilterGlobal
+      v-if="global"
+      :filter="filter"
+      :filter-search="filterSearch"
+      :query-params="queryParams"
+      :search="search === true"
+      @update:query-params="$emit('update:query-params', $event)"
+    />
+
+    <ListFilterLocal
+      v-else 
+      :filter="filter"
+      :filter-search="filterSearch"
+      :query-params="queryParams"
+      :search="search === true"
+      @update:query-params="$emit('update:query-params', $event)"
+    />
+  </template>
+
   <div
     :class="{
       'w-card': isGrid,
@@ -7,7 +27,7 @@
   >
     <WInfiniteList
       :use-query-fn="useQueryFn"
-      :query-params="(queryParams as QueryParams)"
+      :query-params="queryParams"
       :query-options="queryOptions"
       :skeleton-length="count ?? listCount ?? PAGE_LENGTH"
       hide-page-title
@@ -35,7 +55,7 @@
           :title="selectionTitle"
           :disable-message="bulkDisableMessage"
           :selected-count="selectionCount"
-          class="z-[2]"
+          :style="{zIndex: BASE_ZINDEX_DROPDOWN}"
           @clear:selection="resetSelection"
         >
           <template
@@ -247,11 +267,11 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>, CardColumns extends readonly GridCol[]">
-import type {BulkComponent, CardActionParams, CardAreas, FieldComponent, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
+import type {BulkComponent, CardActionParams, CardAreas, FieldComponent, FieldConfigMap, FilterComponent, GridCol, ListFields, MenuComponent} from './types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type StyleValue, computed, ref, toRef} from 'vue'
+import {type StyleValue, computed, ref, toRef, watch} from 'vue'
 
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
@@ -260,7 +280,7 @@ import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, parseOrdering} from '@/utils/order'
 import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
 import {useSelected} from '@/utils/useSelected'
-import {ListMode} from '@/utils/utils'
+import {BASE_ZINDEX_DROPDOWN, ListMode} from '@/utils/utils'
 
 import WListCard from './WListCard.vue'
 import WListHeader from './WListHeader.vue'
@@ -269,6 +289,8 @@ import HeaderFieldNested from './components/HeaderFieldNested.vue'
 import HeaderSettings from './components/HeaderSettings.vue'
 import HeaderSort from './components/HeaderSort.vue'
 import ListCardFieldNested from './components/ListCardFieldNested.vue'
+import ListFilterGlobal from './components/ListFilterGlobal.vue'
+import ListFilterLocal from './components/ListFilterLocal.vue'
 import {filterFields, getFirstFieldLabel, useListConfig} from './use/useListConfig'
 
 const props = defineProps<{
@@ -301,11 +323,17 @@ const props = defineProps<{
   cardAreas: CardAreas<Fields, CardColumns['length']>
   cardTo?: (item: Data) => LinkProps['to'] | undefined
   hasAction?: boolean
+  filter?: FilterComponent<QueryParams>[]
+  filterSearch?: FilterComponent<QueryParams>
+  search?: boolean
+  global?: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'update:error', value: ApiError): void
   (e: 'click:action', value: CardActionParams<Data>): void
+  (e: 'update:query-params', value: QueryParams): void
+  (e: 'update:count', value: number | undefined): void
 }>()
 
 const {isMobile} = useIsMobile()
@@ -388,4 +416,6 @@ const getFieldStyles = (label: string, nested: boolean): StyleValue | undefined 
     maxWidth: value,
   }
 }
+
+watch(countValue, value => emit('update:count', value), {immediate: true})
 </script>

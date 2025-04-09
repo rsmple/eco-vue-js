@@ -2,7 +2,7 @@
   <div 
     class="
       height-full bg-default dark:bg-default-dark
-      sm-not:[--actions-bar-filter-width:calc(100vw-var(--w-actions-bar-width))] fixed right-0 top-0 z-40 grid
+      sm-not:[--actions-bar-filter-width:calc(100vw-var(--w-actions-bar-width))] fixed right-0 top-0 grid
       grid-cols-[var(--actions-bar-filter-width-current,0),var(--w-actions-bar-width)] grid-rows-[var(--header-height),1fr]
       justify-end overflow-hidden shadow-md transition-[grid-template-columns]
       duration-300 print:hidden
@@ -10,6 +10,7 @@
     :class="{
       '[--actions-bar-filter-width-current:var(--actions-bar-filter-width)]': isOpen && hasFilter,
     }"
+    :style="{zIndex: BASE_ZINDEX_ACTIONS_BAR}"
   >
     <div
       class="
@@ -17,11 +18,18 @@
         justify-self-end overflow-y-auto overflow-x-hidden overscroll-contain
       "
     >
-      <component
-        :is="filter"
-        v-if="filter"
-        @update:count="updateCount"
-      />
+
+      <div class="-px--inner-margin pb-16">
+        <div class="text-accent -h--header-height flex items-center text-xl font-semibold">
+          Filters
+        </div>
+
+        <component
+          :is="slot"
+          v-for="(slot, index) in filter"
+          :key="index"
+        />
+      </div>
     </div>
 
     <div class="relative row-span-2 grid h-full grid-cols-1 grid-rows-subgrid overflow-x-hidden overscroll-contain">
@@ -50,7 +58,7 @@
             :title="textFilter ?? 'Filters'"
             :icon="markRaw(IconFilter)"
             :active="isOpen"
-            :count="filterCount"
+            :count="count"
             :semantic-type="SemanticType.PRIMARY"
             @click="toggle"
           />
@@ -70,25 +78,32 @@
 </template>
 
 <script lang="ts" setup>
-import {type Component, type VNode, computed, markRaw, onUnmounted, ref, watch} from 'vue'
+import {type Component, type VNode, computed, markRaw, onUnmounted, provide, ref, watch} from 'vue'
 
 import WButtonAction from '@/components/Button/WButtonAction.vue'
 
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
 import IconFilter from '@/assets/icons/sax/IconFilter.svg?component'
 
-import {SemanticType} from '@/main'
+import {SemanticType} from '@/utils/SemanticType'
+import {BASE_ZINDEX_ACTIONS_BAR, wBaseZIndex} from '@/utils/utils'
 
-const props = defineProps<{
-  filter?: Component
+import {useActionBarFilter} from './use/useActionsBarFilter'
+
+defineProps<{
   bottom?: Component
   textFilter?: string
 }>()
 
+provide(wBaseZIndex, BASE_ZINDEX_ACTIONS_BAR)
+
 let closeModal: (() => void) | null = null
 
+const {filter, count} = useActionBarFilter()
+
+const hasFilter = computed(() => filter.value !== undefined)
+
 const isOpen = ref(false)
-const filterCount = ref(0)
 
 const toggle = () => {
   isOpen.value = !isOpen.value
@@ -96,12 +111,6 @@ const toggle = () => {
 
 const close = () => {
   isOpen.value = false
-}
-
-const hasFilter = computed(() => !!props.filter)
-
-const updateCount = (value: number): void => {
-  filterCount.value = value
 }
 
 onUnmounted(() => {

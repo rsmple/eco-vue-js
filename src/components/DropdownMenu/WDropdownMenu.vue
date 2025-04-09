@@ -7,7 +7,7 @@
 
   <Teleport
     to="body"
-    :disabled="!teleport || !isOpen"
+    :disabled="!isOpen"
   >
     <WDropdown
       v-if="(parentElement || element) && isOpen"
@@ -18,7 +18,7 @@
       :max-height="maxHeight"
       :max-width="maxWidth"
       :emit-update="emitUpdate"
-      :style="{zIndex: teleport ? baseZInfex + 2 : 2}"
+      :style="{zIndex: baseZIndex + BASE_ZINDEX_DROPDOWN}"
       @update:rect="$emit('update:rect')"
     >
       <template #default="defaultScope">
@@ -39,8 +39,7 @@ import {type VNode, computed, inject, useTemplateRef} from 'vue'
 
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 
-import {wBaseZInfex} from '@/components/Modal/models/injection'
-import {unwrapSlots} from '@/utils/utils'
+import {BASE_ZINDEX_DROPDOWN, unwrapSlots, wBaseZIndex} from '@/utils/utils'
 
 defineProps<DropdownMenuProps>()
 
@@ -48,7 +47,7 @@ defineEmits<{
   (e: 'update:rect'): void
 }>()
 
-const baseZInfex = inject(wBaseZInfex, 0)
+const baseZIndex = inject(wBaseZIndex, 0)
 
 const containerRef = useTemplateRef<ComponentInstance<unknown> | HTMLElement>('container')
 const dropdownRef = useTemplateRef('dropdown')

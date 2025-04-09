@@ -4,20 +4,17 @@
     ref="button"
     role="button"
     tabindex="0"
-    class="w-ripple w-ripple-hover -px--inner-margin -mx---inner-margin relative grid cursor-pointer select-none grid-cols-[auto,1fr,auto] items-center py-3 text-start"
+    class="w-ripple w-ripple-hover -px--inner-margin -mx---inner-margin relative grid cursor-pointer select-none grid-cols-[1fr,auto] items-center gap-2 py-3 text-start"
     @click="toggle"
     @keydown.enter="toggle"
     @keydown.space="toggle"
   >
-    <template v-if="icon">
+    <div>
       <component
         :is="icon"
-        class="square-[1.5em] mr-2"
-      />
-    </template>
-
-    <div class="col-start-2 mr-2">
-      <span
+        v-if="icon"
+        class="square-[1.25em] -mt-1 inline"
+      /> <span
         class="relative pr-4 font-semibold" 
         :class="{'text-xs': minTitle}"
       >

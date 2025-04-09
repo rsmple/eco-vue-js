@@ -20,7 +20,7 @@ import {useTabItemActiveListener} from '../use/useTabItemActiveListener'
 
 const props = defineProps<{
   name: string
-  title: string
+  title: string | undefined
   active: boolean
   removable: boolean
 }>()

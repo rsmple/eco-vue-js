@@ -1,5 +1,5 @@
 <template>
-  <div class="z-[1000]">
+  <div :style="{zIndex: BASE_ZINDEX_MODAL}">
     <Transition
       enter-active-class="transition-opacity"
       leave-active-class="transition-opacity"
@@ -45,12 +45,11 @@ import {onBeforeMount, onBeforeUnmount, provide, reactive, ref, watch} from 'vue
 
 import {Modal, type ModalComponent, initModal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
+import {BASE_ZINDEX_MODAL, wBaseZIndex} from '@/utils/utils'
 
 import ModalCloseButton from './components/ModalCloseButton.vue'
-import {wBaseZInfex, wIsModal} from './models/injection'
+import {wIsModal} from './models/injection'
 import {useIsBackdrop} from './use/useIsBackdrop'
-
-const MODAL_Z_INDEX = 1000
 
 type ModalMeta<ModalProps> = {
   key: number
@@ -60,7 +59,7 @@ type ModalMeta<ModalProps> = {
   autoclose: boolean
 }
 
-provide(wBaseZInfex, MODAL_Z_INDEX)
+provide(wBaseZIndex, BASE_ZINDEX_MODAL)
 provide(wIsModal, true)
 
 const key = ref(0)

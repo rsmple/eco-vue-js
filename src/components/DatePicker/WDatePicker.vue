@@ -49,6 +49,7 @@
             :is-hover-enabled="preselectedValue !== null"
             :min-date="minDate"
             :max-date="maxDate"
+            :today="today && isSameMonth(today, currentDate) ? today : undefined"
             class="px-3"
             @click:day="onClickDay"
             @hover:day="setRange"
@@ -64,7 +65,7 @@ import type {DateRange} from './models/types'
 
 import {computed, ref, toRef, watch} from 'vue'
 
-import {addDay, addMonth, addYear, getStartOfMonth, getStartOfWeek, monthShortFormatter} from '@/utils/dateTime'
+import {addDay, addMonth, addYear, getStartOfDay, getStartOfMonth, getStartOfWeek, isSameMonth, monthShortFormatter} from '@/utils/dateTime'
 
 import CalendarMonth from './components/CalendarMonth.vue'
 import CalendarToggle from './components/CalendarToggle.vue'
@@ -84,6 +85,8 @@ const currentDate = ref(getStartOfMonth())
 const dateRange = ref<DateRange | undefined>(props.modelValue)
 const preselectedValue = ref<Date | null>(null)
 const isDirect = ref(false)
+
+const today = ref(getStartOfDay())
 
 const year = computed<number>(() => currentDate.value.getFullYear())
 

@@ -157,3 +157,17 @@ export type CardActionParams<Data> = {
   item: Data
   setter: (value: Data) => void
 }
+
+export type FilterProps<QueryParams> = {
+  queryParams: QueryParams
+  fields?: Array<keyof QueryParams>
+  title?: string
+  icon?: SVGComponent
+  hidden?: boolean
+}
+
+export type FilterEmits<QueryParams, Field extends keyof QueryParams> = {
+  (e: 'update:query-params', value: Pick<QueryParams, Field>): void
+}
+
+export type FilterComponent<QueryParams> = Component<FilterProps<QueryParams>>

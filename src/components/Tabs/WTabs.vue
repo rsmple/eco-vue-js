@@ -14,7 +14,9 @@
       class="relative"
       :class="{
         'sm-not:snap-start grid grid-cols-[1fr,auto]': side,
-        'no-scrollbar sm-not:-pl--inner-margin sm-not:-mx---inner-margin flex snap-x snap-mandatory snap-always overflow-x-auto overscroll-x-contain pr-[50%]': !side,
+        'no-scrollbar sm-not:-pl--inner-margin sm-not:-mx---inner-margin flex snap-x snap-mandatory snap-always overflow-x-auto overscroll-x-contain': !side,
+        'flex-wrap': !side && wrap,
+        'pr-[50%]': !side && !wrap,
       }"
     >
       <template
@@ -40,7 +42,6 @@
           :class="{
             'snap-center': !side,
           }"
-          @update:indicator-style="indicatorStyle = $event"
           @update:scroll-position="updateScrollPosition"
           @click="switchTab(slot.props?.name)"
         >
@@ -80,18 +81,6 @@
           v-else
         />
       </template>
-
-      <div
-        v-if="!stepper"
-        class="absolute rounded-sm duration-500"
-        :style="indicatorStyle"
-        :class="{
-          'bg-primary dark:bg-primary-dark': currentIsValid !== false,
-          'bg-negative dark:bg-negative-dark': currentIsValid === false,
-          'transition-[left,width,background-color]': !side && indicatorStyle !== undefined,
-          'transition-[top,height,background-color]': side && indicatorStyle !== undefined,
-        }"
-      />
     </div>
 
     <div
@@ -130,7 +119,7 @@
 <script lang="ts" setup>
 import type {TabsItemProps, TabsProps} from './types'
 
-import {type CSSProperties, type Component, type RendererElement, type RendererNode, type VNode, computed, inject, onMounted, onUnmounted, ref, useSlots, useTemplateRef, watch} from 'vue'
+import {type Component, type RendererElement, type RendererNode, type VNode, computed, inject, onMounted, onUnmounted, ref, useSlots, useTemplateRef, watch} from 'vue'
 
 import WForm from '@/components/Form/WForm.vue'
 
@@ -148,7 +137,7 @@ const emit = defineEmits<{
   (e: 'update:current', value: string): void
   (e: 'update:current-index', value: number): void
   (e: 'update:has-changes', value: boolean): void
-  (e: 'update:current-title', value: string): void
+  (e: 'update:current-title', value: string | undefined): void
   (e: 'update:tabs-length', value: number): void
   (e: 'update:progress', value: number): void
   (e: 'update:first', value: boolean): void
@@ -185,7 +174,6 @@ const current = ref<string>(props.initTab ?? (props.initTabIndex !== undefined
 const currentIndex = computed(() => defaultSlotsKeys.value.indexOf(current.value))
 const isDirect = ref(true)
 const buttonRef = useTemplateRef<ComponentInstance<typeof TabTitleButton>[]>('button')
-const indicatorStyle = ref<CSSProperties | undefined>(undefined)
 const minHeight = ref(0)
 const tabItemRef = useTemplateRef('tabItem')
 

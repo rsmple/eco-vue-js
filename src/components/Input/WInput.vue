@@ -198,7 +198,7 @@
 <script lang="ts" setup generic="Type extends InputType = 'text'">
 import type {InputProps} from './types'
 
-import {computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef} from 'vue'
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch} from 'vue'
 
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 
@@ -389,6 +389,12 @@ const autofocusDebounced = () => {
 if (props.autofocus) {
   useTabActiveListener(autofocusDebounced)
 }
+
+watch(() => props.autofocus, value => {
+  if (!value) return
+
+  nextTick(focus)
+})
 
 onMounted(() => {
   if (props.autofocus) autofocusDebounced()

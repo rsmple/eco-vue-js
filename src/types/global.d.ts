@@ -25,15 +25,17 @@ declare type PaginatedResponse<ValueType extends Record<string, unknown> | unkno
   results: ValueType[]
 }
 
-declare type EncodeQueryParam<T> = string extends T
-? string
-: number extends T
+declare type EncodeQueryParam<T> = T extends string
+? T
+: T extends number
 ? T
 : string
 
 declare type EncodeQueryParams<T> = {
   [Key in keyof T]: EncodeQueryParam<T[Key]>
 }
+
+declare type ParseFn<T> = (value: EncodeQueryParam<T> | undefined) => T | undefined
 
 declare type ValidateFn = (value: string | number | undefined | string[] | boolean | null) => string | undefined
 
@@ -66,9 +68,20 @@ declare type ConfirmProps = Omit<import('@/components/Modal/types').ConfirmModal
 
 declare type RequestData = Record<string, unknown> | Record<string, unknown>[] | FormData
 
+declare type RequestParams = Record<string,
+  | string
+  | string[]
+  | boolean
+  | number
+  | number[]
+  | Record<string, unknown>
+  | Record<string, unknown>[]
+  | undefined
+>
+
 declare type RequestConfig<Data extends RequestData = RequestData> = {
   data?: Data
-  params?: Record<string, string | number | Record<string, unknown> | number[] | Record<string, unknown>[] | undefined>
+  params?: RequestParams
   signal?: AbortSignal
   noAuth?: boolean
   updateToken?: boolean

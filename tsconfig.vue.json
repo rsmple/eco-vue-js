@@ -8,7 +8,8 @@
   ],
   "exclude": [
     "src/**/__tests__/*",
-    "node_modules"
+    "node_modules",
+    "package/dist/**/*"
   ],
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,

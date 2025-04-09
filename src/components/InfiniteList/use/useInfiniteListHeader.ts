@@ -1,16 +1,22 @@
-import {type Ref, inject, onBeforeUnmount, onMounted, ref} from 'vue'
+import {inject, onBeforeUnmount, onMounted, ref} from 'vue'
 
+import {useHeader} from '@/components/HeaderBar/use/useHeader'
+import {wModalHeaderHeight} from '@/components/Modal/models/injection'
 import {isClientSide} from '@/utils/utils'
 
 import {wScrollingElement} from '../models/injection'
 
-export const useInfiniteListHeader = (headerElementHeight: Ref<number>, initIsIntersecting = true) => {
+export const useInfiniteListHeader = (initIsIntersecting = true) => {
   const indicator = ref<HTMLDivElement>()
   const header = ref<HTMLDivElement>()
   const headerHeight = ref<number>(0)
   const headerTop = ref<number>(0)
   const isIntersecting = ref(initIsIntersecting)
   let observer: IntersectionObserver | null = null
+
+  const {updateHeaderPadding, headerHeight: headerElementHeight} = useHeader()
+
+  const modalHeaderHeight = inject(wModalHeaderHeight, undefined)
 
   const scrollingElement = inject(wScrollingElement, null)
 
@@ -27,7 +33,17 @@ export const useInfiniteListHeader = (headerElementHeight: Ref<number>, initIsIn
 
     const rect = header.value.getBoundingClientRect()
     headerHeight.value = rect.height
-    headerTop.value = rect.top + (scrollingElement?.value?.scrollTop ?? document.scrollingElement?.scrollTop ?? 0) - headerElementHeight.value
+    headerTop.value = rect.top + (scrollingElement?.value?.scrollTop ?? document.scrollingElement?.scrollTop ?? 0) - (modalHeaderHeight ?? headerElementHeight.value)
+  }
+
+  const updateHeaderHeight = () => {
+    if (!isIntersecting.value && headerHeight.value) {
+      updateHeader()
+
+      updateHeaderPadding(headerHeight.value)
+    } else {
+      updateHeaderPadding(0)
+    }
   }
 
   onMounted(() => {
@@ -56,6 +72,7 @@ export const useInfiniteListHeader = (headerElementHeight: Ref<number>, initIsIn
     headerHeight,
     headerTop,
     isIntersecting,
-    updateHeader,
+    updateHeaderPadding,
+    updateHeaderHeight,
   }
 }

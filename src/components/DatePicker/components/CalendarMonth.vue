@@ -23,6 +23,7 @@
       :min-date="minDate"
       :max-date="maxDate"
       :disabled="isDisabled"
+      :today="today && toWeek && isSameDate(toWeek, week) ? today : undefined"
       @click:day="$emit('click:day', $event)"
       @hover:day="$emit('hover:day', $event)"
     />
@@ -34,7 +35,7 @@ import type {DateRange} from '../models/types'
 
 import {computed} from 'vue'
 
-import {WeekDay, getStartOfWeek, weekdayShortFormatter} from '@/utils/dateTime'
+import {WeekDay, getStartOfWeek, isSameDate, weekdayShortFormatter} from '@/utils/dateTime'
 
 import CalendarWeek from './CalendarWeek.vue'
 
@@ -47,12 +48,15 @@ const props = defineProps<{
   minDate?: Date
   maxDate?: Date
   disabled?: boolean
+  today: Date | undefined
 }>()
 
 defineEmits<{
   (e: 'click:day', value: Date): void
   (e: 'hover:day', value: Date): void
 }>()
+
+const toWeek = computed(() => props.today ? getStartOfWeek(props.today) : undefined)
 
 const startDayOfWeekPrepared = computed(() => props.startDayOfWeek || 1)
 

@@ -1,5 +1,5 @@
 import type {FieldConfig, FieldConfigMap, GetFieldLabels, ListFields} from '@/components/List/types'
-import type {VNode} from 'vue'
+import type {InjectionKey, VNode} from 'vue'
 
 const overflowScrollRegexp = /auto|scroll|overlay/
 
@@ -144,6 +144,54 @@ export const parseIndex = (value: unknown): number => {
   return NaN
 }
 
+export const parseString: ParseFn<string> = value => typeof value === 'string' ? value : undefined
+export const parseBoolean: ParseFn<boolean> = value => value === 'true' ? true : value === 'false' ? false : undefined
+export const parseInteger: ParseFn<number> = value => {
+  const parsed = Number(value)
+
+  if (Number.isInteger(parsed)) return parsed
+}
+
+export const parseStringList: ParseFn<string[]> = value => {
+  if (typeof value !== 'string') return
+
+  return value.split(',')
+}
+
+export const parseIntegerList: ParseFn<number[]> = value => {
+  if (typeof value !== 'string') return
+
+  return value.split(',').map(Number).filter(Number.isInteger)
+}
+
+export const parseIdList: ParseFn<number[]> = value => {
+  if (typeof value !== 'string') return
+
+  return value.split(',').map(Number).filter(isId)
+}
+
+export const parseSliceIndexes: ParseFn<[number, number]> = value => {
+  if (typeof value !== 'string') return
+
+  const parsed = parseIntegerList(value)
+
+  if (parsed?.length === 2) return parsed as [number, number]
+}
+
+export const parseJson = <Data>(isValid: (value: unknown) => value is Data) => {
+  return (value: unknown): Data | undefined => {
+    if (!value || typeof value !== 'string') return undefined
+  
+    try {
+      const parsed = JSON.parse(value)
+  
+      if (isValid(parsed)) return parsed
+    } catch {}
+  
+    return undefined
+  }
+}
+
 export const get = <FieldType, Data>(data: Data, path: keyof ObjectPaths<Data, FieldType>): FieldType | undefined => (path as string).split('.').reduce((result, current) => (result as Record<string, unknown>)?.[current] as Data, data) as FieldType | undefined
 
 export const set = <FieldType, Data>(data: Data, path: keyof ObjectPaths<Data, FieldType>, value: FieldType): Data => {
@@ -200,3 +248,12 @@ export const unwrapSlots = (slots: VNode[]): VNode[] => {
     else return []
   })
 }
+
+export const wBaseZIndex = Symbol('wBaseZIndex') as InjectionKey<number>
+
+export const BASE_ZINDEX_MODAL = 1000
+export const BASE_ZINDEX_ACTIONS_BAR = 40
+export const BASE_ZINDEX_NAV_BAR = 30
+export const BASE_ZINDEX_LIST_HEADER = 20
+export const BASE_ZINDEX_HEADER_BAR = 10
+export const BASE_ZINDEX_DROPDOWN = 2

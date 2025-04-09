@@ -9,9 +9,10 @@
       v-if="isOpen && isTablet"
       title="Click to close"
       class="
-        bg-primary-light/40 dark:bg-primary-darkest/40 no-scrollbar fixed left-0 top-0 z-30 size-full
+        bg-primary-light/40 dark:bg-primary-darkest/40 no-scrollbar fixed left-0 top-0 size-full
         overflow-y-auto overflow-x-hidden overscroll-contain backdrop-blur print:hidden
       "
+      :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
       @click.stop.prevent="close"
     >
       <div class="h-[calc(100%+1px)]" />
@@ -20,13 +21,14 @@
 
   <div
     class="
-      xl-not:bg-default xl-not:dark:bg-default-dark fixed left-0 top-0 z-30 grid h-full overflow-hidden
+      xl-not:bg-default xl-not:dark:bg-default-dark fixed left-0 top-0 grid h-full overflow-hidden
       shadow-md transition-[grid-template-columns] duration-200 xl:grid-cols-[1fr] xl:shadow-none print:hidden 
     "
     :class="{
       'xl-not:grid-cols-[0fr]': !isOpen,
       'grid-cols-[1fr]': isOpen,
     }"
+    :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
   >
     <div class="bg-default dark:bg-default-dark -mt--header-height overflow-hidden">
       <slot />
@@ -34,8 +36,9 @@
   </div>
 
   <div
-    class="-square--header-height w-ripple fixed left-0 top-0 z-30 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
+    class="-square--header-height w-ripple fixed left-0 top-0 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
     :class="{'text-primary': isOpen}"
+    :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
     @click.stop="toggle"
   >
     <IconMenu />
@@ -43,15 +46,18 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue'
+import {provide, ref} from 'vue'
 
 import IconMenu from '@/assets/icons/sax/IconMenu.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
+import {BASE_ZINDEX_NAV_BAR, wBaseZIndex} from '@/utils/utils'
 
 const emit = defineEmits<{
   (e: 'update:isOpen', value: boolean): void
 }>()
+
+provide(wBaseZIndex, BASE_ZINDEX_NAV_BAR)
 
 const {isTablet} = useIsMobile()
 

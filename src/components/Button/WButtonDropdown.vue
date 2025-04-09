@@ -5,7 +5,6 @@
     :max-width="maxWidth"
     :horizontal-align="horizontalAlign"
     update-align
-    :teleport="teleport"
   >
     <template #toggle>
       <div>

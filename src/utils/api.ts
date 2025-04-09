@@ -1,3 +1,6 @@
+import {type Reactive, reactive, watch} from 'vue'
+import {useRouter} from 'vue-router'
+
 import type WForm from '@/components/Form/WForm.vue'
 import type WFormValidator from '@/components/Form/WFormValidator.vue'
 
@@ -64,8 +67,70 @@ export const encodeQueryParams = <T>(params: T): EncodeQueryParams<T> => {
   for (const key in params) {
     const value = encodeQueryParam(params[key])
 
-    if (value !== undefined) result[key] = value
+    if (value === undefined || (Array.isArray(value) && value.length === 0)) continue
+
+    result[key] = value
   }
 
   return result
+}
+
+export const encodeRouteParams = <T>(params: T): Partial<EncodeQueryParams<T>> => {
+  const result = {} as Partial<EncodeQueryParams<T>>
+
+  for (const key in params) {
+    const value = encodeQueryParam(params[key])
+
+    if (value === undefined || (Array.isArray(value) && value.length === 0)) {
+      result[key] = undefined
+    } else {
+      result[key] = value
+    }
+  }
+
+  return result
+}
+
+export const createUseQueryParams = <QueryParams extends Record<string, unknown>>(config: {[Key in keyof QueryParams]: ParseFn<QueryParams[Key]>}) => {
+  const keyList = Object.keys(config) as Array<keyof QueryParams>
+
+  const parse = (queryParams: Partial<QueryParams> | Reactive<Partial<QueryParams>>, value: Partial<EncodeQueryParams<QueryParams>>) => {
+    for (const key of keyList) {
+      const resultValue = config[key](value[key])
+
+      if (queryParams[key as keyof typeof queryParams] === resultValue) continue
+
+      if (
+        resultValue === undefined ||
+        Number.isNaN(resultValue) ||
+        (Array.isArray(resultValue) && resultValue.length === 0)
+      ) {
+        delete queryParams[key as keyof typeof queryParams]
+      } else {
+        queryParams[key as keyof typeof queryParams] = resultValue as typeof queryParams[keyof typeof queryParams]
+      }
+    }
+  }
+
+  const fn = (route: {query: Partial<EncodeQueryParams<QueryParams>>}) => {
+    const router = useRouter()
+
+    const queryParams = reactive<Partial<QueryParams>>({})
+
+    const updateQueryParams = (value: Partial<QueryParams>) => {
+      router.replace({query: {...route.query as Record<string, string>, ...encodeRouteParams(value)}})
+    }
+
+    watch(() => route.query, value => parse(queryParams, value), {immediate: true})
+  
+    return {
+      queryParams,
+      updateQueryParams,
+    }
+  }
+
+  fn.config = config
+  fn.parse = parse
+
+  return fn as typeof fn & {QueryParams: Partial<QueryParams>}
 }

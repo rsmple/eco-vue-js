@@ -1,7 +1,8 @@
 <template>
   <div
     ref="element"
-    class="-h--header-height fixed inset-x-0 top-0 z-10 flex print:hidden"
+    class="-h--header-height fixed inset-x-0 top-0 grid grid-cols-1 print:hidden"
+    :style="{zIndex: BASE_ZINDEX_HEADER_BAR}"
   >
     <div
       :key="headerPadding"
@@ -13,10 +14,10 @@
     />
 
     <div
-      v-show="!isSearchVisible && !search"
-      class="-pl--inner-margin xl-not:-pl--header-height relative flex max-w-full flex-1 items-center"
+      v-show="!visible"
+      class="-pl--inner-margin xl-not:-pl--header-height relative flex items-center"
       :class="{
-        '-pr--inner-margin': !searchEnabled
+        '-pr--inner-margin': !search
       }"
     >
       <div class="text-accent sm:text-2.5xl flex-1 truncate text-xl font-semibold">
@@ -26,9 +27,9 @@
       </div>
 
       <button
-        v-if="searchEnabled"
+        v-if="search"
         class="w-ripple-trigger sm:-pr--inner-margin h-full select-none"
-        @click="openSearch"
+        @click="updateVisible(true)"
       >
         <div class="w-ripple w-ripple-hover sm-not:-px--inner-margin relative flex h-full items-center px-[--w-list-padding,1rem]">
           <IconSearch class="square-[1.25em] text-accent" />
@@ -37,106 +38,46 @@
     </div>
 
     <div
-      v-if="searchEnabled"
-      v-show="isSearchVisible || search"
-      class="xl-not:pl-[3.75rem] -px--inner-margin relative flex w-full flex-1 items-center gap-2"
+      v-if="search"
+      v-show="visible"
+      class="xl-not:-pl--header-height -px--inner-margin grid items-center"
     >
-      <WInputSuggest
-        v-if="$slots.search && isMobile"
-        ref="input"
-        :model-value="search"
-        placeholder="Search.."
-        allow-clear
-        persist
-        teleport
-        no-margin
-        class="w-full"
-        :icon="markRaw(IconSearch)"
-        @click:clear="!isMobile && inputRef?.close()"
-        @close="closeSearch"
-        @update:model-value="$emit('update:search', $event)"
-      >
-        <template
-          v-if="isMobile"
-          #content
-        >
-          <slot name="search" />
-        </template>
-      </WInputSuggest>
-
-      <template v-else>
-        <WInput
-          ref="input"
-          :model-value="search"
-          placeholder="Search.."
-          autofocus
-          allow-clear
-          no-margin
-          class="w-full"
-          :icon="markRaw(IconSearch)"
-          @click:clear="closeSearch"
-          @close="$route.meta.headerSearchComponent && closeSearch()"
-          @update:model-value="$emit('update:search', $event)"
-        />
-
-        <slot name="search" />
-      </template>
+      <component
+        :is="slot"
+        v-for="(slot, index) in search"
+        :key="index"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {markRaw, nextTick, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
-
-import WInput from '@/components/Input/WInput.vue'
-import WInputSuggest from '@/components/Input/WInputSuggest.vue'
+import {onBeforeUnmount, onMounted, provide, ref, useTemplateRef} from 'vue'
 
 import IconSearch from '@/assets/icons/sax/IconSearch.svg?component'
 
-import {useIsMobile} from '@/utils/mobile'
+import {BASE_ZINDEX_HEADER_BAR, wBaseZIndex} from '@/utils/utils'
 
 import {useHeader} from './use/useHeader'
+import {useHeaderSearch} from './use/useHeaderSearch'
+import {useHeaderSearchVisible} from './use/useHeaderSearchVisible'
 
-const props = withDefaults(
-  defineProps<{
-    title?: string
-    search?: string
-    searchEnabled?: boolean
-  }>(),
-  {
-    title: undefined,
-    search: undefined,
-  },
-)
+defineProps<{
+  title?: string
+}>()
 
 defineEmits<{
   (e: 'update:search', value: string | undefined): void
 }>()
 
-const {isMobile} = useIsMobile()
+provide(wBaseZIndex, BASE_ZINDEX_HEADER_BAR)
 
 const {headerPadding, updateHeaderHeight} = useHeader()
+const {search} = useHeaderSearch()
+const {visible, updateVisible} = useHeaderSearchVisible()
 const elementRef = useTemplateRef('element')
-const inputRef = useTemplateRef<ComponentInstance<typeof WInputSuggest>>('input')
 
 const isTransparent = ref(false)
-const isSearchVisible = ref(false)
-
-const openSearch = (): void => {
-  isSearchVisible.value = true
-
-  nextTick().then(() => inputRef.value?.focus())
-}
-
-const closeSearch = (): void => {
-  isSearchVisible.value = false
-}
-
-watch(toRef(props, 'searchEnabled'), value => {
-  if (value) return
-
-  isSearchVisible.value = false
-})
 
 let timeout: NodeJS.Timeout | undefined
 

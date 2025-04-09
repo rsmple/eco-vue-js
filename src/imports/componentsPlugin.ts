@@ -1,6 +1,7 @@
 import type {App} from 'vue'
 
 import WActionsBar from '@/components/ActionsBar/WActionsBar.vue'
+import WActionsBarFilter from '@/components/ActionsBar/WActionsBarFilter.vue'
 import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import WButton from '@/components/Button/WButton.vue'
 import WButtonAction from '@/components/Button/WButtonAction.vue'
@@ -13,6 +14,7 @@ import WButtonMoreItem from '@/components/Button/WButtonMoreItem.vue'
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
 import WButtonSelectionState from '@/components/Button/WButtonSelectionState.vue'
+import WButtonTab from '@/components/Button/WButtonTab.vue'
 import WButtonUnselect from '@/components/Button/WButtonUnselect.vue'
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 import WCheckboxGroup from '@/components/Checkbox/WCheckboxGroup.vue'
@@ -40,6 +42,7 @@ import WFormAsyncSelectSingle from '@/components/FormAsync/WFormAsyncSelectSingl
 import WFormAsyncSelectStringified from '@/components/FormAsync/WFormAsyncSelectStringified.vue'
 import WFormAsyncToggle from '@/components/FormAsync/WFormAsyncToggle.vue'
 import WHeaderBar from '@/components/HeaderBar/WHeaderBar.vue'
+import WHeaderBarSearch from '@/components/HeaderBar/WHeaderBarSearch.vue'
 import WImageViewer from '@/components/ImageViewer/WImageViewer.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
@@ -98,6 +101,7 @@ export default {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   install: (app: App | any) => {
     app.component('WActionsBar', WActionsBar)
+    app.component('WActionsBarFilter', WActionsBarFilter)
     app.component('WBottomSheet', WBottomSheet)
     app.component('WButton', WButton)
     app.component('WButtonAction', WButtonAction)
@@ -110,6 +114,7 @@ export default {
     app.component('WButtonSelection', WButtonSelection)
     app.component('WButtonSelectionAction', WButtonSelectionAction)
     app.component('WButtonSelectionState', WButtonSelectionState)
+    app.component('WButtonTab', WButtonTab)
     app.component('WButtonUnselect', WButtonUnselect)
     app.component('WCheckbox', WCheckbox)
     app.component('WCheckboxGroup', WCheckboxGroup)
@@ -137,6 +142,7 @@ export default {
     app.component('WFormAsyncSelectStringified', WFormAsyncSelectStringified)
     app.component('WFormAsyncToggle', WFormAsyncToggle)
     app.component('WHeaderBar', WHeaderBar)
+    app.component('WHeaderBarSearch', WHeaderBarSearch)
     app.component('WImageViewer', WImageViewer)
     app.component('WInfiniteList', WInfiniteList)
     app.component('WInfiniteListScrollingElement', WInfiniteListScrollingElement)
@@ -195,6 +201,7 @@ export default {
 
 export {
   WActionsBar,
+  WActionsBarFilter,
   WBottomSheet,
   WButton,
   WButtonAction,
@@ -207,6 +214,7 @@ export {
   WButtonSelection,
   WButtonSelectionAction,
   WButtonSelectionState,
+  WButtonTab,
   WButtonUnselect,
   WCheckbox,
   WCheckboxGroup,
@@ -234,6 +242,7 @@ export {
   WFormAsyncSelectStringified,
   WFormAsyncToggle,
   WHeaderBar,
+  WHeaderBarSearch,
   WImageViewer,
   WInfiniteList,
   WInfiniteListScrollingElement,

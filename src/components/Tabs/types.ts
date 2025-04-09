@@ -13,6 +13,7 @@ export interface TabsProps {
   stepper?: boolean
   showHasValue?: boolean
   noSwitchOnInvalid?: boolean
+  wrap?: boolean
 }
 
 export type TabsItemScopedProps = {
@@ -22,7 +23,7 @@ export type TabsItemScopedProps = {
 }
 
 export type TabsItemProps = {
-  title: string
+  title?: string
   name: string
   icon?: SVGComponent
   disabled?: boolean

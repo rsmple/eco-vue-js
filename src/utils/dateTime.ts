@@ -208,6 +208,10 @@ export function isSameDate(a: Date, b: Date): boolean {
   return a.getDate() === b.getDate() && isSameMonth(a, b)
 }
 
+export function isSameWeek(a: Date, b: Date): boolean {
+  return isSameDate(getStartOfWeek(a), getStartOfWeek(b))
+}
+
 export function isSameMonth(a: Date, b: Date): boolean {
   return a.getMonth() === b.getMonth() && isSameYear(a, b)
 }

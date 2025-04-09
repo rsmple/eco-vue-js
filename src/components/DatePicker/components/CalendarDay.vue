@@ -30,7 +30,8 @@
       :class="{
         'w-ripple w-ripple-hover': !isDisabled,
         'opacity-50': isDisabled,
-        'bg-primary dark:bg-primary-dark font-semibold': isSelected,
+        'bg-primary dark:bg-primary-dark text-default font-semibold': isSelected,
+        'bg-negative dark:bg-negative-dark text-default font-semibold': !isSelected && isToday,
       }"
     >
       <div class="font-normal">
@@ -57,6 +58,7 @@ const props = defineProps<{
   disabled?: boolean
   minDate?: Date
   maxDate?: Date
+  isToday: boolean
 }>()
 
 defineEmits<{

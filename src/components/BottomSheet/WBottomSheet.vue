@@ -16,9 +16,10 @@
         <div
           v-if="isOpen"
           class="
-            bg-primary-light dark:bg-primary-darkest no-scrollbar fixed left-0 top-0 z-[1000] size-full snap-y snap-mandatory snap-always
+            bg-primary-light dark:bg-primary-darkest no-scrollbar fixed left-0 top-0 size-full snap-y snap-mandatory snap-always
             overflow-scroll overflow-y-auto overscroll-contain scroll-smooth bg-opacity-40 backdrop-blur dark:bg-opacity-40
           "
+          :style="{zIndex: baseZIndex + BASE_ZINDEX_DROPDOWN}"
         >
           <div
             ref="backdrop"
@@ -60,7 +61,9 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeUnmount, ref, useTemplateRef, watch} from 'vue'
+import {inject, onBeforeUnmount, ref, useTemplateRef, watch} from 'vue'
+
+import {BASE_ZINDEX_DROPDOWN, wBaseZIndex} from '@/utils/utils'
 
 defineProps<{
   isOpen: boolean
@@ -69,6 +72,8 @@ defineProps<{
 const emit = defineEmits<{
   (e: 'close'): void
 }>()
+
+const baseZIndex = inject(wBaseZIndex, 0)
 
 const backdropRef = useTemplateRef('backdrop')
 const contentRef = useTemplateRef('content')

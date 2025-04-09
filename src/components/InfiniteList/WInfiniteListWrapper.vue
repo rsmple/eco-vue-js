@@ -8,11 +8,10 @@
     ref="header"
     class="sticky print:hidden"
     :class="{
-      'z-20': !isIntersecting,
-      'z-[2]': isIntersecting,
       '-top--modal-header-height bg-default dark:bg-default-dark': isModal,
       '-top--header-height': !isModal,
     }"
+    :style="{zIndex: isIntersecting ? BASE_ZINDEX_DROPDOWN : BASE_ZINDEX_LIST_HEADER}"
   >
     <slot
       name="header"
@@ -26,8 +25,8 @@
 <script lang="ts" setup>
 import {inject, onUnmounted, watch} from 'vue'
 
-import {useHeader} from '@/components/HeaderBar/use/useHeader'
 import {wIsModal} from '@/components/Modal/models/injection'
+import {BASE_ZINDEX_DROPDOWN, BASE_ZINDEX_LIST_HEADER} from '@/utils/utils'
 
 import {useInfiniteListHeader} from './use/useInfiniteListHeader'
 
@@ -37,23 +36,13 @@ const props = defineProps<{
 
 const isModal = inject(wIsModal, false)
 
-const {updateHeaderPadding, headerHeight: headerElementHeight} = useHeader()
+const {indicator, header, headerTop, headerHeight, isIntersecting, updateHeaderHeight, updateHeaderPadding} = useInfiniteListHeader(props.initIsIntersecting)
 
-const {indicator, header, headerTop, headerHeight, isIntersecting, updateHeader} = useInfiniteListHeader(headerElementHeight, props.initIsIntersecting)
+if (!isModal) {
+  watch(isIntersecting, updateHeaderHeight)
 
-const updateHeaderHeight = () => {
-  if (!isIntersecting.value && headerHeight.value) {
-    updateHeader()
-
-    updateHeaderPadding(headerHeight.value)
-  } else {
+  onUnmounted(() => {
     updateHeaderPadding(0)
-  }
+  })
 }
-
-watch(isIntersecting, updateHeaderHeight)
-
-onUnmounted(() => {
-  updateHeaderPadding(0)
-})
 </script>

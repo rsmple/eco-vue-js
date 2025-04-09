@@ -12,6 +12,7 @@
       :min-date="minDate"
       :max-date="maxDate"
       :disabled="isDisabled"
+      :is-today="today ? isSameDate(today, day) : false"
       @click:day="$emit('click:day', $event)"
       @hover:day="$emit('hover:day', $event)"
     />
@@ -22,6 +23,8 @@
 import type {DateRange} from '../models/types'
 
 import {computed} from 'vue'
+
+import {isSameDate} from '@/utils/dateTime'
 
 import CalendarDay from './CalendarDay.vue'
 
@@ -34,6 +37,7 @@ const props = defineProps<{
   minDate?: Date
   maxDate?: Date
   disabled?: boolean
+  today: Date | undefined
 }>()
 
 defineEmits<{

@@ -11,7 +11,6 @@
       maxWidth,
       horizontalAlign,
       updateAlign: true,
-      teleport,
       parentElement: inputRef?.fieldRef,
     }"
   >

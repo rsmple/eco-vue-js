@@ -34,10 +34,11 @@
 
     <div
       ref="footer"
-      class="bg-default dark:bg-default-dark -gap--inner-margin -p--w-modal-wrapper-padding sm-not:w-screen sticky bottom-0 left-0 z-[2] flex w-[--w-modal-wrapper-width,35rem] justify-center"
+      class="bg-default dark:bg-default-dark -gap--inner-margin -p--w-modal-wrapper-padding sm-not:w-screen sticky bottom-0 left-0 flex w-[--w-modal-wrapper-width,35rem] justify-center"
       :class="{
         'sm-not:flex-col': !maximized,
       }"
+      :style="{zIndex: BASE_ZINDEX_DROPDOWN}"
     >
       <slot name="actions" />
     </div>
@@ -45,9 +46,13 @@
 </template>
 
 <script lang="ts" setup>
-import {useTemplateRef} from 'vue'
+import {onMounted, provide, useTemplateRef} from 'vue'
 
 import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
+
+import {BASE_ZINDEX_DROPDOWN} from '@/utils/utils'
+
+import {wModalHeaderHeight} from './models/injection'
 
 defineProps<{
   maximized?: boolean
@@ -56,4 +61,10 @@ defineProps<{
 const headerRef = useTemplateRef('header')
 const footerRef = useTemplateRef('footer')
 const contentRef = useTemplateRef('content')
+
+onMounted(() => {
+  if (!headerRef.value) return
+
+  provide(wModalHeaderHeight, headerRef.value.offsetHeight)
+})
 </script>
