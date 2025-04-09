@@ -6,6 +6,7 @@
       :filter-search="filterSearch"
       :query-params="queryParams"
       :search="search === true"
+      :disabled-filter-fields="disabledFilterFields ?? []"
       @update:query-params="$emit('update:query-params', $event)"
     />
 
@@ -15,6 +16,7 @@
       :filter-search="filterSearch"
       :query-params="queryParams"
       :search="search === true"
+      :disabled-filter-fields="disabledFilterFields ?? []"
       @update:query-params="$emit('update:query-params', $event)"
     />
   </template>
@@ -114,6 +116,7 @@
                 :fields="fieldsFiltered"
                 :query-params="queryParams"
                 class="border-r border-solid border-gray-300 dark:border-gray-700"
+                @update:ordering="updateOrdering"
               />
 
               <HeaderSettings
@@ -147,7 +150,7 @@
               <template #default="{field, nested}">
                 <WListHeaderItem
                   :title="typeof field.title === 'string' ? field.title : field.title(queryParams)"
-                  :field="typeof field.field === 'string' ? field.field : field.field?.(queryParams)"
+                  :field="typeof field.field === 'string' ? field.field : (field.field?.(queryParams) as keyof Data)"
                   :class="field.cssClass"
                   :ordering="ordering"
                   :disabled="noOrdering || !field.field"
@@ -156,6 +159,7 @@
                   :width-style="getFieldStyles(field.label, nested)"
                   @update:width="fieldConfigMap[field.label].width = $event"
                   @save:width="save"
+                  @update:ordering="updateOrdering"
                 />
               </template>
             </HeaderFieldNested>
@@ -277,7 +281,7 @@ import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
 import {useIsMobile} from '@/utils/mobile'
-import {type OrderItem, parseOrdering} from '@/utils/order'
+import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
 import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
 import {useSelected} from '@/utils/useSelected'
 import {BASE_ZINDEX_DROPDOWN, ListMode} from '@/utils/utils'
@@ -325,6 +329,7 @@ const props = defineProps<{
   hasAction?: boolean
   filter?: FilterComponent<QueryParams>[]
   filterSearch?: FilterComponent<QueryParams>
+  disabledFilterFields?: Array<keyof QueryParams>
   search?: boolean
   global?: boolean
 }>()
@@ -392,6 +397,14 @@ const ordering = computed<OrderItem<keyof Data>[]>(() => {
 
   return []
 })
+
+const updateOrdering = (value: OrderItem<keyof Data>[]) => {
+  const ordering = encodeOrdering(value)
+
+  if (props.queryParams instanceof Object && 'ordering' in props.queryParams && ordering === props.queryParams.ordering) return
+
+  emit('update:query-params', {ordering} as QueryParams)
+}
 
 const getQueryParamsBulk = (): QueryParams => {
   const queryParamsSelection = getQueryParams()

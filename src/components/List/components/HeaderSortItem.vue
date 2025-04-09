@@ -41,23 +41,39 @@
   </WMenuItem>
 </template>
 
-<script lang="ts" setup generic="Data extends DefaultData">
-import {toRef} from 'vue'
+<script lang="ts" setup generic="Field">
+import {computed} from 'vue'
 
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
 
-import {type OrderItem} from '@/utils/order'
-
-import {useOrdering} from '../use/useOrdering'
+import {Order, type OrderItem} from '@/utils/order'
 
 const props = defineProps<{
-  ordering: OrderItem<keyof Data>[]
-  field: keyof Data
+  ordering: OrderItem<Field>[]
+  field: Field
   title: string
   disabled?: boolean
 }>()
 
-const {index, setOrdering} = useOrdering(toRef(props, 'ordering'), toRef(props, 'field'))
+const emit = defineEmits<{
+  (e: 'update:ordering', value: OrderItem<Field>[]): void
+}>()
+
+const index = computed(() => props.ordering.findIndex(item => item.field === props.field))
+
+const setOrdering = (): void => {
+  const newOrdering: OrderItem<Field>[] = props.ordering.slice()
+  
+  if (index.value === -1) {
+    newOrdering.push({field: props.field, order: Order.DESC})
+  } else if (newOrdering[index.value].order === Order.DESC) {
+    newOrdering[index.value].order = Order.ASC
+  } else {
+    newOrdering.splice(index.value, 1)
+  }
+  
+  emit('update:ordering', newOrdering)
+}
 </script>

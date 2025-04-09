@@ -36,7 +36,7 @@
 
         <template v-if="filter">
           <WTabsItem
-            v-for="item in filter.filter((_, index) => selected.includes(index))"
+            v-for="item in filterList.filter((_, index) => selected.includes(index))"
             :key="filter.indexOf(item)"
             :name="filter.indexOf(item).toString()"
             :title="getItemProp(queryParams, item, 'title') ?? ''"
@@ -76,7 +76,7 @@
 <script setup lang="ts" generic="QueryParams">
 import type {FilterComponent} from '../types'
 
-import {markRaw, ref} from 'vue'
+import {computed, markRaw, ref} from 'vue'
 
 import WExpansionItem from '@/components/Expansion/WExpansionItem.vue'
 import WInput from '@/components/Input/WInput.vue'
@@ -96,6 +96,7 @@ const props = defineProps<{
   filterSearch: FilterComponent<QueryParams> | undefined
   search: boolean
   queryParams: QueryParams
+  disabledFilterFields: Array<keyof QueryParams>
 }>()
 
 const emit = defineEmits<{
@@ -104,11 +105,19 @@ const emit = defineEmits<{
 
 const isOpen = ref(false)
 
+const filterList = computed(() => {
+  return props.filter?.filter(item => {
+    if (getItemProp(props.queryParams, item, 'hidden')) return false
+
+    const fields = getItemProp(props.queryParams, item, 'fields') ?? []
+    return !fields.some(field => !props.disabledFilterFields.includes(field))
+  }) ?? []
+})
+
 const selected = ref<number[]>(
-  props.filter
-    ?.filter(item => getItemProp(props.queryParams, item, 'fields')?.some(field => field in (props.queryParams as Record<string, unknown>)))
-    .map(item => props.filter?.indexOf(item) ?? -1)
-    ?? [],
+  filterList.value
+    .filter(item => getItemProp(props.queryParams, item, 'fields')?.some(field => field in (props.queryParams as Record<string, unknown>)))
+    .map(item => props.filter?.indexOf(item) ?? -1),
 )
 
 const clearFilterItem = (item: FilterComponent<QueryParams>) => {

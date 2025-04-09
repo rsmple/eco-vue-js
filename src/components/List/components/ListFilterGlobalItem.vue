@@ -1,6 +1,6 @@
 <template>
   <WExpansionItem
-    v-if="!getItemProp(queryParams, item, 'hidden')"
+    v-if="!getItemProp(queryParams, item, 'hidden') && !fields.some(field => disabledFilterFields.includes(field))"
     :title="getItemProp(queryParams, item, 'title')"
     :icon="getItemProp(queryParams, item, 'icon')"
     :is-open="isOpen"
@@ -28,6 +28,7 @@ const props = defineProps<{
   item: FilterComponent<QueryParams>
   queryParams: QueryParams
   isOpen: boolean
+  disabledFilterFields: Array<keyof QueryParams>
 }>()
 
 defineEmits<{
@@ -35,10 +36,12 @@ defineEmits<{
   (e: 'toggle'): void
 }>()
 
-const hasChanges = computed(() => getItemProp(props.queryParams, props.item, 'fields')?.some(field => field in (props.queryParams as Record<string, unknown>)))
+const fields = computed(() => getItemProp(props.queryParams, props.item, 'fields') ?? [])
+
+const hasChanges = computed(() => fields.value.some(field => field in (props.queryParams as Record<string, unknown>)))
 
 const getDefaultQuery = (): Partial<Record<keyof QueryParams, undefined>> => {
-  return getItemProp(props.queryParams, props.item, 'fields')?.reduce<Partial<Record<keyof QueryParams, undefined>>>((result, field) => {
+  return fields.value.reduce<Partial<Record<keyof QueryParams, undefined>>>((result, field) => {
     result[field] = undefined
     return result
   }, {}) ?? {}

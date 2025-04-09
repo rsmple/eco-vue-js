@@ -117,6 +117,8 @@ const initModelMap = useFormValueMap(
   },
 )
 
+const unlistenerInjected = inject(wFormUnlistener, undefined)
+
 const unlistener = (key: string) => {
   titleMap.unlistener(key)
   errorMessageMap.unlistener(key)
@@ -126,11 +128,11 @@ const unlistener = (key: string) => {
   validateMap.unlistener(key)
   invalidateMap.unlistener(key)
   initModelMap.unlistener(key)
+
+  if (!props.name) unlistenerInjected?.(key)
 }
 
 provide(wFormUnlistener, unlistener)
-
-const unlistenerInjected = inject(wFormUnlistener, undefined)
 
 watch(errorMessageMap.map, () => emit('update:is-valid', isValid.value))
 

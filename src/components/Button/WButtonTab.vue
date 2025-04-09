@@ -45,7 +45,7 @@
     <div
       class="relative col-start-2 self-start"
       :class="{
-        'mt-3': indicator,
+        'mt-3.5': indicator,
         'w-ripple w-ripple-hover': !disabled
       }"
     >
@@ -64,7 +64,7 @@
         }"
       >
         <div
-          class="-px--inner-margin whitespace-nowrap"
+          class="whitespace-nowrap px-3"
           :class="{
             'sm-not:-pl--inner-margin': side,
           }"
@@ -112,14 +112,14 @@
         leave-active-class="transition-[transform,opacity] origin-center duration-300"
         enter-from-class="scale-x-0 opacity-0"
         leave-to-class="scale-x-0 opacity-0"
-        :css="!persisted"
+        :css="!indicator"
       >
         <div
-          v-if="active || persisted"
+          v-if="active || indicator"
           class="absolute inset-x-0 bottom-0 h-0.5 rounded-sm"
           :class="{
-            'bg-current': persisted,
-            'bg-primary dark:bg-primary-dark': !persisted,
+            'bg-current': indicator,
+            'bg-primary dark:bg-primary-dark': !indicator,
           }"
         />
       </Transition>
@@ -138,7 +138,6 @@ defineProps<{
   hasValue?: boolean
   hasChanges?: boolean
   disabled?: boolean
-  persisted?: boolean
   icon?: SVGComponent
   title?: string
   indicator?: boolean

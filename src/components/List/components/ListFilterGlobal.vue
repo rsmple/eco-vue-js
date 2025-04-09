@@ -67,6 +67,7 @@
       :item="item"
       :query-params="queryParams"
       :is-open="open === index"
+      :disabled-filter-fields="disabledFilterFields"
       @toggle="open = open === index ? null : index"
       @update:query-params="$emit('update:query-params', $event)"
     />
@@ -113,6 +114,7 @@ defineProps<{
   filterSearch: FilterComponent<QueryParams> | undefined
   search: boolean
   queryParams: QueryParams
+  disabledFilterFields: Array<keyof QueryParams>
 }>()
 
 const emit = defineEmits<{

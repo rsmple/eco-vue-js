@@ -27,6 +27,7 @@
           :field="typeof field.field === 'string' ? field.field : field.field(queryParams)"
           :ordering="ordering"
           :disabled="disabled"
+          @update:ordering="$emit('update:ordering', $event)"
         />
       </WClickOutside>
     </template>
@@ -63,6 +64,7 @@ defineEmits<{
   (e: 'update:field-config-map', value: Record<string, FieldConfig>): void
   (e: 'update:mode', value: ListMode): void
   (e: 'click:reset'): void
+  (e: 'update:ordering', value: OrderItem<keyof Data>[]): void
 }>()
 
 const isOpen = ref(false)

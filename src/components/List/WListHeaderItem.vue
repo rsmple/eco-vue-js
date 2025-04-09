@@ -56,14 +56,13 @@
 </template>
 
 <script lang="ts" setup generic="Field">
-import {type StyleValue, onMounted, ref, toRef, useTemplateRef} from 'vue'
+import {type StyleValue, computed, onMounted, ref, useTemplateRef} from 'vue'
 
 import IconBack from '@/assets/icons/default/IconBack.svg?component'
 
-import {type OrderItem} from '@/utils/order'
+import {Order, type OrderItem} from '@/utils/order'
 
 import HeaderItemResizer from './components/HeaderItemResizer.vue'
-import {useOrdering} from './use/useOrdering'
 
 const props = defineProps<{
   title?: string
@@ -75,13 +74,28 @@ const props = defineProps<{
   widthStyle: StyleValue | undefined
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'update:width', value: number): void
+  (e: 'update:ordering', value: OrderItem<Field>[]): void
 }>()
 
 const containerRef = useTemplateRef<ComponentInstance<typeof HeaderItemResizer> | HTMLDivElement>('container')
 
-const {index, setOrdering} = useOrdering(toRef(props, 'ordering'), toRef(props, 'field'))
+const index = computed(() => props.ordering.findIndex(item => item.field === props.field))
+
+const setOrdering = (): void => {
+  const newOrdering: OrderItem<Field>[] = props.ordering.slice()
+  
+  if (index.value === -1) {
+    newOrdering.push({field: props.field, order: Order.DESC})
+  } else if (newOrdering[index.value].order === Order.DESC) {
+    newOrdering[index.value].order = Order.ASC
+  } else {
+    newOrdering.splice(index.value, 1)
+  }
+  
+  emit('update:ordering', newOrdering)
+}
 
 const widthStyleInner = ref<StyleValue>()
 
