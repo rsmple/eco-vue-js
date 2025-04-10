@@ -23,6 +23,8 @@ const newValues = {
   '--modal-header-height': 'var(--w-modal-header-height, 0px)',
   '--modal-footer-height': 'var(--w-modal-footer-height, 0px)',
   '--modal-content-height': 'var(--w-modal-content-height, 0px)',
+
+  fr: '1fr',
 }
 
 const extend = {

@@ -433,6 +433,7 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       'w-list-padding': value => ({'--w-list-padding': value}),
       'w-modal-confirm-w': value => ({'--w-modal-confirm-width': value}),
       'grid-cols-fill': value => ({'grid-template-columns': `repeat(auto-fill, minmax(${ value }, 1fr))`}),
+      'w-tabs-side-width': value => ({'--w-tabs-side-width': value}),
     },
     {
       values: theme('width'),

@@ -4,7 +4,8 @@
     ref="button"
     role="button"
     tabindex="0"
-    class="w-ripple w-ripple-hover -px--inner-margin -mx---inner-margin relative grid cursor-pointer select-none grid-cols-[1fr,auto] items-center gap-2 py-3 text-start"
+    class="w-ripple w-ripple-hover -px--inner-margin relative grid cursor-pointer select-none grid-cols-[1fr,auto] items-center gap-2 py-3 text-start"
+    :class="toggleClass"
     @click="toggle"
     @keydown.enter="toggle"
     @keydown.space="toggle"
@@ -45,7 +46,7 @@
   <WExpansion
     :is-open="isOpen"
     :class="$attrs.class"
-    class="-px--inner-margin -mx---inner-margin py-2"
+    class="py-2"
   >
     <slot />
   </WExpansion>
@@ -64,6 +65,7 @@ defineProps<{
   icon?: SVGComponent
   hasFlag?: boolean
   minTitle?: boolean
+  toggleClass?: string
 }>()
 
 const emit = defineEmits<{

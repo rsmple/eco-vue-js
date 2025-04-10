@@ -19,11 +19,13 @@
           @update:model-value="$emit('update:query-params', {search: $event || undefined} as QueryParams)"
         >
           <template #content>
-            <component
-              :is="filterSearch" 
-              :query-params="queryParams"
-              @update:query-params="$emit('update:query-params', $event)"
-            />
+            <div class="px-3">
+              <component
+                :is="filterSearch" 
+                :query-params="queryParams"
+                @update:query-params="$emit('update:query-params', $event)"
+              />
+            </div>
           </template>
         </WInputSuggest>
 
@@ -68,13 +70,14 @@
       :query-params="queryParams"
       :is-open="open === index"
       :disabled-filter-fields="disabledFilterFields"
+      class="-px--inner-margin"
       @toggle="open = open === index ? null : index"
       @update:query-params="$emit('update:query-params', $event)"
     />
 
-    <div class="my-8 h-0.5 rounded bg-gray-400" />
+    <div class="-mx--inner-margin my-8 h-0.5 rounded bg-gray-400" />
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="-px--inner-margin grid grid-cols-2 gap-4">
       <slot name="bottom" />
 
       <WButton

@@ -46,7 +46,7 @@
       class="relative col-start-2 self-start"
       :class="{
         'mt-3.5': indicator,
-        'w-ripple w-ripple-hover': !disabled
+        'w-ripple w-ripple-hover': !disabled,
       }"
     >
       <slot
@@ -120,6 +120,7 @@
           :class="{
             'bg-current': indicator,
             'bg-primary dark:bg-primary-dark': !indicator,
+            'sm-not:-left--inner-margin': side,
           }"
         />
       </Transition>

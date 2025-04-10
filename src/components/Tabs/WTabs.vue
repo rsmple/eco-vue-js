@@ -5,7 +5,7 @@
     class="grid gap-4"
     :class="{
       'grid grid-cols-1': !side,
-      'sm-not:grid-cols-[repeat(2,100vw)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain grid grid-cols-[auto,1fr] items-start': side,
+      'sm-not:grid-cols-[repeat(2,100vw)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain grid grid-cols-[minmax(var(--w-tabs-side-width,auto),auto),1fr] items-start': side,
     }"
   >
     <div

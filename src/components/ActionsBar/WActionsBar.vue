@@ -19,8 +19,8 @@
       "
     >
 
-      <div class="-px--inner-margin pb-16">
-        <div class="text-accent -h--header-height flex items-center text-xl font-semibold">
+      <div class="pb-16">
+        <div class="text-accent -px--inner-margin -h--header-height flex items-center text-xl font-semibold">
           Filters
         </div>
 

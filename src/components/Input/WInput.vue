@@ -227,7 +227,7 @@ const emit = defineEmits<{
   (e: 'keypress:delete', value: KeyboardEvent): void
   (e: 'keypress:backspace', value: KeyboardEvent): void
   (e: 'click:clear'): void
-  (e: 'focus', value: FocusEvent): void
+  (e: 'focus', value: FocusEvent | undefined): void
   (e: 'blur', value: FocusEvent): void
   (e: 'click', value: MouseEvent): void
   (e: 'mousedown', value: MouseEvent): void
@@ -310,9 +310,10 @@ const clearValue = () => {
 }
 
 const focus = (): void => {
-  if (props.disabled || props.readonly || props.unclickable) return
+  if (props.disabled || props.readonly) return
 
-  inputRef.value?.focus()
+  if (props.unclickable) emit('focus', undefined)
+  else inputRef.value?.focus()
 }
 
 const blur = (): void => {
