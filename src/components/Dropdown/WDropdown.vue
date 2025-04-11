@@ -81,7 +81,9 @@ const setParentRect = (updateSize = false, updateAlign = false): void => {
   }
 
   if (!verticalGetter || (isTopChanged && (props.updateAlign || updateAlign))) {
-    const order = horizontalGetter.verticalGetterOrder
+    const order = props.top
+      ? horizontalGetter.verticalGetterOrder.slice().reverse()
+      : horizontalGetter.verticalGetterOrder
 
     verticalGetter = searchStyleGetter(order, newRect, props.maxHeight)
     isTop.value = verticalGetter.isTop
@@ -105,8 +107,16 @@ let requestAnimationFrameId: number | null = null
 onMounted(() => {
   if (!isClientSide || !dropdownRef.value) return
 
+  const parent = props.parentElement instanceof Element
+    ? props.parentElement
+    : props.parentElement instanceof Range
+      ? props.parentElement.commonAncestorContainer
+      : undefined
+
   domListenerContainer = new DOMListenerContainer(
-    [document, window, ...getAllScrollParents(props.parentElement)],
+    parent
+      ? [document, window, ...getAllScrollParents(parent)]
+      : [document, window],
     ['scroll', 'touchmove', 'resize'],
     () => {
       if (requestAnimationFrameId) window.cancelAnimationFrame(requestAnimationFrameId)

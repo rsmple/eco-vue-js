@@ -19,6 +19,7 @@
       :max-width="maxWidth"
       :emit-update="emitUpdate"
       :style="{zIndex: baseZIndex + BASE_ZINDEX_DROPDOWN}"
+      :top="top"
       @update:rect="$emit('update:rect')"
     >
       <template #default="defaultScope">

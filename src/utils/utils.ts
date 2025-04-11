@@ -11,14 +11,14 @@ const isScroll = (node: Element) => overflowScrollRegexp.test(
   getStyleValue(node, 'overflow-x'),
 )
 
-export const getScrollParent = (node: Element): Element | null =>
+export const getScrollParent = (node: Node): Element | null =>
   node.parentElement
     ? isScroll(node.parentElement)
       ? node.parentElement
       : getScrollParent(node.parentElement)
     : null
 
-export const getAllScrollParents = (node?: Element, max = 10): Array<Element> => {
+export const getAllScrollParents = (node?: Node, max = 10): Array<Element> => {
   const arr: Array<Element> = []
 
   let parent = node && getScrollParent(node)
