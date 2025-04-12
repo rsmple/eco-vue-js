@@ -31,7 +31,7 @@
     <div class="absolute inset-x-[1cm] bottom-[1cm] grid grid-cols-[1fr,auto,1fr] gap-4">
       <div
         v-if="logoComponent || $slots.logo"
-        class="grid grid-cols-[auto,auto] items-center gap-3"
+        class="grid grid-cols-[auto,1fr] items-center gap-3"
         :class="{
           'col-start-2': centerLogo,
           'col-start-1': !centerLogo,
