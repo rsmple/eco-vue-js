@@ -14,6 +14,7 @@
         class="w-tabs-side-width-72"
       >
         <WTabsItem
+          v-if="search"
           name="search"
           title="Search"
           :icon="markRaw(IconSearch)"
@@ -44,7 +45,7 @@
 
         <template v-if="filter">
           <WTabsItem
-            v-for="item in filterList.filter(item => selected.includes(filter?.indexOf(item) ?? -1))"
+            v-for="item in filterList.filter(item => allShown.includes(filter?.indexOf(item) ?? -1))"
             :key="filter.indexOf(item)"
             :name="filter.indexOf(item).toString()"
             :title="getItemProp(queryParams, item, 'title') ?? ''"
@@ -71,7 +72,7 @@
           </WTabsItem>
 
           <ListFilterSelect
-            v-if="selected.length < filterList.length"
+            v-if="allShown.length < filterList.length"
             :filter="filter"
             :exclude="excluded"
             :query-params="queryParams"
@@ -124,16 +125,18 @@ const filterList = computed(() => {
   }) ?? []
 })
 
-const selected = ref<number[]>(
-  filterList.value
-    .filter(item => getItemProp(props.queryParams, item, 'fields')?.some(field => field in (props.queryParams as Record<string, unknown>)))
-    .map(item => props.filter?.indexOf(item) ?? -1),
-)
+const selected = ref<number[]>([])
+
+const shown = computed(() => filterList.value
+  .filter(item => getItemProp(props.queryParams, item, 'fields')?.some(field => field in (props.queryParams as Record<string, unknown>)))
+  .map(item => props.filter?.indexOf(item) ?? -1))
+
+const allShown = computed(() => [...selected.value, ...shown.value])
 
 const excluded = computed<number[]>(() => {
   const hidden = props.filter?.filter(item => !filterList.value.includes(item)).map(item => props.filter?.indexOf(item) ?? -1) ?? []
 
-  return [...selected.value, ...hidden]
+  return [...allShown.value, ...hidden]
 })
 
 const clearFilterItem = (item: FilterComponent<QueryParams>) => {
