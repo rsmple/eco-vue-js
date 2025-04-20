@@ -32,13 +32,7 @@
         >
           <div class="px-3">
             <div class="flex h-9 items-center justify-center">
-              <div
-                class="h-1 w-12 rounded-sm"
-                :class="{
-                  'bg-gray-300': !swipeStarted,
-                  'bg-primary dark:bg-primary-dark': swipeStarted,
-                }"
-              />
+              <div class="h-1 w-12 rounded-sm bg-gray-300" />
             </div>
 
             <slot
@@ -59,7 +53,7 @@
 </template>
 
 <script lang="ts" setup>
-import {inject, onBeforeUnmount, ref, useTemplateRef, watch} from 'vue'
+import {inject, onBeforeUnmount, useTemplateRef, watch} from 'vue'
 
 import {BASE_ZINDEX_BOTTOM_SHEET, wBaseZIndex} from '@/utils/utils'
 
@@ -75,8 +69,6 @@ const baseZIndex = inject(wBaseZIndex, 0)
 
 const backdropRef = useTemplateRef('backdrop')
 const contentRef = useTemplateRef('content')
-
-const swipeStarted = ref(false)
 
 const hide = () => {
   backdropRef.value?.scrollIntoView({behavior: 'smooth', block: 'start'})
