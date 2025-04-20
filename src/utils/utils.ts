@@ -252,6 +252,7 @@ export const unwrapSlots = (slots: VNode[]): VNode[] => {
 export const wBaseZIndex = Symbol('wBaseZIndex') as InjectionKey<number>
 
 export const BASE_ZINDEX_MODAL = 1000
+export const BASE_ZINDEX_BOTTOM_SHEET = 100
 export const BASE_ZINDEX_ACTIONS_BAR = 40
 export const BASE_ZINDEX_NAV_BAR = 30
 export const BASE_ZINDEX_LIST_HEADER = 20
