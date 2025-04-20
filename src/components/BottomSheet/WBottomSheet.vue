@@ -5,9 +5,9 @@
   />
 
   <Teleport to="body">
-    <DismissContainer
+    <WDismissable
       :is-open="isOpen"
-      class="bg-primary-light/40 dark:bg-primary-darkest/40 fixed inset-0"
+      class="bg-primary-light/40 dark:bg-primary-darkest/40 fixed inset-0 backdrop-blur"
       content-class="bg-default dark:bg-default-dark grid-cols-[1fr] grid-rows-[auto,1fr] height-[90%] rounded-t-3xl shadow-md relative grid"
       :style="{zIndex: baseZIndex + BASE_ZINDEX_BOTTOM_SHEET}"
       @close="$emit('close')"
@@ -28,16 +28,16 @@
       </div>
 
       <div class="absolute top-full h-screen w-full bg-[inherit]" />
-    </DismissContainer>
+    </WDismissable>
   </Teleport>
 </template>
 
 <script lang="ts" setup>
 import {inject} from 'vue'
 
-import {BASE_ZINDEX_BOTTOM_SHEET, wBaseZIndex} from '@/utils/utils'
+import WDismissable from '@/components/Dismissable/WDismissable.vue'
 
-import DismissContainer from './components/DismissContainer.vue'
+import {BASE_ZINDEX_BOTTOM_SHEET, wBaseZIndex} from '@/utils/utils'
 
 defineProps<{
   isOpen: boolean

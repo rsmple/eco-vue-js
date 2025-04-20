@@ -23,6 +23,7 @@ import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WCounter from '@/components/Counter/WCounter.vue'
 import WDatePicker from '@/components/DatePicker/WDatePicker.vue'
 import WDatePickerSingle from '@/components/DatePicker/WDatePickerSingle.vue'
+import WDismissable from '@/components/Dismissable/WDismissable.vue'
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
@@ -123,6 +124,7 @@ export default {
     app.component('WCounter', WCounter)
     app.component('WDatePicker', WDatePicker)
     app.component('WDatePickerSingle', WDatePickerSingle)
+    app.component('WDismissable', WDismissable)
     app.component('WDropdown', WDropdown)
     app.component('WDropdownMenu', WDropdownMenu)
     app.component('WEmptyComponent', WEmptyComponent)
@@ -223,6 +225,7 @@ export {
   WCounter,
   WDatePicker,
   WDatePickerSingle,
+  WDismissable,
   WDropdown,
   WDropdownMenu,
   WEmptyComponent,
