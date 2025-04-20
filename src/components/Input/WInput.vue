@@ -23,7 +23,13 @@
       v-if="readonly"
       #default
     >
-      <div class="flex flex-wrap gap-1">
+      <div
+        class="flex gap-1"
+        :class="{
+          'flex-wrap': !seamless,
+          'overflow-hidden': seamless,
+        }"
+      >
         <slot name="prefix" />
         <div
           v-if="!hideInput"
