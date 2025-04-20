@@ -6,29 +6,33 @@
     leave-to-class="opacity-0"
     @after-enter="show"
   >
-    <button
+    <div
       v-if="isOpen"
       ref="container"
-      class="no-scrollbar snap-y snap-mandatory snap-always overflow-scroll overflow-y-auto overscroll-contain scroll-smooth text-start"
-      @click="hide"
+      class="no-scrollbar snap-y snap-mandatory snap-always overflow-scroll overflow-y-auto overscroll-contain scroll-smooth"
     >
-      <div class="height-full snap-start" />
+      <button
+        class="square-full snap-start"
+        @click="hide"
+      />
 
       <div
         ref="content"
         class="snap-end"
         :class="contentClass"
+        @mousedown.stop=""
+        @click.stop=""
       >
-        <slot />
+        <slot :hide="hide" />
       </div>
-    </button>
+    </div>
   </Transition>
 </template>
 
 <script lang="ts" setup>
-import {onBeforeUnmount, useTemplateRef, watch} from 'vue'
+import {onBeforeUnmount, onMounted, useTemplateRef, watch} from 'vue'
 
-defineProps<{
+const props = defineProps<{
   isOpen: boolean
   contentClass?: string
 }>()
@@ -45,7 +49,7 @@ const hide = () => {
 }
 
 const show = () => {
-  containerRef.value?.scrollTo({top: containerRef.value.offsetHeight, behavior: 'smooth'})
+  containerRef.value?.scrollTo({top: contentRef.value?.offsetTop, behavior: 'smooth'})
 }
 
 const observerCb = (entries: IntersectionObserverEntry[]) => {
@@ -73,6 +77,10 @@ watch(contentRef, (value, oldValue) => {
       observer.observe(value)
     }, 500)
   }
+})
+
+onMounted(() => {
+  if (props.isOpen) show()
 })
 
 onBeforeUnmount(() => {

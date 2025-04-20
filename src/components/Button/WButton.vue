@@ -1,4 +1,13 @@
 <template>
+  <WSkeleton
+    v-if="skeleton"
+    class="w-skeleton-rounded-[--w-button-rounded,1rem] w-skeleton-w-max w-skeleton-h-[--w-button-height,2.75rem]"
+  >
+    <div class="flex gap-2 px-[--w-button-rounded,1rem] font-medium opacity-0">
+      <slot />
+    </div>
+  </WSkeleton>
+
   <component
     v-bind="{
       class: $attrs.class,
@@ -12,6 +21,7 @@
             : {})
     }"
     :is="to !== undefined ? disabled ? 'a' : RouterLink : tag"
+    v-else
     class="
       w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-1px)] relative isolate flex
       min-h-[--w-button-height,2.75rem] select-none
@@ -73,6 +83,8 @@ import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 import {SemanticType, useSemanticTypeBackgroundMap, useSemanticTypeBorderMap} from '@/utils/SemanticType'
+
+import WSkeleton from '../Skeleton/WSkeleton.vue'
 
 defineOptions({inheritAttrs: false})
 
