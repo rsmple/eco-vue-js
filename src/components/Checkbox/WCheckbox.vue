@@ -8,7 +8,7 @@
       'cursor-not-allowed opacity-70': disabled,
       'cursor-pointer': !disabled && !loading && !readonly,
       'cursor-auto': readonly,
-      'pb-4 pt-1': title,
+      'pb-4 pt-1': title && !noMargin,
       'items-start': alignTop,
       'items-center': !alignTop,
     }"

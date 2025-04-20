@@ -14,6 +14,7 @@ export interface TabsProps {
   showHasValue?: boolean
   noSwitchOnInvalid?: boolean
   wrap?: boolean
+  statusIcon?: boolean
 }
 
 export type TabsItemScopedProps = {
@@ -30,4 +31,5 @@ export type TabsItemProps = {
   removable?: boolean
   divided?: boolean
   init?: boolean
+  hasValue?: boolean
 }

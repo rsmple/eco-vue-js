@@ -5,8 +5,8 @@
     :class="{
       'text-primary dark:text-primary-dark': !hasError && active,
       'text-negative dark:text-negative-dark': hasError,
-      'text-positive dark:text-positive-dark': !active && !hasError && hasValue,
-      'text-description': !active && !hasError && !hasValue,
+      'text-positive dark:text-positive-dark': !active && !hasError && hasValue && showHasValue,
+      'text-description': !active && !hasError && (!showHasValue || !hasValue),
       'cursor-not-allowed opacity-50': disabled,
       'cursor-pointer': !disabled,
     }"
@@ -20,8 +20,8 @@
         class="text-default dark:text-default-dark rounded-full bg-[inherit] bg-opacity-100 p-1 outline transition-[outline-width] duration-500" 
         :class="{
           'bg-negative dark:bg-negative-dark outline-negative/10 dark:outline-negative-dark/10': hasError,
-          'bg-positive dark:bg-positive-dark outline-positive/10 dark:outline-positive-dark/10': !hasError && hasValue,
-          'bg-gray-400 outline-gray-400/10 dark:bg-gray-600 dark:outline-gray-600/10': !hasError && !hasValue,
+          'bg-positive dark:bg-positive-dark outline-positive/10 dark:outline-positive-dark/10': !hasError && hasValue && showHasValue,
+          'bg-gray-400 outline-gray-400/10 dark:bg-gray-600 dark:outline-gray-600/10': !hasError && (!showHasValue || !hasValue),
           'outline-[1.5rem]': active,
         }"
       >
@@ -85,6 +85,13 @@
           {{ title }}
         </div>
 
+        <WStatusIcon
+          v-if="statusIcon"
+          :has-value="hasValue"
+          :has-error="hasError"
+          class="sm-not:-mr--inner-margin ml-auto mr-4"
+        />
+
         <slot
           name="suffix" 
           v-bind="{hasChanges, hasError, hasValue}"
@@ -133,6 +140,8 @@ import IconCheckCircle from '@/assets/icons/sax/IconCheckCircle.svg?component'
 import IconClose from '@/assets/icons/sax/IconClose.svg?component'
 import IconNegativeInfo from '@/assets/icons/sax/IconNegativeInfo.svg?component'
 
+import WStatusIcon from '../Status/WStatusIcon.vue'
+
 defineProps<{
   active?: boolean
   hasError?: boolean
@@ -143,6 +152,8 @@ defineProps<{
   title?: string
   indicator?: boolean
   side?: boolean
+  statusIcon?: boolean
+  showHasValue?: boolean
 }>()
 
 defineEmits<{

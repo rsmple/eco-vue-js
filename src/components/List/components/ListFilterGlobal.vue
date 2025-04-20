@@ -6,7 +6,7 @@
           v-if="filterSearch && isMobile"
           ref="input"
           :model-value="(queryParams as Record<string, string>).search"
-          :autofocus="visible"
+          :autofocus="visible && !(queryParams as Record<string, string>).search"
           placeholder="Search.."
           allow-clear
           persist
@@ -39,7 +39,6 @@
           no-margin
           class="w-full"
           :icon="markRaw(IconSearch)"
-          @blur="!(queryParams as Record<string, string>).search && hide?.()"
           @click:clear="hide"
           @update:model-value="$emit('update:query-params', {search: $event || undefined} as QueryParams)"
         >

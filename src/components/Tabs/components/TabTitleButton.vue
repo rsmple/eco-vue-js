@@ -12,11 +12,13 @@
       :disabled="disabled"
       :has-changes="hasChanges"
       :has-error="hasError"
-      :has-value="showHasValue && hasValue"
+      :has-value="hasValue"
       :indicator="stepper"
       :side="side"
       :title="title"
       :icon="icon"
+      :status-icon="statusIcon"
+      :show-has-value="showHasValue"
       @click="$emit('click', $event)"
     >
       <template v-if="$slots.title">
@@ -50,6 +52,7 @@ const props = defineProps<{
   stepper?: boolean
   showHasValue?: boolean
   side?: boolean
+  statusIcon?: boolean
 }>()
 
 const emit = defineEmits<{

@@ -32,13 +32,14 @@
           :icon="slot.props.icon"
           :has-changes="formRef?.hasChangesMap[slot.props.name] === true"
           :has-error="formRef?.hasShownMap[slot.props.name] === true && typeof formRef?.errorMessageMap[slot.props.name] === 'string'"
-          :has-value="formRef?.hasValueMap[slot.props.name] === true"
+          :has-value="slot.props.hasValue ?? slot.props['has-value' as never] ?? formRef?.hasValueMap[slot.props.name] === true"
           :first="defaultSlots.indexOf(slot) === 0"
           :last="defaultSlots.indexOf(slot) === defaultSlots.length - 1"
           :disabled="stepper ? defaultSlots.indexOf(slot) > hasNoValueFirst : false"
           :stepper="stepper"
           :show-has-value="showHasValue"
           :side="side"
+          :status-icon="statusIcon"
           :class="{
             'snap-center': !side,
           }"

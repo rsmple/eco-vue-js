@@ -18,6 +18,7 @@ import WButtonTab from '@/components/Button/WButtonTab.vue'
 import WButtonUnselect from '@/components/Button/WButtonUnselect.vue'
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 import WCheckboxGroup from '@/components/Checkbox/WCheckboxGroup.vue'
+import WCheckboxGroupMultiple from '@/components/Checkbox/WCheckboxGroupMultiple.vue'
 import WChip from '@/components/Chip/WChip.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WCounter from '@/components/Counter/WCounter.vue'
@@ -90,6 +91,7 @@ import WShine from '@/components/Shine/WShine.vue'
 import WShineEffect from '@/components/Shine/WShineEffect.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
+import WStatusIcon from '@/components/Status/WStatusIcon.vue'
 import WTabs from '@/components/Tabs/WTabs.vue'
 import WTabsColumns from '@/components/Tabs/WTabsColumns.vue'
 import WTabsItem from '@/components/Tabs/WTabsItem.vue'
@@ -119,6 +121,7 @@ export default {
     app.component('WButtonUnselect', WButtonUnselect)
     app.component('WCheckbox', WCheckbox)
     app.component('WCheckboxGroup', WCheckboxGroup)
+    app.component('WCheckboxGroupMultiple', WCheckboxGroupMultiple)
     app.component('WChip', WChip)
     app.component('WClickOutside', WClickOutside)
     app.component('WCounter', WCounter)
@@ -191,6 +194,7 @@ export default {
     app.component('WShineEffect', WShineEffect)
     app.component('WSkeleton', WSkeleton)
     app.component('WSpinner', WSpinner)
+    app.component('WStatusIcon', WStatusIcon)
     app.component('WTabs', WTabs)
     app.component('WTabsColumns', WTabsColumns)
     app.component('WTabsItem', WTabsItem)
@@ -220,6 +224,7 @@ export {
   WButtonUnselect,
   WCheckbox,
   WCheckboxGroup,
+  WCheckboxGroupMultiple,
   WChip,
   WClickOutside,
   WCounter,
@@ -292,6 +297,7 @@ export {
   WShineEffect,
   WSkeleton,
   WSpinner,
+  WStatusIcon,
   WTabs,
   WTabsColumns,
   WTabsItem,

@@ -1,6 +1,9 @@
 <template>
   <WFieldWrapper
-    v-bind="props"
+    v-bind="{
+      ...props,
+      modelValue: undefined as never,
+    }"
     :class="$attrs.class"
   >
     <template
@@ -20,8 +23,8 @@
     <template #field>
       <div
         :class="{
-          'flex flex-wrap items-center gap-x-4': wrap,
-          'flex items-center gap-x-4 [&>*]:flex-1': stretch,
+          'flex flex-wrap gap-x-4': wrap,
+          'flex gap-x-4 [&>*]:flex-1': stretch,
         }"
       >
         <WCheckbox
@@ -29,7 +32,7 @@
           :key="index"
           v-bind="{
             ...props,
-            modelValue: getValue(item) === modelValue,
+            modelValue: modelValue.includes(getValue(item)),
             title: titleMap?.[getValue(item)!.toString() as GroupModelStringified<Model>],
             tooltipText: tooltipTextMap?.[getValue(item)!.toString() as GroupModelStringified<Model>],
             icon: iconMap?.[getValue(item)!.toString() as GroupModelStringified<Model>],
@@ -37,7 +40,7 @@
             disabled: disabled || (loading && getValue(item as Model | Entity) !== loadingItem),
           }"
           :class="[classMap?.[getValue(item)!.toString() as GroupModelStringified<Model>], optionClass]"
-          @update:model-value="updateModelValue(getValue(item as Model | Entity))"
+          @update:model-value="emitUpdateModelValue(getValue(item as Model | Entity))"
         >
           <template
             v-if="$slots.option || optionComponent"
@@ -46,18 +49,17 @@
             <slot
               name="option"
               :option="(item as ValueGetter extends undefined ? Model : Entity)"
-              :selected="getValue(item) === modelValue"
+              :selected="modelValue.includes(getValue(item))"
             >
               <component
                 :is="optionComponent"
                 v-if="optionComponent"
                 :option="item"
-                :selected="getValue(item) === modelValue"
+                :selected="modelValue.includes(getValue(item))"
               />
             </slot>
           </template>
         </WCheckbox>
-        
       </div>
     </template>
 
@@ -71,7 +73,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined">
-import type {CheckboxGroupProps, GroupModelStringified} from './types'
+import type {CheckboxGroupMultipleProps, GroupModelStringified} from './types'
 
 import {ref} from 'vue'
 
@@ -81,10 +83,11 @@ import WCheckbox from './WCheckbox.vue'
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<CheckboxGroupProps<Model, Entity, ValueGetter>>()
+const props = defineProps<CheckboxGroupMultipleProps<Model, Entity, ValueGetter>>()
 
 const emit = defineEmits<{
-  (e: 'update:model-value', value: Model): void
+  (e: 'select', value: Model): void
+  (e: 'unselect', value: Model): void
 }>()
 
 const loadingItem = ref<Model | undefined>(undefined)
@@ -100,11 +103,7 @@ const getValue = (item: Model | Entity): Model => {
 const emitUpdateModelValue = (value: Model): void => {
   loadingItem.value = value
 
-  emit('update:model-value', value)
-}
-
-const updateModelValue = (value: Model): void => {
-  if (value !== props.modelValue) emitUpdateModelValue(value)
-  else if (props.allowClear) emitUpdateModelValue(null as Model)
+  if (props.modelValue.includes(value)) emit('unselect', value)
+  else emit('select', value)
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div class="sm:-w--width-inner sm:-left--left-inner pb-4 sm:sticky">
     <WExpansionItem
-      title="Filters"
+      :title="`Filters (${ shown.length })`"
       :icon="markRaw(IconFilter)"
       :is-open="isOpen"
       toggle-class="sm:px-3"
@@ -11,6 +11,8 @@
         switch-to-new
         disable-min-height
         side
+        status-icon
+        name="filter"
         class="w-tabs-side-width-72"
       >
         <WTabsItem
@@ -18,17 +20,20 @@
           name="search"
           title="Search"
           :icon="markRaw(IconSearch)"
+          :has-value="!!(queryParams as Record<string, string>).search"
         >
           <div class="sm-not:-px--inner-margin">
-            <WInput
-              ref="input"
-              :model-value="(queryParams as Record<string, string>).search"
-              placeholder="Search.."
-              allow-clear
-              class="w-full"
-              :icon="markRaw(IconSearch)"
-              @update:model-value="$emit('update:query-params', {search: $event || undefined} as QueryParams)"
-            />
+            <WFormValidator name="search">
+              <WInput
+                ref="input"
+                :model-value="(queryParams as Record<string, string>).search"
+                placeholder="Search.."
+                allow-clear
+                class="w-full"
+                :icon="markRaw(IconSearch)"
+                @update:model-value="$emit('update:query-params', {search: $event || undefined} as QueryParams)"
+              />
+            </WFormValidator>
 
             <component
               :is="filterSearch"
@@ -45,11 +50,13 @@
 
         <template v-if="filter">
           <WTabsItem
-            v-for="item in filterList.filter(item => allShown.includes(filter?.indexOf(item) ?? -1))"
+            v-for="(item, index) in filterList.filter(item => allShown.includes(filter?.indexOf(item) ?? -1))"
             :key="filter.indexOf(item)"
             :name="filter.indexOf(item).toString()"
             :title="getItemProp(queryParams, item, 'title') ?? ''"
             :icon="getItemProp(queryParams, item, 'icon')"
+            :init="index === 0 && !(queryParams as Record<string, string>).search"
+            :has-value="shown.includes(filter.indexOf(item))"
           >
             <div class="sm-not:-px--inner-margin">
               <component
@@ -90,6 +97,7 @@ import type {FilterComponent} from '../types'
 import {computed, markRaw, ref} from 'vue'
 
 import WExpansionItem from '@/components/Expansion/WExpansionItem.vue'
+import WFormValidator from '@/components/Form/WFormValidator.vue'
 import WInput from '@/components/Input/WInput.vue'
 import WTabs from '@/components/Tabs/WTabs.vue'
 import WTabsItem from '@/components/Tabs/WTabsItem.vue'
@@ -125,13 +133,13 @@ const filterList = computed(() => {
   }) ?? []
 })
 
-const selected = ref<number[]>([])
-
 const shown = computed(() => filterList.value
   .filter(item => getItemProp(props.queryParams, item, 'fields')?.some(field => field in (props.queryParams as Record<string, unknown>)))
   .map(item => props.filter?.indexOf(item) ?? -1))
 
-const allShown = computed(() => [...selected.value, ...shown.value])
+const selected = ref<number[]>(shown.value.slice())
+
+const allShown = computed(() => [...selected.value, ...shown.value].filter((item, index, array) => array.indexOf(item) === index))
 
 const excluded = computed<number[]>(() => {
   const hidden = props.filter?.filter(item => !filterList.value.includes(item)).map(item => props.filter?.indexOf(item) ?? -1) ?? []

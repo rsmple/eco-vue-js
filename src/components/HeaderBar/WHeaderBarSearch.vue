@@ -12,7 +12,11 @@ const hide = () => {
   updateVisible(false)
 }
 
-const slotsDefault = computed(() => slots.default?.({visible: visible.value, hide}))
+const show = () => {
+  updateVisible(true)
+}
+
+const slotsDefault = computed(() => slots.default?.({visible: visible.value, hide, show}))
 
 const {updateHeaderSearch} = useHeaderSearch()
 
@@ -23,6 +27,6 @@ onBeforeUnmount(() => {
 })
 
 defineSlots<{
-  default: (props: {visible?: boolean, hide?: () => void}) => VNode[]
+  default: (props: {visible?: boolean, hide?: () => void, show?: () => void}) => VNode[]
 }>()
 </script>
