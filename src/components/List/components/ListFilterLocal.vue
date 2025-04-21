@@ -122,7 +122,7 @@ const emit = defineEmits<{
   (e: 'update:query-params', value: QueryParams): void
 }>()
 
-const isOpen = ref(false)
+const isOpen = ref(true)
 
 const filterList = computed(() => {
   return props.filter?.filter(item => {

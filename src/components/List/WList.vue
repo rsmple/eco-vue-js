@@ -19,9 +19,12 @@
       :disabled-filter-fields="disabledFilterFields ?? []"
       @update:query-params="$emit('update:query-params', $event)"
     />
+
+    <slot name="filter" />
   </template>
 
   <div
+    v-if="!noList"
     :class="{
       'w-card': isGrid,
       'w-list': !isGrid,
@@ -297,6 +300,8 @@ import ListFilterGlobal from './components/ListFilterGlobal.vue'
 import ListFilterLocal from './components/ListFilterLocal.vue'
 import {filterFields, getFirstFieldLabel, useListConfig} from './use/useListConfig'
 
+defineOptions({inheritAttrs: false})
+
 const props = defineProps<{
   count?: number
   fields: Fields
@@ -332,6 +337,7 @@ const props = defineProps<{
   disabledFilterFields?: Array<keyof QueryParams>
   search?: boolean
   global?: boolean
+  noList?: boolean
 }>()
 
 const emit = defineEmits<{
