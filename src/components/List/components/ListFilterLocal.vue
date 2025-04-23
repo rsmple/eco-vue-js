@@ -1,5 +1,5 @@
 <template>
-  <div class="sm:-w--width-inner sm:-left--left-inner pb-4 sm:sticky">
+  <div class="pb-4">
     <WExpansionItem
       :title="`Filters (${ shown.length })`"
       :icon="markRaw(IconFilter)"

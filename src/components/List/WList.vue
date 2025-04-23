@@ -1,30 +1,5 @@
 <template>
-  <template v-if="filter || search">
-    <ListFilterGlobal
-      v-if="global"
-      :filter="filter"
-      :filter-search="filterSearch"
-      :query-params="queryParams"
-      :search="search === true"
-      :disabled-filter-fields="disabledFilterFields ?? []"
-      @update:query-params="$emit('update:query-params', $event)"
-    />
-
-    <ListFilterLocal
-      v-else 
-      :filter="filter"
-      :filter-search="filterSearch"
-      :query-params="queryParams"
-      :search="search === true"
-      :disabled-filter-fields="disabledFilterFields ?? []"
-      @update:query-params="$emit('update:query-params', $event)"
-    />
-
-    <slot name="filter" />
-  </template>
-
   <div
-    v-if="!noList"
     :class="{
       'w-card': isGrid,
       'w-list': !isGrid,
@@ -274,7 +249,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>, CardColumns extends readonly GridCol[]">
-import type {BulkComponent, CardActionParams, CardAreas, FieldComponent, FieldConfigMap, FilterComponent, GridCol, ListFields, MenuComponent} from './types'
+import type {BulkComponent, CardActionParams, CardAreas, FieldComponent, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
@@ -296,8 +271,6 @@ import HeaderFieldNested from './components/HeaderFieldNested.vue'
 import HeaderSettings from './components/HeaderSettings.vue'
 import HeaderSort from './components/HeaderSort.vue'
 import ListCardFieldNested from './components/ListCardFieldNested.vue'
-import ListFilterGlobal from './components/ListFilterGlobal.vue'
-import ListFilterLocal from './components/ListFilterLocal.vue'
 import {filterFields, getFirstFieldLabel, useListConfig} from './use/useListConfig'
 
 defineOptions({inheritAttrs: false})
@@ -332,12 +305,6 @@ const props = defineProps<{
   cardAreas: CardAreas<Fields, CardColumns['length']>
   cardTo?: (item: Data) => LinkProps['to'] | undefined
   hasAction?: boolean
-  filter?: FilterComponent<QueryParams>[]
-  filterSearch?: FilterComponent<QueryParams>
-  disabledFilterFields?: Array<keyof QueryParams>
-  search?: boolean
-  global?: boolean
-  noList?: boolean
 }>()
 
 const emit = defineEmits<{

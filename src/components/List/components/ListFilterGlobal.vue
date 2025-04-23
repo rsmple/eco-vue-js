@@ -1,5 +1,8 @@
 <template>
-  <WHeaderBarSearch v-if="search">
+  <WHeaderBarSearch
+    v-if="search"
+    :shown="!!(queryParams as Record<string, string>).search"
+  >
     <template #default="{visible, hide}">
       <div>
         <WInputSuggest
@@ -33,7 +36,7 @@
           v-else
           ref="input"
           :model-value="(queryParams as Record<string, string>).search"
-          :autofocus="visible"
+          :autofocus="visible && !(queryParams as Record<string, string>).search"
           placeholder="Search.."
           allow-clear
           no-margin

@@ -61,6 +61,7 @@ import WLinkArrow from '@/components/Link/WLinkArrow.vue'
 import WList from '@/components/List/WList.vue'
 import WListCard from '@/components/List/WListCard.vue'
 import WListCardField from '@/components/List/WListCardField.vue'
+import WListFilter from '@/components/List/WListFilter.vue'
 import WListHeader from '@/components/List/WListHeader.vue'
 import WListHeaderItem from '@/components/List/WListHeaderItem.vue'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
@@ -164,6 +165,7 @@ export default {
     app.component('WList', WList)
     app.component('WListCard', WListCard)
     app.component('WListCardField', WListCardField)
+    app.component('WListFilter', WListFilter)
     app.component('WListHeader', WListHeader)
     app.component('WListHeaderItem', WListHeaderItem)
     app.component('WMenuItem', WMenuItem)
@@ -267,6 +269,7 @@ export {
   WList,
   WListCard,
   WListCardField,
+  WListFilter,
   WListHeader,
   WListHeaderItem,
   WMenuItem,
