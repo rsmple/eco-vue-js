@@ -164,10 +164,12 @@ export type FilterProps<QueryParams> = {
   title?: string
   icon?: SVGComponent
   hidden?: boolean
+  global?: boolean
 }
 
 export type FilterEmits<QueryParams, Field extends keyof QueryParams> = {
   (e: 'update:query-params', value: Pick<QueryParams, Field>): void
+  (e: 'close'): void
 }
 
 export type FilterComponent<QueryParams> = Component<FilterProps<QueryParams>>

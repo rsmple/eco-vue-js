@@ -7,6 +7,10 @@ import type {TabsItemProps, TabsItemScopedProps} from './types'
 
 defineProps<TabsItemProps>()
 
+defineEmits<{
+  (e: 'close'): void
+}>()
+
 defineSlots<{
   default?: () => void
   title?: (props: TabsItemScopedProps) => void

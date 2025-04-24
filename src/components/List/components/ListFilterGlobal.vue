@@ -4,59 +4,14 @@
     :shown="!!(queryParams as Record<string, string>).search"
   >
     <template #default="{visible, hide}">
-      <div>
-        <WInputSuggest
-          v-if="filterSearch && isMobile"
-          ref="input"
-          :model-value="(queryParams as Record<string, string>).search"
-          :autofocus="visible && !(queryParams as Record<string, string>).search"
-          placeholder="Search.."
-          allow-clear
-          persist
-          teleport
-          no-margin
-          class="w-full"
-          :icon="markRaw(IconSearch)"
-          @click:clear="inputRef?.close"
-          @close="!(queryParams as Record<string, string>).search && hide?.()"
-          @update:model-value="$emit('update:query-params', {search: $event || undefined} as QueryParams)"
-        >
-          <template #content>
-            <div class="px-3">
-              <component
-                :is="filterSearch" 
-                :query-params="queryParams"
-                @update:query-params="$emit('update:query-params', $event)"
-              />
-            </div>
-          </template>
-        </WInputSuggest>
-
-        <WInput
-          v-else
-          ref="input"
-          :model-value="(queryParams as Record<string, string>).search"
-          :autofocus="visible && !(queryParams as Record<string, string>).search"
-          placeholder="Search.."
-          allow-clear
-          no-margin
-          class="w-full"
-          :icon="markRaw(IconSearch)"
-          @click:clear="hide"
-          @update:model-value="$emit('update:query-params', {search: $event || undefined} as QueryParams)"
-        >
-          <template
-            v-if="filterSearch"
-            #right
-          >
-            <component
-              :is="filterSearch" 
-              :query-params="queryParams"
-              @update:query-params="$emit('update:query-params', $event)"
-            />
-          </template>
-        </WInput>
-      </div>
+      <component
+        :is="filterSearch ?? ListFilterSearch"
+        :query-params="queryParams"
+        :autofocus="!(queryParams as Record<string, string>).search && visible"
+        global
+        @update:query-params="$emit('update:query-params', $event)"
+        @close="!(queryParams as Record<string, string>).search && hide?.()"
+      />
     </template>
   </WHeaderBarSearch>
 
@@ -97,22 +52,19 @@
 <script setup lang="ts" generic="QueryParams">
 import type {FilterComponent} from '../types'
 
-import {computed, markRaw, ref, useTemplateRef} from 'vue'
+import {computed, ref, useTemplateRef} from 'vue'
 
 import WActionsBarFilter from '@/components/ActionsBar/WActionsBarFilter.vue'
 import WButton from '@/components/Button/WButton.vue'
 import WHeaderBarSearch from '@/components/HeaderBar/WHeaderBarSearch.vue'
-import WInput from '@/components/Input/WInput.vue'
-import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 import IconFilterRemove from '@/assets/icons/sax/IconFilterRemove.svg?component'
-import IconSearch from '@/assets/icons/sax/IconSearch.svg?component'
 
 import {Modal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
-import {useIsMobile} from '@/utils/mobile'
 
 import ListFilterGlobalItem from './ListFilterGlobalItem.vue'
+import ListFilterSearch from './ListFilterSearch.vue'
 
 defineProps<{
   filter: FilterComponent<QueryParams>[] | undefined
@@ -126,11 +78,8 @@ const emit = defineEmits<{
   (e: 'update:query-params', value: QueryParams): void
 }>()
 
-const {isMobile} = useIsMobile()
-
 const open = ref<number | null>(null)
 
-const inputRef = useTemplateRef<ComponentInstance<typeof WInputSuggest>>('input')
 const filterItemRef = useTemplateRef<ComponentInstance<typeof ListFilterGlobalItem>[]>('filterItem')
 
 const count = computed(() => filterItemRef.value?.filter(item => item.hasChanges).length ?? 0)

@@ -89,11 +89,15 @@ const hasChanges = computed<boolean>(() => {
   if (initModelValue.value === undefined) {
     return modelValue.value !== undefined && modelValue.value !== ''
   } else {
-    if (Array.isArray(modelValue.value) && Array.isArray(initModelValue.value)) {
-      const oldValue = initModelValue.value
-      const newValue = modelValue.value
+    const oldValue = initModelValue.value
+    const newValue = modelValue.value
 
+    if (Array.isArray(newValue) && Array.isArray(oldValue)) {
       return newValue.length !== oldValue.length || newValue.some(item => !oldValue.includes(item))
+    } if (newValue instanceof Object && oldValue instanceof Object) {
+      const keys = Object.keys(newValue)
+      return keys.length !== Object.keys(oldValue).length
+        || keys.some(key => newValue[key as keyof typeof newValue] !== oldValue[key as keyof typeof oldValue])
     } else {
       return modelValue.value !== initModelValue.value
     }
@@ -107,7 +111,7 @@ const hasValueExact = computed<boolean | null>(() => {
 
   if (Array.isArray(modelValue.value)) return modelValue.value.length !== 0
 
-  return modelValue.value !== undefined && modelValue.value !== null && modelValue.value !== ''
+  return modelValue.value !== undefined && modelValue.value !== null && modelValue.value !== '' && modelValue.value !== false
 })
 
 const _hasValue = computed<boolean | null>(() => mandatory.value && hasValueExact.value === false ? null : hasValueExact.value)

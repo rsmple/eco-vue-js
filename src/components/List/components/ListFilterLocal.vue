@@ -1,94 +1,49 @@
 <template>
-  <div class="pb-4">
-    <WExpansionItem
-      :title="`Filters (${ shown.length })`"
-      :icon="markRaw(IconFilter)"
-      :is-open="isOpen"
-      toggle-class="sm:px-3"
-      @toggle="isOpen = !isOpen"
+  <WExpansionItem
+    :title="title?.(shown.length) ?? `Filters (${ shown.length })`"
+    :icon="markRaw(IconFilter)"
+    :is-open="isOpen"
+    toggle-class="sm:px-3"
+    @toggle="isOpen = !isOpen"
+  >
+    <WTabs
+      switch-to-new
+      disable-min-height
+      side
+      status-icon
+      name="filter"
+      class="w-tabs-side-width-72"
     >
-      <WTabs
-        switch-to-new
-        disable-min-height
-        side
-        status-icon
-        name="filter"
-        class="w-tabs-side-width-72"
-      >
+      <template v-if="filter || search">
         <WTabsItem
-          v-if="search"
-          name="search"
-          title="Search"
-          :icon="markRaw(IconSearch)"
-          :has-value="!!(queryParams as Record<string, string>).search"
+          v-for="(item, index) in filterList.filter(item => allShown.includes(filterAll.indexOf(item)))"
+          :key="filterAll.indexOf(item)"
+          :name="filterAll.indexOf(item).toString()"
+          :title="getItemProp(queryParams, item, 'title') ?? ''"
+          :icon="getItemProp(queryParams, item, 'icon')"
+          :init="index === 0 && !(queryParams as Record<string, string>).search"
+          :has-value="shown.includes(filterAll.indexOf(item))"
+          @close="clearFilterItem(item)"
         >
           <div class="sm-not:-px--inner-margin">
-            <WFormValidator name="search">
-              <WInput
-                ref="input"
-                :model-value="(queryParams as Record<string, string>).search"
-                placeholder="Search.."
-                allow-clear
-                class="w-full"
-                :icon="markRaw(IconSearch)"
-                @update:model-value="$emit('update:query-params', {search: $event || undefined} as QueryParams)"
-              />
-            </WFormValidator>
-
             <component
-              :is="filterSearch"
-              v-if="filterSearch" 
+              :is="item"
               :query-params="queryParams"
               @update:query-params="$emit('update:query-params', $event)"
             />
           </div>
-
-          <template #right>
-            <div class="w-10" />
-          </template>
         </WTabsItem>
 
-        <template v-if="filter">
-          <WTabsItem
-            v-for="(item, index) in filterList.filter(item => allShown.includes(filter?.indexOf(item) ?? -1))"
-            :key="filter.indexOf(item)"
-            :name="filter.indexOf(item).toString()"
-            :title="getItemProp(queryParams, item, 'title') ?? ''"
-            :icon="getItemProp(queryParams, item, 'icon')"
-            :init="index === 0 && !(queryParams as Record<string, string>).search"
-            :has-value="shown.includes(filter.indexOf(item))"
-          >
-            <div class="sm-not:-px--inner-margin">
-              <component
-                :is="item"
-                :query-params="queryParams"
-                @update:query-params="$emit('update:query-params', $event)"
-              />
-            </div>
-
-            <template #right>
-              <button
-                class="w-ripple-trigger text-description sm-not:-mr--inner-margin flex h-full items-center justify-center px-1"
-                @click="clearFilterItem(item)"
-              >
-                <div class="w-ripple w-ripple-hover relative rounded-full">
-                  <IconClose />
-                </div>
-              </button>
-            </template>
-          </WTabsItem>
-
-          <ListFilterSelect
-            v-if="allShown.length < filterList.length"
-            :filter="filter"
-            :exclude="excluded"
-            :query-params="queryParams"
-            @select="selected.push($event)"
-          />
-        </template>
-      </WTabs>
-    </WExpansionItem>
-  </div>
+        <ListFilterSelect
+          v-if="allShown.length < filterList.length"
+          :filter="filterAll"
+          :exclude="excluded"
+          :query-params="queryParams"
+          @select="selected.push($event)"
+        />
+      </template>
+    </WTabs>
+  </WExpansionItem>
 </template>
 
 <script setup lang="ts" generic="QueryParams">
@@ -97,15 +52,12 @@ import type {FilterComponent} from '../types'
 import {computed, markRaw, ref} from 'vue'
 
 import WExpansionItem from '@/components/Expansion/WExpansionItem.vue'
-import WFormValidator from '@/components/Form/WFormValidator.vue'
-import WInput from '@/components/Input/WInput.vue'
 import WTabs from '@/components/Tabs/WTabs.vue'
 import WTabsItem from '@/components/Tabs/WTabsItem.vue'
 
-import IconClose from '@/assets/icons/sax/IconClose.svg?component'
 import IconFilter from '@/assets/icons/sax/IconFilter.svg?component'
-import IconSearch from '@/assets/icons/sax/IconSearch.svg?component'
 
+import ListFilterSearch from './ListFilterSearch.vue'
 import ListFilterSelect from './ListFilterSelect.vue'
 
 import {getItemProp} from '../models/utils'
@@ -116,6 +68,7 @@ const props = defineProps<{
   search: boolean
   queryParams: QueryParams
   disabledFilterFields: Array<keyof QueryParams>
+  title?: (count: number) => string
 }>()
 
 const emit = defineEmits<{
@@ -124,8 +77,13 @@ const emit = defineEmits<{
 
 const isOpen = ref(true)
 
+const filterAll = computed(() => [
+  props.search ? props.filterSearch ?? markRaw(ListFilterSearch) : undefined,
+  ...props.filter ?? [],
+].filter((item): item is FilterComponent<QueryParams> => item !== undefined))
+
 const filterList = computed(() => {
-  return props.filter?.filter(item => {
+  return filterAll.value.filter(item => {
     if (getItemProp(props.queryParams, item, 'hidden')) return false
 
     const fields = getItemProp(props.queryParams, item, 'fields') ?? []
@@ -135,7 +93,7 @@ const filterList = computed(() => {
 
 const shown = computed(() => filterList.value
   .filter(item => getItemProp(props.queryParams, item, 'fields')?.some(field => field in (props.queryParams as Record<string, unknown>)))
-  .map(item => props.filter?.indexOf(item) ?? -1))
+  .map(item => filterAll.value.indexOf(item)))
 
 const selected = ref<number[]>(shown.value.slice())
 
@@ -154,7 +112,7 @@ const clearFilterItem = (item: FilterComponent<QueryParams>) => {
     result[field as keyof QueryParams] = undefined as never
   })
 
-  const index = props.filter?.indexOf(item) ?? -1
+  const index = filterAll.value.indexOf(item)
   const selectedIndex = selected.value.indexOf(index)
 
   if (index !== -1 && selectedIndex !== -1) selected.value.splice(selectedIndex, 1)

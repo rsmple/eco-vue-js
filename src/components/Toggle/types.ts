@@ -15,6 +15,7 @@ export interface ToggleProps<Value extends boolean | null> {
   negate?: boolean
   validate?: ValidateFn | ValidateFn[]
   center?: boolean
+  mandatory?: boolean
 }
 
 export interface ToggleThemeProps extends Omit<ToggleProps<boolean>, 'modelValue' | 'icon' | 'negate' | 'intermediate'> {

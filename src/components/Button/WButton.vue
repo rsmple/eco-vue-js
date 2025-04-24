@@ -1,7 +1,7 @@
 <template>
   <WSkeleton
     v-if="skeleton"
-    class="w-skeleton-rounded-[--w-button-rounded,1rem] w-skeleton-w-max w-skeleton-h-[--w-button-height,2.75rem]"
+    class="w-skeleton-rounded-[--w-button-rounded,1rem] w-skeleton-w-max -w-skeleton-h--button-height"
   >
     <div class="flex gap-2 px-[--w-button-rounded,1rem] font-medium opacity-0">
       <slot />
@@ -23,8 +23,8 @@
     :is="to !== undefined ? disabled ? 'a' : RouterLink : tag"
     v-else
     class="
-      w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-1px)] relative isolate flex
-      min-h-[--w-button-height,2.75rem] select-none
+      w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-1px)] -min-h--button-height relative isolate
+      flex select-none
       items-center justify-center whitespace-nowrap
       rounded-[--w-button-rounded,1rem] px-[--w-button-rounded,1rem] font-medium outline-none
     "

@@ -67,12 +67,27 @@
           </template>
 
           <template
-            v-if="(slot.children as Record<string, Component>)?.right"
+            v-if="(slot.children as Record<string, Component>)?.right || hasOnClose"
             #right="scope"
           >
             <component
               v-bind="scope"
               :is="(slot.children as Record<string, Component>)?.right"
+            />
+
+            <button
+              v-if="'onClose' in slot.props"
+              class="w-ripple-trigger text-description sm-not:-mr--inner-margin flex h-full items-center justify-center px-1"
+              @click="(slot.props.onClose as () => void)?.()"
+            >
+              <div class="w-ripple w-ripple-hover relative rounded-full">
+                <IconClose />
+              </div>
+            </button>
+            
+            <div
+              v-else
+              class="w-10"
             />
           </template>
         </TabTitleButton>
@@ -123,6 +138,8 @@ import type {TabsItemProps, TabsProps} from './types'
 import {type Component, type RendererElement, type RendererNode, type VNode, computed, inject, onMounted, onUnmounted, ref, useSlots, useTemplateRef, watch} from 'vue'
 
 import WForm from '@/components/Form/WForm.vue'
+
+import IconClose from '@/assets/icons/sax/IconClose.svg?component'
 
 import {Notify} from '@/utils/Notify'
 import {useIsMobile} from '@/utils/mobile'
@@ -188,6 +205,8 @@ const hasNoValueFirst = computed<number>(() => {
 
   return index
 })
+
+const hasOnClose = computed(() => defaultSlotsAll.value.some(item => item.props && 'onClose' in item.props))
 
 const first = computed<boolean>(() => currentIndex.value === 0)
 const last = computed<boolean>(() => currentIndex.value === defaultSlotsKeys.value.length - 1)

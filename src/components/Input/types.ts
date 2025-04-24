@@ -44,6 +44,7 @@ export interface InputAsyncProps<Type extends InputType> extends InputProps<Type
 export interface InputSuggestProps<Type extends InputType> extends InputProps<Type>, Partial<Omit<DropdownMenuProps, 'isOpen' | 'updateAlign' | 'emitUpdate'>> {
   mobileTitle?: string
   persist?: boolean
+  closeOnClear?: boolean
 }
 
 export interface InputOptionsProps<Type extends InputType, Option> extends InputSuggestProps<Type> {

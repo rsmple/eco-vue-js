@@ -41,7 +41,7 @@
 
         @click="isMobile && toggleScope?.unclickable && open()"
         @click:suffix="isMobile && toggleScope?.unclickable && open()"
-        @click:clear="$emit('click:clear')"
+        @click:clear="$emit('click:clear'); closeOnClear && close()"
       >
         <template
           v-if="$slots.title"

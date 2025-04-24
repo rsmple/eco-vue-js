@@ -10,6 +10,7 @@
     <component
       :is="item"
       :query-params="queryParams"
+      global
       @update:query-params="$emit('update:query-params', $event)"
     />
   </WExpansionItem>
