@@ -110,12 +110,12 @@ export const getFirstFieldLabel = <F extends ListFields<any, any>[number]>(field
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useListConfig = <Fields extends ListFields<any, any>>(key: MaybeRef<string>, fields: MaybeRef<Fields>, defaultConfigMap: MaybeRef<FieldConfigMap<Fields>>, defailtMode: MaybeRef<ListMode>) => {
+export const useListConfig = <Fields extends ListFields<any, any>>(key: MaybeRef<string>, fields: MaybeRef<Fields>, defaultConfigMap: MaybeRef<FieldConfigMap<Fields>>, defailtMode: MaybeRef<ListMode>, disable?: boolean) => {
   const {isMobile} = useIsMobile()
 
   const value = ref<ListConfig<Fields>>(
     parseListConfig(
-      getListConfig(unref(key)),
+      disable ? undefined : getListConfig(unref(key)),
       unref(fields),
       unref(defaultConfigMap),
       unref(defailtMode),
@@ -136,12 +136,16 @@ export const useListConfig = <Fields extends ListFields<any, any>>(key: MaybeRef
   const isGrid = computed(() => isMobile.value || value.value.mode === ListMode.GRID)
 
   const reset = () => {
+    if (disable) return
+
     value.value = parseListConfig(undefined, unref(fields), unref(defaultConfigMap), unref(defailtMode))
     hasSaved.value = false
     localStorage.removeItem(unref(key))
   }
 
   const save = () => {
+    if (disable) return
+
     localStorage.setItem(unref(key), JSON.stringify(value.value))
     hasSaved.value = true
   }
@@ -152,14 +156,12 @@ export const useListConfig = <Fields extends ListFields<any, any>>(key: MaybeRef
     save()
   }
 
-  if (isRef(key)) {
-    watch(key, newKey => {
-      value.value = parseListConfig(getListConfig(unref(newKey)), unref(fields), unref(defaultConfigMap), unref(defailtMode))
-      hasSaved.value = localStorage.getItem(unref(key)) !== null
-    })
-  }
+  if (!disable && isRef(key)) watch(key, newKey => {
+    value.value = parseListConfig(getListConfig(unref(newKey)), unref(fields), unref(defaultConfigMap), unref(defailtMode))
+    hasSaved.value = localStorage.getItem(unref(key)) !== null
+  })
 
-  if (isRef(defaultConfigMap)) watch(defaultConfigMap, newValue => {
+  if (!disable && isRef(defaultConfigMap)) watch(defaultConfigMap, newValue => {
     value.value = parseListConfig(getListConfig(unref(key)), unref(fields), newValue, unref(defailtMode))
     hasSaved.value = localStorage.getItem(unref(key)) !== null
   })

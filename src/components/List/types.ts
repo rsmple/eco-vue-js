@@ -119,6 +119,13 @@ export type BulkProps<QueryParams> = {
 
 export type BulkComponent<QueryParams> = Component<BulkProps<QueryParams>>
 
+export type ActionProps<QueryParams> = {
+  queryParams: QueryParams
+  readonly: boolean
+}
+
+export type ActionComponent<QueryParams> = Component<ActionProps<QueryParams>>
+
 export type FieldConfig = {
   width: number | null
   visible: boolean

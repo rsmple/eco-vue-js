@@ -39,22 +39,38 @@
           @clear:selection="resetSelection"
         >
           <template
-            v-if="bulk"
+            v-if="bulk || action"
             #default="{disableMessage, cssClass}"
           >
-            <template
-              v-for="(item, index) in bulk"
-              :key="index"
-            >
-              <component
-                :is="item"
-                :selection-count="selectionCount"
-                :query-params-getter="getQueryParamsBulk"
-                :disable-message="disableMessage"
-                :readonly="readonly ?? false"
-                :class="cssClass"
-                @clear:selected="resetSelection"
-              />
+            <template v-if="selectionCount === 0 && action">
+              <template
+                v-for="(item, index) in action"
+                :key="index"
+              >
+                <component
+                  :is="item"
+                  :query-params="queryParams"
+                  :readonly="readonly ?? false"
+                  :class="cssClass"
+                />
+              </template>
+            </template>
+
+            <template v-else>
+              <template
+                v-for="(item, index) in bulk"
+                :key="index"
+              >
+                <component
+                  :is="item"
+                  :selection-count="selectionCount"
+                  :query-params-getter="getQueryParamsBulk"
+                  :disable-message="disableMessage"
+                  :readonly="readonly ?? false"
+                  :class="cssClass"
+                  @clear:selected="resetSelection"
+                />
+              </template>
             </template>
           </template>
 
@@ -98,6 +114,7 @@
               />
 
               <HeaderSettings
+                v-if="!noHeaderSettings"
                 v-model:field-config-map="fieldConfigMap"
                 :mode="listConfig.mode"
                 :fields="fieldsVisible"
@@ -244,12 +261,19 @@
           </template>
         </WListCard>
       </template>
+
+      <template
+        v-if="$slots.empty"
+        #empty
+      >
+        <slot name="empty" />
+      </template>
     </WInfiniteList>
   </div>
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>, CardColumns extends readonly GridCol[]">
-import type {BulkComponent, CardActionParams, CardAreas, FieldComponent, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
+import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, FieldComponent, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
@@ -286,6 +310,7 @@ const props = defineProps<{
   selectionTitle: string
   bulk?: BulkComponent<QueryParams>[]
   bulkMore?: BulkComponent<QueryParams>[]
+  action?: ActionComponent<QueryParams>[]
   menu?: MenuComponent<Data>[]
   readonlyGetter?: (item: Data) => boolean
   cardClass?: string
@@ -305,6 +330,7 @@ const props = defineProps<{
   cardAreas: CardAreas<Fields, CardColumns['length']>
   cardTo?: (item: Data) => LinkProps['to'] | undefined
   hasAction?: boolean
+  noHeaderSettings?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -339,7 +365,7 @@ const {
   reset,
   save,
   updateMode,
-} = useListConfig(toRef(props, 'configKey'), fieldsVisible, toRef(props, 'defaultConfigMap'), toRef(props, 'defaultMode'))
+} = useListConfig(toRef(props, 'configKey'), fieldsVisible, toRef(props, 'defaultConfigMap'), toRef(props, 'defaultMode'), props.noHeaderSettings)
 
 const fieldsFiltered = computed(() => {
   return filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible)

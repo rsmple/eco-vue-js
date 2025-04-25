@@ -3,7 +3,7 @@
     ref="infiniteScroll"
     :style="{'--infinite-list-header-height': headerHeight + 'px'}"
     :class="{
-      '-min-h--height-inner pb-16 pt-[--w-list-gap,1rem]': !minHeight,
+      '-min-h--height-inner list:pt-[--w-list-gap,1rem] pb-16': !minHeight,
       'min-h-full': minHeight,
     }"
     @scroll:down="addNextPage"
@@ -66,12 +66,9 @@
 
       <template
         v-if="$slots.empty"
-        #empty="emptyScope"
+        #empty
       >
-        <slot
-          name="empty"
-          v-bind="(emptyScope as EmptyProps)"
-        />
+        <slot name="empty" />
       </template>
     </InfiniteListPage>
 
@@ -270,8 +267,6 @@ defineExpose({
   goto,
 })
 
-type EmptyProps = {queryParams: QueryParams}
-
 defineSlots<{
   default?: (props: {
     item: Data
@@ -287,6 +282,6 @@ defineSlots<{
     index: number
     value: Model
   }) => void
-  empty?: (props: EmptyProps) => void
+  empty?: () => void
 }>()
 </script>

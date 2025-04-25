@@ -1,7 +1,7 @@
 <template>
   <div
     class="
-      from-primary dark:from-primary-dark text-default dark:text-default-dark relative
+      from-primary dark:from-primary-dark text-default relative
       w-full select-none rounded-xl bg-gradient-to-tr to-[#C376FF] px-4
       py-3 dark:to-[#9b3be6]
     "

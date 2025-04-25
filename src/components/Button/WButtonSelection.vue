@@ -1,5 +1,5 @@
 <template>
-  <div class="sm:-left--left-inner sm:-w--width-inner grid w-full grid-cols-[1fr,auto] pb-3 sm:sticky">
+  <div class="list:-left--left-inner list:-w--width-inner list:sticky grid w-full grid-cols-[1fr,auto] pb-3">
     <div class="flex">
       <slot
         v-bind="{

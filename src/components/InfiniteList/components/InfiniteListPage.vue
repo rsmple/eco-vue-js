@@ -4,7 +4,12 @@
     class="relative"
   >
     <template v-if="page && data?.results.length !== 0">
-      <div class="mt-[--w-list-gap,0] flex">
+      <div
+        class="flex"
+        :class="{
+          'mt-[--w-list-gap,0]': page > 1,
+        }"
+      >
         <InfiniteListPageTitle
           v-if="!hidePageTitle"
           :query-params="(queryParams as QueryParams)"
@@ -80,7 +85,6 @@
     <slot
       v-else
       name="empty"
-      v-bind="{queryParams}"
     >
       <div class="text-accent sm:-left--left-inner sm:-max-w--width-inner flex justify-center px-8 py-16 text-center font-normal sm:sticky">
         {{ emptyStub }}
@@ -324,6 +328,6 @@ defineSlots<{
     page: number
     index: number
   }) => void
-  empty?: (props: {queryParams: QueryParams}) => void
+  empty?: () => void
 }>()
 </script>

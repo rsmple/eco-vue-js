@@ -242,7 +242,7 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
     '.text-accent': {
       color: theme('colors.black.default'),
       [config('darkMode')[1][0]]: {
-        color: theme('colors.gray.200'),
+        color: theme('colors.default'),
       },
     },
     '.text-description': {

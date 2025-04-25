@@ -186,7 +186,7 @@
   <template v-if="$slots.expansion">
     <div
       v-if="isOpen"
-      class="sm:-w--width-inner sm:-left--left-inner col-span-full sm:sticky"
+      class="list:-w--width-inner list:-left--left-inner list:sticky col-span-full"
       :class="{
         'border-gray-300 dark:border-gray-700': hasBorder && !selected,
         'border-primary dark:border-primary-dark': hasBorder && selected,

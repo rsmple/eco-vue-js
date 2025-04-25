@@ -60,12 +60,9 @@
 
         <template
           v-if="$slots.empty"
-          #empty="emptyScope"
+          #empty
         >
-          <slot
-            name="empty"
-            v-bind="emptyScope"
-          />
+          <slot name="empty" />
         </template>
       </InfiniteListPages>
     </template>
@@ -159,6 +156,6 @@ defineSlots<{
     goto: typeof goto
     updateHeaderHeight: () => void
   }) => void
-  empty?: (props: {queryParams: QueryParams}) => void
+  empty?: () => void
 }>()
 </script>
