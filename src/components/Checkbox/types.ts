@@ -17,6 +17,7 @@ export interface CheckboxProps {
   tooltipText?: string
   alignTop?: boolean
   noMargin?: boolean
+  lessTransitions?: boolean
 }
 
 export type CheckboxGroupOptionProps<Option> = {option: Option | undefined, selected?: boolean}

@@ -9,6 +9,7 @@
       'sm-not:dark:even:bg-primary-darkest/25 sm-not:even:bg-gray-50 grid grid-cols-1': card,
       'flex': !card,
       '-mb-px': !card && isOpen,
+      'w-hover-checked': allowSelectHover,
     }"
     @contextmenu="toggleMenu"
   >
@@ -26,7 +27,7 @@
 
     <div
       v-if="!card"
-      class="-left--left-inner bg-default dark:bg-default-dark @not-lg:hidden sticky z-[1]"
+      class="-left--left-inner bg-default dark:bg-default-dark @not-lg:hidden w-ripple-opacity-[0.05] sticky z-[1]"
       :class="{
         'width-[--w-list-header-rounded,1rem]': !allowSelect,
       }"
@@ -41,8 +42,10 @@
           'border-primary dark:border-primary-dark': hasBorder && selected,
           'rounded-bl-[unset!important]': isOpen,
           'border-b-transparent dark:border-b-transparent': hasBorder && isOpen,
-          'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': isActionShown,
+          'w-ripple-has-only w-ripple-hover': isActionShown,
           'pl-px': !hasBorder,
+          'before:text-primary dark:before:text-primary-dark w-ripple-opacity-15': allowSelectHover || selected || moreRef?.isOpen,
+          'before:opacity-10': selected || moreRef?.isOpen,
         }"
       >
         <WCheckbox
@@ -50,17 +53,13 @@
           :model-value="selected"
           :disabled="disabled"
           :align-top="alignTop"
+          :less-transitions="allowSelectHover"
           class="h-full px-[--w-list-padding,1rem]"
           :class="{
             'opacity-50': allowSelectHover,
             'pt-4.5': alignTop,
           }"
           @update:model-value="$emit('toggle:selected')"
-        />
-
-        <div
-          v-if="selected || moreRef?.isOpen"
-          class="bg-primary/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
         />
       </div>
     </div>
@@ -105,11 +104,11 @@
               ? {tag: markRaw(RouterLink), card, class: 'z-[-1]', props: {to}}
               : {tag: 'button', card, class: 'z-[-1]', onClick: toggle}
         "
-      />
-
-      <div
-        v-if="selected || moreRef?.isOpen"
-        class="bg-primary/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
+        :class="{
+          'before:text-primary dark:before:text-primary-dark': allowSelectHover || selected || moreRef?.isOpen,
+          'before:opacity-10': selected || moreRef?.isOpen,
+        }"
+        :opacity-class="allowSelectHover || selected || moreRef?.isOpen ? 'w-ripple-opacity-15' : undefined"
       />
 
       <WButtonMore
@@ -134,7 +133,7 @@
       
     <div
       v-if="!card"
-      class="-right--right-inner bg-default dark:bg-default-dark sticky z-[1]"
+      class="-right--right-inner bg-default dark:bg-default-dark w-ripple-opacity-[0.05] sticky z-[1]"
       :class="{
         'width-[calc(var(--w-list-padding,1rem)*2+1.25em)]': $slots.more,
         'width-[--w-list-header-rounded,1rem]': !$slots.more,
@@ -150,7 +149,9 @@
           'border-primary dark:border-primary-dark': hasBorder && selected,
           'rounded-br-[unset!important]': isOpen,
           'border-b-transparent dark:border-b-transparent': hasBorder && isOpen,
-          'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.04]': isActionShown,
+          'w-ripple-has-only w-ripple-hover': isActionShown,
+          'before:text-primary dark:before:text-primary-dark w-ripple-opacity-15': allowSelectHover || selected || moreRef?.isOpen,
+          'before:opacity-10': selected || moreRef?.isOpen,
         }"
       >
         <WButtonMore
@@ -167,11 +168,6 @@
         >
           <slot name="more" />
         </WButtonMore>
-
-        <div
-          v-if="selected || moreRef?.isOpen"
-          class="bg-primary/10 dark:bg-primary-dark/10 rounded-inherit pointer-events-none absolute inset-0"
-        />
       </div>
     </div>
 

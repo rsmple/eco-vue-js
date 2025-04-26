@@ -66,6 +66,9 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
   })
 
   const resetSelection = (): void => {
+    hoverValue.value = null
+    preselectValue.value = null
+
     router.replace({query: route.query, hash: '#'})
   }
 
@@ -146,7 +149,7 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
   }
 
   const hoverSelected = (position: number) => {
-    if (unmounted.value || disabled.value) return
+    if (unmounted.value || disabled.value || (!preselectValue.value && !selection.value.range)) return
 
     hoverValue.value = position
   }
@@ -177,6 +180,9 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
       if (range) {
         updateSelection({range})
 
+        hoverValue.value = null
+        preselectValue.value = null
+
         return
       }
     }
@@ -194,6 +200,9 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
 
     if (selection.value.id__in) {
       if (index === -1) preselectValue.value = position
+      else if (preselectValue.value === position) preselectValue.value = null
+    } else if (selection.value.id__not_in) {
+      if (index !== -1) preselectValue.value = position
       else if (preselectValue.value === position) preselectValue.value = null
     }
   }

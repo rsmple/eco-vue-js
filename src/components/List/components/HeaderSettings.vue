@@ -82,9 +82,8 @@
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
 import type {FieldConfig, ListField, ListFields} from '../types'
-import type {ListMode} from '@/utils/utils'
 
-import {markRaw, ref} from 'vue'
+import {markRaw, provide, ref} from 'vue'
 
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
@@ -93,6 +92,7 @@ import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import IconTableSettings from '@/assets/icons/sax/IconTableSettings.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
+import {BASE_ZINDEX_LIST_HEADER, type ListMode, wBaseZIndex} from '@/utils/utils'
 
 import HeaderFieldNested from './HeaderFieldNested.vue'
 import HeaderSettingsItem from './HeaderSettingsItem.vue'
@@ -115,6 +115,8 @@ const emit = defineEmits<{
   (e: 'update:mode', value: ListMode): void
   (e: 'click:reset'): void
 }>()
+
+provide(wBaseZIndex, BASE_ZINDEX_LIST_HEADER)
 
 const isOpen = ref(false)
 
