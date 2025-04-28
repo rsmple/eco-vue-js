@@ -7,8 +7,19 @@
     :has-flag="hasChanges"
     @toggle="$emit('toggle')"
   >
+    
+    <component
+      :is="item[0]"
+      v-if="Array.isArray(item)"
+      v-bind="item[1]"
+      :query-params="queryParams"
+      global
+      @update:query-params="$emit('update:query-params', $event)"
+    />
+
     <component
       :is="item"
+      v-else
       :query-params="queryParams"
       global
       @update:query-params="$emit('update:query-params', $event)"

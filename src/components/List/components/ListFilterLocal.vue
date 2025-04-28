@@ -27,7 +27,16 @@
         >
           <div class="sm-not:-px--inner-margin">
             <component
+              :is="item[0]"
+              v-if="Array.isArray(item)"
+              v-bind="item[1]"
+              :query-params="queryParams"
+              @update:query-params="$emit('update:query-params', $event)"
+            />
+
+            <component
               :is="item"
+              v-else
               :query-params="queryParams"
               @update:query-params="$emit('update:query-params', $event)"
             />

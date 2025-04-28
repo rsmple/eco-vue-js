@@ -179,4 +179,13 @@ export type FilterEmits<QueryParams, Field extends keyof QueryParams> = {
   (e: 'close'): void
 }
 
-export type FilterComponent<QueryParams> = Component<FilterProps<QueryParams>>
+export type FilterComponent<QueryParams> = Component<FilterProps<QueryParams>> | [
+  Component<FilterProps<QueryParams>>,
+  {[Key in string]?: Key extends keyof Pick<FilterProps<QueryParams>, 'queryParams'>
+      ? never
+      : Key extends keyof FilterProps<QueryParams>
+      ? FilterProps<QueryParams>[Key]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      : any
+  },
+]

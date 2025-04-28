@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="mb-4 grid grid-cols-2 gap-8">
+    <div class="mb-4 grid grid-cols-2 gap-5">
       <CalendarValue
         title="From:"
         :value="dateRange?.from"
@@ -21,7 +21,7 @@
       class="bg-default dark:bg-default-dark overflow-hidden rounded-xl border border-solid border-gray-300 py-3 dark:border-gray-700"
       :style="{'--direction-factor': isDirect ? '1' : '-1'}"
     >
-      <div class="grid grid-cols-2 gap-8 px-3 pb-4">
+      <div class="grid grid-cols-2 gap-5 px-3 pb-4">
         <CalendarToggle
           :text="monthShortFormatter.format(currentDate).toLocaleUpperCase()"
           @click:previous="setCurrentDate(addMonth(currentDate, -1))"
