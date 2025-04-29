@@ -95,6 +95,7 @@ export interface SelectAsyncPrefixProps<Model extends number | string, Data exte
   createdData?: Data[]
   valueGetter: (value: Data) => Model
   valueQueryKey: string
+  readonly: boolean | undefined
 }
 
 export interface SelectAsyncPrefixPageProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
@@ -107,6 +108,7 @@ export interface SelectAsyncPrefixPageProps<Model extends number | string, Data 
   previewData?: Data[]
   createdData?: Data[]
   valueGetter: (value: Data) => Model
+  readonly: boolean | undefined
 }
 
 export interface SelectAsyncSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean>

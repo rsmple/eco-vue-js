@@ -62,7 +62,7 @@ import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {getItemProp} from '../models/utils'
 
 defineProps<{
-  filter: FilterComponent<QueryParams>[] | undefined
+  filter: FilterComponent<QueryParams>[]
   exclude: number[]
   queryParams: QueryParams
 }>()

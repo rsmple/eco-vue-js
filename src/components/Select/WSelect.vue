@@ -50,6 +50,10 @@
           :readonly="readonly"
           :disable-clear="disableClear || readonly || (seamless && !focused)"
           :search="value"
+          :class="{
+            'cursor-pointer': !disabled && !readonly,
+            'cursor-not-allowed opacity-50': disabled,
+          }"
           @unselect="unselect(value)"
         >
           <template

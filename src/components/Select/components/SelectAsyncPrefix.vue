@@ -11,17 +11,17 @@
       :preview-data="previewData"
       :created-data="createdData"
       :value-getter="valueGetter"
+      :readonly="readonly"
       @unselect="$emit('unselect', $event)"
       @update:fetching="$emit('update:fetching', $event)"
     >
       <template
-        v-if="$slots.default"
-        #default="{option, skeleton, index}"
+        v-if="$slots.option"
+        #option="scope"
       >
         <slot
-          :option="option"
-          :index="index"
-          :skeleton="skeleton"
+          name="option"
+          v-bind="scope"
         />
       </template>
     </SelectAsyncPrefixPage>
@@ -73,7 +73,7 @@ watch(hasFetching, value => {
 }, {immediate: true})
 
 defineSlots<{
-  default?: (props: {option: Data, skeleton: boolean, index: number}) => void
+  option?: (props: {option: Data | undefined, index: number}) => void
 }>()
 
 onBeforeUnmount(() => {

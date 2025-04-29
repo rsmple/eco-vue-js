@@ -1,61 +1,40 @@
 <template>
-  <div
+  <SelectOptionPrefix
     v-for="(option, index) in options"
     :key="valueGetter(option)"
-    class="text-description relative flex items-center overflow-hidden"
+    :option="option"
+    :option-component="(optionComponent as SelectOptionComponent<Data>)"
+    :option-component-props="(optionComponentProps)"
+    :index="index"
+    :loading="loading"
+    :disabled="disabled"
+    :readonly="readonly"
+    :disable-clear="disableClear"
+    :search="undefined"
     :class="{
-      'cursor-pointer': !disabled,
-      'cursor-not-allowed': disabled,
+      'cursor-pointer': !disabled && !readonly,
+      'cursor-not-allowed opacity-50': disabled,
     }"
   >
-    <slot
-      :option="option"
-      :index="index"
-      :skeleton="false"
+    <template
+      v-if="$slots.option"
+      #option="scope"
     >
-      <template v-if="optionComponent">
-        <component
-          v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
-          :is="(optionComponent as SelectOptionComponent<Data>)"
-          :option="option"
-          :index="index"
-          :selected="true"
-          :model="true"
-          :skeleton="false"
-        >
-          <template
-            v-if="!disableClear && !disabled"
-            #default
-          >
-            <WButtonUnselect
-              :loading="loading"
-              :disabled="disabled"
-              class="w-option-button ml-1 mr-2"
-              @mousedown.stop.prevent=""
-              @click.stop.prevent="!loading && $emit('unselect', valueGetter(option))"
-            />
-          </template>
-        </component>
-      </template>
-    </slot>
-
-    <WButtonUnselect
-      v-if="!optionComponent && !disableClear"
-      :loading="loading"
-      :disabled="disabled"
-      class="ml-1 mr-2"
-      @mousedown.stop.prevent=""
-      @click.stop.prevent="!loading && $emit('unselect', valueGetter(option))"
-    />
-  </div>
+      <slot
+        name="option"
+        v-bind="scope"
+        :index="index"
+      />
+    </template>
+  </SelectOptionPrefix>
 </template>
 
 <script lang="ts" setup generic="Model extends string | number, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
-import type {SelectAsyncPrefixPageProps, SelectOptionComponent, SelectOptionComponentProps} from '../types'
+import type {SelectAsyncPrefixPageProps, SelectOptionComponent} from '../types'
 
 import {computed, onBeforeUnmount, toRef, watch} from 'vue'
 
-import WButtonUnselect from '@/components/Button/WButtonUnselect.vue'
+import SelectOptionPrefix from './SelectOptionPrefix.vue'
 
 const props = defineProps<SelectAsyncPrefixPageProps<Model, Data, QueryParams, OptionComponent>>()
 
@@ -102,6 +81,6 @@ onBeforeUnmount(() => {
 })
 
 defineSlots<{
-  default?: (props: {option: Data, skeleton: boolean, index: number}) => void
+  option?: (props: {option: Data | undefined, index: number}) => void
 }>()
 </script>

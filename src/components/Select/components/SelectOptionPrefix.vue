@@ -23,10 +23,6 @@
   <div
     v-else
     class="text-description group/model relative grid grid-cols-[1fr,auto] items-center"
-    :class="{
-      'cursor-pointer': !disabled && !readonly,
-      'cursor-not-allowed opacity-50': disabled,
-    }"
   >
     <slot
       name="option"
@@ -54,5 +50,9 @@ defineProps<SelectPrefixProps<Data, OptionComponent>>()
 
 defineEmits<{
   (e: 'unselect'): void
+}>()
+
+defineSlots<{
+  option: (props: {option: Data | undefined, search: string | undefined}) => void
 }>()
 </script>

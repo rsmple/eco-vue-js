@@ -109,7 +109,7 @@ const selected = ref<number[]>(shown.value.slice())
 const allShown = computed(() => [...selected.value, ...shown.value].filter((item, index, array) => array.indexOf(item) === index))
 
 const excluded = computed<number[]>(() => {
-  const hidden = props.filter?.filter(item => !filterList.value.includes(item)).map(item => props.filter?.indexOf(item) ?? -1) ?? []
+  const hidden = props.filter?.filter(item => !filterList.value.includes(item)).map(item => filterAll.value.indexOf(item) ?? -1) ?? []
 
   return [...allShown.value, ...hidden]
 })

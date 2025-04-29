@@ -50,21 +50,22 @@
         :created-data="createdData"
         :value-getter="valueGetter"
         :value-query-key="valueQueryKey"
+        :readonly="readonly"
         @unselect="unselect"
         @update:fetching="!$event && updateDropdown(); isFetchingPrefix = $event"
         @update:model-value="updateSelected"
       >
         <template
           v-if="$slots.option"
-          #default="{option, skeleton: skeletonPrefix, index}"
+          #option="{option, index}"
         >
           <slot
             name="option"
-            :option="option"
+            :option="option ?? null"
             :index="index"
             :selected="true"
             :model="true"
-            :skeleton="skeletonPrefix"
+            :skeleton="false"
           />
         </template>
       </SelectAsyncPrefix>
