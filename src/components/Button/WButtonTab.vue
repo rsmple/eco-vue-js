@@ -89,7 +89,7 @@
           v-if="statusIcon"
           :has-value="hasValue"
           :has-error="hasError"
-          class="sm-not:-mr--inner-margin ml-auto mr-4"
+          class="sm-not:-mr--inner-margin square-4 ml-auto mr-4"
         />
 
         <slot
@@ -106,7 +106,7 @@
       >
         <div
           v-if="hasChanges"
-          class="square-2 absolute right-0 top-0 rounded-full transition-colors duration-500"
+          class="square-2 absolute right-1 top-1 rounded-full transition-colors duration-500"
           :class="{
             'bg-info dark:bg-info-dark': !hasError,
             'bg-negative dark:bg-negative-dark': hasError,

@@ -9,7 +9,7 @@
   />
   <IconSlash
     v-else
-    class="text-description"
+    class="text-description opacity-50"
   />
 </template>
 
