@@ -1,34 +1,30 @@
 <template>
   <div>
     <WDropdownMenu
-      :is-open="isDropdownOpen && !hasActiveCached"
+      :is-open="isDropdownOpen && !hasActive"
       :max-width="320"
       :max-height="320"
       :horizontal-align="HorizontalAlign.RIGHT_OUTER"
     >
       <template #toggle>
         <WNavItem
-          v-bind="isMobile || hasActiveCached || even ? undefined : {
+          v-bind="isMobile || hasActive || even ? undefined : {
             onmouseenter: showDropdown,
             onmouseleave: hideDropdown,
           }"
+          ref="component"
           :to="to ?? slotsDefault?.[0]?.props?.to"
           :title="title"
           :icon="icon"
           :skeleton="skeleton"
           :count="count"
           :counter="counter"
-          :has-active="hasActiveCached"
+          :has-active="hasActive"
           :indent="indent"
           :even="even"
           :expand="!to"
           :query-fields="queryFields"
-          :hovered="isDropdownOpen && !hasActiveCached"
-          @update:is-active="
-            isOpen = $event[1];
-            $event[1] && $emit('update:isActive', [title, $event[1]]);
-            $event[1] && hideDropdown();
-          "
+          :hovered="isDropdownOpen && !hasActive"
         >
           <template #icon>
             <slot name="icon" />
@@ -38,7 +34,7 @@
             <IconArrow
               class="square-3 transition-transform"
               :class="{
-                '-rotate-90': !hasActiveCached && !even,
+                '-rotate-90': !hasActive && !even,
               }"
             />
           </template>
@@ -72,19 +68,16 @@
       </template>
     </WDropdownMenu>
 
-    <WExpansion :is-shown="hasActiveCached || even">
+    <WExpansion :is-shown="hasActive || even">
       <WNavItemTransition>
-        <template
+        <component
+          :is="slot"
           v-for="(slot, index) in slotsDefault"
           :key="index"
-        >
-          <component
-            :is="slot"
-            :even="even"
-            :indent="!even"
-            @update:is-active="isActiveChildrenMap[$event[0]] = $event[1]; $event[1] && hideDropdown()"
-          />
-        </template>
+          ref="inner"
+          :even="even"
+          :indent="!even"
+        />
       </WNavItemTransition>
     </WExpansion>
   </div>
@@ -93,7 +86,7 @@
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
 
-import {type VNode, computed, onBeforeUnmount, reactive, ref, useSlots, watch} from 'vue'
+import {type VNode, computed, nextTick, onBeforeUnmount, ref, useSlots, useTemplateRef, watch} from 'vue'
 
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import WExpansion from '@/components/Expansion/WExpansion.vue'
@@ -102,7 +95,7 @@ import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {useIsMobile} from '@/utils/mobile'
-import {debounce, unwrapSlots} from '@/utils/utils'
+import {unwrapSlots} from '@/utils/utils'
 
 import WNavItem from './WNavItem.vue'
 import WNavItemTransition from './WNavItemTransition.vue'
@@ -118,30 +111,28 @@ interface Props extends Partial<LinkProps> {
   even?: boolean
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
+
 const slots = useSlots()
 
 const {isMobile} = useIsMobile()
 
 const slotsDefault = computed(() => unwrapSlots(slots.default?.() ?? []))
 
-const emit = defineEmits<{
-  (e: 'update:isActive', value: [string, boolean]): void
-}>()
+const componentRef = useTemplateRef<typeof WNavItem>('component')
+const innerRef = useTemplateRef<(typeof WNavItem)[] | undefined>('inner')
 
-const isOpen = ref(false)
-const hasActiveCached = ref(false)
 const isDropdownOpen = ref(false)
+const hasActive = ref(false)
 
-const isActiveChildrenMap = reactive<Record<string, boolean>>({})
-const hasActive = computed<boolean>(() => isOpen.value || Object.values(isActiveChildrenMap).includes(true))
+const isActive = computed(() => componentRef.value?.isActive ?? false)
+const hasInnerActive = computed(() => innerRef.value?.some(item => item.isActive) ?? false)
 
-const updateHasActiveCache = debounce((value) => {
-  hasActiveCached.value = value
-  isDropdownOpen.value = false
+const updateHasActive = async () => {
+  await nextTick()
 
-  emit('update:isActive', [props.title, value])
-}, 10)
+  hasActive.value = componentRef.value?.isActive || (innerRef.value?.some(item => item.isActive) ?? false)
+}
 
 const showDropdown = () => {
   isDropdownOpen.value = true
@@ -151,15 +142,24 @@ const hideDropdown = () => {
   isDropdownOpen.value = false
 }
 
-watch(hasActive, updateHasActiveCache, {immediate: true})
+watch(hasInnerActive, updateHasActive, {immediate: true})
+watch(isActive, updateHasActive, {immediate: true})
+watch(slotsDefault, updateHasActive, {immediate: true})
+
+watch(hasActive, () => {
+  isDropdownOpen.value = false
+}, {immediate: true})
 
 onBeforeUnmount(() => {
   isDropdownOpen.value = false
-  emit('update:isActive', [props.title, false])
 })
 
 defineSlots<{
   default?: () => VNode[]
   icon?: () => VNode[]
 }>()
+
+defineExpose({
+  isActive: hasActive,
+})
 </script>

@@ -91,7 +91,7 @@
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
 
-import {computed, onBeforeUnmount, watch} from 'vue'
+import {computed} from 'vue'
 import {RouterLink, useRoute, useRouter} from 'vue-router'
 
 import WCounter from '@/components/Counter/WCounter.vue'
@@ -117,10 +117,6 @@ interface Props extends LinkProps {
 
 const props = defineProps<Props>()
 
-const emit = defineEmits<{
-  (e: 'update:isActive', value: [string, boolean]): void
-}>()
-
 const route = useRoute()
 const router = useRouter()
 
@@ -136,9 +132,7 @@ const isActive = computed<boolean>(() => {
 
 const isTextColor = computed(() => props.hasActive ? !props.indent : isActive.value)
 
-watch(isActive, value => emit('update:isActive', [titleLocal.value, value]), {immediate: true})
-
-onBeforeUnmount(() => {
-  emit('update:isActive', [titleLocal.value, false])
+defineExpose({
+  isActive,
 })
 </script>
