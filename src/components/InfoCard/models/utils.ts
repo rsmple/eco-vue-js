@@ -5,7 +5,7 @@ export const infoCardSemanticTypeMap: Record<SemanticType, string> = {
   [SemanticType.SECONDARY]: 'bg-gray-100 dark:bg-gray-800',
   [SemanticType.POSITIVE]: 'bg-positive/10 dark:bg-positive-dark/10',
   [SemanticType.NEGARIVE]: 'bg-negative/10 dark:bg-negative-dark/10',
-  [SemanticType.WARNING]: 'bg-warning/10 dark:bg-warning-dark/10',
+  [SemanticType.WARNING]: 'bg-warning/20 dark:bg-warning-dark/10',
   [SemanticType.INFO]: 'bg-info/10 dark:bg-info-dark/10',
 }
 

@@ -11,14 +11,15 @@
       <component
         :is="icon ?? IconNegativeInfo"
         v-if="!noIcon"
-        class="square-6 sm-not:-mx-1 inline-block"
+        class="square-[1.5em] inline-block"
         :class="{
           [infoCardIconSemanticTypeMap[semanticType ?? SemanticType.SECONDARY]]: true,
-          'rotate-180': !icon,
+          'rotate-180': !icon && semanticType !== SemanticType.WARNING && semanticType !== SemanticType.NEGARIVE,
+          '[&_*]:stroke-2': !icon,
         }"
       />
 
-      <div class="text-pretty py-1 leading-relaxed">
+      <div class="text-pretty leading-relaxed">
         <slot />
       </div>
     </div>
