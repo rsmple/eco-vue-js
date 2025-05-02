@@ -106,7 +106,7 @@
       >
         <div
           v-if="hasChanges"
-          class="square-2 absolute right-1 top-1 rounded-full transition-colors duration-500"
+          class="square-2 absolute right-1 top-1 rounded-full transition-colors duration-200"
           :class="{
             'bg-info dark:bg-info-dark': !hasError,
             'bg-negative dark:bg-negative-dark': hasError,
