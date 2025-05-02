@@ -23,8 +23,8 @@
           class="relative"
           :class="{
             'w-hover-circle': !disabled,
-            'text-description': !isOpen,
-            'text-primary dark:text-primary-dark': isOpen,
+            'text-description': !isOpen || anchor,
+            'text-primary dark:text-primary-dark': isOpen && !anchor,
           }"
         >
           <component
