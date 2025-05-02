@@ -108,7 +108,7 @@
           }"
         >
           <div class="w-option flex cursor-default select-none items-center">
-            {{ !search && emptyStub ? emptyStub : 'No match' }}
+            {{ !search && emptyStub ? emptyStub : search ? 'No match' : 'Nothing to show' }}
           </div>
         </div>
       </template>

@@ -1,4 +1,4 @@
-import {type Reactive, reactive, watch} from 'vue'
+import {type Reactive, type Ref, reactive, watch} from 'vue'
 import {useRouter} from 'vue-router'
 
 import type WForm from '@/components/Form/WForm.vue'
@@ -112,16 +112,28 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
     }
   }
 
-  const fn = (route: {query: EncodeQueryParams<Partial<QueryParams>>}) => {
-    const router = useRouter()
+  const queryParams = reactive<Partial<QueryParams>>({})
+  let lastQuery: EncodeQueryParams<Partial<QueryParams>> | null = null
 
-    const queryParams = reactive<Partial<QueryParams>>({})
+  const fn = (route: {query: EncodeQueryParams<Partial<QueryParams>>}, enabled?: Ref<boolean>) => {
+    const router = useRouter()
 
     const updateQueryParams = (value: Partial<QueryParams>) => {
       router.replace({query: {...route.query as Record<string, string>, ...encodeRouteParams(value)}})
     }
 
-    watch(() => route.query, value => parse(queryParams, value), {immediate: true})
+    const handle = watch(() => route.query, value => {
+      if (lastQuery === value) return
+      parse(queryParams, value)
+      lastQuery = value
+    }, {immediate: enabled ? enabled.value : true})
+
+    if (enabled) {
+      watch(enabled, value => {
+        if (value) handle.resume()
+        else handle.pause()
+      }, {immediate: true})
+    }
   
     return {
       queryParams,

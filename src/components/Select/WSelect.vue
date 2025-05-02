@@ -129,7 +129,7 @@
         class="w-select-option first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
       >
         <div class="w-option flex cursor-default select-none items-center">
-          {{ !search && emptyStub ? emptyStub : 'No match' }}
+          {{ !search && emptyStub ? emptyStub : search ? 'No match' : 'Nothing to show' }}
         </div>
       </div>
 

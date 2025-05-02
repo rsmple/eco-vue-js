@@ -1,11 +1,12 @@
 <template>
   <RouterLink
     :to="to"
-    class="w-ripple w-ripple-hover relative block no-underline"
+    class="w-ripple-trigger relative block py-1 no-underline"
     :class="{
       'text-primary dark:text-primary-dark': isTextColor,
       'text-accent': !isTextColor,
-      'pl-2': indent
+      'px-1': even,
+      'xl-not:pr-1 pl-2': !even,
     }"
   >
     <Transition
@@ -35,7 +36,14 @@
     </Transition>
 
     <div class="[overflow:inherit]">
-      <div class="grid grid-cols-[1.5rem,1fr,auto] items-center px-4">
+      <div
+        class="w-ripple w-ripple-hover relative grid grid-cols-[1.5rem,1fr,auto] items-center rounded-lg pr-2"
+        :class="{
+          'before:opacity-10': hovered,
+          'pl-4': indent,
+          'pl-2': !indent,
+        }"
+      >
         <div class="flex items-center">
           <template v-if="icon ?? routeTo.meta.icon">
             <component
@@ -53,7 +61,7 @@
         <div class="last-not:pr-1 whitespace-nowrap font-normal">
           <span class="relative">
             <span class="tracking-wide">
-              <span class="leading-[2.625]">
+              <span class="leading-loose">
                 {{ titleLocal }}
               </span>&nbsp;<span v-if="!skeleton">
                 {{ typeof count === 'number' ? `(${numberCompactFormatter.format(count)})` : '' }}
@@ -103,6 +111,8 @@ interface Props extends LinkProps {
   expand?: boolean
   indent?: boolean
   queryFields?: string[]
+  hovered?: boolean
+  even?: boolean
 }
 
 const props = defineProps<Props>()
