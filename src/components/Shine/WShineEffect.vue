@@ -1,8 +1,9 @@
 <template>
   <svg
+    v-if="!isMobile"
     width="100%"
     height="100%"
-    class="pointer-events-none absolute top-0 -translate-x-full"
+    class="pointer-events-none fixed top-0"
   >
     <defs>
       <linearGradient
@@ -66,7 +67,11 @@
 </template>
 
 <script setup lang="ts">
+import {useIsMobile} from '@/utils/mobile'
+
 import {useShine} from './use/useShine'
 
 const {id} = useShine()
+
+const {isMobile} = useIsMobile()
 </script>

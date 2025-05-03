@@ -20,9 +20,10 @@
         v-bind="{
           ...props,
           ...$attrs,
-          title: toggleScope?.unclickable ? mobileTitle ?? title : title,
+          title: toggleScope?.unclickable === false ? mobileTitle ?? title : title,
           unclickable: toggleScope?.unclickable,
           description: toggleScope?.unclickable === false ? undefined : description,
+          seamless: toggleScope?.unclickable === false ? false : props.seamless,
         }"
         :class="{
           'cursor-pointer': !disabled && !readonly,

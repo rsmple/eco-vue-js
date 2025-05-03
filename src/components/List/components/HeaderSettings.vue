@@ -83,7 +83,7 @@
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
 import type {FieldConfig, ListField, ListFields} from '../types'
 
-import {markRaw, provide, ref} from 'vue'
+import {inject, markRaw, provide, ref} from 'vue'
 
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
@@ -116,7 +116,9 @@ const emit = defineEmits<{
   (e: 'click:reset'): void
 }>()
 
-provide(wBaseZIndex, BASE_ZINDEX_LIST_HEADER)
+const baseZIndex = inject(wBaseZIndex, null)
+
+provide(wBaseZIndex, baseZIndex ?? BASE_ZINDEX_LIST_HEADER)
 
 const isOpen = ref(false)
 

@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="!isMobile"
     ref="element"
     class="rounded-inherit pointer-events-none absolute inset-0 overflow-hidden"
   >
@@ -17,9 +18,12 @@
 <script setup lang="ts">
 import {useTemplateRef} from 'vue'
 
+import {useIsMobile} from '@/utils/mobile'
+
 import {useShine} from './use/useShine'
 
 const {id} = useShine()
+const {isMobile} = useIsMobile()
 
 const elementRef = useTemplateRef('element')
 </script>

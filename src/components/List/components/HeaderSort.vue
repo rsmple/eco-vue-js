@@ -37,9 +37,8 @@
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
 import type {FieldConfig, ListField, ListFields} from '../types'
 import type {OrderItem} from '@/utils/order'
-import type {ListMode} from '@/utils/utils'
 
-import {computed, markRaw, ref} from 'vue'
+import {computed, inject, markRaw, provide, ref} from 'vue'
 
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
@@ -48,6 +47,7 @@ import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import IconSort from '@/assets/icons/default/IconSort.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
+import {BASE_ZINDEX_LIST_HEADER, type ListMode, wBaseZIndex} from '@/utils/utils'
 
 import HeaderSortItem from './HeaderSortItem.vue'
 
@@ -66,6 +66,10 @@ defineEmits<{
   (e: 'click:reset'): void
   (e: 'update:ordering', value: OrderItem<keyof Data>[]): void
 }>()
+
+const baseZIndex = inject(wBaseZIndex, null)
+
+provide(wBaseZIndex, baseZIndex ?? BASE_ZINDEX_LIST_HEADER)
 
 const isOpen = ref(false)
 

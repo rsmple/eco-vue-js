@@ -404,12 +404,8 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
         top: '0',
         width: '100%',
         height: '100%',
-        'background-image': 'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.5), rgba(255,255,255,0))',
+        'background-image': 'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255, var(--w-skeleton-opacity)), rgba(255,255,255,0))',
         animation: theme('animation.ticker'),
-
-        [config('darkMode')[1][0]]: {
-          'background-image': 'linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.01),rgba(255,255,255,0))',
-        },
       },
     },
     '.w-skeleton-static': {
@@ -466,6 +462,15 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
     },
     {
       values: theme('borderRadius'),
+    },
+  )
+
+  matchUtilities(
+    {
+      'w-skeleton-opacity': value => ({'--w-skeleton-opacity': value}),
+    },
+    {
+      values: theme('opacity'),
     },
   )
 

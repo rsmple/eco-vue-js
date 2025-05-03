@@ -43,7 +43,7 @@
           v-if="filterField && encodedQueryParam"
           :filter-field="filterField"
           :encoded-query-param="encodedQueryParam"
-          class="absolute -top-0.5 ml-1"
+          class="absolute top-0.5 ml-2"
         />
       </template>
 

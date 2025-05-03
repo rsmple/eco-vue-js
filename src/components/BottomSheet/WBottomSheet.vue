@@ -17,10 +17,12 @@
           <div class="h-1 w-12 rounded-sm bg-gray-300" />
         </div>
 
-        <slot
-          name="toggle"
-          :unclickable="false"
-        />
+        <div>
+          <slot
+            name="toggle"
+            :unclickable="false"
+          />
+        </div>
       </div>
 
       <div class="overflow-y-auto overflow-x-hidden overscroll-contain">
