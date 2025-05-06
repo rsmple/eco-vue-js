@@ -24,6 +24,7 @@ const newValues = {
   '--modal-footer-height': 'var(--w-modal-footer-height, 0px)',
   '--modal-content-height': 'var(--w-modal-content-height, 0px)',
   '--button-height': 'var(--w-button-height, 2.75rem)',
+  '--scroll-bar-width': 'var(--scroll-bar-width)',
 
   fr: '1fr',
 }

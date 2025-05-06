@@ -19,7 +19,7 @@
   >
     <div
       ref="header"
-      class="bg-default dark:bg-default-dark sm-not:w-screen sticky left-0 top-0 z-[1] w-[--w-modal-wrapper-width,35rem]"
+      class="bg-default dark:bg-default-dark sm-not:w-screen sticky left-0 top-0 z-[1] w-full"
     >
       <div class="text-accent -p--w-modal-wrapper-padding flex items-center justify-center text-balance text-center text-xl font-semibold">
         <slot name="title" />
@@ -34,7 +34,10 @@
 
     <div
       ref="footer"
-      class="bg-default dark:bg-default-dark -gap--inner-margin -p--w-modal-wrapper-padding sm-not:w-screen sticky bottom-0 left-0 flex w-[--w-modal-wrapper-width,35rem] justify-center"
+      class="
+        bg-default dark:bg-default-dark -gap--inner-margin -p--w-modal-wrapper-padding
+        sm-not:w-screen sticky bottom-0 left-0 flex w-full justify-center
+      "
       :class="{
         'sm-not:flex-col': !maximized,
       }"
