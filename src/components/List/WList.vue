@@ -246,7 +246,8 @@
               :key="menuIndex"
             >
               <component
-                :is="menuItem"
+                :is="Array.isArray(menuItem) ? menuItem[0] : menuItem"
+                v-bind="Array.isArray(menuItem) ? menuItem[1] : undefined"
                 :item="item"
                 :readonly="readonly || (readonlyGetter?.(item) ?? false)"
                 :update-item="setter"

@@ -22,6 +22,7 @@
         :class="{
           'flex flex-wrap items-center gap-x-4': wrap,
           'flex items-center gap-x-4 [&>*]:flex-1': stretch,
+          'col-span-full grid grid-cols-subgrid': subgrid,
         }"
       >
         <WCheckbox

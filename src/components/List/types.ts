@@ -108,7 +108,14 @@ export type MenuEmits<Data> = {
   (e: 'delete:item'): void
 }
 
-export type MenuComponent<Data> = Component<MenuProps<Data>>
+export type MenuComponent<Data> = Component<MenuProps<Data>> | [
+  Component<MenuProps<Data>>,
+  {[Key in string]?: Key extends MenuProps<Data>
+      ? never
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      : any
+  },
+]
 
 export type BulkProps<QueryParams> = {
   queryParamsGetter: () => QueryParams
