@@ -6,7 +6,8 @@
     :query-params="queryParams"
     :search="search === true"
     :disabled-filter-fields="disabledFilterFields ?? []"
-    v-bind="global ? undefined : {title}"
+    :title="title"
+    :readonly="readonly ?? false"
     @update:query-params="$emit('update:query-params', $event)"
   />
 </template>
@@ -27,6 +28,7 @@ defineProps<{
   search?: boolean
   global?: boolean
   title?: (count: number) => string
+  readonly?: boolean
 }>()
 
 defineEmits<{

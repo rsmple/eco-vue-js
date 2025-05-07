@@ -23,7 +23,9 @@
           :icon="getItemProp(queryParams, item, 'icon')"
           :init="index === 0 && !(queryParams as Record<string, string>).search"
           :has-value="shown.includes(filterAll.indexOf(item))"
-          @close="clearFilterItem(item)"
+          v-bind="!readonly ? {
+            onClose: () => clearFilterItem(item)
+          } : undefined"
         >
           <div class="sm-not:-px--inner-margin">
             <component
@@ -31,6 +33,7 @@
               v-if="Array.isArray(item)"
               v-bind="item[1]"
               :query-params="queryParams"
+              :readonly="readonly"
               @update:query-params="$emit('update:query-params', $event)"
             />
 
@@ -38,13 +41,14 @@
               :is="item"
               v-else
               :query-params="queryParams"
+              :readonly="readonly"
               @update:query-params="$emit('update:query-params', $event)"
             />
           </div>
         </WTabsItem>
 
         <ListFilterSelect
-          v-if="allShown.length < filterList.length"
+          v-if="!readonly && allShown.length < filterList.length"
           :filter="filterAll"
           :exclude="excluded"
           :query-params="queryParams"
@@ -77,7 +81,8 @@ const props = defineProps<{
   search: boolean
   queryParams: QueryParams
   disabledFilterFields: Array<keyof QueryParams>
-  title?: (count: number) => string
+  title: ((count: number) => string) | undefined
+  readonly: boolean
 }>()
 
 const emit = defineEmits<{

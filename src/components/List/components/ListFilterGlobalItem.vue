@@ -13,6 +13,7 @@
       v-if="Array.isArray(item)"
       v-bind="item[1]"
       :query-params="queryParams"
+      :readonly="readonly"
       global
       @update:query-params="$emit('update:query-params', $event)"
     />
@@ -21,6 +22,7 @@
       :is="item"
       v-else
       :query-params="queryParams"
+      :readonly="readonly"
       global
       @update:query-params="$emit('update:query-params', $event)"
     />
@@ -41,6 +43,7 @@ const props = defineProps<{
   queryParams: QueryParams
   isOpen: boolean
   disabledFilterFields: Array<keyof QueryParams>
+  readonly: boolean
 }>()
 
 defineEmits<{

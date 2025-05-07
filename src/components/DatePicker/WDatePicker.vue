@@ -50,6 +50,7 @@
             :min-date="minDate"
             :max-date="maxDate"
             :today="today && isSameMonth(today, currentDate) ? today : undefined"
+            :readonly="readonly"
             class="px-3"
             @click:day="onClickDay"
             @hover:day="setRange"
@@ -75,6 +76,7 @@ const props = defineProps<{
   modelValue: DateRange | undefined
   minDate?: Date
   maxDate?: Date
+  readonly?: boolean
 }>()
 
 const emit = defineEmits<{

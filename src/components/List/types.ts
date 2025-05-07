@@ -179,6 +179,7 @@ export type FilterProps<QueryParams> = {
   icon?: SVGComponent
   hidden?: boolean
   global?: boolean
+  readonly?: boolean
 }
 
 export type FilterEmits<QueryParams, Field extends keyof QueryParams> = {

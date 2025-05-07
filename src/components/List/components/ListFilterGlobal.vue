@@ -27,6 +27,7 @@
       :query-params="queryParams"
       :is-open="open === index"
       :disabled-filter-fields="disabledFilterFields"
+      :readonly="readonly"
       class="-px--inner-margin"
       @toggle="open = open === index ? null : index"
       @update:query-params="$emit('update:query-params', $event)"
@@ -72,6 +73,8 @@ defineProps<{
   search: boolean
   queryParams: QueryParams
   disabledFilterFields: Array<keyof QueryParams>
+  title: ((count: number) => string) | undefined
+  readonly: boolean
 }>()
 
 const emit = defineEmits<{

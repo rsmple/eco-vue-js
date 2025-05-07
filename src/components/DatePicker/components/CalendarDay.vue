@@ -6,11 +6,11 @@
       'text-description': !isSelected && isOutOfMonth,
       'text-default dark:text-default-dark selected': isSelected,
       'cursor-not-allowed': isDisabled,
-      'cursor-pointer': !isDisabled,
+      'cursor-pointer': !isDisabled && !readonly,
       'hover-enabled': isHoverEnabled,
     }"
-    @click="!isDisabled && $emit('click:day', startOfDay)"
-    @mouseenter="!isDisabled && isHoverEnabled && $emit('hover:day', startOfDay)"
+    @click="!isDisabled && !readonly && $emit('click:day', startOfDay)"
+    @mouseenter="!isDisabled && !readonly && isHoverEnabled && $emit('hover:day', startOfDay)"
   >
     <div
       v-show="isBetweenRange || (isFrom || isTo && !(isFrom && isTo)) || isDisabled"
@@ -28,7 +28,7 @@
     <div
       class="square-9 relative flex items-center justify-center rounded-full"
       :class="{
-        'w-ripple w-ripple-hover': !isDisabled,
+        'w-ripple w-ripple-hover': !isDisabled && !readonly,
         'opacity-50': isDisabled,
         'bg-primary dark:bg-primary-dark text-default font-semibold': isSelected,
         'bg-negative dark:bg-negative-dark text-default font-semibold': !isSelected && isToday,
@@ -56,6 +56,7 @@ const props = defineProps<{
   isWeekOutOfMonth: boolean
   isHoverEnabled: boolean
   disabled?: boolean
+  readonly?: boolean
   minDate?: Date
   maxDate?: Date
   isToday: boolean

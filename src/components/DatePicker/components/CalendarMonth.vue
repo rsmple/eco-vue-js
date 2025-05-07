@@ -23,6 +23,7 @@
       :min-date="minDate"
       :max-date="maxDate"
       :disabled="isDisabled"
+      :readonly="readonly"
       :today="today && toWeek && isSameDate(toWeek, week) ? today : undefined"
       @click:day="$emit('click:day', $event)"
       @hover:day="$emit('hover:day', $event)"
@@ -48,6 +49,7 @@ const props = defineProps<{
   minDate?: Date
   maxDate?: Date
   disabled?: boolean
+  readonly?: boolean
   today: Date | undefined
 }>()
 
