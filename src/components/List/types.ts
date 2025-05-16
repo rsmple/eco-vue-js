@@ -41,44 +41,32 @@ export type ListFieldNested<Data, QueryParams = unknown> = {
   fields: ListFields<Data, QueryParams>
 }
 
-type FieldNestedEntity<Data, QueryParams = unknown, Key extends keyof PickByType<Data, NonNullable<unknown>> = keyof PickByType<Data, NonNullable<unknown>>> = {
+export type ListFieldNestedEntity<Data, QueryParams = unknown, Key extends keyof PickByType<Data, NonNullable<unknown>> = keyof PickByType<Data, NonNullable<unknown>>> = {
   keyEntity: Key
-  fields: ListFields<Data[Key], QueryParams>
-}
-
-export interface ListFieldNestedEntity<Data, QueryParams = unknown> extends FieldNestedEntity<Data, QueryParams> {
+  fields: Data[Key] extends NonNullable<infer Inner> ? ListFields<Inner, QueryParams> : []
   cssClass?: string
 }
 
-type FieldNestedEntityGetter<Data, QueryParams = unknown, Inner = unknown> = {
+export type ListFieldNestedEntityGetter<Data, QueryParams = unknown, Inner = unknown> = {
   getterEntity: (data: Data) => Inner
   fields: ListFields<Inner, QueryParams>
   componentItem?: Raw<FieldComponentItem<Inner>>
-}
-
-export interface ListFieldNestedEntityGetter<Data, QueryParams = unknown, Inner = unknown> extends FieldNestedEntityGetter<Data, QueryParams, Inner> {
   cssClass?: string
 }
 
-type FieldNestedArray<Data, QueryParams = unknown, Key extends keyof PickByType<Data, Array<unknown>> = keyof PickByType<Data, Array<unknown>>> = {
+export type ListFieldNestedArray<Data, QueryParams = unknown, Key extends keyof PickByType<Data, Array<unknown>> = keyof PickByType<Data, Array<unknown>>> = {
   keyArray: Key
   fields: Data[Key] extends Array<infer Inner> ? ListFields<Inner, QueryParams> : []
   componentItem?: Data[Key] extends Array<infer Inner> ? Raw<FieldComponentItem<Inner>> : never
-}
-
-export interface ListFieldNestedArray<Data, QueryParams = unknown> extends FieldNestedArray<Data, QueryParams> {
   cssClass?: string
   cssClassArray?: string
   componentArray?: Raw<FieldComponentNested<Data>>
 }
 
-type FieldNestedArrayGetter<Data, QueryParams = unknown, Inner = unknown> = {
+export type ListFieldNestedArrayGetter<Data, QueryParams = unknown, Inner = unknown> = {
   getterArray: (data: Data) => Inner[]
   fields: ListFields<Inner, QueryParams>
   componentItem?: Raw<FieldComponentItem<Inner>>
-}
-
-export interface ListFieldNestedArrayGetter<Data, QueryParams = unknown, Inner = unknown> extends FieldNestedArrayGetter<Data, QueryParams, Inner> {
   cssClass?: string
   cssClassArray?: string
   componentArray?: Raw<FieldComponentNested<Data>>

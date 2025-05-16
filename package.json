@@ -12,8 +12,7 @@
     "type-check": "vue-tsc --build --force",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "lint-inspect-config": "npx eslint --inspect-config",
-    "write-imports": "node write-imports.js"
+    "lint-inspect-config": "npx eslint --inspect-config"
   },
   "dependencies": {
     "@stylistic/eslint-plugin-ts": "4.2.0",
