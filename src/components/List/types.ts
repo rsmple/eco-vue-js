@@ -10,12 +10,6 @@ export type FieldProps<Data> = {
 
 export type FieldComponent<Data> = Component<FieldProps<Data>>
 
-export type FieldComponentNested<Data> = Component<{
-  item: Data
-  skeleton: boolean
-  card: boolean
-}>
-
 export type FieldComponentItem<Data> = Component<{
   item: Data
   skeleton: boolean
@@ -26,7 +20,6 @@ export type FieldComponentItem<Data> = Component<{
 }>
 
 export type ListField<Data, QueryParams = unknown> = {
-  component: Raw<FieldComponent<Data>>
   title: string | ((params: QueryParams) => string)
   label: string
   cssClass?: string
@@ -50,7 +43,6 @@ export type ListFieldNestedEntity<Data, QueryParams = unknown, Key extends keyof
 export type ListFieldNestedEntityGetter<Data, QueryParams = unknown, Inner = unknown> = {
   getterEntity: (data: Data) => Inner
   fields: ListFields<Inner, QueryParams>
-  componentItem?: Raw<FieldComponentItem<Inner>>
   cssClass?: string
 }
 
@@ -60,7 +52,6 @@ export type ListFieldNestedArray<Data, QueryParams = unknown, Key extends keyof 
   componentItem?: Data[Key] extends Array<infer Inner> ? Raw<FieldComponentItem<Inner>> : never
   cssClass?: string
   cssClassArray?: string
-  componentArray?: Raw<FieldComponentNested<Data>>
 }
 
 export type ListFieldNestedArrayGetter<Data, QueryParams = unknown, Inner = unknown> = {
@@ -69,19 +60,23 @@ export type ListFieldNestedArrayGetter<Data, QueryParams = unknown, Inner = unkn
   componentItem?: Raw<FieldComponentItem<Inner>>
   cssClass?: string
   cssClassArray?: string
-  componentArray?: Raw<FieldComponentNested<Data>>
+}
+
+export type ListFieldExport<Component, Meta> = {
+  default?: Component
+  meta: Meta
 }
 
 export type ListFields<Data, QueryParams = unknown> = (
-  | ListField<Data, QueryParams>
+  | ListFieldExport<FieldComponent<Data>, ListField<Data, QueryParams>>
 
-  | ListFieldNested<Data, QueryParams>
+  | ListFieldExport<FieldComponent<Data>, ListFieldNested<Data, QueryParams>>
 
-  | ListFieldNestedEntity<Data, QueryParams>
-  | ListFieldNestedEntityGetter<Data, QueryParams>
+  | ListFieldExport<FieldComponent<Data>, ListFieldNestedEntity<Data, QueryParams>>
+  | ListFieldExport<FieldComponent<Data>, ListFieldNestedEntityGetter<Data, QueryParams>>
 
-  | ListFieldNestedArray<Data, QueryParams>
-  | ListFieldNestedArrayGetter<Data, QueryParams>
+  | ListFieldExport<FieldComponent<Data>, ListFieldNestedArray<Data, QueryParams>>
+  | ListFieldExport<FieldComponent<Data>, ListFieldNestedArrayGetter<Data, QueryParams>>
 )[]
 
 export type MenuProps<Data> = {
@@ -128,9 +123,9 @@ export type FieldConfig = {
 }
 
 type GetFieldLabelsTuple<Fields> = Fields extends [infer Head, ...infer Tail]
-  ? Head extends {label: infer Label}
+  ? Head extends ListFieldExport<unknown, {label: infer Label}>
   ? [Label, ...GetFieldLabelsTuple<Tail>]
-  : Head extends {fields: infer InnerFields}
+  : Head extends ListFieldExport<unknown, {fields: infer InnerFields}>
   ? [...GetFieldLabelsTuple<InnerFields>, ...GetFieldLabelsTuple<Tail>]
   : GetFieldLabelsTuple<Tail>
   : []

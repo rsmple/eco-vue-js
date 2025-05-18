@@ -3,8 +3,18 @@
     v-for="(field, index) in fields"
     :key="getFirstFieldLabel(field)"
   >
-    <template v-if="'fields' in field">
-      <HeaderFieldNested :fields="(field.fields as ListFields<Data, QueryParams>)">
+    <slot
+      v-if="isField(field)"
+      :field="field"
+      :nested="false"
+      :index="index"
+      :length="fields.length"
+      :first="index === 0"
+      :last="index === fields.length - 1"
+    />
+
+    <template v-else>
+      <HeaderFieldNested :fields="(field.meta.fields as ListFields<Data, QueryParams>)">
         <template #default="defaultScope">
           <slot
             v-if="defaultScope.length !== 1"
@@ -28,22 +38,13 @@
         </template>
       </HeaderFieldNested>
     </template>
-
-    <slot
-      v-else
-      :field="field"
-      :nested="false"
-      :index="index"
-      :length="fields.length"
-      :first="index === 0"
-      :last="index === fields.length - 1"
-    />
   </template>
 </template>
 
 <script setup lang="ts" generic="Data, QueryParams">
-import type {ListField, ListFields} from '../types'
+import type {FieldComponent, ListField, ListFieldExport, ListFields} from '../types'
 
+import {isField} from '../models/utils'
 import {getFirstFieldLabel} from '../use/useListConfig'
 
 defineProps<{
@@ -52,7 +53,7 @@ defineProps<{
 
 defineSlots<{
   default: (props: {
-    field: ListField<Data, QueryParams>
+    field: ListFieldExport<FieldComponent<Data>, ListField<Data, QueryParams>>
     nested: boolean
     index: number
     length: number

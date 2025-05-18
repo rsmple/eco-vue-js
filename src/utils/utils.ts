@@ -1,6 +1,8 @@
 import type {FieldConfig, FieldConfigMap, GetFieldLabels, ListFields} from '@/components/List/types'
 import type {InjectionKey, VNode} from 'vue'
 
+import {isField} from '@/components/List/models/utils'
+
 const overflowScrollRegexp = /auto|scroll|overlay/
 
 const getStyleValue = (node: Element, prop: string) => getComputedStyle(node, null).getPropertyValue(prop)
@@ -219,8 +221,8 @@ export const getDefaultFieldConfigMap = <Fields extends ListFields<any, any>>(fi
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const processFields = <F extends ListFields<any, any>>(fieldList: F) => {
     fieldList.forEach(field => {
-      if ('fields' in field) processFields(field.fields)
-      else result[field.label] = {width: null, visible: visible.includes(field.label as typeof visible[number]), order}
+      if (isField(field)) result[field.meta.label] = {width: null, visible: visible.includes(field.meta.label as typeof visible[number]), order}
+      else processFields(field.meta.fields)
 
       order++
     })

@@ -144,15 +144,15 @@
             <HeaderFieldNested :fields="fieldsFiltered">
               <template #default="{field, nested}">
                 <WListHeaderItem
-                  :title="typeof field.title === 'string' ? field.title : field.title(queryParams)"
-                  :field="typeof field.field === 'string' ? field.field : (field.field?.(queryParams) as keyof Data)"
-                  :class="field.cssClass"
+                  :title="typeof field.meta.title === 'string' ? field.meta.title : field.meta.title(queryParams)"
+                  :field="typeof field.meta.field === 'string' ? field.meta.field : (field.meta.field?.(queryParams) as keyof Data)"
+                  :class="field.meta.cssClass"
                   :ordering="ordering"
-                  :disabled="noOrdering || !field.field"
-                  :allow-resize="field.allowResize"
-                  :item-class="field.cssClassHeader"
-                  :width-style="getFieldStyles(field.label, nested)"
-                  @update:width="fieldConfigMap[field.label].width = $event"
+                  :disabled="noOrdering || !field.meta.field"
+                  :allow-resize="field.meta.allowResize"
+                  :item-class="field.meta.cssClassHeader"
+                  :width-style="getFieldStyles(field.meta.label, nested)"
+                  @update:width="fieldConfigMap[field.meta.label].width = $event"
                   @save:width="save"
                   @update:ordering="updateOrdering"
                 />
@@ -199,21 +199,22 @@
               :item="item"
               :skeleton="skeleton"
               :card="isGrid"
+              :readonly="readonly || (readonlyGetter?.(item) ?? false)"
             >
               <template #default="defaultScope">
                 <component
-                  :is="defaultScope.field.component"
+                  :is="defaultScope.field.default"
                   :item="defaultScope.item"
                   :readonly="readonly || (readonlyGetter?.(defaultScope.item) ?? false)"
                   :skeleton="skeleton"
                   :card="isGrid"
                   :class="{
-                    [defaultScope.field.cssClass ?? '']: true,
+                    [defaultScope.field.meta.cssClass ?? '']: true,
                     'items-center': !alignTop,
                     'items-start': alignTop,
                     'pr-6': !isGrid,
                   }"
-                  :style="getFieldStyles(defaultScope.field.label, defaultScope.nested)"
+                  :style="getFieldStyles(defaultScope.field.meta.label, defaultScope.nested)"
                   @update:item="setter"
                   @delete:item="setter(); refetch()"
                   @validate="validate()"

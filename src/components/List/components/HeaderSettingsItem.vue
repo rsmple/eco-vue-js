@@ -21,12 +21,12 @@
     </button>
 
     <div class="col-start-2 self-center truncate px-2 py-1 font-semibold">
-      {{ typeof field.title === 'string' ? field.title : field.title(queryParams) }}
+      {{ typeof field.meta.title === 'string' ? field.meta.title : field.meta.title(queryParams) }}
     </div>
 
     <button
       class="w-ripple w-ripple-hover relative flex items-center px-2"
-      @click="$emit('update:fields-config-map', {[field.label]: {...fieldConfig, visible: !fieldConfig.visible}})"
+      @click="$emit('update:fields-config-map', {[field.meta.label]: {...fieldConfig, visible: !fieldConfig.visible}})"
     >
       <component
         :is="fieldConfig.visible ? IconEye : IconEyeSlash"
@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
-import type {FieldConfig, ListField} from '../types'
+import type {FieldComponent, FieldConfig, ListField, ListFieldExport} from '../types'
 
 import {ref} from 'vue'
 
@@ -46,7 +46,7 @@ import IconEye from '@/assets/icons/sax/IconEye.svg?component'
 import IconEyeSlash from '@/assets/icons/sax/IconEyeSlash.svg?component'
 
 const props = defineProps<{
-  field: ListField<Data, QueryParams>
+  field: ListFieldExport<FieldComponent<Data>, ListField<Data, QueryParams>>
   fieldConfig: FieldConfig
   queryParams: QueryParams
   disabled?: boolean

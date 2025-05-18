@@ -39,20 +39,20 @@ const isFieldConfig = (value: unknown): value is Partial<FieldConfig> => {
 const parseFieldConfigMap = <Fields extends ListFields<unknown>>(value: unknown, fields: Fields, fieldConfigMap: FieldConfigMap<Fields>): FieldConfigMap<Fields> => {
   const configMap: Record<string, FieldConfig> = {}
 
-  const processFields = (fieldList: ListFields<unknown>) => {
+  const processFields = (fieldList: ListFields<unknown, unknown> | ListFields<never, unknown>) => {
     fieldList.forEach(field => {
-      if ('fields' in field) {
-        processFields(field.fields as ListFields<unknown>)
+      if ('fields' in field.meta) {
+        processFields(field.meta.fields)
         return
       }
 
-      const config = value instanceof Object && field.label in value ? value[field.label as keyof typeof value] : undefined
-      const defaultConfig = fieldConfigMap[field.label as keyof typeof fieldConfigMap]
+      const config = value instanceof Object && field.meta.label in value ? value[field.meta.label as keyof typeof value] : undefined
+      const defaultConfig = fieldConfigMap[field.meta.label as keyof typeof fieldConfigMap]
 
       if (!isFieldConfig(config)) {
-        configMap[field.label] = {...defaultConfig}
+        configMap[field.meta.label] = {...defaultConfig}
       } else {
-        configMap[field.label] = {
+        configMap[field.meta.label] = {
           width: config.width ?? null,
           visible: config.visible ?? defaultConfig.visible,
           order: config.order ?? defaultConfig.order,
@@ -94,11 +94,11 @@ const getListConfig = (key: string): unknown | undefined => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const filterFields = <F extends ListFields<any, any>>(fields: F, method: (field: ListField<unknown>) => boolean): F => {
   return fields.reduce<F>((result, field) => {
-    if ('fields' in field) {
-      const fields = filterFields(field.fields, method)
+    if ('fields' in field.meta) {
+      const fields = filterFields(field.meta.fields, method)
 
-      if (fields.length) result.push({...field, fields})
-    } else if (method(field)) result.push(field)
+      if (fields.length) result.push({...field, meta: {...field.meta, fields}})
+    } else if (method(field.meta)) result.push(field)
 
     return result
   }, [] as unknown as F)
@@ -106,7 +106,7 @@ export const filterFields = <F extends ListFields<any, any>>(fields: F, method: 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getFirstFieldLabel = <F extends ListFields<any, any>[number]>(field: F): string => {
-  return 'label' in field ? field.label : getFirstFieldLabel(field.fields[0])
+  return 'label' in field.meta ? field.meta.label : getFirstFieldLabel(field.meta.fields[0])
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -161,7 +161,7 @@ export const useListConfig = <Fields extends ListFields<any, any>>(key: MaybeRef
     hasSaved.value = localStorage.getItem(unref(key)) !== null
   })
 
-  if (!disable && isRef(defaultConfigMap)) watch(defaultConfigMap, newValue => {
+  if (!disable && isRef(defaultConfigMap)) watch(defaultConfigMap, (newValue: FieldConfigMap<Fields>) => {
     value.value = parseListConfig(getListConfig(unref(key)), unref(fields), newValue, unref(defailtMode))
     hasSaved.value = localStorage.getItem(unref(key)) !== null
   })

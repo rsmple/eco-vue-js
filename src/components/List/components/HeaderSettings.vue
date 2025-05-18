@@ -44,12 +44,12 @@
                 <template #default="{field, nested, first, last}">
                   <HeaderSettingsItem
                     :field="field"
-                    :field-config="fieldConfigMap[field.label]"
+                    :field-config="fieldConfigMap[field.meta.label]"
                     :query-params="queryParams"
                     :disabled="disabled"
                     :disabled-drag="nested"
-                    :order="getOrder(field)"
-                    @drag:start="dragStart(field.label, $event)"
+                    :order="getOrder(field.meta)"
+                    @drag:start="dragStart(field.meta.label, $event)"
                     @drag:enter="dragEnter($event, nested, first, last)"
                     @drag:end="drop"
                     @update:fields-config-map="$emit('update:field-config-map', {...fieldConfigMap, ...$event})"
@@ -167,9 +167,9 @@ const drop = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const processConfig = <F extends ListFields<any, any>>(fields: F) => {
     fields.forEach((field) => {
-      if ('label' in field) newConfig[field.label] = {...props.fieldConfigMap[field.label], order: getOrder(field)}
+      if ('label' in field.meta) newConfig[field.meta.label] = {...props.fieldConfigMap[field.meta.label], order: getOrder(field.meta)}
 
-      if ('fields' in field) processConfig(field.fields)
+      if ('fields' in field.meta) processConfig(field.meta.fields)
     }, {})
   }
 

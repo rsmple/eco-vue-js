@@ -22,9 +22,9 @@
       >
         <HeaderSortItem
           v-for="field in fieldsFlat"
-          :key="field.label"
-          :title="typeof field.title === 'string' ? field.title : field.title(queryParams)"
-          :field="typeof field.field === 'string' ? field.field : field.field(queryParams)"
+          :key="field.meta.label"
+          :title="typeof field.meta.title === 'string' ? field.meta.title : field.meta.title(queryParams)"
+          :field="typeof field.meta.field === 'string' ? field.meta.field : field.meta.field(queryParams)"
           :ordering="ordering"
           :disabled="disabled"
           @update:ordering="$emit('update:ordering', $event)"
@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
-import type {FieldConfig, ListField, ListFields} from '../types'
+import type {FieldComponent, FieldConfig, ListField, ListFieldExport, ListFields} from '../types'
 import type {OrderItem} from '@/utils/order'
 
 import {computed, inject, markRaw, provide, ref} from 'vue'
@@ -51,7 +51,7 @@ import {BASE_ZINDEX_LIST_HEADER, type ListMode, wBaseZIndex} from '@/utils/utils
 
 import HeaderSortItem from './HeaderSortItem.vue'
 
-type RequiredField = ListField<Data, QueryParams> & Required<Pick<ListField<Data, QueryParams>, 'field'>>
+type RequiredField = ListFieldExport<FieldComponent<Data>, ListField<Data, QueryParams> & Required<Pick<ListField<Data, QueryParams>, 'field'>>>
 
 const props = defineProps<{
   ordering: OrderItem<keyof Data>[]
@@ -73,11 +73,15 @@ provide(wBaseZIndex, baseZIndex ?? BASE_ZINDEX_LIST_HEADER)
 
 const isOpen = ref(false)
 
+const isFieldRequired = (field: ListFields<Data, QueryParams>[number]): field is RequiredField => {
+  return 'field' in field && field.field !== undefined
+}
+
 const fieldsFlat = computed(() => {
   const result: RequiredField[] = []
 
   const processField = (field: ListFields<Data, QueryParams>[number]) => {
-    if ('field' in field && field.field !== undefined) result.push(field as RequiredField)
+    if (isFieldRequired(field)) result.push(field)
     else if ('fields' in field) (field.fields as ListFields<Data, QueryParams>).forEach(processField)
   }
 
