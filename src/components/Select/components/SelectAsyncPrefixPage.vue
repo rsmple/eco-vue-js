@@ -15,6 +15,7 @@
       'cursor-pointer': !disabled && !readonly,
       'cursor-not-allowed opacity-50': disabled,
     }"
+    @unselect="$emit('unselect', valueGetter(option))"
   >
     <template
       v-if="$slots.option"

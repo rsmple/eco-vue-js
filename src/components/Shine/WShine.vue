@@ -2,7 +2,7 @@
   <div
     v-if="!isMobile"
     ref="element"
-    class="rounded-inherit pointer-events-none absolute inset-0 overflow-hidden"
+    class="rounded-inherit pointer-events-none absolute inset-0 overflow-hidden print:hidden"
   >
     <div
       class="bg-default/80 dark:bg-default/50 pointer-events-none absolute h-full w-screen bg-clip-border" 
