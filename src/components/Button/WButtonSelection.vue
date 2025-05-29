@@ -56,14 +56,14 @@
 </template>
 
 <script lang="ts" setup>
-import {type VNode, computed, markRaw, ref} from 'vue'
+import {type VNode, computed, inject, markRaw, provide, ref} from 'vue'
 
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 
 import IconMore from '@/assets/icons/default/IconMore.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
-import {numberFormatter} from '@/utils/utils'
+import {BASE_ZINDEX_LIST_HEADER, numberFormatter, wBaseZIndex} from '@/utils/utils'
 
 import WButtonSelectionAction from './WButtonSelectionAction.vue'
 import WButtonSelectionState from './WButtonSelectionState.vue'
@@ -86,6 +86,10 @@ const props = withDefaults(
 defineEmits<{
   (e: 'clear:selection'): void
 }>()
+
+const baseZIndex = inject(wBaseZIndex, null)
+
+provide(wBaseZIndex, baseZIndex ?? BASE_ZINDEX_LIST_HEADER)
 
 const isOpen = ref(false)
 

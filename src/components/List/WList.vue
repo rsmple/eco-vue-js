@@ -109,7 +109,7 @@
                 :ordering="ordering"
                 :fields="fieldsFiltered"
                 :query-params="queryParams"
-                class="border-r border-solid border-gray-300 dark:border-gray-700"
+                class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
                 @update:ordering="updateOrdering"
               />
 

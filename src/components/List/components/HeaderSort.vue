@@ -38,7 +38,7 @@
 import type {FieldComponent, FieldConfig, ListField, ListFieldExport, ListFields} from '../types'
 import type {OrderItem} from '@/utils/order'
 
-import {computed, inject, markRaw, provide, ref} from 'vue'
+import {computed, markRaw, ref} from 'vue'
 
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
@@ -47,7 +47,7 @@ import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import IconSort from '@/assets/icons/default/IconSort.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
-import {BASE_ZINDEX_LIST_HEADER, type ListMode, wBaseZIndex} from '@/utils/utils'
+import {type ListMode} from '@/utils/utils'
 
 import HeaderSortItem from './HeaderSortItem.vue'
 
@@ -67,14 +67,10 @@ defineEmits<{
   (e: 'update:ordering', value: OrderItem<keyof Data>[]): void
 }>()
 
-const baseZIndex = inject(wBaseZIndex, null)
-
-provide(wBaseZIndex, baseZIndex ?? BASE_ZINDEX_LIST_HEADER)
-
 const isOpen = ref(false)
 
 const isFieldRequired = (field: ListFields<Data, QueryParams>[number]): field is RequiredField => {
-  return 'field' in field && field.field !== undefined
+  return 'field' in field.meta && field.meta.field !== undefined
 }
 
 const fieldsFlat = computed(() => {
@@ -82,7 +78,7 @@ const fieldsFlat = computed(() => {
 
   const processField = (field: ListFields<Data, QueryParams>[number]) => {
     if (isFieldRequired(field)) result.push(field)
-    else if ('fields' in field) (field.fields as ListFields<Data, QueryParams>).forEach(processField)
+    else if ('fields' in field.meta) (field.meta.fields as ListFields<Data, QueryParams>).forEach(processField)
   }
 
   props.fields.forEach(processField)
