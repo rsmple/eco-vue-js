@@ -182,7 +182,7 @@ type PathsEntries<Model, FieldType, IncludeNull = false, ParentKey extends strin
   : Head extends keyof Model
   ? Model[Head] extends object
   ? [
-    ...PathsEntries<Model[Head], FieldType, IncludeNull, Head>,
+    ...PathsEntries<Model[Head], FieldType, IncludeNull, [ParentKey] extends [never] ? Head : `${ ParentKey }.${ Head }`>,
     ...PathsEntries<Omit<Model, Head>, FieldType, IncludeNull, ParentKey, FilteredModel>
   ]
   : PathsEntries<Omit<Model, Head>, FieldType, IncludeNull, ParentKey, FilteredModel>
