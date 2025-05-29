@@ -1,8 +1,8 @@
 <template>
   <WExpansionItem
-    v-if="!getItemProp(queryParams, item, 'hidden') && !fields.some(field => disabledFilterFields.includes(field))"
-    :title="getItemProp(queryParams, item, 'title')"
-    :icon="getItemProp(queryParams, item, 'icon')"
+    v-if="!getMetaValue(meta.hidden, queryParams) && !fields.some(field => disabledFilterFields.includes(field))"
+    :title="getMetaValue(meta.title, queryParams)"
+    :icon="getMetaValue(meta.icon, queryParams)"
     :is-open="isOpen"
     :has-flag="hasChanges"
     @toggle="$emit('toggle')"
@@ -36,7 +36,7 @@ import {computed} from 'vue'
 
 import WExpansionItem from '@/components/Expansion/WExpansionItem.vue'
 
-import {getItemProp} from '../models/utils'
+import {getMetaValue} from '../models/utils'
 
 const props = defineProps<{
   item: FilterComponent<QueryParams>
@@ -51,7 +51,9 @@ defineEmits<{
   (e: 'toggle'): void
 }>()
 
-const fields = computed(() => getItemProp(props.queryParams, props.item, 'fields') ?? [])
+const meta = computed(() => Array.isArray(props.item) ? props.item[0].meta : props.item.meta)
+
+const fields = computed(() => meta.value.fields ?? [])
 
 const hasChanges = computed(() => fields.value.some(field => field in (props.queryParams as Record<string, unknown>)))
 

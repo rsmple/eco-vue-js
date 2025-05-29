@@ -179,7 +179,7 @@
 <script lang="ts" setup>
 import type {FieldWrapperProps} from './types'
 
-import {type StyleValue, computed, readonly, ref, useId, useTemplateRef} from 'vue'
+import {type StyleValue, computed, ref, useId, useTemplateRef} from 'vue'
 
 import WButtonCopy from '@/components/Button/WButtonCopy.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'

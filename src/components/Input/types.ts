@@ -41,7 +41,7 @@ export interface InputAsyncProps<Type extends InputType> extends InputProps<Type
   hideButton?: boolean
 }
 
-export interface InputSuggestProps<Type extends InputType> extends InputProps<Type>, Partial<Omit<DropdownMenuProps, 'isOpen' | 'updateAlign' | 'emitUpdate'>> {
+export interface InputSuggestProps<Type extends InputType> extends Omit<InputProps<Type>, 'unclickable'>, Partial<Omit<DropdownMenuProps, 'isOpen' | 'updateAlign' | 'emitUpdate'>> {
   mobileTitle?: string
   persist?: boolean
   closeOnClear?: boolean

@@ -23,17 +23,17 @@ import WInput from '@/components/Input/WInput.vue'
 
 import IconSearch from '@/assets/icons/sax/IconSearch.svg?component'
 
-withDefaults(defineProps<FilterProps<QueryParams>>(), {
-  fields: () => fields,
-  title: 'Search',
-  icon: markRaw(IconSearch),
-})
+defineProps<FilterProps<QueryParams>>()
 
-defineEmits<FilterEmits<QueryParams, typeof fields[number]>>()
+defineEmits<FilterEmits<QueryParams, typeof meta.fields[number]>>()
 </script>
 
 <script lang="ts">
-const fields = [
-  'search',
-] as Extract<keyof Record<string, unknown>, `search${ string }`>[]
+export const meta = {
+  title: 'Search',
+  icon: markRaw(IconSearch),
+  fields: [
+    'search',
+  ] as Extract<keyof Record<string, unknown>, `search${ string }`>[],
+}
 </script>

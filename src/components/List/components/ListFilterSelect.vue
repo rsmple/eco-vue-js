@@ -34,9 +34,9 @@
           >
             <div>
               <component
-                :is="getItemProp(queryParams, item, 'icon')"
+                :is="getMetaValue((Array.isArray(item) ? item[0].meta : item.meta).icon, queryParams)"
                 class="square-[1.25em] -mt-1 inline"
-              /> {{ getItemProp(queryParams, item, 'title') ?? '' }}
+              /> {{ getMetaValue((Array.isArray(item) ? item[0].meta : item.meta).title, queryParams) ?? '' }}
             </div>
           </WMenuItem>
         </template>
@@ -59,7 +59,7 @@ import IconAdd from '@/assets/icons/sax/IconAdd.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 
-import {getItemProp} from '../models/utils'
+import {getMetaValue} from '../models/utils'
 
 defineProps<{
   filter: FilterComponent<QueryParams>[]

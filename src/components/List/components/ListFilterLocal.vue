@@ -19,8 +19,8 @@
           v-for="(item, index) in filterList.filter(item => allShown.includes(filterAll.indexOf(item)))"
           :key="filterAll.indexOf(item)"
           :name="filterAll.indexOf(item).toString()"
-          :title="getItemProp(queryParams, item, 'title') ?? ''"
-          :icon="getItemProp(queryParams, item, 'icon')"
+          :title="getMetaValue((Array.isArray(item) ? item[0].meta : item.meta).title, queryParams)"
+          :icon="getMetaValue((Array.isArray(item) ? item[0].meta : item.meta).icon, queryParams)"
           :init="index === 0 && !(queryParams as Record<string, string>).search"
           :has-value="shown.includes(filterAll.indexOf(item))"
           v-bind="!readonly ? {
@@ -73,7 +73,7 @@ import IconFilter from '@/assets/icons/sax/IconFilter.svg?component'
 import ListFilterSearch from './ListFilterSearch.vue'
 import ListFilterSelect from './ListFilterSelect.vue'
 
-import {getItemProp} from '../models/utils'
+import {getMetaValue} from '../models/utils'
 
 const props = defineProps<{
   filter: FilterComponent<QueryParams>[] | undefined
@@ -98,15 +98,17 @@ const filterAll = computed(() => [
 
 const filterList = computed(() => {
   return filterAll.value.filter(item => {
-    if (getItemProp(props.queryParams, item, 'hidden')) return false
+    const meta = Array.isArray(item) ? item[0].meta : item.meta
 
-    const fields = getItemProp(props.queryParams, item, 'fields') ?? []
+    if (getMetaValue(meta.hidden, props.queryParams)) return false
+
+    const fields = meta.fields ?? []
     return !fields.some(field => props.disabledFilterFields.includes(field))
   }) ?? []
 })
 
 const shown = computed(() => filterList.value
-  .filter(item => getItemProp(props.queryParams, item, 'fields')?.some(field => field in (props.queryParams as Record<string, unknown>)))
+  .filter(item => (Array.isArray(item) ? item[0].meta.fields : item.meta.fields)?.some(field => field in (props.queryParams as Record<string, unknown>)))
   .map(item => filterAll.value.indexOf(item)))
 
 const selected = ref<number[]>(shown.value.slice())
@@ -121,8 +123,9 @@ const excluded = computed<number[]>(() => {
 
 const clearFilterItem = (item: FilterComponent<QueryParams>) => {
   const result: QueryParams = {} as QueryParams
+  const meta = Array.isArray(item) ? item[0].meta : item.meta
 
-  getItemProp(props.queryParams, item, 'fields')?.forEach(field => {
+  meta.fields?.forEach(field => {
     result[field as keyof QueryParams] = undefined as never
   })
 

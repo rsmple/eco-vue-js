@@ -1,16 +1,23 @@
-import stylisticTs from '@stylistic/eslint-plugin-ts'
+import stylistic from '@stylistic/eslint-plugin'
 import pluginQuery from '@tanstack/eslint-plugin-query'
-import vueTsEslintConfig from '@vue/eslint-config-typescript'
+import {
+  defineConfigWithVueTs,
+  vueTsConfigs,
+} from '@vue/eslint-config-typescript'
 import importPlugin from 'eslint-plugin-import'
+import eslintPluginJsonc from 'eslint-plugin-jsonc'
 import tailwind from 'eslint-plugin-tailwindcss'
 import unusedImports from 'eslint-plugin-unused-imports'
 import pluginVue from 'eslint-plugin-vue'
 
 export default [
-  ...pluginVue.configs['flat/recommended'],
+  ...defineConfigWithVueTs(
+    pluginVue.configs['flat/recommended'],
+    vueTsConfigs.recommendedTypeChecked,
+  ).map(item => ({...item, files: ['**/*.{ts,tsx,vue}']})),
+
   ...tailwind.configs['flat/recommended'],
   ...pluginQuery.configs['flat/recommended'],
-  ...vueTsEslintConfig(),
 
   {
     files: ['**/*.cjs'],
@@ -20,7 +27,7 @@ export default [
   },
 
   {
-    files: ['**/*.{ts,js,mts,tsx,json}'],
+    files: ['**/*.{ts,js,tsx}'],
     rules: {
       indent: ['error', 2, {
         SwitchCase: 1,
@@ -28,12 +35,15 @@ export default [
     },
   },
 
+  ...eslintPluginJsonc.configs['flat/recommended-with-json'],
   {
     files: ['**/*.json'],
     rules: {
-      quotes: ['error', 'double'],
-      '@typescript-eslint/no-unused-expressions': 'off',
-      'comma-dangle': ['error', 'never'],
+      'jsonc/indent': ['error', 2, {}],
+      'jsonc/key-spacing': ['error', {beforeColon: false, afterColon: true, mode: 'strict'}],
+      'jsonc/comma-style': ['error', 'last'],
+      'jsonc/object-curly-newline': ['error', 'always'],
+      'jsonc/object-property-newline': 'error',
     },
   },
 
@@ -45,6 +55,13 @@ export default [
         {selector: 'enum', format: ['PascalCase']},
         {selector: 'enumMember', format: ['UPPER_CASE', 'snake_case']},
       ],
+    },
+  },
+
+  {
+    files: ['**/*.{ts,tsx,vue}'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': ['error', {args: 'after-used', caughtErrors: 'none'}],
     },
   },
 
@@ -101,10 +118,10 @@ export default [
     files: ['**/*.{ts,js,vue}'],
     plugins: {
       'unused-imports': unusedImports,
-      '@stylistic/ts': stylisticTs,
+      '@stylistic': stylistic,
     },
     languageOptions: {
-      parser: pluginVue.parser,
+      parser: vueTsConfigs.parser,
       ecmaVersion: 'latest',
       sourceType: 'module',
     },
@@ -121,7 +138,6 @@ export default [
       'default-case-last': 'off',
       'no-console': ['warn'],
       'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', {args: 'after-used', caughtErrors: 'none'}],
       'unused-imports/no-unused-imports': 'error',
       'tailwindcss/no-custom-classname': 'off',
       'tailwindcss/migration-from-tailwind-2': 'off',
@@ -129,10 +145,10 @@ export default [
       'no-multiple-empty-lines': [1, {max: 1, maxEOF: 0, maxBOF: 0}],
       'keyword-spacing': 1,
       'key-spacing': 1,
-      '@stylistic/ts/function-call-spacing': 1,
-      '@stylistic/ts/member-delimiter-style': [1, {multiline: {delimiter: 'none'}, singleline: {delimiter: 'comma'}}],
-      '@stylistic/ts/type-annotation-spacing': [1, {before: false, after: true, overrides: {arrow: {before: true, after: true}}}],
-      '@stylistic/ts/quote-props': [1, 'as-needed'],
+      '@stylistic/function-call-spacing': 1,
+      '@stylistic/member-delimiter-style': [1, {multiline: {delimiter: 'none'}, singleline: {delimiter: 'comma'}}],
+      '@stylistic/type-annotation-spacing': [1, {before: false, after: true, overrides: {arrow: {before: true, after: true}}}],
+      '@stylistic/quote-props': [1, 'as-needed'],
     },
   },
 

@@ -6,7 +6,9 @@
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
-    "build/**/*"
+    "build/**/*",
+    "tailwind/**/*",
+    "package/tailwind-base/**/*"
   ],
   "compilerOptions": {
     "composite": true,

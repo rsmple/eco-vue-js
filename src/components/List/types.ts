@@ -157,12 +157,15 @@ export type CardActionParams<Data> = {
 
 export type FilterProps<QueryParams> = {
   queryParams: QueryParams
+  global: boolean
+  readonly: boolean
+}
+
+export type FilterMeta<QueryParams> = {
   fields?: Array<keyof QueryParams>
-  title?: string
-  icon?: SVGComponent
-  hidden?: boolean
-  global?: boolean
-  readonly?: boolean
+  title?: string | ((queryParams: QueryParams) => string)
+  icon?: SVGComponent | ((queryParams: QueryParams) => SVGComponent)
+  hidden?: boolean | ((queryParams: QueryParams) => boolean)
 }
 
 export type FilterEmits<QueryParams, Field extends keyof QueryParams> = {
@@ -170,8 +173,8 @@ export type FilterEmits<QueryParams, Field extends keyof QueryParams> = {
   (e: 'close'): void
 }
 
-export type FilterComponent<QueryParams> = Component<FilterProps<QueryParams>> | [
-  Component<FilterProps<QueryParams>>,
+export type FilterComponent<QueryParams> = ListFieldExport<Component<FilterProps<QueryParams>>, FilterMeta<QueryParams>> | [
+  ListFieldExport<Component<FilterProps<QueryParams>>, FilterMeta<QueryParams>>,
   {[Key in string]?: Key extends keyof Pick<FilterProps<QueryParams>, 'queryParams'>
       ? never
       : Key extends keyof FilterProps<QueryParams>

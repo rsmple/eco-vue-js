@@ -5,7 +5,7 @@
   >
     <template #default="{visible, hide}">
       <component
-        :is="filterSearch ?? ListFilterSearch"
+        :is="!filterSearch ? ListFilterSearch.default : Array.isArray(filterSearch) ? filterSearch[0].default : filterSearch.default"
         :query-params="queryParams"
         :autofocus="!(queryParams as Record<string, string>).search && visible"
         global
@@ -65,7 +65,7 @@ import {Modal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
 
 import ListFilterGlobalItem from './ListFilterGlobalItem.vue'
-import ListFilterSearch from './ListFilterSearch.vue'
+import * as ListFilterSearch from './ListFilterSearch.vue'
 
 defineProps<{
   filter: FilterComponent<QueryParams>[] | undefined
