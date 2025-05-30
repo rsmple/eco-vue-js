@@ -1,15 +1,4 @@
-import pluginQuery from '@tanstack/eslint-plugin-query'
-import {
-  defineConfigWithVueTs,
-  vueTsConfigs,
-} from '@vue/eslint-config-typescript'
-import pluginVue from 'eslint-plugin-vue'
-
-import configImports from './configs/configImports.js'
-import configJson from './configs/configJson.js'
-import configTailwind from './configs/configTailwind.js'
-import configTypescript from './configs/configTypescript.js'
-import configVue from './configs/configVue.js'
+import recommended from './recommended.js'
 import modalDeclaration from './rules/modal-declaration.js'
 import modalImportAsync from './rules/modal-import-async.js'
 import modalImport from './rules/modal-import.js'
@@ -53,19 +42,7 @@ const customRules = {
 }
 
 plugin.configs.recommended = (config = {}) => [
-  ...config.noVue ? [] : defineConfigWithVueTs(
-    pluginVue.configs['flat/recommended'],
-    vueTsConfigs.recommendedTypeChecked,
-  ).map(item => ({...item, files: ['**/*.{ts,tsx,vue}']})),
-
-  ...config.noVue ? [] : configVue,
-  
-  ...pluginQuery.configs['flat/recommended'],
-
-  ...configJson,
-  ...configTypescript,
-  ...configTailwind,
-  ...configImports(config),
+  ...recommended(config),
 
   ...config.noCustom ? [] : [customRules],
 ]
