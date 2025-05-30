@@ -6,6 +6,7 @@
       placeholder="Search.."
       allow-clear
       class="w-full"
+      :no-margin="global"
       :icon="markRaw(IconSearch)"
       @click:clear="$emit('close')"
       @update:model-value="$emit('update:query-params', {search: $event || undefined})"

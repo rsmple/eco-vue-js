@@ -8,6 +8,7 @@
         :is="!filterSearch ? ListFilterSearch.default : Array.isArray(filterSearch) ? filterSearch[0].default : filterSearch.default"
         :query-params="queryParams"
         :autofocus="!(queryParams as Record<string, string>).search && visible"
+        :readonly="readonly"
         global
         @update:query-params="$emit('update:query-params', $event)"
         @close="!(queryParams as Record<string, string>).search && hide?.()"
@@ -78,7 +79,7 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:query-params', value: QueryParams): void
+  (e: 'update:query-params', value: Partial<QueryParams>): void
 }>()
 
 const open = ref<number | null>(null)

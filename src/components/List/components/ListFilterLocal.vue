@@ -29,19 +29,21 @@
         >
           <div class="sm-not:-px--inner-margin">
             <component
-              :is="item[0]"
+              :is="item[0].default"
               v-if="Array.isArray(item)"
               v-bind="item[1]"
               :query-params="queryParams"
               :readonly="readonly"
+              :global="false"
               @update:query-params="$emit('update:query-params', $event)"
             />
 
             <component
-              :is="item"
+              :is="item.default"
               v-else
               :query-params="queryParams"
               :readonly="readonly"
+              :global="false"
               @update:query-params="$emit('update:query-params', $event)"
             />
           </div>

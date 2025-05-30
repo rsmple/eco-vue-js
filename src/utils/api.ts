@@ -81,7 +81,7 @@ export const encodeRouteParams = <T>(params: T): Partial<EncodeQueryParams<T>> =
   for (const key in params) {
     const value = encodeQueryParam(params[key])
 
-    if (value === undefined || (Array.isArray(value) && value.length === 0)) {
+    if (value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
       result[key] = undefined
     } else {
       result[key] = value
