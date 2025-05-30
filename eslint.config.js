@@ -1,4 +1,4 @@
-import recommended from './package/eslint/recommended.js'
+import plugin from './package/eslint/plugin.js'
 
 export default [
   {
@@ -11,5 +11,5 @@ export default [
     ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**', '**/src/imports/**'],
   },
 
-  ...recommended,
+  ...plugin.configs.recommended({noCustom: true}),
 ]
