@@ -1,4 +1,4 @@
-declare type SVGComponent = import('vue').Raw<import('vue').FunctionalComponent<import('vue').SVGAttributes, Record<string, never>>>
+declare type SVGComponent = import('vue').Raw<import('vue').FunctionalComponent<import('vue').SVGAttributes>>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare type ComponentInstance<T> = T extends new (...args: any[]) => infer R
