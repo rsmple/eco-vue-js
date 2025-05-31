@@ -1,9 +1,5 @@
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M10 6H14C16 6 16 5 16 4C16 2 15 2 14 2H10C9 2 8 2 8 4C8 6 9 6 10 6Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M8 4.02002C4.67 4.20002 3 5.44002 3 10V16C3 20 4 22 9 22H11.5" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M16 4.02002C19.33 4.20002 21 5.43002 21 10V12.5" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M13.75 17.375V16.4375C13.75 15.5038 14.5038 14.75 15.4375 14.75H16.375" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M18.625 14.75H19.5625C20.4963 14.75 21.25 15.5038 21.25 16.4375V17.375" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M21.25 20V20.5625C21.25 21.4963 20.4963 22.25 19.5625 22.25H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M16.375 22.25H15.4375C14.5038 22.25 13.75 21.4963 13.75 20.5625V19.625" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5" d="M10 6h4c2 0 2-1 2-2 0-2-1-2-2-2h-4C9 2 8 2 8 4s1 2 2 2"/>
+  <path stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5" d="M8 4.02C4.67 4.2 3 5.44 3 10v6c0 4 1 6 6 6h2.5M16 4.02c3.33.18 5 1.41 5 5.98v2.5"/>
+  <path stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.75 17.38v-.94c0-.94.75-1.69 1.69-1.69h.94m2.25 0h.93c.94 0 1.69.75 1.69 1.69v.93m0 2.63v.56c0 .94-.75 1.69-1.69 1.69H19m-2.62 0h-.94c-.94 0-1.69-.75-1.69-1.69v-.93"/>
 </svg>

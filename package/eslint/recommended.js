@@ -7,6 +7,7 @@ import pluginVue from 'eslint-plugin-vue'
 
 import configImports from './configs/configImports.js'
 import configJson from './configs/configJson.js'
+import configSvgo from './configs/configSvgo.js'
 import configTailwind from './configs/configTailwind.js'
 import configTypescript from './configs/configTypescript.js'
 import configVue from './configs/configVue.js'
@@ -25,4 +26,5 @@ export default (config = {}) => [
   ...configTypescript,
   ...configTailwind,
   ...configImports(config),
+  ...configSvgo,
 ]
