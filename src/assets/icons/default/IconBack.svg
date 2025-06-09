@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
-  <rect width="22.88" height="2" x="23.88" y="13" fill="currentcolor" rx="1" transform="rotate(-180 23.88 13)"/>
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="22.88" height="2" fill="currentcolor" rx="1" transform="rotate(-180 23.88 13)" x="23.88" y="13"/>
   <rect width="12.94" height="2" fill="currentcolor" rx="1" transform="matrix(.71961 -.69438 .71961 .69438 0 11.99)"/>
   <rect width="12.94" height="2" fill="currentcolor" rx="1" transform="matrix(-.71961 -.69438 .71961 -.69438 9.32 21)"/>
 </svg>

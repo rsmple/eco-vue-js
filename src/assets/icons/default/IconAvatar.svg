@@ -1,14 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 40 40">
-  <circle cx="20" cy="20" r="19.5" fill="url(#a)" stroke="#fff"/>
-  <circle cx="20" cy="12" r="6" fill="#fff"/>
-  <mask id="b" width="22" height="14" x="9" y="20" maskUnits="userSpaceOnUse" style="mask-type:alpha">
-    <path fill="#fff" d="M9.33 31a10.67 10.67 0 0 1 21.34 0v3H9.33z"/>
+<svg width="20" height="20" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" fill="url(#paint0_linear_1326_14234)" r="19.5" stroke="#fff"/>
+  <circle cx="20" cy="12" fill="#fff" r="6"/>
+  <mask width="22" height="14" id="mask0_1326_14234" maskUnits="userSpaceOnUse" style="mask-type:alpha" x="9" y="20">
+    <path d="M9.33 31a10.67 10.67 0 0 1 21.34 0v3H9.33z" fill="#fff"/>
   </mask>
-  <g mask="url(#b)">
+  <g mask="url(#mask0_1326_14234)">
     <ellipse cx="20.17" cy="24.33" fill="#fff" rx="19.17" ry="9.67"/>
   </g>
   <defs>
-    <linearGradient id="a" x1="20" x2="20" y1="0" y2="40" gradientUnits="userSpaceOnUse">
+    <linearGradient gradientUnits="userSpaceOnUse" id="paint0_linear_1326_14234" x1="20" x2="20" y1="0" y2="40">
       <stop stop-color="#cbc9db"/>
       <stop offset="1" stop-color="#d6c1cb"/>
     </linearGradient>
