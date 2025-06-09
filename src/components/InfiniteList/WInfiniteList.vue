@@ -6,7 +6,7 @@
     <template #header="headerScope">
       <slot
         name="header"
-        v-bind="{goto, ...headerScope ?? {}}"
+        v-bind="{...infiniteListPagesRef ?? {}, ...headerScope ?? {}}"
       />
     </template>
 
@@ -126,15 +126,7 @@ defineEmits<{
 
 const infiniteListPagesRef = useTemplateRef('infiniteListPages')
 
-const goto = (page: number, itemIndex?: number) => {
-  infiniteListPagesRef.value?.goto(page, itemIndex)
-}
-
-defineExpose({
-  resetPage() {
-    infiniteListPagesRef.value?.resetPage()
-  },
-})
+defineExpose(infiniteListPagesRef.value ?? {})
 
 defineSlots<{
   default?: (props: {
@@ -153,9 +145,8 @@ defineSlots<{
     value: Model
   }) => void
   header?: (props: {
-    goto: typeof goto
     updateHeaderHeight: () => void
-  }) => void
+  } & typeof infiniteListPagesRef.value) => void
   empty?: () => void
 }>()
 </script>

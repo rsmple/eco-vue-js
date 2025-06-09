@@ -244,10 +244,10 @@ watch(error, error => {
 }, {immediate: true})
 
 watch(isFetching, value => {
-  if (value) return
+  if (!value) return
 
   emit('fetched')
-})
+}, {immediate: true})
 
 let height = 0
 let intersectionObserver: IntersectionObserver | undefined
@@ -313,6 +313,7 @@ defineExpose({
   getLast,
   refetch: refetchPage,
   scrollTo,
+  isFetching,
 })
 
 defineSlots<{

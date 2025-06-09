@@ -51,7 +51,7 @@
         <slot
           :item="(item as Data)"
           :setter="setter"
-          :skeleton="skeleton"
+          :skeleton="skeleton || isRefetchingAll"
           :refetch="refetch"
           :previous="previous ?? pageComponent[index - 1]?.getLast() ?? pageComponent[pageComponent.length - 1]?.getLast()"
           :next="next ?? pageComponent[index + 1]?.getFirst() ?? pageComponent[0]?.getFirst()"
@@ -164,6 +164,16 @@ const isPreviousButtonVisible = computed<boolean>(() => {
 
 const {pageComponent, refetchNextPages} = useRefetchNextPages()
 
+const isRefetchingAll = ref(false)
+
+const isFetching = computed(() => pageComponent.value.some(item => item.isFetching))
+
+watch(isFetching, value => {
+  if (value) return
+
+  isRefetchingAll.value = false
+}, {immediate: true})
+
 const updateCount = (value: number): void => {
   count.value = value
 }
@@ -248,6 +258,12 @@ const resetPage = async (page = 1) => {
   pages.value = [page]
 }
 
+const refetchAll = () => {
+  isRefetchingAll.value = true
+
+  refetchNextPages(0)
+}
+
 watch(toRef(props, 'queryParams'), (newValue, oldValue) => {
   if (isEqualObj(newValue, oldValue, ['page', ...(props.excludeParams ?? []) as string[]])) return
 
@@ -265,6 +281,9 @@ watch(pagesCount, value => {
 defineExpose({
   resetPage,
   goto,
+  isFetching,
+  isRefetchingAll,
+  refetchAll,
 })
 
 defineSlots<{

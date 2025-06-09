@@ -25,7 +25,7 @@
       @update:count="listCount = $event"
       @update:error="$emit('update:error', $event)"
     >
-      <template #header="{updateHeaderHeight}">
+      <template #header="{updateHeaderHeight, isRefetchingAll, refetchAll}">
         <slot
           name="header"
           :count="listCount"
@@ -104,6 +104,14 @@
               v-else
               class="flex"
             >
+              <WButtonSelectionAction
+                v-if="!noRefetch"
+                :icon="markRaw(IconRefresh)"
+                :loading="isRefetchingAll"
+                class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
+                @click="refetchAll"
+              />
+
               <HeaderSort
                 v-if="!noOrdering"
                 :ordering="ordering"
@@ -279,10 +287,13 @@ import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, FieldC
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type StyleValue, computed, ref, toRef, watch} from 'vue'
+import {type StyleValue, computed, markRaw, ref, toRef, watch} from 'vue'
 
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
+import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
+
+import IconRefresh from '@/assets/icons/sax/IconRefresh.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
@@ -333,6 +344,7 @@ const props = defineProps<{
   cardTo?: (item: Data) => LinkProps['to'] | undefined
   hasAction?: boolean
   noHeaderSettings?: boolean
+  noRefetch?: boolean
 }>()
 
 const emit = defineEmits<{
