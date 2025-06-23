@@ -14,7 +14,6 @@ export default [
   ...recommended({
     noCustom: true,
     tsConfig: [
-      'tsconfig.json',
       'tsconfig.node.json',
       'tsconfig.vue.json',
     ],
