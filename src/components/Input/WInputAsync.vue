@@ -13,7 +13,7 @@
     :class="$attrs.class"
     @keypress:enter="handleEnterPress"
     @click="open"
-    @blur="close"
+    @blur="toggle(); focused = false;"
     @focus="focused = true"
     @paste="handlePaste"
     @update:model-value="value = $event"
@@ -90,7 +90,7 @@
 <script lang="ts" setup generic="Type extends InputType = 'text'">
 import type {InputAsyncProps} from './types'
 
-import {computed, markRaw, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
+import {computed, markRaw, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import WButtonInput from '@/components/Button/WButtonInput.vue'
 import WInput from '@/components/Input/WInput.vue'
@@ -98,9 +98,6 @@ import WInput from '@/components/Input/WInput.vue'
 import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 import IconEdit from '@/assets/icons/sax/IconEdit.svg?component'
 import IconSlash from '@/assets/icons/sax/IconSlash.svg?component'
-
-import {Modal} from '@/utils/Modal'
-import {SemanticType} from '@/utils/SemanticType'
 
 type ModelValue = Required<InputAsyncProps<Type>>['modelValue']
 
@@ -151,42 +148,6 @@ const toggle = async () => {
   } else {
     if (focused.value) cancel()
     else open()
-  }
-}
-
-let closeModal: (() => void) | null = null
-
-const close = () => {
-  closeModal?.()
-
-  doClearTimeout()
-
-  if (props.textarea && !props.textSecure && value.value !== props.modelValue) {
-    closeModal = Modal.addConfirm({
-      title: `Discard changes${ props.title ? ' for ' + props.title : '' }?`,
-      description: 'Leaving the form will undo any edits.',
-      acceptText: 'Discard',
-      intermediateText: 'Save',
-      acceptSemanticType: SemanticType.WARNING,
-      onAccept: reset,
-      onIntermediate: () => {
-        emitUpdateModelValue(value.value)
-
-        focused.value = false
-      },
-    }, () => {
-      closeModal = null
-
-      nextTick().then(() => {
-        if (focused.value) inputRef.value?.focus()
-      })
-    })
-  } else if (props.debounce) {
-    if (canSave.value) emitUpdateModelValue(value.value)
-  } else {
-    value.value = props.modelValue
-
-    focused.value = false
   }
 }
 
