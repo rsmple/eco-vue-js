@@ -28,7 +28,7 @@
     />
 
     <WButton
-      v-if="!readonly"
+      v-if="!readonly && hasChanges"
       :semantic-type="SemanticType.SECONDARY"
       :disabled="!hasChanges"
       class="mt-4 w-full"

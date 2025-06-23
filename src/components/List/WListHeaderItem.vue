@@ -6,6 +6,7 @@
     class="text-description shrink-0 select-none overflow-hidden pr-6"
     :style="widthStyle ?? widthStyleInner"
     @update:width="$emit('update:width', $event)"
+    @save:width="$emit('save:width')"
   >
     <component
       :is="disabled ? 'div' : 'button'"
@@ -76,6 +77,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:width', value: number): void
+  (e: 'save:width'): void
   (e: 'update:ordering', value: OrderItem<Field>[]): void
 }>()
 

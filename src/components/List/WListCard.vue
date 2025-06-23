@@ -102,7 +102,9 @@
             ? {tag: 'button', card, class: 'z-[-1]', onClick: () => $emit('click:action')}
             : to
               ? {tag: markRaw(RouterLink), card, class: 'z-[-1]', props: {to}}
-              : {tag: 'button', card, class: 'z-[-1]', onClick: toggle}
+              : allowOpen
+                ? {tag: 'button', card, class: 'z-[-1]', onClick: toggle}
+                : {tag: 'div', card, class: 'z-[-1]'}
         "
         :class="{
           'before:text-primary dark:before:text-primary-dark': allowSelectHover || selected || moreRef?.isOpen,
@@ -252,7 +254,7 @@ const toggle = () => {
 
 const validate: ComponentInstance<typeof WForm>['validate'] = (...args) => formRef.value?.validate(...args)
 
-const isActionShown = computed<boolean>(() => !props.skeleton && (props.allowOpen || props.to !== undefined || props.allowSelectHover || props.hasAction))
+const isActionShown = computed<boolean>(() => !props.skeleton && (props.allowOpen || props.to !== undefined || props.allowSelectHover || props.hasAction || props.selected))
 
 const toggleMenu = (event: MouseEvent) => {
   if (props.disabled || props.disableMore || !containerRef.value || !moreRef.value || event.ctrlKey) return

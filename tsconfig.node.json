@@ -10,6 +10,10 @@
     "tailwind/**/*",
     "package/tailwind-base/**/*"
   ],
+  "exclude": [
+    "node_modules",
+    "package/dist/**/*"
+  ],
   "compilerOptions": {
     "composite": true,
     "noEmit": true,

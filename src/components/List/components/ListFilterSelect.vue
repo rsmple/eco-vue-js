@@ -4,7 +4,6 @@
     :horizontal-align="HorizontalAlign.FILL"
     :max-height="320"
     :max-width="320"
-    teleport
     update-align
   >
     <template #toggle>

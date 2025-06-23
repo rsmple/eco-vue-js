@@ -1,6 +1,6 @@
 import importPlugin from 'eslint-plugin-import'
 
-export default ({tsConfig = './tsconfig.vue.json'}) => [
+export default ({tsConfig = './tsconfig.json'}) => [
   {
     files: ['**/*.{ts,js,vue}'],
     plugins: {
@@ -41,6 +41,7 @@ export default ({tsConfig = './tsconfig.vue.json'}) => [
           project: tsConfig,
         },
         node: true,
+        noWarnOnMultipleProjects: true,
       },
     },
   },

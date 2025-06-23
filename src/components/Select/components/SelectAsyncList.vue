@@ -48,7 +48,6 @@
       :query-params="(queryParams as QueryParams)"
       :transition="transition"
       :exclude-params="excludeParams"
-      :selected="modelValue"
       :empty-stub="emptyStub"
       :value-getter="valueGetter"
       :query-options="queryOptions"
@@ -57,9 +56,7 @@
       hide-page-title
       header-top-ignore
       min-height
-      no-gap
       @update:count="$emit('update:count', $event); count = $event; updateCursor(undefined)"
-      @update:selected="!disabled && $emit('update:modelValue', $event)"
     >
       <template #default="{item, skeleton, previous, next, first, last}">
         <SelectOption

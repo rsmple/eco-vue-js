@@ -32,6 +32,7 @@ watch(() => props.shown, value => {
 
 onBeforeUnmount(() => {
   updateHeaderSearch(undefined)
+  hide()
 })
 
 defineSlots<{

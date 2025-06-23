@@ -7,6 +7,7 @@
       'w-ripple w-ripple-hover cursor-pointer ': !loading && !disabled,
     }"
     @click="!loading && !disabled && $emit('click', $event)"
+    @mousedown="!loading && !disabled && $emit('mousedown', $event)"
   >
     <IconCancel class="square-[0.75em]" />
   </button>
@@ -22,5 +23,6 @@ defineProps<{
 
 defineEmits<{
   (e: 'click', value: MouseEvent): void
+  (e: 'mousedown', value: MouseEvent): void
 }>()
 </script>

@@ -11,5 +11,12 @@ export default [
     ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**', '**/src/imports/**'],
   },
 
-  ...recommended({noCustom: true}),
+  ...recommended({
+    noCustom: true,
+    tsConfig: [
+      'tsconfig.json',
+      'tsconfig.node.json',
+      'tsconfig.vue.json',
+    ],
+  }),
 ]

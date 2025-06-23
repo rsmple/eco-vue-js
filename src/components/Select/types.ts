@@ -1,7 +1,13 @@
 import type {InputSuggestProps} from '@/components/Input/types'
 import type {Component} from 'vue'
 
-export type SelectOptionProps<Option> = {option: Option | undefined, selected?: boolean, model?: boolean, index?: number}
+export type SelectOptionProps<Option> = {
+  option: Option | undefined
+  selected: boolean
+  model: boolean
+  index: number
+  search: string | undefined
+}
 
 export type SelectOptionComponent<Option> = Component<SelectOptionProps<Option>>
 
