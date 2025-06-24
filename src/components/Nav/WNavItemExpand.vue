@@ -84,7 +84,7 @@
 </template>
 
 <script lang="ts" setup>
-import type {LinkProps} from '@/types/types'
+import type {NavItemExpandProps} from './types'
 
 import {type VNode, computed, nextTick, onBeforeUnmount, ref, useSlots, useTemplateRef, watch} from 'vue'
 
@@ -100,20 +100,12 @@ import {unwrapSlots} from '@/utils/utils'
 import WNavItem from './WNavItem.vue'
 import WNavItemTransition from './WNavItemTransition.vue'
 
-interface Props extends Partial<LinkProps> {
-  icon?: SVGComponent
-  title: string
-  count?: number
-  counter?: number
-  skeleton?: boolean
-  indent?: boolean
-  queryFields?: string[]
-  even?: boolean
+defineProps<NavItemExpandProps>()
+
+const slots = useSlots() as {
+  default?: () => VNode[]
+  icon?: () => VNode[]
 }
-
-defineProps<Props>()
-
-const slots = useSlots()
 
 const {isMobile} = useIsMobile()
 

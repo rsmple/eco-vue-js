@@ -89,7 +89,7 @@
 </template>
 
 <script lang="ts" setup>
-import type {LinkProps} from '@/types/types'
+import type {NavItemProps} from './types'
 
 import {computed} from 'vue'
 import {RouterLink, useRoute, useRouter} from 'vue-router'
@@ -101,21 +101,7 @@ import {isEqualObj, numberCompactFormatter} from '@/utils/utils'
 
 const EXCLUDE_QUERY_FIELDS = ['ordering', 'page']
 
-interface Props extends LinkProps {
-  icon?: SVGComponent
-  title?: string
-  count?: number
-  counter?: number
-  skeleton?: boolean
-  hasActive?: boolean
-  expand?: boolean
-  indent?: boolean
-  queryFields?: string[]
-  hovered?: boolean
-  even?: boolean
-}
-
-const props = defineProps<Props>()
+const props = defineProps<NavItemProps>()
 
 const route = useRoute()
 const router = useRouter()

@@ -124,7 +124,7 @@ defineEmits<{
   (e: 'update:error', value: ApiError): void
 }>()
 
-const infiniteListPagesRef = useTemplateRef('infiniteListPages')
+const infiniteListPagesRef = useTemplateRef<ComponentInstance<typeof InfiniteListPages>>('infiniteListPages')
 
 defineExpose(infiniteListPagesRef.value ?? {})
 
