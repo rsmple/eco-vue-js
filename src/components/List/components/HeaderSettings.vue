@@ -39,24 +39,14 @@
               class="mx-4 h-full border-r border-solid border-gray-200 dark:border-gray-700"
             />
 
-            <div class="grid grid-cols-1">
-              <HeaderFieldNested :fields="fields">
-                <template #default="{field, nested, first, last}">
-                  <HeaderSettingsItem
-                    :field="field"
-                    :field-config="fieldConfigMap[field.meta.label]"
-                    :query-params="queryParams"
-                    :disabled="disabled"
-                    :disabled-drag="nested"
-                    :order="getOrder(field.meta)"
-                    @drag:start="dragStart(field.meta.label, $event)"
-                    @drag:enter="dragEnter($event, nested, first, last)"
-                    @drag:end="drop"
-                    @update:fields-config-map="$emit('update:field-config-map', {...fieldConfigMap, ...$event})"
-                  />
-                </template>
-              </HeaderFieldNested>
-            </div>
+            <HeaderSettingsList
+              :fields="fields"
+              :field-config-map="fieldConfigMap"
+              :query-params="queryParams"
+              class="text-description"
+              @update:field-config-map="$emit('update:field-config-map', {...fieldConfigMap, ...$event})"
+              @update:list="updateOrder"
+            />
           </div>
 
           <div class="my-4 border-b border-solid border-gray-200 dark:border-gray-700" />
@@ -81,7 +71,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
-import type {FieldConfig, ListField, ListFields} from '../types'
+import type {FieldConfig, ListFields} from '../types'
 
 import {markRaw, ref} from 'vue'
 
@@ -94,11 +84,11 @@ import IconTableSettings from '@/assets/icons/sax/IconTableSettings.svg?componen
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {type ListMode} from '@/utils/utils'
 
-import HeaderFieldNested from './HeaderFieldNested.vue'
-import HeaderSettingsItem from './HeaderSettingsItem.vue'
+import HeaderSettingsList from './HeaderSettingsList.vue'
 import HeaderSettingsModeButton from './HeaderSettingsModeButton.vue'
 
-import {listModeIconMap, listModeList} from '../use/useListConfig'
+import {isField} from '../models/utils'
+import {listModeIconMap, listModeList, sortFields} from '../use/useListConfig'
 
 const props = defineProps<{
   fields: ListFields<Data, QueryParams>
@@ -118,67 +108,40 @@ const emit = defineEmits<{
 
 const isOpen = ref(false)
 
-const dragItem = ref<string | null>(null)
-const dragItemNewOrder = ref<number | null>(null)
+const updateOrder = (list: ListFields<Data, QueryParams>) => {
+  let currentIndex = 0
 
-const getOrder = (field: ListField<Data, QueryParams>): number => {
-  if (dragItem.value === null || dragItemNewOrder.value === null) return props.fieldConfigMap[field.label].order
+  const newConfigMap: Record<string, FieldConfig> = {}
 
-  if (field.label === dragItem.value) return dragItemNewOrder.value
+  const processFields = (fields: ListFields<Data, QueryParams>) => {
+    let currentFields
 
-  if (props.fieldConfigMap[field.label].order <= dragItemNewOrder.value) return props.fieldConfigMap[field.label].order - 1
-
-  return props.fieldConfigMap[field.label].order
-}
-
-const dragStart = (label: string, order: number): void => {
-  dragItem.value = label
-  dragItemNewOrder.value = order
-}
-
-const dragEnter = (order: number, nested: boolean, first: boolean, last: boolean): void => {
-  if (nested) {
-    if (dragItemNewOrder.value === null) return
-
-    if (first) {
-      if (order < dragItemNewOrder.value) dragItemNewOrder.value = order
-    } else if (last) {
-      if (order > dragItemNewOrder.value) dragItemNewOrder.value = order
+    if (list.some(field => fields.includes(field))) {
+      currentFields = list
+    } else {
+      currentFields = sortFields(fields, props.fieldConfigMap) as ListFields<Data, QueryParams>
     }
 
-    return
+    currentFields.forEach(field => {
+      currentIndex++
+
+      if (isField(field)) {
+        newConfigMap[field.meta.label] = {
+          ...props.fieldConfigMap[field.meta.label],
+          order: currentIndex,
+        }
+      } else processFields(field.meta.fields as ListFields<Data, QueryParams>)
+    })
   }
 
-  dragItemNewOrder.value = order
-}
+  processFields(props.fields)
 
-const dragEnd = () => {
-  dragItem.value = null
-  dragItemNewOrder.value = null
-}
-
-const drop = () => {
-  const newConfig: Record<string, FieldConfig> = {}
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const processConfig = <F extends ListFields<any, any>>(fields: F) => {
-    fields.forEach((field) => {
-      if ('label' in field.meta) newConfig[field.meta.label] = {...props.fieldConfigMap[field.meta.label], order: getOrder(field.meta)}
-
-      if ('fields' in field.meta) processConfig(field.meta.fields)
-    }, {})
-  }
-
-  processConfig(props.fields)
-
-  Object.values(newConfig)
+  Object.values<FieldConfig>(newConfigMap)
     .sort((a, b) => a.order - b.order)
     .forEach((item, index) => {
-      item.order = index
+      item.order = index + 1
     })
 
-  if (Object.keys(newConfig).some(key => props.fieldConfigMap[key].order !== newConfig[key].order)) emit('update:field-config-map', newConfig)
-
-  dragEnd()
+  if (Object.keys(newConfigMap).some(key => props.fieldConfigMap[key].order !== newConfigMap[key].order)) emit('update:field-config-map', newConfigMap)
 }
 </script>

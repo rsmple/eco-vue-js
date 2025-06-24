@@ -1,6 +1,6 @@
 <template>
   <template
-    v-for="(field, index) in fields"
+    v-for="(field, index) in sortFields(fields, fieldConfigMap)"
     :key="getFirstFieldLabel(field)"
   >
     <slot
@@ -14,7 +14,10 @@
     />
 
     <template v-else>
-      <HeaderFieldNested :fields="(field.meta.fields as ListFields<Data, QueryParams>)">
+      <HeaderFieldNested
+        :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
+        :field-config-map="fieldConfigMap"
+      >
         <template #default="defaultScope">
           <slot
             v-if="defaultScope.length !== 1"
@@ -42,13 +45,14 @@
 </template>
 
 <script setup lang="ts" generic="Data, QueryParams">
-import type {FieldComponent, ListField, ListFieldExport, ListFields} from '../types'
+import type {FieldComponent, FieldConfig, ListField, ListFieldExport, ListFields} from '../types'
 
 import {isField} from '../models/utils'
-import {getFirstFieldLabel} from '../use/useListConfig'
+import {getFirstFieldLabel, sortFields} from '../use/useListConfig'
 
 defineProps<{
   fields: ListFields<Data, QueryParams>
+  fieldConfigMap: Record<string, FieldConfig>
 }>()
 
 defineSlots<{

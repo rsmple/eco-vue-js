@@ -149,7 +149,10 @@
           @update:header="updateHeaderHeight"
         >
           <template #default>
-            <HeaderFieldNested :fields="fieldsFiltered">
+            <HeaderFieldNested
+              :fields="fieldsFiltered"
+              :field-config-map="fieldConfigMap"
+            >
               <template #default="{field, nested}">
                 <WListHeaderItem
                   :title="typeof field.meta.title === 'string' ? field.meta.title : field.meta.title(queryParams)"
@@ -204,6 +207,7 @@
           <template #default="{validate}">
             <ListCardFieldNested
               :fields="fieldsFiltered"
+              :field-config-map="fieldConfigMap"
               :item="item"
               :skeleton="skeleton"
               :card="isGrid"
@@ -308,7 +312,7 @@ import HeaderFieldNested from './components/HeaderFieldNested.vue'
 import HeaderSettings from './components/HeaderSettings.vue'
 import HeaderSort from './components/HeaderSort.vue'
 import ListCardFieldNested from './components/ListCardFieldNested.vue'
-import {filterFields, getFirstFieldLabel, useListConfig} from './use/useListConfig'
+import {filterFields, useListConfig} from './use/useListConfig'
 
 defineOptions({inheritAttrs: false})
 
@@ -383,7 +387,6 @@ const {
 
 const fieldsFiltered = computed(() => {
   return filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible)
-    .sort((a, b) => fieldConfigMap.value[getFirstFieldLabel(a)].order - fieldConfigMap.value[getFirstFieldLabel(b)].order)
 })
 
 const allowSelect = computed(() => props.bulk !== undefined)

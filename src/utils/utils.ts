@@ -221,10 +221,10 @@ export const getDefaultFieldConfigMap = <Fields extends ListFields<any, any>>(fi
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const processFields = <F extends ListFields<any, any>>(fieldList: F) => {
     fieldList.forEach(field => {
+      order++
+
       if (isField(field)) result[field.meta.label] = {width: null, visible: visible.includes(field.meta.label as typeof visible[number]), order}
       else processFields(field.meta.fields)
-
-      order++
     })
   }
 

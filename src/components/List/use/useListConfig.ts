@@ -66,7 +66,7 @@ const parseFieldConfigMap = <Fields extends ListFields<unknown>>(value: unknown,
   Object.values<FieldConfig>(configMap)
     .sort((a, b) => a.order - b.order)
     .forEach((item, index) => {
-      item.order = index
+      item.order = index + 1
     })
 
   return configMap as FieldConfigMap<Fields>
@@ -175,4 +175,9 @@ export const useListConfig = <Fields extends ListFields<any, any>>(key: MaybeRef
     save,
     updateMode,
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const sortFields = <Fields extends ListFields<any, any>>(list: Fields, fieldConfigMap: Record<string, FieldConfig>) => {
+  return list.slice().sort((a, b) => fieldConfigMap[getFirstFieldLabel(a)].order - fieldConfigMap[getFirstFieldLabel(b)].order)
 }

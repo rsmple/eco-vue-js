@@ -1,6 +1,6 @@
 <template>
   <template
-    v-for="field in fields"
+    v-for="field in sortFields(fields, fieldConfigMap)"
     :key="getFirstFieldLabel(field)"
   >
     <slot
@@ -29,6 +29,7 @@
                 >
                   <ListCardFieldNested
                     :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
+                    :field-config-map="fieldConfigMap"
                     :item="inner"
                     :skeleton="skeleton"
                     :card="card"
@@ -55,6 +56,7 @@
       >
         <ListCardFieldNested
           :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
+          :field-config-map="fieldConfigMap"
           :item="'keyEntity' in field.meta ? (item[field.meta.keyEntity] as Data) : 'getterEntity' in field.meta ? (field.meta.getterEntity(item) as Data) : item"
           :skeleton="skeleton"
           :card="card"
@@ -71,17 +73,18 @@
 </template>
 
 <script setup lang="ts" generic="Data extends DefaultData, QueryParams">
-import type {FieldComponent, ListField, ListFieldExport, ListFields} from '../types'
+import type {FieldComponent, FieldConfig, ListField, ListFieldExport, ListFields} from '../types'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
 import ListCardFieldNestedItem from './ListCardFieldNestedItem.vue'
 
 import {isField} from '../models/utils'
-import {getFirstFieldLabel} from '../use/useListConfig'
+import {getFirstFieldLabel, sortFields} from '../use/useListConfig'
 
 defineProps<{
   fields: ListFields<Data, QueryParams>
+  fieldConfigMap: Record<string, FieldConfig>
   item: Data
   nested?: boolean
   skeleton: boolean
