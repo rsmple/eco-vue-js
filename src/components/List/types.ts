@@ -27,6 +27,7 @@ export type ListField<Data, QueryParams = unknown> = {
   field?: Extract<keyof Data, string> | ((params: QueryParams) => Extract<keyof Data, string>)
   visibleGetter?: (params: QueryParams) => boolean
   allowResize?: boolean
+  fixed?: boolean
 }
 
 export type ListFieldNested<Data, QueryParams = unknown> = {
@@ -120,6 +121,7 @@ export type FieldConfig = {
   width: number | null
   visible: boolean
   order: number
+  fixed: boolean
 }
 
 type GetFieldLabelsTuple<Fields> = Fields extends [infer Head, ...infer Tail]
@@ -130,7 +132,8 @@ type GetFieldLabelsTuple<Fields> = Fields extends [infer Head, ...infer Tail]
   : GetFieldLabelsTuple<Tail>
   : []
 
-export type GetFieldLabels<Fields extends ListFields<unknown>> = GetFieldLabelsTuple<Fields>[number]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type GetFieldLabels<Fields extends ListFields<any, any>> = GetFieldLabelsTuple<Fields>[number]
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FieldConfigMap<Fields extends ListFields<any, any>> = Record<GetFieldLabels<Fields>, FieldConfig>

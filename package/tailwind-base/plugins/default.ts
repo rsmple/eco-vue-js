@@ -258,52 +258,6 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
   })
 
   addUtilities({
-    '.w-ripple': {
-      '&::before, &-has-only::before': {
-        content: '""',
-        position: 'absolute',
-        top: '0',
-        left: '0',
-        height: '100%',
-        width: '100%',
-        'border-radius': 'var(--w-ripple-rounded,inherit)',
-        'background-color': 'currentColor',
-        'pointer-events': 'none',
-        'user-select': 'none',
-        opacity: '0',
-      },
-
-      '&:active::before': {
-        opacity: 'calc(var(--w-ripple-opacity, 0.10) * 2)',
-      },
-    },
-
-    '.w-ripple-trigger:active': {
-      '.w-ripple::before, &.w-ripple::before': {
-        opacity: 'calc(var(--w-ripple-opacity, 0.10) * 2)',
-      },
-    },
-
-    '.w-ripple-trigger-has:has(.w-ripple-has:active)': {
-      '.w-ripple-has-only::before, &.w-ripple-has-only::before': {
-        opacity: 'calc(var(--w-ripple-opacity, 0.10) * 2)',
-      },
-    },
-
-    '.w-ripple-hover:not(:active):hover, .w-ripple-trigger:not(:active):hover .w-ripple-hover, .w-ripple-hover:not(:active):focus, .w-ripple-trigger:not(:active):focus .w-ripple-hover': {
-      '& .w-ripple:not(:active)::before, &.w-ripple::before': {
-        opacity: 'var(--w-ripple-opacity, 0.10)',
-      },
-    },
-
-    '.w-ripple-trigger-has:has(.w-ripple-has:not(:active):hover) .w-ripple-hover, .w-ripple-trigger-has:has(.w-ripple-has:not(:active):focus) .w-ripple-hover': {
-      '& .w-ripple-has-only:not(:active)::before, &.w-ripple-has-only::before': {
-        opacity: 'var(--w-ripple-opacity, 0.10)',
-      },
-    },
-  })
-
-  addUtilities({
     '.w-hover-circle': {
       '&::after': {
         content: '""',

@@ -23,6 +23,7 @@
           :query-params="queryParams"
           :disabled="disabled"
           :style="container.style"
+          nested
           @update:list="$emit('update:list', $event)"
           @update:field-config-map="$emit('update:field-config-map', $event)"
         />
@@ -30,7 +31,7 @@
 
       <div
         v-else-if="'label' in item.meta"
-        class="bg-default dark:bg-default-dark grid select-none grid-cols-[1.75rem,1fr,auto]"
+        class="bg-default dark:bg-default-dark grid select-none grid-cols-[1.75rem,1fr,2.25rem,2.25rem]"
         v-bind="container"
       >
         <button
@@ -46,12 +47,29 @@
         </div>
 
         <button
-          class="w-ripple w-ripple-hover relative flex items-center px-2"
+          class="w-ripple w-ripple-hover group relative flex items-center justify-center"
           @click="$emit('update:field-config-map', {[item.meta.label]: {...fieldConfigMap[item.meta.label], visible: !fieldConfigMap[item.meta.label].visible}})"
         >
           <component
             :is="fieldConfigMap[item.meta.label].visible ? IconEye : IconEyeSlash"
             class="pointer-events-none"
+            :class="{
+              'opacity-20 group-hover:opacity-50': fieldConfigMap[item.meta.label].visible,
+            }"
+          />
+        </button>
+
+        <button
+          v-if="!nested"
+          class="w-ripple w-ripple-hover group relative flex items-center justify-center"
+          @click="$emit('update:field-config-map', {[item.meta.label]: {...fieldConfigMap[item.meta.label], fixed: !fieldConfigMap[item.meta.label].fixed}})"
+        >
+          <component
+            :is="fieldConfigMap[item.meta.label].fixed ? IconLock : IconLockOff"
+            class="pointer-events-none"
+            :class="{
+              'opacity-20 group-hover:opacity-50': !fieldConfigMap[item.meta.label].fixed,
+            }"
           />
         </button>
       </div>
@@ -67,6 +85,8 @@ import WDragContainer from '@/components/DragContainer/WDragContainer.vue'
 import IconDrag from '@/assets/icons/sax/IconDrag.svg?component'
 import IconEye from '@/assets/icons/sax/IconEye.svg?component'
 import IconEyeSlash from '@/assets/icons/sax/IconEyeSlash.svg?component'
+import IconLock from '@/assets/icons/sax/IconLock.svg?component'
+import IconLockOff from '@/assets/icons/sax/IconLockOff.svg?component'
 
 import {sortFields} from '../use/useListConfig'
 
@@ -75,6 +95,7 @@ defineProps<{
   fieldConfigMap: Record<string, FieldConfig>
   queryParams: QueryParams
   disabled?: boolean
+  nested?: boolean
 }>()
 
 defineEmits<{
