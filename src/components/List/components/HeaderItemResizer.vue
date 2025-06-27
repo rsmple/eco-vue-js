@@ -6,7 +6,7 @@
     <slot />
 
     <button
-      class="absolute right-1 top-0 flex h-full w-6 cursor-col-resize items-center opacity-50 hover:opacity-100"
+      class="absolute -right-2 top-0 flex h-full w-6 cursor-col-resize items-center opacity-50 hover:opacity-100"
       @mousedown.stop.prevent="startDrag"
       @click.stop.prevent
     >
@@ -26,7 +26,7 @@ const MIN_WIDTH = 64
 const MAX_WIDTH = 2000
 
 const props = defineProps<{
-  hasStyles: boolean
+  hasWidth: boolean
 }>()
 
 const emit = defineEmits<{
@@ -72,7 +72,7 @@ const endDrag = () => {
   emit('save:width')
 }
 
-watch(() => props.hasStyles, value => {
+watch(() => props.hasWidth, value => {
   if (!value) setTimeout(() => {
     if (!elementRef.value) return
 

@@ -134,7 +134,7 @@
                 :query-params="queryParams"
                 :has-saved="hasSaved"
                 :mobile="isMobile"
-                @click:reset="reset"
+                @click:reset="reset(); updateStylesWidth(); updateStylesFixed()"
                 @update:mode="updateMode"
                 @update:field-config-map="updateStylesWidth(); updateStylesFixed()"
               />
@@ -173,6 +173,7 @@
                     left: fieldConfigMap[field.meta.label]?.fixed ? `var(${getFieldVariable('left', field.meta.label)})` : undefined,
                     right: fieldConfigMap[field.meta.label]?.fixed ? `var(${getFieldVariable('right', field.meta.label)})` : undefined,
                   }"
+                  :has-width="stylesWidth[getFieldVariable('width', field.meta.label)] !== undefined"
                   :class="{
                     [field.meta.cssClass ?? '']: true,
                     'sticky z-[1] bg-[inherit]': !isGrid && fieldConfigMap[field.meta.label]?.fixed,
@@ -238,11 +239,10 @@
                     [defaultScope.field.meta.cssClass ?? '']: true,
                     'items-center': !alignTop,
                     'items-start': alignTop,
-                    'pr-6': !isGrid,
                     'bg-default dark:bg-default-dark sticky z-[1]': !isGrid && fieldConfigMap[defaultScope.field.meta.label]?.fixed,
                     ...(!isGrid && fieldConfigMap[defaultScope.field.meta.label]?.fixed ? beforeClass : {})
                   }"
-                  :style="isGrid ? {gridArea: defaultScope.field.meta.label} : {
+                  :style="isGrid ? !defaultScope.nested ? {gridArea: defaultScope.field.meta.label} : undefined : {
                     minWidth: `var(${getFieldVariable('width', defaultScope.field.meta.label)})`,
                     maxWidth: `var(${getFieldVariable('width', defaultScope.field.meta.label)})`,
                     left: fieldConfigMap[defaultScope.field.meta.label]?.fixed ? `var(${getFieldVariable('left', defaultScope.field.meta.label)})` : undefined,
@@ -435,9 +435,9 @@ const ordering = computed<OrderItem<keyof Data>[]>(() => {
   return []
 })
 
-const stylesWidth = ref({})
+const stylesWidth = ref<Record<string, string>>({})
 
-const stylesFixed = ref({})
+const stylesFixed = ref<Record<string, string>>({})
 
 const updateOrdering = (value: OrderItem<keyof Data>[]) => {
   const ordering = encodeOrdering(value)
@@ -476,7 +476,7 @@ const unwatch = watch(fieldsFiltered, async () => {
     updateStylesFixed(),
   ])
 
-  if (Object.keys(stylesWidth.value).length !== 0 || Object.keys(stylesFixed.value).length !== 0) unwatch()
+  if (Object.keys(stylesWidth.value).length !== 0 || Object.keys(stylesFixed.value).length !== 0) unwatch.stop()
 }, {immediate: true})
 
 watch(countValue, value => emit('update:count', value), {immediate: true})

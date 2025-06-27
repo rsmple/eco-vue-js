@@ -1,6 +1,6 @@
 <template>
   <template
-    v-for="field in sortFields(fields, fieldConfigMap)"
+    v-for="field in (card ? (fields as ListFields<any, any>) : sortFields(fields, fieldConfigMap))"
     :key="getFirstFieldLabel(field)"
   >
     <slot

@@ -23,6 +23,7 @@
           :query-params="queryParams"
           :disabled="disabled"
           :style="container.style"
+          nested
           @update:list="$emit('update:list', $event)"
           @update:field-config-map="$emit('update:field-config-map', $event)"
         />
@@ -30,7 +31,7 @@
 
       <div
         v-else-if="'label' in item.meta"
-        class="bg-default dark:bg-default-dark grid select-none grid-cols-[1.75rem,1fr,auto,auto]"
+        class="bg-default dark:bg-default-dark grid select-none grid-cols-[1.75rem,1fr,2.25rem,2.25rem]"
         v-bind="container"
       >
         <button
@@ -46,7 +47,7 @@
         </div>
 
         <button
-          class="w-ripple w-ripple-hover group relative flex items-center px-2"
+          class="w-ripple w-ripple-hover group relative flex items-center justify-center"
           @click="$emit('update:field-config-map', {[item.meta.label]: {...fieldConfigMap[item.meta.label], visible: !fieldConfigMap[item.meta.label].visible}})"
         >
           <component
@@ -59,7 +60,8 @@
         </button>
 
         <button
-          class="w-ripple w-ripple-hover group relative flex items-center px-2"
+          v-if="!nested"
+          class="w-ripple w-ripple-hover group relative flex items-center justify-center"
           @click="$emit('update:field-config-map', {[item.meta.label]: {...fieldConfigMap[item.meta.label], fixed: !fieldConfigMap[item.meta.label].fixed}})"
         >
           <component
@@ -93,6 +95,7 @@ defineProps<{
   fieldConfigMap: Record<string, FieldConfig>
   queryParams: QueryParams
   disabled?: boolean
+  nested?: boolean
 }>()
 
 defineEmits<{
