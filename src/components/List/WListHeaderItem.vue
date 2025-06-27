@@ -3,7 +3,7 @@
     :is="allowResize ? HeaderItemResizer : HeaderItem"
     ref="container"
     v-bind="allowResize ? {
-      hasStyles: !!styleValue.width && styleValue.width !== '0px',
+      hasStyles: !!styleValue.minWidth && styleValue.minWidth !== '0px',
       'onSave:width': () => $emit('save:width'),
     } : (undefined as never)"
     class="text-description shrink-0 select-none overflow-hidden pr-6"
