@@ -27,7 +27,7 @@
 
     <div
       v-if="!card"
-      class="-left--left-inner bg-default dark:bg-default-dark @not-lg:hidden w-ripple-opacity-[0.05] sticky z-[1]"
+      class="-left--left-inner bg-default dark:bg-default-dark @not-lg:hidden sticky z-[1]"
       :class="{
         'width-[--w-list-header-rounded,1rem]': !allowSelect,
       }"
@@ -42,10 +42,8 @@
           'border-primary dark:border-primary-dark': hasBorder && selected,
           'rounded-bl-[unset!important]': isOpen,
           'border-b-transparent dark:border-b-transparent': hasBorder && isOpen,
-          'w-ripple-has-only w-ripple-hover': isActionShown,
           'pl-px': !hasBorder,
-          'before:text-primary dark:before:text-primary-dark w-ripple-opacity-15': allowSelectHover || selected || moreRef?.isOpen,
-          'before:opacity-10': selected || moreRef?.isOpen,
+          ...beforeClass,
         }"
       >
         <WCheckbox
@@ -92,7 +90,7 @@
         @update:model-value="$emit('toggle:selected')"
       />
 
-      <slot v-bind="{toggle, isOpen, validate}" />
+      <slot v-bind="{toggle, isOpen, validate, beforeClass}" />
 
       <ListCardAction
         v-if="isActionShown"
@@ -135,7 +133,7 @@
       
     <div
       v-if="!card"
-      class="-right--right-inner bg-default dark:bg-default-dark w-ripple-opacity-[0.05] sticky z-[1]"
+      class="-right--right-inner bg-default dark:bg-default-dark sticky z-[1]"
       :class="{
         'width-[calc(var(--w-list-padding,1rem)*2+1.25em)]': $slots.more,
         'width-[--w-list-header-rounded,1rem]': !$slots.more,
@@ -151,9 +149,7 @@
           'border-primary dark:border-primary-dark': hasBorder && selected,
           'rounded-br-[unset!important]': isOpen,
           'border-b-transparent dark:border-b-transparent': hasBorder && isOpen,
-          'w-ripple-has-only w-ripple-hover': isActionShown,
-          'before:text-primary dark:before:text-primary-dark w-ripple-opacity-15': allowSelectHover || selected || moreRef?.isOpen,
-          'before:opacity-10': selected || moreRef?.isOpen,
+          ...beforeClass,
         }"
       >
         <WButtonMore
@@ -247,6 +243,14 @@ const formRef = useTemplateRef<ComponentInstance<typeof WForm>>('form')
 const isOpen = ref(false)
 const position = ref<{left: string, top: string} | null>(null)
 const anchorRef = useTemplateRef<HTMLDivElement>('anchor')
+
+const beforeClass = computed(() => {
+  return {
+    'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.05]': isActionShown.value,
+    'before:text-primary dark:before:text-primary-dark w-ripple-opacity-15': props.allowSelectHover || props.selected || moreRef.value?.isOpen,
+    'before:opacity-10': props.selected || moreRef.value?.isOpen,
+  }
+})
 
 const toggle = () => {
   isOpen.value = !isOpen.value

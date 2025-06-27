@@ -3,7 +3,12 @@
     :class="{
       'w-card': isGrid,
       'w-list': !isGrid,
+      '[--w-list-right:calc(var(--w-list-padding,1rem)*2+1.25em)]': menu,
+      '[--w-list-right:--w-list-header-rounded,1rem]': !menu,
+      '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.5em)]': allowSelect,
+      '[--w-list-left:--w-list-header-rounded,1rem]': !allowSelect,
     }"
+    :style="[stylesWidth, stylesFixed]"
   >
     <WInfiniteList
       :use-query-fn="useQueryFn"
@@ -153,16 +158,24 @@
               :fields="fieldsFiltered"
               :field-config-map="fieldConfigMap"
             >
-              <template #default="{field, nested}">
+              <template #default="{field}">
                 <WListHeaderItem
                   :title="typeof field.meta.title === 'string' ? field.meta.title : field.meta.title(queryParams)"
                   :field="typeof field.meta.field === 'string' ? field.meta.field : (field.meta.field?.(queryParams) as keyof Data)"
-                  :class="field.meta.cssClass"
                   :ordering="ordering"
                   :disabled="noOrdering || !field.meta.field"
                   :allow-resize="field.meta.allowResize"
                   :item-class="field.meta.cssClassHeader"
-                  :width-style="getFieldStyles(field.meta.label, nested)"
+                  :style-value="isGrid ? {gridArea: field.meta.label} : {
+                    minWidth: `var(${getFieldVariable('width', field.meta.label)})`,
+                    maxWidth: `var(${getFieldVariable('width', field.meta.label)})`,
+                    left: fieldConfigMap[field.meta.label]?.fixed ? `var(${getFieldVariable('left', field.meta.label)})` : undefined,
+                    right: fieldConfigMap[field.meta.label]?.fixed ? `var(${getFieldVariable('right', field.meta.label)})` : undefined,
+                  }"
+                  :class="{
+                    [field.meta.cssClass ?? '']: true,
+                    'sticky z-[1] bg-[inherit]': !isGrid && fieldConfigMap[field.meta.label]?.fixed,
+                  }"
                   @update:width="fieldConfigMap[field.meta.label].width = $event"
                   @save:width="save"
                   @update:ordering="updateOrdering"
@@ -204,7 +217,7 @@
           @hover:selected="hoverSelected(position)"
           @click:action="$emit('click:action', {item, setter})"
         >
-          <template #default="{validate}">
+          <template #default="{validate, beforeClass}">
             <ListCardFieldNested
               :fields="fieldsFiltered"
               :field-config-map="fieldConfigMap"
@@ -225,8 +238,15 @@
                     'items-center': !alignTop,
                     'items-start': alignTop,
                     'pr-6': !isGrid,
+                    'bg-default dark:bg-default-dark sticky': !isGrid && fieldConfigMap[defaultScope.field.meta.label]?.fixed,
+                    ...(!isGrid && fieldConfigMap[defaultScope.field.meta.label]?.fixed ? beforeClass : {})
                   }"
-                  :style="getFieldStyles(defaultScope.field.meta.label, defaultScope.nested)"
+                  :style="isGrid ? {gridArea: defaultScope.field.meta.label} : {
+                    minWidth: `var(${getFieldVariable('width', defaultScope.field.meta.label)})`,
+                    maxWidth: `var(${getFieldVariable('width', defaultScope.field.meta.label)})`,
+                    left: fieldConfigMap[defaultScope.field.meta.label]?.fixed ? `var(${getFieldVariable('left', defaultScope.field.meta.label)})` : undefined,
+                    right: fieldConfigMap[defaultScope.field.meta.label]?.fixed ? `var(${getFieldVariable('right', defaultScope.field.meta.label)})` : undefined,
+                  }"
                   @update:item="setter"
                   @delete:item="setter(); refetch()"
                   @validate="validate()"
@@ -312,7 +332,7 @@ import HeaderFieldNested from './components/HeaderFieldNested.vue'
 import HeaderSettings from './components/HeaderSettings.vue'
 import HeaderSort from './components/HeaderSort.vue'
 import ListCardFieldNested from './components/ListCardFieldNested.vue'
-import {filterFields, useListConfig} from './use/useListConfig'
+import {filterFields, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, sortFields, useListConfig} from './use/useListConfig'
 
 defineOptions({inheritAttrs: false})
 
@@ -414,6 +434,10 @@ const ordering = computed<OrderItem<keyof Data>[]>(() => {
   return []
 })
 
+const stylesWidth = computed(() => getFieldStylesWidth(fieldsFiltered.value, fieldConfigMap.value))
+
+const stylesFixed = computed(() => getFieldStylesFixed(sortFields(fieldsFiltered.value, fieldConfigMap.value), fieldConfigMap.value))
+
 const updateOrdering = (value: OrderItem<keyof Data>[]) => {
   const ordering = encodeOrdering(value)
 
@@ -431,19 +455,6 @@ const getQueryParamsBulk = (): QueryParams => {
   }
 
   return props.queryParams
-}
-
-const getFieldStyles = (label: string, nested: boolean): StyleValue | undefined => {
-  if (isGrid.value) return nested ? undefined : {gridArea: label}
-
-  if (!fieldConfigMap.value[label]?.width) return undefined
-
-  const value = fieldConfigMap.value[label].width + 'px'
-
-  return {
-    minWidth: value,
-    maxWidth: value,
-  }
 }
 
 watch(countValue, value => emit('update:count', value), {immediate: true})

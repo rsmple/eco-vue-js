@@ -26,7 +26,7 @@ export const listModeIconMap: Record<ListMode, SVGComponent> = {
   [ListMode.GRID]: markRaw(IconGrid),
 }
 
-const fieldConfigKeyLength: ObjectKeys<FieldConfig>['length'] = 3
+const fieldConfigKeyLength: ObjectKeys<FieldConfig>['length'] = 4
 
 const isFieldConfig = (value: unknown): value is Partial<FieldConfig> => {
   return value instanceof Object
@@ -56,6 +56,7 @@ const parseFieldConfigMap = <Fields extends ListFields<unknown>>(value: unknown,
           width: config.width ?? null,
           visible: config.visible ?? defaultConfig.visible,
           order: config.order ?? defaultConfig.order,
+          fixed: config.fixed ?? defaultConfig.fixed,
         }
       }
     })
@@ -180,4 +181,55 @@ export const useListConfig = <Fields extends ListFields<any, any>>(key: MaybeRef
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sortFields = <Fields extends ListFields<any, any>>(list: Fields, fieldConfigMap: Record<string, FieldConfig>) => {
   return list.slice().sort((a, b) => fieldConfigMap[getFirstFieldLabel(a)].order - fieldConfigMap[getFirstFieldLabel(b)].order)
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const forEachField = <Fields extends ListFields<any, any>>(fields: Fields, callback: (field: Extract<Fields[number], {meta: {label: string}}>) => void) => {
+  fields.forEach(field => {
+    if ('fields' in field.meta) {
+      forEachField(field.meta.fields as Fields, callback)
+    } else {
+      callback(field as Extract<Fields[number], {meta: {label: string}}>)
+    }
+  })
+}
+
+export const getFieldVariable = <T extends 'width' | 'left' | 'right', Label extends string>(type: T, label: Label): `--w-list-field-${ T }-${ Label }` => {
+  return `--w-list-field-${ type }-${ label }`
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getFieldStylesWidth = <Fields extends ListFields<any, any>>(fields: Fields, fieldConfigMap: Record<string, FieldConfig>): Record<string, string> => {
+  const styles: Record<string, string> = {}
+
+  forEachField(fields, field => {
+    if (fieldConfigMap[field.meta.label]?.width) {
+      styles[getFieldVariable('width', field.meta.label)] = fieldConfigMap[field.meta.label].width + 'px'
+    }
+  })
+
+  return styles
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getFieldStylesFixed = <Fields extends ListFields<any, any>>(fields: Fields, fieldConfigMap: Record<string, FieldConfig>): Record<string, string> => {
+  const styles: Record<string, string> = {}
+
+  const fixedLabels: string[] = []
+
+  forEachField(fields, field => {
+    if (fieldConfigMap[field.meta.label]?.fixed) {
+      fixedLabels.push(field.meta.label)
+    }
+  })
+
+  fixedLabels.forEach((label, index, array) => {
+    const left = array.slice(0, index).map(label => `var(${ getFieldVariable('width', label) })`).join(' + ')
+    styles[getFieldVariable('left', label)] = `calc(var(--w-left-inner) + var(--w-list-left)${ left ? ` + ${ left }` : '' })`
+
+    const right = array.slice(index + 1).map(label => `var(${ getFieldVariable('width', label) })`).join(' + ')
+    styles[getFieldVariable('right', label)] = `calc(var(--w-right-inner) + var(--w-list-right)${ right ? ` + ${ right }` : '' })`
+  })
+
+  return styles
 }

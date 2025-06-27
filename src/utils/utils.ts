@@ -223,7 +223,12 @@ export const getDefaultFieldConfigMap = <Fields extends ListFields<any, any>>(fi
     fieldList.forEach(field => {
       order++
 
-      if (isField(field)) result[field.meta.label] = {width: null, visible: visible.includes(field.meta.label as typeof visible[number]), order}
+      if (isField(field)) result[field.meta.label] = {
+        width: null,
+        visible: visible.includes(field.meta.label as typeof visible[number]),
+        order,
+        fixed: field.meta.fixed ?? false,
+      }
       else processFields(field.meta.fields)
     })
   }

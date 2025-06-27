@@ -2,9 +2,9 @@
   <component
     :is="allowResize ? HeaderItemResizer : 'div'"
     ref="container"
-    v-bind="allowResize ? {hasStyles: widthStyle !== undefined} : (undefined as never)"
+    v-bind="allowResize ? {hasStyles: !!styleValue.width && styleValue.width !== '0px'} : (undefined as never)"
     class="text-description shrink-0 select-none overflow-hidden pr-6"
-    :style="widthStyle ?? widthStyleInner"
+    :style="[widthStyleInner, styleValue]"
     @update:width="$emit('update:width', $event)"
     @save:width="$emit('save:width')"
   >
@@ -72,7 +72,7 @@ const props = defineProps<{
   disabled?: boolean
   allowResize?: boolean
   itemClass?: string
-  widthStyle: StyleValue | undefined
+  styleValue: Record<string, string | undefined>
 }>()
 
 const emit = defineEmits<{
