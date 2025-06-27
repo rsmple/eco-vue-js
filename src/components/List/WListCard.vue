@@ -5,7 +5,7 @@
     class="relative isolate"
     :class="{
       [cardWrapperClass ?? '']: true,
-      'w-ripple-trigger-has': isActionShown,
+      'w-ripple-trigger-list': isActionShown,
       'sm-not:dark:even:bg-primary-darkest/25 sm-not:even:bg-gray-50 grid grid-cols-1': card,
       'flex': !card,
       '-mb-px': !card && isOpen,
@@ -248,7 +248,7 @@ const beforeClass = computed(() => {
   if (!isActionShown.value) return {}
 
   return {
-    'w-ripple-has-only w-ripple-hover': true,
+    'w-ripple-list w-ripple-hover-list': true,
     'w-ripple-opacity-[0.05]': !props.allowSelectHover && !props.selected && !moreRef.value?.isOpen,
     'before:text-primary dark:before:text-primary-dark w-ripple-opacity-15': props.allowSelectHover || props.selected || moreRef.value?.isOpen,
     'before:opacity-10': props.selected || moreRef.value?.isOpen,

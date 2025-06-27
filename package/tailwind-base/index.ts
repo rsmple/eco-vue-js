@@ -4,6 +4,7 @@ import colors from 'tailwindcss/colors.js'
 
 import pluginContainerQueries from './plugins/container-queries.js'
 import pluginDefault from './plugins/default.js'
+import pluginRipple from './plugins/w-ripple.js'
 import animations from './theme/animations.js'
 import score from './theme/score.js'
 import severity from './theme/severity.js'
@@ -119,6 +120,7 @@ const tailwindBase = {
   },
   plugins: [
     pluginDefault,
+    pluginRipple,
     pluginContainerQueries,
   ],
 } satisfies Config
