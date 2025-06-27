@@ -245,8 +245,11 @@ const position = ref<{left: string, top: string} | null>(null)
 const anchorRef = useTemplateRef<HTMLDivElement>('anchor')
 
 const beforeClass = computed(() => {
+  if (!isActionShown.value) return {}
+
   return {
-    'w-ripple-has-only w-ripple-hover w-ripple-opacity-[0.05]': isActionShown.value,
+    'w-ripple-has-only w-ripple-hover': true,
+    'w-ripple-opacity-[0.05]': !props.allowSelectHover && !props.selected && !moreRef.value?.isOpen,
     'before:text-primary dark:before:text-primary-dark w-ripple-opacity-15': props.allowSelectHover || props.selected || moreRef.value?.isOpen,
     'before:opacity-10': props.selected || moreRef.value?.isOpen,
   }

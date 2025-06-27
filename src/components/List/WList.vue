@@ -239,7 +239,7 @@
                     'items-center': !alignTop,
                     'items-start': alignTop,
                     'pr-6': !isGrid,
-                    'bg-default dark:bg-default-dark sticky': !isGrid && fieldConfigMap[defaultScope.field.meta.label]?.fixed,
+                    'bg-default dark:bg-default-dark sticky z-[1]': !isGrid && fieldConfigMap[defaultScope.field.meta.label]?.fixed,
                     ...(!isGrid && fieldConfigMap[defaultScope.field.meta.label]?.fixed ? beforeClass : {})
                   }"
                   :style="isGrid ? {gridArea: defaultScope.field.meta.label} : {
