@@ -1,12 +1,14 @@
 <template>
   <component
-    :is="allowResize ? HeaderItemResizer : 'div'"
+    :is="allowResize ? HeaderItemResizer : HeaderItem"
     ref="container"
-    v-bind="allowResize ? {hasStyles: !!styleValue.width && styleValue.width !== '0px'} : (undefined as never)"
+    v-bind="allowResize ? {
+      hasStyles: !!styleValue.width && styleValue.width !== '0px',
+      'onSave:width': () => $emit('save:width'),
+    } : (undefined as never)"
     class="text-description shrink-0 select-none overflow-hidden pr-6"
     :style="[widthStyleInner, styleValue]"
     @update:width="$emit('update:width', $event)"
-    @save:width="$emit('save:width')"
   >
     <component
       :is="disabled ? 'div' : 'button'"
@@ -63,6 +65,7 @@ import IconBack from '@/assets/icons/default/IconBack.svg?component'
 
 import {Order, type OrderItem} from '@/utils/order'
 
+import HeaderItem from './components/HeaderItem.vue'
 import HeaderItemResizer from './components/HeaderItemResizer.vue'
 
 const props = defineProps<{

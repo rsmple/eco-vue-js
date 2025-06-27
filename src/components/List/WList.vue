@@ -136,6 +136,7 @@
                 :mobile="isMobile"
                 @click:reset="reset"
                 @update:mode="updateMode"
+                @update:field-config-map="updateStylesWidth(); updateStylesFixed()"
               />
             </div>
           </template>
@@ -167,8 +168,8 @@
                   :allow-resize="field.meta.allowResize"
                   :item-class="field.meta.cssClassHeader"
                   :style-value="isGrid ? {gridArea: field.meta.label} : {
-                    minWidth: `var(${getFieldVariable('width', field.meta.label)})`,
-                    maxWidth: `var(${getFieldVariable('width', field.meta.label)})`,
+                    minWidth: field.meta.allowResize ? `var(${getFieldVariable('width', field.meta.label)})` : undefined,
+                    maxWidth: field.meta.allowResize ? `var(${getFieldVariable('width', field.meta.label)})` : undefined,
                     left: fieldConfigMap[field.meta.label]?.fixed ? `var(${getFieldVariable('left', field.meta.label)})` : undefined,
                     right: fieldConfigMap[field.meta.label]?.fixed ? `var(${getFieldVariable('right', field.meta.label)})` : undefined,
                   }"
@@ -176,7 +177,7 @@
                     [field.meta.cssClass ?? '']: true,
                     'sticky z-[1] bg-[inherit]': !isGrid && fieldConfigMap[field.meta.label]?.fixed,
                   }"
-                  @update:width="fieldConfigMap[field.meta.label].width = $event"
+                  @update:width="fieldConfigMap[field.meta.label].width = $event; updateStylesWidth()"
                   @save:width="save"
                   @update:ordering="updateOrdering"
                 />
@@ -311,7 +312,7 @@ import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, FieldC
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type StyleValue, computed, markRaw, ref, toRef, watch} from 'vue'
+import {type StyleValue, computed, markRaw, nextTick, ref, toRef, watch} from 'vue'
 
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
@@ -434,9 +435,9 @@ const ordering = computed<OrderItem<keyof Data>[]>(() => {
   return []
 })
 
-const stylesWidth = computed(() => getFieldStylesWidth(fieldsFiltered.value, fieldConfigMap.value))
+const stylesWidth = ref({})
 
-const stylesFixed = computed(() => getFieldStylesFixed(sortFields(fieldsFiltered.value, fieldConfigMap.value), fieldConfigMap.value))
+const stylesFixed = ref({})
 
 const updateOrdering = (value: OrderItem<keyof Data>[]) => {
   const ordering = encodeOrdering(value)
@@ -456,6 +457,27 @@ const getQueryParamsBulk = (): QueryParams => {
 
   return props.queryParams
 }
+
+const updateStylesWidth = async () => {
+  await nextTick()
+
+  stylesWidth.value = getFieldStylesWidth(fieldsFiltered.value, fieldConfigMap.value)
+}
+
+const updateStylesFixed = async () => {
+  await nextTick()
+
+  stylesFixed.value = getFieldStylesFixed(sortFields(fieldsFiltered.value, fieldConfigMap.value), fieldConfigMap.value)
+}
+
+const unwatch = watch(fieldsFiltered, async () => {
+  await Promise.all([
+    updateStylesWidth(),
+    updateStylesFixed(),
+  ])
+
+  if (Object.keys(stylesWidth.value).length !== 0 || Object.keys(stylesFixed.value).length !== 0) unwatch()
+}, {immediate: true})
 
 watch(countValue, value => emit('update:count', value), {immediate: true})
 </script>
