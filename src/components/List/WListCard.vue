@@ -261,7 +261,7 @@ const toggle = () => {
 
 const validate: ComponentInstance<typeof WForm>['validate'] = (...args) => formRef.value?.validate(...args)
 
-const isActionShown = computed<boolean>(() => !props.skeleton && (props.allowOpen || props.to !== undefined || props.allowSelectHover || props.hasAction || props.selected))
+const isActionShown = computed<boolean>(() => !props.skeleton && (props.allowOpen || props.to !== undefined || props.allowSelectHover || props.hasAction || props.selected || moreRef.value?.isOpen === true))
 
 const toggleMenu = (event: MouseEvent) => {
   if (props.disabled || props.disableMore || !containerRef.value || !moreRef.value || event.ctrlKey) return

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="list:last-not:pr-3 list:first-not:pl-3 grid shrink-0 grid-cols-1"
+    class="list:pr-3 list:first-not:pl-3 grid shrink-0 grid-cols-1"
     :class="{
       'pointer-events-none': allowOpen,
     }"
