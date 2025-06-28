@@ -43,6 +43,8 @@ import InfiniteListWrapper from './components/InfiniteListWrapper.vue'
 
 import {useHeader} from '../HeaderBar/use/useHeader'
 
+defineOptions({inheritAttrs: false})
+
 const props = defineProps<{
   initIsIntersecting?: boolean
 }>()

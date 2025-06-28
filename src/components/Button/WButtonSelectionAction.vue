@@ -3,7 +3,7 @@
     :disabled="disabled || disableMessage !== undefined"
     class="
       disabled:text-description relative isolate flex
-      select-none items-center justify-center bg-none
+      select-none items-center bg-none
       no-underline outline-none disabled:cursor-not-allowed
     "
     :class="{
@@ -16,7 +16,7 @@
     @click="!disabled && !disableMessage && !loading && $emit('click')"
   >
     <div
-      class="-h--w-input-height sm-not:-px--inner-margin z-10 flex items-center justify-center gap-2 px-[--w-list-padding,1rem]" 
+      class="-h--w-input-height sm-not:-px--inner-margin z-10 flex items-center gap-2 px-[--w-list-padding,1rem]" 
       :class="{
         'opacity-0': loading,
       }"
@@ -28,7 +28,7 @@
 
       <div
         v-if="title"
-        class="sm-not:hidden whitespace-nowrap font-normal"
+        class="sm-not:hidden sm-not:[.dropdown_&]:block whitespace-nowrap font-normal"
       >
         {{ title }}
       </div>
