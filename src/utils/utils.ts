@@ -227,7 +227,7 @@ export const getDefaultFieldConfigMap = <Fields extends ListFields<any, any>>(fi
         width: null,
         visible: visible.includes(field.meta.label as typeof visible[number]),
         order,
-        fixed: field.meta.fixed ?? false,
+        sticky: field.meta.sticky ?? false,
       }
       else processFields(field.meta.fields)
     })

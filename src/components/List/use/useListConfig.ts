@@ -56,7 +56,7 @@ const parseFieldConfigMap = <Fields extends ListFields<unknown>>(value: unknown,
           width: config.width ?? null,
           visible: config.visible ?? defaultConfig.visible,
           order: config.order ?? defaultConfig.order,
-          fixed: config.fixed ?? defaultConfig.fixed,
+          sticky: config.sticky ?? defaultConfig.sticky,
         }
       }
     })
@@ -218,7 +218,7 @@ export const getFieldStylesFixed = <Fields extends ListFields<any, any>>(fields:
   const fixedLabels: string[] = []
 
   forEachField(fields, field => {
-    if (fieldConfigMap[field.meta.label]?.fixed) {
+    if (fieldConfigMap[field.meta.label]?.sticky) {
       fixedLabels.push(field.meta.label)
     }
   })

@@ -27,7 +27,7 @@ export type ListField<Data, QueryParams = unknown> = {
   field?: Extract<keyof Data, string> | ((params: QueryParams) => Extract<keyof Data, string>)
   visibleGetter?: (params: QueryParams) => boolean
   allowResize?: boolean
-  fixed?: boolean
+  sticky?: boolean
 }
 
 export type ListFieldNested<Data, QueryParams = unknown> = {
@@ -121,7 +121,7 @@ export type FieldConfig = {
   width: number | null
   visible: boolean
   order: number
-  fixed: boolean
+  sticky: boolean
 }
 
 type GetFieldLabelsTuple<Fields> = Fields extends [infer Head, ...infer Tail]

@@ -3,10 +3,10 @@
     :class="{
       'w-card': isGrid,
       'w-list': !isGrid,
-      '[--w-list-right:calc(var(--w-list-padding,1rem)*2+1.25em)]': menu,
-      '[--w-list-right:--w-list-header-rounded,1rem]': !menu,
-      '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em+1px)]': allowSelect,
-      '[--w-list-left:--w-list-header-rounded,1rem]': !allowSelect,
+      '[--w-list-right:calc(var(--w-list-padding,1rem)*2+1.25em+1px)]': menu,
+      '[--w-list-right:calc(var(--w-list-header-rounded,1rem)+1px)]': !menu,
+      '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em+2px)]': allowSelect,
+      '[--w-list-left:calc(var(--w-list-header-rounded,1rem)+1px)': !allowSelect,
     }"
     :style="[stylesWidth, stylesFixed]"
   >
@@ -170,13 +170,13 @@
                   :style-value="isGrid ? {gridArea: field.meta.label} : {
                     minWidth: field.meta.allowResize ? `var(${getFieldVariable('width', field.meta.label)})` : undefined,
                     maxWidth: field.meta.allowResize ? `var(${getFieldVariable('width', field.meta.label)})` : undefined,
-                    left: fieldConfigMap[field.meta.label]?.fixed ? `var(${getFieldVariable('left', field.meta.label)})` : undefined,
-                    right: fieldConfigMap[field.meta.label]?.fixed ? `var(${getFieldVariable('right', field.meta.label)})` : undefined,
+                    left: fieldConfigMap[field.meta.label]?.sticky ? `var(${getFieldVariable('left', field.meta.label)})` : undefined,
+                    right: fieldConfigMap[field.meta.label]?.sticky ? `var(${getFieldVariable('right', field.meta.label)})` : undefined,
                   }"
                   :has-width="stylesWidth[getFieldVariable('width', field.meta.label)] !== undefined"
                   :class="{
                     [field.meta.cssClass ?? '']: true,
-                    'sticky z-[1] bg-[inherit]': !isGrid && fieldConfigMap[field.meta.label]?.fixed,
+                    'sticky z-[1] bg-[inherit]': !isGrid && fieldConfigMap[field.meta.label]?.sticky,
                   }"
                   @update:width="fieldConfigMap[field.meta.label].width = $event; updateStylesWidth()"
                   @save:width="save"
@@ -239,14 +239,14 @@
                     [defaultScope.field.meta.cssClass ?? '']: true,
                     'items-center': !alignTop,
                     'items-start': alignTop,
-                    'bg-default dark:bg-default-dark sticky z-[1]': !isGrid && fieldConfigMap[defaultScope.field.meta.label]?.fixed,
-                    ...(!isGrid && fieldConfigMap[defaultScope.field.meta.label]?.fixed ? beforeClass : {})
+                    'bg-default dark:bg-default-dark sticky z-[1]': !isGrid && fieldConfigMap[defaultScope.field.meta.label]?.sticky,
+                    ...(!isGrid && fieldConfigMap[defaultScope.field.meta.label]?.sticky ? beforeClass : {})
                   }"
                   :style="isGrid ? !defaultScope.nested ? {gridArea: defaultScope.field.meta.label} : undefined : {
                     minWidth: `var(${getFieldVariable('width', defaultScope.field.meta.label)})`,
                     maxWidth: `var(${getFieldVariable('width', defaultScope.field.meta.label)})`,
-                    left: fieldConfigMap[defaultScope.field.meta.label]?.fixed ? `var(${getFieldVariable('left', defaultScope.field.meta.label)})` : undefined,
-                    right: fieldConfigMap[defaultScope.field.meta.label]?.fixed ? `var(${getFieldVariable('right', defaultScope.field.meta.label)})` : undefined,
+                    left: fieldConfigMap[defaultScope.field.meta.label]?.sticky ? `var(${getFieldVariable('left', defaultScope.field.meta.label)})` : undefined,
+                    right: fieldConfigMap[defaultScope.field.meta.label]?.sticky ? `var(${getFieldVariable('right', defaultScope.field.meta.label)})` : undefined,
                   }"
                   @update:item="setter"
                   @delete:item="setter(); refetch()"

@@ -62,13 +62,13 @@
         <button
           v-if="!nested"
           class="w-ripple w-ripple-hover group relative flex items-center justify-center"
-          @click="$emit('update:field-config-map', {[item.meta.label]: {...fieldConfigMap[item.meta.label], fixed: !fieldConfigMap[item.meta.label].fixed}})"
+          @click="$emit('update:field-config-map', {[item.meta.label]: {...fieldConfigMap[item.meta.label], sticky: !fieldConfigMap[item.meta.label].sticky}})"
         >
           <component
-            :is="fieldConfigMap[item.meta.label].fixed ? IconLock : IconLockOff"
+            :is="fieldConfigMap[item.meta.label].sticky ? IconLock : IconLockOff"
             class="pointer-events-none"
             :class="{
-              'opacity-20 group-hover:opacity-50': !fieldConfigMap[item.meta.label].fixed,
+              'opacity-20 group-hover:opacity-50': !fieldConfigMap[item.meta.label].sticky,
             }"
           />
         </button>
