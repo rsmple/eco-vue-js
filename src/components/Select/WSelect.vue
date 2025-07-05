@@ -66,6 +66,7 @@
               :selected="true"
               :model="true"
               :index="index"
+              :skeleton="false"
             />
           </template>
         </SelectOptionPrefix>
@@ -101,10 +102,12 @@
         <slot
           v-if="search && !isModelValueSearch"
           name="option"
-          :option="null"
+          :option="undefined"
           :search="search"
           :selected="false"
           :model="false"
+          :index="undefined"
+          :skeleton="false"
         >
           <component
             v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
@@ -152,6 +155,9 @@
             :option="option"
             :selected="selected"
             :model="false"
+            :index="index"
+            :skeleton="false"
+            :search="search"
           >
             <component
               v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
@@ -168,7 +174,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>">
-import type {SelectOptionComponent, SelectOptionComponentProps, SelectProps} from './types'
+import type {SelectOptionComponent, SelectOptionComponentProps, SelectOptionProps, SelectProps} from './types'
 
 import {type Ref, computed, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
 
@@ -434,13 +440,7 @@ defineExpose({
 defineSlots<{
   title?: () => void
   subtitle?: () => void
-  option?: (props: {
-    option: Data | null | undefined
-    index?: number
-    selected: boolean
-    model: boolean
-    search?: string
-  }) => void
+  option?: (props: PartialNot<SelectOptionProps<Data>>) => void
   right?: () => void
 }>()
 </script>

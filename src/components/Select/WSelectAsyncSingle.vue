@@ -33,14 +33,11 @@
 
     <template
       v-if="$slots.option"
-      #option="{option, selected, model, search}"
+      #option="scope"
     >
       <slot
         name="option"
-        :option="option"
-        :selected="selected"
-        :model="model"
-        :search="search"
+        v-bind="scope"
       />
     </template>
 
@@ -54,7 +51,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false">
-import type {SelectAsyncSingleProps, SelectOptionComponent} from './types'
+import type {SelectAsyncSingleProps, SelectOptionComponent, SelectOptionProps} from './types'
 
 import {computed, toRef, useTemplateRef, watch} from 'vue'
 
@@ -88,4 +85,11 @@ watch(toRef(props, 'modelValue'), blur)
 defineExpose({
   blur,
 })
+
+defineSlots<{
+  title?: () => void
+  subtitle?: () => void
+  right?: (props: Record<string, never>) => void
+  option?: (props: PartialNot<SelectOptionProps<Data>>) => void
+}>()
 </script>

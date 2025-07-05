@@ -61,11 +61,12 @@
         >
           <slot
             name="option"
-            :option="option ?? null"
+            :option="option"
             :index="index"
             :selected="true"
             :model="true"
             :skeleton="false"
+            :search="undefined"
           />
         </template>
       </SelectAsyncPrefix>
@@ -97,7 +98,7 @@
         @create:option="create(search)"
         @update:model-value="updateSelected"
       >
-        <template #default="{option, selected, skeleton: skeletonList}">
+        <template #default="{option, selected, skeleton: skeletonList, index}">
           <slot
             name="option"
             :option="option"
@@ -105,6 +106,7 @@
             :skeleton="skeletonList"
             :model="false"
             :search="search"
+            :index="index"
           >
             <component
               v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
@@ -123,7 +125,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
-import type {SelectAsyncProps, SelectOptionComponent, SelectOptionComponentProps} from './types'
+import type {SelectAsyncProps, SelectOptionComponent, SelectOptionComponentProps, SelectOptionProps} from './types'
 
 import {computed, nextTick, ref, useTemplateRef, watch} from 'vue'
 
@@ -298,6 +300,6 @@ defineSlots<{
   title?: () => void
   subtitle?: () => void
   right?: (props: Record<string, never>) => void
-  option?: (props: {option: Data | null, index?: number, selected: boolean, skeleton: boolean, model: boolean, search?: string}) => void
+  option?: (props: PartialNot<SelectOptionProps<Data>>) => void
 }>()
 </script>

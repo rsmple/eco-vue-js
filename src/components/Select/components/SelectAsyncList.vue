@@ -29,10 +29,12 @@
 
       <slot
         v-if="search && !isModelValueSearch"
-        :option="null"
+        :option="undefined"
         :selected="false"
         :skeleton="false"
         :search="search"
+        :model="false"
+        :index="undefined"
       />
 
       <div
@@ -58,7 +60,7 @@
       min-height
       @update:count="$emit('update:count', $event); count = $event; updateCursor(undefined)"
     >
-      <template #default="{item, skeleton, previous, next, first, last}">
+      <template #default="{item, skeleton, previous, next, first, last, index}">
         <SelectOption
           :is-selected="!skeleton && modelValue.includes(valueGetter(item))"
           :is-cursor="!skeleton && valueGetter(item) === cursor"
@@ -92,6 +94,8 @@
               :selected="selected"
               :skeleton="skeleton"
               :search="undefined"
+              :index="index"
+              :model="false"
             />
           </template>
         </SelectOption>
@@ -114,6 +118,8 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
+import type {SelectOptionProps} from '../types'
+
 import {type UnwrapRef, computed, ref} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
@@ -244,11 +250,6 @@ defineExpose({
 })
 
 defineSlots<{
-  default?: (props: {
-    option: Data | null
-    selected: boolean
-    skeleton: boolean
-    search: string | undefined
-  }) => void
+  default?: (props: PartialNot<SelectOptionProps<Data>>) => void
 }>()
 </script>

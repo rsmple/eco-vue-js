@@ -1,3 +1,4 @@
+import type {SelectOptionProps} from '../Select/types'
 import type {DropdownMenuProps} from '@/components/DropdownMenu/types'
 import type {FieldWrapperProps} from '@/components/FieldWrapper/types'
 import type {LinkProps} from '@/types/types'
@@ -19,9 +20,7 @@ export interface ButtonProps extends Partial<LinkProps> {
   skeleton?: boolean
 }
 
-export type ButtonGroupOptionProps<Option> = {option: Option, selected?: boolean}
-
-export type ButtonGroupOptionComponent<Option> = Component<ButtonGroupOptionProps<Option>>
+export type ButtonGroupOptionComponent<Option> = Component<SelectOptionProps<Option>>
 
 interface ButtonGroupPropsBase<Model extends number | string | null | boolean>
   extends Omit<FieldWrapperProps, 'modelValue'>,

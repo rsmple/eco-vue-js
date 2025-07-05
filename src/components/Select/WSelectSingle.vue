@@ -33,14 +33,11 @@
 
     <template
       v-if="$slots.option"
-      #option="{option, selected, model, search}"
+      #option="scope"
     >
       <slot
         name="option"
-        :option="option"
-        :selected="selected"
-        :model="model"
-        :search="search"
+        v-bind="scope"
       />
     </template>
 
@@ -54,9 +51,9 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false">
-import type {SelectOptionComponent, SelectSingleProps} from './types'
+import type {SelectOptionComponent, SelectOptionProps, SelectSingleProps} from './types'
 
-import {computed, toRef, useTemplateRef, watch} from 'vue'
+import {type VNode, computed, toRef, useTemplateRef, watch} from 'vue'
 
 import WSelect from '@/components/Select/WSelect.vue'
 
@@ -91,4 +88,11 @@ watch(toRef(props, 'modelValue'), blur)
 defineExpose({
   blur,
 })
+
+defineSlots<{
+  title?: () => VNode[]
+  subtitle?: () => VNode[]
+  right?: () => VNode[]
+  option?: (props: PartialNot<SelectOptionProps<Data>>) => VNode[]
+}>()
 </script>

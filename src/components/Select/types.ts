@@ -3,10 +3,11 @@ import type {Component} from 'vue'
 
 export type SelectOptionProps<Option> = {
   option: Option | undefined
-  selected: boolean
-  model: boolean
-  index: number
-  search: string | undefined
+  selected?: boolean
+  model?: boolean
+  index?: number
+  search?: string | undefined
+  skeleton?: boolean
 }
 
 export type SelectOptionComponent<Option> = Component<SelectOptionProps<Option>>

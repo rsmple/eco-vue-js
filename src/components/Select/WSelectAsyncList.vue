@@ -39,13 +39,15 @@
       >
         <template
           v-if="$slots.default"
-          #default="{option, selected, skeleton: skeletonList}"
+          #default="{option, selected, skeleton: skeletonList, index}"
         >
           <slot
             :option="option"
             :selected="selected"
             :skeleton="skeletonList"
             :model="false"
+            :index="index"
+            :search="undefined"
           />
         </template>
       </SelectAsyncList>
@@ -54,6 +56,8 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
+import type {SelectOptionProps} from './types'
+
 import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
@@ -91,6 +95,6 @@ defineEmits<{
 }>()
 
 defineSlots<{
-  default?: (props: {option: Data | null, selected: boolean, skeleton: boolean, model: boolean}) => void
+  default?: (props: PartialNot<SelectOptionProps<Data>>) => void
 }>()
 </script>

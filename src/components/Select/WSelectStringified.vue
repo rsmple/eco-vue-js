@@ -29,14 +29,11 @@
 
     <template
       v-if="$slots.option"
-      #option="{option, selected, model, search}"
+      #option="scope"
     >
       <slot
         name="option"
-        :option="option"
-        :selected="selected"
-        :model="model"
-        :search="search"
+        v-bind="scope"
       />
     </template>
 
@@ -50,7 +47,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>">
-import type {SelectOptionComponent, SelectStringifiedProps} from './types'
+import type {SelectOptionComponent, SelectOptionProps, SelectStringifiedProps} from './types'
 
 import {type VNode, computed, useTemplateRef} from 'vue'
 
@@ -98,11 +95,6 @@ defineSlots<{
   title?: () => VNode[]
   subtitle?: () => VNode[]
   right?: () => VNode[]
-  option?: (props: {
-    option: Data | null | undefined
-    selected: boolean
-    model: boolean
-    search: string | undefined
-  }) => VNode[]
+  option?: (props: PartialNot<SelectOptionProps<Data>>) => VNode[]
 }>()
 </script>

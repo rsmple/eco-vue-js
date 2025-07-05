@@ -211,3 +211,11 @@ declare type Join<Data, Separator extends string> = Data extends [infer Head, ..
   : Head
   : Join<Tail, Separator>
   : ''
+
+declare type Pretty<T> = {
+  [Key in keyof T]: T[Key]
+}
+
+declare type PartialNot<T> = {
+  [Key in keyof Required<T> as Key extends keyof T ? Key: Key?]: T[Key]
+}
