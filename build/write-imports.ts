@@ -213,6 +213,9 @@ const getPackageExports = (list: ComponentPath[]) => {
     './dist/utils/api': {
       import: './dist/utils/api.js',
     },
+    './dist/utils/ApiClient': {
+      import: './dist/utils/ApiClient.js',
+    },
     './dist/utils/validate': {
       import: './dist/utils/validate.js',
     },
@@ -235,6 +238,7 @@ const writePackageExports = async (list: ComponentPath[]) => {
   const obj = await fs.readFile('package.json', 'utf8').then(JSON.parse)
 
   delete obj.devDependencies
+  delete obj.scripts
 
   obj.exports = getPackageExports(list)
 

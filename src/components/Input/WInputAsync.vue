@@ -13,7 +13,7 @@
     :class="$attrs.class"
     @keypress:enter="handleEnterPress"
     @click="open"
-    @blur="toggle(); focused = false;"
+    @blur="props.textSecure && !value ? cancel() : toggle(); focused = false;"
     @focus="focused = true"
     @paste="handlePaste"
     @update:model-value="value = $event"
