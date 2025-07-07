@@ -13,8 +13,6 @@ export const getURLParams = (params: RequestConfig['params'] | LocationQuery): s
   return new URLSearchParams(encodeQueryParams(params) as Record<string, string>).toString()
 }
 
-const BASE_URL = '/api/v1'
-
 const HEADERS_JSON: Record<string, string> = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*',
@@ -25,8 +23,21 @@ const HEADERS_FORMDATA: Record<string, string> = {
 }
 
 type ApiUrl = `/${ string }/`
+type BaseUrl = `/${ string }`
 
-export class ApiClient {
+export interface ApiClientInstance {
+  baseUrl: string
+
+  get<R>(url: ApiUrl, config?: RequestConfig<never>): Promise<RequestResponse<R, NonNullable<unknown>>>
+
+  post<R, D extends RequestData = RequestData>(url: ApiUrl, data?: Required<RequestConfig<D>>['data'], config?: Omit<RequestConfig<D>, 'data'>): Promise<RequestResponse<R, D>>
+
+  patch<R, D extends RequestData = RequestData>(url: ApiUrl, data?: Required<RequestConfig<D>>['data'], config?: Omit<RequestConfig<D>, 'data'>): Promise<RequestResponse<R, D>>
+
+  delete<R>(url: ApiUrl, config?: RequestConfig<never>): Promise<RequestResponse<R, NonNullable<unknown>>>
+}
+
+export class ApiClient implements ApiClientInstance {
   routeNameAuth = Symbol('w-router-auth')
   routeNameAuthNo = Symbol('w-router-auth-no')
   refreshPromise: Promise<void> | null = null
@@ -34,16 +45,17 @@ export class ApiClient {
 
   constructor(private config: {
     tokenGetter?: () => string | null
-    refreshUrl?: string
+    refreshUrl?: ApiUrl
     onFailure?: (response: Response) => void
     credentials?: RequestCredentials
+    baseUrl?: BaseUrl
   }) {}
 
   logout() {
     removeExpirationDate()
   }
 
-  async retry(request: Request) {
+  private async retry(request: Request) {
     const newRequest = request.clone()
 
     const response = await fetch(request)
@@ -55,7 +67,7 @@ export class ApiClient {
     }
   }
 
-  async refresh(): Promise<void> {
+  private async refresh(): Promise<void> {
     if (!this.refreshPromise) {
       const refreshTimeoutPromise = getLastRefreshPromise()
 
@@ -86,7 +98,7 @@ export class ApiClient {
       } else {
         setRefreshTimestamp()
 
-        this.refreshPromise = this.fetch('GET', this.config.refreshUrl ?? '', {updateToken: true})
+        this.refreshPromise = this.fetch('GET', this.config.refreshUrl!, {updateToken: true})
           .then(() => {
             this.refreshPromise = null
           })
@@ -115,7 +127,7 @@ export class ApiClient {
     return result
   }
 
-  protected fetch<R, D extends RequestData>(method: string, url: string, config?: RequestConfig<D>): Promise<RequestResponse<R, D>> {
+  private fetch<R, D extends RequestData>(method: string, url: ApiUrl, config?: RequestConfig<D>, baseUrl?: BaseUrl): Promise<RequestResponse<R, D>> {
     return new Promise(async (resolve, reject) => {
       const headers = new Headers(config?.data instanceof FormData ? HEADERS_FORMDATA : HEADERS_JSON)
 
@@ -132,13 +144,18 @@ export class ApiClient {
           }
 
           if (this.config.refreshUrl) await this.refresh()
+        } else if (this.config.tokenGetter) {
+          const token = this.config.tokenGetter()
+
+          if (token) headers.append('Authorization', 'Bearer ' + token)
+          else return Promise.reject()
         }
       }
 
       const params = config?.params ? '?' + getURLParams(config.params) : ''
 
       const request = new Request(
-        BASE_URL + url + params,
+        (baseUrl ?? this.config.baseUrl) + url + params,
         {
           method: method,
           mode: 'cors',
@@ -167,7 +184,9 @@ export class ApiClient {
                 })
               } else {
                 if (response.status === 401) {
-                  return this.refresh().then(() => this.retry(request))
+                  if (this.config.refreshUrl) return this.refresh().then(() => this.retry(request))
+
+                  this.isAuthFailed.value = true
                 }
 
                 this.config.onFailure?.(response)
@@ -198,6 +217,10 @@ export class ApiClient {
     })
   }
 
+  public get baseUrl() {
+    return this.config.baseUrl ?? ''
+  }
+
   get<R>(url: ApiUrl, config?: RequestConfig<never>) {
     return this.fetch<R, NonNullable<unknown>>('GET', url, config)
   }
@@ -224,6 +247,8 @@ export class ApiClient {
         if (to.meta.noAuth) return
 
         if (this.refreshPromise) await this.refreshPromise
+
+        console.log('check')
 
         if (!this.checkAuth()) {
           if (this.config.refreshUrl) return this.refresh()
@@ -262,5 +287,30 @@ export class ApiClient {
         noAuth: true,
       },
     } satisfies RouteRecordRaw
+  }
+
+  addChild(baseUrl: BaseUrl): ApiClientInstance {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this
+
+    return {
+      baseUrl,
+
+      get<R>(url: ApiUrl, config?: RequestConfig<never>) {
+        return self.fetch<R, NonNullable<unknown>>('GET', url, config, baseUrl)
+      },
+
+      post<R, D extends RequestData = RequestData>(url: ApiUrl, data?: Required<RequestConfig<D>>['data'], config?: Omit<RequestConfig<D>, 'data'>) {
+        return self.fetch<R, D>('POST', url, {data, ...config}, baseUrl)
+      },
+
+      patch<R, D extends RequestData = RequestData>(url: ApiUrl, data?: Required<RequestConfig<D>>['data'], config?: Omit<RequestConfig<D>, 'data'>) {
+        return self.fetch<R, D>('PATCH', url, {data, ...config}, baseUrl)
+      },
+
+      delete<R>(url: ApiUrl, config?: RequestConfig<never>) {
+        return self.fetch<R, NonNullable<unknown>>('DELETE', url, config, baseUrl)
+      },
+    }
   }
 }
