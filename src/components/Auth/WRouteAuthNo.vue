@@ -3,14 +3,14 @@
 </template>
 
 <script lang="ts" setup>
-import type {ApiClient} from '@/utils/ApiClient'
+import type {ApiClientInstance} from '@/utils/ApiClient'
 
 import {useQueryClient} from '@tanstack/vue-query'
 import {onBeforeMount, onBeforeUnmount, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 
 const props = defineProps<{
-  apiClient: ApiClient
+  apiClientInstance: ApiClientInstance
 }>()
 
 const router = useRouter()
@@ -24,22 +24,22 @@ const redirect = async () => {
     const resolved = router.resolve(route.query.hash)
 
     if (!resolved.matched.length) {
-      await router.replace({name: props.apiClient.routeNameAuth})
+      await router.replace({name: props.apiClientInstance.routeNameAuth})
     } else {
       await router.replace(resolved)
     }
   } else {
-    await router.replace({name: props.apiClient.routeNameAuth})
+    await router.replace({name: props.apiClientInstance.routeNameAuth})
   }
 }
 
 const checkLogin = () => {
-  if (!props.apiClient.checkAuth()) return
+  if (!props.apiClientInstance.checkAuth()) return
 
   redirect()
 }
 
-watch(() => props.apiClient.isAuthFailed.value, value => {
+watch(() => props.apiClientInstance.isAuthFailed.value, value => {
   if (value) return
   
   redirect()

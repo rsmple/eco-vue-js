@@ -25,7 +25,7 @@ const HEADERS_FORMDATA: Record<string, string> = {
 type ApiUrl = `/${ string }/`
 type BaseUrl = `/${ string }`
 
-export interface ApiClientInstance {
+export interface ApiClient {
   baseUrl: string
 
   get<R>(url: ApiUrl, config?: RequestConfig<never>): Promise<RequestResponse<R, NonNullable<unknown>>>
@@ -37,9 +37,7 @@ export interface ApiClientInstance {
   delete<R>(url: ApiUrl, config?: RequestConfig<never>): Promise<RequestResponse<R, NonNullable<unknown>>>
 }
 
-export class ApiClient implements ApiClientInstance {
-  routeNameAuth = Symbol('w-router-auth')
-  routeNameAuthNo = Symbol('w-router-auth-no')
+export class ApiClientInstance implements ApiClient {
   refreshPromise: Promise<void> | null = null
   isAuthFailed = ref(false)
 
@@ -49,7 +47,17 @@ export class ApiClient implements ApiClientInstance {
     onFailure?: (response: Response) => void
     credentials?: RequestCredentials
     baseUrl?: BaseUrl
+    routeNameAuth: string
+    routeNameAuthNo: string
   }) {}
+
+  get routeNameAuth() {
+    return this.config.routeNameAuth
+  }
+
+  get routeNameAuthNo() {
+    return this.config.routeNameAuthNo
+  }
 
   logout() {
     removeExpirationDate()
@@ -237,18 +245,15 @@ export class ApiClient implements ApiClientInstance {
     return this.fetch<R, NonNullable<unknown>>('DELETE', url, config)
   }
 
-  getRouteAuth(this: ApiClient) {
+  getRouteAuth(this: ApiClientInstance) {
     return {
       path: '',
-      name: this.routeNameAuth,
-      props: {apiClient: this},
+      props: {apiClientInstance: this} satisfies ComponentInstance<typeof WRouteAuth> extends {$props: infer P} ? P : never,
       component: WRouteAuth,
       beforeEnter: async to => {
         if (to.meta.noAuth) return
 
         if (this.refreshPromise) await this.refreshPromise
-
-        console.log('check')
 
         if (!this.checkAuth()) {
           if (this.config.refreshUrl) return this.refresh()
@@ -265,11 +270,10 @@ export class ApiClient implements ApiClientInstance {
     } satisfies RouteRecordRaw
   }
 
-  getRouteAuthNo(this: ApiClient) {
+  getRouteAuthNo(this: ApiClientInstance) {
     return {
       path: '',
-      name: this.routeNameAuthNo,
-      props: {apiClient: this},
+      props: {apiClientInstance: this} satisfies ComponentInstance<typeof WRouteAuthNo> extends {$props: infer P} ? P : never,
       component: WRouteAuthNo,
       beforeEnter: (to, from) => {
         if (!this.checkAuth()) {
@@ -289,27 +293,24 @@ export class ApiClient implements ApiClientInstance {
     } satisfies RouteRecordRaw
   }
 
-  addChild(baseUrl: BaseUrl): ApiClientInstance {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this
-
+  addInstance(baseUrl: BaseUrl): ApiClient {
     return {
       baseUrl,
 
-      get<R>(url: ApiUrl, config?: RequestConfig<never>) {
-        return self.fetch<R, NonNullable<unknown>>('GET', url, config, baseUrl)
+      get: <R>(url: ApiUrl, config?: RequestConfig<never>) => {
+        return this.fetch<R, NonNullable<unknown>>('GET', url, config, baseUrl)
       },
 
-      post<R, D extends RequestData = RequestData>(url: ApiUrl, data?: Required<RequestConfig<D>>['data'], config?: Omit<RequestConfig<D>, 'data'>) {
-        return self.fetch<R, D>('POST', url, {data, ...config}, baseUrl)
+      post: <R, D extends RequestData = RequestData>(url: ApiUrl, data?: Required<RequestConfig<D>>['data'], config?: Omit<RequestConfig<D>, 'data'>) => {
+        return this.fetch<R, D>('POST', url, {data, ...config}, baseUrl)
       },
 
-      patch<R, D extends RequestData = RequestData>(url: ApiUrl, data?: Required<RequestConfig<D>>['data'], config?: Omit<RequestConfig<D>, 'data'>) {
-        return self.fetch<R, D>('PATCH', url, {data, ...config}, baseUrl)
+      patch: <R, D extends RequestData = RequestData>(url: ApiUrl, data?: Required<RequestConfig<D>>['data'], config?: Omit<RequestConfig<D>, 'data'>) => {
+        return this.fetch<R, D>('PATCH', url, {data, ...config}, baseUrl)
       },
 
-      delete<R>(url: ApiUrl, config?: RequestConfig<never>) {
-        return self.fetch<R, NonNullable<unknown>>('DELETE', url, config, baseUrl)
+      delete: <R>(url: ApiUrl, config?: RequestConfig<never>) => {
+        return this.fetch<R, NonNullable<unknown>>('DELETE', url, config, baseUrl)
       },
     }
   }
