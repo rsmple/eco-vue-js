@@ -2,6 +2,8 @@ import type {App} from 'vue'
 
 import WActionsBar from '@/components/ActionsBar/WActionsBar.vue'
 import WActionsBarFilter from '@/components/ActionsBar/WActionsBarFilter.vue'
+import WRouteAuth from '@/components/Auth/WRouteAuth.vue'
+import WRouteAuthNo from '@/components/Auth/WRouteAuthNo.vue'
 import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import WButton from '@/components/Button/WButton.vue'
 import WButtonAction from '@/components/Button/WButtonAction.vue'
@@ -107,6 +109,8 @@ export default {
   install: (app: App | any) => {
     app.component('WActionsBar', WActionsBar)
     app.component('WActionsBarFilter', WActionsBarFilter)
+    app.component('WRouteAuth', WRouteAuth)
+    app.component('WRouteAuthNo', WRouteAuthNo)
     app.component('WBottomSheet', WBottomSheet)
     app.component('WButton', WButton)
     app.component('WButtonAction', WButtonAction)
@@ -212,6 +216,8 @@ export default {
 export {
   WActionsBar,
   WActionsBarFilter,
+  WRouteAuth,
+  WRouteAuthNo,
   WBottomSheet,
   WButton,
   WButtonAction,

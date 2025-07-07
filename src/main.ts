@@ -3,6 +3,7 @@ export * as iconsSax from '@/imports/iconsSax'
 export * from '@/imports/componentsPlugin'
 
 export * from '@/utils/api'
+export * from '@/utils/ApiClient'
 export * from '@/utils/Notify'
 export * from '@/utils/Modal'
 export * as DOMListenerContainer from '@/utils/DOMListenerContainer'
