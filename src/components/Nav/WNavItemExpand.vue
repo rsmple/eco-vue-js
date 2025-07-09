@@ -68,7 +68,7 @@
       </template>
     </WDropdownMenu>
 
-    <WExpansion :is-shown="hasActive || even">
+    <WExpansion :is-shown="isActive || even">
       <WNavItemTransition>
         <component
           :is="slot"
@@ -117,13 +117,13 @@ const innerRef = useTemplateRef<(typeof WNavItem)[] | undefined>('inner')
 const isDropdownOpen = ref(false)
 const hasActive = ref(false)
 
-const isActive = computed(() => componentRef.value?.isActive ?? false)
+const isActive = computed(() => hasActive.value || (componentRef.value?.isActive ?? false))
 const hasInnerActive = computed(() => innerRef.value?.some(item => item.isActive) ?? false)
 
 const updateHasActive = async () => {
   await nextTick()
 
-  hasActive.value = componentRef.value?.isActive || (innerRef.value?.some(item => item.isActive) ?? false)
+  hasActive.value = innerRef.value?.some(item => item.isActive) ?? false
 }
 
 const showDropdown = () => {
@@ -152,6 +152,6 @@ defineSlots<{
 }>()
 
 defineExpose({
-  isActive: hasActive,
+  isActive,
 })
 </script>
