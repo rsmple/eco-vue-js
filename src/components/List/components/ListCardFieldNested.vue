@@ -14,7 +14,7 @@
       <template v-if="'keyArray' in field.meta || 'getterArray' in field.meta">
         <component
           :is="field.default ?? 'div'"
-          v-bind="field.default ? {item, skeleton, card, readonly} : (undefined as never)"
+          v-bind="field.default ? {item, skeleton, card, readonly, config} : (undefined as never)"
           :class="field.meta.cssClassArray"
         >
           <ListCardFieldNestedItem :items="skeleton ? [item] : (('keyArray' in field.meta ? item[field.meta.keyArray] : field.meta.getterArray(item)) as Data[])">
@@ -50,7 +50,7 @@
       <component
         :is="field.default ?? 'div'"
         v-else
-        v-bind="field.default ? {item, skeleton, card, readonly} : (undefined as never)"
+        v-bind="field.default ? {item, skeleton, card, readonly, config} : (undefined as never)"
         :class="field.meta.cssClass"
         class="flex"
       >
@@ -81,6 +81,8 @@ import ListCardFieldNestedItem from './ListCardFieldNestedItem.vue'
 
 import {isField} from '../models/utils'
 import {getFirstFieldLabel, sortFields} from '../use/useListConfig'
+
+const config = {width: null, visible: true, order: 0, sticky: false}
 
 defineProps<{
   fields: ListFields<Data, QueryParams>
