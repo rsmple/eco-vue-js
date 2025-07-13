@@ -134,12 +134,12 @@
     width="100%"
     height="100%"
   >
-    <div
-      class="text-description text-2xs flex size-full cursor-not-allowed items-center opacity-40"
-    >
-      <div>
-        {{ disableMessage ?? 'No data is currently available' }}
-      </div>
+    <div class="text-description text-2xs flex size-full cursor-not-allowed items-center opacity-40">
+      <slot name="empty">
+        <div>
+          {{ emptyStub ?? 'No data' }}
+        </div>
+      </slot>
     </div>
   </foreignObject>
 </template>
@@ -164,7 +164,7 @@ const props = defineProps<{
   hasArea?: boolean
   showPoints?: boolean
   pointRadius?: number
-  disableMessage?: string
+  emptyStub?: string
 } & ChartContext>()
 
 const gradientId = useId()

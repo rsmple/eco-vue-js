@@ -6,9 +6,11 @@ export type FieldProps<Data> = {
   skeleton: boolean
   readonly: boolean
   card: boolean
+  config: FieldConfig
 }
 
 export type FieldComponent<Data> = Component<FieldProps<Data>>
+export type ExpansionComponent<Data> = Component<Omit<FieldProps<Data>, 'config'>>
 
 export type FieldComponentItem<Data> = Component<{
   item: Data

@@ -235,6 +235,7 @@
                   :readonly="readonly || (readonlyGetter?.(defaultScope.item) ?? false)"
                   :skeleton="skeleton"
                   :card="isGrid"
+                  :config="fieldConfigMap[defaultScope.field.meta.label]"
                   :class="{
                     [defaultScope.field.meta.cssClass ?? '']: true,
                     'items-center': !alignTop,
@@ -308,7 +309,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>, CardColumns extends readonly GridCol[]">
-import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, FieldComponent, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
+import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, ExpansionComponent, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
@@ -340,7 +341,7 @@ defineOptions({inheritAttrs: false})
 const props = defineProps<{
   count?: number
   fields: Fields
-  expansion?: FieldComponent<Data>
+  expansion?: ExpansionComponent<Data>
   useQueryFn: UseQueryPaginated<Data, QueryParams>
   queryParams: QueryParams
   queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
