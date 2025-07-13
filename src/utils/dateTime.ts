@@ -65,38 +65,38 @@ export function datetimeFormat(date: Date): string {
   return `${ dateFormat(date) } ${ timeFormat(date) }`
 }
 
-export function durationHumanize(durationSeconds: number, full?: boolean): string {
+export function durationHumanize(durationSeconds: number, full?: boolean, round?: boolean): string {
   const cb = full ? getDurationStringFull : getDurationString
 
   const seconds = durationSeconds % 60
-  if (durationSeconds === seconds) return cb(seconds)
+  if (durationSeconds === seconds) return round ? cb(Math.round(seconds)) : cb(seconds)
 
   const durationMinutes = (durationSeconds - seconds) / 60
   const minutes = durationMinutes % 60
-  if (durationMinutes === minutes) return cb(seconds, minutes)
+  if (durationMinutes === minutes) return round ? cb(0, Math.round(minutes)) : cb(seconds, minutes)
 
   const durationHours = (durationMinutes - minutes) / 60
   const hours = durationHours % 24
-  if (durationHours === hours) return cb(seconds, minutes, hours)
+  if (durationHours === hours) return  round ? cb(0, 0, Math.round(hours)) :cb(seconds, minutes, hours)
 
   const durationDays = (durationHours - hours) / 24
   const days = durationDays % 365
   if (durationDays === days) {
-    if (days < 30) return cb(seconds, minutes, hours, days)
+    if (days < 30) return round ? cb(0, 0, 0, Math.round(days)) : cb(seconds, minutes, hours, days)
 
     const newDays = days % 30
     const months = (days - newDays) / 30
 
-    return cb(seconds, minutes, hours, newDays, months)
+    return round ? cb(0, 0, 0, 0, Math.round(months)) : cb(seconds, minutes, hours, newDays, months)
   } else {
     const durationYears = (durationDays - days) / 365
 
-    if (days < 30) return cb(seconds, minutes, hours, days, 0, durationYears)
+    if (days < 30) return round ? cb(0, 0, 0, 0, 0, Math.round(durationYears)) : cb(seconds, minutes, hours, days, 0, durationYears)
 
     const newDays = days % 30
     const months = (days - newDays) / 30
 
-    return cb(seconds, minutes, hours, newDays, months, durationYears)
+    return round ? cb(0, 0, 0, 0, 0, Math.round(durationYears)) : cb(seconds, minutes, hours, newDays, months, durationYears)
   }
 }
 

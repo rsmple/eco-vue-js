@@ -18,7 +18,7 @@
       </linearGradient>
 
       <linearGradient
-        v-if="hasArea"
+        v-if="hasArea && !yKeyMin && !yKeyMax"
         :id="gradientAreaId"
         gradientTransform="rotate(90)"
       >
@@ -37,8 +37,18 @@
       </linearGradient>
 
       <mask :id="maskId">
+        <template v-if="yKeyMin && yKeyMax">
+          <path
+            v-if="minMaxAreaPath"
+            :d="minMaxAreaPath"
+            fill="white"
+            fill-opacity="0.2"
+            class="transition-[d]"
+          />
+        </template>
+
         <path
-          v-if="hasArea && areaPath"
+          v-else-if="hasArea && areaPath"
           :d="areaPath"
           :fill="`url(#${gradientAreaId})`"
           class="transition-[d]"
@@ -76,6 +86,7 @@
         class="cursor-crosshair"
         @mousemove="handleMouseMove"
         @mouseleave="closeTooltip"
+        @mouseenter="handleMouseEnter"
       />
 
       <g :transform="`translate(${hoveredData?.x ?? 0} 0)`">
@@ -126,7 +137,7 @@
     <div
       class="text-description text-2xs flex size-full cursor-not-allowed items-center opacity-40"
     >
-      <div class="pl-36">
+      <div>
         {{ disableMessage ?? 'No data is currently available' }}
       </div>
     </div>
@@ -140,12 +151,14 @@ import {computed, nextTick, onUnmounted, ref, useId, useTemplateRef, watch} from
 
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
-type DataPrepared = {x: number, y: number, d: Data}
+type DataPrepared = {x: number, y: number, yMin: number, yMax: number, d: Data}
 
 const props = defineProps<{
   data: Data[]
   xKey: keyof Data
   yKey: keyof Data
+  yKeyMin?: keyof Data
+  yKeyMax?: keyof Data
   strokeStyle?: 'solid' | 'dashed' | 'dotted'
   strokeWidth?: number
   hasArea?: boolean
@@ -186,11 +199,20 @@ const ROUND_FACTOR = 100
 const round = (value: number) => Math.round(value * ROUND_FACTOR) / ROUND_FACTOR
 
 const preparedData = computed<DataPrepared[]>(() => {
-  const result = dataFiltered.value.map(d => ({
-    x: round(Math.min(Math.max(props.scaleX(d[props.xKey]), props.left), props.svgWidth - props.right)),
-    y: round(props.scaleY(d[props.yKey])),
-    d,
-  }))
+  const result = dataFiltered.value.map(d => {
+    const item = {
+      x: round(Math.min(Math.max(props.scaleX(d[props.xKey]), props.left), props.svgWidth - props.right)),
+      y: round(props.scaleY(d[props.yKey])),
+      yMin: round(props.scaleY(d[props.yKeyMin!])),
+      yMax: round(props.scaleY(d[props.yKeyMax!])),
+      d,
+    }
+
+    item.yMin = props.yKeyMin && typeof d[props.yKeyMin] === 'number' ? round(props.scaleY(d[props.yKeyMin!])) : item.y
+    item.yMax = props.yKeyMax && typeof d[props.yKeyMax] === 'number' ? round(props.scaleY(d[props.yKeyMax!])) : item.y
+
+    return item
+  })
 
   const lastIndex = result.length - 1
   if (result[lastIndex] && result[lastIndex].x !== props.left) result.push({...result[lastIndex], x: props.left})
@@ -257,6 +279,10 @@ const handleMouseMove = (event: MouseEvent) => {
   }
 }
 
+const handleMouseEnter = () => {
+  if (!tooltipRef.value?.isOpen) hoveredIndex.value = null
+}
+
 const closeTooltip = () => {
   if (tooltipRef.value) tooltipRef.value?.close() 
   else hoveredIndex.value = null
@@ -298,14 +324,42 @@ const areaPath = computed(() => {
   return path
 })
 
+const minMaxAreaPath = computed(() => {
+  if (!props.yKeyMin || !props.yKeyMax || preparedData.value.length === 0) return ''
+  
+  const data = preparedData.value
+  
+  // Start from left side, draw top line (yMax values)
+  let path = `M ${ data[0].x } ${ data[0].yMax }`
+  
+  // Draw through all yMax points
+  for (let i = 1; i < data.length; i++) {
+    path += ` L ${ data[i].x } ${ data[i].yMax }`
+  }
+  
+  // Now draw bottom line (yMin values) in reverse order
+  for (let i = data.length - 1; i >= 0; i--) {
+    path += ` L ${ data[i].x } ${ data[i].yMin }`
+  }
+  
+  // Close the polygon
+  path += ' Z'
+  
+  return path
+})
+
 const yExtent = computed<[number, number]>(() => {
   if (props.data.length === 0) return [0, 100]
-  
-  const yValues = dataFiltered.value.map(d => d[props.yKey])
 
-  return yValues.length > 0
-    ? [0, Math.max(...yValues)]
-    : [0, 100]
+  let maxValue = 0
+
+  dataFiltered.value.forEach(item => {
+    if (typeof item[props.yKey] === 'number' && item[props.yKey] > maxValue) maxValue = item[props.yKey]
+    if (props.yKeyMin && typeof item[props.yKeyMin] === 'number' && item[props.yKeyMin] > maxValue) maxValue = item[props.yKeyMin]
+    if (props.yKeyMax && typeof item[props.yKeyMax] === 'number' && item[props.yKeyMax] > maxValue) maxValue = item[props.yKeyMax]
+  })
+
+  return [0, maxValue || 100]
 })
 
 const emitDomainUpdate = () => {
