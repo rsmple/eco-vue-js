@@ -57,6 +57,10 @@ export function timeFormat(date: Date): string {
   return date.toLocaleTimeString('en-GB')
 }
 
+export function timeFormatShort(date: Date): string {
+  return date.toLocaleTimeString('en-GB', {timeStyle: 'short'})
+}
+
 export function datetimeFormat(date: Date): string {
   return `${ dateFormat(date) } ${ timeFormat(date) }`
 }

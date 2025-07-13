@@ -59,6 +59,10 @@ export class ApiClientInstance implements ApiClient {
     return this.config.routeNameAuthNo
   }
 
+  setOnFailure(value: (response: Response) => void) {
+    this.config.onFailure = value
+  }
+
   logout() {
     removeExpirationDate()
   }

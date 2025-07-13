@@ -7,12 +7,11 @@
 </template>
 
 <script lang="ts" setup>
-import {type VNode, computed, markRaw, onBeforeUnmount, ref, toRef, useSlots, useTemplateRef, watch} from 'vue'
+import {type VNode, computed, markRaw, onBeforeUnmount, toRef, useId, useSlots, useTemplateRef, watch} from 'vue'
 
-import {Tooltip} from '@/utils/Tooltip'
 import {getIsTouchDevice} from '@/utils/mobile'
 
-import {getIncrement} from './models/utils'
+import {useTooltipMeta} from './models/tooltipMeta'
 
 const props = defineProps<{
   text?: string
@@ -20,6 +19,7 @@ const props = defineProps<{
   overflowOnly?: boolean
   light?: boolean
   trigger?: Element
+  noTrigger?: boolean
   maxHeight?: number
   left?: boolean
   right?: boolean
@@ -27,12 +27,15 @@ const props = defineProps<{
 
 const slots = useSlots()
 
+const {tooltipMeta, setTooltipMeta} = useTooltipMeta()
+
 const isTouchDevice = getIsTouchDevice()
 const containerRef = useTemplateRef('container')
-const isOpen = ref(false)
+const id = useId()
 
 const parent = computed(() => containerRef.value?.parentElement ?? null)
-const triggerElement = computed(() => props.trigger ?? parent.value)
+const triggerElement = computed(() => props.noTrigger ? null : (props.trigger ?? parent.value))
+const isOpen = computed(() => tooltipMeta.value?.id === id)
 
 const open = () => {
   const slot = slots.default?.()?.[0]
@@ -40,19 +43,17 @@ const open = () => {
   if (!parent.value) return
   if (!slot && !props.text) return
 
-  isOpen.value = true
-
   if (props.overflowOnly) {
     const rect = parent.value.getBoundingClientRect()
 
     if (parent.value.scrollHeight === Math.round(rect.height) && parent.value.scrollWidth === Math.round(rect.width)) return
   }
 
-  Tooltip.add({
+  setTooltipMeta({
     parent: parent.value,
     slot: slot ? markRaw(slot) : undefined,
     text: props.text,
-    key: getIncrement(),
+    id,
     maxHeight: props.maxHeight,
     left: props.left,
     right: props.right,
@@ -60,9 +61,7 @@ const open = () => {
 }
 
 const close = () => {
-  isOpen.value = false
-
-  Tooltip.close()
+  setTooltipMeta(null)
 }
 
 watch(triggerElement, (newValue, oldValue) => {
@@ -86,4 +85,10 @@ onBeforeUnmount(() => {
 defineSlots<{
   default?: () => VNode[]
 }>()
+
+defineExpose({
+  isOpen,
+  open,
+  close,
+})
 </script>

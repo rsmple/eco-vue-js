@@ -64,7 +64,7 @@
 </template>
 
 <script lang="ts" setup>
-import type {TooltipMeta} from '@/utils/Tooltip'
+import type {TooltipMeta} from '../models/tooltipMeta'
 
 import {nextTick, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 

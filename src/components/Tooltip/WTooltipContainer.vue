@@ -7,6 +7,7 @@
   >
     <WDropdown
       v-if="tooltipMeta"
+      ref="dropdown"
       :key="dropdownKey"
       :parent-element="tooltipMeta.parent"
       :horizontal-align="tooltipMeta.left ? HorizontalAlign.LEFT_CENTER : tooltipMeta.right ? HorizontalAlign.RIGHT_CENTER : HorizontalAlign.CENTER"
@@ -32,7 +33,7 @@
           <template v-if="tooltipMeta.slot">
             <component
               :is="tooltipMeta.slot"
-              :key="tooltipMeta.key"
+              :key="tooltipMeta.id"
             />
           </template>
 
@@ -49,59 +50,27 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, markRaw, onBeforeMount, onBeforeUnmount, onMounted, onUnmounted, ref} from 'vue'
+import {computed, onMounted, onUnmounted, useTemplateRef, watch} from 'vue'
 
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
-import {type SetTooltipMeta, type TooltipMeta, initTooltip} from '@/utils/Tooltip'
 
 import TooltipContainer from './components/TooltipContainer.vue'
+import {useTooltipMeta} from './models/tooltipMeta'
 
-const tooltipMeta = ref<TooltipMeta | null>(null)
-let timeout: NodeJS.Timeout | undefined
+const {tooltipMeta, setTooltipMeta, close} = useTooltipMeta()
 
-const setTooltipMeta: SetTooltipMeta = (meta: TooltipMeta | null) => {
-  clearTimeoutOnClose()
-
-  if (!meta) {
-    timeout = setTimeout(() => {
-      tooltipMeta.value = null
-      timeout = undefined
-    }, 100)
-  } else if (tooltipMeta.value !== meta) {
-    timeout = setTimeout(() => {
-      tooltipMeta.value = markRaw(meta)
-      timeout = undefined
-    }, 25)
-  }
-}
+const dropdownRef = useTemplateRef('dropdown')
 
 const dropdownKey = computed(() => tooltipMeta.value?.left ? HorizontalAlign.LEFT_OUTER : tooltipMeta.value?.right ? HorizontalAlign.RIGHT_OUTER : HorizontalAlign.CENTER)
 
-const close = () => {
-  clearTimeoutOnClose()
-
-  tooltipMeta.value = null
-}
-
-const clearTimeoutOnClose = () => {
-  if (!timeout) return
-
-  clearTimeout(timeout)
-  timeout = undefined
-}
-
-onBeforeMount(() => {
-  initTooltip(setTooltipMeta)
+watch(tooltipMeta, (newValue, oldValue) => {
+  if (newValue && oldValue && newValue.parent === oldValue.parent) dropdownRef.value?.update()
 })
 
 onMounted(() => {
   window.addEventListener('touch', close)
-})
-
-onBeforeUnmount(() => {
-  initTooltip(undefined)
 })
 
 onUnmounted(() => {

@@ -18,6 +18,8 @@ import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.v
 import WButtonSelectionState from '@/components/Button/WButtonSelectionState.vue'
 import WButtonTab from '@/components/Button/WButtonTab.vue'
 import WButtonUnselect from '@/components/Button/WButtonUnselect.vue'
+import WChartLine from '@/components/Chart/WChartLine.vue'
+import WChartLinear from '@/components/Chart/WChartLinear.vue'
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 import WCheckboxGroup from '@/components/Checkbox/WCheckboxGroup.vue'
 import WCheckboxGroupMultiple from '@/components/Checkbox/WCheckboxGroupMultiple.vue'
@@ -125,6 +127,8 @@ export default {
     app.component('WButtonSelectionState', WButtonSelectionState)
     app.component('WButtonTab', WButtonTab)
     app.component('WButtonUnselect', WButtonUnselect)
+    app.component('WChartLine', WChartLine)
+    app.component('WChartLinear', WChartLinear)
     app.component('WCheckbox', WCheckbox)
     app.component('WCheckboxGroup', WCheckboxGroup)
     app.component('WCheckboxGroupMultiple', WCheckboxGroupMultiple)
@@ -232,6 +236,8 @@ export {
   WButtonSelectionState,
   WButtonTab,
   WButtonUnselect,
+  WChartLine,
+  WChartLinear,
   WCheckbox,
   WCheckboxGroup,
   WCheckboxGroupMultiple,

@@ -192,9 +192,6 @@ const getPackageExports = (list: ComponentPath[]) => {
     './dist/utils/Notify': {
       import: './dist/utils/Notify.js',
     },
-    './dist/utils/Tooltip': {
-      import: './dist/utils/Tooltip.js',
-    },
     './dist/utils/useDefaultQuery': {
       import: './dist/utils/useDefaultQuery.js',
     },
