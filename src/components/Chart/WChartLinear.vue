@@ -7,7 +7,7 @@
   >
     <WSkeleton
       v-if="skeleton"
-      class="w-skeleton-w-full w-skeleton-h-full w-skeleton-rounded-3xl"
+      class="w-skeleton-w-full w-skeleton-h-full w-skeleton-rounded-2xl"
     />
 
     <svg

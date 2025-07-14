@@ -130,7 +130,7 @@
   <foreignObject
     v-else
     y="0"
-    x="0"
+    :x="left"
     width="100%"
     height="100%"
   >
