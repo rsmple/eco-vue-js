@@ -49,7 +49,8 @@
         <WCheckbox
           v-if="allowSelect"
           :model-value="selected"
-          :disabled="disabled"
+          :disabled="disabled ?? false"
+          :readonly="false"
           :align-top="alignTop"
           :less-transitions="allowSelectHover"
           class="h-full px-[--w-list-padding,1rem]"
