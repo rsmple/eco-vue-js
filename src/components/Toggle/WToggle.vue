@@ -51,7 +51,7 @@
                 'right-[calc(100%-1.25rem)]': value === false,
                 'right-[calc(50%-0.625rem)]': value === null,
                 'right-0': value === true,
-                'w-ripple w-ripple-hover': !disabled && !readonly && !skeleton,
+                'w-ripple w-ripple-hover': !isDisabled && !isReadonly && !isSkeleton,
               }"
             >
               <WSpinner
