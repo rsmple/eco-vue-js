@@ -6,6 +6,8 @@ export type TooltipMeta = {
   slot?: VNode
   text?: string
   maxHeight?: number
+  top?: boolean
+  bottom?: boolean
   left?: boolean
   right?: boolean
 }

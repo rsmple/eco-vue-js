@@ -81,11 +81,11 @@ const setParentRect = (updateSize = false, updateAlign = false): void => {
   }
 
   if (!verticalGetter || (isTopChanged && (props.updateAlign || updateAlign))) {
-    const order = props.top
-      ? horizontalGetter.verticalGetterOrder.slice().reverse()
-      : horizontalGetter.verticalGetterOrder
-
-    verticalGetter = searchStyleGetter(order, newRect, props.maxHeight)
+    verticalGetter = props.top
+      ? horizontalGetter.verticalGetterOrder[1]
+      : props.bottom
+        ? horizontalGetter.verticalGetterOrder[0]
+        : searchStyleGetter(horizontalGetter.verticalGetterOrder, newRect, props.maxHeight)
     isTop.value = verticalGetter.isTop
 
     if (updateSize) heightStyle.value = verticalGetter.heightStyleGetter(newRect, props.maxHeight)

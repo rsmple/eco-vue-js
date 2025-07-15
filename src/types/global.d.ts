@@ -50,7 +50,7 @@ declare module 'eco-vue-js/dist/assets/icons/*' {
   export default src
 }
 
-declare type DefaultData = {id: number | string, [key: string]: unknown}
+declare type DefaultData = NonNullable<unknown>
 
 type Params = Parameters<import('@tanstack/vue-query').QueryClient['setQueriesData']>
 

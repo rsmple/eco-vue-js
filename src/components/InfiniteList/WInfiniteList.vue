@@ -2,6 +2,7 @@
   <component
     :is="minHeight ? WEmptyComponent : WInfiniteListWrapper"
     :init-is-intersecting="props.queryParams instanceof Object && 'page' in props.queryParams && Number.isInteger(props.queryParams.page) && (props.queryParams.page as number) > 1 ? false : undefined"
+    :no-header-update="noHeaderUpdate"
   >
     <template #header="headerScope">
       <slot
@@ -90,6 +91,7 @@ const props = withDefaults(
     transition?: boolean
     headerTopIgnore?: boolean
     minHeight?: boolean
+    noHeaderUpdate?: boolean
     lastChild?: boolean
     excludeParams?: (keyof QueryParams)[]
     emptyStub?: string
@@ -110,7 +112,7 @@ const props = withDefaults(
     pageClass: undefined,
     maxPages: undefined,
     refetchInterval: undefined,
-    valueGetter: (item: Data) => (item.id as Model),
+    valueGetter: (item: Data) => (item as unknown as {id: Model}).id,
     queryOptions: undefined,
 
     pageLength: 24,

@@ -5,6 +5,7 @@ export interface DropdownProps {
   maxWidth: number
   horizontalAlign: HorizontalAlign
   top?: boolean
+  bottom?: boolean
   parentElement: Pick<Element, 'getBoundingClientRect'>
   updateAlign?: boolean
   emitUpdate?: boolean

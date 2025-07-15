@@ -4,7 +4,7 @@
     class="print:hidden"
   />
 
-  <template v-if="isModal">
+  <template v-if="isModal || noHeaderUpdate">
     <div
       ref="header"
       class="-top--modal-header-height bg-default dark:bg-default-dark sticky print:hidden"
@@ -47,6 +47,7 @@ defineOptions({inheritAttrs: false})
 
 const props = defineProps<{
   initIsIntersecting?: boolean
+  noHeaderUpdate?: boolean
 }>()
 
 const isModal = inject(wIsModal, false)

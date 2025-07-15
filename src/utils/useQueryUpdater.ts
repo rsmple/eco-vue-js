@@ -4,8 +4,8 @@ export const paginatedResponseUpdater = <Data extends DefaultData>(oldData: Pagi
   if (!oldData) return undefined
 
   const included = reverseSelection
-    ? oldData.results.filter(item => !selected.includes(item.id as number))
-    : oldData.results.filter(item => selected.includes(item.id as number))
+    ? oldData.results.filter(item => !selected.includes((item as unknown as {id: number}).id))
+    : oldData.results.filter(item => selected.includes((item as unknown as {id: number}).id))
 
   if (!included.length) return oldData
 
@@ -16,7 +16,7 @@ export const paginatedResponseUpdater = <Data extends DefaultData>(oldData: Pagi
 
     if (index === -1) return
 
-    const finding = newValues.find(item => item.id === oldItem.id)
+    const finding = newValues.find(item => (item as unknown as {id: number}).id === (oldItem as unknown as {id: number}).id)
 
     if (finding) newData.results.splice(index, 1, finding)
     else newData.results.splice(index, 1)
@@ -33,7 +33,7 @@ export const useQueryUpdater = () => {
       queryClient.setQueriesData<Model[]>(options.listQueryFilter, value => {
         if (!value) return
 
-        const index = value.findIndex(item => item.id === data.id)
+        const index = value.findIndex(item => (item as unknown as {id: number}).id === (data as unknown as {id: number}).id)
 
         if (index === -1) return
 
@@ -48,14 +48,14 @@ export const useQueryUpdater = () => {
     if (options.paginatedQueryFilter) {
       queryClient.setQueriesData<PaginatedResponse<Model>>(
         options.paginatedQueryFilter,
-        oldData => paginatedResponseUpdater(oldData, [data], [data.id as number]))
+        oldData => paginatedResponseUpdater(oldData, [data], [(data as unknown as {id: number}).id]))
     }
   }
 
   const updateBulk = <Model extends DefaultData>(data: Model[], filter: QueryFilters) => {
     queryClient.setQueriesData<PaginatedResponse<Model>>(
       filter,
-      oldData => paginatedResponseUpdater(oldData, data, data.map(item => item.id as number)))
+      oldData => paginatedResponseUpdater(oldData, data, data.map(item => (item as unknown as {id: number}).id)))
   }
 
   const deleteItems = <Model extends DefaultData>(filter: QueryFilters, selected: number[], reverse = false) => {

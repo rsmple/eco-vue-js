@@ -65,7 +65,7 @@ export const makeQueryPaginated = <Data, QueryParams extends {page?: number}>(ke
           const oldItem = query.data.value?.results[index]
 
           if (oldItem !== undefined) {
-            const itemIndex = newList.findIndex(item => (item as DefaultData).id === (oldItem as DefaultData).id)
+            const itemIndex = newList.findIndex(item => (item as {id: number}).id === (oldItem as {id: number}).id)
             const newItem = unref(unref(options)?.newItem)
 
             if (index !== -1) {

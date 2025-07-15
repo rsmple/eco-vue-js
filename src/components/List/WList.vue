@@ -430,7 +430,7 @@ const {
 
 const ordering = computed<OrderItem<keyof Data>[]>(() => {
   if (props.queryParams instanceof Object && 'ordering' in props.queryParams && typeof props.queryParams.ordering === 'string') {
-    return parseOrdering(props.queryParams.ordering)
+    return parseOrdering(props.queryParams.ordering) as OrderItem<keyof Data>[]
   }
 
   return []

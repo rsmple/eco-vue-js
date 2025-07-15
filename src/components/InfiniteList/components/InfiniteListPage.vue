@@ -66,7 +66,7 @@
             :key="index"
           >
             <slot
-              :item="({id: index} as Data)"
+              :item="({id: index} as unknown as Data)"
               :setter="(newItem?: Data) => setItem(index, newItem)"
               :refetch="emitRefetch"
               :skeleton="true"

@@ -97,10 +97,13 @@
           :y2="svgHeight - bottom"
           stroke="currentColor"
           stroke-width="1"
-          class="text-description pointer-events-none"
+          class="pointer-events-none text-gray-400 dark:text-gray-600"
         />
 
-        <foreignObject :y="svgHeight - bottom">
+        <foreignObject
+          :height="svgHeight - bottom - 9"
+          :y="top + 4.5"
+        >
           <WTooltip
             ref="tooltip"
             no-trigger
@@ -151,7 +154,7 @@ import {computed, nextTick, onUnmounted, ref, useId, useTemplateRef, watch} from
 
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
-type DataPrepared = {x: number, y: number, yMin: number, yMax: number, d: Data}
+type DataPrepared = {x: number, y: number, yMin: number, yMax: number, d: Data, imagine: boolean}
 
 const props = defineProps<{
   data: Data[]
@@ -188,10 +191,11 @@ const strokeDashArray = computed(() => {
 })
 
 const dataFiltered = computed<Data[]>(() => props.data
-  .filter(data => typeof data[props.yKey] === 'number' &&
-    typeof data[props.xKey] === 'number' &&
-    data[props.xKey] >= props.xExtent[0] &&
-    data[props.xKey] <= props.xExtent[1],
+  .filter((data, index, array) => 
+    data[props.xKey] >= props.xExtent[0] || 
+    data[props.xKey] <= props.xExtent[1] ||
+    array[index + 1][props.xKey] >= props.xExtent[0] ||
+    array[index - 1][props.xKey] <= props.xExtent[1],
   ),
 )
 
@@ -206,6 +210,7 @@ const preparedData = computed<DataPrepared[]>(() => {
       yMin: round(props.scaleY(d[props.yKeyMin!])),
       yMax: round(props.scaleY(d[props.yKeyMax!])),
       d,
+      imagine: false,
     }
 
     item.yMin = props.yKeyMin && typeof d[props.yKeyMin] === 'number' ? round(props.scaleY(d[props.yKeyMin!])) : item.y
@@ -214,9 +219,11 @@ const preparedData = computed<DataPrepared[]>(() => {
     return item
   })
 
+  if (result.length === 0) return result
+
   const lastIndex = result.length - 1
-  if (result[lastIndex] && result[lastIndex].x !== props.left) result.push({...result[lastIndex], x: props.left})
-  if (result[0] && result[0].x !== props.right) result.unshift({...result[0], x: props.svgWidth - props.right})
+  if (result[lastIndex].x !== props.left) result.push({...result[lastIndex], x: props.left, imagine: true})
+  if (result[0].x !== props.svgWidth - props.right) result.unshift({...result[0], x: props.svgWidth - props.right, imagine: true})
 
   return result
 })
@@ -224,8 +231,8 @@ const preparedData = computed<DataPrepared[]>(() => {
 const tooltipData = computed<DataPrepared[]>(() => {
   return preparedData.value
     .slice(
-      preparedData.value[0]?.d === preparedData.value[1]?.d ? 1 : 0,
-      preparedData.value[preparedData.value.length - 1]?.d === preparedData.value[preparedData.value.length - 2]?.d ? -1 : undefined,
+      preparedData.value[0]?.imagine ? 1 : 0,
+      preparedData.value[preparedData.value.length - 1]?.imagine ? -1 : undefined,
     )
     .reverse()
 })

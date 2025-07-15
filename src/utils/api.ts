@@ -115,11 +115,14 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
   const queryParams = reactive<Partial<QueryParams>>({})
   let lastQuery: EncodeQueryParams<Partial<QueryParams>> | null = null
 
-  const fn = (route: {query: EncodeQueryParams<Partial<QueryParams>>}, enabled?: Ref<boolean>) => {
+  const fn = (route: {query: EncodeQueryParams<Partial<QueryParams>>, hash?: string}, enabled?: Ref<boolean>) => {
     const router = useRouter()
 
     const updateQueryParams = (value: Partial<QueryParams>) => {
-      router.replace({query: {...route.query as Record<string, string>, ...encodeRouteParams(value)}})
+      router.replace({
+        query: {...route.query as Record<string, string>, ...encodeRouteParams(value)},
+        hash: Object.keys(value).length === 1 && 'ordering' in value ? route.hash : undefined,
+      })
     }
 
     const handle = watch(() => route.query, value => {

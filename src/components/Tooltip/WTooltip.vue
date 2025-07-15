@@ -21,6 +21,8 @@ const props = defineProps<{
   trigger?: Element
   noTrigger?: boolean
   maxHeight?: number
+  top?: boolean
+  bottom?: boolean
   left?: boolean
   right?: boolean
 }>()
@@ -55,6 +57,8 @@ const open = () => {
     text: props.text,
     id,
     maxHeight: props.maxHeight,
+    top: props.top,
+    bottom: props.bottom,
     left: props.left,
     right: props.right,
   })
