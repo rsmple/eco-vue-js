@@ -204,6 +204,9 @@ const getPackageExports = (list: ComponentPath[]) => {
     './dist/utils/order': {
       import: './dist/utils/order.js',
     },
+    './dist/utils/provide': {
+      import: './dist/utils/provide.js',
+    },
     './dist/utils/useSelected': {
       import: './dist/utils/useSelected.js',
     },
