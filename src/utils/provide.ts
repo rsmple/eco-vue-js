@@ -5,7 +5,7 @@ const wReadonlyKey = Symbol('wReadonlyKey') as InjectionKey<MaybeRef<boolean>>
 export const useProvideReadonly = (value?: MaybeRef<boolean>) => {
   if (value !== undefined) provide(wReadonlyKey, value)
 
-  return inject(wReadonlyKey)
+  return inject(wReadonlyKey, undefined)
 }
 
 const wDisabledKey = Symbol('wDisabledKey') as InjectionKey<MaybeRef<boolean>>
@@ -13,7 +13,7 @@ const wDisabledKey = Symbol('wDisabledKey') as InjectionKey<MaybeRef<boolean>>
 export const useProvideDisabled = (value?: MaybeRef<boolean>) => {
   if (value !== undefined) provide(wDisabledKey, value)
 
-  return inject(wDisabledKey)
+  return inject(wDisabledKey, undefined)
 }
 
 const wSkeletonKey = Symbol('wSkeletonKey') as InjectionKey<MaybeRef<boolean>>
@@ -21,5 +21,5 @@ const wSkeletonKey = Symbol('wSkeletonKey') as InjectionKey<MaybeRef<boolean>>
 export const useProvideSkeleton = (value?: MaybeRef<boolean>) => {
   if (value !== undefined) provide(wSkeletonKey, value)
 
-  return inject(wSkeletonKey)
+  return inject(wSkeletonKey, undefined)
 }

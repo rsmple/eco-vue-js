@@ -24,7 +24,15 @@ import WToggle from '@/components/Toggle/WToggle.vue'
 
 import {useFormAsync} from './use/useFormAsync'
 
-const props = withDefaults(defineProps<FormAsyncToggleProps<Model, FieldType, QueryParams>>(), {queryEnabled: undefined})
+const props = withDefaults(
+  defineProps<FormAsyncToggleProps<Model, FieldType, QueryParams>>(),
+  {
+    queryEnabled: undefined,
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'success', value: Model): void

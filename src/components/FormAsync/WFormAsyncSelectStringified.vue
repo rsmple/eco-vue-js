@@ -40,7 +40,15 @@ import WSelectStringified from '@/components/Select/WSelectStringified.vue'
 
 import {useFormAsync} from './use/useFormAsync'
 
-const props = withDefaults(defineProps<FormAsyncSelectStringifiedProps<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent>>(), {queryEnabled: undefined})
+const props = withDefaults(
+  defineProps<FormAsyncSelectStringifiedProps<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent>>(),
+  {
+    queryEnabled: undefined,
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'success', value: Model): void

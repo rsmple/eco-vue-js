@@ -86,15 +86,25 @@ import {computed, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 import SelectOption from '@/components/Select/components/SelectOption.vue'
+import {useComponentStates} from '@/utils/useComponentStates'
 import {debounce} from '@/utils/utils'
 
 type ModelValue = Required<InputOptionsProps<Type, Option>>['modelValue']
 
-const props = defineProps<InputOptionsProps<Type, Option>>()
+const props = withDefaults(
+  defineProps<InputOptionsProps<Type, Option>>(),
+  {
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'update:model-value', value: ModelValue): void
 }>()
+
+const {isReadonly, isDisabled} = useComponentStates(props)
 
 const isOpen = ref(false)
 const inputRef = useTemplateRef('input')
@@ -104,7 +114,7 @@ const lastIndex = computed(() => props.options.length)
 const focused = ref(false)
 const loadingOptionIndex = ref<number | null>(null)
 
-const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
+const isDisabledComputed = computed(() => props.loading || isReadonly.value || isDisabled.value)
 
 const close = () => {
   isOpen.value = false
@@ -112,7 +122,7 @@ const close = () => {
 }
 
 const setLoadingOptionIndex = (value: number) => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
 
   loadingOptionIndex.value = value
 }
@@ -134,7 +144,7 @@ const setCursor = (value: number): void => {
 }
 
 const cursorUp = () => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
 
   lockCursor()
 
@@ -146,7 +156,7 @@ const cursorUp = () => {
 }
 
 const cursorDown = () => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
 
   lockCursor()
 
@@ -158,7 +168,7 @@ const cursorDown = () => {
 }
 
 const selectCursor = () => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
 
   const value = cursor.value !== -1 ? props.options[cursor.value] : undefined
 

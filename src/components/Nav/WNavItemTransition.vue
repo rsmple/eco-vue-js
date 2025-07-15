@@ -10,3 +10,6 @@
     <slot />
   </TransitionGroup>
 </template>
+
+<script setup lang="ts">
+</script>

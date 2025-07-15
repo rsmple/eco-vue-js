@@ -4,7 +4,7 @@
       v-if="title || $slots.title"
       class="text-accent mb-2 text-xs font-semibold"
     >
-      <template v-if="!skeleton">
+      <template v-if="!isSkeleton">
         <slot name="title">
           {{ title }}
         </slot>
@@ -33,6 +33,7 @@
       @drop.prevent="onDrop"
     >
       <input
+        v-if="!isReadonly && !isDisabled && !isSkeleton"
         ref="input"
         type="file"
         class="pointer-events-none hidden"
@@ -83,6 +84,7 @@
 
         <WButton
           :semantic-type="SemanticType.PRIMARY"
+          :disabled="isReadonly || isDisabled"
           class="mt-4"
           @click.stop.prevent="inputRef?.click()"
         >
@@ -143,6 +145,7 @@ import WButton from '@/components/Button/WButton.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {useComponentStates} from '@/utils/useComponentStates'
 import {isClientSide} from '@/utils/utils'
 
 import FilePickerItem from './components/FilePickerItem.vue'
@@ -150,21 +153,36 @@ import FilePickerSvg from './components/FilePickerSvg.vue'
 
 import {useTabActiveListener} from '../Tabs/use/useTabActiveListener'
 
-const props = defineProps<{
-  modelValue: File[]
-  placeholder?: string
-  multiple?: boolean
-  accept?: string
-  errorMessage?: string
-  title?: string
-  skeleton?: boolean
-  required?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    modelValue: File[]
+    placeholder?: string
+    multiple?: boolean
+    accept?: string
+    errorMessage?: string
+    title?: string
+    skeleton?: boolean
+    readonly?: boolean
+    disabled?: boolean
+    required?: boolean
+  }>(),
+  {
+    placeholder: undefined,
+    accept: undefined,
+    errorMessage: undefined,
+    title: undefined,
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: File[]): void
   (e: 'clear:placeholder'): void
 }>()
+
+const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 const inputRef = useTemplateRef('input')
 const containerRef = useTemplateRef('container')

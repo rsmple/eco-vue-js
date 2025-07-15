@@ -40,7 +40,15 @@ import WSelectAsyncSingle from '@/components/Select/WSelectAsyncSingle.vue'
 
 import {useFormAsync} from './use/useFormAsync'
 
-const props = withDefaults(defineProps<FormAsyncSelectInfiniteSingleProps<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent, AllowClear>>(), {queryEnabled: undefined})
+const props = withDefaults(
+  defineProps<FormAsyncSelectInfiniteSingleProps<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent, AllowClear>>(),
+  {
+    queryEnabled: undefined,
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'success', value: Model): void

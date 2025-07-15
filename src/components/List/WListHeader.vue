@@ -12,6 +12,7 @@
         <WCheckbox
           v-if="allowSelect && selection !== undefined"
           :disabled="disabled || count === 0 || count === undefined"
+          :readonly="false"
           :model-value="selection"
           :tooltip-text="tooltipText"
           intermediate

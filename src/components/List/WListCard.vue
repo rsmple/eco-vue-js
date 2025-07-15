@@ -81,7 +81,8 @@
       <WCheckbox
         v-if="allowSelect && card"
         :model-value="selected"
-        :disabled="disabled"
+        :disabled="disabled ?? false"
+        :readonly="false"
         class="-p--inner-margin -my---inner-margin -mr---inner-margin justify-end self-start"
         :class="{
           'opacity-50': allowSelectHover,

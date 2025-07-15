@@ -20,7 +20,7 @@
     </template>
 
     <template
-      v-if="readonly"
+      v-if="isReadonly"
       #default
     >
       <div
@@ -53,11 +53,11 @@
           overflow-hidden rounded-[--w-input-rounded,0.75rem] border border-solid
         "
         :class="{
-          'focus-within:border-primary dark:focus-within:border-primary-dark focus-within:outline-primary/20 dark:focus-within:outline-primary-dark/20 focus-within:outline focus-within:outline-2': !disabled && !readonly && !unclickable,
-          'cursor-text': !disabled,
+          'focus-within:border-primary dark:focus-within:border-primary-dark focus-within:outline-primary/20 dark:focus-within:outline-primary-dark/20 focus-within:outline focus-within:outline-2': !isDisabled && !isReadonly && !unclickable,
+          'cursor-text': !isDisabled,
           'border-negative dark:border-negative-dark': errorMessage,
-          'border-gray-300 dark:border-gray-700': !disabled,
-          'border-gray-300/50 dark:border-gray-700/50': disabled,
+          'border-gray-300 dark:border-gray-700': !isDisabled,
+          'border-gray-300/50 dark:border-gray-700/50': isDisabled,
           'border-opacity-0 group-hover/field:border-opacity-100 dark:border-opacity-0 dark:group-hover/field:border-opacity-100': seamless && !focused,
           'bg-default dark:bg-default-dark': !seamless || focused,
         }"
@@ -121,15 +121,15 @@
                   'w-option': !textarea && $slots.prefix,
                   'font-mono': mono,
                   'text-secure': textSecure && !isSecureVisible,
-                  'text-black-default dark:text-gray-200': !disabled,
-                  'text-black-default/50 dark:text-gray-200/50': disabled,
+                  'text-black-default dark:text-gray-200': !isDisabled,
+                  'text-black-default/50 dark:text-gray-200/50': isDisabled,
                 }"
                 :value="placeholderSecure && modelValue === undefined && !focused ? '******' : modelValue"
                 :placeholder="placeholder"
                 :type="type ?? 'text'"
                 :name="name"
-                :disabled="disabled"
-                :readonly="readonly || unclickable"
+                :disabled="isDisabled"
+                :readonly="isReadonly || unclickable"
                 :autocomplete="autocomplete"
                 :size="size || undefined"
                 :step="step"
@@ -137,10 +137,10 @@
                 :max="max"
                 :spellcheck="spellcheck ? 'true' : 'false'"
                 @input="handleInputEvent"
-                @keypress.enter.exact="!disabled && !readonly && $emit('keypress:enter', $event)"
-                @keydown.up.exact.stop="!disabled && !readonly && $emit('keypress:up', $event)"
-                @keydown.down.exact.stop="!disabled && !readonly && $emit('keypress:down', $event)"
-                @keydown.delete.exact.stop="!disabled && !readonly && $emit('keypress:delete', $event); handleBackspace($event)"
+                @keypress.enter.exact="!isDisabled && !isReadonly && $emit('keypress:enter', $event)"
+                @keydown.up.exact.stop="!isDisabled && !isReadonly && $emit('keypress:up', $event)"
+                @keydown.down.exact.stop="!isDisabled && !isReadonly && $emit('keypress:down', $event)"
+                @keydown.delete.exact.stop="!isDisabled && !isReadonly && $emit('keypress:delete', $event); handleBackspace($event)"
                 @focus="
                   $emit('focus', $event);
                   setFocused(true);
@@ -167,8 +167,8 @@
           :model-value="(modelValue as ModelValue)"
           :loading="loading"
           :allow-clear="allowClear && modelValue !== ''"
-          :disabled="disabled || disabledActions"
-          :readonly="readonly || unclickable === true"
+          :disabled="isDisabled || disabledActions"
+          :readonly="isReadonly || unclickable === true"
           :text-secure="textSecure"
           :is-secure-visible="isSecureVisible"
           :allow-paste="allowPaste"
@@ -210,6 +210,7 @@ import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 import {Notify} from '@/utils/Notify'
+import {useComponentStates} from '@/utils/useComponentStates'
 
 import InputActions from './components/InputActions.vue'
 
@@ -222,6 +223,9 @@ const props = withDefaults(
   {
     size: 10,
     autocomplete: 'off',
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
   },
 )
 
@@ -242,13 +246,15 @@ const emit = defineEmits<{
   (e: 'paste'): void
 }>()
 
+const {isReadonly, isDisabled} = useComponentStates(props)
+
 const fieldWrapperRef = useTemplateRef('fieldWrapper')
 const contentRef = useTemplateRef('content')
 const inputRef = useTemplateRef<HTMLInputElement>('input')
 const isSecureVisible = ref(false)
 
 const updateModelValue = (value: string | undefined): void => {
-  if (props.loading || props.disabled || props.readonly || props.unclickable) return
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
 
   if (props.type === 'number') {
     emit('update:modelValue', (typeof value === 'string' && value.length ? Number.parseFloat(value) : undefined) as ModelValue)
@@ -305,7 +311,7 @@ const handleInputEvent = (event: Event): void => {
 }
 
 const clearValue = () => {
-  if (props.disabled || props.readonly || props.unclickable) return
+  if (isDisabled.value || isReadonly.value || props.unclickable) return
 
   if (typeof props.modelValue === 'string') updateModelValue('')
   else updateModelValue(undefined)
@@ -316,7 +322,7 @@ const clearValue = () => {
 }
 
 const focus = (): void => {
-  if (props.disabled || props.readonly) return
+  if (isDisabled.value || isReadonly.value) return
 
   if (props.unclickable) emit('focus', undefined)
   else inputRef.value?.focus()

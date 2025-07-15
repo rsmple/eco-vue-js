@@ -26,8 +26,8 @@
           seamless: toggleScope?.unclickable === false ? false : props.seamless,
         }"
         :class="{
-          'cursor-pointer': !disabled && !readonly,
-          'cursor-not-allowed': disabled && !readonly,
+          'cursor-pointer': !isDisabled && !isReadonly,
+          'cursor-not-allowed': isDisabled && !isReadonly,
           'mb-3': isMobile && !toggleScope?.unclickable,
         }"
         @update:model-value="!loading && $emit('update:modelValue', $event as ModelValue)"
@@ -67,7 +67,7 @@
 
         <template #suffix>
           <IconArrow
-            v-if="!disabled"
+            v-if="!isDisabled"
             class="square-3 text-description transition-transform"
             :class="{'rotate-180': isOpen}"
           />
@@ -122,6 +122,7 @@ import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {useIsMobile} from '@/utils/mobile'
+import {useComponentStates} from '@/utils/useComponentStates'
 
 type ModelValue = Required<InputSuggestProps<Type>>['modelValue']
 
@@ -133,6 +134,9 @@ const props = withDefaults(
     maxHeight: 320,
     maxWidth: 600,
     horizontalAlign: HorizontalAlign.FILL,
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
   },
 )
 
@@ -149,15 +153,17 @@ const emit = defineEmits<{
   (e: 'blur', value: FocusEvent): void
 }>()
 
+const {isReadonly, isDisabled} = useComponentStates(props)
+
 const isOpen = ref(false)
 const dropdownMenuRef = useTemplateRef('dropdownMenu')
 const inputRef = useTemplateRef('input')
 const {isMobile} = useIsMobile()
 
-const isDisabled = computed(() => props.readonly || props.disabled)
+const isDisabledComputed = computed(() => isReadonly.value || isDisabled.value)
 
 const open = () => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
 
   isOpen.value = true
 

@@ -4,7 +4,7 @@
       v-if="title"
       class="text-accent mb-2 text-xs font-semibold"
     >
-      <WSkeleton v-if="skeleton" />
+      <WSkeleton v-if="isSkeleton" />
       
       <template v-else>
         {{ title }}
@@ -12,7 +12,7 @@
     </div>
 
     <WSkeleton
-      v-if="skeleton"
+      v-if="isSkeleton"
       class="w-skeleton-rounded-2xl w-skeleton-h-[24rem] w-skeleton-w-full"
     />
 
@@ -31,6 +31,7 @@
         :hide-option-icon="hideOptionIcon"
         :value-getter="valueGetter"
         :query-options="queryOptions"
+        :disabled="isDisabled || isReadonly"
         transition
         @select="$emit('select', $event)"
         @unselect="$emit('unselect', $event)"
@@ -61,9 +62,11 @@ import type {SelectOptionProps} from './types'
 import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
+import {useComponentStates} from '@/utils/useComponentStates'
+
 import SelectAsyncList from './components/SelectAsyncList.vue'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     title?: string
     emptyStub?: string
@@ -77,6 +80,8 @@ withDefaults(
     hideOptionIcon?: boolean
     valueGetter?: (data: Data) => Model
     queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
+    disabled?: boolean
+    readonly?: boolean
   }>(),
   {
     title: undefined,
@@ -84,6 +89,9 @@ withDefaults(
     excludeParams: undefined,
     valueGetter: (data: Data) => (data as unknown as {id: Model}).id,
     queryOptions: undefined,
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
   },
 )
 
@@ -93,6 +101,8 @@ defineEmits<{
   (e: 'update:model-value', value: Model[]): void
   (e: 'update:count', value: number): void
 }>()
+
+const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 defineSlots<{
   default?: (props: PartialNot<SelectOptionProps<Data>>) => void

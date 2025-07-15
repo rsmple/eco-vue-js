@@ -89,6 +89,7 @@ withDefaults(
     maxHeight: 200,
     maxWidth: 320,
     horizontalAlign: HorizontalAlign.LEFT_INNER,
+    disabled: undefined,
   },
 )
 

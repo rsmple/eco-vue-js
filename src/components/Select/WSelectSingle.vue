@@ -61,7 +61,14 @@ type EmitType = AllowClear extends true ? Model | null : NonNullable<Model>
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<SelectSingleProps<Model, Data, QueryParamsOptions, OptionComponent, AllowClear>>()
+const props = withDefaults(
+  defineProps<SelectSingleProps<Model, Data, QueryParamsOptions, OptionComponent, AllowClear>>(),
+  {
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'update:model-value', value: EmitType): void

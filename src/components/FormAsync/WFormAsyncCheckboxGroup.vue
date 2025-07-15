@@ -53,7 +53,15 @@ import WCheckboxGroup from '@/components/Checkbox/WCheckboxGroup.vue'
 
 import {useFormAsync} from './use/useFormAsync'
 
-const props = withDefaults(defineProps<FormAsyncCheckboxGroupProps<Model, FieldType, QueryParams, Entity, ValueGetter>>(), {queryEnabled: undefined})
+const props = withDefaults(
+  defineProps<FormAsyncCheckboxGroupProps<Model, FieldType, QueryParams, Entity, ValueGetter>>(),
+  {
+    queryEnabled: undefined,
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'success', value: Model): void

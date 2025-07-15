@@ -55,7 +55,14 @@ import WSelect from '@/components/Select/WSelect.vue'
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<SelectStringifiedProps<Model, Data, QueryParamsOptions, OptionComponent>>()
+const props = withDefaults(
+  defineProps<SelectStringifiedProps<Model, Data, QueryParamsOptions, OptionComponent>>(),
+  {
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'update:model-value', value: Model): void

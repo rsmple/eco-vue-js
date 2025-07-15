@@ -33,13 +33,13 @@
     </template>
 
     <template
-      v-if="(!readonly && !hideButton) || $slots.right"
+      v-if="(!isReadonly && !hideButton) || $slots.right"
       #right
     >
       <slot name="right" />
 
       <WButtonInput
-        v-if="!readonly && !hideButton"
+        v-if="!isReadonly && !hideButton"
         :icon="canSave ? markRaw(IconCheck) : focused ? markRaw(IconSlash) : markRaw(IconEdit)"
         :tooltip-text="!loading && focused ? canSave ? 'Save' : 'Cancel' : undefined"
         :loading="loading"
@@ -99,15 +99,26 @@ import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 import IconEdit from '@/assets/icons/sax/IconEdit.svg?component'
 import IconSlash from '@/assets/icons/sax/IconSlash.svg?component'
 
+import {useComponentStates} from '@/utils/useComponentStates'
+
 type ModelValue = Required<InputAsyncProps<Type>>['modelValue']
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<InputAsyncProps<Type>>()
+const props = withDefaults(
+  defineProps<InputAsyncProps<Type>>(),
+  {
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: ModelValue | undefined): void
 }>()
+
+const {isReadonly, isDisabled} = useComponentStates(props)
 
 const focused = ref(false)
 const saved = ref(false)
@@ -141,7 +152,7 @@ const cancel = () => {
 }
 
 const toggle = async () => {
-  if (props.disabled || props.loading) return
+  if (isDisabled.value || isReadonly.value || props.loading) return
 
   if (canSave.value) {
     emitUpdateModelValue(value.value)
@@ -152,7 +163,7 @@ const toggle = async () => {
 }
 
 const open = () => {
-  if (props.disabled || props.loading) return
+  if (isDisabled.value || isReadonly.value || props.loading) return
 
   inputRef.value?.focus()
 }
@@ -180,7 +191,7 @@ watch(value, (newValue: ModelValue | undefined): void => {
 })
 
 const emitUpdateModelValue = (newValue: ModelValue | undefined) => {
-  if (props.disabled || props.loading) return
+  if (isDisabled.value || isReadonly.value || props.loading) return
   if (errorMessageValue.value) return
   if (props.placeholderSecure) inputRef.value?.blur()
 

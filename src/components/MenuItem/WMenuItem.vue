@@ -1,7 +1,7 @@
 <template>
   <component
-    :is="to && !disabled ? RouterLink : href ? 'a' : 'button'"
-    v-bind="to && !disabled ? {to} : href ? {href, download} : undefined"
+    :is="disabled ? 'div' : to ? RouterLink : href ? 'a' : 'button'"
+    v-bind="disabled ? undefined : to ? {to} : href ? {href, download} : undefined"
     class="text-description w-ripple-trigger block w-full min-w-36 select-none items-center justify-start px-2 text-start outline-none first:pt-2 last:pb-2"
     :class="{
       'hover:text-primary dark:hover:text-primary-dark cursor-pointer': !disabled,

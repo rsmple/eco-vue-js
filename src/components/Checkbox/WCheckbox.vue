@@ -4,10 +4,10 @@
     v-bind="{class: $attrs.class, style: $attrs.style as StyleValue}"
     class="w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-[0.08] flex select-none gap-2 outline-none"
     :class="{
-      'cursor-progress': loading,
-      'cursor-not-allowed opacity-70': disabled,
-      'cursor-pointer': !disabled && !loading && !readonly,
-      'cursor-auto': readonly,
+      'cursor-progress': loading || isSkeleton,
+      'cursor-not-allowed opacity-70': isDisabled || isSkeleton,
+      'cursor-pointer': !isDisabled && !loading && !isReadonly && !isSkeleton,
+      'cursor-auto': isReadonly,
       'pb-4 pt-1': title && !noMargin,
       'items-start': alignTop,
       'items-center': !alignTop,
@@ -17,14 +17,14 @@
     <div
       class="square-[1.5em] bg-default dark:bg-default-dark relative isolate flex items-center justify-center border border-solid [font-size:--w-checkbox-size]"
       :class="{
-        'text-default': modelValue && !disabled,
-        'text-primary dark:text-primary-dark': !modelValue && !disabled,
-        'text-gray-300 dark:text-gray-700': !modelValue && disabled,
-        'w-ripple w-hover-circle before:text-accent after:text-accent': !disabled && !readonly,
+        'text-default': modelValue && !isDisabled && !isSkeleton,
+        'text-primary dark:text-primary-dark': !modelValue && !isDisabled && !isSkeleton,
+        'text-gray-300 dark:text-gray-700': !modelValue && isDisabled && !isSkeleton,
+        'w-ripple w-hover-circle before:text-accent after:text-accent': !isDisabled && !isReadonly && !isSkeleton,
         'rounded-full': radio,
         'rounded-md': !radio,
-        'border-gray-300 dark:border-gray-700': disabled,
-        'border-primary dark:border-primary-dark [.w-hover-checked:hover_&]:text-default': !disabled,
+        'border-gray-300 dark:border-gray-700': isDisabled || isSkeleton,
+        'border-primary dark:border-primary-dark [.w-hover-checked:hover_&]:text-default': !isDisabled && !isSkeleton,
       }"
       @keypress.enter.stop.prevent="toggle"
     >
@@ -43,8 +43,8 @@
             'scale-[0.66] rounded': !radio && intermediate && modelValue === null,
             'scale-[0.66] rounded-full': radio && !(intermediate && modelValue === null),
             'rounded': !radio && !(intermediate && modelValue === null),
-            'bg-primary dark:bg-primary-dark [.w-hover-checked:hover_&]:[display:block!important]': !disabled,
-            'bg-gray-300 dark:bg-gray-700': disabled,
+            'bg-primary dark:bg-primary-dark [.w-hover-checked:hover_&]:[display:block!important]': !isDisabled && !isSkeleton,
+            'bg-gray-300 dark:bg-gray-700': isDisabled || isSkeleton,
             'transition-[opacity,transform]': !lessTransitions,
           }"
         />
@@ -67,12 +67,12 @@
         v-show="modelValue"
         class="square-[1em]"
         :class="{
-          '[.w-hover-checked:hover_&]:[display:block!important]': !disabled,
+          '[.w-hover-checked:hover_&]:[display:block!important]': !isDisabled && !isSkeleton,
         }"
       />
 
       <WTooltip
-        v-if="tooltipText && !disabled"
+        v-if="tooltipText && !isDisabled && !isSkeleton"
         :text="tooltipText"
         :trigger="(elementRef as HTMLButtonElement)"
         no-touch
@@ -101,9 +101,20 @@ import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
 
+import {useComponentStates} from '@/utils/useComponentStates'
+
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<CheckboxProps>()
+const props = withDefaults(
+  defineProps<CheckboxProps>(),
+  {
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
+
+const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
@@ -112,7 +123,7 @@ const emit = defineEmits<{
 const elementRef = useTemplateRef('element')
 
 const toggle = (): void => {
-  if (props.disabled || props.readonly || props.loading) return
+  if (isDisabled.value || isReadonly.value || props.loading || isSkeleton.value) return
 
   emit('update:modelValue', !props.modelValue)
 }

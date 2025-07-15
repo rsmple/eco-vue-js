@@ -46,13 +46,13 @@
           :option-component-props="(optionComponentProps as SelectProps<Model, Data, QueryParamsOptions, OptionComponent>['optionComponentProps'])"
           :index="index"
           :loading="loading || isLoading"
-          :disabled="disabled"
-          :readonly="readonly"
-          :disable-clear="disableClear || readonly || (seamless && !focused)"
+          :disabled="isDisabled"
+          :readonly="isReadonly"
+          :disable-clear="disableClear || isReadonly || (seamless && !focused)"
           :search="value"
           :class="{
-            'cursor-pointer': !disabled && !readonly,
-            'cursor-not-allowed opacity-50': disabled,
+            'cursor-pointer': !isDisabled && !isReadonly,
+            'cursor-not-allowed opacity-50': isDisabled,
           }"
           @unselect="unselect(value)"
         >
@@ -182,6 +182,7 @@ import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 import {ApiError} from '@/utils/api'
 import {useIsMobile} from '@/utils/mobile'
+import {useComponentStates} from '@/utils/useComponentStates'
 import {debounce} from '@/utils/utils'
 
 import SelectOption from './components/SelectOption.vue'
@@ -189,7 +190,14 @@ import SelectOptionPrefix from './components/SelectOptionPrefix.vue'
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<SelectProps<Model, Data, QueryParamsOptions, OptionComponent>>()
+const props = withDefaults(
+  defineProps<SelectProps<Model, Data, QueryParamsOptions, OptionComponent>>(),
+  {
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'select', item: Model): void
@@ -199,6 +207,8 @@ const emit = defineEmits<{
   (e: 'update:query-options-error', value: string | undefined): void
   (e: 'init-model'): void
 }>()
+
+const {isReadonly, isDisabled} = useComponentStates(props)
 
 const {isMobile} = useIsMobile()
 
@@ -245,7 +255,7 @@ const focused = ref(false)
 const loadingOptionIndex = ref<number | null>(null)
 const loadingCreate = ref(false)
 
-const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
+const isDisabledComputed = computed(() => props.loading || isReadonly.value || isDisabled.value)
 
 const hasCreateOption = computed(() => props.createOption && (!optionsFiltered.value.some(option => props.valueGetter(option) === search.value) || isModelValueSearch.value))
 
@@ -264,7 +274,7 @@ const close = () => {
 }
 
 const setLoadingOptionIndex = (value: number) => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
 
   loadingOptionIndex.value = value
 }
@@ -286,7 +296,7 @@ const setCursor = (value: number): void => {
 }
 
 const cursorUp = () => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
 
   lockCursor()
 
@@ -298,7 +308,7 @@ const cursorUp = () => {
 }
 
 const cursorDown = () => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
 
   lockCursor()
 
@@ -310,7 +320,7 @@ const cursorDown = () => {
 }
 
 const selectCursor = () => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
 
   if (cursor.value === optionsFiltered.value.length) {
     if (search.value && props.createOption) create(search.value)
@@ -348,7 +358,7 @@ const captureDoubleDelete = () => {
 }
 
 const select = (item: Model): void => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
 
   emit('select', item)
 
@@ -356,7 +366,7 @@ const select = (item: Model): void => {
 }
 
 const unselect = (item: Model): void => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
 
   emit('unselect', item)
 
@@ -368,7 +378,7 @@ const unselect = (item: Model): void => {
 }
 
 const create = async (value: string) => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
   if (!props.createOption) return
 
   loadingCreate.value = true

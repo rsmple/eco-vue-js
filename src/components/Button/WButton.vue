@@ -1,6 +1,6 @@
 <template>
   <WSkeleton
-    v-if="skeleton"
+    v-if="isSkeleton"
     class="w-skeleton-rounded-[--w-button-rounded,1rem] w-skeleton-w-max -w-skeleton-h--button-height"
   >
     <div class="flex gap-2 px-[--w-button-rounded,1rem] font-medium opacity-0">
@@ -12,7 +12,7 @@
     v-bind="{
       class: $attrs.class,
       style: $attrs.style as StyleValue,
-      ...(disabled
+      ...(isDisabled
         ? {}
         : tag === 'a'
           ? {href, target}
@@ -20,7 +20,7 @@
             ? {to, replace}
             : {})
     }"
-    :is="to !== undefined ? disabled ? 'a' : RouterLink : tag"
+    :is="to !== undefined ? isDisabled ? 'a' : RouterLink : tag"
     v-else
     class="
       w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-1px)] -min-h--button-height relative isolate
@@ -31,12 +31,12 @@
     :class="{
       [semanticTypeBackgroundMap[semanticType]]: true,
       [semanticTypeBorderMap[semanticType]]: true,
-      'w-ripple w-ripple-hover before:text-black-default w-ripple-opacity-20 dark:w-ripple-opacity-30 cursor-pointer': !loading && !disabled,
+      'w-ripple w-ripple-hover before:text-black-default w-ripple-opacity-20 dark:w-ripple-opacity-30 cursor-pointer': !loading && !isDisabled,
       'cursor-progress': loading,
-      'cursor-not-allowed opacity-70': disabled,
+      'cursor-not-allowed opacity-70': isDisabled,
       'first-not:rounded-l-none first-not:border-l-0 first-not:before:rounded-l-none last-not:rounded-r-none last-not:border-r-0 last-not:before:rounded-r-none': join
     }"
-    :disabled="!loading && disabled"
+    :disabled="!loading && isDisabled"
     :download="download"
     :type="type"
     @click="click"
@@ -68,7 +68,7 @@
       :text="tooltipText"
     />
 
-    <WShine v-if="!disabled && !loading" />
+    <WShine v-if="!isDisabled && !loading" />
   </component>
 </template>
 
@@ -83,6 +83,7 @@ import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 import {SemanticType, useSemanticTypeBackgroundMap, useSemanticTypeBorderMap} from '@/utils/SemanticType'
+import {useComponentStatesButton} from '@/utils/useComponentStates'
 
 import WSkeleton from '../Skeleton/WSkeleton.vue'
 
@@ -98,8 +99,12 @@ const props = withDefaults(
     href: undefined,
     target: undefined,
     semanticTypeMap: undefined,
+    disabled: undefined,
+    skeleton: undefined,
   },
 )
+
+const {isDisabled, isSkeleton} = useComponentStatesButton(props)
 
 const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()
 const semanticTypeBorderMap = useSemanticTypeBorderMap()
@@ -109,7 +114,7 @@ const emit = defineEmits<{
 }>()
 
 const click = (event: MouseEvent | KeyboardEvent): void => {
-  if (props.disabled || props.loading) return
+  if (isDisabled.value || props.loading) return
 
   emit('click', event)
 }

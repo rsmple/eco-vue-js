@@ -2,11 +2,11 @@
   <div
     ref="container"
     :class="{
-      'size-full cursor-progress': skeleton,
+      'size-full cursor-progress': isSkeleton,
     }"
   >
     <WSkeleton
-      v-if="skeleton"
+      v-if="isSkeleton"
       class="w-skeleton-w-full w-skeleton-h-full w-skeleton-rounded-2xl"
     />
 
@@ -35,7 +35,7 @@
       />
 
       <slot
-        v-if="!skeleton"
+        v-if="!isSkeleton"
         :scale-x="scaleX"
         :scale-y="scaleY"
         :svg-width="svgWidth"
@@ -60,6 +60,7 @@ import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 import DOMListenerContainer from '@/utils/DOMListenerContainer'
 import {dateFormat} from '@/utils/dateTime'
+import {useComponentStatesSkeleton} from '@/utils/useComponentStates'
 
 import ChartAxis from './components/ChartAxis.vue'
 
@@ -85,8 +86,11 @@ const props = withDefaults(
     left: 40,
     right: 32,
     yFormat: undefined,
+    skeleton: undefined,
   },
 )
+
+const {isSkeleton} = useComponentStatesSkeleton(props)
 
 const svgWidth = ref(0)
 const svgHeight = ref(props.height)

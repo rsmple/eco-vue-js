@@ -41,16 +41,16 @@
         v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true"
         :use-query-fn="useQueryFnPrefix ?? useQueryFnOptions"
         :model-value="modelValue"
-        :disabled="disabled"
+        :disabled="isDisabled"
         :loading="loading || isFetchingPrefix"
         :option-component="(optionComponent as SelectOptionComponent<Data>)"
         :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
-        :disable-clear="disableClear || readonly || (seamless && !focused)"
+        :disable-clear="disableClear || isReadonly || (seamless && !focused)"
         :preview-data="previewData"
         :created-data="createdData"
         :value-getter="valueGetter"
         :value-query-key="valueQueryKey"
-        :readonly="readonly"
+        :readonly="isReadonly"
         @unselect="unselect"
         @update:fetching="!$event && updateDropdown(); isFetchingPrefix = $event"
         @update:model-value="updateSelected"
@@ -86,7 +86,7 @@
         :use-query-fn="useQueryFnOptions"
         :query-params="queryParams"
         :loading="loading || isFetchingPrefix"
-        :disabled="isDisabled"
+        :disabled="isDisabledComputed"
         :empty-stub="!search && emptyStub ? emptyStub : undefined"
         :allow-create="createOption && (!hasSearchOption || isModelValueSearch)"
         :hide-option-icon="hideOptionIcon"
@@ -132,6 +132,7 @@ import {computed, nextTick, ref, useTemplateRef, watch} from 'vue'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 import {useIsMobile} from '@/utils/mobile'
+import {useComponentStates} from '@/utils/useComponentStates'
 
 import SelectAsyncList from './components/SelectAsyncList.vue'
 import SelectAsyncPrefix from './components/SelectAsyncPrefix.vue'
@@ -144,6 +145,9 @@ const props = withDefaults(
     emptyStub: 'No match',
     valueGetter: (data: Data) => (data as unknown as {id: Model}).id,
     valueQueryKey: 'id__in',
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
   },
 )
 
@@ -156,6 +160,8 @@ const emit = defineEmits<{
   (e: 'blur', value: FocusEvent): void
 }>()
 
+const {isReadonly, isDisabled} = useComponentStates(props)
+
 const {isMobile} = useIsMobile()
 
 const isOpen = ref(false)
@@ -166,7 +172,7 @@ const isFetchingPrefix = ref(false)
 const search = ref('')
 const loadingCreate = ref(false)
 
-const isDisabled = computed(() => props.loading || props.readonly || props.disabled)
+const isDisabledComputed = computed(() => props.loading || isReadonly.value || isDisabled.value)
 const isModelValueSearch = computed(() => !!search.value && props.modelValue.includes(search.value as Model))
 const enabled = computed(() => !props.disabled)
 const queryParams = computed(() => ({...props.queryParamsOptions, [props.searchField ?? 'search']: search.value}))
@@ -213,7 +219,7 @@ const captureDoubleDelete = () => {
 }
 
 const select = (item: Model): void => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
 
   emit('select', item)
 
@@ -221,7 +227,7 @@ const select = (item: Model): void => {
 }
 
 const unselect = (item: Model): void => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
 
   emit('unselect', item)
 
@@ -229,7 +235,7 @@ const unselect = (item: Model): void => {
 }
 
 const create = async (value: string) => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
   if (!props.createOption) return
 
   loadingCreate.value = true
@@ -246,7 +252,7 @@ const create = async (value: string) => {
 }
 
 const updateSelected = (value: Model[]): void => {
-  if (isDisabled.value) return
+  if (isDisabledComputed.value) return
 
   emit('update:modelValue', value)
 

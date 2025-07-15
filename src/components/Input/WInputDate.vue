@@ -70,6 +70,9 @@ const props = withDefaults(
     horizontalAlign: HorizontalAlign.RIGHT_INNER,
     minDate: undefined,
     maxDate: undefined,
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
   },
 )
 

@@ -41,7 +41,15 @@ import WSelect from '@/components/Select/WSelect.vue'
 
 import {useFormAsync} from './use/useFormAsync'
 
-const props = withDefaults(defineProps<FormAsyncSelectProps<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent>>(), {queryEnabled: undefined})
+const props = withDefaults(
+  defineProps<FormAsyncSelectProps<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent>>(),
+  {
+    queryEnabled: undefined,
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'success', value: Model): void

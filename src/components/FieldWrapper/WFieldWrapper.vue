@@ -13,11 +13,11 @@
       :for="id"
       class="text-accent relative block pr-6 text-xs font-semibold leading-loose"
       :class="{
-        'cursor-not-allowed opacity-50': disabled && !readonly && !skeleton,
+        'cursor-not-allowed opacity-50': isDisabled && !isReadonly && !isSkeleton,
         'col-start-1': subgrid,
       }"
     >
-      <template v-if="!skeleton">
+      <template v-if="!isSkeleton">
         <slot name="title">
           <template v-if="titleIcon"><component
             :is="titleIcon"
@@ -62,7 +62,7 @@
       }"
     >
       <div
-        v-if="!skeleton"
+        v-if="!isSkeleton"
         class="w-has-changes-color-info dark:w-has-changes-color-info-dark relative grid"
         :class="{
           'focus-within-not:w-has-changes-color-negative dark:focus-within-not:w-has-changes-color-negative-dark': errorMessage,
@@ -148,7 +148,7 @@
         <FilterButton
           :filter-field="filterField"
           :encoded-query-param="encodedQueryParam"
-          :skeleton="skeleton"
+          :skeleton="isSkeleton"
           class="absolute right-0 self-center"
         />
       </template>
@@ -158,11 +158,11 @@
       v-if="description"
       class="text-description col-start-1 whitespace-pre-wrap text-pretty break-words text-xs font-normal"
       :class="{
-        'opacity-50': disabled && !readonly && !skeleton,
+        'opacity-50': isDisabled && !isReadonly && !isSkeleton,
         'pt-4': !subgrid,
       }"
     >
-      <WSkeleton v-if="skeleton" />
+      <WSkeleton v-if="isSkeleton" />
 
       <template v-else>
         {{ description }}
@@ -170,7 +170,7 @@
     </div>
 
     <WTooltip
-      v-if="tooltipText && !skeleton && !readonly"
+      v-if="tooltipText && !isSkeleton && !isReadonly"
       :text="tooltipText"
     />
   </div>
@@ -186,17 +186,27 @@ import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 import {encodeQueryParam} from '@/utils/api'
+import {useComponentStates} from '@/utils/useComponentStates'
 import {numberFormatter} from '@/utils/utils'
 
 import FilterButton from './components/FilterButton.vue'
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<FieldWrapperProps>()
+const props = withDefaults(
+  defineProps<FieldWrapperProps>(),
+  {
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 defineEmits<{
   (e: 'click', value: MouseEvent): void
 }>()
+
+const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 const id = useId()
 

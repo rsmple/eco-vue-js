@@ -8,17 +8,18 @@
     <button
       class="w-ripple-trigger isolate grid w-full items-center text-start focus:outline-none"
       :class="{
-        'cursor-not-allowed opacity-50': disabled,
-        'cursor-progress': loading,
-        'cursor-pointer': !readonly && !loading && !disabled,
-        'cursor-auto select-text': readonly,
-        'select-none': !readonly,
+        'cursor-not-allowed': isDisabled && !isSkeleton,
+        'opacity-50': isDisabled || isSkeleton,
+        'cursor-progress': loading || isSkeleton,
+        'cursor-pointer': !isReadonly && !loading && !isDisabled && !isSkeleton,
+        'cursor-auto select-text': isReadonly,
+        'select-none': !isReadonly,
         'grid-cols-[1fr,auto]': (title || $slots.title) && !rightLabel,
         'grid-cols-[auto,1fr]': (title || $slots.title) && rightLabel,
         'gap-4': title || $slots.title,
         'justify-center': center,
       }"
-      :disabled="disabled || readonly"
+      :disabled="isDisabled || isReadonly || isSkeleton"
       @click="updateModelValue"
     >
       <div
@@ -50,7 +51,7 @@
                 'right-[calc(100%-1.25rem)]': value === false,
                 'right-[calc(50%-0.625rem)]': value === null,
                 'right-0': value === true,
-                'w-ripple w-ripple-hover': !disabled && !readonly,
+                'w-ripple w-ripple-hover': !disabled && !readonly && !skeleton,
               }"
             >
               <WSpinner
@@ -87,6 +88,7 @@ import WSpinner from '@/components/Spinner/WSpinner.vue'
 
 import {Notify} from '@/utils/Notify'
 import {SemanticType, useSemanticTypeBackgroundMap} from '@/utils/SemanticType'
+import {useComponentStates} from '@/utils/useComponentStates'
 
 defineOptions({inheritAttrs: false})
 
@@ -96,12 +98,17 @@ const props = withDefaults(
     description: undefined,
     title: undefined,
     intermediate: false as unknown as undefined,
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
   },
 )
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: Value): void
 }>()
+
+const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()
 
@@ -114,7 +121,7 @@ const value = computed<boolean | null>({
     return props.modelValue
   },
   set: value => {
-    if (props.disabled || props.loading || props.readonly) return
+    if (isDisabled.value || props.loading || isReadonly.value) return
 
     const newValue = (value === null ? null : props.negate ? !value : value) as Value
 

@@ -61,7 +61,7 @@
             ...props,
             semanticType: getValue(item as Model | Entity) === modelValue ? semanticType ?? SemanticType.PRIMARY : SemanticType.SECONDARY,
             loading: loading && getValue(item as Model | Entity) === loadingItem,
-            disabled: disabled || (loading && getValue(item as Model | Entity) !== loadingItem),
+            disabled: isDisabled || isReadonly || (loading && getValue(item as Model | Entity) !== loadingItem),
             join: !wrap && !col,
             tooltipText: undefined,
           }"
@@ -103,16 +103,26 @@ import {computed, ref} from 'vue'
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {useComponentStates} from '@/utils/useComponentStates'
 
 import WButton from './WButton.vue'
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<ButtonGroupProps<Model, Entity, ValueGetter>>()
+const props = withDefaults(
+  defineProps<ButtonGroupProps<Model, Entity, ValueGetter>>(),
+  {
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'update:model-value', value: Model): void
 }>()
+
+const {isDisabled, isReadonly} = useComponentStates(props)
 
 const loadingItem = ref<Model | undefined>(undefined)
 

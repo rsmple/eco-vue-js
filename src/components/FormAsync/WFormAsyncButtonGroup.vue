@@ -53,7 +53,15 @@ import WButtonGroup from '@/components/Button/WButtonGroup.vue'
 
 import {useFormAsync} from './use/useFormAsync'
 
-const props = withDefaults(defineProps<FormAsyncButtonGroupProps<Model, FieldType, QueryParams, Entity, ValueGetter>>(), {queryEnabled: undefined})
+const props = withDefaults(
+  defineProps<FormAsyncButtonGroupProps<Model, FieldType, QueryParams, Entity, ValueGetter>>(),
+  {
+    queryEnabled: undefined,
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'success', value: Model): void

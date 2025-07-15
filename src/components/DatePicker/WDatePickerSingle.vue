@@ -32,6 +32,7 @@
           :min-date="minDate"
           :max-date="maxDate"
           :today="today"
+          :readonly="isReadonly || isDisabled || isSkeleton"
           class="px-3"
           @click:day="onClickDay"
         />
@@ -46,16 +47,32 @@ import type {DateRange} from './models/types'
 import {computed, ref, toRef, watch} from 'vue'
 
 import {addDay, addMonth, addYear, getStartOfDay, getStartOfMonth, getStartOfWeek, monthShortFormatter} from '@/utils/dateTime'
+import {useComponentStates} from '@/utils/useComponentStates'
 
 import CalendarMonth from './components/CalendarMonth.vue'
 import CalendarToggle from './components/CalendarToggle.vue'
 
-const props = defineProps<{
-  modelValue: Date | undefined
-  title?: string
-  minDate?: Date
-  maxDate?: Date
-}>()
+const props = withDefaults(
+  defineProps<{
+    modelValue: Date | undefined
+    title?: string
+    minDate?: Date
+    maxDate?: Date
+    readonly?: boolean
+    disabled?: boolean
+    skeleton?: boolean
+  }>(),
+  {
+    title: undefined,
+    minDate: undefined,
+    maxDate: undefined,
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
+
+const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: Date | undefined): void

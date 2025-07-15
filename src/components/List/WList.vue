@@ -55,7 +55,7 @@
                 <component
                   :is="item"
                   :query-params="queryParams"
-                  :readonly="readonly ?? false"
+                  :readonly="isReadonly ?? isDisabled ?? false"
                   :class="cssClass"
                 />
               </template>
@@ -71,7 +71,7 @@
                   :selection-count="selectionCount"
                   :query-params-getter="getQueryParamsBulk"
                   :disable-message="disableMessage"
-                  :readonly="readonly ?? false"
+                  :readonly="isReadonly ?? isDisabled ?? false"
                   :class="cssClass"
                   @clear:selected="resetSelection"
                 />
@@ -92,7 +92,7 @@
                 :selection-count="selectionCount"
                 :query-params-getter="getQueryParamsBulk"
                 :disable-message="scope?.disableMessage"
-                :readonly="readonly ?? false"
+                :readonly="isReadonly ?? isDisabled ?? false"
                 :class="scope?.cssClass"
                 @clear:selected="resetSelection"
               />
@@ -226,13 +226,13 @@
               :item="item"
               :skeleton="skeleton"
               :card="isGrid"
-              :readonly="readonly || (readonlyGetter?.(item) ?? false)"
+              :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
             >
               <template #default="defaultScope">
                 <component
                   :is="defaultScope.field.default"
                   :item="defaultScope.item"
-                  :readonly="readonly || (readonlyGetter?.(defaultScope.item) ?? false)"
+                  :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(defaultScope.item) ?? false)"
                   :skeleton="skeleton"
                   :card="isGrid"
                   :config="fieldConfigMap[defaultScope.field.meta.label]"
@@ -264,7 +264,7 @@
             <component
               :is="expansion"
               :item="item"
-              :readonly="readonly || (readonlyGetter?.(item) ?? false)"
+              :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
               :skeleton="skeleton"
               :card="isGrid"
               @update:item="setter"
@@ -284,7 +284,7 @@
                 :is="Array.isArray(menuItem) ? menuItem[0] : menuItem"
                 v-bind="Array.isArray(menuItem) ? menuItem[1] : undefined"
                 :item="item"
-                :readonly="readonly || (readonlyGetter?.(item) ?? false)"
+                :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
                 :update-item="setter"
                 :delete-item="() => {
                   setter()
@@ -323,6 +323,7 @@ import IconRefresh from '@/assets/icons/sax/IconRefresh.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
+import {useComponentStates} from '@/utils/useComponentStates'
 import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
 import {useSelected} from '@/utils/useSelected'
 import {BASE_ZINDEX_DROPDOWN, ListMode} from '@/utils/utils'
@@ -338,40 +339,60 @@ import {filterFields, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable
 
 defineOptions({inheritAttrs: false})
 
-const props = defineProps<{
-  count?: number
-  fields: Fields
-  expansion?: ExpansionComponent<Data>
-  useQueryFn: UseQueryPaginated<Data, QueryParams>
-  queryParams: QueryParams
-  queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
-  bulkDisableMessage?: string
-  selectionTitle: string
-  bulk?: BulkComponent<QueryParams>[]
-  bulkMore?: BulkComponent<QueryParams>[]
-  action?: ActionComponent<QueryParams>[]
-  menu?: MenuComponent<Data>[]
-  readonlyGetter?: (item: Data) => boolean
-  cardClass?: string
-  cardWrapperClass?: string
-  selectAllTextGetter: (isUnselect: boolean, count: number) => string
-  hasBorder?: boolean
-  configKey: string
-  defaultConfigMap: FieldConfigMap<Fields>
-  defaultMode?: ListMode
-  alignTop?: boolean
-  disableMore?: boolean
-  readonly?: boolean
-  noOrdering?: boolean
-  formNameGetter?: (data: Data) => string | undefined
-  groupBy?: (a: Data, b: Data) => boolean
-  cardColumns: CardColumns
-  cardAreas: CardAreas<Fields, CardColumns['length']>
-  cardTo?: (item: Data) => LinkProps['to'] | undefined
-  hasAction?: boolean
-  noHeaderSettings?: boolean
-  noRefetch?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    count?: number
+    fields: Fields
+    expansion?: ExpansionComponent<Data>
+    useQueryFn: UseQueryPaginated<Data, QueryParams>
+    queryParams: QueryParams
+    queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
+    bulkDisableMessage?: string
+    selectionTitle: string
+    bulk?: BulkComponent<QueryParams>[]
+    bulkMore?: BulkComponent<QueryParams>[]
+    action?: ActionComponent<QueryParams>[]
+    menu?: MenuComponent<Data>[]
+    readonlyGetter?: (item: Data) => boolean
+    cardClass?: string
+    cardWrapperClass?: string
+    selectAllTextGetter: (isUnselect: boolean, count: number) => string
+    hasBorder?: boolean
+    configKey: string
+    defaultConfigMap: FieldConfigMap<Fields>
+    defaultMode?: ListMode
+    alignTop?: boolean
+    disableMore?: boolean
+    readonly?: boolean
+    noOrdering?: boolean
+    formNameGetter?: (data: Data) => string | undefined
+    groupBy?: (a: Data, b: Data) => boolean
+    cardColumns: CardColumns
+    cardAreas: CardAreas<Fields, CardColumns['length']>
+    cardTo?: (item: Data) => LinkProps['to'] | undefined
+    hasAction?: boolean
+    noHeaderSettings?: boolean
+    noRefetch?: boolean
+  }>(),
+  {
+    count: undefined,
+    expansion: undefined,
+    queryOptions: undefined,
+    bulkDisableMessage: undefined,
+    bulk: undefined,
+    bulkMore: undefined,
+    action: undefined,
+    menu: undefined,
+    readonlyGetter: undefined,
+    readonly: undefined,
+    cardClass: undefined,
+    cardWrapperClass: undefined,
+    defaultMode: ListMode.TABLE,
+    formNameGetter: undefined,
+    groupBy: undefined,
+    cardTo: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'update:error', value: ApiError): void
@@ -379,6 +400,8 @@ const emit = defineEmits<{
   (e: 'update:query-params', value: QueryParams): void
   (e: 'update:count', value: number | undefined): void
 }>()
+
+const {isDisabled, isReadonly} = useComponentStates(props)
 
 const {isMobile} = useIsMobile()
 

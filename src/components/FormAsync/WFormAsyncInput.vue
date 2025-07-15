@@ -45,7 +45,15 @@ import {validateRequired} from '@/utils/validate'
 
 import {useFormAsync} from './use/useFormAsync'
 
-const props = withDefaults(defineProps<FormAsyncInputProps<Model, FieldType, QueryParams>>(), {queryEnabled: undefined})
+const props = withDefaults(
+  defineProps<FormAsyncInputProps<Model, FieldType, QueryParams>>(),
+  {
+    queryEnabled: undefined,
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'success', value: Model): void

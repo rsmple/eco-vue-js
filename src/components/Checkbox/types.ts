@@ -13,6 +13,7 @@ export interface CheckboxProps {
   icon?: SVGComponent
   radio?: boolean
   loading?: boolean
+  skeleton?: boolean
   intermediate?: boolean
   tooltipText?: string
   alignTop?: boolean

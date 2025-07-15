@@ -1,17 +1,17 @@
 <template>
   <component
-    :is="to !== undefined ? disabled || skeleton ? 'a' : RouterLink : tag"
-    v-bind="to !== undefined && !disabled && !skeleton ? {to} : undefined"
+    :is="to !== undefined ? isDisabled || isSkeleton ? 'a' : RouterLink : tag"
+    v-bind="to !== undefined && !isDisabled && !isSkeleton ? {to} : undefined"
     class="w-ripple-trigger group grid w-full grid-cols-1 py-1"
     :class="{
-      'cursor-not-allowed opacity-50': disabled,
-      'cursor-progress': skeleton,
+      'cursor-not-allowed opacity-50': isDisabled,
+      'cursor-progress': isSkeleton,
     }"
-    :disabled="disabled || skeleton"
-    @click="!disabled && !skeleton && $emit('click', $event)"
+    :disabled="isDisabled || isSkeleton"
+    @click="!isDisabled && !isSkeleton && $emit('click', $event)"
   >
     <WSkeleton
-      v-if="skeleton"
+      v-if="isSkeleton"
       class="w-skeleton-w-auto w-skeleton-h-auto w-skeleton-rounded-full mx-1 aspect-square"
     />
 
@@ -19,7 +19,7 @@
       v-else
       class="relative mx-1 grid aspect-square select-none items-center justify-center gap-1 rounded-full bg-[200%_auto] [background-position:right]"
       :class="{
-        'w-ripple w-ripple-hover cursor-pointer': !disabled && !skeleton,
+        'w-ripple w-ripple-hover cursor-pointer': !isDisabled && !isSkeleton,
         'text-primary dark:text-primary-dark': active && semanticType === SemanticType.SECONDARY,
         [semanticTypeBackgroundMap[semanticType]]: true,
       }"
@@ -38,23 +38,23 @@
             :is="icon"
             class="square-6 w-svg-stroke-width-sm transition-transform"
             :class="{
-              'group-hover:scale-120': !disabled,
+              'group-hover:scale-120': !isDisabled,
             }"
           />
         </template>
       </slot>
 
-      <WShine v-if="!disabled && !isBackdrop" />
+      <WShine v-if="!isDisabled && !isBackdrop" />
     </div>
 
     <div
       v-if="titleText"
       class="text-3xs mt-1 text-center"
       :class="{
-        'self-center': !skeleton,
+        'self-center': !isSkeleton,
       }"
     >
-      <WSkeleton v-if="skeleton" />
+      <WSkeleton v-if="isSkeleton" />
 
       <template v-else>
         {{ title }}
@@ -81,6 +81,7 @@ import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 import {useIsBackdrop} from '@/components/Modal/use/useIsBackdrop'
 import {SemanticType, useSemanticTypeBackgroundMap} from '@/utils/SemanticType'
+import {useComponentStatesButton} from '@/utils/useComponentStates'
 
 interface Props extends Partial<LinkProps> {
   icon?: SVGComponent
@@ -95,7 +96,7 @@ interface Props extends Partial<LinkProps> {
   titleText?: boolean
 }
 
-withDefaults(
+const props = withDefaults(
   defineProps<Props>(),
   {
     icon: undefined,
@@ -105,8 +106,12 @@ withDefaults(
     semanticType: SemanticType.SECONDARY,
     tooltipText: undefined,
     semanticTypeMap: undefined,
+    disabled: undefined,
+    skeleton: undefined,
   },
 )
+
+const {isDisabled, isSkeleton} = useComponentStatesButton(props)
 
 defineEmits<{
   (e: 'click', event: MouseEvent): void
