@@ -3,10 +3,10 @@
     :class="{
       'w-card': isGrid,
       'w-list': !isGrid,
-      '[--w-list-right:calc(var(--w-list-padding,1rem)*2+1.25em+1px)]': menu,
-      '[--w-list-right:calc(var(--w-list-header-rounded,1rem)+1px)]': !menu,
-      '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em+2px)]': allowSelect,
-      '[--w-list-left:calc(var(--w-list-header-rounded,1rem)+1px)': !allowSelect,
+      '[--w-list-right:calc(var(--w-list-padding,1rem)*2+1.25em)]': menu,
+      '[--w-list-right:--w-list-header-rounded,1rem]': !menu,
+      '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em+1px)]': allowSelect,
+      '[--w-list-left:--w-list-header-rounded,1rem)': !allowSelect,
     }"
     :style="[stylesWidth, stylesFixed]"
   >
