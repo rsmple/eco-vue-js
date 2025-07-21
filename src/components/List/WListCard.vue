@@ -239,14 +239,14 @@ defineEmits<{
 }>()
 
 const containerRef = useTemplateRef('container')
-const moreRef = useTemplateRef('more')
+const moreRef = useTemplateRef<ComponentInstance<typeof WButtonMore>>('more')
 const formRef = useTemplateRef<ComponentInstance<typeof WForm>>('form')
 
 const isOpen = ref(false)
 const position = ref<{left: string, top: string} | null>(null)
 const anchorRef = useTemplateRef<HTMLDivElement>('anchor')
 
-const beforeClass = computed(() => {
+const beforeClass = computed<Record<string, boolean | undefined>>(() => {
   if (!isActionShown.value) return {}
 
   return {

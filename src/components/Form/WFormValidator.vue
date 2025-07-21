@@ -258,7 +258,7 @@ const showError = () => {
 watch(errorMessage, value => {
   if (value === null) return
 
-  if (props.name) errorMessageUpdater?.(props.name, value)
+  if (props.name) errorMessageUpdater?.(value, props.name)
 
   emit('update:is-valid', !value)
 })
@@ -266,25 +266,25 @@ watch(errorMessage, value => {
 watch(hasChanges, value => {
   if (value) wasChanged.value = true
 
-  if (props.name) hasChangesUpdater?.(props.name, value)
+  if (props.name) hasChangesUpdater?.(value, props.name)
 
   emit('update:has-changes', value)
 })
 
 watch(_hasValue, value => {
-  if (props.name) hasValueUpdater?.(props.name, value)
+  if (props.name) hasValueUpdater?.(value, props.name)
 
   emit('update:has-value', value)
 }, {immediate: true})
 
 watch(isErrorShown, value => {
-  if (props.name) hasShownUpdater?.(props.name, value)
+  if (props.name) hasShownUpdater?.(value, props.name)
 
   emit('update:has-shown', value)
 })
 
 watch(title, value => {
-  if (props.name) titleUpdater?.(props.name, value)
+  if (props.name) titleUpdater?.(value, props.name)
 }, {immediate: true})
 
 watch(required, () => {
@@ -299,14 +299,14 @@ onBeforeMount(() => {
   if (props.name) {
     initModel()
 
-    validateUpdater?.(props.name, doValidate)
-    invalidateUpdater?.(props.name, invalidate)
-    initModelUpdater?.(props.name, initModel)
+    validateUpdater?.(doValidate, props.name)
+    invalidateUpdater?.(invalidate, props.name)
+    initModelUpdater?.(initModel, props.name)
   }
 })
 
 onBeforeUnmount(() => {
-  if (props.name) unlistener?.(props.name)
+  if (props.name) unlistener?.(undefined, props.name)
 })
 
 defineExpose({

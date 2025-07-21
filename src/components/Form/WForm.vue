@@ -119,7 +119,7 @@ const initModelMap = useFormValueMap(
 
 const unlistenerInjected = inject(wFormUnlistener, undefined)
 
-const unlistener = (key: string) => {
+const unlistener = (value: undefined, key: string) => {
   titleMap.unlistener(key)
   errorMessageMap.unlistener(key)
   hasChangesMap.unlistener(key)
@@ -129,7 +129,7 @@ const unlistener = (key: string) => {
   invalidateMap.unlistener(key)
   initModelMap.unlistener(key)
 
-  if (!props.name) unlistenerInjected?.(key)
+  if (!props.name) unlistenerInjected?.(undefined, key)
 }
 
 provide(wFormUnlistener, unlistener)
@@ -144,7 +144,7 @@ watch(hasShownMap.value, value => emit('update:has-shown', value))
 
 onBeforeUnmount(() => {
   if (props.name) {
-    unlistenerInjected?.(props.name)
+    unlistenerInjected?.(undefined, props.name)
   }
 
   emit('update:is-valid', undefined)
