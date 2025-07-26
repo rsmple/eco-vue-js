@@ -178,7 +178,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: File[]): void
+  (e: 'update:model-value', value: File[]): void
   (e: 'clear:placeholder'): void
 }>()
 
@@ -191,7 +191,7 @@ const containerHeight = ref<number | undefined>(undefined)
 const isActive = ref(false)
 
 const updateModelValue = (): void => {
-  emit('update:modelValue', inputRef.value?.files?.length ? Array.from(inputRef.value.files) : [])
+  emit('update:model-value', inputRef.value?.files?.length ? Array.from(inputRef.value.files) : [])
 }
 
 const setIsActive = (value: boolean): void => {
@@ -201,7 +201,7 @@ const setIsActive = (value: boolean): void => {
 const onDrop = (event: DragEvent): void => {
   setIsActive(false)
 
-  emit('update:modelValue', event.dataTransfer?.files?.length ? Array.from(event.dataTransfer.files) : [])
+  emit('update:model-value', event.dataTransfer?.files?.length ? Array.from(event.dataTransfer.files) : [])
 }
 
 const unselectFile = (index: number): void => {
@@ -209,7 +209,7 @@ const unselectFile = (index: number): void => {
 
   newFiles.splice(index, 1)
 
-  emit('update:modelValue', newFiles)
+  emit('update:model-value', newFiles)
 
   if (newFiles.length === 0 && inputRef.value) inputRef.value.value = ''
 }

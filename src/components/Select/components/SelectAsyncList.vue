@@ -152,7 +152,7 @@ const emit = defineEmits<{
   (e: 'select', value: Model): void
   (e: 'unselect', value: Model): void
   (e: 'update:count', value: number): void
-  (e: 'update:modelValue', value: Model[]): void
+  (e: 'update:model-value', value: Model[]): void
   (e: 'create:option'): void
 }>()
 

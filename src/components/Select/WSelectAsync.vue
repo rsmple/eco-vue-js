@@ -154,7 +154,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'select', item: Model): void
   (e: 'unselect', item: Model): void
-  (e: 'update:modelValue', value: Model[]): void
+  (e: 'update:model-value', value: Model[]): void
   (e: 'init-model'): void
   (e: 'focus', value: FocusEvent): void
   (e: 'blur', value: FocusEvent): void
@@ -254,7 +254,7 @@ const create = async (value: string) => {
 const updateSelected = (value: Model[]): void => {
   if (isDisabledComputed.value) return
 
-  emit('update:modelValue', value)
+  emit('update:model-value', value)
 
   search.value = ''
 }

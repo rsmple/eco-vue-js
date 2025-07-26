@@ -75,7 +75,7 @@ const props = withDefaults(
 const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Date | undefined): void
+  (e: 'update:model-value', value: Date | undefined): void
 }>()
 
 const currentDate = ref(getStartOfMonth())
@@ -92,7 +92,7 @@ const setCurrentDate = (value: Date): void => {
 }
 
 const onClickDay = (value: Date): void => {
-  emit('update:modelValue', value)
+  emit('update:model-value', value)
 }
 
 const firstDay = computed(() => getStartOfWeek(currentDate.value))

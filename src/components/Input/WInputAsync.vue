@@ -115,7 +115,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: ModelValue | undefined): void
+  (e: 'update:model-value', value: ModelValue | undefined): void
 }>()
 
 const {isReadonly, isDisabled} = useComponentStates(props)
@@ -195,7 +195,7 @@ const emitUpdateModelValue = (newValue: ModelValue | undefined) => {
   if (errorMessageValue.value) return
   if (props.placeholderSecure) inputRef.value?.blur()
 
-  emit('update:modelValue', newValue)
+  emit('update:model-value', newValue)
 
   if (!props.placeholderSecure) saved.value = true
 }
@@ -220,7 +220,7 @@ const handlePaste = () => {
 }
 
 const saveDebounced = () => {
-  if (canSave.value) emit('update:modelValue', value.value)
+  if (canSave.value) emit('update:model-value', value.value)
 
   timeout.value = null
 }

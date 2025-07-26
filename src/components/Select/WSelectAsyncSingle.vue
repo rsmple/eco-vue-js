@@ -71,7 +71,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: EmitType): void
+  (e: 'update:model-value', value: EmitType): void
   (e: 'init-model'): void
 }>()
 
@@ -80,7 +80,7 @@ const selectComponentRef = useTemplateRef('selectComponent')
 const arrayValue = computed<Model[]>(() => props.modelValue ? [props.modelValue] : [])
 
 const updateModelValue = (value: EmitType): void => {
-  emit('update:modelValue', value)
+  emit('update:model-value', value)
 }
 
 const blur = () => {

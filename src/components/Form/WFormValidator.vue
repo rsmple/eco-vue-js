@@ -18,7 +18,7 @@ import {type VNode, computed, inject, nextTick, onBeforeMount, onBeforeUnmount, 
 import {useIsInsideTab} from '@/components/Tabs/use/useIsInsideTab'
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 import {debounce} from '@/utils/utils'
-import {validateRequired} from '@/utils/validate'
+import {validateForbiddenRegexp, validateRequired, validateRequiredSymbols} from '@/utils/validate'
 
 import {wFormErrorMessageUpdater, wFormHasChangesUpdater, wFormHasShownUpdater, wFormHasValueUpdater, wFormInitModelUpdater, wFormInvalidateUpdater, wFormTitleUpdater, wFormUnlistener, wFormValidateUpdater} from './models/injection'
 import {type ValidatePath, scrollToValidator} from './models/utils'
@@ -116,53 +116,13 @@ const hasValueExact = computed<boolean | null>(() => {
 
 const _hasValue = computed<boolean | null>(() => mandatory.value && hasValueExact.value === false ? null : hasValueExact.value)
 
-const requiredSymbols = computed<string[]>(() => props.requiredSymbols?.split('') ?? [])
-
 const _validate = (value: Parameters<ValidateFn>[0]): string | undefined => {
   const requiredMessage = required.value ? validateRequired(value) : undefined
   if (requiredMessage) return requiredMessage
 
-  if (props.forbiddenRegexp && typeof value === 'string') {
-    const match = value.match(props.forbiddenRegexp)
+  if (props.forbiddenRegexp && typeof value === 'string') return validateForbiddenRegexp(props.forbiddenRegexp, value)
 
-    if (match?.length) {
-      const message = 'The following symbols are not allowed: ' + match
-        .filter((item, index) => match.indexOf(item) === index)
-        .map(item => {
-          switch (item) {
-            case ' ':
-              return 'whitespace'
-            case '\n':
-              return 'line break'
-            default:
-              return `" ${ item } "`
-          }
-        })
-        .join(', ')
-
-      return message
-    }
-  }
-
-  if (props.requiredSymbols && typeof value === 'string') {
-    const match = requiredSymbols.value
-      .filter(item => !value.includes(item))
-      .map(item => {
-        switch (item) {
-          case ' ':
-            return 'whitespace'
-          case '\n':
-            return 'line break'
-          case '\t':
-            return 'tabulation'
-          default:
-            return `${ item }`
-        }
-      })
-      .join(', ')
-
-    if (match.length) return 'Please include the required symbols: ' + match
-  }
+  if (props.requiredSymbols && typeof value === 'string') return validateRequiredSymbols(props.requiredSymbols, value)
 
   let message
 
