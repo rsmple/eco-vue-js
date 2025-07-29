@@ -5,6 +5,7 @@
       'text-primary dark:text-primary-dark bg-primary/10 dark:bg-primary-dark/10': active,
       'text-description': !active,
     }"
+    @click="$emit('click', $event)"
   >
     <component
       :is="icon"
@@ -17,5 +18,9 @@
 defineProps<{
   icon: SVGComponent
   active: boolean
+}>()
+
+defineEmits<{
+  (e: 'click', value: MouseEvent): void
 }>()
 </script>
