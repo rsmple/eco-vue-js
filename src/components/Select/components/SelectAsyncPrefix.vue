@@ -46,7 +46,7 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
 import type {SelectAsyncPrefixProps, SelectOptionComponent, SelectOptionComponentProps} from '../types'
 
-import {computed, onBeforeUnmount, ref, watch} from 'vue'
+import {computed, onBeforeUnmount} from 'vue'
 
 import WButtonUnselect from '@/components/Button/WButtonUnselect.vue'
 
@@ -64,16 +64,10 @@ const emit = defineEmits<{
   (e: 'update:model-value', value: Model[]): void
 }>()
 
-const hasFetching = ref(false)
-
 const valueInString = computed(() => props.modelValue.slice(0, PAGE_LENGTH).join(','))
 
-watch(hasFetching, value => {
-  emit('update:fetching', value)
-}, {immediate: true})
-
 defineSlots<{
-  option?: (props: {option: Data | undefined, index: number}) => void
+  option?: (props: {option: Data | undefined, index: number, skeleton: boolean}) => void
 }>()
 
 onBeforeUnmount(() => {

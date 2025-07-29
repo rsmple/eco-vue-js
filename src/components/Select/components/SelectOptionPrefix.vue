@@ -8,6 +8,7 @@
       :search="option === undefined ? search?.toString() : undefined"
       :selected="true"
       :model="true"
+      :skeleton="skeleton"
     >
       <WButtonUnselect
         v-if="!disableClear"
@@ -28,6 +29,7 @@
       name="option"
       :option="option"
       :search="option === undefined ? search as string : undefined"
+      :skeleton="skeleton"
     />
 
     <WButtonUnselect
@@ -53,6 +55,6 @@ defineEmits<{
 }>()
 
 defineSlots<{
-  option: (props: {option: Data | undefined, search: string | undefined}) => void
+  option: (props: {option: Data | undefined, search: string | undefined, skeleton: boolean}) => void
 }>()
 </script>

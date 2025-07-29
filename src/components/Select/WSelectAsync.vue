@@ -5,9 +5,10 @@
       ...props,
       modelValue: search,
       loading: loading || isFetchingPrefix || loadingCreate,
-      hideInput: isMobile ? !focused : !isOpen,
+      hideInput: modelValue.length === 0 && !emptyValue ? false : isMobile ? !focused : !isOpen,
       filterValue: filterValue === undefined ? modelValue : filterValue,
-      placeholder: placeholder ?? (modelValue.length === 0 ? emptyValue : undefined),
+      placeholder: emptyValue ? undefined : placeholder,
+      emptyValue: undefined,
     }"
     :class="$attrs.class"
     @update:model-value="!loading && !isFetchingPrefix && (search = $event as string ?? '')"
@@ -40,12 +41,12 @@
       <SelectAsyncPrefix
         v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true"
         :use-query-fn="useQueryFnPrefix ?? useQueryFnOptions"
-        :model-value="modelValue"
+        :model-value="!emptyValue || modelValue.length !== 0 ? modelValue : emptyValue"
         :disabled="isDisabled"
         :loading="loading || isFetchingPrefix"
         :option-component="(optionComponent as SelectOptionComponent<Data>)"
         :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
-        :disable-clear="disableClear || isReadonly || (seamless && !focused)"
+        :disable-clear="disableClear || isReadonly || (seamless && !focused) || modelValue.length === 0"
         :preview-data="previewData"
         :created-data="createdData"
         :value-getter="valueGetter"
@@ -57,7 +58,7 @@
       >
         <template
           v-if="$slots.option"
-          #option="{option, index}"
+          #option="{option, index, skeleton: skeletonOption}"
         >
           <slot
             name="option"
@@ -65,7 +66,7 @@
             :index="index"
             :selected="true"
             :model="true"
-            :skeleton="false"
+            :skeleton="skeletonOption"
             :search="undefined"
           />
         </template>
@@ -174,11 +175,10 @@ const loadingCreate = ref(false)
 
 const isDisabledComputed = computed(() => props.loading || isReadonly.value || isDisabled.value)
 const isModelValueSearch = computed(() => !!search.value && props.modelValue.includes(search.value as Model))
-const enabled = computed(() => !props.disabled)
 const queryParams = computed(() => ({...props.queryParamsOptions, [props.searchField ?? 'search']: search.value}))
 const queryParamsFirstPage = computed(() => ({...queryParams.value, page: 1}))
 
-const {data: firstPageData} = props.useQueryFnOptions(queryParamsFirstPage, {enabled: false})
+const {data: firstPageData} = props.useQueryFnOptions(queryParamsFirstPage)
 
 const hasSearchOption = computed(() => {
   if (props.createdData?.some(option => props.valueGetter(option) === search.value)) return true
@@ -278,7 +278,7 @@ const setSearch = (value: string): void => {
 }
 
 if (props.useQueryFnDefault) {
-  const {data: defaultData} = props.useQueryFnDefault({enabled})
+  const {data: defaultData} = props.useQueryFnDefault({enabled: computed(() => !props.disabled)})
 
   watch(defaultData, value => {
     if (value && props.modelValue.length === 0) {

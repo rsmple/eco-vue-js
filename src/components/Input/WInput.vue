@@ -88,7 +88,7 @@
           }"
         >
           <div
-            class="flex gap-[--w-input-gap,0.25rem]"
+            class="w-skeleton-w-32 flex gap-[--w-input-gap,0.25rem]"
             :class="{
               '[&:not(:has(.w-option-has-bg))]:-px--w-option-padding': !icon && !textarea,
               'flex-wrap': !noWrap,

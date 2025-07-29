@@ -10,6 +10,7 @@
     :disabled="disabled"
     :readonly="readonly"
     :disable-clear="disableClear"
+    :skeleton="!data"
     :search="undefined"
     :class="{
       'cursor-pointer': !disabled && !readonly,
@@ -82,6 +83,6 @@ onBeforeUnmount(() => {
 })
 
 defineSlots<{
-  option?: (props: {option: Data | undefined, index: number}) => void
+  option?: (props: {option: Data | undefined, index: number, skeleton: boolean}) => void
 }>()
 </script>

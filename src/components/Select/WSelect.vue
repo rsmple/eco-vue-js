@@ -4,10 +4,11 @@
     v-bind="{
       ...props,
       modelValue: search,
-      hideInput: modelValue.length === 0 ? false : isMobile ? !focused : !isOpen,
       loading: loading || isLoading || loadingCreate,
+      hideInput: modelValue.length === 0 && !emptyValue ? false : isMobile ? !focused : !isOpen,
       filterValue: filterValue === undefined ? modelValue : filterValue,
-      placeholder: placeholder ?? (modelValue.length === 0 ? emptyValue : undefined),
+      placeholder: emptyValue ? undefined : placeholder,
+      emptyValue: undefined,
     }"
     :class="$attrs.class"
     @update:model-value="!loading && !isLoading && (search = $event as string ?? '')"
@@ -39,7 +40,7 @@
     <template #prefix="{unclickable}">
       <template v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true">
         <SelectOptionPrefix
-          v-for="(value, index) in modelValue"
+          v-for="(value, index) in !emptyValue || modelValue.length !== 0 ? modelValue : emptyValue"
           :key="value"
           :option="optionsWithCreated.find(item => valueGetter(item) === value)"
           :option-component="(optionComponent as SelectOptionComponent<Data>)"
@@ -48,8 +49,9 @@
           :loading="loading || isLoading"
           :disabled="isDisabled"
           :readonly="isReadonly"
-          :disable-clear="disableClear || isReadonly || (seamless && !focused)"
+          :disable-clear="disableClear || isReadonly || (seamless && !focused) || modelValue.length === 0"
           :search="value"
+          :skeleton="optionsWithCreated.length === 0"
           :class="{
             'cursor-pointer': !isDisabled && !isReadonly,
             'cursor-not-allowed opacity-50': isDisabled,
@@ -66,7 +68,6 @@
               :selected="true"
               :model="true"
               :index="index"
-              :skeleton="false"
             />
           </template>
         </SelectOptionPrefix>
@@ -219,12 +220,11 @@ const isCursorLocked = ref(false)
 const search = ref('')
 const isModelValueSearch = computed(() => !!search.value && props.modelValue.includes(search.value as Model))
 const searchPrepared = computed(() => isModelValueSearch.value ? '' : search.value.trim().toLocaleLowerCase())
-const enabled = computed(() => !props.disabled)
 
 const {data, isLoading, error: queryError} = props.useQueryFnOptions
   ? props.queryParamsOptions === undefined
-    ? (props.useQueryFnOptions as UseQueryEmpty<Data[]>)({enabled})
-    : props.useQueryFnOptions(toRef(props, 'queryParamsOptions'), {enabled})
+    ? (props.useQueryFnOptions as UseQueryEmpty<Data[]>)()
+    : props.useQueryFnOptions(toRef(props, 'queryParamsOptions'))
   : {
     data: toRef(props, 'options') as Ref<Data[] | undefined>,
     isLoading: ref(false),
@@ -411,7 +411,7 @@ const setSearch = (value: string): void => {
 }
 
 if (props.useQueryFnDefault) {
-  const {data: defaultData} = props.useQueryFnDefault({enabled})
+  const {data: defaultData} = props.useQueryFnDefault({enabled: computed(() => !props.disabled)})
 
   watch(defaultData, value => {
     if (value && props.modelValue.length === 0) {

@@ -53,7 +53,7 @@
 
       <div
         v-if="placeholder"
-        class="grid-cols-fill-44 grid h-full items-center justify-center gap-6"
+        class="grid-cols-fit-44 grid h-full items-center justify-center gap-6"
       >
         <FilePickerItem
           :name="placeholder"

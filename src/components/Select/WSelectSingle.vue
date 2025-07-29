@@ -9,6 +9,7 @@
       hidePrefix: true,
       filterValue: filterValue === undefined ? modelValue : filterValue,
       selectOnClose: props.searchModel ? props.searchModel : props.selectOnClose,
+      emptyValue: props.emptyValue !== undefined && props.emptyValue !== null ? [props.emptyValue] : undefined,
     }"
     :class="$attrs.class"
     @select="updateModelValue($event)"
