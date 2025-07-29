@@ -72,7 +72,30 @@ const emit = defineEmits<{
 
 const selectComponentRef = useTemplateRef('selectComponent')
 
-const arrayValue = computed<string[]>(() => props.modelValue ? props.modelValue.split(props.divider).filter((item, index, arr) => item !== '' && arr.indexOf(item) === index) : [])
+const decodeValue = (value: string | null): string[] => {
+  if (!value) return []
+
+  if (props.divider !== 'json') return value.split(props.divider).filter((item, index, arr) => item !== '' && arr.indexOf(item) === index)
+
+  const result: string[] = []
+
+  try {
+    const parsed = JSON.parse(value)
+    if (!Array.isArray(parsed)) return result
+    for (const item in parsed) {
+      if (typeof item === 'string' && item !== '' && !result.includes(item)) result.push(item)
+    }
+    return result
+  } catch {
+    return result
+  }
+}
+
+const encodeValue = (value: string[]): string => {
+  return props.divider === 'json' ? JSON.stringify(value) : value.join(props.divider)
+}
+
+const arrayValue = computed<string[]>(() => decodeValue(props.modelValue))
 
 const updateModelValue = (value: string, isSelect: boolean): void => {
   const valueList = value.split(props.divider)
@@ -82,7 +105,7 @@ const updateModelValue = (value: string, isSelect: boolean): void => {
   if (isSelect) {
     newValue = [...arrayValue.value, ...valueList].filter((item, index, arr) => item !== '' && arr.indexOf(item) === index).join(props.divider)
   } else {
-    newValue = arrayValue.value.filter(item => !valueList.includes(item)).join(props.divider)
+    newValue = encodeValue(arrayValue.value.filter(item => !valueList.includes(item)))
   }
 
   if (newValue === props.modelValue) return

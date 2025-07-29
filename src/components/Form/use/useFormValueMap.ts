@@ -1,7 +1,7 @@
 import {type InjectionKey, type Ref, inject, isRef, onBeforeMount, provide, ref, watch} from 'vue'
 
 export const useFormValueMap = <Value, ValueGetter extends Ref<Value> | ((map: Ref<Record<string, Value>>) => Value) | ((map: Ref<Record<string, Value>>) => Ref<Value>)>(
-  injectionKey: InjectionKey<(key: string, value: Value) => void>,
+  injectionKey: InjectionKey<(value: Value, key: string) => void>,
   name: Ref<string | undefined>,
   valueGetter: ValueGetter,
   immediate = true,
@@ -12,11 +12,11 @@ export const useFormValueMap = <Value, ValueGetter extends Ref<Value> | ((map: R
 } => {
   const map = ref<Record<string, Value>>({})
 
-  const updater = (key: string, value: Value): void => {
+  const updater = (value: Value, key: string): void => {
     if (value === null || value === undefined) unlistener(key)
     else map.value[key] = value
 
-    if (!name.value) updaterInjected?.(key, value)
+    if (!name.value) updaterInjected?.(value, key)
   }
 
   const unlistener = (key: string) => {
@@ -31,11 +31,11 @@ export const useFormValueMap = <Value, ValueGetter extends Ref<Value> | ((map: R
 
   if (isRef(value)) {
     watch(value, value => {
-      if (name.value) updaterInjected?.(name.value, value as Value)
+      if (name.value) updaterInjected?.(value as Value, name.value)
     }, {immediate})
   } else {
     onBeforeMount(() => {
-      if (name.value) updaterInjected?.(name.value, value)
+      if (name.value) updaterInjected?.(value, name.value)
     })
   }
 

@@ -94,7 +94,7 @@ const props = withDefaults(
 const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: DateRange | undefined): void
+  (e: 'update:model-value', value: DateRange | undefined): void
 }>()
 
 const currentDate = ref(getStartOfMonth())
@@ -121,7 +121,7 @@ const onClickDay = (value: Date): void => {
 
     preselectedValue.value = null
 
-    emit('update:modelValue', dateRange.value)
+    emit('update:model-value', dateRange.value)
 
     dateRange.value = undefined
   }

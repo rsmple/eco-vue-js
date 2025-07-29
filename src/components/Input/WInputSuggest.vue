@@ -30,7 +30,7 @@
           'cursor-not-allowed': isDisabled && !isReadonly,
           'mb-3': isMobile && !toggleScope?.unclickable,
         }"
-        @update:model-value="!loading && $emit('update:modelValue', $event as ModelValue)"
+        @update:model-value="!loading && $emit('update:model-value', $event as ModelValue)"
 
         @keypress:enter="$emit('keypress:enter', $event)"
         @keypress:up="$emit('keypress:up', $event)"
@@ -141,7 +141,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', event: ModelValue): void
+  (e: 'update:model-value', event: ModelValue): void
   (e: 'keypress:enter', event: KeyboardEvent): void
   (e: 'keypress:up', event: KeyboardEvent): void
   (e: 'keypress:down', event: KeyboardEvent): void

@@ -105,7 +105,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Value): void
+  (e: 'update:model-value', value: Value): void
 }>()
 
 const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
@@ -138,7 +138,7 @@ const value = computed<boolean | null>({
       return
     }
 
-    emit('update:modelValue', newValue)
+    emit('update:model-value', newValue)
   },
 })
 

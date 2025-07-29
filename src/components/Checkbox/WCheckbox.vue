@@ -117,7 +117,7 @@ const props = withDefaults(
 const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void
+  (e: 'update:model-value', value: boolean): void
 }>()
 
 const elementRef = useTemplateRef('element')
@@ -125,6 +125,6 @@ const elementRef = useTemplateRef('element')
 const toggle = (): void => {
   if (isDisabled.value || isReadonly.value || props.loading || isSkeleton.value) return
 
-  emit('update:modelValue', !props.modelValue)
+  emit('update:model-value', !props.modelValue)
 }
 </script>

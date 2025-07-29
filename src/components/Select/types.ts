@@ -77,7 +77,7 @@ export interface SelectSingleProps<Model extends number | string, Data extends D
 export interface SelectStringifiedProps<Model extends string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
   extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue'> {
   modelValue: Model | null
-  divider: string
+  divider: string | 'json'
 }
 
 export interface SelectAsyncProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>

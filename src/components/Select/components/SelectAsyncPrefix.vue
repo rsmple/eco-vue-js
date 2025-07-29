@@ -37,7 +37,7 @@
         :loading="loading"
         :disabled="disabled"
         @mousedown.stop.prevent=""
-        @click.stop.prevent="!loading && $emit('update:modelValue', [])"
+        @click.stop.prevent="!loading && $emit('update:model-value', [])"
       />
     </div>
   </template>
@@ -61,7 +61,7 @@ const props = defineProps<SelectAsyncPrefixProps<Model, Data, QueryParams, Optio
 const emit = defineEmits<{
   (e: 'unselect', value: Model): void
   (e: 'update:fetching', value: boolean): void
-  (e: 'update:modelValue', value: Model[]): void
+  (e: 'update:model-value', value: Model[]): void
 }>()
 
 const hasFetching = ref(false)
