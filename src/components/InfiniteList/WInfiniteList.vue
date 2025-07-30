@@ -71,6 +71,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
+import type {InfiniteListHeaderScope} from './types'
 import type {ApiError} from '@/utils/api'
 
 import {useTemplateRef} from 'vue'
@@ -146,9 +147,7 @@ defineSlots<{
     position: number
     value: Model
   }) => void
-  header?: (props: {
-    updateHeaderHeight: () => void
-  } & typeof infiniteListPagesRef.value) => void
+  header?: (props: InfiniteListHeaderScope & typeof infiniteListPagesRef.value) => void
   empty?: () => void
 }>()
 </script>
