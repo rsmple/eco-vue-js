@@ -10,7 +10,7 @@
     :disabled="disabled"
     :readonly="readonly"
     :disable-clear="disableClear"
-    :skeleton="!data"
+    :skeleton="queryEnabled && !data"
     :search="undefined"
     :class="{
       'cursor-pointer': !disabled && !readonly,
