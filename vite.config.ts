@@ -19,7 +19,7 @@ export default defineConfig(({mode}) => ({
       copyDtsFiles: true,
     }),
     vue(),
-    svgLoader({defaultImport: 'component'}),
+    svgLoader({defaultImport: 'component', svgo: false}),
     {
       name: 'pre-build-hook',
       enforce: 'pre',
