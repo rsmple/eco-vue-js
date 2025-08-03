@@ -19,7 +19,11 @@
   >
     <div
       ref="header"
-      class="bg-default dark:bg-default-dark sm-not:w-screen sticky left-0 top-0 z-[1] w-[calc(var(--w-modal-wrapper-width,35rem)-var(--scroll-bar-width))]"
+      class="bg-default dark:bg-default-dark sticky left-0 top-0 z-[1] w-[calc(var(--w-modal-wrapper-width,35rem)-var(--scroll-bar-width))]"
+      :class="{
+        'sm-not:w-full': !maximized,
+        'sm-not:w-screen': maximized,
+      }"
     >
       <div class="text-accent -p--w-modal-wrapper-padding flex items-center justify-center text-balance text-center text-xl font-semibold">
         <slot name="title" />
@@ -36,10 +40,11 @@
       ref="footer"
       class="
         bg-default dark:bg-default-dark -gap--inner-margin -p--w-modal-wrapper-padding
-        sm-not:w-screen sticky bottom-0 left-0 flex w-[calc(var(--w-modal-wrapper-width,35rem)-var(--scroll-bar-width))] justify-center
+        sticky bottom-0 left-0 flex w-[calc(var(--w-modal-wrapper-width,35rem)-var(--scroll-bar-width))] justify-center
       "
       :class="{
-        'sm-not:flex-col': !maximized,
+        'sm-not:flex-col sm-not:w-full': !maximized,
+        'sm-not:w-screen': maximized,
       }"
       :style="{zIndex: BASE_ZINDEX_DROPDOWN}"
     >
