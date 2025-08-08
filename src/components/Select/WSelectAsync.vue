@@ -7,7 +7,7 @@
       loading: loading || isFetchingPrefix || loadingCreate,
       hideInput: modelValue.length === 0 && !emptyValue ? false : isMobile ? !focused : !isOpen,
       filterValue: filterValue === undefined ? modelValue : filterValue,
-      placeholder: emptyValue ? undefined : placeholder,
+      placeholder: emptyValue || focused || modelValue.length ? undefined : placeholder,
       emptyValue: undefined,
     }"
     :class="$attrs.class"
