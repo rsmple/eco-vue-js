@@ -40,7 +40,7 @@ import {type VNode, computed, inject, useTemplateRef} from 'vue'
 
 import WDropdown from '@/components/Dropdown/WDropdown.vue'
 
-import {BASE_ZINDEX_DROPDOWN, unwrapSlots, wBaseZIndex} from '@/utils/utils'
+import {BASE_ZINDEX_DROPDOWN, isClientSide, unwrapSlots, wBaseZIndex} from '@/utils/utils'
 
 defineProps<DropdownMenuProps>()
 
@@ -53,7 +53,7 @@ const baseZIndex = inject(wBaseZIndex, 0)
 const containerRef = useTemplateRef<ComponentInstance<unknown> | HTMLElement>('container')
 const dropdownRef = useTemplateRef('dropdown')
 
-const element = computed(() => containerRef.value instanceof HTMLElement ? containerRef.value : containerRef.value?.$el)
+const element = computed(() => isClientSide ? containerRef.value instanceof HTMLElement ? containerRef.value : containerRef.value?.$el : undefined)
 
 defineSlots<{
   toggle?: () => VNode[]
