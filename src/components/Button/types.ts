@@ -18,6 +18,7 @@ export interface ButtonProps extends Partial<LinkProps> {
   tooltipText?: string
   download?: string
   skeleton?: boolean
+  autofocus?: boolean
 }
 
 export type ButtonGroupOptionComponent<Option> = Component<SelectOptionProps<Option>>

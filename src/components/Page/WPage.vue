@@ -1,5 +1,6 @@
 <template>
   <div
+    v-bind="$attrs"
     ref="element"
     class="
       not-print:shadow-md bg-default text-black-default light relative isolate grid
@@ -67,6 +68,7 @@
 
   <WPage
     v-if="overflow.length !== 0"
+    v-bind="$attrs"
     :prerendered="overflow"
     :title="title"
     top-title

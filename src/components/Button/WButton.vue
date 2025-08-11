@@ -22,6 +22,7 @@
     }"
     :is="to !== undefined ? isDisabled ? 'a' : RouterLink : tag"
     v-else
+    ref="container"
     class="
       w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-1px)] -min-h--button-height relative isolate
       flex select-none
@@ -75,7 +76,7 @@
 <script lang="ts" setup>
 import type {ButtonProps} from './types'
 
-import {type StyleValue} from 'vue'
+import {type StyleValue, computed, nextTick, onMounted, useTemplateRef, watch} from 'vue'
 import {RouterLink} from 'vue-router'
 
 import WShine from '@/components/Shine/WShine.vue'
@@ -86,6 +87,7 @@ import {SemanticType, useSemanticTypeBackgroundMap, useSemanticTypeBorderMap} fr
 import {useComponentStatesButton} from '@/utils/useComponentStates'
 
 import WSkeleton from '../Skeleton/WSkeleton.vue'
+import {useTabActiveListener} from '../Tabs/use/useTabActiveListener'
 
 defineOptions({inheritAttrs: false})
 
@@ -104,6 +106,8 @@ const props = withDefaults(
   },
 )
 
+const containerRef = useTemplateRef('container')
+
 const {isDisabled, isSkeleton} = useComponentStatesButton(props)
 
 const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()
@@ -118,4 +122,44 @@ const click = (event: MouseEvent | KeyboardEvent): void => {
 
   emit('click', event)
 }
+
+const isNotEnabled = computed(() => isDisabled.value || isSkeleton.value)
+
+const focus = () => {
+  if (isNotEnabled.value) return
+
+  containerRef.value?.focus()
+}
+
+let timeout: NodeJS.Timeout | undefined
+
+const autofocusDebounced = () => {
+  if (timeout) clearTimeout(timeout)
+
+  timeout = setTimeout(() => {
+    if (props.autofocus) focus()
+
+    timeout = undefined
+  }, 250)
+}
+
+if (props.autofocus) {
+  useTabActiveListener(autofocusDebounced)
+}
+
+watch(() => props.autofocus, value => {
+  if (!value) return
+
+  nextTick(autofocusDebounced)
+})
+
+watch(isNotEnabled, value => {
+  if (!value) return
+
+  nextTick(autofocusDebounced)
+})
+
+onMounted(() => {
+  if (props.autofocus) autofocusDebounced()
+})
 </script>
