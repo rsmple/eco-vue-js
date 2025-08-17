@@ -146,7 +146,7 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
         'overflow-y': 'auto',
       },
     },
-    'textarea::-webkit-resizer': {
+    '*::-webkit-resizer': {
       transform: 'scale(2)',
       'transform-origin': 'top left',
       'background-size': '7px 7px',
@@ -418,6 +418,15 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
     {
       values: theme('borderRadius'),
     },
+  )
+
+  matchUtilities(
+    {
+      'w-button-border': value => ({'--w-button-border': value}),
+    },
+    {
+      values: theme('borderWidth')
+    }
   )
 
   matchUtilities(

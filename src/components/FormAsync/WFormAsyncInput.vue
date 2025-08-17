@@ -31,6 +31,26 @@
     >
       <slot name="right" />
     </template>
+
+    <template
+      v-if="$slots.prefix"
+      #prefix="scope"
+    >
+      <slot
+        name="prefix"
+        v-bind="scope"
+      />
+    </template>
+
+    <template
+      v-if="$slots.before"
+      #before="scope"
+    >
+      <slot
+        name="before"
+        v-bind="scope"
+      />
+    </template>
   </WInputAsync>
 </template>
 

@@ -19,6 +19,7 @@ export interface ButtonProps extends Partial<LinkProps> {
   download?: string
   skeleton?: boolean
   autofocus?: boolean
+  outline?: boolean
 }
 
 export type ButtonGroupOptionComponent<Option> = Component<SelectOptionProps<Option>>

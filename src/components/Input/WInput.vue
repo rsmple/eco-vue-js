@@ -62,7 +62,6 @@
           'bg-default dark:bg-default-dark': !seamless || focused,
         }"
         @click="focus"
-        @mousedown.prevent=""
       >
         <div
           v-if="icon"
@@ -94,70 +93,82 @@
               'flex-wrap': !noWrap,
             }"
           >
-            <slot name="prefix" />
+            <slot
+              name="prefix"
+              v-bind="{modelValue}"
+            />
 
             <div
-              class="flex flex-1 items-baseline"
+              class="overflow-auto font-normal"
               :class="{
                 'absolute w-0 max-w-0': hideInput,
+                'w-full': !hideInput,
                 'w-option-has-bg-input': $slots.prefix,
+                'resize-y': resize && textarea,
+                'resize-none': !resize && textarea,
+                'h-[calc(var(--w-input-height,2.75rem)-2px)]': !textarea && !$slots.suffix,
+                'w-option': !textarea && $slots.prefix,
+                'font-mono': mono,
+                'text-black-default dark:text-gray-200': !isDisabled,
+                'text-black-default/50 dark:text-gray-200/50': isDisabled,
+                '-p--w-option-padding h-[--w-textarea-height,10rem] min-h-[--w-textarea-height,10rem] w-full': textarea,
               }"
             >
-              <slot name="before" />
+              <div class="relative flex min-h-full flex-1">
+                <slot
+                  name="before"
+                  v-bind="{modelValue}"
+                />
 
-              <component
-                :is="textarea ? 'textarea' : 'input'"
-                :id="id"
-                ref="input"
-                class="
-                  w-input max-w-full flex-1 basis-auto appearance-none border-none bg-[inherit] font-normal
-                  outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed disabled:opacity-80 dark:placeholder:text-gray-500
-                "
-                :class="{
-                  '-p--w-option-padding min-h-[--w-textarea-height,10rem] w-full': textarea,
-                  'resize-y': resize && textarea,
-                  'resize-none': !resize && textarea,
-                  'h-[calc(var(--w-input-height,2.75rem)-2px)]': !textarea && !$slots.suffix,
-                  'w-option': !textarea && $slots.prefix,
-                  'font-mono': mono,
-                  'text-secure': textSecure && !isSecureVisible,
-                  'text-black-default dark:text-gray-200': !isDisabled,
-                  'text-black-default/50 dark:text-gray-200/50': isDisabled,
-                }"
-                :value="placeholderSecure && modelValue === undefined && !focused ? '******' : modelValue"
-                :placeholder="placeholder"
-                :type="type ?? 'text'"
-                :name="name"
-                :disabled="isDisabled"
-                :readonly="isReadonly || unclickable"
-                :autocomplete="autocomplete"
-                :size="size || undefined"
-                :step="step"
-                :min="min"
-                :max="max"
-                :spellcheck="spellcheck ? 'true' : 'false'"
-                @input="handleInputEvent"
-                @keypress.enter.exact="!isDisabled && !isReadonly && $emit('keypress:enter', $event)"
-                @keydown.up.exact.stop="!isDisabled && !isReadonly && $emit('keypress:up', $event)"
-                @keydown.down.exact.stop="!isDisabled && !isReadonly && $emit('keypress:down', $event)"
-                @keydown.delete.exact.stop="!isDisabled && !isReadonly && $emit('keypress:delete', $event); handleBackspace($event)"
-                @focus="
-                  $emit('focus', $event);
-                  setFocused(true);
-                  seamless && nextTick(scrollToInput);
-                "
-                @blur="
-                  $emit('blur', $event);
-                  setFocused(false);
-                  isSecureVisible = false;
-                  seamless && contentRef?.scrollTo({left: 0});
-                "
-                @click="$emit('click', $event)"
-                @mousedown.stop="$emit('mousedown', $event)"
-                @select.stop="$emit('select:input', $event)"
-              />
+                <component
+                  :is="textarea ? ContentEditable : 'input'"
+                  :id="id"
+                  ref="input"
+                  class="
+                    w-input min-h-full flex-1 basis-auto appearance-none border-none bg-[inherit]
+                    outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed dark:placeholder:text-gray-500
+                  "
+                  :class="{
+                    'text-secure': textSecure && !isSecureVisible,
+                    '[-webkit-text-fill-color:transparent]': textTransparent,
+                  }"
+                  :value="placeholderSecure && modelValue === undefined && !focused ? '******' : modelValue"
+                  :placeholder="placeholder"
+                  :type="type ?? 'text'"
+                  :name="name"
+                  :disabled="isDisabled"
+                  :readonly="isReadonly || unclickable"
+                  :autocomplete="autocomplete"
+                  :size="size || undefined"
+                  :step="step"
+                  :min="min"
+                  :max="max"
+                  :spellcheck="spellcheck ? 'true' : 'false'"
+                  :max-length="maxLength"
+                  @input="handleInputEvent"
+                  @keypress.enter.exact="!isDisabled && !isReadonly && $emit('keypress:enter', $event)"
+                  @keydown.up.exact.stop="!isDisabled && !isReadonly && $emit('keypress:up', $event)"
+                  @keydown.down.exact.stop="!isDisabled && !isReadonly && $emit('keypress:down', $event)"
+                  @keydown.delete.exact.stop="!isDisabled && !isReadonly && $emit('keypress:delete', $event); handleBackspace($event)"
+                  @focus="
+                    $emit('focus', $event);
+                    setFocused(true);
+                    seamless && nextTick(scrollToInput);
+                  "
+                  @blur="
+                    $emit('blur', $event);
+                    setFocused(false);
+                    isSecureVisible = false;
+                    seamless && contentRef?.scrollTo({left: 0});
+                  "
+                  @click="$emit('click', $event)"
+                  @mousedown.stop="$emit('mousedown', $event)"
+                  @select.stop="$emit('select:input', $event)"
+                  @update:model-value="updateModelValue"
+                />
 
-              <slot name="after" />
+                <slot name="after" />
+              </div>
             </div>
           </div>
         </div>
@@ -219,6 +230,7 @@ import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 import {Notify} from '@/utils/Notify'
 import {useComponentStates} from '@/utils/useComponentStates'
 
+import ContentEditable from './components/ContentEditable.vue'
 import InputActions from './components/InputActions.vue'
 
 type ModelValue = Required<InputProps<Type>>['modelValue']
@@ -257,7 +269,7 @@ const {isReadonly, isDisabled} = useComponentStates(props)
 
 const fieldWrapperRef = useTemplateRef('fieldWrapper')
 const contentRef = useTemplateRef('content')
-const inputRef = useTemplateRef<HTMLInputElement>('input')
+const inputRef = useTemplateRef<HTMLInputElement | ComponentInstance<typeof ContentEditable>>('input')
 const isSecureVisible = ref(false)
 
 const updateModelValue = (value: string | undefined): void => {

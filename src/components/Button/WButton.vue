@@ -24,13 +24,13 @@
     v-else
     ref="container"
     class="
-      w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-1px)] -min-h--button-height relative isolate
-      flex select-none
-      items-center justify-center whitespace-nowrap
-      rounded-[--w-button-rounded,1rem] px-[--w-button-rounded,1rem] font-medium outline-none
+      w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-var(--w-button-border,1px))] -min-h--button-height relative isolate
+      flex select-none items-center
+      justify-center whitespace-nowrap rounded-[--w-button-rounded,1rem]
+      px-[--w-button-rounded,1rem] font-medium outline-none [border-width:--w-button-border,1px]
     "
     :class="{
-      [semanticTypeBackgroundMap[semanticType]]: true,
+      [semanticTypeBackgroundMap[semanticType]]: !outline,
       [semanticTypeBorderMap[semanticType]]: true,
       'w-ripple w-ripple-hover before:text-black-default w-ripple-opacity-20 dark:w-ripple-opacity-30 cursor-pointer': !loading && !isDisabled,
       'cursor-progress': loading,

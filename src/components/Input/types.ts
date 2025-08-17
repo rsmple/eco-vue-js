@@ -33,6 +33,7 @@ export interface InputProps<Type extends InputType> extends Omit<FieldWrapperPro
   allowPaste?: boolean
   hideInput?: boolean
   noWrap?: boolean
+  textTransparent?: boolean
 }
 
 export interface InputAsyncProps<Type extends InputType> extends InputProps<Type> {
