@@ -102,7 +102,7 @@
               class="overflow-auto font-normal"
               :class="{
                 'absolute w-0 max-w-0': hideInput,
-                'w-full': !hideInput,
+                'w-full': !hideInput && !$slots.prefix,
                 'w-option-has-bg-input': $slots.prefix,
                 'resize-y': resize && textarea,
                 'resize-none': !resize && textarea,

@@ -8,7 +8,7 @@
     :textContent="value"
     :placeholder="placeholder"
     class="
-      whitespace-pre-wrap [word-wrap:break-word] empty:before:pointer-events-none empty:before:text-gray-400
+      whitespace-pre empty:before:pointer-events-none empty:before:text-gray-400
       empty:before:[content:attr(placeholder)] dark:empty:before:text-gray-500
     "
     @input="onInput"
