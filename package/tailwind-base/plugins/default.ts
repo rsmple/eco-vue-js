@@ -425,8 +425,8 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       'w-button-border': value => ({'--w-button-border': value}),
     },
     {
-      values: theme('borderWidth')
-    }
+      values: theme('borderWidth'),
+    },
   )
 
   matchUtilities(
