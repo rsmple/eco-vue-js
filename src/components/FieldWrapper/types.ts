@@ -22,4 +22,5 @@ export interface FieldWrapperProps {
   subgrid?: boolean
   seamless?: boolean
   savedText?: string
+  topText?: boolean
 }

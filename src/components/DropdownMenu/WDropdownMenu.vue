@@ -1,6 +1,6 @@
 <template>
   <component
-    :is="unwrapSlots($slots.toggle?.() ?? [])[0]"
+    :is="unwrapSlots($slots.toggle?.({isTop}) ?? [])[0]"
     ref="container"
     v-bind="$attrs"
   />
@@ -55,8 +55,10 @@ const dropdownRef = useTemplateRef('dropdown')
 
 const element = computed(() => isClientSide ? containerRef.value instanceof HTMLElement ? containerRef.value : containerRef.value?.$el : undefined)
 
+const isTop = computed(() => dropdownRef.value?.top ?? false)
+
 defineSlots<{
-  toggle?: () => VNode[]
+  toggle?: (props: {isTop: boolean, unclickable: false}) => VNode[]
   content?: (props: DropdownDefaultSlotScope) => VNode[]
 }>()
 

@@ -14,7 +14,7 @@
       parentElement: inputRef?.fieldRef,
     }"
   >
-    <template #toggle="toggleScope: ({unclickable: boolean} | undefined)">
+    <template #toggle="toggleScope: ({unclickable: boolean, isTop: boolean} | undefined)">
       <WInput
         ref="input"
         v-bind="{
@@ -24,6 +24,7 @@
           unclickable: toggleScope?.unclickable,
           description: toggleScope?.unclickable === false ? undefined : description,
           seamless: toggleScope?.unclickable === false ? false : props.seamless,
+          topText: topText || (isOpen && !toggleScope?.isTop)
         }"
         :class="{
           'cursor-pointer': !isDisabled && !isReadonly,

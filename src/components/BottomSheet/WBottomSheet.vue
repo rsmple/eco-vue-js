@@ -21,6 +21,7 @@
           <slot
             name="toggle"
             :unclickable="false"
+            v-bind="{isTop: false}"
           />
         </div>
       </div>

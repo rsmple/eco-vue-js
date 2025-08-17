@@ -42,6 +42,7 @@
     :type="type"
     @click="click"
     @keypress.enter.stop.prevent="click"
+    @mousedown="mousedown"
   >
     <div
       class="z-10 flex flex-1 items-center justify-center gap-2"
@@ -115,12 +116,19 @@ const semanticTypeBorderMap = useSemanticTypeBorderMap()
 
 const emit = defineEmits<{
   (e: 'click', event: MouseEvent | KeyboardEvent): void
+  (e: 'mousedown', event: MouseEvent | KeyboardEvent): void
 }>()
 
 const click = (event: MouseEvent | KeyboardEvent): void => {
   if (isDisabled.value || props.loading) return
 
   emit('click', event)
+}
+
+const mousedown = (event: MouseEvent): void => {
+  if (isDisabled.value || props.loading) return
+
+  emit('mousedown', event)
 }
 
 const isNotEnabled = computed(() => isDisabled.value || isSkeleton.value)

@@ -43,10 +43,12 @@
       v-if="!skeleton && textSecure && focused"
       #bottom
     >
-      <div class="flex justify-end gap-4">
+      <div class="flex justify-end gap-4 pt-4">
         <WButton
           :semantic-type="SemanticType.SECONDARY"
           :disabled="disabled || loading"
+          class="basis-32"
+          @mousedown.prevent=""
           @click="cancel"
         >
           Cancel
@@ -56,6 +58,8 @@
           :semantic-type="SemanticType.PRIMARY"
           :loading="loading"
           :disabled="disabled"
+          class="basis-32"
+          @mousedown.prevent=""
           @click="save"
         >
           Save

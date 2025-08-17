@@ -113,25 +113,27 @@
         >
           <div
             v-if="saved"
-            class="text-description absolute right-0 top-full whitespace-nowrap pt-0.5 text-xs font-normal"
+            class="text-description absolute right-0 whitespace-nowrap py-0.5 text-xs font-normal"
+            :class="topText ? 'bottom-full' : 'top-full'"
           >
             {{ savedText ?? 'Saved' }}
           </div>
 
           <div
             v-else-if="errorMessage"
-            class="text-negative dark:text-negative-dark absolute top-full pt-0.5 text-xs font-normal"
-            :class="{
-              'right-0 text-end': !leftError,
-              'left-0 text-start': leftError,
-            }"
+            class="text-negative dark:text-negative-dark absolute pt-0.5 text-xs font-normal"
+            :class="[
+              !leftError || topText ? 'right-0 text-end' : 'left-0 text-start',
+              topText ? 'bottom-full' : 'top-full',
+            ]"
           >
             {{ errorMessage }}
           </div>
 
           <div
             v-else-if="maxLength !== undefined && focused"
-            class="text-description absolute right-0 top-full whitespace-nowrap pt-0.5 text-xs font-normal"
+            class="text-description absolute right-0 whitespace-nowrap pt-0.5 text-xs font-normal"
+            :class="topText ? 'bottom-full' : 'top-full'"
           >
             {{ numberFormatter.format(`${typeof modelValue === 'number' ? modelValue : (modelValue || '')}`.length) }} / {{ numberFormatter.format(maxLength) }}
           </div>

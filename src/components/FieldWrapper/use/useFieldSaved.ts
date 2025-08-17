@@ -21,9 +21,15 @@ export const useFieldSaved = () => {
   const showSaved = () => {
     if (timeout) clearTimeout(timeout)
 
-    saved.value = true
+    if (saved.value) {
+      saved.value = false
 
-    timeout = setTimeout(resetSaved, 2000)
+      timeout = setTimeout(showSaved, 100)
+    } else {
+      saved.value = true
+
+      timeout = setTimeout(resetSaved, 2000)
+    }
   }
 
   onBeforeUnmount(resetSaved)
