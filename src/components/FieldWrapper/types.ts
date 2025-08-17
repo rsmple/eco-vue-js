@@ -21,4 +21,5 @@ export interface FieldWrapperProps {
   filterValue?: unknown
   subgrid?: boolean
   seamless?: boolean
+  savedText?: string
 }

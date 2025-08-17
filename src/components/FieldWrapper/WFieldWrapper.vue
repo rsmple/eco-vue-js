@@ -112,7 +112,14 @@
           leave-to-class="opacity-0"
         >
           <div
-            v-if="errorMessage"
+            v-if="saved"
+            class="text-description absolute right-0 top-full whitespace-nowrap pt-0.5 text-xs font-normal"
+          >
+            {{ savedText ?? 'Saved' }}
+          </div>
+
+          <div
+            v-else-if="errorMessage"
             class="text-negative dark:text-negative-dark absolute top-full pt-0.5 text-xs font-normal"
             :class="{
               'right-0 text-end': !leftError,
@@ -154,6 +161,8 @@
       </template>
     </div>
 
+    <slot name="bottom" />
+
     <div
       v-if="description"
       class="text-description col-start-1 whitespace-pre-wrap text-pretty break-words text-xs font-normal"
@@ -179,7 +188,7 @@
 <script lang="ts" setup>
 import type {FieldWrapperProps} from './types'
 
-import {type StyleValue, computed, ref, useId, useTemplateRef} from 'vue'
+import {type StyleValue, computed, inject, ref, useId, useTemplateRef} from 'vue'
 
 import WButtonCopy from '@/components/Button/WButtonCopy.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
@@ -190,6 +199,7 @@ import {useComponentStates} from '@/utils/useComponentStates'
 import {numberFormatter} from '@/utils/utils'
 
 import FilterButton from './components/FilterButton.vue'
+import {wFieldSaved} from './use/useFieldSaved'
 
 defineOptions({inheritAttrs: false})
 
@@ -213,6 +223,8 @@ const id = useId()
 const fieldRef = useTemplateRef('field')
 
 const focused = ref(false)
+
+const saved = inject(wFieldSaved, ref(false))
 
 const encodedQueryParam = computed(() => {
   if (props.filterField === undefined) return undefined

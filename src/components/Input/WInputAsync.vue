@@ -13,7 +13,7 @@
     :class="$attrs.class"
     @keypress:enter="handleEnterPress"
     @click="open"
-    @blur="props.textSecure ? cancel() : toggle(); focused = false;"
+    @blur="props.textSecure || !hasChangesValue ? cancel() : save(); focused = false;"
     @focus="focused = true"
     @paste="handlePaste"
     @update:model-value="value = $event"
@@ -33,30 +33,41 @@
     </template>
 
     <template
-      v-if="(!isReadonly && !hideButton) || $slots.right"
+      v-if="$slots.right"
       #right
     >
       <slot name="right" />
+    </template>
 
-      <WButtonInput
-        v-if="!isReadonly && !hideButton"
-        :icon="canSave ? markRaw(IconCheck) : focused ? markRaw(IconSlash) : markRaw(IconEdit)"
-        :tooltip-text="!loading && focused ? canSave ? 'Save' : 'Cancel' : undefined"
-        :loading="loading"
-        :skeleton="skeleton"
-        :disabled="disabled"
-        :class="{
-          'bg-primary dark:bg-primary-dark text-default dark:text-default-dark': canSave,
-        }"
-        @click="toggle"
-      />
+    <template
+      v-if="!skeleton && textSecure && focused"
+      #bottom
+    >
+      <div class="flex justify-end gap-4">
+        <WButton
+          :semantic-type="SemanticType.SECONDARY"
+          :disabled="disabled || loading"
+          @click="cancel"
+        >
+          Cancel
+        </WButton>
+
+        <WButton
+          :semantic-type="SemanticType.PRIMARY"
+          :loading="loading"
+          :disabled="disabled"
+          @click="save"
+        >
+          Save
+        </WButton>
+      </div>
     </template>
 
     <template
       v-if="debounce"
       #inner
     >
-      <div class="absolute inset-x-3 bottom-1 isolate h-0.5">
+      <div class="absolute inset-x-3 bottom-[calc((var(--w-input-height)-1.75em)/2)] isolate h-0.5">
         <Transition
           enter-active-class="transition-opacity"
           leave-active-class="transition-opacity"
@@ -90,15 +101,12 @@
 <script lang="ts" setup generic="Type extends InputType = 'text'">
 import type {InputAsyncProps} from './types'
 
-import {computed, markRaw, ref, toRef, useTemplateRef, watch} from 'vue'
+import {computed, ref, toRef, useTemplateRef, watch} from 'vue'
 
-import WButtonInput from '@/components/Button/WButtonInput.vue'
+import WButton from '@/components/Button/WButton.vue'
 import WInput from '@/components/Input/WInput.vue'
 
-import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
-import IconEdit from '@/assets/icons/sax/IconEdit.svg?component'
-import IconSlash from '@/assets/icons/sax/IconSlash.svg?component'
-
+import {SemanticType} from '@/utils/SemanticType'
 import {useComponentStates} from '@/utils/useComponentStates'
 
 type ModelValue = Required<InputAsyncProps<Type>>['modelValue']
@@ -126,7 +134,6 @@ const value = ref<ModelValue | undefined>()
 const inputRef = useTemplateRef('input')
 const errorMessageValue = ref<string | undefined>()
 const hasChangesValue = computed(() => props.modelValue !== value.value)
-const canSave = computed(() => (props.textSecure && focused.value) || hasChangesValue.value)
 
 const timeout = ref<NodeJS.Timeout | null>(null)
 
@@ -151,15 +158,10 @@ const cancel = () => {
   inputRef.value?.blur()
 }
 
-const toggle = async () => {
+const save = async () => {
   if (isDisabled.value || isReadonly.value || props.loading) return
 
-  if (canSave.value) {
-    emitUpdateModelValue(value.value)
-  } else {
-    if (focused.value) cancel()
-    else open()
-  }
+  emitUpdateModelValue(value.value)
 }
 
 const open = () => {
@@ -195,6 +197,8 @@ const emitUpdateModelValue = (newValue: ModelValue | undefined) => {
   if (errorMessageValue.value) return
   if (props.placeholderSecure) inputRef.value?.blur()
 
+  if (timeout.value) clearTimeout(timeout.value)
+
   emit('update:model-value', newValue)
 
   if (!props.placeholderSecure) saved.value = true
@@ -208,7 +212,7 @@ const handleEnterPress = (event: KeyboardEvent): void => {
   event.stopPropagation()
   event.preventDefault()
 
-  if (canSave.value) emitUpdateModelValue(value.value)
+  if (value.value !== props.modelValue) emitUpdateModelValue(value.value)
 }
 
 const handlePaste = () => {
@@ -216,11 +220,11 @@ const handlePaste = () => {
 
   if (!value.value) return
 
-  if (canSave.value) emitUpdateModelValue(value.value)
+  if (value.value !== props.modelValue) emitUpdateModelValue(value.value)
 }
 
 const saveDebounced = () => {
-  if (canSave.value) emit('update:model-value', value.value)
+  if (value.value !== props.modelValue) emit('update:model-value', value.value)
 
   timeout.value = null
 }
@@ -228,7 +232,7 @@ const saveDebounced = () => {
 const updateModelValueDebounced = () => {
   if (timeout.value) clearTimeout(timeout.value)
 
-  if (!canSave.value) {
+  if (value.value === props.modelValue) {
     timeout.value = null
     return
   }

@@ -270,7 +270,7 @@ const toggleMenu = (event: MouseEvent) => {
 
   const containerRect = containerRef.value.getBoundingClientRect()
 
-  position.value = {left: event.screenX - containerRect.x + 'px', top: event.clientY - containerRect.y + 'px'}
+  position.value = {left: event.clientX - containerRect.x + 'px', top: event.clientY - containerRect.y + 'px'}
 
   moreRef.value.open()
 

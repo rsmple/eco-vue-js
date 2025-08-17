@@ -198,6 +198,13 @@
     >
       <slot name="right" />
     </template>
+
+    <template 
+      v-if="$slots.bottom"
+      #bottom
+    >
+      <slot name="bottom" />
+    </template>
   </WFieldWrapper>
 </template>
 

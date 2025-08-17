@@ -38,7 +38,7 @@
 
       <div class="-h--w-input-height py-0.75">
         <div
-          class="width-10 p-0.75 h-full rounded-full bg-[200%_auto] [background-position:right]"
+          class="width-[calc(var(--w-input-height)+0.5rem)] p-0.75 h-full rounded-full bg-[200%_auto] [background-position:right]"
           :class="{
             'bg-gray-300 dark:bg-gray-700': !value || loading,
             [semanticTypeBackgroundMap[SemanticType.PRIMARY]]: value && !loading,
@@ -48,8 +48,8 @@
             <div
               class="bg-default text-primary dark:text-primary-dark absolute z-10 flex aspect-square h-full items-center justify-center rounded-full shadow-md transition-[right]"
               :class="{
-                'right-[calc(100%-1.25rem)]': value === false,
-                'right-[calc(50%-0.625rem)]': value === null,
+                'right-[calc(100%-(var(--w-input-height)-0.75rem))]': value === false,
+                'right-[calc(50%-(var(--w-input-height)-0.75rem)/2)]': value === null,
                 'right-0': value === true,
                 'w-ripple w-ripple-hover': !isDisabled && !isReadonly && !isSkeleton,
               }"
