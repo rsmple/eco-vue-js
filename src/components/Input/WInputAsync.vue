@@ -88,7 +88,7 @@
     </template>
 
     <template
-      v-if="debounce"
+      v-if="debounce && !hideDebounce"
       #inner
     >
       <div class="absolute inset-x-3 bottom-[calc((var(--w-input-height)-1.75em)/2)] isolate h-0.5">
