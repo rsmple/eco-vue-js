@@ -29,7 +29,7 @@
     >
       <InfiniteListHeaderPadding
         :is-intersecting="isIntersecting"
-        :header-height="headerHeight"
+        :header-height="scope.headerHeight"
       >
         <slot
           name="header"
