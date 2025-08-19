@@ -59,7 +59,7 @@
           'border-gray-300 dark:border-gray-700': !isDisabled,
           'border-gray-300/50 dark:border-gray-700/50': isDisabled,
           'border-opacity-0 group-hover/field:border-opacity-100 dark:border-opacity-0 dark:group-hover/field:border-opacity-100': seamless && !focused,
-          'bg-default dark:bg-default-dark': !seamless || focused,
+          'bg-[--w-input-bg,inherit]': !seamless || focused,
         }"
         @click="focus"
       >
