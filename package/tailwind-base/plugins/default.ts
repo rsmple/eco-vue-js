@@ -467,8 +467,8 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       'w-input-bg': value => ({'--w-input-bg': value}),
     },
     {
-      values: theme('colors')
-    }
+      values: theme('colors'),
+    },
   )
 
   addBase({
