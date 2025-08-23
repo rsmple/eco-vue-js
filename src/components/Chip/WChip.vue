@@ -40,7 +40,7 @@ const classMap: Record<SemanticType, string> = {
   [SemanticType.PRIMARY]: 'text-primary dark:text-primary-dark',
   [SemanticType.SECONDARY]: 'text-description',
   [SemanticType.POSITIVE]: 'text-positive dark:text-positive-dark',
-  [SemanticType.NEGARIVE]: 'text-negative dark:text-negative-dark',
+  [SemanticType.NEGATIVE]: 'text-negative dark:text-negative-dark',
   [SemanticType.WARNING]: 'text-warning dark:text-warning-dark',
   [SemanticType.INFO]: 'text-info dark:text-info-dark',
 }

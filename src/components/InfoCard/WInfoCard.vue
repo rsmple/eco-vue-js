@@ -14,7 +14,7 @@
         class="square-[1.5em] inline-block"
         :class="{
           [infoCardIconSemanticTypeMap[semanticType ?? SemanticType.SECONDARY]]: true,
-          'rotate-180': !icon && semanticType !== SemanticType.WARNING && semanticType !== SemanticType.NEGARIVE,
+          'rotate-180': !icon && semanticType !== SemanticType.WARNING && semanticType !== SemanticType.NEGATIVE,
           '[&_*]:stroke-2': !icon,
         }"
       />
