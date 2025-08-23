@@ -29,7 +29,7 @@ export const useTooltipMeta = () => {
 
     if (!meta) {
       timeout = setTimeout(() => {
-        tooltipMeta.value = null
+        // tooltipMeta.value = null
         timeout = undefined
       }, 100)
     } else if (tooltipMeta.value !== meta) {

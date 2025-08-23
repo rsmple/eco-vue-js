@@ -31,11 +31,11 @@ class BottomInner extends VerticalGetter {
   origin = OriginY.TOP
 
   styleGetter(parentRect: DOMRect) {
-    return parentRect.top
+    return Math.round(parentRect.top)
   }
 
   marginGetter(parentRect: DOMRect, maxHeight: number) {
-    return window.innerHeight - parentRect.top - maxHeight - EDGE
+    return Math.round(window.innerHeight - parentRect.top - maxHeight - EDGE)
   }
 }
 
@@ -44,11 +44,11 @@ class BottomOuter extends VerticalGetter {
   origin = OriginY.TOP
 
   styleGetter(parentRect: DOMRect) {
-    return parentRect.bottom
+    return Math.round(parentRect.bottom)
   }
 
   marginGetter(parentRect: DOMRect, maxHeight: number) {
-    return window.innerHeight - parentRect.bottom - maxHeight - EDGE
+    return Math.round(window.innerHeight - parentRect.bottom - maxHeight - EDGE)
   }
 }
 
@@ -57,7 +57,7 @@ class VerticalCenter extends VerticalGetter {
   origin = OriginY.CENTER
 
   styleGetter(parentRect: DOMRect) {
-    return parentRect.top + parentRect.height / 2
+    return Math.round(parentRect.top + parentRect.height / 2)
   }
 
   marginGetter() {
@@ -74,11 +74,11 @@ class TopOuter extends VerticalGetter {
   origin = OriginY.BOTTOM
 
   styleGetter(parentRect: DOMRect) {
-    return parentRect.top
+    return Math.round(parentRect.top)
   }
 
   marginGetter(parentRect: DOMRect, maxHeight: number) {
-    return parentRect.top - maxHeight - EDGE
+    return Math.round(parentRect.top - maxHeight - EDGE)
   }
 }
 
@@ -87,11 +87,11 @@ class TopInner extends VerticalGetter {
   origin = OriginY.BOTTOM
 
   styleGetter(parentRect: DOMRect) {
-    return parentRect.bottom
+    return Math.round(parentRect.bottom)
   }
 
   marginGetter(parentRect: DOMRect, maxHeight: number) {
-    return parentRect.bottom - maxHeight - EDGE
+    return Math.round(parentRect.bottom - maxHeight - EDGE)
   }
 }
 
@@ -120,11 +120,11 @@ export class RightOuter extends HorizontalGetter {
   origin = OriginX.LEFT
 
   styleGetter(parentRect: DOMRect) {
-    return parentRect.right
+    return Math.round(parentRect.right)
   }
 
   marginGetter(parentRect: DOMRect, maxWidth: number) {
-    return document.documentElement.clientWidth - parentRect.right - maxWidth - EDGE
+    return Math.round(document.documentElement.clientWidth - parentRect.right - maxWidth - EDGE)
   }
 }
 
@@ -133,11 +133,11 @@ export class RightInner extends HorizontalGetter {
   origin = OriginX.LEFT
 
   styleGetter(parentRect: DOMRect) {
-    return parentRect.left
+    return Math.round(parentRect.left)
   }
 
   marginGetter(parentRect: DOMRect, maxWidth: number) {
-    return document.documentElement.clientWidth - parentRect.left - maxWidth - EDGE
+    return Math.round(document.documentElement.clientWidth - parentRect.left - maxWidth - EDGE)
   }
 }
 
@@ -150,7 +150,7 @@ class Fill extends HorizontalGetter {
   origin = OriginX.LEFT
 
   styleGetter(parentRect: DOMRect) {
-    return parentRect.left
+    return Math.round(parentRect.left)
   }
 
   marginGetter() {
@@ -158,7 +158,7 @@ class Fill extends HorizontalGetter {
   }
 
   widthStyleGetter(parentRect: DOMRect) {
-    return parentRect.right - parentRect.left
+    return Math.round(parentRect.right - parentRect.left)
   }
 }
 
@@ -167,7 +167,7 @@ class Center extends HorizontalGetter {
   origin = OriginX.CENTER
 
   styleGetter(parentRect: DOMRect) {
-    return parentRect.left + parentRect.width / 2
+    return Math.round(parentRect.left + parentRect.width / 2)
   }
 
   marginGetter() {
@@ -184,11 +184,11 @@ export class LeftInner extends HorizontalGetter {
   origin = OriginX.RIGHT
 
   styleGetter(parentRect: DOMRect) {
-    return parentRect.right
+    return Math.round(parentRect.right)
   }
 
   marginGetter(parentRect: DOMRect, maxWidth: number) {
-    return parentRect.right - maxWidth - EDGE
+    return Math.round(parentRect.right - maxWidth - EDGE)
   }
 }
 
@@ -197,11 +197,11 @@ export class LeftOuter extends HorizontalGetter {
   origin = OriginX.RIGHT
 
   styleGetter(parentRect: DOMRect) {
-    return parentRect.left
+    return Math.round(parentRect.left)
   }
 
   marginGetter(parentRect: DOMRect, maxWidth: number) {
-    return parentRect.left - maxWidth - EDGE
+    return Math.round(parentRect.left - maxWidth - EDGE)
   }
 }
 
@@ -237,6 +237,6 @@ export function searchStyleGetter<T extends StyleGetter>(order: Array<T>, parent
 function _maxHeightOrWidthGetter(getter: StyleGetter, parentRect: DOMRect, maxHeightOrWidth: number): number {
   const margin = getter.marginGetter(parentRect, maxHeightOrWidth)
 
-  if (margin > 0) return maxHeightOrWidth
-  else return maxHeightOrWidth + margin
+  if (margin > 0) return Math.round(maxHeightOrWidth)
+  else return Math.round(maxHeightOrWidth + margin)
 }

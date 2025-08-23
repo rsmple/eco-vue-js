@@ -50,13 +50,7 @@
         border-gray-400 px-3 py-2 text-center text-xs
         font-medium shadow-md will-change-transform dark:border-gray-600 dark:bg-gray-800
       "
-      :style="{
-        '--t-translate-x': transformX + 'px',
-        '--t-translate-y': transformY + 'px',
-      }"
-      style="
-        transform: translate(var(--t-translate-x, 0px), var(--t-translate-y, 0px));
-      "
+      :class="isLeft || isRight ? 'w-tooltip-center-y' : 'w-tooltip-center-x'"
       @mouseover="$emit('over')"
       @mouseleave="$emit('leave')"
     >
@@ -68,17 +62,9 @@
 <script lang="ts" setup>
 import type {TooltipMeta} from '../models/tooltipMeta'
 
-import {nextTick, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
-
-import {isClientSide} from '@/utils/utils'
-
-const MARGIN = 12
-
-const props = defineProps<{
+defineProps<{
   tooltipMeta: TooltipMeta
   isTop?: boolean
-  x: number
-  y: number
   isLeft?: boolean
   isRight?: boolean
 }>()
@@ -87,49 +73,4 @@ defineEmits<{
   (e: 'over'): void
   (e: 'leave'): void
 }>()
-
-const containerRef = useTemplateRef('container')
-const transformX = ref<number>(0)
-const transformY = ref<number>(0)
-
-const getTransformX = () => {
-  if (!isClientSide || !containerRef.value) return 0
-  if (props.isLeft || props.isRight) return 0
-
-  const containerLeft = props.x - (containerRef.value.offsetWidth / 2) - MARGIN
-
-  if (containerLeft < 0) return containerLeft * -1
-
-  const containerRight = window.innerWidth - props.x - (containerRef.value.offsetWidth / 2) - MARGIN
-
-  if (containerRight < 0) return containerRight
-
-  return 0
-}
-
-const getTransformY = () => {
-  if (!isClientSide || !containerRef.value) return 0
-  if (!props.isLeft && !props.isRight) return 0
-
-  const containerTop = props.y - (containerRef.value.offsetHeight / 2) - MARGIN
-
-  if (containerTop < 0) return containerTop * -1
-
-  const containerBottom = window.innerHeight - props.y - (containerRef.value.offsetHeight / 2) - MARGIN
-
-  if (containerBottom < 0) return containerBottom
-
-  return 0
-}
-
-const setTransform = async () => {
-  await nextTick()
-
-  transformX.value = getTransformX()
-  transformY.value = getTransformY()
-}
-
-watch(toRef(props, 'tooltipMeta'), setTransform)
-
-onMounted(setTransform)
 </script>

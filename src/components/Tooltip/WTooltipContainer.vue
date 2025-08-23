@@ -19,11 +19,9 @@
       class="isolate z-[10000]"
       @update:rect="close"
     >
-      <template #default="{isTop, x, y}">
+      <template #default="{isTop}">
         <TooltipContainer
           :tooltip-meta="tooltipMeta"
-          :x="x"
-          :y="y"
           :is-top="isTop"
           :is-left="tooltipMeta.left"
           :is-right="tooltipMeta.right"
