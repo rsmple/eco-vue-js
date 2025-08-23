@@ -45,16 +45,18 @@
     <div
       ref="container"
       class="
-        bg-black-default text-default pointer-events-auto
-        max-w-[calc(100vw-1.5rem)] translate-x-[var(--t-translate-x)]
-        translate-y-[var(--t-translate-y)] rounded-lg border
-        border-solid border-gray-400 px-3 py-2 text-center
-        text-xs font-medium shadow-md dark:border-gray-600 dark:bg-gray-800
+        bg-black-default text-default pointer-events-auto max-w-[calc(100vw-1.5rem)]
+        rounded-lg border border-solid
+        border-gray-400 px-3 py-2 text-center text-xs
+        font-medium shadow-md will-change-transform dark:border-gray-600 dark:bg-gray-800
       "
       :style="{
         '--t-translate-x': transformX + 'px',
         '--t-translate-y': transformY + 'px',
       }"
+      style="
+        transform: translate(var(--t-translate-x, 0px), var(--t-translate-y, 0px));
+      "
       @mouseover="$emit('over')"
       @mouseleave="$emit('leave')"
     >
@@ -68,7 +70,6 @@ import type {TooltipMeta} from '../models/tooltipMeta'
 
 import {nextTick, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
-import {OriginX, OriginY} from '@/components/Dropdown/utils/DropdownStyle'
 import {isClientSide} from '@/utils/utils'
 
 const MARGIN = 12
@@ -78,8 +79,6 @@ const props = defineProps<{
   isTop?: boolean
   x: number
   y: number
-  originX: OriginX
-  originY: OriginY
   isLeft?: boolean
   isRight?: boolean
 }>()
@@ -97,29 +96,13 @@ const getTransformX = () => {
   if (!isClientSide || !containerRef.value) return 0
   if (props.isLeft || props.isRight) return 0
 
-  if (props.originX === OriginX.LEFT) {
-    const containerLeft = props.x - (containerRef.value.offsetWidth / 2) - MARGIN
+  const containerLeft = props.x - (containerRef.value.offsetWidth / 2) - MARGIN
 
-    if (containerLeft < 0) return containerLeft * -1
+  if (containerLeft < 0) return containerLeft * -1
 
-    const containerRight = window.innerWidth - props.x - (containerRef.value.offsetWidth / 2) - MARGIN
+  const containerRight = window.innerWidth - props.x - (containerRef.value.offsetWidth / 2) - MARGIN
 
-    if (containerRight < 0) return containerRight
-
-    return 0
-  }
-  
-  if (props.originX === OriginX.RIGHT) {
-    const containerLeft = window.innerWidth - props.x - (containerRef.value.offsetWidth / 2) - MARGIN
-
-    if (containerLeft < 0) return containerLeft * -1
-
-    const containerRight = props.x - (containerRef.value.offsetWidth / 2) - MARGIN
-
-    if (containerRight < 0) return containerRight
-
-    return 0
-  }
+  if (containerRight < 0) return containerRight
 
   return 0
 }
@@ -128,29 +111,13 @@ const getTransformY = () => {
   if (!isClientSide || !containerRef.value) return 0
   if (!props.isLeft && !props.isRight) return 0
 
-  if (props.originY === OriginY.TOP) {
-    const containerTop = props.y - (containerRef.value.offsetHeight / 2) - MARGIN
+  const containerTop = props.y - (containerRef.value.offsetHeight / 2) - MARGIN
 
-    if (containerTop < 0) return containerTop * -1
+  if (containerTop < 0) return containerTop * -1
 
-    const containerBottom = window.innerHeight - props.y - (containerRef.value.offsetHeight / 2) - MARGIN
+  const containerBottom = window.innerHeight - props.y - (containerRef.value.offsetHeight / 2) - MARGIN
 
-    if (containerBottom < 0) return containerBottom
-
-    return 0
-  }
-  
-  if (props.originY === OriginY.BOTTOM) {
-    const containerTop = window.innerHeight - props.y - (containerRef.value.offsetHeight / 2) - MARGIN
-
-    if (containerTop < 0) return containerTop * -1
-
-    const containerBottom = props.y - (containerRef.value.offsetHeight / 2) - MARGIN
-
-    if (containerBottom < 0) return containerBottom
-
-    return 0
-  }
+  if (containerBottom < 0) return containerBottom
 
   return 0
 }
