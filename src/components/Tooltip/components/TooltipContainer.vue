@@ -50,7 +50,7 @@
         border-gray-400 px-3 py-2 text-center text-xs
         font-medium shadow-md will-change-transform dark:border-gray-600 dark:bg-gray-800
       "
-      :class="isLeft || isRight ? 'w-tooltip-center-y' : 'w-tooltip-center-x'"
+      :class="isLeft || isRight ? undefined : 'w-tooltip-center-x'"
       @mouseover="$emit('over')"
       @mouseleave="$emit('leave')"
     >
