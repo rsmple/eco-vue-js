@@ -68,6 +68,7 @@ import type {TooltipMeta} from '../models/tooltipMeta'
 
 import {nextTick, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
+import {OriginX, OriginY} from '@/components/Dropdown/utils/DropdownStyle'
 import {isClientSide} from '@/utils/utils'
 
 const MARGIN = 12
@@ -75,10 +76,10 @@ const MARGIN = 12
 const props = defineProps<{
   tooltipMeta: TooltipMeta
   isTop?: boolean
-  left?: string
-  right?: string
-  top?: string
-  bottom?: string
+  x: number
+  y: number
+  originX: OriginX
+  originY: OriginY
   isLeft?: boolean
   isRight?: boolean
 }>()
@@ -96,28 +97,24 @@ const getTransformX = () => {
   if (!isClientSide || !containerRef.value) return 0
   if (props.isLeft || props.isRight) return 0
 
-  const l = props.left ? Number.parseFloat(props.left.slice(0, -2)) : null
-
-  if (typeof l === 'number') {
-    const containerLeft = l - (containerRef.value.offsetWidth / 2) - MARGIN
+  if (props.originX === OriginX.LEFT) {
+    const containerLeft = props.x - (containerRef.value.offsetWidth / 2) - MARGIN
 
     if (containerLeft < 0) return containerLeft * -1
 
-    const containerRight = window.innerWidth - l - (containerRef.value.offsetWidth / 2) - MARGIN
+    const containerRight = window.innerWidth - props.x - (containerRef.value.offsetWidth / 2) - MARGIN
 
     if (containerRight < 0) return containerRight
 
     return 0
   }
-
-  const r = props.right ? Number.parseFloat(props.right.slice(0, -2)) : null
   
-  if (typeof r === 'number') {
-    const containerLeft = window.innerWidth - r - (containerRef.value.offsetWidth / 2) - MARGIN
+  if (props.originX === OriginX.RIGHT) {
+    const containerLeft = window.innerWidth - props.x - (containerRef.value.offsetWidth / 2) - MARGIN
 
     if (containerLeft < 0) return containerLeft * -1
 
-    const containerRight = r - (containerRef.value.offsetWidth / 2) - MARGIN
+    const containerRight = props.x - (containerRef.value.offsetWidth / 2) - MARGIN
 
     if (containerRight < 0) return containerRight
 
@@ -131,28 +128,24 @@ const getTransformY = () => {
   if (!isClientSide || !containerRef.value) return 0
   if (!props.isLeft && !props.isRight) return 0
 
-  const t = props.top ? Number.parseFloat(props.top.slice(0, -2)) : null
-
-  if (typeof t === 'number') {
-    const containerTop = t - (containerRef.value.offsetHeight / 2) - MARGIN
+  if (props.originY === OriginY.TOP) {
+    const containerTop = props.y - (containerRef.value.offsetHeight / 2) - MARGIN
 
     if (containerTop < 0) return containerTop * -1
 
-    const containerBottom = window.innerHeight - t - (containerRef.value.offsetHeight / 2) - MARGIN
+    const containerBottom = window.innerHeight - props.y - (containerRef.value.offsetHeight / 2) - MARGIN
 
     if (containerBottom < 0) return containerBottom
 
     return 0
   }
-
-  const b = props.bottom ? Number.parseFloat(props.bottom.slice(0, -2)) : null
   
-  if (typeof b === 'number') {
-    const containerTop = window.innerHeight - b - (containerRef.value.offsetHeight / 2) - MARGIN
+  if (props.originY === OriginY.BOTTOM) {
+    const containerTop = window.innerHeight - props.y - (containerRef.value.offsetHeight / 2) - MARGIN
 
     if (containerTop < 0) return containerTop * -1
 
-    const containerBottom = b - (containerRef.value.offsetHeight / 2) - MARGIN
+    const containerBottom = props.y - (containerRef.value.offsetHeight / 2) - MARGIN
 
     if (containerBottom < 0) return containerBottom
 

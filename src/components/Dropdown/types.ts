@@ -1,3 +1,4 @@
+import type {OriginX, OriginY} from './utils/DropdownStyle'
 import type {HorizontalAlign} from '@/utils/HorizontalAlign'
 
 export interface DropdownProps {
@@ -12,10 +13,10 @@ export interface DropdownProps {
 }
 
 export type DropdownDefaultSlotScope = {
-  left: string
-  right: string
-  top: string
-  bottom: string
+  x: number
+  y: number
+  originX: OriginX
+  originY: OriginY
   isTop: boolean
   isLeft: boolean
   isRight: boolean

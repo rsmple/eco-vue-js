@@ -3,27 +3,35 @@ import {HorizontalAlign} from '@/utils/HorizontalAlign'
 const EDGE = 20
 
 interface StyleGetter {
-  styleGetter(parentRect: DOMRect): Record<string, string>
+  styleGetter(parentRect: DOMRect): number
   marginGetter(parentRect: DOMRect, maxHeightOrWidth: number): number
+}
+
+export enum OriginY {
+  TOP = 'content-start',
+  BOTTOM = 'content-end',
+  CENTER = 'content-center',
 }
 
 export abstract class VerticalGetter implements StyleGetter {
   abstract isTop: boolean
+  abstract origin: OriginY
 
-  abstract styleGetter(parentRect: DOMRect): Record<string, string>
+  abstract styleGetter(parentRect: DOMRect): number
 
   abstract marginGetter(parentRect: DOMRect, maxHeight: number): number
 
-  heightStyleGetter(parentRect: DOMRect, maxHeight: number): Record<string, string> {
-    return {maxHeight: _maxHeightOrWidthGetter(this, parentRect, maxHeight) + 'px'}
+  heightStyleGetter(parentRect: DOMRect, maxHeight: number): number | undefined {
+    return _maxHeightOrWidthGetter(this, parentRect, maxHeight)
   }
 }
 
 class BottomInner extends VerticalGetter {
   isTop = false
+  origin = OriginY.TOP
 
   styleGetter(parentRect: DOMRect) {
-    return {top: parentRect.top + 'px'}
+    return parentRect.top
   }
 
   marginGetter(parentRect: DOMRect, maxHeight: number) {
@@ -33,9 +41,10 @@ class BottomInner extends VerticalGetter {
 
 class BottomOuter extends VerticalGetter {
   isTop = false
+  origin = OriginY.TOP
 
   styleGetter(parentRect: DOMRect) {
-    return {top: parentRect.bottom + 'px'}
+    return parentRect.bottom
   }
 
   marginGetter(parentRect: DOMRect, maxHeight: number) {
@@ -45,9 +54,10 @@ class BottomOuter extends VerticalGetter {
 
 class VerticalCenter extends VerticalGetter {
   isTop = false
+  origin = OriginY.CENTER
 
   styleGetter(parentRect: DOMRect) {
-    return {top: parentRect.top + parentRect.height / 2 + 'px'}
+    return parentRect.top + parentRect.height / 2
   }
 
   marginGetter() {
@@ -55,17 +65,16 @@ class VerticalCenter extends VerticalGetter {
   }
 
   heightStyleGetter() {
-    return {
-      height: '0px',
-    }
+    return undefined
   }
 }
 
 class TopOuter extends VerticalGetter {
   isTop = true
+  origin = OriginY.BOTTOM
 
   styleGetter(parentRect: DOMRect) {
-    return {bottom: window.innerHeight - parentRect.top + 'px'}
+    return parentRect.top
   }
 
   marginGetter(parentRect: DOMRect, maxHeight: number) {
@@ -75,9 +84,10 @@ class TopOuter extends VerticalGetter {
 
 class TopInner extends VerticalGetter {
   isTop = true
+  origin = OriginY.BOTTOM
 
   styleGetter(parentRect: DOMRect) {
-    return {bottom: window.innerHeight - parentRect.bottom + 'px'}
+    return parentRect.bottom
   }
 
   marginGetter(parentRect: DOMRect, maxHeight: number) {
@@ -85,23 +95,32 @@ class TopInner extends VerticalGetter {
   }
 }
 
+export enum OriginX {
+  LEFT = 'justify-start',
+  RIGHT = 'justify-end',
+  CENTER = 'justify-center',
+}
+
 export abstract class HorizontalGetter implements StyleGetter {
+  abstract origin: OriginX
+
   abstract verticalGetterOrder: Array<VerticalGetter>
 
-  abstract styleGetter(parentRect: DOMRect): Record<string, string>
+  abstract styleGetter(parentRect: DOMRect): number
 
   abstract marginGetter(parentRect: DOMRect, maxWidth: number): number
 
-  widthStyleGetter(parentRect: DOMRect, maxWidth: number): Record<string, string> {
-    return {maxWidth: _maxHeightOrWidthGetter(this, parentRect, maxWidth) + 'px'}
+  widthStyleGetter(parentRect: DOMRect, maxWidth: number): number | undefined {
+    return _maxHeightOrWidthGetter(this, parentRect, maxWidth)
   }
 }
 
 export class RightOuter extends HorizontalGetter {
   verticalGetterOrder = [new BottomInner(), new TopInner()]
+  origin = OriginX.LEFT
 
   styleGetter(parentRect: DOMRect) {
-    return {left: parentRect.right + 'px'}
+    return parentRect.right
   }
 
   marginGetter(parentRect: DOMRect, maxWidth: number) {
@@ -111,9 +130,10 @@ export class RightOuter extends HorizontalGetter {
 
 export class RightInner extends HorizontalGetter {
   verticalGetterOrder = [new BottomOuter(), new TopOuter()]
+  origin = OriginX.LEFT
 
   styleGetter(parentRect: DOMRect) {
-    return {left: parentRect.left + 'px'}
+    return parentRect.left
   }
 
   marginGetter(parentRect: DOMRect, maxWidth: number) {
@@ -127,30 +147,27 @@ class RightCenter extends RightOuter {
 
 class Fill extends HorizontalGetter {
   verticalGetterOrder = [new BottomOuter(), new TopOuter()]
+  origin = OriginX.LEFT
 
   styleGetter(parentRect: DOMRect) {
-    return {
-      left: parentRect.left + 'px',
-      right: document.documentElement.clientWidth - parentRect.right + 'px',
-    }
+    return parentRect.left
   }
 
   marginGetter() {
     return 0
   }
 
-  widthStyleGetter() {
-    return {}
+  widthStyleGetter(parentRect: DOMRect) {
+    return parentRect.right - parentRect.left
   }
 }
 
 class Center extends HorizontalGetter {
   verticalGetterOrder = [new BottomOuter(), new TopOuter()]
+  origin = OriginX.CENTER
 
   styleGetter(parentRect: DOMRect) {
-    return {
-      left: parentRect.left + parentRect.width / 2 + 'px',
-    }
+    return parentRect.left + parentRect.width / 2
   }
 
   marginGetter() {
@@ -158,17 +175,16 @@ class Center extends HorizontalGetter {
   }
 
   widthStyleGetter() {
-    return {
-      width: '0px',
-    }
+    return undefined
   }
 }
 
 export class LeftInner extends HorizontalGetter {
   verticalGetterOrder = [new BottomOuter(), new TopOuter()]
+  origin = OriginX.RIGHT
 
   styleGetter(parentRect: DOMRect) {
-    return {right: document.documentElement.clientWidth - parentRect.right + 'px'}
+    return parentRect.right
   }
 
   marginGetter(parentRect: DOMRect, maxWidth: number) {
@@ -178,9 +194,10 @@ export class LeftInner extends HorizontalGetter {
 
 export class LeftOuter extends HorizontalGetter {
   verticalGetterOrder = [new BottomInner(), new TopInner()]
+  origin = OriginX.RIGHT
 
   styleGetter(parentRect: DOMRect) {
-    return {right: document.documentElement.clientWidth - parentRect.left + 'px'}
+    return parentRect.left
   }
 
   marginGetter(parentRect: DOMRect, maxWidth: number) {
