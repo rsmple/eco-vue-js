@@ -6,8 +6,7 @@ const ConfirmModal = defineAsyncComponent(() => import('@/components/Modal/modal
 
 export type ModalComponent<Props> = Component<
   Props,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  any,
+  {formRef?: {hasChanges?: boolean}},
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any,
   ComponentOptions,

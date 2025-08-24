@@ -27,13 +27,13 @@
       >
         <div class="h-[calc(100%+1px)]" />
 
-        <ModalCloseButton @click.stop.prevent="closeModalWithConfirm(modalMeta)" />
+        <ModalCloseButton @click.stop.prevent="closeModalWithConfirm(modalMeta, index)" />
 
         <component
+          ref="modalComponent"
           :is="modalMeta.component"
           v-bind="modalMeta.props"
           @close:modal="closeModal(modalMeta)"
-          @update:has-changes="hasChangesMap[modalMeta.key] = $event"
         />
       </div>
     </TransitionGroup>
@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeMount, onBeforeUnmount, provide, reactive, ref, watch} from 'vue'
+import {onBeforeMount, onBeforeUnmount, provide, reactive, ref, useId, useTemplateRef, watch} from 'vue'
 
 import {Modal, type ModalComponent, initModal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
@@ -52,7 +52,7 @@ import {wIsModal} from './models/injection'
 import {useIsBackdrop} from './use/useIsBackdrop'
 
 type ModalMeta<ModalProps> = {
-  key: number
+  key: string
   component: ModalComponent<unknown>
   props?: ModalProps
   cb?: () => void
@@ -62,11 +62,11 @@ type ModalMeta<ModalProps> = {
 provide(wBaseZIndex, BASE_ZINDEX_MODAL)
 provide(wIsModal, true)
 
-const key = ref(0)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const modalMetaList = ref<ModalMeta<any>[]>([])
 const isBackdrop = useIsBackdrop()
-const hasChangesMap = reactive<Record<number, boolean>>({})
+const modalComponentRef = useTemplateRef<ComponentInstance<ModalComponent<unknown>>[]>('modalComponent')
+const hasChangesMap = reactive<Record<string, boolean>>({})
 
 type Cb = () => void
 type CloseModal = () => ReturnType<typeof closeModal>
@@ -74,7 +74,7 @@ type CloseModal = () => ReturnType<typeof closeModal>
 const addModal = (component: ModalComponent<unknown>, props?: unknown, cb?: Cb, autoclose = false): CloseModal => {
   const modalMeta = {
     component,
-    key: key.value++,
+    key: useId(),
     props,
     cb,
     autoclose,
@@ -97,17 +97,13 @@ const closeModal = (modalMeta: ModalMeta<unknown>): void => {
   modalMetaList.value = modalMetaListNew
   delete hasChangesMap[modalMeta.key]
 
-  if (!modalMetaListNew.length) {
-    key.value = 0
-  }
-
   modalMeta.cb?.()
 }
 
 let closeConfirm: (() => void) | null = null
 
-const closeModalWithConfirm = (modalMeta: ModalMeta<unknown>): void => {
-  if (modalMeta.autoclose || !hasChangesMap[modalMeta.key]) {
+const closeModalWithConfirm = (modalMeta: ModalMeta<unknown>, index: number): void => {
+  if (modalMeta.autoclose || (!hasChangesMap[modalMeta.key] && !modalComponentRef.value?.[index]?.formRef?.hasChanges)) {
     closeModal(modalMeta)
     return
   }
