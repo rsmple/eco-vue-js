@@ -63,6 +63,7 @@ provide(wBaseZIndex, BASE_ZINDEX_MODAL)
 provide(wIsModal, true)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+let key = 0
 const modalMetaList = ref<ModalMeta<any>[]>([])
 const isBackdrop = useIsBackdrop()
 const modalComponentRef = useTemplateRef<ComponentInstance<ModalComponent<unknown>>[]>('modalComponent')
@@ -74,7 +75,7 @@ type CloseModal = () => ReturnType<typeof closeModal>
 const addModal = (component: ModalComponent<unknown>, props?: unknown, cb?: Cb, autoclose = false): CloseModal => {
   const modalMeta = {
     component,
-    key: useId(),
+    key: `w-modal-${key++}`,
     props,
     cb,
     autoclose,
@@ -96,6 +97,8 @@ const closeModal = (modalMeta: ModalMeta<unknown>): void => {
 
   modalMetaList.value = modalMetaListNew
   delete hasChangesMap[modalMeta.key]
+
+  if (modalMetaListNew.length === 0) key = 0
 
   modalMeta.cb?.()
 }
