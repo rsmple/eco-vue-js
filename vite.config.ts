@@ -2,7 +2,7 @@ import vue from '@vitejs/plugin-vue'
 import autoprefixer from 'autoprefixer'
 import postcssImport from 'postcss-import'
 import tailwindcss from 'tailwindcss'
-import {type CSSOptions, defineConfig} from 'vite'
+import {defineConfig} from 'vite'
 import dts from 'vite-plugin-dts'
 import svgLoader from 'vite-svg-loader'
 
@@ -46,11 +46,7 @@ export default defineConfig(({mode}) => ({
   ],
   css: {
     postcss: {
-      plugins: [
-        postcssImport(),
-        tailwindcss({config: './tailwind/tailwind.config.ts'}),
-        autoprefixer(),
-      ] as CSSOptions['postcss'] extends {plugins: infer P} ? P : never,
+      plugins: [postcssImport(), tailwindcss({config: './tailwind/tailwind.config.ts'}), autoprefixer()],
     },
   },
   build: {
