@@ -30,8 +30,8 @@
         <ModalCloseButton @click.stop.prevent="closeModalWithConfirm(modalMeta, index)" />
 
         <component
-          ref="modalComponent"
           :is="modalMeta.component"
+          ref="modalComponent"
           v-bind="modalMeta.props"
           @close:modal="closeModal(modalMeta)"
         />
@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeMount, onBeforeUnmount, provide, reactive, ref, useId, useTemplateRef, watch} from 'vue'
+import {onBeforeMount, onBeforeUnmount, provide, reactive, ref, useTemplateRef, watch} from 'vue'
 
 import {Modal, type ModalComponent, initModal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
@@ -61,9 +61,9 @@ type ModalMeta<ModalProps> = {
 
 provide(wBaseZIndex, BASE_ZINDEX_MODAL)
 provide(wIsModal, true)
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 let key = 0
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const modalMetaList = ref<ModalMeta<any>[]>([])
 const isBackdrop = useIsBackdrop()
 const modalComponentRef = useTemplateRef<ComponentInstance<ModalComponent<unknown>>[]>('modalComponent')
@@ -75,7 +75,7 @@ type CloseModal = () => ReturnType<typeof closeModal>
 const addModal = (component: ModalComponent<unknown>, props?: unknown, cb?: Cb, autoclose = false): CloseModal => {
   const modalMeta = {
     component,
-    key: `w-modal-${key++}`,
+    key: `w-modal-${ key++ }`,
     props,
     cb,
     autoclose,
