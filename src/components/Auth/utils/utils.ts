@@ -13,16 +13,28 @@ function getCookie(name: string): string {
   return ''
 }
 
+function setCookie(name: string, value: string, expires?: Date) {
+  document.cookie = name + '=' + encodeURIComponent(value) + '; Path=/;' + (expires ? ' Expires=' + expires.toUTCString() + ';' : '')
+}
+
 function deleteCookie(name: string) {
   document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
 }
+
+const EXP_FACTOR = 1000
 
 export function checkExpirationDate(): boolean | null {
   const exp = Number.parseFloat(getCookie(EXPIRATION_DATE_KEY))
 
   if (!exp || !Number.isFinite(exp)) return null
 
-  return exp > Date.now() / 1000
+  return exp > Date.now() / EXP_FACTOR
+}
+
+export function updateExpirationDate(date: Date) {
+  const exp = (date.getTime() / EXP_FACTOR).toString()
+  setCookie(EXPIRATION_DATE_KEY, exp, date)
+  localStorage.setItem(EXPIRATION_DATE_KEY, exp)
 }
 
 export function setExpirationDate() {

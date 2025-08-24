@@ -9,6 +9,8 @@ import {checkExpirationDate, getLastRefreshPromise, removeExpirationDate, remove
 
 import {ApiError, ApiErrorCancel, encodeQueryParams} from './api'
 
+export {updateExpirationDate} from '@/components/Auth/utils/utils'
+
 export const getURLParams = (params: RequestConfig['params'] | LocationQuery): string => {
   return new URLSearchParams(encodeQueryParams(params) as Record<string, string>).toString()
 }
@@ -23,7 +25,7 @@ const HEADERS_FORMDATA: Record<string, string> = {
 }
 
 type ApiUrl = `/${ string }/`
-type BaseUrl = `/${ string }`
+type BaseUrl = `/${ string }` | `http://${ string }` | `https://${ string }`
 
 export interface ApiClient {
   baseUrl: string
@@ -43,6 +45,7 @@ export class ApiClientInstance implements ApiClient {
 
   constructor(private config: {
     tokenGetter?: () => string | null
+    tokenRefresh?: () => Promise<void>
     refreshUrl?: ApiUrl
     onFailure?: (response: Response) => void
     credentials?: RequestCredentials
@@ -110,7 +113,11 @@ export class ApiClientInstance implements ApiClient {
       } else {
         setRefreshTimestamp()
 
-        this.refreshPromise = this.fetch('GET', this.config.refreshUrl!, {updateToken: true})
+        const promise = this.config.tokenRefresh
+          ? this.config.tokenRefresh()
+          : this.fetch('GET', this.config.refreshUrl!, {updateToken: true})
+
+        this.refreshPromise = promise
           .then(() => {
             this.refreshPromise = null
           })
@@ -131,7 +138,7 @@ export class ApiClientInstance implements ApiClient {
   checkAuth() {
     let result
 
-    if (this.config.tokenGetter) result = !!this.config.tokenGetter?.()
+    if (this.config.tokenGetter && !this.config.tokenRefresh) result = !!this.config.tokenGetter?.()
     else result = checkExpirationDate()
 
     if (result) this.isAuthFailed.value = false
@@ -149,14 +156,16 @@ export class ApiClientInstance implements ApiClient {
         const check = this.checkAuth()
 
         if (!check) {
-          if (check === null) {
+          if (check !== null && (this.config.refreshUrl || this.config.tokenRefresh)) await this.refresh()
+
+          if (!this.checkAuth()) {
             this.isAuthFailed.value = true
 
             return Promise.reject()
           }
+        }
 
-          if (this.config.refreshUrl) await this.refresh()
-        } else if (this.config.tokenGetter) {
+        if (this.config.tokenGetter) {
           const token = this.config.tokenGetter()
 
           if (token) headers.append('Authorization', 'Bearer ' + token)
@@ -196,7 +205,7 @@ export class ApiClientInstance implements ApiClient {
                 })
               } else {
                 if (response.status === 401) {
-                  if (this.config.refreshUrl) return this.refresh().then(() => this.retry(request))
+                  if (this.config.refreshUrl || this.config.tokenRefresh) return this.refresh().then(() => this.retry(request))
 
                   this.isAuthFailed.value = true
                 }
@@ -260,7 +269,7 @@ export class ApiClientInstance implements ApiClient {
         if (this.refreshPromise) await this.refreshPromise
 
         if (!this.checkAuth()) {
-          if (this.config.refreshUrl) return this.refresh()
+          if (this.config.refreshUrl || this.config.tokenRefresh) return this.refresh()
             .catch(() => ({
               name: this.routeNameAuthNo, query: to.fullPath !== '/' ? {hash: to.fullPath} : undefined,
             }))
