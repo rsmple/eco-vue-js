@@ -1,7 +1,6 @@
 import stylistic from '@stylistic/eslint-plugin'
 import unusedImports from 'eslint-plugin-unused-imports'
 import pluginVue from 'eslint-plugin-vue'
-// eslint-disable-next-line import/no-unresolved
 import {parser as tseslintParser, plugin as tseslintPlugin} from 'typescript-eslint'
 
 export default [
