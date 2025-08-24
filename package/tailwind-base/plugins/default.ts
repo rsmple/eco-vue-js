@@ -190,10 +190,10 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
 
   addBase({
     '.w-tooltip-center-x': {
-      transform: 'translate(calc(min(100vw - var(--dropdown-x, 0px) - 50% - 12px, max((var(--dropdown-x, 0px) - 50% - 12px) * -1, 0px))), 0)'
+      transform: 'translate(calc(min(100vw - var(--dropdown-x, 0px) - 50% - 12px, max((var(--dropdown-x, 0px) - 50% - 12px) * -1, 0px))), 0)',
     },
     '.w-tooltip-center-y': {
-      transform: 'translate(0, calc(min(100vh - var(--dropdown-y, 0px) - 50% - 12px, max((var(--dropdown-y, 0px) - 50% - 12px) * -1, 0px))))'
+      transform: 'translate(0, calc(min(100vh - var(--dropdown-y, 0px) - 50% - 12px, max((var(--dropdown-y, 0px) - 50% - 12px) * -1, 0px))))',
     },
   })
 
