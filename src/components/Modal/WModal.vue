@@ -8,7 +8,7 @@
     >
       <div
         v-if="isBackdrop"
-        :style="{zIndex: 100 + modalMetaList.length + modalMetaList.length - 1}"
+        :style="{zIndex: 99 + modalMetaList.length + modalMetaList.length}"
         class="bg-primary-light dark:bg-primary-darkest fixed left-0 top-0 size-full bg-opacity-40 backdrop-blur dark:bg-opacity-40"
       />
     </Transition>
@@ -22,7 +22,7 @@
       <div
         v-for="(modalMeta, index) in modalMetaList"
         :key="modalMeta.key"
-        :style="{zIndex: 100 + index + index + 2}"
+        :style="{zIndex: 102 + index}"
         class="no-scrollbar fixed inset-0 isolate flex items-center justify-center overflow-y-auto overscroll-none"
       >
         <div class="h-[calc(100%+1px)]" />
