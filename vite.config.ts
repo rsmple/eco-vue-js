@@ -11,15 +11,10 @@ import {URL, fileURLToPath} from 'node:url'
 
 import {writeImports} from './build/write-imports'
 
+await writeImports()
+
 export default defineConfig(({mode}) => ({
   plugins: [
-    {
-      name: 'pre-build-hook',
-      enforce: 'pre',
-      async buildStart() {
-        return await writeImports()
-      },
-    },
     dts({
       tsconfigPath: 'tsconfig.vue.json',
       entryRoot: 'src',
