@@ -97,10 +97,12 @@ const getPackageExports = (list: ComponentPath[]) => {
   }
 
   list.forEach(item => {
-    const distPath = `./dist/src/${ item.path }`
+    const distPath = `./dist/${ item.path }`
 
     if (item.path.endsWith('.d.ts')) {
       result[distPath.slice(0, -5)] = {import: distPath}
+    } else if (item.path.endsWith('.ts')) {
+      result[distPath.slice(0, -3)] = {import: distPath.slice(0, -3) + '.js'}
     } else {
       result[distPath] = {import: distPath + '.js'}
     }
