@@ -4,38 +4,38 @@ import path from 'path'
 
 type ComponentPath = {name: string, path: string}
 
-const PATH_ICONS = 'src/assets/icons'
-const PATH_COMPONENTS = 'src/components'
+const PATH_BASE = 'src'
+const PATH_ICONS = 'assets/icons'
+const PATH_COMPONENTS = 'components'
+const PATH_UTILS = 'utils'
 const PATH_PACKAGE = 'package/package.json'
-const PATH_UTILS = 'src/utils'
-const PATH_MAIN = 'src/main.ts'
+const PATH_MAIN = 'main.ts'
 
-const getIconPaths = (root: string) => {
-  const dirPath = path.resolve(root)
-
+const getIconPaths = () => {
   return fs
-    .readdir(dirPath)
-    .then(files => files.filter(name => name.startsWith('Icon') && name.endsWith('.svg')).map(name => ({name: name.slice(0, -4), path: path.join(dirPath, name)})))
+    .readdir(path.resolve(PATH_BASE, PATH_ICONS))
+    .then(files => files
+      .filter(name => name.startsWith('Icon') && name.endsWith('.svg'))
+      .map(name => ({name: name.slice(0, -4), path: path.join(PATH_ICONS, name)})),
+    )
 }
 
 const getComponentPaths = (root: string) => {
-  const dirPath = path.resolve(root)
-
   return fs
-    .readdir(dirPath)
+    .readdir(path.resolve(PATH_BASE, PATH_COMPONENTS, root))
     .then(files => files
       .reduce<ComponentPath[]>((result, name) => {
         if (name.startsWith('W') && name.endsWith('.vue')) {
           result.push({
             name: name.slice(0, -4),
-            path: path.join(dirPath, name),
+            path: path.join(PATH_COMPONENTS, root, name),
           })
         }
 
         if (name === 'types.ts') {
           result.push({
             name: name.slice(0, -3),
-            path: path.join(dirPath, name.slice(0, -3) + '.d.ts'),
+            path: path.join(PATH_COMPONENTS, root, name.slice(0, -3) + '.d.ts'),
           })
         }
 
@@ -44,23 +44,9 @@ const getComponentPaths = (root: string) => {
     )
 }
 
-const getComponentDirs = (root: string) => {
-  const dirPath = path.resolve(root)
-
-  return fs.readdir(dirPath).then(dirs => dirs.map(name => path.join(dirPath, name)))
-}
-
-const getComponentsList = async () => {
-  const dirs = await getComponentDirs(PATH_COMPONENTS)
-
-  const list: ComponentPath[] = []
-
-  for (let i = 0; i < dirs.length; i++) {
-    list.push(...await getComponentPaths(dirs[i]))
-  }
-
-  return list
-}
+const getComponentsList = async () => (await Promise.all(
+  (await fs.readdir(path.resolve(PATH_BASE, PATH_COMPONENTS))).map(getComponentPaths),
+)).flat(1) satisfies ComponentPath[]
 
 const getVuePlugin = (list: ComponentPath[]) => {
   const result = list
@@ -79,13 +65,11 @@ const getExports = (list: ComponentPath[]) => {
 }
 
 const getUtils = () => {
-  const dirPath = path.resolve(PATH_UTILS)
-
   return fs
-    .readdir(dirPath)
+    .readdir(path.resolve(PATH_BASE, PATH_UTILS))
     .then(files => files.map(name => ({
       name: name.slice(0, -4),
-      path: path.join(dirPath, name),
+      path: path.join(PATH_UTILS, name),
     })))
 }
 
@@ -113,7 +97,7 @@ const getPackageExports = (list: ComponentPath[]) => {
   }
 
   list.forEach(item => {
-    const distPath = `./dist${ item.path.substring(item.path.indexOf('/components')) }`
+    const distPath = `./dist/src/${ item.path }`
 
     if (item.path.endsWith('.d.ts')) {
       result[distPath.slice(0, -5)] = {import: distPath}
@@ -145,21 +129,23 @@ export const writeImports = async () => {
 
   const result =`import type {App} from 'vue'
 
-${ componentsListNoTypes.map(item => `import ${ item.name } from '@${ item.path.substring(item.path.indexOf('/components')) }'`).join('\n') }
+${ componentsListNoTypes.map(item => `import ${ item.name } from '@/${ item.path }'`).join('\n') }
 
-${ utilsList.map(item => `export * from '@${ item.path.substring(item.path.indexOf('/utils')) }'`).join('\n') }
+${ utilsList.map(item => `export * from '@/${ item.path }'`).join('\n') }
 
-${ (await getIconPaths(PATH_ICONS)).map(item => `export {default as ${ item.name }} from '@${ item.path.substring(item.path.indexOf('/assets')) }?component'`).join('\n') }
+${ (await getIconPaths()).map(item => `export {default as ${ item.name }} from '@/${ item.path }?component'`).join('\n') }
 
 ${ getVuePlugin(componentsListNoTypes) }
 
 ${ getExports(componentsListNoTypes) }
 `
 
-  const content = (await fs.readFile(PATH_MAIN).catch(() => '')).toString()
+  const pathMain = path.resolve(PATH_BASE, PATH_MAIN)
+
+  const content = (await fs.readFile(pathMain).catch(() => '')).toString()
 
   if (content === result) console.log('Main is up to date')
-  else await fs.writeFile(PATH_MAIN, result, 'utf8')
+  else await fs.writeFile(pathMain, result, 'utf8')
 
   await writePackageExports([...utilsList, ...componentsList])
    
