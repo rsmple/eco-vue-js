@@ -23,7 +23,7 @@
 <script lang="ts" setup>
 import {computed} from 'vue'
 
-import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
+import IconCancel from '@/assets/icons/IconCancel.svg?component'
 
 const props = defineProps<{
   modelValue: string

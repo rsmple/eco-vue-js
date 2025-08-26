@@ -119,7 +119,7 @@ import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
 import WInput from '@/components/Input/WInput.vue'
 
-import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
+import IconArrow from '@/assets/icons/IconArrow.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {useIsMobile} from '@/utils/mobile'

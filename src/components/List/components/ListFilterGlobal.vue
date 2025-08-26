@@ -60,7 +60,7 @@ import WActionsBarFilter from '@/components/ActionsBar/WActionsBarFilter.vue'
 import WButton from '@/components/Button/WButton.vue'
 import WHeaderBarSearch from '@/components/HeaderBar/WHeaderBarSearch.vue'
 
-import IconFilterRemove from '@/assets/icons/sax/IconFilterRemove.svg?component'
+import IconFilterRemove from '@/assets/icons/IconFilterRemove.svg?component'
 
 import {Modal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'

@@ -1,7 +1,7 @@
 import {type MaybeRef, computed, isRef, markRaw, ref, unref, watch} from 'vue'
 
-import IconGrid from '@/assets/icons/sax/IconGrid.svg?component'
-import IconTable from '@/assets/icons/sax/IconTable.svg?component'
+import IconGrid from '@/assets/icons/IconGrid.svg?component'
+import IconTable from '@/assets/icons/IconTable.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
 import {ListMode} from '@/utils/utils'

@@ -18,7 +18,7 @@ import type {LinkProps} from '@/types/types'
 
 import {RouterLink} from 'vue-router'
 
-import IconLink from '@/assets/icons/sax/IconLink.svg?component'
+import IconLink from '@/assets/icons/IconLink.svg?component'
 
 import {SemanticType, useSemanticTypeChipMap, useSemanticTypeTextMap} from '@/utils/SemanticType'
 

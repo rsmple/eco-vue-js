@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts" setup>
-import IconDanger from '@/assets/icons/default/IconDanger.svg?component'
+import IconDanger from '@/assets/icons/IconDanger.svg?component'
 
 import {SemanticType} from '@/utils/SemanticType'
 

@@ -10,7 +10,7 @@ const eventOptionsMap: Partial<Record<keyof GlobalEventHandlersEventMap | 'mouse
   keydown: false,
 }
 
-export default class DOMListenerContainer {
+export class DOMListenerContainer {
   private unlisteners: Array<() => void> = []
 
   constructor(elements?: Array<Element | Window | Document>, types?: (keyof GlobalEventHandlersEventMap | 'mousewheel')[], listener?: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {

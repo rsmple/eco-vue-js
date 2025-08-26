@@ -1,7 +1,7 @@
 import {type MaybeRef, computed, markRaw, ref, unref} from 'vue'
 
-import IconCopy from '@/assets/icons/sax/IconCopy.svg?component'
-import IconCopySuccess from '@/assets/icons/sax/IconCopySuccess.svg?component'
+import IconCopy from '@/assets/icons/IconCopy.svg?component'
+import IconCopySuccess from '@/assets/icons/IconCopySuccess.svg?component'
 
 import {Notify} from './Notify'
 

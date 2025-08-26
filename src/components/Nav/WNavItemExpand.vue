@@ -91,7 +91,7 @@ import {type VNode, computed, nextTick, onBeforeUnmount, ref, useSlots, useTempl
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import WExpansion from '@/components/Expansion/WExpansion.vue'
 
-import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
+import IconArrow from '@/assets/icons/IconArrow.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {useIsMobile} from '@/utils/mobile'

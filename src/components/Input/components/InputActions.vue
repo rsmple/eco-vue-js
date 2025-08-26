@@ -58,10 +58,10 @@ import {markRaw, toRef} from 'vue'
 
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 
-import IconClose from '@/assets/icons/sax/IconClose.svg?component'
-import IconEye from '@/assets/icons/sax/IconEye.svg?component'
-import IconEyeSlash from '@/assets/icons/sax/IconEyeSlash.svg?component'
-import IconPaste from '@/assets/icons/sax/IconPaste.svg?component'
+import IconClose from '@/assets/icons/IconClose.svg?component'
+import IconEye from '@/assets/icons/IconEye.svg?component'
+import IconEyeSlash from '@/assets/icons/IconEyeSlash.svg?component'
+import IconPaste from '@/assets/icons/IconPaste.svg?component'
 
 import {useCopy} from '@/utils/useCopy'
 

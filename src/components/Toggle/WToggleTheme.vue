@@ -14,8 +14,8 @@ import type {ToggleThemeProps} from './types'
 
 import {markRaw} from 'vue'
 
-import IconMoon from '@/assets/icons/sax/IconMoon.svg?component'
-import IconSun from '@/assets/icons/sax/IconSun.svg?component'
+import IconMoon from '@/assets/icons/IconMoon.svg?component'
+import IconSun from '@/assets/icons/IconSun.svg?component'
 
 import {Theme} from '@/utils/utils'
 

@@ -48,7 +48,7 @@
 <script lang="ts" setup>
 import {provide, ref} from 'vue'
 
-import IconMenu from '@/assets/icons/sax/IconMenu.svg?component'
+import IconMenu from '@/assets/icons/IconMenu.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
 import {BASE_ZINDEX_NAV_BAR, wBaseZIndex} from '@/utils/utils'

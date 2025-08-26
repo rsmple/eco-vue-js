@@ -54,7 +54,7 @@
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, provide, ref, useTemplateRef} from 'vue'
 
-import IconSearch from '@/assets/icons/sax/IconSearch.svg?component'
+import IconSearch from '@/assets/icons/IconSearch.svg?component'
 
 import {BASE_ZINDEX_HEADER_BAR, wBaseZIndex} from '@/utils/utils'
 

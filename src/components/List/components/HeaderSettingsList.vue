@@ -82,11 +82,11 @@ import type {FieldConfig, ListFields} from '../types'
 
 import WDragContainer from '@/components/DragContainer/WDragContainer.vue'
 
-import IconDrag from '@/assets/icons/sax/IconDrag.svg?component'
-import IconEye from '@/assets/icons/sax/IconEye.svg?component'
-import IconEyeSlash from '@/assets/icons/sax/IconEyeSlash.svg?component'
-import IconLock from '@/assets/icons/sax/IconLock.svg?component'
-import IconLockOff from '@/assets/icons/sax/IconLockOff.svg?component'
+import IconDrag from '@/assets/icons/IconDrag.svg?component'
+import IconEye from '@/assets/icons/IconEye.svg?component'
+import IconEyeSlash from '@/assets/icons/IconEyeSlash.svg?component'
+import IconLock from '@/assets/icons/IconLock.svg?component'
+import IconLockOff from '@/assets/icons/IconLockOff.svg?component'
 
 import {sortFields} from '../use/useListConfig'
 

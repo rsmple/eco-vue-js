@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts" setup>
-import IconFilter from '@/assets/icons/sax/IconFilter.svg?component'
+import IconFilter from '@/assets/icons/IconFilter.svg?component'
 
 defineProps<{
   filterField: string

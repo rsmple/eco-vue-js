@@ -54,7 +54,7 @@ import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
-import IconAdd from '@/assets/icons/sax/IconAdd.svg?component'
+import IconAdd from '@/assets/icons/IconAdd.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 

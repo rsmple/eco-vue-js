@@ -46,7 +46,7 @@ import {computed} from 'vue'
 
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
-import IconBack from '@/assets/icons/default/IconBack.svg?component'
+import IconBack from '@/assets/icons/IconBack.svg?component'
 
 import {Order, type OrderItem} from '@/utils/order'
 

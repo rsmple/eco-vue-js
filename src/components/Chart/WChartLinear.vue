@@ -58,7 +58,7 @@ import {type VNode, computed, onBeforeUnmount, onMounted, ref, useTemplateRef, w
 
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
-import DOMListenerContainer from '@/utils/DOMListenerContainer'
+import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
 import {dateFormat} from '@/utils/dateTime'
 import {useComponentStatesSkeleton} from '@/utils/useComponentStates'
 

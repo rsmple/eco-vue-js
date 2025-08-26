@@ -64,7 +64,7 @@ import {readonly, ref} from 'vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 
-import IconMore from '@/assets/icons/default/IconMore.svg?component'
+import IconMore from '@/assets/icons/IconMore.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 

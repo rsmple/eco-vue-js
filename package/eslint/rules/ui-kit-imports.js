@@ -43,7 +43,7 @@ export default {
           }
 
           if (source.includes('iconsSax')) {
-            const replacementImport = `import ${ importedName } from 'eco-vue-js/dist/assets/icons/sax/${ importedName }'`
+            const replacementImport = `import ${ importedName } from 'eco-vue-js/dist/assets/icons/${ importedName }'`
             context.report({
               node,
               message: `Do not import '${ importedName }' directly. Use the replacement: ${ replacementImport }`,
@@ -56,7 +56,7 @@ export default {
           }
 
           if (source.includes('iconsDefault')) {
-            const replacementImport = `import ${ importedName } from 'eco-vue-js/dist/assets/icons/default/${ importedName }'`
+            const replacementImport = `import ${ importedName } from 'eco-vue-js/dist/assets/icons/${ importedName }'`
             context.report({
               node,
               message: `Do not import '${ importedName }' directly. Use the replacement: ${ replacementImport }`,

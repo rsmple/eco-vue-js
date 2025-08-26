@@ -38,5 +38,5 @@ The icons in the library are functional Vue components generated from SVG files 
 
 Here's an example of how to import an icon named IconCheck:
 ```
-import IconCheck from 'eco-vue-js/dist/assets/icons/default/IconCheck'
+import IconCheck from 'eco-vue-js/dist/assets/icons/IconCheck'
 ```

@@ -79,7 +79,7 @@ import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.v
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 
-import IconTableSettings from '@/assets/icons/sax/IconTableSettings.svg?component'
+import IconTableSettings from '@/assets/icons/IconTableSettings.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {type ListMode} from '@/utils/utils'

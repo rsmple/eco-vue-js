@@ -107,7 +107,7 @@ const props = withDefaults(
   },
 )
 
-const containerRef = useTemplateRef('container')
+const containerRef = useTemplateRef<HTMLElement | ComponentInstance<typeof RouterLink>>('container')
 
 const {isDisabled, isSkeleton} = useComponentStatesButton(props)
 
@@ -134,9 +134,10 @@ const mousedown = (event: MouseEvent): void => {
 const isNotEnabled = computed(() => isDisabled.value || isSkeleton.value)
 
 const focus = () => {
-  if (isNotEnabled.value) return
+  if (isNotEnabled.value || !containerRef.value) return
 
-  containerRef.value?.focus()
+  if (containerRef.value instanceof HTMLElement) containerRef.value?.focus()
+  else if ('$el' in containerRef.value && containerRef.value.$el instanceof HTMLElement) containerRef.value.$el.focus()
 }
 
 let timeout: NodeJS.Timeout | undefined

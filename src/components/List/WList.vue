@@ -319,7 +319,7 @@ import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
-import IconRefresh from '@/assets/icons/sax/IconRefresh.svg?component'
+import IconRefresh from '@/assets/icons/IconRefresh.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'

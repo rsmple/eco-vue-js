@@ -60,7 +60,7 @@ import {type VNode, computed, inject, markRaw, provide, ref} from 'vue'
 
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 
-import IconMore from '@/assets/icons/default/IconMore.svg?component'
+import IconMore from '@/assets/icons/IconMore.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {BASE_ZINDEX_LIST_HEADER, numberFormatter, wBaseZIndex} from '@/utils/utils'

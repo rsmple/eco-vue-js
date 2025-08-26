@@ -5,10 +5,10 @@ import path from 'path'
 type ComponentPath = {name: string, path: string}
 
 const PATH_ICONS = 'src/assets/icons'
-const PATH_ICONS_PLUGIN =  'src/imports/icons.ts'
 const PATH_COMPONENTS = 'src/components'
-const PATH_COMPONENTS_PLUGIN = 'src/imports/components.ts'
 const PATH_PACKAGE = 'package/package.json'
+const PATH_UTILS = 'src/utils'
+const PATH_MAIN = 'src/main.ts'
 
 const getIconPaths = (root: string) => {
   const dirPath = path.resolve(root)
@@ -16,30 +16,6 @@ const getIconPaths = (root: string) => {
   return fs
     .readdir(dirPath)
     .then(files => files.filter(name => name.startsWith('Icon') && name.endsWith('.svg')).map(name => ({name: name.slice(0, -4), path: path.join(dirPath, name)})))
-}
-
-const getIconImports = (list: ComponentPath[]) => {
-  const imports = list.map(item => `export {default as ${ item.name }} from '@${ item.path.substring(item.path.indexOf('/assets')) }?component'`)
-
-  return imports.join('\n')
-}
-
-const writeIcons = async () => {
-  const text = (await fs.readFile(PATH_ICONS_PLUGIN).catch(() => '')).toString()
-  const imports = getIconImports(await getIconPaths(PATH_ICONS))
-
-  if (text === imports) {
-    console.log('Icons are up to date')
-
-    return
-  }
-
-  console.log('Writing Icons')
-
-  return fs.writeFile(
-    PATH_ICONS_PLUGIN,
-    imports,
-  )
 }
 
 const getComponentPaths = (root: string) => {
@@ -86,12 +62,6 @@ const getComponentsList = async () => {
   return list
 }
 
-const getImports = (list: ComponentPath[]) => {
-  return list
-    .map(item => `import ${ item.name } from '@${ item.path.substring(item.path.indexOf('/components')) }'`)
-    .join('\n')
-}
-
 const getVuePlugin = (list: ComponentPath[]) => {
   const result = list
     .map(item => `    app.component('${ item.name }', ${ item.name })`)
@@ -108,20 +78,15 @@ const getExports = (list: ComponentPath[]) => {
   return `export {\n${ result },\n}`
 }
 
-const writePlugin = async (list: ComponentPath[]) => {
-  const result = `import type {App} from 'vue'\n\n${ getImports(list) }\n\n${ getVuePlugin(list) }\n\n${ getExports(list) }`
+const getUtils = () => {
+  const dirPath = path.resolve(PATH_UTILS)
 
-  const text = (await fs.readFile(PATH_COMPONENTS_PLUGIN).catch(() => '')).toString()
-
-  if (text === result) {
-    console.log('Components are up to date')
-
-    return
-  }
-
-  console.log('Writing Components')
-
-  return fs.writeFile(PATH_COMPONENTS_PLUGIN, result)
+  return fs
+    .readdir(dirPath)
+    .then(files => files.map(name => ({
+      name: name.slice(0, -4),
+      path: path.join(dirPath, name),
+    })))
 }
 
 const getPackageExports = (list: ComponentPath[]) => {
@@ -144,57 +109,6 @@ const getPackageExports = (list: ComponentPath[]) => {
     },
     './dist/assets/icons/*': {
       import: './dist/assets/icons/*.svg.js',
-    },
-    './dist/utils/DOMListenerContainer': {
-      import: './dist/utils/DOMListenerContainer.js',
-    },
-    './dist/utils/HorizontalAlign': {
-      import: './dist/utils/HorizontalAlign.js',
-    },
-    './dist/utils/SemanticType': {
-      import: './dist/utils/SemanticType.js',
-    },
-    './dist/utils/dateTime': {
-      import: './dist/utils/dateTime.js',
-    },
-    './dist/utils/utils': {
-      import: './dist/utils/utils.js',
-    },
-    './dist/utils/mobile': {
-      import: './dist/utils/mobile.js',
-    },
-    './dist/utils/Modal': {
-      import: './dist/utils/Modal.js',
-    },
-    './dist/utils/Notify': {
-      import: './dist/utils/Notify.js',
-    },
-    './dist/utils/useDefaultQuery': {
-      import: './dist/utils/useDefaultQuery.js',
-    },
-    './dist/utils/useQueryUpdater': {
-      import: './dist/utils/useQueryUpdater.js',
-    },
-    './dist/utils/useCopy': {
-      import: './dist/utils/useCopy.js',
-    },
-    './dist/utils/order': {
-      import: './dist/utils/order.js',
-    },
-    './dist/utils/provide': {
-      import: './dist/utils/provide.js',
-    },
-    './dist/utils/useSelected': {
-      import: './dist/utils/useSelected.js',
-    },
-    './dist/utils/api': {
-      import: './dist/utils/api.js',
-    },
-    './dist/utils/ApiClient': {
-      import: './dist/utils/ApiClient.js',
-    },
-    './dist/utils/validate': {
-      import: './dist/utils/validate.js',
     },
   }
 
@@ -222,20 +136,32 @@ const writePackageExports = async (list: ComponentPath[]) => {
   fs.writeFile(PATH_PACKAGE, JSON.stringify(obj, null, 2) + '\n', 'utf8')
 }
 
-const writeComponents = async () => {
-  const list = await getComponentsList()
-
-  await Promise.all([
-    writePlugin(list.filter(item => item.name !== 'types')),
-    writePackageExports(list),
-  ])
-}
-
 export const writeImports = async () => {
-  await Promise.all([
-    writeComponents(),
-    writeIcons(),
-  ])
+  const start = performance.now()
+
+  const utilsList = await getUtils()
+  const componentsList = await getComponentsList()
+  const componentsListNoTypes = componentsList.filter(item => item.name !== 'types')
+
+  const result =`import type {App} from 'vue'
+
+${ componentsListNoTypes.map(item => `import ${ item.name } from '@${ item.path.substring(item.path.indexOf('/components')) }'`).join('\n') }
+
+${ utilsList.map(item => `export * from '@${ item.path.substring(item.path.indexOf('/utils')) }'`).join('\n') }
+
+${ (await getIconPaths(PATH_ICONS)).map(item => `export {default as ${ item.name }} from '@${ item.path.substring(item.path.indexOf('/assets')) }?component'`).join('\n') }
+
+${ getVuePlugin(componentsListNoTypes) }
+
+${ getExports(componentsListNoTypes) }
+`
+
+  const content = (await fs.readFile(PATH_MAIN).catch(() => '')).toString()
+
+  if (content === result) console.log('Main is up to date')
+  else await fs.writeFile(PATH_MAIN, result, 'utf8')
+
+  await writePackageExports([...utilsList, ...componentsList])
    
-  console.log('Successfully written')
+  console.log(`Successfully written: ${ (performance.now() - start) / 1000 }s`)
 }

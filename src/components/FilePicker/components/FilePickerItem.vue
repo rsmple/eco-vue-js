@@ -30,9 +30,9 @@
 </template>
 
 <script lang="ts" setup>
-import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
-import IconCheckCircle from '@/assets/icons/sax/IconCheckCircle.svg?component'
-import IconCloseCircle from '@/assets/icons/sax/IconCloseCircle.svg?component'
+import IconCancel from '@/assets/icons/IconCancel.svg?component'
+import IconCheckCircle from '@/assets/icons/IconCheckCircle.svg?component'
+import IconCloseCircle from '@/assets/icons/IconCloseCircle.svg?component'
 
 defineProps<{
   name?: string

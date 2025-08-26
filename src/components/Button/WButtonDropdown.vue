@@ -77,7 +77,7 @@ import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
-import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
+import IconArrow from '@/assets/icons/IconArrow.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 

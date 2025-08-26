@@ -48,7 +48,7 @@ import {onUnmounted, useTemplateRef, watch, watchEffect} from 'vue'
 
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 
-import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
+import IconCheck from '@/assets/icons/IconCheck.svg?component'
 
 const props = defineProps<{
   isSelected: boolean

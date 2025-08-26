@@ -22,7 +22,7 @@ import {markRaw} from 'vue'
 import WFormValidator from '@/components/Form/WFormValidator.vue'
 import WInput from '@/components/Input/WInput.vue'
 
-import IconSearch from '@/assets/icons/sax/IconSearch.svg?component'
+import IconSearch from '@/assets/icons/IconSearch.svg?component'
 
 defineProps<FilterProps<QueryParams>>()
 

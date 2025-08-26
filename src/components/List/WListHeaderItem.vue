@@ -61,7 +61,7 @@
 <script lang="ts" setup generic="Field">
 import {type StyleValue, computed, onMounted, ref, useTemplateRef} from 'vue'
 
-import IconBack from '@/assets/icons/default/IconBack.svg?component'
+import IconBack from '@/assets/icons/IconBack.svg?component'
 
 import {Order, type OrderItem} from '@/utils/order'
 

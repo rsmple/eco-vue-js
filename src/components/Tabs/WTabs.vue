@@ -139,7 +139,7 @@ import {type Component, type RendererElement, type RendererNode, type VNode, com
 
 import WForm from '@/components/Form/WForm.vue'
 
-import IconClose from '@/assets/icons/sax/IconClose.svg?component'
+import IconClose from '@/assets/icons/IconClose.svg?component'
 
 import {Notify} from '@/utils/Notify'
 import {useIsMobile} from '@/utils/mobile'

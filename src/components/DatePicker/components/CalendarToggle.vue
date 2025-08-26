@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
+import IconArrow from '@/assets/icons/IconArrow.svg?component'
 
 defineProps<{
   text: string

@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
+import IconCancel from '@/assets/icons/IconCancel.svg?component'
 
 defineProps<{
   disabled?: boolean

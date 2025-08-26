@@ -14,9 +14,9 @@
 </template>
 
 <script setup lang="ts">
-import IconCheckCircle from '@/assets/icons/sax/IconCheckCircle.svg?component'
-import IconNegativeInfo from '@/assets/icons/sax/IconNegativeInfo.svg?component'
-import IconSlash from '@/assets/icons/sax/IconSlash.svg?component'
+import IconCheckCircle from '@/assets/icons/IconCheckCircle.svg?component'
+import IconNegativeInfo from '@/assets/icons/IconNegativeInfo.svg?component'
+import IconSlash from '@/assets/icons/IconSlash.svg?component'
 
 defineProps<{
   hasValue?: boolean

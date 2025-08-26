@@ -82,8 +82,8 @@ import {type Component, type VNode, computed, markRaw, onUnmounted, provide, ref
 
 import WButtonAction from '@/components/Button/WButtonAction.vue'
 
-import IconBack from '@/assets/icons/default/IconBack.svg?component'
-import IconFilter from '@/assets/icons/sax/IconFilter.svg?component'
+import IconBack from '@/assets/icons/IconBack.svg?component'
+import IconFilter from '@/assets/icons/IconFilter.svg?component'
 
 import {SemanticType} from '@/utils/SemanticType'
 import {BASE_ZINDEX_ACTIONS_BAR, wBaseZIndex} from '@/utils/utils'

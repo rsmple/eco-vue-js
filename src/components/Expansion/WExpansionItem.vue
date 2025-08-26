@@ -55,7 +55,7 @@
 <script lang="ts" setup>
 import {type VNode, useTemplateRef} from 'vue'
 
-import IconArrow from '@/assets/icons/default/IconArrow.svg?component'
+import IconArrow from '@/assets/icons/IconArrow.svg?component'
 
 import WExpansion from './WExpansion.vue'
 

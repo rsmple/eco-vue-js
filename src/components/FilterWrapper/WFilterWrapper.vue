@@ -41,7 +41,7 @@ import {useRoute, useRouter} from 'vue-router'
 
 import WButton from '@/components/Button/WButton.vue'
 
-import IconFilterRemove from '@/assets/icons/sax/IconFilterRemove.svg?component'
+import IconFilterRemove from '@/assets/icons/IconFilterRemove.svg?component'
 
 import {Modal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'

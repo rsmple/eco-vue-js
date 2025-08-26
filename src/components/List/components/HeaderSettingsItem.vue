@@ -41,9 +41,9 @@ import type {FieldComponent, FieldConfig, ListField, ListFieldExport} from '../t
 
 import {ref} from 'vue'
 
-import IconDrag from '@/assets/icons/sax/IconDrag.svg?component'
-import IconEye from '@/assets/icons/sax/IconEye.svg?component'
-import IconEyeSlash from '@/assets/icons/sax/IconEyeSlash.svg?component'
+import IconDrag from '@/assets/icons/IconDrag.svg?component'
+import IconEye from '@/assets/icons/IconEye.svg?component'
+import IconEyeSlash from '@/assets/icons/IconEyeSlash.svg?component'
 
 const props = defineProps<{
   field: ListFieldExport<FieldComponent<Data>, ListField<Data, QueryParams>>

@@ -206,8 +206,8 @@ import WButtonMoreItem from '@/components/Button/WButtonMoreItem.vue'
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 import WForm from '@/components/Form/WForm.vue'
 
-import IconAddCircle from '@/assets/icons/sax/IconAddCircle.svg?component'
-import IconMinusCircle from '@/assets/icons/sax/IconMinusCircle.svg?component'
+import IconAddCircle from '@/assets/icons/IconAddCircle.svg?component'
+import IconMinusCircle from '@/assets/icons/IconMinusCircle.svg?component'
 
 import ListCardAction from './components/ListCardAction.vue'
 import {AREA_MORE, AREA_SELECT} from './types'

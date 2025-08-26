@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts" setup>
-import IconNegativeInfo from '@/assets/icons/sax/IconNegativeInfo.svg?component'
+import IconNegativeInfo from '@/assets/icons/IconNegativeInfo.svg?component'
 
 import {SemanticType} from '@/utils/SemanticType'
 

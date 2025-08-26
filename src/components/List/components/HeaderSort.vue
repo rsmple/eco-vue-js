@@ -44,7 +44,7 @@ import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.v
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 
-import IconSort from '@/assets/icons/default/IconSort.svg?component'
+import IconSort from '@/assets/icons/IconSort.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {type ListMode} from '@/utils/utils'

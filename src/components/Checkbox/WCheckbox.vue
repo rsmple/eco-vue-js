@@ -99,7 +99,7 @@ import {type StyleValue, useTemplateRef} from 'vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
-import IconCheck from '@/assets/icons/default/IconCheck.svg?component'
+import IconCheck from '@/assets/icons/IconCheck.svg?component'
 
 import {useComponentStates} from '@/utils/useComponentStates'
 

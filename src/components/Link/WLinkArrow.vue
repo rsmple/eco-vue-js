@@ -18,7 +18,7 @@ import type {LinkProps} from '@/types/types'
 
 import {RouterLink} from 'vue-router'
 
-import IconBack from '@/assets/icons/default/IconBack.svg?component'
+import IconBack from '@/assets/icons/IconBack.svg?component'
 
 interface Props extends LinkProps {
   text?: string

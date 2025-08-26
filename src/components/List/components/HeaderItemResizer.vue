@@ -18,9 +18,9 @@
 <script lang="ts" setup generic="Field">
 import {onBeforeUnmount, useTemplateRef, watch} from 'vue'
 
-import IconDrag from '@/assets/icons/sax/IconDrag.svg?component'
+import IconDrag from '@/assets/icons/IconDrag.svg?component'
 
-import DOMListenerContainer from '@/utils/DOMListenerContainer'
+import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
 
 const MIN_WIDTH = 64
 const MAX_WIDTH = 2000

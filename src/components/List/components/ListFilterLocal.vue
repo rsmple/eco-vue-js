@@ -70,7 +70,7 @@ import WExpansionItem from '@/components/Expansion/WExpansionItem.vue'
 import WTabs from '@/components/Tabs/WTabs.vue'
 import WTabsItem from '@/components/Tabs/WTabsItem.vue'
 
-import IconFilter from '@/assets/icons/sax/IconFilter.svg?component'
+import IconFilter from '@/assets/icons/IconFilter.svg?component'
 
 import ListFilterSearch from './ListFilterSearch.vue'
 import ListFilterSelect from './ListFilterSelect.vue'

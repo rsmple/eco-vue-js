@@ -71,11 +71,11 @@ import {useRouter} from 'vue-router'
 import WButton from '@/components/Button/WButton.vue'
 import WCounter from '@/components/Counter/WCounter.vue'
 
-import IconBack from '@/assets/icons/default/IconBack.svg?component'
-import IconCancel from '@/assets/icons/default/IconCancel.svg?component'
-import IconDanger from '@/assets/icons/default/IconDanger.svg?component'
-import IconSuccess from '@/assets/icons/default/IconSuccess.svg?component'
-import IconWarn from '@/assets/icons/default/IconWarn.svg?component'
+import IconBack from '@/assets/icons/IconBack.svg?component'
+import IconCancel from '@/assets/icons/IconCancel.svg?component'
+import IconDanger from '@/assets/icons/IconDanger.svg?component'
+import IconSuccess from '@/assets/icons/IconSuccess.svg?component'
+import IconWarn from '@/assets/icons/IconWarn.svg?component'
 
 import {SemanticType} from '@/utils/SemanticType'
 
