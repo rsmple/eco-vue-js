@@ -4,12 +4,10 @@ import path from 'path'
 
 type ComponentPath = {name: string, path: string}
 
-const PATH_ICONS_DEFAULT = 'src/assets/icons/default'
-const PATH_ICONS_DEFAULT_PLUGIN = 'src/imports/iconsDefault.ts'
-const PATH_ICONS_SAX = 'src/assets/icons/sax'
-const PATH_ICONS_SAX_PLUGIN =  'src/imports/iconsSax.ts'
+const PATH_ICONS = 'src/assets/icons'
+const PATH_ICONS_PLUGIN =  'src/imports/icons.ts'
 const PATH_COMPONENTS = 'src/components'
-const PATH_COMPONENTS_PLUGIN = 'src/imports/componentsPlugin.ts'
+const PATH_COMPONENTS_PLUGIN = 'src/imports/components.ts'
 const PATH_PACKAGE = 'package/package.json'
 
 const getIconPaths = (root: string) => {
@@ -26,38 +24,20 @@ const getIconImports = (list: ComponentPath[]) => {
   return imports.join('\n')
 }
 
-const writeIconDefault = async () => {
-  const text = (await fs.readFile(PATH_ICONS_DEFAULT_PLUGIN)).toString()
-  const imports = getIconImports(await getIconPaths(PATH_ICONS_DEFAULT))
+const writeIcons = async () => {
+  const text = (await fs.readFile(PATH_ICONS_PLUGIN).catch(() => '')).toString()
+  const imports = getIconImports(await getIconPaths(PATH_ICONS))
 
   if (text === imports) {
-    console.log('IconDefault is up to date')
+    console.log('Icons are up to date')
 
     return
   }
 
-  console.log('Writing IconDefault')
+  console.log('Writing Icons')
 
   return fs.writeFile(
-    PATH_ICONS_DEFAULT_PLUGIN,
-    imports,
-  )
-}
-
-const writeIconSax = async () => {
-  const text = (await fs.readFile(PATH_ICONS_SAX_PLUGIN)).toString()
-  const imports = getIconImports(await getIconPaths(PATH_ICONS_SAX))
-
-  if (text === imports) {
-    console.log('IconSax is up to date')
-
-    return
-  }
-
-  console.log('Writing IconSax')
-
-  return fs.writeFile(
-    PATH_ICONS_SAX_PLUGIN,
+    PATH_ICONS_PLUGIN,
     imports,
   )
 }
@@ -131,7 +111,7 @@ const getExports = (list: ComponentPath[]) => {
 const writePlugin = async (list: ComponentPath[]) => {
   const result = `import type {App} from 'vue'\n\n${ getImports(list) }\n\n${ getVuePlugin(list) }\n\n${ getExports(list) }`
 
-  const text = (await fs.readFile(PATH_COMPONENTS_PLUGIN)).toString()
+  const text = (await fs.readFile(PATH_COMPONENTS_PLUGIN).catch(() => '')).toString()
 
   if (text === result) {
     console.log('Components are up to date')
@@ -162,11 +142,8 @@ const getPackageExports = (list: ComponentPath[]) => {
     './eslint/plugin': {
       import: './eslint/plugin.js',
     },
-    './dist/assets/icons/default/*': {
-      import: './dist/assets/icons/default/*.svg.js',
-    },
-    './dist/assets/icons/sax/*': {
-      import: './dist/assets/icons/sax/*.svg.js',
+    './dist/assets/icons/*': {
+      import: './dist/assets/icons/*.svg.js',
     },
     './dist/utils/DOMListenerContainer': {
       import: './dist/utils/DOMListenerContainer.js',
@@ -251,13 +228,6 @@ const writeComponents = async () => {
   await Promise.all([
     writePlugin(list.filter(item => item.name !== 'types')),
     writePackageExports(list),
-  ])
-}
-
-const writeIcons = async () => {
-  await Promise.all([
-    writeIconDefault(),
-    writeIconSax(),
   ])
 }
 

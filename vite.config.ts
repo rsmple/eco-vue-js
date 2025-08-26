@@ -13,6 +13,13 @@ import {writeImports} from './build/write-imports'
 
 export default defineConfig(({mode}) => ({
   plugins: [
+    {
+      name: 'pre-build-hook',
+      enforce: 'pre',
+      async buildStart() {
+        return await writeImports()
+      },
+    },
     dts({
       tsconfigPath: 'tsconfig.vue.json',
       entryRoot: 'src',
@@ -20,13 +27,6 @@ export default defineConfig(({mode}) => ({
     }),
     vue(),
     svgLoader({defaultImport: 'component', svgo: false}),
-    {
-      name: 'pre-build-hook',
-      enforce: 'pre',
-      buildStart() {
-        return writeImports()
-      },
-    },
     {
       name: 'atomic-dist-swap',
       closeBundle() {
