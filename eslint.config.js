@@ -8,7 +8,7 @@ export default [
 
   {
     name: 'app/files-to-ignore',
-    ignores: ['**/dist/**', '**/dist-temp/**', '**/src/imports/**'],
+    ignores: ['**/dist/**', '**/dist-temp/**', '**/src/imports/**', 'src/main.ts'],
   },
 
   ...recommended({
