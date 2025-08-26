@@ -31,4 +31,6 @@ coverage
 *.sln
 *.sw?
 
+src/main.ts
+
 eco-vue-js-*.*.*.tgz
