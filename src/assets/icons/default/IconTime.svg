@@ -1,5 +1,0 @@
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M22.8 12c.66 0 1.2.54 1.14 1.2A12 12 0 1 1 20.96 4c.44.5.31 1.25-.22 1.64-.54.4-1.28.27-1.74-.22a9.6 9.6 0 1 0 2.53 7.77c.08-.66.6-1.2 1.27-1.2" fill="currentcolor"/>
-  <rect width="1.92" height="6.72" fill="currentcolor" rx=".96" x="10.56" y="7.68"/>
-  <rect width="1.92" height="7.68" fill="currentcolor" rx=".96" transform="rotate(90 18.24 12.48)" x="18.24" y="12.48"/>
-</svg>
