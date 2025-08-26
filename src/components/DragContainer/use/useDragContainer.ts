@@ -1,6 +1,6 @@
 import {computed, ref} from 'vue'
 
-import {genId} from '@/main'
+import {genId} from '@/utils/utils'
 
 const dragIdCurrent = ref<number | null>(null)
 

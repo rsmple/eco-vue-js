@@ -40,8 +40,8 @@ import type {DropdownDefaultSlotScope, DropdownProps} from './types'
 
 import {type VNode, computed, onBeforeMount, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
-import {HorizontalAlign} from '@/main'
 import DOMListenerContainer from '@/utils/DOMListenerContainer'
+import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {getAllScrollParents, isClientSide} from '@/utils/utils'
 
 import {type HorizontalGetter, LeftCenter, LeftInner, LeftOuter, OriginX, OriginY, RightInner, RightOuter, VerticalGetter, horizontalGetterOrderMap, searchStyleGetter} from './utils/DropdownStyle'

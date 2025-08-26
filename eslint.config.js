@@ -19,4 +19,17 @@ export default [
       'tsconfig.vue.json',
     ],
   }),
+
+  {
+    files: ['**/*.{ts,js,vue}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          name: '@/main',
+          message: 'Import direcrlty',
+        },
+      ],
+    },
+  },
 ]

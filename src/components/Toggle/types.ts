@@ -1,4 +1,4 @@
-import type {Theme} from '@/main'
+import type {Theme} from '@/utils/utils'
 
 export interface ToggleProps<Value extends boolean | null> {
   modelValue: Value
