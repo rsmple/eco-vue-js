@@ -82,15 +82,15 @@
           class="group/input col-start-2 grid grid-cols-1"
           :class="{
             'py-[--w-input-gap,0.25rem] first:pl-[--w-input-gap,0.25rem] last:pr-[--w-input-gap,0.25rem]': $slots.prefix,
-            'no-scrollbar overflow-x-auto overscroll-x-contain': noWrap && (!seamless || focused),
-            'overflow-hidden': noWrap && (seamless && !focused),
+            'no-scrollbar overflow-x-auto overscroll-x-contain': seamless && focused,
+            'overflow-hidden': seamless && !focused,
           }"
         >
           <div
-            class="w-skeleton-w-32 flex gap-[--w-input-gap,0.25rem]"
+            class="w-skeleton-w-32 flex w-max gap-[--w-input-gap,0.25rem]"
             :class="{
               '[&:not(:has(.w-option-has-bg))]:-px--w-option-padding': !icon && !textarea,
-              'flex-wrap': !noWrap,
+              'flex-wrap': !noWrap && !seamless,
             }"
           >
             <slot

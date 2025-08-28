@@ -1,8 +1,8 @@
 <template>
   <component
-    :is="isMobile ? WBottomSheet : WDropdownMenu"
+    :is="static ? InputSuggestStatic : isMobile ? WBottomSheet : WDropdownMenu"
     ref="dropdownMenu"
-    v-bind="isMobile ? {
+    v-bind="static ? undefined : isMobile ? {
       isOpen,
       onClose: close
     } : {
@@ -14,7 +14,7 @@
       parentElement: inputRef?.fieldRef,
     }"
   >
-    <template #toggle="toggleScope: ({unclickable: boolean, isTop: boolean} | undefined)">
+    <template #toggle="toggleScope">
       <WInput
         ref="input"
         v-bind="{
@@ -66,6 +66,14 @@
           />
         </template>
 
+        <template
+          v-if="$slots.bottom || (static && $slots.content)"
+          #bottom
+        >
+          <slot name="content" />
+          <slot name="bottom" />
+        </template>
+
         <template #suffix>
           <IconArrow
             v-if="!isDisabled"
@@ -83,26 +91,21 @@
       </WInput>
     </template>
 
-    <template #content="contentScope">
+    <template
+      v-if="!static"
+      #content="contentScope"
+    >
       <WInfiniteListScrollingElement
         :parent="isMobile"
         class="bg-default dark:bg-default-dark w-full"
         :class="{
           'pb-[50vh]': isMobile,
           'overflow-y-overlay max-h-[inherit] overflow-x-hidden overscroll-contain rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
-          'mt-5': 'istop' in contentScope && contentScope.istop === false && (errorMessage || maxLength),
+          'mt-5': 'isTop' in contentScope && contentScope.isTop === false && (errorMessage || maxLength),
         }"
       >
         <template v-if="$slots.content">
-          <template
-            v-for="(slot, index) in $slots.content()"
-            :key="index"
-          >
-            <component
-              :is="slot"
-              @close="close"
-            />
-          </template>
+          <slot name="content" />
         </template>
       </WInfiniteListScrollingElement>
     </template>
@@ -124,6 +127,8 @@ import IconArrow from '@/assets/icons/IconArrow.svg?component'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {useIsMobile} from '@/utils/mobile'
 import {useComponentStates} from '@/utils/useComponentStates'
+
+import InputSuggestStatic from './components/InputSuggestStatic.vue'
 
 type ModelValue = Required<InputSuggestProps<Type>>['modelValue']
 
@@ -150,7 +155,7 @@ const emit = defineEmits<{
   (e: 'open'): void
   (e: 'close'): void
   (e: 'click:clear'): void
-  (e: 'focus', value: FocusEvent): void
+  (e: 'focus', value: FocusEvent | undefined): void
   (e: 'blur', value: FocusEvent): void
 }>()
 
@@ -205,9 +210,10 @@ defineExpose({
 
 defineSlots<{
   title?: () => void
+  bottom?: () => void
   subtitle?: () => void
   prefix?: (props: {unclickable?: boolean | null}) => void
   right?: (props: Record<string, never>) => void
-  content?: (props?: {scrollingElement?: Element}) => VNode[]
+  content?: () => VNode[]
 }>()
 </script>

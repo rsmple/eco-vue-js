@@ -203,7 +203,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'select', item: Model): void
   (e: 'unselect', item: Model): void
-  (e: 'focus', value: FocusEvent): void
+  (e: 'focus', value: FocusEvent | undefined): void
   (e: 'blur', value: FocusEvent): void
   (e: 'update:query-options-error', value: string | undefined): void
   (e: 'init-model'): void

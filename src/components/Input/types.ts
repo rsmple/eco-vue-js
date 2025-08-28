@@ -46,6 +46,7 @@ export interface InputSuggestProps<Type extends InputType> extends Omit<InputPro
   mobileTitle?: string
   persist?: boolean
   closeOnClear?: boolean
+  static?: boolean
 }
 
 export interface InputOptionsProps<Type extends InputType, Option> extends InputSuggestProps<Type> {

@@ -9,8 +9,9 @@
       'w-ripple': !loading && !skeleton && !disabled,
       'cursor-not-allowed': disabled,
     }"
-    @mousedown.prevent.stop=""
+    @mousedown.prevent.stop
     @click.prevent.stop="toggle"
+    @mouseenter="$emit('mouseenter', $event)"
   >
     <slot name="prefix" />
 
@@ -75,6 +76,7 @@ const emit = defineEmits<{
   (e: 'unmounted'): void
   (e: 'update:first'): void
   (e: 'update:last'): void
+  (e: 'mouseenter', value: MouseEvent): void
 }>()
 
 const elementRef = useTemplateRef('element')
