@@ -22,6 +22,7 @@
         '--dropdown-width': width !== undefined ? width + 'px' : undefined,
         '--dropdown-height': height !== undefined ? height + 'px' : undefined,
         width: props.horizontalAlign === HorizontalAlign.FILL ? 'var(--dropdown-width)' : 'max-content',
+        minWidth: props.horizontalAlign === HorizontalAlign.FILL_MIN ? 'var(--dropdown-width)' : undefined,
       }"
       style="
         max-width: var(--dropdown-width);

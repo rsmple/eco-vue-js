@@ -214,6 +214,7 @@ export const horizontalGetterOrderMap: Record<HorizontalAlign, HorizontalGetter[
   [HorizontalAlign.RIGHT_CENTER]: [new RightCenter(), new LeftCenter()],
   [HorizontalAlign.RIGHT_INNER]: [new RightInner(), new LeftInner()],
   [HorizontalAlign.FILL]: [new Fill()],
+  [HorizontalAlign.FILL_MIN]: [new Fill()],
   [HorizontalAlign.CENTER]: [new Center()],
   [HorizontalAlign.LEFT_INNER]: [new LeftInner(), new RightInner()],
   [HorizontalAlign.LEFT_CENTER]: [new LeftCenter(), new RightCenter()],

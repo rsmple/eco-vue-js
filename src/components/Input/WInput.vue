@@ -2,7 +2,9 @@
   <WFieldWrapper
     ref="fieldWrapper"
     v-bind="props"
-    :class="$attrs.class"
+    :class="[$attrs.class, {
+      'group/seamless': seamless,
+    }]"
     @click="$emit('click:suffix', $event); seamless && focus()"
   >
     <template
@@ -58,7 +60,7 @@
           'border-negative dark:border-negative-dark': errorMessage,
           'border-gray-300 dark:border-gray-700': !isDisabled,
           'border-gray-300/50 dark:border-gray-700/50': isDisabled,
-          'border-opacity-0 group-hover/field:border-opacity-100 dark:border-opacity-0 dark:group-hover/field:border-opacity-100': seamless && !focused,
+          'border-opacity-0 group-hover/seamless:border-opacity-100 dark:border-opacity-0 dark:group-hover/seamless:border-opacity-100': seamless && !focused,
           'bg-[--w-input-bg,inherit]': !seamless || focused,
         }"
         @click="focus"
@@ -87,10 +89,11 @@
           }"
         >
           <div
-            class="w-skeleton-w-32 flex w-max gap-[--w-input-gap,0.25rem]"
+            class="w-skeleton-w-32 flex gap-[--w-input-gap,0.25rem]"
             :class="{
               '[&:not(:has(.w-option-has-bg))]:-px--w-option-padding': !icon && !textarea,
               'flex-wrap': !noWrap && !seamless,
+              'w-full min-w-max': !textarea && $slots.prefix,
             }"
           >
             <slot
@@ -99,9 +102,8 @@
             />
 
             <div
-              class="overflow-auto font-normal"
+              class="flex-1 overflow-auto font-normal"
               :class="{
-                'absolute w-0 max-w-0': hideInput,
                 'w-full': !hideInput && !$slots.prefix,
                 'w-option-has-bg-input': $slots.prefix,
                 'resize-y': resize && textarea,
@@ -129,6 +131,7 @@
                     outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed dark:placeholder:text-gray-500
                   "
                   :class="{
+                    'absolute w-0 max-w-0': hideInput,
                     'text-secure': textSecure && !isSecureVisible,
                     '[-webkit-text-fill-color:transparent]': textTransparent,
                   }"

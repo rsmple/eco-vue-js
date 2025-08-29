@@ -69,7 +69,7 @@ const onPaste = async (e: ClipboardEvent) => {
 }
 
 const onKeyDown = (e: KeyboardEvent) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
+  if (e.key === 'Enter') {
     e.preventDefault()
     insertPlain('\n')
   } else {

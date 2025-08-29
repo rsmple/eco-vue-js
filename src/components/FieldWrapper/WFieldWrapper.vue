@@ -1,11 +1,11 @@
 <template>
   <div
-    class="group/field relative"
-    v-bind="{class: $attrs.class, style: $attrs.style as StyleValue}"
-    :class="{
+    class="relative"
+    v-bind="{style: $attrs.style as StyleValue}"
+    :class="[$attrs.class, {
       'mb-[1.125rem]': !noMargin && !subgrid,
       'col-span-full grid grid-cols-subgrid': subgrid,
-    }"
+    }]"
     @click="$emit('click', $event)"
   >
     <label
