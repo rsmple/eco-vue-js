@@ -2,8 +2,6 @@
   <WDropdownMenu
     :is-open="isOpen"
     :horizontal-align="HorizontalAlign.FILL"
-    :max-height="320"
-    :max-width="320"
     update-align
   >
     <template #toggle>

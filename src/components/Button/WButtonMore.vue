@@ -11,8 +11,6 @@
   >
     <WDropdownMenu
       :is-open="isOpen"
-      :max-height="210"
-      :max-width="320"
       :horizontal-align="anchor ? HorizontalAlign.RIGHT_INNER : HorizontalAlign.LEFT_INNER"
       :update-align="false"
       :parent-element="anchor"

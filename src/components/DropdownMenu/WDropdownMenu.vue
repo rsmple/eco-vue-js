@@ -15,8 +15,6 @@
       :parent-element="parentElement ?? (element as HTMLDivElement)"
       :horizontal-align="horizontalAlign"
       :update-align="updateAlign"
-      :max-height="maxHeight"
-      :max-width="maxWidth"
       :emit-update="emitUpdate"
       :style="{zIndex: baseZIndex + BASE_ZINDEX_DROPDOWN}"
       :top="top"

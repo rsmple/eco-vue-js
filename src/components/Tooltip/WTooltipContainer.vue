@@ -11,8 +11,6 @@
       :key="dropdownKey"
       :parent-element="tooltipMeta.parent"
       :horizontal-align="tooltipMeta.left ? HorizontalAlign.LEFT_CENTER : tooltipMeta.right ? HorizontalAlign.RIGHT_CENTER : HorizontalAlign.CENTER"
-      :max-height="tooltipMeta?.maxHeight ?? 120"
-      :max-width="tooltipMeta.left || tooltipMeta.right ? 400 : 240"
       :top="tooltipMeta.top"
       :bottom="tooltipMeta.bottom"
       emit-update

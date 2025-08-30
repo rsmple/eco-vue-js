@@ -82,94 +82,96 @@
     </template>
 
     <template #content>
-      <SelectOption
-        v-if="hasCreateOption"
-        :is-selected="false"
-        :is-cursor="cursor === optionsFiltered.length"
-        :loading="(loadingCreate || loadingOptionIndex === optionsFiltered.length) && loading"
-        :scroll="isCursorLocked"
-        :hide-option-icon="hideOptionIcon"
-        :disabled="!search || isModelValueSearch"
-        class="first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
-        @select="create(search)"
-        @mouseenter="setCursor(optionsFiltered.length)"
-      >
-        <template #prefix>
-          <div class="w-option flex items-center pr-2">
-            Create:
-          </div>
-        </template>
-
-        <slot
-          v-if="search && !isModelValueSearch"
-          name="option"
-          :option="undefined"
-          :search="search"
-          :selected="false"
-          :model="false"
-          :index="undefined"
-          :skeleton="false"
+      <div class="max-h-80">
+        <SelectOption
+          v-if="hasCreateOption"
+          :is-selected="false"
+          :is-cursor="cursor === optionsFiltered.length"
+          :loading="(loadingCreate || loadingOptionIndex === optionsFiltered.length) && loading"
+          :scroll="isCursorLocked"
+          :hide-option-icon="hideOptionIcon"
+          :disabled="!search || isModelValueSearch"
+          class="first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
+          @select="create(search)"
+          @mouseenter="setCursor(optionsFiltered.length)"
         >
-          <component
-            v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
-            :is="optionComponent"
-            :option="null"
+          <template #prefix>
+            <div class="w-option flex items-center pr-2">
+              Create:
+            </div>
+          </template>
+
+          <slot
+            v-if="search && !isModelValueSearch"
+            name="option"
+            :option="undefined"
             :search="search"
             :selected="false"
             :model="false"
-          />
-        </slot>
-
-        <div
-          v-else
-          class="text-description w-option flex items-center"
-        >
-          Start typing..
-        </div>
-      </SelectOption>
-
-      <div
-        v-if="!optionsFiltered.length && !isModelValueSearch && (!createOption || optionsWithCreated.length)"
-        class="w-select-option first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
-      >
-        <div class="w-option flex cursor-default select-none items-center">
-          {{ !search && emptyStub ? emptyStub : search ? 'No match' : 'Nothing to show' }}
-        </div>
-      </div>
-
-      <SelectOption
-        v-for="(option, index) in optionsFiltered"
-        :key="valueGetter(option)"
-        :is-selected="modelValue.includes(valueGetter(option))"
-        :is-cursor="index === cursor"
-        :loading="loadingOptionIndex === index && loading"
-        :scroll="isCursorLocked"
-        :hide-option-icon="hideOptionIcon"
-        class="first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
-        @select="select(valueGetter(option)); setLoadingOptionIndex(index)"
-        @unselect="unselect(valueGetter(option)); setLoadingOptionIndex(index)"
-        @mouseenter="setCursor(index)"
-      >
-        <template #default="{selected}">
-          <slot
-            name="option"
-            :option="option"
-            :selected="selected"
-            :model="false"
-            :index="index"
+            :index="undefined"
             :skeleton="false"
-            :search="search"
           >
             <component
               v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
               :is="optionComponent"
-              :option="option"
-              :selected="selected"
+              :option="null"
+              :search="search"
+              :selected="false"
               :model="false"
             />
           </slot>
-        </template>
-      </SelectOption>
+
+          <div
+            v-else
+            class="text-description w-option flex items-center"
+          >
+            Start typing..
+          </div>
+        </SelectOption>
+
+        <div
+          v-if="!optionsFiltered.length && !isModelValueSearch && (!createOption || optionsWithCreated.length)"
+          class="w-select-option first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
+        >
+          <div class="w-option flex cursor-default select-none items-center">
+            {{ !search && emptyStub ? emptyStub : search ? 'No match' : 'Nothing to show' }}
+          </div>
+        </div>
+
+        <SelectOption
+          v-for="(option, index) in optionsFiltered"
+          :key="valueGetter(option)"
+          :is-selected="modelValue.includes(valueGetter(option))"
+          :is-cursor="index === cursor"
+          :loading="loadingOptionIndex === index && loading"
+          :scroll="isCursorLocked"
+          :hide-option-icon="hideOptionIcon"
+          class="first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
+          @select="select(valueGetter(option)); setLoadingOptionIndex(index)"
+          @unselect="unselect(valueGetter(option)); setLoadingOptionIndex(index)"
+          @mouseenter="setCursor(index)"
+        >
+          <template #default="{selected}">
+            <slot
+              name="option"
+              :option="option"
+              :selected="selected"
+              :model="false"
+              :index="index"
+              :skeleton="false"
+              :search="search"
+            >
+              <component
+                v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
+                :is="optionComponent"
+                :option="option"
+                :selected="selected"
+                :model="false"
+              />
+            </slot>
+          </template>
+        </SelectOption>
+      </div>
     </template>
   </WInputSuggest>
 </template>

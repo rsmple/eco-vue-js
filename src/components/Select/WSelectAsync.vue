@@ -94,6 +94,7 @@
         :value-getter="valueGetter"
         :loading-create="loadingCreate"
         :search="search"
+        class="max-h-80"
         @select="select"
         @unselect="unselect"
         @create:option="create(search)"
@@ -157,7 +158,7 @@ const emit = defineEmits<{
   (e: 'unselect', item: Model): void
   (e: 'update:model-value', value: Model[]): void
   (e: 'init-model'): void
-  (e: 'focus', value: FocusEvent): void
+  (e: 'focus', value: FocusEvent | undefined): void
   (e: 'blur', value: FocusEvent): void
 }>()
 

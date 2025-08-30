@@ -6,31 +6,23 @@
       '--dropdown-y': y + 'px',
     }"
     class="group/dropdown width-0 height-0 fixed left-0 top-0 grid will-change-transform"
-    style="
-      transform: translate(var(--dropdown-x, 0px), var(--dropdown-y, 0px));
-    "
+    style="transform: translate(var(--dropdown-x, 0px), var(--dropdown-y, 0px));"
     :class="[
-      {
-        'dropdown-top': isTop,
-      },
-      originX,
-      originY,
+      {'dropdown-top': isTop},
+      horizontalGetter?.origin,
+      verticalGetter?.origin,
     ]"
   >
     <div
-      :style="{
-        '--dropdown-width': width !== undefined ? width + 'px' : undefined,
-        '--dropdown-height': height !== undefined ? height + 'px' : undefined,
-        width: props.horizontalAlign === HorizontalAlign.FILL ? 'var(--dropdown-width)' : 'max-content',
-        minWidth: props.horizontalAlign === HorizontalAlign.FILL_MIN ? 'var(--dropdown-width)' : undefined,
-      }"
-      style="
-        max-width: var(--dropdown-width);
-        max-height: var(--dropdown-height);
-      "
+      class="relative w-max"
+      :style="[
+        verticalGetter?.style,
+        horizontalGetter?.style,
+        parentRect ? horizontalGetter?.styleGetter?.(parentRect) : undefined,
+      ]"
     >
       <slot
-        v-bind="{isTop, isLeft, isRight, x, y, originX, originY}"
+        v-bind="{isTop, isLeft, isRight}"
       />
     </div>
   </div>
@@ -42,10 +34,9 @@ import type {DropdownDefaultSlotScope, DropdownProps} from './types'
 import {type VNode, computed, onBeforeMount, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {getAllScrollParents, isClientSide} from '@/utils/utils'
 
-import {type HorizontalGetter, LeftCenter, LeftInner, LeftOuter, OriginX, OriginY, RightInner, RightOuter, VerticalGetter, horizontalGetterOrderMap, searchStyleGetter} from './utils/DropdownStyle'
+import {type HorizontalGetter, OriginX, type VerticalGetter, horizontalGetterOrderMap, searchStyleGetter} from './utils/DropdownStyle'
 
 const props = defineProps<DropdownProps>()
 
@@ -55,58 +46,41 @@ const emit = defineEmits<{
 
 const dropdownRef = useTemplateRef('dropdown')
 
-let parentRect: DOMRect | null = null
-let horizontalGetter: HorizontalGetter | null = null
-let verticalGetter: VerticalGetter | null = null
+const parentRect = ref<DOMRect | null>(null)
+const horizontalGetter = ref<HorizontalGetter | null>(null)
+const verticalGetter = ref<VerticalGetter | null>(null)
 
-const isTop = ref(false)
-const isLeftCenter = ref(false)
-const isLeft = ref(false)
-const isRight = ref(false)
+const isTop = computed(() => verticalGetter.value?.isTop === true)
+const isLeft = computed(() => horizontalGetter.value?.origin === OriginX.RIGHT)
+const isRight = computed(() => horizontalGetter.value?.origin === OriginX.LEFT)
 
 const x = ref(0)
 const y = ref(0)
-const width = ref<number | undefined>(0)
-const height = ref<number | undefined>(0)
-const originX = ref(OriginX.LEFT)
-const originY = ref(OriginY.TOP)
 
 const order = computed(() => horizontalGetterOrderMap[props.horizontalAlign])
 
-const setParentRect = (updateSize = false, updateAlign = false): void => {
+const setParentRect = (updateAlign = false): void => {
   const newRect = props.parentElement.getBoundingClientRect()
 
-  const isLeftChanged = newRect.left !== parentRect?.left
-  const isTopChanged = newRect.top !== parentRect?.top || newRect.bottom !== parentRect?.bottom
+  const isLeftChanged = newRect.left !== parentRect.value?.left
+  const isTopChanged = newRect.top !== parentRect.value?.top || newRect.bottom !== parentRect.value?.bottom
 
-  if (!horizontalGetter || (isLeftChanged && (props.updateAlign || updateAlign))) {
-    horizontalGetter = searchStyleGetter(order.value, newRect, props.maxWidth)
-
-    originX.value = horizontalGetter.origin
-    isLeftCenter.value = horizontalGetter instanceof LeftCenter
-    isLeft.value = horizontalGetter instanceof LeftOuter || horizontalGetter instanceof LeftInner
-    isRight.value = horizontalGetter instanceof RightOuter || horizontalGetter instanceof RightInner
-
-    if (updateSize) width.value = horizontalGetter.widthStyleGetter(newRect, props.maxWidth)
+  if (!horizontalGetter.value || (isLeftChanged && (props.updateAlign || updateAlign))) {
+    horizontalGetter.value = searchStyleGetter(order.value, newRect)
   }
 
-  if (!verticalGetter || (isTopChanged && (props.updateAlign || updateAlign))) {
-    verticalGetter = props.top
-      ? horizontalGetter.verticalGetterOrder[1]
+  if (!verticalGetter.value || (isTopChanged && (props.updateAlign || updateAlign))) {
+    verticalGetter.value = props.top && horizontalGetter.value.verticalGetterOrder[1]
+      ? horizontalGetter.value.verticalGetterOrder[1]
       : props.bottom
-        ? horizontalGetter.verticalGetterOrder[0]
-        : searchStyleGetter(horizontalGetter.verticalGetterOrder, newRect, props.maxHeight)
-
-    originY.value = verticalGetter.origin
-    isTop.value = verticalGetter.isTop
-
-    if (updateSize) height.value = verticalGetter.heightStyleGetter(newRect, props.maxHeight)
+        ? horizontalGetter.value.verticalGetterOrder[0]
+        : searchStyleGetter(horizontalGetter.value!.verticalGetterOrder, newRect)
   }
-  
-  if (isLeftChanged) x.value = horizontalGetter.styleGetter(newRect)
-  if (isTopChanged) y.value = verticalGetter.styleGetter(newRect)
 
-  if (isLeftChanged || isTopChanged) parentRect = newRect
+  if (isLeftChanged) x.value = horizontalGetter.value.x(newRect)
+  if (isTopChanged) y.value = verticalGetter.value.y(newRect)
+
+  if (isLeftChanged || isTopChanged) parentRect.value = newRect
 }
 
 onBeforeMount(() => {
@@ -151,7 +125,7 @@ onBeforeUnmount(() => {
 })
 
 watch(toRef(props, 'parentElement'), () => {
-  setParentRect(false, true)
+  setParentRect(true)
 })
 
 defineSlots<{

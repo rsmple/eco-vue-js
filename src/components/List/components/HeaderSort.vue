@@ -2,8 +2,6 @@
   <WDropdownMenu
     v-if="fieldsFlat.length"
     :is-open="isOpen"
-    :max-width="300"
-    :max-height="300"
     :horizontal-align="HorizontalAlign.RIGHT_INNER"
   >
     <template #toggle>

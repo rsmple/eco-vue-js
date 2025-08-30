@@ -1,8 +1,6 @@
 <template>
   <WDropdownMenu 
     :is-open="isOpen"
-    :max-height="maxHeight"
-    :max-width="maxWidth"
     :horizontal-align="horizontalAlign"
     update-align
   >
@@ -86,8 +84,6 @@ import WButton from './WButton.vue'
 withDefaults(
   defineProps<ButtonDropdownProps>(),
   {
-    maxHeight: 200,
-    maxWidth: 320,
     horizontalAlign: HorizontalAlign.LEFT_INNER,
     disabled: undefined,
   },

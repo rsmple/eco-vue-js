@@ -1,11 +1,12 @@
+import {markRaw} from 'vue'
+
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 
-const EDGE = 20
-
-interface StyleGetter {
-  styleGetter(parentRect: DOMRect): number
-  marginGetter(parentRect: DOMRect, maxHeightOrWidth: number): number
+type StyleGetter = {
+  isEdge: ((parentRect: DOMRect) => boolean) | undefined
 }
+
+const EDGE_FACTOR = 0.66
 
 export enum OriginY {
   TOP = 'content-start',
@@ -13,87 +14,71 @@ export enum OriginY {
   CENTER = 'content-center',
 }
 
-export abstract class VerticalGetter implements StyleGetter {
-  abstract isTop: boolean
-  abstract origin: OriginY
+export type VerticalGetter = {
+  isTop: boolean
+  origin: OriginY
+  style?: Record<string, string>
+  y: (parentRect: DOMRect) => number
+} & StyleGetter
 
-  abstract styleGetter(parentRect: DOMRect): number
+const BOTTOM_EDGE = window.innerHeight * EDGE_FACTOR
 
-  abstract marginGetter(parentRect: DOMRect, maxHeight: number): number
+/**
+ *   ↓
+ *  [ ]
+ */
+const BottomInner: VerticalGetter = markRaw({
+  isTop: false,
+  origin: OriginY.TOP,
+  style: {maxHeight: 'calc(100vh - var(--dropdown-y, 0px) - var(--w-bottom-inner, 0px) - var(--inner-margin, 0px))'},
+  y: parentRect => Math.round(parentRect.top),
+  isEdge: parentRect => parentRect.top > BOTTOM_EDGE,
+})
 
-  heightStyleGetter(parentRect: DOMRect, maxHeight: number): number | undefined {
-    return _maxHeightOrWidthGetter(this, parentRect, maxHeight)
-  }
-}
+/**
+ *  [ ]
+ *   ↓
+ */
+const BottomOuter: VerticalGetter = markRaw({
+  ...BottomInner,
+  y: parentRect => Math.round(parentRect.bottom),
+  isEdge: parentRect => parentRect.bottom > BOTTOM_EDGE,
+})
 
-class BottomInner extends VerticalGetter {
-  isTop = false
-  origin = OriginY.TOP
+/**
+ *  [x]
+ */
+const VerticalCenter: VerticalGetter = markRaw({
+  isTop: false,
+  origin: OriginY.CENTER,
+  style: undefined,
+  y: parentRect => Math.round(parentRect.top + parentRect.height / 2),
+  isEdge: undefined,
+})
 
-  styleGetter(parentRect: DOMRect) {
-    return Math.round(parentRect.top)
-  }
+const TOP_EDGE = window.innerHeight * (1 - EDGE_FACTOR)
 
-  marginGetter(parentRect: DOMRect, maxHeight: number) {
-    return Math.round(window.innerHeight - parentRect.top - maxHeight - EDGE)
-  }
-}
+/**
+ *   ↑
+ *  [ ]
+ */
+const TopOuter: VerticalGetter = markRaw({
+  isTop: true,
+  origin: OriginY.BOTTOM,
+  style: {maxHeight: 'calc(var(--dropdown-y, 0px) - var(--w-top-inner, 0px) - var(--inner-margin, 0px))'},
+  y: parentRect => Math.round(parentRect.top),
+  isEdge: parentRect => parentRect.top < TOP_EDGE,
+})
 
-class BottomOuter extends VerticalGetter {
-  isTop = false
-  origin = OriginY.TOP
-
-  styleGetter(parentRect: DOMRect) {
-    return Math.round(parentRect.bottom)
-  }
-
-  marginGetter(parentRect: DOMRect, maxHeight: number) {
-    return Math.round(window.innerHeight - parentRect.bottom - maxHeight - EDGE)
-  }
-}
-
-class VerticalCenter extends VerticalGetter {
-  isTop = false
-  origin = OriginY.CENTER
-
-  styleGetter(parentRect: DOMRect) {
-    return Math.round(parentRect.top + parentRect.height / 2)
-  }
-
-  marginGetter() {
-    return 0
-  }
-
-  heightStyleGetter() {
-    return undefined
-  }
-}
-
-class TopOuter extends VerticalGetter {
-  isTop = true
-  origin = OriginY.BOTTOM
-
-  styleGetter(parentRect: DOMRect) {
-    return Math.round(parentRect.top)
-  }
-
-  marginGetter(parentRect: DOMRect, maxHeight: number) {
-    return Math.round(parentRect.top - maxHeight - EDGE)
-  }
-}
-
-class TopInner extends VerticalGetter {
-  isTop = true
-  origin = OriginY.BOTTOM
-
-  styleGetter(parentRect: DOMRect) {
-    return Math.round(parentRect.bottom)
-  }
-
-  marginGetter(parentRect: DOMRect, maxHeight: number) {
-    return Math.round(parentRect.bottom - maxHeight - EDGE)
-  }
-}
+/**
+ *  [ ]
+ *   ↑
+ */
+const TopInner: VerticalGetter = markRaw({
+  ...TopOuter,
+  y: parentRect => Math.round(parentRect.bottom),
+  isEdge: parentRect => parentRect.bottom < TOP_EDGE,
+})
 
 export enum OriginX {
   LEFT = 'justify-start',
@@ -101,143 +86,111 @@ export enum OriginX {
   CENTER = 'justify-center',
 }
 
-export abstract class HorizontalGetter implements StyleGetter {
-  abstract origin: OriginX
+export type HorizontalGetter = {
+  verticalGetterOrder: [VerticalGetter, VerticalGetter] | [VerticalGetter]
+  origin: OriginX
+  style?: Record<string, string> | undefined
+  styleGetter?: (parentRect: DOMRect) => Record<string, string>
+  x: (parentRect: DOMRect) => number
+} & StyleGetter
 
-  abstract verticalGetterOrder: Array<VerticalGetter>
+const RIGHT_EDGE = window.innerWidth * EDGE_FACTOR
 
-  abstract styleGetter(parentRect: DOMRect): number
+/**
+ *    [ ] →
+ */
+export const RightOuter: HorizontalGetter = markRaw({
+  verticalGetterOrder: [BottomInner, TopInner],
+  origin: OriginX.LEFT,
+  style: {maxWidth: 'calc(100vw - var(--dropdown-x, 0px) - var(--w-right-inner, 0px))'},
+  x: parentRect => Math.round(parentRect.right),
+  isEdge: parentRect => parentRect.right > RIGHT_EDGE,
+})
 
-  abstract marginGetter(parentRect: DOMRect, maxWidth: number): number
+/**
+ *  → [ ]
+ */
+export const RightInner: HorizontalGetter = markRaw({
+  ...RightOuter,
+  verticalGetterOrder: [BottomOuter, TopOuter],
+  x: parentRect => Math.round(parentRect.left),
+  isEdge: parentRect => parentRect.left > RIGHT_EDGE,
+})
 
-  widthStyleGetter(parentRect: DOMRect, maxWidth: number): number | undefined {
-    return _maxHeightOrWidthGetter(this, parentRect, maxWidth)
-  }
+/**
+ *    [x] →
+ */
+const RightCenter: HorizontalGetter = markRaw({
+  ...RightOuter,
+  verticalGetterOrder: [VerticalCenter],
+})
+
+/**
+ *  → [ ] ←
+ */
+const Fill: HorizontalGetter = markRaw({
+  verticalGetterOrder: [BottomOuter, TopOuter],
+  origin: OriginX.LEFT,
+  style: {minWidth: 'var(--dropdown-width)', maxWidth: 'var(--dropdown-width)'},
+  styleGetter: parentRect => ({'--dropdown-width': `${ Math.round(parentRect.right - parentRect.left) }px`}),
+  x: parentRect => Math.round(parentRect.left),
+  isEdge: undefined,
+})
+
+/**
+ *    [x]
+ */
+const Center: HorizontalGetter = markRaw({
+  verticalGetterOrder: [BottomOuter, TopOuter],
+  origin: OriginX.CENTER,
+  x: parentRect => Math.round(parentRect.left + parentRect.width / 2),
+  isEdge: undefined,
+})
+
+const LEFT_EDGE = window.innerWidth * (1 - EDGE_FACTOR)
+
+/**
+ *    [ ] ←
+ */
+export const LeftInner: HorizontalGetter = markRaw({
+  verticalGetterOrder: [BottomOuter, TopOuter],
+  origin: OriginX.RIGHT,
+  style: {maxWidth: 'calc(var(--dropdown-x, 0px) - var(--w-left-inner, 0px))'},
+  x: parentRect => Math.round(parentRect.right),
+  isEdge: parentRect => parentRect.right < LEFT_EDGE,
+})
+
+/**
+ *  ← [ ]
+ */
+export const LeftOuter: HorizontalGetter = markRaw({
+  ...LeftInner,
+  verticalGetterOrder: [BottomInner, TopInner],
+  x: parentRect => Math.round(parentRect.left),
+  isEdge: parentRect => parentRect.left < LEFT_EDGE,
+})
+
+/**
+ *  ← [x]
+ */
+export const LeftCenter: HorizontalGetter = markRaw({
+  ...LeftOuter,
+  verticalGetterOrder: [VerticalCenter],
+})
+
+export const horizontalGetterOrderMap: Record<HorizontalAlign, [HorizontalGetter, HorizontalGetter] | [HorizontalGetter]> = {
+  [HorizontalAlign.RIGHT_OUTER]: [RightOuter, LeftOuter],
+  [HorizontalAlign.RIGHT_CENTER]: [RightCenter, LeftCenter],
+  [HorizontalAlign.RIGHT_INNER]: [RightInner, LeftInner],
+  [HorizontalAlign.FILL]: [Fill],
+  [HorizontalAlign.CENTER]: [Center],
+  [HorizontalAlign.LEFT_INNER]: [LeftInner, RightInner],
+  [HorizontalAlign.LEFT_CENTER]: [LeftCenter, RightCenter],
+  [HorizontalAlign.LEFT_OUTER]: [LeftOuter, RightOuter],
 }
 
-export class RightOuter extends HorizontalGetter {
-  verticalGetterOrder = [new BottomInner(), new TopInner()]
-  origin = OriginX.LEFT
-
-  styleGetter(parentRect: DOMRect) {
-    return Math.round(parentRect.right)
-  }
-
-  marginGetter(parentRect: DOMRect, maxWidth: number) {
-    return Math.round(document.documentElement.clientWidth - parentRect.right - maxWidth - EDGE)
-  }
-}
-
-export class RightInner extends HorizontalGetter {
-  verticalGetterOrder = [new BottomOuter(), new TopOuter()]
-  origin = OriginX.LEFT
-
-  styleGetter(parentRect: DOMRect) {
-    return Math.round(parentRect.left)
-  }
-
-  marginGetter(parentRect: DOMRect, maxWidth: number) {
-    return Math.round(document.documentElement.clientWidth - parentRect.left - maxWidth - EDGE)
-  }
-}
-
-class RightCenter extends RightOuter {
-  verticalGetterOrder = [new VerticalCenter()]
-}
-
-class Fill extends HorizontalGetter {
-  verticalGetterOrder = [new BottomOuter(), new TopOuter()]
-  origin = OriginX.LEFT
-
-  styleGetter(parentRect: DOMRect) {
-    return Math.round(parentRect.left)
-  }
-
-  marginGetter() {
-    return 0
-  }
-
-  widthStyleGetter(parentRect: DOMRect) {
-    return Math.round(parentRect.right - parentRect.left)
-  }
-}
-
-class Center extends HorizontalGetter {
-  verticalGetterOrder = [new BottomOuter(), new TopOuter()]
-  origin = OriginX.CENTER
-
-  styleGetter(parentRect: DOMRect) {
-    return Math.round(parentRect.left + parentRect.width / 2)
-  }
-
-  marginGetter() {
-    return 0
-  }
-
-  widthStyleGetter() {
-    return undefined
-  }
-}
-
-export class LeftInner extends HorizontalGetter {
-  verticalGetterOrder = [new BottomOuter(), new TopOuter()]
-  origin = OriginX.RIGHT
-
-  styleGetter(parentRect: DOMRect) {
-    return Math.round(parentRect.right)
-  }
-
-  marginGetter(parentRect: DOMRect, maxWidth: number) {
-    return Math.round(parentRect.right - maxWidth - EDGE)
-  }
-}
-
-export class LeftOuter extends HorizontalGetter {
-  verticalGetterOrder = [new BottomInner(), new TopInner()]
-  origin = OriginX.RIGHT
-
-  styleGetter(parentRect: DOMRect) {
-    return Math.round(parentRect.left)
-  }
-
-  marginGetter(parentRect: DOMRect, maxWidth: number) {
-    return Math.round(parentRect.left - maxWidth - EDGE)
-  }
-}
-
-export class LeftCenter extends LeftOuter {
-  verticalGetterOrder = [new VerticalCenter()]
-}
-
-export const horizontalGetterOrderMap: Record<HorizontalAlign, HorizontalGetter[]> = {
-  [HorizontalAlign.RIGHT_OUTER]: [new RightOuter(), new LeftOuter(), new RightInner(), new LeftInner()],
-  [HorizontalAlign.RIGHT_CENTER]: [new RightCenter(), new LeftCenter()],
-  [HorizontalAlign.RIGHT_INNER]: [new RightInner(), new LeftInner()],
-  [HorizontalAlign.FILL]: [new Fill()],
-  [HorizontalAlign.FILL_MIN]: [new Fill()],
-  [HorizontalAlign.CENTER]: [new Center()],
-  [HorizontalAlign.LEFT_INNER]: [new LeftInner(), new RightInner()],
-  [HorizontalAlign.LEFT_CENTER]: [new LeftCenter(), new RightCenter()],
-  [HorizontalAlign.LEFT_OUTER]: [new LeftOuter(), new RightOuter(), new LeftInner(), new RightInner()],
-}
-
-export function searchStyleGetter<T extends StyleGetter>(order: Array<T>, parentRect: DOMRect, maxHeightOrWidth: number): T {
-  const margins: Array<number> = []
-
-  return order
-    .find(item => {
-      const margin = item.marginGetter(parentRect, maxHeightOrWidth)
-
-      margins.push(margin)
-
-      return margin >= 0
-    }) ||
-    order[margins.indexOf(Math.max(...margins))]
-}
-
-function _maxHeightOrWidthGetter(getter: StyleGetter, parentRect: DOMRect, maxHeightOrWidth: number): number {
-  const margin = getter.marginGetter(parentRect, maxHeightOrWidth)
-
-  if (margin > 0) return Math.round(maxHeightOrWidth)
-  else return Math.round(maxHeightOrWidth + margin)
+export function searchStyleGetter<T extends HorizontalGetter | VerticalGetter>(order: Array<T>, parentRect: DOMRect): T {
+  if (order[1] && order[0].isEdge?.(parentRect)) return order[1]
+  
+  return order[0]
 }

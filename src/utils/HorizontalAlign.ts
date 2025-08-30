@@ -3,7 +3,6 @@ export enum HorizontalAlign {
   LEFT_CENTER = 'LEFT_CENTER',
   LEFT_INNER = 'LEFT_INNER',
   FILL = 'FILL',
-  FILL_MIN = 'FILL_MIN',
   CENTER = 'CENTER',
   RIGHT_INNER = 'RIGHT_INNER',
   RIGHT_CENTER = 'RIGHT_CENTER',

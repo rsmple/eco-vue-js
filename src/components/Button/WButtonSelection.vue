@@ -11,8 +11,6 @@
       <WDropdownMenu
         v-if="$slots.more"
         :is-open="isOpen"
-        :max-width="200"
-        :max-height="300"
         :horizontal-align="HorizontalAlign.RIGHT_INNER"
       >
         <template #toggle>

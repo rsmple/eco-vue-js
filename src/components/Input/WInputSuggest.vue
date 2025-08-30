@@ -7,8 +7,6 @@
       onClose: close
     } : {
       isOpen,
-      maxHeight,
-      maxWidth,
       horizontalAlign,
       updateAlign: true,
       parentElement: inputRef?.fieldRef,
@@ -100,7 +98,7 @@
         class="bg-default dark:bg-default-dark w-full"
         :class="{
           'pb-[50vh]': isMobile,
-          'overflow-y-overlay max-h-[inherit] overflow-x-hidden overscroll-contain rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
+          'max-h-[inherit] overflow-auto overscroll-contain rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
           'mt-5': 'isTop' in contentScope && contentScope.isTop === false && (errorMessage || maxLength),
         }"
       >

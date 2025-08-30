@@ -164,7 +164,7 @@ const loadingOption = ref<Model | null | undefined>(undefined)
 const firstItem = ref<Model | undefined>()
 const lastItem = ref<Model | undefined>()
 const count = ref(0)
-const isModelValueSearch = computed(() => props.search && props.modelValue.includes(props.search as Model))
+const isModelValueSearch = computed(() => !!props.search && props.modelValue.includes(props.search as Model))
 
 const setLoadingOption = (value: Model | null): void => {
   loadingOption.value = value as UnwrapRef<Model>
