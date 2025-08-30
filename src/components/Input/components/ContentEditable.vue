@@ -82,21 +82,21 @@ const onPaste = async (e: ClipboardEvent) => {
 const insertPlain = (text: string) => {
   const root = elementRef.value
   if (!root) return
-  const {start, end} = getSelectionOffsets(root)
+  const {start, end} = getSelectionOffsets()
   const next = (props.value ?? '').slice(0, start) + text + ((props.value ?? '').slice(end) || ' ')
   const caretAfter = start + text.length
 
   emit('update:model-value', next)
-  nextTick(() => setCaretByCharIndex(root, caretAfter))
+  nextTick(() => setCaret(caretAfter))
 }
 
-const getSelectionOffsets = (root: HTMLDivElement) => {
+const getSelectionOffsets = () => {
   const selection = window.getSelection()
-  if (!selection || selection.rangeCount === 0) return {start: 0, end: 0}
+  if (!elementRef.value || !selection || selection.rangeCount === 0) return {start: 0, end: 0}
   const range = selection.getRangeAt(0)
 
   const pre = range.cloneRange()
-  pre.selectNodeContents(root)
+  pre.selectNodeContents(elementRef.value)
   pre.setEnd(range.startContainer, range.startOffset)
   const start = pre.toString().length
 
@@ -104,39 +104,46 @@ const getSelectionOffsets = (root: HTMLDivElement) => {
   return {start, end: start + selected}
 }
 
-const updateSelection = (node: Node, offset: number) => {
+const getNodeOffset = (index: number | undefined) => {
+  if (!elementRef.value || index === undefined) return undefined
+  if (!elementRef.value.firstChild) elementRef.value.appendChild(document.createTextNode(''))
+
+  const walker = document.createTreeWalker(elementRef.value, NodeFilter.SHOW_TEXT, null)
+  let node, offset = index
+  while ((node = walker.nextNode())) {
+    const len = node.nodeValue?.length ?? 0
+    if (offset <= len) return {node, offset}
+    offset -= len
+  }
+
+  const last = elementRef.value.lastChild
+  if (!last) return undefined
+  return {node: last, offset: last.nodeType === Node.TEXT_NODE && last.nodeValue ? last.nodeValue.length : last.childNodes.length}
+}
+
+const setCaret = (indexStart: number, indexEnd?: number) => {
+  const start = getNodeOffset(indexStart)
+
+  if (start === undefined) return
+
   const range = document.createRange()
-  range.setStart(node, offset)
-  range.collapse(true)
+  range.setStart(start.node, start.offset)
+
+  const end = getNodeOffset(indexEnd)
+  if (end !== undefined) range.setEnd(end.node, end.offset)
+  else range.collapse(true)
+
   const selection = window.getSelection()
   selection?.removeAllRanges()
   selection?.addRange(range)
-}
 
-const setCaretByCharIndex = (root: HTMLDivElement, index: number) => {
-  if (!root.firstChild) root.appendChild(document.createTextNode(''))
-
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null)
-  let node, pos = index
-  while ((node = walker.nextNode())) {
-    const len = node.nodeValue?.length ?? 0
-    if (pos <= len) {
-      updateSelection(node, pos)
-      return
-    }
-    pos -= len
-  }
-
-  const last = root.lastChild
-  if (!last) return
-  updateSelection(last, last.nodeType === Node.TEXT_NODE && last.nodeValue ? last.nodeValue.length : last.childNodes.length)
 }
 
 const wrapSelection = (value: WrapSelection): void => {
   const root = elementRef.value
   if (!root) return
 
-  const {start, end} = getSelectionOffsets(root)
+  const {start, end} = getSelectionOffsets()
   const currentText = props.value ?? ''
   const selectedText = currentText.slice(start, end)
   
@@ -148,7 +155,7 @@ const wrapSelection = (value: WrapSelection): void => {
   const cursorPosition = start + (value.start?.length ?? 0) + (value.end ? selectedText.length : 0)
   
   emit('update:model-value', newText)
-  nextTick(() => setCaretByCharIndex(root, cursorPosition))
+  nextTick(() => setCaret(cursorPosition))
 }
 
 const focus = () => {
@@ -163,6 +170,8 @@ defineExpose({
   focus,
   blur,
   wrapSelection,
+  setCaret,
+  getSelectionOffsets,
   get offsetWidth() {
     return elementRef.value?.offsetWidth ?? 0
   },

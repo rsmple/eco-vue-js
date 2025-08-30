@@ -414,9 +414,9 @@ const scrollToInput = () => {
   contentRef.value.scrollTo({left: contentRef.value.scrollWidth - inputRef.value.offsetWidth - 40})
 }
 
-const wrapSelection = (value: WrapSelection) => {
-  if (inputRef.value && 'wrapSelection' in inputRef.value) inputRef.value.wrapSelection?.(value)
-}
+const wrapSelection = (value: WrapSelection) => inputRef.value && 'wrapSelection' in inputRef.value ? inputRef.value.wrapSelection(value) : void 0
+const setCaret = (indexStart: number, indexEnd?: number) => inputRef.value && 'setCaret' in inputRef.value ? inputRef.value.setCaret(indexStart, indexEnd) : void 0
+const getSelectionOffsets = () => inputRef.value && 'getSelectionOffsets' in inputRef.value ? inputRef.value.getSelectionOffsets() : undefined
 
 let timeout: NodeJS.Timeout | undefined
 
@@ -455,6 +455,8 @@ defineExpose({
   focus,
   blur,
   wrapSelection,
+  setCaret,
+  getSelectionOffsets,
   fieldRef: computed(() => fieldWrapperRef.value?.fieldRef),
   scrollToInput,
 })

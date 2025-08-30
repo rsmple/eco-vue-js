@@ -196,21 +196,13 @@ const focus = () => {
   inputRef.value?.focus()
 }
 
-const blur = () => {
-  inputRef.value?.blur()
-}
+const blur = () => inputRef.value?.blur()
+const scrollToInput = () => inputRef.value?.scrollToInput()
+const wrapSelection = (value: WrapSelection) => inputRef.value?.wrapSelection(value)
+const setCaret = (indexStart: number, indexEnd?: number) => inputRef.value?.setCaret(indexStart, indexEnd)
+const getSelectionOffsets = () => inputRef.value?.getSelectionOffsets()
 
-const scrollToInput = () => {
-  inputRef.value?.scrollToInput()
-}
-
-const wrapSelection = (value: WrapSelection) => {
-  inputRef.value?.wrapSelection(value)
-}
-
-const updateDropdown = () => {
-  if (dropdownMenuRef.value && 'updateDropdown' in dropdownMenuRef.value) dropdownMenuRef.value.updateDropdown()
-}
+const updateDropdown = () => dropdownMenuRef.value && 'updateDropdown' in dropdownMenuRef.value ? dropdownMenuRef.value.updateDropdown() : void 0
 
 defineExpose({
   focus,
@@ -219,6 +211,8 @@ defineExpose({
   updateDropdown,
   scrollToInput,
   wrapSelection,
+  setCaret,
+  getSelectionOffsets,
 })
 
 defineSlots<{
