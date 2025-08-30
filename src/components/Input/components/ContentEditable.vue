@@ -8,12 +8,13 @@
     :textContent="value"
     :placeholder="placeholder"
     class="
-      whitespace-pre empty:before:pointer-events-none empty:before:text-gray-400
-      empty:before:[content:attr(placeholder)] dark:empty:before:text-gray-500
+      relative whitespace-pre empty:before:pointer-events-none
+      empty:before:text-gray-400 empty:before:[content:attr(placeholder)] dark:empty:before:text-gray-500
     "
     @input="onInput"
+    @beforeinput="insertParagraph"
     @paste="onPaste"
-    @keydown="onKeyDown"
+    @keydown="$emit('keydown', $event)"
     @focus="$emit('focus', $event)"
     @blur="$emit('blur', $event)"
   />
@@ -36,6 +37,14 @@ const emit = defineEmits<{
 }>()
 
 const elementRef = useTemplateRef('element')
+
+const insertParagraph = (e: Event) => {
+  if ((e as InputEvent).inputType === 'insertParagraph') {
+    e.preventDefault()
+
+    insertPlain('\n')
+  }
+}
 
 const onInput = (e: Event) => {
   e.stopImmediatePropagation()
@@ -68,15 +77,6 @@ const onPaste = async (e: ClipboardEvent) => {
   insertPlain(text)
 }
 
-const onKeyDown = (e: KeyboardEvent) => {
-  if (e.key === 'Enter') {
-    e.preventDefault()
-    insertPlain('\n')
-  } else {
-    emit('keydown', e)
-  }
-}
-
 const insertPlain = (text: string) => {
   const root = elementRef.value
   if (!root) return
@@ -93,7 +93,6 @@ const getSelectionOffsets = (root: HTMLDivElement) => {
   if (!selection || selection.rangeCount === 0) return {start: 0, end: 0}
   const range = selection.getRangeAt(0)
 
-  // Build a range from start of root to caret start to measure text length
   const pre = range.cloneRange()
   pre.selectNodeContents(root)
   pre.setEnd(range.startContainer, range.startOffset)
@@ -103,8 +102,16 @@ const getSelectionOffsets = (root: HTMLDivElement) => {
   return {start, end: start + selected}
 }
 
+const updateSelection = (node: Node, offset: number) => {
+  const range = document.createRange()
+  range.setStart(node, offset)
+  range.collapse(true)
+  const selection = window.getSelection()
+  selection?.removeAllRanges()
+  selection?.addRange(range)
+}
+
 const setCaretByCharIndex = (root: HTMLDivElement, index: number) => {
-  // Ensure there is at least one text node
   if (!root.firstChild) root.appendChild(document.createTextNode(''))
 
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null)
@@ -112,12 +119,7 @@ const setCaretByCharIndex = (root: HTMLDivElement, index: number) => {
   while ((node = walker.nextNode())) {
     const len = node.nodeValue?.length ?? 0
     if (pos <= len) {
-      const r = document.createRange()
-      r.setStart(node, pos)
-      r.collapse(true)
-      const selection = window.getSelection()
-      selection?.removeAllRanges()
-      selection?.addRange(r)
+      updateSelection(node, pos)
       return
     }
     pos -= len
@@ -125,12 +127,7 @@ const setCaretByCharIndex = (root: HTMLDivElement, index: number) => {
 
   const last = root.lastChild
   if (!last) return
-  const r = document.createRange()
-  r.setStart(last, last.nodeType === Node.TEXT_NODE && last.nodeValue ? last.nodeValue.length : last.childNodes.length)
-  r.collapse(true)
-  const selection = window.getSelection()
-  selection?.removeAllRanges()
-  selection?.addRange(r)
+  updateSelection(last, last.nodeType === Node.TEXT_NODE && last.nodeValue ? last.nodeValue.length : last.childNodes.length)
 }
 
 const focus = () => {
