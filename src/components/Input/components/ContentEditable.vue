@@ -21,6 +21,8 @@
 </template>
 
 <script lang="ts" setup>
+import type {WrapSelection} from '../types'
+
 import {defineEmits, defineProps, nextTick, useTemplateRef} from 'vue'
 
 const props = defineProps<{
@@ -130,6 +132,25 @@ const setCaretByCharIndex = (root: HTMLDivElement, index: number) => {
   updateSelection(last, last.nodeType === Node.TEXT_NODE && last.nodeValue ? last.nodeValue.length : last.childNodes.length)
 }
 
+const wrapSelection = (value: WrapSelection): void => {
+  const root = elementRef.value
+  if (!root) return
+
+  const {start, end} = getSelectionOffsets(root)
+  const currentText = props.value ?? ''
+  const selectedText = currentText.slice(start, end)
+  
+  const beforeSelection = currentText.slice(0, start)
+  const afterSelection = currentText.slice(end)
+  
+  const newText = beforeSelection + (value.start || '') + selectedText + (value.end || '') + afterSelection
+  
+  const cursorPosition = start + (value.start?.length ?? 0) + (value.end ? selectedText.length : 0)
+  
+  emit('update:model-value', newText)
+  nextTick(() => setCaretByCharIndex(root, cursorPosition))
+}
+
 const focus = () => {
   elementRef.value?.focus()
 }
@@ -141,6 +162,7 @@ const blur = () => {
 defineExpose({
   focus,
   blur,
+  wrapSelection,
   get offsetWidth() {
     return elementRef.value?.offsetWidth ?? 0
   },

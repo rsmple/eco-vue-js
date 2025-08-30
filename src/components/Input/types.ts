@@ -61,3 +61,8 @@ export interface InputDateProps extends Omit<InputSuggestProps<'text'>, 'modelVa
   minDate?: Date
   maxDate?: Date
 }
+
+export type WrapSelection = {
+  start?: string
+  end?: string
+}

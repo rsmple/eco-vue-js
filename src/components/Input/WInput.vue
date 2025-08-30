@@ -65,6 +65,11 @@
         }"
         @click="focus"
       >
+        <slot
+          name="toolbar"
+          v-bind="{wrapSelection}"
+        />
+
         <div
           v-if="icon"
           class="flex h-full w-[--w-input-height,2.75rem] select-none items-center justify-center"
@@ -223,7 +228,7 @@
 </template>
 
 <script lang="ts" setup generic="Type extends InputType = 'text'">
-import type {InputProps} from './types'
+import type {InputProps, WrapSelection} from './types'
 
 import {computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch} from 'vue'
 
@@ -409,6 +414,10 @@ const scrollToInput = () => {
   contentRef.value.scrollTo({left: contentRef.value.scrollWidth - inputRef.value.offsetWidth - 40})
 }
 
+const wrapSelection = (value: WrapSelection) => {
+  if (inputRef.value && 'wrapSelection' in inputRef.value) inputRef.value.wrapSelection?.(value)
+}
+
 let timeout: NodeJS.Timeout | undefined
 
 const autofocusDebounced = () => {
@@ -445,6 +454,7 @@ onBeforeUnmount(() => {
 defineExpose({
   focus,
   blur,
+  wrapSelection,
   fieldRef: computed(() => fieldWrapperRef.value?.fieldRef),
   scrollToInput,
 })

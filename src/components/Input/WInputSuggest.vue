@@ -57,6 +57,16 @@
           <slot name="subtitle" />
         </template>
 
+        <template
+          v-if="$slots.toolbar"
+          #toolbar="scope"
+        >
+          <slot
+            name="toolbar"
+            v-bind="scope"
+          />
+        </template>
+
         <template #prefix>
           <slot
             name="prefix"
@@ -111,7 +121,7 @@
 </template>
 
 <script lang="ts" setup generic="Type extends InputType = 'text'">
-import type {InputSuggestProps} from './types'
+import type {InputSuggestProps, WrapSelection} from './types'
 
 import {type VNode, computed, ref, useTemplateRef} from 'vue'
 
@@ -194,6 +204,10 @@ const scrollToInput = () => {
   inputRef.value?.scrollToInput()
 }
 
+const wrapSelection = (value: WrapSelection) => {
+  inputRef.value?.wrapSelection(value)
+}
+
 const updateDropdown = () => {
   if (dropdownMenuRef.value && 'updateDropdown' in dropdownMenuRef.value) dropdownMenuRef.value.updateDropdown()
 }
@@ -204,12 +218,14 @@ defineExpose({
   close,
   updateDropdown,
   scrollToInput,
+  wrapSelection,
 })
 
 defineSlots<{
   title?: () => void
   bottom?: () => void
   subtitle?: () => void
+  toolbar?: () => void
   prefix?: (props: {unclickable?: boolean | null}) => void
   right?: (props: Record<string, never>) => void
   content?: () => VNode[]
