@@ -51,8 +51,8 @@
     >
       <div
         class="
-          relative grid min-h-[--w-input-min-height,var(--w-input-height,2.75rem)] grid-cols-[auto,1fr,auto]
-          overflow-hidden rounded-[--w-input-rounded,0.75rem] border border-solid
+          relative isolate grid min-h-[--w-input-min-height,var(--w-input-height,2.75rem)]
+          grid-cols-[auto,1fr,auto] overflow-hidden rounded-[--w-input-rounded,0.75rem] border border-solid
         "
         :class="{
           'focus-within:border-primary dark:focus-within:border-primary-dark focus-within:outline-primary/20 dark:focus-within:outline-primary-dark/20 focus-within:outline focus-within:outline-2': !isDisabled && !isReadonly && !unclickable,
