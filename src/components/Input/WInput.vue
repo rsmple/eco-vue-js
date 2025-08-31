@@ -423,14 +423,19 @@ let timeout: NodeJS.Timeout | undefined
 const autofocusDebounced = () => {
   if (timeout) clearTimeout(timeout)
 
+  if (props.autofocus === 0) {
+    focus()
+    return
+  }
+
   timeout = setTimeout(() => {
-    if (props.autofocus) focus()
+    if (props.autofocus !== false && props.autofocus !== undefined) focus()
 
     timeout = undefined
-  }, 250)
+  }, typeof props.autofocus === 'number' ? props.autofocus : 250)
 }
 
-if (props.autofocus) {
+if (props.autofocus !== false && props.autofocus !== undefined) {
   useTabActiveListener(autofocusDebounced)
 }
 
@@ -441,7 +446,7 @@ watch(() => props.autofocus, value => {
 })
 
 onMounted(() => {
-  if (props.autofocus) autofocusDebounced()
+  if (props.autofocus !== false && props.autofocus !== undefined) autofocusDebounced()
 })
 
 onBeforeUnmount(() => {

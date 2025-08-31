@@ -15,20 +15,20 @@
     @beforeinput="insertParagraph"
     @paste="onPaste"
     @keydown="$emit('keydown', $event)"
-    @focus="$emit('focus', $event)"
-    @blur="$emit('blur', $event)"
+    @focus="$emit('focus', $event); focused = true"
+    @blur="$emit('blur', $event); focused = false"
   />
 </template>
 
 <script lang="ts" setup>
 import type {WrapSelection} from '../types'
 
-import {defineEmits, defineProps, nextTick, useTemplateRef} from 'vue'
+import {defineEmits, defineProps, nextTick, ref, useTemplateRef} from 'vue'
 
 const props = defineProps<{
   value: string
-  placeholder?: string
-  maxLength?: number
+  placeholder: string
+  maxLength: number
 }>()
 
 const emit = defineEmits<{
@@ -39,6 +39,7 @@ const emit = defineEmits<{
 }>()
 
 const elementRef = useTemplateRef('element')
+const focused = ref(false)
 
 const insertParagraph = (e: Event) => {
   if ((e as InputEvent).inputType === 'insertParagraph') {
@@ -136,23 +137,26 @@ const setCaret = (indexStart: number, indexEnd?: number) => {
   const selection = window.getSelection()
   selection?.removeAllRanges()
   selection?.addRange(range)
-
 }
+
+let offsetsOld: {start: number, end: number} | null = null
 
 const wrapSelection = (value: WrapSelection): void => {
   const root = elementRef.value
   if (!root) return
 
-  const {start, end} = getSelectionOffsets()
+  let offsets = getSelectionOffsets()
+  if (focused.value || !offsetsOld) offsetsOld = offsets
+  else offsets = offsetsOld
   const currentText = props.value ?? ''
-  const selectedText = currentText.slice(start, end)
+  const selectedText = currentText.slice(offsets.start, offsets.end)
   
-  const beforeSelection = currentText.slice(0, start)
-  const afterSelection = currentText.slice(end)
+  const beforeSelection = currentText.slice(0, offsets.start)
+  const afterSelection = currentText.slice(offsets.end)
   
   const newText = beforeSelection + (value.start || '') + selectedText + (value.end || '') + afterSelection
   
-  const cursorPosition = start + (value.start?.length ?? 0) + (value.end ? selectedText.length : 0)
+  const cursorPosition = offsets.start + (value.end ? (value.start?.length ?? 0) + selectedText.length : 0)
   
   emit('update:model-value', newText)
   nextTick(() => setCaret(cursorPosition))

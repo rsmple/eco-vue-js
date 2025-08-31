@@ -38,6 +38,8 @@
     </template>
 
     <template #prefix="{unclickable}">
+      <slot name="prefix" />
+
       <template v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true">
         <SelectOptionPrefix
           v-for="(value, index) in !emptyValue || modelValue.length !== 0 ? modelValue : emptyValue"
@@ -454,5 +456,6 @@ defineSlots<{
   subtitle?: () => void
   option?: (props: PartialNot<SelectOptionProps<Data>>) => void
   right?: () => void
+  prefix?: () => void
 }>()
 </script>

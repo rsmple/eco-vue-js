@@ -19,7 +19,7 @@ export interface InputProps<Type extends InputType> extends Omit<FieldWrapperPro
 
   name?: string
   autocomplete?: 'off' | string
-  autofocus?: boolean
+  autofocus?: boolean | number
   readonly?: boolean
   unclickable?: boolean | null
   disabledActions?: boolean
