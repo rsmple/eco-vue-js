@@ -29,6 +29,8 @@ export default {
           if (importedName.startsWith('W')) {
             const path = keys.find(item => item.includes(importedName))
 
+            if (!path) return
+
             const replacementImport = `import ${ importedName } from 'eco-vue-js${ path.substring(1) }'`
 
             context.report({

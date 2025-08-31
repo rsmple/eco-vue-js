@@ -440,9 +440,9 @@ if (props.autofocus !== false && props.autofocus !== undefined) {
 }
 
 watch(() => props.autofocus, value => {
-  if (!value) return
+  if (value === false || value === undefined) return
 
-  nextTick(focus)
+  nextTick(autofocusDebounced)
 })
 
 onMounted(() => {
