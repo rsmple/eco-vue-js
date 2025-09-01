@@ -19,7 +19,7 @@
 <script lang="ts" setup>
 import type {TextPart, WrapSelection} from '../types'
 
-import {defineEmits, defineProps, nextTick, ref, useTemplateRef, watch} from 'vue'
+import {defineEmits, defineProps, nextTick, onMounted, ref, useTemplateRef, watch} from 'vue'
 
 const props = defineProps<{
   value: string
@@ -266,6 +266,11 @@ const focus = () => {
 const blur = () => {
   elementRef.value?.blur()
 }
+
+onMounted(() => {
+  updateTextValue(props.value)
+  updateTextParts()
+})
 
 defineExpose({
   focus,
