@@ -1,18 +1,15 @@
 <template>
   <div
     ref="element"
-    contenteditable="true"
+    contenteditable="plaintext-only"
     role="textbox"
     aria-multiline="true"
     spellcheck="false"
-    :textContent="value"
+    :textContent="textParts ? undefined : value"
     :placeholder="placeholder"
-    class="
-      relative whitespace-pre empty:before:pointer-events-none
-      empty:before:text-gray-400 empty:before:[content:attr(placeholder)] dark:empty:before:text-gray-500
-    "
+    class="relative whitespace-pre"
     @input="onInput"
-    @beforeinput="insertParagraph"
+    @beforeinput="insertParagraph($event as InputEvent)"
     @paste="onPaste"
     @keydown="$emit('keydown', $event)"
     @focus="$emit('focus', $event); focused = true"
@@ -21,14 +18,15 @@
 </template>
 
 <script lang="ts" setup>
-import type {WrapSelection} from '../types'
+import type {TextPart, WrapSelection} from '../types'
 
-import {defineEmits, defineProps, nextTick, ref, useTemplateRef} from 'vue'
+import {defineEmits, defineProps, nextTick, ref, useTemplateRef, watch} from 'vue'
 
 const props = defineProps<{
   value: string
   placeholder: string
   maxLength: number
+  textParts: TextPart[] | undefined
 }>()
 
 const emit = defineEmits<{
@@ -41,12 +39,96 @@ const emit = defineEmits<{
 const elementRef = useTemplateRef('element')
 const focused = ref(false)
 
-const insertParagraph = (e: Event) => {
-  if ((e as InputEvent).inputType === 'insertParagraph') {
+const updateTextParts = () => {
+  if (!elementRef.value || !props.textParts) return
+
+  const offsets = getSelectionOffsets()
+  const existingNodes = Array.from(elementRef.value.childNodes)
+
+  let nodeIndex = 0
+
+  for (const item of props.textParts) {
+    const existingNode = existingNodes[nodeIndex]
+
+    if (typeof item === 'string') {
+      // Add space after newlines for cursor positioning
+      const displayText = item.replace(/\n$/g, '\n ')
+      
+      if (existingNode?.nodeType === Node.TEXT_NODE) {
+        if (existingNode.textContent !== displayText) {
+          existingNode.textContent = displayText
+        }
+      } else {
+        const textNode = document.createTextNode(displayText)
+        elementRef.value.insertBefore(textNode, existingNode || null)
+      }
+    } else {
+      if (existingNode?.nodeType === Node.ELEMENT_NODE &&
+        (existingNode as HTMLElement).tagName.toLowerCase() === item.tag.toLowerCase()) {
+        const element = existingNode as HTMLElement
+
+        if (element.textContent !== item.value) {
+          element.textContent = item.value
+        }
+
+        const contentEditable = item.edit ? 'plaintext-only' : 'false'
+        if (element.getAttribute('contenteditable') !== contentEditable) {
+          element.setAttribute('contenteditable', contentEditable)
+        }
+
+        if (element.className !== (item.class || '')) {
+          element.className = item.class || ''
+        }
+      } else {
+        const element = document.createElement(item.tag)
+        element.textContent = item.value
+        element.setAttribute('contenteditable', item.edit ? 'plaintext-only' : 'false')
+        if (item.class) element.className = item.class
+
+        elementRef.value.insertBefore(element, existingNode || null)
+      }
+    }
+
+    nodeIndex++
+  }
+
+  while (nodeIndex < existingNodes.length) {
+    elementRef.value.removeChild(existingNodes[nodeIndex])
+    nodeIndex++
+  }
+
+  if (focused.value) setCaret(offsets.start, offsets.end !== offsets.start ? undefined : offsets.end)
+}
+
+watch(() => props.textParts, updateTextParts, {immediate: true})
+
+const textPartsToText = (parts: TextPart[]): string => {
+  return parts.map(part => typeof part === 'string' ? part : part.value).join('')
+}
+
+const getCurrentText = (): string => {
+  return props.textParts ? textPartsToText(props.textParts) : props.value
+}
+
+const lineBreakEvents = ['insertParagraph', 'insertLineBreak']
+
+const insertParagraph = (e: InputEvent) => {
+  if (lineBreakEvents.includes(e.inputType)) {
     e.preventDefault()
 
     insertPlain('\n')
   }
+}
+
+const regexDifferentEnding = /\r\n?/g
+const regexSpaces = /\n \n/g
+const regexEnding = / +$/gm
+
+const normalizeText = (text: string): string => {
+  return text
+    .replace(regexDifferentEnding, '\n')
+    .replace(regexSpaces, '\n\n')
+    .replace(regexEnding, '')
 }
 
 const onInput = (e: Event) => {
@@ -54,16 +136,18 @@ const onInput = (e: Event) => {
 
   if (!(e.target instanceof HTMLDivElement)) return
 
-  const text = e.target.textContent?.replace(/\r\n?/g, '\n') ?? ''
+  const rawText = e.target.textContent ?? ''
+  const text = normalizeText(rawText)
+  const currentText = getCurrentText()
 
-  if (text === props.value) return
+  if (text === currentText) return
 
   if (props.maxLength && typeof text === 'string' && text.length > props.maxLength) {
     e.preventDefault()
 
     const substring = text.substring(0, props.maxLength)
 
-    if (e.target) e.target.textContent = substring
+    if (e.target && !props.textParts) e.target.textContent = substring
 
     emit('update:model-value', substring)
   } else {
@@ -84,7 +168,8 @@ const insertPlain = (text: string) => {
   const root = elementRef.value
   if (!root) return
   const {start, end} = getSelectionOffsets()
-  const next = (props.value ?? '').slice(0, start) + text + ((props.value ?? '').slice(end) || ' ')
+  const currentText = getCurrentText()
+  const next = (currentText ?? '').slice(0, start) + text + ((currentText ?? '').slice(end) || ' ')
   const caretAfter = start + text.length
 
   emit('update:model-value', next)
@@ -148,7 +233,7 @@ const wrapSelection = (value: WrapSelection): void => {
   let offsets = getSelectionOffsets()
   if (focused.value || !offsetsOld) offsetsOld = offsets
   else offsets = offsetsOld
-  const currentText = props.value ?? ''
+  const currentText = getCurrentText() ?? ''
   const selectedText = currentText.slice(offsets.start, offsets.end)
   
   const beforeSelection = currentText.slice(0, offsets.start)

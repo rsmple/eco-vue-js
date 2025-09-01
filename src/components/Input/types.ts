@@ -34,6 +34,7 @@ export interface InputProps<Type extends InputType> extends Omit<FieldWrapperPro
   hideInput?: boolean
   noWrap?: boolean
   textTransparent?: boolean
+  textParts?: TextPart[]
 }
 
 export interface InputAsyncProps<Type extends InputType> extends InputProps<Type> {
@@ -66,3 +67,5 @@ export type WrapSelection = {
   start?: string
   end?: string
 }
+
+export type TextPart = {value: string, tag: keyof HTMLElementTagNameMap, edit?: boolean, class?: string} | string

@@ -153,6 +153,7 @@
                   :max="max"
                   :spellcheck="spellcheck ? 'true' : 'false'"
                   :max-length="maxLength"
+                  :text-parts="textParts"
                   @input="handleInputEvent"
                   @keypress.enter.exact="!isDisabled && !isReadonly && $emit('keypress:enter', $event)"
                   @keydown.up.exact.stop="!isDisabled && !isReadonly && $emit('keypress:up', $event)"
