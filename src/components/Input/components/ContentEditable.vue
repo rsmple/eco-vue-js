@@ -184,8 +184,8 @@ const insertPlain = (text: string) => {
   const next = (currentText ?? '').slice(0, start) + text + ((currentText ?? '').slice(end) || ' ')
   const caretAfter = start + text.length
 
-  emit('update:model-value', next)
-  nextTick(() => setCaret(caretAfter))
+  emit('update:model-value', props.maxLength && next.length > props.maxLength ? next.substring(0, props.maxLength) : next)
+  nextTick(() => setCaret(props.maxLength ? Math.min(caretAfter, props.maxLength) : caretAfter))
 }
 
 const getSelectionOffsets = () => {
