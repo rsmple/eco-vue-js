@@ -5,7 +5,6 @@
     role="textbox"
     aria-multiline="true"
     spellcheck="false"
-    :textContent="textParts ? undefined : value"
     :placeholder="placeholder"
     class="relative whitespace-pre"
     @input="onInput"
@@ -102,6 +101,18 @@ const updateTextParts = () => {
 
 watch(() => props.textParts, updateTextParts, {immediate: true})
 
+const updateTextValue = (value: string) => {
+  if (props.textParts || !elementRef.value) return
+  
+  if (elementRef.value.textContent !== value) {
+    const offsets = getSelectionOffsets()
+    elementRef.value.textContent = value
+    if (focused.value) setCaret(offsets.start, offsets.end !== offsets.start ? undefined : offsets.end)
+  }
+}
+
+watch(() => props.value, updateTextValue, {immediate: true})
+
 const textPartsToText = (parts: TextPart[]): string => {
   return parts.map(part => typeof part === 'string' ? part : part.value).join('')
 }
@@ -147,7 +158,8 @@ const onInput = (e: Event) => {
 
     const substring = text.substring(0, props.maxLength)
 
-    if (e.target && !props.textParts) e.target.textContent = substring
+    if (!props.textParts) updateTextValue(substring)
+    else updateTextParts()
 
     emit('update:model-value', substring)
   } else {

@@ -231,7 +231,7 @@
 <script lang="ts" setup generic="Type extends InputType = 'text'">
 import type {InputProps, WrapSelection} from './types'
 
-import {computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch} from 'vue'
+import {computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch} from 'vue'
 
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 
@@ -239,8 +239,9 @@ import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 import {Notify} from '@/utils/Notify'
 import {useComponentStates} from '@/utils/useComponentStates'
 
-import ContentEditable from './components/ContentEditable.vue'
 import InputActions from './components/InputActions.vue'
+
+const ContentEditable = defineAsyncComponent(() => import('./components/ContentEditable.vue'))
 
 type ModelValue = Required<InputProps<Type>>['modelValue']
 
