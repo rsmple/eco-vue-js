@@ -65,10 +65,15 @@
         }"
         @click="focus"
       >
-        <slot
-          name="toolbar"
-          v-bind="{wrapSelection}"
-        />
+        <InputToolbar
+          v-if="textarea && rich"
+          @wrap-selection="wrapSelection"
+        >
+          <slot
+            name="toolbar"
+            v-bind="{wrapSelection}"
+          />
+        </InputToolbar>
 
         <div
           v-if="icon"
@@ -240,6 +245,8 @@ import {Notify} from '@/utils/Notify'
 import {useComponentStates} from '@/utils/useComponentStates'
 
 import InputActions from './components/InputActions.vue'
+
+const InputToolbar = defineAsyncComponent(() => import('./components/InputToolbar.vue'))
 
 const ContentEditable = defineAsyncComponent(() => import('./components/ContentEditable.vue'))
 

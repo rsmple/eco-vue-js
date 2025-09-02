@@ -35,6 +35,7 @@ export interface InputProps<Type extends InputType> extends Omit<FieldWrapperPro
   noWrap?: boolean
   textTransparent?: boolean
   textParts?: TextPart[]
+  rich?: boolean
 }
 
 export interface InputAsyncProps<Type extends InputType> extends InputProps<Type> {
@@ -63,9 +64,39 @@ export interface InputDateProps extends Omit<InputSuggestProps<'text'>, 'modelVa
   maxDate?: Date
 }
 
+export enum WrapSelectionType {
+  WRAP = 'WRAP',
+  LINE_PREFIX = 'LINE_PREFIX',
+  TOGGLE = 'TOGGLE'
+}
+
 export type WrapSelection = {
-  start?: string
-  end?: string
+  cursorOffset?: number
+} & ({
+  type: WrapSelectionType.WRAP
+  start: string
+  end: string
+} | {
+  type: WrapSelectionType.TOGGLE
+  start: string
+  end: string
+} | {
+  type: WrapSelectionType.LINE_PREFIX
+  linePrefix: string
+  lineTransform?: never
+  detectPattern?: never
+} | {
+  type: WrapSelectionType.LINE_PREFIX
+  linePrefix?: never
+  lineTransform: (line: string, index: number) => string
+  detectPattern?: RegExp
+})
+
+export type ToolbarAction = {
+  title?: string
+  icon?: SVGComponent
+  value: WrapSelection | {title?: string, icon?: SVGComponent, value: WrapSelection}[]
+  tooltip?: string
 }
 
 export type TextPart = {value: string, tag: keyof HTMLElementTagNameMap, edit?: boolean, class?: string} | string

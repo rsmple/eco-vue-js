@@ -17,9 +17,10 @@
 </template>
 
 <script lang="ts" setup>
-import type {TextPart, WrapSelection} from '../types'
-
 import {defineEmits, defineProps, nextTick, onMounted, ref, useTemplateRef, watch} from 'vue'
+
+import {linePrefixRegex} from '../models/toolbarActions'
+import {type TextPart, type WrapSelection, WrapSelectionType} from '../types'
 
 const props = defineProps<{
   value: string
@@ -239,24 +240,87 @@ const setCaret = (indexStart: number, indexEnd?: number) => {
 let offsetsOld: {start: number, end: number} | null = null
 
 const wrapSelection = (value: WrapSelection): void => {
-  const root = elementRef.value
-  if (!root) return
-
   let offsets = getSelectionOffsets()
   if (focused.value || !offsetsOld) offsetsOld = offsets
   else offsets = offsetsOld
   const currentText = getCurrentText() ?? ''
-  const selectedText = currentText.slice(offsets.start, offsets.end)
   
-  const beforeSelection = currentText.slice(0, offsets.start)
-  const afterSelection = currentText.slice(offsets.end)
+  let newText = ''
+  let newCursorStart = offsets.start
+  let newCursorEnd: number | undefined = undefined
   
-  const newText = beforeSelection + (value.start || '') + selectedText + (value.end || '') + afterSelection
-  
-  const cursorPosition = offsets.start + (value.end ? (value.start?.length ?? 0) + selectedText.length : 0)
+  switch (value.type) {
+    case WrapSelectionType.TOGGLE:
+      const startLen = value.start.length
+      const endLen = value.end.length
+      const textWithContext = currentText.slice(
+        Math.max(0, offsets.start - startLen),
+        Math.min(currentText.length, offsets.end + endLen),
+      )
+
+      if (textWithContext.startsWith(value.start) && textWithContext.endsWith(value.end)) {
+        const expandedStart = Math.max(0, offsets.start - startLen)
+        
+        newText = currentText.slice(0, expandedStart) + currentText.slice(offsets.start, offsets.end) + currentText.slice(Math.min(currentText.length, offsets.end + endLen))
+        newCursorStart = expandedStart
+        newCursorEnd = expandedStart + offsets.end - offsets.start
+      } else {
+        newText = currentText.slice(0, offsets.start) + value.start + currentText.slice(offsets.start, offsets.end) + value.end + currentText.slice(offsets.end)
+        newCursorStart = offsets.start + startLen
+        if (offsets.start !== offsets.end) newCursorEnd = newCursorStart + offsets.end - offsets.start
+      }
+      break
+
+    case WrapSelectionType.WRAP:
+      const wrappedText = value.start + currentText.slice(offsets.start, offsets.end) + value.end
+      newText = currentText.slice(0, offsets.start) + wrappedText + currentText.slice(offsets.end)
+      
+      if (value.cursorOffset !== undefined) {
+        newCursorStart = offsets.start + wrappedText.length + value.cursorOffset
+      } else if (offsets.start !== offsets.end) {
+        newCursorStart = offsets.start + value.start.length
+        newCursorEnd = newCursorStart + offsets.end - offsets.start
+      } else {
+        newCursorStart = offsets.start + value.start.length
+      }
+      break
+    
+    case WrapSelectionType.LINE_PREFIX: 
+      const lineStart = currentText.lastIndexOf('\n', offsets.start - 1) + 1
+      const lineEnd = currentText.indexOf('\n', offsets.end)
+      const actualLineEnd = lineEnd === -1 ? currentText.length : lineEnd
+      
+      const linesText = currentText.slice(lineStart, actualLineEnd)
+      const beforeLines = currentText.slice(0, lineStart)
+      const afterLines = currentText.slice(actualLineEnd)
+      
+      const lines = linesText.split('\n')
+      if (lines.length === 0) lines.push('')
+
+      const allLinesHavePrefix = value.detectPattern
+        ? lines.every(line => !line.trim() || value.detectPattern!.test(line))
+        : lines.every(line => !line.trim() || line.startsWith(value.linePrefix!))
+      
+      if (allLinesHavePrefix) {
+        const cleanText = lines.map(line => line.replace(linePrefixRegex, '')).join('\n')
+        newText = beforeLines + cleanText + afterLines
+        newCursorStart = lineStart
+        newCursorEnd = lineStart + cleanText.length
+      } else {
+        const processedLines: string[] = value.lineTransform
+          ? lines.map((line, index) => value.lineTransform(line, index))
+          : lines.map(line => line.trim() ? value.linePrefix + line.replace(linePrefixRegex, '') : line)
+
+        const processedText = processedLines.join('\n')
+        newText = beforeLines + processedText + afterLines
+        newCursorStart = lineStart
+        newCursorEnd = lineStart + processedText.length
+      }
+      break
+  }
   
   emit('update:model-value', newText)
-  nextTick(() => setCaret(cursorPosition))
+  nextTick(() => setCaret(newCursorStart, newCursorEnd))
 }
 
 const focus = () => {
