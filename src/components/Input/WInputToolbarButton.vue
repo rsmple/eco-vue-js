@@ -8,19 +8,17 @@
     <template #toggle>
       <InputToolbarButton
         :action="action"
-        @click="isOpen ? leave : enter"
         @mouseenter="enter"
         @mouseleave="leave"
       />
     </template>
 
     <template #content>
-      <WClickOutside
+      <div
         class="
           bg-default dark:bg-default-dark max-h-80 overflow-y-auto overscroll-y-contain rounded-xl
           text-start text-xs font-semibold shadow-md dark:border dark:border-solid dark:border-gray-800
         "
-        @click="leave"
         @mouseenter="enter"
         @mouseleave="leave"
         @mousedown.prevent=""
@@ -32,7 +30,7 @@
         >
           <component :is="item.icon" /> {{ item.title }}
         </WMenuItem>
-      </WClickOutside>
+      </div>
     </template>
   </WDropdownMenu>
 
@@ -48,7 +46,6 @@ import type {ToolbarAction, WrapSelection} from '@/components/Input/types'
 
 import {ref} from 'vue'
 
-import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 

@@ -261,7 +261,7 @@ const wrapSelection = (value: WrapSelection): void => {
         Math.min(currentText.length, offsets.end + endLen),
       )
 
-      if (textWithContext.startsWith(value.start) && textWithContext.endsWith(value.end)) {
+      if ((!value.start || textWithContext.startsWith(value.start)) && (!value.end || textWithContext.endsWith(value.end))) {
         const expandedStart = Math.max(0, offsets.start - startLen)
         
         newText = currentText.slice(0, expandedStart) + currentText.slice(offsets.start, offsets.end) + currentText.slice(Math.min(currentText.length, offsets.end + endLen))
@@ -270,9 +270,18 @@ const wrapSelection = (value: WrapSelection): void => {
         newCursorEnd = expandedStart + offsets.end - offsets.start
       } else {
         const p = value.prepare
-        newText = p
-          ? p(currentText.slice(0, offsets.start), 0) + value.start + p(currentText.slice(offsets.start, offsets.end), offsets.start) + value.end + p(currentText.slice(offsets.end), offsets.end)
-          : currentText.slice(0, offsets.start) + value.start + currentText.slice(offsets.start, offsets.end) + value.end + currentText.slice(offsets.end)
+
+        if (!value.start || !value.end) {
+          const offset = value.start ? offsets.start : offsets.end
+          newText = p
+            ? p(currentText.slice(0, offset), 0) + (value.start || value.end) + p(currentText.slice(offset), offset)
+            : currentText.slice(0, offset) + (value.start || value.end) + currentText.slice(offset)
+        } else {
+          newText = p
+            ? p(currentText.slice(0, offsets.start), 0) + value.start + p(currentText.slice(offsets.start, offsets.end), offsets.start) + value.end + p(currentText.slice(offsets.end), offsets.end)
+            : currentText.slice(0, offsets.start) + value.start + currentText.slice(offsets.start, offsets.end) + value.end + currentText.slice(offsets.end)
+        }
+        
         newCursorStart = offsets.start + startLen
         if (offsets.start !== offsets.end) newCursorEnd = newCursorStart + offsets.end - offsets.start
       }
