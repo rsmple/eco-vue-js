@@ -41,7 +41,7 @@ export const toolbarActionList: ToolbarAction[] = [
   },
   {
     icon: markRaw(IconCodeBlock),
-    value: {type: WrapSelectionType.TOGGLE, start: '```\n', end: '\n```'},
+    value: {type: WrapSelectionType.TOGGLE, start: '\n```\n', end: '\n```\n'},
     tooltip: 'Code block',
   },
   {
