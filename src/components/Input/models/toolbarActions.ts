@@ -1,3 +1,5 @@
+import type {ToolbarAction} from '../types'
+
 import {markRaw} from 'vue'
 
 import IconBold from '@/assets/icons/IconBold.svg?component'
@@ -12,71 +14,44 @@ import IconListNumbered from '@/assets/icons/IconListNumbered.svg?component'
 import IconQuote from '@/assets/icons/IconQuote.svg?component'
 import IconStrikethrough from '@/assets/icons/IconStrikethrough.svg?component'
 
-import {type ToolbarAction, WrapSelectionType} from '../types'
+import {WrapSelectionType} from '@/utils/utils'
 
 export const linePrefixRegex = /^-\s|^>\s|^\d+\.\s|^\[ \]\s|^#{1,6}\s/
 
 export const toolbarActionList: ToolbarAction[] = [
   {
     icon: markRaw(IconBold),
-    value: {
-      type: WrapSelectionType.TOGGLE,
-      start: '**',
-      end: '**',
-    },
+    value: {type: WrapSelectionType.TOGGLE, start: '**', end: '**'},
     tooltip: 'Bold',
   },
   {
     icon: markRaw(IconItalic),
-    value: {
-      type: WrapSelectionType.TOGGLE,
-      start: '_',
-      end: '_',
-    },
+    value: {type: WrapSelectionType.TOGGLE, start: '_', end: '_'},
     tooltip: 'Italic',
   },
   {
     icon: markRaw(IconStrikethrough),
-    value: {
-      type: WrapSelectionType.TOGGLE,
-      start: '~~',
-      end: '~~',
-    },
+    value: {type: WrapSelectionType.TOGGLE, start: '~~', end: '~~'},
     tooltip: 'Strikethrough',
   },
   {
     icon: markRaw(IconCodeInline),
-    value: {
-      type: WrapSelectionType.TOGGLE,
-      start: '`',
-      end: '`',
-    },
+    value: {type: WrapSelectionType.TOGGLE, start: '`', end: '`'},
     tooltip: 'Inline code',
   },
   {
     icon: markRaw(IconCodeBlock),
-    value: {
-      type: WrapSelectionType.TOGGLE,
-      start: '```\n',
-      end: '\n```',
-    },
+    value: {type: WrapSelectionType.TOGGLE, start: '```\n', end: '\n```'},
     tooltip: 'Code block',
   },
   {
     icon: markRaw(IconLink),
-    value: {
-      type: WrapSelectionType.TOGGLE,
-      start: '[',
-      end: '](url)',
-    },
+    value: {type: WrapSelectionType.TOGGLE, start: '[', end: '](url)'},
     tooltip: 'Insert link',
   },
   {
     icon: markRaw(IconListBullet),
-    value: {
-      type: WrapSelectionType.LINE_PREFIX,
-      linePrefix: '- ',
-    },
+    value: {type: WrapSelectionType.LINE_PREFIX, linePrefix: '- '},
     tooltip: 'Bullet list',
   },
   {
@@ -90,28 +65,19 @@ export const toolbarActionList: ToolbarAction[] = [
   },
   {
     icon: markRaw(IconListCheckbox),
-    value: {
-      type: WrapSelectionType.LINE_PREFIX,
-      linePrefix: '[ ] ',
-    },
+    value: {type: WrapSelectionType.LINE_PREFIX, linePrefix: '[ ] '},
     tooltip: 'Checkbox list',
   },
   {
     icon: markRaw(IconQuote),
-    value: {
-      type: WrapSelectionType.LINE_PREFIX,
-      linePrefix: '> ',
-    },
+    value: {type: WrapSelectionType.LINE_PREFIX, linePrefix: '> '},
     tooltip: 'Quote',
   },
   {
     icon: markRaw(IconHeading),
     value: Array(6).fill(null).map((_, index) => ({
       title: `H${ index + 1 }`,
-      value: {
-        type: WrapSelectionType.LINE_PREFIX,
-        linePrefix: `${ '#'.repeat(index + 1) } `,
-      },
+      value: {type: WrapSelectionType.LINE_PREFIX, linePrefix: `${ '#'.repeat(index + 1) } `},
     })),
   },
 ]

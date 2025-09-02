@@ -17,10 +17,13 @@
 </template>
 
 <script lang="ts" setup>
+import type {TextPart,  WrapSelection} from '../types'
+
 import {defineEmits, defineProps, nextTick, onMounted, ref, useTemplateRef, watch} from 'vue'
 
+import {WrapSelectionType} from '@/utils/utils'
+
 import {linePrefixRegex} from '../models/toolbarActions'
-import {type TextPart, type WrapSelection, WrapSelectionType} from '../types'
 
 const props = defineProps<{
   value: string

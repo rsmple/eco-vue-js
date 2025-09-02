@@ -1,5 +1,6 @@
 import type {DropdownMenuProps} from '../DropdownMenu/types'
 import type {FieldWrapperProps} from '@/components/FieldWrapper/types'
+import type {WrapSelectionType} from '@/utils/utils'
 import type {Component} from 'vue'
 
 export interface InputProps<Type extends InputType> extends Omit<FieldWrapperProps, 'modelValue'> {
@@ -36,6 +37,7 @@ export interface InputProps<Type extends InputType> extends Omit<FieldWrapperPro
   textTransparent?: boolean
   textParts?: TextPart[]
   rich?: boolean
+  toolbarActions?: ToolbarAction[]
 }
 
 export interface InputAsyncProps<Type extends InputType> extends InputProps<Type> {
@@ -62,11 +64,6 @@ export interface InputDateProps extends Omit<InputSuggestProps<'text'>, 'modelVa
   modelValue?: Date | undefined
   minDate?: Date
   maxDate?: Date
-}
-
-export enum WrapSelectionType {
-  LINE_PREFIX = 'LINE_PREFIX',
-  TOGGLE = 'TOGGLE'
 }
 
 export type WrapSelection = {

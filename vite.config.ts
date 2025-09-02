@@ -13,6 +13,10 @@ import {writeImports} from './build/write-imports'
 
 await writeImports()
 
+const tempDir = 'package/dist-temp'
+const finalDir = 'package/dist'
+const mainPath = 'src/main.ts'
+
 export default defineConfig(({mode}) => ({
   plugins: [
     dts({
@@ -27,15 +31,18 @@ export default defineConfig(({mode}) => ({
       closeBundle() {
         if (mode !== 'development') return
 
-        const tempDir = 'package/dist-temp'
-        const finalDir = 'package/dist'
-
         if (existsSync(tempDir)) {
           if (existsSync(finalDir)) {
             rmSync(finalDir, {recursive: true, force: true})
           }
           renameSync(tempDir, finalDir)
         }
+      },
+    },
+    {
+      name: 'remove-main',
+      closeBundle() {
+        if (existsSync(mainPath)) rmSync(mainPath)
       },
     },
   ],

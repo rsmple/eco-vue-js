@@ -66,7 +66,9 @@
         @click="focus"
       >
         <InputToolbar
-          v-if="textarea && rich"
+          v-if="textarea && (rich || toolbarActions || $slots.toolbar)"
+          :list="toolbarActions"
+          :rich="rich === true"
           @wrap-selection="wrapSelection"
         >
           <slot

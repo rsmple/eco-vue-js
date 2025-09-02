@@ -8,11 +8,17 @@
   >
     <slot />
 
-    <template
-      v-for="(action, index) in toolbarActionList"
+    <InputToolbarItem
+      v-for="(action, index) in list"
       :key="index"
-    >
+      :action="action"
+      @wrap-selection="$emit('wrap-selection', $event)"
+    />
+
+    <template v-if="rich">
       <InputToolbarItem
+        v-for="(action, index) in toolbarActionList"
+        :key="index"
         :action="action"
         @wrap-selection="$emit('wrap-selection', $event)"
       />
@@ -21,11 +27,16 @@
 </template>
 
 <script setup lang="ts">
-import type {WrapSelection} from '@/components/Input/types'
+import type {ToolbarAction, WrapSelection} from '@/components/Input/types'
 
 import InputToolbarItem from './InputToolbarItem.vue'
 
 import {toolbarActionList} from '../models/toolbarActions'
+
+defineProps<{
+  list: ToolbarAction[] | undefined
+  rich: boolean
+}>()
 
 defineEmits<{
   (e: 'wrap-selection', value: WrapSelection): void
