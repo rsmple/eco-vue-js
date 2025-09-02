@@ -26,7 +26,7 @@ export const toolbarActionList: ToolbarAction[] = [
   },
   {
     icon: markRaw(IconItalic),
-    value: {type: WrapSelectionType.TOGGLE, start: '_', end: '_'},
+    value: {type: WrapSelectionType.TOGGLE, start: ' _', end: '_ '},
     tooltip: 'Italic',
   },
   {
