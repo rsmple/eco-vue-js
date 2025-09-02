@@ -2,6 +2,8 @@
   <button
     class="text-accent w-ripple w-ripple-hover group/toolbar first-not:-ml-px relative pb-1 pt-2"
     @click="$emit('click', $event)"
+    @mouseenter="$emit('mouseenter', $event)"
+    @mouseleave="$emit('mouseleave', $event)"
   >
     <div class="border-r border-solid border-gray-300 px-2 group-last/toolbar:border-r-0 dark:border-gray-600">
       <component
@@ -29,5 +31,7 @@ defineProps<{
 
 defineEmits<{
   (e: 'click', value: MouseEvent): void
+  (e: 'mouseenter', value: MouseEvent): void
+  (e: 'mouseleave', value: MouseEvent): void
 }>()
 </script>

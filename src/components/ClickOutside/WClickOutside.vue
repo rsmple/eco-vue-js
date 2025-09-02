@@ -1,5 +1,10 @@
 <template>
-  <div ref="element">
+  <div
+    ref="element"
+    @mouseenter="$emit('mouseenter', $event)"
+    @mouseleave="$emit('mouseleave', $event)"
+    @mousedown="$emit('mousedown', $event)"
+  >
     <slot />
   </div>
 </template>
@@ -15,6 +20,9 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'click'): void
+  (e: 'mouseenter', value: MouseEvent): void
+  (e: 'mouseleave', value: MouseEvent): void
+  (e: 'mousedown', value: MouseEvent): void
 }>()
 
 const elementRef = useTemplateRef('element')

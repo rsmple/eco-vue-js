@@ -270,20 +270,6 @@ const wrapSelection = (value: WrapSelection): void => {
         if (offsets.start !== offsets.end) newCursorEnd = newCursorStart + offsets.end - offsets.start
       }
       break
-
-    case WrapSelectionType.WRAP:
-      const wrappedText = value.start + currentText.slice(offsets.start, offsets.end) + value.end
-      newText = currentText.slice(0, offsets.start) + wrappedText + currentText.slice(offsets.end)
-      
-      if (value.cursorOffset !== undefined) {
-        newCursorStart = offsets.start + wrappedText.length + value.cursorOffset
-      } else if (offsets.start !== offsets.end) {
-        newCursorStart = offsets.start + value.start.length
-        newCursorEnd = newCursorStart + offsets.end - offsets.start
-      } else {
-        newCursorStart = offsets.start + value.start.length
-      }
-      break
     
     case WrapSelectionType.LINE_PREFIX: 
       const lineStart = currentText.lastIndexOf('\n', offsets.start - 1) + 1

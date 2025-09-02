@@ -65,10 +65,9 @@ export const toolbarActionList: ToolbarAction[] = [
   {
     icon: markRaw(IconLink),
     value: {
-      type: WrapSelectionType.WRAP,
+      type: WrapSelectionType.TOGGLE,
       start: '[',
       end: '](url)',
-      cursorOffset: -4,
     },
     tooltip: 'Insert link',
   },

@@ -3,21 +3,27 @@
     v-if="Array.isArray(action.value)"
     :is-open="isOpen"
     :horizontal-align="HorizontalAlign.CENTER"
+    top
   >
     <template #toggle>
       <InputToolbarButton
         :action="action"
-        @click="isOpen = !isOpen"
+        @click="isOpen ? leave : enter"
+        @mouseenter="enter"
+        @mouseleave="leave"
       />
     </template>
 
     <template #content>
       <WClickOutside
         class="
-          bg-default dark:bg-default-dark overflow-hidden rounded-xl
-          text-start text-xs font-normal shadow-md dark:border dark:border-solid dark:border-gray-800
+          bg-default dark:bg-default-dark max-h-80 overflow-y-auto overscroll-y-contain rounded-xl
+          text-start text-xs font-semibold shadow-md dark:border dark:border-solid dark:border-gray-800
         "
-        @click="isOpen = false"
+        @click="leave"
+        @mouseenter="enter"
+        @mouseleave="leave"
+        @mousedown.prevent=""
       >
         <WMenuItem
           v-for="(item, index) in action.value"
@@ -59,4 +65,27 @@ defineEmits<{
 }>()
 
 const isOpen = ref(false)
+
+let timeout: NodeJS.Timeout | null = null
+
+const enter = () => {
+  if (timeout) {
+    clearTimeout(timeout)
+    timeout = null
+  }
+
+  isOpen.value = true
+}
+
+const leave = () => {
+  if (timeout) {
+    clearTimeout(timeout)
+    timeout = null
+  }
+
+  timeout = setTimeout(() => {
+    isOpen.value = false
+    timeout = null
+  })
+}
 </script>

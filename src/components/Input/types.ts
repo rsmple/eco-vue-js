@@ -65,18 +65,11 @@ export interface InputDateProps extends Omit<InputSuggestProps<'text'>, 'modelVa
 }
 
 export enum WrapSelectionType {
-  WRAP = 'WRAP',
   LINE_PREFIX = 'LINE_PREFIX',
   TOGGLE = 'TOGGLE'
 }
 
 export type WrapSelection = {
-  cursorOffset?: number
-} & ({
-  type: WrapSelectionType.WRAP
-  start: string
-  end: string
-} | {
   type: WrapSelectionType.TOGGLE
   start: string
   end: string
@@ -90,7 +83,7 @@ export type WrapSelection = {
   linePrefix?: never
   lineTransform: (line: string, index: number) => string
   detectPattern?: RegExp
-})
+}
 
 export type ToolbarAction = {
   title?: string
