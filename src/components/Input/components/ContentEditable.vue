@@ -265,10 +265,14 @@ const wrapSelection = (value: WrapSelection): void => {
         const expandedStart = Math.max(0, offsets.start - startLen)
         
         newText = currentText.slice(0, expandedStart) + currentText.slice(offsets.start, offsets.end) + currentText.slice(Math.min(currentText.length, offsets.end + endLen))
+        if (value.prepare) newText = value.prepare(newText, 0)
         newCursorStart = expandedStart
         newCursorEnd = expandedStart + offsets.end - offsets.start
       } else {
-        newText = currentText.slice(0, offsets.start) + value.start + currentText.slice(offsets.start, offsets.end) + value.end + currentText.slice(offsets.end)
+        const p = value.prepare
+        newText = p
+          ? p(currentText.slice(0, offsets.start), 0) + value.start + p(currentText.slice(offsets.start, offsets.end), offsets.start) + value.end + p(currentText.slice(offsets.end), offsets.end)
+          : currentText.slice(0, offsets.start) + value.start + currentText.slice(offsets.start, offsets.end) + value.end + currentText.slice(offsets.end)
         newCursorStart = offsets.start + startLen
         if (offsets.start !== offsets.end) newCursorEnd = newCursorStart + offsets.end - offsets.start
       }

@@ -54,7 +54,7 @@ import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 
-import InputToolbarButton from './InputToolbarButton.vue'
+import InputToolbarButton from './components/InputToolbarButton.vue'
 
 defineProps<{
   action: ToolbarAction

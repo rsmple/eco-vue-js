@@ -8,7 +8,7 @@
   >
     <slot />
 
-    <InputToolbarItem
+    <WInputToolbarButton
       v-for="(action, index) in list"
       :key="index"
       :action="action"
@@ -16,7 +16,7 @@
     />
 
     <template v-if="rich">
-      <InputToolbarItem
+      <WInputToolbarButton
         v-for="(action, index) in toolbarActionList"
         :key="index"
         :action="action"
@@ -29,8 +29,7 @@
 <script setup lang="ts">
 import type {ToolbarAction, WrapSelection} from '@/components/Input/types'
 
-import InputToolbarItem from './InputToolbarItem.vue'
-
+import WInputToolbarButton from '../WInputToolbarButton.vue'
 import {toolbarActionList} from '../models/toolbarActions'
 
 defineProps<{
