@@ -264,9 +264,18 @@ const wrapSelection = (value: WrapSelection): void => {
       )
 
       if ((!value.start || textWithContext.startsWith(value.start)) && (!value.end || textWithContext.endsWith(value.end))) {
-        const expandedStart = Math.max(0, offsets.start - startLen)
-        
-        newText = currentText.slice(0, expandedStart) + currentText.slice(offsets.start, offsets.end) + currentText.slice(Math.min(currentText.length, offsets.end + endLen))
+        let expandedStart = Math.max(0, offsets.start - startLen)
+        let start = currentText.slice(0, expandedStart)
+        const middle = currentText.slice(offsets.start, offsets.end)
+        let end = currentText.slice(Math.min(currentText.length, offsets.end + endLen))
+        for (const item of collapseList) {
+          if (value.start.startsWith(item) && !start.endsWith(item) && !middle.startsWith(item)) {
+            start += item
+            expandedStart += item.length
+          }
+          if (value.end.endsWith(item) && !end.startsWith(item) && !middle.endsWith(item)) end = item + end
+        }
+        newText = start + middle + end
         if (value.prepare) newText = value.prepare(newText, 0)
         newCursorStart = expandedStart
         newCursorEnd = expandedStart + offsets.end - offsets.start
@@ -276,7 +285,10 @@ const wrapSelection = (value: WrapSelection): void => {
           let start = currentText.slice(0, offset)
           let end = currentText.slice(offset)
           for (const item of collapseList) {
-            if (value.start.startsWith(item) && start.endsWith(item)) start = start.slice(0, offsets.start - item.length)
+            if (value.start.startsWith(item) && start.endsWith(item)) {
+              start = start.slice(0, offsets.start - item.length)
+              startLen -= item.length
+            }
             if (value.end.endsWith(item) && end.startsWith(item)) end = end.slice(item.length)
           }
           newText = (value.prepare?.(start, 0) ?? start) + (value.start || value.end) + (value.prepare?.(end, offset) ?? end)
