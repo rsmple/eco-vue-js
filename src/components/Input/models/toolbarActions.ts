@@ -9,7 +9,7 @@ import IconHeading from '@/assets/icons/IconHeading.svg?component'
 import IconItalic from '@/assets/icons/IconItalic.svg?component'
 import IconLink from '@/assets/icons/IconLink.svg?component'
 import IconListBullet from '@/assets/icons/IconListBullet.svg?component'
-import IconListCheckbox from '@/assets/icons/IconListCheckbox.svg?component'
+// import IconListCheckbox from '@/assets/icons/IconListCheckbox.svg?component'
 import IconListDecrease from '@/assets/icons/IconListDecrease.svg?component'
 import IconListIncrease from '@/assets/icons/IconListIncrease.svg?component'
 import IconListNumbered from '@/assets/icons/IconListNumbered.svg?component'
@@ -21,6 +21,7 @@ import {WrapSelectionType} from '@/utils/utils'
 
 export const linePrefixRegex = /^-\s|^>\s|^\d+\.\s|^\[ \]\s|^#{1,6}\s/
 export const indentRegex = /^(\s*)/
+const tableDividerRowRegex = /^\s*\|(\s*-+\s*\|)+\s*$/
 
 export const preserveIndentation = (line: string, newPrefix: string): string => {
   const indent = line.match(indentRegex)?.[1] ?? ''
@@ -74,11 +75,11 @@ export const toolbarActionList: ToolbarAction[] = [
     },
     tooltip: 'Numbered list',
   },
-  {
-    icon: markRaw(IconListCheckbox),
-    value: {type: WrapSelectionType.LINE_PREFIX, linePrefix: '[ ] '},
-    tooltip: 'Checkbox list',
-  },
+  // {
+  //   icon: markRaw(IconListCheckbox),
+  //   value: {type: WrapSelectionType.LINE_PREFIX, linePrefix: '[ ] '},
+  //   tooltip: 'Checkbox list',
+  // },
   {
     icon: markRaw(IconListIncrease),
     value: {type: WrapSelectionType.LINE_PREFIX, lineTransform: line => indent + line},
@@ -97,22 +98,50 @@ export const toolbarActionList: ToolbarAction[] = [
   {
     icon: markRaw(IconTable),
     value: {type: WrapSelectionType.LINE_PREFIX, lineTransform: (line, index, _lines) => {
-      const lines = _lines as string[] & {indent: string, maxLength: number}
-      if (lines.indent === undefined || lines.maxLength === undefined) {
+      const lines = _lines as string[] & {indent: string, columns: number[], items: string[][]}
+      if (lines.indent === undefined || lines.columns === undefined) {
+        if (lines.length === 1 && !lines[0].trim()) lines.push('header|header')
+        else if (lines[1] && tableDividerRowRegex.test(lines[1])) lines.splice(1, 1)
+
         lines.indent = ''
-        lines.maxLength = 0
-        lines.forEach((item) => {
+        lines.columns = []
+        lines.items = []
+
+        for (const item of lines) {
           const match = item.match(indentRegex)?.[1] ?? ''
           if (match.length > lines.indent.length) lines.indent = match
-          const length = item.length - match.length
-          if (length > lines.maxLength) lines.maxLength = length
-        }, '')
+
+          const currentItems: string[] = []
+          lines.items.push(currentItems)
+
+          const splitted = item.trim().split('|')
+          if (splitted[0] === '') splitted.shift()
+          if (splitted[splitted.length - 1] === '') splitted.pop()
+          for (let col = 0; col < splitted.length; col++) {
+            const prepared = splitted[col].trim()
+            currentItems.push(prepared)
+
+            const length = prepared.length
+            if (lines.columns[col] === undefined) {
+              lines.columns.push(Math.max(length, 1))
+            } else if (lines.columns[col] < length) {
+              lines.columns.splice(col, 1, length)
+            }
+          }
+        }
       }
-      
-      const cleanLine = line.replace(indentRegex, '').replace(linePrefixRegex, '') || (index === 0 ? 'header' : '')
-      return `${ lines.indent }| ${ cleanLine.padEnd(lines.maxLength, ' ') } |${ index === 0 ? `\n${ lines.indent }| ${ '-'.repeat(lines.maxLength) } |` : '' }${ lines.length === 1 ? `\n${ lines.indent }| ${ ' '.repeat(lines.maxLength) } |` : '' }`
+
+      return `${
+        lines.indent
+      }${
+        lines.columns.reduce((result, length, col) => `${ result } ${ (lines.items[index]?.[col] ?? '').padEnd(length || 1, ' ') } |`, '|')
+      }${
+        index === 0 ? `\n${ lines.indent }${ lines.columns.reduce((result, length) => `${ result } ${ '-'.repeat(length || 1) } |`, '|') }` : ''
+      }${
+        lines.length === 1 ? `\n${ lines.indent }| ${ lines.columns.reduce((result, length) => `${ result } ${ ' '.repeat(length || 1) } |`, '|') } |` : ''
+      }`
     }},
-    tooltip: 'Insert table',
+    tooltip: 'Insert table / Align table',
   },
   {
     icon: markRaw(IconHeading),
