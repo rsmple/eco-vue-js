@@ -16,6 +16,7 @@ import IconListNumbered from '@/assets/icons/IconListNumbered.svg?component'
 import IconQuote from '@/assets/icons/IconQuote.svg?component'
 import IconStrikethrough from '@/assets/icons/IconStrikethrough.svg?component'
 import IconTable from '@/assets/icons/IconTable.svg?component'
+import IconTableCollapsed from '@/assets/icons/IconTableCollapsed.svg?component'
 
 import {WrapSelectionType} from '@/utils/utils'
 
@@ -29,6 +30,50 @@ export const preserveIndentation = (line: string, newPrefix: string): string => 
 }
 
 const indent = '  '
+
+const insertTable = (lines: string[], collapsed?: boolean): string => {
+  let indent = ''
+  const columns: number[] = []
+  const items: string[][] = []
+
+  if (lines.length === 1 && !lines[0].trim()) lines.push('header|header')
+  else if (lines[1] && tableDividerRowRegex.test(lines[1])) lines.splice(1, 1)
+
+  for (const item of lines) {
+    const match = item.match(indentRegex)?.[1] ?? ''
+    if (match.length > indent.length) indent = match
+
+    const currentItems: string[] = []
+    items.push(currentItems)
+
+    const splitted = item.trim().split('|')
+    if (splitted[0] === '') splitted.shift()
+    if (splitted[splitted.length - 1] === '') splitted.pop()
+    for (let col = 0; col < splitted.length; col++) {
+      const prepared = splitted[col].trim()
+      currentItems.push(prepared)
+
+      const length = collapsed ? 0 : prepared.length
+      if (columns[col] === undefined) {
+        columns.push(length)
+      } else if (!collapsed && columns[col] < length) {
+        columns.splice(col, 1, length)
+      }
+    }
+  }
+
+  const s = collapsed ? '' : ' '
+
+  return items.map((splitted, index) => `${
+    indent
+  }${
+    columns.reduce((result, length, col) => `${ result }${ s }${ (splitted[col] ?? '').padEnd(length, ' ') }${ s }|`, '|')
+  }${
+    index === 0 ? `\n${ indent }${ columns.reduce((result, length) => `${ result }${ s }${ '-'.repeat(length || 1) }${ s }|`, '|') }` : ''
+  }${
+    lines.length === 1 ? `\n${ indent }| ${ columns.reduce((result, length) => `${ result }${ s }${ length === 0 ? '' : ' '.repeat(length) }${ s }|`, '|') } |` : ''
+  }`).join('\n')
+}
 
 export const toolbarActionList: ToolbarAction[] = [
   {
@@ -97,48 +142,13 @@ export const toolbarActionList: ToolbarAction[] = [
   },
   {
     icon: markRaw(IconTable),
-    value: {type: WrapSelectionType.LINE_PREFIX, lineTransformAll: lines => {
-      let indent = ''
-      const columns: number[] = []
-      const items: string[][] = []
-
-      if (lines.length === 1 && !lines[0].trim()) lines.push('header|header')
-      else if (lines[1] && tableDividerRowRegex.test(lines[1])) lines.splice(1, 1)
-
-      for (const item of lines) {
-        const match = item.match(indentRegex)?.[1] ?? ''
-        if (match.length > indent.length) indent = match
-
-        const currentItems: string[] = []
-        items.push(currentItems)
-
-        const splitted = item.trim().split('|')
-        if (splitted[0] === '') splitted.shift()
-        if (splitted[splitted.length - 1] === '') splitted.pop()
-        for (let col = 0; col < splitted.length; col++) {
-          const prepared = splitted[col].trim()
-          currentItems.push(prepared)
-
-          const length = prepared.length
-          if (columns[col] === undefined) {
-            columns.push(Math.max(length, 1))
-          } else if (columns[col] < length) {
-            columns.splice(col, 1, length)
-          }
-        }
-      }
-
-      return items.map((splitted, index) => `${
-        indent
-      }${
-        columns.reduce((result, length, col) => `${ result } ${ (splitted[col] ?? '').padEnd(length || 1, ' ') } |`, '|')
-      }${
-        index === 0 ? `\n${ indent }${ columns.reduce((result, length) => `${ result } ${ '-'.repeat(length || 1) } |`, '|') }` : ''
-      }${
-        lines.length === 1 ? `\n${ indent }| ${ columns.reduce((result, length) => `${ result } ${ ' '.repeat(length || 1) } |`, '|') } |` : ''
-      }`).join('\n')
-    }},
+    value: {type: WrapSelectionType.LINE_PREFIX, lineTransformAll: insertTable},
     tooltip: 'Insert table / Align table',
+  },
+  {
+    icon: markRaw(IconTableCollapsed),
+    value: {type: WrapSelectionType.LINE_PREFIX, lineTransformAll: lines => insertTable(lines, true)},
+    tooltip: 'Collapse table',
   },
   {
     icon: markRaw(IconHeading),
