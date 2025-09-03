@@ -20,6 +20,12 @@ import IconTable from '@/assets/icons/IconTable.svg?component'
 import {WrapSelectionType} from '@/utils/utils'
 
 export const linePrefixRegex = /^-\s|^>\s|^\d+\.\s|^\[ \]\s|^#{1,6}\s/
+export const indentRegex = /^(\s*)/
+
+export const preserveIndentation = (line: string, newPrefix: string): string => {
+  const indent = line.match(indentRegex)?.[1] ?? ''
+  return indent + newPrefix + (indent ? line.slice(indent.length) : line).replace(linePrefixRegex, '')
+}
 
 const indent = '  '
 
@@ -64,7 +70,7 @@ export const toolbarActionList: ToolbarAction[] = [
     value: {
       type: WrapSelectionType.LINE_PREFIX,
       detectPattern: /^\d+\.\s/,
-      lineTransform: (line, index) => `${ index + 1 }. ${ line.replace(linePrefixRegex, '') }`,
+      lineTransform: (line, index) => preserveIndentation(line, `${ index + 1 }. `),
     },
     tooltip: 'Numbered list',
   },
@@ -90,9 +96,21 @@ export const toolbarActionList: ToolbarAction[] = [
   },
   {
     icon: markRaw(IconTable),
-    value: {type: WrapSelectionType.LINE_PREFIX, lineTransform: (line, index) => {
-      line = line.replace(linePrefixRegex, '')
-      return `| ${ line } |${ index === 0 ? `\n| ${ '-'.repeat(line.length) } |` : '' }`
+    value: {type: WrapSelectionType.LINE_PREFIX, lineTransform: (line, index, _lines) => {
+      const lines = _lines as string[] & {indent: string, maxLength: number}
+      if (lines.indent === undefined || lines.maxLength === undefined) {
+        lines.indent = ''
+        lines.maxLength = 0
+        lines.forEach((item) => {
+          const match = item.match(indentRegex)?.[1] ?? ''
+          if (match.length > lines.indent.length) lines.indent = match
+          const length = item.length - match.length
+          if (length > lines.maxLength) lines.maxLength = length
+        }, '')
+      }
+      
+      const cleanLine = line.replace(indentRegex, '').replace(linePrefixRegex, '') || (index === 0 ? 'header' : '')
+      return `${ lines.indent }| ${ cleanLine.padEnd(lines.maxLength, ' ') } |${ index === 0 ? `\n${ lines.indent }| ${ '-'.repeat(lines.maxLength) } |` : '' }${ lines.length === 1 ? `\n${ lines.indent }| ${ ' '.repeat(lines.maxLength) } |` : '' }`
     }},
     tooltip: 'Insert table',
   },

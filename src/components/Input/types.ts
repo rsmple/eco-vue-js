@@ -79,7 +79,7 @@ export type WrapSelection = {
 } | {
   type: WrapSelectionType.LINE_PREFIX
   linePrefix?: never
-  lineTransform: (line: string, index: number) => string
+  lineTransform: (line: string, index: number, lines: string[]) => string
   detectPattern?: RegExp
 }
 

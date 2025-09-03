@@ -23,7 +23,7 @@ import {defineEmits, defineProps, nextTick, onMounted, ref, useTemplateRef, watc
 
 import {WrapSelectionType} from '@/utils/utils'
 
-import {linePrefixRegex} from '../models/toolbarActions'
+import {preserveIndentation} from '../models/toolbarActions'
 
 const props = defineProps<{
   value: string
@@ -330,14 +330,14 @@ const wrapSelection = (value: WrapSelection): void => {
           : false
       
       if (allLinesHavePrefix) {
-        const cleanText = lines.map(line => line.replace(linePrefixRegex, '')).join('\n')
+        const cleanText = lines.map(line => preserveIndentation(line, '')).join('\n')
         newText = beforeLines + cleanText + afterLines
         newCursorStart = lineStart
         newCursorEnd = lineStart + cleanText.length
       } else {
         const processedLines: string[] = value.lineTransform
-          ? lines.map((line, index) => value.lineTransform(line, index))
-          : lines.map(line => line.trim() ? value.linePrefix + line.replace(linePrefixRegex, '') : line)
+          ? lines.map(value.lineTransform)
+          : lines.map(line => line.trim() ? preserveIndentation(line, value.linePrefix) : line)
 
         const processedText = processedLines.join('\n')
         newText = beforeLines + processedText + afterLines
