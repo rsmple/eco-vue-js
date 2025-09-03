@@ -10,13 +10,18 @@ import IconItalic from '@/assets/icons/IconItalic.svg?component'
 import IconLink from '@/assets/icons/IconLink.svg?component'
 import IconListBullet from '@/assets/icons/IconListBullet.svg?component'
 import IconListCheckbox from '@/assets/icons/IconListCheckbox.svg?component'
+import IconListDecrease from '@/assets/icons/IconListDecrease.svg?component'
+import IconListIncrease from '@/assets/icons/IconListIncrease.svg?component'
 import IconListNumbered from '@/assets/icons/IconListNumbered.svg?component'
 import IconQuote from '@/assets/icons/IconQuote.svg?component'
 import IconStrikethrough from '@/assets/icons/IconStrikethrough.svg?component'
+import IconTable from '@/assets/icons/IconTable.svg?component'
 
 import {WrapSelectionType} from '@/utils/utils'
 
 export const linePrefixRegex = /^-\s|^>\s|^\d+\.\s|^\[ \]\s|^#{1,6}\s/
+
+const indent = '  '
 
 export const toolbarActionList: ToolbarAction[] = [
   {
@@ -59,7 +64,7 @@ export const toolbarActionList: ToolbarAction[] = [
     value: {
       type: WrapSelectionType.LINE_PREFIX,
       detectPattern: /^\d+\.\s/,
-      lineTransform: (line: string, index: number) => `${ index + 1 }. ${ line.replace(linePrefixRegex, '') }`,
+      lineTransform: (line, index) => `${ index + 1 }. ${ line.replace(linePrefixRegex, '') }`,
     },
     tooltip: 'Numbered list',
   },
@@ -69,9 +74,27 @@ export const toolbarActionList: ToolbarAction[] = [
     tooltip: 'Checkbox list',
   },
   {
+    icon: markRaw(IconListIncrease),
+    value: {type: WrapSelectionType.LINE_PREFIX, lineTransform: line => indent + line},
+    tooltip: 'Increase indent',
+  },
+  {
+    icon: markRaw(IconListDecrease),
+    value: {type: WrapSelectionType.LINE_PREFIX, lineTransform: line => line.startsWith(indent) ? line.slice(indent.length) : line},
+    tooltip: 'Decrease indent',
+  },
+  {
     icon: markRaw(IconQuote),
     value: {type: WrapSelectionType.LINE_PREFIX, linePrefix: '> '},
     tooltip: 'Quote',
+  },
+  {
+    icon: markRaw(IconTable),
+    value: {type: WrapSelectionType.LINE_PREFIX, lineTransform: (line, index) => {
+      line = line.replace(linePrefixRegex, '')
+      return `| ${ line } |${ index === 0 ? `\n| ${ '-'.repeat(line.length) } |` : '' }`
+    }},
+    tooltip: 'Insert table',
   },
   {
     icon: markRaw(IconHeading),

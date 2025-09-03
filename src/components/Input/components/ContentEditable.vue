@@ -325,7 +325,9 @@ const wrapSelection = (value: WrapSelection): void => {
 
       const allLinesHavePrefix = value.detectPattern
         ? lines.every(line => !line.trim() || value.detectPattern!.test(line))
-        : lines.every(line => !line.trim() || line.startsWith(value.linePrefix!))
+        : value.linePrefix
+          ? lines.every(line => !line.trim() || line.startsWith(value.linePrefix))
+          : false
       
       if (allLinesHavePrefix) {
         const cleanText = lines.map(line => line.replace(linePrefixRegex, '')).join('\n')

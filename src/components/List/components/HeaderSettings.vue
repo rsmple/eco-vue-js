@@ -5,7 +5,7 @@
   >
     <template #toggle>
       <WButtonSelectionAction
-        :icon="markRaw(IconTableSettings)"
+        :icon="markRaw(IconListSettings)"
         :disabled="disabled"
         :active="isOpen"
         @click="isOpen = !isOpen"
@@ -77,7 +77,7 @@ import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.v
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 
-import IconTableSettings from '@/assets/icons/IconTableSettings.svg?component'
+import IconListSettings from '@/assets/icons/IconListSettings.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {type ListMode} from '@/utils/utils'

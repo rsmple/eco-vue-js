@@ -1,7 +1,7 @@
 import {type MaybeRef, computed, isRef, markRaw, ref, unref, watch} from 'vue'
 
 import IconGrid from '@/assets/icons/IconGrid.svg?component'
-import IconTable from '@/assets/icons/IconTable.svg?component'
+import IconList from '@/assets/icons/IconList.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
 import {ListMode} from '@/utils/utils'
@@ -22,7 +22,7 @@ const parseListMode = (value: unknown): ListMode | undefined => {
 }
 
 export const listModeIconMap: Record<ListMode, SVGComponent> = {
-  [ListMode.TABLE]: markRaw(IconTable),
+  [ListMode.TABLE]: markRaw(IconList),
   [ListMode.GRID]: markRaw(IconGrid),
 }
 
