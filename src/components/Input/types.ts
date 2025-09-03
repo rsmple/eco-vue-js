@@ -70,6 +70,7 @@ export type WrapSelection = {
   type: WrapSelectionType.TOGGLE
   start: string
   end: string
+  prepare?: (previousValue: string, offset: number) => string
 } | {
   type: WrapSelectionType.LINE_PREFIX
   linePrefix: string
