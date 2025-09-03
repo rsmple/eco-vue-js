@@ -97,49 +97,46 @@ export const toolbarActionList: ToolbarAction[] = [
   },
   {
     icon: markRaw(IconTable),
-    value: {type: WrapSelectionType.LINE_PREFIX, lineTransform: (line, index, _lines) => {
-      const lines = _lines as string[] & {indent: string, columns: number[], items: string[][]}
-      if (lines.indent === undefined || lines.columns === undefined) {
-        if (lines.length === 1 && !lines[0].trim()) lines.push('header|header')
-        else if (lines[1] && tableDividerRowRegex.test(lines[1])) lines.splice(1, 1)
+    value: {type: WrapSelectionType.LINE_PREFIX, lineTransformAll: lines => {
+      let indent = ''
+      const columns: number[] = []
+      const items: string[][] = []
 
-        lines.indent = ''
-        lines.columns = []
-        lines.items = []
+      if (lines.length === 1 && !lines[0].trim()) lines.push('header|header')
+      else if (lines[1] && tableDividerRowRegex.test(lines[1])) lines.splice(1, 1)
 
-        for (const item of lines) {
-          const match = item.match(indentRegex)?.[1] ?? ''
-          if (match.length > lines.indent.length) lines.indent = match
+      for (const item of lines) {
+        const match = item.match(indentRegex)?.[1] ?? ''
+        if (match.length > indent.length) indent = match
 
-          const currentItems: string[] = []
-          lines.items.push(currentItems)
+        const currentItems: string[] = []
+        items.push(currentItems)
 
-          const splitted = item.trim().split('|')
-          if (splitted[0] === '') splitted.shift()
-          if (splitted[splitted.length - 1] === '') splitted.pop()
-          for (let col = 0; col < splitted.length; col++) {
-            const prepared = splitted[col].trim()
-            currentItems.push(prepared)
+        const splitted = item.trim().split('|')
+        if (splitted[0] === '') splitted.shift()
+        if (splitted[splitted.length - 1] === '') splitted.pop()
+        for (let col = 0; col < splitted.length; col++) {
+          const prepared = splitted[col].trim()
+          currentItems.push(prepared)
 
-            const length = prepared.length
-            if (lines.columns[col] === undefined) {
-              lines.columns.push(Math.max(length, 1))
-            } else if (lines.columns[col] < length) {
-              lines.columns.splice(col, 1, length)
-            }
+          const length = prepared.length
+          if (columns[col] === undefined) {
+            columns.push(Math.max(length, 1))
+          } else if (columns[col] < length) {
+            columns.splice(col, 1, length)
           }
         }
       }
 
-      return `${
-        lines.indent
+      return items.map((splitted, index) => `${
+        indent
       }${
-        lines.columns.reduce((result, length, col) => `${ result } ${ (lines.items[index]?.[col] ?? '').padEnd(length || 1, ' ') } |`, '|')
+        columns.reduce((result, length, col) => `${ result } ${ (splitted[col] ?? '').padEnd(length || 1, ' ') } |`, '|')
       }${
-        index === 0 ? `\n${ lines.indent }${ lines.columns.reduce((result, length) => `${ result } ${ '-'.repeat(length || 1) } |`, '|') }` : ''
+        index === 0 ? `\n${ indent }${ columns.reduce((result, length) => `${ result } ${ '-'.repeat(length || 1) } |`, '|') }` : ''
       }${
-        lines.length === 1 ? `\n${ lines.indent }| ${ lines.columns.reduce((result, length) => `${ result } ${ ' '.repeat(length || 1) } |`, '|') } |` : ''
-      }`
+        lines.length === 1 ? `\n${ indent }| ${ columns.reduce((result, length) => `${ result } ${ ' '.repeat(length || 1) } |`, '|') } |` : ''
+      }`).join('\n')
     }},
     tooltip: 'Insert table / Align table',
   },

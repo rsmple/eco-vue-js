@@ -335,11 +335,9 @@ const wrapSelection = (value: WrapSelection): void => {
         newCursorStart = lineStart
         newCursorEnd = lineStart + cleanText.length
       } else {
-        const processedLines: string[] = value.lineTransform
-          ? lines.map(value.lineTransform)
-          : lines.map(line => line.trim() ? preserveIndentation(line, value.linePrefix) : line)
-
-        const processedText = processedLines.join('\n')
+        const processedText = value.lineTransformAll ? value.lineTransformAll(lines) : value.lineTransform
+          ? lines.map(value.lineTransform).join('\n')
+          : lines.map(line => line.trim() ? preserveIndentation(line, value.linePrefix) : line).join('\n')
         newText = beforeLines + processedText + afterLines
         newCursorStart = lineStart
         newCursorEnd = lineStart + processedText.length
