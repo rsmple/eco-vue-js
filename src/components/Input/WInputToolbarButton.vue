@@ -1,13 +1,17 @@
 <template>
   <WDropdownMenu
-    v-if="Array.isArray(action.value)"
-    :is-open="isOpen"
+    v-if="Array.isArray(value)"
+    :is-open="!disabled && isOpen"
     :horizontal-align="HorizontalAlign.CENTER"
     top
   >
     <template #toggle>
       <InputToolbarButton
-        :action="action"
+        :title="title"
+        :icon="icon"
+        :tooltip="tooltip"
+        :disabled="disabled"
+        :active="isOpen"
         @mouseenter="enter"
         @mouseleave="leave"
       />
@@ -16,49 +20,51 @@
     <template #content>
       <div
         class="
-          bg-default dark:bg-default-dark max-h-80 overflow-y-auto overscroll-y-contain rounded-xl
-          text-start text-xs font-semibold shadow-md dark:border dark:border-solid dark:border-gray-800
+          bg-default dark:bg-default-dark flex overflow-y-auto overscroll-y-contain rounded-md
+          text-xs shadow-md dark:border dark:border-solid dark:border-gray-800
         "
         @mouseenter="enter"
         @mouseleave="leave"
         @mousedown.prevent=""
       >
-        <WMenuItem
-          v-for="(item, index) in action.value"
+        <InputToolbarButton
+          v-for="(item, index) in value"
           :key="index"
-          @click="$emit('wrap-selection', item.value)"
-        >
-          <component :is="item.icon" /> {{ item.title }}
-        </WMenuItem>
+          :icon="item.icon"
+          :title="item.title"
+          :disabled="disabled"
+          :tooltip="undefined"
+          @click="$emit('click', index)"
+        />
       </div>
     </template>
   </WDropdownMenu>
 
   <InputToolbarButton
     v-else
-    :action="action"
-    @click="$emit('wrap-selection', action.value)"
+    :title="title"
+    :icon="icon"
+    :tooltip="tooltip"
+    :disabled="disabled"
+    @click="$emit('click', undefined)"
   />
 </template>
 
 <script setup lang="ts">
-import type {ToolbarAction, WrapSelection} from '@/components/Input/types'
+import type {ToolbarAction} from './types'
 
 import {ref} from 'vue'
 
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
-import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 
 import InputToolbarButton from './components/InputToolbarButton.vue'
 
-defineProps<{
-  action: ToolbarAction
-}>()
+defineProps<ToolbarAction>()
 
 defineEmits<{
-  (e: 'wrap-selection', value: WrapSelection): void
+  (e: 'click', index: number | undefined): void
 }>()
 
 const isOpen = ref(false)
@@ -83,6 +89,6 @@ const leave = () => {
   timeout = setTimeout(() => {
     isOpen.value = false
     timeout = null
-  })
+  }, 500)
 }
 </script>

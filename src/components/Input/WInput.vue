@@ -69,7 +69,11 @@
           v-if="textarea && (rich || toolbarActions || $slots.toolbar)"
           :list="toolbarActions"
           :rich="rich === true"
+          :is-undo="historyPosition !== 0"
+          :is-redo="historyPosition !== history.length - 1"
           @wrap-selection="wrapSelection"
+          @undo="undo"
+          @redo="redo"
         >
           <slot
             name="toolbar"
@@ -260,7 +264,6 @@ type ModelValue = Required<InputProps<Type>>['modelValue']
 
 interface HistoryEntry {
   value: ModelValue | undefined
-  timestamp: number
   caret: CaretOffset
 }
 
@@ -317,7 +320,7 @@ const setCaret = (start: number, end?: number): void => {
 }
 
 const addToHistory = debounce((value: ModelValue | undefined): void => {
-  const entry: HistoryEntry = {value, timestamp: Date.now(), caret: getCaret()}
+  const entry: HistoryEntry = {value, caret: getCaret()}
 
   if (historyPosition.value < history.value.length - 1) history.value = history.value.slice(0, historyPosition.value + 1)
 

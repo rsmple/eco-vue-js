@@ -94,8 +94,9 @@ export type WrapSelection = {
 export type ToolbarAction = {
   title?: string
   icon?: SVGComponent
-  value: WrapSelection | {title?: string, icon?: SVGComponent, value: WrapSelection}[]
+  value?: WrapSelection | {title?: string, icon?: SVGComponent, value?: WrapSelection}[]
   tooltip?: string
+  disabled?: boolean
 }
 
 export type TextPart = {value: string, tag: keyof HTMLElementTagNameMap, edit?: boolean, class?: string} | string

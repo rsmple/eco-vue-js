@@ -11,23 +11,42 @@
     <WInputToolbarButton
       v-for="(action, index) in list"
       :key="index"
-      :action="action"
-      @wrap-selection="$emit('wrap-selection', $event)"
+      v-bind="action"
+      @click="wrapSelection(action, $event)"
     />
 
     <template v-if="rich">
       <WInputToolbarButton
         v-for="(action, index) in toolbarActionList"
         :key="index"
-        :action="action"
-        @wrap-selection="$emit('wrap-selection', $event)"
+        v-bind="action"
+        @click="wrapSelection(action, $event)"
       />
     </template>
+
+    <WInputToolbarButton
+      tooltip="Undo"
+      :icon="markRaw(IconUndo)"
+      :disabled="!isUndo"
+      @click="$emit('undo')"
+    />
+
+    <WInputToolbarButton
+      tooltip="Redo"
+      :icon="markRaw(IconRedo)"
+      :disabled="!isRedo"
+      @click="$emit('redo')"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import type {ToolbarAction, WrapSelection} from '@/components/Input/types'
+
+import {markRaw} from 'vue'
+
+import IconRedo from '@/assets/icons/IconRedo.svg?component'
+import IconUndo from '@/assets/icons/IconUndo.svg?component'
 
 import WInputToolbarButton from '../WInputToolbarButton.vue'
 import {toolbarActionList} from '../models/toolbarActions'
@@ -35,9 +54,18 @@ import {toolbarActionList} from '../models/toolbarActions'
 defineProps<{
   list: ToolbarAction[] | undefined
   rich: boolean
+  isUndo: boolean
+  isRedo: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'wrap-selection', value: WrapSelection): void
+  (e: 'undo'): void
+  (e: 'redo'): void
 }>()
+
+const wrapSelection = (action: ToolbarAction, index: number | undefined) => {
+  const value = Array.isArray(action.value) && typeof index === 'number' ? action.value[index].value : action.value as WrapSelection
+  if (value) emit('wrap-selection', value)
+}
 </script>
