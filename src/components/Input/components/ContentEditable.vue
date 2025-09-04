@@ -47,41 +47,30 @@ const updateTextParts = () => {
   if (!elementRef.value || !props.textParts) return
 
   const offsets = getCaret()
-  const existingNodes = Array.from(elementRef.value.childNodes)
 
   let nodeIndex = 0
 
   for (const item of props.textParts) {
-    const existingNode = existingNodes[nodeIndex]
+    const existingNode = elementRef.value.childNodes[nodeIndex] ?? null
 
     if (typeof item === 'string') {
       // Add space after newlines for cursor positioning
       const displayText = item.replace(/\n$/g, '\n ')
       
-      if (existingNode?.nodeType === Node.TEXT_NODE) {
-        if (existingNode.textContent !== displayText) {
-          existingNode.textContent = displayText
-        }
+      if (existingNode instanceof Text) {
+        if (existingNode.textContent !== displayText) existingNode.textContent = displayText
       } else {
         const textNode = document.createTextNode(displayText)
-        elementRef.value.insertBefore(textNode, existingNode || null)
+        elementRef.value.insertBefore(textNode, existingNode)
       }
     } else {
-      if (existingNode?.nodeType === Node.ELEMENT_NODE &&
-        (existingNode as HTMLElement).tagName.toLowerCase() === item.tag.toLowerCase()) {
-        const element = existingNode as HTMLElement
-
-        if (element.textContent !== item.value) {
-          element.textContent = item.value
-        }
+      if (existingNode instanceof HTMLElement && existingNode.tagName.toLowerCase() === item.tag.toLowerCase()) {
+        if (existingNode.textContent !== item.value) existingNode.textContent = item.value
+        if (existingNode.className !== (item.class || '')) existingNode.className = item.class || ''
 
         const contentEditable = item.edit ? 'plaintext-only' : 'false'
-        if (element.getAttribute('contenteditable') !== contentEditable) {
-          element.setAttribute('contenteditable', contentEditable)
-        }
-
-        if (element.className !== (item.class || '')) {
-          element.className = item.class || ''
+        if (existingNode.getAttribute('contenteditable') !== contentEditable) {
+          existingNode.setAttribute('contenteditable', contentEditable)
         }
       } else {
         const element = document.createElement(item.tag)
@@ -89,7 +78,7 @@ const updateTextParts = () => {
         element.setAttribute('contenteditable', item.edit ? 'plaintext-only' : 'false')
         if (item.class) element.className = item.class
 
-        elementRef.value.insertBefore(element, existingNode || null)
+        elementRef.value.insertBefore(element, existingNode)
       }
     }
 
@@ -101,7 +90,7 @@ const updateTextParts = () => {
     elementRef.value.removeChild(nodeToRemove)
   }
 
-  if (focused.value) setCaret(offsets.start, offsets.end !== offsets.start ? undefined : offsets.end)
+  if (focused.value && !isSetCaretNext) setCaret(offsets.start, offsets.end !== offsets.start ? undefined : offsets.end)
 }
 
 watch(() => props.textParts, updateTextParts, {immediate: true})
@@ -212,7 +201,10 @@ const getNodeOffset = (index: number | undefined) => {
   return {node: last, offset: last.nodeType === Node.TEXT_NODE && last.nodeValue ? last.nodeValue.length : last.childNodes.length}
 }
 
+let isSetCaretNext = false
+
 const setCaret = (indexStart: number, indexEnd?: number) => {
+  isSetCaretNext = false
   const start = getNodeOffset(indexStart)
 
   if (start === undefined) return
@@ -252,7 +244,7 @@ const wrapSelection = (value: WrapSelection): void => {
         Math.min(currentText.length, offsets.end + endLen),
       )
 
-      if ((!value.start || textWithContext.startsWith(value.start)) && (!value.end || textWithContext.endsWith(value.end))) {
+      if (value.start && textWithContext.startsWith(value.start) && value.end && textWithContext.endsWith(value.end)) {
         let expandedStart = Math.max(0, offsets.start - startLen)
         let start = currentText.slice(0, expandedStart)
         const middle = currentText.slice(offsets.start, offsets.end)
@@ -333,7 +325,9 @@ const wrapSelection = (value: WrapSelection): void => {
       }
       break
   }
-  
+
+  isSetCaretNext = true
+
   emit('update:model-value', newText)
   nextTick(() => setCaret(newCursorStart, newCursorEnd))
 }
