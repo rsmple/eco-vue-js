@@ -192,7 +192,7 @@ const getNodeOffset = (index: number | undefined) => {
   let node, offset = index
   while ((node = walker.nextNode())) {
     const len = node.nodeValue?.length ?? 0
-    if (offset <= len) return {node, offset}
+    if (offset <= len && node.parentElement?.contentEditable !== 'false') return {node, offset}
     offset -= len
   }
 
@@ -203,17 +203,8 @@ const getNodeOffset = (index: number | undefined) => {
     return {node: last, offset: last.nodeValue?.length ?? 0}
   }
 
-  let deepestNode = last
-  while (deepestNode.lastChild) {
-    deepestNode = deepestNode.lastChild
-  }
-
-  if (deepestNode.nodeType === Node.TEXT_NODE) {
-    return {node: deepestNode, offset: deepestNode.nodeValue?.length ?? 0}
-  }
-
   const textNode = document.createTextNode('')
-  last.appendChild(textNode)
+  elementRef.value.appendChild(textNode)
   return {node: textNode, offset: 0}
 }
 
@@ -345,10 +336,7 @@ const wrapSelection = (value: WrapSelection): void => {
   isSetCaretNext = true
 
   emit('update:model-value', newText)
- 
-  setTimeout(() => {
-    setCaret(newCursorStart, newCursorEnd)
-  }, 10)
+  requestAnimationFrame(() => setCaret(newCursorStart, newCursorEnd))
 }
 
 const focus = () => {
