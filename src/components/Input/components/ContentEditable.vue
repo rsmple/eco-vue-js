@@ -198,7 +198,23 @@ const getNodeOffset = (index: number | undefined) => {
 
   const last = elementRef.value.lastChild
   if (!last) return undefined
-  return {node: last, offset: last.nodeType === Node.TEXT_NODE && last.nodeValue ? last.nodeValue.length : last.childNodes.length}
+
+  if (last.nodeType === Node.TEXT_NODE) {
+    return {node: last, offset: last.nodeValue?.length ?? 0}
+  }
+
+  let deepestNode = last
+  while (deepestNode.lastChild) {
+    deepestNode = deepestNode.lastChild
+  }
+
+  if (deepestNode.nodeType === Node.TEXT_NODE) {
+    return {node: deepestNode, offset: deepestNode.nodeValue?.length ?? 0}
+  }
+
+  const textNode = document.createTextNode('')
+  last.appendChild(textNode)
+  return {node: textNode, offset: 0}
 }
 
 let isSetCaretNext = false
@@ -244,7 +260,7 @@ const wrapSelection = (value: WrapSelection): void => {
         Math.min(currentText.length, offsets.end + endLen),
       )
 
-      if (value.start && textWithContext.startsWith(value.start) && value.end && textWithContext.endsWith(value.end)) {
+      if ((!value.start || textWithContext.startsWith(value.start)) && (!value.end || textWithContext.endsWith(value.end))) {
         let expandedStart = Math.max(0, offsets.start - startLen)
         let start = currentText.slice(0, expandedStart)
         const middle = currentText.slice(offsets.start, offsets.end)
@@ -329,7 +345,10 @@ const wrapSelection = (value: WrapSelection): void => {
   isSetCaretNext = true
 
   emit('update:model-value', newText)
-  nextTick(() => setCaret(newCursorStart, newCursorEnd))
+ 
+  setTimeout(() => {
+    setCaret(newCursorStart, newCursorEnd)
+  }, 10)
 }
 
 const focus = () => {

@@ -6,7 +6,7 @@
       'w-ripple w-ripple-hover cursor-pointer': !disabled,
       'before:opacity-10': !disabled && active,
     }"
-    @click="!disabled && $emit('click', $event)"
+    @click.prevent="!disabled && $emit('click', $event)"
     @mouseenter="!disabled && $emit('mouseenter', $event)"
     @mouseleave="!disabled && $emit('mouseleave', $event)"
   >
