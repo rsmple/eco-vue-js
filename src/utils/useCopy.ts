@@ -5,17 +5,21 @@ import IconCopySuccess from '@/assets/icons/IconCopySuccess.svg?component'
 
 import {Notify} from './Notify'
 
+export const checkPermissionPaste = async (): Promise<boolean> => {
+  const result = await navigator.permissions.query({name: 'clipboard-read' as PermissionName})
+  return result.state === 'granted' || result.state === 'prompt'
+}
+
+const checkPermissionCopy = async (): Promise<boolean> => {
+  const result = await navigator.permissions.query({name: 'clipboard-write' as PermissionName})
+  return result.state === 'granted' || result.state === 'prompt'
+}
+
 export const useCopy = (value: MaybeRef<string | number | undefined>) => {
   const copied = ref(false)
   let timeout: NodeJS.Timeout | undefined
 
   const iconCopy = computed(() => copied.value ? markRaw(IconCopySuccess) : markRaw(IconCopy))
-
-  const checkPermission = async (): Promise<boolean> => {
-    const result = await navigator.permissions.query({name: 'clipboard-write' as PermissionName})
-
-    return result.state === 'granted' || result.state === 'prompt'
-  }
 
   const _doCopy = () => {
     const text = unref(value)
@@ -49,7 +53,7 @@ export const useCopy = (value: MaybeRef<string | number | undefined>) => {
     try {
       _doCopy()
         .catch(async () => {
-          await checkPermission()
+          await checkPermissionCopy()
           await _doCopy()
         })
     } catch {

@@ -246,6 +246,7 @@ import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 import {Notify} from '@/utils/Notify'
 import {useComponentStates} from '@/utils/useComponentStates'
+import {checkPermissionPaste} from '@/utils/useCopy'
 import {debounce} from '@/utils/utils'
 
 import InputActions from './components/InputActions.vue'
@@ -433,7 +434,6 @@ const clearValue = () => {
   else updateModelValue(undefined)
 
   inputRef.value?.focus()
-
   emit('click:clear')
 }
 
@@ -444,34 +444,19 @@ const focus = (): void => {
   else inputRef.value?.focus()
 }
 
-const blur = (): void => {
-  inputRef.value?.blur()
-}
-
-const checkPermission = async (): Promise<boolean> => {
-  const result = await navigator.permissions.query({name: 'clipboard-read' as PermissionName})
-
-  return result.state === 'granted' || result.state === 'prompt'
-}
+const blur = (): void => inputRef.value?.blur()
 
 const paste = async () => {
   try {
-    if (!(await checkPermission())) return Promise.reject()
-
+    await checkPermissionPaste()
     await navigator.clipboard
       .readText()
       .then(value => {
         if (!value) {
-          Notify.warn({
-            title: 'Nothing to paste',
-          })
+          Notify.warn({title: 'Nothing to paste'})
         } else if (!props.maxLength || props.maxLength <= value.length) {
           updateModelValue(value)
-
-          Notify.success({
-            title: 'Pasted',
-          })
-
+          Notify.success({title: 'Pasted'})
           nextTick().then(() => emit('paste'))
         } else Notify.error({
           title: 'Unable to paste',
@@ -511,9 +496,7 @@ const autofocusDebounced = () => {
   }, typeof props.autofocus === 'number' ? props.autofocus : 250)
 }
 
-if (props.autofocus !== false && props.autofocus !== undefined) {
-  useTabActiveListener(autofocusDebounced)
-}
+if (props.autofocus !== false && props.autofocus !== undefined) useTabActiveListener(autofocusDebounced)
 
 watch(() => props.autofocus, value => {
   if (value === false || value === undefined) return
