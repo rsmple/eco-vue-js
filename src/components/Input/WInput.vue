@@ -455,46 +455,35 @@ const checkPermission = async (): Promise<boolean> => {
 }
 
 const paste = async () => {
-  if (!(await checkPermission())) {
-    Notify.error({
-      title: 'Paste failed',
-      caption: 'Reading from clipboard is not permitted',
-    })
+  try {
+    if (!(await checkPermission())) return Promise.reject()
 
-    return
-  }
+    await navigator.clipboard
+      .readText()
+      .then(value => {
+        if (!value) {
+          Notify.warn({
+            title: 'Nothing to paste',
+          })
+        } else if (!props.maxLength || props.maxLength <= value.length) {
+          updateModelValue(value)
 
-  navigator.clipboard
-    .readText()
-    .then(value => {
-      if (!value) {
-        Notify.warn({
-          title: 'Nothing to paste',
-        })
+          Notify.success({
+            title: 'Pasted',
+          })
 
-        return
-      }
-
-      if (!props.maxLength || props.maxLength <= value.length) {
-        updateModelValue(value)
-
-        Notify.success({
-          title: 'Pasted',
-        })
-
-        nextTick().then(() => emit('paste'))
-      } else {
-        Notify.error({
+          nextTick().then(() => emit('paste'))
+        } else Notify.error({
           title: 'Unable to paste',
           caption: 'The length of the pasted value exceeds the allowed limit',
         })
-      }
-    })
-    .catch(() => {
-      Notify.error({
-        title: 'Paste failed',
       })
+  } catch {
+    Notify.error({
+      title: 'Paste failed',
+      caption: `Please allow the clipboard actions in browser settings for current domain: ${ location.host }`,
     })
+  }
 }
 
 const scrollToInput = () => {

@@ -43,25 +43,22 @@ export const useCopy = (value: MaybeRef<string | number | undefined>) => {
           copied.value = false
         }, 1000)
       })
-      .catch(() => {
-        Notify.error({
-          title: 'Copy failed',
-        })
-      })
   }
 
   const doCopy = () => {
-    _doCopy()
-      .catch(async () => {
-        if (!(await checkPermission())) {
-          Notify.error({
-            title: 'Copy failed',
-            caption: 'Writing to clipboard is not permitted',
-          })
-        }
-
-        _doCopy()
+    try {
+      _doCopy()
+        .catch(async () => {
+          await checkPermission()
+          await _doCopy()
+        })
+    } catch {
+      Notify.error({
+        title: 'Copy failed',
+        caption: `Please allow the clipboard actions in browser settings for current domain: ${ location.host }`,
       })
+    }
+    
   }
 
   return {
