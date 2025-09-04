@@ -24,19 +24,21 @@
       />
     </template>
 
-    <WInputToolbarButton
-      tooltip="Undo"
-      :icon="markRaw(IconUndo)"
-      :disabled="!isUndo"
-      @click="$emit('undo')"
-    />
+    <template v-if="!textSecure">
+      <WInputToolbarButton
+        tooltip="Undo"
+        :icon="markRaw(IconUndo)"
+        :disabled="!isUndo"
+        @click="$emit('undo')"
+      />
 
-    <WInputToolbarButton
-      tooltip="Redo"
-      :icon="markRaw(IconRedo)"
-      :disabled="!isRedo"
-      @click="$emit('redo')"
-    />
+      <WInputToolbarButton
+        tooltip="Redo"
+        :icon="markRaw(IconRedo)"
+        :disabled="!isRedo"
+        @click="$emit('redo')"
+      />
+    </template>
   </div>
 </template>
 
@@ -56,6 +58,7 @@ defineProps<{
   rich: boolean
   isUndo: boolean
   isRedo: boolean
+  textSecure: boolean
 }>()
 
 const emit = defineEmits<{

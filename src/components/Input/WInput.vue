@@ -71,6 +71,7 @@
           :rich="rich === true"
           :is-undo="historyPosition !== 0"
           :is-redo="historyPosition !== history.length - 1"
+          :text-secure="textSecure ?? false"
           @wrap-selection="wrapSelection"
           @undo="undo"
           @redo="redo"
