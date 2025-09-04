@@ -24,6 +24,7 @@ import {defineEmits, defineProps, nextTick, onMounted, ref, useTemplateRef, watc
 import {WrapSelectionType} from '@/utils/utils'
 
 import {preserveIndentation} from '../models/toolbarActions'
+import {getCaretOffset} from '../models/utils'
 
 const props = defineProps<{
   value: string
@@ -45,7 +46,7 @@ const focused = ref(false)
 const updateTextParts = () => {
   if (!elementRef.value || !props.textParts) return
 
-  const offsets = getSelectionOffsets()
+  const offsets = getCaret()
   const existingNodes = Array.from(elementRef.value.childNodes)
 
   let nodeIndex = 0
@@ -109,7 +110,7 @@ const updateTextValue = (value: string) => {
   if (props.textParts || !elementRef.value) return
   
   if (elementRef.value.textContent !== value) {
-    const offsets = getSelectionOffsets()
+    const offsets = getCaret()
     elementRef.value.textContent = value
     if (focused.value) setCaret(offsets.start, offsets.end !== offsets.start ? undefined : offsets.end)
   }
@@ -183,7 +184,7 @@ const onPaste = async (e: ClipboardEvent) => {
 const insertPlain = (text: string) => {
   const root = elementRef.value
   if (!root) return
-  const {start, end} = getSelectionOffsets()
+  const {start, end} = getCaret()
   const currentText = getCurrentText()
   const next = (currentText ?? '').slice(0, start) + text + ((currentText ?? '').slice(end) || ' ')
   const caretAfter = start + text.length
@@ -192,19 +193,7 @@ const insertPlain = (text: string) => {
   nextTick(() => setCaret(props.maxLength ? Math.min(caretAfter, props.maxLength) : caretAfter))
 }
 
-const getSelectionOffsets = () => {
-  const selection = window.getSelection()
-  if (!elementRef.value || !selection || selection.rangeCount === 0) return {start: 0, end: 0}
-  const range = selection.getRangeAt(0)
-
-  const pre = range.cloneRange()
-  pre.selectNodeContents(elementRef.value)
-  pre.setEnd(range.startContainer, range.startOffset)
-  const start = pre.toString().length
-
-  const selected = range.toString().length
-  return {start, end: start + selected}
-}
+const getCaret = () => getCaretOffset(elementRef.value)
 
 const getNodeOffset = (index: number | undefined) => {
   if (!elementRef.value || index === undefined) return undefined
@@ -245,7 +234,7 @@ const collapseList = [' ', '\n']
 let offsetsOld: {start: number, end: number} | null = null
 
 const wrapSelection = (value: WrapSelection): void => {
-  let offsets = getSelectionOffsets()
+  let offsets = getCaret()
   if (focused.value || !offsetsOld) offsetsOld = offsets
   else offsets = offsetsOld
   const currentText = getCurrentText() ?? ''
@@ -367,7 +356,7 @@ defineExpose({
   blur,
   wrapSelection,
   setCaret,
-  getSelectionOffsets,
+  getCaret,
   get offsetWidth() {
     return elementRef.value?.offsetWidth ?? 0
   },

@@ -166,6 +166,7 @@
                   @keydown.up.exact.stop="!isDisabled && !isReadonly && $emit('keypress:up', $event)"
                   @keydown.down.exact.stop="!isDisabled && !isReadonly && $emit('keypress:down', $event)"
                   @keydown.delete.exact.stop="!isDisabled && !isReadonly && $emit('keypress:delete', $event); handleBackspace($event)"
+                  @keydown="handleHistoryKeydown"
                   @focus="
                     $emit('focus', $event);
                     setFocused(true);
@@ -245,14 +246,22 @@ import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 import {Notify} from '@/utils/Notify'
 import {useComponentStates} from '@/utils/useComponentStates'
+import {debounce} from '@/utils/utils'
 
 import InputActions from './components/InputActions.vue'
+import {type CaretOffset, getCaretOffset} from './models/utils'
 
 const InputToolbar = defineAsyncComponent(() => import('./components/InputToolbar.vue'))
 
 const ContentEditable = defineAsyncComponent(() => import('./components/ContentEditable.vue'))
 
 type ModelValue = Required<InputProps<Type>>['modelValue']
+
+interface HistoryEntry {
+  value: ModelValue | undefined
+  timestamp: number
+  caret: CaretOffset
+}
 
 defineOptions({inheritAttrs: false})
 
@@ -291,14 +300,83 @@ const contentRef = useTemplateRef('content')
 const inputRef = useTemplateRef<HTMLInputElement | ComponentInstance<typeof ContentEditable>>('input')
 const isSecureVisible = ref(false)
 
+const history = ref<HistoryEntry[]>([])
+const historyPosition = ref(-1)
+
+const getCaret = (): CaretOffset => {
+  if (!inputRef.value) return {start: 0, end: 0}
+  if ('getCaret' in inputRef.value) return inputRef.value.getCaret()
+  return getCaretOffset(inputRef.value)
+}
+
+const setCaret = (start: number, end?: number): void => {
+  if (!inputRef.value) return
+  if ('setCaret' in inputRef.value) inputRef.value.setCaret(start, end)
+  else inputRef.value.setSelectionRange(start, end ?? null)
+}
+
+const addToHistory = debounce((value: ModelValue | undefined): void => {
+  const entry: HistoryEntry = {value, timestamp: Date.now(), caret: getCaret()}
+
+  if (historyPosition.value < history.value.length - 1) history.value = history.value.slice(0, historyPosition.value + 1)
+
+  history.value.push(entry as typeof history.value[number])
+  historyPosition.value = history.value.length - 1
+  if (history.value.length > 50) {
+    history.value.shift()
+    historyPosition.value--
+  }
+}, 500)
+
+const undo = (): void => {
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable || props.textSecure) return
+  if (historyPosition.value === 0) {
+    fieldWrapperRef.value?.showMessage('No Undo')
+    return
+  }
+
+  fieldWrapperRef.value?.showMessage('Undo')
+  const index = historyPosition.value - 1
+  const item = history.value[index]
+  emit('update:model-value', item.value as ModelValue)
+  nextTick(() => setCaret(item.caret.start, item.caret.end))
+  historyPosition.value = index
+}
+
+const redo = (): void => {
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable || props.textSecure) return
+  if (historyPosition.value === history.value.length - 1) {
+    fieldWrapperRef.value?.showMessage('No Redo')
+    return
+  }
+
+  fieldWrapperRef.value?.showMessage('Redo')
+  const index = historyPosition.value + 1
+  const item = history.value[index]
+  emit('update:model-value', item.value as ModelValue)
+  nextTick(() => setCaret(item.caret.start, item.caret.end))
+  historyPosition.value = index
+}
+
+const handleHistoryKeydown = (event: KeyboardEvent): void => {
+  if (!event.ctrlKey && !event.metaKey) return
+  if (event.key !== 'z' && event.key !== 'Z') return
+  event.preventDefault()
+  event.stopPropagation()
+  if (event.shiftKey) redo()
+  else undo()
+}
+
 const updateModelValue = (value: string | undefined): void => {
   if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
 
-  if (props.type === 'number') {
-    emit('update:model-value', (typeof value === 'string' && value.length ? Number.parseFloat(value) : undefined) as ModelValue)
-  } else {
-    emit('update:model-value', value as ModelValue)
-  }
+  let newValue: ModelValue
+  if (props.type === 'number') newValue = (typeof value === 'string' && value.length ? Number.parseFloat(value) : undefined) as ModelValue
+  else newValue = value as ModelValue
+
+  if (!props.textSecure) addToHistory(newValue)
+
+  emit('update:model-value', newValue)
 }
 
 const handleBackspace = (event: KeyboardEvent): void => {
@@ -426,8 +504,6 @@ const scrollToInput = () => {
 }
 
 const wrapSelection = (value: WrapSelection) => inputRef.value && 'wrapSelection' in inputRef.value ? inputRef.value.wrapSelection(value) : void 0
-const setCaret = (indexStart: number, indexEnd?: number) => inputRef.value && 'setCaret' in inputRef.value ? inputRef.value.setCaret(indexStart, indexEnd) : void 0
-const getSelectionOffsets = () => inputRef.value && 'getSelectionOffsets' in inputRef.value ? inputRef.value.getSelectionOffsets() : undefined
 
 let timeout: NodeJS.Timeout | undefined
 
@@ -456,8 +532,18 @@ watch(() => props.autofocus, value => {
   nextTick(autofocusDebounced)
 })
 
+const handle = watch(() => props.modelValue, value => {
+  if (history.value.length === 0) {
+    if (value) {
+      addToHistory(value)
+      handle.stop()
+    }
+  } else handle.stop()
+})
+
 onMounted(() => {
   if (props.autofocus !== false && props.autofocus !== undefined) autofocusDebounced()
+  if (props.modelValue) addToHistory(props.modelValue)
 })
 
 onBeforeUnmount(() => {
@@ -472,8 +558,10 @@ defineExpose({
   blur,
   wrapSelection,
   setCaret,
-  getSelectionOffsets,
+  getCaret,
   fieldRef: computed(() => fieldWrapperRef.value?.fieldRef),
   scrollToInput,
+  undo,
+  redo,
 })
 </script>

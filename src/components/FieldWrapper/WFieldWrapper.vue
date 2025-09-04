@@ -112,11 +112,12 @@
           leave-to-class="opacity-0"
         >
           <div
-            v-if="saved"
+            v-if="message"
+            v-show="isMessageShown"
             class="text-description absolute right-0 whitespace-nowrap py-0.5 text-xs font-normal"
             :class="topText ? 'bottom-full' : 'top-full'"
           >
-            {{ savedText ?? 'Saved' }}
+            {{ message }}
           </div>
 
           <div
@@ -190,7 +191,7 @@
 <script lang="ts" setup>
 import type {FieldWrapperProps} from './types'
 
-import {type StyleValue, computed, inject, ref, useId, useTemplateRef} from 'vue'
+import {type StyleValue, computed, inject, onBeforeUnmount, ref, useId, useTemplateRef} from 'vue'
 
 import WButtonCopy from '@/components/Button/WButtonCopy.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
@@ -201,7 +202,7 @@ import {useComponentStates} from '@/utils/useComponentStates'
 import {numberFormatter} from '@/utils/utils'
 
 import FilterButton from './components/FilterButton.vue'
-import {wFieldSaved} from './use/useFieldSaved'
+import {wFieldSetShowMessage} from './use/useFieldSaved'
 
 defineOptions({inheritAttrs: false})
 
@@ -226,7 +227,8 @@ const fieldRef = useTemplateRef('field')
 
 const focused = ref(false)
 
-const saved = inject(wFieldSaved, ref(false))
+const message = ref<string | null>(null)
+const isMessageShown = ref(true)
 
 const encodedQueryParam = computed(() => {
   if (props.filterField === undefined) return undefined
@@ -238,7 +240,44 @@ const setFocused = (value: boolean): void => {
   focused.value = value
 }
 
+let timeout: NodeJS.Timeout | null = null
+
+const resetMessage = () => {
+  message.value = null
+  isMessageShown.value = true
+
+  if (timeout) {
+    clearTimeout(timeout)
+    timeout = null
+  }
+}
+
+const showMessage = (value: string, durationMs: number = 2000) => {
+  if (timeout) clearTimeout(timeout)
+
+  if (message.value && isMessageShown.value) {
+    isMessageShown.value = false
+
+    timeout = setTimeout(() => showMessage(value, durationMs), 100)
+  } else {
+    message.value = value
+    isMessageShown.value = true
+
+    timeout = setTimeout(resetMessage, durationMs)
+  }
+}
+
+const setShowMessageInjected = inject(wFieldSetShowMessage, null)
+
+setShowMessageInjected?.(showMessage)
+
+onBeforeUnmount(() => {
+  setShowMessageInjected?.(null)
+  resetMessage()
+})
+
 defineExpose({
   fieldRef,
+  showMessage,
 })
 </script>

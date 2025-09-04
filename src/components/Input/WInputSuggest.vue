@@ -200,7 +200,7 @@ const blur = () => inputRef.value?.blur()
 const scrollToInput = () => inputRef.value?.scrollToInput()
 const wrapSelection = (value: WrapSelection) => inputRef.value?.wrapSelection(value)
 const setCaret = (indexStart: number, indexEnd?: number) => inputRef.value?.setCaret(indexStart, indexEnd)
-const getSelectionOffsets = () => inputRef.value?.getSelectionOffsets()
+const getCaret = () => inputRef.value?.getCaret()
 
 const updateDropdown = () => dropdownMenuRef.value && 'updateDropdown' in dropdownMenuRef.value ? dropdownMenuRef.value.updateDropdown() : void 0
 
@@ -212,7 +212,7 @@ defineExpose({
   scrollToInput,
   wrapSelection,
   setCaret,
-  getSelectionOffsets,
+  getCaret,
 })
 
 defineSlots<{

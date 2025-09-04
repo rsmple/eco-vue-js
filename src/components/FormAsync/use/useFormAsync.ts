@@ -2,7 +2,7 @@ import type {FormAsyncProps} from '../types'
 
 import {computed, onBeforeUnmount, ref, toRef} from 'vue'
 
-import {useFieldSaved} from '@/components/FieldWrapper/use/useFieldSaved'
+import {useFieldMessage} from '@/components/FieldWrapper/use/useFieldSaved'
 import {Modal} from '@/utils/Modal'
 import {handleApiError} from '@/utils/api'
 import {get, set} from '@/utils/utils'
@@ -10,7 +10,7 @@ import {get, set} from '@/utils/utils'
 export const useFormAsync = <Model, FieldType, QueryParams>(props: FormAsyncProps<Model, FieldType, QueryParams>, onSuccess: (value: Model) => void) => {
   const enabled = toRef(props, 'queryEnabled')
 
-  const {showSaved} = useFieldSaved()
+  const showMessage = useFieldMessage()
 
   const {data, setData, isLoadingError} = props.noParams === true
     ? props.useQueryFn({enabled})
@@ -29,7 +29,7 @@ export const useFormAsync = <Model, FieldType, QueryParams>(props: FormAsyncProp
       .then(response => {
         setData(response.data)
 
-        showSaved()
+        showMessage('Saved')
 
         onSuccess(response.data)
       })

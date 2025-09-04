@@ -1,38 +1,19 @@
-import {type InjectionKey, type Ref, onBeforeUnmount, provide, ref} from 'vue'
+import {type InjectionKey, provide} from 'vue'
 
-export const wFieldSaved = Symbol('wFieldSaved') as InjectionKey<Ref<boolean>>
+export type ShowMessage = (value: string, durationMs?: number) => void
 
-export const useFieldSaved = () => {
-  const saved = ref(false)
+export const wFieldSetShowMessage = Symbol('wFieldSaved') as InjectionKey<(showMessage: ShowMessage | null) => void>
 
-  provide(wFieldSaved, saved)
+export const useFieldMessage = () => {
+  let showMessageFn: ShowMessage | null = null
 
-  let timeout: NodeJS.Timeout | null = null
-
-  const resetSaved = () => {
-    saved.value = false
-
-    if (timeout) {
-      clearTimeout(timeout)
-      timeout = null
-    }
+  const setShowMessage = (value: ShowMessage | null) => {
+    showMessageFn = value
   }
 
-  const showSaved = () => {
-    if (timeout) clearTimeout(timeout)
+  provide(wFieldSetShowMessage, setShowMessage)
 
-    if (saved.value) {
-      saved.value = false
+  const showMessage: ShowMessage = (value, durationMs) => showMessageFn?.(value, durationMs)
 
-      timeout = setTimeout(showSaved, 100)
-    } else {
-      saved.value = true
-
-      timeout = setTimeout(resetSaved, 2000)
-    }
-  }
-
-  onBeforeUnmount(resetSaved)
-
-  return {showSaved}
+  return showMessage
 }
