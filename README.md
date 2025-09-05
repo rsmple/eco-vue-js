@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/eco-vue-js.svg)](https://www.npmjs.com/package/eco-vue-js)
 [![npm downloads](https://img.shields.io/npm/dm/eco-vue-js.svg)](https://www.npmjs.com/package/eco-vue-js)
-[![Build Status](https://github.com/rsmple/eco-vue-js/workflows/Node.js%20Package/badge.svg)](https://github.com/rsmple/eco-vue-js/actions)
+[![Build Status](https://github.com/rsmple/eco-vue-js/workflows/CI/badge.svg)](https://github.com/rsmple/eco-vue-js/actions)
 
 ## Development
 
