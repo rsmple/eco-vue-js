@@ -1,5 +1,10 @@
 # eco-vue-js
 
+[![npm version](https://img.shields.io/npm/v/eco-vue-js.svg)](https://www.npmjs.com/package/eco-vue-js)
+[![npm downloads](https://img.shields.io/npm/dm/eco-vue-js.svg)](https://www.npmjs.com/package/eco-vue-js)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/eco-vue-js.svg)](https://bundlephobia.com/package/eco-vue-js)
+[![Build Status](https://github.com/rsmple/eco-vue-js/workflows/CI/badge.svg)](https://github.com/rsmple/eco-vue-js/actions)
+
 ## Development
 
 ### Local testing
