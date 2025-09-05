@@ -255,7 +255,7 @@ import {checkPermissionPaste} from '@/utils/useCopy'
 import {debounce} from '@/utils/utils'
 
 import InputActions from './components/InputActions.vue'
-import {type CaretOffset, getCaretOffset} from './models/utils'
+import {type CaretOffset} from './models/utils'
 
 const InputToolbar = defineAsyncComponent(() => import('./components/InputToolbar.vue'))
 
@@ -311,7 +311,7 @@ const historyPosition = ref(-1)
 const getCaret = (): CaretOffset => {
   if (!inputRef.value) return {start: 0, end: 0}
   if ('getCaret' in inputRef.value) return inputRef.value.getCaret()
-  return getCaretOffset(inputRef.value)
+  return {start: inputRef.value.selectionStart ?? 0, end: inputRef.value.selectionEnd ?? 0}
 }
 
 const setCaret = (start: number, end?: number): void => {

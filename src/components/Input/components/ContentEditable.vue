@@ -24,7 +24,7 @@ import {defineEmits, defineProps, nextTick, onMounted, ref, useTemplateRef, watc
 import {WrapSelectionType} from '@/utils/utils'
 
 import {preserveIndentation} from '../models/toolbarActions'
-import {getCaretOffset} from '../models/utils'
+import {getCaretOffset, setCaretOffset} from '../models/utils'
 
 const props = defineProps<{
   value: string
@@ -184,48 +184,11 @@ const insertPlain = (text: string) => {
 
 const getCaret = () => getCaretOffset(elementRef.value)
 
-const getNodeOffset = (index: number | undefined) => {
-  if (!elementRef.value || index === undefined) return undefined
-  if (!elementRef.value.firstChild) elementRef.value.appendChild(document.createTextNode(''))
-
-  const walker = document.createTreeWalker(elementRef.value, NodeFilter.SHOW_TEXT, null)
-  let node, offset = index
-  while ((node = walker.nextNode())) {
-    const len = node.nodeValue?.length ?? 0
-    if (offset <= len && node.parentElement?.contentEditable !== 'false') return {node, offset}
-    offset -= len
-  }
-
-  const last = elementRef.value.lastChild
-  if (!last) return undefined
-
-  if (last.nodeType === Node.TEXT_NODE) {
-    return {node: last, offset: last.nodeValue?.length ?? 0}
-  }
-
-  const textNode = document.createTextNode('')
-  elementRef.value.appendChild(textNode)
-  return {node: textNode, offset: 0}
-}
-
 let isSetCaretNext = false
 
 const setCaret = (indexStart: number, indexEnd?: number) => {
   isSetCaretNext = false
-  const start = getNodeOffset(indexStart)
-
-  if (start === undefined) return
-
-  const range = document.createRange()
-  range.setStart(start.node, start.offset)
-
-  const end = getNodeOffset(indexEnd)
-  if (end !== undefined) range.setEnd(end.node, end.offset)
-  else range.collapse(true)
-
-  const selection = window.getSelection()
-  selection?.removeAllRanges()
-  selection?.addRange(range)
+  setCaretOffset(elementRef.value, indexStart, indexEnd)
 }
 
 const collapseList = [' ', '\n']
@@ -233,11 +196,10 @@ const collapseList = [' ', '\n']
 let offsetsOld: {start: number, end: number} | null = null
 
 const wrapSelection = (value: WrapSelection): void => {
-  let offsets = getCaret()
-  if (focused.value || !offsetsOld) offsetsOld = offsets
-  else offsets = offsetsOld
+  if (focused.value || !offsetsOld) offsetsOld = getCaret()
+  const offsets = offsetsOld
   const currentText = getCurrentText() ?? ''
-  
+
   let newText = ''
   let newCursorStart = offsets.start
   let newCursorEnd: number | undefined = undefined
