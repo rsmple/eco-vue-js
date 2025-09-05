@@ -233,11 +233,9 @@
     </template>
 
     <template
-      v-if="$slots.bottom || true"
+      v-if="$slots.bottom"
       #bottom
     >
-      <pre>{{ historyPosition }}</pre>
-      <pre>{{ history }}</pre>
       <slot name="bottom" />
     </template>
   </WFieldWrapper>
