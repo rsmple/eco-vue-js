@@ -232,10 +232,12 @@
       <slot name="right" />
     </template>
 
-    <template 
-      v-if="$slots.bottom"
+    <template
+      v-if="$slots.bottom || true"
       #bottom
     >
+      <pre>{{ historyPosition }}</pre>
+      <pre>{{ history }}</pre>
       <slot name="bottom" />
     </template>
   </WFieldWrapper>
@@ -335,8 +337,9 @@ const addToHistory = debounce((value: ModelValue | undefined): void => {
 
 const undo = (): void => {
   if (props.loading || isDisabled.value || isReadonly.value || props.unclickable || props.textSecure) return
-  if (historyPosition.value === 0) {
+  if (historyPosition.value <= 0) {
     fieldWrapperRef.value?.showMessage('No Undo')
+    historyPosition.value = history.value.length ? 0 : -1
     return
   }
 
@@ -350,8 +353,9 @@ const undo = (): void => {
 
 const redo = (): void => {
   if (props.loading || isDisabled.value || isReadonly.value || props.unclickable || props.textSecure) return
-  if (historyPosition.value === history.value.length - 1) {
+  if (historyPosition.value >= history.value.length - 1) {
     fieldWrapperRef.value?.showMessage('No Redo')
+    historyPosition.value = history.value.length -1
     return
   }
 

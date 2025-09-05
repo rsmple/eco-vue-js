@@ -6,7 +6,7 @@ const getNodeOffset = (parent: Element | null | undefined, index: number | undef
   let node, offset = index
   while ((node = walker.nextNode())) {
     const len = node.nodeValue?.length ?? 0
-    if (offset <= len && node.parentElement?.contentEditable !== 'false') return {node, offset}
+    if (offset <= len && node.parentElement?.contentEditable !== 'false') return {node, offset: Math.max(offset, 0)}
     offset -= len
   }
 
@@ -41,17 +41,33 @@ export const setCaretOffset = (parent: Element | null | undefined, indexStart: n
   selection?.addRange(range)
 }
 
+const getOffsetFromNode = (parent: Element, targetNode: Node, targetOffset: number, isStart: boolean): number => {
+  if (!parent.firstChild) parent.appendChild(document.createTextNode(''))
+  
+  const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT, null)
+  let node, offset = 0
+  
+  while ((node = walker.nextNode())) {
+    if (node.parentElement?.contentEditable === 'false') {
+      if (isStart && node === targetNode) return offset
+    } else if (node === targetNode) {
+      return offset + targetOffset
+    }
+
+    offset += node.nodeValue?.length ?? 0
+  }
+  
+  return offset
+}
+
 export const getCaretOffset = (parent: Element | null | undefined): CaretOffset => {
   if (!parent) return {start: 0, end: 0}
   const selection = window.getSelection()
   if (!selection || selection.rangeCount === 0) return {start: 0, end: 0}
   const range = selection.getRangeAt(0)
 
-  const pre = range.cloneRange()
-  pre.selectNodeContents(parent)
-  pre.setEnd(range.startContainer, range.startOffset)
-  const start = pre.toString().length
+  const start = getOffsetFromNode(parent, range.startContainer, range.startOffset, true)
+  const end = range.startOffset !== range.endOffset ? getOffsetFromNode(parent, range.endContainer, range.endOffset, false) : start
 
-  const selected = range.toString().length
-  return {start, end: start + selected}
+  return {start, end}
 }
