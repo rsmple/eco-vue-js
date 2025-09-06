@@ -17,6 +17,7 @@ import IconQuote from '@/assets/icons/IconQuote.svg?component'
 import IconStrikethrough from '@/assets/icons/IconStrikethrough.svg?component'
 import IconTable from '@/assets/icons/IconTable.svg?component'
 import IconTableCollapsed from '@/assets/icons/IconTableCollapsed.svg?component'
+// import IconUnderline from '@/assets/icons/IconUnderline.svg?component'
 
 import {WrapSelectionType} from '@/utils/utils'
 
@@ -91,6 +92,11 @@ export const toolbarActionList: ToolbarAction[] = [
     value: {type: WrapSelectionType.TOGGLE, start: '~~', end: '~~'},
     tooltip: 'Strikethrough',
   },
+  // {
+  //   icon: markRaw(IconUnderline),
+  //   value: {type: WrapSelectionType.TOGGLE, start: '++', end: '++'},
+  //   tooltip: 'Underline',
+  // },
   {
     icon: markRaw(IconCodeInline),
     value: {type: WrapSelectionType.TOGGLE, start: '`', end: '`'},

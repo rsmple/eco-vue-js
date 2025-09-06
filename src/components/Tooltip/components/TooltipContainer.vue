@@ -19,7 +19,10 @@
       @mouseleave="$emit('leave')"
     >
       <g
-        :transform="`rotate(${ isTop ? 0 : isLeft ? -90 : isRight ? 90 : 180 } ${isLeft || isRight ? '4 0' : '0 0'})`"
+        :transform="isTop ? 'rotate(0 0 0)'
+          : isLeft ? 'rotate(-90 4 0)'
+            : isRight ? 'rotate(90 0 -4)'
+              : 'rotate(180 0 0)'"
         transform-origin="center center"
       >
         <rect
@@ -60,10 +63,7 @@
 </template>
 
 <script lang="ts" setup>
-import type {TooltipMeta} from '../models/tooltipMeta'
-
 defineProps<{
-  tooltipMeta: TooltipMeta
   isTop?: boolean
   isLeft?: boolean
   isRight?: boolean
