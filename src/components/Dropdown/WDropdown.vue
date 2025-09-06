@@ -2,11 +2,15 @@
   <div
     ref="dropdown"
     :style="{
-      '--dropdown-x': x + 'px',
-      '--dropdown-y': y + 'px',
+      '--w-dropdown-x': x + 'px',
+      '--w-dropdown-y': y + 'px',
     }"
     class="group/dropdown width-0 height-0 fixed left-0 top-0 grid will-change-transform"
-    style="transform: translate(var(--dropdown-x, 0px), var(--dropdown-y, 0px));"
+    style="
+    transform: translate(var(--dropdown-x, 0px), var(--dropdown-y, 0px));
+    --dropdown-x: calc(max(min(var(--w-dropdown-x, 0px), var(--w-dropdown-x-max, 100vw)), var(--w-dropdown-x-min, 0px)));
+    --dropdown-y: calc(max(min(var(--w-dropdown-y, 0px), var(--w-dropdown-y-max, 100vh)), var(--w-dropdown-y-min, 0px)));
+    "
     :class="[
       {'dropdown-top': isTop},
       horizontalGetter?.origin,

@@ -102,7 +102,7 @@ const RIGHT_EDGE = window.innerWidth * EDGE_FACTOR
 export const RightOuter: HorizontalGetter = markRaw({
   verticalGetterOrder: [BottomInner, TopInner],
   origin: OriginX.LEFT,
-  style: {maxWidth: 'calc(100vw - var(--dropdown-x, 0px) - var(--w-right-inner, 0px))'},
+  style: {maxWidth: 'calc(var(--w-dropdown-x-max, calc(100vw - var(--w-right-inner, 0px))) - var(--dropdown-x, 0px))'},
   x: parentRect => Math.round(parentRect.right),
   isEdge: parentRect => parentRect.right > RIGHT_EDGE,
 })
@@ -155,7 +155,7 @@ const LEFT_EDGE = window.innerWidth * (1 - EDGE_FACTOR)
 export const LeftInner: HorizontalGetter = markRaw({
   verticalGetterOrder: [BottomOuter, TopOuter],
   origin: OriginX.RIGHT,
-  style: {maxWidth: 'calc(var(--dropdown-x, 0px) - var(--w-left-inner, 0px))'},
+  style: {maxWidth: 'calc(var(--dropdown-x, 0px) - var(--w-dropdown-x-min, var(--w-left-inner, 0px)))'},
   x: parentRect => Math.round(parentRect.right),
   isEdge: parentRect => parentRect.right < LEFT_EDGE,
 })

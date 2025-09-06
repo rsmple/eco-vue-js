@@ -8,8 +8,7 @@
     "playwright.config.*",
     "build/**/*",
     "tailwind/**/*",
-    "package/tailwind-base/**/*",
-    "tailwind-base/plugins/default.ts"
+    "package/tailwind-base/**/*"
   ],
   "exclude": [
     "node_modules",

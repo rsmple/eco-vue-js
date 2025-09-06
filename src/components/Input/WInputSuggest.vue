@@ -10,6 +10,7 @@
       horizontalAlign,
       updateAlign: true,
       parentElement: inputRef?.fieldRef,
+      dropdownClass,
     }"
   >
     <template #toggle="toggleScope">

@@ -18,6 +18,7 @@
       :emit-update="emitUpdate"
       :style="{zIndex: baseZIndex + BASE_ZINDEX_DROPDOWN}"
       :top="top"
+      :class="dropdownClass"
       @update:rect="$emit('update:rect')"
     >
       <template #default="defaultScope">

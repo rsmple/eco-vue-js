@@ -407,6 +407,8 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       'grid-cols-fill': value => ({'grid-template-columns': `repeat(auto-fill, minmax(${ value }, 1fr))`}),
       'grid-cols-fit': value => ({'grid-template-columns': `repeat(auto-fit, minmax(${ value }, 1fr))`}),
       'w-tabs-side-width': value => ({'--w-tabs-side-width': value}),
+      'w-dropdown-x-min': value => ({'--w-dropdown-x-min': value}),
+      'w-dropdown-x-max': value => ({'--w-dropdown-x-max': value}),
     },
     {
       values: theme('width'),
@@ -420,6 +422,8 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       'w-input-min-h': value => ({'--w-input-min-height': value}),
       'w-textarea-h': value => ({'--w-textarea-height': value}),
       'w-button-h': value => ({'--w-button-height': value}),
+      'w-dropdown-y-min': value => ({'--w-dropdown-y-min': value}),
+      'w-dropdown-y-max': value => ({'--w-dropdown-y-max': value}),
     },
     {
       values: theme('height'),

@@ -480,7 +480,8 @@ const paste = async () => {
 const scrollToInput = () => {
   if (!contentRef.value || !inputRef.value) return
 
-  contentRef.value.scrollTo({left: contentRef.value.scrollWidth - 40})
+  if (inputRef.value instanceof HTMLElement) inputRef.value.scrollIntoView({behavior: 'instant', block: 'center'})
+  else contentRef.value.scrollTo({left: contentRef.value.scrollWidth - 40})
 }
 
 const wrapSelection = (value: WrapSelection) => inputRef.value && 'wrapSelection' in inputRef.value ? inputRef.value.wrapSelection(value) : void 0
