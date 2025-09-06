@@ -13,17 +13,19 @@
     @click="!disabled && $emit('click', $event)"
   >
     <div
-      class="relative flex w-full gap-4 rounded-lg px-2 py-1"
+      class="relative grid w-full grid-cols-[1fr,1.25rem] gap-1 rounded-lg px-2 py-1"
       :class="{
         'w-ripple w-ripple-hover': !disabled,
         'before:opacity-10': active && !disabled
       }"
     >
-      <slot />
+      <div class="flex gap-4">
+        <slot />
+      </div>
 
       <div
         v-if="active"
-        class="ml-auto flex h-full items-center pl-1"
+        class="flex h-full items-center"
       >
         <IconCheck class="square-[1.25em]" />
       </div>
