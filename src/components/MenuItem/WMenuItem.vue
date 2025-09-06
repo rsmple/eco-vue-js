@@ -13,10 +13,12 @@
     @click="!disabled && $emit('click', $event)"
   >
     <div
-      class="relative grid w-full grid-cols-[1fr,1.25rem] gap-1 rounded-lg px-2 py-1"
+      class="relative grid w-full rounded-lg px-2 py-1"
       :class="{
         'w-ripple w-ripple-hover': !disabled,
-        'before:opacity-10': active && !disabled
+        'before:opacity-10': active && !disabled,
+        'grid-cols-[1fr,1.25rem] gap-4': active !== undefined,
+        'grid-cols-[1fr]': active === undefined,
       }"
     >
       <div class="flex gap-4">
@@ -47,7 +49,14 @@ interface Props extends Partial<LinkProps> {
   active?: boolean
 }
 
-defineProps<Props>()
+withDefaults(
+  defineProps<Props>(),
+  {
+    active: undefined,
+    download: undefined,
+    href: undefined,
+  },
+)
 
 defineEmits<{
   (e: 'click', value: MouseEvent): void
