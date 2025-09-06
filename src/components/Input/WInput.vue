@@ -101,7 +101,7 @@
           class="group/input col-start-2 grid grid-cols-1"
           :class="{
             'py-[--w-input-gap,0.25rem] first:pl-[--w-input-gap,0.25rem] last:pr-[--w-input-gap,0.25rem]': $slots.prefix,
-            'no-scrollbar overflow-x-auto overscroll-x-contain': seamless && focused,
+            'no-scrollbar overflow-x-auto overscroll-x-contain': noWrap && !(seamless && !focused),
             'overflow-hidden': seamless && !focused,
           }"
         >
@@ -110,7 +110,7 @@
             :class="{
               '[&:not(:has(.w-option-has-bg))]:-px--w-option-padding': !icon && !textarea,
               'flex-wrap': !noWrap && !seamless,
-              'w-full min-w-max': !textarea && $slots.prefix,
+              'w-full min-w-max': !textarea && noWrap,
             }"
           >
             <slot
@@ -126,7 +126,7 @@
                 'resize-y': resize && textarea,
                 'resize-none': !resize && textarea,
                 'h-[calc(var(--w-input-height,2.75rem)-2px)]': !textarea && !$slots.suffix,
-                'w-option': !textarea && $slots.prefix,
+                'w-option min-w-40': !textarea && $slots.prefix && !hideInput,
                 'font-mono': mono,
                 'text-black-default dark:text-gray-200': !isDisabled,
                 'text-black-default/50 dark:text-gray-200/50': isDisabled,
@@ -480,7 +480,7 @@ const paste = async () => {
 const scrollToInput = () => {
   if (!contentRef.value || !inputRef.value) return
 
-  contentRef.value.scrollTo({left: contentRef.value.scrollWidth - inputRef.value.offsetWidth - 40})
+  contentRef.value.scrollTo({left: contentRef.value.scrollWidth - 40})
 }
 
 const wrapSelection = (value: WrapSelection) => inputRef.value && 'wrapSelection' in inputRef.value ? inputRef.value.wrapSelection(value) : void 0
