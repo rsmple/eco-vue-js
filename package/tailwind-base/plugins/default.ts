@@ -203,6 +203,13 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
     },
   })
 
+  addBase({
+    '.w-shine-hidden': {
+      '.w-shine': {display: 'none'},
+    },
+    '.w-shine': {},
+  })
+
   matchUtilities(
     {
       'w-scroll-bar-color': value => {

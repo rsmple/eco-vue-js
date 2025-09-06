@@ -44,10 +44,13 @@
         {{ disableMessage }}
       </div>
     </WTooltip>
+
+    <WShine v-if="!disabled && !disableMessage && !loading" />
   </button>
 </template>
 
 <script lang="ts" setup>
+import WShine from '@/components/Shine/WShine.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
