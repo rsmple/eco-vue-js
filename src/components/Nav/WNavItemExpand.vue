@@ -40,10 +40,11 @@
       </template>
 
       <template #content>
-        <div
+        <WClickOutside
           class="px-1"
           @mouseenter="showDropdown"
           @mouseleave="hideDropdown"
+          @click="hideDropdown"
         >
           <div
             class="
@@ -62,7 +63,7 @@
               />
             </template>
           </div>
-        </div>
+        </WClickOutside>
       </template>
     </WDropdownMenu>
 
@@ -98,6 +99,8 @@ import {unwrapSlots} from '@/utils/utils'
 import WNavItem from './WNavItem.vue'
 import WNavItemTransition from './WNavItemTransition.vue'
 
+import WClickOutside from '../ClickOutside/WClickOutside.vue'
+
 defineProps<NavItemExpandProps>()
 
 const slots = useSlots() as {
@@ -124,12 +127,26 @@ const updateHasActive = async () => {
   hasActive.value = innerRef.value?.some(item => item.isActive) ?? false
 }
 
+let timeout: NodeJS.Timeout | null = null
+
 const showDropdown = () => {
+  if (timeout) {
+    clearTimeout(timeout)
+    timeout = null
+  }
+
   isDropdownOpen.value = true
 }
 
 const hideDropdown = () => {
-  isDropdownOpen.value = false
+  if (timeout) {
+    clearTimeout(timeout)
+    timeout = null
+  }
+
+  timeout = setTimeout(() => {
+    isDropdownOpen.value = false
+  }, 20)
 }
 
 watch(hasInnerActive, updateHasActive, {immediate: true})

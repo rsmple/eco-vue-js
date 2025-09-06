@@ -1,3 +1,4 @@
+import type {LinkProps} from '@/types/types'
 import type {SemanticType} from '@/utils/SemanticType'
 import type {Component, VNode} from 'vue'
 
@@ -13,7 +14,10 @@ export interface ConfirmModalProps {
 
   cancelText?: string | VNode | Component
 
-  onAccept: () => void | Promise<void>
+  onAccept?: () => void | Promise<void>
   onIntermediate?: () => void | Promise<void>
   onCancel?: () => void
+
+  acceptTo?: LinkProps['to']
+  intermediateTo?: LinkProps['to']
 }

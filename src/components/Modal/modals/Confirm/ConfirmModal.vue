@@ -41,6 +41,7 @@
 
       <WButton
         v-if="intermediateText"
+        :to="intermediateTo"
         :semantic-type="intermediateSemanticType"
         :loading="loadingIntermediate"
         :disabled="loadingAccept"
@@ -58,6 +59,7 @@
       </WButton>
 
       <WButton
+        :to="acceptTo"
         :semantic-type="acceptSemanticType"
         :loading="loadingAccept"
         :disabled="loadingIntermediate"
@@ -127,7 +129,7 @@ const intermediate = () => {
 const accept = () => {
   if (loadingIntermediate.value || loadingAccept.value) return
 
-  const promise = props.onAccept()
+  const promise = props.onAccept?.()
 
   if (promise) {
     loadingAccept.value = true
