@@ -119,7 +119,7 @@
             />
 
             <div
-              class="flex-1 overflow-auto font-normal"
+              class="flex-1 font-normal"
               :class="{
                 'w-full': !hideInput && !$slots.prefix,
                 'w-option-has-bg-input': $slots.prefix,
@@ -130,7 +130,7 @@
                 'font-mono': mono,
                 'text-black-default dark:text-gray-200': !isDisabled,
                 'text-black-default/50 dark:text-gray-200/50': isDisabled,
-                '-p--w-option-padding h-[--w-textarea-height,10rem] min-h-[--w-textarea-height,10rem] w-full': textarea,
+                '-p--w-option-padding h-[--w-textarea-height,10rem] min-h-[--w-textarea-height,10rem] w-full overflow-auto overscroll-contain': textarea,
               }"
             >
               <div class="relative flex min-h-full flex-1">
