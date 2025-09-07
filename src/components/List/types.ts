@@ -1,3 +1,4 @@
+import type {UniformScope} from '../Uniform/types'
 import type {ListMode} from '@/utils/utils'
 import type {Component, Raw} from 'vue'
 
@@ -7,6 +8,7 @@ export type FieldProps<Data> = {
   readonly: boolean
   card: boolean
   config: FieldConfig
+  uniformScope: UniformScope<Data, number> | undefined
 }
 
 export type FieldComponent<Data> = Component<FieldProps<Data>>

@@ -1,7 +1,6 @@
 <template>
-  <WForm
-    ref="form"
-    :name="name"
+  <div
+    ref="container"
     class="grid gap-4"
     :class="{
       'grid grid-cols-1': !side,
@@ -30,9 +29,9 @@
           :index="index"
           :title="slot.props.title"
           :icon="slot.props.icon"
-          :has-changes="formRef?.hasChangesMap[slot.props.name] === true"
-          :has-error="formRef?.hasShownMap[slot.props.name] === true && typeof formRef?.errorMessageMap[slot.props.name] === 'string'"
-          :has-value="slot.props.hasValue ?? slot.props['has-value' as never] ?? formRef?.hasValueMap[slot.props.name] === true"
+          :has-changes="slot.props.hasChanges === true"
+          :has-error="slot.props.hasError === true"
+          :has-value="slot.props.hasValue === true"
           :first="defaultSlots.indexOf(slot) === 0"
           :last="defaultSlots.indexOf(slot) === defaultSlots.length - 1"
           :disabled="stepper ? defaultSlots.indexOf(slot) > hasNoValueFirst : false"
@@ -121,7 +120,6 @@
           :title="slot.props.title"
           :active="slot.props.name === current"
           :removable="slot.props.removable ?? false"
-          @tab:switch="!noSwitchOnInvalid && switchOnInvalid($event)"
           @update:height="!disableMinHeight && updateHeight($event)"
           @update:active="$emit('update:current-title', slot.props?.title)"
         >
@@ -129,15 +127,13 @@
         </TabItem>
       </TransitionGroup>
     </div>
-  </WForm>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import type {TabsItemProps, TabsProps} from './types'
 
 import {type Component, type RendererElement, type RendererNode, type VNode, computed, inject, onMounted, onUnmounted, ref, useSlots, useTemplateRef, watch} from 'vue'
-
-import WForm from '@/components/Form/WForm.vue'
 
 import IconClose from '@/assets/icons/IconClose.svg?component'
 
@@ -168,7 +164,7 @@ const hasScrollbar = getHasScrollbar()
 
 const slots = useSlots()
 
-const formRef = useTemplateRef('form')
+const containerRef = useTemplateRef('container')
 const buttonContainerRef = useTemplateRef('buttonContainer')
 
 const defaultSlotsRaw = computed(() => props.customSlots ?? slots.default?.() ?? [])
@@ -197,11 +193,10 @@ const buttonRef = useTemplateRef<ComponentInstance<typeof TabTitleButton>[]>('bu
 const minHeight = ref(0)
 const tabItemRef = useTemplateRef('tabItem')
 
-const currentIsValid = computed<boolean>(() => !formRef.value?.hasShownMap[current.value] || typeof formRef.value?.errorMessageMap[current.value] !== 'string')
 const hasNoValueFirst = computed<number>(() => {
   if (!props.stepper) return 0
 
-  const index = defaultSlotsKeys.value.findIndex(item => formRef.value?.hasValueMap[item] === false)
+  const index = defaultSlotsAll.value.findIndex(item => isTabItem(item) && item.props.hasValue === false)
 
   if (index === -1) return defaultSlotsKeys.value.length
 
@@ -212,10 +207,6 @@ const hasOnClose = computed(() => defaultSlotsAll.value.some(item => item.props 
 
 const first = computed<boolean>(() => currentIndex.value === 0)
 const last = computed<boolean>(() => currentIndex.value === defaultSlotsKeys.value.length - 1)
-
-const switchOnInvalid = debounce((key: string): void => {
-  if (currentIsValid.value !== false) switchTab(key)
-}, 50)
 
 const switchTab = throttle((key: string): void => {
   if (current.value === key) return
@@ -246,7 +237,7 @@ const scrollToTabContent = () => {
   }
 
   timeout = setTimeout(() => {
-    formRef.value?.$el?.scrollTo({left: document.documentElement.offsetWidth, behavior: 'smooth'})
+    containerRef.value?.scrollTo({left: document.documentElement.offsetWidth, behavior: 'smooth'})
 
     timeout = null
   }, 300)
@@ -263,7 +254,7 @@ const setCurrentDebounced = debounce((value: string) => {
 }, 100)
 
 const next = (update = false): void => {
-  const errorMessage = update ? validate(current.value) : validateIfNoError(current.value)
+  const errorMessage = update ? validate(currentIndex.value) : validateIfNoError(currentIndex.value)
 
   if (errorMessage) {
     Notify.warn({title: 'Form contains invalid values', caption: errorMessage.length < 200 ? errorMessage : undefined})
@@ -282,7 +273,8 @@ const jump = (name: string, update = false): void => {
   const valid = defaultSlotsKeys.value
     .slice(currentIndex.value, defaultSlotsKeys.value.indexOf(name))
     .every(item => {
-      const errorMessage = update ? validate(item) : validateIfNoError(item)
+      const index = defaultSlotsAll.value.findIndex(slot => isTabItem(slot) && slot.props.name === item)
+      const errorMessage = update ? validate(index) : validateIfNoError(index)
 
       if (errorMessage) {
         Notify.warn({title: 'Form contains invalid values', caption: errorMessage.length < 200 ? errorMessage : undefined})
@@ -302,22 +294,20 @@ const updateHeight = (value: number): void => {
   minHeight.value = value
 }
 
-const validate = (name: string, ...args: Parameters<ComponentInstance<typeof WForm>['validate']>): ReturnType<ComponentInstance<typeof WForm>['validate']> => {
-  return formRef.value?.validateMap[name]?.(...args)
+const validate = (index: number): string | undefined => {
+  const slot = defaultSlotsAll.value[index]
+
+  if (!isTabItem(slot)) return undefined
+
+  return slot.props.validate?.()
 }
 
-const validateIfNoError = (name: string, ...args: Parameters<ComponentInstance<typeof WForm>['validate']>): ReturnType<ComponentInstance<typeof WForm>['validate']> => {
-  if (formRef.value?.errorMessageMap[name] && formRef.value?.hasShownMap[name]) return formRef.value.errorMessageMap[name]
+const validateIfNoError = (index: number): string | undefined => {
+  const slot = defaultSlotsAll.value[index]
 
-  return formRef.value?.validateMap[name]?.(...args)
-}
+  if (!isTabItem(slot) || slot.props.hasError) return undefined
 
-const invalidate = (name: string, ...args: Parameters<ComponentInstance<typeof WForm>['invalidate']>): ReturnType<ComponentInstance<typeof WForm>['invalidate']> => {
-  return formRef.value?.invalidateMap[name]?.(...args)
-}
-
-const initModel = (name: string, ...args: Parameters<ComponentInstance<typeof WForm>['initModel']>): ReturnType<ComponentInstance<typeof WForm>['initModel']> => {
-  return formRef.value?.initModelMap[name]?.(...args)
+  return slot.props.validate?.()
 }
 
 const updateIndicator = () => {
@@ -383,6 +373,16 @@ if (props.stepper) {
   }, {immediate: true})
 }
 
+if (!props.noSwitchOnInvalid) {
+  const switchTabDebounced = debounce(switchTab, 50)
+
+  const invalidName = computed<string | undefined>(() => defaultSlotsAll.value.find(slot => isTabItem(slot) && slot.props.hasError)?.props?.name)
+
+  watch(invalidName, value => {
+    if (value && value !== current.value) switchTabDebounced(value)
+  })
+}
+
 onMounted(() => {
   tabItemListenerInjected?.(updateIndicator)
 })
@@ -397,10 +397,6 @@ defineExpose({
   next,
   previous,
   jump,
-  validate,
-  validateIfNoError,
-  invalidate,
-  initModel,
 })
 
 defineSlots<{

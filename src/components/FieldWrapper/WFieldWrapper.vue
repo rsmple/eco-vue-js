@@ -9,7 +9,7 @@
     @click="$emit('click', $event)"
   >
     <label
-      v-if="title || $slots.title"
+      v-if="(title || $slots.title) && !seamless"
       :for="id"
       class="text-accent relative block pr-6 text-xs font-semibold leading-loose"
       :class="{
