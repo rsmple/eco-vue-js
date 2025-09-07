@@ -90,7 +90,7 @@
       v-if="field"
       name="field"
       v-bind="{
-        ref: fieldRef,
+        ref: (value: ComponentInstance<Component>) => (fieldRef = value),
         field,
         title: title as string,
         modelValue: value ?? null as InnerModel,
@@ -109,12 +109,12 @@
 </template>
 
 <script setup lang="ts" generic="Model, QueryParams, Field extends (Model extends unknown[] ? number : keyof Model) | undefined = undefined, Result = Model">
-import {type VNode, computed, isReadonly, nextTick, onBeforeUnmount, ref, toRef, useId, watch} from 'vue'
+import {type Component, type VNode, computed, isReadonly, nextTick, onBeforeUnmount, ref, toRef, useId, watch} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
 import {Notify} from '@/utils/Notify'
-import {ApiError, ApiErrorCancel} from '@/utils/api'
+import {ApiError, ApiErrorCancel, isRequestResponse} from '@/utils/api'
 import {validateRequired} from '@/utils/validate'
 
 import {type InvalidatePayload, type UniformInstance, type UniformScope, type UniformScopeField, isUniformInstance} from './types'
@@ -163,7 +163,7 @@ type Props = {
   validate?: ValidateMethod | ValidateMethod[]
   mandatory?: boolean
   skeleton?: boolean
-  apiMethod?: (data: Partial<Model>) => Promise<RequestResponse<Result>>
+  apiMethod?: (data: Partial<Model>) => Promise<RequestResponse<Result> | Result | void> | void
   tag?: keyof HTMLElementTagNameMap
 }
 
@@ -495,13 +495,15 @@ const submit = () => {
 
   isSubmitting.value = true
 
-  return props.apiMethod(data.value)
+  return (props.apiMethod(data.value) ?? Promise.resolve())
     .then(response => {
-      query?.setData(response.data)
+      const isResponse = isRequestResponse(response)
+
+      if (response) query?.setData(isResponse ? response.data : response)
 
       initModel()
 
-      emit('success', response.data)
+      emit('success', isResponse ? response.data : response!)
     })
     .catch(error => {
       if (error instanceof ApiError && !(error instanceof ApiErrorCancel)) {

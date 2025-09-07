@@ -1,3 +1,5 @@
+import type {Component} from 'vue'
+
 export interface UniformInstance {
   id: string
   field: string
@@ -29,6 +31,7 @@ export type UniformScope<InnerModel, Field = undefined> = {
 }
 
 export type UniformScopeField<InnerModel, Field = undefined> = {
+  ref: (component: ComponentInstance<Component>) => void
   field: NonNullable<Field>
   title: string
   modelValue: InnerModel
