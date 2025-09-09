@@ -174,10 +174,10 @@ const onPaste = async (e: ClipboardEvent) => {
 const insertPlain = (text: string) => {
   const root = elementRef.value
   if (!root) return
-  const {start, end} = getCaret()
+  const {start, end, trail} = getCaret()
   const currentText = getCurrentText()
-  const next = (currentText ?? '').slice(0, start) + text + ((currentText ?? '').slice(end) || ' ')
-  const caretAfter = start + text.length
+  const next = (currentText ?? '').slice(0, start) + ' '.repeat(trail) + text + ((currentText ?? '').slice(end) || ' ')
+  const caretAfter = start + text.length + trail
 
   emit('update:model-value', props.maxLength && next.length > props.maxLength ? next.substring(0, props.maxLength) : next)
   nextTick(() => setCaret(props.maxLength ? Math.min(caretAfter, props.maxLength) : caretAfter))
