@@ -26,7 +26,7 @@
       #default
     >
       <div
-        class="flex gap-1"
+        class="flex max-w-full gap-1"
         :class="{
           'flex-wrap': !seamless,
           'overflow-hidden': seamless,
@@ -38,7 +38,9 @@
           :class="{
             'font-mono': mono,
             'text-secure': textSecure && !isSecureVisible && modelValue,
+            'whitespace-pre': textarea,
           }"
+          class="overflow-x-auto overscroll-x-contain"
         >
           {{ modelValue || emptyValue }}
         </div>
@@ -66,7 +68,7 @@
         @click="focus"
       >
         <InputToolbar
-          v-if="textarea && (rich || toolbarActions || $slots.toolbar)"
+          v-if="!isDisabled && !isReadonly && textarea && (rich || toolbarActions || $slots.toolbar)"
           :list="toolbarActions"
           :rich="rich === true"
           :is-undo="historyPosition > 0"
@@ -254,12 +256,11 @@ import {useComponentStates} from '@/utils/useComponentStates'
 import {checkPermissionPaste} from '@/utils/useCopy'
 import {debounce} from '@/utils/utils'
 
+import ContentEditable from './components/ContentEditable.vue'
 import InputActions from './components/InputActions.vue'
 import {type CaretOffset} from './models/utils'
 
 const InputToolbar = defineAsyncComponent(() => import('./components/InputToolbar.vue'))
-
-const ContentEditable = defineAsyncComponent(() => import('./components/ContentEditable.vue'))
 
 type ModelValue = Required<InputProps<Type>>['modelValue']
 
