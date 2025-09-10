@@ -256,10 +256,10 @@ import {useComponentStates} from '@/utils/useComponentStates'
 import {checkPermissionPaste} from '@/utils/useCopy'
 import {debounce} from '@/utils/utils'
 
-import ContentEditable from './components/ContentEditable.vue'
 import InputActions from './components/InputActions.vue'
 import {type CaretOffset} from './models/utils'
 
+const ContentEditable = defineAsyncComponent(() => import('./components/ContentEditable.vue'))
 const InputToolbar = defineAsyncComponent(() => import('./components/InputToolbar.vue'))
 
 type ModelValue = Required<InputProps<Type>>['modelValue']
