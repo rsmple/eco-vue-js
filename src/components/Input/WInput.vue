@@ -30,6 +30,7 @@
         :class="{
           'flex-wrap': !seamless,
           'overflow-hidden': seamless,
+          'w-full': textarea,
         }"
       >
         <slot name="prefix" />
@@ -38,12 +39,16 @@
           :class="{
             'font-mono': mono,
             'text-secure': textSecure && !isSecureVisible && modelValue,
-            'whitespace-pre': textarea,
+            'h-[--w-textarea-height,10rem] min-h-[--w-textarea-height,10rem] w-full overflow-auto overscroll-contain whitespace-pre': textarea,
+            'resize-y': resize && textarea,
+            'resize-none': !resize && textarea,
+            'border-b border-solid border-gray-300 dark:border-gray-700': textarea,
           }"
           class="overflow-x-auto overscroll-x-contain"
-        >
-          {{ modelValue || emptyValue }}
-        </div>
+        ><slot
+          name="before"
+          v-bind="{modelValue}"
+        />{{ modelValue || emptyValue }}</div>
       </div>
     </template>
 
