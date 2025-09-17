@@ -79,7 +79,10 @@
           v-if="$slots.bottom || (static && $slots.content)"
           #bottom
         >
-          <slot name="content" />
+          <template v-if="static">
+            <div class="pb-4" />
+            <slot name="content" />
+          </template>
           <slot name="bottom" />
         </template>
 

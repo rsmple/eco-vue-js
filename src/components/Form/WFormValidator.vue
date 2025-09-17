@@ -170,7 +170,7 @@ const doValidate = (silent?: boolean, path?: ValidatePath): string | undefined =
   errorMessage.value = message
 
   if (!silent) {
-    isErrorShown.value = true
+    isErrorShown.value = message !== undefined
 
     if (!isInsideTab) scrollTo()
   }
@@ -248,7 +248,7 @@ watch(title, value => {
 }, {immediate: true})
 
 watch(required, () => {
-  doValidate()
+  doValidate(true)
 })
 
 watch(skeleton, value => {

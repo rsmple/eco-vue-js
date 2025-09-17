@@ -188,7 +188,7 @@
                     $emit('blur', $event);
                     setFocused(false);
                     isSecureVisible = false;
-                    seamless && contentRef?.scrollTo({left: 0});
+                    contentRef?.scrollTo({left: 0});
                   "
                   @click="$emit('click', $event)"
                   @mousedown.stop="$emit('mousedown', $event)"

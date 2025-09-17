@@ -194,7 +194,7 @@ const setCaret = (indexStart: number, indexEnd?: number) => {
 
 const collapseList = [' ', '\n']
 
-let offsetsOld: {start: number, end: number} | null = null
+let offsetsOld: {start: number, end: number, trail: number} | null = null
 
 const wrapSelection = (value: WrapSelection): void => {
   if (focused.value || !offsetsOld) offsetsOld = getCaret()
