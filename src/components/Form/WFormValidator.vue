@@ -73,7 +73,7 @@ const modelValue = computed<Parameters<ValidateFn>[0]>(() => {
   return undefined
 })
 
-const initModelValue = ref<Parameters<ValidateFn>[0]>()
+const initModelValue = ref<Parameters<ValidateFn>[0]>(modelValue.value)
 const isErrorShown = ref(false)
 const wasChanged = ref(false)
 const required = computed<boolean | undefined>(() => componentSlot.value?.props?.required !== undefined ? componentSlot.value?.props?.required !== false : undefined)
