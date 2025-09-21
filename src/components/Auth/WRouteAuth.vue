@@ -4,16 +4,17 @@
 
 <script lang="ts" setup>
 import {onBeforeUnmount, watch} from 'vue'
-import {RouterView, useRoute, useRouter} from 'vue-router'
+import {RouterView} from 'vue-router'
 
+import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRouter'
 import {type ApiClientInstance} from '@/utils/ApiClient'
 
 const props = defineProps<{
   apiClientInstance: ApiClientInstance
 }>()
 
-const router = useRouter()
-const route = useRoute()
+const router = useOptionalRouter()
+const route = useOptionalRoute()
 
 const redirect = () => {
   router.push({name: props.apiClientInstance.routeNameAuthNo, query: route.fullPath !== '/' ? {hash: route.fullPath} : undefined})

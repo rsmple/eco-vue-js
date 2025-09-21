@@ -92,20 +92,19 @@
 import type {NavItemProps} from './types'
 
 import {computed} from 'vue'
-import {useRoute} from 'vue-router'
 
 import WCounter from '@/components/Counter/WCounter.vue'
 import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
-import {useOptionalRouter} from '@/composables/useOptionalRouter'
+import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRouter'
 import {isEqualObj, numberCompactFormatter} from '@/utils/utils'
 
 const EXCLUDE_QUERY_FIELDS = ['ordering', 'page']
 
 const props = defineProps<NavItemProps>()
 
-const route = useRoute()
+const route = useOptionalRoute()
 const router = useOptionalRouter()
 
 const routeTo = computed(() => router.resolve(props.to))

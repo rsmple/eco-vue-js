@@ -37,12 +37,12 @@
 import type {LocationQueryRaw} from 'vue-router'
 
 import {type VNode, computed, onUnmounted, ref, watch} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
 
 import WButton from '@/components/Button/WButton.vue'
 
 import IconFilterRemove from '@/assets/icons/IconFilterRemove.svg?component'
 
+import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRouter'
 import {Modal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
 import {throttle} from '@/utils/utils'
@@ -55,8 +55,8 @@ const emit = defineEmits<{
   (e: 'update:count', value: number): void
 }>()
 
-const route = useRoute()
-const router = useRouter()
+const route = useOptionalRoute()
+const router = useOptionalRouter()
 
 const selectedIndex = ref<number | null>(null)
 const hasChangesMap = ref<Record<string, boolean>>({})

@@ -7,14 +7,15 @@ import type {ApiClientInstance} from '@/utils/ApiClient'
 
 import {useQueryClient} from '@tanstack/vue-query'
 import {onBeforeMount, onBeforeUnmount, ref, watch} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
+
+import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRouter'
 
 const props = defineProps<{
   apiClientInstance: ApiClientInstance
 }>()
 
-const router = useRouter()
-const route = useRoute()
+const router = useOptionalRouter()
+const route = useOptionalRoute()
 const queryClient = useQueryClient()
 
 const queryEnabled = ref(false)
