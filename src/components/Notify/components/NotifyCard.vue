@@ -105,7 +105,7 @@ defineEmits<{
 const elementRef = useTemplateRef('element')
 const height = ref<number | undefined>()
 
-const router = useRouter()
+const router = props.to ? useRouter() : undefined
 
 const linkText = computed(() => {
   if (!props.to) return undefined
@@ -114,7 +114,7 @@ const linkText = computed(() => {
     return props.to.meta.title
   }
 
-  return router.resolve(props.to).meta.title
+  return router?.resolve(props.to).meta.title
 })
 
 const elementStyles = computed<StyleValue | undefined>(() => {
