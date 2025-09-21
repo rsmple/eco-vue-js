@@ -91,23 +91,19 @@ export const useOptionalRoute = (): FallbackRoute => {
   const hasRouter = isRouterAvailable()
 
   if (hasRouter) {
-    try {
-      const instance = getCurrentInstance()
-      if (instance) {
-        const injectionKey = Object.getOwnPropertySymbols(instance.appContext.provides).find(item => item.toString() === SYMBOL_ROUTE)
+    const instance = getCurrentInstance()
 
-        if (injectionKey) {
-          return inject(injectionKey) as FallbackRoute
-        }
-      }
-    } catch {}
+    if (instance) {
+      const injectionKey = Object.getOwnPropertySymbols(instance.appContext.provides).find(item => item.toString() === SYMBOL_ROUTE)
+
+      if (injectionKey) return inject(injectionKey) as FallbackRoute
+    }
   }
 
   const url = new URL(window.location.href)
-  const query: LocationQuery = Object.fromEntries(url.searchParams.entries())
 
   return {
-    query,
+    query: Object.fromEntries(url.searchParams.entries()),
     name: url.pathname,
     hash: url.hash,
     fullPath: url.pathname,
