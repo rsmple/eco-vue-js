@@ -66,7 +66,6 @@
 import type {LinkProps} from '@/types/types'
 
 import {type StyleValue, computed, ref, useTemplateRef, watch} from 'vue'
-import {useRouter} from 'vue-router'
 
 import WButton from '@/components/Button/WButton.vue'
 import WCounter from '@/components/Counter/WCounter.vue'
@@ -77,6 +76,7 @@ import IconDanger from '@/assets/icons/IconDanger.svg?component'
 import IconSuccess from '@/assets/icons/IconSuccess.svg?component'
 import IconWarn from '@/assets/icons/IconWarn.svg?component'
 
+import {useOptionalRouter} from '@/composables/useOptionalRouter'
 import {SemanticType} from '@/utils/SemanticType'
 
 import {NotifyType} from '../models/NotifyType'
@@ -105,7 +105,7 @@ defineEmits<{
 const elementRef = useTemplateRef('element')
 const height = ref<number | undefined>()
 
-const router = props.to ? useRouter() : undefined
+const router = useOptionalRouter()
 
 const linkText = computed(() => {
   if (!props.to) return undefined
@@ -114,7 +114,7 @@ const linkText = computed(() => {
     return props.to.meta.title
   }
 
-  return router?.resolve(props.to).meta.title
+  return router.resolve(props.to).meta?.title
 })
 
 const elementStyles = computed<StyleValue | undefined>(() => {

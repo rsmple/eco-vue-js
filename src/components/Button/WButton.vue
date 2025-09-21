@@ -20,7 +20,7 @@
             ? {to, replace}
             : {})
     }"
-    :is="to !== undefined ? isDisabled ? 'a' : RouterLink : tag"
+    :is="to !== undefined ? isDisabled ? 'a' : WRouterLink : tag"
     v-else
     ref="container"
     class="
@@ -78,8 +78,8 @@
 import type {ButtonProps} from './types'
 
 import {type StyleValue, computed, nextTick, onMounted, useTemplateRef, watch} from 'vue'
-import {RouterLink} from 'vue-router'
 
+import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 import WShine from '@/components/Shine/WShine.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
@@ -107,7 +107,7 @@ const props = withDefaults(
   },
 )
 
-const containerRef = useTemplateRef<HTMLElement | ComponentInstance<typeof RouterLink>>('container')
+const containerRef = useTemplateRef<HTMLElement | ComponentInstance<typeof WRouterLink>>('container')
 
 const {isDisabled, isSkeleton} = useComponentStatesButton(props)
 

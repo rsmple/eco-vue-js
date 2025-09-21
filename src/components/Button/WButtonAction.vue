@@ -1,6 +1,6 @@
 <template>
   <component
-    :is="to !== undefined ? disabled || skeleton ? 'a' : RouterLink : tag"
+    :is="to !== undefined ? disabled || skeleton ? 'a' : WRouterLink : tag"
     v-bind="to !== undefined && !disabled && !skeleton ? {to} : undefined"
     class="w-ripple-trigger group grid w-full grid-cols-1 py-1"
     :class="{
@@ -72,9 +72,8 @@
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
 
-import {RouterLink} from 'vue-router'
-
 import WCounter from '@/components/Counter/WCounter.vue'
+import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 import WShine from '@/components/Shine/WShine.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'

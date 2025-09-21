@@ -1,7 +1,7 @@
 <template>
   <component
     v-bind="!to ? {target, href} : {to}"
-    :is="to ? RouterLink : 'a'"
+    :is="to ? WRouterLink : 'a'"
     class="cursor-pointer overflow-hidden truncate whitespace-normal font-normal no-underline hover:underline"
     :class="semanticTypeTextMap[semanticType]"
   >
@@ -16,7 +16,7 @@
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
 
-import {RouterLink} from 'vue-router'
+import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 
 import IconLink from '@/assets/icons/IconLink.svg?component'
 
