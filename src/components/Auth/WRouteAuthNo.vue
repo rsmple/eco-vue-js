@@ -1,14 +1,27 @@
 <template>
-  <RouterView />
+  <component
+    :is="RouterViewComponent"
+    v-if="RouterViewComponent"
+  />
+
+  <slot v-else />
 </template>
 
 <script lang="ts" setup>
 import type {ApiClientInstance} from '@/utils/ApiClient'
+import type {RouterView} from 'vue-router'
 
 import {useQueryClient} from '@tanstack/vue-query'
-import {onBeforeMount, onBeforeUnmount, ref, watch} from 'vue'
+import {onBeforeMount, onBeforeUnmount, ref, resolveComponent, watch} from 'vue'
 
 import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRouter'
+
+let RouterViewComponent: typeof RouterView | null = null
+try {
+  RouterViewComponent = resolveComponent('RouterView') as unknown as typeof RouterView
+} catch {
+  RouterViewComponent = null
+}
 
 const props = defineProps<{
   apiClientInstance: ApiClientInstance
