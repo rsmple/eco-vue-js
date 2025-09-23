@@ -21,7 +21,7 @@ export const useIsMobile = () => {
 }
 
 export const getIsTouchDevice = (): boolean => {
-  return getIsClientSide() && ('ontouchstart' in window) || navigator.maxTouchPoints > 0
+  return getIsClientSide() ? ('ontouchstart' in window) || navigator.maxTouchPoints > 0 : false
 }
 
 if (getIsClientSide()) {

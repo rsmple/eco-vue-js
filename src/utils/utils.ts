@@ -102,6 +102,8 @@ export const numberFormatter = getFormatter(Intl.NumberFormat('en', {maximumFrac
 
 export const getIsClientSide = () => typeof window !== 'undefined'
 
+export const isClientSide = getIsClientSide()
+
 let iterator = 1
 
 export const genId = () => {
