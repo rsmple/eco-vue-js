@@ -50,7 +50,7 @@ import type {InfiniteListHeaderScope} from './types'
 import {type VNode, inject, onBeforeUnmount, onMounted, ref, useTemplateRef} from 'vue'
 
 import {wIsModal} from '@/components/Modal/models/injection'
-import {BASE_ZINDEX_DROPDOWN, BASE_ZINDEX_LIST_HEADER, isClientSide} from '@/utils/utils'
+import {BASE_ZINDEX_DROPDOWN, BASE_ZINDEX_LIST_HEADER, getIsClientSide} from '@/utils/utils'
 
 import InfiniteListHeaderHeight from './components/InfiniteListHeaderHeight.vue'
 import InfiniteListHeaderPadding from './components/InfiniteListHeaderPadding.vue'
@@ -82,7 +82,7 @@ let observer: IntersectionObserver | null = null
 const {headerHeight} = useHeader()
 
 onMounted(() => {
-  if (!isClientSide) return
+  if (!getIsClientSide()) return
 
   if (indicatorRef.value) {
     observer = new IntersectionObserver(observerCb, {

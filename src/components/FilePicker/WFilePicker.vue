@@ -146,7 +146,7 @@ import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
 import {useComponentStates} from '@/utils/useComponentStates'
-import {isClientSide} from '@/utils/utils'
+import {getIsClientSide} from '@/utils/utils'
 
 import FilePickerItem from './components/FilePickerItem.vue'
 import FilePickerSvg from './components/FilePickerSvg.vue'
@@ -228,7 +228,7 @@ const updateSize = () => {
 useTabActiveListener(updateSize)
 
 onMounted(() => {
-  if (!isClientSide) return
+  if (!getIsClientSide()) return
 
   updateSize()
 
@@ -240,7 +240,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  if (!isClientSide) return
+  if (!getIsClientSide()) return
 
   events.forEach((eventName) => {
     document.body.removeEventListener(eventName, preventDefaults)

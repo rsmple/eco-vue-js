@@ -100,7 +100,7 @@ export const percentFormatter = getFormatter(Intl.NumberFormat('en', {maximumFra
 export const numberCompactFormatter = Intl.NumberFormat('en', {notation: 'compact'})
 export const numberFormatter = getFormatter(Intl.NumberFormat('en', {maximumFractionDigits: 3}))
 
-export const isClientSide: boolean = typeof window !== 'undefined'
+export const getIsClientSide = () => typeof window !== 'undefined'
 
 let iterator = 1
 

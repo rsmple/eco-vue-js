@@ -1,13 +1,13 @@
 import {readonly, ref} from 'vue'
 
-import {debounce, isClientSide} from './utils'
+import {debounce, getIsClientSide} from './utils'
 
 export const getIsMobile = (): boolean => {
-  return isClientSide && window.innerWidth < 640
+  return getIsClientSide() && window.innerWidth < 640
 }
 
 export const getIsTablet = (): boolean => {
-  return isClientSide && window.innerWidth < 1280
+  return getIsClientSide() && window.innerWidth < 1280
 }
 
 const isMobile = ref(getIsMobile())
@@ -21,10 +21,10 @@ export const useIsMobile = () => {
 }
 
 export const getIsTouchDevice = (): boolean => {
-  return isClientSide && ('ontouchstart' in window) || navigator.maxTouchPoints > 0
+  return getIsClientSide() && ('ontouchstart' in window) || navigator.maxTouchPoints > 0
 }
 
-if (isClientSide) {
+if (getIsClientSide()) {
   const listener = debounce(() => {
     isMobile.value = getIsMobile()
     isTablet.value = getIsTablet()

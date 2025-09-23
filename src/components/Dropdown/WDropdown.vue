@@ -38,7 +38,7 @@ import type {DropdownDefaultSlotScope, DropdownProps} from './types'
 import {type VNode, computed, onBeforeMount, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
-import {getAllScrollParents, isClientSide} from '@/utils/utils'
+import {getAllScrollParents, getIsClientSide} from '@/utils/utils'
 
 import {type HorizontalGetter, OriginX, type VerticalGetter, horizontalGetterOrderMap, searchStyleGetter} from './utils/DropdownStyle'
 
@@ -95,7 +95,7 @@ let domListenerContainer: DOMListenerContainer
 let requestAnimationFrameId: number | null = null
 
 onMounted(() => {
-  if (!isClientSide || !dropdownRef.value) return
+  if (!getIsClientSide() || !dropdownRef.value) return
 
   const parent = props.parentElement instanceof Element
     ? props.parentElement

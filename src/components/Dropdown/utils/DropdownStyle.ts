@@ -1,7 +1,7 @@
 import {markRaw} from 'vue'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
-import {isClientSide} from '@/utils/utils'
+import {getIsClientSide} from '@/utils/utils'
 
 type StyleGetter = {
   isEdge: ((parentRect: DOMRect) => boolean) | undefined
@@ -22,7 +22,7 @@ export type VerticalGetter = {
   y: (parentRect: DOMRect) => number
 } & StyleGetter
 
-const BOTTOM_EDGE = isClientSide ? window.innerHeight * EDGE_FACTOR : 0
+const BOTTOM_EDGE = getIsClientSide() ? window.innerHeight * EDGE_FACTOR : 0
 
 /**
  *   ↓
@@ -57,7 +57,7 @@ const VerticalCenter: VerticalGetter = markRaw({
   isEdge: undefined,
 })
 
-const TOP_EDGE = isClientSide ? window.innerHeight * (1 - EDGE_FACTOR) : 0
+const TOP_EDGE = getIsClientSide() ? window.innerHeight * (1 - EDGE_FACTOR) : 0
 
 /**
  *   ↑
@@ -95,7 +95,7 @@ export type HorizontalGetter = {
   x: (parentRect: DOMRect) => number
 } & StyleGetter
 
-const RIGHT_EDGE = isClientSide ? window.innerWidth * EDGE_FACTOR : 0
+const RIGHT_EDGE = getIsClientSide() ? window.innerWidth * EDGE_FACTOR : 0
 
 /**
  *    [ ] →
@@ -148,7 +148,7 @@ const Center: HorizontalGetter = markRaw({
   isEdge: undefined,
 })
 
-const LEFT_EDGE = isClientSide ? window.innerWidth * (1 - EDGE_FACTOR) : 0
+const LEFT_EDGE = getIsClientSide() ? window.innerWidth * (1 - EDGE_FACTOR) : 0
 
 /**
  *    [ ] ←
