@@ -1,7 +1,7 @@
 <template>
   <div
     ref="element"
-    contenteditable="plaintext-only"
+    :contenteditable="readonly || disabled ? 'false' : 'plaintext-only'"
     role="textbox"
     aria-multiline="true"
     spellcheck="false"
@@ -31,6 +31,8 @@ const props = defineProps<{
   placeholder: string
   maxLength: number
   textParts: TextPart[] | undefined
+  readonly: boolean | undefined
+  disabled: boolean | undefined
 }>()
 
 const emit = defineEmits<{
@@ -68,9 +70,8 @@ const updateTextParts = () => {
         if (existingNode.textContent !== item.value) existingNode.textContent = item.value
         if (existingNode.className !== (item.class || '')) existingNode.className = item.class || ''
 
-        const contentEditable = item.edit ? 'plaintext-only' : 'false'
-        if (existingNode.getAttribute('contenteditable') !== contentEditable) {
-          existingNode.setAttribute('contenteditable', contentEditable)
+        if (item.edit === false && existingNode.getAttribute('contenteditable') !== 'false') {
+          existingNode.setAttribute('contenteditable', 'false')
         }
       } else {
         const element = document.createElement(item.tag)
@@ -173,10 +174,10 @@ const onPaste = async (e: ClipboardEvent) => {
 const insertPlain = (text: string) => {
   const root = elementRef.value
   if (!root) return
-  const {start, end} = getCaret()
+  const {start, end, trail} = getCaret()
   const currentText = getCurrentText()
-  const next = (currentText ?? '').slice(0, start) + text + ((currentText ?? '').slice(end) || ' ')
-  const caretAfter = start + text.length
+  const next = (currentText ?? '').slice(0, start) + ' '.repeat(trail) + text + ((currentText ?? '').slice(end) || ' ')
+  const caretAfter = start + text.length + trail
 
   emit('update:model-value', props.maxLength && next.length > props.maxLength ? next.substring(0, props.maxLength) : next)
   nextTick(() => setCaret(props.maxLength ? Math.min(caretAfter, props.maxLength) : caretAfter))
@@ -193,7 +194,7 @@ const setCaret = (indexStart: number, indexEnd?: number) => {
 
 const collapseList = [' ', '\n']
 
-let offsetsOld: {start: number, end: number} | null = null
+let offsetsOld: {start: number, end: number, trail: number} | null = null
 
 const wrapSelection = (value: WrapSelection): void => {
   if (focused.value || !offsetsOld) offsetsOld = getCaret()

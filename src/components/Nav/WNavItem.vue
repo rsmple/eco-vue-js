@@ -1,5 +1,5 @@
 <template>
-  <RouterLink
+  <WRouterLink
     :to="to"
     class="w-ripple-trigger relative block py-1 no-underline"
     :class="{
@@ -45,9 +45,9 @@
         }"
       >
         <div class="flex items-center">
-          <template v-if="icon ?? routeTo.meta.icon">
+          <template v-if="icon ?? routeTo?.meta?.icon">
             <component
-              :is="icon ?? routeTo.meta.icon"
+              :is="icon ?? routeTo?.meta?.icon"
               class="square-[1.25em]"
             />
           </template>
@@ -85,36 +85,38 @@
         <slot name="right" />
       </div>
     </div>
-  </RouterLink>
+  </WRouterLink>
 </template>
 
 <script lang="ts" setup>
 import type {NavItemProps} from './types'
 
 import {computed} from 'vue'
-import {RouterLink, useRoute, useRouter} from 'vue-router'
 
 import WCounter from '@/components/Counter/WCounter.vue'
+import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
+import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRouter'
 import {isEqualObj, numberCompactFormatter} from '@/utils/utils'
 
 const EXCLUDE_QUERY_FIELDS = ['ordering', 'page']
 
 const props = defineProps<NavItemProps>()
 
-const route = useRoute()
-const router = useRouter()
+const route = useOptionalRoute()
+const router = useOptionalRouter()
 
 const routeTo = computed(() => router.resolve(props.to))
 
-const titleLocal = computed<string>(() => props.title ?? (typeof routeTo.value.meta.titleShort === 'string' ? routeTo.value.meta.titleShort : typeof routeTo.value.meta.title === 'string' ? routeTo.value.meta.title : ''))
-
 const isActive = computed<boolean>(() => {
-  if (routeTo.value?.name !== route.name) return false
+  if (!route) return false
+  if (routeTo.value?.name !== route?.name) return false
 
-  return isEqualObj(route.query, routeTo.value.query, EXCLUDE_QUERY_FIELDS, props.queryFields)
+  return isEqualObj(route.query, routeTo.value.query ?? {}, EXCLUDE_QUERY_FIELDS, props.queryFields)
 })
+
+const titleLocal = computed<string>(() => props.title ?? (typeof routeTo.value?.meta?.titleShort === 'string' ? routeTo.value.meta.titleShort : typeof routeTo.value?.meta?.title === 'string' ? routeTo.value.meta.title : ''))
 
 const isTextColor = computed(() => props.hasActive ? !props.indent : isActive.value)
 

@@ -161,7 +161,8 @@ export class ApiClientInstance implements ApiClient {
           if (!this.checkAuth()) {
             this.isAuthFailed.value = true
 
-            return Promise.reject()
+            reject()
+            return
           }
         }
 
@@ -169,7 +170,10 @@ export class ApiClientInstance implements ApiClient {
           const token = this.config.tokenGetter()
 
           if (token) headers.append('Authorization', 'Bearer ' + token)
-          else return Promise.reject()
+          else {
+            reject()
+            return
+          }
         }
       }
 

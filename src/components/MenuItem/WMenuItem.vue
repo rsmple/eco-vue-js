@@ -1,6 +1,6 @@
 <template>
   <component
-    :is="disabled ? 'div' : to ? RouterLink : href ? 'a' : 'button'"
+    :is="disabled ? 'div' : to ? WRouterLink : href ? 'a' : 'button'"
     v-bind="disabled ? undefined : to ? {to} : href ? {href, download} : undefined"
     class="w-ripple-trigger block w-full select-none items-center justify-start px-2 text-start outline-none first:pt-2 last:pb-2"
     :class="{
@@ -38,7 +38,7 @@
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
 
-import {RouterLink} from 'vue-router'
+import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 
 import IconCheck from '@/assets/icons/IconCheck.svg?component'
 

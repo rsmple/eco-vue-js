@@ -19,7 +19,7 @@ import {type VNode, inject, onMounted, ref, useTemplateRef, watch} from 'vue'
 
 import {useHeader} from '@/components/HeaderBar/use/useHeader'
 import {wModalHeaderHeight} from '@/components/Modal/models/injection'
-import {isClientSide} from '@/utils/utils'
+import {getIsClientSide} from '@/utils/utils'
 
 import {wScrollingElement} from '../models/injection'
 
@@ -48,7 +48,7 @@ const updateHeader = () => {
 watch(() => props.isIntersecting, updateHeader)
 
 onMounted(() => {
-  if (!isClientSide) return
+  if (!getIsClientSide()) return
     
   updateHeader()
 })

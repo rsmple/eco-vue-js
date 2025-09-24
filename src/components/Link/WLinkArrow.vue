@@ -1,5 +1,5 @@
 <template>
-  <RouterLink
+  <WRouterLink
     :to="to"
     class="
       text-description hover:text-primary dark:hover:text-primary-dark flex cursor-pointer select-none
@@ -10,13 +10,13 @@
       {{ text }}
     </slot>
     <IconBack class="square-[1.25em] rotate-180" />
-  </RouterLink>
+  </WRouterLink>
 </template>
 
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
 
-import {RouterLink} from 'vue-router'
+import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 
 import IconBack from '@/assets/icons/IconBack.svg?component'
 

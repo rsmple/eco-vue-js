@@ -12,7 +12,7 @@
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, useTemplateRef} from 'vue'
 
-import {hasParent, isClientSide} from '@/utils/utils'
+import {getIsClientSide, hasParent} from '@/utils/utils'
 
 const props = defineProps<{
   noFilter?: boolean
@@ -36,7 +36,7 @@ const clickListener = (event: MouseEvent) => {
 }
 
 onMounted(() => {
-  if (!isClientSide) return
+  if (!getIsClientSide()) return
 
   setTimeout(() => {
     document.addEventListener('click', clickListener)
@@ -45,7 +45,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  if (!isClientSide) return
+  if (!getIsClientSide()) return
 
   document.removeEventListener('click', clickListener)
   document.removeEventListener('contextmenu', clickListener)

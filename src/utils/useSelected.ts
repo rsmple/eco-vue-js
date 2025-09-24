@@ -1,6 +1,6 @@
 import {type MaybeRef, type Ref, computed, onBeforeUnmount, ref, unref, watch} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
 
+import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRouter'
 import {isIdArray, isIndex} from '@/utils/utils'
 
 const isSelectedRange = (value: unknown): value is [number, number] => {
@@ -45,8 +45,8 @@ export type QueryParamsSelection = {
 const isEmpty = <Value>(value: Selection<Value>) => !value.id__in?.length && !value.id__not_in && !value.range
 
 export const useSelected = <Value extends number>(count: MaybeRef<number | undefined>, disabled: Ref<boolean>) => {
-  const route = useRoute()
-  const router = useRouter()
+  const route = useOptionalRoute()
+  const router = useOptionalRouter()
 
   const selection = computed<Selection<Value>>(() => {
     if (!route.hash) return {}

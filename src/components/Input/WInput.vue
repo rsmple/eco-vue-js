@@ -26,10 +26,11 @@
       #default
     >
       <div
-        class="flex gap-1"
+        class="flex max-w-full gap-1"
         :class="{
           'flex-wrap': !seamless,
           'overflow-hidden': seamless,
+          'w-full': textarea,
         }"
       >
         <slot name="prefix" />
@@ -38,10 +39,16 @@
           :class="{
             'font-mono': mono,
             'text-secure': textSecure && !isSecureVisible && modelValue,
+            'h-[--w-textarea-height,10rem] min-h-[--w-textarea-height,10rem] w-full overflow-auto overscroll-contain whitespace-pre': textarea,
+            'resize-y': resize && textarea,
+            'resize-none': !resize && textarea,
+            'border-b border-solid border-gray-300 dark:border-gray-700': textarea,
           }"
-        >
-          {{ modelValue || emptyValue }}
-        </div>
+          class="overflow-x-auto overscroll-x-contain"
+        ><slot
+          name="before"
+          v-bind="{modelValue}"
+        />{{ modelValue || emptyValue }}</div>
       </div>
     </template>
 
@@ -66,7 +73,7 @@
         @click="focus"
       >
         <InputToolbar
-          v-if="textarea && (rich || toolbarActions || $slots.toolbar)"
+          v-if="!isDisabled && !isReadonly && textarea && (rich || toolbarActions || $slots.toolbar)"
           :list="toolbarActions"
           :rich="rich === true"
           :is-undo="historyPosition > 0"
@@ -181,7 +188,7 @@
                     $emit('blur', $event);
                     setFocused(false);
                     isSecureVisible = false;
-                    seamless && contentRef?.scrollTo({left: 0});
+                    contentRef?.scrollTo({left: 0});
                   "
                   @click="$emit('click', $event)"
                   @mousedown.stop="$emit('mousedown', $event)"
@@ -257,9 +264,8 @@ import {debounce} from '@/utils/utils'
 import InputActions from './components/InputActions.vue'
 import {type CaretOffset} from './models/utils'
 
-const InputToolbar = defineAsyncComponent(() => import('./components/InputToolbar.vue'))
-
 const ContentEditable = defineAsyncComponent(() => import('./components/ContentEditable.vue'))
+const InputToolbar = defineAsyncComponent(() => import('./components/InputToolbar.vue'))
 
 type ModelValue = Required<InputProps<Type>>['modelValue']
 

@@ -41,7 +41,9 @@ export const setCaretOffset = (parent: Element | null | undefined, indexStart: n
   selection?.addRange(range)
 }
 
-const getOffsetFromNode = (parent: Element, targetNode: Node, targetOffset: number, isStart: boolean): number => {
+const endSpacesRegex = /\s+$/
+
+const getOffsetFromNode = (parent: Element, targetNode: Node, targetOffset: number, isStart: boolean): {offset: number, trail: number} => {
   if (!parent.firstChild) parent.appendChild(document.createTextNode(''))
   
   const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT, null)
@@ -49,25 +51,31 @@ const getOffsetFromNode = (parent: Element, targetNode: Node, targetOffset: numb
   
   while ((node = walker.nextNode())) {
     if (node.parentElement?.contentEditable === 'false') {
-      if (isStart && node === targetNode) return offset
+      if (isStart && node === targetNode) return {offset, trail: 0}
     } else if (node === targetNode) {
-      return offset + targetOffset
+      const text = node.textContent
+      if (text?.[targetOffset] === '\n') {
+        const trail = text.slice(0, targetOffset).match(endSpacesRegex)?.[0]?.length ?? 0
+        return {offset: offset + targetOffset - trail, trail}
+      }
+
+      return {offset: offset + targetOffset, trail: 0}
     }
 
     offset += node.nodeValue?.length ?? 0
   }
   
-  return offset
+  return {offset, trail: 0}
 }
 
-export const getCaretOffset = (parent: Element | null | undefined): CaretOffset => {
-  if (!parent) return {start: 0, end: 0}
+export const getCaretOffset = (parent: Element | null | undefined): CaretOffset & {trail: number} => {
+  if (!parent) return {start: 0, end: 0, trail: 0}
   const selection = window.getSelection()
-  if (!selection || selection.rangeCount === 0) return {start: 0, end: 0}
+  if (!selection || selection.rangeCount === 0) return {start: 0, end: 0, trail: 0}
   const range = selection.getRangeAt(0)
 
   const start = getOffsetFromNode(parent, range.startContainer, range.startOffset, true)
   const end = range.startOffset !== range.endOffset ? getOffsetFromNode(parent, range.endContainer, range.endOffset, false) : start
 
-  return {start, end}
+  return {start: start.offset, end: end.offset, trail: end.trail}
 }

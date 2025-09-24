@@ -73,7 +73,7 @@ const modelValue = computed<Parameters<ValidateFn>[0]>(() => {
   return undefined
 })
 
-const initModelValue = ref<Parameters<ValidateFn>[0]>()
+const initModelValue = ref<Parameters<ValidateFn>[0]>(modelValue.value)
 const isErrorShown = ref(false)
 const wasChanged = ref(false)
 const required = computed<boolean | undefined>(() => componentSlot.value?.props?.required !== undefined ? componentSlot.value?.props?.required !== false : undefined)
@@ -170,7 +170,7 @@ const doValidate = (silent?: boolean, path?: ValidatePath): string | undefined =
   errorMessage.value = message
 
   if (!silent) {
-    isErrorShown.value = true
+    isErrorShown.value = message !== undefined
 
     if (!isInsideTab) scrollTo()
   }
@@ -248,7 +248,7 @@ watch(title, value => {
 }, {immediate: true})
 
 watch(required, () => {
-  doValidate()
+  doValidate(true)
 })
 
 watch(skeleton, value => {

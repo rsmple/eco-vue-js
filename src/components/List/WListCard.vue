@@ -98,7 +98,7 @@
           : hasAction
             ? {tag: 'button', card, class: 'z-[-1]', onClick: () => $emit('click:action')}
             : to
-              ? {tag: markRaw(RouterLink), card, class: 'z-[-1]', props: {to}}
+              ? {tag: markRaw(WRouterLink), card, class: 'z-[-1]', props: {to}}
               : allowOpen
                 ? {tag: 'button', card, class: 'z-[-1]', onClick: toggle}
                 : {tag: 'div', card, class: 'z-[-1]'}
@@ -196,11 +196,11 @@
 import type {LinkProps} from '@/types/types'
 
 import {computed, markRaw, ref, useTemplateRef} from 'vue'
-import {RouterLink} from 'vue-router'
 
 import WButtonMore from '@/components/Button/WButtonMore.vue'
 import WButtonMoreItem from '@/components/Button/WButtonMoreItem.vue'
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
+import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 
 import IconAddCircle from '@/assets/icons/IconAddCircle.svg?component'
 import IconMinusCircle from '@/assets/icons/IconMinusCircle.svg?component'

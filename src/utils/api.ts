@@ -1,9 +1,9 @@
 import {type Reactive, type Ref, reactive, watch} from 'vue'
-import {useRouter} from 'vue-router'
 
 import type WForm from '@/components/Form/WForm.vue'
 import type WFormValidator from '@/components/Form/WFormValidator.vue'
 
+import {useOptionalRouter} from '@/composables/useOptionalRouter'
 import {Notify} from '@/utils/Notify'
 
 import {get} from './utils'
@@ -116,7 +116,7 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
   let lastQuery: EncodeQueryParams<Partial<QueryParams>> | null = null
 
   const fn = (route: {query: EncodeQueryParams<Partial<QueryParams>>, hash?: string}, enabled?: Ref<boolean>) => {
-    const router = useRouter()
+    const router = useOptionalRouter()
 
     const updateQueryParams = (value: Partial<QueryParams>) => {
       router.replace({

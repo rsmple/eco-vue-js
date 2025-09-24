@@ -10,8 +10,9 @@
 </template>
 
 <script lang="ts" setup generic="QueryParams">
-import {type LocationQueryRaw, useRoute, useRouter} from 'vue-router'
+import {type LocationQueryRaw} from 'vue-router'
 
+import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRouter'
 import {Notify} from '@/utils/Notify'
 
 const props = defineProps<{
@@ -22,8 +23,8 @@ defineEmits<{
   (e: 'update:selected', value: boolean): void
 }>()
 
-const route = useRoute()
-const router = useRouter()
+const route = useOptionalRoute()
+const router = useOptionalRouter()
 
 const copyRoute = (): void => {
   navigator.clipboard

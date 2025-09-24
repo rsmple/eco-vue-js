@@ -5,7 +5,7 @@
   />
 
   <component
-    :is="to ? RouterLink : 'button'"
+    :is="to ? WRouterLink : 'button'"
     v-else
     v-bind="to ? {to} : undefined"
     class="
@@ -43,8 +43,7 @@
 <script setup lang="ts">
 import type {LinkProps} from '@/types/types'
 
-import {RouterLink} from 'vue-router'
-
+import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
