@@ -165,6 +165,8 @@ const _validateOnUnselect = (value: string) => {
 const doValidate = (silent?: boolean, path?: ValidatePath): string | undefined => {
   if (props.name && path && !path[props.name]) return
 
+  if (errorMessage.value) return errorMessage.value
+
   const message = _validate(modelValue.value)
   
   errorMessage.value = message
@@ -187,6 +189,8 @@ const invalidate = (messages: Record<string, string | string[] | undefined>): vo
 
   if (typeof message === 'string') errorMessage.value = message
   else if (message instanceof Array) errorMessage.value = message.join(', ')
+
+  if (message) isErrorShown.value = true
 }
 
 const initModel = (): void => {
