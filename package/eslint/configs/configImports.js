@@ -39,7 +39,6 @@ const createConfig = (tsConfig, astro = false) => {
     settings: {
       'import/parsers': {
         '@typescript-eslint/parser': ['.ts', '.js'],
-        ...(astro ? {'astro-eslint-parser': ['.astro']} : {}),
       },
       'import/resolver': {
         typescript: {
@@ -60,6 +59,11 @@ export default ({tsConfig = './tsconfig.json', astro = false}) => [
     },
     rules: {
       ...importPlugin.flatConfigs.recommended.rules,
+      ...(astro ? {
+        'import/named': 'off',
+        'import/namespace': 'off',
+        'import/default': 'off',
+      } : {}),
       'import/order': [
         1,
         {

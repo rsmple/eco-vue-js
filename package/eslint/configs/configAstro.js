@@ -14,6 +14,8 @@ export default (astroParser) => [
       'import/default': 'off',
       'import/no-named-as-default': 'off',
       'import/no-named-as-default-member': 'off',
+      'import/named': 'off',
+      'import/namespace': 'off',
       indent: 'off',
       '@stylistic/indent': 'off',
     },
