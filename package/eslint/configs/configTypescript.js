@@ -3,9 +3,9 @@ import unusedImports from 'eslint-plugin-unused-imports'
 import pluginVue from 'eslint-plugin-vue'
 import {parser as tseslintParser, plugin as tseslintPlugin} from 'typescript-eslint'
 
-export default [
+export default (config = {}) => [
   {
-    files: ['**/*.{ts,js,vue}'],
+    files: config.astro ? ['**/*.{ts,js,vue,astro}'] : ['**/*.{ts,js,vue}'],
     plugins: {
       'unused-imports': unusedImports,
       '@stylistic': stylistic,

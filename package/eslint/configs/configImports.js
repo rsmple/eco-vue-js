@@ -2,12 +2,12 @@ import importPlugin from 'eslint-plugin-import'
 
 import {readFileSync} from 'fs'
 
-const createConfig = (tsConfig) => {
+const createConfig = (tsConfig, astro = false) => {
   const file = readFileSync(tsConfig, 'utf-8')
   const parsed = JSON.parse(file)
 
   return {
-    files: parsed.include ?? ['**/*.{ts,js,vue}'],
+    files: parsed.include ?? (astro ? ['**/*.{ts,js,vue,astro}'] : ['**/*.{ts,js,vue}']),
     plugins: {
       import: importPlugin,
     },
@@ -39,6 +39,7 @@ const createConfig = (tsConfig) => {
     settings: {
       'import/parsers': {
         '@typescript-eslint/parser': ['.ts', '.js'],
+        ...(astro ? {'astro-eslint-parser': ['.astro']} : {}),
       },
       'import/resolver': {
         typescript: {
@@ -51,9 +52,9 @@ const createConfig = (tsConfig) => {
   }
 }
 
-export default ({tsConfig = './tsconfig.json'}) => [
+export default ({tsConfig = './tsconfig.json', astro = false}) => [
   {
-    files: ['**/*.{ts,js,vue}'],
+    files: astro ? ['**/*.{ts,js,vue,astro}'] : ['**/*.{ts,js,vue}'],
     plugins: {
       import: importPlugin,
     },
@@ -84,5 +85,5 @@ export default ({tsConfig = './tsconfig.json'}) => [
     },
   },
 
-  ...(Array.isArray(tsConfig) ? tsConfig : [tsConfig]).map(createConfig),
+  ...(Array.isArray(tsConfig) ? tsConfig : [tsConfig]).map(cfg => createConfig(cfg, astro)),
 ]

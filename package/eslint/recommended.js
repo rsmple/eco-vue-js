@@ -5,6 +5,7 @@ import {
 } from '@vue/eslint-config-typescript'
 import pluginVue from 'eslint-plugin-vue'
 
+import configAstro from './configs/configAstro.js'
 import configImports from './configs/configImports.js'
 import configJson from './configs/configJson.js'
 import configSvgo from './configs/configSvgo.js'
@@ -19,12 +20,14 @@ export default (config = {}) => [
   ).map(item => ({...item, files: ['**/*.{ts,tsx,vue}']})),
 
   ...config.noVue ? [] : configVue,
-  
+
   ...pluginQuery.configs['flat/recommended'],
 
   ...configJson,
-  ...configTypescript,
-  ...configTailwind,
+  ...configTypescript(config),
+  ...configTailwind(config),
   ...configImports(config),
   ...configSvgo,
+
+  ...config.astro ? configAstro(config.astro) : [],
 ]
