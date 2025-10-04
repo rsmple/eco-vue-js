@@ -19,6 +19,7 @@
       border-gray-100 bg-cover bg-center outline-none dark:border-gray-800
     "
       :style="{backgroundImage: `url(${modelValue})`}"
+      aria-label="View image"
       @click="openModal"
     >
       <div class="opacity-0 transition-opacity group-hover/image-button:opacity-100">

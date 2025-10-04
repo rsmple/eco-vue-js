@@ -43,13 +43,11 @@
       <WSpinner class="w-spinner-size-[1.125em]" />
     </div>
 
-    <InputActionsButton
-      v-else-if="$slots.default"
+    <slot
+      name="default"
+      :loading="loading"
       :disabled="disabled"
-      @click="$emit('click:slot', $event)"
-    >
-      <slot name="default" />
-    </InputActionsButton>
+    />
   </div>
 </template>
 
@@ -85,7 +83,6 @@ defineEmits<{
   (e: 'show:secure', value: MouseEvent): void
   (e: 'hide:secure', value: MouseEvent): void
   (e: 'click:clear'): void
-  (e: 'click:slot', value: MouseEvent): void
 }>()
 
 const {doCopy, iconCopy} = useCopy(toRef(props, 'modelValue'))

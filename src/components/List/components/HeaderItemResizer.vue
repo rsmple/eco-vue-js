@@ -7,6 +7,7 @@
 
     <button
       class="absolute -right-2 top-0 flex h-full w-6 cursor-col-resize items-center opacity-50 hover:opacity-100"
+      aria-label="Resize column"
       @mousedown.stop.prevent="startDrag"
       @click.stop.prevent
     >

@@ -5,7 +5,7 @@
     :class="[$attrs.class, {
       'group/seamless': seamless,
     }]"
-    @click="$emit('click:suffix', $event); seamless && focus()"
+    @click="seamless && focus()"
   >
     <template
       v-if="$slots.title"
@@ -215,16 +215,18 @@
           :allow-copy="allowCopy"
           :focused="focused"
           @click:clear="clearValue"
-          @click:slot="focused ? blur() : focus(); $emit('click:suffix', $event)"
           @show:secure="isSecureVisible = true; $emit('click', $event)"
           @hide:secure="isSecureVisible = false"
           @click:paste="paste"
         >
           <template
             v-if="$slots.suffix"
-            #default
+            #default="scope"
           >
-            <slot name="suffix" />
+            <slot
+              name="suffix"
+              v-bind="scope"
+            />
           </template>
         </InputActions>
 
@@ -299,7 +301,6 @@ const emit = defineEmits<{
   (e: 'blur', value: FocusEvent): void
   (e: 'click', value: MouseEvent): void
   (e: 'mousedown', value: MouseEvent): void
-  (e: 'click:suffix', value: MouseEvent): void
   (e: 'select:input', value: Event): void
   (e: 'paste'): void
 }>()

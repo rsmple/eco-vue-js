@@ -13,6 +13,7 @@
     >
       <button
         class="square-full snap-start"
+        aria-label="Close"
         @click="hide"
       />
 

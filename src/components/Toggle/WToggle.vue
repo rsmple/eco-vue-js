@@ -20,6 +20,10 @@
         'justify-center': center,
       }"
       :disabled="isDisabled || isReadonly || isSkeleton"
+      role="switch"
+      :aria-checked="value === null ? 'mixed' : value"
+      :aria-disabled="isDisabled || isSkeleton"
+      :aria-readonly="isReadonly"
       @click="updateModelValue"
     >
       <div

@@ -6,6 +6,7 @@
       'w-ripple w-ripple-hover cursor-pointer': !disabled,
       'before:opacity-10': !disabled && active,
     }"
+    :aria-label="label ?? tooltip ?? title"
     @click="!disabled && $emit('click', $event)"
     @mouseenter="!disabled && $emit('mouseenter', $event)"
     @mouseleave="!disabled && $emit('mouseleave', $event)"
@@ -33,6 +34,7 @@ defineProps<{
   icon: SVGComponent | undefined
   tooltip: string | undefined
   disabled: boolean | undefined
+  label: string | undefined
   active?: boolean
 }>()
 

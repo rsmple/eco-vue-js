@@ -161,6 +161,8 @@ export const toolbarActionList: ToolbarAction[] = [
     value: Array(6).fill(null).map((_, index) => ({
       title: `H${ index + 1 }`,
       value: {type: WrapSelectionType.LINE_PREFIX, linePrefix: `${ '#'.repeat(index + 1) } `},
+      label: `Heading ${ index + 1 }`,
     })),
+    label: 'Heading',
   },
 ]

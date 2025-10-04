@@ -2,7 +2,7 @@
   <button
     ref="closeButton"
     class="absolute left-0 top-0 -z-10 size-full cursor-pointer outline-none"
-    title="Click outside to close modal"
+    aria-label="Close modal"
     @click="$emit('click', $event)"
   />
 </template>

@@ -5,6 +5,8 @@
       'text-primary dark:text-primary-dark bg-primary/10 dark:bg-primary-dark/10': active,
       'text-description': !active,
     }"
+    :aria-pressed="active"
+    :aria-label="label"
     @click="$emit('click', $event)"
   >
     <component
@@ -17,6 +19,7 @@
 <script setup lang="ts">
 defineProps<{
   icon: SVGComponent
+  label: string
   active: boolean
 }>()
 

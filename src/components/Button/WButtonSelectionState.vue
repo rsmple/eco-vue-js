@@ -6,6 +6,7 @@
 
     <button
       class="text-description w-ripple w-ripple-hover relative flex cursor-pointer select-none items-center justify-self-end"
+      aria-label="Remove selection"
       @click="$emit('click', $event)"
     >
       <IconCancel class="square-[1.25em] mx-[--w-list-padding,1rem]" />

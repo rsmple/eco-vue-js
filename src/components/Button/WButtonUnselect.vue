@@ -6,6 +6,9 @@
       'cursor-progress': loading,
       'w-ripple w-ripple-hover cursor-pointer ': !loading && !disabled,
     }"
+    :disabled="disabled"
+    :aria-disabled="disabled || loading"
+    aria-label="Clear selection"
     @click="!loading && !disabled && $emit('click', $event)"
     @mousedown="!loading && !disabled && $emit('mousedown', $event)"
   >

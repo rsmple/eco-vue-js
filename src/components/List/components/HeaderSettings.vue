@@ -27,6 +27,7 @@
                 v-for="item in listModeList"
                 :key="item"
                 :icon="listModeIconMap[item]"
+                :label="listModeLabelMap[item]"
                 :active="mode === item"
                 @click="$emit('update:mode', item)"
               />
@@ -57,6 +58,8 @@
                 'cursor-not-allowed opacity-50': !hasSaved,
               }"
               :disabled="!hasSaved"
+              :aria-disabled="!hasSaved"
+              aria-label="Reset column settings"
               @click="hasSaved && $emit('click:reset')"
             >
               Reset
@@ -86,7 +89,7 @@ import HeaderSettingsList from './HeaderSettingsList.vue'
 import HeaderSettingsModeButton from './HeaderSettingsModeButton.vue'
 
 import {isField} from '../models/utils'
-import {listModeIconMap, listModeList, sortFields} from '../use/useListConfig'
+import {listModeIconMap, listModeLabelMap, listModeList, sortFields} from '../use/useListConfig'
 
 const props = defineProps<{
   fields: ListFields<Data, QueryParams>
