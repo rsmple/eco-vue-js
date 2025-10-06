@@ -1,9 +1,6 @@
-import type {LocationQuery, RouteRecordRaw} from 'vue-router'
+import type {LocationQuery} from 'vue-router'
 
-import {ref} from 'vue'
-
-import WRouteAuth from '@/components/Auth/WRouteAuth.vue'
-import WRouteAuthNo from '@/components/Auth/WRouteAuthNo.vue'
+import {type Ref, ref} from 'vue'
 
 import {checkExpirationDate, getLastRefreshPromise, removeExpirationDate, removeRefreshTimestamp, setExpirationDate, setRefreshTimestamp} from '@/components/Auth/utils/utils'
 
@@ -41,7 +38,8 @@ export interface ApiClient {
 
 export class ApiClientInstance implements ApiClient {
   refreshPromise: Promise<void> | null = null
-  isAuthFailed = ref(false)
+  private readonly auth = ref(true)
+  public readonly useAuth: () => Ref<boolean>
 
   constructor(private config: {
     tokenGetter?: () => string | null
@@ -50,16 +48,12 @@ export class ApiClientInstance implements ApiClient {
     onFailure?: (response: Response) => void
     credentials?: RequestCredentials
     baseUrl?: BaseUrl
-    routeNameAuth: string
-    routeNameAuthNo: string
-  }) {}
+  }) {
+    window.addEventListener('storage', this.checkAuth)
 
-  get routeNameAuth() {
-    return this.config.routeNameAuth
-  }
-
-  get routeNameAuthNo() {
-    return this.config.routeNameAuthNo
+    this.useAuth = () => {
+      return this.auth
+    }
   }
 
   setOnFailure(value: (response: Response) => void) {
@@ -68,6 +62,8 @@ export class ApiClientInstance implements ApiClient {
 
   logout() {
     removeExpirationDate()
+
+    this.auth.value = false
   }
 
   private async retry(request: Request) {
@@ -91,7 +87,7 @@ export class ApiClientInstance implements ApiClient {
           .then(() => {
             this.refreshPromise = null
 
-            this.isAuthFailed.value = false
+            this.auth.value = true
           })
           .catch(async () => {
             this.refreshPromise = null
@@ -102,7 +98,7 @@ export class ApiClientInstance implements ApiClient {
               if (this.refreshPromise) return this.refreshPromise
 
               if (check === null) {
-                this.isAuthFailed.value = true
+                this.auth.value = false
 
                 return Promise.reject()
               }
@@ -120,11 +116,11 @@ export class ApiClientInstance implements ApiClient {
         this.refreshPromise = promise
           .then(() => {
             this.refreshPromise = null
+            this.auth.value = true
           })
           .catch((error: unknown) => {
             this.refreshPromise = null
-
-            this.isAuthFailed.value = true
+            this.auth.value = false
 
             return Promise.reject(error)
           })
@@ -141,7 +137,7 @@ export class ApiClientInstance implements ApiClient {
     if (this.config.tokenGetter && !this.config.tokenRefresh) result = !!this.config.tokenGetter?.()
     else result = checkExpirationDate()
 
-    if (result) this.isAuthFailed.value = false
+    if (result !== false) this.auth.value = result !== null
 
     return result
   }
@@ -159,7 +155,7 @@ export class ApiClientInstance implements ApiClient {
           if (check !== null && (this.config.refreshUrl || this.config.tokenRefresh)) await this.refresh()
 
           if (!this.checkAuth()) {
-            this.isAuthFailed.value = true
+            this.auth.value = false
 
             reject()
             return
@@ -171,6 +167,7 @@ export class ApiClientInstance implements ApiClient {
 
           if (token) headers.append('Authorization', 'Bearer ' + token)
           else {
+            this.auth.value = false
             reject()
             return
           }
@@ -211,7 +208,7 @@ export class ApiClientInstance implements ApiClient {
                 if (response.status === 401) {
                   if (this.config.refreshUrl || this.config.tokenRefresh) return this.refresh().then(() => this.retry(request))
 
-                  this.isAuthFailed.value = true
+                  this.auth.value = false
                 }
 
                 this.config.onFailure?.(response)
@@ -260,54 +257,6 @@ export class ApiClientInstance implements ApiClient {
 
   delete<R>(url: ApiUrl, config?: RequestConfig<never>) {
     return this.fetch<R, NonNullable<unknown>>('DELETE', url, config)
-  }
-
-  getRouteAuth(this: ApiClientInstance) {
-    return {
-      path: '',
-      props: {apiClientInstance: this} satisfies ComponentInstance<typeof WRouteAuth> extends {$props: infer P} ? P : never,
-      component: WRouteAuth,
-      beforeEnter: async to => {
-        if (to.meta.noAuth) return
-
-        if (this.refreshPromise) await this.refreshPromise
-
-        if (!this.checkAuth()) {
-          if (this.config.refreshUrl || this.config.tokenRefresh) return this.refresh()
-            .catch(() => ({
-              name: this.routeNameAuthNo, query: to.fullPath !== '/' ? {hash: to.fullPath} : undefined,
-            }))
-
-          return {name: this.routeNameAuthNo, query: to.fullPath !== '/' ? {hash: to.fullPath} : undefined}
-        }
-      },
-      meta: {
-        noAuth: false,
-      },
-    } satisfies RouteRecordRaw
-  }
-
-  getRouteAuthNo(this: ApiClientInstance) {
-    return {
-      path: '',
-      props: {apiClientInstance: this} satisfies ComponentInstance<typeof WRouteAuthNo> extends {$props: infer P} ? P : never,
-      component: WRouteAuthNo,
-      beforeEnter: (to, from) => {
-        if (!this.checkAuth()) {
-          if (!to.query.hash && !from.meta.noAuth && from.fullPath !== '/') {
-            return {...to, query: {hash: from.fullPath}}
-          }
-
-          return
-        }
-  
-        if (typeof to.query.hash === 'string') return to.query.hash
-        else return {name: this.routeNameAuth}
-      },
-      meta: {
-        noAuth: true,
-      },
-    } satisfies RouteRecordRaw
   }
 
   addInstance(baseUrl: BaseUrl): ApiClient {
