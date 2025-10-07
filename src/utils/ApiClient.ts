@@ -138,6 +138,7 @@ export class ApiClientInstance implements ApiClient {
     else result = checkExpirationDate()
 
     if (result !== false) this.auth.value = result !== null
+    if (result === null) removeExpirationDate()
 
     return result
   }
