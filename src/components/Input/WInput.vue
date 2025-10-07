@@ -194,6 +194,7 @@
                   @mousedown.stop="$emit('mousedown', $event)"
                   @select.stop="$emit('select:input', $event)"
                   @update:model-value="updateModelValue"
+                  @paste.prevent="onPaste"
                 />
 
                 <slot name="after" />
@@ -324,10 +325,19 @@ const getCaret = (): CaretOffset => {
 const setCaret = (start: number, end?: number): void => {
   if (!inputRef.value) return
   if ('setCaret' in inputRef.value) inputRef.value.setCaret(start, end)
-  else inputRef.value.setSelectionRange(start, end ?? null)
+  else inputRef.value.setSelectionRange(start, end ?? start)
 }
 
-const addToHistory = debounce((value: ModelValue | undefined): void => {
+const addToHistory = (value: ModelValue | undefined) => {
+  if (history.value.length === 0) {
+    history.value.push({value: props.modelValue, caret: getCaret()} as typeof history.value[number])
+    historyPosition.value = 0
+  }
+
+  addToHistoryDebounced(value)
+}
+
+const addToHistoryDebounced = debounce((value: ModelValue | undefined): void => {
   const entry: HistoryEntry = {value, caret: getCaret()}
 
   if (historyPosition.value < history.value.length - 1) history.value = history.value.slice(0, historyPosition.value + 1)
@@ -459,7 +469,30 @@ const focus = (): void => {
 
 const blur = (): void => inputRef.value?.blur()
 
+const onPaste = async (e: ClipboardEvent) => {
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
+
+  navigator.clipboard.readText()
+  const text = (e.clipboardData?.getData('text/plain') || await navigator.clipboard.readText()).replace(/\r\n?/g, '\n')
+
+  if (!text) {
+    fieldWrapperRef.value?.showMessage('Nothing to paste')
+    return
+  }
+ 
+  const caret = getCaret()
+  const value = props.modelValue?.toString() ?? ''
+  const newValue = value.slice(0, caret.start) + text + value.slice(caret.end)
+
+  updateModelValue(newValue)
+
+  await nextTick()
+  setCaret(Math.min(caret.start + text.length, props.modelValue?.toString().length ?? 0))
+}
+
 const paste = async () => {
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
+
   try {
     await checkPermissionPaste()
     await navigator.clipboard

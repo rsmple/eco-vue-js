@@ -9,7 +9,7 @@
     class="relative whitespace-pre"
     @input="onInput"
     @beforeinput="insertParagraph($event as InputEvent)"
-    @paste="onPaste"
+    @paste.prevent="onPaste"
     @keydown="$emit('keydown', $event)"
     @focus="$emit('focus', $event); focused = true"
     @blur="$emit('blur', $event); focused = false"
@@ -163,8 +163,6 @@ const onInput = (e: Event) => {
 }
 
 const onPaste = async (e: ClipboardEvent) => {
-  e.preventDefault()
-
   navigator.clipboard.readText()
   const text = (e.clipboardData?.getData('text/plain') || await navigator.clipboard.readText()).replace(/\r\n?/g, '\n')
  

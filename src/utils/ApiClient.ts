@@ -49,7 +49,7 @@ export class ApiClientInstance implements ApiClient {
     credentials?: RequestCredentials
     baseUrl?: BaseUrl
   }) {
-    window.addEventListener('storage', this.checkAuth)
+    if (typeof window !== 'undefined') window.addEventListener('storage', this.checkAuth)
 
     this.useAuth = () => {
       return this.auth
