@@ -24,7 +24,7 @@ function deleteCookie(name: string) {
 const EXP_FACTOR = 1000
 
 export function checkExpirationDate(): boolean | null {
-  const exp = Number.parseFloat(getCookie(EXPIRATION_DATE_KEY))
+  const exp = Number.parseFloat(localStorage.getItem(EXPIRATION_DATE_KEY) ?? getCookie(EXPIRATION_DATE_KEY))
 
   if (!exp || !Number.isFinite(exp)) return null
 
