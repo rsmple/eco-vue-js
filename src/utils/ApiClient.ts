@@ -49,7 +49,7 @@ export class ApiClientInstance implements ApiClient {
     credentials?: RequestCredentials
     baseUrl?: BaseUrl
   }) {
-    if (typeof window !== 'undefined') setInterval(this.checkAuth, 500)
+    if (typeof window !== 'undefined') setInterval(() => this.checkAuth(), 500)
 
     this.useAuth = () => {
       return this.auth
