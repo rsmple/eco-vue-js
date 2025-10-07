@@ -36,7 +36,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:model-value', value: string): void
+  (e: 'update:model-value', value: string, noDebounce?: boolean): void
   (e: 'focus', value: FocusEvent): void
   (e: 'blur', value: FocusEvent): void
   (e: 'keydown', value: KeyboardEvent): void
@@ -177,7 +177,7 @@ const insertPlain = (text: string) => {
   const next = (currentText ?? '').slice(0, start) + ' '.repeat(trail) + text + ((currentText ?? '').slice(end) || ' ')
   const caretAfter = start + text.length + trail
 
-  emit('update:model-value', props.maxLength && next.length > props.maxLength ? next.substring(0, props.maxLength) : next)
+  emit('update:model-value', props.maxLength && next.length > props.maxLength ? next.substring(0, props.maxLength) : next, true)
   nextTick(() => setCaret(props.maxLength ? Math.min(caretAfter, props.maxLength) : caretAfter))
 }
 
@@ -296,7 +296,7 @@ const wrapSelection = (value: WrapSelection): void => {
 
   isSetCaretNext = true
 
-  emit('update:model-value', newText)
+  emit('update:model-value', newText, true)
   requestAnimationFrame(() => setCaret(newCursorStart, newCursorEnd))
 }
 

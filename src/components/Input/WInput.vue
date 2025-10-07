@@ -328,16 +328,17 @@ const setCaret = (start: number, end?: number): void => {
   else inputRef.value.setSelectionRange(start, end ?? start)
 }
 
-const addToHistory = (value: ModelValue | undefined) => {
+const addToHistory = (value: ModelValue | undefined, noDebounce: boolean) => {
   if (history.value.length === 0) {
     history.value.push({value: props.modelValue, caret: getCaret()} as typeof history.value[number])
     historyPosition.value = 0
   }
 
-  addToHistoryDebounced(value)
+  if (noDebounce) nextTick(() => addToHistoryFn(value))
+  else addToHistoryDebounced(value)
 }
 
-const addToHistoryDebounced = debounce((value: ModelValue | undefined): void => {
+const addToHistoryFn = (value: ModelValue | undefined): void => {
   const entry: HistoryEntry = {value, caret: getCaret()}
 
   if (historyPosition.value < history.value.length - 1) history.value = history.value.slice(0, historyPosition.value + 1)
@@ -348,7 +349,9 @@ const addToHistoryDebounced = debounce((value: ModelValue | undefined): void => 
     history.value.shift()
     historyPosition.value--
   }
-}, 500)
+}
+
+const addToHistoryDebounced = debounce(addToHistoryFn, 500)
 
 const undo = (): void => {
   if (props.loading || isDisabled.value || isReadonly.value || props.unclickable || props.textSecure) return
@@ -391,14 +394,14 @@ const handleHistoryKeydown = (event: KeyboardEvent): void => {
   else undo()
 }
 
-const updateModelValue = (value: string | undefined): void => {
+const updateModelValue = (value: string | undefined, noDebounce = false): void => {
   if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
 
   let newValue: ModelValue
   if (props.type === 'number') newValue = (typeof value === 'string' && value.length ? Number.parseFloat(value) : undefined) as ModelValue
   else newValue = value as ModelValue
 
-  if (!props.textSecure) addToHistory(newValue)
+  if (!props.textSecure) addToHistory(newValue, noDebounce)
 
   emit('update:model-value', newValue)
 }
@@ -453,8 +456,8 @@ const handleInputEvent = (event: Event): void => {
 const clearValue = () => {
   if (isDisabled.value || isReadonly.value || props.unclickable) return
 
-  if (typeof props.modelValue === 'string') updateModelValue('')
-  else updateModelValue(undefined)
+  if (typeof props.modelValue === 'string') updateModelValue('', true)
+  else updateModelValue(undefined, true)
 
   inputRef.value?.focus()
   emit('click:clear')
@@ -484,7 +487,7 @@ const onPaste = async (e: ClipboardEvent) => {
   const value = props.modelValue?.toString() ?? ''
   const newValue = value.slice(0, caret.start) + text + value.slice(caret.end)
 
-  updateModelValue(newValue)
+  updateModelValue(newValue, true)
 
   await nextTick()
   setCaret(Math.min(caret.start + text.length, props.modelValue?.toString().length ?? 0))
@@ -501,7 +504,7 @@ const paste = async () => {
         if (!value) {
           Notify.warn({title: 'Nothing to paste'})
         } else if (!props.maxLength || props.maxLength <= value.length) {
-          updateModelValue(value)
+          updateModelValue(value, true)
           Notify.success({title: 'Pasted'})
           nextTick().then(() => emit('paste'))
         } else Notify.error({
@@ -551,18 +554,8 @@ watch(() => props.autofocus, value => {
   nextTick(autofocusDebounced)
 })
 
-const handle = watch(() => props.modelValue, value => {
-  if (history.value.length === 0) {
-    if (value) {
-      addToHistory(value)
-      handle.stop()
-    }
-  } else handle.stop()
-})
-
 onMounted(() => {
   if (props.autofocus !== false && props.autofocus !== undefined) autofocusDebounced()
-  if (props.modelValue) addToHistory(props.modelValue)
 })
 
 onBeforeUnmount(() => {
