@@ -1,20 +1,15 @@
 <template>
-  <WForm
+  <div
     v-if="!removable || active"
     v-show="active"
-    ref="form"
-    :name="name"
-    :title="title"
-    @update:is-valid="$event === false && $emit('tab:switch', name)"
+    ref="element"
   >
     <slot />
-  </WForm>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import {nextTick, toRef, useTemplateRef, watch} from 'vue'
-
-import WForm from '@/components/Form/WForm.vue'
 
 import {useTabItemActiveListener} from '../use/useTabItemActiveListener'
 
@@ -26,19 +21,18 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'tab:switch', value: string): void
   (e: 'update:height', value: number): void
   (e: 'update:active'): void
 }>()
 
 const {callListeners} = useTabItemActiveListener()
 
-const formRef = useTemplateRef('form')
+const elementRef = useTemplateRef('element')
 
 const emitHeight = (): void => {
-  if (!formRef.value) return
+  if (!elementRef.value) return
 
-  emit('update:height', formRef.value.$el.offsetHeight)
+  emit('update:height', elementRef.value.offsetHeight)
 }
 
 watch(() => props.active, async value => {

@@ -14,7 +14,7 @@
       <template v-if="'keyArray' in field.meta || 'getterArray' in field.meta">
         <component
           :is="field.default ?? 'div'"
-          v-bind="field.default ? {item, skeleton, card, readonly, config} : (undefined as never)"
+          v-bind="field.default ? {item, skeleton, card, readonly, config, uniformScope} : (undefined as never)"
           :class="field.meta.cssClassArray"
         >
           <ListCardFieldNestedItem :items="skeleton ? [item] : (('keyArray' in field.meta ? item[field.meta.keyArray as keyof typeof item] : field.meta.getterArray(item)) as Data[])">
@@ -34,6 +34,7 @@
                     :skeleton="skeleton"
                     :card="card"
                     :readonly="readonly"
+                    :uniform-scope="uniformScope"
                     nested
                   >
                     <template #default="defaultScope">
@@ -50,7 +51,7 @@
       <component
         :is="field.default ?? 'div'"
         v-else
-        v-bind="field.default ? {item, skeleton, card, readonly, config} : (undefined as never)"
+        v-bind="field.default ? {item, skeleton, card, readonly, config, uniformScope} : (undefined as never)"
         :class="field.meta.cssClass"
         class="flex"
       >
@@ -61,6 +62,7 @@
           :skeleton="skeleton"
           :card="card"
           :readonly="readonly"
+          :uniform-scope="uniformScope"
           nested
         >
           <template #default="defaultScope">
@@ -74,6 +76,7 @@
 
 <script setup lang="ts" generic="Data extends DefaultData, QueryParams">
 import type {FieldComponent, FieldConfig, ListField, ListFieldExport, ListFields} from '../types'
+import type {UniformScope} from '@/components/Uniform/types'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
@@ -92,6 +95,7 @@ defineProps<{
   skeleton: boolean
   card: boolean
   readonly: boolean
+  uniformScope: UniformScope<Data, number> | undefined
 }>()
 
 defineSlots<{
