@@ -138,6 +138,7 @@
                 'text-black-default dark:text-gray-200': !isDisabled,
                 'text-black-default/50 dark:text-gray-200/50': isDisabled,
                 '-p--w-option-padding h-[--w-textarea-height,10rem] min-h-[--w-textarea-height,10rem] w-full overflow-auto overscroll-contain': textarea,
+                'absolute': hideInput,
               }"
             >
               <div class="relative flex min-h-full flex-1">
@@ -151,11 +152,11 @@
                   :id="id"
                   ref="input"
                   class="
-                    w-input min-h-full flex-1 basis-auto appearance-none border-none bg-[inherit]
+                    w-input sm-not:text-base min-h-full flex-1 basis-auto appearance-none border-none bg-[inherit]
                     outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed dark:placeholder:text-gray-500
                   "
                   :class="{
-                    'absolute w-0 max-w-0': hideInput,
+                    'w-0 max-w-0': hideInput,
                     'text-secure': textSecure && !isSecureVisible,
                     '[-webkit-text-fill-color:transparent]': textTransparent,
                   }"
