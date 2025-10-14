@@ -5,7 +5,7 @@
     :class="[$attrs.class, {
       'group/seamless': seamless,
     }]"
-    @click="$emit('click:suffix', $event); seamless && focus()"
+    @click="seamless && focus()"
   >
     <template
       v-if="$slots.title"
@@ -138,6 +138,7 @@
                 'text-black-default dark:text-gray-200': !isDisabled,
                 'text-black-default/50 dark:text-gray-200/50': isDisabled,
                 '-p--w-option-padding h-[--w-textarea-height,10rem] min-h-[--w-textarea-height,10rem] w-full overflow-auto overscroll-contain': textarea,
+                'absolute': hideInput,
               }"
             >
               <div class="relative flex min-h-full flex-1">
@@ -151,11 +152,11 @@
                   :id="id"
                   ref="input"
                   class="
-                    w-input min-h-full flex-1 basis-auto appearance-none border-none bg-[inherit]
+                    w-input sm-not:text-base min-h-full flex-1 basis-auto appearance-none border-none bg-[inherit]
                     outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed dark:placeholder:text-gray-500
                   "
                   :class="{
-                    'absolute w-0 max-w-0': hideInput,
+                    'w-0 max-w-0': hideInput,
                     'text-secure': textSecure && !isSecureVisible,
                     '[-webkit-text-fill-color:transparent]': textTransparent,
                   }"
@@ -194,6 +195,7 @@
                   @mousedown.stop="$emit('mousedown', $event)"
                   @select.stop="$emit('select:input', $event)"
                   @update:model-value="updateModelValue"
+                  @paste.prevent="onPaste"
                 />
 
                 <slot name="after" />
@@ -215,16 +217,18 @@
           :allow-copy="allowCopy"
           :focused="focused"
           @click:clear="clearValue"
-          @click:slot="focused ? blur() : focus(); $emit('click:suffix', $event)"
           @show:secure="isSecureVisible = true; $emit('click', $event)"
           @hide:secure="isSecureVisible = false"
           @click:paste="paste"
         >
           <template
             v-if="$slots.suffix"
-            #default
+            #default="scope"
           >
-            <slot name="suffix" />
+            <slot
+              name="suffix"
+              v-bind="scope"
+            />
           </template>
         </InputActions>
 
@@ -284,6 +288,7 @@ const props = withDefaults(
     readonly: undefined,
     disabled: undefined,
     skeleton: undefined,
+    unclickable: null,
   },
 )
 
@@ -299,7 +304,6 @@ const emit = defineEmits<{
   (e: 'blur', value: FocusEvent): void
   (e: 'click', value: MouseEvent): void
   (e: 'mousedown', value: MouseEvent): void
-  (e: 'click:suffix', value: MouseEvent): void
   (e: 'select:input', value: Event): void
   (e: 'paste'): void
 }>()
@@ -323,10 +327,20 @@ const getCaret = (): CaretOffset => {
 const setCaret = (start: number, end?: number): void => {
   if (!inputRef.value) return
   if ('setCaret' in inputRef.value) inputRef.value.setCaret(start, end)
-  else inputRef.value.setSelectionRange(start, end ?? null)
+  else inputRef.value.setSelectionRange(start, end ?? start)
 }
 
-const addToHistory = debounce((value: ModelValue | undefined): void => {
+const addToHistory = (value: ModelValue | undefined, noDebounce: boolean) => {
+  if (history.value.length === 0) {
+    history.value.push({value: props.modelValue, caret: getCaret()} as typeof history.value[number])
+    historyPosition.value = 0
+  }
+
+  if (noDebounce) nextTick(() => addToHistoryFn(value))
+  else addToHistoryDebounced(value)
+}
+
+const addToHistoryFn = (value: ModelValue | undefined): void => {
   const entry: HistoryEntry = {value, caret: getCaret()}
 
   if (historyPosition.value < history.value.length - 1) history.value = history.value.slice(0, historyPosition.value + 1)
@@ -337,7 +351,9 @@ const addToHistory = debounce((value: ModelValue | undefined): void => {
     history.value.shift()
     historyPosition.value--
   }
-}, 500)
+}
+
+const addToHistoryDebounced = debounce(addToHistoryFn, 500)
 
 const undo = (): void => {
   if (props.loading || isDisabled.value || isReadonly.value || props.unclickable || props.textSecure) return
@@ -380,14 +396,14 @@ const handleHistoryKeydown = (event: KeyboardEvent): void => {
   else undo()
 }
 
-const updateModelValue = (value: string | undefined): void => {
+const updateModelValue = (value: string | undefined, noDebounce = false): void => {
   if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
 
   let newValue: ModelValue
   if (props.type === 'number') newValue = (typeof value === 'string' && value.length ? Number.parseFloat(value) : undefined) as ModelValue
   else newValue = value as ModelValue
 
-  if (!props.textSecure) addToHistory(newValue)
+  if (!props.textSecure) addToHistory(newValue, noDebounce)
 
   emit('update:model-value', newValue)
 }
@@ -442,8 +458,8 @@ const handleInputEvent = (event: Event): void => {
 const clearValue = () => {
   if (isDisabled.value || isReadonly.value || props.unclickable) return
 
-  if (typeof props.modelValue === 'string') updateModelValue('')
-  else updateModelValue(undefined)
+  if (typeof props.modelValue === 'string') updateModelValue('', true)
+  else updateModelValue(undefined, true)
 
   inputRef.value?.focus()
   emit('click:clear')
@@ -458,7 +474,30 @@ const focus = (): void => {
 
 const blur = (): void => inputRef.value?.blur()
 
+const onPaste = async (e: ClipboardEvent) => {
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
+
+  navigator.clipboard.readText()
+  const text = (e.clipboardData?.getData('text/plain') || await navigator.clipboard.readText()).replace(/\r\n?/g, '\n')
+
+  if (!text) {
+    fieldWrapperRef.value?.showMessage('Nothing to paste')
+    return
+  }
+ 
+  const caret = getCaret()
+  const value = props.modelValue?.toString() ?? ''
+  const newValue = value.slice(0, caret.start) + text + value.slice(caret.end)
+
+  updateModelValue(newValue, true)
+
+  await nextTick()
+  setCaret(Math.min(caret.start + text.length, props.modelValue?.toString().length ?? 0))
+}
+
 const paste = async () => {
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
+
   try {
     await checkPermissionPaste()
     await navigator.clipboard
@@ -467,7 +506,7 @@ const paste = async () => {
         if (!value) {
           Notify.warn({title: 'Nothing to paste'})
         } else if (!props.maxLength || props.maxLength <= value.length) {
-          updateModelValue(value)
+          updateModelValue(value, true)
           Notify.success({title: 'Pasted'})
           nextTick().then(() => emit('paste'))
         } else Notify.error({
@@ -517,18 +556,8 @@ watch(() => props.autofocus, value => {
   nextTick(autofocusDebounced)
 })
 
-const handle = watch(() => props.modelValue, value => {
-  if (history.value.length === 0) {
-    if (value) {
-      addToHistory(value)
-      handle.stop()
-    }
-  } else handle.stop()
-})
-
 onMounted(() => {
   if (props.autofocus !== false && props.autofocus !== undefined) autofocusDebounced()
-  if (props.modelValue) addToHistory(props.modelValue)
 })
 
 onBeforeUnmount(() => {

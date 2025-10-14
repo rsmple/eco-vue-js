@@ -12,6 +12,10 @@
       'items-start': alignTop,
       'items-center': !alignTop,
     }"
+    :role="radio ? 'radio' : 'checkbox'"
+    :aria-checked="modelValue === null ? 'mixed' : modelValue"
+    :aria-disabled="isDisabled || isSkeleton"
+    :aria-readonly="isReadonly"
     @click="toggle"
   >
     <div

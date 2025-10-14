@@ -36,6 +36,8 @@
       <button
         v-if="hasFilter"
         class="w-ripple w-ripple-hover relative row-start-1 flex cursor-pointer select-none items-center justify-center"
+        :aria-expanded="isOpen"
+        aria-label="Toggle filters"
         @click="toggle"
       >
         <IconBack

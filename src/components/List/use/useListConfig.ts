@@ -26,6 +26,11 @@ export const listModeIconMap: Record<ListMode, SVGComponent> = {
   [ListMode.GRID]: markRaw(IconGrid),
 }
 
+export const listModeLabelMap: Record<ListMode, string> = {
+  [ListMode.TABLE]: 'Table mode',
+  [ListMode.GRID]: 'Grid mode',
+}
+
 const fieldConfigKeyLength: ObjectKeys<FieldConfig>['length'] = 4
 
 const isFieldConfig = (value: unknown): value is Partial<FieldConfig> => {

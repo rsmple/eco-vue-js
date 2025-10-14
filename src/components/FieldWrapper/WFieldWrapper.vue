@@ -11,7 +11,7 @@
     <label
       v-if="(title || $slots.title) && !seamless"
       :for="id"
-      class="text-accent relative block pr-6 text-xs font-semibold leading-loose"
+      class="text-accent relative block text-xs font-semibold leading-loose"
       :class="{
         'cursor-not-allowed opacity-50': isDisabled && !isReadonly && !isSkeleton,
         'col-start-1': subgrid,

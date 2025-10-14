@@ -36,8 +36,8 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
   addBase({
     '*': {
       '--w-left-inner': 'calc(var(--nav-bar-width, 0px) + var(--inner-margin, 0px))',
-      '--w-right-inner': 'calc(var(--actions-bar-width, 0px) + var(--inner-margin, 0px) + var(--scroll-bar-width, 0px))',
-      '--w-width-inner': 'calc(100vw - var(--w-left-inner, 0px) - var(--w-right-inner, 0px))',
+      '--w-right-inner': 'calc(var(--actions-bar-width, 0px) + var(--inner-margin, 0px))',
+      '--w-width-inner': 'calc(100vw - var(--w-left-inner, 0px) - var(--w-right-inner, 0px) - var(--scroll-bar-width, 0px))',
 
       '--w-top-inner': 'calc(var(--header-height, 0px) + var(--infinite-list-header-height, 0px))',
       '--w-bottom-inner': 'var(--scroll-bar-width, 0px)',
@@ -45,8 +45,8 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
     },
     '.w-modal-wrapper *': {
       '--w-left-inner': 'var(--w-modal-wrapper-padding, 0px)',
-      '--w-right-inner': 'calc(var(--w-modal-wrapper-padding, 0px) + var(--scroll-bar-width, 0px)))',
-      '--w-width-inner': 'calc(var(--w-modal-wrapper-width, 35rem) - var(--w-left-inner, 0px) - var(--w-left-inner, 0px))',
+      '--w-right-inner': 'calc(var(--w-modal-wrapper-padding, 0px))',
+      '--w-width-inner': 'calc(var(--w-modal-wrapper-width, 35rem) - var(--w-left-inner, 0px) - var(--w-right-inner, 0px) - var(--scroll-bar-width, 0px))',
 
       '--w-top-inner': 'calc(var(--w-modal-header-height, 0px) + var(--infinite-list-header-height, 0px))',
       '--w-bottom-inner': 'calc(var(--w-modal-footer-height, 0px) + var(--scroll-bar-width, 0px))',

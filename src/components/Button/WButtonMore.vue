@@ -7,6 +7,9 @@
       'cursor-not-allowed opacity-50': disabled,
     }"
     class="flex justify-center outline-none"
+    :aria-expanded="isOpen"
+    :aria-disabled="disabled"
+    aria-label="More options"
     @click="toggle"
   >
     <WDropdownMenu

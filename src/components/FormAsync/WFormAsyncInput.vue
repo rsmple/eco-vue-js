@@ -72,6 +72,7 @@ const props = withDefaults(
     readonly: undefined,
     disabled: undefined,
     skeleton: undefined,
+    unclickable: null,
   },
 )
 

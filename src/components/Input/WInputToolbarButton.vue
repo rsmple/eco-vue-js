@@ -12,6 +12,7 @@
         :tooltip="tooltip"
         :disabled="disabled"
         :active="isOpen"
+        :label="label"
         @mouseenter="enter"
         @mouseleave="leave"
       />
@@ -34,6 +35,7 @@
           :title="item.title"
           :disabled="disabled"
           :tooltip="undefined"
+          :label="item.label"
           @click="$emit('click', index)"
         />
       </div>
@@ -46,6 +48,7 @@
     :icon="icon"
     :tooltip="tooltip"
     :disabled="disabled"
+    :label="label"
     @click="$emit('click', undefined)"
   />
 </template>

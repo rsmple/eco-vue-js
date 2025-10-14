@@ -29,6 +29,7 @@
       <button
         v-if="search"
         class="w-ripple-trigger sm:-pr--inner-margin h-full select-none"
+        aria-label="Open search"
         @click="updateVisible(true)"
       >
         <div class="w-ripple w-ripple-hover sm-not:-px--inner-margin relative flex h-full items-center px-[--w-list-padding,1rem]">

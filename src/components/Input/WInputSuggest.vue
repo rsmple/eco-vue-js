@@ -41,7 +41,6 @@
         @blur="!isMobile && !persist && close(); !toggleScope?.unclickable && $emit('blur', $event)"
 
         @click="isMobile && toggleScope?.unclickable && open()"
-        @click:suffix="isMobile && toggleScope?.unclickable && open()"
         @click:clear="$emit('click:clear'); closeOnClear && close()"
       >
         <template
@@ -87,11 +86,17 @@
         </template>
 
         <template #suffix>
-          <IconArrow
+          <InputActionsButton
             v-if="!isDisabled"
-            class="square-3 text-description transition-transform"
-            :class="{'rotate-180': isOpen}"
-          />
+            label="Show suggest"
+            :expanded="isOpen"
+            @click="isOpen ? toggleScope.unclickable === false ? close() : blur() : focus()"
+          >
+            <IconArrow
+              class="square-3 text-description transition-transform"
+              :class="{'rotate-180': isOpen}"
+            />
+          </InputActionsButton>
         </template>
 
         <template
@@ -140,6 +145,7 @@ import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {useIsMobile} from '@/utils/mobile'
 import {useComponentStates} from '@/utils/useComponentStates'
 
+import InputActionsButton from './components/InputActionsButton.vue'
 import InputSuggestStatic from './components/InputSuggestStatic.vue'
 
 type ModelValue = Required<InputSuggestProps<Type>>['modelValue']

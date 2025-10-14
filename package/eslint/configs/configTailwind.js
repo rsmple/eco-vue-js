@@ -1,10 +1,10 @@
 import tailwind from 'eslint-plugin-tailwindcss'
 
-export default [
+export default (config = {}) => [
   ...tailwind.configs['flat/recommended'],
 
   {
-    files: ['**/*.{ts,js,vue}'],
+    files: config.astro ? ['**/*.{ts,js,vue,astro}'] : ['**/*.{ts,js,vue}'],
     rules: {
       'tailwindcss/no-custom-classname': 'off',
       'tailwindcss/migration-from-tailwind-2': 'off',

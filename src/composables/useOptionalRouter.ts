@@ -85,7 +85,11 @@ export type FallbackRoute = {
   noRouter?: true | undefined
 }
 
-const SYMBOL_ROUTE = 'Symbol(route location)'
+const isRouteLocation = (value: unknown): value is FallbackRoute => {
+  return value instanceof Object &&
+    'hash' in value && typeof value.hash === 'string' &&
+    'fullPath' in value && typeof value.fullPath === 'string'
+}
 
 export const useOptionalRoute = (): FallbackRoute => {
   const hasRouter = isRouterAvailable()
@@ -94,9 +98,18 @@ export const useOptionalRoute = (): FallbackRoute => {
     const instance = getCurrentInstance()
 
     if (instance) {
-      const injectionKey = Object.getOwnPropertySymbols(instance.appContext.provides).find(item => item.toString() === SYMBOL_ROUTE)
+      let injected: FallbackRoute | null = null
 
-      if (injectionKey) return inject(injectionKey) as FallbackRoute
+      for (const item of Object.getOwnPropertySymbols(instance.appContext.provides)) {
+        const value = inject(item)
+
+        if (isRouteLocation(value)) {
+          injected = value
+          break
+        }
+      }
+
+      if (injected) return injected
     }
   }
 

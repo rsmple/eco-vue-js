@@ -2,12 +2,12 @@ import importPlugin from 'eslint-plugin-import'
 
 import {readFileSync} from 'fs'
 
-const createConfig = (tsConfig) => {
+const createConfig = (tsConfig, astro = false) => {
   const file = readFileSync(tsConfig, 'utf-8')
   const parsed = JSON.parse(file)
 
   return {
-    files: parsed.include ?? ['**/*.{ts,js,vue}'],
+    files: parsed.include ?? (astro ? ['**/*.{ts,js,vue,astro}'] : ['**/*.{ts,js,vue}']),
     plugins: {
       import: importPlugin,
     },
@@ -51,14 +51,19 @@ const createConfig = (tsConfig) => {
   }
 }
 
-export default ({tsConfig = './tsconfig.json'}) => [
+export default ({tsConfig = './tsconfig.json', astro = false}) => [
   {
-    files: ['**/*.{ts,js,vue}'],
+    files: astro ? ['**/*.{ts,js,vue,astro}'] : ['**/*.{ts,js,vue}'],
     plugins: {
       import: importPlugin,
     },
     rules: {
       ...importPlugin.flatConfigs.recommended.rules,
+      ...(astro ? {
+        'import/named': 'off',
+        'import/namespace': 'off',
+        'import/default': 'off',
+      } : {}),
       'import/order': [
         1,
         {
@@ -84,5 +89,5 @@ export default ({tsConfig = './tsconfig.json'}) => [
     },
   },
 
-  ...(Array.isArray(tsConfig) ? tsConfig : [tsConfig]).map(createConfig),
+  ...(Array.isArray(tsConfig) ? tsConfig : [tsConfig]).map(cfg => createConfig(cfg, astro)),
 ]

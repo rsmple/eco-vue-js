@@ -20,8 +20,14 @@ export const useIsMobile = () => {
   }
 }
 
+let isTouchDeviceInit: boolean | null = null
+
+export const setIsTouchDeviceInit = (value: boolean | null): void => {
+  isTouchDeviceInit = value
+}
+
 export const getIsTouchDevice = (): boolean => {
-  return getIsClientSide() ? ('ontouchstart' in window) || navigator.maxTouchPoints > 0 : false
+  return isTouchDeviceInit ?? (getIsClientSide() ? ('ontouchstart' in window) || navigator.maxTouchPoints > 0 : false)
 }
 
 if (getIsClientSide()) {

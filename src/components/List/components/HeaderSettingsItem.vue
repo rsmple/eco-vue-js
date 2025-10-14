@@ -15,6 +15,7 @@
     <button
       v-if="!disabledDrag"
       class="w-ripple w-ripple-hover relative flex cursor-grab items-center justify-center active:cursor-grabbing"
+      aria-label="Reorder field"
       @mousedown="initDrag"
     >
       <IconDrag class="rotate-90" />
@@ -26,6 +27,8 @@
 
     <button
       class="w-ripple w-ripple-hover relative flex items-center px-2"
+      :aria-pressed="!fieldConfig.visible"
+      aria-label="Hide field"
       @click="$emit('update:fields-config-map', {[field.meta.label]: {...fieldConfig, visible: !fieldConfig.visible}})"
     >
       <component

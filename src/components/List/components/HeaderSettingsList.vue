@@ -37,6 +37,7 @@
         <button
           v-if="!disabled"
           class="w-ripple w-ripple-hover relative flex cursor-grab items-center justify-center active:cursor-grabbing"
+          aria-label="Reorder field"
           @mousedown="initDrag"
         >
           <IconDrag class="rotate-90" />
@@ -48,6 +49,8 @@
 
         <button
           class="w-ripple w-ripple-hover group relative flex items-center justify-center"
+          :aria-pressed="!fieldConfigMap[item.meta.label].visible"
+          aria-label="Hide field"
           @click="$emit('update:field-config-map', {[item.meta.label]: {...fieldConfigMap[item.meta.label], visible: !fieldConfigMap[item.meta.label].visible}})"
         >
           <component
@@ -62,6 +65,8 @@
         <button
           v-if="!nested"
           class="w-ripple w-ripple-hover group relative flex items-center justify-center"
+          :aria-pressed="fieldConfigMap[item.meta.label].sticky"
+          aria-label="Pin column"
           @click="$emit('update:field-config-map', {[item.meta.label]: {...fieldConfigMap[item.meta.label], sticky: !fieldConfigMap[item.meta.label].sticky}})"
         >
           <component

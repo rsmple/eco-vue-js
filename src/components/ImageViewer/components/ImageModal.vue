@@ -3,6 +3,7 @@
     <div class="relative">
       <button
         class="w-ripple w-ripple-hover absolute -top-14 right-3 rounded-full p-3 outline-none sm:-right-14"
+        aria-label="Close image viewer"
         @click="$emit('close:modal')"
       >
         <IconCancel class="text-description" />
