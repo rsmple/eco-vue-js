@@ -26,7 +26,7 @@
     </template>
 
     <template
-      v-if="$slots.subtitle || true"
+      v-if="$slots.subtitle"
       #subtitle
     >
       <slot name="subtitle" />
@@ -143,6 +143,7 @@ const props = withDefaults(
     readonly: undefined,
     disabled: undefined,
     skeleton: undefined,
+    unclickable: null,
   },
 )
 
