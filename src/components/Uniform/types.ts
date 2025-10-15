@@ -15,6 +15,14 @@ export interface UniformInstance {
   getErrorMessage: () => string | undefined
 }
 
+type Get<Value, Path extends unknown[] | readonly unknown[]> = Path extends [infer Head, ...infer Tail]
+  ? Head extends keyof Value
+    ? Tail extends []
+      ? Value[Head]
+      : Get<Value[Head], Tail>
+    : undefined
+  : undefined
+
 export type UniformScope<InnerModel, Field = undefined> = {
   ref: (item: UniformInstance | unknown) => void
   parentRef: (item: UniformInstance | unknown) => void
@@ -24,7 +32,7 @@ export type UniformScope<InnerModel, Field = undefined> = {
   removeParentRef: (id: string) => void
   onUnmouted: (id: string) => void
   updateModelValue: Field extends undefined ? undefined : (newValue: InnerModel) => void
-  updateModelValueInner: <Key extends keyof InnerModel>(newValue: InnerModel[Key], field: [Key]) => void
+  updateModelValueInner: <Fields extends unknown[] | readonly unknown[]>(newValue: Get<InnerModel, Fields>, field: Fields) => void
   select: (newValue: InnerModel extends unknown[] ? InnerModel[number] : never) => void
   unselect: (newValue: InnerModel extends unknown[] ? InnerModel[number] : never) => void
   'onUpdate:modelValue': (newValue: InnerModel, fields: (string | number)[]) => void
