@@ -70,7 +70,7 @@ export interface SelectPrefixProps<Data extends DefaultData, OptionComponent ext
 
 export interface SelectSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean>
   extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'createdData' | 'emptyValue'> {
-  modelValue: Model | null
+  modelValue: Model | null | undefined
   allowClear?: boolean & AllowClear
   searchModel?: boolean
   createdData?: Data

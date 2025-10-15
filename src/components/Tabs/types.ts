@@ -1,7 +1,6 @@
 import type {VNode} from 'vue'
 
 export interface TabsProps {
-  name?: string
   customSlots?: VNode[]
   lessTransitions?: boolean
   initTab?: string
@@ -17,12 +16,6 @@ export interface TabsProps {
   statusIcon?: boolean
 }
 
-export type TabsItemScopedProps = {
-  hasError: boolean
-  hasChanges: boolean
-  hasValue: boolean
-}
-
 export type TabsItemProps = {
   title?: string
   name: string
@@ -32,4 +25,7 @@ export type TabsItemProps = {
   divided?: boolean
   init?: boolean
   hasValue?: boolean
+  hasError?: boolean
+  hasChanges?: boolean
+  validate?: () => string | undefined
 }
