@@ -34,15 +34,15 @@ const pluginDefault = plugin(function ({addBase, theme, config}) {
       },
     },
     '.code-inline.bg-positive': {
-      backgroundColor: `${theme('colors.positive')}4d`,
+      backgroundColor: `${ theme('colors.positive') }4d`,
       [config('darkMode')[1][0]]: {
-        backgroundColor: `${theme('colors.positive-dark')}4d`,
+        backgroundColor: `${ theme('colors.positive-dark') }4d`,
       },
     },
     '.code-inline.bg-negative': {
-      backgroundColor: `${theme('colors.negative')}4d`,
+      backgroundColor: `${ theme('colors.negative') }4d`,
       [config('darkMode')[1][0]]: {
-        backgroundColor: `${theme('colors.negative-dark')}4d`,
+        backgroundColor: `${ theme('colors.negative-dark') }4d`,
       },
     },
   })

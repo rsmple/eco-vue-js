@@ -1,6 +1,6 @@
 import plugin from 'tailwindcss/plugin.js'
 
-const pluginDefault = plugin(function ({addBase, theme, config}) {
+const pluginDefault = plugin(function ({addBase}) {
   addBase({
     '.w-hover-circle': {
       '&::after': {

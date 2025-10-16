@@ -1,7 +1,7 @@
-import plugin from 'tailwindcss/plugin.js'
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
+import plugin from 'tailwindcss/plugin.js'
 
-const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities, addBase, theme, addComponents, config}) {
+const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities, addBase, theme}) {
   matchUtilities(
     {
       square: value => {

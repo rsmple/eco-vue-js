@@ -1,5 +1,5 @@
-import plugin from 'tailwindcss/plugin.js'
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
+import plugin from 'tailwindcss/plugin.js'
 
 const pluginDefault = plugin(function ({matchUtilities, theme}) {
   matchUtilities(
