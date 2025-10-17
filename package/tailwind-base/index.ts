@@ -11,8 +11,6 @@ import pluginText from './plugins/text.js'
 import pluginHoverCircle from './plugins/w-hover-circle.js'
 import pluginRipple from './plugins/w-ripple.js'
 import animations from './theme/animations.js'
-import score from './theme/score.js'
-import severity from './theme/severity.js'
 import sizes from './theme/sizes.js'
 
 const tailwindBase = {
@@ -51,8 +49,23 @@ const tailwindBase = {
       info: '#82adff',
       'info-dark': '#407ae5',
 
-      severity,
-      score,
+      severity: {
+        critical: {bg: '#ff757520', text: '#FF7171'},
+        high: {bg: '#ffbc7035', text: '#FF9B63'},
+        medium: {bg: '#fff06b45',text: '#F4CF4D'},
+        low: {bg: '#8cff7330',text: '#6AD682'},
+        info: {bg: '#75acff20',text: '#82ADFF'},
+        resolved: {bg: '#8778fc15',text: '#4F4F4F'},
+      },
+      score: {
+        critical: {bg: '#ff73bb30', text: '#f95f95'},
+        high: {bg: '#ff757c25', text: '#f8808e'},
+        medium: {bg: '#ffe57030', text: '#ebc17b'},
+        low: {bg: '#93ff7330', text: '#88cd83'},
+        negligible: {bg: '#70ffb030', text: '#38cba4'},
+        nullable: {bg: '#73d5ff30', text: '#44b0ef'},
+        undefinedly: {bg: '#7affff10', text: '#c9e3ef'},
+      },
 
       transparent: 'transparent',
     },
