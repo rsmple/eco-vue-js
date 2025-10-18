@@ -24,6 +24,8 @@ const tailwindBase = {
   theme: {
     colors: {
       current: 'currentColor',
+      transparent: 'transparent',
+
       default: '#ffffff',
       'default-dark': colors.zinc['900'], // '#101827',
 
@@ -66,8 +68,6 @@ const tailwindBase = {
         nullable: {bg: '#73d5ff30', text: '#44b0ef'},
         undefinedly: {bg: '#7affff10', text: '#c9e3ef'},
       },
-
-      transparent: 'transparent',
     },
     extend: {
       ...sizes,
