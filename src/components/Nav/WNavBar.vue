@@ -21,7 +21,7 @@
 
   <div
     class="
-      fixed left-0 top-0 grid h-full overflow-hidden w-nav-bar
+      w-nav-bar fixed left-0 top-0 grid h-full overflow-hidden
       transition-[grid-template-columns] duration-200 xl:grid-cols-[1fr] print:hidden 
     "
     :class="[{
