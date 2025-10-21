@@ -21,16 +21,16 @@
 
   <div
     class="
-      xl-not:bg-default xl-not:dark:bg-default-dark fixed left-0 top-0 grid h-full overflow-hidden
-      shadow-md transition-[grid-template-columns] duration-200 xl:grid-cols-[1fr] xl:shadow-none print:hidden 
+      fixed left-0 top-0 grid h-full overflow-hidden w-nav-bar
+      transition-[grid-template-columns] duration-200 xl:grid-cols-[1fr] print:hidden 
     "
-    :class="{
+    :class="[{
       'xl-not:grid-cols-[0fr]': !isOpen,
       'grid-cols-[1fr]': isOpen,
-    }"
+    }, $attrs.class]"
     :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
   >
-    <div class="bg-default dark:bg-default-dark -mt--header-height overflow-hidden">
+    <div class="-mt--header-height overflow-hidden">
       <slot />
     </div>
   </div>

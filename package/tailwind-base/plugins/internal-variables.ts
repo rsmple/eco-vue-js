@@ -10,6 +10,9 @@ const pluginDefault = plugin(function ({matchUtilities, theme}) {
       'w-input-bg': value => ({'--w-input-bg': value}),
       'w-slider-from': value => ({'--w-slider-from': value}),
       'w-slider-to': value => ({'--w-slider-to': value}),
+      'w-toggle-caret': value => ({'--w-toggle-caret': value}),
+      'w-checkbox-color': value => ({'--w-checkbox-color': value}),
+      'w-nav-item-dot-color': value => ({'--w-nav-item-dot-color': value}),
     },
     {values: flattenColorPalette(theme('colors'))},
   )
@@ -68,6 +71,7 @@ const pluginDefault = plugin(function ({matchUtilities, theme}) {
       'w-option-rounded': value => ({'--w-option-rounded': value}),
       'w-modal-wrapper-rounded': value => ({'--w-modal-wrapper-rounded': value}),
       'w-list-header-rounded': value => ({'--w-list-header-rounded': value}),
+      'w-button-action-rounded': value => ({'--w-button-action-rounded': value}),
     },
     {values: theme('borderRadius')},
   )

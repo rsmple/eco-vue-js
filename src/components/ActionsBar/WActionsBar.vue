@@ -1,10 +1,10 @@
 <template>
   <div 
     class="
-      height-full bg-default dark:bg-default-dark
+      height-full w-actions-bar
       sm-not:[--actions-bar-filter-width:calc(100vw-var(--w-actions-bar-width))] fixed right-0 top-0 grid
       grid-cols-[var(--actions-bar-filter-width-current,0),var(--w-actions-bar-width)] grid-rows-[var(--header-height),1fr]
-      justify-end overflow-hidden shadow-md transition-[grid-template-columns]
+      justify-end overflow-hidden transition-[grid-template-columns]
       duration-300 print:hidden
     "
     :class="{

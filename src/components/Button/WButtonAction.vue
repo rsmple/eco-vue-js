@@ -12,12 +12,12 @@
   >
     <WSkeleton
       v-if="skeleton"
-      class="w-skeleton-w-auto w-skeleton-h-auto w-skeleton-rounded-full mx-1 aspect-square"
+      class="w-skeleton-w-auto w-skeleton-h-auto w-skeleton-rounded-[--w-button-action-rounded,9999px] mx-1 aspect-square"
     />
 
     <div
       v-else
-      class="relative mx-1 grid aspect-square select-none gap-1 rounded-full bg-[200%_auto] [background-position:right]"
+      class="relative mx-1 grid aspect-square select-none gap-1 rounded-[--w-button-action-rounded,9999px] bg-[200%_auto] [background-position:right]"
       :class="{
         'w-ripple w-ripple-hover cursor-pointer': !disabled && !skeleton,
         'text-primary dark:text-primary-dark': active && semanticType === SemanticType.SECONDARY,

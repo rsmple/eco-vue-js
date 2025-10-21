@@ -21,7 +21,7 @@
     <div
       class="square-[1.5em] bg-default dark:bg-default-dark relative isolate flex items-center justify-center border border-solid [font-size:--w-checkbox-size]"
       :class="{
-        'text-default': modelValue && !isDisabled && !isSkeleton,
+        'text-[--w-checkbox-color,#ffffff]': modelValue && !isDisabled && !isSkeleton,
         'text-primary dark:text-primary-dark': !modelValue && !isDisabled && !isSkeleton,
         'text-gray-300 dark:text-gray-700': !modelValue && isDisabled && !isSkeleton,
         'w-ripple w-hover-circle before:text-accent after:text-accent': !isDisabled && !isReadonly && !isSkeleton,
