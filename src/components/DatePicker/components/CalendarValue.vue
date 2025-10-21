@@ -1,13 +1,9 @@
 <template>
   <div
-    class="
-      from-primary dark:from-primary-dark text-default relative
-      w-full select-none rounded-xl bg-gradient-to-tr to-[#C376FF] px-4
-      py-3 dark:to-[#9b3be6]
-    "
-    :class="{
+    class="relative w-full select-none rounded-xl bg-gradient-to-tr px-4 py-3"
+    :class="[{
       'w-ripple w-ripple-hover cursor-pointer': clickable,
-    }"
+    }, semanticTypeBackgroundMap[SemanticType.PRIMARY]]"
     @click="updateCurrentDate"
   >
     <div class="mb-0.5 font-normal tracking-wide">
@@ -28,6 +24,7 @@
 <script lang="ts" setup>
 import {computed, onBeforeMount} from 'vue'
 
+import {SemanticType, useSemanticTypeBackgroundMap} from '@/utils/SemanticType'
 import {dateFormat, getStartOfMonth, isSameMonth} from '@/utils/dateTime'
 
 const props = defineProps<{
@@ -48,6 +45,8 @@ const updateCurrentDate = () => {
 
   emit('update:currentDate', getStartOfMonth(props.value))
 }
+
+const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()
 
 onBeforeMount(() => {
   if (props.autoFocus) {

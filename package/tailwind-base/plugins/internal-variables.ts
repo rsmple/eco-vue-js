@@ -13,6 +13,7 @@ const pluginDefault = plugin(function ({matchUtilities, theme}) {
       'w-toggle-caret': value => ({'--w-toggle-caret': value}),
       'w-checkbox-color': value => ({'--w-checkbox-color': value}),
       'w-nav-item-dot-color': value => ({'--w-nav-item-dot-color': value}),
+      'w-date-picker-day': value => ({'--w-date-picker-day': value}),
     },
     {values: flattenColorPalette(theme('colors'))},
   )
