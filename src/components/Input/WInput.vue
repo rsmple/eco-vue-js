@@ -477,8 +477,18 @@ const blur = (): void => inputRef.value?.blur()
 const onPaste = async (e: ClipboardEvent) => {
   if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
 
-  navigator.clipboard.readText()
-  const text = (e.clipboardData?.getData('text/plain') || await navigator.clipboard.readText()).replace(/\r\n?/g, '\n')
+  let text = e.clipboardData?.getData('text/plain')
+
+  if (!text) {
+    try {
+      text = await navigator.clipboard.readText()
+    } catch {
+      Notify.error({title: 'Clipboard API not available'})
+      return
+    }
+  }
+
+  text = text.replace(/\r\n?/g, '\n')
 
   if (!text) {
     fieldWrapperRef.value?.showMessage('Nothing to paste')

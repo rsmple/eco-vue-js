@@ -6,7 +6,7 @@
     aria-multiline="true"
     spellcheck="false"
     :placeholder="placeholder"
-    class="relative whitespace-pre"
+    class="relative [whitespace:var(--w-input-whitespace,pre)]"
     @input="onInput"
     @beforeinput="insertParagraph($event as InputEvent)"
     @paste.prevent="onPaste"
@@ -21,6 +21,7 @@ import type {TextPart,  WrapSelection} from '../types'
 
 import {defineEmits, defineProps, nextTick, onMounted, ref, useTemplateRef, watch} from 'vue'
 
+import {Notify} from '@/utils/Notify'
 import {WrapSelectionType} from '@/utils/utils'
 
 import {preserveIndentation} from '../models/toolbarActions'
@@ -163,10 +164,20 @@ const onInput = (e: Event) => {
 }
 
 const onPaste = async (e: ClipboardEvent) => {
-  navigator.clipboard.readText()
-  const text = (e.clipboardData?.getData('text/plain') || await navigator.clipboard.readText()).replace(/\r\n?/g, '\n')
- 
-  insertPlain(text)
+  if (props.readonly || props.disabled) return
+
+  let text = e.clipboardData?.getData('text/plain') || ''
+
+  if (!text) {
+    try {
+      text = await navigator.clipboard.readText()
+    } catch (error) {
+      Notify.error({title: 'Clipboard API not available'})
+      return
+    }
+  }
+
+  insertPlain(text.replace(/\r\n?/g, '\n'))
 }
 
 const insertPlain = (text: string) => {

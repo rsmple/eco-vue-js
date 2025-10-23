@@ -1,7 +1,11 @@
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 import plugin from 'tailwindcss/plugin.js'
 
-const pluginDefault = plugin(function ({matchUtilities, theme}) {
+const pluginDefault = plugin(function ({matchUtilities, theme, addBase}) {
+  addBase({
+    '.w-input-whitespace-pre-wrap': {'--w-input-whitespace': 'pre-wrap'},
+  })
+
   matchUtilities(
     {
       'w-scroll-bar-color': value => ({'--w-scroll-bar-color': value}),
