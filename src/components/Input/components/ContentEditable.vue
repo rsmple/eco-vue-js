@@ -6,7 +6,7 @@
     aria-multiline="true"
     spellcheck="false"
     :placeholder="placeholder"
-    class="relative [whitespace:var(--w-input-whitespace,pre)]"
+    class="relative [white-space:var(--w-input-whitespace,pre)]"
     @input="onInput"
     @beforeinput="insertParagraph($event as InputEvent)"
     @paste.prevent="onPaste"
