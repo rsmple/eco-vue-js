@@ -276,7 +276,6 @@ onBeforeUnmount(() => {
 defineExpose({
   validateOnUpdate() {
     isErrorShown.value = true
-    console.log('Validating on update:', props.name, getModelValue())
 
     return validateOnUpdate(getModelValue())
   },
