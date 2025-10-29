@@ -263,8 +263,8 @@ const setCurrentDebounced = debounce((value: string) => {
   scrollToTabContent()
 }, 100)
 
-const next = (update = false): void => {
-  const errorMessage = update ? validate(current.value) : validateIfNoError(current.value)
+const next = (): void => {
+  const errorMessage = validate(current.value)
 
   if (errorMessage) {
     Notify.warn({title: 'Form contains invalid values', caption: errorMessage.length < 200 ? errorMessage : undefined})
@@ -279,11 +279,11 @@ const previous = (): void => {
   switchTab(defaultSlotsKeys.value[currentIndex.value - 1])
 }
 
-const jump = (name: string, update = false): void => {
+const jump = (name: string): void => {
   const valid = defaultSlotsKeys.value
     .slice(currentIndex.value, defaultSlotsKeys.value.indexOf(name))
     .every(item => {
-      const errorMessage = update ? validate(item) : validateIfNoError(item)
+      const errorMessage = validate(item)
 
       if (errorMessage) {
         Notify.warn({title: 'Form contains invalid values', caption: errorMessage.length < 200 ? errorMessage : undefined})

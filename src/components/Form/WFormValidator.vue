@@ -57,7 +57,7 @@ const slots = useSlots()
 const componentSlot = computed<ComponentInstance<ThisType<unknown>>>(() => slots.default?.()[0])
 const componentRef = useTemplateRef<ComponentInstance<ThisType<unknown>>>('component')
 
-const modelValue = computed<Parameters<ValidateFn>[0]>(() => {
+const getModelValue = (): Parameters<ValidateFn>[0] | undefined => {
   const props = componentSlot.value?.props
 
   if (!props) return undefined
@@ -71,7 +71,9 @@ const modelValue = computed<Parameters<ValidateFn>[0]>(() => {
   }
 
   return undefined
-})
+} 
+
+const modelValue = computed<Parameters<ValidateFn>[0]>(getModelValue)
 
 const initModelValue = ref<Parameters<ValidateFn>[0]>(modelValue.value)
 const isErrorShown = ref(false)
@@ -165,9 +167,7 @@ const _validateOnUnselect = (value: string) => {
 const doValidate = (silent?: boolean, path?: ValidatePath): string | undefined => {
   if (props.name && path && !path[props.name]) return
 
-  if (errorMessage.value) return errorMessage.value
-
-  const message = _validate(modelValue.value)
+  const message = _validate(getModelValue())
   
   errorMessage.value = message
 
@@ -276,8 +276,9 @@ onBeforeUnmount(() => {
 defineExpose({
   validateOnUpdate() {
     isErrorShown.value = true
+    console.log('Validating on update:', props.name, getModelValue())
 
-    return validateOnUpdate(modelValue.value)
+    return validateOnUpdate(getModelValue())
   },
   invalidate(message: string) {
     errorMessage.value = message
