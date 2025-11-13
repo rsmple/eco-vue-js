@@ -45,6 +45,7 @@
       :class="{
         'sm-not:flex-col sm-not:w-full': !maximized,
         'sm-not:w-screen': maximized,
+        'flex-col': actionsCol,
       }"
       :style="{zIndex: BASE_ZINDEX_DROPDOWN}"
     >
@@ -64,6 +65,7 @@ import {wModalHeaderHeight} from './models/injection'
 
 defineProps<{
   maximized?: boolean
+  actionsCol?: boolean
 }>()
 
 const headerRef = useTemplateRef('header')
