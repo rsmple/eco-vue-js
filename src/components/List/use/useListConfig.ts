@@ -238,3 +238,7 @@ export const getFieldStylesFixed = <Fields extends ListFields<any, any>>(fields:
 
   return styles
 }
+
+export const getFieldWidthSumStyles = (fieldConfigMap: Record<string, FieldConfig>): string => {
+  return 'calc(' + Object.keys(fieldConfigMap).filter(key => fieldConfigMap[key].visible).map(label => `var(${ getFieldVariable('width', label) })`).join(' + ') + ')'
+}

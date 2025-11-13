@@ -151,6 +151,9 @@
 
           :count="count ?? listCount"
           :selection="selectAllValue"
+          :style="{
+            '--list-header-width': getFieldWidthSumStyles(fieldConfigMap),
+          }"
           @toggle:selection="$event ? selectAll() : resetSelection()"
           @update:header="updateHeader"
         >
@@ -335,7 +338,7 @@ import HeaderFieldNested from './components/HeaderFieldNested.vue'
 import HeaderSettings from './components/HeaderSettings.vue'
 import HeaderSort from './components/HeaderSort.vue'
 import ListCardFieldNested from './components/ListCardFieldNested.vue'
-import {filterFields, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, sortFields, useListConfig} from './use/useListConfig'
+import {filterFields, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, getFieldWidthSumStyles, sortFields, useListConfig} from './use/useListConfig'
 
 defineOptions({inheritAttrs: false})
 
