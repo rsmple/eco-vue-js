@@ -106,9 +106,9 @@ const handleMove = (event: MouseEvent | TouchEvent): void => {
 
   let x: number
 
-  if (event instanceof TouchEvent){
-    const touch = event.touches[0] || event.changedTouches[0]
-    x = touch.pageX
+  if ('touches' in event){
+    const touch = event.touches?.[0] || event.changedTouches?.[0]
+    x = touch?.pageX ?? 0
   } else {
     x = event.clientX
   }

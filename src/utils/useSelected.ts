@@ -239,7 +239,6 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
         if (preselectValue.value !== null) return
         isShift.value = false
         window.removeEventListener('click', applySelect)
-        console.log('cancel')
       })
       return
     }
