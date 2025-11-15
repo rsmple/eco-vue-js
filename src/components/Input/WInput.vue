@@ -481,6 +481,7 @@ const onPaste = async (e: ClipboardEvent) => {
 
   if (!text) {
     try {
+      await checkPermissionPaste()
       text = await navigator.clipboard.readText()
     } catch {
       Notify.error({title: 'Clipboard API not available'})
