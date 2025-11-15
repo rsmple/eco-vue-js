@@ -37,8 +37,8 @@
         @keypress:down="$emit('keypress:down', $event)"
         @keypress:delete="$emit('keypress:delete', $event)"
 
-        @focus="open(); !toggleScope?.unclickable && $emit('focus', $event)"
-        @blur="!isMobile && !persist && close(); !toggleScope?.unclickable && $emit('blur', $event)"
+        @focus="open(); !toggleScope?.unclickable && $emit('focus', $event); focused = true"
+        @blur="!isMobile && !persist && close(); !toggleScope?.unclickable && $emit('blur', $event); focused = false"
 
         @click="isMobile && toggleScope?.unclickable && open()"
         @click:clear="$emit('click:clear'); closeOnClear && close()"
@@ -80,7 +80,10 @@
         >
           <template v-if="static">
             <div class="pb-4" />
-            <slot name="content" />
+            <slot
+              name="content"
+              v-bind="{focused, focus, blur}"
+            />
           </template>
           <slot name="bottom" />
         </template>
@@ -122,7 +125,10 @@
         }"
       >
         <template v-if="$slots.content">
-          <slot name="content" />
+          <slot
+            name="content"
+            v-bind="{focused, focus, blur}"
+          />
         </template>
       </WInfiniteListScrollingElement>
     </template>
@@ -180,6 +186,7 @@ const emit = defineEmits<{
 const {isReadonly, isDisabled} = useComponentStates(props)
 
 const isOpen = ref(false)
+const focused = ref(false)
 const dropdownMenuRef = useTemplateRef('dropdownMenu')
 const inputRef = useTemplateRef('input')
 const {isMobile} = useIsMobile()
@@ -232,6 +239,6 @@ defineSlots<{
   toolbar?: () => void
   prefix?: (props: {unclickable?: boolean | null}) => void
   right?: (props: Record<string, never>) => void
-  content?: () => VNode[]
+  content?: (props: {focused: boolean, blur: () => void, focus: () => void}) => VNode[]
 }>()
 </script>
