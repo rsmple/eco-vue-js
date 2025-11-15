@@ -1,6 +1,6 @@
 import plugin from 'tailwindcss/plugin.js'
 
-const pluginRipple = plugin(function ({matchUtilities, addUtilities}) {
+const pluginRipple = plugin(function ({matchUtilities, addUtilities, addBase}) {
   const configRipple = {
     'w-ripple': () => ({
       '&::before': {
@@ -45,6 +45,12 @@ const pluginRipple = plugin(function ({matchUtilities, addUtilities}) {
         },
       }
     }, 
+
+    'w-ripple-active:not(:active)': () => ({
+      '&::before': {
+        animation: 'ripple-active infinite linear alternate 0.5s'
+      }
+    }),
   }
 
   matchUtilities(configRipple, {
@@ -59,6 +65,17 @@ const pluginRipple = plugin(function ({matchUtilities, addUtilities}) {
     result[`.${ key }`] = configRipple[key as keyof typeof configRipple]('')
     return result
   }, {} as Record<string, ReturnType<typeof configRipple[keyof typeof configRipple]>>))
+
+  addBase({
+    '@keyframes ripple-active': {
+      '0%': {
+        'opacity': '0',
+      },
+      '100%': {
+        'opacity': '0.15',
+      }
+    },
+  })
 })
 
 export default pluginRipple

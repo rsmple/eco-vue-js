@@ -110,9 +110,32 @@
               class="flex"
             >
               <WButtonSelectionAction
+                v-if="allowSelect"
+                :icon="markRaw(IconRange)"
+                :active="isShift"
+                tooltip-text="Select range"
+                class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
+                @click.stop="setIsSelecting()"
+              >
+                <template #tooltip>
+                  <div class="grid grid-cols-[1fr,auto] gap-4">
+                    <div>
+                      Select range
+                    </div>
+
+                    <div class="text-description whitespace-nowrap">
+                      <IconShift class="square-4 -mt-[0.25em] inline" /> Shift
+                    </div>
+                  </div>
+                </template>
+              </WButtonSelectionAction>
+
+              <WButtonSelectionAction
                 v-if="!noRefetch"
                 :icon="markRaw(IconRefresh)"
                 :loading="isRefetchingAll"
+                :active="isRefetchingAll"
+                tooltip-text="Refetch"
                 class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
                 @click="refetchAll"
               />
@@ -322,7 +345,9 @@ import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
+import IconRange from '@/assets/icons/IconRange.svg?component'
 import IconRefresh from '@/assets/icons/IconRefresh.svg?component'
+import IconShift from '@/assets/icons/IconShift.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
@@ -443,6 +468,7 @@ const allowOpen = computed(() => props.expansion !== undefined)
 const disableSelect = computed(() => !allowSelect.value)
 
 const {
+  isShift,
   allowSelectHover,
   selectionCount,
   selectAllValue,
@@ -452,6 +478,7 @@ const {
   resetSelection,
   selectAll,
   getQueryParams,
+  setIsSelecting,
 } = useSelected<number>(countValue, disableSelect)
 
 const ordering = computed<OrderItem<keyof Data>[]>(() => {
