@@ -41,8 +41,6 @@ export const setCaretOffset = (parent: Element | null | undefined, indexStart: n
   selection?.addRange(range)
 }
 
-const endSpacesRegex = /\s+$/
-
 const getOffsetFromNode = (parent: Element, targetNode: Node, targetOffset: number, isStart: boolean): {offset: number, trail: number} => {
   if (!parent.firstChild) parent.appendChild(document.createTextNode(''))
   
@@ -55,8 +53,7 @@ const getOffsetFromNode = (parent: Element, targetNode: Node, targetOffset: numb
     } else if (node === targetNode) {
       const text = node.textContent
       if (text?.[targetOffset] === '\n') {
-        const trail = text.slice(0, targetOffset).match(endSpacesRegex)?.[0]?.length ?? 0
-        return {offset: offset + targetOffset - trail, trail}
+        return {offset: offset + targetOffset, trail: 0}
       }
 
       return {offset: offset + targetOffset, trail: 0}

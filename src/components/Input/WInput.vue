@@ -494,6 +494,11 @@ const onPaste = async (e: ClipboardEvent) => {
     fieldWrapperRef.value?.showMessage('Nothing to paste')
     return
   }
+
+  if (inputRef.value && 'insertPlain' in inputRef.value) {
+    inputRef.value.insertPlain(text)
+    return
+  }
  
   const caret = getCaret()
   const value = props.modelValue?.toString() ?? ''

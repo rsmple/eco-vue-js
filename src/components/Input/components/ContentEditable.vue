@@ -9,7 +9,6 @@
     class="relative [white-space:var(--w-input-whitespace,pre)]"
     @input="onInput"
     @beforeinput="insertParagraph($event as InputEvent)"
-    @paste.prevent="onPaste"
     @keydown="$emit('keydown', $event)"
     @focus="$emit('focus', $event); focused = true"
     @blur="$emit('blur', $event); focused = false"
@@ -21,7 +20,6 @@ import type {TextPart,  WrapSelection} from '../types'
 
 import {defineEmits, defineProps, nextTick, onMounted, ref, useTemplateRef, watch} from 'vue'
 
-import {Notify} from '@/utils/Notify'
 import {WrapSelectionType} from '@/utils/utils'
 
 import {preserveIndentation} from '../models/toolbarActions'
@@ -128,15 +126,6 @@ const insertParagraph = (e: InputEvent) => {
 }
 
 const regexDifferentEnding = /\r\n?/g
-const regexSpaces = /\n \n/g
-const regexEnding = / +$/gm
-
-const normalizeText = (text: string): string => {
-  return text
-    .replace(regexDifferentEnding, '\n')
-    .replace(regexSpaces, '\n\n')
-    .replace(regexEnding, '')
-}
 
 const onInput = (e: Event) => {
   e.stopImmediatePropagation()
@@ -144,7 +133,7 @@ const onInput = (e: Event) => {
   if (!(e.target instanceof HTMLDivElement)) return
 
   const rawText = e.target.textContent ?? ''
-  const text = normalizeText(rawText)
+  const text = rawText.replace(regexDifferentEnding, '\n')
   const currentText = getCurrentText()
 
   if (text === currentText) return
@@ -161,23 +150,6 @@ const onInput = (e: Event) => {
   } else {
     emit('update:model-value', text)
   }
-}
-
-const onPaste = async (e: ClipboardEvent) => {
-  if (props.readonly || props.disabled) return
-
-  let text = e.clipboardData?.getData('text/plain') || ''
-
-  if (!text) {
-    try {
-      text = await navigator.clipboard.readText()
-    } catch (error) {
-      Notify.error({title: 'Clipboard API not available'})
-      return
-    }
-  }
-
-  insertPlain(text.replace(/\r\n?/g, '\n'))
 }
 
 const insertPlain = (text: string) => {
@@ -330,6 +302,7 @@ defineExpose({
   wrapSelection,
   setCaret,
   getCaret,
+  insertPlain,
   get offsetWidth() {
     return elementRef.value?.offsetWidth ?? 0
   },
