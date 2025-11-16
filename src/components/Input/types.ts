@@ -71,6 +71,7 @@ export type WrapSelection = {
   start: string
   end: string
   prepare?: (previousValue: string, offset: number) => string
+  lineBreakPadding?: boolean
 } | {
   type: WrapSelectionType.LINE_PREFIX
   linePrefix: string

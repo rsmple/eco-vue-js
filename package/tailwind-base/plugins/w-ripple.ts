@@ -48,8 +48,8 @@ const pluginRipple = plugin(function ({matchUtilities, addUtilities, addBase}) {
 
     'w-ripple-active:not(:active)': () => ({
       '&::before': {
-        animation: 'ripple-active infinite linear alternate 0.5s'
-      }
+        animation: 'ripple-active infinite linear alternate 0.5s',
+      },
     }),
   }
 
@@ -69,11 +69,11 @@ const pluginRipple = plugin(function ({matchUtilities, addUtilities, addBase}) {
   addBase({
     '@keyframes ripple-active': {
       '0%': {
-        'opacity': '0',
+        opacity: '0',
       },
       '100%': {
-        'opacity': '0.15',
-      }
+        opacity: '0.15',
+      },
     },
   })
 })

@@ -155,10 +155,10 @@ const onInput = (e: Event) => {
 const insertPlain = (text: string) => {
   const root = elementRef.value
   if (!root) return
-  const {start, end, trail} = getCaret()
+  const {start, end} = getCaret()
   const currentText = getCurrentText()
-  const next = (currentText ?? '').slice(0, start) + ' '.repeat(trail) + text + ((currentText ?? '').slice(end) || ' ')
-  const caretAfter = start + text.length + trail
+  const next = (currentText ?? '').slice(0, start) + text + ((currentText ?? '').slice(end) || ' ')
+  const caretAfter = start + text.length
 
   emit('update:model-value', props.maxLength && next.length > props.maxLength ? next.substring(0, props.maxLength) : next, true)
   nextTick(() => setCaret(props.maxLength ? Math.min(caretAfter, props.maxLength) : caretAfter))
@@ -175,7 +175,7 @@ const setCaret = (indexStart: number, indexEnd?: number) => {
 
 const collapseList = [' ', '\n']
 
-let offsetsOld: {start: number, end: number, trail: number} | null = null
+let offsetsOld: {start: number, end: number} | null = null
 
 const wrapSelection = (value: WrapSelection): void => {
   if (focused.value || !offsetsOld) offsetsOld = getCaret()
@@ -223,10 +223,18 @@ const wrapSelection = (value: WrapSelection): void => {
             }
             if (value.end.endsWith(item) && end.startsWith(item)) end = end.slice(item.length)
           }
-          newText = (value.prepare?.(start, 0) ?? start) + (value.start || value.end) + (value.prepare?.(end, offset) ?? end)
+          if (value.prepare) {
+            start = value.prepare(start, 0)
+            end = value.prepare(end, offset)
+          }
+          if (value.lineBreakPadding) {
+            if (start.endsWith('\n')) start += ' '
+            if (end.startsWith('\n')) end = ' ' + end
+          }
+          newText = start + (value.start || value.end) + end
         } else {
           let start = currentText.slice(0, offsets.start)
-          const middle = currentText.slice(offsets.start, offsets.end)
+          let middle = currentText.slice(offsets.start, offsets.end)
           let end = currentText.slice(offsets.end)
           for (const item of collapseList) {
             if (value.start.startsWith(item) && start.endsWith(item)) {
@@ -235,7 +243,16 @@ const wrapSelection = (value: WrapSelection): void => {
             }
             if (value.end.endsWith(item) && end.startsWith(item)) end = end.slice(item.length)
           }
-          newText = (value.prepare?.(start, 0) ?? start) + value.start + (value.prepare?.(middle, offsets.start) ?? middle) + value.end + (value.prepare?.(end, offsets.end) ?? end)
+          if (value.prepare) {
+            start = value.prepare(start, 0)
+            middle = value.prepare(middle, offsets.start)
+            end = value.prepare(end, offsets.end)
+          }
+          if (value.lineBreakPadding) {
+            if (start.endsWith('\n')) start += ' '
+            if (end.startsWith('\n')) end = ' ' + end
+          }
+          newText = start + value.start + middle + value.end + end
         }
         
         newCursorStart = offsets.start + startLen
