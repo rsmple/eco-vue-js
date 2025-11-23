@@ -314,6 +314,7 @@ defineExpose({
   refetch: refetchPage,
   scrollTo,
   isFetching,
+  pageNumber: page,
 })
 
 defineSlots<{

@@ -43,13 +43,14 @@
     <template #header="headerScope">
       <slot
         name="header"
-        v-bind="headerScope"
+        v-bind="{isFetching, isRefetchingAll, refetchAll, ...headerScope}"
       />
     </template>
 
     <template #default="defaultScope">
       <div
         ref="container"
+        v-bind="$attrs"
         :style="{
           height: `${height}px`,
           '--infinite-list-header-height': defaultScope && 'headerHeight' in defaultScope ? defaultScope.headerHeight + 'px' : undefined
@@ -69,17 +70,20 @@
             :virtual-index="index"
             :use-query-fn="useQueryFn"
             :query-params="queryParams"
+            :query-options="queryOptions"
             :page="virtualPageMap[index] ?? null"
             :initial-page-height="averagePageHeight"
             :skeleton-length="getSkeletonLength(virtualPageMap[index] ?? 0)"
             :empty-stub="emptyStub"
-            class="absolute left-0 top-0"
             :style="{
               transform: `translateY(${ !virtualPageMap[index] ? '-9999' : pagesTop[virtualPageMap[index] - 1] }px)`,
             }"
+            :class="pageClass"
+            class="absolute left-0 top-0"
             @update:page-count="pageCount = $event"
-            @update:count="countValue = $event"
+            @update:count="countValue = $event; $emit('update:count', $event)"
             @update:page-height="updatePagesTop(virtualPageMap[index] ?? null)"
+            @refetch="refetchNextPages(virtualPageMap[index] ?? 0)"
           >
             <template #default="scope">
               <slot v-bind="scope" />
@@ -109,7 +113,9 @@
   </component>
 </template>
 
-<script setup lang="ts" generic="Model extends {id: string | number}, QueryParams">
+<script setup lang="ts" generic="Data extends {id: string | number}, QueryParams">
+import type {ApiError} from '@/utils/api'
+
 import {computed, inject, onUnmounted, ref, useTemplateRef, watch} from 'vue'
 
 import {debounce} from '@/utils/utils'
@@ -119,16 +125,24 @@ import VirtualScrollPage from './components/VirtualScrollPage.vue'
 import WEmptyComponent from '../EmptyComponent/WEmptyComponent.vue'
 import WInfiniteListWrapper from '../InfiniteList/WInfiniteListWrapper.vue'
 import {wScrollingElement} from '../InfiniteList/models/injection'
+import {useRefetchNextPages} from '../InfiniteList/use/useRefetchNextPages'
 
 const PAGE_LENGTH_DEFAULT = 24
 
 const props = defineProps<{
-  useQueryFn: UseQueryWithParams<PaginatedResponse<Model>, QueryParams>
+  useQueryFn: UseQueryWithParams<PaginatedResponse<Data>, QueryParams>
   queryParams: QueryParams
+  queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
   count: number
   noHeaderUpdate?: boolean
   minHeight?: boolean
   emptyStub?: string
+  pageClass?: string
+}>()
+
+defineEmits<{
+  (e: 'update:count', value: number): void
+  (e: 'update:error', value: ApiError): void
 }>()
 
 const scrollingElement = inject(wScrollingElement, null)
@@ -143,6 +157,8 @@ const pageRef = useTemplateRef<ComponentInstance<typeof VirtualScrollPage>[]>('p
 
 const pageCount = ref(Math.ceil(props.count / PAGE_LENGTH_DEFAULT))
 const countValue = ref(props.count)
+
+const {isFetching, isRefetchingAll, refetchNextPages, refetchAll} = useRefetchNextPages(pageRef)
 
 const getSkeletonLength = (page: number) => {
   if (page !== pageCount.value) return PAGE_LENGTH_DEFAULT
@@ -334,6 +350,7 @@ const resetScroll = () => {
 watch(() => props.queryParams, resetScroll)
 
 watch(() => props.count, newValue => {
+  if (newValue === countValue.value) return
   countValue.value = newValue
   pageCount.value = Math.ceil(newValue / PAGE_LENGTH_DEFAULT)
 })

@@ -4,10 +4,10 @@
       virtualIndex: {{ virtualIndex }}
     </div>
     <template
-      v-for="(item, index) in data?.results ?? (skeletonItems as Model[])"
+      v-for="(item, index) in data?.results ?? (skeletonItems as Data[])"
       :key="item.id"
     >
-      <slot v-bind="{item, updatePageHeight, index, page}" />
+      <slot v-bind="{item, updatePageHeight, index, page, refetch: emitRefetch}" />
     </template>
 
     <slot
@@ -21,12 +21,15 @@
   </div>
 </template>
 
-<script setup lang="ts" generic="Model extends {id: string | number}, QueryParams">
+<script setup lang="ts" generic="Data extends {id: string | number}, QueryParams">
+import type {ApiError} from '@/utils/api'
+
 import {computed, nextTick, onMounted, ref, useTemplateRef, watch} from 'vue'
 
 const props = defineProps<{
   virtualIndex: number
-  useQueryFn: UseQueryWithParams<PaginatedResponse<Model>, QueryParams>
+  useQueryFn: UseQueryWithParams<PaginatedResponse<Data>, QueryParams>
+  queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
   queryParams: QueryParams
   page: number | null
   initialPageHeight: number
@@ -38,13 +41,15 @@ const emit = defineEmits<{
   (e: 'update:page-count', value: number): void
   (e: 'update:count', value: number): void
   (e: 'update:page-height'): void
+  (e: 'update:error', value: ApiError): void
+  (e: 'refetch'): void
 }>()
 
 const skeletonItems = computed(() => Array(props.skeletonLength).fill(null).map((_, id) => ({id})))
 
 const queryParams = computed(() => ({...props.queryParams, page: props.page}))
 
-const {data} = props.useQueryFn(queryParams, {enabled: computed(() => props.page !== null)})
+const {data, error, refetch, isFetching} = props.useQueryFn(queryParams, {...props.queryOptions ?? {}, enabled: computed(() => props.page !== null)})
 
 const pageRef = useTemplateRef('page')
 
@@ -61,6 +66,8 @@ const updatePageHeight = () => {
   emit('update:page-height')
 }
 
+const emitRefetch = () => emit('refetch')
+
 watch(data, async () => {
   await nextTick()
 
@@ -75,6 +82,10 @@ watch(count, value => {
   if (value !== undefined) emit('update:count', value)
 }, {immediate: true})
 
+watch(error, error => {
+  if (error) emit('update:error', error)
+}, {immediate: true})
+
 onMounted(() => {
   updatePageHeight()
 })
@@ -83,5 +94,7 @@ defineExpose({
   pageHeight,
   pageCount,
   pageNumber,
+  refetch,
+  isFetching,
 })
 </script>
