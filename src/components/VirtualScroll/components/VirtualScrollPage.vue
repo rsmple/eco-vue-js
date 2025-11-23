@@ -9,6 +9,15 @@
     >
       <slot v-bind="{item, updatePageHeight, index, page}" />
     </template>
+
+    <slot
+      v-if="data?.results.length === 0"
+      name="empty"
+    >
+      <div class="text-accent sm:-left--left-inner sm:-max-w--width-inner flex justify-center px-8 py-16 text-center font-normal sm:sticky">
+        {{ emptyStub ?? 'Nothing to show' }}
+      </div>
+    </slot>
   </div>
 </template>
 
@@ -22,6 +31,7 @@ const props = defineProps<{
   page: number | null
   initialPageHeight: number
   skeletonLength: number
+  emptyStub: string | undefined
 }>()
 
 const emit = defineEmits<{

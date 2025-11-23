@@ -35,58 +35,90 @@
     </div>
   </div>
 
-  <div
-    ref="container"
-    :style="{
-      height: `${height}px`,
-    }"
-    class="relative min-h-screen"
+  <component
+    :is="minHeight ? WEmptyComponent : WInfiniteListWrapper"
+    :init-is-intersecting="visiblePage !== 1 ? false : undefined"
+    :no-header-update="noHeaderUpdate"
   >
-    <template
-      v-for="index in virtualPageCount"
-      :key="index"
-    >
-      <VirtualScrollPage
-        ref="page"
-        :virtual-index="index"
-        :use-query-fn="useQueryFn"
-        :query-params="queryParams"
-        :page="virtualPageMap[index] ?? null"
-        :initial-page-height="averagePageHeight"
-        :skeleton-length="getSkeletonLength(virtualPageMap[index] ?? 0)"
-        class="absolute left-0 top-0"
-        :style="{
-          transform: `translateY(${ !virtualPageMap[index] ? '-9999' : pagesTop[virtualPageMap[index] - 1] }px)`,
-        }"
-        @update:page-count="pageCount = $event"
-        @update:count="countValue = $event"
-        @update:page-height="updatePagesTop(virtualPageMap[index] ?? null)"
-      >
-        <template #default="scope">
-          <slot v-bind="scope" />
-        </template>
-      </VirtualScrollPage>
+    <template #header="headerScope">
+      <slot
+        name="header"
+        v-bind="headerScope"
+      />
     </template>
 
-    <div
-      v-for="page in pageCount"
-      :key="page"
-      class="-w--width-inner absolute left-0 top-0 z-[1] border-t border-gray-300 bg-gray-200/20 py-1 text-center text-xs text-gray-500"
-      :style="{
-        transform: `translateY(${ pagesTop[page - 1] }px)`,
-      }"
-    >
-      {{ page }}: {{ pagesTop[page - 1] ?? 0 }}
-    </div>
-  </div>
+    <template #default="defaultScope">
+      <div
+        ref="container"
+        :style="{
+          height: `${height}px`,
+          '--infinite-list-header-height': defaultScope && 'headerHeight' in defaultScope ? defaultScope.headerHeight + 'px' : undefined
+        }"
+        :class="{
+          '-min-h--height-inner list:pt-[--w-list-gap,1rem] pb-16': !minHeight,
+          'min-h-full': minHeight,
+        }"
+        class="relative"
+      >
+        <template
+          v-for="index in virtualPageCount"
+          :key="index"
+        >
+          <VirtualScrollPage
+            ref="page"
+            :virtual-index="index"
+            :use-query-fn="useQueryFn"
+            :query-params="queryParams"
+            :page="virtualPageMap[index] ?? null"
+            :initial-page-height="averagePageHeight"
+            :skeleton-length="getSkeletonLength(virtualPageMap[index] ?? 0)"
+            :empty-stub="emptyStub"
+            class="absolute left-0 top-0"
+            :style="{
+              transform: `translateY(${ !virtualPageMap[index] ? '-9999' : pagesTop[virtualPageMap[index] - 1] }px)`,
+            }"
+            @update:page-count="pageCount = $event"
+            @update:count="countValue = $event"
+            @update:page-height="updatePagesTop(virtualPageMap[index] ?? null)"
+          >
+            <template #default="scope">
+              <slot v-bind="scope" />
+            </template>
+
+            <template
+              v-if="$slots.empty"
+              #empty
+            >
+              <slot name="empty" />
+            </template>
+          </VirtualScrollPage>
+        </template>
+
+        <div
+          v-for="page in pageCount"
+          :key="page"
+          class="-w--width-inner absolute left-0 top-0 z-[1] border-t border-gray-300 bg-gray-200/20 py-1 text-center text-xs text-gray-500"
+          :style="{
+            transform: `translateY(${ pagesTop[page - 1] }px)`,
+          }"
+        >
+          {{ page }}: {{ pagesTop[page - 1] ?? 0 }}
+        </div>
+      </div>
+    </template>
+  </component>
 </template>
 
 <script setup lang="ts" generic="Model extends {id: string | number}, QueryParams">
-import {computed, onMounted, onUnmounted, ref, useTemplateRef, watch} from 'vue'
+import {computed, inject, onUnmounted, ref, useTemplateRef, watch} from 'vue'
 
 import {debounce} from '@/utils/utils'
 
 import VirtualScrollPage from './components/VirtualScrollPage.vue'
+
+import WEmptyComponent from '../EmptyComponent/WEmptyComponent.vue'
+import WInfiniteListWrapper from '../InfiniteList/WInfiniteListWrapper.vue'
+import {wScrollingElement} from '../InfiniteList/models/injection'
 
 const PAGE_LENGTH_DEFAULT = 24
 
@@ -94,7 +126,14 @@ const props = defineProps<{
   useQueryFn: UseQueryWithParams<PaginatedResponse<Model>, QueryParams>
   queryParams: QueryParams
   count: number
+  noHeaderUpdate?: boolean
+  minHeight?: boolean
+  emptyStub?: string
 }>()
+
+const scrollingElement = inject(wScrollingElement, null)
+
+const getScrollingElement = () => scrollingElement?.value ?? document.scrollingElement
 
 const virtualPageCount = ref(5)
 const virtualPageMap = ref<Record<number, number>>({1: 1})
@@ -172,6 +211,7 @@ const updatePagesTop = (start: number | null) => {
 
   let page = visiblePage.value + 1
   if (scrollTop.value - pagesTop.value[page + 1] < scrollTop.value - pagesTop.value[page]) page += 1 // Closer to next page
+  const scrollElement = getScrollingElement()
   if (scrollElement && page > 3 && page >= start) {
     const oldValue = pagesTop.value[page]
     const newValue = tops[page - start - 1]
@@ -187,8 +227,6 @@ const updatePagesTop = (start: number | null) => {
 
   pagesTop.value.splice(start - 1, tops.length, ...tops)
 }
-
-const scrollElement = document.scrollingElement
 
 const SCAN_LIMIT = 5
 let lastPage = 1
@@ -272,6 +310,7 @@ const height = computed(() => pagesTop.value[pageCount.value] ?? 0)
 watch([startPage, endPage], updateVirtualPageMap, {immediate: true})
 
 const handleScroll = () => {
+  const scrollElement = getScrollingElement()
   if (!containerRef.value || !scrollElement) return
 
   const newValue = scrollElement.scrollTop - containerRef.value.offsetTop
@@ -281,6 +320,7 @@ const handleScroll = () => {
 }
 
 const resetScroll = () => {
+  const scrollElement = getScrollingElement()
   if (!containerRef.value || !scrollElement) return
 
   scrollElement.scrollTop = containerRef.value.offsetTop
@@ -298,11 +338,13 @@ watch(() => props.count, newValue => {
   pageCount.value = Math.ceil(newValue / PAGE_LENGTH_DEFAULT)
 })
 
-onMounted(() => {
-  window.addEventListener('scroll', handleScroll, {passive: true})
+watch(containerRef, (newValue, oldValue) => {
+  oldValue?.removeEventListener('scroll', handleScroll)
+  newValue?.addEventListener('scroll', handleScroll, {passive: true})
+  if (oldValue) resetScroll()
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+  containerRef.value?.removeEventListener('scroll', handleScroll)
 })
 </script>
