@@ -2,6 +2,7 @@
   <WModalWrapper
     :actions-col="actionsCol"
     class="w-modal-wrapper-w-[--w-modal-confirm-width,40rem]"
+    :class="wrapperClass"
   >
     <template #title>
       <template v-if="typeof title === 'string'">
