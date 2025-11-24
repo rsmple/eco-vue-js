@@ -147,6 +147,13 @@
                   v-bind="{modelValue}"
                 />
 
+                <div
+                  v-if="placeholder && textarea && !modelValue && !textParts?.length"
+                  class="text-description pointer-events-none absolute"
+                >
+                  {{ placeholder }}
+                </div>
+
                 <component
                   :is="textarea ? ContentEditable : 'input'"
                   :id="id"

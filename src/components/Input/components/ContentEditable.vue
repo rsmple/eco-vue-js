@@ -5,7 +5,6 @@
     role="textbox"
     aria-multiline="true"
     spellcheck="false"
-    :placeholder="placeholder"
     class="relative [white-space:var(--w-input-whitespace,pre)]"
     @input="onInput"
     @beforeinput="insertParagraph($event as InputEvent)"
