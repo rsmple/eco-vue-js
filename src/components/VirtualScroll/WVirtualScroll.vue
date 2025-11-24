@@ -149,7 +149,7 @@ const scrollingElement = inject(wScrollingElement, null)
 
 const getScrollingElement = () => scrollingElement?.value ?? document.scrollingElement
 
-const virtualPageCount = ref(5)
+const virtualPageCount = ref<number>(5)
 const virtualPageMap = ref<Record<number, number>>({1: 1})
 const virtualPageMapReverse = ref<Record<number, number>>({1: 1})
 
@@ -168,9 +168,9 @@ const getSkeletonLength = (page: number) => {
 
 const pageItemsHeight = computed(() => Math.ceil((pageRef.value?.reduce((sum, page) => sum + (page?.pageHeight ?? 0), 0) ?? 0) / 100) * 100)
 
-const containerRef = useTemplateRef('container')
+const containerRef = useTemplateRef<HTMLDivElement>('container')
 
-const averagePageHeight = ref(containerRef.value?.offsetHeight ?? 0)
+const averagePageHeight = ref<number>(containerRef.value?.offsetHeight ?? 0)
 const scrollTop = ref(0)
 
 let lastLess = 0
