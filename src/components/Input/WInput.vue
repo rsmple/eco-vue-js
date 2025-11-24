@@ -268,6 +268,7 @@ import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 import {Notify} from '@/utils/Notify'
+import {getIsMobile} from '@/utils/mobile'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {checkPermissionPaste} from '@/utils/useCopy'
 import {debounce} from '@/utils/utils'
@@ -331,10 +332,23 @@ const getCaret = (): CaretOffset => {
   return {start: inputRef.value.selectionStart ?? 0, end: inputRef.value.selectionEnd ?? 0}
 }
 
+const noSelectionTypes = ['email', 'number', 'date']
+
 const setCaret = (start: number, end?: number): void => {
   if (!inputRef.value) return
   if ('setCaret' in inputRef.value) inputRef.value.setCaret(start, end)
-  else inputRef.value.setSelectionRange(start, end ?? start)
+  else {
+    const previousType = inputRef.value.type
+
+    if (noSelectionTypes.includes(previousType)) {
+      if (getIsMobile()) return
+      inputRef.value.type = 'text'
+      inputRef.value.setSelectionRange(start, end ?? start)
+      inputRef.value.type = previousType
+    } else {
+      inputRef.value.setSelectionRange(start, end ?? start)
+    }
+  }
 }
 
 const addToHistory = (value: ModelValue | undefined, noDebounce: boolean) => {
