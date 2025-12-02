@@ -21,7 +21,10 @@ const HEADERS_FORMDATA: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',
 }
 
-type ApiUrl = `/${ string }/`
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface Config {}
+
+type ApiUrl = Config extends {ApiUrl: infer Value} ? Value : `/${ string }/`
 type BaseUrl = `/${ string }` | `http://${ string }` | `https://${ string }`
 
 export interface ApiClient {
