@@ -1,4 +1,4 @@
-import {type QueryFilters, useQueryClient} from '@tanstack/vue-query'
+import {QueryClient, type QueryFilters, useQueryClient} from '@tanstack/vue-query'
 
 export const paginatedResponseUpdater = <Data extends DefaultData>(oldData: PaginatedResponse<Data> | undefined, newValues: Data[], selected: number[], reverseSelection = false): PaginatedResponse<Data> | undefined => {
   if (!oldData) return undefined
@@ -30,7 +30,7 @@ export const useQueryUpdater = () => {
 
   const update = <Model extends DefaultData>(data: Model, options: {listQueryFilter?: QueryFilters, paginatedQueryFilter?: QueryFilters}) => {
     if (options.listQueryFilter) {
-      queryClient.setQueriesData<Model[]>(options.listQueryFilter, value => {
+      queryClient.setQueriesData<Model[]>(options.listQueryFilter as Parameters<QueryClient['setQueriesData']>[0], value => {
         if (!value) return
 
         const index = value.findIndex(item => (item as unknown as {id: number}).id === (data as unknown as {id: number}).id)
@@ -47,20 +47,20 @@ export const useQueryUpdater = () => {
 
     if (options.paginatedQueryFilter) {
       queryClient.setQueriesData<PaginatedResponse<Model>>(
-        options.paginatedQueryFilter,
+        options.paginatedQueryFilter as Parameters<QueryClient['setQueriesData']>[0],
         oldData => paginatedResponseUpdater(oldData, [data], [(data as unknown as {id: number}).id]))
     }
   }
 
   const updateBulk = <Model extends DefaultData>(data: Model[], filter: QueryFilters) => {
     queryClient.setQueriesData<PaginatedResponse<Model>>(
-      filter,
+      filter as Parameters<QueryClient['setQueriesData']>[0],
       oldData => paginatedResponseUpdater(oldData, data, data.map(item => (item as unknown as {id: number}).id)))
   }
 
   const deleteItems = <Model extends DefaultData>(filter: QueryFilters, selected: number[], reverse = false) => {
     queryClient.setQueriesData<PaginatedResponse<Model>>(
-      filter,
+      filter as Parameters<QueryClient['setQueriesData']>[0],
       oldData => paginatedResponseUpdater(oldData, [], selected, reverse),
     )
   }
