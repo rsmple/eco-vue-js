@@ -54,7 +54,7 @@
     "postcss-import": "16.1.1",
     "rollup-plugin-watch": "1.0.5",
     "tailwindcss": "3.4.17",
-    "typescript": "5.8.3",
+    "typescript": "5.9.3",
     "vite": "7.2.7",
     "vite-plugin-dts": "4.5.4",
     "vite-svg-loader": "5.1.0",
