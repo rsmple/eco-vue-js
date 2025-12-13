@@ -1,11 +1,11 @@
 <template>
-  <div
-    class="text-description square-[1.25em] w-hover-circle relative inline-block cursor-pointer select-none"
+  <button
+    class="text-description w-hover-circle relative inline-block cursor-pointer select-none"
     @click="doCopy()"
   >
     <component
       :is="iconCopy"
-      class="-mt-px"
+      class="square-[1.25em] mt-[-0.125em]"
       :class="{
         'text-primary dark:text-primary-dark': copied
       }"
@@ -16,7 +16,7 @@
       text="Copy"
       no-touch
     />
-  </div>
+  </button>
 </template>
 
 <script lang="ts" setup>
