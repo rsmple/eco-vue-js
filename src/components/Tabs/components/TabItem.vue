@@ -5,6 +5,7 @@
     ref="form"
     :name="name"
     :title="title"
+    class="h-full"
     @update:is-valid="$event === false && $emit('tab:switch', name)"
   >
     <slot />
