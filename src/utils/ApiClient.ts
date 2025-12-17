@@ -51,8 +51,9 @@ export class ApiClientInstance implements ApiClient {
     onFailure?: (response: Response) => void
     credentials?: RequestCredentials
     baseUrl?: BaseUrl
+    noRecheck?: boolean
   }) {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !config.noRecheck) {
       this.checkAuth()
       setInterval(() => void this.checkAuth(), 500)
       window.addEventListener('storage', () => void this.checkAuth())
@@ -141,7 +142,7 @@ export class ApiClientInstance implements ApiClient {
   checkAuth() {
     let result
 
-    if (this.config.tokenGetter && !this.config.tokenRefresh) result = !!this.config.tokenGetter?.()
+    if (this.config.tokenGetter) result = !!this.config.tokenGetter?.()
     else result = checkExpirationDate()
 
     if (result !== false) this.auth.value = result !== null
@@ -162,7 +163,7 @@ export class ApiClientInstance implements ApiClient {
         if (!check) {
           if (check !== null && (this.config.refreshUrl || this.config.tokenRefresh)) await this.refresh()
 
-          if (!this.checkAuth()) {
+          if (!this.checkAuth() && !this.config.tokenGetter) {
             this.auth.value = false
 
             reject()

@@ -425,6 +425,15 @@ if (props.useQueryFnDefault) {
   }, {immediate: true})
 }
 
+if (props.useFirstDefault) {
+  watch(data, value => {
+    if (value && props.modelValue.length === 0 && value[0]) {
+      select(props.valueGetter(value[0]))
+      emit('init-model')
+    }
+  }, {immediate: true})
+}
+
 watch(() => props.modelValue, async () => {
   await nextTick()
 
