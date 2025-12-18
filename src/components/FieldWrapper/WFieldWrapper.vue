@@ -191,7 +191,7 @@
 <script lang="ts" setup>
 import type {FieldWrapperProps} from './types'
 
-import {type StyleValue, computed, inject, onBeforeUnmount, ref, useId, useTemplateRef} from 'vue'
+import {type StyleValue, type VNode, computed, inject, onBeforeUnmount, ref, useId, useTemplateRef} from 'vue'
 
 import WButtonCopy from '@/components/Button/WButtonCopy.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
@@ -280,4 +280,13 @@ defineExpose({
   fieldRef,
   showMessage,
 })
+
+defineSlots<{
+  title: () => VNode[]
+  subtitle: () => VNode[]
+  right: () => VNode[]
+  bottom: () => VNode[]
+  field: (props: {id: string, focused: boolean, setFocused: (value: boolean) => void}) => VNode[]
+  default: (props: {id: string, focused: boolean, setFocused: (value: boolean) => void}) => VNode[]
+}>()
 </script>

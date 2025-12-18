@@ -38,6 +38,7 @@ const pluginDefault = plugin(function ({matchUtilities, theme, addBase}) {
       'w-checkbox-size': value => ({'--w-checkbox-size': value}),
       'w-input-gap': value => ({'--w-input-gap': value}),
       'w-spinner-size': value => ({'--w-spinner-size': value}),
+      'w-button-spinner-size': value => ({'--w-button-spinner-size': value}),
       'w-modal-wrapper-p': value => ({'--w-modal-wrapper-padding': value}),
       'w-modal-wrapper-w': value => ({'--w-modal-wrapper-width': value}),
       'w-list-header-h': value => ({'--w-list-header-height': value}),

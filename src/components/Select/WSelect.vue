@@ -85,6 +85,8 @@
 
     <template #content>
       <div class="max-h-80">
+        <slot name="content" />
+
         <SelectOption
           v-if="hasCreateOption"
           :is-selected="false"
@@ -466,5 +468,6 @@ defineSlots<{
   option?: (props: PartialNot<SelectOptionProps<Data>>) => void
   right?: () => void
   prefix?: () => void
+  content?: () => void
 }>()
 </script>

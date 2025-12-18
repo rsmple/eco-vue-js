@@ -44,6 +44,13 @@
     >
       <slot name="right" />
     </template>
+
+    <template
+      v-if="$slots.content"
+      #content
+    >
+      <slot name="content" />
+    </template>
   </WSelect>
 </template>
 
@@ -129,5 +136,6 @@ defineSlots<{
   subtitle?: () => VNode[]
   right?: () => VNode[]
   option?: (props: PartialNot<SelectOptionProps<Data>>) => VNode[]
+  content?: () => VNode[]
 }>()
 </script>

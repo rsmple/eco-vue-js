@@ -38,6 +38,8 @@
     </template>
 
     <template #prefix="{unclickable}">
+      <slot name="content" />
+
       <SelectAsyncPrefix
         v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true"
         :use-query-fn="useQueryFnPrefix ?? useQueryFnOptions"
@@ -308,5 +310,6 @@ defineSlots<{
   subtitle?: () => void
   right?: (props: Record<string, never>) => void
   option?: (props: PartialNot<SelectOptionProps<Data>>) => void
+  content?: () => void
 }>()
 </script>
