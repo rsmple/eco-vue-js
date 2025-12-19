@@ -88,6 +88,12 @@ const toggle = (): void => {
   else emit('select')
 }
 
+const toggleCursor = (): void => {
+  if (props.isCursor) return
+
+  toggle()
+}
+
 const scrollIntoView = () => {
   elementRef.value?.scrollIntoView({behavior: 'auto', block: 'center'})
 }
@@ -132,6 +138,7 @@ onUnmounted(() => {
 
 defineExpose({
   scrollIntoView,
+  toggleCursor,
 })
 
 defineSlots<{

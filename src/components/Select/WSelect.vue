@@ -145,13 +145,14 @@
         <SelectOption
           v-for="(option, index) in optionsFiltered"
           :key="valueGetter(option)"
+          ref="option"
           :is-selected="modelValue.includes(valueGetter(option))"
           :is-cursor="index === cursor"
           :loading="loadingOptionIndex === index && loading"
           :scroll="isCursorLocked"
           :hide-option-icon="hideOptionIcon"
           class="first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
-          @select="select(valueGetter(option)); setLoadingOptionIndex(index)"
+          @select="select(valueGetter(option), option); setLoadingOptionIndex(index)"
           @unselect="unselect(valueGetter(option)); setLoadingOptionIndex(index)"
           @mouseenter="setCursor(index)"
         >
@@ -207,7 +208,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'select', item: Model): void
+  (e: 'select', item: Model, data: Data): void
   (e: 'unselect', item: Model): void
   (e: 'focus', value: FocusEvent | undefined): void
   (e: 'blur', value: FocusEvent): void
@@ -220,6 +221,7 @@ const {isReadonly, isDisabled} = useComponentStates(props)
 const {isMobile} = useIsMobile()
 
 const isOpen = ref(false)
+const optionRef = useTemplateRef('option')
 const inputRef = useTemplateRef('input')
 const cursor = ref<number>(0)
 const isCursorLocked = ref(false)
@@ -269,7 +271,7 @@ const close = () => {
   if (props.selectOnClose && focused.value && !isModelValueSearch.value) {
     const optionExact = optionsFiltered.value.find(option => props.valueGetter(option) === search.value)
 
-    if (optionExact) select(props.valueGetter(optionExact))
+    if (optionExact) select(props.valueGetter(optionExact), optionExact)
     else if (search.value) create(search.value)
     else if (props.modelValue.length) unselect(props.modelValue[props.modelValue.length - 1])
   }
@@ -342,8 +344,7 @@ const selectCursor = () => {
 
   setLoadingOptionIndex(cursor.value)
 
-  if (props.modelValue.includes(value)) unselect(value)
-  else select(value)
+  optionRef.value?.forEach(item => item?.toggleCursor())
 }
 
 let deletePressTimeout: NodeJS.Timeout | null = null
@@ -363,10 +364,10 @@ const captureDoubleDelete = () => {
   }
 }
 
-const select = (item: Model): void => {
+const select = (item: Model, data: Data): void => {
   if (isDisabledComputed.value) return
 
-  emit('select', item)
+  emit('select', item, data)
 
   search.value = ''
 }
@@ -394,7 +395,7 @@ const create = async (value: string) => {
   if (option) {
     createdOptions.value.push(option as Data)
     setLoadingOptionIndex(optionsFiltered.value.length)
-    select(props.valueGetter(option))
+    select(props.valueGetter(option), option)
 
     search.value = ''
   }
@@ -421,7 +422,7 @@ if (props.useQueryFnDefault) {
 
   watch(defaultData, value => {
     if (value && props.modelValue.length === 0) {
-      select(props.valueGetter(value))
+      select(props.valueGetter(value), value)
       emit('init-model')
     }
   }, {immediate: true})
@@ -430,7 +431,7 @@ if (props.useQueryFnDefault) {
 if (props.useFirstDefault) {
   watch(data, value => {
     if (value && props.modelValue.length === 0 && value[0]) {
-      select(props.valueGetter(value[0]))
+      select(props.valueGetter(value[0]), value[0])
       emit('init-model')
     }
   }, {immediate: true})

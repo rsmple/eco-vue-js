@@ -1,7 +1,7 @@
 <template>
   <div
     class="
-      bg-default dark:bg-default-dark no-scrollbar sticky top-0 z-[2] col-span-full -mb-2 flex
+      bg-default dark:bg-default-dark no-scrollbar sticky top-0 z-[2] col-span-full flex
       overflow-x-auto overscroll-x-contain border-b border-solid border-gray-50 text-xs dark:border-gray-800/50
     "
     @mousedown.prevent=""
