@@ -3,7 +3,7 @@ import type {DropdownMenuProps} from '@/components/DropdownMenu/types'
 import type {FieldWrapperProps} from '@/components/FieldWrapper/types'
 import type {LinkProps} from '@/types/types'
 import type {SemanticType} from '@/utils/SemanticType'
-import type {Component} from 'vue'
+import type {Component, VNode} from 'vue'
 
 export interface ButtonProps extends Partial<LinkProps> {
   semanticType?: SemanticType
@@ -20,6 +20,8 @@ export interface ButtonProps extends Partial<LinkProps> {
   skeleton?: boolean
   autofocus?: boolean
   outline?: boolean
+  borderComponent?: VNode
+  noBorderComponent?: boolean
 }
 
 export type ButtonGroupOptionComponent<Option> = Component<SelectOptionProps<Option>>
