@@ -4,8 +4,9 @@
     class="bg-default dark:bg-default-dark flex overflow-hidden rounded-[--w-input-rounded,0.75rem]"
   >
     <InputActionsButton
-      v-if="allowClear && !disabled && !readonly"
+      v-if="allowClear && !readonly"
       :icon="markRaw(IconClose)"
+      :disabled="disabled"
       tooltip-text="Clear"
       top
       @click="$emit('click:clear')"
@@ -20,8 +21,9 @@
     />
 
     <InputActionsButton
-      v-if="allowPaste && !disabled && !readonly"
+      v-if="allowPaste && !readonly"
       :icon="markRaw(IconPaste)"
+      :disabled="disabled"
       tooltip-text="Paste"
       top
       @click="$emit('click:paste')"

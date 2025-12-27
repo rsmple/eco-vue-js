@@ -73,12 +73,13 @@
         @click="focus"
       >
         <InputToolbar
-          v-if="!isDisabled && !isReadonly && textarea && (rich || toolbarActions || $slots.toolbar)"
+          v-if="!isReadonly && textarea && (rich || toolbarActions || $slots.toolbar)"
           :list="toolbarActions"
           :rich="rich === true"
           :is-undo="historyPosition > 0"
           :is-redo="historyPosition < history.length - 1"
           :text-secure="textSecure ?? false"
+          :disabled="isDisabled === true"
           @wrap-selection="wrapSelection"
           @undo="undo"
           @redo="redo"
@@ -148,7 +149,7 @@
                 />
 
                 <div
-                  v-if="placeholder && textarea && !modelValue && !textParts?.length"
+                  v-if="placeholder && textarea && hasNoValue"
                   class="text-description pointer-events-none absolute"
                 >
                   {{ placeholder }}
@@ -215,7 +216,7 @@
           v-if="!seamless || focused"
           :model-value="(modelValue as ModelValue)"
           :loading="loading"
-          :allow-clear="allowClear && modelValue !== ''"
+          :allow-clear="allowClear && !hasNoValue"
           :disabled="isDisabled || disabledActions"
           :readonly="isReadonly || unclickable === true"
           :text-secure="textSecure"
@@ -325,6 +326,8 @@ const isSecureVisible = ref(false)
 
 const history = ref<HistoryEntry[]>([])
 const historyPosition = ref(-1)
+
+const hasNoValue = computed(() => !props.modelValue && !props.textParts?.length && !props.placeholderSecure)
 
 const getCaret = (): CaretOffset => {
   if (!inputRef.value) return {start: 0, end: 0}

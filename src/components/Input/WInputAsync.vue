@@ -4,10 +4,9 @@
     v-bind="{
       ...props,
       modelValue: value,
-      disabledActions: (!focused && !hasChangesValue) || disabledActions,
       errorMessage: errorMessageValue ?? errorMessage,
       hasChanges: hasChanges || hasChangesValue,
-      allowClear: !textarea || allowClear,
+      allowClear: (!textarea || allowClear) && focused,
       loading: undefined as never,
     }"
     :class="$attrs.class"

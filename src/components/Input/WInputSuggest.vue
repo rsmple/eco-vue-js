@@ -90,9 +90,10 @@
 
         <template #suffix>
           <InputActionsButton
-            v-if="!isDisabled"
+            v-if="!isReadonly"
             label="Show suggest"
             :expanded="isOpen"
+            :disabled="isDisabled"
             @click="isOpen ? toggleScope.unclickable === false ? close() : blur() : focus()"
           >
             <IconArrow
