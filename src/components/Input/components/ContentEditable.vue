@@ -7,7 +7,7 @@
     spellcheck="false"
     class="relative [white-space:var(--w-input-whitespace,pre)]"
     @input="onInput"
-    @beforeinput="insertParagraph($event as InputEvent)"
+    @beforeinput="handleBeforeInput($event as InputEvent)"
     @keydown="$emit('keydown', $event)"
     @focus="$emit('focus', $event); focused = true"
     @blur="$emit('blur', $event); focused = false"
@@ -116,7 +116,16 @@ const getCurrentText = (): string => {
 
 const lineBreakEvents = ['insertParagraph', 'insertLineBreak']
 
-const insertParagraph = (e: InputEvent) => {
+const autoPairMap: Record<string, string> = {
+  '(': ')',
+  '[': ']',
+  '{': '}',
+  '"': '"',
+  '\'': '\'',
+  '`': '`',
+}
+
+const handleBeforeInput = (e: InputEvent) => {
   if (lineBreakEvents.includes(e.inputType)) {
     e.preventDefault()
 
@@ -127,6 +136,30 @@ const insertParagraph = (e: InputEvent) => {
     const leadingSpaces = currentLine.match(/^[ ]*/)?.[0] || ''
 
     insertPlain('\n' + leadingSpaces)
+    return
+  }
+
+  if (e.inputType === 'insertText' && e.data && autoPairMap[e.data]) {
+    e.preventDefault()
+
+    const {start, end} = getCaret()
+    const currentText = getCurrentText()
+    const closingChar = autoPairMap[e.data]
+
+    if (start !== end) {
+      const before = currentText.slice(0, start)
+      const selected = currentText.slice(start, end)
+      const after = currentText.slice(end)
+      const newText = before + e.data + selected + closingChar + after
+
+      emit('update:model-value', newText, true)
+      nextTick(() => setCaret(start + 1, end + 1))
+    } else {
+      const newText = currentText.slice(0, start) + e.data + closingChar + currentText.slice(start)
+
+      emit('update:model-value', newText, true)
+      nextTick(() => setCaret(start + 1))
+    }
   }
 }
 
