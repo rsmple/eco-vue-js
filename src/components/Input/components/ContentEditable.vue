@@ -120,7 +120,13 @@ const insertParagraph = (e: InputEvent) => {
   if (lineBreakEvents.includes(e.inputType)) {
     e.preventDefault()
 
-    insertPlain('\n')
+    const {start} = getCaret()
+    const currentText = getCurrentText()
+    const lineStart = currentText.lastIndexOf('\n', start - 1) + 1
+    const currentLine = currentText.slice(lineStart, start)
+    const leadingSpaces = currentLine.match(/^[ ]*/)?.[0] || ''
+
+    insertPlain('\n' + leadingSpaces)
   }
 }
 
