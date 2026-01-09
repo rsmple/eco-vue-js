@@ -78,8 +78,23 @@ const pluginDefault = plugin(function ({matchUtilities, theme, addBase}) {
       'w-modal-wrapper-rounded': value => ({'--w-modal-wrapper-rounded': value}),
       'w-list-header-rounded': value => ({'--w-list-header-rounded': value}),
       'w-button-action-rounded': value => ({'--w-button-action-rounded': value}),
+      'w-border-svg-rounded': value => ({'--w-border-svg-rounded': value}),
     },
     {values: theme('borderRadius')},
+  )
+
+  matchUtilities(
+    {
+      'w-border-svg-stroke': value => ({'--w-border-svg-stroke-width': value}),
+    },
+    {values: theme('strokeWidth')},
+  )
+
+  matchUtilities(
+    {
+      'w-border-svg-padding': value => ({'--w-border-svg-padding': value}),
+    },
+    {values: theme('padding')},
   )
 
   matchUtilities(

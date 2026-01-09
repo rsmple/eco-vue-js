@@ -24,8 +24,11 @@
     </div>
 
     <label
-      ref="container"
-      class="height-64 relative mb-1 block w-full min-w-60"
+      class="height-64 relative mb-1 block w-full min-w-60 rounded-xl"
+      :class="{
+        'bg-primary/10 dark:bg-primary-dark/10': !isActive,
+        'bg-primary/20 dark:bg-primary-dark/20': isActive,
+      }"
       @dragenter.prevent="setIsActive(true)"
       @dragover.prevent="setIsActive(true)"
       @dragleave.prevent="setIsActive(false)"
@@ -43,12 +46,12 @@
       >
 
       <FilePickerSvg
-        v-if="containerWidth && containerHeight"
-        :svg-width="containerWidth"
-        :svg-height="containerHeight"
         :is-active="isActive"
-        :has-error="!!errorMessage"
-        class="absolute left-0 top-0"
+        class="w-border-svg-rounded-xl absolute left-0 top-0"
+        :class="{
+          'text-negative dark:text-negative-dark': !!errorMessage,
+          'text-primary dark:text-primary-dark': !errorMessage,
+        }"
       />
 
       <div
@@ -151,8 +154,6 @@ import {getIsClientSide} from '@/utils/utils'
 import FilePickerItem from './components/FilePickerItem.vue'
 import FilePickerSvg from './components/FilePickerSvg.vue'
 
-import {useTabActiveListener} from '../Tabs/use/useTabActiveListener'
-
 const props = withDefaults(
   defineProps<{
     modelValue: File[]
@@ -185,9 +186,6 @@ const emit = defineEmits<{
 const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 const inputRef = useTemplateRef('input')
-const containerRef = useTemplateRef('container')
-const containerWidth = ref<number | undefined>(undefined)
-const containerHeight = ref<number | undefined>(undefined)
 const isActive = ref(false)
 
 const updateModelValue = (): void => {
@@ -220,23 +218,12 @@ const preventDefaults = (e: Event) => {
 
 const events = ['dragenter', 'dragover', 'dragleave', 'drop']
 
-const updateSize = () => {
-  containerWidth.value = containerRef.value?.offsetWidth
-  containerHeight.value = containerRef.value?.offsetHeight
-}
-
-useTabActiveListener(updateSize)
-
 onMounted(() => {
   if (!getIsClientSide()) return
-
-  updateSize()
 
   events.forEach((eventName) => {
     document.body.addEventListener(eventName, preventDefaults)
   })
-
-  window.addEventListener('resize', updateSize)
 })
 
 onUnmounted(() => {
@@ -245,7 +232,5 @@ onUnmounted(() => {
   events.forEach((eventName) => {
     document.body.removeEventListener(eventName, preventDefaults)
   })
-
-  window.removeEventListener('resize', updateSize)
 })
 </script>
