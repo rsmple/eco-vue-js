@@ -46,7 +46,7 @@
       >
 
       <FilePickerSvg
-        :is-active="isActive"
+        :animate="isDragging"
         class="w-border-svg-rounded-xl absolute left-0 top-0"
         :class="{
           'text-negative dark:text-negative-dark': !!errorMessage,
@@ -142,14 +142,14 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, onUnmounted, ref, useTemplateRef} from 'vue'
+import {ref, useTemplateRef} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {isDragging} from '@/utils/preventDragFile'
 import {useComponentStates} from '@/utils/useComponentStates'
-import {getIsClientSide} from '@/utils/utils'
 
 import FilePickerItem from './components/FilePickerItem.vue'
 import FilePickerSvg from './components/FilePickerSvg.vue'
@@ -211,26 +211,4 @@ const unselectFile = (index: number): void => {
 
   if (newFiles.length === 0 && inputRef.value) inputRef.value.value = ''
 }
-
-const preventDefaults = (e: Event) => {
-  e.preventDefault()
-}
-
-const events = ['dragenter', 'dragover', 'dragleave', 'drop']
-
-onMounted(() => {
-  if (!getIsClientSide()) return
-
-  events.forEach((eventName) => {
-    document.body.addEventListener(eventName, preventDefaults)
-  })
-})
-
-onUnmounted(() => {
-  if (!getIsClientSide()) return
-
-  events.forEach((eventName) => {
-    document.body.removeEventListener(eventName, preventDefaults)
-  })
-})
 </script>

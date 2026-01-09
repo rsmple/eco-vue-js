@@ -5,7 +5,7 @@
     stroke-dasharray="4px 8px"
   >
     <animate
-      v-if="isActive"
+      v-if="animate"
       attributeName="stroke-dashoffset"
       from="0px"
       to="-12px"
@@ -19,6 +19,6 @@
 import WBorderSvg from '@/components/BorderSvg/WBorderSvg.vue'
 
 defineProps<{
-  isActive?: boolean
+  animate?: boolean
 }>()
 </script>

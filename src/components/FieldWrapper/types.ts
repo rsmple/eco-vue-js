@@ -23,4 +23,5 @@ export interface FieldWrapperProps {
   seamless?: boolean
   savedText?: string
   topText?: boolean
+  allowDropFile?: boolean
 }

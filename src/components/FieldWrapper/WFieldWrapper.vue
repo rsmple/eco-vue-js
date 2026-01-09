@@ -1,7 +1,15 @@
 <template>
   <div
     class="relative"
-    v-bind="{style: $attrs.style as StyleValue}"
+    v-bind="
+      allowDropFile ? {
+        style: $attrs.style as StyleValue,
+        onDragover,
+        onDragleave,
+        onDrop,
+      } : {
+        style: $attrs.style as StyleValue,
+      }"
     :class="[$attrs.class, {
       'mb-[1.125rem]': !noMargin && !subgrid,
       'col-span-full grid grid-cols-subgrid': subgrid,
@@ -71,7 +79,7 @@
         }"
       >
         <slot
-          v-bind="{id, setFocused, focused}"
+          v-bind="{id, setFocused, focused, isDragover}"
           name="field"
         >
           <div
@@ -81,7 +89,7 @@
               'border-t border-solid border-gray-300 dark:border-gray-700': title || $slots.title,
             }"
           >
-            <slot v-bind="{id, setFocused, focused}">
+            <slot v-bind="{id, setFocused, focused, isDragover}">
               {{ typeof modelValue === 'number' ? numberFormatter.format(modelValue) : modelValue === null ? (emptyValue ?? 'N / A') : (modelValue || emptyValue) }}
             </slot>
 
@@ -215,8 +223,9 @@ const props = withDefaults(
   },
 )
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'click', value: MouseEvent): void
+  (e: 'drop', value: DataTransferItemList): void
 }>()
 
 const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
@@ -271,6 +280,22 @@ const setShowMessageInjected = inject(wFieldSetShowMessage, null)
 
 setShowMessageInjected?.(showMessage)
 
+const isDragover = ref(false)
+
+const onDragover = (): void => {
+  isDragover.value = true
+}
+
+const onDragleave = (): void => {
+  isDragover.value = false
+}
+
+const onDrop = (event: DragEvent): void => {
+  const list = event.dataTransfer?.items
+
+  if (list) emit('drop', list)
+}
+
 onBeforeUnmount(() => {
   setShowMessageInjected?.(null)
   resetMessage()
@@ -286,7 +311,7 @@ defineSlots<{
   subtitle: () => VNode[]
   right: () => VNode[]
   bottom: () => VNode[]
-  field: (props: {id: string, focused: boolean, setFocused: (value: boolean) => void}) => VNode[]
-  default: (props: {id: string, focused: boolean, setFocused: (value: boolean) => void}) => VNode[]
+  field: (props: {id: string, focused: boolean, setFocused: (value: boolean) => void, isDragover: boolean}) => VNode[]
+  default: (props: {id: string, focused: boolean, setFocused: (value: boolean) => void, isDragover: boolean}) => VNode[]
 }>()
 </script>

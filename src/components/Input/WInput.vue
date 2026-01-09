@@ -6,6 +6,7 @@
       'group/seamless': seamless,
     }]"
     @click="seamless && focus()"
+    @drop="onDrop"
   >
     <template
       v-if="$slots.title"
@@ -54,7 +55,7 @@
 
     <template
       v-else
-      #field="{id, setFocused, focused}"
+      #field="{id, setFocused, focused, isDragover}"
     >
       <div
         class="
@@ -106,13 +107,23 @@
 
         <div
           ref="content"
-          class="group/input col-start-2 grid grid-cols-1"
+          class="group/input relative col-start-2 grid grid-cols-1"
           :class="{
             'py-[--w-input-gap,0.25rem] first:pl-[--w-input-gap,0.25rem] last:pr-[--w-input-gap,0.25rem]': $slots.prefix,
             'no-scrollbar overflow-x-auto overscroll-x-contain': noWrap && !(seamless && !focused),
             'overflow-hidden': seamless && !focused,
           }"
         >
+          <div
+            v-if="allowDropFile && isDragging"
+            class="text-primary dark:text-primary-dark bg-primary/10 dark:bg-primary-dark/10 pointer-events-none absolute inset-0.5 rounded-[--w-option-rounded]"
+          >
+            <FilePickerSvg
+              :animate="isDragover"
+              class="w-border-svg-rounded-[--w-option-rounded]"
+            />
+          </div>
+
           <div
             class="w-skeleton-w-32 flex gap-[--w-input-gap,0.25rem]"
             :class="{
@@ -268,14 +279,19 @@ import {computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, re
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
+import {Modal} from '@/utils/Modal'
 import {Notify} from '@/utils/Notify'
+import {SemanticType} from '@/utils/SemanticType'
 import {getIsMobile} from '@/utils/mobile'
+import {isDragging} from '@/utils/preventDragFile'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {checkPermissionPaste} from '@/utils/useCopy'
 import {debounce} from '@/utils/utils'
 
 import InputActions from './components/InputActions.vue'
 import {type CaretOffset} from './models/utils'
+
+import FilePickerSvg from '../FilePicker/components/FilePickerSvg.vue'
 
 const ContentEditable = defineAsyncComponent(() => import('./components/ContentEditable.vue'))
 const InputToolbar = defineAsyncComponent(() => import('./components/InputToolbar.vue'))
@@ -553,8 +569,7 @@ const paste = async () => {
 const scrollToInput = () => {
   if (!contentRef.value || !inputRef.value) return
 
-  if (inputRef.value instanceof HTMLElement) inputRef.value.scrollIntoView({behavior: 'instant', block: 'center'})
-  else contentRef.value.scrollTo({left: contentRef.value.scrollWidth - 40})
+  contentRef.value.scrollTo({left: contentRef.value.scrollWidth - 40})
 }
 
 const wrapSelection = (value: WrapSelection) => inputRef.value && 'wrapSelection' in inputRef.value ? inputRef.value.wrapSelection(value) : void 0
@@ -574,6 +589,56 @@ const autofocusDebounced = () => {
 
     timeout = undefined
   }, typeof props.autofocus === 'number' ? props.autofocus : 250)
+}
+
+const maxSizeKb = 10
+const maxSize = maxSizeKb * 1024 // 10 KB
+
+let closeModal: (() => void) | null = null
+
+const onDrop = async (list: DataTransferItemList) => {
+  closeModal?.()
+  closeModal = null
+
+  const file = list[0]?.getAsFile()
+
+  if (!file) return
+
+  if (file.size > maxSize) {
+    fieldWrapperRef.value?.showMessage(`File is too large. Max size is ${ (maxSizeKb).toFixed(0) } KB`, 4000)
+    return
+  }
+    
+  const text = await file.text()
+
+  if (text.length === 0) {
+    fieldWrapperRef.value?.showMessage('File is empty', 4000)
+    return
+  } else if (props.maxLength && text.length > props.maxLength) {
+    fieldWrapperRef.value?.showMessage(`File content length exceeds the allowed limit of ${ props.maxLength } characters`, 4000)
+    return
+  }
+
+  if (props.modelValue === text) {
+    fieldWrapperRef.value?.showMessage('File content is already applied', 2000)
+    return
+  }
+
+  if (props.modelValue || props.placeholderSecure) {
+    closeModal = Modal.addConfirm({
+      title: `${ props.title ? props.title + ': ' : '' }Overwrite current content?`,
+      description: `The current content will be replaced with the content of the file "${ file.name }"`,
+      acceptText: 'Overwrite',
+      acceptSemanticType: SemanticType.WARNING,
+      onAccept: () => {
+        updateModelValue(text)
+        Notify.success({title: `File "${ file.name }" applied`})
+      },
+    }, () => closeModal = null)
+  } else {
+    updateModelValue(text)
+    Notify.success({title: `File "${ file.name }" applied`})
+  }
 }
 
 if (props.autofocus !== false && props.autofocus !== undefined) useTabActiveListener(autofocusDebounced)
