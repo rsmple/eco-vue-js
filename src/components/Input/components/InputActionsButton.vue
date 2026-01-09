@@ -12,7 +12,6 @@
     :aria-disabled="disabled"
     :aria-pressed="pressed"
     :aria-expanded="expanded"
-    @mousedown.prevent.stop
     @click.stop="$emit('click', $event)"
   >
     <slot name="default">
@@ -25,6 +24,7 @@
     <WTooltip
       v-if="tooltipText && !disabled"
       :text="tooltipText"
+      :right="tooltipRight"
       no-touch
     />
   </button>
@@ -36,6 +36,7 @@ import WTooltip from '@/components/Tooltip/WTooltip.vue'
 withDefaults(
   defineProps<{
     tooltipText?: string
+    tooltipRight?: boolean
     disabled?: boolean
     icon?: SVGComponent
     top?: boolean

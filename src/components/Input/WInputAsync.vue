@@ -62,7 +62,7 @@
       v-if="!skeleton && textSecure && focused"
       #bottom
     >
-      <div class="flex justify-end gap-4 pt-4">
+      <div class="flex justify-end gap-4 pt-5">
         <WButton
           :semantic-type="SemanticType.SECONDARY"
           :disabled="disabled || loading"

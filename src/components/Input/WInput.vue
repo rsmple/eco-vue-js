@@ -176,7 +176,7 @@
                   "
                   :class="{
                     'w-0 max-w-0': hideInput,
-                    'text-secure': textSecure && !isSecureVisible,
+                    'text-secure w-input-whitespace-pre-wrap break-all': textSecure && !isSecureVisible,
                     '[-webkit-text-fill-color:transparent]': textTransparent,
                   }"
                   :value="placeholderSecure && modelValue === undefined && !focused ? '******' : modelValue"
@@ -235,10 +235,13 @@
           :allow-paste="allowPaste"
           :allow-copy="allowCopy"
           :focused="focused"
+          :allow-drop-file="allowDropFile"
+          :textarea="textarea"
           @click:clear="clearValue"
           @show:secure="isSecureVisible = true; $emit('click', $event)"
           @hide:secure="isSecureVisible = false"
           @click:paste="paste"
+          @click:drop-file="openFilePicker"
         >
           <template
             v-if="$slots.suffix"
@@ -279,9 +282,7 @@ import {computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, re
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
-import {Modal} from '@/utils/Modal'
 import {Notify} from '@/utils/Notify'
-import {SemanticType} from '@/utils/SemanticType'
 import {getIsMobile} from '@/utils/mobile'
 import {isDragging} from '@/utils/preventDragFile'
 import {useComponentStates} from '@/utils/useComponentStates'
@@ -596,19 +597,12 @@ const maxSize = maxSizeKb * 1024 // 10 KB
 
 let closeModal: (() => void) | null = null
 
-const onDrop = async (list: DataTransferItemList) => {
-  closeModal?.()
-  closeModal = null
-
-  const file = list[0]?.getAsFile()
-
-  if (!file) return
-
+const processFile = async (file: File) => {
   if (file.size > maxSize) {
     fieldWrapperRef.value?.showMessage(`File is too large. Max size is ${ (maxSizeKb).toFixed(0) } KB`, 4000)
     return
   }
-    
+
   const text = await file.text()
 
   if (text.length === 0) {
@@ -624,21 +618,41 @@ const onDrop = async (list: DataTransferItemList) => {
     return
   }
 
-  if (props.modelValue || props.placeholderSecure) {
-    closeModal = Modal.addConfirm({
-      title: `${ props.title ? props.title + ': ' : '' }Overwrite current content?`,
-      description: `The current content will be replaced with the content of the file "${ file.name }"`,
-      acceptText: 'Overwrite',
-      acceptSemanticType: SemanticType.WARNING,
-      onAccept: () => {
-        updateModelValue(text)
-        Notify.success({title: `File "${ file.name }" applied`})
-      },
-    }, () => closeModal = null)
-  } else {
-    updateModelValue(text)
-    Notify.success({title: `File "${ file.name }" applied`})
+  updateModelValue(text, true)
+  fieldWrapperRef.value?.showMessage(`File "${ file.name }" applied`, 2000)
+  focus()
+}
+
+const onDrop = async (list: DataTransferItemList) => {
+  closeModal?.()
+  closeModal = null
+
+  const file = list[0]?.getAsFile()
+
+  if (!file) return
+
+  await processFile(file)
+}
+
+const openFilePicker = () => {
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
+
+  closeModal?.()
+  closeModal = null
+
+  const input = document.createElement('input')
+  input.type = 'file'
+
+  input.onchange = async (event) => {
+    const target = event.target as HTMLInputElement
+    const file = target.files?.[0]
+
+    if (!file) return
+
+    await processFile(file)
   }
+
+  input.click()
 }
 
 if (props.autofocus !== false && props.autofocus !== undefined) useTabActiveListener(autofocusDebounced)
