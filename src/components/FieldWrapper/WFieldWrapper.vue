@@ -122,7 +122,7 @@
           <div
             v-if="message"
             v-show="isMessageShown"
-            class="text-description absolute right-0 whitespace-nowrap py-0.5 text-xs font-normal"
+            class="text-description absolute right-0 whitespace-nowrap my-0.5 bg-default dark:bg-default-dark text-xs font-normal"
             :class="topText ? 'bottom-full' : 'top-full'"
           >
             {{ message }}
@@ -130,7 +130,7 @@
 
           <div
             v-else-if="errorMessage"
-            class="text-negative dark:text-negative-dark absolute pt-0.5 text-xs font-normal"
+            class="text-negative dark:text-negative-dark absolute mt-0.5 bg-default dark:bg-default-dark text-xs font-normal"
             :class="[
               !leftError || topText ? 'right-0 text-end' : 'left-0 text-start',
               topText ? 'bottom-full' : 'top-full',
@@ -141,7 +141,7 @@
 
           <div
             v-else-if="maxLength !== undefined && focused"
-            class="text-description absolute right-0 whitespace-nowrap pt-0.5 text-xs font-normal"
+            class="text-description absolute right-0 whitespace-nowrap mt-0.5 bg-default dark:bg-default-dark text-xs font-normal"
             :class="topText ? 'bottom-full' : 'top-full'"
           >
             {{ numberFormatter.format(`${typeof modelValue === 'number' ? modelValue : (modelValue || '')}`.length) }} / {{ numberFormatter.format(maxLength) }}

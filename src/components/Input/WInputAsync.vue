@@ -180,6 +180,8 @@ const cancel = () => {
   reset()
 
   inputRef.value?.blur()
+
+  inputRef.value?.showMessage('Cancelled', 1000)
 }
 
 const save = async () => {

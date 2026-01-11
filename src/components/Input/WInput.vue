@@ -138,6 +138,19 @@
             />
 
             <div
+              v-if="placeholderSecure && modelValue === undefined && !focused"
+              class="bg-info/10 dark:bg-info-dark/10 pointer-events-none absolute inset-0.5 flex items-center justify-center rounded-[--w-option-rounded]"
+            >
+              <IconCheckSecret
+                class="text-info dark:text-info-dark"
+                :class="{
+                  'square-6': !textarea,
+                  'square-7': textarea,
+                }"
+              />
+            </div>
+
+            <div
               class="flex-1 font-normal"
               :class="{
                 'w-full': !hideInput && !$slots.prefix,
@@ -179,7 +192,7 @@
                     'text-secure w-input-whitespace-pre-wrap break-all': textSecure && !isSecureVisible,
                     '[-webkit-text-fill-color:transparent]': textTransparent,
                   }"
-                  :value="placeholderSecure && modelValue === undefined && !focused ? '******' : modelValue"
+                  :value="placeholderSecure && modelValue === undefined && !focused ? '' : modelValue"
                   :placeholder="placeholder"
                   :type="type ?? 'text'"
                   :name="name"
@@ -276,10 +289,13 @@
 
 <script lang="ts" setup generic="Type extends InputType = 'text'">
 import type {InputProps, WrapSelection} from './types'
+import type {ShowMessage} from '../FieldWrapper/use/useFieldSaved'
 
 import {computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch} from 'vue'
 
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
+
+import IconCheckSecret from '@/assets/icons/IconCheckSecret.svg?component'
 
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 import {Notify} from '@/utils/Notify'
@@ -655,6 +671,8 @@ const openFilePicker = () => {
   input.click()
 }
 
+const showMessage: ShowMessage = (...args) => fieldWrapperRef.value?.showMessage(...args)
+
 if (props.autofocus !== false && props.autofocus !== undefined) useTabActiveListener(autofocusDebounced)
 
 watch(() => props.autofocus, value => {
@@ -684,5 +702,6 @@ defineExpose({
   scrollToInput,
   undo,
   redo,
+  showMessage,
 })
 </script>
