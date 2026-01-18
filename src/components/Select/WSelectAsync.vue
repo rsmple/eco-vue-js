@@ -38,6 +38,8 @@
     </template>
 
     <template #prefix="{unclickable}">
+      <slot name="content" />
+
       <SelectAsyncPrefix
         v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true"
         :use-query-fn="useQueryFnPrefix ?? useQueryFnOptions"
@@ -154,7 +156,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'select', item: Model): void
+  (e: 'select', item: Model, data: Data): void
   (e: 'unselect', item: Model): void
   (e: 'update:model-value', value: Model[]): void
   (e: 'init-model'): void
@@ -194,7 +196,7 @@ const close = () => {
   if (props.selectOnClose && search.value && !isModelValueSearch.value) {
     const optionExact = firstPageData.value?.results.find(option => props.valueGetter(option) === search.value)
 
-    if (optionExact) select(props.valueGetter(optionExact))
+    if (optionExact) select(props.valueGetter(optionExact), optionExact)
     else if (search.value) create(search.value)
     else if (props.modelValue.length) unselect(props.modelValue[props.modelValue.length - 1])
   }
@@ -219,10 +221,10 @@ const captureDoubleDelete = () => {
   }
 }
 
-const select = (item: Model): void => {
+const select = (item: Model, data: Data): void => {
   if (isDisabledComputed.value) return
 
-  emit('select', item)
+  emit('select', item, data)
 
   search.value = ''
 }
@@ -244,7 +246,7 @@ const create = async (value: string) => {
   const option = await props.createOption(value)
 
   if (option) {
-    select(props.valueGetter(option))
+    select(props.valueGetter(option), option)
 
     search.value = ''
   }
@@ -283,7 +285,7 @@ if (props.useQueryFnDefault) {
 
   watch(defaultData, value => {
     if (value && props.modelValue.length === 0) {
-      select(props.valueGetter(value))
+      select(props.valueGetter(value), value)
       emit('init-model')
     }
   }, {immediate: true})
@@ -308,5 +310,6 @@ defineSlots<{
   subtitle?: () => void
   right?: (props: Record<string, never>) => void
   option?: (props: PartialNot<SelectOptionProps<Data>>) => void
+  content?: () => void
 }>()
 </script>

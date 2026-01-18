@@ -1,27 +1,21 @@
-import type InfiniteListPage from './components/InfiniteListPage.vue'
-
-import {ref} from 'vue'
+import {type Ref, computed, ref, watch} from 'vue'
 
 import {debounce} from '@/utils/utils'
 
-export const useRefetchNextPages = () => {
-  const pageComponent = ref<ComponentInstance<typeof InfiniteListPage>[]>([])
+type PageComponent = {isFetching: boolean, pageNumber: number | null, refetch: () => void}
+
+export const useRefetchNextPages = <C extends PageComponent>(pageComponent: Ref<C[] | null>) => {
+  const isRefetchingAll = ref(false)
+  const isFetching = computed(() => pageComponent.value?.some(item => item.isFetching) ?? false)
   let refetchLastPage: number | null = null
 
   const refetchNextPagesDebounced = debounce((index: number): void => {
     refetchLastPage = null
 
-    let pageList
-
-    if (index === 0) {
-      pageList = pageComponent.value
-    } else {
-      pageList = pageComponent.value?.slice(index - 1).reverse()
-    }
-
-    pageList?.forEach(item => {
+    for (const item of pageComponent.value ?? []) {
+      if (item.pageNumber === null || item.pageNumber < index) continue
       item.refetch()
-    })
+    }
   }, 50)
 
   const refetchNextPages = (index: number): void => {
@@ -32,8 +26,22 @@ export const useRefetchNextPages = () => {
     refetchNextPagesDebounced(index)
   }
 
+  const refetchAll = () => {
+    isRefetchingAll.value = true
+
+    refetchNextPages(0)
+  }
+
+  watch(isFetching, value => {
+    if (value) return
+
+    isRefetchingAll.value = false
+  }, {immediate: true})
+
   return {
-    pageComponent,
+    isFetching,
+    isRefetchingAll,
     refetchNextPages,
+    refetchAll,
   }
 }

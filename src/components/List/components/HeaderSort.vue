@@ -9,6 +9,7 @@
         :icon="markRaw(IconSort)"
         :disabled="disabled"
         :active="isOpen"
+        :tooltip-text="isOpen ? undefined : 'Sort'"
         @click="isOpen = !isOpen"
       />
     </template>

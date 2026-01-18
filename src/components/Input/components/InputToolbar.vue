@@ -1,7 +1,7 @@
 <template>
   <div
     class="
-      bg-default dark:bg-default-dark no-scrollbar sticky top-0 z-[2] col-span-full -mb-2 flex
+      bg-default dark:bg-default-dark no-scrollbar sticky top-0 z-[2] col-span-full flex
       overflow-x-auto overscroll-x-contain border-b border-solid border-gray-50 text-xs dark:border-gray-800/50
     "
     @mousedown.prevent=""
@@ -12,6 +12,7 @@
       v-for="(action, index) in list"
       :key="index"
       v-bind="action"
+      :disabled="disabled"
       @click="wrapSelection(action, $event)"
     />
 
@@ -20,6 +21,7 @@
         v-for="(action, index) in toolbarActionList"
         :key="index"
         v-bind="action"
+        :disabled="disabled"
         @click="wrapSelection(action, $event)"
       />
     </template>
@@ -28,14 +30,14 @@
       <WInputToolbarButton
         tooltip="Undo"
         :icon="markRaw(IconUndo)"
-        :disabled="!isUndo"
+        :disabled="!isUndo || disabled"
         @click="$emit('undo')"
       />
 
       <WInputToolbarButton
         tooltip="Redo"
         :icon="markRaw(IconRedo)"
-        :disabled="!isRedo"
+        :disabled="!isRedo || disabled"
         @click="$emit('redo')"
       />
     </template>
@@ -59,6 +61,7 @@ defineProps<{
   isUndo: boolean
   isRedo: boolean
   textSecure: boolean
+  disabled: boolean
 }>()
 
 const emit = defineEmits<{

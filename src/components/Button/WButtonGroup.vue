@@ -60,6 +60,7 @@
           v-bind="{
             ...props,
             semanticType: getValue(item as Model | Entity) === modelValue ? semanticType ?? SemanticType.PRIMARY : SemanticType.SECONDARY,
+            noBorderComponent: getValue(item as Model | Entity) !== modelValue,
             loading: loading && getValue(item as Model | Entity) === loadingItem,
             disabled: isDisabled || isReadonly || (loading && getValue(item as Model | Entity) !== loadingItem),
             join: !wrap && !col,

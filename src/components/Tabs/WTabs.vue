@@ -270,7 +270,7 @@ const previous = (): void => {
   switchTab(defaultSlotsKeys.value[currentIndex.value - 1])
 }
 
-const jump = (name: string, update = false): void => {
+const jump = (name: string, update: boolean): void => {
   const valid = defaultSlotsKeys.value
     .slice(currentIndex.value, defaultSlotsKeys.value.indexOf(name))
     .every(item => {

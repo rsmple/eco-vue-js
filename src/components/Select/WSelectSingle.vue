@@ -56,6 +56,13 @@
     >
       <slot name="prefix" />
     </template>
+
+    <template
+      v-if="$slots.content"
+      #content
+    >
+      <slot name="content" />
+    </template>
   </WSelect>
 </template>
 
@@ -113,5 +120,6 @@ defineSlots<{
   right?: () => VNode[]
   prefix?: () => VNode[]
   option?: (props: PartialNot<SelectOptionProps<Data>>) => VNode[]
+  content?: () => VNode[]
 }>()
 </script>

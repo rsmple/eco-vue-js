@@ -48,6 +48,13 @@
     >
       <slot name="right" />
     </template>
+
+    <template
+      v-if="$slots.content"
+      #content
+    >
+      <slot name="content" />
+    </template>
   </WSelectAsync>
 </template>
 
@@ -99,5 +106,6 @@ defineSlots<{
   subtitle?: () => void
   right?: (props: Record<string, never>) => void
   option?: (props: PartialNot<SelectOptionProps<Data>>) => void
+  content?: () => void
 }>()
 </script>

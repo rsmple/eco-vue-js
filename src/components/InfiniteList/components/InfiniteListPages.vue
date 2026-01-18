@@ -53,8 +53,8 @@
           :setter="setter"
           :skeleton="skeleton || isRefetchingAll"
           :refetch="refetch"
-          :previous="previous ?? pageComponent[index - 1]?.getLast() ?? pageComponent[pageComponent.length - 1]?.getLast()"
-          :next="next ?? pageComponent[index + 1]?.getFirst() ?? pageComponent[0]?.getFirst()"
+          :previous="((previous ?? pageComponentRef?.[index - 1]?.getLast() ?? pageComponentRef?.[pageComponentRef.length - 1]?.getLast()) as Data | undefined)"
+          :next="((next ?? pageComponentRef?.[index + 1]?.getFirst() ?? pageComponentRef?.[0]?.getFirst()) as Data | undefined)"
           :first="first"
           :last="last"
           :resetting="isResettingPage"
@@ -162,17 +162,9 @@ const isPreviousButtonVisible = computed<boolean>(() => {
   return false
 })
 
-const {pageComponent, refetchNextPages} = useRefetchNextPages()
+const pageComponentRef = useTemplateRef<ComponentInstance<typeof InfiniteListPage>[]>('pageComponent')
 
-const isRefetchingAll = ref(false)
-
-const isFetching = computed(() => pageComponent.value.some(item => item.isFetching))
-
-watch(isFetching, value => {
-  if (value) return
-
-  isRefetchingAll.value = false
-}, {immediate: true})
+const {isFetching, isRefetchingAll, refetchNextPages, refetchAll} = useRefetchNextPages(pageComponentRef)
 
 const updateCount = (value: number): void => {
   count.value = value
@@ -233,7 +225,7 @@ const removePage = (page: number): void => {
 const goto = async (page = 1, itemIndex?: number) => {
   const index = pages.value.indexOf(page)
   if (index !== -1) {
-    pageComponent.value[index].scrollTo(itemIndex)
+    pageComponentRef.value?.[index].scrollTo(itemIndex)
 
     return
   }
@@ -256,12 +248,6 @@ const resetPage = async (page = 1) => {
   await nextTick()
 
   pages.value = [page]
-}
-
-const refetchAll = () => {
-  isRefetchingAll.value = true
-
-  refetchNextPages(0)
 }
 
 watch(toRef(props, 'queryParams'), (newValue, oldValue) => {

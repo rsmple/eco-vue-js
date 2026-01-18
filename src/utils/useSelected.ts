@@ -149,7 +149,7 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
   }
 
   const hoverSelected = (position: number) => {
-    if (unmounted.value || disabled.value || (!preselectValue.value && !selection.value.range)) return
+    if (unmounted.value || disabled.value || (preselectValue.value === null && !selection.value.range)) return
 
     hoverValue.value = position
   }
@@ -182,6 +182,8 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
 
         hoverValue.value = null
         preselectValue.value = null
+
+        resetIsSelecting()
 
         return
       }
@@ -232,7 +234,14 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
   })
 
   const applySelect = (event: MouseEvent): void => {
-    if (hoverValue.value === null) return
+    if (hoverValue.value === null) {
+      setTimeout(() => {
+        if (preselectValue.value !== null) return
+        isShift.value = false
+        window.removeEventListener('click', applySelect)
+      })
+      return
+    }
 
     event.stopPropagation()
     event.preventDefault()
@@ -240,11 +249,15 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
     toggleSelected(0 as never, hoverValue.value)
   }
 
-  const setIsSelecting = (event: KeyboardEvent) => {
-    if (!event.shiftKey || event.ctrlKey || event.altKey || event.metaKey || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
-      resetIsSelecting()
+  const setIsSelecting = (event?: KeyboardEvent) => {
+    if (isShift.value) return
 
-      return
+    if (event) {
+      if (!event.shiftKey || event.ctrlKey || event.altKey || event.metaKey || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        resetIsSelecting()
+
+        return
+      }
     }
 
     isShift.value = true
@@ -290,6 +303,7 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
   })
 
   return {
+    isShift,
     allowSelectHover,
     selectionCount,
     selectAllValue,
@@ -299,5 +313,6 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
     selectAll,
     resetSelection,
     getQueryParams,
+    setIsSelecting,
   }
 }

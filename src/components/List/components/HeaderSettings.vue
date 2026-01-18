@@ -8,6 +8,7 @@
         :icon="markRaw(IconListSettings)"
         :disabled="disabled"
         :active="isOpen"
+        :tooltip-text="isOpen ? undefined : 'Table settings'"
         @click="isOpen = !isOpen"
       />
     </template>

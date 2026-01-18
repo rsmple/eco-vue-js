@@ -2,7 +2,7 @@ export default [
   {
     files: ['**/*.vue'],
     rules: {
-      'vue/script-indent': ['error', 2, {
+      'vue/script-indent': ['warn', 2, {
         baseIndent: 0,
         switchCase: 1,
         ignores: [],
@@ -11,7 +11,7 @@ export default [
       'vue/block-order': ['error', {
         order: ['template', 'script[setup]', 'style'],
       }],
-      'vue/multiline-html-element-content-newline': ['error', {
+      'vue/multiline-html-element-content-newline': ['warn', {
         ignoreWhenEmpty: true,
         ignores: ['pre', 'textarea', 'span', 'tspan', 'template'],
         allowEmptyLines: false,

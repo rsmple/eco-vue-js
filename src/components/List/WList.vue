@@ -110,9 +110,32 @@
               class="flex"
             >
               <WButtonSelectionAction
+                v-if="allowSelect"
+                :icon="markRaw(IconRange)"
+                :active="isShift"
+                tooltip-text="Select range"
+                class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
+                @click.stop="setIsSelecting()"
+              >
+                <template #tooltip>
+                  <div class="grid grid-cols-[1fr,auto] gap-4">
+                    <div>
+                      Select range
+                    </div>
+
+                    <div class="text-description whitespace-nowrap">
+                      <IconShift class="square-4 -mt-[0.25em] inline" /> Shift
+                    </div>
+                  </div>
+                </template>
+              </WButtonSelectionAction>
+
+              <WButtonSelectionAction
                 v-if="!noRefetch"
                 :icon="markRaw(IconRefresh)"
                 :loading="isRefetchingAll"
+                :active="isRefetchingAll"
+                tooltip-text="Refetch"
                 class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
                 @click="refetchAll"
               />
@@ -151,6 +174,9 @@
 
           :count="count ?? listCount"
           :selection="selectAllValue"
+          :style="{
+            '--list-header-width': getFieldWidthSumStyles(fieldConfigMap),
+          }"
           @toggle:selection="$event ? selectAll() : resetSelection()"
           @update:header="updateHeader"
         >
@@ -333,7 +359,9 @@ import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 import WUniform from '@/components/Uniform/WUniform.vue'
 
+import IconRange from '@/assets/icons/IconRange.svg?component'
 import IconRefresh from '@/assets/icons/IconRefresh.svg?component'
+import IconShift from '@/assets/icons/IconShift.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
@@ -349,7 +377,7 @@ import HeaderFieldNested from './components/HeaderFieldNested.vue'
 import HeaderSettings from './components/HeaderSettings.vue'
 import HeaderSort from './components/HeaderSort.vue'
 import ListCardFieldNested from './components/ListCardFieldNested.vue'
-import {filterFields, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, sortFields, useListConfig} from './use/useListConfig'
+import {filterFields, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, getFieldWidthSumStyles, sortFields, useListConfig} from './use/useListConfig'
 
 defineOptions({inheritAttrs: false})
 
@@ -456,6 +484,7 @@ const allowOpen = computed(() => props.expansion !== undefined)
 const disableSelect = computed(() => !allowSelect.value)
 
 const {
+  isShift,
   allowSelectHover,
   selectionCount,
   selectAllValue,
@@ -465,6 +494,7 @@ const {
   resetSelection,
   selectAll,
   getQueryParams,
+  setIsSelecting,
 } = useSelected<number>(countValue, disableSelect)
 
 const ordering = computed<OrderItem<keyof Data>[]>(() => {

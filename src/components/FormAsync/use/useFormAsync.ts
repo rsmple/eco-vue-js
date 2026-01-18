@@ -41,10 +41,16 @@ export const useFormAsync = <Model, FieldType, QueryParams>(props: FormAsyncProp
 
   let closeModal: (() => void) | null = null
 
-  const showModal = (value: FieldType) => {
+  const showModal = async (value: FieldType) => {
     closeModal?.()
 
-    const confirmProps = props.confimGetter?.(value)
+    let confirmProps = props.confimGetter?.(value, data.value as Model)
+
+    if (confirmProps instanceof Promise) {
+      submitting.value = true
+      confirmProps = await confirmProps
+      submitting.value = false
+    }
 
     if (!confirmProps) {
       save(value)

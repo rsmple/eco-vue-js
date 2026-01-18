@@ -45,6 +45,7 @@ export interface SelectProps<Model extends number | string, Data extends Default
   valueGetter: (value: Data) => Model
   searchFn: (option: Data, search: string) => boolean
   useQueryFnDefault?: UseQueryEmpty<Data>
+  useFirstDefault?: boolean
   emptyStub?: string
   disableClear?: boolean
   hidePrefix?: boolean

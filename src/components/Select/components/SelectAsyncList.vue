@@ -62,6 +62,7 @@
     >
       <template #default="{item, skeleton, previous, next, first, last, index}">
         <SelectOption
+          ref="option"
           :is-selected="!skeleton && modelValue.includes(valueGetter(item))"
           :is-cursor="!skeleton && valueGetter(item) === cursor"
           :loading="loading && loadingOption === valueGetter(item)"
@@ -77,7 +78,7 @@
             '-pt--w-select-option-padding': !noPadding && first && !allowCreate,
             '-pb--w-select-option-padding': !noPadding && last,
           }"
-          @select="emitSelect(valueGetter(item))"
+          @select="emitSelect(valueGetter(item), item)"
           @unselect="emitUnselect(valueGetter(item))"
           @mouseenter="!skeleton && setCursor(valueGetter(item))"
           @update:cursor="setCursor(valueGetter(item))"
@@ -120,7 +121,7 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import type {SelectOptionProps} from '../types'
 
-import {type UnwrapRef, computed, ref} from 'vue'
+import {type UnwrapRef, computed, ref, useTemplateRef} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
@@ -149,12 +150,14 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'select', value: Model): void
+  (e: 'select', value: Model, data: Data): void
   (e: 'unselect', value: Model): void
   (e: 'update:count', value: number): void
   (e: 'update:model-value', value: Model[]): void
   (e: 'create:option'): void
 }>()
+
+const optionRef = useTemplateRef<ComponentInstance<typeof SelectOption>[]>('option')
 
 const cursor = ref<Model | null | undefined>(undefined)
 const cursorPrevious = ref<Model | null | undefined>(undefined)
@@ -219,19 +222,14 @@ const selectCursor = () => {
     return
   }
 
-  if (cursor.value) {
-    setLoadingOption(cursor.value as Model)
-
-    if (props.modelValue.includes(cursor.value as Model)) emit('unselect', cursor.value as Model)
-    else emit('select', cursor.value as Model)
-  }
+  if (cursor.value) optionRef.value?.forEach(item => item.toggleCursor())
 }
 
-const emitSelect = (value: Model): void => {
+const emitSelect = (value: Model, data: Data): void => {
   if (props.disabled || props.loading) return
   if (props.unselectOnly) return
 
-  emit('select', value)
+  emit('select', value, data)
   setLoadingOption(value)
 }
 

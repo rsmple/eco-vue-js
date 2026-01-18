@@ -20,4 +20,7 @@ export interface ConfirmModalProps {
 
   acceptTo?: LinkProps['to']
   intermediateTo?: LinkProps['to']
+
+  actionsCol?: boolean
+  wrapperClass?: string
 }

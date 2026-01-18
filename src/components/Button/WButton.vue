@@ -61,7 +61,7 @@
     >
       <WSpinner
         v-if="loading"
-        class="w-spinner-size-6 absolute z-10"
+        class="w-spinner-size-[--w-button-spinner-size,1.5rem] absolute z-10"
       />
     </Transition>
 
@@ -71,6 +71,10 @@
     />
 
     <WShine v-if="!isDisabled && !loading" />
+
+    <template v-if="!noBorderComponent && (borderComponent ?? semanticTypeBorderComponentMap[semanticType])">
+      <component :is="borderComponent ?? semanticTypeBorderComponentMap[semanticType]" />
+    </template>
   </component>
 </template>
 
@@ -84,7 +88,7 @@ import WShine from '@/components/Shine/WShine.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
-import {SemanticType, useSemanticTypeBackgroundMap, useSemanticTypeBorderMap} from '@/utils/SemanticType'
+import {SemanticType, useSemanticTypeBackgroundMap, useSemanticTypeBorderComponentMap, useSemanticTypeBorderMap} from '@/utils/SemanticType'
 import {useComponentStatesButton} from '@/utils/useComponentStates'
 
 import WSkeleton from '../Skeleton/WSkeleton.vue'
@@ -113,6 +117,7 @@ const {isDisabled, isSkeleton} = useComponentStatesButton(props)
 
 const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()
 const semanticTypeBorderMap = useSemanticTypeBorderMap()
+const semanticTypeBorderComponentMap = useSemanticTypeBorderComponentMap()
 
 const emit = defineEmits<{
   (e: 'click', event: MouseEvent | KeyboardEvent): void

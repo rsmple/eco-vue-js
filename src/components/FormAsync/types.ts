@@ -8,7 +8,7 @@ type FormAsyncPropsBase<Model, FieldType> = {
   queryEnabled?: boolean
   field: keyof ObjectPaths<Model, FieldType, true>
   apiMethod: (payload: PartialNested<Model>) => Promise<RequestResponse<Model>>
-  confimGetter?: (payload: FieldType) => ConfirmProps | undefined
+  confimGetter?: (payload: FieldType, data: Model) => ConfirmProps | Promise<ConfirmProps | undefined> | undefined
 }
 
 interface FormAsyncPropsWithParams<Model, FieldType, QueryParams> extends FormAsyncPropsBase<Model, FieldType> {

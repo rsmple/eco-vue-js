@@ -1,7 +1,15 @@
 <template>
   <div
     class="relative"
-    v-bind="{style: $attrs.style as StyleValue}"
+    v-bind="
+      allowDropFile ? {
+        style: $attrs.style as StyleValue,
+        onDragover,
+        onDragleave,
+        onDrop,
+      } : {
+        style: $attrs.style as StyleValue,
+      }"
     :class="[$attrs.class, {
       'mb-[1.125rem]': !noMargin && !subgrid,
       'col-span-full grid grid-cols-subgrid': subgrid,
@@ -71,7 +79,7 @@
         }"
       >
         <slot
-          v-bind="{id, setFocused, focused}"
+          v-bind="{id, setFocused, focused, isDragover}"
           name="field"
         >
           <div
@@ -81,7 +89,7 @@
               'border-t border-solid border-gray-300 dark:border-gray-700': title || $slots.title,
             }"
           >
-            <slot v-bind="{id, setFocused, focused}">
+            <slot v-bind="{id, setFocused, focused, isDragover}">
               {{ typeof modelValue === 'number' ? numberFormatter.format(modelValue) : modelValue === null ? (emptyValue ?? 'N / A') : (modelValue || emptyValue) }}
             </slot>
 
@@ -114,7 +122,7 @@
           <div
             v-if="message"
             v-show="isMessageShown"
-            class="text-description absolute right-0 whitespace-nowrap py-0.5 text-xs font-normal"
+            class="text-description absolute right-0 whitespace-nowrap my-0.5 bg-default dark:bg-default-dark text-xs font-normal"
             :class="topText ? 'bottom-full' : 'top-full'"
           >
             {{ message }}
@@ -122,7 +130,7 @@
 
           <div
             v-else-if="errorMessage"
-            class="text-negative dark:text-negative-dark absolute pt-0.5 text-xs font-normal"
+            class="text-negative dark:text-negative-dark absolute mt-0.5 bg-default dark:bg-default-dark text-xs font-normal"
             :class="[
               !leftError || topText ? 'right-0 text-end' : 'left-0 text-start',
               topText ? 'bottom-full' : 'top-full',
@@ -133,7 +141,7 @@
 
           <div
             v-else-if="maxLength !== undefined && focused"
-            class="text-description absolute right-0 whitespace-nowrap pt-0.5 text-xs font-normal"
+            class="text-description absolute right-0 whitespace-nowrap mt-0.5 bg-default dark:bg-default-dark text-xs font-normal"
             :class="topText ? 'bottom-full' : 'top-full'"
           >
             {{ numberFormatter.format(`${typeof modelValue === 'number' ? modelValue : (modelValue || '')}`.length) }} / {{ numberFormatter.format(maxLength) }}
@@ -191,7 +199,7 @@
 <script lang="ts" setup>
 import type {FieldWrapperProps} from './types'
 
-import {type StyleValue, computed, inject, onBeforeUnmount, ref, useId, useTemplateRef} from 'vue'
+import {type StyleValue, type VNode, computed, inject, onBeforeUnmount, ref, useId, useTemplateRef} from 'vue'
 
 import WButtonCopy from '@/components/Button/WButtonCopy.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
@@ -215,8 +223,9 @@ const props = withDefaults(
   },
 )
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'click', value: MouseEvent): void
+  (e: 'drop', value: DataTransferItemList): void
 }>()
 
 const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
@@ -271,6 +280,22 @@ const setShowMessageInjected = inject(wFieldSetShowMessage, null)
 
 setShowMessageInjected?.(showMessage)
 
+const isDragover = ref(false)
+
+const onDragover = (): void => {
+  isDragover.value = true
+}
+
+const onDragleave = (): void => {
+  isDragover.value = false
+}
+
+const onDrop = (event: DragEvent): void => {
+  const list = event.dataTransfer?.items
+
+  if (list) emit('drop', list)
+}
+
 onBeforeUnmount(() => {
   setShowMessageInjected?.(null)
   resetMessage()
@@ -280,4 +305,13 @@ defineExpose({
   fieldRef,
   showMessage,
 })
+
+defineSlots<{
+  title: () => VNode[]
+  subtitle: () => VNode[]
+  right: () => VNode[]
+  bottom: () => VNode[]
+  field: (props: {id: string, focused: boolean, setFocused: (value: boolean) => void, isDragover: boolean}) => VNode[]
+  default: (props: {id: string, focused: boolean, setFocused: (value: boolean) => void, isDragover: boolean}) => VNode[]
+}>()
 </script>

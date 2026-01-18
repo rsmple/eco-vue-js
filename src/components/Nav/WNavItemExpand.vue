@@ -48,7 +48,7 @@
         >
           <div
             class="
-              bg-default dark:bg-default-dark w-nav-bar-width overflow-hidden rounded-xl border
+              w-nav-bar w-nav-bar-width overflow-hidden rounded-xl border
               border-solid border-gray-200 text-start font-normal shadow dark:border-gray-800
             "
           >

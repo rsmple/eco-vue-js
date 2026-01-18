@@ -6,6 +6,7 @@
       'group/seamless': seamless,
     }]"
     @click="seamless && focus()"
+    @drop="onDrop"
   >
     <template
       v-if="$slots.title"
@@ -54,7 +55,7 @@
 
     <template
       v-else
-      #field="{id, setFocused, focused}"
+      #field="{id, setFocused, focused, isDragover}"
     >
       <div
         class="
@@ -73,12 +74,13 @@
         @click="focus"
       >
         <InputToolbar
-          v-if="!isDisabled && !isReadonly && textarea && (rich || toolbarActions || $slots.toolbar)"
+          v-if="!isReadonly && textarea && (rich || toolbarActions || $slots.toolbar)"
           :list="toolbarActions"
           :rich="rich === true"
           :is-undo="historyPosition > 0"
           :is-redo="historyPosition < history.length - 1"
           :text-secure="textSecure ?? false"
+          :disabled="isDisabled === true"
           @wrap-selection="wrapSelection"
           @undo="undo"
           @redo="redo"
@@ -105,13 +107,23 @@
 
         <div
           ref="content"
-          class="group/input col-start-2 grid grid-cols-1"
+          class="group/input relative col-start-2 grid grid-cols-1"
           :class="{
             'py-[--w-input-gap,0.25rem] first:pl-[--w-input-gap,0.25rem] last:pr-[--w-input-gap,0.25rem]': $slots.prefix,
             'no-scrollbar overflow-x-auto overscroll-x-contain': noWrap && !(seamless && !focused),
             'overflow-hidden': seamless && !focused,
           }"
         >
+          <div
+            v-if="allowDropFile && isDragging"
+            class="text-primary dark:text-primary-dark bg-primary/10 dark:bg-primary-dark/10 pointer-events-none absolute inset-0.5 rounded-[--w-option-rounded]"
+          >
+            <FilePickerSvg
+              :animate="isDragover"
+              class="w-border-svg-rounded-[--w-option-rounded]"
+            />
+          </div>
+
           <div
             class="w-skeleton-w-32 flex gap-[--w-input-gap,0.25rem]"
             :class="{
@@ -124,6 +136,19 @@
               name="prefix"
               v-bind="{modelValue}"
             />
+
+            <div
+              v-if="placeholderSecure && modelValue === undefined && !focused"
+              class="bg-info/10 dark:bg-info-dark/10 pointer-events-none absolute inset-0.5 flex items-center justify-center rounded-[--w-option-rounded]"
+            >
+              <IconCheckSecret
+                class="text-info dark:text-info-dark"
+                :class="{
+                  'square-6': !textarea,
+                  'square-7': textarea,
+                }"
+              />
+            </div>
 
             <div
               class="flex-1 font-normal"
@@ -147,6 +172,13 @@
                   v-bind="{modelValue}"
                 />
 
+                <div
+                  v-if="placeholder && textarea && hasNoValue"
+                  class="text-description pointer-events-none absolute"
+                >
+                  {{ placeholder }}
+                </div>
+
                 <component
                   :is="textarea ? ContentEditable : 'input'"
                   :id="id"
@@ -157,10 +189,10 @@
                   "
                   :class="{
                     'w-0 max-w-0': hideInput,
-                    'text-secure': textSecure && !isSecureVisible,
+                    'text-secure w-input-whitespace-pre-wrap break-all': textSecure && !isSecureVisible,
                     '[-webkit-text-fill-color:transparent]': textTransparent,
                   }"
-                  :value="placeholderSecure && modelValue === undefined && !focused ? '******' : modelValue"
+                  :value="placeholderSecure && modelValue === undefined && !focused ? '' : modelValue"
                   :placeholder="placeholder"
                   :type="type ?? 'text'"
                   :name="name"
@@ -208,7 +240,7 @@
           v-if="!seamless || focused"
           :model-value="(modelValue as ModelValue)"
           :loading="loading"
-          :allow-clear="allowClear && modelValue !== ''"
+          :allow-clear="allowClear && !hasNoValue"
           :disabled="isDisabled || disabledActions"
           :readonly="isReadonly || unclickable === true"
           :text-secure="textSecure"
@@ -216,10 +248,13 @@
           :allow-paste="allowPaste"
           :allow-copy="allowCopy"
           :focused="focused"
+          :allow-drop-file="allowDropFile"
+          :textarea="textarea"
           @click:clear="clearValue"
           @show:secure="isSecureVisible = true; $emit('click', $event)"
           @hide:secure="isSecureVisible = false"
           @click:paste="paste"
+          @click:drop-file="openFilePicker"
         >
           <template
             v-if="$slots.suffix"
@@ -254,19 +289,26 @@
 
 <script lang="ts" setup generic="Type extends InputType = 'text'">
 import type {InputProps, WrapSelection} from './types'
+import type {ShowMessage} from '../FieldWrapper/use/useFieldSaved'
 
 import {computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch} from 'vue'
 
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
 
+import IconCheckSecret from '@/assets/icons/IconCheckSecret.svg?component'
+
 import {useTabActiveListener} from '@/components/Tabs/use/useTabActiveListener'
 import {Notify} from '@/utils/Notify'
+import {getIsMobile} from '@/utils/mobile'
+import {isDragging} from '@/utils/preventDragFile'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {checkPermissionPaste} from '@/utils/useCopy'
 import {debounce} from '@/utils/utils'
 
 import InputActions from './components/InputActions.vue'
 import {type CaretOffset} from './models/utils'
+
+import FilePickerSvg from '../FilePicker/components/FilePickerSvg.vue'
 
 const ContentEditable = defineAsyncComponent(() => import('./components/ContentEditable.vue'))
 const InputToolbar = defineAsyncComponent(() => import('./components/InputToolbar.vue'))
@@ -318,16 +360,31 @@ const isSecureVisible = ref(false)
 const history = ref<HistoryEntry[]>([])
 const historyPosition = ref(-1)
 
+const hasNoValue = computed(() => !props.modelValue && !props.textParts?.length && !props.placeholderSecure)
+
 const getCaret = (): CaretOffset => {
   if (!inputRef.value) return {start: 0, end: 0}
   if ('getCaret' in inputRef.value) return inputRef.value.getCaret()
   return {start: inputRef.value.selectionStart ?? 0, end: inputRef.value.selectionEnd ?? 0}
 }
 
+const noSelectionTypes = ['email', 'number', 'date']
+
 const setCaret = (start: number, end?: number): void => {
   if (!inputRef.value) return
   if ('setCaret' in inputRef.value) inputRef.value.setCaret(start, end)
-  else inputRef.value.setSelectionRange(start, end ?? start)
+  else {
+    const previousType = inputRef.value.type
+
+    if (noSelectionTypes.includes(previousType)) {
+      if (getIsMobile()) return
+      inputRef.value.type = 'text'
+      inputRef.value.setSelectionRange(start, end ?? start)
+      inputRef.value.type = previousType
+    } else {
+      inputRef.value.setSelectionRange(start, end ?? start)
+    }
+  }
 }
 
 const addToHistory = (value: ModelValue | undefined, noDebounce: boolean) => {
@@ -477,11 +534,15 @@ const blur = (): void => inputRef.value?.blur()
 const onPaste = async (e: ClipboardEvent) => {
   if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
 
-  navigator.clipboard.readText()
-  const text = (e.clipboardData?.getData('text/plain') || await navigator.clipboard.readText()).replace(/\r\n?/g, '\n')
+  const text = e.clipboardData?.getData('text/plain').replace(/\r\n?/g, '\n') ?? ''
 
   if (!text) {
     fieldWrapperRef.value?.showMessage('Nothing to paste')
+    return
+  }
+
+  if (inputRef.value && 'insertPlain' in inputRef.value) {
+    inputRef.value.insertPlain(text)
     return
   }
  
@@ -525,8 +586,7 @@ const paste = async () => {
 const scrollToInput = () => {
   if (!contentRef.value || !inputRef.value) return
 
-  if (inputRef.value instanceof HTMLElement) inputRef.value.scrollIntoView({behavior: 'instant', block: 'center'})
-  else contentRef.value.scrollTo({left: contentRef.value.scrollWidth - 40})
+  contentRef.value.scrollTo({left: contentRef.value.scrollWidth - 40})
 }
 
 const wrapSelection = (value: WrapSelection) => inputRef.value && 'wrapSelection' in inputRef.value ? inputRef.value.wrapSelection(value) : void 0
@@ -547,6 +607,71 @@ const autofocusDebounced = () => {
     timeout = undefined
   }, typeof props.autofocus === 'number' ? props.autofocus : 250)
 }
+
+const maxSizeKb = 10
+const maxSize = maxSizeKb * 1024 // 10 KB
+
+let closeModal: (() => void) | null = null
+
+const processFile = async (file: File) => {
+  if (file.size > maxSize) {
+    fieldWrapperRef.value?.showMessage(`File is too large. Max size is ${ (maxSizeKb).toFixed(0) } KB`, 4000)
+    return
+  }
+
+  const text = await file.text()
+
+  if (text.length === 0) {
+    fieldWrapperRef.value?.showMessage('File is empty', 4000)
+    return
+  } else if (props.maxLength && text.length > props.maxLength) {
+    fieldWrapperRef.value?.showMessage(`File content length exceeds the allowed limit of ${ props.maxLength } characters`, 4000)
+    return
+  }
+
+  if (props.modelValue === text) {
+    fieldWrapperRef.value?.showMessage('File content is already applied', 2000)
+    return
+  }
+
+  updateModelValue(text, true)
+  fieldWrapperRef.value?.showMessage(`File "${ file.name }" applied`, 2000)
+  focus()
+}
+
+const onDrop = async (list: DataTransferItemList) => {
+  closeModal?.()
+  closeModal = null
+
+  const file = list[0]?.getAsFile()
+
+  if (!file) return
+
+  await processFile(file)
+}
+
+const openFilePicker = () => {
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
+
+  closeModal?.()
+  closeModal = null
+
+  const input = document.createElement('input')
+  input.type = 'file'
+
+  input.onchange = async (event) => {
+    const target = event.target as HTMLInputElement
+    const file = target.files?.[0]
+
+    if (!file) return
+
+    await processFile(file)
+  }
+
+  input.click()
+}
+
+const showMessage: ShowMessage = (...args) => fieldWrapperRef.value?.showMessage(...args)
 
 if (props.autofocus !== false && props.autofocus !== undefined) useTabActiveListener(autofocusDebounced)
 
@@ -577,5 +702,6 @@ defineExpose({
   scrollToInput,
   undo,
   redo,
+  showMessage,
 })
 </script>

@@ -3,6 +3,7 @@
     v-if="!removable || active"
     v-show="active"
     ref="element"
+    class="h-full"
   >
     <slot />
   </div>

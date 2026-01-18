@@ -42,6 +42,7 @@ export default defineConfig(({mode}) => ({
     {
       name: 'remove-main',
       closeBundle() {
+        if (mode === 'development') return
         if (existsSync(mainPath)) rmSync(mainPath)
       },
     },

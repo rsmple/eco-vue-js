@@ -5,11 +5,9 @@
     role="textbox"
     aria-multiline="true"
     spellcheck="false"
-    :placeholder="placeholder"
-    class="relative whitespace-pre"
+    class="relative [white-space:var(--w-input-whitespace,pre)]"
     @input="onInput"
-    @beforeinput="insertParagraph($event as InputEvent)"
-    @paste.prevent="onPaste"
+    @beforeinput="handleBeforeInput($event as InputEvent)"
     @keydown="$emit('keydown', $event)"
     @focus="$emit('focus', $event); focused = true"
     @blur="$emit('blur', $event); focused = false"
@@ -19,7 +17,7 @@
 <script lang="ts" setup>
 import type {TextPart,  WrapSelection} from '../types'
 
-import {defineEmits, defineProps, nextTick, onMounted, ref, useTemplateRef, watch} from 'vue'
+import {nextTick, onMounted, ref, useTemplateRef, watch} from 'vue'
 
 import {WrapSelectionType} from '@/utils/utils'
 
@@ -118,24 +116,54 @@ const getCurrentText = (): string => {
 
 const lineBreakEvents = ['insertParagraph', 'insertLineBreak']
 
-const insertParagraph = (e: InputEvent) => {
+const autoPairMap: Record<string, string> = {
+  '(': ')',
+  '[': ']',
+  '{': '}',
+  '"': '"',
+  '\'': '\'',
+  '`': '`',
+}
+
+const handleBeforeInput = (e: InputEvent) => {
   if (lineBreakEvents.includes(e.inputType)) {
     e.preventDefault()
 
-    insertPlain('\n')
+    const {start} = getCaret()
+    const currentText = getCurrentText()
+    const lineStart = currentText.lastIndexOf('\n', start - 1) + 1
+    const currentLine = currentText.slice(lineStart, start)
+    const leadingSpaces = currentLine.match(/^[ ]*/)?.[0] || ''
+
+    insertPlain('\n' + leadingSpaces)
+    return
+  }
+
+  if (e.inputType === 'insertText' && e.data && autoPairMap[e.data]) {
+    e.preventDefault()
+
+    const {start, end} = getCaret()
+    const currentText = getCurrentText()
+    const closingChar = autoPairMap[e.data]
+
+    if (start !== end) {
+      const before = currentText.slice(0, start)
+      const selected = currentText.slice(start, end)
+      const after = currentText.slice(end)
+      const newText = before + e.data + selected + closingChar + after
+
+      emit('update:model-value', newText, true)
+      nextTick(() => setCaret(start + 1, end + 1))
+    } else {
+      const newText = currentText.slice(0, start) + e.data + closingChar + currentText.slice(start)
+
+      emit('update:model-value', newText, true)
+      nextTick(() => setCaret(start + 1))
+    }
   }
 }
 
 const regexDifferentEnding = /\r\n?/g
-const regexSpaces = /\n \n/g
-const regexEnding = / +$/gm
-
-const normalizeText = (text: string): string => {
-  return text
-    .replace(regexDifferentEnding, '\n')
-    .replace(regexSpaces, '\n\n')
-    .replace(regexEnding, '')
-}
 
 const onInput = (e: Event) => {
   e.stopImmediatePropagation()
@@ -143,7 +171,7 @@ const onInput = (e: Event) => {
   if (!(e.target instanceof HTMLDivElement)) return
 
   const rawText = e.target.textContent ?? ''
-  const text = normalizeText(rawText)
+  const text = rawText.replace(regexDifferentEnding, '\n')
   const currentText = getCurrentText()
 
   if (text === currentText) return
@@ -162,20 +190,13 @@ const onInput = (e: Event) => {
   }
 }
 
-const onPaste = async (e: ClipboardEvent) => {
-  navigator.clipboard.readText()
-  const text = (e.clipboardData?.getData('text/plain') || await navigator.clipboard.readText()).replace(/\r\n?/g, '\n')
- 
-  insertPlain(text)
-}
-
 const insertPlain = (text: string) => {
   const root = elementRef.value
   if (!root) return
-  const {start, end, trail} = getCaret()
+  const {start, end} = getCaret()
   const currentText = getCurrentText()
-  const next = (currentText ?? '').slice(0, start) + ' '.repeat(trail) + text + ((currentText ?? '').slice(end) || ' ')
-  const caretAfter = start + text.length + trail
+  const next = (currentText ?? '').slice(0, start) + text + ((currentText ?? '').slice(end) || ' ')
+  const caretAfter = start + text.length
 
   emit('update:model-value', props.maxLength && next.length > props.maxLength ? next.substring(0, props.maxLength) : next, true)
   nextTick(() => setCaret(props.maxLength ? Math.min(caretAfter, props.maxLength) : caretAfter))
@@ -192,7 +213,7 @@ const setCaret = (indexStart: number, indexEnd?: number) => {
 
 const collapseList = [' ', '\n']
 
-let offsetsOld: {start: number, end: number, trail: number} | null = null
+let offsetsOld: {start: number, end: number} | null = null
 
 const wrapSelection = (value: WrapSelection): void => {
   if (focused.value || !offsetsOld) offsetsOld = getCaret()
@@ -240,10 +261,18 @@ const wrapSelection = (value: WrapSelection): void => {
             }
             if (value.end.endsWith(item) && end.startsWith(item)) end = end.slice(item.length)
           }
-          newText = (value.prepare?.(start, 0) ?? start) + (value.start || value.end) + (value.prepare?.(end, offset) ?? end)
+          if (value.prepare) {
+            start = value.prepare(start, 0)
+            end = value.prepare(end, offset)
+          }
+          if (value.lineBreakPadding) {
+            if (start.endsWith('\n')) start += ' '
+            if (end.startsWith('\n')) end = ' ' + end
+          }
+          newText = start + (value.start || value.end) + end
         } else {
           let start = currentText.slice(0, offsets.start)
-          const middle = currentText.slice(offsets.start, offsets.end)
+          let middle = currentText.slice(offsets.start, offsets.end)
           let end = currentText.slice(offsets.end)
           for (const item of collapseList) {
             if (value.start.startsWith(item) && start.endsWith(item)) {
@@ -252,7 +281,16 @@ const wrapSelection = (value: WrapSelection): void => {
             }
             if (value.end.endsWith(item) && end.startsWith(item)) end = end.slice(item.length)
           }
-          newText = (value.prepare?.(start, 0) ?? start) + value.start + (value.prepare?.(middle, offsets.start) ?? middle) + value.end + (value.prepare?.(end, offsets.end) ?? end)
+          if (value.prepare) {
+            start = value.prepare(start, 0)
+            middle = value.prepare(middle, offsets.start)
+            end = value.prepare(end, offsets.end)
+          }
+          if (value.lineBreakPadding) {
+            if (start.endsWith('\n')) start += ' '
+            if (end.startsWith('\n')) end = ' ' + end
+          }
+          newText = start + value.start + middle + value.end + end
         }
         
         newCursorStart = offsets.start + startLen
@@ -319,6 +357,7 @@ defineExpose({
   wrapSelection,
   setCaret,
   getCaret,
+  insertPlain,
   get offsetWidth() {
     return elementRef.value?.offsetWidth ?? 0
   },

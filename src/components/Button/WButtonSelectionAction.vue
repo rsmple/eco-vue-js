@@ -3,17 +3,17 @@
     :disabled="disabled || disableMessage !== undefined"
     class="
       disabled:text-description relative isolate flex
-      select-none items-center bg-none
+      select-none items-center justify-center bg-none
       no-underline outline-none disabled:cursor-not-allowed
     "
     :class="{
       'w-ripple w-ripple-hover before:text-primary dark:before:text-primary-dark hover:text-primary dark:hover:text-primary-dark cursor-pointer': !disabled && !disableMessage && !loading,
-      'text-primary dark:text-primary-dark': active,
+      'text-primary dark:text-primary-dark w-ripple-active': active,
       'text-accent': !active,
       'cursor-not-allowed': disabled || disableMessage,
       'cursor-progress': loading,
     }"
-    @click="!disabled && !disableMessage && !loading && $emit('click')"
+    @click="!disabled && !disableMessage && !loading && $emit('click', $event)"
   >
     <div
       class="-h--w-input-height sm-not:-px--inner-margin z-10 flex items-center gap-2 px-[--w-list-padding,1rem]" 
@@ -39,10 +39,16 @@
       class="w-spinner-size-5 text-description absolute z-10"
     />
 
-    <WTooltip v-if="disableMessage">
-      <div class="whitespace-nowrap">
-        {{ disableMessage }}
-      </div>
+    <WTooltip
+      v-if="disableMessage || tooltipText"
+      :text="disableMessage ?? tooltipText"
+    >
+      <template
+        v-if="$slots.tooltip"
+        #default
+      >
+        <slot name="tooltip" />
+      </template>
     </WTooltip>
 
     <WShine v-if="!disabled && !disableMessage && !loading" />
@@ -61,9 +67,10 @@ defineProps<{
   disabled?: boolean
   active?: boolean
   loading?: boolean
+  tooltipText?: string
 }>()
 
 defineEmits<{
-  (e: 'click'): void
+  (e: 'click', value: MouseEvent): void
 }>()
 </script>

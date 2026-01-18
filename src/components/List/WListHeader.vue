@@ -22,7 +22,7 @@
       </div>
     </div>
 
-    <div class="bg-primary-light dark:bg-primary-darkest flex flex-1 border-y border-solid border-gray-300 dark:border-gray-700">
+    <div class="bg-primary-light dark:bg-primary-darkest flex min-w-[--list-header-width] flex-1 border-y border-solid border-gray-300 dark:border-gray-700">
       <slot />
     </div>
 

@@ -1,4 +1,4 @@
-import {reactive} from 'vue'
+import {type VNode, reactive} from 'vue'
 
 export enum SemanticType {
   PRIMARY = 'primary',
@@ -71,4 +71,21 @@ export const useSemanticTypeTextMap = () => {
 
 export const setSemanticTypeTextMap = (value: Partial<Record<SemanticType, string>>) => {
   Object.assign(semanticTypeTextStylesMap, value)
+}
+
+const semanticTypeBorderComponentMap = reactive<Partial<Record<SemanticType, VNode>>>({
+  [SemanticType.PRIMARY]: undefined,
+  [SemanticType.SECONDARY]: undefined,
+  [SemanticType.NEGATIVE]: undefined,
+  [SemanticType.POSITIVE]: undefined,
+  [SemanticType.WARNING]: undefined,
+  [SemanticType.INFO]: undefined,
+})
+
+export const useSemanticTypeBorderComponentMap = () => {
+  return semanticTypeBorderComponentMap
+}
+
+export const setSemanticTypeBorderComponentMap = (value: Partial<Record<SemanticType, VNode>>) => {
+  Object.assign(semanticTypeBorderComponentMap, value)
 }

@@ -50,7 +50,7 @@
         >
           <div class="relative grid size-full grid-cols-3">
             <div
-              class="bg-default text-primary dark:text-primary-dark absolute z-10 flex aspect-square h-full items-center justify-center rounded-full shadow-md transition-[right]"
+              class="text-primary dark:text-primary-dark absolute z-10 flex aspect-square h-full items-center justify-center rounded-full bg-[--w-toggle-caret,#ffffff] shadow-md transition-[right]"
               :class="{
                 'right-[calc(100%-(var(--w-input-height)-0.75rem))]': value === false,
                 'right-[calc(50%-(var(--w-input-height)-0.75rem)/2)]': value === null,

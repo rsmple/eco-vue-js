@@ -1,4 +1,4 @@
-declare type SVGComponent = import('vue').Raw<import('vue').FunctionalComponent<import('vue').SVGAttributes>>
+declare type SVGComponent = import('vue').Raw<import('vue').FunctionalComponent<import('vue').SVGAttributes>> | keyof import('vue').GlobalComponents
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare type ComponentInstance<T> = T extends new (...args: any[]) => infer R
@@ -59,10 +59,10 @@ declare type UseQueryDefault<TQueryFnData = unknown, TData = TQueryFnData, TQuer
 
 declare type QueryOptions<Data> = Partial<Parameters<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Data>>[0]>
 
-declare type UseQueryEmpty<Model> = (options?: QueryOptions<Model>) => ReturnType<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Model>>
+declare type UseQueryEmpty<Model> = (options?: QueryOptions<Model>) => Omit<ReturnType<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Model>>, 'isError'> & {isError: import('vue').Ref<boolean>}
 
 declare type UseQueryWithParams<Model, QueryParams> =
-  (queryParams: import('vue').MaybeRef<QueryParams>, options?: QueryOptions<Model>) => ReturnType<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Model>>
+  (queryParams: import('vue').MaybeRef<QueryParams>, options?: QueryOptions<Model>) => Omit<ReturnType<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Model>>, 'isError'> & {isError: import('vue').Ref<boolean>}
 
 declare type UseQueryPaginated<Model, QueryParams> = UseQueryWithParams<PaginatedResponse<Model>, QueryParams>
 
