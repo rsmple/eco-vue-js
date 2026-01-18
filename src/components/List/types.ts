@@ -1,3 +1,4 @@
+import type {UniformScope} from '../Uniform/types'
 import type {ListMode} from '@/utils/utils'
 import type {Component, Raw} from 'vue'
 
@@ -7,6 +8,7 @@ export type FieldProps<Data> = {
   readonly: boolean
   card: boolean
   config: FieldConfig
+  uniformScope: UniformScope<Data, number> | undefined
 }
 
 export type FieldComponent<Data> = Component<FieldProps<Data>>
@@ -43,7 +45,8 @@ export type ListFieldNestedEntity<Data, QueryParams = unknown, Key extends keyof
   cssClass?: string
 }
 
-export type ListFieldNestedEntityGetter<Data, QueryParams = unknown, Inner = unknown> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ListFieldNestedEntityGetter<Data, QueryParams = unknown, Inner = any> = {
   getterEntity: (data: Data) => Inner
   fields: ListFields<Inner, QueryParams>
   cssClass?: string
@@ -57,7 +60,8 @@ export type ListFieldNestedArray<Data, QueryParams = unknown, Key extends keyof 
   cssClassArray?: string
 }
 
-export type ListFieldNestedArrayGetter<Data, QueryParams = unknown, Inner = unknown> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ListFieldNestedArrayGetter<Data, QueryParams = unknown, Inner = any> = {
   getterArray: (data: Data) => Inner[]
   fields: ListFields<Inner, QueryParams>
   componentItem?: Raw<FieldComponentItem<Inner>>

@@ -149,3 +149,7 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
 
   return fn as typeof fn & {QueryParams: Partial<QueryParams>}
 }
+
+export const isRequestResponse = <Data>(value: unknown): value is RequestResponse<Data> => {
+  return value instanceof Object && Object.keys(value).length <= (4 satisfies ObjectKeys<RequestResponse<Data>>['length']) && 'data' in value
+}
