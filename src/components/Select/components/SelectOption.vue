@@ -104,20 +104,7 @@ const scrollIntoView = () => {
 
   if (!parent) return
 
-  console.log({
-    e: elementRef.value.getBoundingClientRect().top,
-    p: parent.getBoundingClientRect().top,
-    el: elementRef.value,
-  })
-
   parent.scrollTo({top: elementRef.value.getBoundingClientRect().top - parent.getBoundingClientRect().top})
-
-  setTimeout(() => {
-    console.log({
-      e: elementRef.value?.getBoundingClientRect().top,
-      p: parent.getBoundingClientRect().top,
-    })
-  }, 1000)
 }
 
 watch(() => props.isCursor, value => {
