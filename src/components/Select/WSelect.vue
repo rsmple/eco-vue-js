@@ -89,6 +89,7 @@
 
         <SelectOption
           v-if="hasCreateOption"
+          :index="optionsFiltered.length"
           :is-selected="false"
           :is-cursor="cursor === optionsFiltered.length"
           :loading="(loadingCreate || loadingOptionIndex === optionsFiltered.length) && loading"
@@ -146,6 +147,7 @@
           v-for="(option, index) in optionsFiltered"
           :key="valueGetter(option)"
           ref="option"
+          :index="index"
           :is-selected="modelValue.includes(valueGetter(option))"
           :is-cursor="index === cursor"
           :loading="loadingOptionIndex === index && loading"
@@ -416,6 +418,19 @@ const blur = () => {
 const setSearch = (value: string): void => {
   search.value = value
 }
+
+watch(isModelValueSearch, async value => {
+  if (!value) return
+
+  await nextTick()
+
+  const index = optionsFiltered.value.findIndex(item => props.valueGetter(item) === search.value)
+
+  if (index !== -1) {
+    cursor.value = index
+    optionRef.value?.find(item => item?.index === index)?.scrollIntoView()
+  }
+})
 
 if (props.useQueryFnDefault) {
   const {data: defaultData} = props.useQueryFnDefault({enabled: computed(() => !props.disabled)})

@@ -3,7 +3,7 @@
     :disabled="disabled || disableMessage !== undefined"
     class="
       disabled:text-description relative isolate flex
-      select-none items-center justify-center bg-none
+      select-none items-center bg-none
       no-underline outline-none disabled:cursor-not-allowed
     "
     :class="{

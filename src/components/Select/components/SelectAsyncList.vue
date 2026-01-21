@@ -4,6 +4,7 @@
       v-if="allowCreate"
       :is-selected="false"
       :is-cursor="cursor === null"
+      :index="-1"
       :loading="loading && (loadingCreate || loadingOption === null)"
       :scroll="isCursorLocked"
       :previous="lastItem"
@@ -63,6 +64,7 @@
       <template #default="{item, skeleton, previous, next, first, last, index}">
         <SelectOption
           ref="option"
+          :index="index"
           :is-selected="!skeleton && modelValue.includes(valueGetter(item))"
           :is-cursor="!skeleton && valueGetter(item) === cursor"
           :loading="loading && loadingOption === valueGetter(item)"
