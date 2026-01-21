@@ -1,4 +1,4 @@
-import type {FormAsyncProps} from '../types'
+import type {FormAsyncProps} from '@/components/FormAsync/types'
 
 import {computed, onBeforeUnmount, ref, toRef} from 'vue'
 

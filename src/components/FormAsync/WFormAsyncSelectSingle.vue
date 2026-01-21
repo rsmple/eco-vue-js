@@ -38,7 +38,7 @@ import type {SelectOptionComponent} from '@/components/Select/types'
 
 import WSelectSingle from '@/components/Select/WSelectSingle.vue'
 
-import {useFormAsync} from './use/useFormAsync'
+import {useFormAsync} from '@/utils/useFormAsync'
 
 const props = withDefaults(
   defineProps<FormAsyncSelectSingleProps<Model, FieldType, QueryParamsOptions, QueryParams, Data, OptionComponent, AllowClear>>(),

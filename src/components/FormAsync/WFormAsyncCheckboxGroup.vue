@@ -51,7 +51,7 @@ import type {CheckboxGroupOptionComponent} from '../Checkbox/types'
 
 import WCheckboxGroup from '@/components/Checkbox/WCheckboxGroup.vue'
 
-import {useFormAsync} from './use/useFormAsync'
+import {useFormAsync} from '@/utils/useFormAsync'
 
 const props = withDefaults(
   defineProps<FormAsyncCheckboxGroupProps<Model, FieldType, QueryParams, Entity, ValueGetter>>(),

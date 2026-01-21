@@ -1,23 +1,29 @@
 <template>
   <TransitionGroup
-    enter-active-class="transition-[margin,opacity,transform] duration-500"
-    leave-active-class="transition-[margin,opacity,transform] duration-500"
-    enter-from-class="opacity-0 translate-y-5"
-    leave-to-class="opacity-0 -mb-[var(--list-item-height,5.5rem)]"
+    enter-from-class="opacity-0 translate-y-2"
+    enter-to-class="opacity-1"
+    leave-from-class="opacity-1 grid-rows-[1fr]"
+    leave-to-class="opacity-0 grid-rows-[0fr]"
     tag="div"
-    class="fixed right-0 top-2 z-[10000]"
+    class="fixed right-0 top-2 isolate z-[10000]"
   >
-    <NotifyCard
+    <div
       v-for="config in list"
       :key="config.title + config.caption + config.type"
-      :title="config.title"
-      :caption="config.caption"
-      :type="config.type"
-      :count="config.count"
-      :to="config.to"
-      :user-input="config.userInput"
-      @click:close="removeNotify(config)"
-    />
+      class="grid justify-end transition-[opacity,transform,grid-template-rows] duration-500"
+    >
+      <div class="min-h-0">
+        <NotifyCard
+          :title="config.title"
+          :caption="config.caption"
+          :type="config.type"
+          :count="config.count"
+          :to="config.to"
+          :user-input="config.userInput"
+          @click:close="removeNotify(config)"
+        />
+      </div>
+    </div>
   </TransitionGroup>
 </template>
 

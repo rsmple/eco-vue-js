@@ -51,7 +51,7 @@ import type {ButtonGroupOptionComponent} from '../Button/types'
 
 import WButtonGroup from '@/components/Button/WButtonGroup.vue'
 
-import {useFormAsync} from './use/useFormAsync'
+import {useFormAsync} from '@/utils/useFormAsync'
 
 const props = withDefaults(
   defineProps<FormAsyncButtonGroupProps<Model, FieldType, QueryParams, Entity, ValueGetter>>(),

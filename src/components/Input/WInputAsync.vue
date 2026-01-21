@@ -181,7 +181,7 @@ const cancel = () => {
 
   inputRef.value?.blur()
 
-  inputRef.value?.showMessage('Cancelled', 1000)
+  if (hasChangesValue.value) inputRef.value?.showMessage('Cancelled', 1000)
 }
 
 const save = async () => {

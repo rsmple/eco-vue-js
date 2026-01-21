@@ -22,7 +22,7 @@ import type {FormAsyncToggleProps} from './types'
 
 import WToggle from '@/components/Toggle/WToggle.vue'
 
-import {useFormAsync} from './use/useFormAsync'
+import {useFormAsync} from '@/utils/useFormAsync'
 
 const props = withDefaults(
   defineProps<FormAsyncToggleProps<Model, FieldType, QueryParams>>(),

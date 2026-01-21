@@ -1,71 +1,65 @@
 <template>
-  <div
-    ref="element"
-    class="isolate z-[1] flex"
-    :style="elementStyles"
-  >
-    <div class="bg-black-default relative my-2 ml-auto mr-4 flex min-h-[4.5rem] max-w-[calc(100vw-2rem)] select-none rounded-xl shadow-md sm:max-w-lg dark:bg-gray-800">
-      <WCounter
-        v-show="count > 1"
-        class="absolute left-[-0.625em] top-[-0.625em] text-xs shadow-md"
-        :count="count"
+  <div class="bg-black-default relative my-2 mr-4 grid min-h-[4.5rem] max-w-[calc(100vw-2rem)] grid-cols-[auto,1fr,auto] rounded-xl shadow-md sm:max-w-lg dark:bg-gray-800">
+    <WCounter
+      v-show="count > 1"
+      class="absolute left-[-0.625em] top-[-0.625em] text-xs shadow-md"
+      :count="count"
+    />
+
+    <div class="m-7">
+      <IconDanger
+        v-if="type === NotifyType.DANGER"
+        class="square-6 text-negative dark:text-negative-dark"
       />
 
-      <div class="m-7">
-        <IconDanger
-          v-if="type === NotifyType.DANGER"
-          class="square-6 text-negative dark:text-negative-dark"
-        />
+      <IconWarn
+        v-else-if="type === NotifyType.WARN"
+        class="square-6 text-warning dark:text-warning-dark"
+      />
 
-        <IconWarn
-          v-else-if="type === NotifyType.WARN"
-          class="square-6 text-warning dark:text-warning-dark"
-        />
+      <IconSuccess
+        v-else-if="type === NotifyType.SUCCESS"
+        class="square-6 text-positive dark:text-positive-dark"
+      />
+    </div>
 
-        <IconSuccess
-          v-else-if="type === NotifyType.SUCCESS"
-          class="square-6 text-positive dark:text-positive-dark"
-        />
-      </div>
-
-      <div class="grid flex-1 items-center py-4">
-        <div class="text-default font-semibold">
-          {{ title }}
-        </div>
-
-        <div
-          v-if="caption || userInput"
-          class="text-default whitespace-pre-wrap break-words font-normal"
-        >
-          {{ caption ? caption + ' ' : '' }}<span class="break-all">{{ userInput }}</span>
-        </div>
-
-        <WButton
-          v-if="to"
-          :to="to"
-          :semantic-type="SemanticType.SECONDARY"
-          class="mt-4 justify-self-start"
-        >
-          {{ linkText }} <IconBack class="rotate-180" />
-        </WButton>
+    <div class="grid items-center py-4">
+      <div class="text-default font-semibold">
+        {{ title }}
       </div>
 
       <div
-        class="w-ripple-trigger w-ripple-hover text-description cursor-pointer p-6"
-        @click="$emit('click:close')"
+        v-if="caption || userInput"
+        class="text-default whitespace-pre-wrap break-words font-normal [word-break:break-word]"
       >
-        <div class="square-8 w-ripple relative flex items-center justify-center rounded-full">
-          <IconCancel class="square-4" />
-        </div>
+        {{ caption ? caption + ' ' : '' }}<span class="break-all">{{ userInput }}</span>
       </div>
+
+      <WButton
+        v-if="to"
+        :to="to"
+        :semantic-type="SemanticType.SECONDARY"
+        class="mt-4 justify-self-start"
+      >
+        {{ linkText }} <IconBack class="rotate-180" />
+      </WButton>
     </div>
+
+    <button
+      class="w-ripple-trigger w-ripple-hover text-description flex cursor-pointer p-6"
+      @click="$emit('click:close')"
+    >
+      <div class="square-8 w-ripple relative flex items-center justify-center rounded-full">
+        <IconCancel class="square-4" />
+      </div>
+    </button>
   </div>
 </template>
 
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
 
-import {type StyleValue, computed, ref, useTemplateRef, watch} from 'vue'
+import {computed} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
 import WCounter from '@/components/Counter/WCounter.vue'
@@ -102,9 +96,6 @@ defineEmits<{
   (e: 'click:close'): void
 }>()
 
-const elementRef = useTemplateRef('element')
-const height = ref<number | undefined>()
-
 const router = useOptionalRouter()
 
 const linkText = computed(() => {
@@ -115,19 +106,5 @@ const linkText = computed(() => {
   }
 
   return router.resolve(props.to).meta?.title
-})
-
-const elementStyles = computed<StyleValue | undefined>(() => {
-  if (!height.value) return undefined
-
-  return {
-    '--list-item-height': height.value + 'px',
-  }
-})
-
-watch(elementRef, value => {
-  if (!value) return
-
-  height.value = value.getBoundingClientRect().height || undefined
 })
 </script>
