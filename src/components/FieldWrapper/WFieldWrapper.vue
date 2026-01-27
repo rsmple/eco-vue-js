@@ -122,7 +122,7 @@
           <div
             v-if="message"
             v-show="isMessageShown"
-            class="text-description absolute right-0 whitespace-nowrap my-0.5 bg-default dark:bg-default-dark text-xs font-normal"
+            class="text-description bg-default dark:bg-default-dark absolute right-0 my-0.5 whitespace-nowrap text-xs font-normal"
             :class="topText ? 'bottom-full' : 'top-full'"
           >
             {{ message }}
@@ -130,7 +130,7 @@
 
           <div
             v-else-if="errorMessage"
-            class="text-negative dark:text-negative-dark absolute mt-0.5 bg-default dark:bg-default-dark text-xs font-normal"
+            class="text-negative dark:text-negative-dark bg-default dark:bg-default-dark absolute mt-0.5 text-xs font-normal"
             :class="[
               !leftError || topText ? 'right-0 text-end' : 'left-0 text-start',
               topText ? 'bottom-full' : 'top-full',
@@ -141,7 +141,7 @@
 
           <div
             v-else-if="maxLength !== undefined && focused"
-            class="text-description absolute right-0 whitespace-nowrap mt-0.5 bg-default dark:bg-default-dark text-xs font-normal"
+            class="text-description bg-default dark:bg-default-dark absolute right-0 mt-0.5 whitespace-nowrap text-xs font-normal"
             :class="topText ? 'bottom-full' : 'top-full'"
           >
             {{ numberFormatter.format(`${typeof modelValue === 'number' ? modelValue : (modelValue || '')}`.length) }} / {{ numberFormatter.format(maxLength) }}
@@ -307,9 +307,9 @@ defineExpose({
 })
 
 defineSlots<{
-  title: () => VNode[]
+  title?: () => VNode[]
   subtitle: () => VNode[]
-  right: () => VNode[]
+  right?: () => VNode[]
   bottom: () => VNode[]
   field: (props: {id: string, focused: boolean, setFocused: (value: boolean) => void, isDragover: boolean}) => VNode[]
   default: (props: {id: string, focused: boolean, setFocused: (value: boolean) => void, isDragover: boolean}) => VNode[]
