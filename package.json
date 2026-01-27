@@ -15,8 +15,8 @@
     "lint:inspect": "npx eslint --inspect-config"
   },
   "dependencies": {
-    "@stylistic/eslint-plugin": "5.6.1",
-    "@tanstack/eslint-plugin-query": "5.91.2",
+    "@stylistic/eslint-plugin": "5.7.1",
+    "@tanstack/eslint-plugin-query": "5.91.3",
     "@vue/eslint-config-typescript": "14.6.0",
     "eslint-import-resolver-typescript": "4.4.4",
     "eslint-plugin-import": "2.32.0",
@@ -24,7 +24,7 @@
     "eslint-plugin-svgo": "0.11.3",
     "eslint-plugin-tailwindcss": "3.18.2",
     "eslint-plugin-unused-imports": "4.3.0",
-    "eslint-plugin-vue": "10.6.2"
+    "eslint-plugin-vue": "10.7.0"
   },
   "peerDependencies": {
     "@tanstack/vue-query": ">=5.92.1",
@@ -41,13 +41,13 @@
   "devDependencies": {
     "@tsconfig/node22": "22.0.5",
     "@types/jsdom": "27.0.0",
-    "@types/node": "25.0.0",
+    "@types/node": "25.0.10",
     "@types/postcss-import": "14.0.3",
-    "@vitejs/plugin-vue": "6.0.2",
+    "@vitejs/plugin-vue": "6.0.3",
     "@vue/tsconfig": "0.7.0",
-    "autoprefixer": "10.4.22",
-    "eslint": "9.39.1",
-    "jsdom": "27.3.0",
+    "autoprefixer": "10.4.23",
+    "eslint": "9.39.2",
+    "jsdom": "27.4.0",
     "npm-run-all2": "8.0.4",
     "path": "0.12.7",
     "postcss": "8.5.6",
@@ -55,7 +55,7 @@
     "rollup-plugin-watch": "1.0.5",
     "tailwindcss": "3.4.17",
     "typescript": "5.9.3",
-    "vite": "7.2.7",
+    "vite": "7.3.1",
     "vite-plugin-dts": "4.5.4",
     "vite-svg-loader": "5.1.0",
     "vue-router": ">=4.6.4",
