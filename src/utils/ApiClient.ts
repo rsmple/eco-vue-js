@@ -75,14 +75,12 @@ export class ApiClientInstance implements ApiClient {
   }
 
   private async retry(request: Request) {
-    const newRequest = request.clone()
-
     const response = await fetch(request)
 
     return {
       data: await response.json(),
       status: response.status,
-      request: newRequest,
+      request,
     }
   }
 
@@ -200,6 +198,8 @@ export class ApiClientInstance implements ApiClient {
         },
       )
 
+      const requestClone = request.clone()
+
       fetch(request)
         .then(response => {
           response
@@ -215,7 +215,7 @@ export class ApiClientInstance implements ApiClient {
                 })
               } else {
                 if (response.status === 401) {
-                  if (this.config.refreshUrl || this.config.tokenRefresh) return this.refresh().then(() => this.retry(request))
+                  if (this.config.refreshUrl || this.config.tokenRefresh) return this.refresh().then(() => this.retry(requestClone))
 
                   this.auth.value = false
                 }
