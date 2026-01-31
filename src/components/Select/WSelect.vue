@@ -58,7 +58,7 @@
             'cursor-pointer': !isDisabled && !isReadonly,
             'cursor-not-allowed opacity-50': isDisabled,
           }"
-          @unselect="unselect(value)"
+          @unselect="unselect(value, $event)"
         >
           <template
             v-if="$slots.option"
@@ -155,7 +155,7 @@
           :hide-option-icon="hideOptionIcon"
           class="first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
           @select="select(valueGetter(option), option); setLoadingOptionIndex(index)"
-          @unselect="unselect(valueGetter(option)); setLoadingOptionIndex(index)"
+          @unselect="unselect(valueGetter(option), option); setLoadingOptionIndex(index)"
           @mouseenter="setCursor(index)"
         >
           <template #default="{selected}">
@@ -211,7 +211,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'select', item: Model, data: Data): void
-  (e: 'unselect', item: Model): void
+  (e: 'unselect', item: Model, data: Data | undefined): void
   (e: 'focus', value: FocusEvent | undefined): void
   (e: 'blur', value: FocusEvent): void
   (e: 'update:query-options-error', value: string | undefined): void
@@ -275,7 +275,10 @@ const close = () => {
 
     if (optionExact) select(props.valueGetter(optionExact), optionExact)
     else if (search.value) create(search.value)
-    else if (props.modelValue.length) unselect(props.modelValue[props.modelValue.length - 1])
+    else if (props.modelValue.length) {
+      const last = props.modelValue[props.modelValue.length - 1]
+      unselect(last, optionsWithCreated.value.find(option => props.valueGetter(option) === last))
+    }
   }
 
   isOpen.value = false
@@ -355,7 +358,8 @@ const captureDoubleDelete = () => {
   if (!props.modelValue.length || search.value.length) return
 
   if (deletePressTimeout) {
-    unselect(props.modelValue[props.modelValue.length - 1])
+    const last = props.modelValue[props.modelValue.length - 1]
+    unselect(last, optionsWithCreated.value.find(option => props.valueGetter(option) === last))
 
     clearTimeout(deletePressTimeout)
     deletePressTimeout = null
@@ -374,10 +378,10 @@ const select = (item: Model, data: Data): void => {
   search.value = ''
 }
 
-const unselect = (item: Model): void => {
+const unselect = (item: Model, data: Data | undefined): void => {
   if (isDisabledComputed.value) return
 
-  emit('unselect', item)
+  emit('unselect', item, data)
 
   search.value = ''
 

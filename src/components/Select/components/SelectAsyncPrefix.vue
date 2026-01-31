@@ -12,7 +12,7 @@
       :created-data="createdData"
       :value-getter="valueGetter"
       :readonly="readonly"
-      @unselect="$emit('unselect', $event)"
+      @unselect="(value, data) => $emit('unselect', value, data)"
       @update:fetching="$emit('update:fetching', $event)"
     >
       <template
@@ -59,7 +59,7 @@ const PAGE_LENGTH = 8
 const props = defineProps<SelectAsyncPrefixProps<Model, Data, QueryParams, OptionComponent>>()
 
 const emit = defineEmits<{
-  (e: 'unselect', value: Model): void
+  (e: 'unselect', value: Model, data: Data): void
   (e: 'update:fetching', value: boolean): void
   (e: 'update:model-value', value: Model[]): void
 }>()

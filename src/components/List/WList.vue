@@ -15,6 +15,7 @@
       :query-params="queryParams"
       :query-options="queryOptions"
       :skeleton-length="count ?? listCount ?? PAGE_LENGTH"
+      :refetch-interval="refetchInterval"
       hide-page-title
 
       :page-length="PAGE_LENGTH"
@@ -401,6 +402,7 @@ const props = withDefaults(
     hasAction?: boolean
     noHeaderSettings?: boolean
     noRefetch?: boolean
+    refetchInterval?: number
   }>(),
   {
     count: undefined,
@@ -419,6 +421,7 @@ const props = withDefaults(
     formNameGetter: undefined,
     groupBy: undefined,
     cardTo: undefined,
+    refetchInterval: undefined,
   },
 )
 

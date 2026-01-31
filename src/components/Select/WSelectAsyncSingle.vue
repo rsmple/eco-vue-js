@@ -13,8 +13,8 @@
       emptyValue: props.emptyValue !== undefined && props.emptyValue !== null ? [props.emptyValue] : undefined,
     }"
     :class="$attrs.class"
-    @select="updateModelValue($event as EmitType)"
-    @unselect="allowClear && updateModelValue(null as EmitType)"
+    @select="updateModelValue"
+    @unselect="(value, data) => allowClear && updateModelValue(null as EmitType, data)"
     @focus="searchModel && typeof modelValue === 'string' ? selectComponentRef?.setSearch(modelValue) : undefined"
     @init-model="$emit('init-model')"
   >
@@ -79,7 +79,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'update:model-value', value: EmitType): void
+  (e: 'update:model-value', value: EmitType, data: Data | undefined): void
   (e: 'init-model'): void
 }>()
 
@@ -87,8 +87,8 @@ const selectComponentRef = useTemplateRef('selectComponent')
 
 const arrayValue = computed<Model[]>(() => props.modelValue ? [props.modelValue] : [])
 
-const updateModelValue = (value: EmitType): void => {
-  emit('update:model-value', value)
+const updateModelValue = (value: Model | null, data: Data | undefined): void => {
+  emit('update:model-value', value as EmitType, data)
 }
 
 const blur = () => {

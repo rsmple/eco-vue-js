@@ -16,7 +16,7 @@
       'cursor-pointer': !disabled && !readonly,
       'cursor-not-allowed opacity-50': disabled,
     }"
-    @unselect="$emit('unselect', valueGetter(option))"
+    @unselect="$emit('unselect', valueGetter(option), option)"
   >
     <template
       v-if="$slots.option"
@@ -41,7 +41,7 @@ import SelectOptionPrefix from './SelectOptionPrefix.vue'
 const props = defineProps<SelectAsyncPrefixPageProps<Model, Data, QueryParams, OptionComponent>>()
 
 const emit = defineEmits<{
-  (e: 'unselect', value: Model): void
+  (e: 'unselect', value: Model, data: Data): void
   (e: 'update:pages-count', value: number): void
   (e: 'update:fetching', value: boolean): void
 }>()
