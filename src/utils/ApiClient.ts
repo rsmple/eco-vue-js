@@ -75,6 +75,10 @@ export class ApiClientInstance implements ApiClient {
   }
 
   private async retry(request: Request) {
+    const token = this.config.tokenGetter?.()
+
+    if (token) request.headers.set('Authorization', 'Bearer ' + token)
+
     const response = await fetch(request)
 
     return {
@@ -215,7 +219,7 @@ export class ApiClientInstance implements ApiClient {
                 })
               } else {
                 if (response.status === 401) {
-                  if (this.config.refreshUrl || this.config.tokenRefresh) return this.refresh().then(() => this.retry(requestClone))
+                  if (this.config.refreshUrl || this.config.tokenRefresh) return this.refresh().then(() => this.retry(requestClone).then(resolve).catch(reject))
 
                   this.auth.value = false
                 }
