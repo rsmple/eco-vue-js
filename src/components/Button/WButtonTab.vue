@@ -69,7 +69,7 @@
             'sm-not:-pl--inner-margin': side,
           }"
         >
-          <WTextOverflow>
+          <component :is="enableOverflow ? WTextOverflow : WEmptyComponent">
             <Suspense v-if="icon !== undefined">
               <component 
                 :is="icon"
@@ -84,7 +84,7 @@
             </Suspense>
 
             {{ title }}
-          </WTextOverflow>
+          </component>
         </div>
 
         <WStatusIcon
@@ -142,6 +142,7 @@ import IconCheckCircle from '@/assets/icons/IconCheckCircle.svg?component'
 import IconClose from '@/assets/icons/IconClose.svg?component'
 import IconNegativeInfo from '@/assets/icons/IconNegativeInfo.svg?component'
 
+import WEmptyComponent from '../EmptyComponent/WEmptyComponent.vue'
 import WStatusIcon from '../Status/WStatusIcon.vue'
 import WTextOverflow from '../TextOverflow/WTextOverflow.vue'
 
