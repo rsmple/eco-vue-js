@@ -76,7 +76,7 @@
       />
 
       <WTooltip
-        v-if="tooltipText && !isDisabled && !isSkeleton"
+        v-if="tooltipText && !isSkeleton"
         :text="tooltipText"
         :trigger="(elementRef as HTMLButtonElement)"
         no-touch

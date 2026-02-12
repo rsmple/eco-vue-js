@@ -4,6 +4,7 @@
     :href="href"
     :download="download"
     :disabled="disabled"
+    :tooltip-text="tooltipText"
     @click="$emit('click', $event)"
   >
     <div class="min-w-20 flex-1 text-start">
@@ -32,6 +33,7 @@ interface Props extends Partial<LinkProps> {
   disabled?: boolean
   href?: string
   download?: string
+  tooltipText?: string
 }
 
 defineProps<Props>()

@@ -32,6 +32,12 @@
         <IconCheck class="square-[1.25em]" />
       </div>
     </div>
+
+    <WTooltip
+      v-if="tooltipText"
+      :text="tooltipText"
+      left
+    />
   </component>
 </template>
 
@@ -39,6 +45,7 @@
 import type {LinkProps} from '@/types/types'
 
 import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
+import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 import IconCheck from '@/assets/icons/IconCheck.svg?component'
 
@@ -47,6 +54,7 @@ interface Props extends Partial<LinkProps> {
   href?: string
   download?: string
   active?: boolean
+  tooltipText?: string
 }
 
 withDefaults(
@@ -55,6 +63,7 @@ withDefaults(
     active: undefined,
     download: undefined,
     href: undefined,
+    tooltipText: undefined,
   },
 )
 
