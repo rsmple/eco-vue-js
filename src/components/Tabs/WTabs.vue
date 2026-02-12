@@ -5,7 +5,7 @@
     class="grid gap-4"
     :class="{
       'grid grid-cols-1': !side,
-      'sm-not:grid-cols-[repeat(2,100vw)] sm-not:overflow-x-auto sm-not:overscroll-x-contain grid grid-cols-[minmax(var(--w-tabs-side-width,auto),auto),1fr] items-start': side,
+      'sm-not:grid-cols-[repeat(2,100vw)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain grid grid-cols-[minmax(auto,var(--w-tabs-side-width,auto)),1fr] items-start': side,
     }"
   >
     <div
@@ -13,10 +13,11 @@
       ref="buttonContainer"
       class="relative"
       :class="{
-        'grid grid-cols-[1fr,auto]': side,
+        'sm-not:snap-start grid grid-cols-[1fr,auto]': side,
         'no-scrollbar sm-not:-pl--inner-margin sm-not:-mx---inner-margin flex overflow-x-auto overscroll-x-contain': !side,
         'flex-wrap': !side && wrap,
         'pr-[50%]': !side && !wrap,
+        [headerClass ?? '']: true,
       }"
     >
       <template
@@ -40,6 +41,7 @@
           :show-has-value="showHasValue"
           :side="side"
           :status-icon="statusIcon"
+          :enable-overflow="side"
           @update:scroll-position="updateScrollPosition"
           @click="switchTab(slot.props?.name)"
         >
@@ -100,6 +102,9 @@
     <div
       v-if="defaultSlots.some(slot => (slot.children as Record<string, Component>)?.default)"
       class="relative h-full transition-[min-height] duration-300"
+      :class="{
+        'sm-not:snap-start': side,
+      }"
       :style="{minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
     >
       <TransitionGroup
@@ -213,7 +218,10 @@ const switchOnInvalid = debounce((key: string): void => {
 }, 50)
 
 const switchTab = throttle((key: string): void => {
-  if (current.value === key) return
+  if (current.value === key) {
+    scrollToTabContent()
+    return
+  }
 
   updateCurrent(key)
 }, 200)

@@ -57,7 +57,7 @@
 
       <div
         v-else
-        class="flex items-center py-2"
+        class="group/overflow grid grid-cols-[1fr,auto] items-center py-2"
         :class="{
           'justify-center text-center': !side,
           'text-start': side,
@@ -69,20 +69,22 @@
             'sm-not:-pl--inner-margin': side,
           }"
         >
-          <Suspense v-if="icon !== undefined">
-            <component 
-              :is="icon"
-              class="square-[1.25em] -mt-1 inline"
-            />
+          <WTextOverflow>
+            <Suspense v-if="icon !== undefined">
+              <component 
+                :is="icon"
+                class="square-[1.25em] -mt-1 inline"
+              />
 
-            <template #fallback>
-              <svg class="square-[1.25em] -mt-1 inline">
-                <g />
-              </svg>
-            </template>
-          </Suspense>
+              <template #fallback>
+                <svg class="square-[1.25em] -mt-1 inline">
+                  <g />
+                </svg>
+              </template>
+            </Suspense>
 
-          {{ title }}
+            {{ title }}
+          </WTextOverflow>
         </div>
 
         <WStatusIcon
@@ -141,6 +143,7 @@ import IconClose from '@/assets/icons/IconClose.svg?component'
 import IconNegativeInfo from '@/assets/icons/IconNegativeInfo.svg?component'
 
 import WStatusIcon from '../Status/WStatusIcon.vue'
+import WTextOverflow from '../TextOverflow/WTextOverflow.vue'
 
 defineProps<{
   active?: boolean
@@ -154,6 +157,7 @@ defineProps<{
   side?: boolean
   statusIcon?: boolean
   showHasValue?: boolean
+  enableOverflow?: boolean
 }>()
 
 defineEmits<{

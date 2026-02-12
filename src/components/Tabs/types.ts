@@ -9,6 +9,7 @@ export interface TabsProps {
   side?: boolean
   disableMinHeight?: boolean
   noHeader?: boolean
+  headerClass?: string
   switchToNew?: boolean
   stepper?: boolean
   showHasValue?: boolean

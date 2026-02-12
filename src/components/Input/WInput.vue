@@ -151,7 +151,7 @@
             </div>
 
             <div
-              class="flex-1 font-normal"
+              class="flex-1"
               :class="{
                 'w-full': !hideInput && !$slots.prefix,
                 'w-option-has-bg-input': $slots.prefix,
