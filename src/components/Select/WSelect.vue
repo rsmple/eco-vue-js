@@ -230,11 +230,12 @@ const isCursorLocked = ref(false)
 const search = ref('')
 const isModelValueSearch = computed(() => !!search.value && props.modelValue.includes(search.value as Model))
 const searchPrepared = computed(() => isModelValueSearch.value ? '' : search.value.trim().toLocaleLowerCase())
+const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
 
 const {data, isLoading, error: queryError} = props.useQueryFnOptions
   ? props.queryParamsOptions === undefined
-    ? (props.useQueryFnOptions as UseQueryEmpty<Data[]>)()
-    : props.useQueryFnOptions(toRef(props, 'queryParamsOptions'))
+    ? (props.useQueryFnOptions as UseQueryEmpty<Data[]>)({enabled: queryEnabled})
+    : props.useQueryFnOptions(toRef(props, 'queryParamsOptions'), {enabled: queryEnabled})
   : {
     data: toRef(props, 'options') as Ref<Data[] | undefined>,
     isLoading: ref(false),

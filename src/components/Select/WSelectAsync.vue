@@ -180,8 +180,9 @@ const isDisabledComputed = computed(() => props.loading || isReadonly.value || i
 const isModelValueSearch = computed(() => !!search.value && props.modelValue.includes(search.value as Model))
 const queryParams = computed(() => ({...props.queryParamsOptions, [props.searchField ?? 'search']: search.value}))
 const queryParamsFirstPage = computed(() => ({...queryParams.value, page: 1}))
+const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
 
-const {data: firstPageData} = props.useQueryFnOptions(queryParamsFirstPage)
+const {data: firstPageData} = props.useQueryFnOptions(queryParamsFirstPage, {enabled: queryEnabled})
 
 const hasSearchOption = computed(() => {
   if (props.createdData?.some(option => props.valueGetter(option) === search.value)) return true
