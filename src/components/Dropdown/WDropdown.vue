@@ -35,7 +35,7 @@
 <script lang="ts" setup>
 import type {DropdownDefaultSlotScope, DropdownProps} from './types'
 
-import {type VNode, computed, onBeforeMount, onBeforeUnmount, onMounted, onUnmounted, ref, toRef, useTemplateRef, watch} from 'vue'
+import {type VNode, computed, onBeforeMount, onMounted, onUnmounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
 import {getAllScrollParents, getIsClientSide} from '@/utils/utils'
