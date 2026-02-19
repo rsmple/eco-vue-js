@@ -242,9 +242,9 @@ export class ApiClientInstance implements ApiClient {
               config: config,
               request,
             }))
+          } else {
+            reject(error)
           }
-
-          reject(error)
         })
         .finally(() => {
           if (config?.updateToken) setExpirationDate()
