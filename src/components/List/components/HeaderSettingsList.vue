@@ -49,15 +49,15 @@
 
         <button
           class="w-ripple w-ripple-hover group relative flex items-center justify-center"
-          :aria-pressed="!fieldConfigMap[item.meta.label].visible"
+          :aria-pressed="!fieldConfigMap[item.meta.label]?.visible"
           aria-label="Hide field"
-          @click="$emit('update:field-config-map', {[item.meta.label]: {...fieldConfigMap[item.meta.label], visible: !fieldConfigMap[item.meta.label].visible}})"
+          @click="$emit('update:field-config-map', {[item.meta.label]: {...fieldConfigMap[item.meta.label]!, visible: !fieldConfigMap[item.meta.label]?.visible}})"
         >
           <component
-            :is="fieldConfigMap[item.meta.label].visible ? IconEye : IconEyeSlash"
+            :is="fieldConfigMap[item.meta.label]?.visible ? IconEye : IconEyeSlash"
             class="pointer-events-none"
             :class="{
-              'opacity-20 group-hover:opacity-50': fieldConfigMap[item.meta.label].visible,
+              'opacity-20 group-hover:opacity-50': fieldConfigMap[item.meta.label]?.visible,
             }"
           />
         </button>
@@ -65,15 +65,15 @@
         <button
           v-if="!nested"
           class="w-ripple w-ripple-hover group relative flex items-center justify-center"
-          :aria-pressed="fieldConfigMap[item.meta.label].sticky"
+          :aria-pressed="fieldConfigMap[item.meta.label]?.sticky"
           aria-label="Pin column"
-          @click="$emit('update:field-config-map', {[item.meta.label]: {...fieldConfigMap[item.meta.label], sticky: !fieldConfigMap[item.meta.label].sticky}})"
+          @click="$emit('update:field-config-map', {[item.meta.label]: {...fieldConfigMap[item.meta.label]!, sticky: !fieldConfigMap[item.meta.label]?.sticky}})"
         >
           <component
-            :is="fieldConfigMap[item.meta.label].sticky ? IconLock : IconLockOff"
+            :is="fieldConfigMap[item.meta.label]?.sticky ? IconLock : IconLockOff"
             class="pointer-events-none"
             :class="{
-              'opacity-20 group-hover:opacity-50': !fieldConfigMap[item.meta.label].sticky,
+              'opacity-20 group-hover:opacity-50': !fieldConfigMap[item.meta.label]?.sticky,
             }"
           />
         </button>

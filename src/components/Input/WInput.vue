@@ -423,7 +423,7 @@ const undo = (): void => {
 
   fieldWrapperRef.value?.showMessage('Undo')
   const index = historyPosition.value - 1
-  const item = history.value[index]
+  const item = history.value[index]!
   emit('update:model-value', item.value as ModelValue)
   nextTick(() => setCaret(item.caret.start, item.caret.end))
   historyPosition.value = index
@@ -439,7 +439,7 @@ const redo = (): void => {
 
   fieldWrapperRef.value?.showMessage('Redo')
   const index = historyPosition.value + 1
-  const item = history.value[index]
+  const item = history.value[index]!
   emit('update:model-value', item.value as ModelValue)
   nextTick(() => setCaret(item.caret.start, item.caret.end))
   historyPosition.value = index

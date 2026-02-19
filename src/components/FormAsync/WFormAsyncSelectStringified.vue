@@ -2,7 +2,7 @@
   <WSelectStringified
     v-bind="{
       ...props,
-      modelValue,
+      modelValue: modelValue ?? null,
       skeleton: skeleton || !data,
       disabled: disabled || isLoadingError,
       loading: loading || submitting,

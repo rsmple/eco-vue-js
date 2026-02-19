@@ -37,7 +37,7 @@ const insertTable = (lines: string[], collapsed?: boolean): string => {
   const columns: number[] = []
   const items: string[][] = []
 
-  if (lines.length === 1 && !lines[0].trim()) lines.push('header|header')
+  if (lines.length === 1 && !lines[0]!.trim()) lines.push('header|header')
   else if (lines[1] && tableDividerRowRegex.test(lines[1])) lines.splice(1, 1)
 
   for (const item of lines) {
@@ -51,13 +51,13 @@ const insertTable = (lines: string[], collapsed?: boolean): string => {
     if (splitted[0] === '') splitted.shift()
     if (splitted[splitted.length - 1] === '') splitted.pop()
     for (let col = 0; col < splitted.length; col++) {
-      const prepared = splitted[col].trim()
+      const prepared = splitted[col]!.trim()
       currentItems.push(prepared)
 
       const length = collapsed ? 0 : prepared.length
       if (columns[col] === undefined) {
         columns.push(length)
-      } else if (!collapsed && columns[col] < length) {
+      } else if (!collapsed && columns[col]! < length) {
         columns.splice(col, 1, length)
       }
     }

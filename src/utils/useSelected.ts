@@ -4,7 +4,7 @@ import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRout
 import {isIdArray, isIndex} from '@/utils/utils'
 
 const isSelectedRange = (value: unknown): value is [number, number] => {
-  return Array.isArray(value) && value.length === 2 && value.every(isIndex) && value[0] <= value[1]
+  return Array.isArray(value) && value.length === 2 && value.every(isIndex) && value[0]! <= value[1]!
 }
 
 const keysLengthSelection: ObjectKeys<Selection<number>>['length'] = 3

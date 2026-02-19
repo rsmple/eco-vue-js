@@ -112,7 +112,7 @@ export const filterFields = <F extends ListFields<any, any>>(fields: F, method: 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getFirstFieldLabel = <F extends ListFields<any, any>[number]>(field: F): string => {
-  return 'label' in field.meta ? field.meta.label : getFirstFieldLabel(field.meta.fields[0])
+  return 'label' in field.meta ? field.meta.label : getFirstFieldLabel(field.meta.fields[0]!)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -185,7 +185,7 @@ export const useListConfig = <Fields extends ListFields<any, any>>(key: MaybeRef
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sortFields = <Fields extends ListFields<any, any>>(list: Fields, fieldConfigMap: Record<string, FieldConfig>) => {
-  return list.slice().sort((a, b) => fieldConfigMap[getFirstFieldLabel(a)].order - fieldConfigMap[getFirstFieldLabel(b)].order)
+  return list.slice().sort((a, b) => fieldConfigMap[getFirstFieldLabel(a)]!.order - fieldConfigMap[getFirstFieldLabel(b)]!.order)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -209,7 +209,7 @@ export const getFieldStylesWidth = <Fields extends ListFields<any, any>>(fields:
 
   forEachField(fields, field => {
     if (fieldConfigMap[field.meta.label]?.width) {
-      styles[getFieldVariable('width', field.meta.label)] = fieldConfigMap[field.meta.label].width + 'px'
+      styles[getFieldVariable('width', field.meta.label)] = fieldConfigMap[field.meta.label]!.width + 'px'
     }
   })
 
@@ -240,5 +240,5 @@ export const getFieldStylesFixed = <Fields extends ListFields<any, any>>(fields:
 }
 
 export const getFieldWidthSumStyles = (fieldConfigMap: Record<string, FieldConfig>): string => {
-  return 'calc(' + Object.keys(fieldConfigMap).filter(key => fieldConfigMap[key].visible).map(label => `var(${ getFieldVariable('width', label) })`).join(' + ') + ')'
+  return 'calc(' + Object.keys(fieldConfigMap).filter(key => fieldConfigMap[key]?.visible).map(label => `var(${ getFieldVariable('width', label) })`).join(' + ') + ')'
 }

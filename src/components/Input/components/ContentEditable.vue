@@ -86,7 +86,7 @@ const updateTextParts = () => {
 
   while (elementRef.value.childNodes.length > props.textParts.length) {
     const nodeToRemove = elementRef.value.childNodes[props.textParts.length]
-    elementRef.value.removeChild(nodeToRemove)
+    if (nodeToRemove) elementRef.value.removeChild(nodeToRemove)
   }
 
   if (focused.value && !isSetCaretNext) setCaret(offsets.start, offsets.end !== offsets.start ? undefined : offsets.end)

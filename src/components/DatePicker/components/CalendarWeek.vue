@@ -55,7 +55,7 @@ const days = computed<Date[]>(() => Array(7).fill(undefined).map((_, index) => {
   return date
 }))
 
-const endOfWeek = computed(() => days.value[days.value.length - 1])
+const endOfWeek = computed(() => days.value[days.value.length - 1]!)
 
 const isWeekOutOfMonth = computed(() => {
   const month = props.startOfMonth.getMonth()

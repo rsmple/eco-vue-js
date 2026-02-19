@@ -1,12 +1,12 @@
 <template>
   <WSelect
-    v-bind="{
+    v-bind="({
       ...props,
       modelValue: modelValue ?? [],
       skeleton: skeleton || !data,
       disabled: disabled || isLoadingError,
       loading: loading || submitting,
-    }"
+    } as SelectProps<FieldType[number], Data, QueryParamsOptions, OptionComponent>)"
     @select="showModal(getNewValue($event))"
     @unselect="showModal(getNewValue($event))"
   >
@@ -35,7 +35,7 @@
 
 <script lang="ts" setup generic="Model, FieldType extends string[] | number[], QueryParamsOptions, QueryParams, Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>">
 import type {FormAsyncSelectProps} from './types'
-import type {SelectOptionComponent} from '@/components/Select/types'
+import type {SelectOptionComponent, SelectProps} from '@/components/Select/types'
 
 import WSelect from '@/components/Select/WSelect.vue'
 

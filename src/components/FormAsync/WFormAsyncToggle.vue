@@ -2,7 +2,7 @@
   <WToggle
     v-bind="{
       ...props,
-      modelValue,
+      modelValue: modelValue!,
       loading: loading || !data || submitting,
       disabled: !data || isLoadingError || disabled,
     }"

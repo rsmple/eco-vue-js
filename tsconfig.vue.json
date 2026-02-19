@@ -47,6 +47,6 @@
   },
   "vueCompilerOptions": {
     "strictTemplates": true,
-    "dataAttributes": ["transform-origin", "textContent"]
+    "dataAttributes": ["transform-origin", "textContent", "key"]
   }
 }

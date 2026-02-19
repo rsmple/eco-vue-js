@@ -35,7 +35,7 @@ defineProps<{
   orientation: 'x' | 'y'
   scale: (value: number) => number
   domain: [number, number]
-  format: (value: number) => string
+  format: ((value: number) => string) | undefined
   transform: string
 }>()
 </script>

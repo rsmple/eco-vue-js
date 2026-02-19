@@ -191,7 +191,7 @@ export const horizontalGetterOrderMap: Record<HorizontalAlign, [HorizontalGetter
 }
 
 export function searchStyleGetter<T extends HorizontalGetter | VerticalGetter>(order: Array<T>, parentRect: DOMRect): T {
-  if (order[1] && order[0].isEdge?.(parentRect)) return order[1]
+  if (order[1] && order[0]!.isEdge?.(parentRect)) return order[1]
   
-  return order[0]
+  return order[0]!
 }

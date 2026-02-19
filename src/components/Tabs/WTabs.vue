@@ -188,8 +188,8 @@ const defaultSlots = computed(() => {
 const defaultSlotsKeys = computed<string[]>(() => defaultSlots.value.map(item => item.props.name))
 
 const current = ref<string>(props.initTab ?? (props.initTabIndex !== undefined
-  ? defaultSlotsKeys.value[props.initTabIndex]
-  : defaultSlots.value.find(slot => !!slot.props?.init)?.props?.name ?? defaultSlotsKeys.value[0]
+  ? defaultSlotsKeys.value[props.initTabIndex]!
+  : defaultSlots.value.find(slot => !!slot.props?.init)?.props?.name ?? defaultSlotsKeys.value[0]!
 ))
 const currentIndex = computed(() => defaultSlotsKeys.value.indexOf(current.value))
 const isDirect = ref(true)
@@ -235,7 +235,7 @@ const updateCurrent = (value: string) => {
 const updateIndex = (value: number) => {
   tabItemRef.value?.[currentIndex.value]?.emitHeight?.()
 
-  setCurrentDebounced(defaultSlotsKeys.value[value])
+  setCurrentDebounced(defaultSlotsKeys.value[value]!)
 }
 
 let timeout: NodeJS.Timeout | null = null
@@ -257,7 +257,7 @@ const scrollToTabContent = () => {
 
 const setCurrentDebounced = debounce((value: string) => {
   if (current.value === value || !defaultSlotsKeys.value.includes(value)) return
-  if (defaultSlots.value[defaultSlotsKeys.value.indexOf(value)].props?.disabled !== undefined) return
+  if (defaultSlots.value[defaultSlotsKeys.value.indexOf(value)]?.props?.disabled !== undefined) return
 
   isDirect.value = defaultSlotsKeys.value.indexOf(current.value) < defaultSlotsKeys.value.indexOf(value)
   current.value = value
@@ -274,11 +274,11 @@ const next = (): void => {
     return
   }
 
-  switchTab(defaultSlotsKeys.value[currentIndex.value + 1])
+  switchTab(defaultSlotsKeys.value[currentIndex.value + 1]!)
 }
 
 const previous = (): void => {
-  switchTab(defaultSlotsKeys.value[currentIndex.value - 1])
+  switchTab(defaultSlotsKeys.value[currentIndex.value - 1]!)
 }
 
 const jump = (name: string): void => {
@@ -356,12 +356,12 @@ watch(defaultSlotsKeys, (newValue, oldValue) => {
   const newIndex = newValue.findIndex(item => !oldValue.includes(item))
 
   if (props.switchToNew && newIndex !== -1) {
-    switchTab(newValue[newIndex])
+    switchTab(newValue[newIndex]!)
     return
   }
 
   if (!newValue.includes(current.value)) {
-    switchTab(newValue[oldValue.indexOf(current.value) - 1])
+    switchTab(newValue[oldValue.indexOf(current.value) - 1]!)
     return
   }
 })

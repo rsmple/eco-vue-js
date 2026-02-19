@@ -277,7 +277,7 @@ const close = () => {
     if (optionExact) select(props.valueGetter(optionExact), optionExact)
     else if (search.value) create(search.value)
     else if (props.modelValue.length) {
-      const last = props.modelValue[props.modelValue.length - 1]
+      const last = props.modelValue[props.modelValue.length - 1]!
       unselect(last, optionsWithCreated.value.find(option => props.valueGetter(option) === last))
     }
   }
@@ -359,7 +359,7 @@ const captureDoubleDelete = () => {
   if (!props.modelValue.length || search.value.length) return
 
   if (deletePressTimeout) {
-    const last = props.modelValue[props.modelValue.length - 1]
+    const last = props.modelValue[props.modelValue.length - 1]!
     unselect(last, optionsWithCreated.value.find(option => props.valueGetter(option) === last))
 
     clearTimeout(deletePressTimeout)

@@ -205,7 +205,7 @@
                     [field.meta.cssClass ?? '']: true,
                     'sticky z-[1] bg-[inherit]': !isGrid && fieldConfigMap[field.meta.label]?.sticky,
                   }"
-                  @update:width="fieldConfigMap[field.meta.label].width = $event; updateStylesWidth()"
+                  @update:width="fieldConfigMap[field.meta.label]!.width = $event; updateStylesWidth()"
                   @save:width="save"
                   @update:ordering="updateOrdering"
                 />
@@ -262,7 +262,7 @@
                   :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(defaultScope.item) ?? false)"
                   :skeleton="skeleton"
                   :card="isGrid"
-                  :config="fieldConfigMap[defaultScope.field.meta.label]"
+                  :config="fieldConfigMap[defaultScope.field.meta.label]!"
                   :class="{
                     [defaultScope.field.meta.cssClass ?? '']: true,
                     'items-center': !alignTop,
@@ -462,7 +462,7 @@ const {
 } = useListConfig(toRef(props, 'configKey'), fieldsVisible, toRef(props, 'defaultConfigMap'), toRef(props, 'defaultMode'), props.noHeaderSettings)
 
 const fieldsFiltered = computed(() => {
-  return filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible)
+  return filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible ?? false)
 })
 
 const allowSelect = computed(() => props.bulk !== undefined)

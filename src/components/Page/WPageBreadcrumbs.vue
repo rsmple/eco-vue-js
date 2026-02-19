@@ -13,7 +13,7 @@
 
       <button
         :class="{
-          'font-semibold': active !== null && breadcrumbs[item] <= active && (index + 1 === list.length || breadcrumbs[list[index + 1]] > active)
+          'font-semibold': active !== null && breadcrumbs[item]! <= active && (index + 1 === list.length || breadcrumbs[list[index + 1]!]! > active)
         }"
         class="grid justify-items-center hover:underline"
         @click="scrollTo(item)"

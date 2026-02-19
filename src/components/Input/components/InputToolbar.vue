@@ -71,7 +71,7 @@ const emit = defineEmits<{
 }>()
 
 const wrapSelection = (action: ToolbarAction, index: number | undefined) => {
-  const value = Array.isArray(action.value) && typeof index === 'number' ? action.value[index].value : action.value as WrapSelection
+  const value = Array.isArray(action.value) && typeof index === 'number' ? action.value[index]?.value : action.value as WrapSelection
   if (value) emit('wrap-selection', value)
 }
 </script>

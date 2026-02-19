@@ -217,7 +217,7 @@ const updatePagesTop = (start: number | null) => {
     const index = virtualPageMapReverse.value[page]
     const pageInstance = index !== undefined ? pageRef.value?.[index - 1] : undefined
     const pageHeight = pageInstance?.pageHeight
-      ?? (pagesTop.value[page] ? pagesTop.value[page] - pagesTop.value[page - 1] : averagePageHeight.value)
+      ?? (pagesTop.value[page] ? pagesTop.value[page]! - pagesTop.value[page - 1]! : averagePageHeight.value)
 
     tops.push(currentTop)
     currentTop += pageHeight
@@ -226,13 +226,13 @@ const updatePagesTop = (start: number | null) => {
   tops.push(currentTop) // Add final bottom
 
   let page = visiblePage.value + 1
-  if (scrollTop.value - pagesTop.value[page + 1] < scrollTop.value - pagesTop.value[page]) page += 1 // Closer to next page
+  if (scrollTop.value - pagesTop.value[page + 1]! < scrollTop.value - pagesTop.value[page]!) page += 1 // Closer to next page
   const scrollElement = getScrollingElement()
   if (scrollElement && page > 3 && page >= start) {
     const oldValue = pagesTop.value[page]
     const newValue = tops[page - start - 1]
     if (oldValue !== undefined && newValue !== undefined) {
-      const diff = pagesTop.value[page - 2] - tops[page - start - 1]
+      const diff = pagesTop.value[page - 2]! - tops[page - start - 1]!
       if (diff !== 0) {
         requestAnimationFrame(() => {
           scrollElement.scrollTop -= diff
@@ -256,8 +256,8 @@ const getVisiblePage = () => {
 
   // Try quick directional scan
   for (let i = 0; i < SCAN_LIMIT; i++) {
-    if (page < pageCount.value && scroll >= tops[page]) page++
-    else if (page > 1 && scroll < tops[page - 1]) page--
+    if (page < pageCount.value && scroll >= tops[page]!) page++
+    else if (page > 1 && scroll < tops[page - 1]!) page--
     else {
       lastPage = page
       return page
@@ -269,7 +269,7 @@ const getVisiblePage = () => {
   let right = pageCount.value
   while (left < right) {
     const mid = (left + right) >> 1
-    if (scroll < tops[mid]) right = mid
+    if (scroll < tops[mid]!) right = mid
     else left = mid + 1
   }
 
@@ -292,7 +292,7 @@ const updateVirtualPageMap = debounce(() => {
   const availableVirtualPages = Array.from({length: virtualPageCount.value}, (_, i) => i + 1)
 
   for (const virtualPage in virtualPageMap.value) {
-    const page = virtualPageMap.value[virtualPage]
+    const page = virtualPageMap.value[virtualPage]!
 
     if (page >= startPage.value && page <= endPage.value) {
       newMap[Number(virtualPage)] = page
