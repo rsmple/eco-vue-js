@@ -5,20 +5,20 @@
     :transform="transform"
   >
     <g
-      v-for="item in domain"
+      v-for="(item, index) in domain"
       :key="item"
       :transform="`translate(${ orientation === 'x' ? `${scale(item)}, 0` : `0, ${scale(item)}`})`"
     >
       <line
-        v-bind="orientation === 'x' ? {y2: 6} : {x2: -6}"
+        v-bind="orientation === 'x' ? {y2: 6} : {x2: yRight ? 6 : -6}"
         stroke="currentcolor"
       />
 
       <text
         v-bind="
           orientation === 'x'
-            ? {y: 8, dy: '0.72em', 'text-anchor': 'middle'}
-            : {x: -9, dy: '0.32em', 'text-anchor': 'end'}
+            ? {y: 8, dy: '0.72em', 'text-anchor': domain.length === 2 ? index === 0 && yRight ? 'start' : index === 1 && !yRight ? 'end' : 'middle' : 'middle'}
+            : {x: yRight ? 9 : -9, dy: '0.32em', 'text-anchor': yRight ? 'start' : 'end'}
         "
         fill="currentcolor"
       >
@@ -37,5 +37,6 @@ defineProps<{
   domain: [number, number]
   format: ((value: number) => string) | undefined
   transform: string
+  yRight: boolean
 }>()
 </script>

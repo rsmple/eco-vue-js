@@ -23,6 +23,7 @@
         :format="value => dateFormat(new Date(value))"
         :domain="xExtent"
         :transform="`translate(0, ${svgHeight - bottom})`"
+        :y-right="yRight"
       />
 
       <ChartAxis
@@ -31,7 +32,8 @@
         :scale="scaleY"
         :domain="yDomainComputed"
         :format="yFormat"
-        :transform="`translate(${left}, 0)`"
+        :transform="`translate(${yRight ? svgWidth - right : left}, 0)`"
+        :y-right="yRight"
       />
 
       <slot
@@ -71,6 +73,7 @@ const props = withDefaults(
     height?: number
     xHidden?: boolean
     yHidden?: boolean
+    yRight?: boolean
     yFormat?: (value: number) => string
     top?: number
     bottom?: number
