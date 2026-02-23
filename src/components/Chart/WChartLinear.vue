@@ -20,7 +20,7 @@
         v-if="!xHidden"
         orientation="x"
         :scale="scaleX"
-        :format="value => dateFormat(new Date(value))"
+        :format="value => isSameDate(new Date(value), new Date) ? 'Today' : dateFormatShort(new Date(value))"
         :domain="xExtent"
         :transform="`translate(0, ${svgHeight - bottom})`"
         :y-right="yRight"
@@ -61,7 +61,7 @@ import {type VNode, computed, onBeforeUnmount, onMounted, ref, useTemplateRef, w
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
-import {dateFormat} from '@/utils/dateTime'
+import {dateFormatShort, isSameDate} from '@/utils/dateTime'
 import {useComponentStatesSkeleton} from '@/utils/useComponentStates'
 
 import ChartAxis from './components/ChartAxis.vue'
@@ -84,10 +84,10 @@ const props = withDefaults(
   {
     yDomainGetter: undefined,
     height: 0,
-    top: 10,
-    bottom: 20,
-    left: 40,
-    right: 32,
+    top: 16,
+    bottom: 16,
+    left: 3,
+    right: 3,
     yFormat: undefined,
     skeleton: undefined,
   },
@@ -123,7 +123,7 @@ const yDomainComputed = computed<[number, number]>(() => {
   const yRoundFactor = min > -100 && min < 100 && max < 100 ? 10 : 100
 
   return [
-    Math.floor((min > 0 ? 0 : min) / yRoundFactor) * yRoundFactor,
+    Math.floor(min / yRoundFactor) * yRoundFactor,
     Math.max(Math.ceil(max / yRoundFactor) * yRoundFactor, yRoundFactor),
   ]
 })

@@ -115,6 +115,8 @@
               :x="hoveredData.x"
               :y="hoveredData.y"
               :index="hoveredIndex"
+              :prev="hoveredIndex !== null ? tooltipData[hoveredIndex - 1]?.d : undefined"
+              :next="hoveredIndex !== null ? tooltipData[hoveredIndex + 1]?.d : undefined"
             />
           </WTooltip>
         </foreignObject>
@@ -162,12 +164,13 @@ const props = defineProps<{
   yKey: keyof Data
   yKeyMin?: keyof Data
   yKeyMax?: keyof Data
-  strokeStyle?: 'solid' | 'dashed' | 'dotted'
+  strokeStyle?: 'solid' | 'dashed' | 'dashed-small' | 'dotted'
   strokeWidth?: number
   hasArea?: boolean
   showPoints?: boolean
   pointRadius?: number
   emptyStub?: string
+  calcMin?: boolean
 } & ChartContext>()
 
 const gradientId = useId()
@@ -185,6 +188,8 @@ const strokeDashArray = computed(() => {
       return width / (width > 500 ? 33 : 13)
     case 'dotted':
       return '2,2'
+    case 'dashed-small':
+      return '6,4'
     default:
       return undefined
   }
@@ -358,15 +363,22 @@ const minMaxAreaPath = computed(() => {
 const yExtent = computed<[number, number]>(() => {
   if (props.data.length === 0) return [0, 100]
 
-  let maxValue = 0
+  let maxValue = dataFiltered.value[0]![props.yKey]!
+  let minValue = props.calcMin ? maxValue : 0
 
   dataFiltered.value.forEach(item => {
     if (typeof item[props.yKey] === 'number' && item[props.yKey]! > maxValue) maxValue = item[props.yKey]!
     if (props.yKeyMin && typeof item[props.yKeyMin] === 'number' && item[props.yKeyMin]! > maxValue) maxValue = item[props.yKeyMin]!
     if (props.yKeyMax && typeof item[props.yKeyMax] === 'number' && item[props.yKeyMax]! > maxValue) maxValue = item[props.yKeyMax]!
+
+    if (!props.calcMin) return
+
+    if (typeof item[props.yKey] === 'number' && item[props.yKey]! < minValue) minValue = item[props.yKey]!
+    if (props.yKeyMin && typeof item[props.yKeyMin] === 'number' && item[props.yKeyMin]! < minValue) minValue = item[props.yKeyMin]!
+    if (props.yKeyMax && typeof item[props.yKeyMax] === 'number' && item[props.yKeyMax]! < minValue) minValue = item[props.yKeyMax]!
   })
 
-  return [0, maxValue || 100]
+  return [minValue || 0, maxValue || 100]
 })
 
 const emitDomainUpdate = () => {
