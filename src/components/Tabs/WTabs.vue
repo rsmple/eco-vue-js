@@ -300,7 +300,7 @@ const updateHeight = (value: number): void => {
 const validate = (index: number): string | undefined => {
   const slot = defaultSlotsAll.value[index]
 
-  if (!isTabItem(slot)) return undefined
+  if (!slot || !isTabItem(slot)) return undefined
 
   return slot.props.validate?.()
 }
@@ -308,7 +308,7 @@ const validate = (index: number): string | undefined => {
 const validateIfNoError = (index: number): string | undefined => {
   const slot = defaultSlotsAll.value[index]
 
-  if (!isTabItem(slot) || slot.props.hasError) return undefined
+  if (!slot || !isTabItem(slot) || slot.props.hasError) return undefined
 
   return slot.props.validate?.()
 }
