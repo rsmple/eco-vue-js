@@ -151,7 +151,7 @@
             </div>
 
             <div
-              class="flex-1 font-normal"
+              class="flex-1"
               :class="{
                 'w-full': !hideInput && !$slots.prefix,
                 'w-option-has-bg-input': $slots.prefix,
@@ -184,13 +184,14 @@
                   :id="id"
                   ref="input"
                   class="
-                    w-input sm-not:text-base min-h-full flex-1 basis-auto appearance-none border-none bg-[inherit]
+                    w-input min-h-full flex-1 basis-auto appearance-none border-none bg-[inherit]
                     outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed dark:placeholder:text-gray-500
                   "
                   :class="{
                     'w-0 max-w-0': hideInput,
                     'text-secure w-input-whitespace-pre-wrap break-all': textSecure && !isSecureVisible,
                     '[-webkit-text-fill-color:transparent]': textTransparent,
+                    'sm-not:text-[1rem]': !unclickable,
                   }"
                   :value="placeholderSecure && modelValue === undefined && !focused ? '' : modelValue"
                   :placeholder="placeholder"
@@ -422,7 +423,7 @@ const undo = (): void => {
 
   fieldWrapperRef.value?.showMessage('Undo')
   const index = historyPosition.value - 1
-  const item = history.value[index]
+  const item = history.value[index]!
   emit('update:model-value', item.value as ModelValue)
   nextTick(() => setCaret(item.caret.start, item.caret.end))
   historyPosition.value = index
@@ -438,7 +439,7 @@ const redo = (): void => {
 
   fieldWrapperRef.value?.showMessage('Redo')
   const index = historyPosition.value + 1
-  const item = history.value[index]
+  const item = history.value[index]!
   emit('update:model-value', item.value as ModelValue)
   nextTick(() => setCaret(item.caret.start, item.caret.end))
   historyPosition.value = index

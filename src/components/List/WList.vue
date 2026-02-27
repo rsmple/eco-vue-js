@@ -15,6 +15,7 @@
       :query-params="queryParams"
       :query-options="queryOptions"
       :skeleton-length="count ?? listCount ?? PAGE_LENGTH"
+      :refetch-interval="refetchInterval"
       hide-page-title
 
       :page-length="PAGE_LENGTH"
@@ -204,7 +205,7 @@
                     [field.meta.cssClass ?? '']: true,
                     'sticky z-[1] bg-[inherit]': !isGrid && fieldConfigMap[field.meta.label]?.sticky,
                   }"
-                  @update:width="fieldConfigMap[field.meta.label].width = $event; updateStylesWidth()"
+                  @update:width="fieldConfigMap[field.meta.label]!.width = $event; updateStylesWidth()"
                   @save:width="save"
                   @update:ordering="updateOrdering"
                 />
@@ -269,7 +270,7 @@
                       :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(defaultScope.item) ?? false)"
                       :skeleton="skeleton"
                       :card="isGrid"
-                      :config="fieldConfigMap[defaultScope.field.meta.label]"
+                      :config="fieldConfigMap[defaultScope.field.meta.label]!"
                       :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
                       :class="{
                         [defaultScope.field.meta.cssClass ?? '']: true,
@@ -416,6 +417,7 @@ const props = withDefaults(
     hasAction?: boolean
     noHeaderSettings?: boolean
     noRefetch?: boolean
+    refetchInterval?: number
   }>(),
   {
     count: undefined,
@@ -435,6 +437,7 @@ const props = withDefaults(
     uniformScope: undefined,
     groupBy: undefined,
     cardTo: undefined,
+    refetchInterval: undefined,
   },
 )
 
@@ -475,7 +478,7 @@ const {
 } = useListConfig(toRef(props, 'configKey'), fieldsVisible, toRef(props, 'defaultConfigMap'), toRef(props, 'defaultMode'), props.noHeaderSettings)
 
 const fieldsFiltered = computed(() => {
-  return filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible)
+  return filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible ?? false)
 })
 
 const allowSelect = computed(() => props.bulk !== undefined)

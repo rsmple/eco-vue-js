@@ -75,14 +75,16 @@ export class ApiClientInstance implements ApiClient {
   }
 
   private async retry(request: Request) {
-    const newRequest = request.clone()
+    const token = this.config.tokenGetter?.()
+
+    if (token) request.headers.set('Authorization', 'Bearer ' + token)
 
     const response = await fetch(request)
 
     return {
       data: await response.json(),
       status: response.status,
-      request: newRequest,
+      request,
     }
   }
 
@@ -200,6 +202,8 @@ export class ApiClientInstance implements ApiClient {
         },
       )
 
+      const requestClone = request.clone()
+
       fetch(request)
         .then(response => {
           response
@@ -215,7 +219,7 @@ export class ApiClientInstance implements ApiClient {
                 })
               } else {
                 if (response.status === 401) {
-                  if (this.config.refreshUrl || this.config.tokenRefresh) return this.refresh().then(() => this.retry(request))
+                  if (this.config.refreshUrl || this.config.tokenRefresh) return this.refresh().then(() => this.retry(requestClone).then(resolve).catch(reject))
 
                   this.auth.value = false
                 }
@@ -238,9 +242,9 @@ export class ApiClientInstance implements ApiClient {
               config: config,
               request,
             }))
+          } else {
+            reject(error)
           }
-
-          reject(error)
         })
         .finally(() => {
           if (config?.updateToken) setExpirationDate()

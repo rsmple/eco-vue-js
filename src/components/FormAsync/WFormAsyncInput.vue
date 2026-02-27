@@ -61,9 +61,8 @@ import {computed} from 'vue'
 
 import WInputAsync from '@/components/Input/WInputAsync.vue'
 
+import {useFormAsync} from '@/utils/useFormAsync'
 import {validateRequired} from '@/utils/validate'
-
-import {useFormAsync} from './use/useFormAsync'
 
 const props = withDefaults(
   defineProps<FormAsyncInputProps<Model, FieldType, QueryParams>>(),

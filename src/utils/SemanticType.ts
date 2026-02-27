@@ -89,3 +89,25 @@ export const useSemanticTypeBorderComponentMap = () => {
 export const setSemanticTypeBorderComponentMap = (value: Partial<Record<SemanticType, VNode>>) => {
   Object.assign(semanticTypeBorderComponentMap, value)
 }
+
+const semanticTypeButtonBackgroundMap = reactive<Partial<Record<SemanticType, string | undefined>>>({
+  [SemanticType.PRIMARY]: undefined,
+  [SemanticType.SECONDARY]: undefined,
+  [SemanticType.NEGATIVE]: undefined,
+  [SemanticType.POSITIVE]: undefined,
+  [SemanticType.WARNING]: undefined,
+  [SemanticType.INFO]: undefined,
+})
+
+export const useSemanticTypeButtonBackgroundMap = () => {
+  return semanticTypeButtonBackgroundMap
+}
+
+export const setSemanticTypeButtonBackgroundMap = (value: Partial<Record<SemanticType, string>>) => {
+  Object.assign(semanticTypeButtonBackgroundMap, value)
+}
+
+export const patchSemanticType = (key: string, value: string) => {
+  (SemanticType as Record<string, string>)[key] = value
+  ;(SemanticType as Record<string, string>)[value] = key
+}

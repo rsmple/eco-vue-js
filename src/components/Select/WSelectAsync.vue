@@ -157,7 +157,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'select', item: Model, data: Data): void
-  (e: 'unselect', item: Model): void
+  (e: 'unselect', item: Model, data: Data | undefined): void
   (e: 'update:model-value', value: Model[]): void
   (e: 'init-model'): void
   (e: 'focus', value: FocusEvent | undefined): void
@@ -180,8 +180,9 @@ const isDisabledComputed = computed(() => props.loading || isReadonly.value || i
 const isModelValueSearch = computed(() => !!search.value && props.modelValue.includes(search.value as Model))
 const queryParams = computed(() => ({...props.queryParamsOptions, [props.searchField ?? 'search']: search.value}))
 const queryParamsFirstPage = computed(() => ({...queryParams.value, page: 1}))
+const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
 
-const {data: firstPageData} = props.useQueryFnOptions(queryParamsFirstPage)
+const {data: firstPageData} = props.useQueryFnOptions(queryParamsFirstPage, {enabled: queryEnabled})
 
 const hasSearchOption = computed(() => {
   if (props.createdData?.some(option => props.valueGetter(option) === search.value)) return true
@@ -198,7 +199,10 @@ const close = () => {
 
     if (optionExact) select(props.valueGetter(optionExact), optionExact)
     else if (search.value) create(search.value)
-    else if (props.modelValue.length) unselect(props.modelValue[props.modelValue.length - 1])
+    else if (props.modelValue.length) {
+      const last = props.modelValue[props.modelValue.length - 1]!
+      unselect(last, firstPageData.value?.results.find(option => props.valueGetter(option) === last))
+    }
   }
 
   search.value = ''
@@ -210,7 +214,8 @@ const captureDoubleDelete = () => {
   if (!props.modelValue.length || search.value.length) return
 
   if (deletePressTimeout) {
-    unselect(props.modelValue[props.modelValue.length - 1])
+    const last = props.modelValue[props.modelValue.length - 1]!
+    unselect(last, firstPageData.value?.results.find(option => props.valueGetter(option) === last))
 
     clearTimeout(deletePressTimeout)
     deletePressTimeout = null
@@ -229,10 +234,10 @@ const select = (item: Model, data: Data): void => {
   search.value = ''
 }
 
-const unselect = (item: Model): void => {
+const unselect = (item: Model, data: Data | undefined): void => {
   if (isDisabledComputed.value) return
 
-  emit('unselect', item)
+  emit('unselect', item, data)
 
   search.value = ''
 }

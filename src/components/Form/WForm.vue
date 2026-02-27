@@ -75,7 +75,7 @@ const validateMap = useFormValueMap(
       .map(key => {
         return compileMessage(
           titleGetter(key),
-          map.value[key](
+          map.value[key]?.(
             silent,
             path?.[key] instanceof Object
               ? path[key] as ValidatePath

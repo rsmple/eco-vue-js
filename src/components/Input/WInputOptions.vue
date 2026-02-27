@@ -50,6 +50,7 @@
       <SelectOption
         v-for="(option, index) in options"
         :key="option.id"
+        :index="index"
         :is-selected="modelValue === valueGetter(option)"
         :is-cursor="index === cursor"
         :loading="loadingOptionIndex === index && loading"

@@ -129,7 +129,7 @@ const updateOrder = (list: ListFields<Data, QueryParams>) => {
 
       if (isField(field)) {
         newConfigMap[field.meta.label] = {
-          ...props.fieldConfigMap[field.meta.label],
+          ...props.fieldConfigMap[field.meta.label]!,
           order: currentIndex,
         }
       } else processFields(field.meta.fields as ListFields<Data, QueryParams>)
@@ -144,6 +144,6 @@ const updateOrder = (list: ListFields<Data, QueryParams>) => {
       item.order = index + 1
     })
 
-  if (Object.keys(newConfigMap).some(key => props.fieldConfigMap[key].order !== newConfigMap[key].order)) emit('update:field-config-map', newConfigMap)
+  if (Object.keys(newConfigMap).some(key => props.fieldConfigMap[key]?.order !== newConfigMap[key]?.order)) emit('update:field-config-map', newConfigMap)
 }
 </script>

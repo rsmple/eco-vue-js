@@ -45,11 +45,13 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string">
-import {onUnmounted, useTemplateRef, watch, watchEffect} from 'vue'
+import {onUnmounted, toRef, useTemplateRef, watch, watchEffect} from 'vue'
 
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 
 import IconCheck from '@/assets/icons/IconCheck.svg?component'
+
+import {getScrollParent} from '@/utils/utils'
 
 const props = defineProps<{
   isSelected: boolean
@@ -64,6 +66,7 @@ const props = defineProps<{
   isNoCursor?: boolean
   hideOptionIcon?: boolean
   disabled?: boolean
+  index: number
 }>()
 
 const emit = defineEmits<{
@@ -89,13 +92,19 @@ const toggle = (): void => {
 }
 
 const toggleCursor = (): void => {
-  if (props.isCursor) return
+  if (!props.isCursor) return
 
   toggle()
 }
 
 const scrollIntoView = () => {
-  elementRef.value?.scrollIntoView({behavior: 'auto', block: 'center'})
+  if (!elementRef.value) return
+
+  const parent = getScrollParent(elementRef.value)
+
+  if (!parent) return
+
+  parent.scrollTo({top: elementRef.value.getBoundingClientRect().top - parent.getBoundingClientRect().top})
 }
 
 watch(() => props.isCursor, value => {
@@ -139,6 +148,7 @@ onUnmounted(() => {
 defineExpose({
   scrollIntoView,
   toggleCursor,
+  index: toRef(props, 'index'),
 })
 
 defineSlots<{

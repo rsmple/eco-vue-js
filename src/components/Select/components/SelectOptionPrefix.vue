@@ -16,7 +16,7 @@
         :disabled="disabled"
         class="w-option-button ml-1 mr-2"
         @mousedown.stop.prevent=""
-        @click.stop.prevent="$emit('unselect')"
+        @click.stop.prevent="$emit('unselect', option)"
       />
     </component>
   </template>
@@ -38,7 +38,7 @@
       :disabled="disabled"
       class="mx-1 mr-2"
       @mousedown.stop.prevent=""
-      @click.stop.prevent="$emit('unselect')"
+      @click.stop.prevent="$emit('unselect', option)"
     />
   </div>
 </template>
@@ -51,7 +51,7 @@ import WButtonUnselect from '@/components/Button/WButtonUnselect.vue'
 defineProps<SelectPrefixProps<Data, OptionComponent>>()
 
 defineEmits<{
-  (e: 'unselect'): void
+  (e: 'unselect', option: Data | undefined): void
 }>()
 
 defineSlots<{

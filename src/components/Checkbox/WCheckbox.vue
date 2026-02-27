@@ -17,6 +17,7 @@
     :aria-disabled="isDisabled || isSkeleton"
     :aria-readonly="isReadonly"
     @click="toggle"
+    @mousedown="$emit('mousedown', $event)"
   >
     <div
       class="square-[1.5em] bg-default dark:bg-default-dark relative isolate flex items-center justify-center border border-solid [font-size:--w-checkbox-size]"
@@ -76,7 +77,7 @@
       />
 
       <WTooltip
-        v-if="tooltipText && !isDisabled && !isSkeleton"
+        v-if="tooltipText && !isSkeleton"
         :text="tooltipText"
         :trigger="(elementRef as HTMLButtonElement)"
         no-touch
@@ -122,6 +123,7 @@ const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 const emit = defineEmits<{
   (e: 'update:model-value', value: boolean): void
+  (e: 'mousedown', value: MouseEvent): void
 }>()
 
 const elementRef = useTemplateRef('element')

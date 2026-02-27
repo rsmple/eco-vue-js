@@ -4,6 +4,7 @@
       v-if="allowCreate"
       :is-selected="false"
       :is-cursor="cursor === null"
+      :index="-1"
       :loading="loading && (loadingCreate || loadingOption === null)"
       :scroll="isCursorLocked"
       :previous="lastItem"
@@ -63,6 +64,7 @@
       <template #default="{item, skeleton, previous, next, first, last, index}">
         <SelectOption
           ref="option"
+          :index="index"
           :is-selected="!skeleton && modelValue.includes(valueGetter(item))"
           :is-cursor="!skeleton && valueGetter(item) === cursor"
           :loading="loading && loadingOption === valueGetter(item)"
@@ -79,7 +81,7 @@
             '-pb--w-select-option-padding': !noPadding && last,
           }"
           @select="emitSelect(valueGetter(item), item)"
-          @unselect="emitUnselect(valueGetter(item))"
+          @unselect="emitUnselect(valueGetter(item), item)"
           @mouseenter="!skeleton && setCursor(valueGetter(item))"
           @update:cursor="setCursor(valueGetter(item))"
           @update:is-cursor="updateCursors"
@@ -151,7 +153,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'select', value: Model, data: Data): void
-  (e: 'unselect', value: Model): void
+  (e: 'unselect', value: Model, data: Data): void
   (e: 'update:count', value: number): void
   (e: 'update:model-value', value: Model[]): void
   (e: 'create:option'): void
@@ -233,11 +235,11 @@ const emitSelect = (value: Model, data: Data): void => {
   setLoadingOption(value)
 }
 
-const emitUnselect = (value: Model): void => {
+const emitUnselect = (value: Model, data: Data): void => {
   if (props.disabled || props.loading) return
   if (props.selectOnly) return
 
-  emit('unselect', value)
+  emit('unselect', value, data)
   setLoadingOption(value)
 }
 

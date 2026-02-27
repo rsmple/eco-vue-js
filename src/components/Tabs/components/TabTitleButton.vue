@@ -19,6 +19,7 @@
       :icon="icon"
       :status-icon="statusIcon"
       :show-has-value="showHasValue"
+      :enable-overflow="enableOverflow"
       @click="$emit('click', $event)"
     >
       <template v-if="$slots.title">
@@ -53,6 +54,7 @@ const props = defineProps<{
   showHasValue?: boolean
   side?: boolean
   statusIcon?: boolean
+  enableOverflow?: boolean
 }>()
 
 const emit = defineEmits<{

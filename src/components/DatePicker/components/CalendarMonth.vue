@@ -84,7 +84,7 @@ const weeks = computed<Date[]>(() => Array(6).fill(undefined).map((_, index) => 
   return date
 }))
 
-const startOfLastWeek = computed(() => weeks.value[weeks.value.length - 1])
+const startOfLastWeek = computed(() => weeks.value[weeks.value.length - 1]!)
 
 const endOfLastWeek = computed(() => {
   const date = new Date(startOfLastWeek.value)

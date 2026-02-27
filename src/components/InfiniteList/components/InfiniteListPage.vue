@@ -158,8 +158,8 @@ const scrollingElement = inject(wScrollingElement, null)
 const {data, error, setData, refetch, isFetching} = props.useQueryFn(
   toRef(props, 'queryParams'),
   {
-    ...props.queryOptions ?? {},
     refetchInterval: props.refetchInterval ? (() => isIntersecting.value ? props.refetchInterval : undefined) : undefined,
+    ...props.queryOptions ?? {},
   },
 )
 const nextPage = computed(() => data.value?.next)

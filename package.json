@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/rsmple/eco-vue-js.git"
   },
-  "version": "0.11.67",
+  "version": "0.11.80",
   "scripts": {
     "build": "run-p type-check \"build-only {@}\" --",
     "dev": "vite build --mode development --watch",
@@ -15,16 +15,16 @@
     "lint:inspect": "npx eslint --inspect-config"
   },
   "dependencies": {
-    "@stylistic/eslint-plugin": "5.6.1",
-    "@tanstack/eslint-plugin-query": "5.91.2",
-    "@vue/eslint-config-typescript": "14.6.0",
+    "@stylistic/eslint-plugin": "5.8.0",
+    "@tanstack/eslint-plugin-query": "5.91.4",
+    "@vue/eslint-config-typescript": "14.7.0",
     "eslint-import-resolver-typescript": "4.4.4",
     "eslint-plugin-import": "2.32.0",
-    "eslint-plugin-jsonc": "2.21.0",
+    "eslint-plugin-jsonc": "2.21.1",
     "eslint-plugin-svgo": "0.11.3",
     "eslint-plugin-tailwindcss": "3.18.2",
-    "eslint-plugin-unused-imports": "4.3.0",
-    "eslint-plugin-vue": "10.6.2"
+    "eslint-plugin-unused-imports": "4.4.1",
+    "eslint-plugin-vue": "10.8.0"
   },
   "peerDependencies": {
     "@tanstack/vue-query": ">=5.92.1",
@@ -41,13 +41,13 @@
   "devDependencies": {
     "@tsconfig/node22": "22.0.5",
     "@types/jsdom": "27.0.0",
-    "@types/node": "25.0.0",
+    "@types/node": "25.2.3",
     "@types/postcss-import": "14.0.3",
-    "@vitejs/plugin-vue": "6.0.2",
-    "@vue/tsconfig": "0.7.0",
-    "autoprefixer": "10.4.22",
-    "eslint": "9.39.1",
-    "jsdom": "27.3.0",
+    "@vitejs/plugin-vue": "6.0.4",
+    "@vue/tsconfig": "0.8.1",
+    "autoprefixer": "10.4.24",
+    "eslint": "9.39.2",
+    "jsdom": "28.1.0",
     "npm-run-all2": "8.0.4",
     "path": "0.12.7",
     "postcss": "8.5.6",
@@ -55,11 +55,11 @@
     "rollup-plugin-watch": "1.0.5",
     "tailwindcss": "3.4.17",
     "typescript": "5.9.3",
-    "vite": "7.2.7",
+    "vite": "7.3.1",
     "vite-plugin-dts": "4.5.4",
     "vite-svg-loader": "5.1.0",
-    "vue-router": ">=4.6.4",
-    "vue-tsc": "3.0.6"
+    "vue-router": ">=5.0.2",
+    "vue-tsc": "3.2.4"
   },
   "type": "module",
   "files": [

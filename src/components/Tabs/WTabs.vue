@@ -4,7 +4,7 @@
     class="grid gap-4"
     :class="{
       'grid grid-cols-1': !side,
-      'sm-not:grid-cols-[repeat(2,100vw)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain grid grid-cols-[minmax(var(--w-tabs-side-width,auto),auto),1fr] items-start': side,
+      'sm-not:grid-cols-[repeat(2,100vw)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain grid grid-cols-[minmax(auto,var(--w-tabs-side-width,auto)),1fr] items-start': side,
     }"
   >
     <div
@@ -13,9 +13,10 @@
       class="relative"
       :class="{
         'sm-not:snap-start grid grid-cols-[1fr,auto]': side,
-        'no-scrollbar sm-not:-pl--inner-margin sm-not:-mx---inner-margin flex snap-x snap-mandatory snap-always overflow-x-auto overscroll-x-contain': !side,
+        'no-scrollbar sm-not:-pl--inner-margin sm-not:-mx---inner-margin flex overflow-x-auto overscroll-x-contain': !side,
         'flex-wrap': !side && wrap,
         'pr-[50%]': !side && !wrap,
+        [headerClass ?? '']: true,
       }"
     >
       <template
@@ -39,9 +40,7 @@
           :show-has-value="showHasValue"
           :side="side"
           :status-icon="statusIcon"
-          :class="{
-            'snap-center': !side,
-          }"
+          :enable-overflow="side"
           @update:scroll-position="updateScrollPosition"
           @click="switchTab(slot.props?.name)"
         >
@@ -185,8 +184,8 @@ const defaultSlots = computed(() => {
 const defaultSlotsKeys = computed<string[]>(() => defaultSlots.value.map(item => item.props.name))
 
 const current = ref<string>(props.initTab ?? (props.initTabIndex !== undefined
-  ? defaultSlotsKeys.value[props.initTabIndex]
-  : defaultSlots.value.find(slot => !!slot.props?.init)?.props?.name ?? defaultSlotsKeys.value[0]
+  ? defaultSlotsKeys.value[props.initTabIndex]!
+  : defaultSlots.value.find(slot => !!slot.props?.init)?.props?.name ?? defaultSlotsKeys.value[0]!
 ))
 const currentIndex = computed(() => defaultSlotsKeys.value.indexOf(current.value))
 const isDirect = ref(true)
@@ -210,7 +209,10 @@ const first = computed<boolean>(() => currentIndex.value === 0)
 const last = computed<boolean>(() => currentIndex.value === defaultSlotsKeys.value.length - 1)
 
 const switchTab = throttle((key: string): void => {
-  if (current.value === key) return
+  if (current.value === key) {
+    scrollToTabContent()
+    return
+  }
 
   updateCurrent(key)
 }, 200)
@@ -224,7 +226,7 @@ const updateCurrent = (value: string) => {
 const updateIndex = (value: number) => {
   tabItemRef.value?.[currentIndex.value]?.emitHeight?.()
 
-  setCurrentDebounced(defaultSlotsKeys.value[value])
+  setCurrentDebounced(defaultSlotsKeys.value[value]!)
 }
 
 let timeout: NodeJS.Timeout | null = null
@@ -246,7 +248,7 @@ const scrollToTabContent = () => {
 
 const setCurrentDebounced = debounce((value: string) => {
   if (current.value === value || !defaultSlotsKeys.value.includes(value)) return
-  if (defaultSlots.value[defaultSlotsKeys.value.indexOf(value)].props?.disabled !== undefined) return
+  if (defaultSlots.value[defaultSlotsKeys.value.indexOf(value)]?.props?.disabled !== undefined) return
 
   isDirect.value = defaultSlotsKeys.value.indexOf(current.value) < defaultSlotsKeys.value.indexOf(value)
   current.value = value
@@ -263,11 +265,11 @@ const next = (update = false): void => {
     return
   }
 
-  switchTab(defaultSlotsKeys.value[currentIndex.value + 1])
+  switchTab(defaultSlotsKeys.value[currentIndex.value + 1]!)
 }
 
 const previous = (): void => {
-  switchTab(defaultSlotsKeys.value[currentIndex.value - 1])
+  switchTab(defaultSlotsKeys.value[currentIndex.value - 1]!)
 }
 
 const jump = (name: string, update: boolean): void => {
@@ -344,12 +346,12 @@ watch(defaultSlotsKeys, (newValue, oldValue) => {
   const newIndex = newValue.findIndex(item => !oldValue.includes(item))
 
   if (props.switchToNew && newIndex !== -1) {
-    switchTab(newValue[newIndex])
+    switchTab(newValue[newIndex]!)
     return
   }
 
   if (!newValue.includes(current.value)) {
-    switchTab(newValue[oldValue.indexOf(current.value) - 1])
+    switchTab(newValue[oldValue.indexOf(current.value) - 1]!)
     return
   }
 })

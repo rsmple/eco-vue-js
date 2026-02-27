@@ -30,7 +30,7 @@
       px-[--w-button-rounded,1rem] font-medium outline-none [border-width:--w-button-border,1px]
     "
     :class="{
-      [semanticTypeBackgroundMap[semanticType]]: !outline,
+      [semanticTypeButtonBackgroundMap[semanticType] ?? semanticTypeBackgroundMap[semanticType]]: !outline,
       [semanticTypeBorderMap[semanticType]]: true,
       'w-ripple w-ripple-hover before:text-black-default w-ripple-opacity-20 dark:w-ripple-opacity-30 cursor-pointer': !loading && !isDisabled,
       'cursor-progress': loading,
@@ -88,7 +88,7 @@ import WShine from '@/components/Shine/WShine.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
-import {SemanticType, useSemanticTypeBackgroundMap, useSemanticTypeBorderComponentMap, useSemanticTypeBorderMap} from '@/utils/SemanticType'
+import {SemanticType, useSemanticTypeBackgroundMap, useSemanticTypeBorderComponentMap, useSemanticTypeBorderMap, useSemanticTypeButtonBackgroundMap} from '@/utils/SemanticType'
 import {useComponentStatesButton} from '@/utils/useComponentStates'
 
 import WSkeleton from '../Skeleton/WSkeleton.vue'
@@ -116,6 +116,7 @@ const containerRef = useTemplateRef<HTMLElement | ComponentInstance<typeof WRout
 const {isDisabled, isSkeleton} = useComponentStatesButton(props)
 
 const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()
+const semanticTypeButtonBackgroundMap = useSemanticTypeButtonBackgroundMap()
 const semanticTypeBorderMap = useSemanticTypeBorderMap()
 const semanticTypeBorderComponentMap = useSemanticTypeBorderComponentMap()
 

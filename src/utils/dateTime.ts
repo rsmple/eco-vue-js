@@ -44,13 +44,16 @@ export function dateToQueryString(date: Date): string {
 
   date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
 
-  return date.toISOString().split('T')[0]
+  return date.toISOString().split('T')[0]!
 }
 
 export function dateFormat(date: Date): string {
   const month = date.getMonth() + 1
-  const day = date.getDate()
-  return `${ day.toString().padStart(2, '0') }.${ month.toString().padStart(2, '0') }.${ date.getFullYear() }`
+  return `${ date.getDate().toString().padStart(2, '0') }.${ month.toString().padStart(2, '0') }.${ date.getFullYear() }`
+}
+
+export function dateFormatShort(date: Date): string {
+  return `${ date.getDate().toString().padStart(2, '0') } ${ monthShortFormatter.format(date) }`
 }
 
 export function timeFormat(date: Date): string {
@@ -73,16 +76,16 @@ export function durationHumanize(durationSeconds: number, full?: boolean, round?
 
   const durationMinutes = (durationSeconds - seconds) / 60
   const minutes = durationMinutes % 60
-  if (durationMinutes === minutes) return round ? cb(0, Math.round(minutes)) : cb(seconds, minutes)
+  if (durationMinutes === minutes) return round ? cb(0, Math.round(minutes + (seconds / 60))) : cb(seconds, minutes)
 
   const durationHours = (durationMinutes - minutes) / 60
   const hours = durationHours % 24
-  if (durationHours === hours) return  round ? cb(0, 0, Math.round(hours)) :cb(seconds, minutes, hours)
+  if (durationHours === hours && (!round || durationHours < 22)) return round ? cb(0, 0, Math.round(hours + (minutes / 60))) :cb(seconds, minutes, hours)
 
   const durationDays = (durationHours - hours) / 24
   const days = durationDays % 365
   if (durationDays === days) {
-    if (days < 30) return round ? cb(0, 0, 0, Math.round(days)) : cb(seconds, minutes, hours, days)
+    if (days < 30) return round ? cb(0, 0, 0, Math.round(days + (hours / 24))) : cb(seconds, minutes, hours, days)
 
     const newDays = days % 30
     const months = (days - newDays) / 30

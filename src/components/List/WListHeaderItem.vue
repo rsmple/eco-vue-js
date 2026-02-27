@@ -94,8 +94,8 @@ const setOrdering = (): void => {
   
   if (index.value === -1) {
     newOrdering.push({field: props.field, order: Order.DESC})
-  } else if (newOrdering[index.value].order === Order.DESC) {
-    newOrdering[index.value].order = Order.ASC
+  } else if (newOrdering[index.value]!.order === Order.DESC) {
+    newOrdering[index.value]!.order = Order.ASC
   } else {
     newOrdering.splice(index.value, 1)
   }

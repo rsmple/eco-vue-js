@@ -115,6 +115,8 @@
               :x="hoveredData.x"
               :y="hoveredData.y"
               :index="hoveredIndex"
+              :prev="hoveredIndex !== null ? tooltipData[hoveredIndex - 1]?.d : undefined"
+              :next="hoveredIndex !== null ? tooltipData[hoveredIndex + 1]?.d : undefined"
             />
           </WTooltip>
         </foreignObject>
@@ -162,12 +164,13 @@ const props = defineProps<{
   yKey: keyof Data
   yKeyMin?: keyof Data
   yKeyMax?: keyof Data
-  strokeStyle?: 'solid' | 'dashed' | 'dotted'
+  strokeStyle?: 'solid' | 'dashed' | 'dashed-small' | 'dotted'
   strokeWidth?: number
   hasArea?: boolean
   showPoints?: boolean
   pointRadius?: number
   emptyStub?: string
+  calcMin?: boolean
 } & ChartContext>()
 
 const gradientId = useId()
@@ -185,18 +188,20 @@ const strokeDashArray = computed(() => {
       return width / (width > 500 ? 33 : 13)
     case 'dotted':
       return '2,2'
+    case 'dashed-small':
+      return '6,4'
     default:
       return undefined
   }
 })
 
-const dataFiltered = computed<Data[]>(() => props.data
+const dataFiltered = computed<Required<Data>[]>(() => props.data
   .filter((data, index, array) => 
-    data[props.xKey] >= props.xExtent[0] || 
-    data[props.xKey] <= props.xExtent[1] ||
-    array[index + 1][props.xKey] >= props.xExtent[0] ||
-    array[index - 1][props.xKey] <= props.xExtent[1],
-  ),
+    (typeof data[props.xKey] === 'number' && data[props.xKey]! >= props.xExtent[0]) || 
+    (typeof data[props.xKey] === 'number' && data[props.xKey]! <= props.xExtent[1]) ||
+    (typeof array[index + 1]?.[props.xKey] === 'number' && array[index + 1]![props.xKey]! >= props.xExtent[0]) ||
+    (typeof array[index - 1]?.[props.xKey] === 'number' && array[index - 1]![props.xKey]! <= props.xExtent[1]),
+  ) as Required<Data>[],
 )
 
 const ROUND_FACTOR = 100
@@ -207,8 +212,8 @@ const preparedData = computed<DataPrepared[]>(() => {
     const item = {
       x: round(Math.min(Math.max(props.scaleX(d[props.xKey]), props.left), props.svgWidth - props.right)),
       y: round(props.scaleY(d[props.yKey])),
-      yMin: round(props.scaleY(d[props.yKeyMin!])),
-      yMax: round(props.scaleY(d[props.yKeyMax!])),
+      yMin: props.yKeyMin ? round(props.scaleY(d[props.yKeyMin])) : 0,
+      yMax: props.yKeyMax ? round(props.scaleY(d[props.yKeyMax])) : 0,
       d,
       imagine: false,
     }
@@ -222,8 +227,8 @@ const preparedData = computed<DataPrepared[]>(() => {
   if (result.length === 0) return result
 
   const lastIndex = result.length - 1
-  if (result[lastIndex].x !== props.left) result.push({...result[lastIndex], x: props.left, imagine: true})
-  if (result[0].x !== props.svgWidth - props.right) result.unshift({...result[0], x: props.svgWidth - props.right, imagine: true})
+  if (result[lastIndex]!.x !== props.left) result.push({...result[lastIndex]!, x: props.left, imagine: true})
+  if (result[0]!.x !== props.svgWidth - props.right) result.unshift({...result[0]!, x: props.svgWidth - props.right, imagine: true})
 
   return result
 })
@@ -250,18 +255,18 @@ const findNearestDataPoint = (mouseX: number): number | null => {
   let left = 0
   let right = data.length - 1
   let closest = 0
-  let minDistance = Math.abs(data[0].x - mouseX)
+  let minDistance = Math.abs(data[0]!.x - mouseX)
   
   while (left <= right) {
     const mid = Math.floor((left + right) / 2)
-    const distance = Math.abs(data[mid].x - mouseX)
+    const distance = Math.abs(data[mid]!.x - mouseX)
     
     if (distance < minDistance) {
       minDistance = distance
       closest = mid
     }
     
-    if (data[mid].x < mouseX) {
+    if (data[mid]!.x < mouseX) {
       left = mid + 1
     } else {
       right = mid - 1
@@ -312,18 +317,18 @@ const areaPath = computed(() => {
   const y0 = props.svgHeight - props.bottom
   
   // Start at first point at bottom
-  let path = `M ${ preparedData.value[0].x } ${ y0 }`
+  let path = `M ${ preparedData.value[0]!.x } ${ y0 }`
   
   // Draw line to first point
-  path += ` L ${ preparedData.value[0].x } ${ preparedData.value[0].y }`
+  path += ` L ${ preparedData.value[0]!.x } ${ preparedData.value[0]!.y }`
   
   // Draw line through all points
   for (let i = 1; i < preparedData.value.length; i++) {
-    path += ` L ${ preparedData.value[i].x } ${ preparedData.value[i].y }`
+    path += ` L ${ preparedData.value[i]!.x } ${ preparedData.value[i]!.y }`
   }
   
   // Draw line to last point at bottom
-  path += ` L ${ preparedData.value[preparedData.value.length - 1].x } ${ y0 }`
+  path += ` L ${ preparedData.value[preparedData.value.length - 1]!.x } ${ y0 }`
   
   // Close path
   path += ' Z'
@@ -337,16 +342,16 @@ const minMaxAreaPath = computed(() => {
   const data = preparedData.value
   
   // Start from left side, draw top line (yMax values)
-  let path = `M ${ data[0].x } ${ data[0].yMax }`
+  let path = `M ${ data[0]!.x } ${ data[0]!.yMax }`
   
   // Draw through all yMax points
   for (let i = 1; i < data.length; i++) {
-    path += ` L ${ data[i].x } ${ data[i].yMax }`
+    path += ` L ${ data[i]!.x } ${ data[i]!.yMax }`
   }
   
   // Now draw bottom line (yMin values) in reverse order
   for (let i = data.length - 1; i >= 0; i--) {
-    path += ` L ${ data[i].x } ${ data[i].yMin }`
+    path += ` L ${ data[i]!.x } ${ data[i]!.yMin }`
   }
   
   // Close the polygon
@@ -358,15 +363,22 @@ const minMaxAreaPath = computed(() => {
 const yExtent = computed<[number, number]>(() => {
   if (props.data.length === 0) return [0, 100]
 
-  let maxValue = 0
+  let maxValue = dataFiltered.value[0]![props.yKey]!
+  let minValue = props.calcMin ? maxValue : 0
 
   dataFiltered.value.forEach(item => {
-    if (typeof item[props.yKey] === 'number' && item[props.yKey] > maxValue) maxValue = item[props.yKey]
-    if (props.yKeyMin && typeof item[props.yKeyMin] === 'number' && item[props.yKeyMin] > maxValue) maxValue = item[props.yKeyMin]
-    if (props.yKeyMax && typeof item[props.yKeyMax] === 'number' && item[props.yKeyMax] > maxValue) maxValue = item[props.yKeyMax]
+    if (typeof item[props.yKey] === 'number' && item[props.yKey]! > maxValue) maxValue = item[props.yKey]!
+    if (props.yKeyMin && typeof item[props.yKeyMin] === 'number' && item[props.yKeyMin]! > maxValue) maxValue = item[props.yKeyMin]!
+    if (props.yKeyMax && typeof item[props.yKeyMax] === 'number' && item[props.yKeyMax]! > maxValue) maxValue = item[props.yKeyMax]!
+
+    if (!props.calcMin) return
+
+    if (typeof item[props.yKey] === 'number' && item[props.yKey]! < minValue) minValue = item[props.yKey]!
+    if (props.yKeyMin && typeof item[props.yKeyMin] === 'number' && item[props.yKeyMin]! < minValue) minValue = item[props.yKeyMin]!
+    if (props.yKeyMax && typeof item[props.yKeyMax] === 'number' && item[props.yKeyMax]! < minValue) minValue = item[props.yKeyMax]!
   })
 
-  return [0, maxValue || 100]
+  return [minValue || 0, maxValue || 100]
 })
 
 const emitDomainUpdate = () => {
