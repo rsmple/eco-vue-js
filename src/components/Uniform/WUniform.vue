@@ -165,6 +165,7 @@ type Props = {
   skeleton?: boolean
   apiMethod?: (data: Partial<Model>) => Promise<RequestResponse<Result> | Result | void> | void
   tag?: keyof HTMLElementTagNameMap
+  hasValue?: boolean
 }
 
 const props = defineProps<Props & NoQueryProps | Props & QueryPropsParams | Props & QueryPropsNoParams>()
@@ -267,7 +268,7 @@ const _hasValueFieldExact = computed<boolean | null>(() => {
 })
 const _hasValueField = computed<boolean | null>(() => props.mandatory && _hasValueFieldExact.value === false ? null : _hasValueFieldExact.value)
 const _hasValue = computed<boolean | null>(() => mapValues.value.length === 0 ? null : mapValues.value.every(value => value.hasValue))
-const hasValue = computed<boolean | null>(() => props.field !== undefined ? _hasValue.value || _hasValueField.value : _hasChanges.value)
+const hasValue = computed<boolean | null>(() => props.hasValue ?? (props.field !== undefined ? _hasValue.value || _hasValueField.value : _hasChanges.value))
 
 const _hasShownError = computed<boolean>(() => mapValues.value.some(value => value.hasShownError))
 const hasShownError = computed<boolean>(() => props.field !== undefined ? _hasShownError.value || isShownError.value : _hasShownError.value)
