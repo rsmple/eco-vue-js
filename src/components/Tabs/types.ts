@@ -25,7 +25,7 @@ export type TabsItemProps = {
   removable?: boolean
   divided?: boolean
   init?: boolean
-  hasValue?: boolean
+  hasValue?: boolean | null
   hasError?: boolean
   hasChanges?: boolean
   validate?: () => string | undefined

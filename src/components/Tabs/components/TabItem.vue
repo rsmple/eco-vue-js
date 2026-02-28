@@ -12,6 +12,8 @@
 <script lang="ts" setup>
 import {nextTick, toRef, useTemplateRef, watch} from 'vue'
 
+import {useUniformState} from '@/components/Uniform/utils/injection'
+
 import {useTabItemActiveListener} from '../use/useTabItemActiveListener'
 
 const props = defineProps<{
@@ -19,12 +21,15 @@ const props = defineProps<{
   title: string | undefined
   active: boolean
   removable: boolean
+  enableStatus: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:height', value: number): void
   (e: 'update:active'): void
 }>()
+
+const {hasChanges, hasValue, hasError} = props.enableStatus ? useUniformState() : {}
 
 const {callListeners} = useTabItemActiveListener()
 
@@ -49,5 +54,8 @@ watch(() => props.active, async value => {
 defineExpose({
   emitHeight,
   name: toRef(props, 'name'),
+  hasChanges,
+  hasValue,
+  hasError,
 })
 </script>

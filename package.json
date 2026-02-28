@@ -9,6 +9,7 @@
     "build": "run-p type-check \"build-only {@}\" --",
     "dev": "vite build --mode development --watch",
     "build-only": "vite build",
+    "build-pack": "vite build && cd package && npm pack",
     "type-check": "vue-tsc --build --force",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

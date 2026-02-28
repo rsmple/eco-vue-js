@@ -63,6 +63,16 @@
           {{ isValid ? 'Valid' : 'Invalid' }}
         </div>
 
+        <div
+          class="text-default rounded px-1 font-semibold"
+          :class="{
+            'bg-gray-200 dark:bg-gray-800': !hasValueValue,
+            'bg-positive dark:bg-positive-dark': hasValueValue,
+          }"
+        >
+          {{ hasValueValue ? 'Has Value' : hasValueValue === null ? 'Empty' : 'No Value' }}
+        </div>
+
         <div>
           {{ errorMessage ?? 'No Error' }}
         </div>
@@ -109,7 +119,7 @@
 </template>
 
 <script setup lang="ts" generic="Model, QueryParams, Field extends (Model extends unknown[] ? number : keyof Model) | undefined = undefined, Result = Model">
-import {type Component, type VNode, computed, isReadonly, nextTick, onBeforeUnmount, ref, toRef, useId, watch} from 'vue'
+import {type Component, type VNode, computed, inject, isReadonly, nextTick, onBeforeUnmount, reactive, ref, toRef, useId, watch} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
@@ -118,6 +128,7 @@ import {ApiError, ApiErrorCancel, isRequestResponse} from '@/utils/api'
 import {validateRequired} from '@/utils/validate'
 
 import {type InvalidatePayload, type UniformInstance, type UniformScope, type UniformScopeField, isUniformInstance} from './types'
+import {wUniformUnlistener, wUniformUpdater} from './utils/injection'
 import {scrollToValidator} from './utils/utils'
 
 const DEBUG = true
@@ -133,20 +144,26 @@ type InnerModel = Model extends unknown[]
 type ValidateMethod = (value: InnerModel) => string | undefined
 
 type NoQueryProps = {
+  // eslint-disable-next-line vue/require-default-prop
   useQueryFn?: never
+  // eslint-disable-next-line vue/require-default-prop
   queryParams?: never
+  // eslint-disable-next-line vue/require-default-prop
   getModel?: never
 }
 
 type QueryPropsParams = {
   useQueryFn: UseQueryWithParams<Result, QueryParams>
   queryParams: QueryParams
+  // eslint-disable-next-line vue/require-default-prop
   getModel?: (value: Result | undefined) => Model
 }
 
 type QueryPropsNoParams = {
   useQueryFn: UseQueryEmpty<Result>
+  // eslint-disable-next-line vue/require-default-prop
   queryParams?: never
+  // eslint-disable-next-line vue/require-default-prop
   getModel?: (value: Result | undefined) => Model
 }
 
@@ -168,7 +185,23 @@ type Props = {
   hasValue?: boolean
 }
 
-const props = defineProps<Props & NoQueryProps | Props & QueryPropsParams | Props & QueryPropsNoParams>()
+const props = withDefaults(
+  defineProps<Props & NoQueryProps | Props & QueryPropsParams | Props & QueryPropsNoParams>(),
+  {
+    id: undefined,
+    title: undefined,
+    parentRef: undefined,
+    externalRef: undefined,
+    removeParentRef: undefined,
+    modelValue: undefined,
+    field: undefined,
+    initData: undefined,
+    validate: undefined,
+    apiMethod: undefined,
+    tag: undefined,
+    hasValue: undefined,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'unmouted', id: string): void
@@ -267,8 +300,8 @@ const _hasValueFieldExact = computed<boolean | null>(() => {
   return value.value !== undefined && value.value !== null && value.value !== '' && value.value !== false
 })
 const _hasValueField = computed<boolean | null>(() => props.mandatory && _hasValueFieldExact.value === false ? null : _hasValueFieldExact.value)
-const _hasValue = computed<boolean | null>(() => mapValues.value.length === 0 ? null : mapValues.value.every(value => value.hasValue))
-const hasValue = computed<boolean | null>(() => props.hasValue ?? (props.field !== undefined ? _hasValue.value || _hasValueField.value : _hasChanges.value))
+const _hasValue = computed<boolean | null>(() => mapValues.value.length === 0 ? null : mapValues.value.some(value => value.hasValue) && mapValues.value.every(value => value.hasValue !== false))
+const hasValueValue = computed<boolean | null>(() => props.hasValue ?? (props.field !== undefined ? _hasValue.value || _hasValueField.value : _hasChanges.value))
 
 const _hasShownError = computed<boolean>(() => mapValues.value.some(value => value.hasShownError))
 const hasShownError = computed<boolean>(() => props.field !== undefined ? _hasShownError.value || isShownError.value : _hasShownError.value)
@@ -542,18 +575,29 @@ const scrollTo = () => {
 watch(() => props.required, () => void validateField())
 watch(skeletonValue, () => void initModel(), {immediate: true})
 
+const updaterInjected = inject(wUniformUpdater, undefined)
+const unlistenerInjected = inject(wUniformUnlistener, undefined)
+
+updaterInjected?.(reactive({
+  hasChanges,
+  hasValue: hasValueValue,
+  hasError: hasShownError,
+}), idValue)
+
 onBeforeUnmount(() => {
   if (props.field !== undefined) {
     emit('unmouted', idValue)
     props.removeParentRef?.(idValue)
   }
+
+  unlistenerInjected?.(idValue)
 })
 
 defineExpose({
   id: idValue,
   title: toRef(props, 'title'),
   field: toRef(props, 'field'),
-  hasValue,
+  hasValue: hasValueValue,
   hasShown: hasShownError,
   hasChanges,
   isValid,

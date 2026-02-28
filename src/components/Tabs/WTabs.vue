@@ -30,9 +30,9 @@
           :index="index"
           :title="slot.props.title"
           :icon="slot.props.icon"
-          :has-changes="slot.props.hasChanges === true"
-          :has-error="slot.props.hasError === true"
-          :has-value="slot.props.hasValue === true"
+          :has-changes="slot.props.hasChanges ?? slot.props['has-changes' as never] ?? tabItemRefByName[slot.props.name]?.hasChanges"
+          :has-error="slot.props.hasError ?? slot.props['has-error' as never] ?? tabItemRefByName[slot.props.name]?.hasError"
+          :has-value="slot.props.hasValue ?? slot.props['has-value' as never] ?? tabItemRefByName[slot.props.name]?.hasValue"
           :first="defaultSlots.indexOf(slot) === 0"
           :last="defaultSlots.indexOf(slot) === defaultSlots.length - 1"
           :disabled="stepper ? defaultSlots.indexOf(slot) > hasNoValueFirst : false"
@@ -120,6 +120,7 @@
           :title="slot.props.title"
           :active="slot.props.name === current"
           :removable="slot.props.removable ?? false"
+          :enable-status="statusIcon || showHasValue"
           @update:height="!disableMinHeight && updateHeight($event)"
           @update:active="$emit('update:current-title', slot.props?.title)"
         >
@@ -133,7 +134,7 @@
 <script lang="ts" setup>
 import type {TabsItemProps, TabsProps} from './types'
 
-import {type Component, type RendererElement, type RendererNode, type VNode, computed, inject, onMounted, onUnmounted, ref, useSlots, useTemplateRef, watch} from 'vue'
+import {type Component, type RendererElement, type RendererNode, type VNode, computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch} from 'vue'
 
 import IconClose from '@/assets/icons/IconClose.svg?component'
 
@@ -162,7 +163,9 @@ const {isMobile} = useIsMobile()
 
 const hasScrollbar = getHasScrollbar()
 
-const slots = useSlots()
+const slots = defineSlots<{
+  default: () => void
+}>()
 
 const containerRef = useTemplateRef('container')
 const buttonContainerRef = useTemplateRef('buttonContainer')
@@ -192,6 +195,19 @@ const isDirect = ref(true)
 const buttonRef = useTemplateRef<ComponentInstance<typeof TabTitleButton>[]>('button')
 const minHeight = ref(0)
 const tabItemRef = useTemplateRef('tabItem')
+
+const tabItemRefByName = computed(() => {
+  const result: Record<string, ComponentInstance<typeof TabItem>> = {}
+
+  if (tabItemRef.value) {
+    for (const item of tabItemRef.value) {
+      if (!item?.name) continue
+      result[item.name] = item
+    }
+  }
+
+  return result
+})
 
 const hasNoValueFirst = computed<number>(() => {
   if (!props.stepper) return 0
@@ -401,8 +417,4 @@ defineExpose({
   previous,
   jump,
 })
-
-defineSlots<{
-  default: () => void
-}>()
 </script>
