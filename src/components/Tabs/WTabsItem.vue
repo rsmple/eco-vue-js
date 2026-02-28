@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import type {TabsItemProps, TabsItemScopedProps} from './types'
+import type {TabsItemProps} from './types'
 
 defineProps<TabsItemProps>()
 
@@ -13,8 +13,8 @@ defineEmits<{
 
 defineSlots<{
   default?: () => void
-  title?: (props: TabsItemScopedProps) => void
-  suffix?: (props: TabsItemScopedProps) => void
-  right?: (props: TabsItemScopedProps) => void
+  title?: () => void
+  suffix?: () => void
+  right?: () => void
 }>()
 </script>

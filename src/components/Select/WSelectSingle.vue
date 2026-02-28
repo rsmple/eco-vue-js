@@ -96,7 +96,7 @@ const emit = defineEmits<{
 
 const selectComponentRef = useTemplateRef('selectComponent')
 
-const arrayValue = computed<Model[]>(() => props.modelValue !== null && props.modelValue !== '' ? [props.modelValue] : [])
+const arrayValue = computed<Model[]>(() => props.modelValue !== null && props.modelValue !== undefined && props.modelValue !== '' ? [props.modelValue] : [])
 
 const updateModelValue = (value: Model | null, data: Data | undefined): void => {
   emit('update:model-value', value as EmitType, data)

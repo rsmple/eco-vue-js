@@ -11,7 +11,6 @@
       disable-min-height
       side
       status-icon
-      name="filter"
       class="w-tabs-side-width-72"
     >
       <template v-if="filter || search">

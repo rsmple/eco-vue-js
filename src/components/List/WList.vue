@@ -224,105 +224,116 @@
           :skeleton="skeleton"
         />
 
-        <WListCard
-          :disabled="skeleton"
-          :disable-more="disableMore"
-          :mobile="isMobile"
-          :card-class="cardClass"
-          :card-wrapper-class="cardWrapperClass"
-          :has-border="hasBorder"
-          :allow-open="allowOpen && !skeleton"
-          :align-top="alignTop"
-          :form-name="skeleton ? undefined : formNameGetter?.(item)"
-          :card="isGrid"
-          :to="skeleton ? undefined : cardTo?.(item)"
-          :has-action="hasAction"
-          :skeleton="skeleton"
-
-          :selected="skeleton ? false : getIsSelected(value as number, position)"
-          :allow-select="allowSelect"
-          :allow-select-hover="allowSelectHover"
-          @toggle:selected="toggleSelected(value as number, position)"
-          @hover:selected="hoverSelected(position)"
-          @click:action="$emit('click:action', {item, setter})"
+        <component
+          :is="formFieldGetter?.(item) ? WUniform : WEmptyComponent"
+          v-bind="formFieldGetter ? {
+            ...uniformScope ?? {},
+            field: formFieldGetter(item),
+          } : undefined"
         >
-          <template #default="{validate, beforeClass}">
-            <ListCardFieldNested
-              :fields="fieldsFiltered"
-              :field-config-map="fieldConfigMap"
-              :item="item"
-              :skeleton="skeleton"
+          <template #default="innerScope">
+            <WListCard
+              :disabled="skeleton"
+              :disable-more="disableMore"
+              :mobile="isMobile"
+              :card-class="cardClass"
+              :card-wrapper-class="cardWrapperClass"
+              :has-border="hasBorder"
+              :allow-open="allowOpen && !skeleton"
+              :align-top="alignTop"
               :card="isGrid"
-              :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
+              :to="skeleton ? undefined : cardTo?.(item)"
+              :has-action="hasAction"
+              :skeleton="skeleton"
+
+              :selected="skeleton ? false : getIsSelected(value as number, position)"
+              :allow-select="allowSelect"
+              :allow-select-hover="allowSelectHover"
+              @toggle:selected="toggleSelected(value as number, position)"
+              @hover:selected="hoverSelected(position)"
+              @click:action="$emit('click:action', {item, setter})"
             >
-              <template #default="defaultScope">
-                <component
-                  :is="defaultScope.field.default"
-                  :item="defaultScope.item"
-                  :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(defaultScope.item) ?? false)"
+              <template #default="{beforeClass}">
+                <ListCardFieldNested
+                  :fields="fieldsFiltered"
+                  :field-config-map="fieldConfigMap"
+                  :item="item"
                   :skeleton="skeleton"
                   :card="isGrid"
-                  :config="fieldConfigMap[defaultScope.field.meta.label]!"
-                  :class="{
-                    [defaultScope.field.meta.cssClass ?? '']: true,
-                    'items-center': !alignTop,
-                    'items-start': alignTop,
-                    'bg-default dark:bg-default-dark sticky z-[1]': !isGrid && fieldConfigMap[defaultScope.field.meta.label]?.sticky,
-                    ...(!isGrid && fieldConfigMap[defaultScope.field.meta.label]?.sticky ? beforeClass : {})
-                  }"
-                  :style="isGrid ? !defaultScope.nested ? {gridArea: defaultScope.field.meta.label} : undefined : {
-                    minWidth: `var(${getFieldVariable('width', defaultScope.field.meta.label)})`,
-                    maxWidth: `var(${getFieldVariable('width', defaultScope.field.meta.label)})`,
-                    left: fieldConfigMap[defaultScope.field.meta.label]?.sticky ? `var(${getFieldVariable('left', defaultScope.field.meta.label)})` : undefined,
-                    right: fieldConfigMap[defaultScope.field.meta.label]?.sticky ? `var(${getFieldVariable('right', defaultScope.field.meta.label)})` : undefined,
-                  }"
+                  :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
+                  :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
+                >
+                  <template #default="defaultScope">
+                    <component
+                      :is="defaultScope.field.default"
+                      :item="defaultScope.item"
+                      :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(defaultScope.item) ?? false)"
+                      :skeleton="skeleton"
+                      :card="isGrid"
+                      :config="fieldConfigMap[defaultScope.field.meta.label]!"
+                      :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
+                      :class="{
+                        [defaultScope.field.meta.cssClass ?? '']: true,
+                        'items-center': !alignTop,
+                        'items-start': alignTop,
+                        'bg-default dark:bg-default-dark sticky z-[1]': !isGrid && fieldConfigMap[defaultScope.field.meta.label]?.sticky,
+                        ...(!isGrid && fieldConfigMap[defaultScope.field.meta.label]?.sticky ? beforeClass : {})
+                      }"
+                      :style="isGrid ? !defaultScope.nested ? {gridArea: defaultScope.field.meta.label} : undefined : {
+                        minWidth: `var(${getFieldVariable('width', defaultScope.field.meta.label)})`,
+                        maxWidth: `var(${getFieldVariable('width', defaultScope.field.meta.label)})`,
+                        left: fieldConfigMap[defaultScope.field.meta.label]?.sticky ? `var(${getFieldVariable('left', defaultScope.field.meta.label)})` : undefined,
+                        right: fieldConfigMap[defaultScope.field.meta.label]?.sticky ? `var(${getFieldVariable('right', defaultScope.field.meta.label)})` : undefined,
+                      }"
+                      @update:item="setter"
+                      @delete:item="setter(); refetch()"
+                    />
+                  </template>
+                </ListCardFieldNested>
+              </template>
+
+              <template
+                v-if="expansion"
+                #expansion
+              >
+                <component
+                  :is="expansion"
+                  :item="item"
+                  :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
+                  :skeleton="skeleton"
+                  :card="isGrid"
+                  :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
                   @update:item="setter"
                   @delete:item="setter(); refetch()"
-                  @validate="validate()"
                 />
               </template>
-            </ListCardFieldNested>
-          </template>
 
-          <template
-            v-if="expansion"
-            #expansion
-          >
-            <component
-              :is="expansion"
-              :item="item"
-              :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
-              :skeleton="skeleton"
-              :card="isGrid"
-              @update:item="setter"
-              @delete:item="setter(); refetch()"
-            />
+              <template
+                v-if="menu"
+                #more
+              >
+                <template
+                  v-for="(menuItem, menuIndex) in menu"
+                  :key="menuIndex"
+                >
+                  <component
+                    :is="Array.isArray(menuItem) ? menuItem[0] : menuItem"
+                    v-bind="Array.isArray(menuItem) ? menuItem[1] : undefined"
+                    :item="item"
+                    :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
+                    :update-item="setter"
+                    :delete-item="() => {
+                      setter()
+                      refetch()
+                    }"
+                    @update:item="setter"
+                    @delete:item="setter(); refetch()"
+                  />
+                </template>
+              </template>
+            </WListCard>
           </template>
-
-          <template
-            v-if="menu"
-            #more
-          >
-            <template
-              v-for="(menuItem, menuIndex) in menu"
-              :key="menuIndex"
-            >
-              <component
-                :is="Array.isArray(menuItem) ? menuItem[0] : menuItem"
-                v-bind="Array.isArray(menuItem) ? menuItem[1] : undefined"
-                :item="item"
-                :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
-                :update-item="setter"
-                :delete-item="() => {
-                  setter()
-                  refetch()
-                }"
-                @update:item="setter"
-                @delete:item="setter(); refetch()"
-              />
-            </template>
-          </template>
-        </WListCard>
+        </component>
       </template>
 
       <template
@@ -337,6 +348,7 @@
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>, CardColumns extends readonly GridCol[]">
 import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, ExpansionComponent, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
+import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
@@ -344,7 +356,9 @@ import {type StyleValue, computed, markRaw, nextTick, ref, toRef, watch} from 'v
 
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
+import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
+import WUniform from '@/components/Uniform/WUniform.vue'
 
 import IconRange from '@/assets/icons/IconRange.svg?component'
 import IconRefresh from '@/assets/icons/IconRefresh.svg?component'
@@ -394,7 +408,8 @@ const props = withDefaults(
     disableMore?: boolean
     readonly?: boolean
     noOrdering?: boolean
-    formNameGetter?: (data: Data) => string | undefined
+    formFieldGetter?: (data: Data) => string | undefined
+    uniformScope?: UniformScope<Data[]>
     groupBy?: (a: Data, b: Data) => boolean
     cardColumns: CardColumns
     cardAreas: CardAreas<Fields, CardColumns['length']>
@@ -418,7 +433,8 @@ const props = withDefaults(
     cardClass: undefined,
     cardWrapperClass: undefined,
     defaultMode: ListMode.TABLE,
-    formNameGetter: undefined,
+    formFieldGetter: undefined,
+    uniformScope: undefined,
     groupBy: undefined,
     cardTo: undefined,
     refetchInterval: undefined,

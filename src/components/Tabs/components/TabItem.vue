@@ -1,21 +1,18 @@
 <template>
-  <WForm
+  <div
     v-if="!removable || active"
     v-show="active"
-    ref="form"
-    :name="name"
-    :title="title"
+    ref="element"
     class="h-full"
-    @update:is-valid="$event === false && $emit('tab:switch', name)"
   >
     <slot />
-  </WForm>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import {nextTick, toRef, useTemplateRef, watch} from 'vue'
 
-import WForm from '@/components/Form/WForm.vue'
+import {useUniformState} from '@/components/Uniform/utils/injection'
 
 import {useTabItemActiveListener} from '../use/useTabItemActiveListener'
 
@@ -24,22 +21,24 @@ const props = defineProps<{
   title: string | undefined
   active: boolean
   removable: boolean
+  enableStatus: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'tab:switch', value: string): void
   (e: 'update:height', value: number): void
   (e: 'update:active'): void
 }>()
 
+const {hasChanges, hasValue, hasError} = props.enableStatus ? useUniformState() : {}
+
 const {callListeners} = useTabItemActiveListener()
 
-const formRef = useTemplateRef('form')
+const elementRef = useTemplateRef('element')
 
 const emitHeight = (): void => {
-  if (!formRef.value) return
+  if (!elementRef.value) return
 
-  emit('update:height', formRef.value.$el.offsetHeight)
+  emit('update:height', elementRef.value.offsetHeight)
 }
 
 watch(() => props.active, async value => {
@@ -55,5 +54,8 @@ watch(() => props.active, async value => {
 defineExpose({
   emitHeight,
   name: toRef(props, 'name'),
+  hasChanges,
+  hasValue,
+  hasError,
 })
 </script>
