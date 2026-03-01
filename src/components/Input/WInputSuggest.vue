@@ -10,7 +10,7 @@
       horizontalAlign,
       updateAlign: true,
       parentElement: inputRef?.fieldRef,
-      dropdownClass,
+      dropdownClass: `bg-default dark:bg-default-dark ${dropdownClass ?? ''}`,
     }"
   >
     <template #toggle="toggleScope">

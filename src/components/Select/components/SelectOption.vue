@@ -3,7 +3,7 @@
     ref="element"
     class="w-select-option relative grid w-full grid-cols-[auto,1fr,1.25em]"
     :class="{
-      'bg-primary-light/30 dark:bg-primary-darkest/30': isSelected,
+      'bg-primary-light/30 dark:bg-primary-darkest/30': selectedVisible,
       'before:opacity-5': !loading && isCursor && !skeleton && !disabled,
       'cursor-progress': loading || skeleton,
       'w-ripple': !loading && !skeleton && !disabled,
@@ -21,7 +21,7 @@
         'col-span-2': hideOptionIcon,
       }"
     >
-      <slot :selected="isSelected" />
+      <slot :selected="selectedVisible" />
     </div>
 
     <Transition
@@ -31,11 +31,11 @@
       leave-to-class="opacity-0"
     >
       <div
-        v-if="!hideOptionIcon && (isSelected || loading)"
+        v-if="!hideOptionIcon && (selectedVisible || loading)"
         class="text-primary dark:text-primary-dark w-spinner-size-[1.25em] col-start-3 flex items-center justify-self-end"
       >
         <IconCheck
-          v-if="isSelected && !loading"
+          v-if="selectedVisible && !loading"
           class="square-[1.25em]"
         />
         <WSpinner v-else-if="loading" />
@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string">
-import {onUnmounted, toRef, useTemplateRef, watch, watchEffect} from 'vue'
+import {computed, onUnmounted, toRef, useTemplateRef, watch, watchEffect} from 'vue'
 
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 
@@ -67,6 +67,7 @@ const props = defineProps<{
   hideOptionIcon?: boolean
   disabled?: boolean
   index: number
+  reverse?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -83,6 +84,8 @@ const emit = defineEmits<{
 }>()
 
 const elementRef = useTemplateRef('element')
+
+const selectedVisible = computed(() => props.reverse ? !props.isSelected : props.isSelected)
 
 const toggle = (): void => {
   if (props.skeleton || props.loading || props.disabled) return

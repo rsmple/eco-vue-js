@@ -1,6 +1,7 @@
 <template>
   <template v-if="valueInString.length !== 0">
     <SelectAsyncPrefixPage
+      v-if="modelValue.length <= (prefixMax ?? PAGE_LENGTH)"
       :use-query-fn="useQueryFn"
       :query-params="({page: 1, [valueQueryKey]: valueInString} as QueryParams)"
       :option-component="(optionComponent as SelectOptionComponent<Data>)"
@@ -27,10 +28,10 @@
     </SelectAsyncPrefixPage>
 
     <div
-      v-if="modelValue.length > PAGE_LENGTH"
+      v-else
       class="text-accent flex items-center gap-1 overflow-hidden px-1"
     >
-      <div>... {{ numberFormatter.format(modelValue.length) }} items</div>
+      <div>{{ numberFormatter.format(modelValue.length) }} {{ prefixText ?? 'items' }}</div>
 
       <WButtonUnselect
         v-if="!disableClear"

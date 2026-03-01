@@ -5,9 +5,8 @@
       ...props,
       modelValue: search,
       loading: loading || isFetchingPrefix || loadingCreate,
-      hideInput: modelValue.length === 0 && !emptyValue ? false : isMobile ? !focused : !isOpen,
+      hideInput: modelValue.length === 0 && !emptyValue ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
       filterValue: filterValue === undefined ? modelValue : filterValue,
-      placeholder: emptyValue || focused || modelValue.length ? undefined : placeholder,
       emptyValue: undefined,
     }"
     :class="$attrs.class"
@@ -38,41 +37,46 @@
     </template>
 
     <template #prefix="{unclickable}">
-      <slot name="content" />
-
-      <SelectAsyncPrefix
+      <slot
         v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true"
-        :use-query-fn="useQueryFnPrefix ?? useQueryFnOptions"
-        :model-value="!emptyValue || modelValue.length !== 0 ? modelValue : emptyValue"
-        :disabled="isDisabled"
-        :loading="loading || isFetchingPrefix"
-        :option-component="(optionComponent as SelectOptionComponent<Data>)"
-        :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
-        :disable-clear="disableClear || isReadonly || (seamless && !focused) || modelValue.length === 0"
-        :preview-data="previewData"
-        :created-data="createdData"
-        :value-getter="valueGetter"
-        :value-query-key="valueQueryKey"
-        :readonly="isReadonly"
-        @unselect="unselect"
-        @update:fetching="!$event && updateDropdown(); isFetchingPrefix = $event"
-        @update:model-value="updateSelected"
+        name="prefix"
+        v-bind="{modelValue}"
       >
-        <template
-          v-if="$slots.option"
-          #option="{option, index, skeleton: skeletonOption}"
+        <SelectAsyncPrefix
+          :use-query-fn="useQueryFnPrefix ?? useQueryFnOptions"
+          :model-value="!emptyValue || modelValue.length !== 0 ? modelValue : emptyValue"
+          :disabled="isDisabled"
+          :loading="loading || isFetchingPrefix"
+          :option-component="(optionComponent as SelectOptionComponent<Data>)"
+          :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
+          :disable-clear="disableClear || isReadonly || (seamless && !focused) || modelValue.length === 0"
+          :preview-data="previewData"
+          :created-data="createdData"
+          :value-getter="valueGetter"
+          :value-query-key="valueQueryKey"
+          :readonly="isReadonly"
+          :prefix-text="prefixText"
+          :prefix-max="prefixMax"
+          @unselect="unselect"
+          @update:fetching="!$event && updateDropdown(); isFetchingPrefix = $event"
+          @update:model-value="updateSelected"
         >
-          <slot
-            name="option"
-            :option="option"
-            :index="index"
-            :selected="true"
-            :model="true"
-            :skeleton="skeletonOption"
-            :search="undefined"
-          />
-        </template>
-      </SelectAsyncPrefix>
+          <template
+            v-if="$slots.option"
+            #option="{option, index, skeleton: skeletonOption}"
+          >
+            <slot
+              name="option"
+              :option="option"
+              :index="index"
+              :selected="true"
+              :model="true"
+              :skeleton="skeletonOption"
+              :search="undefined"
+            />
+          </template>
+        </SelectAsyncPrefix>
+      </slot>
     </template>
 
     <template
@@ -96,6 +100,7 @@
         :value-getter="valueGetter"
         :loading-create="loadingCreate"
         :search="search"
+        :reverse="reverse"
         class="max-h-80"
         @select="select"
         @unselect="unselect"
@@ -122,6 +127,13 @@
               :search="search"
             />
           </slot>
+        </template>
+
+        <template
+          v-if="$slots.content"
+          #content
+        >
+          <slot name="content" />
         </template>
       </SelectAsyncList>
     </template>
@@ -316,5 +328,6 @@ defineSlots<{
   right?: (props: Record<string, never>) => void
   option?: (props: PartialNot<SelectOptionProps<Data>>) => void
   content?: () => void
+  prefix?: (props: {modelValue: Model[]}) => void
 }>()
 </script>

@@ -7,6 +7,7 @@ export interface DropdownProps {
   parentElement: Pick<Element, 'getBoundingClientRect'>
   updateAlign?: boolean
   emitUpdate?: boolean
+  innerClass?: string
 }
 
 export type DropdownDefaultSlotScope = {

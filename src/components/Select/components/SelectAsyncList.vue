@@ -1,5 +1,7 @@
 <template>
   <div>
+    <slot name="content" />
+
     <SelectOption
       v-if="allowCreate"
       :is-selected="false"
@@ -76,6 +78,7 @@
           :next="last && allowCreate ? null : next ? valueGetter(next) : undefined"
           :is-no-cursor="cursor === undefined"
           :hide-option-icon="hideOptionIcon"
+          :reverse="reverse"
           :class="{
             '-pt--w-select-option-padding': !noPadding && first && !allowCreate,
             '-pb--w-select-option-padding': !noPadding && last,
@@ -149,6 +152,7 @@ const props = defineProps<{
   queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
   loadingCreate?: boolean
   search?: string
+  reverse?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -251,5 +255,6 @@ defineExpose({
 
 defineSlots<{
   default?: (props: PartialNot<SelectOptionProps<Data>>) => void
+  content?: () => void
 }>()
 </script>

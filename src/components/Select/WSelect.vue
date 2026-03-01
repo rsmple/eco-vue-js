@@ -5,9 +5,8 @@
       ...props,
       modelValue: search,
       loading: loading || isLoading || loadingCreate,
-      hideInput: modelValue.length === 0 && !emptyValue ? false : isMobile ? !focused : !isOpen,
+      hideInput: modelValue.length === 0 && !emptyValue ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
       filterValue: filterValue === undefined ? modelValue : filterValue,
-      placeholder: emptyValue || focused || modelValue.length ? undefined : placeholder,
       emptyValue: undefined,
     }"
     :class="$attrs.class"

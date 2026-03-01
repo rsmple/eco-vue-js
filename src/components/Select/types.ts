@@ -38,7 +38,7 @@ interface SelectPropsWithOptions<Data extends DefaultData> {
 type SelectPropsOptions<Data extends DefaultData, QueryParams> = SelectPropsNoParams<Data> | SelectPropsWithParams<Data, QueryParams> | SelectPropsWithOptions<Data>
 
 export interface SelectProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
-  extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'hideInput' | 'emptyValue'>,
+  extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'emptyValue'>,
   SelectOptionComponentProps<Data, OptionComponent>,
   Omit<SelectPropsOptions<Data, QueryParams>, 'modelValue'> {
   modelValue: Model[]
@@ -95,20 +95,25 @@ export interface SelectAsyncProps<Model extends number | string, Data extends De
   searchField?: keyof QueryParams
   previewData?: Data[]
   valueQueryKey?: string
+  prefixText?: string
+  prefixMax?: number
+  reverse?: boolean
 }
 
 export interface SelectAsyncPrefixProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
   extends SelectOptionComponentProps<Data, OptionComponent> {
   useQueryFn: UseQueryPaginated<Data, QueryParams>
   modelValue: Model[]
-  disabled?: boolean
-  loading?: boolean
-  disableClear?: boolean
-  previewData?: Data[]
-  createdData?: Data[]
+  disabled: boolean | undefined
+  loading: boolean | undefined
+  disableClear: boolean | undefined
+  previewData: Data[] | undefined
+  createdData: Data[] | undefined
   valueGetter: (value: Data) => Model
   valueQueryKey: string
   readonly: boolean | undefined
+  prefixText: string | undefined
+  prefixMax: number | undefined
 }
 
 export interface SelectAsyncPrefixPageProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
