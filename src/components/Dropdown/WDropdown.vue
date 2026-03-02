@@ -19,7 +19,7 @@
   >
     <div
       class="relative"
-      :class="innerClass"
+      :class="innerClass ?? 'w-max'"
       :style="[
         verticalGetter?.style,
         horizontalGetter?.style,
