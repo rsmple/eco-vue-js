@@ -104,21 +104,23 @@
           :height="svgHeight - bottom - 9"
           :y="top + 4.5"
         >
-          <WTooltip
-            ref="tooltip"
-            no-trigger
-          >
-            <slot
-              v-if="hoveredData"
-              name="tooltip"
-              :d="hoveredData.d"
-              :x="hoveredData.x"
-              :y="hoveredData.y"
-              :index="hoveredIndex"
-              :prev="hoveredIndex !== null ? tooltipData[hoveredIndex - 1]?.d : undefined"
-              :next="hoveredIndex !== null ? tooltipData[hoveredIndex + 1]?.d : undefined"
-            />
-          </WTooltip>
+          <div class="h-full">
+            <WTooltip
+              ref="tooltip"
+              no-trigger
+            >
+              <slot
+                v-if="hoveredData"
+                name="tooltip"
+                :d="hoveredData.d"
+                :x="hoveredData.x"
+                :y="hoveredData.y"
+                :index="hoveredIndex"
+                :prev="hoveredIndex !== null ? tooltipData[hoveredIndex - 1]?.d : undefined"
+                :next="hoveredIndex !== null ? tooltipData[hoveredIndex + 1]?.d : undefined"
+              />
+            </WTooltip>
+          </div>
         </foreignObject>
       </g>
     </g>
