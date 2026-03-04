@@ -57,7 +57,7 @@ defineProps<{
 
 defineSlots<{
   default: (props: {
-    field: ListFieldExport<FieldComponent<Data>, ListField<Data, QueryParams>>
+    field: ListFieldExport<FieldComponent<Data, QueryParams>, ListField<Data, QueryParams>>
     nested: boolean
     index: number
     length: number

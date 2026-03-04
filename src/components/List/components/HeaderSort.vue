@@ -54,7 +54,7 @@ import {type ListMode} from '@/utils/utils'
 
 import HeaderSortItem from './HeaderSortItem.vue'
 
-type RequiredField = ListFieldExport<FieldComponent<Data>, ListField<Data, QueryParams> & Required<Pick<ListField<Data, QueryParams>, 'field'>>>
+type RequiredField = ListFieldExport<FieldComponent<Data, QueryParams>, ListField<Data, QueryParams> & Required<Pick<ListField<Data, QueryParams>, 'field'>>>
 
 const props = defineProps<{
   ordering: OrderItem<keyof Data>[]

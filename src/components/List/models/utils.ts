@@ -4,6 +4,6 @@ export const getMetaValue = <T, QueryParams>(getter: T | ((queryParams: QueryPar
   return getter instanceof Function ? getter(queryParams) : getter
 }
 
-export const isField = <Data, QueryParams>(field: ListFields<Data, QueryParams>[number]): field is ListFieldExport<FieldComponent<Data>, ListField<Data, QueryParams>> => {
+export const isField = <Data, QueryParams>(field: ListFields<Data, QueryParams>[number]): field is ListFieldExport<FieldComponent<Data, QueryParams>, ListField<Data, QueryParams>> => {
   return !('fields' in field.meta)
 }

@@ -254,6 +254,7 @@
               :skeleton="skeleton"
               :card="isGrid"
               :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
+              :query-params="queryParams"
             >
               <template #default="defaultScope">
                 <component
@@ -263,6 +264,7 @@
                   :skeleton="skeleton"
                   :card="isGrid"
                   :config="fieldConfigMap[defaultScope.field.meta.label]!"
+                  :query-params="queryParams"
                   :class="{
                     [defaultScope.field.meta.cssClass ?? '']: true,
                     'items-center': !alignTop,
@@ -294,6 +296,7 @@
               :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
               :skeleton="skeleton"
               :card="isGrid"
+              :query-params="queryParams"
               @update:item="setter"
               @delete:item="setter(); refetch()"
             />
@@ -372,7 +375,7 @@ const props = withDefaults(
   defineProps<{
     count?: number
     fields: Fields
-    expansion?: ExpansionComponent<Data>
+    expansion?: ExpansionComponent<Data, QueryParams>
     useQueryFn: UseQueryPaginated<Data, QueryParams>
     queryParams: QueryParams
     queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>

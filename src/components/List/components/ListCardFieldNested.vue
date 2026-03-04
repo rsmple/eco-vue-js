@@ -14,7 +14,7 @@
       <template v-if="'keyArray' in field.meta || 'getterArray' in field.meta">
         <component
           :is="field.default ?? 'div'"
-          v-bind="field.default ? {item, skeleton, card, readonly, config} : (undefined as never)"
+          v-bind="field.default ? {item, skeleton, card, readonly, config, queryParams} : (undefined as never)"
           :class="field.meta.cssClassArray"
         >
           <ListCardFieldNestedItem :items="skeleton ? [item] : (('keyArray' in field.meta ? item[field.meta.keyArray as keyof typeof item] : field.meta.getterArray(item)) as Data[])">
@@ -34,6 +34,7 @@
                     :skeleton="skeleton"
                     :card="card"
                     :readonly="readonly"
+                    :query-params="queryParams"
                     nested
                   >
                     <template #default="defaultScope">
@@ -50,7 +51,7 @@
       <component
         :is="field.default ?? 'div'"
         v-else
-        v-bind="field.default ? {item, skeleton, card, readonly, config} : (undefined as never)"
+        v-bind="field.default ? {item, skeleton, card, readonly, config, queryParams} : (undefined as never)"
         :class="field.meta.cssClass"
         class="flex"
       >
@@ -61,6 +62,7 @@
           :skeleton="skeleton"
           :card="card"
           :readonly="readonly"
+          :query-params="queryParams"
           nested
         >
           <template #default="defaultScope">
@@ -92,9 +94,10 @@ defineProps<{
   skeleton: boolean
   card: boolean
   readonly: boolean
+  queryParams: QueryParams
 }>()
 
 defineSlots<{
-  default: (props: {field: ListFieldExport<FieldComponent<Data>, ListField<Data, QueryParams>>, item: Data, nested: boolean}) => void
+  default: (props: {field: ListFieldExport<FieldComponent<Data, QueryParams>, ListField<Data, QueryParams>>, item: Data, nested: boolean}) => void
 }>()
 </script>

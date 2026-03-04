@@ -1,16 +1,18 @@
 import type {ListMode} from '@/utils/utils'
 import type {Component, Raw} from 'vue'
 
-export type FieldProps<Data> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type FieldProps<Data, QueryParams = any> = {
   item: Data
   skeleton: boolean
   readonly: boolean
   card: boolean
   config: FieldConfig
+  queryParams: QueryParams
 }
 
-export type FieldComponent<Data> = Component<FieldProps<Data>>
-export type ExpansionComponent<Data> = Component<Omit<FieldProps<Data>, 'config'>>
+export type FieldComponent<Data, QueryParams> = Component<FieldProps<Data, QueryParams>>
+export type ExpansionComponent<Data, QueryParams> = Component<Omit<FieldProps<Data | undefined, QueryParams>, 'config'>>
 
 export type FieldComponentItem<Data> = Component<{
   item: Data
@@ -71,15 +73,15 @@ export type ListFieldExport<Component, Meta> = {
 }
 
 export type ListFields<Data, QueryParams = unknown> = (
-  | ListFieldExport<FieldComponent<Data>, ListField<Data, QueryParams>>
+  | ListFieldExport<FieldComponent<Data, QueryParams>, ListField<Data, QueryParams>>
 
-  | ListFieldExport<FieldComponent<Data>, ListFieldNested<Data, QueryParams>>
+  | ListFieldExport<FieldComponent<Data, QueryParams>, ListFieldNested<Data, QueryParams>>
 
-  | ListFieldExport<FieldComponent<Data>, ListFieldNestedEntity<Data, QueryParams>>
-  | ListFieldExport<FieldComponent<Data>, ListFieldNestedEntityGetter<Data, QueryParams>>
+  | ListFieldExport<FieldComponent<Data, QueryParams>, ListFieldNestedEntity<Data, QueryParams>>
+  | ListFieldExport<FieldComponent<Data, QueryParams>, ListFieldNestedEntityGetter<Data, QueryParams>>
 
-  | ListFieldExport<FieldComponent<Data>, ListFieldNestedArray<Data, QueryParams>>
-  | ListFieldExport<FieldComponent<Data>, ListFieldNestedArrayGetter<Data, QueryParams>>
+  | ListFieldExport<FieldComponent<Data, QueryParams>, ListFieldNestedArray<Data, QueryParams>>
+  | ListFieldExport<FieldComponent<Data, QueryParams>, ListFieldNestedArrayGetter<Data, QueryParams>>
 )[]
 
 export type MenuProps<Data> = {
