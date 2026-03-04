@@ -10,7 +10,7 @@
       horizontalAlign,
       updateAlign: true,
       parentElement: inputRef?.fieldRef,
-      dropdownClass: `bg-default dark:bg-default-dark ${dropdownClass ?? ''}`,
+      dropdownClass: `bg-default rounded-xl dark:bg-default-dark ${dropdownClass ?? ''}`,
     }"
   >
     <template #toggle="toggleScope">

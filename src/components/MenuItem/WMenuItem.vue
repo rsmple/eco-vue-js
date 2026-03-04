@@ -21,7 +21,7 @@
         'grid-cols-[1fr]': active === undefined,
       }"
     >
-      <div class="flex gap-4">
+      <div class="flex items-center gap-4">
         <slot />
       </div>
 
