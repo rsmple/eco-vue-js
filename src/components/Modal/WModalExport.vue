@@ -22,7 +22,7 @@
       v-else
       class="mb-4 text-center"
     >
-      <div v-if="loading">
+      <div v-if="loading || loadingExportValue">
         <WSpinner class="w-spinner-size-[1.25em] inline" /> Loading
       </div>
 
@@ -44,8 +44,8 @@
         :href="urlToBlob"
         :download="`${fileName ? `${fileName}_` : ''}${dateToQueryString(new Date())}.${format}`"
         :semantic-type="SemanticType.PRIMARY"
-        :disabled="!exportValue"
-        :loading="loading || loadingExportValue"
+        :disabled="!exportValue || loading || loadingExportValue"
+        :loading="downloading"
         tag="a"
         class="flex-1"
         @click="handleDownload"
@@ -84,6 +84,7 @@ const cache = ref<Model[]>([])
 const page = ref(1)
 const loading = ref(!!props.apiMethod)
 const loadingExportValue = ref(false)
+const downloading = ref(false)
 
 const queryParams = computed<QueryParams>(() => ({...(props.initQueryParams ?? {} as QueryParams), page: page.value}))
 
@@ -147,10 +148,10 @@ const blob = computed<Blob | undefined>(() => {
 const urlToBlob = computed<string | undefined>(() => blob.value ? URL.createObjectURL(blob.value) : undefined)
 
 const handleDownload = (): void => {
-  loading.value = true
+  downloading.value = true
 
   setTimeout(() => {
-    loading.value = false
+    downloading.value = false
 
     props.resolve?.()
 
