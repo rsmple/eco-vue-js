@@ -35,6 +35,6 @@ export type ModalExportProps<Model, QueryParams> = {
   initQueryParams?: QueryParams
   apiMethod?: () => Promise<Model[]>
   header?: string[]
-  prepare?: (item: Model) => string[] | Promise<string[]>
+  prepare?: (item: Model, index: number) => string[][] | Promise<string[][]>
   resolve?: () => void
 }

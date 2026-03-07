@@ -6,7 +6,7 @@ export const escapeCsvValue = (value: string): string => {
 
   if (forbiddenStart.includes(str[0]!)) str = ' ' + str
 
-  return escapeNeed.some(item => str.includes(item)) ? '"' + str.replace('"', '""') + '"' : str
+  return escapeNeed.some(item => str.includes(item)) ? '"' + str.replaceAll('"', '""') + '"' : str
 }
 
 export const buildCsvContent = (rows: string[][], header?: string[]): string => {

@@ -130,7 +130,7 @@ const exportValue = ref<string>('')
 const buildExportValue = async () => {
   if (props.format === 'csv') {
     loadingExportValue.value = true
-    const rows = await Promise.all(cache.value.map(item => props.prepare!(item as Model)))
+    const rows = (await Promise.all(cache.value.map((item, index) => props.prepare!(item as Model, index)))).flat()
     exportValue.value = buildCsvContent(rows, props.header)
     loadingExportValue.value = false
   } else {
