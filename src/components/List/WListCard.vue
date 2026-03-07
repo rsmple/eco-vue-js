@@ -96,7 +96,7 @@
 
       <ListCardAction
         v-if="isActionShown"
-        v-bind="allowSelectHover
+        v-bind="allowSelectHover || alwaysSelect
           ? {tag: 'button', card, onClick: () => $emit('toggle:selected')}
           : hasAction
             ? {tag: 'button', card, class: 'z-[-1]', onClick: () => $emit('click:action')}
@@ -230,6 +230,7 @@ const props = defineProps<{
   selected: boolean
   allowSelect: boolean
   allowSelectHover: boolean
+  alwaysSelect: boolean
 }>()
 
 defineEmits<{

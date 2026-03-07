@@ -8,6 +8,7 @@
     :disabled-filter-fields="disabledFilterFields ?? []"
     :title="title"
     :readonly="readonly ?? false"
+    :search-visible="searchVisible"
     @update:query-params="$emit('update:query-params', $event)"
   />
 </template>
@@ -29,6 +30,7 @@ defineProps<{
   global?: boolean
   title?: (count: number) => string
   readonly?: boolean
+  searchVisible?: boolean
 }>()
 
 defineEmits<{

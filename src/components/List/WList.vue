@@ -252,6 +252,7 @@
           :selected="skeleton ? false : getIsSelected(value as number, position)"
           :allow-select="allowSelect"
           :allow-select-hover="allowSelectHover"
+          :always-select="alwaysSelect"
           @toggle:selected="toggleSelected(value as number, position)"
           @hover:selected="hoverSelected(position)"
           @click:action="$emit('click:action', {item, setter})"
@@ -420,6 +421,7 @@ const props = withDefaults(
     apiMethodExport?: () => Promise<Data[]>
     exportFileName?: string
     disableExport?: boolean
+    alwaysSelect?: boolean
   }>(),
   {
     count: undefined,
