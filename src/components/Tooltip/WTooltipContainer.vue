@@ -15,6 +15,7 @@
       :bottom="tooltipMeta.bottom"
       emit-update
       class="isolate z-[10000]"
+      inner-class="w-tooltip-dropdown w-max"
       @update:rect="close"
     >
       <template #default="{isTop, isLeft, isRight}">

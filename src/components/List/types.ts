@@ -32,6 +32,7 @@ export type ListField<Data, QueryParams = unknown> = {
   visibleGetter?: (params: QueryParams) => boolean
   allowResize?: boolean
   sticky?: boolean
+  textFormat?: (item: Data, queryParams: QueryParams) => string | undefined | Promise<string | undefined>
 }
 
 export type ListFieldNested<Data, QueryParams = unknown> = {

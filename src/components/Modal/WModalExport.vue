@@ -8,20 +8,32 @@
       v-if="isPaginated"
       class="mb-4"
     >
-      <WProgressStriped
-        :model-value="progress * 100"
-        class="bg-primary dark:bg-primary-dark"
+      <WProgressBar
+        :model-value="progress"
+        :semantic-type="SemanticType.PRIMARY"
       />
 
       <div class="text-description mt-1 text-end text-xs">
-        {{ page }} / {{ pagesCount }}
+        {{ page }} / {{ pagesCount }} page{{ pagesCount === 1 ? '' : 's' }}
+      </div>
+    </div>
+
+    <div
+      v-else
+      class="mb-4 text-center"
+    >
+      <div v-if="loading">
+        <WSpinner class="w-spinner-size-[1.25em] inline" /> Loading
+      </div>
+
+      <div v-else>
+        Download is ready
       </div>
     </div>
 
     <template #actions>
       <WButton
         :semantic-type="SemanticType.SECONDARY"
-        :disabled="loading"
         class="flex-1"
         @click="$emit('close:modal')"
       >
@@ -30,10 +42,10 @@
 
       <WButton
         :href="urlToBlob"
-        :download="`${fileName}_${dateToQueryString(new Date())}.${format}`"
+        :download="`${fileName ? `${fileName}_` : ''}${dateToQueryString(new Date())}.${format}`"
         :semantic-type="SemanticType.PRIMARY"
-        :disabled="!isDone"
-        :loading="loading"
+        :disabled="!exportValue"
+        :loading="loading || loadingExportValue"
         tag="a"
         class="flex-1"
         @click="handleDownload"
@@ -45,12 +57,13 @@
 </template>
 
 <script lang="ts" setup generic="Model, QueryParams">
+import type {ModalExportProps} from './types'
+
 import {keepPreviousData} from '@tanstack/vue-query'
 import {computed, onMounted, ref, watch} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
 import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
-import WProgressStriped from '@/components/Progress/WProgressStriped.vue'
 
 import {Notify} from '@/utils/Notify'
 import {SemanticType} from '@/utils/SemanticType'
@@ -58,19 +71,10 @@ import {handleApiError} from '@/utils/api'
 import {dateToQueryString} from '@/utils/dateTime'
 import {buildCsvContent} from '@/utils/exportToCsv'
 
-const props = defineProps<{
-  fileName: string
-  format: 'json' | 'csv'
-  title?: string | ((count: number) => string)
-  cancelText?: string
-  downloadText?: string
-  useQueryFn?: UseQueryPaginated<Model, QueryParams> | UseQueryWithParams<Model[], QueryParams>
-  initQueryParams?: QueryParams
-  apiMethod?: () => Promise<Model>
-  header?: string[]
-  prepare?: (item: Model) => (string | number | Date)[]
-  resolve?: () => void
-}>()
+import WProgressBar from '../Progress/WProgressBar.vue'
+import WSpinner from '../Spinner/WSpinner.vue'
+
+const props = defineProps<ModalExportProps<Model, QueryParams>>()
 
 const emit = defineEmits<{
   (e: 'close:modal'): void
@@ -79,7 +83,7 @@ const emit = defineEmits<{
 const cache = ref<Model[]>([])
 const page = ref(1)
 const loading = ref(!!props.apiMethod)
-const simpleData = ref<Model | null>(null)
+const loadingExportValue = ref(false)
 
 const queryParams = computed<QueryParams>(() => ({...(props.initQueryParams ?? {} as QueryParams), page: page.value}))
 
@@ -106,17 +110,12 @@ const progress = computed<number>(() => {
   return page.value / pagesCount.value
 })
 
-const isDone = computed<boolean>(() => {
-  if (isPaginated) return progress.value === 1
-  return simpleData.value !== null
-})
-
 const count = computed<number>(() => {
   if (query) {
     const data = query.data.value
     return Array.isArray(data) ? data.length : (data as PaginatedResponse<Model>)?.count ?? 0
   }
-  return Array.isArray(simpleData.value) ? (simpleData.value as unknown[]).length : simpleData.value ? 1 : 0
+  return cache.value.length
 })
 
 const resolvedTitle = computed<string>(() => {
@@ -126,18 +125,21 @@ const resolvedTitle = computed<string>(() => {
   return `Exporting${ count.value ? ` ${ count.value } item${ count.value === 1 ? '' : 's' }` : '' }`
 })
 
-const exportValue = computed<string>(() => {
-  if (!isDone.value) return ''
+const exportValue = ref<string>('')
 
+const buildExportValue = async () => {
   if (props.format === 'csv') {
-    return buildCsvContent((cache.value as Model[]).map(item => props.prepare!(item)), props.header)
+    loadingExportValue.value = true
+    const rows = await Promise.all(cache.value.map(item => props.prepare!(item as Model)))
+    exportValue.value = buildCsvContent(rows, props.header)
+    loadingExportValue.value = false
+  } else {
+    exportValue.value = JSON.stringify(cache.value)
   }
-
-  return JSON.stringify(isPaginated ? cache.value : simpleData.value)
-})
+}
 
 const blob = computed<Blob | undefined>(() => {
-  if (!isDone.value || !exportValue.value) return
+  if (!exportValue.value) return
   const type = props.format === 'csv' ? 'text/csv;charset=utf-8;' : 'application/json'
   return new Blob([exportValue.value], {type})
 })
@@ -167,6 +169,7 @@ if (query) {
     }
 
     if (pagesCount.value && page.value < pagesCount.value) page.value = page.value + 1
+    else if (pagesCount.value) buildExportValue()
   }, {immediate: true})
 }
 
@@ -174,7 +177,8 @@ if (props.apiMethod) {
   onMounted(() => {
     props.apiMethod!()
       .then(response => {
-        simpleData.value = response
+        cache.value = response
+        buildExportValue()
       })
       .catch(handleApiError)
       .finally(() => {

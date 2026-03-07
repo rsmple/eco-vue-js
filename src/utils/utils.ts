@@ -100,6 +100,10 @@ export const percentFormatter = getFormatter(Intl.NumberFormat('en', {maximumFra
 export const numberCompactFormatter = Intl.NumberFormat('en', {notation: 'compact'})
 export const numberFormatter = getFormatter(Intl.NumberFormat('en', {maximumFractionDigits: 3}))
 
+export const dateFormatterCsv = new Intl.DateTimeFormat('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false})
+
+export const numberFormatCsv = (value: number) => String(value).replace('.', ',')
+
 export const getIsClientSide = () => typeof window !== 'undefined'
 
 export const isClientSide = getIsClientSide()

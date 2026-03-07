@@ -225,6 +225,16 @@ const pluginDefault = plugin(function ({addBase, theme, config}) {
       },
     },
   })
+
+  addBase({
+    '.w-tooltip-dropdown': {
+      '--inner-margin': '4px',
+      '--w-bottom-inner': '0px',
+      '--w-top-inner': '0px',
+      '--w-left-inner': '0px',
+      '--w-right-inner': '0px',
+    },
+  })
 })
 
 export default pluginDefault

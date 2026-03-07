@@ -1,16 +1,15 @@
-const regExp = /("|,|\n)/g
-
+const escapeNeed = ['"', ',', '\n']
 const forbiddenStart = ['=', '+', '-', '@', '\t', '\r']
 
-export const escapeCsvValue = (value: string | null | Date | number): string => {
-  let str = value === null ? '' : value instanceof Date ? value.toLocaleString() ?? '' : value.toString() ?? ''
+export const escapeCsvValue = (value: string): string => {
+  let str = value
 
   if (forbiddenStart.includes(str[0]!)) str = ' ' + str
 
-  return str.search(regExp) >= 0 ? '"' + str.replace(/"/g, '""') + '"' : str
+  return escapeNeed.some(item => str.includes(item)) ? '"' + str.replace('"', '""') + '"' : str
 }
 
-export const buildCsvContent = (rows: (string | number | Date)[][], header?: string[]): string => {
+export const buildCsvContent = (rows: string[][], header?: string[]): string => {
   const result: string[] = []
 
   if (header) result.push(header.map(escapeCsvValue).join(','))

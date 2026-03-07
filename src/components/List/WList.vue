@@ -45,9 +45,19 @@
           @clear:selection="resetSelection"
         >
           <template
-            v-if="bulk || action"
+            v-if="bulk || action || !disableExport"
             #default="{disableMessage, cssClass}"
           >
+            <HeaderExport
+              v-if="!disableExport"
+              :fields="fieldsVisible"
+              :query-params-getter="selectionCount === 0 ? () => queryParams : getQueryParamsBulk"
+              :use-query-fn="useQueryFn"
+              :api-method="apiMethodExport"
+              :file-name="exportFileName"
+              class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
+            />
+
             <template v-if="selectionCount === 0 && action">
               <template
                 v-for="(item, index) in action"
@@ -363,6 +373,7 @@ import {BASE_ZINDEX_DROPDOWN, ListMode} from '@/utils/utils'
 import WListCard from './WListCard.vue'
 import WListHeader from './WListHeader.vue'
 import WListHeaderItem from './WListHeaderItem.vue'
+import HeaderExport from './components/HeaderExport.vue'
 import HeaderFieldNested from './components/HeaderFieldNested.vue'
 import HeaderSettings from './components/HeaderSettings.vue'
 import HeaderSort from './components/HeaderSort.vue'
@@ -406,6 +417,9 @@ const props = withDefaults(
     noHeaderSettings?: boolean
     noRefetch?: boolean
     refetchInterval?: number
+    apiMethodExport?: () => Promise<Data[]>
+    exportFileName?: string
+    disableExport?: boolean
   }>(),
   {
     count: undefined,
@@ -425,6 +439,8 @@ const props = withDefaults(
     groupBy: undefined,
     cardTo: undefined,
     refetchInterval: undefined,
+    apiMethodExport: undefined,
+    exportFileName: undefined,
   },
 )
 
@@ -468,7 +484,7 @@ const fieldsFiltered = computed(() => {
   return filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible ?? false)
 })
 
-const allowSelect = computed(() => props.bulk !== undefined)
+const allowSelect = computed(() => props.bulk !== undefined || !props.disableExport)
 const allowOpen = computed(() => props.expansion !== undefined)
 
 const disableSelect = computed(() => !allowSelect.value)
