@@ -14,4 +14,5 @@ export type DropdownDefaultSlotScope = {
   isTop: boolean
   isLeft: boolean
   isRight: boolean
+  atBottom: boolean
 }

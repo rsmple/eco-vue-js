@@ -565,5 +565,5 @@ const unwatch = watch(fieldsFiltered, async () => {
   if (Object.keys(stylesWidth.value).length !== 0 || Object.keys(stylesFixed.value).length !== 0) unwatch.stop()
 }, {immediate: true})
 
-watch(countValue, value => emit('update:count', value), {immediate: true})
+watch(listCount, value => emit('update:count', value), {immediate: true})
 </script>

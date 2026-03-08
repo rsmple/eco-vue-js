@@ -27,7 +27,7 @@
       ]"
     >
       <slot
-        v-bind="{isTop, isLeft, isRight}"
+        v-bind="{isTop, isLeft, isRight, atBottom}"
       />
     </div>
   </div>
@@ -61,6 +61,8 @@ const isRight = computed(() => horizontalGetter.value?.origin === OriginX.LEFT)
 
 const x = ref(0)
 const y = ref(0)
+
+const atBottom = computed(() => y.value > window.innerHeight / 2)
 
 const order = computed(() => horizontalGetterOrderMap[props.horizontalAlign])
 

@@ -3,6 +3,7 @@
     <WDropdownMenu
       :is-open="isDropdownOpen && !isActive"
       :horizontal-align="HorizontalAlign.RIGHT_OUTER"
+      dropdown-class="flex relative"
     >
       <template #toggle>
         <WNavItem
@@ -39,9 +40,12 @@
         </WNavItem>
       </template>
 
-      <template #content>
+      <template #content="scope">
         <WClickOutside
           class="px-1"
+          :class="{
+            'self-end': scope.atBottom
+          }"
           @mouseenter="showDropdown"
           @mouseleave="hideDropdown"
           @click="hideDropdown"
