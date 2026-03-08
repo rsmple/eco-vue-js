@@ -354,7 +354,7 @@ import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, Expans
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type StyleValue, computed, markRaw, nextTick, ref, toRef, watch} from 'vue'
+import {type Ref, type StyleValue, computed, markRaw, nextTick, ref, toRef, watch} from 'vue'
 
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
@@ -368,7 +368,7 @@ import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
-import {useSelected} from '@/utils/useSelected'
+import {type Selection, useSelected, useSelectionHash} from '@/utils/useSelected'
 import {BASE_ZINDEX_DROPDOWN, ListMode} from '@/utils/utils'
 
 import WListCard from './WListCard.vue'
@@ -422,6 +422,7 @@ const props = withDefaults(
     exportFileName?: string
     disableExport?: boolean
     alwaysSelect?: boolean
+    selection?: Selection<number>
   }>(),
   {
     count: undefined,
@@ -443,6 +444,7 @@ const props = withDefaults(
     refetchInterval: undefined,
     apiMethodExport: undefined,
     exportFileName: undefined,
+    selection: undefined,
   },
 )
 
@@ -451,6 +453,7 @@ const emit = defineEmits<{
   (e: 'click:action', value: CardActionParams<Data>): void
   (e: 'update:query-params', value: QueryParams): void
   (e: 'update:count', value: number | undefined): void
+  (e: 'update:selection', value: Selection<number>): void
 }>()
 
 const {isDisabled, isReadonly} = useComponentStates(props)
@@ -491,6 +494,11 @@ const allowOpen = computed(() => props.expansion !== undefined)
 
 const disableSelect = computed(() => !allowSelect.value)
 
+const {selection: selectionUsed, updateSelection} = props.selection ? {
+  selection: toRef(props, 'selection') as Ref<Selection<number>>,
+  updateSelection: (value: Selection<number>) => emit('update:selection', value),
+} : useSelectionHash()
+
 const {
   isShift,
   allowSelectHover,
@@ -503,7 +511,7 @@ const {
   selectAll,
   getQueryParams,
   setIsSelecting,
-} = useSelected<number>(countValue, disableSelect)
+} = useSelected<number>(countValue, disableSelect, selectionUsed, updateSelection)
 
 const ordering = computed<OrderItem<keyof Data>[]>(() => {
   if (props.queryParams instanceof Object && 'ordering' in props.queryParams && typeof props.queryParams.ordering === 'string') {

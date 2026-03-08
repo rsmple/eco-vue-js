@@ -129,6 +129,14 @@
           @click="$emit('toggle:selected')"
         />
 
+        <WButtonMoreItem
+          v-if="alwaysSelect && allowSelect && to"
+          text="View"
+          :icon="markRaw(IconTo)"
+          :to="to"
+          @click="$emit('toggle:selected')"
+        />
+
         <slot name="more" />
       </WButtonMore>
     </component>
@@ -166,6 +174,14 @@
           :anchor="anchorRef ?? undefined"
           @close="position = null"
         >
+          <WButtonMoreItem
+            v-if="alwaysSelect && allowSelect && to"
+            text="View"
+            :icon="markRaw(IconTo)"
+            :to="to"
+            @click="$emit('toggle:selected')"
+          />
+
           <slot name="more" />
         </WButtonMore>
       </div>
@@ -208,6 +224,7 @@ import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 
 import IconAddCircle from '@/assets/icons/IconAddCircle.svg?component'
 import IconMinusCircle from '@/assets/icons/IconMinusCircle.svg?component'
+import IconTo from '@/assets/icons/IconTo.svg?component'
 
 import ListCardAction from './components/ListCardAction.vue'
 import {AREA_MORE, AREA_SELECT} from './types'
