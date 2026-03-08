@@ -25,6 +25,7 @@ const props = defineProps<{
   bottom?: boolean
   left?: boolean
   right?: boolean
+  static?: boolean
 }>()
 
 const slots = useSlots()
@@ -61,6 +62,7 @@ const open = () => {
     bottom: props.bottom,
     left: props.left,
     right: props.right,
+    static: props.static,
   })
 }
 

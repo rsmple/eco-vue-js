@@ -23,7 +23,7 @@
           :is-top="isTop"
           :is-left="isLeft"
           :is-right="isRight"
-          @over="setTooltipMeta(tooltipMeta)"
+          @over="!tooltipMeta.static && setTooltipMeta(tooltipMeta)"
           @leave="setTooltipMeta(null)"
         >
           <template v-if="tooltipMeta.slot">

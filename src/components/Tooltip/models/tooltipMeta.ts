@@ -10,6 +10,7 @@ export type TooltipMeta = {
   bottom?: boolean
   left?: boolean
   right?: boolean
+  static?: boolean
 }
 
 const tooltipMeta = ref<TooltipMeta | null>(null)

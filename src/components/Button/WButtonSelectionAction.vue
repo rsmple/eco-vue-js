@@ -45,6 +45,7 @@
       v-if="disableMessage || tooltipText"
       :text="disableMessage ?? tooltipText"
       top
+      static
     >
       <template
         v-if="$slots.tooltip"

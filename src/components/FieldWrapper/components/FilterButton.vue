@@ -13,7 +13,7 @@
     }"
     :aria-pressed="$route.query[filterField] === encodedQueryParam"
     aria-label="Toggle filter"
-    @click="$router.replace({query: {...$route.query, [filterField]: $route.query[filterField] === encodedQueryParam ? undefined : encodedQueryParam}})"
+    @click.stop="$router.replace({query: {...$route.query, [filterField]: $route.query[filterField] === encodedQueryParam ? undefined : encodedQueryParam}})"
   >
     <IconFilter class="square-[1.25em]" />
   </button>

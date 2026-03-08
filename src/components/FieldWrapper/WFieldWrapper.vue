@@ -96,7 +96,7 @@
             <WButtonCopy
               v-if="allowCopy && modelValue"
               :value="`${modelValue}`"
-              class="ml-2"
+              class="pointer-events-auto ml-2"
             />
           </div>
         </slot>
@@ -167,7 +167,7 @@
           :filter-field="filterField"
           :encoded-query-param="encodedQueryParam"
           :skeleton="isSkeleton"
-          class="absolute right-0 self-center"
+          class="pointer-events-auto absolute right-0 self-center"
         />
       </template>
     </div>
