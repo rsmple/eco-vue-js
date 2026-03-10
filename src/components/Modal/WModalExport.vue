@@ -70,6 +70,7 @@ import {SemanticType} from '@/utils/SemanticType'
 import {handleApiError} from '@/utils/api'
 import {dateToQueryString} from '@/utils/dateTime'
 import {buildCsvContent} from '@/utils/exportToCsv'
+import {genId} from '@/utils/utils'
 
 import WProgressBar from '../Progress/WProgressBar.vue'
 import WSpinner from '../Spinner/WSpinner.vue'
@@ -135,7 +136,7 @@ const buildExportValue = async () => {
     exportValue.value = buildCsvContent(rows, props.header)
     loadingExportValue.value = false
   } else {
-    exportValue.value = JSON.stringify(cache.value)
+    exportValue.value = JSON.stringify(cache.value.map(item => ({...item, id: genId() * -1})))
   }
 }
 
