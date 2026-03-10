@@ -177,7 +177,7 @@ if (query) {
 
 if (props.apiMethod) {
   onMounted(() => {
-    props.apiMethod!()
+    props.apiMethod!(props.initQueryParams)
       .then(response => {
         cache.value = response
         buildExportValue()

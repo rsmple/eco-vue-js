@@ -418,7 +418,7 @@ const props = withDefaults(
     noHeaderSettings?: boolean
     noRefetch?: boolean
     refetchInterval?: number
-    apiMethodExport?: () => Promise<Data[]>
+    apiMethodExport?: (queryParams: QueryParams) => Promise<Data[]>
     exportFileName?: string
     disableExport?: boolean
     alwaysSelect?: boolean

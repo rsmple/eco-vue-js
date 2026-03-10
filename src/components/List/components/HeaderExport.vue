@@ -53,7 +53,7 @@ const props = defineProps<{
   fields: ListFields<Data, QueryParams>
   queryParamsGetter: () => QueryParams
   useQueryFn: UseQueryPaginated<Data, QueryParams>
-  apiMethod: (() => Promise<Data[]>) | undefined
+  apiMethod: ((queryParams: QueryParams) => Promise<Data[]>) | undefined
   fileName: string | undefined
 }>()
 
