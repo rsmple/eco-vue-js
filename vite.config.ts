@@ -66,7 +66,10 @@ export default defineConfig(({mode}) => ({
       external: ['vue', 'vue-router', '@tanstack/vue-query'],
       output: {
         preserveModules: true,
-        entryFileNames: '[name].js',
+        entryFileNames: (chunkInfo) => {
+          if (chunkInfo.facadeModuleId?.endsWith('.vue')) return '[name].vue.js'
+          return '[name].js'
+        },
         globals: {
           vue: 'Vue',
           'vue-router': 'VueRouter',
