@@ -23,6 +23,7 @@ export interface ConfirmModalProps {
 
   actionsCol?: boolean
   wrapperClass?: string
+  maximized?: boolean
 }
 
 export type ModalExportProps<Model, QueryParams> = {

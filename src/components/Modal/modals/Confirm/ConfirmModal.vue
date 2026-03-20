@@ -1,6 +1,7 @@
 <template>
   <WModalWrapper
     :actions-col="actionsCol"
+    :maximized="maximized"
     class="w-modal-wrapper-w-[--w-modal-confirm-width,40rem]"
     :class="wrapperClass"
   >
