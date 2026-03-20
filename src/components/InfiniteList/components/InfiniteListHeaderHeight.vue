@@ -42,7 +42,7 @@ const updateHeader = () => {
 
   const rect = headerRef.value.getBoundingClientRect()
   headerHeight.value = rect.height
-  headerTop.value = rect.top + (scrollingElement?.value?.scrollTop ?? document.scrollingElement?.scrollTop ?? 0) - (modalHeaderHeight ?? headerHeightLayout.value)
+  headerTop.value = rect.top + (scrollingElement?.value?.scrollTop ?? document.scrollingElement?.scrollTop ?? 0) - (modalHeaderHeight?.value ?? headerHeightLayout.value)
 }
 
 watch(() => props.isIntersecting, updateHeader)
