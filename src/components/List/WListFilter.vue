@@ -8,7 +8,7 @@
     :disabled-filter-fields="disabledFilterFields ?? []"
     :title="title"
     :readonly="readonly ?? false"
-    :search-visible="searchVisible"
+    :search-visible="searchVisible ?? false"
     @update:query-params="$emit('update:query-params', $event)"
   />
 </template>

@@ -23,6 +23,7 @@
       <component
         :is="description"
         v-else
+        @update:disabled="disabledInner = $event"
       />
     </div>
 
@@ -48,7 +49,7 @@
         :to="intermediateTo"
         :semantic-type="intermediateSemanticType"
         :loading="loadingIntermediate"
-        :disabled="loadingAccept"
+        :disabled="loadingAccept || disabledInner"
         class="w-full"
         @click.stop.prevent="intermediate"
       >
@@ -66,7 +67,7 @@
         :to="acceptTo"
         :semantic-type="acceptSemanticType"
         :loading="loadingAccept"
-        :disabled="loadingIntermediate"
+        :disabled="loadingIntermediate || disabledInner"
         class="w-full"
         @click.stop.prevent="accept"
       >
@@ -102,6 +103,8 @@ const props = withDefaults(
     intermediateSemanticType: SemanticType.SECONDARY,
   },
 )
+
+const disabledInner = ref(false)
 
 const loadingAccept = ref(false)
 const loadingIntermediate = ref(false)

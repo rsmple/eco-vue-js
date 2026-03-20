@@ -252,7 +252,7 @@
           :selected="skeleton ? false : getIsSelected(value as number, position)"
           :allow-select="allowSelect"
           :allow-select-hover="allowSelectHover"
-          :always-select="alwaysSelect"
+          :always-select="alwaysSelect ?? false"
           @toggle:selected="toggleSelected(value as number, position)"
           @hover:selected="hoverSelected(position)"
           @click:action="$emit('click:action', {item, setter})"

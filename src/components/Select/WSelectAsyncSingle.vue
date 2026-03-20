@@ -95,10 +95,15 @@ const blur = () => {
   selectComponentRef.value?.blur()
 }
 
+const focus = () => {
+  selectComponentRef.value?.focus()
+}
+
 watch(toRef(props, 'modelValue'), blur)
 
 defineExpose({
   blur,
+  focus,
 })
 
 defineSlots<{
