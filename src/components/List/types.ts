@@ -9,6 +9,7 @@ export type FieldProps<Data, QueryParams = any> = {
   card: boolean
   config: FieldConfig
   queryParams: QueryParams
+  results: Data[] | undefined
 }
 
 export type FieldComponent<Data, QueryParams> = Component<FieldProps<Data, QueryParams>>

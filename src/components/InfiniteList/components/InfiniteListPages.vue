@@ -47,7 +47,7 @@
       @fetched="isResettingPage = false"
       @update:error="$emit('update:error', $event)"
     >
-      <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page: itemPage, index: itemIndex}">
+      <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page: itemPage, index: itemIndex, results}">
         <slot
           :item="(item as Data)"
           :setter="setter"
@@ -61,6 +61,7 @@
           :page="itemPage"
           :index="itemIndex"
           :value="valueGetter(item as Data)"
+          :results="results"
         />
       </template>
 
@@ -286,6 +287,7 @@ defineSlots<{
     page: number
     index: number
     value: Model
+    results: Data[] | undefined
   }) => void
   empty?: () => void
 }>()

@@ -225,7 +225,7 @@
         </WListHeader>
       </template>
 
-      <template #default="{item, skeleton, setter, refetch, previous, index, position, value}">
+      <template #default="{item, skeleton, setter, refetch, previous, index, position, value, results}">
         <slot
           v-if="groupBy && (index === 0 || (!skeleton && (!previous || !groupBy(item, previous))))"
           name="group"
@@ -266,6 +266,7 @@
               :card="isGrid"
               :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
               :query-params="queryParams"
+              :results="results"
             >
               <template #default="defaultScope">
                 <component
@@ -276,6 +277,7 @@
                   :card="isGrid"
                   :config="fieldConfigMap[defaultScope.field.meta.label]!"
                   :query-params="queryParams"
+                  :results="results"
                   :class="{
                     [defaultScope.field.meta.cssClass ?? '']: true,
                     'items-center': !alignTop,
@@ -308,6 +310,7 @@
               :skeleton="skeleton"
               :card="isGrid"
               :query-params="queryParams"
+              :results="results"
               @update:item="setter"
               @delete:item="setter(); refetch()"
             />

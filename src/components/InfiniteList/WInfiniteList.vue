@@ -41,7 +41,7 @@
         @update:page="$emit('update:page', $event)"
         @update:error="$emit('update:error', $event)"
       >
-        <template #default="{item, value, setter, skeleton, refetch, previous, next, first, last, resetting, page, index}">
+        <template #default="{item, value, setter, skeleton, refetch, previous, next, first, last, resetting, page, index, results}">
           <slot
             :item="item"
             :setter="setter"
@@ -56,6 +56,7 @@
             :index="index"
             :position="getPosition(page, index, pageLength)"
             :value="value"
+            v-bind="{results}"
           />
         </template>
 
@@ -137,8 +138,8 @@ defineSlots<{
     setter: (newItem?: Data | undefined) => void
     skeleton: boolean
     refetch: () => void
-    previous?: Data
-    next?: Data
+    previous: Data | undefined
+    next: Data | undefined
     first: boolean
     last: boolean
     resetting: boolean
@@ -146,6 +147,7 @@ defineSlots<{
     index: number
     position: number
     value: Model
+    results: Data[] | undefined
   }) => void
   header?: (props: InfiniteListHeaderScope & typeof infiniteListPagesRef.value) => void
   empty?: () => void

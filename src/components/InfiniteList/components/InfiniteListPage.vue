@@ -54,6 +54,7 @@
                   :last="lastPage && index === data.results.length - 1"
                   :page="page"
                   :index="index"
+                  :results="data.results"
                 />
               </component>
             </component>
@@ -76,6 +77,7 @@
               :last="lastPage && index === skeletonLength"
               :page="page"
               :index="index - 1"
+              :results="undefined"
             />
           </template>
         </template>
@@ -329,6 +331,7 @@ defineSlots<{
     last: boolean
     page: number
     index: number
+    results: Data[] | undefined
   }) => void
   empty?: () => void
 }>()
