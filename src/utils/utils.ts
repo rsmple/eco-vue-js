@@ -84,6 +84,8 @@ export const isEqualObj = (obj1: Record<string, unknown>, obj2: Record<string, u
 
       if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) return isEqualArr(obj1[key] as unknown[], obj2[key] as unknown[])
 
+      if (obj1[key] instanceof Object && obj2[key] instanceof Object) return isEqualObj(obj1[key] as NonNullable<unknown>, obj2[key] as NonNullable<unknown>)
+
       return false
     })
 }

@@ -26,9 +26,12 @@
 
     <template
       v-if="$slots.right"
-      #right
+      #right="scope"
     >
-      <slot name="right" />
+      <slot
+        name="right"
+        v-bind="scope"
+      />
     </template>
 
     <template #content>
