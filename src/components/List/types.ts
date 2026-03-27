@@ -10,6 +10,7 @@ export type FieldProps<Data, QueryParams = any> = {
   config: FieldConfig
   queryParams: QueryParams
   results: Data[] | undefined
+  intersecting: boolean
 }
 
 export type FieldComponent<Data, QueryParams> = Component<FieldProps<Data, QueryParams>>

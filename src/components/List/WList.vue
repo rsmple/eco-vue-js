@@ -225,7 +225,7 @@
         </WListHeader>
       </template>
 
-      <template #default="{item, skeleton, setter, refetch, previous, index, position, value, results}">
+      <template #default="{item, skeleton, setter, refetch, previous, index, position, value, results, intersecting}">
         <slot
           v-if="groupBy && (index === 0 || (!skeleton && (!previous || !groupBy(item, previous))))"
           name="group"
@@ -267,6 +267,7 @@
               :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
               :query-params="queryParams"
               :results="results"
+              :intersecting="intersecting"
             >
               <template #default="defaultScope">
                 <component
@@ -278,6 +279,7 @@
                   :config="fieldConfigMap[defaultScope.field.meta.label]!"
                   :query-params="queryParams"
                   :results="results"
+                  :intersecting="intersecting"
                   :class="{
                     [defaultScope.field.meta.cssClass ?? '']: true,
                     'items-center': !alignTop,
@@ -311,6 +313,7 @@
               :card="isGrid"
               :query-params="queryParams"
               :results="results"
+              :intersecting="intersecting"
               @update:item="setter"
               @delete:item="setter(); refetch()"
             />

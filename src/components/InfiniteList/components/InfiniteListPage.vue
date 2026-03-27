@@ -55,6 +55,7 @@
                   :page="page"
                   :index="index"
                   :results="data.results"
+                  :intersecting="isIntersecting"
                 />
               </component>
             </component>
@@ -78,6 +79,7 @@
               :page="page"
               :index="index - 1"
               :results="undefined"
+              :intersecting="isIntersecting"
             />
           </template>
         </template>
@@ -263,7 +265,7 @@ const observerCb = (entries: IntersectionObserverEntry[]) => {
 }
 
 onMounted(() => {
-  if (props.refetchInterval && elementRef.value) {
+  if (elementRef.value) {
     intersectionObserver = new IntersectionObserver(
       observerCb,
       {
@@ -332,6 +334,7 @@ defineSlots<{
     page: number
     index: number
     results: Data[] | undefined
+    intersecting: boolean
   }) => void
   empty?: () => void
 }>()

@@ -41,7 +41,7 @@
         @update:page="$emit('update:page', $event)"
         @update:error="$emit('update:error', $event)"
       >
-        <template #default="{item, value, setter, skeleton, refetch, previous, next, first, last, resetting, page, index, results}">
+        <template #default="{item, value, setter, skeleton, refetch, previous, next, first, last, resetting, page, index, results, intersecting}">
           <slot
             :item="item"
             :setter="setter"
@@ -56,7 +56,8 @@
             :index="index"
             :position="getPosition(page, index, pageLength)"
             :value="value"
-            v-bind="{results}"
+            :results="results"
+            :intersecting="intersecting"
           />
         </template>
 
@@ -148,6 +149,7 @@ defineSlots<{
     position: number
     value: Model
     results: Data[] | undefined
+    intersecting: boolean
   }) => void
   header?: (props: InfiniteListHeaderScope & typeof infiniteListPagesRef.value) => void
   empty?: () => void

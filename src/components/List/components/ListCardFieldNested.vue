@@ -14,7 +14,7 @@
       <template v-if="'keyArray' in field.meta || 'getterArray' in field.meta">
         <component
           :is="field.default ?? 'div'"
-          v-bind="field.default ? {item, skeleton, card, readonly, config, queryParams, results} : (undefined as never)"
+          v-bind="field.default ? {item, skeleton, card, readonly, config, queryParams, results, intersecting} : (undefined as never)"
           :class="field.meta.cssClassArray"
         >
           <ListCardFieldNestedItem :items="skeleton ? [item] : (('keyArray' in field.meta ? item[field.meta.keyArray as keyof typeof item] : field.meta.getterArray(item)) as Data[])">
@@ -36,6 +36,7 @@
                     :readonly="readonly"
                     :query-params="queryParams"
                     :results="results"
+                    :intersecting="intersecting"
                     nested
                   >
                     <template #default="defaultScope">
@@ -52,7 +53,7 @@
       <component
         :is="field.default ?? 'div'"
         v-else
-        v-bind="field.default ? {item, skeleton, card, readonly, config, queryParams, results} : (undefined as never)"
+        v-bind="field.default ? {item, skeleton, card, readonly, config, queryParams, results, intersecting} : (undefined as never)"
         :class="field.meta.cssClass"
         class="flex"
       >
@@ -65,6 +66,7 @@
           :readonly="readonly"
           :query-params="queryParams"
           :results="results"
+          :intersecting="intersecting"
           nested
         >
           <template #default="defaultScope">
@@ -98,6 +100,7 @@ defineProps<{
   readonly: boolean
   queryParams: QueryParams
   results: Data[] | undefined
+  intersecting: boolean
 }>()
 
 defineSlots<{
