@@ -231,7 +231,7 @@ const value = computed<InnerModel>(() => props.field !== undefined
     : undefined
   : data.value)
 
-const initModelValue = ref(value.value)
+const initModelValue = ref(Array.isArray(value.value) ? [...value.value] : value.value instanceof Object ? {...value.value} : value.value)
 
 const modelValueList = computed<Record<string, InnerModel extends unknown[] ? InnerModel[number] : never>>(previousValue => {
   const result: Record<string, InnerModel extends unknown[] ? InnerModel[number] : never> = previousValue ?? {}
@@ -339,7 +339,7 @@ const initModel = (): void => {
   if (props.getModel && query) data.value = props.getModel(query.data.value)
 
   isShownError.value = false
-  initModelValue.value = value.value
+  initModelValue.value = Array.isArray(value.value) ? [...value.value] : value.value instanceof Object ? {...value.value} : value.value
 
   validateField(true)
 
