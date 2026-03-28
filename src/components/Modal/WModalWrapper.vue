@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, provide, useTemplateRef} from 'vue'
+import {onMounted, provide, ref, useTemplateRef} from 'vue'
 
 import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
 
@@ -72,9 +72,12 @@ const headerRef = useTemplateRef('header')
 const footerRef = useTemplateRef('footer')
 const contentRef = useTemplateRef('content')
 
+const headerHeightProvided = ref(0)
+provide(wModalHeaderHeight, headerHeightProvided)
+
 onMounted(() => {
   if (!headerRef.value) return
 
-  provide(wModalHeaderHeight, headerRef.value.offsetHeight)
+  headerHeightProvided.value = headerRef.value.offsetHeight
 })
 </script>

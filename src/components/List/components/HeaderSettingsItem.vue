@@ -49,7 +49,7 @@ import IconEye from '@/assets/icons/IconEye.svg?component'
 import IconEyeSlash from '@/assets/icons/IconEyeSlash.svg?component'
 
 const props = defineProps<{
-  field: ListFieldExport<FieldComponent<Data>, ListField<Data, QueryParams>>
+  field: ListFieldExport<FieldComponent<Data, QueryParams>, ListField<Data, QueryParams>>
   fieldConfig: FieldConfig
   queryParams: QueryParams
   disabled?: boolean

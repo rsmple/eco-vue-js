@@ -84,6 +84,8 @@ export const isEqualObj = (obj1: Record<string, unknown>, obj2: Record<string, u
 
       if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) return isEqualArr(obj1[key] as unknown[], obj2[key] as unknown[])
 
+      if (obj1[key] instanceof Object && obj2[key] instanceof Object) return isEqualObj(obj1[key] as NonNullable<unknown>, obj2[key] as NonNullable<unknown>)
+
       return false
     })
 }
@@ -99,6 +101,10 @@ export const percentFormatter = getFormatter(Intl.NumberFormat('en', {maximumFra
 
 export const numberCompactFormatter = Intl.NumberFormat('en', {notation: 'compact'})
 export const numberFormatter = getFormatter(Intl.NumberFormat('en', {maximumFractionDigits: 3}))
+
+export const dateFormatterCsv = new Intl.DateTimeFormat('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false})
+
+export const numberFormatCsv = (value: number) => String(value).replace('.', ',')
 
 export const getIsClientSide = () => typeof window !== 'undefined'
 

@@ -44,11 +44,25 @@ export type QueryParamsSelection = {
 
 const isEmpty = <Value>(value: Selection<Value>) => !value.id__in?.length && !value.id__not_in && !value.range
 
-export const useSelected = <Value extends number>(count: MaybeRef<number | undefined>, disabled: Ref<boolean>) => {
+export const useSelection = () => {
+  const selection = ref<Selection<number>>({})
+
+  const updateSelection = (value: Selection<number>) => {
+    if (isEmpty(value)) selection.value = {}
+    else selection.value = value
+  }
+
+  return {
+    selection,
+    updateSelection,
+  }
+}
+
+export const useSelectionHash = () => {
   const route = useOptionalRoute()
   const router = useOptionalRouter()
 
-  const selection = computed<Selection<Value>>(() => {
+  const selection = computed<Selection<number>>(() => {
     if (!route.hash) return {}
 
     try {
@@ -58,28 +72,30 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
       
       const value = parseSelection(parsed)
 
-      if (isSelection(value)) return value as Selection<Value>
+      if (isSelection(value)) return value as Selection<number>
     } catch {
     }
 
     return {}
   })
 
+  const updateSelection = (value: Selection<number>) => {
+    if (isEmpty(value)) router.replace({query: route.query, hash: '#'})
+    else router.replace({query: route.query, hash: `#${ JSON.stringify(value) }`})
+  }
+
+  return {
+    selection,
+    updateSelection,
+  }
+}
+
+export const useSelected = <Value extends number>(count: MaybeRef<number | undefined>, disabled: Ref<boolean>, selection: Ref<Selection<Value>>, updateSelection: (value: Selection<Value>) => void) => {
   const resetSelection = (): void => {
     hoverValue.value = null
     preselectValue.value = null
 
-    router.replace({query: route.query, hash: '#'})
-  }
-
-  const updateSelection = (value: Selection<Value>) => {
-    if (isEmpty(value)) {
-      resetSelection()
-
-      return
-    }
-
-    router.replace({query: route.query, hash: `#${ JSON.stringify(value) }`})
+    updateSelection({})
   }
   
   const selectAll = () => {

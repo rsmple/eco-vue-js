@@ -46,7 +46,6 @@
   <WExpansion
     :is-open="isOpen"
     :class="$attrs.class"
-    class="py-2"
   >
     <slot />
   </WExpansion>

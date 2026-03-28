@@ -23,4 +23,19 @@ export interface ConfirmModalProps {
 
   actionsCol?: boolean
   wrapperClass?: string
+  maximized?: boolean
+}
+
+export type ModalExportProps<Model, QueryParams> = {
+  format: 'json' | 'csv'
+  fileName?: string
+  title?: string | ((count: number) => string)
+  cancelText?: string
+  downloadText?: string
+  useQueryFn?: UseQueryPaginated<Model, QueryParams> | UseQueryWithParams<Model[], QueryParams>
+  initQueryParams: QueryParams
+  apiMethod?: (queryParams: QueryParams) => Promise<Model[]>
+  header?: string[]
+  prepare?: (item: Model, index: number) => string[][] | Promise<string[][]>
+  resolve?: () => void
 }

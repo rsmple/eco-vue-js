@@ -15,6 +15,7 @@
       :bottom="tooltipMeta.bottom"
       emit-update
       class="isolate z-[10000]"
+      inner-class="w-tooltip-dropdown w-max"
       @update:rect="close"
     >
       <template #default="{isTop, isLeft, isRight}">
@@ -22,7 +23,7 @@
           :is-top="isTop"
           :is-left="isLeft"
           :is-right="isRight"
-          @over="setTooltipMeta(tooltipMeta)"
+          @over="!tooltipMeta.static && setTooltipMeta(tooltipMeta)"
           @leave="setTooltipMeta(null)"
         >
           <template v-if="tooltipMeta.slot">

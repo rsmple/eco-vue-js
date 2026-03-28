@@ -76,6 +76,7 @@ defineProps<{
   disabledFilterFields: Array<keyof QueryParams>
   title: ((count: number) => string) | undefined
   readonly: boolean
+  searchVisible: boolean
 }>()
 
 const emit = defineEmits<{

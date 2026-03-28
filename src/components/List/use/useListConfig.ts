@@ -51,18 +51,19 @@ const parseFieldConfigMap = <Fields extends ListFields<unknown>>(value: unknown,
         return
       }
 
-      const config = value instanceof Object && field.meta.label in value ? value[field.meta.label as keyof typeof value] : undefined
       const defaultConfig = fieldConfigMap[field.meta.label as keyof typeof fieldConfigMap]
+      const configValue = value instanceof Object && field.meta.label in value ? value[field.meta.label as keyof typeof value] as unknown as Partial<FieldConfig> : undefined
+      const config: FieldConfig | undefined = configValue instanceof Object ? {
+        width: configValue.width ?? null,
+        visible: configValue.visible ?? defaultConfig.visible,
+        order: configValue.order ?? defaultConfig.order,
+        sticky: configValue.sticky ?? defaultConfig.sticky,
+      } : undefined
 
       if (!isFieldConfig(config)) {
         configMap[field.meta.label] = {...defaultConfig}
       } else {
-        configMap[field.meta.label] = {
-          width: config.width ?? null,
-          visible: config.visible ?? defaultConfig.visible,
-          order: config.order ?? defaultConfig.order,
-          sticky: config.sticky ?? defaultConfig.sticky,
-        }
+        configMap[field.meta.label] = config
       }
     })
   }

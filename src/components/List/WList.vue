@@ -45,9 +45,19 @@
           @clear:selection="resetSelection"
         >
           <template
-            v-if="bulk || action"
+            v-if="bulk || action || !disableExport"
             #default="{disableMessage, cssClass}"
           >
+            <HeaderExport
+              v-if="!disableExport"
+              :fields="fieldsVisible"
+              :query-params-getter="selectionCount === 0 ? () => queryParams : getQueryParamsBulk"
+              :use-query-fn="useQueryFn"
+              :api-method="apiMethodExport"
+              :file-name="exportFileName"
+              class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
+            />
+
             <template v-if="selectionCount === 0 && action">
               <template
                 v-for="(item, index) in action"
@@ -215,7 +225,7 @@
         </WListHeader>
       </template>
 
-      <template #default="{item, skeleton, setter, refetch, previous, index, position, value}">
+      <template #default="{item, skeleton, setter, refetch, previous, index, position, value, results, intersecting}">
         <slot
           v-if="groupBy && (index === 0 || (!skeleton && (!previous || !groupBy(item, previous))))"
           name="group"
@@ -249,6 +259,7 @@
               :selected="skeleton ? false : getIsSelected(value as number, position)"
               :allow-select="allowSelect"
               :allow-select-hover="allowSelectHover"
+              :always-select="alwaysSelect ?? false"
               @toggle:selected="toggleSelected(value as number, position)"
               @hover:selected="hoverSelected(position)"
               @click:action="$emit('click:action', {item, setter})"
@@ -262,6 +273,9 @@
                   :card="isGrid"
                   :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
                   :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
+                  :query-params="queryParams"
+                  :results="results"
+                  :intersecting="intersecting"
                 >
                   <template #default="defaultScope">
                     <component
@@ -272,6 +286,9 @@
                       :card="isGrid"
                       :config="fieldConfigMap[defaultScope.field.meta.label]!"
                       :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
+                      :query-params="queryParams"
+                      :results="results"
+                      :intersecting="intersecting"
                       :class="{
                         [defaultScope.field.meta.cssClass ?? '']: true,
                         'items-center': !alignTop,
@@ -303,6 +320,9 @@
                   :skeleton="skeleton"
                   :card="isGrid"
                   :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
+                  :query-params="queryParams"
+                  :results="results"
+                  :intersecting="intersecting"
                   @update:item="setter"
                   @delete:item="setter(); refetch()"
                 />
@@ -352,7 +372,7 @@ import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type StyleValue, computed, markRaw, nextTick, ref, toRef, watch} from 'vue'
+import {type Ref, type StyleValue, computed, markRaw, nextTick, ref, toRef, watch} from 'vue'
 
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
@@ -368,12 +388,13 @@ import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
-import {useSelected} from '@/utils/useSelected'
+import {type Selection, useSelected, useSelectionHash} from '@/utils/useSelected'
 import {BASE_ZINDEX_DROPDOWN, ListMode} from '@/utils/utils'
 
 import WListCard from './WListCard.vue'
 import WListHeader from './WListHeader.vue'
 import WListHeaderItem from './WListHeaderItem.vue'
+import HeaderExport from './components/HeaderExport.vue'
 import HeaderFieldNested from './components/HeaderFieldNested.vue'
 import HeaderSettings from './components/HeaderSettings.vue'
 import HeaderSort from './components/HeaderSort.vue'
@@ -386,7 +407,7 @@ const props = withDefaults(
   defineProps<{
     count?: number
     fields: Fields
-    expansion?: ExpansionComponent<Data>
+    expansion?: ExpansionComponent<Data, QueryParams>
     useQueryFn: UseQueryPaginated<Data, QueryParams>
     queryParams: QueryParams
     queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
@@ -418,6 +439,11 @@ const props = withDefaults(
     noHeaderSettings?: boolean
     noRefetch?: boolean
     refetchInterval?: number
+    apiMethodExport?: (queryParams: QueryParams) => Promise<Data[]>
+    exportFileName?: string
+    disableExport?: boolean
+    alwaysSelect?: boolean
+    selection?: Selection<number>
   }>(),
   {
     count: undefined,
@@ -438,6 +464,9 @@ const props = withDefaults(
     groupBy: undefined,
     cardTo: undefined,
     refetchInterval: undefined,
+    apiMethodExport: undefined,
+    exportFileName: undefined,
+    selection: undefined,
   },
 )
 
@@ -446,6 +475,7 @@ const emit = defineEmits<{
   (e: 'click:action', value: CardActionParams<Data>): void
   (e: 'update:query-params', value: QueryParams): void
   (e: 'update:count', value: number | undefined): void
+  (e: 'update:selection', value: Selection<number>): void
 }>()
 
 const {isDisabled, isReadonly} = useComponentStates(props)
@@ -481,10 +511,15 @@ const fieldsFiltered = computed(() => {
   return filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible ?? false)
 })
 
-const allowSelect = computed(() => props.bulk !== undefined)
+const allowSelect = computed(() => props.bulk !== undefined || !props.disableExport)
 const allowOpen = computed(() => props.expansion !== undefined)
 
 const disableSelect = computed(() => !allowSelect.value)
+
+const {selection: selectionUsed, updateSelection} = props.selection ? {
+  selection: toRef(props, 'selection') as Ref<Selection<number>>,
+  updateSelection: (value: Selection<number>) => emit('update:selection', value),
+} : useSelectionHash()
 
 const {
   isShift,
@@ -498,7 +533,7 @@ const {
   selectAll,
   getQueryParams,
   setIsSelecting,
-} = useSelected<number>(countValue, disableSelect)
+} = useSelected<number>(countValue, disableSelect, selectionUsed, updateSelection)
 
 const ordering = computed<OrderItem<keyof Data>[]>(() => {
   if (props.queryParams instanceof Object && 'ordering' in props.queryParams && typeof props.queryParams.ordering === 'string') {
@@ -552,5 +587,5 @@ const unwatch = watch(fieldsFiltered, async () => {
   if (Object.keys(stylesWidth.value).length !== 0 || Object.keys(stylesFixed.value).length !== 0) unwatch.stop()
 }, {immediate: true})
 
-watch(countValue, value => emit('update:count', value), {immediate: true})
+watch(listCount, value => emit('update:count', value), {immediate: true})
 </script>

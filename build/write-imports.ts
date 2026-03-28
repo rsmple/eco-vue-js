@@ -92,7 +92,7 @@ const getPackageExports = (list: ComponentPath[]) => {
       import: './eslint/plugin.js',
     },
     './dist/assets/icons/*': {
-      import: './dist/assets/icons/*.svg.js',
+      import: './dist/assets/icons/*.js',
     },
   }
 

@@ -5,9 +5,8 @@
       ...props,
       modelValue: search,
       loading: loading || isLoading || loadingCreate,
-      hideInput: modelValue.length === 0 && !emptyValue ? false : isMobile ? !focused : !isOpen,
+      hideInput: modelValue.length === 0 && !emptyValue ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
       filterValue: filterValue === undefined ? modelValue : filterValue,
-      placeholder: emptyValue || focused || modelValue.length ? undefined : placeholder,
       emptyValue: undefined,
     }"
     :class="$attrs.class"
@@ -457,12 +456,20 @@ if (props.useFirstDefault) {
   }, {immediate: true})
 }
 
-watch(() => props.modelValue, async () => {
+watch(() => props.modelValue, async (value, oldValue) => {
   await nextTick()
 
   inputRef.value?.updateDropdown()
 
   if (props.seamless) inputRef.value?.scrollToInput()
+
+  if (!createdOptions.value.length) return
+
+  for (const valueItem of oldValue.filter(item => !value.includes(item))) {
+    const index = createdOptions.value.findIndex(option => props.valueGetter(option) === valueItem)
+
+    if (index !== -1) createdOptions.value.splice(index, 1)
+  }
 })
 
 watch(queryError, error => {

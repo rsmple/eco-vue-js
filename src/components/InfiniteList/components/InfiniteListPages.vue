@@ -3,7 +3,7 @@
     ref="infiniteScroll"
     :style="{'--infinite-list-header-height': headerHeight + 'px'}"
     :class="{
-      '-min-h--height-inner list:pt-[--w-list-gap,1rem] pb-16': !minHeight,
+      '-min-h--height-inner list:pt-[--w-list-gap,1rem] modal:pb-[--w-list-gap,1rem] modal:min-h-0 pb-16': !minHeight,
       'min-h-full': minHeight,
     }"
     @scroll:down="addNextPage"
@@ -47,7 +47,7 @@
       @fetched="isResettingPage = false"
       @update:error="$emit('update:error', $event)"
     >
-      <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page: itemPage, index: itemIndex}">
+      <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page: itemPage, index: itemIndex, results, intersecting}">
         <slot
           :item="(item as Data)"
           :setter="setter"
@@ -61,6 +61,8 @@
           :page="itemPage"
           :index="itemIndex"
           :value="valueGetter(item as Data)"
+          :results="results"
+          :intersecting="intersecting"
         />
       </template>
 
@@ -286,6 +288,8 @@ defineSlots<{
     page: number
     index: number
     value: Model
+    results: Data[] | undefined
+    intersecting: boolean
   }) => void
   empty?: () => void
 }>()

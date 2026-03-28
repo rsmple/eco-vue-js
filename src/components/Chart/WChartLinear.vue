@@ -23,7 +23,7 @@
         :format="value => isSameDate(new Date(value), new Date) ? 'Today' : dateFormatShort(new Date(value))"
         :domain="xExtent"
         :transform="`translate(0, ${svgHeight - bottom})`"
-        :y-right="yRight"
+        :y-right="yRight === true"
       />
 
       <ChartAxis
@@ -33,7 +33,7 @@
         :domain="yDomainComputed"
         :format="yFormat"
         :transform="`translate(${yRight ? svgWidth - right : left}, 0)`"
-        :y-right="yRight"
+        :y-right="yRight === true"
       />
 
       <slot

@@ -5,7 +5,7 @@
       '--w-dropdown-x': x + 'px',
       '--w-dropdown-y': y + 'px',
     }"
-    class="group/dropdown width-0 height-0 fixed left-0 top-0 grid will-change-transform"
+    class="group/dropdown square-0 fixed left-0 top-0 grid will-change-transform"
     style="
     transform: translate(var(--dropdown-x, 0px), var(--dropdown-y, 0px));
     --dropdown-x: calc(max(min(var(--w-dropdown-x, 0px), var(--w-dropdown-x-max, 100vw)), var(--w-dropdown-x-min, 0px)));
@@ -18,7 +18,8 @@
     ]"
   >
     <div
-      class="relative w-max"
+      class="relative"
+      :class="innerClass ?? 'w-max'"
       :style="[
         verticalGetter?.style,
         horizontalGetter?.style,
@@ -26,7 +27,7 @@
       ]"
     >
       <slot
-        v-bind="{isTop, isLeft, isRight}"
+        v-bind="{isTop, isLeft, isRight, atBottom}"
       />
     </div>
   </div>
@@ -60,6 +61,8 @@ const isRight = computed(() => horizontalGetter.value?.origin === OriginX.LEFT)
 
 const x = ref(0)
 const y = ref(0)
+
+const atBottom = computed(() => y.value > window.innerHeight / 2)
 
 const order = computed(() => horizontalGetterOrderMap[props.horizontalAlign])
 

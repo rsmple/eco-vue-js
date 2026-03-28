@@ -10,7 +10,7 @@
       horizontalAlign,
       updateAlign: true,
       parentElement: inputRef?.fieldRef,
-      dropdownClass,
+      dropdownClass: `bg-default rounded-xl dark:bg-default-dark ${dropdownClass ?? ''}`,
     }"
   >
     <template #toggle="toggleScope">
@@ -107,7 +107,10 @@
           v-if="$slots.right"
           #right
         >
-          <slot name="right" />
+          <slot
+            name="right"
+            :unclickable="toggleScope?.unclickable"
+          />
         </template>
       </WInput>
     </template>
@@ -239,7 +242,7 @@ defineSlots<{
   subtitle?: () => void
   toolbar?: () => void
   prefix?: (props: {unclickable?: boolean | null}) => void
-  right?: (props: Record<string, never>) => void
+  right?: (props: {unclickable?: boolean | null}) => void
   content?: (props: {focused: boolean, blur: () => void, focus: () => void}) => VNode[]
 }>()
 </script>

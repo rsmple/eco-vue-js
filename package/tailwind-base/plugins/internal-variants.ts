@@ -5,6 +5,8 @@ const pluginDefault = plugin(function ({addVariant}) {
   addVariant('card-l', ['&.w-card'])
   addVariant('list', ['.w-list &'])
   addVariant('list-l', ['&.w-list'])
+
+  addVariant('modal', ['.w-modal &'])
 })
 
 export default pluginDefault

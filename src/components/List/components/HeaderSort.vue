@@ -1,8 +1,8 @@
 <template>
   <WDropdownMenu
-    v-if="fieldsFlat.length"
+    v-if="fieldsFiltered.length"
     :is-open="isOpen"
-    :horizontal-align="HorizontalAlign.RIGHT_INNER"
+    :horizontal-align="HorizontalAlign.LEFT_INNER"
   >
     <template #toggle>
       <WButtonSelectionAction
@@ -20,10 +20,10 @@
         @click="isOpen = false"
       >
         <HeaderSortItem
-          v-for="field in fieldsFlat"
+          v-for="field in fieldsFiltered"
           :key="field.meta.label"
           :title="typeof field.meta.title === 'string' ? field.meta.title : field.meta.title(queryParams)"
-          :field="typeof field.meta.field === 'string' ? field.meta.field : field.meta.field(queryParams)"
+          :field="typeof field.meta.field === 'string' ? field.meta.field : field.meta.field(queryParams)!"
           :ordering="ordering"
           :disabled="disabled"
           @update:ordering="$emit('update:ordering', $event)"
@@ -31,6 +31,10 @@
       </WClickOutside>
     </template>
   </WDropdownMenu>
+  <div
+    v-else-if="fieldsFlat.length"
+    class="h-8"
+  />
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
@@ -50,7 +54,7 @@ import {type ListMode} from '@/utils/utils'
 
 import HeaderSortItem from './HeaderSortItem.vue'
 
-type RequiredField = ListFieldExport<FieldComponent<Data>, ListField<Data, QueryParams> & Required<Pick<ListField<Data, QueryParams>, 'field'>>>
+type RequiredField = ListFieldExport<FieldComponent<Data, QueryParams>, ListField<Data, QueryParams> & Required<Pick<ListField<Data, QueryParams>, 'field'>>>
 
 const props = defineProps<{
   ordering: OrderItem<keyof Data>[]
@@ -84,4 +88,6 @@ const fieldsFlat = computed(() => {
 
   return result
 })
+
+const fieldsFiltered = computed(() => fieldsFlat.value.filter(item => typeof item.meta.field === 'string' || item.meta.field(props.queryParams)))
 </script>

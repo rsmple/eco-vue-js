@@ -1,7 +1,7 @@
 <template>
   <button
     class="text-description w-hover-circle relative inline-block cursor-pointer select-none"
-    @click="doCopy()"
+    @click.stop="doCopy()"
   >
     <component
       :is="iconCopy"

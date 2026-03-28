@@ -92,7 +92,7 @@ export const encodeRouteParams = <T>(params: T): Partial<EncodeQueryParams<T>> =
 }
 
 export const createUseQueryParams = <QueryParams extends Record<string, unknown>>(config: {[Key in keyof QueryParams]: ParseFn<QueryParams[Key]>}) => {
-  const keyList = Object.keys(config) as Array<keyof QueryParams>
+  const keyList = Object.keys(config).filter(key => config[key]) as Array<keyof QueryParams>
 
   const parse = (queryParams: Partial<QueryParams> | Reactive<Partial<QueryParams>>, value: EncodeQueryParams<Partial<QueryParams>>) => {
     for (const key of keyList) {
@@ -110,6 +110,8 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
         queryParams[key as keyof typeof queryParams] = resultValue as typeof queryParams[keyof typeof queryParams]
       }
     }
+
+    return queryParams
   }
 
   const queryParams = reactive<Partial<QueryParams>>({})
@@ -146,6 +148,14 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
 
   fn.config = config
   fn.parse = parse
+  fn.filterFields = <QP extends Partial<QueryParams> & Record<string, unknown>>(queryParams: QP): QueryParams => {
+    const result: QueryParams = {} as QueryParams
+    for (const key of keyList) {
+      const value = queryParams[key]
+      if (value !== undefined) result[key] = value as QueryParams[keyof QueryParams]
+    }
+    return result
+  }
 
   return fn as typeof fn & {QueryParams: Partial<QueryParams>}
 }

@@ -34,14 +34,18 @@
       </div>
     </div>
 
-    <WSpinner
+    <div
       v-if="loading" 
-      class="w-spinner-size-5 text-description absolute z-10"
-    />
+      class="w-spinner-size-5 text-description absolute inset-0 z-10 flex items-center justify-center"
+    >
+      <WSpinner />
+    </div>
 
     <WTooltip
       v-if="disableMessage || tooltipText"
       :text="disableMessage ?? tooltipText"
+      top
+      static
     >
       <template
         v-if="$slots.tooltip"

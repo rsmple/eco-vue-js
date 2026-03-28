@@ -14,7 +14,7 @@
       <template v-if="'keyArray' in field.meta || 'getterArray' in field.meta">
         <component
           :is="field.default ?? 'div'"
-          v-bind="field.default ? {item, skeleton, card, readonly, config, uniformScope} : (undefined as never)"
+          v-bind="field.default ? {item, skeleton, card, readonly, config, uniformScope, queryParams, results, intersecting} : (undefined as never)"
           :class="field.meta.cssClassArray"
         >
           <ListCardFieldNestedItem :items="skeleton ? [item] : (('keyArray' in field.meta ? item[field.meta.keyArray as keyof typeof item] : field.meta.getterArray(item)) as Data[])">
@@ -35,6 +35,9 @@
                     :card="card"
                     :readonly="readonly"
                     :uniform-scope="uniformScope"
+                    :query-params="queryParams"
+                    :results="results"
+                    :intersecting="intersecting"
                     nested
                   >
                     <template #default="defaultScope">
@@ -51,7 +54,7 @@
       <component
         :is="field.default ?? 'div'"
         v-else
-        v-bind="field.default ? {item, skeleton, card, readonly, config, uniformScope} : (undefined as never)"
+        v-bind="field.default ? {item, skeleton, card, readonly, config, uniformScope, queryParams, results, intersecting} : (undefined as never)"
         :class="field.meta.cssClass"
         class="flex"
       >
@@ -63,6 +66,9 @@
           :card="card"
           :readonly="readonly"
           :uniform-scope="uniformScope"
+          :query-params="queryParams"
+          :results="results"
+          :intersecting="intersecting"
           nested
         >
           <template #default="defaultScope">
@@ -96,9 +102,12 @@ defineProps<{
   card: boolean
   readonly: boolean
   uniformScope: UniformScope<Data, number> | undefined
+  queryParams: QueryParams
+  results: Data[] | undefined
+  intersecting: boolean
 }>()
 
 defineSlots<{
-  default: (props: {field: ListFieldExport<FieldComponent<Data>, ListField<Data, QueryParams>>, item: Data, nested: boolean}) => void
+  default: (props: {field: ListFieldExport<FieldComponent<Data, QueryParams>, ListField<Data, QueryParams>>, item: Data, nested: boolean}) => void
 }>()
 </script>
