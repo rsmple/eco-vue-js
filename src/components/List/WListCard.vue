@@ -123,13 +123,6 @@
         @close="position = null"
       >
         <WButtonMoreItem
-          v-if="allowSelect"
-          :text="selected ? 'Unselect' : 'Select'"
-          :icon="selected ? markRaw(IconMinusCircle) : markRaw(IconAddCircle)"
-          @click="$emit('toggle:selected')"
-        />
-
-        <WButtonMoreItem
           v-if="alwaysSelect && allowSelect && to"
           text="View"
           :icon="markRaw(IconTo)"
@@ -222,8 +215,6 @@ import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 import WForm from '@/components/Form/WForm.vue'
 import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 
-import IconAddCircle from '@/assets/icons/IconAddCircle.svg?component'
-import IconMinusCircle from '@/assets/icons/IconMinusCircle.svg?component'
 import IconTo from '@/assets/icons/IconTo.svg?component'
 
 import ListCardAction from './components/ListCardAction.vue'
