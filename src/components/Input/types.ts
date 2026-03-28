@@ -4,7 +4,7 @@ import type {WrapSelectionType} from '@/utils/utils'
 import type {Component} from 'vue'
 
 export interface InputProps<Type extends InputType> extends Omit<FieldWrapperProps, 'modelValue'> {
-  modelValue?: (Type extends 'number' ? number : string) | undefined
+  modelValue?: (Type extends 'number' ? number : string) | undefined | null
   type?: Type
 
   textarea?: boolean

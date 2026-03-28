@@ -15,7 +15,7 @@ const checkPermissionCopy = async (): Promise<boolean> => {
   return result.state === 'granted' || result.state === 'prompt'
 }
 
-export const useCopy = (value: MaybeRef<string | number | undefined>) => {
+export const useCopy = (value: MaybeRef<string | number | undefined | null>) => {
   const copied = ref(false)
   let timeout: NodeJS.Timeout | undefined
 

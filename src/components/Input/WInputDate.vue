@@ -87,7 +87,9 @@ const inputComponentRef = useTemplateRef('inputComponent')
 
 const inputValue = ref<string>(props.modelValue ? dateFormat(props.modelValue) : '')
 
-const updateInputValue = (value: string) => {
+const updateInputValue = (value: string | null) => {
+  if (!value) return
+
   inputValue.value = value
 
   const date = parseDate(value)
