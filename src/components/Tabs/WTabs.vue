@@ -120,7 +120,7 @@
           :title="slot.props.title"
           :active="slot.props.name === current"
           :removable="slot.props.removable ?? false"
-          :enable-status="statusIcon || showHasValue"
+          :enable-status="(statusIcon || showHasValue) ?? false"
           @update:height="!disableMinHeight && updateHeight($event)"
           @update:active="$emit('update:current-title', slot.props?.title)"
         >
