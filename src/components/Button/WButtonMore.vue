@@ -60,7 +60,7 @@
 <script lang="ts" setup>
 import type {DropdownProps} from '../Dropdown/types'
 
-import {readonly, ref} from 'vue'
+import {computed, useId} from 'vue'
 
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
@@ -68,6 +68,8 @@ import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import IconMore from '@/assets/icons/IconMore.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
+
+import {useButtonMoreId} from './models/buttonMore'
 
 const props = defineProps<{
   icon?: SVGComponent
@@ -79,28 +81,33 @@ const emit = defineEmits<{
   (e: 'close'): void
 }>()
 
-const isOpen = ref(false)
+const id = useId()
+
+const {current} = useButtonMoreId()
+
+const isOpen = computed(() => current.value === id)
 
 const toggle = (): void => {
   if (props.disabled) return
 
-  isOpen.value = !isOpen.value
+  if (current.value === id) current.value = undefined
+  else current.value = id
 
   if (!isOpen.value) emit('close')
 }
 
 const close = (): void => {
-  isOpen.value = false
+  current.value = undefined
 
   emit('close')
 }
 
 const open = () => {
-  isOpen.value = true
+  current.value = id
 }
 
 defineExpose({
   open,
-  isOpen: readonly(isOpen),
+  isOpen,
 })
 </script>
