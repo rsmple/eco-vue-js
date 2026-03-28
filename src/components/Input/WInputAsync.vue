@@ -147,14 +147,14 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'update:model-value', value: ModelValue | undefined): void
+  (e: 'update:model-value', value: NonNullable<ModelValue> | undefined): void
 }>()
 
 const {isReadonly, isDisabled} = useComponentStates(props)
 
 const focused = ref(false)
 const saved = ref(false)
-const value = ref<ModelValue | undefined>()
+const value = ref<NonNullable<ModelValue> | undefined>()
 const inputRef = useTemplateRef('input')
 const errorMessageValue = ref<string | undefined>()
 const hasChangesValue = computed(() => props.modelValue !== value.value)
@@ -171,7 +171,7 @@ const doClearTimeout = () => {
 const reset = () => {
   doClearTimeout()
 
-  value.value = props.modelValue
+  value.value = props.modelValue || undefined
 
   focused.value = false
 }
@@ -218,7 +218,7 @@ watch(value, (newValue: ModelValue | undefined): void => {
   }
 })
 
-const emitUpdateModelValue = (newValue: ModelValue | undefined) => {
+const emitUpdateModelValue = (newValue: NonNullable<ModelValue> | undefined) => {
   if (isDisabled.value || isReadonly.value || props.loading) return
   if (errorMessageValue.value) return
   if (props.placeholderSecure) inputRef.value?.blur()

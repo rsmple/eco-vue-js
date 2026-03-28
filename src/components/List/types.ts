@@ -9,7 +9,7 @@ export type FieldProps<Data, QueryParams = any> = {
   readonly: boolean
   card: boolean
   config: FieldConfig
-  uniformScope: UniformScope<Data, number> | undefined
+  uniformScope: UniformScope<Data, number | undefined> | undefined
   queryParams: QueryParams
   results: Data[] | undefined
   intersecting: boolean

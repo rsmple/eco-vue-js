@@ -336,7 +336,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'update:model-value', value: ModelValue | undefined): void
+  (e: 'update:model-value', value: NonNullable<ModelValue> | undefined): void
   (e: 'keypress:enter', value: KeyboardEvent): void
   (e: 'keypress:up', value: KeyboardEvent): void
   (e: 'keypress:down', value: KeyboardEvent): void
@@ -424,7 +424,7 @@ const undo = (): void => {
   fieldWrapperRef.value?.showMessage('Undo')
   const index = historyPosition.value - 1
   const item = history.value[index]!
-  emit('update:model-value', item.value as ModelValue)
+  emit('update:model-value', item.value as NonNullable<ModelValue>)
   nextTick(() => setCaret(item.caret.start, item.caret.end))
   historyPosition.value = index
 }
@@ -440,7 +440,7 @@ const redo = (): void => {
   fieldWrapperRef.value?.showMessage('Redo')
   const index = historyPosition.value + 1
   const item = history.value[index]!
-  emit('update:model-value', item.value as ModelValue)
+  emit('update:model-value', item.value as NonNullable<ModelValue>)
   nextTick(() => setCaret(item.caret.start, item.caret.end))
   historyPosition.value = index
 }
@@ -457,9 +457,9 @@ const handleHistoryKeydown = (event: KeyboardEvent): void => {
 const updateModelValue = (value: string | undefined, noDebounce = false): void => {
   if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
 
-  let newValue: ModelValue
-  if (props.type === 'number') newValue = (typeof value === 'string' && value.length ? Number.parseFloat(value) : undefined) as ModelValue
-  else newValue = value as ModelValue
+  let newValue: NonNullable<ModelValue>
+  if (props.type === 'number') newValue = (typeof value === 'string' && value.length ? Number.parseFloat(value) : undefined) as NonNullable<ModelValue>
+  else newValue = value as NonNullable<ModelValue>
 
   if (!props.textSecure) addToHistory(newValue, noDebounce)
 
