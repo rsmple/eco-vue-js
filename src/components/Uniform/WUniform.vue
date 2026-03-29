@@ -317,7 +317,7 @@ const _hasChangesField = computed<boolean>(() => {
     const newValue = value.value
 
     if (Array.isArray(newValue) && Array.isArray(oldValue)) {
-      return newValue.length !== oldValue.length || (!(newValue[0] instanceof Object) && newValue.some(item => !oldValue.includes(item)))
+      return newValue.length !== oldValue.length || newValue.some(item => !oldValue.includes(item))
     } else if (newValue instanceof Object && oldValue instanceof Object) {
       const keys = Object.keys(newValue)
       return keys.length !== Object.keys(oldValue).length
