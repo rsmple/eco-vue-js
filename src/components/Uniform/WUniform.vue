@@ -333,10 +333,11 @@ const _isValidField = computed<boolean>(() => errorMessage.value.length === 0)
 const _isValid = computed<boolean>(() => mapValues.value.every(item => item.isValid))
 const isValid = computed<boolean>(() => _isValidField.value && _isValid.value)
 
-const initModel = (): void => {
+const initModel = (result?: Model): void => {
   if (skeletonValue.value) return
 
-  if (props.getModel && query) data.value = props.getModel(query.data.value)
+  if (props.initData && result) Object.assign(data.value, result)
+  else if (props.getModel && query) data.value = props.getModel(query.data.value)
 
   isShownError.value = false
   initModelValue.value = Array.isArray(value.value) ? [...value.value] : value.value instanceof Object ? {...value.value} : value.value
@@ -503,12 +504,6 @@ const getErrorMessage = (): string | undefined => {
 }
 
 const submit = () => {
-  if (!hasChanges.value) {
-    Notify.warn({title: 'No changes'})
-
-    return
-  }
-
   const message = validateForm(false, true)
 
   if (message) {
@@ -532,12 +527,14 @@ const submit = () => {
   return (props.apiMethod(data.value) ?? Promise.resolve())
     .then(response => {
       const isResponse = isRequestResponse(response)
+      const data = isResponse ? response.data : response
 
-      if (response) query?.setData(isResponse ? response.data : response)
+      if (data) {
+        query?.setData(data)
+        if (props.getModel) initModel(props.getModel(data))
+      }
 
-      initModel()
-
-      emit('success', isResponse ? response.data : response!)
+      emit('success', data!)
     })
     .catch(error => {
       if (error instanceof ApiError && !(error instanceof ApiErrorCancel)) {
