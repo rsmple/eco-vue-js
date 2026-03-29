@@ -13,6 +13,7 @@ export interface UniformInstance {
   invalidate: (messages: InvalidatePayload) => void
   submit: () => Promise<void>
   getErrorMessage: () => string | undefined
+  getHasChangedField: (field: string) => boolean 
 }
 
 type Get<Value, Path extends unknown[] | readonly unknown[]> = Path extends [infer Head, ...infer Tail]
@@ -35,6 +36,8 @@ export type UniformScope<InnerModel, Field = undefined> = {
   updateModelValueInner: <Fields extends unknown[] | readonly unknown[]>(newValue: Get<InnerModel, Fields>, field: Fields) => void
   select: (newValue: InnerModel extends unknown[] ? InnerModel[number] : never) => void
   unselect: (newValue: InnerModel extends unknown[] ? InnerModel[number] : never) => void
+  async: boolean
+  submitting: boolean
   'onUpdate:modelValue': (newValue: InnerModel, fields: (string | number)[]) => void
 }
 
@@ -47,7 +50,9 @@ export type UniformScopeField<InnerModel, Field = undefined> = {
   required: boolean | undefined
   errorMessage: string | undefined
   skeleton: boolean
+  loading: boolean
   updateModelValue: Field extends undefined ? undefined : ((newValue: InnerModel | undefined) => void)
+  async: boolean
   'onUpdate:modelValue': ((newValue: InnerModel | undefined) => void) | undefined
   onSelect: (newValue: InnerModel extends unknown[] ? InnerModel[number] : never) => void
   onUnselect: (newValue: InnerModel extends unknown[] ? InnerModel[number] : never) => void

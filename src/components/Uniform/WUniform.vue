@@ -73,6 +73,13 @@
           {{ hasValueValue ? 'Has Value' : hasValueValue === null ? 'Empty' : 'No Value' }}
         </div>
 
+        <div
+          v-if="submitting || isSubmitting || isSubmittingField"
+          class="text-default rounded bg-gray-200 px-1 font-semibold dark:bg-gray-800"
+        >
+          {{ isSubmittingField ? 'Submitting Field' : 'Submitting' }}
+        </div>
+
         <div>
           {{ errorMessage ?? 'No Error' }}
         </div>
@@ -92,6 +99,8 @@
         updateModelValueInner: updateModelValueInner as UniformScope<InnerModel, Field>['updateModelValueInner'],
         select,
         unselect,
+        async,
+        submitting: isSubmitting || submitting,
         'onUpdate:modelValue': updateModelValueInner,
       }"
     />
@@ -109,6 +118,8 @@
         errorMessage: isShownError ? errorMessage.join('. ') : undefined,
         skeleton: skeletonValue,
         updateModelValue: (field ? updateModelValue : undefined) as UniformScopeField<InnerModel, Field>['updateModelValue'],
+        loading: isSubmittingField,
+        async,
         'onUpdate:modelValue': field ? updateModelValue : undefined,
         'onSelect': select,
         'onUnselect': unselect,
@@ -130,6 +141,8 @@ import {validateRequired} from '@/utils/validate'
 import {type InvalidatePayload, type UniformInstance, type UniformScope, type UniformScopeField, isUniformInstance} from './types'
 import {wUniformUnlistener, wUniformUpdater} from './utils/injection'
 import {scrollToValidator} from './utils/utils'
+
+import {type ShowMessage, useFieldMessage} from '../FieldWrapper/use/useFieldSaved'
 
 const DEBUG = true
 
@@ -183,6 +196,8 @@ type Props = {
   apiMethod?: (data: Partial<Model>) => Promise<RequestResponse<Result> | Result | void> | void
   tag?: keyof HTMLElementTagNameMap
   hasValue?: boolean
+  async?: boolean
+  submitting?: boolean
 }
 
 const props = withDefaults(
@@ -288,6 +303,7 @@ const fieldRef = ref<ComponentInstance<unknown> | ComponentInstance<unknown>[] |
 const isShownError = ref(false)
 const errorMessage = ref<string[]>([])
 const isSubmitting = ref(false)
+const isSubmittingField = computed(() => props.async && props.submitting && props.field !== undefined && hasChanges.value)
 
 const skeletonQuery = computed<boolean>(() => query !== undefined && !query.data.value)
 const skeletonValue = computed<boolean>(() => props.skeleton || skeletonQuery.value)
@@ -336,7 +352,7 @@ const isValid = computed<boolean>(() => _isValidField.value && _isValid.value)
 const initModel = (result?: Model): void => {
   if (skeletonValue.value) return
 
-  if (props.initData && result) Object.assign(data.value, result)
+  if (props.initData && result) data.value = result
   else if (props.getModel && query) data.value = props.getModel(query.data.value)
 
   isShownError.value = false
@@ -344,9 +360,12 @@ const initModel = (result?: Model): void => {
 
   validateField(true)
 
-  for (const item of mapValues.value) {
-    item.initModel()
-  }
+  nextTick(() => {
+    for (const item of mapValues.value) {
+      item.initModel()
+    }
+  })
+
 }
 
 const updateModelValue = (newValue: InnerModel | undefined): void => {
@@ -392,6 +411,8 @@ const updateModelValueInner = (newValue: InnerModel, fields: (string | number)[]
         break
       }
     }
+
+    if (props.async) submit()
   }
 
   emit('update:model-value', newValue, props.field !== undefined ? [props.field as string | number, ...fields] : fields)
@@ -503,6 +524,33 @@ const getErrorMessage = (): string | undefined => {
   return `${ prefix }\n${ messages }`
 }
 
+const getHasChangedField = (field: string): boolean => props.field
+  ? props.field === field && hasChanges.value
+  : mapValues.value.some(item => item.getHasChangedField(field))
+
+const getChangedPayload = () => {
+  const payload: Partial<Model> = {}
+
+  for (const field in data.value) {
+    if (getHasChangedField(field)) payload[field as keyof Model] = data.value[field]
+  }
+
+  return payload
+}
+
+let showMessage: ShowMessage | null = null
+if (props.field) {
+  showMessage = useFieldMessage()
+
+  watch(isSubmittingField, value => {
+    if (value) return
+
+    if (isValid.value) showMessage?.('Saved')
+  })
+
+  // useProvideAsync(toRef(props, 'async'))
+}
+
 const submit = () => {
   const message = validateForm(false, true)
 
@@ -524,7 +572,7 @@ const submit = () => {
 
   isSubmitting.value = true
 
-  return (props.apiMethod(data.value) ?? Promise.resolve())
+  return (props.apiMethod(props.async ? getChangedPayload() : data.value) ?? Promise.resolve())
     .then(response => {
       const isResponse = isRequestResponse(response)
       const data = isResponse ? response.data : response
@@ -571,6 +619,11 @@ const scrollTo = () => {
 
 watch(() => props.required, () => void validateField())
 watch(skeletonValue, () => void initModel(), {immediate: true})
+if (query) watch(query.data, (value, oldValue) => {
+  if (!value || !oldValue) return
+
+  initModel()
+}, {immediate: true})
 
 const updaterInjected = inject(wUniformUpdater, undefined)
 const unlistenerInjected = inject(wUniformUnlistener, undefined)
@@ -606,6 +659,7 @@ defineExpose({
   invalidate,
   submit,
   getErrorMessage,
+  getHasChangedField,
   externalRef: props.externalRef,
   updateModelValue,
   updateModelValueInner: updateModelValueInner as UniformScope<InnerModel, Field>['updateModelValueInner'],

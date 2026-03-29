@@ -38,12 +38,14 @@ export interface InputProps<Type extends InputType> extends Omit<FieldWrapperPro
   textParts?: TextPart[]
   rich?: boolean
   toolbarActions?: ToolbarAction[]
+
+  async?: boolean
+  debounce?: number
+  hideDebounce?: boolean
 }
 
 export interface InputAsyncProps<Type extends InputType> extends InputProps<Type> {
   validate?: ValidateFn | ValidateFn[]
-  debounce?: number
-  hideDebounce?: boolean
 }
 
 export interface InputSuggestProps<Type extends InputType> extends Omit<InputProps<Type>, 'unclickable'>, Partial<Omit<DropdownMenuProps, 'isOpen' | 'updateAlign' | 'emitUpdate'>> {

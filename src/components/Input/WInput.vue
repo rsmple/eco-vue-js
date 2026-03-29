@@ -2,6 +2,8 @@
   <WFieldWrapper
     ref="fieldWrapper"
     v-bind="props"
+    :has-changes="asyncState.hasChanges.value || hasChanges"
+    :allow-clear="asyncState.isAsync.value ? (!textarea || allowClear) && asyncState.focused.value : allowClear"
     :class="[$attrs.class, {
       'group/seamless': seamless,
     }]"
@@ -193,7 +195,7 @@
                     '[-webkit-text-fill-color:transparent]': textTransparent,
                     'sm-not:text-[1rem]': !unclickable,
                   }"
-                  :value="placeholderSecure && modelValue === undefined && !focused ? '' : modelValue"
+                  :value="placeholderSecure && modelValue === undefined && !focused ? '' : asyncState.isAsync.value ? asyncState.value.value : modelValue"
                   :placeholder="placeholder"
                   :type="type ?? 'text'"
                   :name="name"
@@ -208,7 +210,7 @@
                   :max-length="maxLength"
                   :text-parts="textParts"
                   @input="handleInputEvent"
-                  @keypress.enter.exact="!isDisabled && !isReadonly && $emit('keypress:enter', $event)"
+                  @keypress.enter.exact="!isDisabled && !isReadonly && (asyncState.isAsync.value && !textarea ? (asyncState.clearTimeout(), asyncState.hasChanges.value && asyncState.save()) : $emit('keypress:enter', $event))"
                   @keydown.up.exact.stop="!isDisabled && !isReadonly && $emit('keypress:up', $event)"
                   @keydown.down.exact.stop="!isDisabled && !isReadonly && $emit('keypress:down', $event)"
                   @keydown.delete.exact.stop="!isDisabled && !isReadonly && $emit('keypress:delete', $event); handleBackspace($event)"
@@ -216,11 +218,17 @@
                   @focus="
                     $emit('focus', $event);
                     setFocused(true);
+                    asyncState.focused.value = true;
                     seamless && nextTick(scrollToInput);
                   "
                   @blur="
                     $emit('blur', $event);
                     setFocused(false);
+                    if (asyncState.isAsync.value) {
+                      if (textSecure || !asyncState.hasChanges.value) asyncState.cancel();
+                      else asyncState.save();
+                      asyncState.focused.value = false;
+                    }
                     isSecureVisible = false;
                     contentRef?.scrollTo({left: 0});
                   "
@@ -269,10 +277,41 @@
         </InputActions>
 
         <slot name="inner" />
+
+        <div
+          v-if="asyncState.isAsync.value && debounce && !hideDebounce"
+          class="absolute inset-x-3 bottom-[calc((var(--w-input-height)-1.75em)/2)] isolate h-0.5"
+        >
+          <Transition
+            enter-active-class="transition-opacity"
+            leave-active-class="transition-opacity"
+            enter-from-class="opacity-0"
+            leave-to-class="opacity-0"
+          >
+            <div
+              v-if="asyncState.timeout.value"
+              class="absolute inset-0 -z-10 bg-gray-200 dark:bg-gray-700"
+            />
+          </Transition>
+
+          <Transition
+            enter-active-class="transition-[width] ease-linear rounded-sm duration-[var(--debounce-duration)]"
+            enter-from-class="w-0"
+            enter-to-class="w-full"
+            leave-active-class="hidden"
+          >
+            <div
+              v-if="asyncState.timeout.value"
+              :key="asyncState.timeout.value.toString()"
+              class="bg-primary dark:bg-primary-dark relative h-full rounded-sm"
+              :style="{'--debounce-duration': debounce + 'ms'}"
+            />
+          </Transition>
+        </div>
       </div>
     </template>
 
-    <template 
+    <template
       v-if="$slots.right"
       #right
     >
@@ -280,10 +319,18 @@
     </template>
 
     <template
-      v-if="$slots.bottom"
+      v-if="$slots.bottom || (asyncState.isAsync.value && !skeleton && textSecure && asyncState.focused.value)"
       #bottom
     >
       <slot name="bottom" />
+
+      <InputAsyncButtons
+        v-if="asyncState.isAsync.value && !skeleton && textSecure && asyncState.focused.value"
+        :disabled="disabled || loading"
+        :loading="loading"
+        @cancel="asyncState.cancel(); blur()"
+        @save="asyncState.save()"
+      />
     </template>
   </WFieldWrapper>
 </template>
@@ -304,14 +351,16 @@ import {getIsMobile} from '@/utils/mobile'
 import {isDragging} from '@/utils/preventDragFile'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {checkPermissionPaste} from '@/utils/useCopy'
-import {debounce} from '@/utils/utils'
+import {debounce as debounceFn} from '@/utils/utils'
 
 import InputActions from './components/InputActions.vue'
+import {useInputAsync} from './models/useInputAsync'
 import {type CaretOffset} from './models/utils'
 
 import FilePickerSvg from '../FilePicker/components/FilePickerSvg.vue'
 
 const ContentEditable = defineAsyncComponent(() => import('./components/ContentEditable.vue'))
+const InputAsyncButtons = defineAsyncComponent(() => import('./components/InputAsyncButtons.vue'))
 const InputToolbar = defineAsyncComponent(() => import('./components/InputToolbar.vue'))
 
 type ModelValue = Required<InputProps<Type>>['modelValue']
@@ -357,6 +406,12 @@ const fieldWrapperRef = useTemplateRef('fieldWrapper')
 const contentRef = useTemplateRef('content')
 const inputRef = useTemplateRef<HTMLInputElement | ComponentInstance<typeof ContentEditable>>('input')
 const isSecureVisible = ref(false)
+
+const asyncState = useInputAsync({
+  props,
+  emit: emit as (e: 'update:model-value', value: string | number | null | undefined) => void,
+  blur: () => inputRef.value?.blur(),
+})
 
 const history = ref<HistoryEntry[]>([])
 const historyPosition = ref(-1)
@@ -411,7 +466,7 @@ const addToHistoryFn = (value: ModelValue | undefined): void => {
   }
 }
 
-const addToHistoryDebounced = debounce(addToHistoryFn, 500)
+const addToHistoryDebounced = debounceFn(addToHistoryFn, 500)
 
 const undo = (): void => {
   if (props.loading || isDisabled.value || isReadonly.value || props.unclickable || props.textSecure) return
@@ -463,7 +518,11 @@ const updateModelValue = (value: string | undefined, noDebounce = false): void =
 
   if (!props.textSecure) addToHistory(newValue, noDebounce)
 
-  emit('update:model-value', newValue)
+  if (asyncState.isAsync.value) {
+    asyncState.value.value = newValue
+  } else {
+    emit('update:model-value', newValue)
+  }
 }
 
 const handleBackspace = (event: KeyboardEvent): void => {
@@ -548,13 +607,18 @@ const onPaste = async (e: ClipboardEvent) => {
   }
  
   const caret = getCaret()
-  const value = props.modelValue?.toString() ?? ''
-  const newValue = value.slice(0, caret.start) + text + value.slice(caret.end)
+  const currentValue = (asyncState.isAsync.value ? asyncState.value.value : props.modelValue)?.toString() ?? ''
+  const newValue = currentValue.slice(0, caret.start) + text + currentValue.slice(caret.end)
 
   updateModelValue(newValue, true)
 
+  if (asyncState.isAsync.value) {
+    asyncState.clearTimeout()
+    asyncState.save()
+  }
+
   await nextTick()
-  setCaret(Math.min(caret.start + text.length, props.modelValue?.toString().length ?? 0))
+  setCaret(Math.min(caret.start + text.length, (asyncState.isAsync.value ? asyncState.value.value : props.modelValue)?.toString().length ?? 0))
 }
 
 const paste = async () => {
