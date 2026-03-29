@@ -134,6 +134,7 @@ import {type Component, type VNode, computed, inject, isReadonly, nextTick, onBe
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
+import {Modal} from '@/utils/Modal'
 import {Notify} from '@/utils/Notify'
 import {ApiError, ApiErrorCancel, isRequestResponse} from '@/utils/api'
 import {validateRequired} from '@/utils/validate'
@@ -198,6 +199,7 @@ type Props = {
   hasValue?: boolean
   async?: boolean
   submitting?: boolean
+  confimGetter?: (payload: InnerModel, data: Model) => ConfirmProps | Promise<ConfirmProps | undefined> | undefined
 }
 
 const props = withDefaults(
@@ -215,6 +217,7 @@ const props = withDefaults(
     apiMethod: undefined,
     tag: undefined,
     hasValue: undefined,
+    confimGetter: undefined,
   },
 )
 
@@ -365,15 +368,42 @@ const initModel = (result?: Model): void => {
       item.initModel()
     }
   })
+}
 
+let closeModal: (() => void) | null = null
+
+const showModal = async (value: InnerModel) => {
+  closeModal?.()
+
+  let confirmProps = props.confimGetter?.(value, data.value as Model)
+
+  if (confirmProps instanceof Promise) {
+    isSubmitting.value = true
+    confirmProps = await confirmProps
+    isSubmitting.value = false
+  }
+
+  if (!confirmProps) {
+    emit('update:model-value', value, [props.field as string | number])
+
+    _validateFieldAndUpdateMessage(value)
+    return
+  }
+
+  closeModal = Modal.addConfirm({
+    ...confirmProps,
+    onAccept: () => {
+      emit('update:model-value', value, [props.field as string | number])
+
+      _validateFieldAndUpdateMessage(value)
+    },
+  }, () => closeModal = null)
 }
 
 const updateModelValue = (newValue: InnerModel | undefined): void => {
   if (props.field === undefined) return
 
-  emit('update:model-value', newValue!, [props.field as string | number])
-
-  _validateFieldAndUpdateMessage(newValue!)
+  showModal(newValue!)
 }
 
 const select = (newValue: InnerModel extends unknown[] ? InnerModel[number] : never): void => {
@@ -381,9 +411,7 @@ const select = (newValue: InnerModel extends unknown[] ? InnerModel[number] : ne
 
   const newList = [...value.value, newValue] as InnerModel
 
-  emit('update:model-value', newList, [props.field as string | number])
-
-  _validateFieldAndUpdateMessage(newList)
+  showModal(newList)
 }
 
 const unselect = (newValue: InnerModel extends unknown[] ? InnerModel[number] : never): void => {
@@ -393,9 +421,7 @@ const unselect = (newValue: InnerModel extends unknown[] ? InnerModel[number] : 
   const index = newList.indexOf(newValue)
   if (index !== -1) newList.splice(index, 1)
 
-  emit('update:model-value', newList as InnerModel, [props.field as string | number])
-
-  _validateFieldAndUpdateMessage(newList as InnerModel)
+  showModal(newList as InnerModel)
 }
 
 const updateModelValueInner = (newValue: InnerModel, fields: (string | number)[]) => {
