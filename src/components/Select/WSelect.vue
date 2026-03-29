@@ -274,7 +274,7 @@ const close = () => {
     const optionExact = optionsFiltered.value.find(option => props.valueGetter(option) === search.value)
 
     if (optionExact) select(props.valueGetter(optionExact), optionExact)
-    else if (search.value) create(search.value)
+    else if (search.value && !loadingCreate.value) create(search.value)
     else if (props.modelValue.length) {
       const last = props.modelValue[props.modelValue.length - 1]!
       unselect(last, optionsWithCreated.value.find(option => props.valueGetter(option) === last))
