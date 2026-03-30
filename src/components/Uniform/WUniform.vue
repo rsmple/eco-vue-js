@@ -130,7 +130,7 @@
 </template>
 
 <script setup lang="ts" generic="Model, QueryParams, Field extends (Model extends unknown[] ? number : keyof Model) | undefined = undefined, Result = Model">
-import {type Component, type VNode, computed, inject, isReadonly, nextTick, onBeforeUnmount, reactive, ref, toRef, useId, watch} from 'vue'
+import {type Component, type Ref, type VNode, computed, inject, isReadonly, nextTick, onBeforeUnmount, reactive, ref, toRef, useId, watch} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
@@ -158,24 +158,24 @@ type InnerModel = Model extends unknown[]
 type ValidateMethod = (value: InnerModel) => string | undefined
 
 type NoQueryProps = {
-  // eslint-disable-next-line vue/require-default-prop
+   
   useQueryFn?: never
-  // eslint-disable-next-line vue/require-default-prop
+   
   queryParams?: never
   // eslint-disable-next-line vue/require-default-prop
   getModel?: never
 }
 
 type QueryPropsParams = {
-  useQueryFn: UseQueryWithParams<Result, QueryParams>
-  queryParams: QueryParams
+  useQueryFn?: UseQueryWithParams<Result, QueryParams>
+  queryParams?: QueryParams
   // eslint-disable-next-line vue/require-default-prop
   getModel?: (value: Result | undefined) => Model
 }
 
 type QueryPropsNoParams = {
-  useQueryFn: UseQueryEmpty<Result>
-  // eslint-disable-next-line vue/require-default-prop
+  useQueryFn?: UseQueryEmpty<Result>
+   
   queryParams?: never
   // eslint-disable-next-line vue/require-default-prop
   getModel?: (value: Result | undefined) => Model
@@ -218,6 +218,8 @@ const props = withDefaults(
     tag: undefined,
     hasValue: undefined,
     confimGetter: undefined,
+    useQueryFn: undefined,
+    queryParams: undefined,
   },
 )
 
@@ -231,16 +233,14 @@ const idValue = props.id ?? useId()
 
 const query = props.modelValue === undefined && props.initData === undefined && 'useQueryFn' in props
   ? props.queryParams !== undefined
-    ? (props.useQueryFn as UseQueryWithParams<Result, QueryParams>)(toRef(props, 'queryParams'))
+    ? (props.useQueryFn as UseQueryWithParams<Result, QueryParams>)(toRef(props, 'queryParams') as Ref<QueryParams>)
     : (props.useQueryFn as UseQueryEmpty<Result>)()
   : undefined
 
 const data = props.initData
   ? ref(props.initData())
   : query
-    ? props.getModel
-      ? ref(props.getModel(query.data.value))
-      : query.data
+    ? ref(props.getModel ? props.getModel(query.data.value) : {...query.data.value})
     : toRef(props, 'modelValue')
 
 const value = computed<InnerModel>(() => props.field !== undefined
@@ -356,7 +356,7 @@ const initModel = (result?: Model): void => {
   if (skeletonValue.value) return
 
   if (props.initData && result) data.value = result
-  else if (props.getModel && query) data.value = props.getModel(query.data.value)
+  else if (query) data.value = props.getModel ? props.getModel(query.data.value) : {...query.data.value}
 
   isShownError.value = false
   initModelValue.value = Array.isArray(value.value) ? [...value.value] : value.value instanceof Object ? {...value.value} : value.value
@@ -384,32 +384,46 @@ const showModal = async (value: InnerModel) => {
   }
 
   if (!confirmProps) {
-    emit('update:model-value', value, [props.field as string | number])
+    if (props.field === undefined) {
+      if (value) {
+        if (props.initData || props.getModel || query) {
+          data.value = value
 
-    _validateFieldAndUpdateMessage(value)
+          if (props.async) nextTick(submit)
+        } else emit('update:model-value', value, [])
+      }
+
+      return
+    } else {
+      emit('update:model-value', value, [props.field as string | number])
+
+      _validateFieldAndUpdateMessage(value)
+    }
     return
   }
 
   closeModal = Modal.addConfirm({
     ...confirmProps,
     onAccept: () => {
-      emit('update:model-value', value, [props.field as string | number])
+      if (props.field === undefined) {
+        if (value) {
+          if (props.initData || props.getModel || query) {
+            data.value = value
+            if (props.async) nextTick(submit)
+          } else emit('update:model-value', value, [])
+        }
 
-      _validateFieldAndUpdateMessage(value)
+        return
+      } else {
+        emit('update:model-value', value, [props.field as string | number])
+
+        _validateFieldAndUpdateMessage(value)
+      }
     },
   }, () => closeModal = null)
 }
 
 const updateModelValue = (newValue: InnerModel | undefined): void => {
-  if (props.field === undefined) {
-    if (newValue) {
-      if (props.initData || props.getModel) data.value = newValue
-      else emit('update:model-value', newValue, [])
-    }
-
-    return
-  }
-
   showModal(newValue!)
 }
 
@@ -432,20 +446,24 @@ const unselect = (newValue: InnerModel extends unknown[] ? InnerModel[number] : 
 }
 
 const updateModelValueInner = (newValue: InnerModel, fields: (string | number)[]) => {
-  if (!isReadonly(data.value) && (props.initData || props.getModel)) {
-    let current = data.value
+  if (!isReadonly(data.value) && (props.initData || props.getModel || query)) {
+    if (fields.length) {
+      let current = data.value
 
-    for (const field of fields) {
-      if (fields.indexOf(field) !== fields.length - 1) current = current[field]
-      else {
-        current[field] = newValue
+      for (const field of fields) {
+        if (fields.indexOf(field) !== fields.length - 1) current = current[field]
+        else {
+          current[field] = newValue
 
-        validateField(true)
-        break
+          validateField(true)
+          break
+        }
       }
+    } else {
+      data.value = newValue
     }
 
-    if (props.async) submit()
+    if (props.async) nextTick(submit)
   }
 
   emit('update:model-value', newValue, props.field !== undefined ? [props.field as string | number, ...fields] : fields)
@@ -611,8 +629,12 @@ const submit = () => {
       const data = isResponse ? response.data : response
 
       if (data) {
-        query?.setData(data)
-        if (props.getModel) initModel(props.getModel(data))
+        if (query) {
+          query.setData(data)
+          initModel()
+        } else if (props.getModel) {
+          initModel(props.getModel(data))
+        }
       }
 
       emit('success', data!)

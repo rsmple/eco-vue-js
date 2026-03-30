@@ -81,7 +81,7 @@ export interface SelectSingleProps<Model extends number | string, Data extends D
 
 export interface SelectStringifiedProps<Model extends string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
   extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'emptyValue'> {
-  modelValue: Model | null
+  modelValue: Model | null | undefined
   divider: string | 'json'
   emptyValue?: Model | null
 }

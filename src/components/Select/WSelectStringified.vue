@@ -80,7 +80,7 @@ const emit = defineEmits<{
 
 const selectComponentRef = useTemplateRef('selectComponent')
 
-const decodeValue = (value: string | null): string[] => {
+const decodeValue = (value: string | null | undefined): string[] => {
   if (!value) return []
 
   if (props.divider !== 'json') return value.split(props.divider).filter((item, index, arr) => item !== '' && arr.indexOf(item) === index)
