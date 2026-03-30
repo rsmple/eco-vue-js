@@ -9,7 +9,7 @@ export type FieldProps<Data, QueryParams = any> = {
   readonly: boolean
   card: boolean
   config: FieldConfig
-  uniformScope: UniformScope<Data, number | undefined> | undefined
+  uniformScope: UniformScope<Data> | undefined
   queryParams: QueryParams
   results: Data[] | undefined
   intersecting: boolean
@@ -170,7 +170,7 @@ export type CardActionParams<Data> = {
 }
 
 export type FilterProps<QueryParams> = {
-  queryParams: QueryParams
+  scope: UniformScope<QueryParams>
   global: boolean
   readonly: boolean
 }
@@ -182,14 +182,13 @@ export type FilterMeta<QueryParams> = {
   hidden?: boolean | ((queryParams: QueryParams) => boolean)
 }
 
-export type FilterEmits<QueryParams, Field extends keyof QueryParams> = {
-  (e: 'update:query-params', value: Pick<QueryParams, Field>): void
+export type FilterEmits = {
   (e: 'close'): void
 }
 
 export type FilterComponent<QueryParams> = ListFieldExport<Component<FilterProps<QueryParams>>, FilterMeta<QueryParams>> | [
   ListFieldExport<Component<FilterProps<QueryParams>>, FilterMeta<QueryParams>>,
-  {[Key in string]?: Key extends keyof Pick<FilterProps<QueryParams>, 'queryParams'>
+  {[Key in string]?: Key extends keyof Pick<FilterProps<QueryParams>, 'scope'>
       ? never
       : Key extends keyof FilterProps<QueryParams>
       ? FilterProps<QueryParams>[Key]

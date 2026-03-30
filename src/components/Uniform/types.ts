@@ -24,7 +24,7 @@ type Get<Value, Path extends unknown[] | readonly unknown[]> = Path extends [inf
     : undefined
   : undefined
 
-export type UniformScope<InnerModel, Field = undefined> = {
+export type UniformScope<InnerModel> = {
   ref: (item: UniformInstance | unknown) => void
   parentRef: (item: UniformInstance | unknown) => void
   skeleton: boolean
@@ -32,7 +32,7 @@ export type UniformScope<InnerModel, Field = undefined> = {
   modelValueList: Record<string, InnerModel extends unknown[] ? InnerModel[number] : never>
   removeParentRef: (id: string) => void
   onUnmouted: (id: string) => void
-  updateModelValue: Field extends undefined ? undefined : (newValue: InnerModel) => void
+  updateModelValue: (newValue: InnerModel) => void
   updateModelValueInner: <Fields extends unknown[] | readonly unknown[]>(newValue: Get<InnerModel, Fields>, field: Fields) => void
   select: (newValue: InnerModel extends unknown[] ? InnerModel[number] : never) => void
   unselect: (newValue: InnerModel extends unknown[] ? InnerModel[number] : never) => void

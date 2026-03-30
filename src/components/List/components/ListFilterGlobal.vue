@@ -1,17 +1,16 @@
 <template>
   <WHeaderBarSearch
     v-if="search"
-    :shown="!!(queryParams as Record<string, string>).search"
+    :shown="!!(scope.modelValue as Record<string, string>).search"
   >
     <template #default="{visible, hide}">
       <component
         :is="!filterSearch ? ListFilterSearch.default : Array.isArray(filterSearch) ? filterSearch[0].default : filterSearch.default"
-        :query-params="queryParams"
-        :autofocus="!(queryParams as Record<string, string>).search && visible"
+        :scope="scope"
+        :autofocus="!(scope.modelValue as Record<string, string>).search && visible"
         :readonly="readonly"
         global
-        @update:query-params="$emit('update:query-params', $event)"
-        @close="!(queryParams as Record<string, string>).search && hide?.()"
+        @close="!(scope.modelValue as Record<string, string>).search && hide?.()"
       />
     </template>
   </WHeaderBarSearch>
@@ -24,14 +23,13 @@
       v-for="(item, index) in filter"
       :key="index"
       ref="filterItem"
+      :scope="scope"
       :item="item"
-      :query-params="queryParams"
       :is-open="open === index"
       :disabled-filter-fields="disabledFilterFields"
       :readonly="readonly"
       class="-px--inner-margin"
       @toggle="open = open === index ? null : index"
-      @update:query-params="$emit('update:query-params', $event)"
     />
 
     <div class="-mx--inner-margin my-8 h-0.5 rounded bg-gray-400" />
@@ -53,6 +51,7 @@
 
 <script setup lang="ts" generic="QueryParams">
 import type {FilterComponent} from '../types'
+import type {UniformScope} from '@/components/Uniform/types'
 
 import {computed, ref, useTemplateRef} from 'vue'
 
@@ -68,19 +67,15 @@ import {SemanticType} from '@/utils/SemanticType'
 import ListFilterGlobalItem from './ListFilterGlobalItem.vue'
 import * as ListFilterSearch from './ListFilterSearch.vue'
 
-defineProps<{
+const props = defineProps<{
+  scope: UniformScope<QueryParams>
   filter: FilterComponent<QueryParams>[] | undefined
   filterSearch: FilterComponent<QueryParams> | undefined
   search: boolean
-  queryParams: QueryParams
   disabledFilterFields: Array<keyof QueryParams>
   title: ((count: number) => string) | undefined
   readonly: boolean
   searchVisible: boolean
-}>()
-
-const emit = defineEmits<{
-  (e: 'update:query-params', value: Partial<QueryParams>): void
 }>()
 
 const open = ref<number | null>(null)
@@ -109,7 +104,7 @@ const openConfirmReset = () => {
             Object.assign(result, item.getDefaultQuery())
           })
 
-          emit('update:query-params', result as QueryParams)
+          props.scope.updateModelValue({...props.scope.modelValue, ...result})
         },
       },
     )

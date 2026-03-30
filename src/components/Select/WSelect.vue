@@ -5,7 +5,7 @@
       ...props,
       modelValue: search,
       loading: loading || isLoading || loadingCreate,
-      hideInput: modelValue.length === 0 && !emptyValue ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
+      hideInput: !modelValue?.length && !emptyValue ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
       filterValue: filterValue === undefined ? modelValue : filterValue,
       emptyValue: undefined,
     }"
@@ -41,7 +41,7 @@
 
       <template v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true">
         <SelectOptionPrefix
-          v-for="(value, index) in !emptyValue || modelValue.length !== 0 ? modelValue : emptyValue"
+          v-for="(value, index) in !emptyValue || modelValue?.length !== 0 ? modelValue : emptyValue"
           :key="value"
           :option="optionsWithCreated.find(item => valueGetter(item) === value)"
           :option-component="(optionComponent as SelectOptionComponent<Data>)"
@@ -50,7 +50,7 @@
           :loading="loading || isLoading"
           :disabled="isDisabled"
           :readonly="isReadonly"
-          :disable-clear="disableClear || isReadonly || (seamless && !focused) || modelValue.length === 0"
+          :disable-clear="disableClear || isReadonly || (seamless && !focused) || modelValue?.length === 0"
           :search="value"
           :skeleton="optionsWithCreated.length === 0"
           :class="{
@@ -147,7 +147,7 @@
           :key="valueGetter(option)"
           ref="option"
           :index="index"
-          :is-selected="modelValue.includes(valueGetter(option))"
+          :is-selected="modelValue?.includes(valueGetter(option)) ?? false"
           :is-cursor="index === cursor"
           :loading="loadingOptionIndex === index && loading"
           :scroll="isCursorLocked"
@@ -227,7 +227,7 @@ const inputRef = useTemplateRef('input')
 const cursor = ref<number>(0)
 const isCursorLocked = ref(false)
 const search = ref('')
-const isModelValueSearch = computed(() => !!search.value && props.modelValue.includes(search.value as Model))
+const isModelValueSearch = computed(() => !!search.value && props.modelValue?.includes(search.value as Model))
 const searchPrepared = computed(() => isModelValueSearch.value ? '' : search.value.trim().toLocaleLowerCase())
 const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
 
@@ -275,7 +275,7 @@ const close = () => {
 
     if (optionExact) select(props.valueGetter(optionExact), optionExact)
     else if (search.value && !loadingCreate.value) create(search.value)
-    else if (props.modelValue.length) {
+    else if (props.modelValue?.length) {
       const last = props.modelValue[props.modelValue.length - 1]!
       unselect(last, optionsWithCreated.value.find(option => props.valueGetter(option) === last))
     }
@@ -355,7 +355,7 @@ const selectCursor = () => {
 let deletePressTimeout: NodeJS.Timeout | null = null
 
 const captureDoubleDelete = () => {
-  if (!props.modelValue.length || search.value.length) return
+  if (!props.modelValue?.length || search.value.length) return
 
   if (deletePressTimeout) {
     const last = props.modelValue[props.modelValue.length - 1]!
@@ -440,7 +440,7 @@ if (props.useQueryFnDefault) {
   const {data: defaultData} = props.useQueryFnDefault({enabled: computed(() => !props.disabled)})
 
   watch(defaultData, value => {
-    if (value && props.modelValue.length === 0) {
+    if (value && props.modelValue?.length === 0) {
       select(props.valueGetter(value), value)
       emit('init-model')
     }
@@ -449,7 +449,7 @@ if (props.useQueryFnDefault) {
 
 if (props.useFirstDefault) {
   watch(data, value => {
-    if (value && props.modelValue.length === 0 && value[0]) {
+    if (value && props.modelValue?.length === 0 && value[0]) {
       select(props.valueGetter(value[0]), value[0])
       emit('init-model')
     }
@@ -463,7 +463,7 @@ watch(() => props.modelValue, async (value, oldValue) => {
 
   if (props.seamless) inputRef.value?.scrollToInput()
 
-  if (!createdOptions.value.length) return
+  if (!createdOptions.value.length || !oldValue || !value) return
 
   for (const valueItem of oldValue.filter(item => !value.includes(item))) {
     const index = createdOptions.value.findIndex(option => props.valueGetter(option) === valueItem)

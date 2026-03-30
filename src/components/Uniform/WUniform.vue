@@ -87,25 +87,6 @@
     </div>
 
     <slot
-      v-bind="{
-        ref: addRef,
-        parentRef: addRef,
-        modelValue: value as InnerModel,
-        modelValueList,
-        skeleton: skeletonValue,
-        removeParentRef: removeRef,
-        onUnmouted: removeRef,
-        updateModelValue: (field ? updateModelValue : undefined) as Field extends undefined ? undefined : typeof updateModelValue,
-        updateModelValueInner: updateModelValueInner as UniformScope<InnerModel, Field>['updateModelValueInner'],
-        select,
-        unselect,
-        async,
-        submitting: isSubmitting || submitting,
-        'onUpdate:modelValue': updateModelValueInner,
-      }"
-    />
-
-    <slot
       v-if="field"
       name="field"
       v-bind="{
@@ -124,6 +105,25 @@
         'onSelect': select,
         'onUnselect': unselect,
         'onInitModel': initModel,
+      }"
+    />
+
+    <slot
+      v-bind="{
+        ref: addRef,
+        parentRef: addRef,
+        modelValue: value as InnerModel,
+        modelValueList,
+        skeleton: skeletonValue,
+        removeParentRef: removeRef,
+        onUnmouted: removeRef,
+        updateModelValue,
+        updateModelValueInner: updateModelValueInner as UniformScope<InnerModel>['updateModelValueInner'],
+        select,
+        unselect,
+        async,
+        submitting: isSubmitting || submitting,
+        'onUpdate:modelValue': updateModelValueInner,
       }"
     />
   </component>
@@ -401,23 +401,30 @@ const showModal = async (value: InnerModel) => {
 }
 
 const updateModelValue = (newValue: InnerModel | undefined): void => {
-  if (props.field === undefined) return
+  if (props.field === undefined) {
+    if (newValue) {
+      if (props.initData || props.getModel) data.value = newValue
+      else emit('update:model-value', newValue, [])
+    }
+
+    return
+  }
 
   showModal(newValue!)
 }
 
 const select = (newValue: InnerModel extends unknown[] ? InnerModel[number] : never): void => {
-  if (props.field === undefined || !Array.isArray(value.value)) return
+  if (props.field === undefined) return
 
-  const newList = [...value.value, newValue] as InnerModel
+  const newList = [...(value.value as unknown[]) ?? [], newValue] as InnerModel
 
   showModal(newList)
 }
 
 const unselect = (newValue: InnerModel extends unknown[] ? InnerModel[number] : never): void => {
-  if (props.field === undefined || !Array.isArray(value.value)) return
+  if (props.field === undefined) return
 
-  const newList = value.value.slice()
+  const newList = (value.value as unknown[])?.slice() ?? []
   const index = newList.indexOf(newValue)
   if (index !== -1) newList.splice(index, 1)
 
@@ -688,11 +695,11 @@ defineExpose({
   getHasChangedField,
   externalRef: props.externalRef,
   updateModelValue,
-  updateModelValueInner: updateModelValueInner as UniformScope<InnerModel, Field>['updateModelValueInner'],
+  updateModelValueInner: updateModelValueInner as UniformScope<InnerModel>['updateModelValueInner'],
 })
 
 defineSlots<{
-  default: (props: UniformScope<InnerModel, Field>) => VNode[]
+  default: (props: UniformScope<InnerModel>) => VNode[]
   field: (props: UniformScopeField<InnerModel, Field>) => VNode[]
 }>()
 </script>

@@ -32,7 +32,7 @@
           :key="index"
           v-bind="{
             ...props,
-            modelValue: modelValue.includes(getValue(item)),
+            modelValue: modelValue?.includes(getValue(item)) ?? false,
             title: titleMap?.[getValue(item)!.toString() as GroupModelStringified<Model>],
             tooltipText: tooltipTextMap?.[getValue(item)!.toString() as GroupModelStringified<Model>],
             icon: iconMap?.[getValue(item)!.toString() as GroupModelStringified<Model>],
@@ -49,13 +49,13 @@
             <slot
               name="option"
               :option="(item as ValueGetter extends undefined ? Model : Entity)"
-              :selected="modelValue.includes(getValue(item))"
+              :selected="modelValue?.includes(getValue(item))"
             >
               <component
                 :is="optionComponent"
                 v-if="optionComponent"
                 :option="item"
-                :selected="modelValue.includes(getValue(item))"
+                :selected="modelValue?.includes(getValue(item))"
               />
             </slot>
           </template>
@@ -103,7 +103,7 @@ const getValue = (item: Model | Entity): Model => {
 const emitUpdateModelValue = (value: Model): void => {
   loadingItem.value = value
 
-  if (props.modelValue.includes(value)) emit('unselect', value)
+  if (props.modelValue?.includes(value)) emit('unselect', value)
   else emit('select', value)
 }
 </script>

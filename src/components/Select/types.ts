@@ -41,7 +41,7 @@ export interface SelectProps<Model extends number | string, Data extends Default
   extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'emptyValue' | 'async' | 'debounce' | 'hideDebounce'>,
   SelectOptionComponentProps<Data, OptionComponent>,
   Omit<SelectPropsOptions<Data, QueryParams>, 'modelValue'> {
-  modelValue: Model[]
+  modelValue: Model[] | undefined
   valueGetter: (value: Data) => Model
   searchFn: (option: Data, search: string) => boolean
   useQueryFnDefault?: UseQueryEmpty<Data>

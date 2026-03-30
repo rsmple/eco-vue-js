@@ -67,7 +67,7 @@ export type CheckboxGroupProps<Model extends number | string | null | boolean, E
 
 interface CheckboxGroupMultiplePropsBase<Model extends number | string | null | boolean>
   extends Omit<CheckboxGroupPropsBase<Model>, 'modelValue' | 'allowClear'> {
-  modelValue: Model[]
+  modelValue: Model[] | undefined
 }
 
 interface CheckboxGroupMultiplePropsForModel<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>

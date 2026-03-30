@@ -120,16 +120,29 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
   const fn = (route: {query: EncodeQueryParams<Partial<QueryParams>>, hash?: string}, enabled?: Ref<boolean>) => {
     const router = useOptionalRouter()
 
-    const updateQueryParams = (value: Partial<QueryParams>) => {
+    const updateQueryParams = (value: Partial<QueryParams>, fields?: (string | number)[]) => {
+      const data = fields?.length ? {} as QueryParams : value
+      let current: Partial<QueryParams> = data
+      if (fields?.length) {
+        for (const field of fields) {
+          if (fields.indexOf(field) !== fields.length - 1) current = current[field] as Partial<QueryParams>
+          else {
+            current[field as keyof QueryParams] = value as QueryParams[keyof QueryParams]
+            break
+          }
+        }
+      }
+
       router.replace({
-        query: {...route.query as Record<string, string>, ...encodeRouteParams(value)},
-        hash: Object.keys(value).length === 1 && 'ordering' in value ? route.hash : undefined,
+        query: {...route.query as Record<string, string>, ...encodeRouteParams(data)},
+        hash: Object.keys(data).length === 1 && 'ordering' in data ? route.hash : undefined,
       })
     }
 
     const handle = watch(() => route.query, value => {
       if (lastQuery === value) return
       parse(queryParams, value)
+
       lastQuery = value
     }, {immediate: enabled ? enabled.value : true})
 
@@ -146,6 +159,37 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
     }
   }
 
+  const useQueryParamsLocal = (initialParams: Partial<QueryParams> = {}) => {
+    const queryParams = reactive<Partial<QueryParams>>({...initialParams})
+
+    const updateQueryParams = (value: Partial<QueryParams>, fields?: (string | number)[]) => {
+      const data = fields?.length ? {} as Partial<QueryParams> : value
+      let current: Partial<QueryParams> = data
+      if (fields?.length) {
+        for (const field of fields) {
+          if (fields.indexOf(field) !== fields.length - 1) current = current[field] as Partial<QueryParams>
+          else {
+            current[field as keyof QueryParams] = value as QueryParams[keyof QueryParams]
+            break
+          }
+        }
+      }
+    
+      for (const key of Object.keys(data) as Array<keyof QueryParams>) {
+        if (data[key] === undefined || (Array.isArray(data[key]) && data[key].length === 0)) {
+          delete queryParams[key as keyof typeof queryParams]
+        } else {
+          queryParams[key as keyof typeof queryParams] = data[key] as never
+        }
+      }
+    }
+
+    return {
+      queryParams,
+      updateQueryParams,
+    }
+  }
+
   fn.config = config
   fn.parse = parse
   fn.filterFields = <QP extends Partial<QueryParams> & Record<string, unknown>>(queryParams: QP): QueryParams => {
@@ -156,6 +200,8 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
     }
     return result
   }
+
+  fn.useQueryParamsLocal = useQueryParamsLocal
 
   return fn as typeof fn & {QueryParams: Partial<QueryParams>}
 }
