@@ -673,12 +673,13 @@ const scrollTo = () => {
 }
 
 watch(() => props.required, () => void validateField())
-watch(skeletonValue, () => void initModel(), {immediate: true})
-if (query) watch(query.data, (value, oldValue) => {
-  if (!value || !oldValue) return
+if (query) {
+  watch(query.data, (value) => {
+    if (!value) return
 
-  initModel()
-}, {immediate: true})
+    initModel()
+  }, {immediate: true})
+}
 
 const updaterInjected = inject(wUniformUpdater, undefined)
 const unlistenerInjected = inject(wUniformUnlistener, undefined)

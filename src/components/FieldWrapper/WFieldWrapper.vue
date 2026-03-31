@@ -17,7 +17,7 @@
     @click="$emit('click', $event)"
   >
     <label
-      v-if="(title || $slots.title) && !seamless"
+      v-if="!hideTitle && !seamless && (title || $slots.title)"
       :for="id"
       class="text-accent relative block text-xs font-semibold leading-loose"
       :class="{
