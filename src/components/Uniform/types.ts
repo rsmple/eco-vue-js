@@ -38,6 +38,9 @@ export type UniformScope<InnerModel> = {
   unselect: (newValue: InnerModel extends unknown[] ? InnerModel[number] : never) => void
   async: boolean
   submitting: boolean
+  hasChanges: boolean
+  submit: () => void
+  initModel: (value?: InnerModel) => void
   'onUpdate:modelValue': (newValue: InnerModel, fields: (string | number)[]) => void
 }
 

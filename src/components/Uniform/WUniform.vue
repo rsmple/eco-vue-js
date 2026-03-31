@@ -93,7 +93,7 @@
         ref: (value: ComponentInstance<Component>) => (fieldRef = value),
         field,
         title: title as string,
-        modelValue: value ?? null as InnerModel,
+        modelValue: (data ?? null) as InnerModel,
         hasChanges,
         required,
         errorMessage: isShownError ? errorMessage.join('. ') : undefined,
@@ -112,7 +112,7 @@
       v-bind="{
         ref: addRef,
         parentRef: addRef,
-        modelValue: value as InnerModel,
+        modelValue: data as InnerModel,
         modelValueList,
         skeleton: skeletonValue,
         removeParentRef: removeRef,
@@ -123,6 +123,9 @@
         unselect,
         async,
         submitting: isSubmitting || submitting,
+        hasChanges,
+        submit,
+        initModel,
         'onUpdate:modelValue': updateModelValueInner,
       }"
     />
@@ -170,7 +173,7 @@ type QueryPropsParams = {
   useQueryFn?: UseQueryWithParams<Result, QueryParams>
   queryParams?: QueryParams
   // eslint-disable-next-line vue/require-default-prop
-  getModel?: (value: Result | undefined) => Model
+  getModel?: (value: Result | undefined) => InnerModel
 }
 
 type QueryPropsNoParams = {
@@ -178,7 +181,7 @@ type QueryPropsNoParams = {
    
   queryParams?: never
   // eslint-disable-next-line vue/require-default-prop
-  getModel?: (value: Result | undefined) => Model
+  getModel?: (value: Result | undefined) => InnerModel
 }
 
 type Props = {
@@ -189,7 +192,7 @@ type Props = {
   removeParentRef?: (id: string) => void
   modelValue?: Model
   field?: Field
-  initData?: () => Model
+  initData?: (value?: InnerModel) => InnerModel
   required?: boolean
   validate?: ValidateMethod | ValidateMethod[]
   mandatory?: boolean
@@ -237,24 +240,24 @@ const query = props.modelValue === undefined && props.initData === undefined && 
     : (props.useQueryFn as UseQueryEmpty<Result>)()
   : undefined
 
+const getFieldValue = () => props.field !== undefined
+  ? props.modelValue instanceof Object
+    ? props.modelValue[props.field as keyof typeof props.modelValue] as InnerModel
+    : undefined
+  : props.modelValue as InnerModel
+
 const data = props.initData
-  ? ref(props.initData())
+  ? ref(props.initData(getFieldValue()))
   : query
     ? ref(props.getModel ? props.getModel(query.data.value) : {...query.data.value})
-    : toRef(props, 'modelValue')
+    : computed<InnerModel | undefined>(() => getFieldValue())
 
-const value = computed<InnerModel>(() => props.field !== undefined
-  ? data.value instanceof Object && data.value !== null
-    ? data.value[props.field]
-    : undefined
-  : data.value)
-
-const initModelValue = ref(Array.isArray(value.value) ? [...value.value] : value.value instanceof Object ? {...value.value} : value.value)
+const initModelValue = ref(Array.isArray(data.value) ? [...data.value] : data.value instanceof Object ? {...data.value} : data.value)
 
 const modelValueList = computed<Record<string, InnerModel extends unknown[] ? InnerModel[number] : never>>(previousValue => {
   const result: Record<string, InnerModel extends unknown[] ? InnerModel[number] : never> = previousValue ?? {}
 
-  const currentValue = value.value
+  const currentValue = data.value
 
   if (!Array.isArray(currentValue)) return result
 
@@ -314,9 +317,9 @@ const skeletonValue = computed<boolean>(() => props.skeleton || skeletonQuery.va
 const _hasValueFieldExact = computed<boolean | null>(() => {
   if (!props.required && !props.mandatory) return null
 
-  if (Array.isArray(value.value)) return value.value.length !== 0
+  if (Array.isArray(data.value)) return data.value.length !== 0
 
-  return value.value !== undefined && value.value !== null && value.value !== '' && value.value !== false
+  return data.value !== undefined && data.value !== null && data.value !== '' && data.value !== false
 })
 const _hasValueField = computed<boolean | null>(() => props.mandatory && _hasValueFieldExact.value === false ? null : _hasValueFieldExact.value)
 const _hasValue = computed<boolean | null>(() => mapValues.value.length === 0 ? null : mapValues.value.some(value => value.hasValue) && mapValues.value.every(value => value.hasValue !== false))
@@ -330,10 +333,10 @@ const _hasChangesField = computed<boolean>(() => {
   if (props.field === undefined) return false
 
   if (initModelValue.value === undefined) {
-    return value.value !== undefined && value.value !== ''
+    return data.value !== undefined && data.value !== ''
   } else {
     const oldValue = initModelValue.value
-    const newValue = value.value
+    const newValue = data.value
 
     if (Array.isArray(newValue) && Array.isArray(oldValue)) {
       return newValue.length !== oldValue.length || newValue.some(item => !oldValue.includes(item))
@@ -342,7 +345,7 @@ const _hasChangesField = computed<boolean>(() => {
       return keys.length !== Object.keys(oldValue).length
         || keys.some(key => newValue[key as keyof typeof newValue] !== oldValue[key as keyof typeof oldValue])
     } else {
-      return value.value !== initModelValue.value
+      return data.value !== initModelValue.value
     }
   }
 })
@@ -352,14 +355,16 @@ const _isValidField = computed<boolean>(() => errorMessage.value.length === 0)
 const _isValid = computed<boolean>(() => mapValues.value.every(item => item.isValid))
 const isValid = computed<boolean>(() => _isValidField.value && _isValid.value)
 
-const initModel = (result?: Model): void => {
+const initModel = (result?: InnerModel): void => {
   if (skeletonValue.value) return
 
-  if (props.initData && result) data.value = result
-  else if (query) data.value = props.getModel ? props.getModel(query.data.value) : {...query.data.value}
+  if (!isReadonly(data)) {
+    if (props.initData && result) (data as Ref<InnerModel>).value = result
+    else if (query) (data as Ref<InnerModel>).value = props.getModel ? props.getModel(query.data.value) : {...query.data.value} as InnerModel
+  }
 
   isShownError.value = false
-  initModelValue.value = Array.isArray(value.value) ? [...value.value] : value.value instanceof Object ? {...value.value} : value.value
+  initModelValue.value = Array.isArray(data.value) ? [...data.value] : data.value instanceof Object ? {...data.value} : data.value
 
   validateField(true)
 
@@ -368,6 +373,16 @@ const initModel = (result?: Model): void => {
       item.initModel()
     }
   })
+}
+
+const emitValue = (value: InnerModel) => {
+  if (!isReadonly(data) && (props.initData || props.getModel || query)) {
+    (data as Ref<InnerModel>).value = value
+  } else emit('update:model-value', value, props.field ? [props.field as string | number] : [])
+
+  _validateFieldAndUpdateMessage(value)
+
+  if (props.async && (props.initData || props.getModel || query)) nextTick(submit)
 }
 
 let closeModal: (() => void) | null = null
@@ -383,43 +398,11 @@ const showModal = async (value: InnerModel) => {
     isSubmitting.value = false
   }
 
-  if (!confirmProps) {
-    if (props.field === undefined) {
-      if (value) {
-        if (props.initData || props.getModel || query) {
-          data.value = value
-
-          if (props.async) nextTick(submit)
-        } else emit('update:model-value', value, [])
-      }
-
-      return
-    } else {
-      emit('update:model-value', value, [props.field as string | number])
-
-      _validateFieldAndUpdateMessage(value)
-    }
-    return
-  }
+  if (!confirmProps) return emitValue(value)
 
   closeModal = Modal.addConfirm({
     ...confirmProps,
-    onAccept: () => {
-      if (props.field === undefined) {
-        if (value) {
-          if (props.initData || props.getModel || query) {
-            data.value = value
-            if (props.async) nextTick(submit)
-          } else emit('update:model-value', value, [])
-        }
-
-        return
-      } else {
-        emit('update:model-value', value, [props.field as string | number])
-
-        _validateFieldAndUpdateMessage(value)
-      }
-    },
+    onAccept: () => emitValue(value),
   }, () => closeModal = null)
 }
 
@@ -430,7 +413,7 @@ const updateModelValue = (newValue: InnerModel | undefined): void => {
 const select = (newValue: InnerModel extends unknown[] ? InnerModel[number] : never): void => {
   if (props.field === undefined) return
 
-  const newList = [...(value.value as unknown[]) ?? [], newValue] as InnerModel
+  const newList = [...(data.value as unknown[]) ?? [], newValue] as InnerModel
 
   showModal(newList)
 }
@@ -438,7 +421,7 @@ const select = (newValue: InnerModel extends unknown[] ? InnerModel[number] : ne
 const unselect = (newValue: InnerModel extends unknown[] ? InnerModel[number] : never): void => {
   if (props.field === undefined) return
 
-  const newList = (value.value as unknown[])?.slice() ?? []
+  const newList = (data.value as unknown[])?.slice() ?? []
   const index = newList.indexOf(newValue)
   if (index !== -1) newList.splice(index, 1)
 
@@ -460,13 +443,13 @@ const updateModelValueInner = (newValue: InnerModel, fields: (string | number)[]
         }
       }
     } else {
-      data.value = newValue
+      (data as Ref<InnerModel>).value = newValue
     }
 
     if (props.async) nextTick(submit)
+  } else {
+    emit('update:model-value', newValue, props.field !== undefined ? [props.field as string | number, ...fields] : fields)
   }
-
-  emit('update:model-value', newValue, props.field !== undefined ? [props.field as string | number, ...fields] : fields)
 }
 
 const _validateField = (newValue: InnerModel): string[] => {
@@ -494,7 +477,7 @@ const _validateFieldAndUpdateMessage = (newValue: InnerModel) => {
 }
 
 const validateField = (silent?: boolean): string[] => {
-  const message = _validateField(value.value)
+  const message = _validateField(data.value)
 
   errorMessage.value = message
 
@@ -617,7 +600,8 @@ const submit = () => {
   if (isSubmitting.value) return
 
   if (!props.apiMethod) {
-    emit('success', data.value)
+    if (props.modelValue) emit('update:model-value', data.value, props.field ? [props.field as string | number] : [])
+    else emit('success', data.value)
     return
   }
 
@@ -709,7 +693,7 @@ defineExpose({
   isValid,
   isSubmitting,
   skeleton: skeletonValue,
-  modelValue: value,
+  modelValue: data,
   initModel,
   validate: validateForm,
   invalidate,
