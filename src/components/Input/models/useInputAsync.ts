@@ -7,7 +7,7 @@ interface InputAsyncProps {
   modelValue?: ModelValue
   loading?: boolean
   debounce?: number
-  placeholderSecure?: boolean
+  textSecure?: boolean
 }
 
 interface InputAsyncContext {
@@ -39,27 +39,25 @@ export const useInputAsync = (context: InputAsyncContext) => {
   const save = () => {
     if (props.loading) return
 
-    if (props.placeholderSecure) context.blur()
-
     doClearTimeout()
 
-    emit('update:model-value', value.value)
+    emit('update:model-value', props.textSecure ? value.value || '' : value.value)
 
-    if (!props.placeholderSecure) saved.value = true
+    saved.value = true
   }
 
   const cancel = () => {
     doClearTimeout()
-    value.value = props.modelValue ?? undefined
+    value.value = props.textSecure && typeof props.modelValue !== 'string' ? undefined : props.modelValue ?? undefined
     focused.value = false
   }
 
   watch(toRef(props, 'modelValue'), modelValue => {
     doClearTimeout()
 
-    value.value = modelValue ?? undefined
+    value.value = props.textSecure && typeof modelValue !== 'string' ? undefined : modelValue ?? undefined
 
-    if (!props.placeholderSecure && saved.value) {
+    if (saved.value) {
       context.blur()
       saved.value = false
     }

@@ -129,7 +129,7 @@
   </component>
 </template>
 
-<script setup lang="ts" generic="Model, QueryParams, Field extends (Model extends unknown[] ? number : keyof Model) | undefined = undefined, Result = Model">
+<script setup lang="ts" generic="Model, QueryParams, Field extends keyof NonNullable<Model> | undefined = undefined, Result = Model">
 import {type Component, type Ref, type VNode, computed, inject, isReadonly, nextTick, onBeforeUnmount, reactive, ref, toRef, useId, watch} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'

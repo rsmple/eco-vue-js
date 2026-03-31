@@ -140,7 +140,7 @@
             />
 
             <div
-              v-if="placeholderSecure && modelValue === undefined && !focused"
+              v-if="textSecure && modelValue !== undefined && typeof modelValue !== 'string' && !focused"
               class="bg-info/10 dark:bg-info-dark/10 pointer-events-none absolute inset-0.5 flex items-center justify-center rounded-[--w-option-rounded]"
             >
               <IconCheckSecret
@@ -195,8 +195,8 @@
                     '[-webkit-text-fill-color:transparent]': textTransparent,
                     'sm-not:text-[1rem]': !unclickable,
                   }"
-                  :value="placeholderSecure && modelValue === undefined && !focused ? '' : asyncState.isAsync.value ? asyncState.value.value : modelValue"
-                  :placeholder="placeholder"
+                  :value="textSecure && modelValue !== undefined && typeof modelValue !== 'string' && !focused ? '' : asyncState.isAsync.value ? asyncState.value.value : modelValue"
+                  :placeholder="hasNoValue ? placeholder : undefined"
                   :type="type ?? 'text'"
                   :name="name"
                   :disabled="isDisabled"
@@ -319,13 +319,13 @@
     </template>
 
     <template
-      v-if="$slots.bottom || (asyncState.isAsync.value && !skeleton && textSecure && asyncState.focused.value)"
+      v-if="$slots.bottom || (asyncState.isAsync.value && !skeleton && (textSecure || textarea) && asyncState.focused.value)"
       #bottom
     >
       <slot name="bottom" />
 
       <InputAsyncButtons
-        v-if="asyncState.isAsync.value && !skeleton && textSecure && asyncState.focused.value"
+        v-if="asyncState.isAsync.value && !skeleton && (textSecure || textarea) && asyncState.focused.value"
         :disabled="disabled || loading"
         :loading="loading"
         @cancel="asyncState.cancel(); blur()"
@@ -416,7 +416,7 @@ const asyncState = useInputAsync({
 const history = ref<HistoryEntry[]>([])
 const historyPosition = ref(-1)
 
-const hasNoValue = computed(() => !props.modelValue && !props.textParts?.length && !props.placeholderSecure)
+const hasNoValue = computed(() => (asyncState.isAsync.value ? !asyncState.value.value : !props.modelValue) && !props.textParts?.length && (!props.textSecure || !props.modelValue))
 
 const getCaret = (): CaretOffset => {
   if (!inputRef.value) return {start: 0, end: 0}
