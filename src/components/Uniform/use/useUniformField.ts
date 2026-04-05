@@ -123,6 +123,11 @@ export const useUniformField = <Model>(
     if (!onlyChanged || hasChanges.value) showMessage(message)
   }
 
+  const getFieldChanged = (field: string): boolean => {
+    if (fieldGetter() === field) return hasChanges.value
+    return false
+  }
+
   return {
     setFieldRef,
     errorMessageString,
@@ -134,5 +139,6 @@ export const useUniformField = <Model>(
     validate,
     invalidate,
     showMessage: showMessageField,
+    getFieldChanged,
   }
 }

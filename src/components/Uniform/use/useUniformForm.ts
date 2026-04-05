@@ -72,6 +72,17 @@ export const useUniformForm = (
     }
   }
 
+  const getFieldChanged = (field: string): boolean => {
+    if (fieldGetter() === field) return hasChanges.value
+
+    for (const item of mapValues.value) {
+      const result = item.getFieldChanged(field)
+      if (result) return true
+    }
+
+    return false
+  }
+
   return {
     addRef,
     removeRef,
@@ -83,5 +94,6 @@ export const useUniformForm = (
     validate,
     invalidate,
     showMessage,
+    getFieldChanged,
   }
 }

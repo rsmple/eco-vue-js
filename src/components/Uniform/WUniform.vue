@@ -89,7 +89,7 @@
         hasChanges: scopeField.hasChanges.value,
         hasValue: scopeField.hasValue.value,
         loading: async && scopeField.hasChanges.value && (submitting || (scopeSubmit?.submitting.value ?? false)),
-        disabled: submitting || (scopeSubmit?.submitting.value ?? false),
+        disabled: !async && (submitting || (scopeSubmit?.submitting.value ?? false)),
         skeleton: scopeModel.skeleton?.value ?? skeleton,
         required,
         async,
@@ -137,7 +137,7 @@
   ResultModel = InnerModel
 "
 >
-import type {InnerInstanceExpose, UniformScope, UniformScopeField} from './types'
+import type {InnerInstanceExpose, UniformInstance, UniformScope, UniformScopeField} from './types'
 
 import {type VNode, computed, onUnmounted, toRef, useId} from 'vue'
 
@@ -186,7 +186,19 @@ const slots = defineSlots<{
 }>()
 
 const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
-  () => scopeModel.modelValue.value,
+  () => {
+    if (!props.async || !scopeForm || !(scopeModel.modelValue.value instanceof Object)) return scopeModel.modelValue.value
+
+    const result: Partial<ResultModel> = {}
+
+    const list = Object.values(scopeForm.map.value) as UniformInstance[]
+
+    for (const key of Object.keys(scopeModel.modelValue.value)) {
+      if (list.some(item => item.getFieldChanged(key))) result[key as keyof ResultModel] = scopeModel.modelValue.value[key as keyof ResultModel]
+    }
+
+    return result as ResultModel
+  },
   props.apiMethod,
   (silent?: boolean | undefined, includeMessage?: boolean | undefined) => scopeField?.validate(silent, includeMessage) ?? scopeForm?.validate(silent, includeMessage),
   payload => scopeField?.invalidate(payload) ?? scopeForm?.invalidate(payload),
@@ -235,6 +247,7 @@ defineExpose({
   validate: scopeField?.validate ?? scopeForm?.validate ?? (() => undefined),
   invalidate: scopeField?.invalidate ?? scopeForm?.invalidate ?? (() => void 0),
   showMessage: scopeField?.showMessage ?? scopeForm?.showMessage ?? (() => void 0),
+  getFieldChanged: scopeField?.getFieldChanged ?? scopeForm?.getFieldChanged ?? (() => false),
 
   modelValue: scopeModel.modelValue,
   updateModelValueInner: scopeModel.updateModelValueInner as InnerInstanceExpose<InnerModel, ResultModel>['updateModelValueInner'],

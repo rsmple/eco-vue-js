@@ -17,6 +17,7 @@ export type UniformInstance = {
   validate: UniformValidate
   invalidate: (payload: InvalidatePayload) => void
   showMessage: (message: string, onlyChanged?: boolean) => void
+  getFieldChanged: (field: string) => boolean
 }
 
 type ToRefs<Value> = {
