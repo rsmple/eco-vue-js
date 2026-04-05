@@ -39,7 +39,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   const data = initFn || query ? ref<ResultModel>((initFn ?? copyItem)((innerModel.value ?? {}) as ResultModel & InnerModel)) : undefined
   const modelValueInitRef = initFn || query ? ref<ResultModel>((initFn ?? copyItem)((innerModel.value ?? {}) as ResultModel & InnerModel)) : undefined
   const modelValueInit = modelValueInitRef ?? (field.value !== undefined ? computed(() => parentModelInit.value?.[field.value as keyof ParentModel]) : parentModelInit)
-  const modelValue: Ref<ResultModel> = data ? data : innerModel as unknown as Ref<ResultModel>
+  const modelValue: Ref<ResultModel> = data ?? innerModel as unknown as Ref<ResultModel>
 
   if (data && modelValueInitRef) {
     watch(innerModel, value => {
