@@ -13,6 +13,7 @@ const copyItem = <Value>(value: Value): Value => Array.isArray(value)
 
 export const useUniformModel = <ParentModel, Field extends keyof NonNullable<ParentModel>, InnerModel, QueryParams, ResultModel>(
   parentModel: Ref<ParentModel>,
+  parentModelInit: Ref<ParentModel>,
   field: Ref<Field | undefined>,
   useQueryFn: UseQueryWithParams<InnerModel, QueryParams> | undefined,
   queryParams: Ref<QueryParams | undefined>,
@@ -38,7 +39,8 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   
   const skeleton = query ? computed(() => !query.data.value) : undefined
   const data = initFn || query ? ref<ResultModel>((initFn ?? copyItem)(innerModel.value as ResultModel & InnerModel)) : undefined
-  const modelValueInit = initFn || query ? ref<ResultModel>((initFn ?? copyItem)(innerModel.value as ResultModel & InnerModel)) : undefined
+  const modelValueInitRef = initFn || query ? ref<ResultModel>((initFn ?? copyItem)(innerModel.value as ResultModel & InnerModel)) : undefined
+  const modelValueInit = modelValueInitRef ?? (field.value ? computed(() => parentModelInit.value?.[field.value as keyof ParentModel]) : parentModelInit)
   const modelValue: Ref<ResultModel> = data ? data : innerModel as unknown as Ref<ResultModel>
 
   const modelValueList = computed<Record<string, ResultModel extends unknown[] ? ResultModel[number] : never>>(previousValue => {
@@ -73,22 +75,22 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   const initModel = (value?: InnerModel) => {
     if (query && value) {
       query.setData(value)
-    } else if (data && modelValueInit && initFn) {
+    } else if (data && modelValueInitRef && initFn) {
       if (value) {
         data.value = initFn(value)
-        modelValueInit.value = initFn(value)
+        modelValueInitRef.value = initFn(value)
       } else {
-        modelValueInit.value = copyItem(data.value)
+        modelValueInitRef.value = copyItem(data.value)
       }
     } else {
       emitInitModel()
     }
   }
   
-  if (initFn && data && modelValueInit) {
+  if (initFn && data && modelValueInitRef) {
     watch(innerModel, value => {
       data.value = initFn(value)
-      modelValueInit.value = initFn(value)
+      modelValueInitRef.value = initFn(value)
     })
   }
   

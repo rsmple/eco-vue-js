@@ -106,6 +106,7 @@
         ref: scopeForm?.addRef,
         modelValue: scopeModel.modelValue.value,
         modelValueList: scopeModel.modelValueList.value,
+        modelValueInit: scopeModel.modelValueInit.value,
         async,
         skeleton: scopeModel.skeleton?.value ?? skeleton,
         hasChanges: scopeField ? scopeField.hasChanges.value : scopeForm ? scopeForm.hasChanges.value : false,
@@ -198,6 +199,7 @@ const scopeSubmit = props.initData && props.apiMethod ? useUniformSubmit<ResultM
 
 const scopeModel = useUniformModel(
   toRef(props, 'modelValue'),
+  toRef(props, 'modelValueInit'),
   field,
   props.useQueryFn,
   toRef(props, 'queryParams'),
@@ -212,7 +214,7 @@ const scopeModel = useUniformModel(
 
 const scopeField = slots.field ? useUniformField(
   scopeModel.modelValue,
-  scopeModel.modelValueInit ?? toRef(props, 'modelValueInit'),
+  scopeModel.modelValueInit,
   field,
   title,
   toRef(props, 'required'),

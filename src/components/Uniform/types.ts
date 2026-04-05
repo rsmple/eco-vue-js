@@ -37,6 +37,7 @@ export type UniformScope<ModelValue> = {
   ref: ((item: UniformInstance | unknown) => void) | undefined
   modelValue: ModelValue
   modelValueList: Record<string, ModelValue extends unknown[] ? ModelValue[number] : never>
+  modelValueInit: ModelValue
   async: boolean
   skeleton: boolean
   submitting: boolean
