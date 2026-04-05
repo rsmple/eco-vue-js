@@ -174,7 +174,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:model-value', value: ResultModel, fields: (string | number)[]): void
   (e: 'success', value: InnerModel): void
-  (e: 'unmouted', id: string): void
+  (e: 'unmounted', id: string): void
   (e: 'init-model'): void
 }>()
 
@@ -257,5 +257,5 @@ defineExpose({
   initModel: scopeModel.initModel,
 } satisfies InnerInstanceExpose<InnerModel, ResultModel>)
 
-onUnmounted(() => emit('unmouted', id))
+onUnmounted(() => emit('unmounted', id))
 </script>

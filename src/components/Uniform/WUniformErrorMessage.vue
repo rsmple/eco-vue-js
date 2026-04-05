@@ -4,7 +4,7 @@
   </div>
   <div v-else-if="message">
     <div v-if="message.title || typeof message.message[0] === 'string'">
-      {{ message.title ? `${message.title}: ` : '' }}{{ message.message.join(', ') }}
+      - {{ message.title ? `${message.title}: ` : '' }}{{ message.message.join(', ') }}
     </div>
 
     <div
