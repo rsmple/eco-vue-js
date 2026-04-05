@@ -1,9 +1,10 @@
 import type {NotifyType} from './NotifyType'
 import type {LinkProps} from '@/types/types'
+import type {VNode} from 'vue'
 
 export interface NotifyConfig extends Partial<LinkProps> {
-  title: string
-  caption?: string
+  title: string | VNode
+  caption?: string | VNode
   userInput?: string
   type: NotifyType
 }
