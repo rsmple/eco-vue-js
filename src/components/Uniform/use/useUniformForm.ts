@@ -1,10 +1,10 @@
-import {type Ref, computed, ref} from 'vue'
+import {computed, ref} from 'vue'
 
 import {type InvalidatePayload, type UniformInstance, type UniformValidate, isInnerInstance} from '../types'
 
 export const useUniformForm = (
-  field: Ref<string | number | symbol | undefined>,
-  title: Ref<string | undefined>,
+  fieldGetter: () => string | number | symbol | undefined,
+  titleGetter: () => string | undefined,
 ) => {
   const map = ref<Record<string, UniformInstance>>({})
 
@@ -43,7 +43,7 @@ export const useUniformForm = (
 
       if (!result.length) return undefined
 
-      return {title: title.value, message: result}
+      return {title: titleGetter(), message: result}
     }
 
     for (const item of mapValues.value) {
@@ -54,8 +54,9 @@ export const useUniformForm = (
   }
 
   const invalidate = (messages: InvalidatePayload): void => {
-    const message = field.value !== undefined && messages instanceof Object && field.value in messages
-      ? messages[field.value as keyof InvalidatePayload] as InvalidatePayload | undefined
+    const field = fieldGetter()
+    const message = field !== undefined && messages instanceof Object && field in messages
+      ? messages[field as keyof InvalidatePayload] as InvalidatePayload | undefined
       : messages
 
     if (!message) return

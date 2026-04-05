@@ -19,7 +19,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   queryParams: Ref<QueryParams | undefined>,
   initFn: ((value: InnerModel) => ResultModel) | undefined,
   confimGetter: ((payload: ResultModel, data: ParentModel) => ConfirmProps | Promise<ConfirmProps | undefined> | undefined) | undefined,
-  async: Ref<boolean>,
+  asyncGetter: () => boolean,
   emitModelValue: (value: ResultModel, fields: (string | number)[]) => void,
   submit: () => void,
   emitInitModel: () => void,
@@ -100,7 +100,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
     if (data) data.value = value
     else emitModelValue(value, field.value ? [field.value as string | number] : [])
   
-    if (async.value && data) nextTick(submit)
+    if (asyncGetter() && data) nextTick(submit)
   }
   
   let closeModal: (() => void) | null = null
@@ -162,7 +162,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
       data.value = newValue
     }
   
-    if (async.value) nextTick(submit)
+    if (asyncGetter()) nextTick(submit)
   }
 
   return {

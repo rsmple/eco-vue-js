@@ -12,8 +12,8 @@ type ValidateMethod<Model> = (value: Model) => string | undefined
 export const useUniformField = <Model>(
   modelValue: Ref<Model>,
   modelValueInit: Ref<Model>,
-  field: Ref<string | number | symbol | undefined>,
-  title: Ref<string | undefined>,
+  fieldGetter: () => string | number | symbol | undefined,
+  titleGetter: () => string | undefined,
   required: Ref<boolean>,
   mandatory: Ref<boolean>,
   validateList: ValidateMethod<Model> | ValidateMethod<Model>[] | undefined,
@@ -102,14 +102,15 @@ export const useUniformField = <Model>(
     if (!includeMessage || !message.length) return undefined
 
     return {
-      title: title.value ?? field.value?.toString(),
+      title: titleGetter() ?? fieldGetter()?.toString(),
       message,
     }
   }
 
   const invalidate = (messages: InvalidatePayload): void => {
-    if (field.value !== undefined && messages instanceof Object && field.value in messages) {
-      messages = messages[field.value as keyof typeof messages] as InvalidatePayload
+    const field = fieldGetter()
+    if (field !== undefined && messages instanceof Object && field in messages) {
+      messages = messages[field as keyof typeof messages] as InvalidatePayload
     }
 
     if (typeof messages === 'string') errorMessage.value.push(messages)

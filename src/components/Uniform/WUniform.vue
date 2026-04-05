@@ -185,9 +185,6 @@ const slots = defineSlots<{
   default?: (props: UniformScope<ResultModel>) => VNode[]
 }>()
 
-const field = computed(() => props.field)
-const title = computed(() => props.title)
-
 const scopeSubmit = props.initData && props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
   () => scopeModel.modelValue.value,
   props.apiMethod,
@@ -201,12 +198,12 @@ const scopeSubmit = props.initData && props.apiMethod ? useUniformSubmit<ResultM
 const scopeModel = useUniformModel(
   toRef(props, 'modelValue'),
   toRef(props, 'modelValueInit'),
-  field,
+  computed(() => props.field),
   props.useQueryFn,
   toRef(props, 'queryParams'),
   props.initData,
   props.confimGetter,
-  toRef(props, 'async'),
+  () => props.async,
   (value, fields) => emit('update:model-value', value, fields),
   (): void => void scopeSubmit?.submit(),
   () => emit('init-model'),
@@ -216,14 +213,17 @@ const scopeModel = useUniformModel(
 const scopeField = slots.field ? useUniformField(
   scopeModel.modelValue,
   scopeModel.modelValueInit,
-  field,
-  title,
+  () => props.field,
+  () => props.title,
   toRef(props, 'required'),
   toRef(props, 'mandatory'),
   props.validate,
 ) : undefined
 
-const scopeForm = slots.default ? useUniformForm(field, title) : undefined
+const scopeForm = slots.default ? useUniformForm(
+  () => props.field,
+  () => props.title,
+) : undefined
 
 defineExpose({
   id,
