@@ -2,6 +2,7 @@ import type {InvalidatePayload, UniformValidate} from '../types'
 
 import {type Ref, computed, nextTick, ref} from 'vue'
 
+import {useFieldMessage} from '@/components/FieldWrapper/use/useFieldSaved'
 import {validateRequired} from '@/utils/validate'
 
 import {scrollToValidator} from '../utils/utils'
@@ -17,6 +18,8 @@ export const useUniformField = <Model>(
   mandatory: Ref<boolean>,
   validateList: ValidateMethod<Model> | ValidateMethod<Model>[] | undefined,
 ) => {
+  const showMessage = useFieldMessage()
+
   const hasShownError = ref(false)
   const errorMessage = ref<string[]>([])
   const fieldRef = ref<ComponentInstance<unknown> | ComponentInstance<unknown>[] | undefined>()
@@ -115,6 +118,10 @@ export const useUniformField = <Model>(
     hasShownError.value = errorMessage.value.length !== 0
   }
 
+  const showMessageField = (message: string, onlyChanged?: boolean) => {
+    if (!onlyChanged || hasChanges.value) showMessage(message)
+  }
+
   return {
     setFieldRef,
     errorMessageString,
@@ -125,5 +132,6 @@ export const useUniformField = <Model>(
     validateFieldOnUpdate,
     validate,
     invalidate,
+    showMessage: showMessageField,
   }
 }

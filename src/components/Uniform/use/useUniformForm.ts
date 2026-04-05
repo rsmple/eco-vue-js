@@ -65,6 +65,12 @@ export const useUniformForm = (
     }
   }
 
+  const showMessage = (message: string, onlyChanged?: boolean): void => {
+    for (const item of mapValues.value) {
+      item.showMessage(message, onlyChanged)
+    }
+  }
+
   return {
     addRef,
     removeRef,
@@ -75,5 +81,6 @@ export const useUniformForm = (
     isValid,
     validate,
     invalidate,
+    showMessage,
   }
 }

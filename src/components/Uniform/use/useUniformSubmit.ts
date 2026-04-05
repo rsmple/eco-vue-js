@@ -14,6 +14,7 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
   invalidate: (payload: InvalidatePayload) => void,
   onSuccess: (value: OriginalModel) => void,
   initModel: (value: OriginalModel) => void,
+  showMessage: (message: string, onlyChanged?: boolean) => void,
 ) => {
   const submitting = ref(false)
 
@@ -46,6 +47,8 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
       .then(response => {
         const isResponse = isRequestResponse<OriginalModel>(response)
         const responseData = isResponse ? response.data : response
+
+        showMessage('Saved', true)
 
         if (!responseData) return
 

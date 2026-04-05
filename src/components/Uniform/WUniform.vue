@@ -88,8 +88,8 @@
         errorMessage: scopeField.errorMessageString.value,
         hasChanges: scopeField.hasChanges.value,
         hasValue: scopeField.hasValue.value,
-        loading: async && scopeField.hasChanges && (submitting || (scopeSubmit?.submitting.value ?? false)),
-        disabled: !async && (submitting || (scopeSubmit?.submitting.value ?? false)),
+        loading: async && scopeField.hasChanges.value && (submitting || (scopeSubmit?.submitting.value ?? false)),
+        disabled: submitting || (scopeSubmit?.submitting.value ?? false),
         skeleton: scopeModel.skeleton?.value ?? skeleton,
         required,
         async,
@@ -195,6 +195,7 @@ const scopeSubmit = props.initData && props.apiMethod ? useUniformSubmit<ResultM
   payload => scopeField?.invalidate(payload) ?? scopeForm?.invalidate(payload),
   result => emit('success', result),
   result => scopeModel.initModel(result),
+  (message, onlyChanged) => scopeField?.showMessage(message, onlyChanged) ?? scopeForm?.showMessage(message, onlyChanged),
 ) : undefined
 
 const scopeModel = useUniformModel(
@@ -233,6 +234,7 @@ defineExpose({
   hasShownError: scopeField?.hasShownError ?? scopeForm?.hasShownError ?? false,
   validate: scopeField?.validate ?? scopeForm?.validate ?? (() => undefined),
   invalidate: scopeField?.invalidate ?? scopeForm?.invalidate ?? (() => void 0),
+  showMessage: scopeField?.showMessage ?? scopeForm?.showMessage ?? (() => void 0),
 
   modelValue: scopeModel.modelValue,
   updateModelValueInner: scopeModel.updateModelValueInner as InnerInstanceExpose<InnerModel, ResultModel>['updateModelValueInner'],
