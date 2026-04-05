@@ -9,7 +9,7 @@ import WUniformErrorMessage from '../WUniformErrorMessage.vue'
 
 export const useUniformSubmit = <ModelValue, OriginalModel>(
   payloadGetter: () => ModelValue,
-  apiMethod: (value: ModelValue) => Promise<RequestResponse<OriginalModel>> | Promise<OriginalModel> | OriginalModel,
+  apiMethod: (value: ModelValue) => Promise<RequestResponse<OriginalModel>> | Promise<OriginalModel> | OriginalModel | undefined | void,
   validate: UniformValidate,
   invalidate: (payload: InvalidatePayload) => void,
   onSuccess: (value: OriginalModel) => void,
@@ -50,10 +50,8 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
 
         showMessage('Saved', true)
 
-        if (!responseData) return
-
-        initModel(responseData)
-        onSuccess(responseData)
+        initModel(responseData ?? payload as unknown as OriginalModel)
+        onSuccess(responseData ?? payload as unknown as OriginalModel)
       })
       .catch(error => {
         if (error instanceof ApiError && !(error instanceof ApiErrorCancel)) {

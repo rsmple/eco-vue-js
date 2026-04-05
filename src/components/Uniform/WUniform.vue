@@ -156,7 +156,7 @@ const props = defineProps<{
   modelValueInit?: Model
   field?: Field
   initData?: (value: InnerModel) => ResultModel
-  apiMethod?: (value: Partial<ResultModel>) => Promise<RequestResponse<InnerModel>> | Promise<InnerModel> | InnerModel
+  apiMethod?: (value: Partial<ResultModel>) => Promise<RequestResponse<InnerModel>> | Promise<InnerModel> | InnerModel | undefined | void
   useQueryFn?: UseQueryWithParams<InnerModel, QueryParams>
   queryParams?: QueryParams
 

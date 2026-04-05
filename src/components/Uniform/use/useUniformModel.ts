@@ -33,12 +33,12 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   
   const innerModel = query
     ? computed<InnerModel>(() => query.data.value as InnerModel)
-    : computed<InnerModel>(() => field.value ? parentModel.value?.[field.value] as InnerModel : parentModel.value as unknown as InnerModel)
+    : computed<InnerModel>(() => field.value !== undefined ? parentModel.value?.[field.value] as InnerModel : parentModel.value as unknown as InnerModel)
   
   const skeleton = query ? computed(() => !query.data.value) : undefined
   const data = initFn || query ? ref<ResultModel>((initFn ?? copyItem)((innerModel.value ?? {}) as ResultModel & InnerModel)) : undefined
   const modelValueInitRef = initFn || query ? ref<ResultModel>((initFn ?? copyItem)((innerModel.value ?? {}) as ResultModel & InnerModel)) : undefined
-  const modelValueInit = modelValueInitRef ?? (field.value ? computed(() => parentModelInit.value?.[field.value as keyof ParentModel]) : parentModelInit)
+  const modelValueInit = modelValueInitRef ?? (field.value !== undefined ? computed(() => parentModelInit.value?.[field.value as keyof ParentModel]) : parentModelInit)
   const modelValue: Ref<ResultModel> = data ? data : innerModel as unknown as Ref<ResultModel>
 
   if (data && modelValueInitRef) {
@@ -49,7 +49,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   }
 
   const modelValueList = computed<Record<string, ResultModel extends unknown[] ? ResultModel[number] : never>>(previousValue => {
-    const result: Record<string, ResultModel extends unknown[] ? ResultModel[number] : never> = previousValue ?? {}
+    const result: Record<string, ResultModel extends unknown[] ? ResultModel[number] : never> = previousValue ? {...previousValue} : {}
 
     const currentValue = modelValue.value
 
@@ -96,7 +96,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
     validateOnUpdate?.(value)
 
     if (data) data.value = value
-    else emitModelValue(value, field.value ? [field.value as string | number] : [])
+    else emitModelValue(value, field.value !== undefined ? [field.value as string | number] : [])
   
     if (asyncGetter() && data) nextTick(submit)
   }
