@@ -31,17 +31,22 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
       : (useQueryFn as UseQueryEmpty<InnerModel>)()
     : undefined
   
-  const innerModel = computed<InnerModel>(() => query
-    ? query.data.value as InnerModel
-    : field.value
-      ? parentModel.value?.[field.value] as InnerModel
-      : parentModel.value as unknown as InnerModel)
+  const innerModel = query
+    ? computed<InnerModel>(() => query.data.value as InnerModel)
+    : computed<InnerModel>(() => field.value ? parentModel.value?.[field.value] as InnerModel : parentModel.value as unknown as InnerModel)
   
   const skeleton = query ? computed(() => !query.data.value) : undefined
-  const data = initFn || query ? ref<ResultModel>((initFn ?? copyItem)(innerModel.value as ResultModel & InnerModel)) : undefined
-  const modelValueInitRef = initFn || query ? ref<ResultModel>((initFn ?? copyItem)(innerModel.value as ResultModel & InnerModel)) : undefined
+  const data = initFn || query ? ref<ResultModel>((initFn ?? copyItem)((innerModel.value ?? {}) as ResultModel & InnerModel)) : undefined
+  const modelValueInitRef = initFn || query ? ref<ResultModel>((initFn ?? copyItem)((innerModel.value ?? {}) as ResultModel & InnerModel)) : undefined
   const modelValueInit = modelValueInitRef ?? (field.value ? computed(() => parentModelInit.value?.[field.value as keyof ParentModel]) : parentModelInit)
   const modelValue: Ref<ResultModel> = data ? data : innerModel as unknown as Ref<ResultModel>
+
+  if (data && modelValueInitRef) {
+    watch(innerModel, value => {
+      data.value = (initFn ?? copyItem)(value ?? {} as InnerModel)
+      modelValueInitRef.value = (initFn ?? copyItem)(value ?? {} as InnerModel)
+    })
+  }
 
   const modelValueList = computed<Record<string, ResultModel extends unknown[] ? ResultModel[number] : never>>(previousValue => {
     const result: Record<string, ResultModel extends unknown[] ? ResultModel[number] : never> = previousValue ?? {}
@@ -85,13 +90,6 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
     } else {
       emitInitModel()
     }
-  }
-  
-  if (initFn && data && modelValueInitRef) {
-    watch(innerModel, value => {
-      data.value = initFn(value)
-      modelValueInitRef.value = initFn(value)
-    })
   }
   
   const emitValue = (value: ResultModel) => {

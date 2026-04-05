@@ -185,7 +185,7 @@ const slots = defineSlots<{
   default?: (props: UniformScope<ResultModel>) => VNode[]
 }>()
 
-const scopeSubmit = props.initData && props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
+const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
   () => scopeModel.modelValue.value,
   props.apiMethod,
   (silent?: boolean | undefined, includeMessage?: boolean | undefined) => scopeField?.validate(silent, includeMessage) ?? scopeForm?.validate(silent, includeMessage),
