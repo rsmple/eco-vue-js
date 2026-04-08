@@ -39,7 +39,7 @@
         class="text-default whitespace-pre-wrap break-words font-normal [word-break:break-word]"
       >
         <template v-if="typeof caption === 'string'">
-          {{ title }}
+          {{ caption }}
         </template>
         <component
           :is="caption"

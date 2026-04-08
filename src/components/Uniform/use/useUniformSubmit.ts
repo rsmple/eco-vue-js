@@ -15,6 +15,7 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
   onSuccess: (value: OriginalModel) => void,
   initModel: (value: OriginalModel) => void,
   showMessage: (message: string, onlyChanged?: boolean) => void,
+  noInitGetter: () => boolean,
 ) => {
   const submitting = ref(false)
 
@@ -50,7 +51,7 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
 
         showMessage('Saved', true)
 
-        initModel(responseData ?? payload as unknown as OriginalModel)
+        if (!noInitGetter()) initModel(responseData ?? payload as unknown as OriginalModel)
         onSuccess(responseData ?? payload as unknown as OriginalModel)
       })
       .catch(error => {

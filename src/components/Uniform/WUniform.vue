@@ -137,7 +137,7 @@
   ResultModel = InnerModel
 "
 >
-import type {InnerInstanceExpose, UniformInstance, UniformScope, UniformScopeField} from './types'
+import type {InnerInstanceExpose, UniformScope, UniformScopeField} from './types'
 
 import {type VNode, computed, inject, onUnmounted, reactive, toRef, useId} from 'vue'
 
@@ -146,6 +146,7 @@ import {useUniformForm} from './use/useUniformForm'
 import {useUniformModel} from './use/useUniformModel'
 import {useUniformSubmit} from './use/useUniformSubmit'
 import {wUniformUnlistener, wUniformUpdater} from './utils/injection'
+import {getChangedPayload} from './utils/utils'
 
 import WEmptyComponent from '../EmptyComponent/WEmptyComponent.vue'
 
@@ -169,6 +170,7 @@ const props = defineProps<{
   async?: boolean
   validate?: ValidateFn | ValidateFn[]
   submitting?: boolean
+  noInit?: boolean
   confimGetter?: (payload: ResultModel, data: Model) => ConfirmProps | Promise<ConfirmProps | undefined> | undefined
 }>()
 
@@ -190,15 +192,7 @@ const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
   () => {
     if (!props.async || !scopeForm || !(scopeModel.modelValue.value instanceof Object)) return scopeModel.modelValue.value
 
-    const result: Partial<ResultModel> = {}
-
-    const list = Object.values(scopeForm.map.value) as UniformInstance[]
-
-    for (const key of Object.keys(scopeModel.modelValue.value)) {
-      if (list.some(item => item.getFieldChanged(key))) result[key as keyof ResultModel] = scopeModel.modelValue.value[key as keyof ResultModel]
-    }
-
-    return result as ResultModel
+    return getChangedPayload<ResultModel>(scopeModel.modelValue.value, scopeModel.modelValueInit.value)
   },
   props.apiMethod,
   (silent?: boolean | undefined, includeMessage?: boolean | undefined) => scopeField?.validate(silent, includeMessage) ?? scopeForm?.validate(silent, includeMessage),
@@ -206,6 +200,7 @@ const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
   result => emit('success', result),
   result => scopeModel.initModel(result),
   (message, onlyChanged) => scopeField?.showMessage(message, onlyChanged) ?? scopeForm?.showMessage(message, onlyChanged),
+  () => props.noInit,
 ) : undefined
 
 const scopeModel = useUniformModel(

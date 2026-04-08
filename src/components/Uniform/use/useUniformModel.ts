@@ -80,10 +80,12 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   const initModel = (value?: InnerModel) => {
     if (query && value) {
       query.setData(value)
-    } else if (data && modelValueInitRef && initFn) {
+    } 
+    
+    if (data && modelValueInitRef) {
       if (value) {
-        data.value = initFn(value)
-        modelValueInitRef.value = initFn(value)
+        data.value = (initFn ?? copyItem)(value)
+        modelValueInitRef.value = (initFn ?? copyItem)(value)
       } else {
         modelValueInitRef.value = copyItem(data.value)
       }
