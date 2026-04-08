@@ -40,7 +40,10 @@ export const useUniformField = <Model>(
   const hasValue = computed<boolean | null>(() => mandatory.value && _hasValueFieldExact.value === false ? null : _hasValueFieldExact.value)
 
   const hasChanges = computed<boolean>(() => {
-    if (modelValueInit.value === undefined) return modelValue.value !== undefined && modelValue.value !== ''
+    if (modelValueInit.value === undefined || modelValueInit.value === null || (Array.isArray(modelValueInit.value) && modelValueInit.value.length === 0)) {
+      if (Array.isArray(modelValue.value)) return modelValue.value.length !== 0
+      return modelValue.value !== undefined && modelValue.value !== null && modelValue.value !== ''
+    }
 
     const oldValue = modelValueInit.value
     const newValue = modelValue.value
