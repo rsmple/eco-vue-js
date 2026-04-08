@@ -30,11 +30,11 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
       ? (useQueryFn as UseQueryWithParams<InnerModel, QueryParams>)(queryParams as Ref<QueryParams>)
       : (useQueryFn as UseQueryEmpty<InnerModel>)()
     : undefined
-  
+
   const innerModel = query
     ? computed<InnerModel>(() => query.data.value as InnerModel)
     : computed<InnerModel>(() => field.value !== undefined ? parentModel.value?.[field.value] as InnerModel : parentModel.value as unknown as InnerModel)
-  
+
   const skeleton = query ? computed(() => !query.data.value) : undefined
   const data = initFn || query ? ref<ResultModel>((initFn ?? copyItem)((innerModel.value ?? {}) as ResultModel & InnerModel)) : undefined
   const modelValueInitRef = initFn || query ? ref<ResultModel>((initFn ?? copyItem)((innerModel.value ?? {}) as ResultModel & InnerModel)) : undefined
@@ -113,7 +113,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
     if (confirmProps instanceof Promise) {
       confirmProps = await confirmProps
     }
-  
+
     if (!confirmProps) return emitValue(value)
   
     closeModal = Modal.addConfirm({
@@ -121,19 +121,19 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
       onAccept: () => emitValue(value),
     }, () => closeModal = null)
   }
-  
+
   const select = (newValue: ResultModel extends unknown[] ? ResultModel[number] : never): void => {
     if (field.value === undefined) return
-  
-    const newList = [...(innerModel.value as unknown[]) ?? [], newValue] as ResultModel
-  
+
+    const newList = [...(modelValue.value as unknown[]) ?? [], newValue] as ResultModel
+
     showModal(newList)
   }
-  
+
   const unselect = (newValue: ResultModel extends unknown[] ? ResultModel[number] : never): void => {
     if (field.value === undefined) return
-  
-    const newList = (innerModel.value as unknown[])?.slice() ?? []
+
+    const newList = (modelValue.value as unknown[])?.slice() ?? []
     const index = newList.indexOf(newValue)
     if (index !== -1) newList.splice(index, 1)
   
