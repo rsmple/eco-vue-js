@@ -139,12 +139,13 @@
 >
 import type {InnerInstanceExpose, UniformInstance, UniformScope, UniformScopeField} from './types'
 
-import {type VNode, computed, onUnmounted, toRef, useId} from 'vue'
+import {type VNode, computed, inject, onUnmounted, reactive, toRef, useId} from 'vue'
 
 import {useUniformField} from './use/useUniformField'
 import {useUniformForm} from './use/useUniformForm'
 import {useUniformModel} from './use/useUniformModel'
 import {useUniformSubmit} from './use/useUniformSubmit'
+import {wUniformUnlistener, wUniformUpdater} from './utils/injection'
 
 import WEmptyComponent from '../EmptyComponent/WEmptyComponent.vue'
 
@@ -237,6 +238,15 @@ const scopeForm = slots.default ? useUniformForm(
   () => props.title,
 ) : undefined
 
+const updaterInjected = inject(wUniformUpdater, undefined)
+const unlistenerInjected = inject(wUniformUnlistener, undefined)
+
+updaterInjected?.(reactive({
+  hasChanges: scopeField?.hasChanges ?? scopeForm?.hasChanges ?? false,
+  hasValue: scopeField?.hasValue ?? scopeForm?.hasValue ?? null,
+  hasError: scopeField?.hasShownError ?? scopeForm?.hasShownError ?? false,
+}), id)
+
 defineExpose({
   id,
   field: props.field,
@@ -257,5 +267,8 @@ defineExpose({
   initModel: scopeModel.initModel,
 } satisfies InnerInstanceExpose<InnerModel, ResultModel>)
 
-onUnmounted(() => emit('unmounted', id))
+onUnmounted(() => {
+  unlistenerInjected?.(id)
+  emit('unmounted', id)
+})
 </script>

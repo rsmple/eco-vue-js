@@ -106,27 +106,20 @@
       }"
       :style="{minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
     >
-      <TransitionGroup
-        enter-active-class="transition-[transform,opacity] duration-[250ms] w-full"
-        leave-active-class="transition-[transform,opacity] duration-[250ms] w-full absolute top-0"
-        :enter-from-class="lessTransitions || side || hasScrollbar ? 'opacity-0' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]'"
-        :leave-to-class="lessTransitions || side || hasScrollbar ? 'opacity-0' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]'"
+      <TabItem
+        v-for="slot in unwrapSlots(customSlots ?? $slots.default?.() ?? []).filter(isTabItem)"
+        ref="tabItem"
+        :key="slot.props.name"
+        :name="slot.props.name"
+        :title="slot.props.title"
+        :active="slot.props.name === current"
+        :removable="slot.props.removable ?? false"
+        :enable-status="(statusIcon || showHasValue) ?? false"
+        @update:height="!disableMinHeight && updateHeight($event)"
+        @update:active="$emit('update:current-title', slot.props?.title)"
       >
-        <TabItem
-          v-for="slot in defaultSlots"
-          ref="tabItem"
-          :key="slot.props.name"
-          :name="slot.props.name"
-          :title="slot.props.title"
-          :active="slot.props.name === current"
-          :removable="slot.props.removable ?? false"
-          :enable-status="(statusIcon || showHasValue) ?? false"
-          @update:height="!disableMinHeight && updateHeight($event)"
-          @update:active="$emit('update:current-title', slot.props?.title)"
-        >
-          <component :is="slot" />
-        </TabItem>
-      </TransitionGroup>
+        <component :is="slot" />
+      </TabItem>
     </div>
   </div>
 </template>
@@ -140,7 +133,7 @@ import IconClose from '@/assets/icons/IconClose.svg?component'
 
 import {Notify} from '@/utils/Notify'
 import {useIsMobile} from '@/utils/mobile'
-import {debounce, getHasScrollbar, throttle, unwrapSlots} from '@/utils/utils'
+import {debounce, throttle, unwrapSlots} from '@/utils/utils'
 
 import TabItem from './components/TabItem.vue'
 import TabTitleButton from './components/TabTitleButton.vue'
@@ -160,8 +153,6 @@ const emit = defineEmits<{
 }>()
 
 const {isMobile} = useIsMobile()
-
-const hasScrollbar = getHasScrollbar()
 
 const slots = defineSlots<{
   default: () => void
