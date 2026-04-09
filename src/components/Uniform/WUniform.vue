@@ -126,6 +126,7 @@
         unselect: scopeModel.unselect,
         initModel: (value?: InnerModel) => scopeModel.initModel(value ?? scopeModel.innerModel.value),
         doValidate: scopeField?.validate ?? scopeForm?.validate ?? (() => undefined),
+        getInvalidatePayload: scopeField?.getInvalidatePayload ?? scopeForm?.getInvalidatePayload ?? (() => undefined),
         onInitModel: () => scopeModel.initModel(),
         updateModelValue: scopeModel.updateModelValue,
         updateModelValueInner: scopeModel.updateModelValueInner as UniformScope<ResultModel>['updateModelValueInner'],
@@ -280,6 +281,7 @@ defineExpose({
   fullPayload: props.fullPayload,
   validate: scopeField?.validate ?? scopeForm?.validate ?? (() => undefined),
   invalidate: scopeField?.invalidate ?? scopeForm?.invalidate ?? (() => void 0),
+  getInvalidatePayload: scopeField?.getInvalidatePayload ?? scopeForm?.getInvalidatePayload ?? (() => undefined),
   showMessage: scopeField?.showMessage ?? scopeForm?.showMessage ?? (() => void 0),
   getFieldChanged: scopeField?.getFieldChanged ?? scopeForm?.getFieldChanged ?? (() => false),
 

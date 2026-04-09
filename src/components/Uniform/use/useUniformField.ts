@@ -123,6 +123,11 @@ export const useUniformField = <Model>(
     hasShownError.value = errorMessage.value.length !== 0
   }
 
+  const getInvalidatePayload = (): InvalidatePayload | undefined => {
+    if (errorMessage.value.length === 0) return undefined
+    return [...errorMessage.value]
+  }
+
   const showMessageField = (message: string, onlyChanged?: boolean) => {
     if (!onlyChanged || hasChanges.value) showMessage(message)
   }
@@ -142,6 +147,7 @@ export const useUniformField = <Model>(
     validateFieldOnUpdate,
     validate,
     invalidate,
+    getInvalidatePayload,
     showMessage: showMessageField,
     getFieldChanged,
   }

@@ -262,7 +262,7 @@
               :always-select="alwaysSelect ?? false"
               @toggle:selected="toggleSelected(value as number, position)"
               @hover:selected="hoverSelected(position)"
-              @click:action="$emit('click:action', {item, setter, scope: innerScope})"
+              @click:action="$emit('click:action', {item, setter, scope: formFieldGetter ? innerScope : undefined})"
             >
               <template #default="{beforeClass}">
                 <ListCardFieldNested

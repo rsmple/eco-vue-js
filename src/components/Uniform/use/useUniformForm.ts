@@ -55,7 +55,7 @@ export const useUniformForm = (
 
   const invalidate = (messages: InvalidatePayload): void => {
     const field = fieldGetter()
-    const message = field !== undefined && messages instanceof Object && field in messages
+    const message = field !== undefined && messages instanceof Object
       ? messages[field as keyof InvalidatePayload] as InvalidatePayload | undefined
       : messages
 
@@ -64,6 +64,28 @@ export const useUniformForm = (
     for (const item of mapValues.value) {
       item.invalidate(message)
     }
+  }
+
+  const getInvalidatePayload = (): InvalidatePayload | undefined => {
+    const merged: Record<string | number | symbol, InvalidatePayload> = {}
+    let hasContent = false
+
+    for (const item of mapValues.value) {
+      const payload = item.getInvalidatePayload()
+      if (payload === undefined) continue
+
+      if (item.field) {
+        merged[item.field] = payload
+        hasContent = true
+      } else if (payload instanceof Object && !Array.isArray(payload)) {
+        Object.assign(merged, payload)
+        hasContent = true
+      }
+    }
+
+    if (!hasContent) return undefined
+
+    return merged
   }
 
   const showMessage = (message: string, onlyChanged?: boolean): void => {
@@ -93,6 +115,7 @@ export const useUniformForm = (
     isValid,
     validate,
     invalidate,
+    getInvalidatePayload,
     showMessage,
     getFieldChanged,
   }

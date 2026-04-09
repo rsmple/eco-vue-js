@@ -17,6 +17,7 @@ export type UniformInstance = {
   fullPayload: boolean
   validate: UniformValidate
   invalidate: (payload: InvalidatePayload) => void
+  getInvalidatePayload: () => InvalidatePayload | undefined
   showMessage: (message: string, onlyChanged?: boolean) => void
   getFieldChanged: (field: string) => boolean
 }
@@ -55,6 +56,7 @@ export type UniformScope<ModelValue, InitModel = any> = {
   initModel: (value?: InitModel) => void
   onInitModel: () => void
   doValidate: () => void
+  getInvalidatePayload: () => InvalidatePayload | undefined
   onUnmounted: ((id: string) => void) | undefined
   updateModelValue: (newValue: ModelValue) => void
   updateModelValueInner: <Fields extends unknown[] | readonly unknown[]>(newValue: Get<ModelValue, Fields>, field: Fields) => void
