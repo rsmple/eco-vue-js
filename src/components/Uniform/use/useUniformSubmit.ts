@@ -75,8 +75,6 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
             caption: text && text.length < 200 ? text : undefined,
           })
 
-          console.log(messages)
-
           if (messages) invalidate(messages)
         }
       })
