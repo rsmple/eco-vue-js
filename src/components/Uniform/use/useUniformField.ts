@@ -3,6 +3,7 @@ import type {InvalidatePayload, UniformValidate} from '../types'
 import {type Ref, computed, nextTick, ref} from 'vue'
 
 import {useFieldMessage} from '@/components/FieldWrapper/use/useFieldSaved'
+import {isEqualArrObj} from '@/utils/utils'
 import {validateRequired} from '@/utils/validate'
 
 import {scrollToValidator} from '../utils/utils'
@@ -49,7 +50,7 @@ export const useUniformField = <Model>(
     const newValue = modelValue.value
 
     if (Array.isArray(newValue) && Array.isArray(oldValue)) {
-      return newValue.length !== oldValue.length || newValue.some(item => !oldValue.includes(item))
+      return newValue.length !== oldValue.length || !isEqualArrObj(newValue, oldValue)
     } else if (newValue instanceof Object && oldValue instanceof Object) {
       const keys = Object.keys(newValue)
       return keys.length !== Object.keys(oldValue).length

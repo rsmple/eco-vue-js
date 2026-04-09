@@ -62,7 +62,7 @@
           class="text-default rounded px-1 font-semibold"
           :class="scopeField?.hasValue.value ?? scopeForm?.hasValue.value ? 'bg-positive dark:bg-positive-dark' : 'bg-gray-200 dark:bg-gray-800'"
         >
-          {{ scopeField?.hasValue.value ?? scopeForm?.hasValue.value ? 'Has Value' : scopeField?.hasValue.value ?? scopeForm?.hasValue.value === null ? 'Empty' : 'No Value' }}
+          {{ scopeField?.hasValue.value ?? scopeForm?.hasValue.value ? 'Has Value' : (scopeField?.hasValue.value ?? scopeForm?.hasValue.value) === null ? 'Empty' : 'No Value' }}
         </div>
 
         <div
@@ -74,6 +74,14 @@
 
         <div>
           {{ scopeField?.errorMessageString.value ?? 'No Error' }}
+        </div>
+
+        <div>
+          {{ scopeForm ? 'Form' : 'No form' }}
+        </div>
+
+        <div>
+          {{ scopeField ? 'Field' : 'No field' }}
         </div>
       </div>
     </div>
@@ -139,7 +147,7 @@
 >
 import type {InnerInstanceExpose, UniformScope, UniformScopeField} from './types'
 
-import {type VNode, computed, inject, onUnmounted, reactive, toRef, useId} from 'vue'
+import {type Ref, type VNode, computed, inject, onUnmounted, reactive, toRef, useId} from 'vue'
 
 import {useUniformField} from './use/useUniformField'
 import {useUniformForm} from './use/useUniformForm'
@@ -152,7 +160,7 @@ import WEmptyComponent from '../EmptyComponent/WEmptyComponent.vue'
 
 const DEBUG = true
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   id?: string
   modelValue?: Model
   modelValueInit?: Model
@@ -172,8 +180,26 @@ const props = defineProps<{
   submitting?: boolean
   noInit?: boolean
   fullPayload?: boolean
+  initHasValue?: boolean | null
+  initHasError?: boolean
   confimGetter?: (payload: ResultModel, data: Model) => ConfirmProps | Promise<ConfirmProps | undefined> | undefined
-}>()
+}>(), {
+  id: undefined,
+  modelValue: undefined,
+  modelValueInit: undefined,
+  field: undefined,
+  initData: undefined,
+  apiMethod: undefined,
+  useQueryFn: undefined,
+  queryParams: undefined,
+
+  tag: undefined,
+  title: undefined,
+  validate: undefined,
+  initHasValue: undefined,
+  initHasError: undefined,
+  confimGetter: undefined,
+})
 
 const emit = defineEmits<{
   (e: 'update:model-value', value: ResultModel, fields: (string | number)[]): void
@@ -205,8 +231,8 @@ const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
 ) : undefined
 
 const scopeModel = useUniformModel(
-  toRef(props, 'modelValue'),
-  toRef(props, 'modelValueInit'),
+  toRef(props, 'modelValue') as Ref<Model>,
+  toRef(props, 'modelValueInit') as Ref<Model>,
   computed(() => props.field),
   props.useQueryFn,
   toRef(props, 'queryParams'),
@@ -239,17 +265,17 @@ const unlistenerInjected = inject(wUniformUnlistener, undefined)
 
 updaterInjected?.(reactive({
   hasChanges: scopeField?.hasChanges ?? scopeForm?.hasChanges ?? false,
-  hasValue: scopeField?.hasValue ?? scopeForm?.hasValue ?? null,
-  hasError: scopeField?.hasShownError ?? scopeForm?.hasShownError ?? false,
+  hasValue: scopeField?.hasValue ?? scopeForm?.hasValue ?? (props.initHasValue !== undefined ? toRef(props, 'initHasValue') as Ref<boolean | null> : null),
+  hasError: scopeField?.hasShownError ?? scopeForm?.hasShownError ?? (props.initHasError !== undefined ? toRef(props, 'initHasError') as Ref<boolean> : false),
 }), id)
 
 defineExpose({
   id,
   field: props.field,
   hasChanges: scopeField?.hasChanges ?? scopeForm?.hasChanges ?? false,
-  hasValue: scopeField?.hasValue ?? scopeForm?.hasValue ?? false,
+  hasValue: scopeField?.hasValue ?? scopeForm?.hasValue ?? (props.initHasValue !== undefined ? toRef(props, 'initHasValue') as Ref<boolean | null> : null),
   isValid: scopeField?.isValid ?? scopeForm?.isValid ?? false,
-  hasShownError: scopeField?.hasShownError ?? scopeForm?.hasShownError ?? false,
+  hasShownError: scopeField?.hasShownError ?? scopeForm?.hasShownError ?? (props.initHasError !== undefined ? toRef(props, 'initHasError') as Ref<boolean> : false),
   fullPayload: props.fullPayload,
   validate: scopeField?.validate ?? scopeForm?.validate ?? (() => undefined),
   invalidate: scopeField?.invalidate ?? scopeForm?.invalidate ?? (() => void 0),

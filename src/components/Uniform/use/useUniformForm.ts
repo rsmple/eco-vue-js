@@ -24,7 +24,10 @@ export const useUniformForm = (
 
   const mapValues = computed(() => Object.values(map.value))
 
-  const hasValue = computed<boolean | null>(() => mapValues.value.length === 0 ? null : mapValues.value.some(value => value.hasValue) && mapValues.value.every(value => value.hasValue !== false))
+  const hasValue = computed<boolean | null>(() => {
+    if (fieldGetter() === 'mapping') console.log(mapValues.value)
+    return mapValues.value.length === 0 || mapValues.value.every(value => value.hasValue === null) ? null : mapValues.value.some(value => value.hasValue) && mapValues.value.every(value => value.hasValue !== false)
+  })
 
   const hasShownError = computed<boolean>(() => mapValues.value.some(value => value.hasShownError))
 

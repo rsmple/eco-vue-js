@@ -42,6 +42,7 @@ export interface InputProps<Type extends InputType> extends Omit<FieldWrapperPro
   async?: boolean
   debounce?: number
   hideDebounce?: boolean
+  explicit?: boolean
 }
 
 export interface InputAsyncProps<Type extends InputType> extends InputProps<Type> {

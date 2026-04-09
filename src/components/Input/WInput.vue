@@ -325,7 +325,7 @@
       <slot name="bottom" />
 
       <InputAsyncButtons
-        v-if="asyncState.isAsync.value && !skeleton && (textSecure || textarea) && asyncState.focused.value"
+        v-if="asyncState.isAsync.value && !skeleton && (textSecure || textarea || explicit) && asyncState.focused.value"
         :disabled="disabled || loading"
         :loading="loading"
         @cancel="asyncState.cancel(); blur()"
