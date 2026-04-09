@@ -27,7 +27,7 @@ export const useInputAsync = (context: InputAsyncContext) => {
   const value = ref<NonNullable<ModelValue> | undefined>()
   const timeout = ref<NodeJS.Timeout | null>(null)
 
-  const hasChanges = computed(() => isAsync.value && (props.modelValue ?? undefined) !== value.value)
+  const hasChanges = computed(() => isAsync.value && (props.modelValue ?? undefined) !== value.value && !(props.textSecure && typeof props.modelValue !== 'string' && !value.value))
 
   const doClearTimeout = () => {
     if (timeout.value) {
@@ -52,7 +52,7 @@ export const useInputAsync = (context: InputAsyncContext) => {
     focused.value = false
   }
 
-  watch(toRef(props, 'modelValue'), modelValue => {
+  const init = (modelValue: ModelValue) => {
     doClearTimeout()
 
     value.value = props.textSecure && typeof modelValue !== 'string' ? undefined : modelValue ?? undefined
@@ -61,7 +61,9 @@ export const useInputAsync = (context: InputAsyncContext) => {
       context.blur()
       saved.value = false
     }
-  }, {immediate: true})
+  }
+
+  watch(toRef(props, 'modelValue'), init, {immediate: true})
 
   // Debounce
   if (props.debounce) {

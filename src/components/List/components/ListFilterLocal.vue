@@ -48,10 +48,10 @@
         <template v-if="filter || search">
           <WTabsItem
             v-for="(item, index) in filterList.filter(item => allShown.includes(filterAll.indexOf(item)))"
-            :key="filterAll.indexOf(item)"
+            :key="item.id"
             :name="filterAll.indexOf(item).toString()"
-            :title="getMetaValue((Array.isArray(item) ? item[0].meta : item.meta).title, scope.modelValue)"
-            :icon="getMetaValue((Array.isArray(item) ? item[0].meta : item.meta).icon, scope.modelValue)"
+            :title="getMetaValue((Array.isArray(item.item) ? item.item[0].meta : item.item.meta).title, scope.modelValue)"
+            :icon="getMetaValue((Array.isArray(item.item) ? item.item[0].meta : item.item.meta).icon, scope.modelValue)"
             :init="index === 0 && !(scope.modelValue as Record<string, string>).search"
             :has-value="shown.includes(filterAll.indexOf(item))"
             v-bind="!readonly ? {
@@ -60,16 +60,16 @@
           >
             <div class="sm-not:-px--inner-margin">
               <component
-                :is="item[0].default"
-                v-if="Array.isArray(item)"
-                v-bind="item[1]"
+                :is="item.item[0].default"
+                v-if="Array.isArray(item.item)"
+                v-bind="item.item[1]"
                 :scope="scope"
                 :readonly="readonly"
                 :global="false"
               />
 
               <component
-                :is="item.default"
+                :is="item.item.default"
                 v-else
                 :scope="scope"
                 :readonly="readonly"
@@ -95,7 +95,7 @@
 import type {FilterComponent} from '../types'
 import type {UniformScope} from '@/components/Uniform/types'
 
-import {computed, markRaw, ref} from 'vue'
+import {computed, markRaw, ref, useId} from 'vue'
 
 import WExpansion from '@/components/Expansion/WExpansion.vue'
 import WTabs from '@/components/Tabs/WTabs.vue'
@@ -127,11 +127,11 @@ const searchComponent: FilterComponent<QueryParams> | undefined = props.search ?
 const filterAll = [
   ...(props.searchVisible || !searchComponent ? [] : [markRaw(searchComponent)]),
   ...props.filter ?? [],
-]
+].map(item => ({id: useId(), item}))
 
 const filterList = computed(() => {
   return filterAll.filter(item => {
-    const meta = Array.isArray(item) ? item[0].meta : item.meta
+    const meta = Array.isArray(item.item) ? item.item[0].meta : item.item.meta
 
     if (getMetaValue(meta.hidden, props.scope.modelValue)) return false
 
@@ -141,7 +141,7 @@ const filterList = computed(() => {
 })
 
 const shown = computed(() => filterList.value
-  .filter(item => (Array.isArray(item) ? item[0].meta.fields : item.meta.fields)?.some(field => field in (props.scope.modelValue as Record<string, unknown>)))
+  .filter(item => (Array.isArray(item.item) ? item.item[0].meta.fields : item.item.meta.fields)?.some(field => field in (props.scope.modelValue as Record<string, unknown>) && props.scope.modelValue[field] !== undefined))
   .map(item => filterAll.indexOf(item)))
 
 const selected = ref<number[]>(shown.value.slice())
@@ -149,14 +149,14 @@ const selected = ref<number[]>(shown.value.slice())
 const allShown = computed(() => [...selected.value, ...shown.value].filter((item, index, array) => array.indexOf(item) === index))
 
 const excluded = computed<number[]>(() => {
-  const hidden = props.filter?.filter(item => !filterList.value.includes(item)).map(item => filterAll.indexOf(item) ?? -1) ?? []
+  const hidden = filterAll.filter(item => !filterList.value.includes(item)).map(item => filterAll.indexOf(item) ?? -1) ?? []
 
   return [...allShown.value, ...hidden]
 })
 
-const clearFilterItem = (item: FilterComponent<QueryParams>) => {
+const clearFilterItem = (item: {id: string, item: FilterComponent<QueryParams>}) => {
   const result: QueryParams = {...props.scope.modelValue} as QueryParams
-  const meta = Array.isArray(item) ? item[0].meta : item.meta
+  const meta = Array.isArray(item.item) ? item.item[0].meta : item.item.meta
 
   meta.fields?.forEach(field => {
     result[field as keyof QueryParams] = undefined as never

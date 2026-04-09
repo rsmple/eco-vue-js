@@ -52,7 +52,6 @@
           :readonly="isReadonly"
           :disable-clear="disableClear || isReadonly || (seamless && !focused) || modelValue?.length === 0"
           :search="value"
-          :skeleton="optionsWithCreated.length === 0"
           :class="{
             'cursor-pointer': !isDisabled && !isReadonly,
             'cursor-not-allowed opacity-50': isDisabled,
@@ -69,6 +68,7 @@
               :selected="true"
               :model="true"
               :index="index"
+              :skeleton="skeleton ?? false"
             />
           </template>
         </SelectOptionPrefix>

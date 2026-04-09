@@ -75,14 +75,26 @@ export const isEqualArr = (arr1: unknown[], arr2: unknown[]): boolean => {
   return arr1.length === arr2.length && arr1.every(item => arr2.includes(item))
 }
 
-export const isEqualObj = (obj1: Record<string, unknown>, obj2: Record<string, unknown>, exclude?: string[], include?: string[]): boolean => {
+export const isEqualArrObj = (arr1: unknown[], arr2: unknown[]): boolean => {
+  return arr1.length === arr2.length && arr1.every((item, index) =>
+    Array.isArray(item) && Array.isArray(arr2[index])
+      ? isEqualArrObj(item, arr2[index])
+      : item instanceof Object && arr2[index] instanceof Object 
+        ? isEqualObj(item as Record<string, unknown>, arr2[index] as Record<string, unknown>, undefined, undefined, true)
+        : item === arr2[index],
+  )
+}
+
+export const isEqualObj = (obj1: Record<string, unknown>, obj2: Record<string, unknown>, exclude?: string[], include?: string[], strictArray?: boolean): boolean => {
   return Object.keys({...obj1, ...obj2})
     .every(key => {
       if (include && !include.includes(key)) return true
 
       if (exclude?.includes(key) || obj1[key] === obj2[key]) return true
 
-      if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) return isEqualArr(obj1[key] as unknown[], obj2[key] as unknown[])
+      if (Array.isArray(obj1[key]) && !Array.isArray(obj2[key])) return obj1[key].length === 0 && !obj2[key]
+      else if (!Array.isArray(obj1[key]) && Array.isArray(obj2[key])) return obj2[key].length === 0 && !obj1[key]
+      else if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) return (strictArray ? isEqualArrObj : isEqualArr)(obj1[key] as unknown[], obj2[key] as unknown[])
 
       if (obj1[key] instanceof Object && obj2[key] instanceof Object) return isEqualObj(obj1[key] as NonNullable<unknown>, obj2[key] as NonNullable<unknown>)
 

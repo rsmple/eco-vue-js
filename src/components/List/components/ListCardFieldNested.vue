@@ -101,7 +101,7 @@ defineProps<{
   skeleton: boolean
   card: boolean
   readonly: boolean
-  uniformScope: UniformScope<Data, number> | undefined
+  uniformScope: UniformScope<Data> | undefined
   queryParams: QueryParams
   results: Data[] | undefined
   intersecting: boolean

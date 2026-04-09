@@ -67,7 +67,7 @@ export const encodeQueryParams = <T>(params: T): EncodeQueryParams<T> => {
   for (const key in params) {
     const value = encodeQueryParam(params[key])
 
-    if (value === undefined || (Array.isArray(value) && value.length === 0)) continue
+    if (value === undefined || value === '' || value === '[]' || value === '{}') continue
 
     result[key] = value
   }
@@ -81,7 +81,7 @@ export const encodeRouteParams = <T>(params: T): Partial<EncodeQueryParams<T>> =
   for (const key in params) {
     const value = encodeQueryParam(params[key])
 
-    if (value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
+    if (value === undefined || value === '' || value === '[]' || value === '{}') {
       result[key] = undefined
     } else {
       result[key] = value
@@ -121,7 +121,7 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
     const router = useOptionalRouter()
 
     const updateQueryParams = (value: Partial<QueryParams>, fields?: (string | number)[]) => {
-      const data = fields?.length ? {} as QueryParams : value
+      const data = fields?.length ? {...queryParams} as Partial<QueryParams> : value
       let current: Partial<QueryParams> = data
       if (fields?.length) {
         for (const field of fields) {

@@ -67,7 +67,6 @@ export interface SelectPrefixProps<Data extends DefaultData, OptionComponent ext
   readonly: boolean | undefined
   loading: boolean | undefined
   disableClear: boolean | undefined
-  skeleton: boolean
 }
 
 export interface SelectSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean>

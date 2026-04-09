@@ -1,70 +1,84 @@
-import type {Component} from 'vue'
+import type {MaybeRef} from 'vue'
 
-export interface UniformInstance {
+export type ValidateResponse = {
+  title: string | undefined
+  message: (string | ValidateResponse)[]
+} | undefined
+
+export type UniformValidate = (silent?: boolean, includeMessage?: boolean) => ValidateResponse | undefined
+
+export type UniformInstance = {
   id: string
-  field: string
-  hasValue: boolean | null
-  hasShownError: boolean
+  field: string | number | symbol | undefined
   hasChanges: boolean
+  hasValue: boolean | null
   isValid: boolean
-  skeleton?: boolean
-  initModel: () => void
-  validate: (silent?: boolean, withMessage?: boolean) => string | undefined | void
-  invalidate: (messages: InvalidatePayload) => void
-  submit: () => Promise<void>
-  getErrorMessage: () => string | undefined
-  getHasChangedField: (field: string) => boolean 
+  hasShownError: boolean
+  fullPayload: boolean
+  validate: UniformValidate
+  invalidate: (payload: InvalidatePayload) => void
+  showMessage: (message: string, onlyChanged?: boolean) => void
+  getFieldChanged: (field: string) => boolean
 }
 
-type Get<Value, Path extends unknown[] | readonly unknown[]> = Path extends [infer Head, ...infer Tail]
-  ? Head extends keyof Value
-    ? Tail extends []
-      ? Value[Head]
-      : Get<Value[Head], Tail>
-    : undefined
-  : undefined
+type ToRefs<Value> = {
+  [Key in keyof Value]: MaybeRef<Value[Key]>
+} 
 
-export type UniformScope<InnerModel> = {
-  ref: (item: UniformInstance | unknown) => void
-  parentRef: (item: UniformInstance | unknown) => void
+export type UniformInstanceExpose<InnerModel, ModelValue> = UniformInstance & {
+  modelValue: ModelValue
+  updateModelValue: (newValue: ModelValue) => void
+  updateModelValueInner: <Fields extends unknown[] | readonly unknown[]>(newValue: Get<ModelValue, Fields>, field: Fields) => void
+  submit: (() => Promise<void> | undefined) | undefined
+  submitting: boolean
   skeleton: boolean
-  modelValue: InnerModel
-  modelValueList: Record<string, InnerModel extends unknown[] ? InnerModel[number] : never>
-  removeParentRef: (id: string) => void
-  onUnmouted: (id: string) => void
-  updateModelValue: (newValue: InnerModel) => void
-  updateModelValueInner: <Fields extends unknown[] | readonly unknown[]>(newValue: Get<InnerModel, Fields>, field: Fields) => void
-  select: (newValue: InnerModel extends unknown[] ? InnerModel[number] : never) => void
-  unselect: (newValue: InnerModel extends unknown[] ? InnerModel[number] : never) => void
+  initModel: (value?: InnerModel) => void
+}
+
+export type InnerInstanceExpose<InnerModel, ModelValue> = ToRefs<UniformInstanceExpose<InnerModel, ModelValue>>
+
+export const isInnerInstance = (value: unknown): value is UniformInstance => value instanceof Object && 'id' in value && 'validate' in value
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type UniformScope<ModelValue, InitModel = any> = {
+  ref: ((item: UniformInstance | unknown) => void) | undefined
+  modelValue: ModelValue
+  modelValueList: Record<string, ModelValue extends unknown[] ? ModelValue[number] : never>
+  modelValueInit: ModelValue
   async: boolean
+  skeleton: boolean
   submitting: boolean
   hasChanges: boolean
-  submit: () => void
-  initModel: (value?: InnerModel) => void
-  'onUpdate:modelValue': (newValue: InnerModel, fields: (string | number)[]) => void
+  select: (newValue: ModelValue extends unknown[] ? ModelValue[number] : never) => void
+  unselect: (newValue: ModelValue extends unknown[] ? ModelValue[number] : never) => void
+  submit: (() => Promise<void> | undefined) | undefined
+  initModel: (value?: InitModel) => void
+  onInitModel: () => void
+  onUnmounted: ((id: string) => void) | undefined
+  updateModelValue: (newValue: ModelValue) => void
+  updateModelValueInner: <Fields extends unknown[] | readonly unknown[]>(newValue: Get<ModelValue, Fields>, field: Fields) => void
+  'onUpdate:modelValue': (newValue: ModelValue, fields: (string | number)[]) => void
 }
 
-export type UniformScopeField<InnerModel, Field = undefined> = {
-  ref: (component: ComponentInstance<Component>) => void
-  field: NonNullable<Field>
-  title: string
-  modelValue: InnerModel
+export type UniformScopeField<ModelValue> = {
+  ref: ((item: UniformInstance | unknown) => void) | undefined
+  title: string | undefined
+  modelValue: ModelValue
   hasChanges: boolean
-  required: boolean | undefined
+  hasValue: boolean | null
+  required: boolean
   errorMessage: string | undefined
   skeleton: boolean
   loading: boolean
-  updateModelValue: Field extends undefined ? undefined : ((newValue: InnerModel | undefined) => void)
+  disabled: boolean
   async: boolean
-  'onUpdate:modelValue': ((newValue: InnerModel | undefined) => void) | undefined
-  onSelect: (newValue: InnerModel extends unknown[] ? InnerModel[number] : never) => void
-  onUnselect: (newValue: InnerModel extends unknown[] ? InnerModel[number] : never) => void
+  onInitModel: () => void
+  onSelect: (value: ModelValue extends unknown[] ? ModelValue[number] : never) => void
+  onUnselect: (value: ModelValue extends unknown[] ? ModelValue[number] : never) => void
+  updateModelValue: (newValue: ModelValue) => void
+  'onUpdate:modelValue': (newValue: ModelValue) => void
 }
 
 export type InvalidatePayload = {
   [Key in 'detail' | 'non_field_errors' | string | number]?: InvalidatePayload
 } | string[] | string
-
-export const isUniformInstance = (item: UniformInstance | unknown): item is UniformInstance => {
-  return item instanceof Object && 'field' in item && item.field !== undefined
-}
