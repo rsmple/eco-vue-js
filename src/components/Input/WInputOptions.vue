@@ -88,7 +88,7 @@ import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 import SelectOption from '@/components/Select/components/SelectOption.vue'
 import {useComponentStates} from '@/utils/useComponentStates'
-import {debounce} from '@/utils/utils'
+import {debounce as debounceImport} from '@/utils/utils'
 
 type ModelValue = Required<InputOptionsProps<Type, Option>>['modelValue']
 
@@ -128,7 +128,7 @@ const setLoadingOptionIndex = (value: number) => {
   loadingOptionIndex.value = value
 }
 
-const unlockCursor = debounce(() => {
+const unlockCursor = debounceImport(() => {
   isCursorLocked.value = false
 }, 50)
 
