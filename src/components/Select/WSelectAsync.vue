@@ -5,7 +5,7 @@
       ...props,
       modelValue: search,
       loading: loading || isFetchingPrefix || loadingCreate,
-      hideInput: modelValue.length === 0 && !emptyValue ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
+      hideInput: !modelValue?.length && !emptyValue ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
       filterValue: filterValue === undefined ? modelValue : filterValue,
       emptyValue: undefined,
     }"
@@ -40,16 +40,16 @@
       <slot
         v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true"
         name="prefix"
-        v-bind="{modelValue}"
+        v-bind="{modelValue: modelValue ?? []}"
       >
         <SelectAsyncPrefix
           :use-query-fn="useQueryFnPrefix ?? useQueryFnOptions"
-          :model-value="!emptyValue || modelValue.length !== 0 ? modelValue : emptyValue"
+          :model-value="!emptyValue || modelValue?.length !== 0 ? modelValue ?? [] : emptyValue"
           :disabled="isDisabled"
           :loading="loading || isFetchingPrefix"
           :option-component="(optionComponent as SelectOptionComponent<Data>)"
           :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
-          :disable-clear="disableClear || isReadonly || (seamless && !focused) || modelValue.length === 0"
+          :disable-clear="disableClear || isReadonly || (seamless && !focused) || modelValue?.length === 0"
           :preview-data="previewData"
           :created-data="createdData"
           :value-getter="valueGetter"
@@ -89,7 +89,7 @@
     <template #content>
       <SelectAsyncList
         ref="list"
-        :model-value="modelValue"
+        :model-value="modelValue ?? []"
         :use-query-fn="useQueryFnOptions"
         :query-params="queryParams"
         :loading="loading || isFetchingPrefix"
@@ -189,7 +189,7 @@ const search = ref('')
 const loadingCreate = ref(false)
 
 const isDisabledComputed = computed(() => props.loading || isReadonly.value || isDisabled.value)
-const isModelValueSearch = computed(() => !!search.value && props.modelValue.includes(search.value as Model))
+const isModelValueSearch = computed(() => !!search.value && props.modelValue?.includes(search.value as Model))
 const queryParams = computed(() => ({...props.queryParamsOptions, [props.searchField ?? 'search']: search.value}))
 const queryParamsFirstPage = computed(() => ({...queryParams.value, page: 1}))
 const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
@@ -211,7 +211,7 @@ const close = () => {
 
     if (optionExact) select(props.valueGetter(optionExact), optionExact)
     else if (search.value) create(search.value)
-    else if (props.modelValue.length) {
+    else if (props.modelValue?.length) {
       const last = props.modelValue[props.modelValue.length - 1]!
       unselect(last, firstPageData.value?.results.find(option => props.valueGetter(option) === last))
     }
@@ -223,7 +223,7 @@ const close = () => {
 let deletePressTimeout: NodeJS.Timeout | null = null
 
 const captureDoubleDelete = () => {
-  if (!props.modelValue.length || search.value.length) return
+  if (!props.modelValue?.length || search.value.length) return
 
   if (deletePressTimeout) {
     const last = props.modelValue[props.modelValue.length - 1]!
@@ -301,7 +301,7 @@ if (props.useQueryFnDefault) {
   const {data: defaultData} = props.useQueryFnDefault({enabled: computed(() => !props.disabled)})
 
   watch(defaultData, value => {
-    if (value && props.modelValue.length === 0) {
+    if (value && props.modelValue?.length === 0) {
       select(props.valueGetter(value), value)
       emit('init-model')
     }

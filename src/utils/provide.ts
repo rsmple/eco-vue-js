@@ -23,3 +23,11 @@ export const useProvideSkeleton = (value?: MaybeRef<boolean>) => {
 
   return inject(wSkeletonKey, undefined)
 }
+
+// const wAsyncKey = Symbol('wAsyncKey') as InjectionKey<MaybeRef<boolean>>
+
+// export const useProvideAsync = (value?: MaybeRef<boolean>) => {
+//   if (value !== undefined) provide(wAsyncKey, value)
+
+//   return inject(wAsyncKey, undefined)
+// }

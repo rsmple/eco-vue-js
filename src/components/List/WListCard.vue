@@ -63,10 +63,7 @@
       </div>
     </div>
 
-    <component
-      :is="formName ? WForm : 'div'"
-      ref="form"
-      v-bind="formName ? {name: formName} : undefined"
+    <div
       class="sm-not:-px--inner-margin isolate"
       :class="{
         [cardClass ?? '']: true,
@@ -92,7 +89,7 @@
         @update:model-value="$emit('toggle:selected')"
       />
 
-      <slot v-bind="{toggle, isOpen, validate, beforeClass}" />
+      <slot v-bind="{toggle, isOpen, beforeClass}" />
 
       <ListCardAction
         v-if="isActionShown"
@@ -132,7 +129,7 @@
 
         <slot name="more" />
       </WButtonMore>
-    </component>
+    </div>
       
     <div
       v-if="!card"
@@ -212,7 +209,6 @@ import {computed, markRaw, ref, useTemplateRef} from 'vue'
 import WButtonMore from '@/components/Button/WButtonMore.vue'
 import WButtonMoreItem from '@/components/Button/WButtonMoreItem.vue'
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
-import WForm from '@/components/Form/WForm.vue'
 import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 
 import IconTo from '@/assets/icons/IconTo.svg?component'
@@ -229,7 +225,6 @@ const props = defineProps<{
   cardWrapperClass: string | undefined
   allowOpen: boolean | undefined
   disableMore: boolean | undefined
-  formName: string | undefined
   card: boolean
   to: LinkProps['to'] | undefined
   hasAction: boolean | undefined
@@ -249,7 +244,6 @@ defineEmits<{
 
 const containerRef = useTemplateRef('container')
 const moreRef = useTemplateRef<ComponentInstance<typeof WButtonMore>>('more')
-const formRef = useTemplateRef<ComponentInstance<typeof WForm>>('form')
 
 const isOpen = ref(false)
 const position = ref<{left: string, top: string} | null>(null)
@@ -269,8 +263,6 @@ const beforeClass = computed<Record<string, boolean | undefined>>(() => {
 const toggle = () => {
   isOpen.value = !isOpen.value
 }
-
-const validate: ComponentInstance<typeof WForm>['validate'] = (...args) => formRef.value?.validate(...args)
 
 const isActionShown = computed<boolean>(() => !props.skeleton && (props.allowOpen || props.to !== undefined || props.allowSelectHover || props.hasAction || props.selected || moreRef.value?.isOpen === true))
 

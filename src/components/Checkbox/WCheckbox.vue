@@ -41,7 +41,7 @@
         :css="!lessTransitions"
       >
         <div
-          v-show="modelValue !== false"
+          v-show="modelValue !== false && !loading"
           class="square-full absolute -z-10"
           :class="{
             'scale-[0.33] rounded-full': radio && intermediate && modelValue === null,
@@ -57,7 +57,7 @@
 
       <WSpinner
         v-if="loading"
-        class="w-spinner-size-[1em]"
+        class="w-spinner-size-[1em] text-primary dark:text-primary-dark"
       />
 
       <template v-else-if="icon">

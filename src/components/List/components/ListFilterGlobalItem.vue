@@ -1,30 +1,27 @@
 <template>
   <WExpansionItem
-    v-if="!getMetaValue(meta.hidden, queryParams) && !fields.some(field => disabledFilterFields.includes(field))"
-    :title="getMetaValue(meta.title, queryParams)"
-    :icon="getMetaValue(meta.icon, queryParams)"
+    v-if="!getMetaValue(meta.hidden, scope.modelValue) && !fields.some(field => disabledFilterFields.includes(field))"
+    :title="getMetaValue(meta.title, scope.modelValue)"
+    :icon="getMetaValue(meta.icon, scope.modelValue)"
     :is-open="isOpen"
     :has-flag="hasChanges"
     @toggle="$emit('toggle')"
   >
-    
     <component
       :is="item[0].default"
       v-if="Array.isArray(item)"
       v-bind="item[1]"
-      :query-params="queryParams"
+      :scope="scope"
       :readonly="readonly"
       global
-      @update:query-params="$emit('update:query-params', $event)"
     />
 
     <component
       :is="item.default"
       v-else
-      :query-params="queryParams"
+      :scope="scope"
       :readonly="readonly"
       global
-      @update:query-params="$emit('update:query-params', $event)"
     />
 
     <WButton
@@ -32,7 +29,7 @@
       :semantic-type="SemanticType.SECONDARY"
       :disabled="!hasChanges"
       class="mt-4 w-full"
-      @click="$emit('update:query-params', getDefaultQuery())"
+      @click="scope.updateModelValue({...scope.modelValue, ...getDefaultQuery()})"
     >
       Reset
     </WButton>
@@ -41,6 +38,7 @@
 
 <script setup lang="ts" generic="QueryParams">
 import type {FilterComponent} from '../types'
+import type {UniformScope} from '@/components/Uniform/types'
 
 import {computed} from 'vue'
 
@@ -52,15 +50,14 @@ import {SemanticType} from '@/utils/SemanticType'
 import {getMetaValue} from '../models/utils'
 
 const props = defineProps<{
+  scope: UniformScope<QueryParams>
   item: FilterComponent<QueryParams>
-  queryParams: QueryParams
   isOpen: boolean
   disabledFilterFields: Array<keyof QueryParams>
   readonly: boolean
 }>()
 
 defineEmits<{
-  (e: 'update:query-params', value: Partial<QueryParams>): void
   (e: 'toggle'): void
 }>()
 
@@ -68,7 +65,7 @@ const meta = computed(() => Array.isArray(props.item) ? props.item[0].meta : pro
 
 const fields = computed(() => meta.value.fields ?? [])
 
-const hasChanges = computed(() => fields.value.some(field => field in (props.queryParams as Record<string, unknown>)))
+const hasChanges = computed(() => fields.value.some(field => field in (props.scope.modelValue as Record<string, unknown>)))
 
 const getDefaultQuery = (): Partial<Record<keyof QueryParams, undefined>> => {
   return fields.value.reduce<Partial<Record<keyof QueryParams, undefined>>>((result, field) => {

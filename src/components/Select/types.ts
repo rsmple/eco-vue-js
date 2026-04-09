@@ -38,10 +38,10 @@ interface SelectPropsWithOptions<Data extends DefaultData> {
 type SelectPropsOptions<Data extends DefaultData, QueryParams> = SelectPropsNoParams<Data> | SelectPropsWithParams<Data, QueryParams> | SelectPropsWithOptions<Data>
 
 export interface SelectProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
-  extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'emptyValue'>,
+  extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'emptyValue' | 'async' | 'debounce' | 'hideDebounce'>,
   SelectOptionComponentProps<Data, OptionComponent>,
   Omit<SelectPropsOptions<Data, QueryParams>, 'modelValue'> {
-  modelValue: Model[]
+  modelValue: Model[] | undefined
   valueGetter: (value: Data) => Model
   searchFn: (option: Data, search: string) => boolean
   useQueryFnDefault?: UseQueryEmpty<Data>
@@ -67,12 +67,11 @@ export interface SelectPrefixProps<Data extends DefaultData, OptionComponent ext
   readonly: boolean | undefined
   loading: boolean | undefined
   disableClear: boolean | undefined
-  skeleton: boolean
 }
 
 export interface SelectSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean>
   extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'createdData' | 'emptyValue'> {
-  modelValue: Model | null
+  modelValue: Model | null | undefined
   allowClear?: boolean & AllowClear
   searchModel?: boolean
   createdData?: Data
@@ -81,7 +80,7 @@ export interface SelectSingleProps<Model extends number | string, Data extends D
 
 export interface SelectStringifiedProps<Model extends string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
   extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'emptyValue'> {
-  modelValue: Model | null
+  modelValue: Model | null | undefined
   divider: string | 'json'
   emptyValue?: Model | null
 }

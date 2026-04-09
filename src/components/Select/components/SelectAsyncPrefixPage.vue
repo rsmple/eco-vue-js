@@ -10,7 +10,6 @@
     :disabled="disabled"
     :readonly="readonly"
     :disable-clear="disableClear"
-    :skeleton="queryEnabled && !data"
     :search="undefined"
     :class="{
       'cursor-pointer': !disabled && !readonly,
@@ -26,6 +25,7 @@
         name="option"
         v-bind="scope"
         :index="index"
+        :skeleton="queryEnabled && !data"
       />
     </template>
   </SelectOptionPrefix>

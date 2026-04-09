@@ -25,14 +25,26 @@
 
     <div class="grid items-center py-4">
       <div class="text-default font-semibold">
-        {{ title }}
+        <template v-if="typeof title === 'string'">
+          {{ title }}
+        </template>
+        <component
+          :is="title"
+          v-else
+        />
       </div>
 
       <div
         v-if="caption || userInput"
         class="text-default whitespace-pre-wrap break-words font-normal [word-break:break-word]"
       >
-        {{ caption ? caption + ' ' : '' }}<span class="break-all">{{ userInput }}</span>
+        <template v-if="typeof caption === 'string'">
+          {{ caption }}
+        </template>
+        <component
+          :is="caption"
+          v-else-if="caption"
+        /> <span class="break-all">{{ userInput }}</span>
       </div>
 
       <WButton
@@ -59,7 +71,7 @@
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
 
-import {computed} from 'vue'
+import {type VNode, computed} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
 import WCounter from '@/components/Counter/WCounter.vue'
@@ -76,8 +88,8 @@ import {SemanticType} from '@/utils/SemanticType'
 import {NotifyType} from '../models/NotifyType'
 
 interface Props extends Partial<LinkProps> {
-  title: string
-  caption?: string
+  title: string | VNode
+  caption?: string | VNode
   userInput?: string
   type: NotifyType
   count: number

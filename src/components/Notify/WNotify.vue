@@ -9,7 +9,7 @@
   >
     <div
       v-for="config in list"
-      :key="config.title + config.caption + config.type"
+      :key="config.id"
       class="grid justify-end transition-[opacity,transform,grid-template-rows] duration-500"
     >
       <div class="min-h-0">
@@ -37,6 +37,7 @@ import {initNotify} from '@/utils/Notify'
 import NotifyCard from './components/NotifyCard.vue'
 
 type NotifyMeta = {
+  id: number
   count: number
   timeout: NodeJS.Timeout
 }
@@ -45,16 +46,20 @@ const NOTIFY_DELAY = 5000
 
 const list = ref<Array<NotifyConfig & NotifyMeta>>([])
 
+let i = 0
+const getId = () => ++i
+
 const addNotify: AddNotify = (config: NotifyConfig): void => {
   const index = list.value.findIndex(item => item.type === config.type
-    && item.title === config.title
-    && item.caption === config.caption
+    && (typeof config.title !== 'string' || item.title === config.title)
+    && (typeof config.caption !== 'string' || item.caption === config.caption)
     && item.userInput === config.userInput
     && (item.to as {name: string})?.name === (config.to as {name: string})?.name,
   )
 
   const configMeta = {
     ...config,
+    id: list.value[index]?.id ?? getId(),
     count: 1,
     timeout: setTimeout(
       () => {

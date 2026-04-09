@@ -39,7 +39,7 @@ declare type EncodeQueryParams<T> = {
 
 declare type ParseFn<T> = (value: EncodeQueryParam<T> | undefined) => T | undefined
 
-declare type ValidateFn = (value: string | number | undefined | string[] | boolean | null) => string | undefined
+declare type ValidateFn = (value: unknown) => string | undefined
 
 declare type InputType = 'number' | 'text' | 'tel' | 'search' | 'password' | 'email' | 'search' | 'url'
 
@@ -219,3 +219,11 @@ declare type Pretty<T> = {
 declare type PartialNot<T> = {
   [Key in keyof Required<T> as Key extends keyof T ? Key: Key?]: T[Key]
 }
+
+declare type Get<Value, Path extends unknown[] | readonly unknown[]> = Path extends [infer Head, ...infer Tail]
+  ? Head extends keyof Value
+    ? Tail extends []
+      ? Value[Head]
+      : Get<Value[Head], Tail>
+    : undefined
+  : undefined

@@ -1,3 +1,4 @@
+import type {UniformScope} from '../Uniform/types'
 import type {ListMode} from '@/utils/utils'
 import type {Component, Raw} from 'vue'
 
@@ -8,6 +9,7 @@ export type FieldProps<Data, QueryParams = any> = {
   readonly: boolean
   card: boolean
   config: FieldConfig
+  uniformScope: UniformScope<Data> | undefined
   queryParams: QueryParams
   results: Data[] | undefined
   intersecting: boolean
@@ -48,7 +50,8 @@ export type ListFieldNestedEntity<Data, QueryParams = unknown, Key extends keyof
   cssClass?: string
 }
 
-export type ListFieldNestedEntityGetter<Data, QueryParams = unknown, Inner = unknown> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ListFieldNestedEntityGetter<Data, QueryParams = unknown, Inner = any> = {
   getterEntity: (data: Data) => Inner
   fields: ListFields<Inner, QueryParams>
   cssClass?: string
@@ -62,7 +65,8 @@ export type ListFieldNestedArray<Data, QueryParams = unknown, Key extends keyof 
   cssClassArray?: string
 }
 
-export type ListFieldNestedArrayGetter<Data, QueryParams = unknown, Inner = unknown> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ListFieldNestedArrayGetter<Data, QueryParams = unknown, Inner = any> = {
   getterArray: (data: Data) => Inner[]
   fields: ListFields<Inner, QueryParams>
   componentItem?: Raw<FieldComponentItem<Inner>>
@@ -163,10 +167,11 @@ export type ListConfig<Fields extends ListFields<any, any>> = {
 export type CardActionParams<Data> = {
   item: Data
   setter: (value: Data) => void
+  scope: UniformScope<Data> | undefined
 }
 
 export type FilterProps<QueryParams> = {
-  queryParams: QueryParams
+  scope: UniformScope<QueryParams>
   global: boolean
   readonly: boolean
 }
@@ -178,14 +183,13 @@ export type FilterMeta<QueryParams> = {
   hidden?: boolean | ((queryParams: QueryParams) => boolean)
 }
 
-export type FilterEmits<QueryParams, Field extends keyof QueryParams> = {
-  (e: 'update:query-params', value: Pick<QueryParams, Field>): void
+export type FilterEmits = {
   (e: 'close'): void
 }
 
 export type FilterComponent<QueryParams> = ListFieldExport<Component<FilterProps<QueryParams>>, FilterMeta<QueryParams>> | [
   ListFieldExport<Component<FilterProps<QueryParams>>, FilterMeta<QueryParams>>,
-  {[Key in string]?: Key extends keyof Pick<FilterProps<QueryParams>, 'queryParams'>
+  {[Key in string]?: Key extends keyof Pick<FilterProps<QueryParams>, 'scope'>
       ? never
       : Key extends keyof FilterProps<QueryParams>
       ? FilterProps<QueryParams>[Key]

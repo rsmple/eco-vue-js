@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeMount, onBeforeUnmount, provide, reactive, ref, useTemplateRef, watch} from 'vue'
+import {nextTick, onBeforeMount, onBeforeUnmount, provide, reactive, ref, useTemplateRef, watch} from 'vue'
 
 import {Modal, type ModalComponent, initModal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
@@ -100,7 +100,7 @@ const closeModal = (modalMeta: ModalMeta<unknown>): void => {
 
   if (modalMetaListNew.length === 0) key = 0
 
-  modalMeta.cb?.()
+  if (modalMeta.cb) nextTick(modalMeta.cb)
 }
 
 let closeConfirm: (() => void) | null = null

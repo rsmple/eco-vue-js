@@ -87,7 +87,7 @@ import {useCopy} from '@/utils/useCopy'
 import InputActionsButton from './InputActionsButton.vue'
 
 const props = defineProps<{
-  modelValue?: number | string
+  modelValue?: number | string | null
   loading?: boolean
   allowClear?: boolean
   allowPaste?: boolean

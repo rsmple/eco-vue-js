@@ -4,7 +4,7 @@ import type {WrapSelectionType} from '@/utils/utils'
 import type {Component} from 'vue'
 
 export interface InputProps<Type extends InputType> extends Omit<FieldWrapperProps, 'modelValue'> {
-  modelValue?: (Type extends 'number' ? number : string) | undefined
+  modelValue?: (Type extends 'number' ? number : string) | undefined | null
   type?: Type
 
   textarea?: boolean
@@ -38,12 +38,15 @@ export interface InputProps<Type extends InputType> extends Omit<FieldWrapperPro
   textParts?: TextPart[]
   rich?: boolean
   toolbarActions?: ToolbarAction[]
+
+  async?: boolean
+  debounce?: number
+  hideDebounce?: boolean
+  explicit?: boolean
 }
 
 export interface InputAsyncProps<Type extends InputType> extends InputProps<Type> {
   validate?: ValidateFn | ValidateFn[]
-  debounce?: number
-  hideDebounce?: boolean
 }
 
 export interface InputSuggestProps<Type extends InputType> extends Omit<InputProps<Type>, 'unclickable'>, Partial<Omit<DropdownMenuProps, 'isOpen' | 'updateAlign' | 'emitUpdate'>> {

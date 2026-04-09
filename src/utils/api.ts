@@ -67,7 +67,7 @@ export const encodeQueryParams = <T>(params: T): EncodeQueryParams<T> => {
   for (const key in params) {
     const value = encodeQueryParam(params[key])
 
-    if (value === undefined || (Array.isArray(value) && value.length === 0)) continue
+    if (value === undefined || value === '' || value === '[]' || value === '{}') continue
 
     result[key] = value
   }
@@ -81,7 +81,7 @@ export const encodeRouteParams = <T>(params: T): Partial<EncodeQueryParams<T>> =
   for (const key in params) {
     const value = encodeQueryParam(params[key])
 
-    if (value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
+    if (value === undefined || value === '' || value === '[]' || value === '{}') {
       result[key] = undefined
     } else {
       result[key] = value
@@ -120,16 +120,29 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
   const fn = (route: {query: EncodeQueryParams<Partial<QueryParams>>, hash?: string}, enabled?: Ref<boolean>) => {
     const router = useOptionalRouter()
 
-    const updateQueryParams = (value: Partial<QueryParams>) => {
+    const updateQueryParams = (value: Partial<QueryParams>, fields?: (string | number)[]) => {
+      const data = fields?.length ? {...queryParams} as Partial<QueryParams> : value
+      let current: Partial<QueryParams> = data
+      if (fields?.length) {
+        for (const field of fields) {
+          if (fields.indexOf(field) !== fields.length - 1) current = current[field] as Partial<QueryParams>
+          else {
+            current[field as keyof QueryParams] = value as QueryParams[keyof QueryParams]
+            break
+          }
+        }
+      }
+
       router.replace({
-        query: {...route.query as Record<string, string>, ...encodeRouteParams(value)},
-        hash: Object.keys(value).length === 1 && 'ordering' in value ? route.hash : undefined,
+        query: {...route.query as Record<string, string>, ...encodeRouteParams(data)},
+        hash: Object.keys(data).length === 1 && 'ordering' in data ? route.hash : undefined,
       })
     }
 
     const handle = watch(() => route.query, value => {
       if (lastQuery === value) return
       parse(queryParams, value)
+
       lastQuery = value
     }, {immediate: enabled ? enabled.value : true})
 
@@ -140,6 +153,37 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
       }, {immediate: true})
     }
   
+    return {
+      queryParams,
+      updateQueryParams,
+    }
+  }
+
+  const useQueryParamsLocal = (initialParams: Partial<QueryParams> = {}) => {
+    const queryParams = reactive<Partial<QueryParams>>({...initialParams})
+
+    const updateQueryParams = (value: Partial<QueryParams>, fields?: (string | number)[]) => {
+      const data = fields?.length ? {} as Partial<QueryParams> : value
+      let current: Partial<QueryParams> = data
+      if (fields?.length) {
+        for (const field of fields) {
+          if (fields.indexOf(field) !== fields.length - 1) current = current[field] as Partial<QueryParams>
+          else {
+            current[field as keyof QueryParams] = value as QueryParams[keyof QueryParams]
+            break
+          }
+        }
+      }
+    
+      for (const key of Object.keys(data) as Array<keyof QueryParams>) {
+        if (data[key] === undefined || (Array.isArray(data[key]) && data[key].length === 0)) {
+          delete queryParams[key as keyof typeof queryParams]
+        } else {
+          queryParams[key as keyof typeof queryParams] = data[key] as never
+        }
+      }
+    }
+
     return {
       queryParams,
       updateQueryParams,
@@ -157,5 +201,11 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
     return result
   }
 
+  fn.useQueryParamsLocal = useQueryParamsLocal
+
   return fn as typeof fn & {QueryParams: Partial<QueryParams>}
+}
+
+export const isRequestResponse = <Data>(value: unknown): value is RequestResponse<Data> => {
+  return value instanceof Object && Object.keys(value).length <= (4 satisfies ObjectKeys<RequestResponse<Data>>['length']) && 'data' in value
 }

@@ -25,13 +25,13 @@ export type CheckboxGroupOptionProps<Option> = {option: Option | undefined, sele
 
 export type CheckboxGroupOptionComponent<Option> = Component<CheckboxGroupOptionProps<Option>>
 
-export type GroupModelStringified<Model> = Exclude<Model, null | boolean> | (Model extends boolean ? 'true' | 'false' : never) | (Model extends null ? 'null' : never)
+export type GroupModelStringified<Model> = Exclude<Model, null | boolean | undefined> | (Model extends boolean ? 'true' | 'false' : never) | (Model extends null ? 'null' : never)
 
 /**
  * CheckboxGroup
  */
 
-interface CheckboxGroupPropsBase<Model extends number | string | null | boolean>
+interface CheckboxGroupPropsBase<Model extends number | string | null | boolean | undefined>
   extends Omit<FieldWrapperProps, 'modelValue'>,
   Omit<CheckboxProps, 'modelValue' | 'title' | 'icon' | 'intermediate' | 'tooltipText'> {
   modelValue: Model | undefined
@@ -45,21 +45,21 @@ interface CheckboxGroupPropsBase<Model extends number | string | null | boolean>
   optionClass?: string
 }
 
-interface CheckboxGroupPropsForModel<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>
+interface CheckboxGroupPropsForModel<Model extends number | string | null | boolean | undefined, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>
   extends CheckboxGroupPropsBase<Model> {
   list: Model[] | readonly Model[]
   valueGetter?: ValueGetter | undefined
   optionComponent?: CheckboxGroupOptionComponent<Model>
 }
 
-interface CheckboxGroupPropsForEntity<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>
+interface CheckboxGroupPropsForEntity<Model extends number | string | null | boolean | undefined, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>
   extends CheckboxGroupPropsBase<Model> {
   list: Entity[] | readonly Entity[]
   valueGetter: ValueGetter | ((value: Entity) => Model)
   optionComponent?: CheckboxGroupOptionComponent<Entity>
 }
 
-export type CheckboxGroupProps<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined> = CheckboxGroupPropsForEntity<Model, Entity, ValueGetter> | CheckboxGroupPropsForModel<Model, Entity, ValueGetter>
+export type CheckboxGroupProps<Model extends number | string | null | boolean | undefined, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined> = CheckboxGroupPropsForEntity<Model, Entity, ValueGetter> | CheckboxGroupPropsForModel<Model, Entity, ValueGetter>
 
 /**
  * CheckboxGroupMultiple
@@ -67,7 +67,7 @@ export type CheckboxGroupProps<Model extends number | string | null | boolean, E
 
 interface CheckboxGroupMultiplePropsBase<Model extends number | string | null | boolean>
   extends Omit<CheckboxGroupPropsBase<Model>, 'modelValue' | 'allowClear'> {
-  modelValue: Model[]
+  modelValue: Model[] | undefined
 }
 
 interface CheckboxGroupMultiplePropsForModel<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>

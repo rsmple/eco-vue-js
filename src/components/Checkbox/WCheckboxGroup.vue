@@ -71,7 +71,7 @@
   </WFieldWrapper>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined">
+<script lang="ts" setup generic="Model extends number | string | null | boolean | undefined, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined">
 import type {CheckboxGroupProps, GroupModelStringified} from './types'
 
 import {ref} from 'vue'

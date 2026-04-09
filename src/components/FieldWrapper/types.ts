@@ -24,4 +24,5 @@ export interface FieldWrapperProps {
   savedText?: string
   topText?: boolean
   allowDropFile?: boolean
+  hideTitle?: boolean
 }

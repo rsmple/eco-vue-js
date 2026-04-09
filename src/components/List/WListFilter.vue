@@ -1,20 +1,20 @@
 <template>
   <component
     :is="global ? ListFilterGlobal : ListFilterLocal"
+    :scope="scope"
     :filter="filter"
     :filter-search="filterSearch"
-    :query-params="queryParams"
     :search="search === true"
     :disabled-filter-fields="disabledFilterFields ?? []"
     :title="title"
     :readonly="readonly ?? false"
     :search-visible="searchVisible ?? false"
-    @update:query-params="$emit('update:query-params', $event)"
   />
 </template>
 
 <script lang="ts" setup generic="QueryParams">
 import type {FilterComponent} from './types'
+import type {UniformScope} from '../Uniform/types'
 
 import {defineAsyncComponent} from 'vue'
 
@@ -22,7 +22,7 @@ const ListFilterGlobal = defineAsyncComponent(() => import('./components/ListFil
 const ListFilterLocal = defineAsyncComponent(() => import('./components/ListFilterLocal.vue'))
 
 defineProps<{
-  queryParams: QueryParams
+  scope: UniformScope<QueryParams>
   filter?: FilterComponent<QueryParams>[]
   filterSearch?: FilterComponent<QueryParams>
   disabledFilterFields?: Array<keyof QueryParams>
@@ -31,9 +31,5 @@ defineProps<{
   title?: (count: number) => string
   readonly?: boolean
   searchVisible?: boolean
-}>()
-
-defineEmits<{
-  (e: 'update:query-params', value: QueryParams): void
 }>()
 </script>

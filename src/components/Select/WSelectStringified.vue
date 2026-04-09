@@ -80,7 +80,7 @@ const emit = defineEmits<{
 
 const selectComponentRef = useTemplateRef('selectComponent')
 
-const decodeValue = (value: string | null): string[] => {
+const decodeValue = (value: string | null | undefined): string[] => {
   if (!value) return []
 
   if (props.divider !== 'json') return value.split(props.divider).filter((item, index, arr) => item !== '' && arr.indexOf(item) === index)
@@ -90,7 +90,7 @@ const decodeValue = (value: string | null): string[] => {
   try {
     const parsed = JSON.parse(value)
     if (!Array.isArray(parsed)) return result
-    for (const item in parsed) {
+    for (const item of parsed) {
       if (typeof item === 'string' && item !== '' && !result.includes(item)) result.push(item)
     }
     return result
@@ -108,12 +108,12 @@ const arrayValue = computed<string[]>(() => decodeValue(props.modelValue))
 const arrayValueEmpty = computed<string[] | undefined>(() => props.emptyValue ? decodeValue(props.emptyValue) : undefined)
 
 const updateModelValue = (value: string, isSelect: boolean): void => {
-  const valueList = value.split(props.divider)
+  const valueList = props.divider === 'json' ? [value] : value.split(props.divider)
 
   let newValue: string
 
   if (isSelect) {
-    newValue = [...arrayValue.value, ...valueList].filter((item, index, arr) => item !== '' && arr.indexOf(item) === index).join(props.divider)
+    newValue = encodeValue([...arrayValue.value, ...valueList].filter((item, index, arr) => item !== '' && arr.indexOf(item) === index))
   } else {
     newValue = encodeValue(arrayValue.value.filter(item => !valueList.includes(item)))
   }

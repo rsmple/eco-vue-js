@@ -1,32 +1,37 @@
 <template>
-  <WFormValidator name="search">
-    <WInput
-      ref="input"
-      :model-value="(queryParams as Record<string, string>).search"
-      placeholder="Search.."
-      allow-clear
-      class="w-full"
-      :no-margin="global"
-      :icon="markRaw(IconSearch)"
-      @click:clear="$emit('close')"
-      @update:model-value="$emit('update:query-params', {search: $event || undefined})"
-    />
-  </WFormValidator>
+  <WUniform
+    v-bind="(scope as unknown as UniformScope<{search?: string}>)"
+    field="search"
+  >
+    <template #field="scopeField">
+      <WInput
+        v-bind="scopeField"
+        placeholder="Search.."
+        allow-clear
+        class="w-full"
+        :no-margin="global"
+        :icon="markRaw(IconSearch)"
+        :autofocus="autofocus"
+        @click:clear="$emit('close')"
+      />
+    </template>
+  </WUniform>
 </template>
 
 <script lang="ts" setup generic="QueryParams">
 import type {FilterEmits, FilterProps} from '../types'
+import type {UniformScope} from '@/components/Uniform/types'
 
 import {markRaw} from 'vue'
 
-import WFormValidator from '@/components/Form/WFormValidator.vue'
 import WInput from '@/components/Input/WInput.vue'
+import WUniform from '@/components/Uniform/WUniform.vue'
 
 import IconSearch from '@/assets/icons/IconSearch.svg?component'
 
-defineProps<FilterProps<QueryParams>>()
+defineProps<FilterProps<QueryParams> & {autofocus?: boolean}>()
 
-defineEmits<FilterEmits<QueryParams, typeof meta.fields[number]>>()
+defineEmits<FilterEmits>()
 </script>
 
 <script lang="ts">
