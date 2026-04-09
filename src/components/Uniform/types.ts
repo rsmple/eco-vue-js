@@ -46,11 +46,11 @@ export type UniformScope<ModelValue, InitModel = any> = {
   modelValue: ModelValue
   modelValueList: Record<string, ModelValue extends unknown[] ? ModelValue[number] : never>
   modelValueInit: ModelValue
-  async: boolean
-  skeleton: boolean
-  readonly: boolean
-  disabled: boolean
-  submitting: boolean
+  async: boolean | undefined
+  skeleton: boolean | undefined
+  readonly: boolean | undefined
+  disabled: boolean | undefined
+  submitting: boolean | undefined
   hasChanges: boolean
   select: (newValue: ModelValue extends unknown[] ? ModelValue[number] : never) => void
   unselect: (newValue: ModelValue extends unknown[] ? ModelValue[number] : never) => void
@@ -71,13 +71,13 @@ export type UniformScopeField<ModelValue> = {
   modelValue: ModelValue
   hasChanges: boolean
   hasValue: boolean | null
-  required: boolean
+  required: boolean | undefined
   errorMessage: string | undefined
-  skeleton: boolean
-  loading: boolean
-  readonly: boolean
-  disabled: boolean
-  async: boolean
+  skeleton: boolean | undefined
+  loading: boolean | undefined
+  readonly: boolean | undefined
+  disabled: boolean | undefined
+  async: boolean | undefined
   onInitModel: () => void
   onSelect: (value: ModelValue extends unknown[] ? ModelValue[number] : never) => void
   onUnselect: (value: ModelValue extends unknown[] ? ModelValue[number] : never) => void
