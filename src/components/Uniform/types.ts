@@ -54,6 +54,7 @@ export type UniformScope<ModelValue, InitModel = any> = {
   submit: (() => Promise<void> | undefined) | undefined
   initModel: (value?: InitModel) => void
   onInitModel: () => void
+  doValidate: () => void
   onUnmounted: ((id: string) => void) | undefined
   updateModelValue: (newValue: ModelValue) => void
   updateModelValueInner: <Fields extends unknown[] | readonly unknown[]>(newValue: Get<ModelValue, Fields>, field: Fields) => void

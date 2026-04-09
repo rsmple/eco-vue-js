@@ -125,6 +125,7 @@
         select: scopeModel.select,
         unselect: scopeModel.unselect,
         initModel: (value?: InnerModel) => scopeModel.initModel(value ?? scopeModel.innerModel.value),
+        doValidate: scopeField?.validate ?? scopeForm?.validate ?? (() => undefined),
         onInitModel: () => scopeModel.initModel(),
         updateModelValue: scopeModel.updateModelValue,
         updateModelValueInner: scopeModel.updateModelValueInner as UniformScope<ResultModel>['updateModelValueInner'],
@@ -217,7 +218,7 @@ const slots = defineSlots<{
 
 const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
   () => {
-    if (!props.async || !scopeForm || !(scopeModel.modelValue.value instanceof Object) || props.fullPayload) return scopeModel.modelValue.value
+    if (!scopeForm || !(scopeModel.modelValue.value instanceof Object) || props.fullPayload) return scopeModel.modelValue.value
 
     return getChangedPayload<ResultModel>(scopeModel.modelValue.value, scopeModel.modelValueInit.value, Object.values(scopeForm.map.value))
   },

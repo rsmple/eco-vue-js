@@ -319,13 +319,13 @@
     </template>
 
     <template
-      v-if="$slots.bottom || (asyncState.isAsync.value && !skeleton && (textSecure || textarea) && asyncState.focused.value)"
+      v-if="$slots.bottom || asyncActionsShown"
       #bottom
     >
       <slot name="bottom" />
 
       <InputAsyncButtons
-        v-if="asyncState.isAsync.value && !skeleton && (textSecure || textarea || explicit) && asyncState.focused.value"
+        v-if="asyncActionsShown"
         :disabled="disabled || loading"
         :loading="loading"
         @cancel="asyncState.cancel(); blur()"
@@ -412,6 +412,8 @@ const asyncState = useInputAsync({
   emit: emit as (e: 'update:model-value', value: string | number | null | undefined) => void,
   blur: () => inputRef.value?.blur(),
 })
+
+const asyncActionsShown = computed(() => asyncState.isAsync.value && !props.skeleton && asyncState.hasChanges.value && asyncState.focused.value && (props.textSecure || props.textarea || props.explicit))
 
 const history = ref<HistoryEntry[]>([])
 const historyPosition = ref(-1)

@@ -167,6 +167,7 @@ export type ListConfig<Fields extends ListFields<any, any>> = {
 export type CardActionParams<Data> = {
   item: Data
   setter: (value: Data) => void
+  scope: UniformScope<Data> | undefined
 }
 
 export type FilterProps<QueryParams> = {

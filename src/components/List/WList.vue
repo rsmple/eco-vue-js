@@ -235,7 +235,7 @@
         />
 
         <component
-          :is="formFieldGetter?.(item) ? WUniform : WEmptyComponent"
+          :is="formFieldGetter?.(item) !== undefined ? WUniform : WEmptyComponent"
           v-bind="formFieldGetter ? {
             ...uniformScope ?? {},
             field: formFieldGetter(item),
@@ -262,7 +262,7 @@
               :always-select="alwaysSelect ?? false"
               @toggle:selected="toggleSelected(value as number, position)"
               @hover:selected="hoverSelected(position)"
-              @click:action="$emit('click:action', {item, setter})"
+              @click:action="$emit('click:action', {item, setter, scope: innerScope})"
             >
               <template #default="{beforeClass}">
                 <ListCardFieldNested

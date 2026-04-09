@@ -35,11 +35,15 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
 
     const payload = payloadGetter()
 
-    submitting.value = true
-
     let promise: ReturnType<typeof apiMethod> | undefined = undefined
 
-    if (payload instanceof Object && !Object.keys(payload!).length) return
+    if (payload instanceof Object && !Object.keys(payload!).length) {
+      Notify.warn({title: 'No changes'})
+      return
+    }
+
+    submitting.value = true
+
     promise = apiMethod(payload!)
 
     if (!(promise instanceof Promise)) Promise.resolve(promise)
@@ -70,6 +74,8 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
             title: 'Error',
             caption: text && text.length < 200 ? text : undefined,
           })
+
+          console.log(messages)
 
           if (messages) invalidate(messages)
         }

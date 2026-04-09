@@ -125,16 +125,12 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   }
 
   const select = (newValue: ResultModel extends unknown[] ? ResultModel[number] : never): void => {
-    if (field.value === undefined) return
-
     const newList = [...(modelValue.value as unknown[]) ?? [], newValue] as ResultModel
 
     showModal(newList)
   }
 
   const unselect = (newValue: ResultModel extends unknown[] ? ResultModel[number] : never): void => {
-    if (field.value === undefined) return
-
     const newList = (modelValue.value as unknown[])?.slice() ?? []
     const index = newList.indexOf(newValue)
     if (index !== -1) newList.splice(index, 1)
