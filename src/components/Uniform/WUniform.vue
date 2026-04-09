@@ -191,7 +191,7 @@ const slots = defineSlots<{
 
 const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
   () => {
-    if (!props.async || !scopeForm || !(scopeModel.modelValue.value instanceof Object)) return scopeModel.modelValue.value
+    if (!props.async || !scopeForm || !(scopeModel.modelValue.value instanceof Object) || props.fullPayload) return scopeModel.modelValue.value
 
     return getChangedPayload<ResultModel>(scopeModel.modelValue.value, scopeModel.modelValueInit.value, Object.values(scopeForm.map.value))
   },
