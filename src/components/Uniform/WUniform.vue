@@ -97,7 +97,8 @@
         hasChanges: scopeField.hasChanges.value,
         hasValue: scopeField.hasValue.value,
         loading: async && scopeField.hasChanges.value && (submitting || (scopeSubmit?.submitting.value ?? false)),
-        disabled: !async && (submitting || (scopeSubmit?.submitting.value ?? false)),
+        disabled: disabled || (!async && (submitting || (scopeSubmit?.submitting.value ?? false))),
+        readonly,
         skeleton: scopeModel.skeleton ? scopeModel.skeleton.value : skeleton,
         required,
         async,
@@ -120,6 +121,8 @@
         hasChanges: scopeField ? scopeField.hasChanges.value : scopeForm ? scopeForm.hasChanges.value : false,
         hasValue: scopeField ? scopeField.hasValue.value : scopeForm ? scopeForm.hasValue.value : false,
         submitting: scopeSubmit ? scopeSubmit.submitting.value : submitting,
+        disabled,
+        readonly,
         submit: scopeSubmit?.submit,
         onUnmounted: scopeForm?.removeRef,
         select: scopeModel.select,
@@ -171,6 +174,8 @@ const props = withDefaults(defineProps<{
   apiMethod?: (value: Partial<ResultModel>) => Promise<RequestResponse<InnerModel>> | Promise<InnerModel> | InnerModel | undefined | void
   useQueryFn?: UseQueryWithParams<InnerModel, QueryParams>
   queryParams?: QueryParams
+  readonly?: boolean
+  disabled?: boolean
 
   tag?: string
   title?: string

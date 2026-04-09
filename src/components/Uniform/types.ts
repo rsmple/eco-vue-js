@@ -48,6 +48,8 @@ export type UniformScope<ModelValue, InitModel = any> = {
   modelValueInit: ModelValue
   async: boolean
   skeleton: boolean
+  readonly: boolean
+  disabled: boolean
   submitting: boolean
   hasChanges: boolean
   select: (newValue: ModelValue extends unknown[] ? ModelValue[number] : never) => void
@@ -73,6 +75,7 @@ export type UniformScopeField<ModelValue> = {
   errorMessage: string | undefined
   skeleton: boolean
   loading: boolean
+  readonly: boolean
   disabled: boolean
   async: boolean
   onInitModel: () => void
