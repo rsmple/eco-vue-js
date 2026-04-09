@@ -31,9 +31,9 @@
           >
             <div>
               <component
-                :is="getMetaValue((Array.isArray(item) ? item[0].meta : item.meta).icon, queryParams)"
+                :is="getMetaValue((Array.isArray(item.item) ? item.item[0].meta : item.item.meta).icon, queryParams)"
                 class="square-[1.25em] -mt-1 inline"
-              /> {{ getMetaValue((Array.isArray(item) ? item[0].meta : item.meta).title, queryParams) ?? '' }}
+              /> {{ getMetaValue((Array.isArray(item.item) ? item.item[0].meta : item.item.meta).title, queryParams) ?? '' }}
             </div>
           </WMenuItem>
         </template>
@@ -59,7 +59,7 @@ import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {getMetaValue} from '../models/utils'
 
 defineProps<{
-  filter: FilterComponent<QueryParams>[]
+  filter: {id: string, item: FilterComponent<QueryParams>}[]
   exclude: number[]
   queryParams: QueryParams
 }>()

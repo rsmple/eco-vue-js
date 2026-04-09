@@ -20,7 +20,7 @@
       }"
     >
       <template
-        v-for="(slot, index) in defaultSlotsAll"
+        v-for="(slot, index) in unwrapSlots(customSlots ?? $slots.default?.() ?? [])"
         :key="slot.props?.name"
       >
         <TabTitleButton
