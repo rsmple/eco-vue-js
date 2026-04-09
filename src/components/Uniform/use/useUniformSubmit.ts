@@ -39,7 +39,7 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
 
     let promise: ReturnType<typeof apiMethod> | undefined = undefined
 
-    if (!Object.keys(payload!).length) return
+    if (payload instanceof Object && !Object.keys(payload!).length) return
     promise = apiMethod(payload!)
 
     if (!(promise instanceof Promise)) Promise.resolve(promise)

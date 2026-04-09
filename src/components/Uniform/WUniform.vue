@@ -116,7 +116,7 @@
         onUnmounted: scopeForm?.removeRef,
         select: scopeModel.select,
         unselect: scopeModel.unselect,
-        initModel: () => scopeModel.initModel(scopeModel.innerModel.value),
+        initModel: (value?: InnerModel) => scopeModel.initModel(value ?? scopeModel.innerModel.value),
         onInitModel: () => scopeModel.initModel(),
         updateModelValue: scopeModel.updateModelValue,
         updateModelValueInner: scopeModel.updateModelValueInner as UniformScope<ResultModel>['updateModelValueInner'],
@@ -186,7 +186,7 @@ const id = props.id ?? useId()
 
 const slots = defineSlots<{
   field?: (props: UniformScopeField<ResultModel>) => VNode[]
-  default?: (props: UniformScope<ResultModel>) => VNode[]
+  default?: (props: UniformScope<ResultModel, InnerModel>) => VNode[]
 }>()
 
 const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(

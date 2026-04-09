@@ -39,7 +39,8 @@ export type InnerInstanceExpose<InnerModel, ModelValue> = ToRefs<UniformInstance
 
 export const isInnerInstance = (value: unknown): value is UniformInstance => value instanceof Object && 'id' in value && 'validate' in value
 
-export type UniformScope<ModelValue> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type UniformScope<ModelValue, InitModel = any> = {
   ref: ((item: UniformInstance | unknown) => void) | undefined
   modelValue: ModelValue
   modelValueList: Record<string, ModelValue extends unknown[] ? ModelValue[number] : never>
@@ -51,7 +52,7 @@ export type UniformScope<ModelValue> = {
   select: (newValue: ModelValue extends unknown[] ? ModelValue[number] : never) => void
   unselect: (newValue: ModelValue extends unknown[] ? ModelValue[number] : never) => void
   submit: (() => Promise<void> | undefined) | undefined
-  initModel: () => void
+  initModel: (value?: InitModel) => void
   onInitModel: () => void
   onUnmounted: ((id: string) => void) | undefined
   updateModelValue: (newValue: ModelValue) => void
