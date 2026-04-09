@@ -40,6 +40,8 @@
     }
   },
   "devDependencies": {
+    "@emnapi/core": "1.9.2",
+    "@emnapi/runtime": "1.9.2",
     "@tsconfig/node22": "22.0.5",
     "@types/jsdom": "28.0.1",
     "@types/node": "25.5.2",
