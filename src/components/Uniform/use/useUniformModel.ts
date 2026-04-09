@@ -25,17 +25,19 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   emitInitModel: () => void,
   validateOnUpdate: ((newValue: ResultModel) => void) | undefined,
 ) => {
-  const query = parentModel.value === undefined && useQueryFn
+  const query = useQueryFn
     ? queryParams.value !== undefined
-      ? (useQueryFn as UseQueryWithParams<InnerModel, QueryParams>)(queryParams as Ref<QueryParams>)
-      : (useQueryFn as UseQueryEmpty<InnerModel>)()
+      ? (useQueryFn as UseQueryWithParams<InnerModel, QueryParams>)(queryParams as Ref<QueryParams>, {enabled: computed(() => !parentModel.value)})
+      : (useQueryFn as UseQueryEmpty<InnerModel>)({enabled: computed(() => !parentModel.value)})
     : undefined
 
-  const innerModel = query
-    ? computed<InnerModel>(() => query.data.value as InnerModel)
-    : computed<InnerModel>(() => field.value !== undefined ? parentModel.value?.[field.value] as InnerModel : parentModel.value as unknown as InnerModel)
+  const getParentValue = () => field.value !== undefined ? parentModel.value?.[field.value] as InnerModel : parentModel.value as unknown as InnerModel
 
-  const skeleton = query ? computed(() => !query.data.value) : undefined
+  const innerModel = query
+    ? computed<InnerModel>(() => getParentValue() ?? query.data.value as InnerModel)
+    : computed<InnerModel>(getParentValue)
+
+  const skeleton = query ? computed(() => !query.data.value && query.isEnabled.value) : undefined
   const data = initFn || query ? ref<ResultModel>((initFn ?? copyItem)((innerModel.value ?? {}) as ResultModel & InnerModel)) : undefined
   const modelValueInitRef = initFn || query ? ref<ResultModel>((initFn ?? copyItem)((innerModel.value ?? {}) as ResultModel & InnerModel)) : undefined
   const modelValueInit = modelValueInitRef ?? (field.value !== undefined ? computed(() => parentModelInit.value?.[field.value as keyof ParentModel]) : parentModelInit)
