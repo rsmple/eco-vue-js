@@ -141,7 +141,7 @@ const filterList = computed(() => {
 })
 
 const shown = computed(() => filterList.value
-  .filter(item => (Array.isArray(item) ? item[0].meta.fields : item.meta.fields)?.some(field => field in (props.scope.modelValue as Record<string, unknown>)))
+  .filter(item => (Array.isArray(item) ? item[0].meta.fields : item.meta.fields)?.some(field => field in (props.scope.modelValue as Record<string, unknown>) && props.scope.modelValue[field] !== undefined))
   .map(item => filterAll.indexOf(item)))
 
 const selected = ref<number[]>(shown.value.slice())

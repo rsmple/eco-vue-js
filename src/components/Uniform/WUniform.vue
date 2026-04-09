@@ -79,7 +79,7 @@
     </div>
 
     <slot
-      v-if="field && $slots.field && scopeField"
+      v-if="field !== undefined && $slots.field && scopeField"
       name="field"
       v-bind="{
         ref: scopeField.setFieldRef,
@@ -116,7 +116,7 @@
         onUnmounted: scopeForm?.removeRef,
         select: scopeModel.select,
         unselect: scopeModel.unselect,
-        initModel: () => scopeModel.initModel(),
+        initModel: () => scopeModel.initModel(scopeModel.innerModel.value),
         onInitModel: () => scopeModel.initModel(),
         updateModelValue: scopeModel.updateModelValue,
         updateModelValueInner: scopeModel.updateModelValueInner as UniformScope<ResultModel>['updateModelValueInner'],
@@ -171,6 +171,7 @@ const props = defineProps<{
   validate?: ValidateFn | ValidateFn[]
   submitting?: boolean
   noInit?: boolean
+  fullPayload?: boolean
   confimGetter?: (payload: ResultModel, data: Model) => ConfirmProps | Promise<ConfirmProps | undefined> | undefined
 }>()
 
@@ -192,7 +193,7 @@ const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
   () => {
     if (!props.async || !scopeForm || !(scopeModel.modelValue.value instanceof Object)) return scopeModel.modelValue.value
 
-    return getChangedPayload<ResultModel>(scopeModel.modelValue.value, scopeModel.modelValueInit.value)
+    return getChangedPayload<ResultModel>(scopeModel.modelValue.value, scopeModel.modelValueInit.value, Object.values(scopeForm.map.value))
   },
   props.apiMethod,
   (silent?: boolean | undefined, includeMessage?: boolean | undefined) => scopeField?.validate(silent, includeMessage) ?? scopeForm?.validate(silent, includeMessage),
@@ -249,12 +250,14 @@ defineExpose({
   hasValue: scopeField?.hasValue ?? scopeForm?.hasValue ?? false,
   isValid: scopeField?.isValid ?? scopeForm?.isValid ?? false,
   hasShownError: scopeField?.hasShownError ?? scopeForm?.hasShownError ?? false,
+  fullPayload: props.fullPayload,
   validate: scopeField?.validate ?? scopeForm?.validate ?? (() => undefined),
   invalidate: scopeField?.invalidate ?? scopeForm?.invalidate ?? (() => void 0),
   showMessage: scopeField?.showMessage ?? scopeForm?.showMessage ?? (() => void 0),
   getFieldChanged: scopeField?.getFieldChanged ?? scopeForm?.getFieldChanged ?? (() => false),
 
   modelValue: scopeModel.modelValue,
+  updateModelValue: scopeModel.updateModelValue,
   updateModelValueInner: scopeModel.updateModelValueInner as InnerInstanceExpose<InnerModel, ResultModel>['updateModelValueInner'],
   skeleton: scopeModel.skeleton ?? toRef(props, 'skeleton'),
   submit: scopeSubmit?.submit,

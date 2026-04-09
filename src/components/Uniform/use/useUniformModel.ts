@@ -80,7 +80,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   const initModel = (value?: InnerModel) => {
     if (query && value) {
       query.setData(value)
-    } 
+    }
     
     if (data && modelValueInitRef) {
       if (value) {
@@ -153,8 +153,12 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
     if (fields.length) {
       let current = data.value as NonNullable<unknown>
   
-      for (const field of fields.slice(0, -1)) {
-        current = current?.[field as keyof typeof current]
+      for (let fieldIndex = 0; fieldIndex <= fields.length - 2; fieldIndex++) {
+        const field = fields[fieldIndex] as keyof typeof current
+        if (!current[field]) {
+          current[field] = typeof fields[fieldIndex] === 'number' ? [] as never : {} as never
+        }
+        current = current[field]
       }
   
       current[fields[fields.length - 1] as keyof typeof current] = newValue as never
@@ -169,6 +173,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
     modelValue,
     modelValueInit,
     modelValueList,
+    innerModel,
     skeleton,
     initModel,
     select,

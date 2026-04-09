@@ -14,6 +14,7 @@ export type UniformInstance = {
   hasValue: boolean | null
   isValid: boolean
   hasShownError: boolean
+  fullPayload: boolean
   validate: UniformValidate
   invalidate: (payload: InvalidatePayload) => void
   showMessage: (message: string, onlyChanged?: boolean) => void
@@ -24,14 +25,17 @@ type ToRefs<Value> = {
   [Key in keyof Value]: MaybeRef<Value[Key]>
 } 
 
-export type InnerInstanceExpose<InnerModel, ModelValue> = ToRefs<UniformInstance & {
+export type UniformInstanceExpose<InnerModel, ModelValue> = UniformInstance & {
   modelValue: ModelValue
+  updateModelValue: (newValue: ModelValue) => void
   updateModelValueInner: <Fields extends unknown[] | readonly unknown[]>(newValue: Get<ModelValue, Fields>, field: Fields) => void
   submit: (() => Promise<void> | undefined) | undefined
   submitting: boolean
   skeleton: boolean
   initModel: (value?: InnerModel) => void
-}>
+}
+
+export type InnerInstanceExpose<InnerModel, ModelValue> = ToRefs<UniformInstanceExpose<InnerModel, ModelValue>>
 
 export const isInnerInstance = (value: unknown): value is UniformInstance => value instanceof Object && 'id' in value && 'validate' in value
 
