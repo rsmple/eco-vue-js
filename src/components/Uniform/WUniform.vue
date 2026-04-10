@@ -1,91 +1,5 @@
 <template>
-  <component
-    :is="props.tag ?? WEmptyComponent"
-    :class="DEBUG ? 'group/uniform' : undefined"
-  >
-    <div
-      v-if="DEBUG"
-      class="dark:bg-default-dark bg-default text-2xs absolute z-10 grid -translate-y-5 gap-2 rounded-lg opacity-5 hover:z-20 hover:opacity-100"
-    >
-      <div class="flex flex-wrap items-center gap-1">
-        <div
-          v-if="field !== undefined"
-          class="text-xs font-semibold"
-        >
-          {{ field }}
-        </div>
-
-        <div
-          v-for="(item, key) in scopeForm?.map.value"
-          :key="key"
-          class="rounded bg-gray-200 px-1 text-xs dark:bg-gray-700"
-        >
-          {{ item.field }}
-        </div>
-
-        <div
-          class="text-default rounded px-1 font-semibold"
-          :class="scopeField?.hasChanges.value ?? scopeForm?.hasChanges.value ? 'bg-info dark:bg-info-dark' : 'bg-gray-300 dark:bg-gray-700'"
-        >
-          {{ scopeField?.hasChanges.value ?? scopeForm?.hasChanges.value ? 'Has Changes' : 'No Changes' }}
-        </div>
-
-        <div
-          class="text-default rounded px-1 font-semibold"
-          :class="scopeModel.skeleton?.value ?? skeleton ? 'bg-gray-400 dark:bg-gray-600' : 'bg-gray-300 dark:bg-gray-700'"
-        >
-          {{ scopeModel.skeleton ? scopeModel.skeleton ? 'Skeleton Model' : 'No skeleton model' : skeleton ? 'Skeleton' : 'No skeleton' }}
-        </div>
-
-        <div
-          class="rounded px-1 font-semibold"
-          :class="scopeField?.hasShownError.value ?? scopeForm?.hasShownError.value ?? false
-            ? 'bg-warning dark:bg-warning-dark'
-            : 'text-description bg-gray-100 dark:bg-gray-700'
-          "
-        >
-          {{ scopeField ? scopeField.hasShownError ? 'Shown Field' : 'Hidden Field' : scopeForm ? scopeForm.hasShownError ? 'Shown Form' : 'Hidden Form' : 'No shown' }}
-        </div>
-
-        <div
-          class="text-default rounded px-1 font-semibold"
-          :class="
-            scopeField?.isValid.value ?? scopeForm?.isValid.value ?? false
-              ? 'bg-positive dark:bg-positive-dark'
-              : 'bg-negative dark:bg-negative-dark'
-          "
-        >
-          {{ scopeField ? scopeField.isValid ? 'Valid Field' : 'Invalid Field' : scopeForm ? scopeForm.isValid ? 'Valid Form' : 'Invalid Form' : 'No validation' }}
-        </div>
-
-        <div
-          class="text-default rounded px-1 font-semibold"
-          :class="scopeField?.hasValue.value ?? scopeForm?.hasValue.value ? 'bg-positive dark:bg-positive-dark' : 'bg-gray-200 dark:bg-gray-800'"
-        >
-          {{ scopeField?.hasValue.value ?? scopeForm?.hasValue.value ? 'Has Value' : (scopeField?.hasValue.value ?? scopeForm?.hasValue.value) === null ? 'Empty' : 'No Value' }}
-        </div>
-
-        <div
-          v-if="submitting || scopeSubmit?.submitting.value"
-          class="text-default rounded bg-gray-200 px-1 font-semibold dark:bg-gray-800"
-        >
-          {{ async && scopeField?.hasChanges && (submitting || scopeSubmit?.submitting.value) ? 'Submitting Field' : 'Submitting' }}
-        </div>
-
-        <div>
-          {{ scopeField?.errorMessageString.value ?? 'No Error' }}
-        </div>
-
-        <div>
-          {{ scopeForm ? 'Form' : 'No form' }}
-        </div>
-
-        <div>
-          {{ scopeField ? 'Field' : 'No field' }}
-        </div>
-      </div>
-    </div>
-
+  <component :is="props.tag ?? WEmptyComponent">
     <slot
       v-if="field !== undefined && $slots.field && scopeField"
       name="field"
@@ -162,8 +76,6 @@ import {wUniformUnlistener, wUniformUpdater} from './utils/injection'
 import {getChangedPayload} from './utils/utils'
 
 import WEmptyComponent from '../EmptyComponent/WEmptyComponent.vue'
-
-const DEBUG = true
 
 const props = withDefaults(defineProps<{
   id?: string
