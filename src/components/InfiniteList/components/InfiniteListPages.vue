@@ -3,7 +3,7 @@
     ref="infiniteScroll"
     :style="{'--infinite-list-header-height': headerHeight + 'px'}"
     :class="{
-      '-min-h--height-inner list:pt-[--w-list-gap,1rem] modal:pb-[--w-list-gap,1rem] modal:min-h-0 pb-16': !minHeight,
+      '-min-h--height-inner list:pt-[--w-list-gap,1rem] modal:pb-[--w-list-gap,1rem] modal:min-h-[50vh] pb-16': !minHeight,
       'min-h-full': minHeight,
     }"
     @scroll:down="addNextPage"

@@ -32,8 +32,8 @@
         modelValueInit: scopeModel.modelValueInit.value,
         async,
         skeleton: scopeModel.skeleton ? scopeModel.skeleton.value : skeleton,
-        hasChanges: scopeField ? scopeField.hasChanges.value : scopeForm ? scopeForm.hasChanges.value : false,
-        hasValue: scopeField ? scopeField.hasValue.value : scopeForm ? scopeForm.hasValue.value : false,
+        hasChanges: scope?.hasChanges.value ?? false,
+        hasValue: scope?.hasValue.value ?? false,
         submitting: scopeSubmit ? scopeSubmit.submitting.value : submitting,
         disabled,
         readonly,
@@ -42,8 +42,8 @@
         select: scopeModel.select,
         unselect: scopeModel.unselect,
         initModel: (value?: InnerModel) => scopeModel.initModel(value ?? scopeModel.innerModel.value),
-        doValidate: scopeField?.validate ?? scopeForm?.validate ?? (() => undefined),
-        getInvalidatePayload: scopeField?.getInvalidatePayload ?? scopeForm?.getInvalidatePayload ?? (() => undefined),
+        doValidate: scope?.validate ?? (() => undefined),
+        getInvalidatePayload: scope?.getInvalidatePayload ?? (() => undefined),
         onInitModel: () => scopeModel.initModel(),
         updateModelValue: scopeModel.updateModelValue,
         updateModelValueInner: scopeModel.updateModelValueInner as UniformScope<ResultModel>['updateModelValueInner'],
@@ -77,15 +77,13 @@ import {getChangedPayload} from './utils/utils'
 
 import WEmptyComponent from '../EmptyComponent/WEmptyComponent.vue'
 
-const props = withDefaults(defineProps<{
+type PropsBase = {
   id?: string
   modelValue?: Model
   modelValueInit?: Model
   field?: Field
   initData?: (value: InnerModel) => ResultModel
   apiMethod?: (value: Partial<ResultModel>) => Promise<RequestResponse<InnerModel>> | Promise<InnerModel> | InnerModel | undefined | void
-  useQueryFn?: UseQueryWithParams<InnerModel, QueryParams>
-  queryParams?: QueryParams
   readonly?: boolean
   disabled?: boolean
 
@@ -102,7 +100,31 @@ const props = withDefaults(defineProps<{
   initHasValue?: boolean | null
   initHasError?: boolean
   confimGetter?: (payload: ResultModel, data: Model) => ConfirmProps | Promise<ConfirmProps | undefined> | undefined
-}>(), {
+}
+
+type PropsNoQuery = {
+  useQueryFn?: never
+  queryParams?: never
+  noParams?: never
+}
+
+type PropsQueryWithParams = {
+  // eslint-disable-next-line vue/no-required-prop-with-default
+  useQueryFn: UseQueryWithParams<InnerModel, QueryParams>
+  // eslint-disable-next-line vue/no-required-prop-with-default
+  queryParams: QueryParams
+  noParams?: never
+}
+
+type PropsQueryWithNoParams = {
+  // eslint-disable-next-line vue/no-required-prop-with-default
+  useQueryFn: UseQueryEmpty<InnerModel>
+  queryParams?: never
+  // eslint-disable-next-line vue/no-required-prop-with-default
+  noParams: true
+}
+
+const props = withDefaults(defineProps<PropsBase & (PropsNoQuery | PropsQueryWithParams | PropsQueryWithNoParams)>(), {
   id: undefined,
   modelValue: undefined,
   modelValueInit: undefined,
@@ -111,6 +133,7 @@ const props = withDefaults(defineProps<{
   apiMethod: undefined,
   useQueryFn: undefined,
   queryParams: undefined,
+  noParams: undefined,
 
   tag: undefined,
   title: undefined,
@@ -141,11 +164,11 @@ const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
     return getChangedPayload<ResultModel>(scopeModel.modelValue.value, scopeModel.modelValueInit.value, Object.values(scopeForm.map.value))
   },
   props.apiMethod,
-  (silent?: boolean | undefined, includeMessage?: boolean | undefined) => scopeField?.validate(silent, includeMessage) ?? scopeForm?.validate(silent, includeMessage),
-  payload => scopeField?.invalidate(payload) ?? scopeForm?.invalidate(payload),
+  (silent?: boolean | undefined, includeMessage?: boolean | undefined) => scope?.validate(silent, includeMessage),
+  payload => scope?.invalidate(payload),
   result => emit('success', result),
   result => scopeModel.initModel(result),
-  (message, onlyChanged) => scopeField?.showMessage(message, onlyChanged) ?? scopeForm?.showMessage(message, onlyChanged),
+  (message, onlyChanged) => scope?.showMessage(message, onlyChanged),
   () => props.noInit,
 ) : undefined
 
@@ -153,8 +176,8 @@ const scopeModel = useUniformModel(
   toRef(props, 'modelValue') as Ref<Model>,
   toRef(props, 'modelValueInit') as Ref<Model>,
   computed(() => props.field),
-  props.useQueryFn,
-  toRef(props, 'queryParams'),
+  props.useQueryFn as UseQueryWithParams<InnerModel, QueryParams>,
+  props.noParams ? undefined : toRef(props, 'queryParams'),
   props.initData,
   props.confimGetter,
   () => props.async,
@@ -179,28 +202,30 @@ const scopeForm = slots.default ? useUniformForm(
   () => props.title,
 ) : undefined
 
+const scope = scopeField ?? scopeForm
+
 const updaterInjected = inject(wUniformUpdater, undefined)
 const unlistenerInjected = inject(wUniformUnlistener, undefined)
 
 updaterInjected?.(reactive({
-  hasChanges: scopeField?.hasChanges ?? scopeForm?.hasChanges ?? false,
-  hasValue: scopeField?.hasValue ?? scopeForm?.hasValue ?? (props.initHasValue !== undefined ? toRef(props, 'initHasValue') as Ref<boolean | null> : null),
-  hasError: scopeField?.hasShownError ?? scopeForm?.hasShownError ?? (props.initHasError !== undefined ? toRef(props, 'initHasError') as Ref<boolean> : false),
+  hasChanges: scope?.hasChanges ?? false,
+  hasValue: scope?.hasValue ?? (props.initHasValue !== undefined ? toRef(props, 'initHasValue') as Ref<boolean | null> : null),
+  hasError: scope?.hasShownError ?? (props.initHasError !== undefined ? toRef(props, 'initHasError') as Ref<boolean> : false),
 }), id)
 
 defineExpose({
   id,
   field: props.field,
-  hasChanges: scopeField?.hasChanges ?? scopeForm?.hasChanges ?? false,
-  hasValue: scopeField?.hasValue ?? scopeForm?.hasValue ?? (props.initHasValue !== undefined ? toRef(props, 'initHasValue') as Ref<boolean | null> : null),
-  isValid: scopeField?.isValid ?? scopeForm?.isValid ?? false,
-  hasShownError: scopeField?.hasShownError ?? scopeForm?.hasShownError ?? (props.initHasError !== undefined ? toRef(props, 'initHasError') as Ref<boolean> : false),
+  hasChanges: scope?.hasChanges ?? false,
+  hasValue: scope?.hasValue ?? (props.initHasValue !== undefined ? toRef(props, 'initHasValue') as Ref<boolean | null> : null),
+  isValid: scope?.isValid ?? false,
+  hasShownError: scope?.hasShownError ?? (props.initHasError !== undefined ? toRef(props, 'initHasError') as Ref<boolean> : false),
   fullPayload: props.fullPayload,
-  validate: scopeField?.validate ?? scopeForm?.validate ?? (() => undefined),
-  invalidate: scopeField?.invalidate ?? scopeForm?.invalidate ?? (() => void 0),
-  getInvalidatePayload: scopeField?.getInvalidatePayload ?? scopeForm?.getInvalidatePayload ?? (() => undefined),
-  showMessage: scopeField?.showMessage ?? scopeForm?.showMessage ?? (() => void 0),
-  getFieldChanged: scopeField?.getFieldChanged ?? scopeForm?.getFieldChanged ?? (() => false),
+  validate: scope?.validate ?? (() => undefined),
+  invalidate: scope?.invalidate ?? (() => void 0),
+  getInvalidatePayload: scope?.getInvalidatePayload ?? (() => undefined),
+  showMessage: scope?.showMessage ?? (() => void 0),
+  getFieldChanged: scope?.getFieldChanged ?? (() => false),
 
   modelValue: scopeModel.modelValue,
   updateModelValue: scopeModel.updateModelValue,

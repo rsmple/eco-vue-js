@@ -16,7 +16,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   parentModelInit: Ref<ParentModel>,
   field: Ref<Field | undefined>,
   useQueryFn: UseQueryWithParams<InnerModel, QueryParams> | undefined,
-  queryParams: Ref<QueryParams | undefined>,
+  queryParams: Ref<QueryParams | undefined> | undefined,
   initFn: ((value: InnerModel) => ResultModel) | undefined,
   confimGetter: ((payload: ResultModel, data: ParentModel) => ConfirmProps | Promise<ConfirmProps | undefined> | undefined) | undefined,
   asyncGetter: () => boolean,
@@ -26,7 +26,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   validateOnUpdate: ((newValue: ResultModel) => void) | undefined,
 ) => {
   const query = useQueryFn
-    ? queryParams.value !== undefined
+    ? queryParams !== undefined
       ? (useQueryFn as UseQueryWithParams<InnerModel, QueryParams>)(queryParams as Ref<QueryParams>, {enabled: computed(() => !parentModel.value)})
       : (useQueryFn as UseQueryEmpty<InnerModel>)({enabled: computed(() => !parentModel.value)})
     : undefined
