@@ -1,11 +1,9 @@
-import {type QueryClient, type QueryKey, type UseQueryOptions, type UseQueryReturnType, useQuery, useQueryClient} from '@tanstack/vue-query'
+import {type QueryClient, type QueryKey, type SetDataOptions, type UseQueryOptions, type UseQueryReturnType, useQuery, useQueryClient} from '@tanstack/vue-query'
 import {type MaybeRef, unref, watch} from 'vue'
 
 import {ApiError} from './api'
 
-type Params = Parameters<QueryClient['setQueriesData']>
-
-type SetData<TQueryFnData = unknown> = (updater: TQueryFnData, options?: Params[2]) => ReturnType<QueryClient['setQueriesData']>
+type SetData<TQueryFnData = unknown> = (updater: TQueryFnData, options?: SetDataOptions) => ReturnType<QueryClient['setQueriesData']>;
 
 export type UseQueryReturnTypeSetData<TQueryFnData = unknown, TData = TQueryFnData> = UseQueryReturnType<TData, ApiError> & {
   setData: SetData<TQueryFnData>
@@ -19,7 +17,7 @@ export const useDefaultQuery = <
   const query = useQuery<TQueryFnData, ApiError, TData, TQueryKey>(options, queryClient) as UseQueryReturnTypeSetData<TQueryFnData, TData>
   const resolvedClient = queryClient ?? useQueryClient()
 
-  query.setData = (updater: TQueryFnData, setOptions?: Params[2]) => resolvedClient.setQueriesData({queryKey: 'queryKey' in options ? options.queryKey : undefined}, updater, setOptions)
+  query.setData = (updater: TQueryFnData, setOptions?: SetDataOptions) => resolvedClient.setQueriesData({queryKey: 'queryKey' in options ? options.queryKey : undefined}, updater, setOptions)
 
   return query
 }
