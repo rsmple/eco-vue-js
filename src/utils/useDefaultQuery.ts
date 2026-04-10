@@ -1,4 +1,4 @@
-import {type QueryClient, type QueryKey, type UseQueryReturnType, useQuery, useQueryClient} from '@tanstack/vue-query'
+import {type QueryClient, type QueryKey, type UseQueryOptions, type UseQueryReturnType, useQuery, useQueryClient} from '@tanstack/vue-query'
 import {type MaybeRef, unref, watch} from 'vue'
 
 import {ApiError} from './api'
@@ -7,7 +7,7 @@ type Params = Parameters<QueryClient['setQueriesData']>
 
 type SetData<TQueryFnData = unknown> = (updater: TQueryFnData, options?: Params[2]) => ReturnType<QueryClient['setQueriesData']>
 
-type UseQueryReturnTypeSetData<TQueryFnData = unknown, TData = TQueryFnData> = UseQueryReturnType<TData, ApiError> & {
+export type UseQueryReturnTypeSetData<TQueryFnData = unknown, TData = TQueryFnData> = UseQueryReturnType<TData, ApiError> & {
   setData: SetData<TQueryFnData>
 }
 
@@ -15,11 +15,11 @@ export const useDefaultQuery = <
   TQueryFnData = unknown,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
->(...args: Parameters<typeof useQuery<TQueryFnData, ApiError, TData, TQueryKey>>): UseQueryReturnTypeSetData<TQueryFnData, TData> => {
-  const query = useQuery<TQueryFnData, ApiError, TData, TQueryKey>(...args) as UseQueryReturnTypeSetData<TQueryFnData, TData>
-  const queryClient = args[1] ?? useQueryClient()
+>(options: UseQueryOptions<TQueryFnData, ApiError, TData, TQueryFnData, TQueryKey>, queryClient?: QueryClient): UseQueryReturnTypeSetData<TQueryFnData, TData> => {
+  const query = useQuery<TQueryFnData, ApiError, TData, TQueryKey>(options, queryClient) as UseQueryReturnTypeSetData<TQueryFnData, TData>
+  const resolvedClient = queryClient ?? useQueryClient()
 
-  query.setData = (updater: TQueryFnData, options?: Params[2]) => queryClient.setQueriesData({queryKey: 'queryKey' in args[0] ? args[0].queryKey : undefined}, updater, options)
+  query.setData = (updater: TQueryFnData, setOptions?: Params[2]) => resolvedClient.setQueriesData({queryKey: 'queryKey' in options ? options.queryKey : undefined}, updater, setOptions)
 
   return query
 }
