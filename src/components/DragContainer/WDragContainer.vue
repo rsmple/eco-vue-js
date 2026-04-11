@@ -14,6 +14,9 @@
         <slot
           v-bind="defaultScope"
           :item="item"
+          :index="value.indexOf(item as typeof value[number])"
+          :last="value.indexOf(item as typeof value[number]) === value.length - 1"
+          :ordered-list="(value as Data[])"
           :dragging="dragging"
         />
       </template>
