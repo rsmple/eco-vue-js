@@ -140,7 +140,7 @@
             />
 
             <div
-              v-if="textSecure && modelValue !== undefined && typeof modelValue !== 'string' && !focused"
+              v-if="textSecure && modelValue !== undefined && modelValue !== null && typeof modelValue !== 'string' && !focused"
               class="bg-info/10 dark:bg-info-dark/10 pointer-events-none absolute inset-0.5 flex items-center justify-center rounded-[--w-option-rounded]"
             >
               <IconCheckSecret
