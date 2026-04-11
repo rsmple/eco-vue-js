@@ -18,6 +18,7 @@ export const useUniformField = <Model>(
   required: Ref<boolean>,
   mandatory: Ref<boolean>,
   validateList: ValidateMethod<Model> | ValidateMethod<Model>[] | undefined,
+  noChanges: boolean,
 ) => {
   const showMessage = useFieldMessage()
 
@@ -40,7 +41,7 @@ export const useUniformField = <Model>(
   })
   const hasValue = computed<boolean | null>(() => mandatory.value && _hasValueFieldExact.value === false ? null : _hasValueFieldExact.value)
 
-  const hasChanges = computed<boolean>(() => {
+  const hasChanges = noChanges ? undefined : computed<boolean>(() => {
     if (modelValueInit.value === undefined || modelValueInit.value === null || (Array.isArray(modelValueInit.value) && modelValueInit.value.length === 0)) {
       if (Array.isArray(modelValue.value)) return modelValue.value.length !== 0
       return modelValue.value !== undefined && modelValue.value !== null && modelValue.value !== ''
@@ -129,11 +130,11 @@ export const useUniformField = <Model>(
   }
 
   const showMessageField = (message: string, onlyChanged?: boolean) => {
-    if (!onlyChanged || hasChanges.value) showMessage(message)
+    if (!onlyChanged || hasChanges?.value) showMessage(message)
   }
 
   const getFieldChanged = (field: string): boolean => {
-    if (fieldGetter() === field) return hasChanges.value
+    if (fieldGetter() === field) return hasChanges?.value ?? false
     return false
   }
 

@@ -8,9 +8,9 @@
         title,
         modelValue: scopeModel.modelValue.value,
         errorMessage: scopeField.errorMessageString.value,
-        hasChanges: scopeField.hasChanges.value,
+        hasChanges: scopeField.hasChanges?.value,
         hasValue: scopeField.hasValue.value,
-        loading: async && scopeField.hasChanges.value && (submitting || (scopeSubmit?.submitting.value ?? false)),
+        loading: async && scopeField.hasChanges?.value && (submitting || (scopeSubmit?.submitting.value ?? false)),
         disabled: disabled || (!async && (submitting || (scopeSubmit?.submitting.value ?? false))),
         readonly,
         skeleton: scopeModel.skeleton ? scopeModel.skeleton.value : skeleton,
@@ -32,7 +32,7 @@
         modelValueInit: scopeModel.modelValueInit.value,
         async,
         skeleton: scopeModel.skeleton ? scopeModel.skeleton.value : skeleton,
-        hasChanges: scope?.hasChanges.value ?? false,
+        hasChanges: noChanges ? undefined : scope?.hasChanges?.value ,
         hasValue: scope?.hasValue.value ?? false,
         submitting: scopeSubmit ? scopeSubmit.submitting.value : submitting,
         disabled,
@@ -99,6 +99,7 @@ type PropsBase = {
   fullPayload?: boolean
   initHasValue?: boolean | null
   initHasError?: boolean
+  noChanges?: boolean
   confimGetter?: (payload: ResultModel, data: Model) => ConfirmProps | Promise<ConfirmProps | undefined> | undefined
 }
 
@@ -195,6 +196,7 @@ const scopeField = slots.field ? useUniformField(
   toRef(props, 'required'),
   toRef(props, 'mandatory'),
   props.validate,
+  props.noChanges,
 ) : undefined
 
 const scopeForm = slots.default ? useUniformForm(
@@ -216,7 +218,7 @@ updaterInjected?.(reactive({
 defineExpose({
   id,
   field: props.field,
-  hasChanges: scope?.hasChanges ?? false,
+  hasChanges: props.noChanges ? false : (scope?.hasChanges ?? false),
   hasValue: scope?.hasValue ?? (props.initHasValue !== undefined ? toRef(props, 'initHasValue') as Ref<boolean | null> : null),
   isValid: scope?.isValid ?? false,
   hasShownError: scope?.hasShownError ?? (props.initHasError !== undefined ? toRef(props, 'initHasError') as Ref<boolean> : false),

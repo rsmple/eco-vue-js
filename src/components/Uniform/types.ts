@@ -51,7 +51,7 @@ export type UniformScope<ModelValue, InitModel = any> = {
   readonly: boolean | undefined
   disabled: boolean | undefined
   submitting: boolean | undefined
-  hasChanges: boolean
+  hasChanges: boolean | undefined
   select: (newValue: ModelValue extends unknown[] ? ModelValue[number] : never) => void
   unselect: (newValue: ModelValue extends unknown[] ? ModelValue[number] : never) => void
   submit: (() => Promise<void> | undefined) | undefined
@@ -69,7 +69,7 @@ export type UniformScopeField<ModelValue> = {
   ref: ((item: UniformInstance | unknown) => void) | undefined
   title: string | undefined
   modelValue: ModelValue
-  hasChanges: boolean
+  hasChanges: boolean | undefined
   hasValue: boolean | null
   required: boolean | undefined
   errorMessage: string | undefined
