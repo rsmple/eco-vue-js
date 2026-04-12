@@ -130,18 +130,17 @@ const maxValue = computed(() => {
   return max || 1
 })
 
-const niceCeil = (raw: number): number => {
-  if (raw <= 1) return 1
+const niceFloor = (raw: number): number => {
+  if (raw < 1) return 1
   const magnitude = Math.pow(10, Math.floor(Math.log10(raw)))
   const residual = raw / magnitude
-  if (residual <= 1) return magnitude
-  if (residual <= 2) return 2 * magnitude
-  if (residual <= 5) return 5 * magnitude
-  return 10 * magnitude
+  if (residual < 2) return magnitude
+  if (residual < 5) return 2 * magnitude
+  return 5 * magnitude
 }
 
 const thresholds = computed(() => {
-  const step = niceCeil(maxValue.value / OPACITIES.length)
+  const step = niceFloor(maxValue.value / (OPACITIES.length - 1))
 
   return OPACITIES.map((_, i) => i * step)
 })
