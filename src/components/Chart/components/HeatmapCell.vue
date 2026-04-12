@@ -5,8 +5,8 @@
   >
     <div
       class="size-[--w-chart-heatmap-size,1rem] rounded-sm"
-      :class="opacity !== null ? 'bg-current' : undefined"
-      :style="opacity !== null ? {opacity} : undefined"
+      :class="empty ? undefined : opacity !== null ? 'bg-current' : 'bg-gray-50 dark:bg-gray-800/20'"
+      :style="opacity !== null && !empty ? {opacity} : undefined"
     />
 
     <template v-if="$slots.default && opacity !== null">
@@ -24,5 +24,6 @@ import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 defineProps<{
   opacity: number | null
+  empty?: boolean
 }>()
 </script>

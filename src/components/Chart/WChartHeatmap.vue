@@ -50,7 +50,10 @@
               v-for="(cell, di) in week.days"
               :key="di"
             >
-              <HeatmapCell :opacity="cell?.opacity ?? null">
+              <HeatmapCell
+                :opacity="cell?.d ? cell.opacity : null"
+                :empty="!cell"
+              >
                 <slot
                   v-if="cell?.d"
                   name="tooltip"
@@ -75,9 +78,9 @@ import {useComponentStatesSkeleton} from '@/utils/useComponentStates'
 
 import HeatmapCell from './components/HeatmapCell.vue'
 
-const OPACITIES = [0.1, 0.25, 0.5, 0.75, 1] as const
+const OPACITIES = [0.2, 0.4, 0.6, 0.8, 1] as const
 
-const DAY_LABELS = ['M', '', 'W', '', 'F', '', 'S'] as const
+const DAY_LABELS = ['M', '', 'W', '', 'F', '', ''] as const
 
 type GridCell = {
   opacity: number
@@ -171,7 +174,6 @@ const weeks = computed<WeekData[]>(() => {
 
   const startDate = new Date(today)
   startDate.setFullYear(startDate.getFullYear() - 1)
-  startDate.setDate(startDate.getDate() + 1)
 
   const gridStart = new Date(startDate)
   const startDay = (gridStart.getDay() + 6) % 7
