@@ -2,7 +2,6 @@
   <WDragContainer
     :list="sortFields(fields, fieldConfigMap)"
     :disabled="disabled"
-    class="grid grid-cols-1"
     @update:list="$emit('update:list', $event as ListFields<Data, QueryParams>)"
   >
     <template #default="{item, container, dragging, initDrag}">

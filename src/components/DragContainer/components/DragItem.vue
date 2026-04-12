@@ -4,12 +4,18 @@
     :container="{
       draggable,
       style: {order: order + 1},
-      class: isDragging ? 'opacity-[0.001]' : disabled ? 'opacity-50' : undefined,
+      class: disabled ? 'opacity-50' : undefined,
       onDragend: !disabled ? endDrag : undefined,
       onDragenter: !draggable ? () => $emit('drag:enter', order) : undefined,
       onDragstart: !disabled ? startDrag : undefined,
       onDragover,
     }"
+  />
+
+  <div
+    v-if="isDragging"
+    class="bg-default dark:bg-default-dark pointer-events-none absolute z-[1] size-full [grid-column:1/2]"
+    :style="{gridRow: `${order + 1}/${order + 2}`}"
   />
 </template>
 

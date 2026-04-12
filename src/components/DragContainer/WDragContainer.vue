@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="relative grid grid-cols-1">
     <DragItem
       v-for="(item, index) in list"
       :key="index"
