@@ -38,7 +38,7 @@
       >
         <div class="flex pl-4">
           <div
-            v-for="(week, wi) in weeks"
+            v-for="(week, wi) in weekGrid"
             :key="wi"
             class="flex flex-col"
           >
@@ -47,18 +47,18 @@
             </div>
 
             <template
-              v-for="(cell, di) in week.days"
+              v-for="(key, di) in week.days"
               :key="di"
             >
               <HeatmapCell
-                :opacity="cell?.d ? cell.opacity : null"
-                :empty="!cell"
+                :opacity="key !== null ? (dataMap.get(key)?.opacity ?? null) : null"
+                :empty="key === null"
               >
                 <slot
-                  v-if="cell?.d"
+                  v-if="key !== null && dataMap.has(key)"
                   name="tooltip"
-                  :d="cell.d"
-                  :index="cell.dataIndex"
+                  :d="dataMap.get(key)!.d"
+                  :index="dataMap.get(key)!.dataIndex"
                 />
               </HeatmapCell>
             </template>
@@ -77,20 +77,16 @@ import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import {useComponentStatesSkeleton} from '@/utils/useComponentStates'
 
 import HeatmapCell from './components/HeatmapCell.vue'
+import {dateToKey, weekGrid} from './models/WeekGrid'
 
 const OPACITIES = [0.2, 0.4, 0.6, 0.8, 1] as const
 
 const DAY_LABELS = ['M', '', 'W', '', 'F', '', ''] as const
 
-type GridCell = {
+type DataEntry = {
   opacity: number
-  d: Data | undefined
+  d: Data
   dataIndex: number
-}
-
-type WeekData = {
-  days: Array<GridCell | null>
-  monthLabel: string | undefined
 }
 
 const props = withDefaults(
@@ -120,12 +116,6 @@ watch(isSkeleton, async value => {
   await nextTick()
   if (scrollContainerRef.value) scrollContainerRef.value.scrollLeft = scrollContainerRef.value.scrollWidth
 })
-
-const monthFormatter = new Intl.DateTimeFormat('en', {month: 'short'})
-
-const dateToKey = (date: Date): string => {
-  return `${ date.getFullYear() }-${ String(date.getMonth() + 1).padStart(2, '0') }-${ String(date.getDate()).padStart(2, '0') }`
-}
 
 const maxValue = computed(() => {
   let max = 0
@@ -161,68 +151,16 @@ const getOpacity = (value: number): typeof OPACITIES[number] => {
   return OPACITIES[0]!
 }
 
-const weeks = computed<WeekData[]>(() => {
-  const dateMap = new Map<string, {d: Data, dataIndex: number}>()
+const dataMap = computed(() => {
+  const map = new Map<string, DataEntry>()
+
   props.data.forEach((d, i) => {
     const date = new Date(d[props.xKey])
     date.setHours(0, 0, 0, 0)
-    dateMap.set(dateToKey(date), {d, dataIndex: i})
+    map.set(dateToKey(date), {opacity: getOpacity(d[props.yKey]), d, dataIndex: i})
   })
 
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
-  const startDate = new Date(today)
-  startDate.setFullYear(startDate.getFullYear() - 1)
-
-  const gridStart = new Date(startDate)
-  const startDay = (gridStart.getDay() + 6) % 7
-  gridStart.setDate(gridStart.getDate() - startDay)
-
-  const gridEnd = new Date(today)
-  const endDay = (gridEnd.getDay() + 6) % 7
-  if (endDay < 6) gridEnd.setDate(gridEnd.getDate() + (6 - endDay))
-
-  const result: WeekData[] = []
-  const current = new Date(gridStart)
-  let lastMonth = -1
-
-  while (current <= gridEnd) {
-    const days: Array<GridCell | null> = []
-    let firstVisibleDate: Date | undefined
-
-    for (let i = 0; i < 7; i++) {
-      if (current < startDate || current > today) {
-        days.push(null)
-      } else {
-        if (!firstVisibleDate) firstVisibleDate = new Date(current)
-
-        const key = dateToKey(current)
-        const entry = dateMap.get(key)
-
-        days.push(entry
-          ? {opacity: getOpacity(entry.d[props.yKey]), d: entry.d, dataIndex: entry.dataIndex}
-          : {opacity: OPACITIES[0], d: undefined, dataIndex: -1},
-        )
-      }
-
-      current.setDate(current.getDate() + 1)
-    }
-
-    let monthLabel: string | undefined
-
-    if (firstVisibleDate) {
-      const month = firstVisibleDate.getMonth()
-      if (month !== lastMonth) {
-        monthLabel = monthFormatter.format(firstVisibleDate)
-        lastMonth = month
-      }
-    }
-
-    result.push({days, monthLabel})
-  }
-
-  return result
+  return map
 })
 
 defineSlots<{

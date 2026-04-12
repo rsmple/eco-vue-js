@@ -10,9 +10,15 @@
     />
 
     <template v-if="$slots.default && opacity !== null">
-      <div class="absolute inset-[--w-chart-heatmap-gap,0.125rem] rounded-sm border-current group-hover/cell:border" />
+      <div
+        class="absolute inset-[--w-chart-heatmap-gap,0.125rem] rounded-sm border-current group-hover/cell:border-2"
+        :class="tooltipRef?.isOpen ? 'border-2' : undefined"
+      />
 
-      <WTooltip :delay="500">
+      <WTooltip
+        ref="tooltip"
+        :delay="500"
+      >
         <slot />
       </WTooltip>
     </template>
@@ -20,10 +26,14 @@
 </template>
 
 <script setup lang="ts">
+import {useTemplateRef} from 'vue'
+
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 defineProps<{
   opacity: number | null
   empty?: boolean
 }>()
+
+const tooltipRef = useTemplateRef('tooltip')
 </script>
