@@ -50,6 +50,8 @@ const pluginDefault = plugin(function ({matchUtilities, theme, addBase}) {
       'w-dropdown-x-min': value => ({'--w-dropdown-x-min': value}),
       'w-dropdown-x-max': value => ({'--w-dropdown-x-max': value}),
       'w-chart-size': value => ({'--w-chart-size': value}),
+      'w-chart-heatmap-size': value => ({'--w-chart-heatmap-size': value}),
+      'w-chart-heatmap-gap': value => ({'--w-chart-heatmap-gap': value}),
     },
     {values: theme('width')},
   )

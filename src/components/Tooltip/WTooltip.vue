@@ -11,7 +11,7 @@ import {type VNode, computed, markRaw, onBeforeUnmount, toRef, useId, useSlots, 
 
 import {getIsTouchDevice} from '@/utils/mobile'
 
-import {useTooltipMeta} from './models/tooltipMeta'
+import {type TooltipMeta, useTooltipMeta} from './models/tooltipMeta'
 
 const props = defineProps<{
   text?: string
@@ -26,6 +26,7 @@ const props = defineProps<{
   left?: boolean
   right?: boolean
   static?: boolean
+  delay?: number
 }>()
 
 const slots = useSlots()
@@ -40,7 +41,14 @@ const parent = computed(() => containerRef.value?.parentElement ?? null)
 const triggerElement = computed(() => props.noTrigger ? null : (props.trigger ?? parent.value))
 const isOpen = computed(() => tooltipMeta.value?.id === id)
 
-const open = () => {
+let timeout: NodeJS.Timeout | null = null
+
+const open = async () => {
+  if (timeout) {
+    clearTimeout(timeout)
+    timeout = null
+  }
+
   const slot = slots.default?.()?.[0]
 
   if (!parent.value) return
@@ -52,7 +60,7 @@ const open = () => {
     if (parent.value.scrollHeight === Math.round(rect.height) && parent.value.scrollWidth === Math.round(rect.width)) return
   }
 
-  setTooltipMeta({
+  const payload: TooltipMeta = {
     parent: parent.value,
     slot: slot ? markRaw(slot) : undefined,
     text: props.text,
@@ -63,10 +71,22 @@ const open = () => {
     left: props.left,
     right: props.right,
     static: props.static,
-  })
+  }
+
+  if (props.delay) {
+    timeout = setTimeout(() => {
+      setTooltipMeta(payload)
+      timeout = null
+    }, props.delay)
+  } else setTooltipMeta(payload)
 }
 
 const close = () => {
+  if (timeout) {
+    clearTimeout(timeout)
+    timeout = null
+  }
+
   setTooltipMeta(null)
 }
 
