@@ -5,8 +5,24 @@
   />
 
   <div v-else>
+    <div class="grid grid-cols-[1fr,auto] gap-2">
+      <div class="text-accent sm-not:text-2xs text-xs font-semibold">
+        {{ title }}
+      </div>
+
+      <div class="flex justify-end">
+        <HeatmapCell
+          v-for="(opacity, i) in OPACITIES"
+          :key="opacity"
+          :opacity="opacity"
+        >
+          {{ thresholds[i] }}{{ i === OPACITIES.length - 1 ? '+' : '' }}
+        </HeatmapCell>
+      </div>
+    </div>
+
     <div class="relative isolate grid justify-end">
-      <div class="from-default text-2xs text-description dark:from-default-dark via-default dark:via-default-dark absolute inset-y-0 left-0 z-[1] flex w-4 flex-col bg-gradient-to-r to-transparent pt-4">
+      <div class="from-default text-2xs text-description dark:from-default-dark via-default dark:via-default-dark absolute inset-y-0 left-0 z-[1] flex w-5 flex-col bg-gradient-to-r to-transparent pt-4">
         <div
           v-for="(label, i) in DAY_LABELS"
           :key="i"
@@ -16,7 +32,10 @@
         </div>
       </div>
 
-      <div class="flex overflow-x-auto overscroll-x-contain">
+      <div
+        ref="scrollContainer"
+        class="flex overflow-x-auto overscroll-x-contain"
+      >
         <div class="flex pl-4">
           <div
             v-for="(week, wi) in weeks"
@@ -44,21 +63,11 @@
         </div>
       </div>
     </div>
-
-    <div class="ml-4 flex items-center justify-end gap-0.5 pt-2">
-      <HeatmapCell
-        v-for="(opacity, i) in OPACITIES"
-        :key="opacity"
-        :opacity="opacity"
-      >
-        {{ thresholds[i] }}{{ i === OPACITIES.length - 1 ? '+' : '' }}
-      </HeatmapCell>
-    </div>
   </div>
 </template>
 
 <script lang="ts" setup generic="Data extends Record<string, number>">
-import {computed} from 'vue'
+import {computed, nextTick, onMounted, useTemplateRef, watch} from 'vue'
 
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
@@ -86,14 +95,28 @@ const props = withDefaults(
     data: Data[]
     xKey: keyof Data
     yKey: keyof Data
+    title?: string
     skeleton?: boolean
   }>(),
   {
+    title: undefined,
     skeleton: undefined,
   },
 )
 
 const {isSkeleton} = useComponentStatesSkeleton(props)
+
+const scrollContainerRef = useTemplateRef('scrollContainer')
+
+onMounted(() => {
+  if (scrollContainerRef.value) scrollContainerRef.value.scrollLeft = scrollContainerRef.value.scrollWidth
+})
+
+watch(isSkeleton, async value => {
+  if (value) return
+  await nextTick()
+  if (scrollContainerRef.value) scrollContainerRef.value.scrollLeft = scrollContainerRef.value.scrollWidth
+})
 
 const monthFormatter = new Intl.DateTimeFormat('en', {month: 'short'})
 
