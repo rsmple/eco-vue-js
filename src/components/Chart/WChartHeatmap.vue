@@ -5,12 +5,15 @@
   />
 
   <div v-else>
-    <div class="grid grid-cols-[1fr,auto] gap-2">
+    <div class="grid h-[--w-chart-heatmap-size,1rem] grid-cols-[1fr,auto] items-center gap-2">
       <div class="text-accent sm-not:text-2xs text-xs font-semibold">
         {{ title }}
       </div>
 
-      <div class="flex justify-end">
+      <div
+        v-if="data.length"
+        class="flex justify-end"
+      >
         <HeatmapCell
           v-for="(opacity, i) in OPACITIES"
           :key="opacity"
@@ -69,7 +72,7 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="Data extends Record<string, number>">
+<script lang="ts" setup generic="Data extends Record<string, unknown>">
 import {computed, nextTick, onMounted, useTemplateRef, watch} from 'vue'
 
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
@@ -92,8 +95,8 @@ type DataEntry = {
 const props = withDefaults(
   defineProps<{
     data: Data[]
-    xKey: keyof Data
-    yKey: keyof Data
+    xKey: keyof PickByType<Required<Data>, number>
+    yKey: keyof PickByType<Required<Data>, number>
     title?: string
     skeleton?: boolean
   }>(),
@@ -155,9 +158,13 @@ const dataMap = computed(() => {
   const map = new Map<string, DataEntry>()
 
   props.data.forEach((d, i) => {
-    const date = new Date(d[props.xKey])
+    const x = d[props.xKey]
+    const y = d[props.yKey]
+    if (typeof x !== 'number' || typeof y !== 'number') return
+
+    const date = new Date(x)
     date.setHours(0, 0, 0, 0)
-    map.set(dateToKey(date), {opacity: getOpacity(d[props.yKey]), d, dataIndex: i})
+    map.set(dateToKey(date), {opacity: getOpacity(y), d, dataIndex: i})
   })
 
   return map
