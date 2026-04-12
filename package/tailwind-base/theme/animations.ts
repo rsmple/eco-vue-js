@@ -82,6 +82,31 @@ export default {
         opacity: '0',
       },
     },
+    'ping-opacity': {
+      '0%': {
+        opacity: '1',
+      },
+      '60%': {
+        opacity: '1',
+      },
+      '100%': {
+        opacity: '0.1',
+      },
+    },
+    'spinner-dash-small': {
+      '0%': {
+        'stroke-dasharray': '1, 69',
+        'stroke-dashoffset': '0',
+      },
+      '50%': {
+        'stroke-dasharray': '30, 69',
+        'stroke-dashoffset': '-20px',
+      },
+      '100%': {
+        'stroke-dasharray': '30, 69',
+        'stroke-dashoffset': '-69px',
+      },
+    },
   },
   animation: {
     ticker: 'ticker var(--tiker-duration, 0.8s) linear infinite',
@@ -92,5 +117,7 @@ export default {
     'dojo-logo-dashoffset': 'dojo-logo-dashoffset 1.6s linear 1;',
     'spinner-dash': 'spinner-dash 1.6s linear infinite',
     'ping-fast': 'ping-big .5s cubic-bezier(0, 0, 0.2, 1)',
+    'ping-opacity': 'ping-opacity 1.2s linear infinite alternate-reverse',
+    'spinner-dash-small': 'spinner-dash-small 1.6s linear infinite',
   },
 }
