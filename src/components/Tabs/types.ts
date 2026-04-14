@@ -15,6 +15,8 @@ export interface TabsProps {
   noSwitchOnInvalid?: boolean
   wrap?: boolean
   statusIcon?: boolean
+  flat?: boolean
+  enableStatus?: boolean
 }
 
 export type TabsItemProps = {

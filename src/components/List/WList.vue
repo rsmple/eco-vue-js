@@ -52,7 +52,7 @@
               v-if="!disableExport"
               :fields="fieldsVisible"
               :query-params-getter="selectionCount === 0 ? () => queryParams : getQueryParamsBulk"
-              :use-query-fn="useQueryFn"
+              :use-query-fn="useQueryFnExport ?? useQueryFn"
               :api-method="apiMethodExport"
               :file-name="exportFileName"
               class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
@@ -409,6 +409,7 @@ const props = withDefaults(
     fields: Fields
     expansion?: ExpansionComponent<Data, QueryParams>
     useQueryFn: UseQueryPaginated<Data, QueryParams>
+    useQueryFnExport?: UseQueryPaginated<Data, QueryParams>
     queryParams: QueryParams
     queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
     bulkDisableMessage?: string

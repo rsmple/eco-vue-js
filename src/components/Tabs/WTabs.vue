@@ -3,12 +3,12 @@
     ref="container"
     class="grid gap-4"
     :class="{
-      'grid grid-cols-1': !side,
+      'grid grid-cols-1': !side || flat,
       'sm-not:grid-cols-[repeat(2,100vw)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain grid grid-cols-[minmax(auto,var(--w-tabs-side-width,auto)),1fr] items-start': side,
     }"
   >
     <div
-      v-if="!noHeader"
+      v-if="!noHeader && !flat"
       ref="buttonContainer"
       class="relative"
       :class="{
@@ -108,13 +108,14 @@
     >
       <TabItem
         v-for="slot in unwrapSlots(customSlots ?? $slots.default?.() ?? []).filter(isTabItem)"
-        ref="tabItem"
+        :ref="(setTabRef as VNodeRef)"
         :key="slot.props.name"
         :name="slot.props.name"
         :title="slot.props.title"
         :active="slot.props.name === current"
         :removable="slot.props.removable ?? false"
-        :enable-status="(statusIcon || showHasValue) ?? false"
+        :enable-status="(statusIcon || showHasValue || enableStatus) ?? false"
+        :flat="flat"
         @update:height="!disableMinHeight && updateHeight($event)"
         @update:active="$emit('update:current-title', slot.props?.title)"
       >
@@ -127,7 +128,7 @@
 <script lang="ts" setup>
 import type {TabsItemProps, TabsProps} from './types'
 
-import {type Component, type RendererElement, type RendererNode, type VNode, computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch} from 'vue'
+import {type Component, type RendererElement, type RendererNode, type VNode, type VNodeRef, computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch} from 'vue'
 
 import IconClose from '@/assets/icons/IconClose.svg?component'
 
@@ -185,20 +186,14 @@ const currentIndex = computed(() => defaultSlotsKeys.value.indexOf(current.value
 const isDirect = ref(true)
 const buttonRef = useTemplateRef<ComponentInstance<typeof TabTitleButton>[]>('button')
 const minHeight = ref(0)
-const tabItemRef = useTemplateRef('tabItem')
 
-const tabItemRefByName = computed(() => {
-  const result: Record<string, ComponentInstance<typeof TabItem>> = {}
+const tabItemRefByName = ref<Record<string, ComponentInstance<typeof TabItem>>>({})
 
-  if (tabItemRef.value) {
-    for (const item of tabItemRef.value) {
-      if (!item?.name) continue
-      result[item.name] = item
-    }
-  }
+const setTabRef = (value: ComponentInstance<typeof TabItem> | null) => {
+  if (typeof value?.name !== 'string') return
 
-  return result
-})
+  tabItemRefByName.value[value.name] = value
+}
 
 const hasNoValueFirst = computed<number>(() => {
   if (!props.stepper) return 0
@@ -225,14 +220,10 @@ const switchTab = throttle((key: string): void => {
 }, 200)
 
 const updateCurrent = (value: string) => {
-  tabItemRef.value?.[currentIndex.value]?.emitHeight?.()
-
   setCurrentDebounced(value)
 }
 
 const updateIndex = (value: number) => {
-  tabItemRef.value?.[currentIndex.value]?.emitHeight?.()
-
   setCurrentDebounced(defaultSlotsKeys.value[value]!)
 }
 

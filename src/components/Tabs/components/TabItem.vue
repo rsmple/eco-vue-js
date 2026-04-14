@@ -1,10 +1,14 @@
 <template>
   <div
-    v-if="!removable || active"
-    v-show="active"
+    v-if="!removable || active || flat"
+    v-show="active || flat"
     ref="element"
-    class="h-full"
+    :class="flat ? 'first-not:mt-12' : 'h-full'"
   >
+    <div v-if="flat && title" class="text-accent mb-2 text-xl font-semibold">
+      {{ title }}
+    </div>
+
     <slot />
   </div>
 </template>
@@ -22,6 +26,7 @@ const props = defineProps<{
   active: boolean
   removable: boolean
   enableStatus: boolean
+  flat: boolean
 }>()
 
 const emit = defineEmits<{
