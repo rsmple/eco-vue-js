@@ -17,7 +17,7 @@
         : tag === 'a'
           ? {href, target}
           : to !== undefined
-            ? {to, replace}
+            ? {to, replace, target}
             : {})
     }"
     :is="to !== undefined ? isDisabled ? 'a' : WRouterLink : tag"
