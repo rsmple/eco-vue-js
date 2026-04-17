@@ -20,7 +20,7 @@
       }"
     >
       <template
-        v-for="(slot, index) in unwrapSlots(customSlots ?? $slots.default?.() ?? [])"
+        v-for="(slot, index) in defaultSlotsAll"
         :key="slot.props?.name"
       >
         <TabTitleButton
@@ -107,7 +107,7 @@
       :style="{minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
     >
       <TabItem
-        v-for="slot in unwrapSlots(customSlots ?? $slots.default?.() ?? []).filter(isTabItem)"
+        v-for="slot in defaultSlots"
         :ref="(setTabRef as VNodeRef)"
         :key="slot.props.name"
         :name="slot.props.name"
@@ -128,7 +128,7 @@
 <script lang="ts" setup>
 import type {TabsItemProps, TabsProps} from './types'
 
-import {type Component, type RendererElement, type RendererNode, type VNode, type VNodeRef, computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch} from 'vue'
+import {type Component, type RendererElement, type RendererNode, type VNode, type VNodeRef, computed, inject, onBeforeUpdate, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch} from 'vue'
 
 import IconClose from '@/assets/icons/IconClose.svg?component'
 
@@ -162,19 +162,19 @@ const slots = defineSlots<{
 const containerRef = useTemplateRef('container')
 const buttonContainerRef = useTemplateRef('buttonContainer')
 
-const defaultSlotsRaw = computed(() => props.customSlots ?? slots.default?.() ?? [])
-
 const isTabItem = (slot: VNode): slot is VNode<RendererNode, RendererElement, TabsItemProps> & {props: TabsItemProps} => {
   return slot.type instanceof Object && '__name' in slot.type && slot.type.__name === 'WTabsItem'
 }
 
-const defaultSlotsAll = computed(() => {
-  return unwrapSlots(defaultSlotsRaw.value)
+const defaultSlotsRaw = shallowRef<VNode[]>(props.customSlots ?? slots.default?.() ?? [])
+
+onBeforeUpdate(() => {
+  defaultSlotsRaw.value = props.customSlots ?? slots.default?.() ?? []
 })
 
-const defaultSlots = computed(() => {
-  return defaultSlotsAll.value.filter(isTabItem)
-})
+const defaultSlotsAll = computed(() => unwrapSlots(defaultSlotsRaw.value))
+
+const defaultSlots = computed(() => defaultSlotsAll.value.filter(isTabItem))
 
 const defaultSlotsKeys = computed<string[]>(() => defaultSlots.value.map(item => item.props.name))
 
