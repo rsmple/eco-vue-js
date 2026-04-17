@@ -5,7 +5,10 @@
     ref="element"
     :class="flat ? 'first-not:mt-12' : 'h-full'"
   >
-    <div v-if="flat && title" class="text-accent mb-2 text-xl font-semibold">
+    <div
+      v-if="flat && title"
+      class="text-accent mb-2 text-xl font-semibold"
+    >
       {{ title }}
     </div>
 
