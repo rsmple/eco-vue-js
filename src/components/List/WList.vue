@@ -449,6 +449,7 @@ const props = withDefaults(
   {
     count: undefined,
     expansion: undefined,
+    useQueryFnExport: undefined,
     queryOptions: undefined,
     bulkDisableMessage: undefined,
     bulk: undefined,
