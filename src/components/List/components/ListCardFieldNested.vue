@@ -1,6 +1,6 @@
 <template>
   <template
-    v-for="field in (card ? (fields as ListFields<any, any>) : sortFields(fields, fieldConfigMap))"
+    v-for="field in sortedFields"
     :key="getFirstFieldLabel(field)"
   >
     <slot
@@ -84,6 +84,8 @@
 import type {FieldComponent, FieldConfig, ListField, ListFieldExport, ListFields} from '../types'
 import type {UniformScope} from '@/components/Uniform/types'
 
+import {computed} from 'vue'
+
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
 import ListCardFieldNestedItem from './ListCardFieldNestedItem.vue'
@@ -93,7 +95,7 @@ import {getFirstFieldLabel, sortFields} from '../use/useListConfig'
 
 const config = {width: null, visible: true, order: 0, sticky: false}
 
-defineProps<{
+const props = defineProps<{
   fields: ListFields<Data, QueryParams>
   fieldConfigMap: Record<string, FieldConfig>
   item: Data
@@ -106,6 +108,8 @@ defineProps<{
   results: Data[] | undefined
   intersecting: boolean
 }>()
+
+const sortedFields = computed<ListFields<Data, QueryParams>>(() => props.card ? props.fields : sortFields(props.fields, props.fieldConfigMap) as ListFields<Data, QueryParams>)
 
 defineSlots<{
   default: (props: {field: ListFieldExport<FieldComponent<Data, QueryParams>, ListField<Data, QueryParams>>, item: Data, nested: boolean}) => void

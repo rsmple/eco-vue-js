@@ -240,6 +240,31 @@
             ...uniformScope ?? {},
             field: formFieldGetter(item),
           } : undefined"
+          v-memo="[
+            item,
+            skeleton,
+            getIsSelected(value as number, position),
+            isReadonly ?? isDisabled,
+            readonlyGetter?.(item),
+            fieldsFiltered,
+            fieldConfigMap,
+            isGrid,
+            alignTop,
+            hasBorder,
+            disableMore,
+            menu,
+            expansion,
+            bulk,
+            hasAction,
+            formFieldGetter,
+            queryParams,
+            results,
+            intersecting,
+            position,
+            cardClass,
+            cardWrapperClass,
+            alwaysSelect,
+          ]"
         >
           <template #default="innerScope">
             <WListCard
@@ -278,30 +303,20 @@
                   :intersecting="intersecting"
                 >
                   <template #default="defaultScope">
-                    <component
-                      :is="defaultScope.field.default"
+                    <ListCardFieldItem
+                      :field="defaultScope.field"
                       :item="defaultScope.item"
+                      :nested="defaultScope.nested"
+                      :config="fieldConfigMap[defaultScope.field.meta.label]!"
                       :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(defaultScope.item) ?? false)"
                       :skeleton="skeleton"
                       :card="isGrid"
-                      :config="fieldConfigMap[defaultScope.field.meta.label]!"
                       :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
                       :query-params="queryParams"
                       :results="results"
                       :intersecting="intersecting"
-                      :class="{
-                        [defaultScope.field.meta.cssClass ?? '']: true,
-                        'items-center': !alignTop,
-                        'items-start': alignTop,
-                        'bg-default dark:bg-default-dark sticky z-[1]': !isGrid && fieldConfigMap[defaultScope.field.meta.label]?.sticky,
-                        ...(!isGrid && fieldConfigMap[defaultScope.field.meta.label]?.sticky ? beforeClass : {})
-                      }"
-                      :style="isGrid ? !defaultScope.nested ? {gridArea: defaultScope.field.meta.label} : undefined : {
-                        minWidth: `var(${getFieldVariable('width', defaultScope.field.meta.label)})`,
-                        maxWidth: `var(${getFieldVariable('width', defaultScope.field.meta.label)})`,
-                        left: fieldConfigMap[defaultScope.field.meta.label]?.sticky ? `var(${getFieldVariable('left', defaultScope.field.meta.label)})` : undefined,
-                        right: fieldConfigMap[defaultScope.field.meta.label]?.sticky ? `var(${getFieldVariable('right', defaultScope.field.meta.label)})` : undefined,
-                      }"
+                      :align-top="alignTop"
+                      :before-class="beforeClass"
                       @update:item="setter"
                       @delete:item="setter(); refetch()"
                     />
@@ -398,6 +413,7 @@ import HeaderExport from './components/HeaderExport.vue'
 import HeaderFieldNested from './components/HeaderFieldNested.vue'
 import HeaderSettings from './components/HeaderSettings.vue'
 import HeaderSort from './components/HeaderSort.vue'
+import ListCardFieldItem from './components/ListCardFieldItem.vue'
 import ListCardFieldNested from './components/ListCardFieldNested.vue'
 import {filterFields, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, getFieldWidthSumStyles, sortFields, useListConfig} from './use/useListConfig'
 

@@ -1,6 +1,6 @@
 <template>
   <template
-    v-for="(field, index) in sortFields(fields, fieldConfigMap)"
+    v-for="(field, index) in sortedFields"
     :key="getFirstFieldLabel(field)"
   >
     <slot
@@ -47,13 +47,17 @@
 <script setup lang="ts" generic="Data, QueryParams">
 import type {FieldComponent, FieldConfig, ListField, ListFieldExport, ListFields} from '../types'
 
+import {computed} from 'vue'
+
 import {isField} from '../models/utils'
 import {getFirstFieldLabel, sortFields} from '../use/useListConfig'
 
-defineProps<{
+const props = defineProps<{
   fields: ListFields<Data, QueryParams>
   fieldConfigMap: Record<string, FieldConfig>
 }>()
+
+const sortedFields = computed<ListFields<Data, QueryParams>>(() => sortFields(props.fields, props.fieldConfigMap) as ListFields<Data, QueryParams>)
 
 defineSlots<{
   default: (props: {
