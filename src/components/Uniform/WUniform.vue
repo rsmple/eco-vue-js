@@ -211,17 +211,17 @@ const unlistenerInjected = inject(wUniformUnlistener, undefined)
 
 updaterInjected?.(reactive({
   hasChanges: scope?.hasChanges ?? false,
-  hasValue: scope?.hasValue ?? (props.initHasValue !== undefined ? toRef(props, 'initHasValue') as Ref<boolean | null> : null),
-  hasError: scope?.hasShownError ?? (props.initHasError !== undefined ? toRef(props, 'initHasError') as Ref<boolean> : false),
+  hasValue: (props.initHasValue !== undefined ? toRef(props, 'initHasValue') : scope?.hasValue ?? null) as Ref<boolean | null>,
+  hasError: (props.initHasError !== undefined ? toRef(props, 'initHasError') : scope?.hasShownError ?? null) as Ref<boolean>,
 }), id)
 
 defineExpose({
   id,
   field: props.field,
   hasChanges: props.noChanges ? false : (scope?.hasChanges ?? false),
-  hasValue: scope?.hasValue ?? (props.initHasValue !== undefined ? toRef(props, 'initHasValue') as Ref<boolean | null> : null),
+  hasValue: (props.initHasValue !== undefined ? toRef(props, 'initHasValue') : scope?.hasValue ?? null) as Ref<boolean | null>,
   isValid: scope?.isValid ?? false,
-  hasShownError: scope?.hasShownError ?? (props.initHasError !== undefined ? toRef(props, 'initHasError') as Ref<boolean> : false),
+  hasShownError: (props.initHasError !== undefined ? toRef(props, 'initHasError') : scope?.hasShownError ?? null) as Ref<boolean>,
   fullPayload: props.fullPayload,
   validate: scope?.validate ?? (() => undefined),
   invalidate: scope?.invalidate ?? (() => void 0),
