@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import {nextTick, onMounted, useTemplateRef, watch} from 'vue'
+import {nextTick, useTemplateRef, watch} from 'vue'
 
 import WButtonTab from '@/components/Button/WButtonTab.vue'
 
@@ -85,12 +85,6 @@ watch(() => props.active, () => {
 
 watch(() => props.index, () => {
   nextTick(update)
-})
-
-onMounted(() => {
-  document.fonts.ready.then(() => {
-    update()
-  })
 })
 
 defineExpose({

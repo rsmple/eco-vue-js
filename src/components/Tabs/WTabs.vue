@@ -33,9 +33,9 @@
           :has-changes="slot.props.hasChanges ?? slot.props['has-changes' as never] ?? tabItemRefByName[slot.props.name]?.hasChanges"
           :has-error="slot.props.hasError ?? slot.props['has-error' as never] ?? tabItemRefByName[slot.props.name]?.hasError"
           :has-value="slot.props.hasValue ?? slot.props['has-value' as never] ?? tabItemRefByName[slot.props.name]?.hasValue"
-          :first="defaultSlots.indexOf(slot) === 0"
-          :last="defaultSlots.indexOf(slot) === defaultSlots.length - 1"
-          :disabled="stepper ? defaultSlots.indexOf(slot) > hasNoValueFirst : false"
+          :first="defaultSlotsIndexByName[slot.props.name] === 0"
+          :last="defaultSlotsIndexByName[slot.props.name] === defaultSlots.length - 1"
+          :disabled="stepper ? (defaultSlotsIndexByName[slot.props.name] ?? 0) > hasNoValueFirst : false"
           :stepper="stepper"
           :show-has-value="showHasValue"
           :side="side"
@@ -100,17 +100,19 @@
 
     <div
       v-if="defaultSlots.some(slot => (slot.children as Record<string, Component>)?.default)"
-      class="relative h-full transition-[min-height] duration-300"
+      class="relative h-full"
       :class="{
+        'transition-[min-height] duration-300': !flat,
         'sm-not:snap-start': side,
       }"
-      :style="{minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
+      :style="flat ? undefined : {minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
     >
       <TransitionGroup
         enter-active-class="transition-[transform,opacity] duration-[250ms] w-full"
         leave-active-class="transition-[transform,opacity] duration-[250ms] w-full absolute top-0"
         :enter-from-class="lessTransitions || side || hasScrollbar ? 'opacity-0 absolute' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]'"
         :leave-to-class="lessTransitions || side || hasScrollbar ? 'opacity-0 absolute' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]'"
+        :css="!flat"
       >
         <TabItem
           v-for="slot in defaultSlots"
@@ -122,7 +124,7 @@
           :removable="slot.props.removable ?? false"
           :enable-status="(statusIcon || showHasValue || enableStatus) ?? false"
           :flat="flat"
-          @update:height="!disableMinHeight && updateHeight($event)"
+          @update:height="!disableMinHeight && !flat && updateHeight($event)"
           @update:active="$emit('update:current-title', slot.props?.title)"
         >
           <component :is="slot" />
@@ -187,6 +189,12 @@ const defaultSlots = computed(() => defaultSlotsAll.value.filter(isTabItem))
 
 const defaultSlotsKeys = computed<string[]>(() => defaultSlots.value.map(item => item.props.name))
 
+const defaultSlotsIndexByName = computed<Record<string, number>>(() => {
+  const map: Record<string, number> = {}
+  defaultSlots.value.forEach((slot, i) => { map[slot.props.name] = i })
+  return map
+})
+
 const current = ref<string>(props.initTab ?? (props.initTabIndex !== undefined
   ? defaultSlotsKeys.value[props.initTabIndex]!
   : defaultSlots.value.find(slot => !!slot.props?.init)?.props?.name ?? defaultSlotsKeys.value[0]!
@@ -207,7 +215,7 @@ const setTabRef = (value: ComponentInstance<typeof TabItem> | null) => {
 const hasNoValueFirst = computed<number>(() => {
   if (!props.stepper) return 0
 
-  const index = defaultSlotsAll.value.findIndex(item => isTabItem(item) && item.props.hasValue === false)
+  const index = defaultSlots.value.findIndex(item => item.props.hasValue === false)
 
   if (index === -1) return defaultSlotsKeys.value.length
 
@@ -283,7 +291,7 @@ const jump = (name: string, update: boolean): void => {
   const valid = defaultSlotsKeys.value
     .slice(currentIndex.value, defaultSlotsKeys.value.indexOf(name))
     .every(item => {
-      const index = defaultSlotsAll.value.findIndex(slot => isTabItem(slot) && slot.props.name === item)
+      const index = defaultSlotsKeys.value.indexOf(item)
       const errorMessage = update ? validate(index) : validateIfNoError(index)
 
       if (errorMessage) {
@@ -305,17 +313,13 @@ const updateHeight = (value: number): void => {
 }
 
 const validate = (index: number): string | undefined => {
-  const slot = defaultSlotsAll.value[index]
-
-  if (!slot || !isTabItem(slot)) return undefined
-
-  return slot.props.validate?.()
+  return defaultSlots.value[index]?.props.validate?.()
 }
 
 const validateIfNoError = (index: number): string | undefined => {
-  const slot = defaultSlotsAll.value[index]
+  const slot = defaultSlots.value[index]
 
-  if (!slot || !isTabItem(slot) || slot.props.hasError) return undefined
+  if (!slot || slot.props.hasError) return undefined
 
   return slot.props.validate?.()
 }
@@ -350,7 +354,8 @@ watch(currentIndex, value => {
 }, {immediate: true})
 
 watch(defaultSlotsKeys, (newValue, oldValue) => {
-  const newIndex = newValue.findIndex(item => !oldValue.includes(item))
+  const oldSet = new Set(oldValue)
+  const newIndex = newValue.findIndex(item => !oldSet.has(item))
 
   if (props.switchToNew && newIndex !== -1) {
     switchTab(newValue[newIndex]!)
@@ -366,6 +371,13 @@ watch(defaultSlotsKeys, (newValue, oldValue) => {
 watch(defaultSlotsKeys, value => {
   emit('update:tabs-length', value.length)
 }, {immediate: true})
+
+watch(defaultSlotsKeys, newKeys => {
+  const active = new Set(newKeys)
+  for (const name in tabItemRefByName.value) {
+    if (!active.has(name)) delete tabItemRefByName.value[name]
+  }
+}, {flush: 'post'})
 
 if (props.stepper) {
   const progress = computed(() => 100 * (currentIndex.value + 1) / defaultSlotsKeys.value.length)
@@ -386,7 +398,7 @@ if (props.stepper) {
 if (!props.noSwitchOnInvalid) {
   const switchTabDebounced = debounce(switchTab, 50)
 
-  const invalidName = computed<string | undefined>(() => defaultSlotsAll.value.find(slot => isTabItem(slot) && slot.props.hasError)?.props?.name)
+  const invalidName = computed<string | undefined>(() => defaultSlots.value.find(slot => slot.props.hasError)?.props?.name)
 
   watch(invalidName, value => {
     if (value && value !== current.value) switchTabDebounced(value)
@@ -395,6 +407,7 @@ if (!props.noSwitchOnInvalid) {
 
 onMounted(() => {
   tabItemListenerInjected?.(updateIndicator)
+  document.fonts.ready.then(updateIndicator)
 })
 
 onUnmounted(() => {

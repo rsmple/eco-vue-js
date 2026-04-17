@@ -44,7 +44,7 @@ const {callListeners} = useTabItemActiveListener()
 const elementRef = useTemplateRef('element')
 
 const emitHeight = (): void => {
-  if (!elementRef.value) return
+  if (props.flat || !elementRef.value) return
 
   emit('update:height', elementRef.value.offsetHeight)
 }
