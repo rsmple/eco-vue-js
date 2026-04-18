@@ -6,19 +6,14 @@
       '-min-h--height-inner list:pt-[--w-list-gap,1rem] modal:pb-[--w-list-gap,1rem] modal:min-h-[50vh] pb-16': !minHeight,
       'min-h-full': minHeight,
     }"
-    @scroll:down="addNextPage"
-    @scroll:up="addPreviousPage"
   >
-    <InfiniteListButton
-      v-if="isPreviousButtonVisible"
-      @click="addPreviousPage()"
-      @check="infiniteScrollRef?.checkIsScrollUp()"
-    />
+    <div :style="{height: topSpacerHeight + 'px'}" />
+    <div ref="topSentinel" />
 
     <InfiniteListPage
       v-for="(page, index) in pages"
       ref="pageComponent"
-      :key="page"
+      :key="slotIds[index]"
       :query-params="{...(queryParams as QueryParams), page}"
       :use-query-fn="useQueryFn"
       :skeleton-length="getSkeletonLength(page - 1)"
@@ -38,8 +33,6 @@
 
       @update:count="updateCount($event); $emit('update:count', $event)"
       @update:pages-count="updatePagesCount"
-      @update:next-page="infiniteScrollRef?.checkIsScrollDown()"
-      @update:previous-page="infiniteScrollRef?.checkIsScrollUp()"
       @update:scroll="updateScroll"
       @update-from-header:scroll="headerTop > 0 && nextTick(() => updateScroll(headerTop))"
       @remove:page="removePage"
@@ -74,22 +67,18 @@
       </template>
     </InfiniteListPage>
 
-    <InfiniteListButton
-      v-if="count !== 0 && nextPage"
-      @click="addNextPage"
-      @check="infiniteScrollRef?.checkIsScrollDown()"
-    />
+    <div ref="bottomSentinel" />
+    <div :style="{height: bottomSpacerHeight + 'px'}" />
   </InfiniteListScroll>
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import type {ApiError} from '@/utils/api'
 
-import {computed, inject, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
+import {computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref, toRef, useTemplateRef, watch} from 'vue'
 
-import {isEqualObj} from '@/utils/utils'
+import {debounce, isEqualObj} from '@/utils/utils'
 
-import InfiniteListButton from './InfiniteListButton.vue'
 import InfiniteListPage from './InfiniteListPage.vue'
 import InfiniteListScroll from './InfiniteListScroll.vue'
 
@@ -142,6 +131,8 @@ const infiniteScrollRef = useTemplateRef('infiniteScroll')
 const scrollingElement = inject(wScrollingElement, null)
 
 const pages = ref<number[]>([(props.queryParams as {page?: number}).page ?? 1])
+let slotIdCounter = 1
+const slotIds = ref<number[]>([slotIdCounter])
 const pagesCount = ref(1)
 const count = ref(0)
 const nextPage = computed(() => pages.value[pages.value.length - 1]! < pagesCount.value ? pages.value[pages.value.length - 1]! + 1 : null)
@@ -156,15 +147,9 @@ const getSkeletonLength = (pagesBefore: number): number => {
   return length < 0 ? props.pageLength : length
 }
 
-const isPreviousButtonVisible = computed<boolean>(() => {
-  if (pages.value.length === 1 && pages.value[0]! > 1) return true
-  if (count.value === 0) return false
-  if (previousPage.value) return true
-
-  return false
-})
-
 const pageComponentRef = useTemplateRef<ComponentInstance<typeof InfiniteListPage>[]>('pageComponent')
+const topSentinelRef = useTemplateRef<HTMLDivElement>('topSentinel')
+const bottomSentinelRef = useTemplateRef<HTMLDivElement>('bottomSentinel')
 
 const {isFetching, isRefetchingAll, refetchNextPages, refetchAll} = useRefetchNextPages(pageComponentRef)
 
@@ -180,26 +165,34 @@ const addNextPage = (silent?: boolean) => {
   if (!nextPage.value) return
   if (pages.value.includes(nextPage.value)) return
 
-  pages.value.push(nextPage.value)
+  if (pages.value.length >= props.maxPages) {
+    const recycledSlotId = slotIds.value.shift()!
+    pages.value.shift()
+    pages.value.push(nextPage.value)
+    slotIds.value.push(recycledSlotId)
+  } else {
+    pages.value.push(nextPage.value)
+    slotIds.value.push(++slotIdCounter)
+  }
 
   if (!silent) emit('update:page', nextPage.value)
-
-  if (pages.value.length < props.maxPages) return
-
-  pages.value.shift()
 }
 
 const addPreviousPage = (silent?: boolean) => {
   if (!previousPage.value) return
   if (pages.value.includes(previousPage.value)) return
 
-  pages.value.unshift(previousPage.value)
+  if (pages.value.length >= props.maxPages) {
+    const recycledSlotId = slotIds.value.pop()!
+    pages.value.pop()
+    pages.value.unshift(previousPage.value)
+    slotIds.value.unshift(recycledSlotId)
+  } else {
+    pages.value.unshift(previousPage.value)
+    slotIds.value.unshift(++slotIdCounter)
+  }
 
   if (!silent) emit('update:page', previousPage.value)
-
-  if (pages.value.length < props.maxPages) return
-
-  pages.value.pop()
 }
 
 const updateScroll = (height: number): void => {
@@ -210,14 +203,160 @@ const updateScroll = (height: number): void => {
   element.scrollTop = element.scrollTop + height
 }
 
+let resizeObserver: ResizeObserver | null = null
+const pageHeights = reactive(new Map<number, number>())
+const observedElements = new Map<HTMLElement, number>()
+
+const avgPageHeight = computed(() => {
+  let sum = 0
+  let count = 0
+  for (const h of pageHeights.values()) {
+    if (h <= 0) continue
+    sum += h
+    count++
+  }
+  return count === 0 ? 0 : Math.round(sum / count)
+})
+
+const topSpacerHeight = computed(() => {
+  if (!avgPageHeight.value) return 0
+  const firstRendered = pages.value[0] ?? 1
+  return Math.max(0, (firstRendered - 1) * avgPageHeight.value)
+})
+
+const bottomSpacerHeight = computed(() => {
+  if (!avgPageHeight.value) return 0
+  const lastRendered = pages.value[pages.value.length - 1] ?? 1
+  return Math.max(0, (pagesCount.value - lastRendered) * avgPageHeight.value)
+})
+
+const getScrollElementTop = (element: Element): number => {
+  if (element === document.scrollingElement || element === document.body || element === document.documentElement) return 0
+  return element.getBoundingClientRect().top
+}
+
+const handleResize: ResizeObserverCallback = (entries) => {
+  const scrollEl = scrollingElement?.value ?? document.scrollingElement
+  if (!scrollEl) return
+
+  const scrollElTop = getScrollElementTop(scrollEl)
+  let totalDelta = 0
+
+  for (const entry of entries) {
+    const el = entry.target as HTMLElement
+    const slotId = observedElements.get(el)
+    if (slotId === undefined) continue
+
+    const newHeight = Math.round(entry.contentRect.height)
+    const oldHeight = pageHeights.get(slotId)
+
+    pageHeights.set(slotId, newHeight)
+
+    if (oldHeight === undefined || oldHeight === newHeight) continue
+
+    if (el.getBoundingClientRect().bottom <= scrollElTop) {
+      totalDelta += newHeight - oldHeight
+    }
+  }
+
+  if (totalDelta !== 0 && scrollEl.scrollTop !== 0) {
+    scrollEl.scrollTop += totalDelta
+  }
+}
+
+onMounted(() => {
+  resizeObserver = new ResizeObserver(handleResize)
+})
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+  resizeObserver = null
+  pageHeights.clear()
+  observedElements.clear()
+})
+
+watch([pageComponentRef, slotIds], () => {
+  if (!resizeObserver) return
+
+  const instances = pageComponentRef.value ?? []
+  const ids = slotIds.value
+
+  if (instances.length === 0 && ids.length > 0) return
+
+  const currentEls = new Set<HTMLElement>()
+
+  for (let i = 0; i < instances.length; i++) {
+    const el = instances[i]?.element as HTMLElement | null | undefined
+    if (!el) continue
+    currentEls.add(el)
+
+    const slotId = ids[i]
+    if (slotId === undefined) continue
+
+    if (!observedElements.has(el)) {
+      observedElements.set(el, slotId)
+      resizeObserver.observe(el)
+    }
+  }
+
+  if (currentEls.size === 0) return
+
+  for (const el of Array.from(observedElements.keys())) {
+    if (!currentEls.has(el)) {
+      const id = observedElements.get(el)!
+      resizeObserver.unobserve(el)
+      observedElements.delete(el)
+      pageHeights.delete(id)
+    }
+  }
+}, {flush: 'post', immediate: true})
+
+let intersectionObserver: IntersectionObserver | null = null
+const topSentinelIntersecting = ref(false)
+const bottomSentinelIntersecting = ref(false)
+
+const handleIntersection: IntersectionObserverCallback = (entries) => {
+  for (const entry of entries) {
+    if (entry.target === topSentinelRef.value) {
+      topSentinelIntersecting.value = entry.isIntersecting
+      if (entry.isIntersecting) addPreviousPage()
+    } else if (entry.target === bottomSentinelRef.value) {
+      bottomSentinelIntersecting.value = entry.isIntersecting
+      if (entry.isIntersecting) addNextPage()
+    }
+  }
+}
+
+onMounted(() => {
+  intersectionObserver = new IntersectionObserver(handleIntersection, {
+    root: scrollingElement?.value ?? null,
+    rootMargin: '200px 0px',
+  })
+
+  if (topSentinelRef.value) intersectionObserver.observe(topSentinelRef.value)
+  if (bottomSentinelRef.value) intersectionObserver.observe(bottomSentinelRef.value)
+})
+
+onBeforeUnmount(() => {
+  intersectionObserver?.disconnect()
+  intersectionObserver = null
+})
+
+watch(nextPage, (value, oldValue) => {
+  if (oldValue === null && value !== null && bottomSentinelIntersecting.value) addNextPage()
+})
+
+watch(previousPage, (value, oldValue) => {
+  if (oldValue === null && value !== null && topSentinelIntersecting.value) addPreviousPage()
+})
+
 const removePage = (page: number): void => {
   const index = pages.value.indexOf(page)
 
   if (index === -1) return
 
-  const newPages = pages.value.slice(0, index)
-
-  pages.value = newPages
+  pages.value = pages.value.slice(0, index)
+  slotIds.value = slotIds.value.slice(0, index)
 
   if (pagesCount.value >= page) pagesCount.value = page - 1
 
@@ -240,6 +379,7 @@ const resetPage = async (page = 1) => {
 
   emit('update:page', page === 1 ? undefined : page)
   pages.value = []
+  slotIds.value = []
 
   const element = scrollingElement?.value ?? document.scrollingElement
 
@@ -250,19 +390,114 @@ const resetPage = async (page = 1) => {
   await nextTick()
 
   pages.value = [page]
+  slotIds.value = [++slotIdCounter]
 }
 
-watch(toRef(props, 'queryParams'), (newValue, oldValue) => {
-  if (isEqualObj(newValue, oldValue, ['page', ...(props.excludeParams ?? []) as string[]])) return
+const jumpToPage = (page: number) => {
+  const totalPages = Math.max(1, pagesCount.value)
+  const rangeSize = Math.min(props.maxPages, totalPages)
+
+  let start = Math.max(1, page - Math.floor(rangeSize / 2))
+  let end = start + rangeSize - 1
+  if (end > totalPages) {
+    end = totalPages
+    start = Math.max(1, end - rangeSize + 1)
+  }
+
+  const newPages: number[] = []
+  for (let p = start; p <= end; p++) newPages.push(p)
+
+  const newSlotIds: number[] = []
+  const existingIds = slotIds.value.slice()
+  for (let i = 0; i < newPages.length; i++) {
+    newSlotIds.push(existingIds.shift() ?? ++slotIdCounter)
+  }
+
+  pages.value = newPages
+  slotIds.value = newSlotIds
+
+  emit('update:page', page === 1 ? undefined : page)
+}
+
+const anyPageInViewport = (): boolean => {
+  const scrollEl = scrollingElement?.value ?? document.scrollingElement
+  if (!scrollEl) return true
+
+  const isDocumentScroll = scrollEl === document.scrollingElement || scrollEl === document.body || scrollEl === document.documentElement
+  const viewportTop = isDocumentScroll ? 0 : scrollEl.getBoundingClientRect().top
+  const viewportBottom = isDocumentScroll ? window.innerHeight : scrollEl.getBoundingClientRect().bottom
+
+  const instances = pageComponentRef.value ?? []
+  for (const instance of instances) {
+    const el = instance?.element as HTMLElement | null | undefined
+    if (!el) continue
+    const rect = el.getBoundingClientRect()
+    if (rect.bottom > viewportTop && rect.top < viewportBottom) return true
+  }
+  return false
+}
+
+const checkScrollJump = debounce(() => {
+  if (isResettingPage.value) return
+  if (topSentinelIntersecting.value || bottomSentinelIntersecting.value) return
+  if (!avgPageHeight.value) return
+  if (anyPageInViewport()) return
+
+  const scrollEl = scrollingElement?.value ?? document.scrollingElement
+  const containerEl = infiniteScrollRef.value?.$el as HTMLElement | null | undefined
+  if (!scrollEl || !containerEl) return
+
+  const isDocumentScroll = scrollEl === document.scrollingElement || scrollEl === document.body || scrollEl === document.documentElement
+  const scrollTop = isDocumentScroll ? window.scrollY : scrollEl.scrollTop
+  const containerTop = isDocumentScroll ? containerEl.getBoundingClientRect().top + scrollTop : containerEl.offsetTop
+
+  const y = Math.max(0, scrollTop - containerTop)
+
+  const target = Math.max(1, Math.min(Math.floor(y / avgPageHeight.value) + 1, pagesCount.value))
+  if (pages.value.includes(target)) return
+
+  jumpToPage(target)
+}, 300)
+
+watch(() => scrollingElement?.value ?? window, (newEl, oldEl) => {
+  oldEl?.removeEventListener('scroll', checkScrollJump)
+  newEl?.addEventListener('scroll', checkScrollJump, {passive: true})
+}, {immediate: true})
+
+onBeforeUnmount(() => {
+  const el = scrollingElement?.value ?? window
+  el.removeEventListener('scroll', checkScrollJump)
+})
+
+let oldQueryParams = {}
+
+watch(toRef(props, 'queryParams'), newValue => {
+  if (pages.value.length !== 0 && isEqualObj(newValue, oldQueryParams, ['page', ...(props.excludeParams ?? []) as string[]])) return
 
   resetPage()
-})
+
+  oldQueryParams = {...newValue}
+}, {deep: true})
 
 watch(pagesCount, value => {
   if (pages.value[pages.value.length - 1]! > value) {
-    const newPages = pages.value.filter(page => page <= value)
+    const newPages: number[] = []
+    const newSlotIds: number[] = []
 
-    pages.value = newPages.length === 0 ? [1] : newPages
+    pages.value.forEach((page, index) => {
+      if (page <= value) {
+        newPages.push(page)
+        newSlotIds.push(slotIds.value[index]!)
+      }
+    })
+
+    if (newPages.length === 0) {
+      pages.value = [1]
+      slotIds.value = [++slotIdCounter]
+    } else {
+      pages.value = newPages
+      slotIds.value = newSlotIds
+    }
   }
 }, {immediate: true})
 

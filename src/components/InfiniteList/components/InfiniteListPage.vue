@@ -3,7 +3,7 @@
     ref="element"
     class="relative"
   >
-    <template v-if="page && data?.results.length !== 0">
+    <template v-if="page && slotList.length !== 0">
       <div
         class="flex"
         :class="{
@@ -20,7 +20,6 @@
       <div :class="pageClass">
         <component
           :is="transition ? TransitionGroup : WEmptyComponent"
-          v-if="hasData && data?.results"
           v-bind="transition ? {
             'enter-active-class': 'transition-[grid-template-rows] overflow-hidden grid',
             'enter-from-class': 'grid-rows-[0fr]',
@@ -32,57 +31,35 @@
           } : undefined"
         >
           <template
-            v-for="(item, index) in data.results"
-            :key="valueGetter(item)"
+            v-for="(slot, slotIndex) in slotList"
+            :key="slot.key"
           >
             <component
               :is="transition ? 'div' : WEmptyComponent"
               v-bind="transition ? {class: 'w-full'} : undefined"
             >
-              <component 
+              <component
                 :is="transition ? 'div' : WEmptyComponent"
                 v-bind="transition ? {class: '[overflow:inherit]'} : undefined"
               >
                 <slot
-                  :item="item"
-                  :setter="(newItem?: Data) => setItem(index, newItem)"
+                  :item="slot.id !== null && data?.results ? data.results[slotIndex]! : ({id: slot.key * -1} as unknown as Data)"
+                  :setter="(newItem?: Data) => setItem(slotIndex, newItem)"
                   :refetch="emitRefetch"
-                  :skeleton="false"
-                  :next="data?.results[index + 1]"
-                  :previous="data?.results[index - 1]"
-                  :first="firstPage && index === 0"
-                  :last="lastPage && index === data.results.length - 1"
+                  :skeleton="slot.id === null"
+                  :next="slot.id !== null && data?.results ? data.results[slotIndex + 1] : undefined"
+                  :previous="slot.id !== null && data?.results ? data.results[slotIndex - 1] : undefined"
+                  :first="firstPage && slotIndex === 0"
+                  :last="lastPage && slotIndex === slotList.length - 1"
                   :page="page"
-                  :index="index"
-                  :results="data.results"
+                  :index="slotIndex"
+                  :results="data?.results"
                   :intersecting="isIntersecting"
                 />
               </component>
             </component>
           </template>
         </component>
-
-        <template v-else>
-          <template
-            v-for="index in skeletonLength"
-            :key="index"
-          >
-            <slot
-              :item="({id: index} as unknown as Data)"
-              :setter="(newItem?: Data) => setItem(index, newItem)"
-              :refetch="emitRefetch"
-              :skeleton="true"
-              :next="undefined"
-              :previous="undefined"
-              :first="firstPage && index === 1"
-              :last="lastPage && index === skeletonLength"
-              :page="page"
-              :index="index - 1"
-              :results="undefined"
-              :intersecting="isIntersecting"
-            />
-          </template>
-        </template>
       </div>
     </template>
 
@@ -98,7 +75,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {TransitionGroup, computed, inject, nextTick, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
+import {type Ref, TransitionGroup, computed, inject, nextTick, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
@@ -155,7 +132,6 @@ const emit = defineEmits<{
 const elementRef = useTemplateRef('element')
 const resultElement = ref<HTMLDivElement[]>([])
 const isIntersecting = ref(false)
-const hasData = ref(false)
 
 const scrollingElement = inject(wScrollingElement, null)
 
@@ -166,6 +142,72 @@ const {data, error, setData, refetch, isFetching} = props.useQueryFn(
     ...props.queryOptions ?? {},
   },
 )
+
+interface ItemSlot {
+  key: number
+  id: Model | null
+}
+
+let slotKeyCounter = 0
+const slotList = ref<ItemSlot[]>([]) as Ref<ItemSlot[]>
+
+const reconcileSlots = () => {
+  const results = data.value?.results
+
+  if (results === undefined) {
+    const target = props.skeletonLength
+    const current = slotList.value
+
+    if (current.length === target && current.every(s => s.id === null)) return
+
+    const newSlots: ItemSlot[] = []
+    for (let i = 0; i < target; i++) {
+      const existing = current[i]
+      newSlots.push({key: existing?.key ?? ++slotKeyCounter, id: null})
+    }
+    slotList.value = newSlots
+    return
+  }
+
+  if (results.length === 0) {
+    slotList.value = []
+    return
+  }
+
+  const newIds = new Set<Model>()
+  for (const item of results) newIds.add(props.valueGetter(item))
+
+  const keepById = new Map<Model, ItemSlot>()
+  const freed: ItemSlot[] = []
+
+  for (const slot of slotList.value) {
+    if (slot.id !== null && newIds.has(slot.id)) {
+      keepById.set(slot.id, slot)
+    } else {
+      freed.push({key: slot.key, id: null})
+    }
+  }
+
+  const isFullReplacement = keepById.size === 0
+
+  const newSlots: ItemSlot[] = []
+  let freeIdx = 0
+  for (const item of results) {
+    const id = props.valueGetter(item)
+    const kept = keepById.get(id)
+    if (kept) {
+      newSlots.push({key: kept.key, id})
+    } else if (isFullReplacement && freeIdx < freed.length) {
+      newSlots.push({key: freed[freeIdx++]!.key, id})
+    } else {
+      newSlots.push({key: ++slotKeyCounter, id})
+    }
+  }
+
+  slotList.value = newSlots
+}
+
+watch([data, () => props.skeletonLength], reconcileSlots, {immediate: true})
 const nextPage = computed(() => data.value?.next)
 const previousPage = computed(() => data.value?.previous)
 
@@ -217,24 +259,11 @@ const scrollTo = (index?: number) => {
   elementRef.value?.scrollIntoView({block: 'center', behavior: 'smooth'})
 }
 
-let timeout: NodeJS.Timeout | null = null
-
 watch(data, value => {
   if (props.firstPage && value?.previous !== undefined) emit('update:previous-page', value.previous)
   if (props.lastPage && value?.next !== undefined) emit('update:next-page', value.next)
   if (value?.pages_count !== undefined) emit('update:pages-count', value.pages_count)
   if (value?.count !== undefined) emit('update:count', value.count)
-
-  if (timeout) clearTimeout(timeout)
-
-  if (value === undefined) {
-    hasData.value = false
-  } else {
-    timeout = setTimeout(() => {
-      hasData.value = true
-      timeout = null
-    }, 100)
-  }
 }, {immediate: true})
 
 const errorStatusList: (number | undefined)[] = [404, 400]
@@ -253,7 +282,6 @@ watch(isFetching, value => {
   emit('fetched')
 }, {immediate: true})
 
-let height = 0
 let intersectionObserver: IntersectionObserver | undefined
 
 const observerCb = (entries: IntersectionObserverEntry[]) => {
@@ -278,17 +306,9 @@ onMounted(() => {
     intersectionObserver.observe(elementRef.value)
   }
 
-  height = elementRef.value?.getBoundingClientRect()?.height ?? 0
-
-  if (height === 0) return
-  if (!props.firstPage) return
-  if (props.lastPage) {
-    if (page.value !== 1) nextTick().then(() => emit('update-from-header:scroll'))
-
-    return
+  if (props.firstPage && props.lastPage && page.value !== 1) {
+    nextTick().then(() => emit('update-from-header:scroll'))
   }
-
-  emit('update:scroll', height)
 })
 
 onBeforeUnmount(() => {
@@ -298,21 +318,8 @@ onBeforeUnmount(() => {
   if (page.value !== null) emit('remove:page', page.value)
 })
 
-watch(data, async (_, oldValue) => {
-  if (oldValue) return
-
-  await nextTick()
-
-  const newHeight = (elementRef.value?.getBoundingClientRect().height ?? 0) - height
-
-  if (newHeight === 0) return
-  if (!props.firstPage) return
-  if (props.lastPage) return
-
-  emit('update:scroll', newHeight)
-})
-
 defineExpose({
+  element: elementRef,
   getFirst,
   getLast,
   refetch: refetchPage,

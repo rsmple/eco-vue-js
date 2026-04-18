@@ -22,8 +22,14 @@
       :enable-overflow="enableOverflow"
       @click="$emit('click', $event)"
     >
-      <template v-if="$slots.title" #title="scope">
-        <slot name="title" v-bind="scope" />
+      <template
+        v-if="$slots.title"
+        #title="scope"
+      >
+        <slot
+          name="title"
+          v-bind="scope"
+        />
       </template>
     </WButtonTab>
 
