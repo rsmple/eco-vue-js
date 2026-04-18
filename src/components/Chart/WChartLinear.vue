@@ -60,7 +60,6 @@ import {type VNode, computed, onBeforeUnmount, onMounted, ref, useTemplateRef, w
 
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
-import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
 import {dateFormatShort, isSameDate} from '@/utils/dateTime'
 import {useComponentStatesSkeleton} from '@/utils/useComponentStates'
 
@@ -151,14 +150,20 @@ watch(() => props.height, newHeight => {
   if (newHeight) svgHeight.value = newHeight
 })
 
-const listenerContainer = new DOMListenerContainer([window], ['resize'], requestUpdateWidth)
+let observer: ResizeObserver | null = null
 
 onMounted(() => {
-  updateSize()
+  if (!containerRef.value) return
+
+  observer = new ResizeObserver(requestUpdateWidth)
+  observer.observe(containerRef.value)
 })
 
 onBeforeUnmount(() => {
-  listenerContainer.destroy()
+  observer?.disconnect()
+  observer = null
+
+  if (animationFrameId.value) cancelAnimationFrame(animationFrameId.value)
 })
 
 defineExpose({

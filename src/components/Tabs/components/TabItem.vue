@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, toRef, useTemplateRef, watch} from 'vue'
+import {onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import {useUniformState} from '@/components/Uniform/utils/injection'
 
@@ -42,21 +42,43 @@ const {hasChanges, hasValue, hasError} = props.enableStatus ? useUniformState() 
 const {callListeners} = useTabItemActiveListener()
 
 const elementRef = useTemplateRef('element')
+const measuredHeight = ref(0)
 
 const emitHeight = (): void => {
-  if (props.flat || !elementRef.value) return
+  if (props.flat) return
 
-  emit('update:height', elementRef.value.offsetHeight)
+  emit('update:height', measuredHeight.value)
 }
 
-watch(() => props.active, async value => {
-  if (value) emit('update:active')
+let observer: ResizeObserver | null = null
 
-  if (value) await nextTick()
+onMounted(() => {
+  if (props.flat || !elementRef.value) return
 
-  emitHeight()
+  observer = new ResizeObserver(entries => {
+    const entry = entries[0]
+    if (!entry) return
 
-  if (value) callListeners()
+    const height = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height
+    if (height === 0) return
+
+    measuredHeight.value = height
+    if (props.active) emitHeight()
+  })
+
+  observer.observe(elementRef.value)
+})
+
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  observer = null
+})
+
+watch(() => props.active, value => {
+  if (!value) return
+
+  emit('update:active')
+  callListeners()
 }, {immediate: true})
 
 defineExpose({

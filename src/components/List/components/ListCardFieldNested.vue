@@ -17,7 +17,7 @@
           v-bind="field.default ? {item, skeleton, card, readonly, config, uniformScope, queryParams, results, intersecting} : (undefined as never)"
           :class="field.meta.cssClassArray"
         >
-          <ListCardFieldNestedItem :items="skeleton ? [item] : (('keyArray' in field.meta ? item[field.meta.keyArray as keyof typeof item] : field.meta.getterArray(item)) as Data[])">
+          <ListCardFieldNestedItem :items="((skeleton ? [item] : 'keyArray' in field.meta ? item[field.meta.keyArray as keyof typeof item] : field.meta.getterArray(item)) as {id: number | string}[])">
             <template #default="{inner, index, last, first}">
               <component
                 :is="field.meta.componentItem ?? WEmptyComponent"
@@ -30,7 +30,7 @@
                   <ListCardFieldNested
                     :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
                     :field-config-map="fieldConfigMap"
-                    :item="inner"
+                    :item="(inner as unknown as Data)"
                     :skeleton="skeleton"
                     :card="card"
                     :readonly="readonly"

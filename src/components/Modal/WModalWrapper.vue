@@ -12,9 +12,9 @@
       'sm-not:max-w-full sm-not:h-full sm-not:rounded-none sm-not:max-h-full': maximized,
     }"
     :style="{
-      '--w-modal-header-height': (headerRef?.offsetHeight ?? 0) + 'px',
-      '--w-modal-footer-height': (footerRef?.offsetHeight ?? 0) + 'px',
-      '--w-modal-content-height': (contentRef?.$el.offsetHeight ?? 0) + 'px'
+      '--w-modal-header-height': headerHeight + 'px',
+      '--w-modal-footer-height': footerHeight + 'px',
+      '--w-modal-content-height': contentHeight + 'px'
     }"
   >
     <div
@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, provide, ref, useTemplateRef} from 'vue'
+import {onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch} from 'vue'
 
 import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
 
@@ -70,14 +70,46 @@ defineProps<{
 
 const headerRef = useTemplateRef('header')
 const footerRef = useTemplateRef('footer')
-const contentRef = useTemplateRef('content')
+const contentRef = useTemplateRef<{$el: HTMLElement}>('content')
 
-const headerHeightProvided = ref(0)
-provide(wModalHeaderHeight, headerHeightProvided)
+const headerHeight = ref(0)
+const footerHeight = ref(0)
+const contentHeight = ref(0)
+
+provide(wModalHeaderHeight, headerHeight)
+
+let observer: ResizeObserver | null = null
+const observed = new Map<Element, (height: number) => void>()
+
+const observe = (el: Element | null | undefined, setter: (height: number) => void) => {
+  if (!el || !observer) return
+  observed.set(el, setter)
+  observer.observe(el)
+}
 
 onMounted(() => {
-  if (!headerRef.value) return
+  observer = new ResizeObserver(entries => {
+    for (const entry of entries) {
+      const setter = observed.get(entry.target)
+      if (!setter) continue
+      const height = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height
+      setter(height)
+    }
+  })
 
-  headerHeightProvided.value = headerRef.value.offsetHeight
+  observe(headerRef.value, value => { headerHeight.value = value })
+  observe(footerRef.value, value => { footerHeight.value = value })
+  observe(contentRef.value?.$el, value => { contentHeight.value = value })
+})
+
+watch(contentRef, value => {
+  if (!observer || !value?.$el || observed.has(value.$el)) return
+  observe(value.$el, height => { contentHeight.value = height })
+})
+
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  observer = null
+  observed.clear()
 })
 </script>

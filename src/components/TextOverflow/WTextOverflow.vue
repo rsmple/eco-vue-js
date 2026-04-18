@@ -44,8 +44,6 @@ const findParent = (element: Element): Element | null => element.classList.conta
 let parent: Element | null = null
 
 onMounted(() => {
-  updateOverflow()
-
   if (!elementRef.value?.parentElement?.parentElement) return
 
   parent = findParent(elementRef.value.parentElement.parentElement)

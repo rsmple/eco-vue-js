@@ -81,6 +81,7 @@ const elementRef = useTemplateRef('element')
 const isTransparent = ref(false)
 
 let timeout: NodeJS.Timeout | undefined
+let observer: ResizeObserver | null = null
 
 onMounted(() => {
   timeout = setTimeout(() => {
@@ -88,13 +89,26 @@ onMounted(() => {
     timeout = undefined
   }, 1500)
 
-  updateHeaderHeight(elementRef.value?.offsetHeight ?? 0)
+  if (!elementRef.value) return
+
+  observer = new ResizeObserver(entries => {
+    const entry = entries[0]
+    if (!entry) return
+
+    const height = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height
+    updateHeaderHeight(height)
+  })
+
+  observer.observe(elementRef.value)
 })
 
 onBeforeUnmount(() => {
-  if (!timeout) return
+  if (timeout) {
+    clearTimeout(timeout)
+    timeout = undefined
+  }
 
-  clearTimeout(timeout)
-  timeout = undefined
+  observer?.disconnect()
+  observer = null
 })
 </script>

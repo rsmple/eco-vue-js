@@ -73,15 +73,34 @@ const endDrag = () => {
   emit('save:width')
 }
 
-watch(() => props.hasWidth, value => {
-  if (!value) setTimeout(() => {
-    if (!elementRef.value) return
+let measureObserver: ResizeObserver | null = null
 
-    emit('update:width', elementRef.value.offsetWidth)
-  }, 0)
-}, {immediate: true})
+const stopMeasuring = () => {
+  measureObserver?.disconnect()
+  measureObserver = null
+}
+
+watch(() => props.hasWidth, value => {
+  if (value) {
+    stopMeasuring()
+    return
+  }
+  if (!elementRef.value || measureObserver) return
+
+  measureObserver = new ResizeObserver(entries => {
+    const entry = entries[0]
+    if (!entry) return
+
+    const width = entry.borderBoxSize?.[0]?.inlineSize ?? entry.contentRect.width
+    emit('update:width', width)
+    stopMeasuring()
+  })
+
+  measureObserver.observe(elementRef.value)
+}, {immediate: true, flush: 'post'})
 
 onBeforeUnmount(() => {
   listenerContainer.destroy()
+  stopMeasuring()
 })
 </script>

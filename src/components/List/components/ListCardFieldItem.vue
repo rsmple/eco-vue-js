@@ -10,8 +10,8 @@
     :query-params="queryParams"
     :results="results"
     :intersecting="intersecting"
-    :class="[field.meta.cssClass, cellClass]"
-    :style="cellStyle"
+    :class="[field.meta.cssClass, getCellClass()]"
+    :style="getCellStyle()"
     @update:item="(value: Data) => emit('update:item', value)"
     @delete:item="emit('delete:item')"
   />
@@ -21,8 +21,6 @@
 import type {FieldComponent, FieldConfig, ListField, ListFieldExport} from '../types'
 import type {UniformScope} from '@/components/Uniform/types'
 import type {StyleValue} from 'vue'
-
-import {computed} from 'vue'
 
 import {getFieldVariable} from '../use/useListConfig'
 
@@ -47,7 +45,7 @@ const emit = defineEmits<{
   (e: 'delete:item'): void
 }>()
 
-const cellClass = computed<Record<string, boolean | undefined>>(() => {
+const getCellClass = (): Record<string, boolean | undefined> => {
   const sticky = !props.card && props.config?.sticky
   return {
     'items-center': !props.alignTop,
@@ -55,9 +53,9 @@ const cellClass = computed<Record<string, boolean | undefined>>(() => {
     'bg-default dark:bg-default-dark sticky z-[1]': sticky,
     ...(sticky ? props.beforeClass : {}),
   }
-})
+}
 
-const cellStyle = computed<StyleValue | undefined>(() => {
+const getCellStyle = (): StyleValue | undefined => {
   if (props.card) return !props.nested ? {gridArea: props.field.meta.label} : undefined
 
   const label = props.field.meta.label
@@ -69,5 +67,5 @@ const cellStyle = computed<StyleValue | undefined>(() => {
     left: sticky ? `var(${ getFieldVariable('left', label) })` : undefined,
     right: sticky ? `var(${ getFieldVariable('right', label) })` : undefined,
   }
-})
+}
 </script>

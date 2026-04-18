@@ -651,7 +651,7 @@ const paste = async () => {
 }
 
 const scrollToInput = () => {
-  if (!contentRef.value || !inputRef.value) return
+  if (!contentRef.value || !inputRef.value || !asyncState.focused.value) return
 
   contentRef.value.scrollTo({left: contentRef.value.scrollWidth - 40})
 }
