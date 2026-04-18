@@ -135,8 +135,14 @@ let slotIdCounter = 1
 const slotIds = ref<number[]>([slotIdCounter])
 const pagesCount = ref(1)
 const count = ref(0)
-const nextPage = computed(() => pages.value[pages.value.length - 1]! < pagesCount.value ? pages.value[pages.value.length - 1]! + 1 : null)
-const previousPage = computed(() => pages.value[0] !== 1 ? pages.value[0]! - 1 : null)
+const nextPage = computed(() => {
+  const max = Math.max(...pages.value)
+  return max < pagesCount.value ? max + 1 : null
+})
+const previousPage = computed(() => {
+  const min = Math.min(...pages.value)
+  return min > 1 ? min - 1 : null
+})
 const isResettingPage = ref(false)
 
 const getSkeletonLength = (pagesBefore: number): number => {
@@ -374,23 +380,24 @@ const goto = async (page = 1, itemIndex?: number) => {
   resetPage(page)
 }
 
-const resetPage = async (page = 1) => {
-  isResettingPage.value = true
-
-  emit('update:page', page === 1 ? undefined : page)
-  pages.value = []
-  slotIds.value = []
-
+const scrollTop = () => {
   const element = scrollingElement?.value ?? document.scrollingElement
 
   const value = (infiniteScrollRef.value?.$el.offsetTop ?? 0) - props.headerHeight - 60
 
   if (element && element.scrollTop > value) element.scrollTop = value
+}
 
-  await nextTick()
+const resetPage = async (page = 1) => {
+  emit('update:page', undefined)
+  scrollTop()
 
+  const index = pages.value.indexOf(page)
+  const recycledSlotId = index !== -1 ? slotIds.value[index] : undefined
+
+  pagesCount.value = 1
   pages.value = [page]
-  slotIds.value = [++slotIdCounter]
+  slotIds.value = [recycledSlotId ?? ++slotIdCounter]
 }
 
 const jumpToPage = (page: number) => {
