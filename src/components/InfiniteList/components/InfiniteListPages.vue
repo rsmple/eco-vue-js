@@ -28,6 +28,7 @@
       :page-class="pageClass"
       :refetch-interval="refetchInterval"
       :query-options="queryOptions"
+      :enabled="!disabledSlots.has(slotIds[index]!)"
 
       :value-getter="valueGetter"
 
@@ -144,6 +145,9 @@ const previousPage = computed(() => {
   return min > 1 ? min - 1 : null
 })
 const isResettingPage = ref(false)
+
+const disabledSlots = reactive(new Set<number>())
+let activationGen = 0
 
 const getSkeletonLength = (pagesBefore: number): number => {
   if (props.skeletonLength === undefined) return props.pageLength
@@ -400,12 +404,21 @@ const resetPage = async (page = 1) => {
   slotIds.value = [recycledSlotId ?? ++slotIdCounter]
 }
 
+const activateInOrder = async (ids: number[], order: number[], gen: number) => {
+  for (const idx of order) {
+    await nextTick()
+    if (gen !== activationGen) return
+    const id = ids[idx]
+    if (id !== undefined) disabledSlots.delete(id)
+  }
+}
+
 const jumpToPage = (page: number) => {
   const totalPages = Math.max(1, pagesCount.value)
   const rangeSize = Math.min(props.maxPages, totalPages)
 
-  let start = Math.max(1, page - Math.floor(rangeSize / 2)) + 1
-  let end = start + rangeSize
+  let start = Math.max(1, page - Math.floor(rangeSize / 2))
+  let end = start + rangeSize - 1
   if (end > totalPages) {
     end = totalPages
     start = Math.max(1, end - rangeSize + 1)
@@ -420,10 +433,32 @@ const jumpToPage = (page: number) => {
     newSlotIds.push(existingIds.shift() ?? ++slotIdCounter)
   }
 
+  const foundIdx = newPages.indexOf(page)
+  const targetIdx = foundIdx === -1 ? 0 : foundIdx
+  const priority: number[] = []
+  const seen = new Set<number>()
+  const pushIdx = (idx: number) => {
+    if (idx < 0 || idx >= newPages.length || seen.has(idx)) return
+    priority.push(idx)
+    seen.add(idx)
+  }
+  pushIdx(targetIdx)
+  for (let offset = 1; offset < newPages.length; offset++) {
+    pushIdx(targetIdx - offset)
+    pushIdx(targetIdx + offset)
+  }
+
+  disabledSlots.clear()
+  for (let i = 0; i < newSlotIds.length; i++) {
+    if (i !== targetIdx) disabledSlots.add(newSlotIds[i]!)
+  }
+
   pages.value = newPages
   slotIds.value = newSlotIds
 
   emit('update:page', page === 1 ? undefined : page)
+
+  activateInOrder(newSlotIds, priority.slice(1), ++activationGen)
 }
 
 const anyPageInViewport = (): boolean => {
@@ -460,7 +495,7 @@ const checkScrollJump = debounce(() => {
 
   const y = Math.max(0, scrollTop - containerTop)
 
-  const target = Math.max(1, Math.min(Math.floor(y / avgPageHeight.value) + 1, pagesCount.value))
+  const target = Math.max(1, Math.min(Math.ceil(y / avgPageHeight.value) + 1, pagesCount.value))
   if (pages.value.includes(target)) return
 
   jumpToPage(target)

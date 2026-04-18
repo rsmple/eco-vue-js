@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {type Ref, TransitionGroup, computed, inject, nextTick, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
+import {type Ref, TransitionGroup, computed, inject, nextTick, onBeforeUnmount, onMounted, ref, toRef, toValue, useTemplateRef, watch} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
@@ -101,6 +101,7 @@ const props = withDefaults(
     pageClass?: string
     refetchInterval?: number | false
     queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
+    enabled?: boolean
 
     valueGetter: (data: Data) => Model
   }>(),
@@ -112,6 +113,7 @@ const props = withDefaults(
     pageClass: undefined,
     refetchInterval: undefined,
     queryOptions: undefined,
+    enabled: true,
   },
 )
 
@@ -140,6 +142,7 @@ const {data, error, setData, refetch, isFetching} = props.useQueryFn(
   {
     refetchInterval: props.refetchInterval ? (() => isIntersecting.value ? props.refetchInterval : undefined) : undefined,
     ...props.queryOptions ?? {},
+    enabled: computed<boolean>(() => props.enabled && (props.queryOptions && 'enabled' in props.queryOptions ? toValue(props.queryOptions.enabled) as boolean : true)),
   },
 )
 
