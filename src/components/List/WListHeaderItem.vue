@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts" setup generic="Field">
-import {type StyleValue, computed, onMounted, ref, useTemplateRef} from 'vue'
+import {type StyleValue, computed, onBeforeUnmount, onMounted, ref, useTemplateRef} from 'vue'
 
 import IconBack from '@/assets/icons/IconBack.svg?component'
 
@@ -105,11 +105,28 @@ const setOrdering = (): void => {
 
 const widthStyleInner = ref<StyleValue>()
 
+let observer: ResizeObserver | null = null
+
 onMounted(() => {
-  if (!props.allowResize && containerRef.value instanceof HTMLDivElement) {
-    widthStyleInner.value = {
-      minWidth: containerRef.value.getBoundingClientRect().width + 'px',
-    }
-  }
+  if (props.allowResize || !(containerRef.value instanceof HTMLDivElement)) return
+
+  const target = containerRef.value
+
+  observer = new ResizeObserver(entries => {
+    const entry = entries[0]
+    if (!entry) return
+
+    const width = entry.borderBoxSize?.[0]?.inlineSize ?? entry.contentRect.width
+    widthStyleInner.value = {minWidth: width + 'px'}
+    observer?.disconnect()
+    observer = null
+  })
+
+  observer.observe(target)
+})
+
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  observer = null
 })
 </script>
