@@ -204,7 +204,7 @@
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
 
-import {computed, markRaw, ref, useTemplateRef} from 'vue'
+import {computed, markRaw, ref, useTemplateRef, watch} from 'vue'
 
 import WButtonMore from '@/components/Button/WButtonMore.vue'
 import WButtonMoreItem from '@/components/Button/WButtonMoreItem.vue'
@@ -276,5 +276,17 @@ const toggleMenu = (event: MouseEvent) => {
   moreRef.value.open()
 
   event.preventDefault()
+}
+
+const slots = defineSlots<{
+  expansion?: () => void
+  more?: () => void
+  default?: (props: {toggle: () => void, isOpen: boolean, beforeClass: Record<string, boolean | undefined>}) => void
+}>()
+
+if (slots.expansion) {
+  watch(() => props.skeleton, () => {
+    isOpen.value = false
+  })
 }
 </script>
