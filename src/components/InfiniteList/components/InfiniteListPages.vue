@@ -487,7 +487,7 @@ watch(toRef(props, 'queryParams'), newValue => {
 }, {deep: true})
 
 watch(pagesCount, value => {
-  if (pages.value[pages.value.length - 1]! > value) {
+  if (Math.max(...pages.value) > value) {
     const newPages: number[] = []
     const newSlotIds: number[] = []
 
