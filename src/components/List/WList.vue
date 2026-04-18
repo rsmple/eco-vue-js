@@ -22,8 +22,8 @@
       :count="count ?? listCount"
       :page-class="
         isGrid
-          ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-[--w-list-gap,0]'
-          : 'grid grid-cols-1 gap-[--w-list-gap,0]'
+          ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-[--w-list-gap,0] isolate'
+          : 'grid grid-cols-1 gap-[--w-list-gap,0] isolate'
       "
       :style="cardStyles"
       :class="$attrs.class"

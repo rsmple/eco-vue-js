@@ -404,8 +404,8 @@ const jumpToPage = (page: number) => {
   const totalPages = Math.max(1, pagesCount.value)
   const rangeSize = Math.min(props.maxPages, totalPages)
 
-  let start = Math.max(1, page - Math.floor(rangeSize / 2))
-  let end = start + rangeSize - 1
+  let start = Math.max(1, page - Math.floor(rangeSize / 2)) + 1
+  let end = start + rangeSize
   if (end > totalPages) {
     end = totalPages
     start = Math.max(1, end - rangeSize + 1)

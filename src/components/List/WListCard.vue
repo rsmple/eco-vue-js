@@ -2,7 +2,7 @@
   <div
     v-bind="allowSelect ? {'onMouseover': () => $emit('hover:selected')} : undefined"
     ref="container"
-    class="relative isolate [contain:content] [content-visibility:auto]"
+    class="relative [contain:content] [content-visibility:auto]"
     :class="{
       [cardWrapperClass ?? '']: true,
       'w-ripple-trigger-list': isActionShown,
