@@ -18,38 +18,46 @@
           v-bind="field.default ? {item, skeleton, card, readonly, config, uniformScope, queryParams, results, intersecting} : (undefined as never)"
           :class="field.meta.cssClassArray"
         >
-          <ListCardFieldNestedItem :items="((skeleton ? [item] : 'keyArray' in field.meta ? item[field.meta.keyArray as keyof typeof item] : field.meta.getterArray(item)) as {id: number | string}[])">
-            <template #default="{inner, index, last, first}">
-              <component
-                :is="field.meta.componentItem ?? WEmptyComponent"
-                v-bind="field.meta.componentItem ? {item, skeleton, card, index, last, first} : (undefined as never)"
-              >
-                <div
-                  class="flex"
-                  :class="field.meta.cssClass"
-                >
-                  <ListCardFieldNested
-                    :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
-                    :field-config-map="fieldConfigMap"
-                    :column-data-map="columnDataMap"
-                    :item="(inner as unknown as Data)"
-                    :skeleton="skeleton"
-                    :card="card"
-                    :readonly="readonly"
-                    :uniform-scope="uniformScope"
-                    :query-params="queryParams"
-                    :results="results"
-                    :intersecting="intersecting"
-                    nested
+          <ListCardFieldNestedArrayItems
+            :item="item"
+            :skeleton="skeleton"
+            :meta="(field.meta as {keyArray: keyof Data} | {getterArray: (data: Data) => {id: number | string}[]})"
+          >
+            <template #default="{items}">
+              <ListCardFieldNestedItem :items="items">
+                <template #default="{inner, index, last, first}">
+                  <component
+                    :is="field.meta.componentItem ?? WEmptyComponent"
+                    v-bind="field.meta.componentItem ? {item, skeleton, card, index, last, first} : (undefined as never)"
                   >
-                    <template #default="defaultScope">
-                      <slot v-bind="defaultScope" />
-                    </template>
-                  </ListCardFieldNested>
-                </div>
-              </component>
+                    <div
+                      class="flex"
+                      :class="field.meta.cssClass"
+                    >
+                      <ListCardFieldNested
+                        :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
+                        :field-config-map="fieldConfigMap"
+                        :column-data-map="columnDataMap"
+                        :item="(inner as unknown as Data)"
+                        :skeleton="skeleton"
+                        :card="card"
+                        :readonly="readonly"
+                        :uniform-scope="uniformScope"
+                        :query-params="queryParams"
+                        :results="results"
+                        :intersecting="intersecting"
+                        nested
+                      >
+                        <template #default="defaultScope">
+                          <slot v-bind="defaultScope" />
+                        </template>
+                      </ListCardFieldNested>
+                    </div>
+                  </component>
+                </template>
+              </ListCardFieldNestedItem>
             </template>
-          </ListCardFieldNestedItem>
+          </ListCardFieldNestedArrayItems>
         </component>
       </template>
 
@@ -91,6 +99,7 @@ import {computed} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
+import ListCardFieldNestedArrayItems from './ListCardFieldNestedArrayItems.vue'
 import ListCardFieldNestedItem from './ListCardFieldNestedItem.vue'
 
 import {isField} from '../models/utils'
