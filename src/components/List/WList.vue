@@ -244,27 +244,6 @@
             ...uniformScope ?? {},
             field: formFieldGetter(item),
           } : undefined"
-          v-memo="[
-            skeleton,
-            getIsSelected(value as number, position),
-            isReadonly ?? isDisabled,
-            readonlyGetter?.(item),
-            fieldsFiltered,
-            fieldConfigMap,
-            isGrid,
-            alignTop,
-            hasBorder,
-            disableMore,
-            menu,
-            bulk,
-            hasAction,
-            formFieldGetter,
-            intersecting,
-            position,
-            cardClass,
-            cardWrapperClass,
-            alwaysSelect,
-          ]"
         >
           <template #default="innerScope">
             <WListCard
@@ -298,16 +277,32 @@
                   :item="item"
                   :skeleton="skeleton"
                   :card="isGrid"
-                  :readonly="(isReadonly ?? isDisabled) ?? false"
-                  :readonly-getter="readonlyGetter"
+                  :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
                   :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
                   :query-params="queryParams"
                   :results="results"
                   :intersecting="intersecting"
-                  :before-class="beforeClass"
-                  @update:item="(value: unknown) => setter(value as Data)"
-                  @delete:item="setter(); refetch()"
-                />
+                >
+                  <template #default="defaultScope">
+                    <ListCardFieldItem
+                      :field="defaultScope.field"
+                      :item="defaultScope.item"
+                      :nested="defaultScope.nested"
+                      :column="defaultScope.column"
+                      :config="fieldConfigMap[defaultScope.field.meta.label]!"
+                      :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(defaultScope.item) ?? false)"
+                      :skeleton="skeleton"
+                      :card="isGrid"
+                      :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
+                      :query-params="queryParams"
+                      :results="results"
+                      :intersecting="intersecting"
+                      :before-class="beforeClass"
+                      @update:item="setter"
+                      @delete:item="setter(); refetch()"
+                    />
+                  </template>
+                </ListCardFieldNested>
               </template>
 
               <template
@@ -399,7 +394,8 @@ import HeaderExport from './components/HeaderExport.vue'
 import HeaderFieldNested from './components/HeaderFieldNested.vue'
 import HeaderSettings from './components/HeaderSettings.vue'
 import HeaderSort from './components/HeaderSort.vue'
-import ListCardFieldNested from './components/ListCardFieldNested'
+import ListCardFieldItem from './components/ListCardFieldItem.vue'
+import ListCardFieldNested from './components/ListCardFieldNested.vue'
 import {filterFields, forEachField, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, getFieldWidthSumStyles, sortFields, useListConfig} from './use/useListConfig'
 
 defineOptions({inheritAttrs: false})

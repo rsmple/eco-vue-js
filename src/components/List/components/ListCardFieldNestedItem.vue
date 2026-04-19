@@ -32,6 +32,8 @@ const slotList = ref<ItemSlot[]>([]) as Ref<ItemSlot[]>
 const reconcileSlots = () => {
   const items = props.items
 
+  console.log('reconcileSlots')
+
   if (items.length === 0) {
     slotList.value = []
     return
