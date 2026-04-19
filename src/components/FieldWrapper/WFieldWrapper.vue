@@ -33,19 +33,12 @@
           />&nbsp;</template>{{ title }}
         </slot>
 
-        <Transition
-          enter-active-class="transition-opacity"
-          leave-active-class="transition-opacity"
-          enter-from-class="opacity-0"
-          leave-to-class="opacity-0"
+        <span
+          v-if="required"
+          class="text-negative dark:text-negative-dark"
         >
-          <span
-            v-if="required"
-            class="text-negative dark:text-negative-dark"
-          >
-            *
-          </span>
-        </Transition>
+          *
+        </span>
 
         <FilterButton
           v-if="filterField && encodedQueryParam"
@@ -101,52 +94,38 @@
           </div>
         </slot>
 
-        <Transition
-          enter-active-class="transition-opacity"
-          leave-active-class="transition-opacity"
-          enter-from-class="opacity-0"
-          leave-to-class="opacity-0"
+        <span
+          v-if="hasChanges"
+          class="square-2 absolute right-0 top-0 rounded-full bg-[var(--has-changes-bg)] transition-colors"
+        />
+
+        <div
+          v-if="message"
+          v-show="isMessageShown"
+          class="text-description bg-default dark:bg-default-dark absolute right-0 my-0.5 whitespace-nowrap text-xs font-normal"
+          :class="topText ? 'bottom-full' : 'top-full'"
         >
-          <span
-            v-if="hasChanges"
-            class="square-2 absolute right-0 top-0 rounded-full bg-[var(--has-changes-bg)] transition-colors"
-          />
-        </Transition>
+          {{ message }}
+        </div>
 
-        <Transition
-          enter-active-class="transition-opacity"
-          leave-active-class="transition-opacity"
-          enter-from-class="opacity-0"
-          leave-to-class="opacity-0"
+        <div
+          v-else-if="errorMessage"
+          class="text-negative dark:text-negative-dark bg-default dark:bg-default-dark absolute mt-0.5 text-xs font-normal"
+          :class="[
+            !leftError || topText ? 'right-0 text-end' : 'left-0 text-start',
+            topText ? 'bottom-full' : 'top-full',
+          ]"
         >
-          <div
-            v-if="message"
-            v-show="isMessageShown"
-            class="text-description bg-default dark:bg-default-dark absolute right-0 my-0.5 whitespace-nowrap text-xs font-normal"
-            :class="topText ? 'bottom-full' : 'top-full'"
-          >
-            {{ message }}
-          </div>
+          {{ errorMessage }}
+        </div>
 
-          <div
-            v-else-if="errorMessage"
-            class="text-negative dark:text-negative-dark bg-default dark:bg-default-dark absolute mt-0.5 text-xs font-normal"
-            :class="[
-              !leftError || topText ? 'right-0 text-end' : 'left-0 text-start',
-              topText ? 'bottom-full' : 'top-full',
-            ]"
-          >
-            {{ errorMessage }}
-          </div>
-
-          <div
-            v-else-if="maxLength !== undefined && focused"
-            class="text-description bg-default dark:bg-default-dark absolute right-0 mt-0.5 whitespace-nowrap text-xs font-normal"
-            :class="topText ? 'bottom-full' : 'top-full'"
-          >
-            {{ numberFormatter.format(`${typeof modelValue === 'number' ? modelValue : (modelValue || '')}`.length) }} / {{ numberFormatter.format(maxLength) }}
-          </div>
-        </Transition>
+        <div
+          v-else-if="maxLength !== undefined && focused"
+          class="text-description bg-default dark:bg-default-dark absolute right-0 mt-0.5 whitespace-nowrap text-xs font-normal"
+          :class="topText ? 'bottom-full' : 'top-full'"
+        >
+          {{ numberFormatter.format(`${typeof modelValue === 'number' ? modelValue : (modelValue || '')}`.length) }} / {{ numberFormatter.format(maxLength) }}
+        </div>
       </div>
 
       <WSkeleton
@@ -232,18 +211,18 @@ const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 const id = useId()
 
-const fieldRef = useTemplateRef('field')
+const fieldRef = useTemplateRef<HTMLDivElement>('field')
+
+const getFieldEl = (): HTMLDivElement | null => fieldRef.value
 
 const focused = ref(false)
 
 const message = ref<string | null>(null)
 const isMessageShown = ref(true)
 
-const encodedQueryParam = computed(() => {
-  if (props.filterField === undefined) return undefined
-
-  return encodeQueryParam(props.filterValue === undefined ? props.modelValue : props.filterValue)
-})
+const encodedQueryParam = props.filterField !== undefined
+  ? computed(() => encodeQueryParam(props.filterValue === undefined ? props.modelValue : props.filterValue))
+  : undefined
 
 const setFocused = (value: boolean): void => {
   focused.value = value
@@ -302,7 +281,7 @@ onBeforeUnmount(() => {
 })
 
 defineExpose({
-  fieldRef,
+  getFieldEl,
   showMessage,
 })
 

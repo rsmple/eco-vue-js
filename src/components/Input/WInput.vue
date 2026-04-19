@@ -765,7 +765,7 @@ defineExpose({
   wrapSelection,
   setCaret,
   getCaret,
-  fieldRef: computed(() => fieldWrapperRef.value?.fieldRef),
+  getFieldEl: () => fieldWrapperRef.value?.getFieldEl() ?? null,
   scrollToInput,
   undo,
   redo,

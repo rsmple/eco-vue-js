@@ -9,7 +9,7 @@
       isOpen,
       horizontalAlign,
       updateAlign: true,
-      parentElement: inputRef?.fieldRef,
+      parentElement: parentEl,
       dropdownClass: `bg-default rounded-xl dark:bg-default-dark ${dropdownClass ?? ''}`,
     }"
   >
@@ -142,7 +142,7 @@
 <script lang="ts" setup generic="Type extends InputType = 'text'">
 import type {InputSuggestProps, WrapSelection} from './types'
 
-import {type VNode, computed, ref, useTemplateRef} from 'vue'
+import {type VNode, computed, ref, shallowRef, useTemplateRef} from 'vue'
 
 import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
@@ -193,6 +193,7 @@ const isOpen = ref(false)
 const focused = ref(false)
 const dropdownMenuRef = useTemplateRef('dropdownMenu')
 const inputRef = useTemplateRef('input')
+const parentEl = shallowRef<Element | null>(null)
 const {isMobile} = useIsMobile()
 
 const isDisabledComputed = computed(() => isReadonly.value || isDisabled.value)
@@ -200,6 +201,7 @@ const isDisabledComputed = computed(() => isReadonly.value || isDisabled.value)
 const open = () => {
   if (isDisabledComputed.value) return
 
+  parentEl.value = inputRef.value?.getFieldEl() ?? null
   isOpen.value = true
 
   emit('open')
@@ -207,6 +209,7 @@ const open = () => {
 
 const close = () => {
   isOpen.value = false
+  parentEl.value = null
 
   emit('close')
 }
