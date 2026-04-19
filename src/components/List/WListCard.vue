@@ -117,7 +117,7 @@
         :disabled="disabled || disableMore"
         :style="{gridArea: AREA_MORE}"
         :anchor="anchorRef ?? undefined"
-        @close="position = null"
+        @close="positionMenu = null"
       >
         <WButtonMoreItem
           v-if="alwaysSelect && allowSelect && to"
@@ -162,7 +162,7 @@
           }"
           :disabled="disabled || disableMore"
           :anchor="anchorRef ?? undefined"
-          @close="position = null"
+          @close="positionMenu = null"
         >
           <WButtonMoreItem
             v-if="alwaysSelect && allowSelect && to"
@@ -178,10 +178,10 @@
     </div>
 
     <div
-      v-if="position"
+      v-if="positionMenu"
       ref="anchor"
       class="absolute"
-      :style="position"
+      :style="positionMenu"
     />
   </div>
 
@@ -229,6 +229,7 @@ const props = defineProps<{
   to: LinkProps['to'] | undefined
   hasAction: boolean | undefined
   skeleton: boolean
+  position: number
 
   selected: boolean
   allowSelect: boolean
@@ -246,7 +247,7 @@ const containerRef = useTemplateRef('container')
 const moreRef = useTemplateRef<ComponentInstance<typeof WButtonMore>>('more')
 
 const isOpen = ref(false)
-const position = ref<{left: string, top: string} | null>(null)
+const positionMenu = ref<{left: string, top: string} | null>(null)
 const anchorRef = useTemplateRef<HTMLDivElement>('anchor')
 
 const beforeClass = computed<Record<string, boolean | undefined>>(() => {
@@ -271,22 +272,22 @@ const toggleMenu = (event: MouseEvent) => {
 
   const containerRect = containerRef.value.getBoundingClientRect()
 
-  position.value = {left: event.clientX - containerRect.x + 'px', top: event.clientY - containerRect.y + 'px'}
+  positionMenu.value = {left: event.clientX - containerRect.x + 'px', top: event.clientY - containerRect.y + 'px'}
 
   moreRef.value.open()
 
   event.preventDefault()
 }
 
-const slots = defineSlots<{
+defineSlots<{
   expansion?: () => void
   more?: () => void
   default?: (props: {toggle: () => void, isOpen: boolean, beforeClass: Record<string, boolean | undefined>}) => void
 }>()
 
-if (slots.expansion) {
-  watch(() => props.skeleton, () => {
-    isOpen.value = false
-  })
-}
+watch(() => props.position, () => {
+  isOpen.value = false
+  positionMenu.value = null
+  moreRef.value?.close()
+})
 </script>

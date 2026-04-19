@@ -280,6 +280,7 @@
               :to="skeleton ? undefined : cardTo?.(item)"
               :has-action="hasAction"
               :skeleton="skeleton"
+              :position="position"
 
               :selected="skeleton ? false : getIsSelected(value as number, position)"
               :allow-select="allowSelect"

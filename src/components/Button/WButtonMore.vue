@@ -108,6 +108,7 @@ const open = () => {
 
 defineExpose({
   open,
+  close,
   isOpen,
 })
 </script>
