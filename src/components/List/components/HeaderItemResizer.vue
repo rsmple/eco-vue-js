@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup generic="Field">
-import {onBeforeUnmount, useTemplateRef, watch} from 'vue'
+import {nextTick, onBeforeUnmount, useTemplateRef, watch} from 'vue'
 
 import IconDrag from '@/assets/icons/IconDrag.svg?component'
 
@@ -80,7 +80,9 @@ const stopMeasuring = () => {
   measureObserver = null
 }
 
-watch(() => props.hasWidth, value => {
+watch(() => props.hasWidth, async value => {
+  await nextTick()
+
   if (value) {
     stopMeasuring()
     return
