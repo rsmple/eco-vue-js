@@ -21,14 +21,14 @@
           <ListCardFieldNestedArrayItems
             :item="item"
             :skeleton="skeleton"
-            :meta="(field.meta as {keyArray: keyof Data} | {getterArray: (data: Data) => {id: number | string}[]})"
+            :meta="field.meta"
           >
             <template #default="{items}">
               <ListCardFieldNestedItem :items="items">
                 <template #default="{inner, index, last, first}">
                   <component
                     :is="field.meta.componentItem ?? WEmptyComponent"
-                    v-bind="field.meta.componentItem ? {item, skeleton, card, index, last, first} : (undefined as never)"
+                    v-bind="field.meta.componentItem ? {item, skeleton, card, index, last, first} : undefined"
                   >
                     <div
                       class="flex"
@@ -38,7 +38,7 @@
                         :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
                         :field-config-map="fieldConfigMap"
                         :column-data-map="columnDataMap"
-                        :item="(inner as unknown as Data)"
+                        :item="inner"
                         :skeleton="skeleton"
                         :card="card"
                         :readonly="readonly"
@@ -72,7 +72,7 @@
           :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
           :field-config-map="fieldConfigMap"
           :column-data-map="columnDataMap"
-          :item="'keyEntity' in field.meta ? (item[field.meta.keyEntity as keyof typeof item] as Data) : 'getterEntity' in field.meta ? (field.meta.getterEntity(item) as Data) : item"
+          :item="'keyEntity' in field.meta ? item[field.meta.keyEntity] : 'getterEntity' in field.meta ? field.meta.getterEntity(item) : item"
           :skeleton="skeleton"
           :card="card"
           :readonly="readonly"
