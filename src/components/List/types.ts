@@ -1,6 +1,6 @@
 import type {UniformScope} from '../Uniform/types'
 import type {ListMode} from '@/utils/utils'
-import type {Component, Raw} from 'vue'
+import type {Component, Raw, StyleValue} from 'vue'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FieldProps<Data, QueryParams = any> = {
@@ -132,6 +132,12 @@ export type FieldConfig = {
   width: number | null
   visible: boolean
   order: number
+  sticky: boolean
+}
+
+export type ColumnData = {
+  style: StyleValue | undefined
+  baseClass: Record<string, boolean | undefined>
   sticky: boolean
 }
 

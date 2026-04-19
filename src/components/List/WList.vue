@@ -293,35 +293,20 @@
                 <ListCardFieldNested
                   :fields="fieldsFiltered"
                   :field-config-map="fieldConfigMap"
+                  :column-data-map="columnDataMap"
                   :item="item"
                   :skeleton="skeleton"
                   :card="isGrid"
-                  :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
+                  :readonly="(isReadonly ?? isDisabled) ?? false"
+                  :readonly-getter="readonlyGetter"
                   :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
                   :query-params="queryParams"
                   :results="results"
                   :intersecting="intersecting"
-                >
-                  <template #default="defaultScope">
-                    <ListCardFieldItem
-                      :field="defaultScope.field"
-                      :item="defaultScope.item"
-                      :nested="defaultScope.nested"
-                      :config="fieldConfigMap[defaultScope.field.meta.label]!"
-                      :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(defaultScope.item) ?? false)"
-                      :skeleton="skeleton"
-                      :card="isGrid"
-                      :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
-                      :query-params="queryParams"
-                      :results="results"
-                      :intersecting="intersecting"
-                      :align-top="alignTop"
-                      :before-class="beforeClass"
-                      @update:item="setter"
-                      @delete:item="setter(); refetch()"
-                    />
-                  </template>
-                </ListCardFieldNested>
+                  :before-class="beforeClass"
+                  @update:item="(value: unknown) => setter(value as Data)"
+                  @delete:item="setter(); refetch()"
+                />
               </template>
 
               <template
@@ -382,7 +367,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>, CardColumns extends readonly GridCol[]">
-import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, ExpansionComponent, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
+import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, ColumnData, ExpansionComponent, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
 import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
@@ -413,9 +398,8 @@ import HeaderExport from './components/HeaderExport.vue'
 import HeaderFieldNested from './components/HeaderFieldNested.vue'
 import HeaderSettings from './components/HeaderSettings.vue'
 import HeaderSort from './components/HeaderSort.vue'
-import ListCardFieldItem from './components/ListCardFieldItem.vue'
-import ListCardFieldNested from './components/ListCardFieldNested.vue'
-import {filterFields, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, getFieldWidthSumStyles, sortFields, useListConfig} from './use/useListConfig'
+import ListCardFieldNested from './components/ListCardFieldNested'
+import {filterFields, forEachField, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, getFieldWidthSumStyles, sortFields, useListConfig} from './use/useListConfig'
 
 defineOptions({inheritAttrs: false})
 
@@ -527,6 +511,37 @@ const {
 
 const fieldsFiltered = computed(() => {
   return filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible ?? false)
+})
+
+const columnDataMap = computed<Record<string, ColumnData>>(() => {
+  const map: Record<string, ColumnData> = {}
+  const card = isGrid.value
+  const at = !!props.alignTop
+
+  forEachField(fieldsFiltered.value, field => {
+    const label = field.meta.label
+    const sticky = fieldConfigMap.value[label]?.sticky ?? false
+    const stickyInTable = !card && sticky
+
+    map[label] = {
+      style: card
+        ? {gridArea: label}
+        : {
+          minWidth: `var(${ getFieldVariable('width', label) })`,
+          maxWidth: `var(${ getFieldVariable('width', label) })`,
+          left: sticky ? `var(${ getFieldVariable('left', label) })` : undefined,
+          right: sticky ? `var(${ getFieldVariable('right', label) })` : undefined,
+        },
+      baseClass: {
+        'items-center': !at,
+        'items-start': at,
+        'bg-default dark:bg-default-dark sticky z-[1]': stickyInTable,
+      },
+      sticky: stickyInTable,
+    }
+  })
+
+  return map
 })
 
 const allowSelect = computed(() => props.bulk !== undefined || !props.disableExport)
