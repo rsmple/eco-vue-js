@@ -2,12 +2,12 @@
   <div
     v-bind="allowSelect ? {'onMouseover': () => $emit('hover:selected')} : undefined"
     ref="container"
-    class="relative [contain:content] [content-visibility:auto]"
+    class="relative"
     :class="{
       [cardWrapperClass ?? '']: true,
       'w-ripple-trigger-list': isActionShown,
-      'sm-not:dark:even:bg-primary-darkest/25 sm-not:even:bg-gray-50 grid grid-cols-1 [contain-intrinsic-size:auto_12rem]': card,
-      'flex [contain-intrinsic-size:auto_3rem]': !card,
+      'sm-not:dark:even:bg-primary-darkest/25 sm-not:even:bg-gray-50 grid grid-cols-1': card,
+      'flex': !card,
       '-mb-px': !card && isOpen,
       'w-hover-checked': allowSelectHover,
     }"

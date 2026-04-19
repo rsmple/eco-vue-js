@@ -241,7 +241,6 @@
             field: formFieldGetter(item),
           } : undefined"
           v-memo="[
-            item,
             skeleton,
             getIsSelected(value as number, position),
             isReadonly ?? isDisabled,
@@ -253,12 +252,9 @@
             hasBorder,
             disableMore,
             menu,
-            expansion,
             bulk,
             hasAction,
             formFieldGetter,
-            queryParams,
-            results,
             intersecting,
             position,
             cardClass,
