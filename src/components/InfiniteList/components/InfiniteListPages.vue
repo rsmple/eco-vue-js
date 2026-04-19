@@ -296,7 +296,7 @@ watch([pageComponentRef, slotIds], () => {
   const currentEls = new Set<HTMLElement>()
 
   for (let i = 0; i < instances.length; i++) {
-    const el = instances[i]?.element as HTMLElement | null | undefined
+    const el = instances[i]?.getElement() ?? null
     if (!el) continue
     currentEls.add(el)
 
@@ -471,7 +471,7 @@ const anyPageInViewport = (): boolean => {
 
   const instances = pageComponentRef.value ?? []
   for (const instance of instances) {
-    const el = instance?.element as HTMLElement | null | undefined
+    const el = instance?.getElement() ?? null
     if (!el) continue
     const rect = el.getBoundingClientRect()
     if (rect.bottom > viewportTop && rect.top < viewportBottom) return true

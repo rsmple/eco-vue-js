@@ -322,7 +322,7 @@ onBeforeUnmount(() => {
 })
 
 defineExpose({
-  element: elementRef,
+  getElement: (): HTMLElement | null => elementRef.value,
   getFirst,
   getLast,
   refetch: refetchPage,
