@@ -11,7 +11,7 @@
     @mouseenter="!disabled && $emit('mouseenter', $event)"
     @mouseleave="!disabled && $emit('mouseleave', $event)"
   >
-    <div class="border-r border-solid border-gray-300 px-2 group-last/toolbar:border-r-0 dark:border-gray-600">
+    <div class="whitespace-nowrap border-r border-solid border-gray-300 px-2 group-last/toolbar:border-r-0 dark:border-gray-600">
       <component
         :is="icon"
         class="square-[1.25em] -mt-[0.25em] inline"

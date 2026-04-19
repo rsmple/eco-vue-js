@@ -167,7 +167,7 @@ const {isMobile} = useIsMobile()
 const hasScrollbar = getHasScrollbar()
 
 const slots = defineSlots<{
-  default: () => void
+  default: () => VNode[]
 }>()
 
 const containerRef = useTemplateRef('container')
@@ -179,9 +179,16 @@ const isTabItem = (slot: VNode): slot is VNode<RendererNode, RendererElement, Ta
 
 const defaultSlotsRaw = shallowRef<VNode[]>(props.customSlots ?? slots.default?.() ?? [])
 
-onBeforeUpdate(() => {
+const refreshSlots = () => {
   defaultSlotsRaw.value = props.customSlots ?? slots.default?.() ?? []
-})
+}
+
+onBeforeUpdate(refreshSlots)
+
+watch(
+  () => unwrapSlots(props.customSlots ?? slots.default?.() ?? []).length,
+  refreshSlots,
+)
 
 const defaultSlotsAll = computed(() => unwrapSlots(defaultSlotsRaw.value))
 

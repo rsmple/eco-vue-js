@@ -80,25 +80,25 @@ export const isEqualArrObj = (arr1: unknown[], arr2: unknown[]): boolean => {
     Array.isArray(item) && Array.isArray(arr2[index])
       ? isEqualArrObj(item, arr2[index])
       : item instanceof Object && arr2[index] instanceof Object 
-        ? isEqualObj(item as Record<string, unknown>, arr2[index] as Record<string, unknown>, undefined, undefined, true)
+        ? isEqualObj(item as NonNullable<unknown>, arr2[index] as NonNullable<unknown>, undefined, undefined, true)
         : item === arr2[index],
   )
 }
 
-export const isEqualObj = (obj1: Record<string, unknown>, obj2: Record<string, unknown>, exclude?: string[], include?: string[], strictArray?: boolean): boolean => {
+export const isEqualObj = (obj1: NonNullable<unknown>, obj2: NonNullable<unknown>, exclude?: string[], include?: string[], strictArray?: boolean): boolean => {
   return Object.keys({...obj1, ...obj2})
     .every(key => {
       if (include && !include.includes(key)) return true
+      if (exclude?.includes(key)) return true
+      if (!(key in obj1) || !(key in obj2)) return false
 
-      if (exclude?.includes(key) || obj1[key] === obj2[key]) return true
-
-      if (Array.isArray(obj1[key]) && !Array.isArray(obj2[key])) return obj1[key].length === 0 && !obj2[key]
-      else if (!Array.isArray(obj1[key]) && Array.isArray(obj2[key])) return obj2[key].length === 0 && !obj1[key]
+      if (Array.isArray(obj1[key]) && !Array.isArray(obj2[key])) return (obj1[key] as unknown[]).length === 0 && !obj2[key]
+      else if (!Array.isArray(obj1[key]) && Array.isArray(obj2[key])) return (obj2[key] as unknown[]).length === 0 && !obj1[key]
       else if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) return (strictArray ? isEqualArrObj : isEqualArr)(obj1[key] as unknown[], obj2[key] as unknown[])
 
-      if (obj1[key] instanceof Object && obj2[key] instanceof Object) return isEqualObj(obj1[key] as NonNullable<unknown>, obj2[key] as NonNullable<unknown>)
+      if ((obj1[key] as NonNullable<unknown>) instanceof Object && (obj2[key] as NonNullable<unknown>) instanceof Object) return isEqualObj(obj1[key] as NonNullable<unknown>, obj2[key] as NonNullable<unknown>)
 
-      return false
+      return obj1[key] === obj2[key]
     })
 }
 

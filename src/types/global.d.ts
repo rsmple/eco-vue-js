@@ -1,3 +1,9 @@
+declare interface ObjectConstructor extends ObjectConstructor {
+  keys<T extends NonNullable<unknown>>(value: T): `${ keyof T }`[]
+
+  entries<T extends NonNullable<unknown>>(value: T): [`${ keyof T }`, T[keyof T]][]
+}
+
 declare type SVGComponent = import('vue').Raw<import('vue').FunctionalComponent<import('vue').SVGAttributes>> | keyof import('vue').GlobalComponents
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
