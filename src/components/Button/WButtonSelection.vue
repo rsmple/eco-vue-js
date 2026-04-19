@@ -4,7 +4,7 @@
       <slot
         v-bind="{
           disableMessage: disableMessageValue,
-          cssClass: 'border-r border-solid border-gray-300 dark:border-gray-700 last:border-r-0'
+          cssClass: 'border-l border-solid border-gray-300 first:border-l-0 dark:border-gray-700'
         }"
       />
 
@@ -12,12 +12,14 @@
         v-if="$slots.more"
         :is-open="isOpen"
         :horizontal-align="HorizontalAlign.RIGHT_INNER"
+        :class="moreToggleClass"
       >
         <template #toggle>
           <WButtonSelectionAction
             title="More"
             :icon="markRaw(IconMore)"
             :disable-message="disableMessageValue"
+            class="border-l border-solid border-gray-300 dark:border-gray-700"
             @click="isOpen = !isOpen"
           />
         </template>
@@ -73,11 +75,13 @@ const props = withDefaults(
     title?: string
     disableMessage?: string
     selectedCount?: number
+    moreToggleClass?: string
   }>(),
   {
     title: 'item',
     disableMessage: 'No selected items',
     selectedCount: undefined,
+    moreToggleClass: undefined,
   },
 )
 

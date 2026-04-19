@@ -5,11 +5,11 @@
     </div>
 
     <button
-      class="text-description w-ripple w-ripple-hover relative flex cursor-pointer select-none items-center justify-self-end"
-      aria-label="Remove selection"
+      class="text-description w-ripple w-ripple-hover sm-not:-px--inner-margin relative flex cursor-pointer select-none items-center justify-self-end px-[--w-list-padding,1rem]"
+      aria-label="Clear selection"
       @click="$emit('click', $event)"
     >
-      <IconCancel class="square-[1.25em] mx-[--w-list-padding,1rem]" />
+      <IconCancel class="square-[1.25em]" />
     </button>
   </div>
 </template>

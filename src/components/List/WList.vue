@@ -42,6 +42,7 @@
           :disable-message="bulkDisableMessage"
           :selected-count="selectionCount"
           :style="{zIndex: BASE_ZINDEX_DROPDOWN}"
+          more-toggle-class="[&:nth-child(-n+3)]:hidden sm:[&:nth-child(-n+5)]:hidden"
           @clear:selection="resetSelection"
         >
           <template
@@ -55,7 +56,7 @@
               :use-query-fn="useQueryFnExport ?? useQueryFn"
               :api-method="apiMethodExport"
               :file-name="exportFileName"
-              class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
+              :class="cssClass"
             />
 
             <template v-if="selectionCount === 0 && action">
@@ -83,7 +84,10 @@
                   :query-params-getter="getQueryParamsBulk"
                   :disable-message="disableMessage"
                   :readonly="isReadonly ?? isDisabled ?? false"
-                  :class="cssClass"
+                  :class="[
+                    cssClass,
+                    'sm-not:[&:nth-child(n+3)]:hidden [&:nth-child(n+5)]:hidden',
+                  ]"
                   @clear:selected="resetSelection"
                 />
               </template>
@@ -91,11 +95,11 @@
           </template>
 
           <template
-            v-if="bulk && bulkMore"
+            v-if="bulk && bulk.length > 2"
             #more="scope"
           >
             <template
-              v-for="(item, index) in bulkMore"
+              v-for="(item, index) in bulk"
               :key="index"
             >
               <component
@@ -104,7 +108,7 @@
                 :query-params-getter="getQueryParamsBulk"
                 :disable-message="scope?.disableMessage"
                 :readonly="isReadonly ?? isDisabled ?? false"
-                :class="scope?.cssClass"
+                class="last:pb-2 [&:nth-child(-n+1)]:hidden sm:[&:nth-child(-n+3)]:hidden [&:nth-child(2)]:pt-2 sm:[&:nth-child(4)]:pt-2"
                 @clear:selected="resetSelection"
               />
             </template>
@@ -411,7 +415,6 @@ const props = withDefaults(
     bulkDisableMessage?: string
     selectionTitle: string
     bulk?: BulkComponent<QueryParams>[]
-    bulkMore?: BulkComponent<QueryParams>[]
     action?: ActionComponent<QueryParams>[]
     menu?: MenuComponent<Data>[]
     readonlyGetter?: (item: Data) => boolean
@@ -449,7 +452,6 @@ const props = withDefaults(
     queryOptions: undefined,
     bulkDisableMessage: undefined,
     bulk: undefined,
-    bulkMore: undefined,
     action: undefined,
     menu: undefined,
     readonlyGetter: undefined,
