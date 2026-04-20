@@ -16,7 +16,7 @@
     <slot name="prefix" />
 
     <div
-      class="-pr--w-option-padding col-start-2 grid grid-cols-1 items-center"
+      class="-pr--w-option-padding col-start-2 grid items-center"
       :class="{
         'col-span-2': hideOptionIcon,
       }"
