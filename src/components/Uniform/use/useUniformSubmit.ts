@@ -37,11 +37,6 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
 
     let promise: ReturnType<typeof apiMethod> | undefined = undefined
 
-    if (payload instanceof Object && !Object.keys(payload!).length) {
-      Notify.warn({title: 'No changes'})
-      return
-    }
-
     submitting.value = true
 
     promise = apiMethod(payload!)

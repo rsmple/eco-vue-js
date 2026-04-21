@@ -12,11 +12,19 @@
     }"
   />
 
-  <div
-    v-if="isDragging"
-    class="bg-default dark:bg-default-dark pointer-events-none absolute z-[1] size-full [grid-column:1/2]"
-    :style="{gridRow: `${order + 1}/${order + 2}`}"
-  />
+  <Transition
+    enter-from-class="opacity-0"
+    enter-to-class="opacity-100"
+    enter-active-class="delay-100"
+    leave-from-class="opacity-100"
+    leave-to-class="opacity-0"
+  >
+    <div
+      v-if="isDragging"
+      class="bg-default dark:bg-default-dark pointer-events-none absolute z-[1] size-full transition-opacity [grid-column:1/2]"
+      :style="{gridRow: `${order + 1}/${order + 2}`}"
+    />
+  </Transition>
 </template>
 
 <script lang="ts" setup>
