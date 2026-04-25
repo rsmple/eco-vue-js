@@ -75,15 +75,15 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {type Ref, TransitionGroup, computed, inject, nextTick, onBeforeUnmount, onMounted, ref, toRef, toValue, useTemplateRef, watch} from 'vue'
+import {type Ref, TransitionGroup, computed, defineAsyncComponent, inject, nextTick, onBeforeUnmount, onMounted, ref, toRef, toValue, useTemplateRef, watch} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
 import {ApiError} from '@/utils/api'
 
-import InfiniteListPageTitle from './InfiniteListPageTitle.vue'
-
 import {wScrollingElement} from '../models/injection'
+
+const InfiniteListPageTitle = defineAsyncComponent(() => import('./InfiniteListPageTitle.vue'))
 
 const props = withDefaults(
   defineProps<{

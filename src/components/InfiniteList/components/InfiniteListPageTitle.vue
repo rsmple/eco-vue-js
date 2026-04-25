@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts" setup generic="QueryParams">
-import {type LocationQueryRaw} from 'vue-router'
+import type {LocationQueryRaw} from 'vue-router'
 
 import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRouter'
 import {Notify} from '@/utils/Notify'

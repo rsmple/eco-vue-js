@@ -4,7 +4,7 @@
       <div class="bg-default dark:bg-default-dark -w--left-inner absolute right-full top-0 z-[-1] h-full" />
 
       <div
-        class="bg-primary-light dark:bg-primary-darkest h-full rounded-l-[--w-list-header-rounded,1rem] border-y border-l border-solid border-gray-300 dark:border-gray-700"
+        class="bg-primary-light dark:bg-primary-darkest h-full rounded-l-[--w-list-header-rounded,0.75rem] border-y border-l border-solid border-gray-300 dark:border-gray-700"
         :class="{
           'width-[--w-list-header-rounded,1rem]': !allowSelect,
         }"

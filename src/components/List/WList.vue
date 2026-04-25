@@ -25,6 +25,7 @@
           ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-[--w-list-gap,0] isolate'
           : 'grid grid-cols-1 gap-[--w-list-gap,0] isolate'
       "
+      :no-header-update="noHeaderUpdate"
       :style="cardStyles"
       :class="$attrs.class"
 
@@ -441,6 +442,7 @@ const props = withDefaults(
     disableExport?: boolean
     alwaysSelect?: boolean
     selection?: Selection<number>
+    noHeaderUpdate?: boolean
   }>(),
   {
     count: undefined,
