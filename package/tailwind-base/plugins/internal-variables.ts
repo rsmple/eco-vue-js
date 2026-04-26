@@ -18,6 +18,7 @@ const pluginDefault = plugin(function ({matchUtilities, theme, addBase}) {
       'w-checkbox-color': value => ({'--w-checkbox-color': value}),
       'w-nav-item-dot-color': value => ({'--w-nav-item-dot-color': value}),
       'w-date-picker-day': value => ({'--w-date-picker-day': value}),
+      'w-list-header-bg': value => ({'--w-list-header-bg': value}),
     },
     {values: flattenColorPalette(theme('colors'))},
   )
