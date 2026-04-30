@@ -25,8 +25,8 @@
       @unmounted="updateCursor(undefined)"
     >
       <template #prefix>
-        <span class="w-option flex items-center pr-2">
-          Create:
+        <span class="w-option w-option-padding-y flex items-center self-start pr-2">
+          new:
         </span>
       </template>
 
@@ -42,7 +42,7 @@
 
       <div
         v-else
-        class="text-description w-option flex items-center"
+        class="text-description w-option w-option-padding-y flex items-center"
       >
         Start typing..
       </div>

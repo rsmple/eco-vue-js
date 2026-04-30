@@ -24,6 +24,8 @@
         'cursor-not-allowed opacity-50': isDisabled && !isReadonly && !isSkeleton,
         'col-start-1': subgrid,
       }"
+      @mousedown="focused ? downed = true : undefined"
+      @click="downed && $event.preventDefault(); downed = false"
     >
       <template v-if="!isSkeleton">
         <slot name="title">
@@ -210,6 +212,8 @@ const emit = defineEmits<{
 const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 const id = useId()
+
+const downed = ref(false)
 
 const fieldRef = useTemplateRef<HTMLDivElement>('field')
 

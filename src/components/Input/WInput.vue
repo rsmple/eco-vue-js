@@ -73,7 +73,8 @@
           'border-opacity-0 group-hover/seamless:border-opacity-100 dark:border-opacity-0 dark:group-hover/seamless:border-opacity-100': seamless && !focused,
           'bg-[--w-input-bg,inherit]': !seamless || focused,
         }"
-        @click="focus"
+        @mousedown="focused ? downed = true : undefined"
+        @click="!downed && focus(); downed = false"
       >
         <InputToolbar
           v-if="!isReadonly && textarea && (rich || toolbarActions || $slots.toolbar)"
@@ -406,6 +407,7 @@ const fieldWrapperRef = useTemplateRef('fieldWrapper')
 const contentRef = useTemplateRef('content')
 const inputRef = useTemplateRef<HTMLInputElement | ComponentInstance<typeof ContentEditable>>('input')
 const isSecureVisible = ref(false)
+const downed = ref(false)
 
 const asyncState = useInputAsync({
   props,

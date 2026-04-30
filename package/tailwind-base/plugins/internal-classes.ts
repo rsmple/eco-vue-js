@@ -144,7 +144,12 @@ const pluginDefault = plugin(function ({addBase, theme, config}) {
       '--w-option-height': 'calc(var(--w-input-height,2.75rem) - (var(--w-input-gap,0.25rem) * 2) - 2px)',
       '--w-option-rounded': 'calc(var(--w-input-rounded,0.75rem) - var(--w-input-gap,0.25rem) - 1px)',
       '--w-option-padding': 'var(--w-input-rounded,0.75rem)',
+      '--w-option-padding-y': 'calc((var(--w-option-height) - 1.5em) / 2)',
       '--w-select-option-padding': 'calc(var(--w-option-padding) + var(--w-input-gap) + 1px)',
+    },
+    '.w-option-padding-y': {
+      'padding-top': 'var(--w-option-padding-y)',
+      'padding-bottom': 'var(--w-option-padding-y)',
     },
   })
 

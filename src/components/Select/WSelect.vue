@@ -100,8 +100,8 @@
           @mouseenter="setCursor(optionsFiltered.length)"
         >
           <template #prefix>
-            <div class="w-option flex items-center pr-2">
-              Create:
+            <div class="w-option w-option-padding-y flex items-center self-start pr-2">
+              New:
             </div>
           </template>
 
@@ -127,7 +127,7 @@
 
           <div
             v-else
-            class="text-description w-option flex items-center"
+            class="text-description w-option w-option-padding-y flex items-center"
           >
             Start typing..
           </div>
