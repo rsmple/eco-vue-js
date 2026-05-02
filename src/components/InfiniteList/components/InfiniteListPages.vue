@@ -3,8 +3,9 @@
     ref="infiniteScroll"
     :style="{'--infinite-list-header-height': headerHeight + 'px'}"
     :class="{
-      '-min-h--height-inner list:pt-[--w-list-gap,1rem] modal:pb-[--w-list-gap,1rem] modal:min-h-[50vh] pb-16': !minHeight,
+      '-min-h--height-inner list:pt-[--w-list-gap,1rem] modal:pb-[--w-list-gap,1rem] modal:min-h-[50vh] pb-16': !minHeight && !minHeightOnly,
       'min-h-full': minHeight,
+      'list:pt-[--w-list-gap,1rem] modal:pb-[--w-list-gap,1rem]': minHeightOnly,
     }"
   >
     <div :style="{height: topSpacerHeight + 'px'}" />
@@ -78,7 +79,7 @@ import type {ApiError} from '@/utils/api'
 
 import {computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref, toRef, useTemplateRef, watch} from 'vue'
 
-import {debounce, isEqualObj} from '@/utils/utils'
+import {debounce, getOffsetTop, isEqualObj} from '@/utils/utils'
 
 import InfiniteListPage from './InfiniteListPage.vue'
 import InfiniteListScroll from './InfiniteListScroll.vue'
@@ -97,6 +98,7 @@ const props = withDefaults(
     headerTop?: number
     headerHeight?: number
     minHeight?: boolean
+    minHeightOnly?: boolean
     lastChild?: boolean
     excludeParams?: (keyof QueryParams)[]
     emptyStub?: string
@@ -387,7 +389,7 @@ const goto = async (page = 1, itemIndex?: number) => {
 const scrollTop = () => {
   const element = scrollingElement?.value ?? document.scrollingElement
 
-  const value = (infiniteScrollRef.value?.$el.offsetTop ?? 0) - props.headerHeight - 60
+  const value = (infiniteScrollRef.value?.$el ? getOffsetTop(infiniteScrollRef.value.$el) : 0) - props.headerHeight - 60
 
   if (element && element.scrollTop > value) element.scrollTop = value
 }

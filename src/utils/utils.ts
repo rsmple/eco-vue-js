@@ -292,3 +292,5 @@ export enum WrapSelectionType {
   LINE_PREFIX = 'LINE_PREFIX',
   TOGGLE = 'TOGGLE'
 }
+
+export const getOffsetTop = (element: HTMLElement): number => element.offsetParent instanceof HTMLElement ? element.offsetTop + getOffsetTop(element.offsetParent) : element.offsetTop

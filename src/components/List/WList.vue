@@ -25,7 +25,7 @@
           ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-[--w-list-gap,0] isolate'
           : 'grid grid-cols-1 gap-[--w-list-gap,0] isolate'
       "
-      :min-height="minHeight"
+      :min-height-only="minHeight"
       :no-header-update="noHeaderUpdate"
       :style="cardStyles"
       :class="$attrs.class"

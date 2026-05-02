@@ -24,6 +24,7 @@
         :header-top="headerTopIgnore ? 0 : 'headerTop' in defaultScope ? defaultScope.headerTop : 0"
         :header-height="'headerHeight' in defaultScope ? defaultScope.headerHeight : 0"
         :min-height="minHeight"
+        :min-height-only="minHeightOnly"
         :last-child="lastChild"
         :exclude-params="excludeParams"
         :empty-stub="emptyStub"
@@ -94,6 +95,7 @@ const props = withDefaults(
     transition?: boolean
     headerTopIgnore?: boolean
     minHeight?: boolean
+    minHeightOnly?: boolean
     noHeaderUpdate?: boolean
     lastChild?: boolean
     excludeParams?: (keyof QueryParams)[]
