@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import {type Ref, TransitionGroup, computed, defineAsyncComponent, inject, nextTick, onBeforeUnmount, onMounted, ref, toRef, toValue, useTemplateRef, watch} from 'vue'
+import {type Ref, TransitionGroup, computed, defineAsyncComponent, inject, onBeforeUnmount, onMounted, ref, toRef, toValue, useTemplateRef, watch} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
@@ -122,10 +122,8 @@ const emit = defineEmits<{
   (e: 'update:pages-count', value: number): void
   (e: 'update:next-page', value: number | null): void
   (e: 'update:previous-page', value: number | null): void
-  (e: 'update:scroll', value: number): void
   (e: 'remove:page', value: number): void
   (e: 'refetch'): void
-  (e: 'update-from-header:scroll'): void
   (e: 'update:selected', values: Model[]): void
   (e: 'fetched'): void
   (e: 'update:error', value: ApiError): void
@@ -307,10 +305,6 @@ onMounted(() => {
     )
 
     intersectionObserver.observe(elementRef.value)
-  }
-
-  if (props.firstPage && props.lastPage && page.value !== 1) {
-    nextTick().then(() => emit('update-from-header:scroll'))
   }
 })
 

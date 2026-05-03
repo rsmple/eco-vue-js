@@ -35,8 +35,6 @@
 
       @update:count="updateCount($event); $emit('update:count', $event)"
       @update:pages-count="updatePagesCount"
-      @update:scroll="updateScroll"
-      @update-from-header:scroll="headerTop > 0 && nextTick(() => updateScroll(headerTop))"
       @remove:page="removePage"
       @refetch="refetchNextPages(index)"
       @fetched="isResettingPage = false"
@@ -205,14 +203,6 @@ const addPreviousPage = (silent?: boolean) => {
   }
 
   if (!silent) emit('update:page', previousPage.value)
-}
-
-const updateScroll = (height: number): void => {
-  const element = scrollingElement?.value ?? document.scrollingElement
-
-  if (!element || element.scrollTop === 0) return
-
-  element.scrollTop = element.scrollTop + height
 }
 
 let resizeObserver: ResizeObserver | null = null
