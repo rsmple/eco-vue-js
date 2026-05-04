@@ -168,7 +168,7 @@ const updateCount = (value: number): void => {
 }
 
 const updatePagesCount = (value: number): void => {
-  pagesCount.value = value
+  pagesCount.value = Math.max(value, 1)
 }
 
 const addNextPage = (silent?: boolean) => {
@@ -297,6 +297,9 @@ watch([pageComponentRef, slotIds], () => {
 
     if (!observedElements.has(el)) {
       observedElements.set(el, slotId)
+      if (!pageHeights.has(slotId)) {
+        pageHeights.set(slotId, Math.round(el.getBoundingClientRect().height))
+      }
       resizeObserver.observe(el)
     }
   }
