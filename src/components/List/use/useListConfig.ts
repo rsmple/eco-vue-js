@@ -128,7 +128,7 @@ export const useListConfig = <Fields extends ListFields<any, any>>(key: MaybeRef
       unref(defailtMode),
     ),
   )
-  const hasSaved = ref(localStorage.getItem(unref(key)) !== null)
+  const hasSaved = ref(disable ? false : localStorage.getItem(unref(key)) !== null)
 
   const listConfig = computed<ListConfig<Fields>>(() => value.value as ListConfig<Fields>)
   const fieldConfigMap = computed<Record<string, FieldConfig>>({

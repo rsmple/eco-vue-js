@@ -77,7 +77,7 @@ import type {ApiError} from '@/utils/api'
 
 import {computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref, toRef, useTemplateRef, watch} from 'vue'
 
-import {debounce, getOffsetTop, isEqualObj} from '@/utils/utils'
+import {debounce, getIsClientSide, getOffsetTop, isEqualObj} from '@/utils/utils'
 
 import InfiniteListPage from './InfiniteListPage.vue'
 import InfiniteListScroll from './InfiniteListScroll.vue'
@@ -496,10 +496,12 @@ const checkScrollJump = debounce(() => {
   jumpToPage(target)
 }, 300)
 
-watch(() => scrollingElement?.value ?? window, (newEl, oldEl) => {
-  oldEl?.removeEventListener('scroll', checkScrollJump)
-  newEl?.addEventListener('scroll', checkScrollJump, {passive: true})
-}, {immediate: true})
+if (getIsClientSide()) {
+  watch(() => scrollingElement?.value ?? window, (newEl, oldEl) => {
+    oldEl?.removeEventListener('scroll', checkScrollJump)
+    newEl?.addEventListener('scroll', checkScrollJump, {passive: true})
+  }, {immediate: true})
+}
 
 onBeforeUnmount(() => {
   const el = scrollingElement?.value ?? window

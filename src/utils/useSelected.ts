@@ -1,7 +1,7 @@
 import {type MaybeRef, type Ref, computed, onBeforeUnmount, ref, unref, watch} from 'vue'
 
 import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRouter'
-import {isIdArray, isIndex} from '@/utils/utils'
+import {getIsClientSide, isIdArray, isIndex} from '@/utils/utils'
 
 const isSelectedRange = (value: unknown): value is [number, number] => {
   return Array.isArray(value) && value.length === 2 && value.every(isIndex) && value[0]! <= value[1]!
@@ -299,16 +299,18 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
     return result
   }
 
-  watch(disabled, value => {
-    if (value) {
-      window.removeEventListener('keydown', setIsSelecting)
-      window.removeEventListener('keyup', resetIsSelecting)
-      window.removeEventListener('click', applySelect)
-    } else {
-      window.addEventListener('keydown', setIsSelecting)
-      window.addEventListener('keyup', resetIsSelecting)
-    }
-  }, {immediate: true})
+  if (getIsClientSide()) {
+    watch(disabled, value => {
+      if (value) {
+        window.removeEventListener('keydown', setIsSelecting)
+        window.removeEventListener('keyup', resetIsSelecting)
+        window.removeEventListener('click', applySelect)
+      } else {
+        window.addEventListener('keydown', setIsSelecting)
+        window.addEventListener('keyup', resetIsSelecting)
+      }
+    }, {immediate: true})
+  }
 
   onBeforeUnmount(() => {
     unmounted.value = true
