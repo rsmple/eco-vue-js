@@ -506,11 +506,15 @@ const {
   reset,
   save,
   updateMode,
-} = useListConfig(toRef(props, 'configKey'), fieldsVisible, toRef(props, 'defaultConfigMap'), toRef(props, 'defaultMode'), props.noHeaderSettings)
+} = useListConfig(
+  () => props.configKey,
+  () => props.fields,
+  () => props.defaultConfigMap,
+  () => props.defaultMode,
+  props.noHeaderSettings,
+)
 
-const fieldsFiltered = computed(() => {
-  return filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible ?? false)
-})
+const fieldsFiltered = computed(() => filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible ?? false))
 
 const columnDataMap = computed<Record<string, ColumnData>>(() => {
   const map: Record<string, ColumnData> = {}
