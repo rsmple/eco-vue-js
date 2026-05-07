@@ -6,7 +6,7 @@ import type WFormValidator from '@/components/Form/WFormValidator.vue'
 import {useOptionalRouter} from '@/composables/useOptionalRouter'
 import {Notify} from '@/utils/Notify'
 
-import {get} from './utils'
+import {get, isEqualArrObj} from './utils'
 
 type ErrorResponse<Response> = {
   [Key in 'detail' | 'non_field_errors' | keyof Response]?: Key extends 'detail' ? string : string[]
@@ -99,6 +99,12 @@ export const createUseQueryParams = <QueryParams extends Record<string, unknown>
       const resultValue = config[key](value[key])
 
       if (queryParams[key as keyof typeof queryParams] === resultValue) continue
+
+      if (
+        Array.isArray(queryParams[key as keyof typeof queryParams]) &&
+        Array.isArray(resultValue) &&
+        isEqualArrObj(queryParams[key as keyof typeof queryParams] as unknown[], resultValue)
+      ) continue
 
       if (
         resultValue === undefined ||

@@ -75,7 +75,7 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import type {ApiError} from '@/utils/api'
 
-import {computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref, toRef, useTemplateRef, watch} from 'vue'
+import {computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref, useTemplateRef, watch} from 'vue'
 
 import {debounce, getIsClientSide, getOffsetTop, isEqualObj} from '@/utils/utils'
 
@@ -508,10 +508,10 @@ onBeforeUnmount(() => {
   el.removeEventListener('scroll', checkScrollJump)
 })
 
-let oldQueryParams = {}
+let oldQueryParams = {...props.queryParams}
 
-watch(toRef(props, 'queryParams'), newValue => {
-  if (pages.value.length !== 0 && isEqualObj(newValue, oldQueryParams, ['page', ...(props.excludeParams ?? []) as string[]])) return
+watch(() => props.queryParams, newValue => {
+  if (pages.value.length > 1 && isEqualObj(newValue as NonNullable<unknown>, oldQueryParams as NonNullable<unknown>, ['page', ...(props.excludeParams ?? []) as string[]])) return
 
   resetPage()
 
