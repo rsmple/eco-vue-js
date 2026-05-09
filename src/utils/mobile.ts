@@ -3,11 +3,11 @@ import {readonly, ref} from 'vue'
 import {debounce, getIsClientSide} from './utils'
 
 export const getIsMobile = (): boolean => {
-  return getIsClientSide() && window.innerWidth < 640
+  return getIsClientSide() && window.innerWidth < 641
 }
 
 export const getIsTablet = (): boolean => {
-  return getIsClientSide() && window.innerWidth < 1280
+  return getIsClientSide() && window.innerWidth < 1281
 }
 
 const isMobile = ref(getIsMobile())
