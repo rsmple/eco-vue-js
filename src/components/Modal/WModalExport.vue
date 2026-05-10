@@ -124,6 +124,7 @@ const resolvedTitle = computed<string>(() => {
   if (typeof props.title === 'function') return props.title(count.value)
   if (typeof props.title === 'string') return props.title
   if (props.format === 'csv') return 'Export to .csv'
+  if (props.format === 'md') return 'Export to .md'
   return `Exporting${ count.value ? ` ${ count.value } item${ count.value === 1 ? '' : 's' }` : '' }`
 })
 
@@ -135,6 +136,8 @@ const buildExportValue = async () => {
     const rows = (await Promise.all(cache.value.map((item, index) => props.prepare!(item as Model, index)))).flat()
     exportValue.value = buildCsvContent(rows, props.header)
     loadingExportValue.value = false
+  } else if (props.format === 'md') {
+    exportValue.value = cache.value.map((item, index) => props.toMarkdown!(item as Model, index)).join('\n\n---\n\n')
   } else {
     exportValue.value = JSON.stringify(cache.value.map(item => ({...item, id: genId() * -1})))
   }
@@ -142,7 +145,11 @@ const buildExportValue = async () => {
 
 const blob = computed<Blob | undefined>(() => {
   if (!exportValue.value) return
-  const type = props.format === 'csv' ? 'text/csv;charset=utf-8;' : 'application/json'
+  const type = props.format === 'csv'
+    ? 'text/csv;charset=utf-8;'
+    : props.format === 'md'
+      ? 'text/markdown;charset=utf-8;'
+      : 'application/json'
   return new Blob([exportValue.value], {type})
 })
 

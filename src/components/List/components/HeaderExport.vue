@@ -24,6 +24,13 @@
         <WMenuItem @click="exportAs('json')">
           Export as JSON
         </WMenuItem>
+
+        <WMenuItem
+          v-if="toMarkdown"
+          @click="exportAs('md')"
+        >
+          Export as Markdown
+        </WMenuItem>
       </WClickOutside>
     </template>
   </WDropdownMenu>
@@ -55,11 +62,12 @@ const props = defineProps<{
   useQueryFn: UseQueryPaginated<Data, QueryParams>
   apiMethod: ((queryParams: QueryParams) => Promise<Data[]>) | undefined
   fileName: string | undefined
+  toMarkdown: ((item: Data, index: number) => string) | undefined
 }>()
 
 const isOpen = ref(false)
 
-const exportAs = (format: 'csv' | 'json') => {
+const exportAs = (format: 'csv' | 'json' | 'md') => {
   isOpen.value = false
 
   const modalProps: ModalExportProps<Data, QueryParams> = {
@@ -74,6 +82,8 @@ const exportAs = (format: 'csv' | 'json') => {
     const {header, prepare} = buildExportColumns(props.fields, modalProps.initQueryParams!)
     modalProps.header = header
     modalProps.prepare = prepare
+  } else if (format === 'md') {
+    modalProps.toMarkdown = props.toMarkdown
   }
 
   Modal.add<ModalExportProps<Data, QueryParams>>(markRaw(WModalExport), modalProps)

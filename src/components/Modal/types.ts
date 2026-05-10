@@ -27,7 +27,7 @@ export interface ConfirmModalProps {
 }
 
 export type ModalExportProps<Model, QueryParams> = {
-  format: 'json' | 'csv'
+  format: 'json' | 'csv' | 'md'
   fileName?: string
   title?: string | ((count: number) => string)
   cancelText?: string
@@ -37,5 +37,6 @@ export type ModalExportProps<Model, QueryParams> = {
   apiMethod?: (queryParams: QueryParams) => Promise<Model[]>
   header?: string[]
   prepare?: (item: Model, index: number) => string[][] | Promise<string[][]>
+  toMarkdown?: (item: Model, index: number) => string
   resolve?: () => void
 }

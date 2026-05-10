@@ -58,6 +58,7 @@
               :use-query-fn="useQueryFnExport ?? useQueryFn"
               :api-method="apiMethodExport"
               :file-name="exportFileName"
+              :to-markdown="toMarkdown"
               :class="cssClass"
             />
 
@@ -327,9 +328,16 @@
               </template>
 
               <template
-                v-if="menu"
+                v-if="menu || (toMarkdown && !skeleton)"
                 #more
               >
+                <ListMenuMarkdown
+                  v-if="toMarkdown && !skeleton"
+                  :item="item"
+                  :index="index"
+                  :to-markdown="toMarkdown"
+                />
+
                 <template
                   v-for="(menuItem, menuIndex) in menu"
                   :key="menuIndex"
@@ -398,6 +406,7 @@ import HeaderSettings from './components/HeaderSettings.vue'
 import HeaderSort from './components/HeaderSort.vue'
 import ListCardFieldItem from './components/ListCardFieldItem.vue'
 import ListCardFieldNested from './components/ListCardFieldNested.vue'
+import ListMenuMarkdown from './components/ListMenuMarkdown.vue'
 import {filterFields, forEachField, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, getFieldWidthSumStyles, sortFields, useListConfig} from './use/useListConfig'
 
 defineOptions({inheritAttrs: false})
@@ -445,6 +454,7 @@ const props = withDefaults(
     selection?: Selection<number>
     noHeaderUpdate?: boolean
     minHeight?: boolean
+    toMarkdown?: (data: Data, index: number) => string
   }>(),
   {
     count: undefined,
@@ -468,6 +478,7 @@ const props = withDefaults(
     apiMethodExport: undefined,
     exportFileName: undefined,
     selection: undefined,
+    toMarkdown: undefined,
   },
 )
 
