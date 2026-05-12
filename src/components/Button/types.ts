@@ -9,7 +9,7 @@ export interface ButtonProps extends Partial<LinkProps> {
   semanticType?: SemanticType
   disabled?: boolean
   loading?: boolean
-  tag?: 'a' | 'button'
+  tag?: keyof HTMLElementTagNameMap
   type?: string
   replace?: boolean
   href?: string
