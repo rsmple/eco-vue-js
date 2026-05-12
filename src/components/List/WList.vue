@@ -188,7 +188,7 @@
           class="sm-not:hidden"
           :allow-select="allowSelect"
           :tooltip-text="selectAllTextGetter(selectAllValue !== true, count ?? listCount ?? 0)"
-          :hide-more="!menu"
+          :hide-more="!menu && !toMarkdown"
 
           :count="count ?? listCount"
           :selection="selectAllValue"
