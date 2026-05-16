@@ -54,13 +54,10 @@ const updateTextParts = () => {
     const existingNode = elementRef.value.childNodes[nodeIndex] ?? null
 
     if (typeof item === 'string') {
-      // Add space after newlines for cursor positioning
-      const displayText = item.replace(/\n$/g, '\n ')
-      
       if (existingNode instanceof Text) {
-        if (existingNode.textContent !== displayText) existingNode.textContent = displayText
+        if (existingNode.textContent !== item) existingNode.textContent = item
       } else {
-        const textNode = document.createTextNode(displayText)
+        const textNode = document.createTextNode(item)
         elementRef.value.insertBefore(textNode, existingNode)
       }
     } else {
