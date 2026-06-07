@@ -1,0 +1,47 @@
+image: node:20.0.0
+
+stages:
+  - prepare
+  - test
+  - build
+  - publish
+
+prepare:
+  stage: prepare
+  tags:
+    - builder
+
+  script:
+    - npm ci
+  artifacts:
+    paths:
+      - node_modules/
+  when: manual
+
+lint:
+  stage: test
+  tags:
+    - builder
+  script:
+    - npm run lint:no-fix
+  needs: ["prepare"]
+
+build:
+  stage: build
+  tags:
+    - builder
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+  needs: ["prepare", "lint"]
+
+publish:
+  stage: publish
+  tags:
+    - builder
+  script:
+    - echo "//registry.npmjs.org/:_authToken=${NPM_PUSHER}">.npmrc
+    - npm publish --access=public
+  needs: ["build"]

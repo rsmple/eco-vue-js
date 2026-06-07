@@ -1,0 +1,62 @@
+const newValues = {
+  '8xl': '88rem',
+  '9xl': '96rem',
+  '10xl': '104rem',
+
+  '--header-height': 'var(--header-height)',
+  '--header-padding-bottom': 'var(--header-padding-bottom)',
+  '--nav-bar-width': 'var(--nav-bar-width)',
+  '--actions-bar-width': 'var(--actions-bar-width)',
+  '--actions-bar-inner-width': 'var(--actions-bar-inner-width)',
+  '--inner-margin': 'var(--inner-margin)',
+  '--inner-width-diff': 'var(--inner-width-diff)',
+  '--w-modal-wrapper-padding': 'var(--w-modal-wrapper-padding)',
+  '--w-option-padding': 'var(--w-option-padding)',
+  '--w-input-height': 'var(--w-input-height)',
+  '--w-input-gap': 'var(--w-input-gap)',
+  '--w-option-height': 'var(--w-option-height)',
+  '--w-select-option-padding': 'var(--w-select-option-padding)',
+  '--left-inner': 'var(--w-left-inner)',
+  '--right-inner': 'var(--w-right-inner)',
+  '--width-inner': 'var(--w-width-inner)',
+  '--height-inner': 'var(--w-height-inner)',
+  '--modal-header-height': 'var(--w-modal-header-height, 0px)',
+  '--modal-footer-height': 'var(--w-modal-footer-height, 0px)',
+  '--modal-content-height': 'var(--w-modal-content-height, 0px)',
+  '--button-height': 'var(--w-button-height, 2.75rem)',
+
+  fr: '1fr',
+}
+
+const extend = {
+  0.75: '0.1875rem',
+  1.25: '0.3125rem',
+  4.5: '1.125rem',
+  6: '1.5rem',
+  8.5: '2.125rem',
+  10: '2.5rem',
+  11: '2.75rem',
+  15: '3.75rem',
+  18: '4.5rem',
+  22: '5.5rem',
+  28: '7rem',
+  30: '7.5rem',
+  34: '8.5rem',
+  36: '9rem',
+  112: '28rem',
+
+  ...newValues,
+}
+
+export default {
+  height: extend,
+  width: extend,
+  maxWidth: extend,
+  minWidth: extend,
+  maxHeight: extend,
+  minHeight: extend,
+  padding: extend,
+  margin: extend,
+  inset: extend,
+  gap: extend,
+}

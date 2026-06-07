@@ -1,0 +1,77 @@
+<template>
+  <template v-if="valueInString.length !== 0">
+    <SelectAsyncPrefixPage
+      v-if="modelValue.length <= (prefixMax ?? PAGE_LENGTH)"
+      :use-query-fn="useQueryFn"
+      :query-params="({page: 1, [valueQueryKey]: valueInString} as QueryParams)"
+      :option-component="(optionComponent as SelectOptionComponent<Data>)"
+      :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
+      :disable-clear="disableClear"
+      :loading="loading"
+      :disabled="disabled"
+      :preview-data="previewData"
+      :created-data="createdData"
+      :value-getter="valueGetter"
+      :readonly="readonly"
+      @unselect="(value, data) => $emit('unselect', value, data)"
+      @update:fetching="$emit('update:fetching', $event)"
+    >
+      <template
+        v-if="$slots.option"
+        #option="scope"
+      >
+        <slot
+          name="option"
+          v-bind="scope"
+        />
+      </template>
+    </SelectAsyncPrefixPage>
+
+    <div
+      v-else
+      class="text-accent flex items-center gap-1 overflow-hidden px-1"
+    >
+      <div>{{ numberFormatter.format(modelValue.length) }} {{ prefixText ?? 'items' }}</div>
+
+      <WButtonUnselect
+        v-if="!disableClear"
+        :loading="loading"
+        :disabled="disabled"
+        @mousedown.stop.prevent=""
+        @click.stop.prevent="!loading && $emit('update:model-value', [])"
+      />
+    </div>
+  </template>
+</template>
+
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
+import type {SelectAsyncPrefixProps, SelectOptionComponent, SelectOptionComponentProps} from '../types'
+
+import {computed, onBeforeUnmount} from 'vue'
+
+import WButtonUnselect from '@/components/Button/WButtonUnselect.vue'
+
+import {numberFormatter} from '@/utils/utils'
+
+import SelectAsyncPrefixPage from './SelectAsyncPrefixPage.vue'
+
+const PAGE_LENGTH = 8
+
+const props = defineProps<SelectAsyncPrefixProps<Model, Data, QueryParams, OptionComponent>>()
+
+const emit = defineEmits<{
+  (e: 'unselect', value: Model, data: Data): void
+  (e: 'update:fetching', value: boolean): void
+  (e: 'update:model-value', value: Model[]): void
+}>()
+
+const valueInString = computed(() => props.modelValue.slice(0, PAGE_LENGTH).join(','))
+
+defineSlots<{
+  option?: (props: {option: Data | undefined, index: number, skeleton: boolean}) => void
+}>()
+
+onBeforeUnmount(() => {
+  emit('update:fetching', false)
+})
+</script>

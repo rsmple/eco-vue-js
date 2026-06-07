@@ -1,0 +1,300 @@
+<template>
+  <div
+    class="relative"
+    v-bind="
+      allowDropFile ? {
+        style: $attrs.style as StyleValue,
+        onDragover,
+        onDragleave,
+        onDrop,
+      } : {
+        style: $attrs.style as StyleValue,
+      }"
+    :class="[$attrs.class, {
+      'mb-[1.125rem]': !noMargin && !subgrid,
+      'col-span-full grid grid-cols-subgrid': subgrid,
+    }]"
+    @click="$emit('click', $event)"
+  >
+    <label
+      v-if="!hideTitle && !seamless && (title || $slots.title)"
+      :for="id"
+      class="text-accent relative block text-xs font-semibold leading-loose"
+      :class="{
+        'cursor-not-allowed opacity-50': isDisabled && !isReadonly && !isSkeleton,
+        'col-start-1': subgrid,
+      }"
+      @mousedown="focused ? downed = true : undefined"
+      @click="downed && $event.preventDefault(); downed = false"
+    >
+      <template v-if="!isSkeleton">
+        <slot name="title">
+          <template v-if="titleIcon"><component
+            :is="titleIcon"
+            class="square-[1.25em] mt-[-0.25em] inline"
+          />&nbsp;</template>{{ title }}
+        </slot>
+
+        <span
+          v-if="required"
+          class="text-negative dark:text-negative-dark"
+        >
+          *
+        </span>
+
+        <FilterButton
+          v-if="filterField && encodedQueryParam"
+          :filter-field="filterField"
+          :encoded-query-param="encodedQueryParam"
+          class="absolute top-0.5 ml-2"
+        />
+      </template>
+
+      <WSkeleton v-else />
+    </label>
+
+    <slot name="subtitle" />
+
+    <div
+      ref="field"
+      class="grid"
+      :class="{
+        'pr-9': !title && !$slots.title && filterField,
+        'col-start-2 -col-end-1 row-start-1 -row-end-3 grid-cols-subgrid': subgrid,
+        'grid-cols-[1fr,auto]': !subgrid,
+      }"
+    >
+      <div
+        v-if="!isSkeleton"
+        class="w-has-changes-color-info dark:w-has-changes-color-info-dark relative grid"
+        :class="{
+          'focus-within-not:w-has-changes-color-negative dark:focus-within-not:w-has-changes-color-negative-dark': errorMessage,
+          'col-span-full grid-cols-subgrid': subgrid,
+          'grid-cols-1': !subgrid,
+        }"
+      >
+        <slot
+          v-bind="{id, setFocused, focused, isDragover}"
+          name="field"
+        >
+          <div
+            class="flex min-h-[--w-input-height,2.75rem] items-center font-normal"
+            :class="{
+              'font-mono': mono,
+              'border-t border-solid border-gray-300 dark:border-gray-700': title || $slots.title,
+            }"
+          >
+            <slot v-bind="{id, setFocused, focused, isDragover}">
+              {{ typeof modelValue === 'number' ? numberFormatter.format(modelValue) : modelValue === null ? (emptyValue ?? 'N / A') : (modelValue || emptyValue) }}
+            </slot>
+
+            <WButtonCopy
+              v-if="allowCopy && modelValue"
+              :value="`${modelValue}`"
+              class="pointer-events-auto ml-2"
+            />
+          </div>
+        </slot>
+
+        <span
+          v-if="hasChanges"
+          class="square-2 absolute right-0 top-0 rounded-full bg-[var(--has-changes-bg)] transition-colors"
+        />
+
+        <div
+          v-if="message"
+          v-show="isMessageShown"
+          class="text-description bg-default dark:bg-default-dark absolute right-0 my-0.5 whitespace-nowrap text-xs font-normal"
+          :class="topText ? 'bottom-full' : 'top-full'"
+        >
+          {{ message }}
+        </div>
+
+        <div
+          v-else-if="errorMessage"
+          class="text-negative dark:text-negative-dark bg-default dark:bg-default-dark absolute mt-0.5 text-xs font-normal"
+          :class="[
+            !leftError || topText ? 'right-0 text-end' : 'left-0 text-start',
+            topText ? 'bottom-full' : 'top-full',
+          ]"
+        >
+          {{ errorMessage }}
+        </div>
+
+        <div
+          v-else-if="maxLength !== undefined && focused"
+          class="text-description bg-default dark:bg-default-dark absolute right-0 mt-0.5 whitespace-nowrap text-xs font-normal"
+          :class="topText ? 'bottom-full' : 'top-full'"
+        >
+          {{ numberFormatter.format(`${typeof modelValue === 'number' ? modelValue : (modelValue || '')}`.length) }} / {{ numberFormatter.format(maxLength) }}
+        </div>
+      </div>
+
+      <WSkeleton
+        v-else
+        class="w-skeleton-w-full w-skeleton-rounded-[--w-input-rounded,0.75rem] w-skeleton-h-[--w-input-height,2.75rem]"
+      />
+
+      <div
+        v-if="$slots.right"
+        ref="rightContainer"
+        class="sm-not:flex-col flex gap-4 pl-4"
+      >
+        <slot name="right" />
+      </div>
+
+      <template v-if="!title && !$slots.title && filterField">
+        <FilterButton
+          :filter-field="filterField"
+          :encoded-query-param="encodedQueryParam"
+          :skeleton="isSkeleton"
+          class="pointer-events-auto absolute right-0 self-center"
+        />
+      </template>
+    </div>
+
+    <slot name="bottom" />
+
+    <div
+      v-if="description"
+      class="text-description col-start-1 whitespace-pre-wrap text-pretty break-words text-xs font-normal"
+      :class="{
+        'opacity-50': isDisabled && !isReadonly && !isSkeleton,
+        'pt-4': !subgrid,
+      }"
+    >
+      <WSkeleton v-if="isSkeleton" />
+
+      <template v-else>
+        {{ description }}
+      </template>
+    </div>
+
+    <WTooltip
+      v-if="tooltipText && !isSkeleton && !isReadonly"
+      :text="tooltipText"
+    />
+  </div>
+</template>
+
+<script lang="ts" setup>
+import type {FieldWrapperProps} from './types'
+
+import {type StyleValue, type VNode, computed, inject, onBeforeUnmount, ref, useId, useTemplateRef} from 'vue'
+
+import WButtonCopy from '@/components/Button/WButtonCopy.vue'
+import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+import WTooltip from '@/components/Tooltip/WTooltip.vue'
+
+import {encodeQueryParam} from '@/utils/api'
+import {useComponentStates} from '@/utils/useComponentStates'
+import {numberFormatter} from '@/utils/utils'
+
+import FilterButton from './components/FilterButton.vue'
+import {wFieldSetShowMessage} from './use/useFieldSaved'
+
+defineOptions({inheritAttrs: false})
+
+const props = withDefaults(
+  defineProps<FieldWrapperProps>(),
+  {
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
+
+const emit = defineEmits<{
+  (e: 'click', value: MouseEvent): void
+  (e: 'drop', value: DataTransferItemList): void
+}>()
+
+const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
+
+const id = useId()
+
+const downed = ref(false)
+
+const fieldRef = useTemplateRef<HTMLDivElement>('field')
+
+const getFieldEl = (): HTMLDivElement | null => fieldRef.value
+
+const focused = ref(false)
+
+const message = ref<string | null>(null)
+const isMessageShown = ref(true)
+
+const encodedQueryParam = props.filterField !== undefined
+  ? computed(() => encodeQueryParam(props.filterValue === undefined ? props.modelValue : props.filterValue))
+  : undefined
+
+const setFocused = (value: boolean): void => {
+  focused.value = value
+}
+
+let timeout: NodeJS.Timeout | null = null
+
+const resetMessage = () => {
+  message.value = null
+  isMessageShown.value = true
+
+  if (timeout) {
+    clearTimeout(timeout)
+    timeout = null
+  }
+}
+
+const showMessage = (value: string, durationMs: number = 2000) => {
+  if (timeout) clearTimeout(timeout)
+
+  if (message.value && isMessageShown.value) {
+    isMessageShown.value = false
+
+    timeout = setTimeout(() => showMessage(value, durationMs), 100)
+  } else {
+    message.value = value
+    isMessageShown.value = true
+
+    timeout = setTimeout(resetMessage, durationMs)
+  }
+}
+
+const setShowMessageInjected = inject(wFieldSetShowMessage, null)
+
+setShowMessageInjected?.(showMessage)
+
+const isDragover = ref(false)
+
+const onDragover = (): void => {
+  isDragover.value = true
+}
+
+const onDragleave = (): void => {
+  isDragover.value = false
+}
+
+const onDrop = (event: DragEvent): void => {
+  const list = event.dataTransfer?.items
+
+  if (list) emit('drop', list)
+}
+
+onBeforeUnmount(() => {
+  setShowMessageInjected?.(null)
+  resetMessage()
+})
+
+defineExpose({
+  getFieldEl,
+  showMessage,
+})
+
+defineSlots<{
+  title?: () => VNode[]
+  subtitle: () => VNode[]
+  right?: () => VNode[]
+  bottom: () => VNode[]
+  field: (props: {id: string, focused: boolean, setFocused: (value: boolean) => void, isDragover: boolean}) => VNode[]
+  default: (props: {id: string, focused: boolean, setFocused: (value: boolean) => void, isDragover: boolean}) => VNode[]
+}>()
+</script>

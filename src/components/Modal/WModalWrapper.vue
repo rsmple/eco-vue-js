@@ -1,0 +1,115 @@
+<template>
+  <WInfiniteListScrollingElement
+    ref="content"
+    class="
+      bg-default dark:bg-default-dark w-modal-wrapper
+      scrollbar-width-thin grid
+      max-h-[calc(100%-var(--inner-margin,2rem)*2)]
+      w-[--w-modal-wrapper-width,35rem] max-w-[calc(100%-var(--inner-margin,2rem)*2)] grid-cols-[1fr] grid-rows-[auto,1fr,auto]
+      overflow-auto overscroll-contain rounded-[--w-modal-wrapper-rounded,1.5rem] shadow-md
+    "
+    :class="{
+      'sm-not:max-w-full sm-not:h-full sm-not:rounded-none sm-not:max-h-full': maximized,
+    }"
+    :style="{
+      '--w-modal-header-height': headerHeight + 'px',
+      '--w-modal-footer-height': footerHeight + 'px',
+      '--w-modal-content-height': contentHeight + 'px'
+    }"
+  >
+    <div
+      ref="header"
+      class="bg-default dark:bg-default-dark sticky left-0 top-0 z-[1] w-[--w-width-inner-out]"
+      :class="{
+        'sm-not:w-full': !maximized,
+        'sm-not:w-screen': maximized,
+      }"
+    >
+      <div class="text-accent -p--w-modal-wrapper-padding flex items-center justify-center text-balance text-center text-xl font-semibold">
+        <slot name="title" />
+      </div>
+
+      <slot name="subtitle" />
+    </div>
+
+    <div class="sm:-px--w-modal-wrapper-padding">
+      <slot />
+    </div>
+
+    <div
+      ref="footer"
+      class="
+        bg-default dark:bg-default-dark -gap--inner-margin -p--w-modal-wrapper-padding
+        md-not:pb-8 sticky bottom-0 left-0 flex w-[--w-width-inner-out] justify-center
+      "
+      :class="{
+        'sm-not:flex-col sm-not:w-full': !maximized,
+        'sm-not:w-screen': maximized,
+        'flex-col': actionsCol,
+      }"
+      :style="{zIndex: BASE_ZINDEX_DROPDOWN}"
+    >
+      <slot name="actions" />
+    </div>
+  </WInfiniteListScrollingElement>
+</template>
+
+<script lang="ts" setup>
+import {onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch} from 'vue'
+
+import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
+
+import {BASE_ZINDEX_DROPDOWN} from '@/utils/utils'
+
+import {wModalHeaderHeight} from './models/injection'
+
+defineProps<{
+  maximized?: boolean
+  actionsCol?: boolean
+}>()
+
+const headerRef = useTemplateRef('header')
+const footerRef = useTemplateRef('footer')
+const contentRef = useTemplateRef<{$el: HTMLElement}>('content')
+
+const headerHeight = ref(0)
+const footerHeight = ref(0)
+const contentHeight = ref(0)
+
+provide(wModalHeaderHeight, headerHeight)
+
+let observer: ResizeObserver | null = null
+const observed = new Map<Element, (height: number) => void>()
+
+const observe = (el: Element | null | undefined, setter: (height: number) => void) => {
+  if (!el || !observer) return
+  observed.set(el, setter)
+  observer.observe(el)
+}
+
+onMounted(() => {
+  observer = new ResizeObserver(entries => {
+    for (const entry of entries) {
+      const setter = observed.get(entry.target)
+      if (!setter) continue
+      const height = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height
+      setter(height)
+    }
+  })
+
+  observe(headerRef.value, value => { headerHeight.value = value })
+  observe(footerRef.value, value => { footerHeight.value = value })
+  observe(contentRef.value?.$el, value => { contentHeight.value = value })
+})
+
+watch(contentRef, value => {
+  if (!observer || !value?.$el || observed.has(value.$el)) return
+  observe(value.$el, height => { contentHeight.value = height })
+})
+
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  observer = null
+  observed.clear()
+})
+</script>

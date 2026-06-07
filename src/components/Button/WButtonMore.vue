@@ -1,0 +1,114 @@
+<template>
+  <button
+    v-bind="$attrs"
+    :disabled="disabled"
+    :class="{
+      'w-hover-circle-trigger cursor-pointer': !disabled,
+      'cursor-not-allowed opacity-50': disabled,
+    }"
+    class="flex justify-center outline-none"
+    :aria-expanded="isOpen"
+    :aria-disabled="disabled"
+    aria-label="More options"
+    @click="toggle"
+  >
+    <WDropdownMenu
+      :is-open="isOpen"
+      :horizontal-align="anchor ? HorizontalAlign.RIGHT_INNER : HorizontalAlign.LEFT_INNER"
+      :update-align="false"
+      :parent-element="anchor"
+    >
+      <template #toggle>
+        <div
+          class="relative"
+          :class="{
+            'w-hover-circle': !disabled,
+            'text-description': !isOpen || anchor,
+            'text-primary dark:text-primary-dark': isOpen && !anchor,
+          }"
+        >
+          <component
+            :is="icon ?? IconMore"
+            class="square-[1.25em]"
+          />
+        </div>
+      </template>
+
+      <template #content="{isTop, isRight, isLeft}">
+        <WClickOutside
+          no-filter
+          class="
+            bg-default dark:bg-default-dark overflow-hidden
+            rounded-xl text-start font-normal shadow-md dark:border dark:border-solid dark:border-gray-800
+          "
+          :class="{
+            'sm-not:-mr-4 my-4 -mr-5': !anchor,
+            'rounded-bl-none': anchor && isRight && isTop,
+            'rounded-tl-none': anchor && isRight && !isTop,
+            'rounded-br-none': anchor && isLeft && isTop,
+            'rounded-tr-none': anchor && isLeft && !isTop,
+          }"
+          @click="close"
+        >
+          <slot />
+        </WClickOutside>
+      </template>
+    </WDropdownMenu>
+  </button>
+</template>
+
+<script lang="ts" setup>
+import type {DropdownProps} from '../Dropdown/types'
+
+import {computed, useId} from 'vue'
+
+import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
+import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+
+import IconMore from '@/assets/icons/IconMore.svg?component'
+
+import {HorizontalAlign} from '@/utils/HorizontalAlign'
+
+import {useButtonMoreId} from './models/buttonMore'
+
+const props = defineProps<{
+  icon?: SVGComponent
+  disabled?: boolean
+  anchor?: DropdownProps['parentElement']
+}>()
+
+const emit = defineEmits<{
+  (e: 'close'): void
+}>()
+
+const id = useId()
+
+const {current} = useButtonMoreId()
+
+const isOpen = computed(() => current.value === id)
+
+const toggle = (): void => {
+  if (props.disabled) return
+
+  if (current.value === id) current.value = undefined
+  else current.value = id
+
+  if (!isOpen.value) emit('close')
+}
+
+const close = (): void => {
+  current.value = undefined
+
+  emit('close')
+}
+
+const open = () => {
+  current.value = id
+}
+
+defineExpose({
+  open,
+  close,
+  isOpen,
+})
+</script>

@@ -1,0 +1,826 @@
+<template>
+  <WFieldWrapper
+    ref="fieldWrapper"
+    v-bind="props"
+    :has-changes="asyncState.hasChanges.value || hasChanges"
+    :allow-clear="asyncState.isAsync.value ? (!textarea || allowClear) && asyncState.focused.value : allowClear"
+    :class="[$attrs.class, {
+      'group/seamless': seamless,
+    }]"
+    @click="seamless && focus()"
+    @drop="onDrop"
+  >
+    <template
+      v-if="$slots.title"
+      #title
+    >
+      <slot name="title" />
+    </template>
+
+    <template
+      v-if="$slots.subtitle && unclickable !== false"
+      #subtitle
+    >
+      <slot name="subtitle" />
+    </template>
+
+    <template
+      v-if="isReadonly"
+      #default
+    >
+      <div
+        class="flex max-w-full gap-1"
+        :class="{
+          'flex-wrap': !seamless,
+          'overflow-hidden': seamless,
+          'w-full': textarea,
+        }"
+      >
+        <slot name="prefix" />
+        <component
+          :is="textarea ? 'code' : 'div'"
+          v-if="!hideInput"
+          :class="{
+            'font-mono': mono,
+            'text-secure': textSecure && !isSecureVisible && modelValue,
+            'relative h-[--w-textarea-height,10rem] min-h-[--w-textarea-height,10rem] w-full overflow-auto overscroll-contain whitespace-pre bg-[--w-input-bg,inherit]': textarea,
+            'resize-y': resize && textarea,
+            'resize-none': !resize && textarea,
+          }"
+          class="scrollbar-width-thin group/field -py--w-option-padding overflow-x-auto overscroll-x-contain"
+        ><slot
+           name="before"
+           v-bind="{modelValue}"
+         />
+          <template v-if="textarea">
+            <div
+              v-for="(line, index) in readonlyLines"
+              :key="index"
+              class="line"
+            >
+              <div>
+                <br v-if="line.length === 0">
+                <template
+                  v-for="(part, partIndex) in line"
+                  :key="partIndex"
+                >
+                  <component
+                    :is="part.tag"
+                    v-if="typeof part !== 'string'"
+                    :id="part.id || undefined"
+                    :class="part.class"
+                  >{{ part.value }}</component>
+                  <template v-else>
+                    {{ part }}
+                  </template>
+                </template>
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            {{ modelValue || emptyValue }}
+          </template>
+        </component>
+      </div>
+    </template>
+
+    <template
+      v-else
+      #field="{id, setFocused, focused, isDragover}"
+    >
+      <div
+        class="
+          relative isolate grid min-h-[--w-input-min-height,var(--w-input-height,2.75rem)]
+          grid-cols-[auto,1fr,auto] overflow-hidden rounded-[--w-input-rounded,0.75rem] border border-solid
+        "
+        :class="{
+          'focus-within:border-primary dark:focus-within:border-primary-dark focus-within:outline-primary/20 dark:focus-within:outline-primary-dark/20 focus-within:outline focus-within:outline-2': !isDisabled && !isReadonly && !unclickable,
+          'cursor-text': !isDisabled,
+          'border-negative dark:border-negative-dark': errorMessage,
+          'border-gray-300 dark:border-gray-700': !isDisabled,
+          'border-gray-300/50 dark:border-gray-700/50': isDisabled,
+          'border-opacity-0 group-hover/seamless:border-opacity-100 dark:border-opacity-0 dark:group-hover/seamless:border-opacity-100': seamless && !focused,
+          'bg-[--w-input-bg,inherit]': !seamless || focused,
+        }"
+        @mousedown="focused ? downed = true : undefined"
+        @click="!downed && focus(); downed = false"
+      >
+        <InputToolbar
+          v-if="!isReadonly && textarea && (rich || toolbarActions || $slots.toolbar)"
+          :list="toolbarActions"
+          :rich="rich === true"
+          :is-undo="historyPosition > 0"
+          :is-redo="historyPosition < history.length - 1"
+          :text-secure="textSecure ?? false"
+          :disabled="isDisabled === true"
+          @wrap-selection="wrapSelection"
+          @undo="undo"
+          @redo="redo"
+        >
+          <slot
+            name="toolbar"
+            v-bind="{wrapSelection}"
+          />
+        </InputToolbar>
+
+        <div
+          v-if="icon"
+          class="flex h-full w-[--w-input-height,2.75rem] select-none items-center justify-center"
+          :class="{
+            'text-description': !focused,
+            'text-primary dark:text-primary-dark': focused,
+          }"
+        >
+          <component
+            :is="icon"
+            class="square-[1.125em]"
+          />
+        </div>
+
+        <div
+          ref="content"
+          class="group/input relative col-start-2 grid grid-cols-1"
+          :class="{
+            'py-[--w-input-gap,0.25rem] first:pl-[--w-input-gap,0.25rem] last:pr-[--w-input-gap,0.25rem]': $slots.prefix,
+            'scrollbar-width-thin overflow-x-auto overscroll-x-contain': noWrap && !(seamless && !focused),
+            'overflow-hidden': seamless && !focused,
+          }"
+        >
+          <div
+            v-if="allowDropFile && isDragging"
+            class="text-primary dark:text-primary-dark bg-primary/10 dark:bg-primary-dark/10 pointer-events-none absolute inset-0.5 rounded-[--w-option-rounded]"
+          >
+            <FilePickerSvg
+              :animate="isDragover"
+              class="w-border-svg-rounded-[--w-option-rounded]"
+            />
+          </div>
+
+          <div
+            class="w-skeleton-w-32 flex gap-[--w-input-gap,0.25rem]"
+            :class="{
+              '[&:not(:has(.w-option-has-bg))]:-px--w-option-padding': !icon && !textarea,
+              'flex-wrap': !noWrap && !seamless,
+              'w-full min-w-max': !textarea && noWrap,
+            }"
+          >
+            <slot
+              name="prefix"
+              v-bind="{modelValue}"
+            />
+
+            <div
+              v-if="!errorMessage && ((placeholderSecure && !modelValue) || (textSecure && modelValue as string | true === true)) && (!asyncState.isAsync.value || !asyncState.value.value) && !focused"
+              class="bg-info/10 dark:bg-info-dark/10 pointer-events-none absolute inset-0.5 flex items-center justify-center rounded-[--w-option-rounded]"
+            >
+              <IconCheckSecret
+                class="text-info dark:text-info-dark"
+                :class="{
+                  'square-6': !textarea,
+                  'square-7': textarea,
+                }"
+              />
+            </div>
+
+            <div
+              class="flex-1"
+              :class="{
+                'w-full': !hideInput && !$slots.prefix,
+                'w-option-has-bg-input': $slots.prefix,
+                'resize-y': resize && textarea,
+                'resize-none': !resize && textarea,
+                'h-[calc(var(--w-input-height,2.75rem)-2px)]': !textarea && !$slots.suffix,
+                'w-option min-w-40': !textarea && $slots.prefix && !hideInput,
+                'font-mono': mono,
+                'text-black-default dark:text-gray-200': !isDisabled,
+                'text-black-default/50 dark:text-gray-200/50': isDisabled,
+                'scrollbar-width-thin min-h-[--w-textarea-height,10rem] w-full overflow-auto overscroll-contain': textarea,
+                'h-[--w-textarea-height,10rem]': textarea && resize,
+                'absolute': hideInput,
+                'opacity-0': textSecure && modelValue as string | true === true && (!asyncState.isAsync.value || !asyncState.value.value) && !focused,
+              }"
+            >
+              <div class="relative flex min-h-full flex-1">
+                <slot
+                  name="before"
+                  v-bind="{modelValue}"
+                />
+
+                <div
+                  v-if="placeholder && textarea && hasNoValue && !focused"
+                  class="text-description -p--w-option-padding pointer-events-none absolute"
+                >
+                  {{ placeholder }}
+                </div>
+
+                <component
+                  :is="textarea ? ContentEditable : 'input'"
+                  :id="id"
+                  ref="input"
+                  class="
+                    w-input min-h-full flex-1 basis-auto appearance-none border-none bg-[inherit]
+                    outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed dark:placeholder:text-gray-500
+                  "
+                  :class="{
+                    'w-0 max-w-0': hideInput,
+                    'text-secure w-input-whitespace-pre-wrap break-all': textSecure && !isSecureVisible,
+                    '[-webkit-text-fill-color:transparent]': textTransparent,
+                    'sm-not:text-[1rem]': !unclickable,
+                    'opacity-0': placeholder && textarea && hasNoValue && !focused,
+                    '-py--w-option-padding': textarea,
+                  }"
+                  :value="gateValue(asyncState.isAsync.value ? asyncState.value.value : modelValue)"
+                  :placeholder="hasNoValue ? placeholder : undefined"
+                  :type="type ?? 'text'"
+                  :name="name"
+                  :disabled="isDisabled"
+                  :readonly="isReadonly || unclickable"
+                  :autocomplete="autocomplete"
+                  :size="size || undefined"
+                  :step="step"
+                  :min="min"
+                  :max="max"
+                  :spellcheck="spellcheck ? 'true' : 'false'"
+                  :max-length="maxLength"
+                  :text-parts="textParts"
+                  @input="handleInputEvent"
+                  @keypress.enter.exact="!isDisabled && !isReadonly && (asyncState.isAsync.value && !textarea ? (asyncState.clearTimeout(), asyncState.hasChanges.value && asyncState.save()) : $emit('keypress:enter', $event))"
+                  @keydown.up.exact.stop="!isDisabled && !isReadonly && $emit('keypress:up', $event)"
+                  @keydown.down.exact.stop="!isDisabled && !isReadonly && $emit('keypress:down', $event)"
+                  @keydown.delete.exact.stop="!isDisabled && !isReadonly && $emit('keypress:delete', $event); handleBackspace($event)"
+                  @keydown="handleHistoryKeydown"
+                  @focus="
+                    $emit('focus', $event);
+                    setFocused(true);
+                    asyncState.focused.value = true;
+                    seamless && nextTick(scrollToInput);
+                  "
+                  @blur="
+                    $emit('blur', $event);
+                    setFocused(false);
+                    if (asyncState.isAsync.value) {
+                      if (textSecure || !asyncState.hasChanges.value) asyncState.cancel();
+                      else asyncState.save();
+                      asyncState.focused.value = false;
+                    }
+                    isSecureVisible = false;
+                    contentRef?.scrollTo({left: 0});
+                  "
+                  @click="$emit('click', $event)"
+                  @mousedown.stop="$emit('mousedown', $event)"
+                  @select.stop="$emit('select:input', $event)"
+                  @update:model-value="updateModelValue"
+                  @paste.prevent="onPaste"
+                  @rendered="$emit('rendered', $event)"
+                />
+
+                <slot name="after" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <InputActions
+          v-if="!seamless || focused"
+          :model-value="(modelValue as ModelValue)"
+          :loading="loading"
+          :allow-clear="allowClear && !hasNoValue"
+          :disabled="isDisabled || disabledActions"
+          :readonly="isReadonly || unclickable === true"
+          :text-secure="textSecure"
+          :is-secure-visible="isSecureVisible"
+          :allow-paste="allowPaste"
+          :allow-copy="allowCopy"
+          :focused="focused"
+          :allow-drop-file="allowDropFile"
+          :textarea="textarea"
+          @click:clear="clearValue"
+          @show:secure="isSecureVisible = true; $emit('click', $event); focus()"
+          @hide:secure="isSecureVisible = false"
+          @click:paste="paste"
+          @click:drop-file="openFilePicker"
+        >
+          <template
+            v-if="$slots.suffix"
+            #default="scope"
+          >
+            <slot
+              name="suffix"
+              v-bind="scope"
+            />
+          </template>
+        </InputActions>
+
+        <slot name="inner" />
+
+        <div
+          v-if="asyncState.isAsync.value && debounce && !hideDebounce"
+          class="absolute inset-x-3 bottom-[calc((var(--w-input-height)-1.75em)/2)] isolate h-0.5"
+        >
+          <Transition
+            enter-active-class="transition-opacity"
+            leave-active-class="transition-opacity"
+            enter-from-class="opacity-0"
+            leave-to-class="opacity-0"
+          >
+            <div
+              v-if="asyncState.timeout.value"
+              class="absolute inset-0 -z-10 bg-gray-200 dark:bg-gray-700"
+            />
+          </Transition>
+
+          <Transition
+            enter-active-class="transition-[width] ease-linear rounded-sm duration-[var(--debounce-duration)]"
+            enter-from-class="w-0"
+            enter-to-class="w-full"
+            leave-active-class="hidden"
+          >
+            <div
+              v-if="asyncState.timeout.value"
+              :key="asyncState.timeout.value.toString()"
+              class="bg-primary dark:bg-primary-dark relative h-full rounded-sm"
+              :style="{'--debounce-duration': debounce + 'ms'}"
+            />
+          </Transition>
+        </div>
+      </div>
+    </template>
+
+    <template
+      v-if="$slots.right"
+      #right
+    >
+      <slot name="right" />
+    </template>
+
+    <template
+      v-if="$slots.bottom || asyncActionsShown"
+      #bottom
+    >
+      <slot name="bottom" />
+
+      <InputAsyncButtons
+        v-if="asyncActionsShown"
+        :disabled="disabled || loading"
+        :loading="loading"
+        @cancel="asyncState.cancel(); blur()"
+        @save="asyncState.save()"
+      />
+    </template>
+  </WFieldWrapper>
+</template>
+
+<script lang="ts" setup generic="Type extends InputType = 'text'">
+import type {InputProps, TextPart, WrapSelection} from './types'
+import type {ShowMessage} from '../FieldWrapper/use/useFieldSaved'
+
+import {computed, defineAsyncComponent, hydrateOnInteraction, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch} from 'vue'
+
+import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
+
+import IconCheckSecret from '@/assets/icons/IconCheckSecret.svg?component'
+
+import {Notify} from '@/utils/Notify'
+import {getIsMobile} from '@/utils/mobile'
+import {isDragging} from '@/utils/preventDragFile'
+import {useComponentStates} from '@/utils/useComponentStates'
+import {checkPermissionPaste} from '@/utils/useCopy'
+import {useTabActiveListener} from '@/utils/useTabActiveListener'
+import {debounce as debounceFn} from '@/utils/utils'
+
+import InputActions from './components/InputActions.vue'
+import {buildLines} from './models/buildLines'
+import {useInputAsync} from './models/useInputAsync'
+import {type CaretOffset} from './models/utils'
+
+import FilePickerSvg from '../FilePicker/components/FilePickerSvg.vue'
+
+const ContentEditable = defineAsyncComponent({
+  loader: () => import('./components/ContentEditable.vue'),
+  hydrate: hydrateOnInteraction(),
+})
+const InputAsyncButtons = defineAsyncComponent(() => import('./components/InputAsyncButtons.vue'))
+const InputToolbar = defineAsyncComponent(() => import('./components/InputToolbar.vue'))
+
+type ModelValue = Required<InputProps<Type>>['modelValue']
+
+interface HistoryEntry {
+  value: ModelValue | undefined
+  caret: CaretOffset
+}
+
+defineOptions({inheritAttrs: false})
+
+const props = withDefaults(
+  defineProps<InputProps<Type>>(),
+  {
+    size: 10,
+    autocomplete: 'off',
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+    unclickable: null,
+  },
+)
+
+const emit = defineEmits<{
+  (e: 'update:model-value', value: NonNullable<ModelValue> | undefined): void
+  (e: 'keypress:enter', value: KeyboardEvent): void
+  (e: 'keypress:up', value: KeyboardEvent): void
+  (e: 'keypress:down', value: KeyboardEvent): void
+  (e: 'keypress:delete', value: KeyboardEvent): void
+  (e: 'keypress:backspace', value: KeyboardEvent): void
+  (e: 'click:clear'): void
+  (e: 'focus', value: FocusEvent | undefined): void
+  (e: 'blur', value: FocusEvent): void
+  (e: 'click', value: MouseEvent): void
+  (e: 'mousedown', value: MouseEvent): void
+  (e: 'select:input', value: Event): void
+  (e: 'paste'): void
+  (e: 'rendered', taggedList: HTMLElement[]): void
+}>()
+
+const {isReadonly, isDisabled} = useComponentStates(props)
+
+const fieldWrapperRef = useTemplateRef('fieldWrapper')
+const contentRef = useTemplateRef('content')
+const inputRef = useTemplateRef<HTMLInputElement | ComponentInstance<typeof ContentEditable>>('input')
+const isSecureVisible = ref(false)
+const downed = ref(false)
+
+const gateValue = (value: unknown) => typeof value !== 'string'
+  ? props.textSecure || typeof value !== 'number' ? '' : `${ value }`
+  : value
+
+const asyncState = useInputAsync({
+  props,
+  emit: emit as (e: 'update:model-value', value: string | number | null | undefined) => void,
+  blur: () => inputRef.value?.blur(),
+})
+
+const asyncActionsShown = computed(() => asyncState.isAsync.value && !props.skeleton && asyncState.hasChanges.value && asyncState.focused.value && (props.textSecure || props.textarea || props.explicit))
+
+const history = ref<HistoryEntry[]>([])
+const historyPosition = ref(-1)
+
+const hasNoValue = computed(() => (asyncState.isAsync.value ? !asyncState.value.value : !props.modelValue) && !props.textParts?.length && (!props.textSecure || !props.modelValue))
+
+const readonlyLines = computed(() => {
+  const sourceParts: TextPart[] = props.textParts ?? [(props.modelValue || props.emptyValue)?.toString() ?? '']
+  return buildLines(sourceParts)
+})
+
+const getCaret = (): CaretOffset => {
+  if (!inputRef.value) return {start: 0, end: 0}
+  if ('getCaret' in inputRef.value) return inputRef.value.getCaret()
+  return {start: inputRef.value.selectionStart ?? 0, end: inputRef.value.selectionEnd ?? 0}
+}
+
+const noSelectionTypes = ['email', 'number', 'date']
+
+const setCaret = (start: number, end?: number): void => {
+  if (!inputRef.value) return
+  if ('setCaret' in inputRef.value) inputRef.value.setCaret(start, end)
+  else {
+    const previousType = inputRef.value.type
+
+    if (noSelectionTypes.includes(previousType)) {
+      if (getIsMobile()) return
+      inputRef.value.type = 'text'
+      inputRef.value.setSelectionRange(start, end ?? start)
+      inputRef.value.type = previousType
+    } else {
+      inputRef.value.setSelectionRange(start, end ?? start)
+    }
+  }
+}
+
+const addToHistory = (value: ModelValue | undefined, noDebounce: boolean) => {
+  if (history.value.length === 0) {
+    history.value.push({value: props.modelValue, caret: getCaret()} as typeof history.value[number])
+    historyPosition.value = 0
+  }
+
+  if (noDebounce) nextTick(() => addToHistoryFn(value))
+  else addToHistoryDebounced(value)
+}
+
+const addToHistoryFn = (value: ModelValue | undefined): void => {
+  const entry: HistoryEntry = {value, caret: getCaret()}
+
+  if (historyPosition.value < history.value.length - 1) history.value = history.value.slice(0, historyPosition.value + 1)
+
+  history.value.push(entry as typeof history.value[number])
+  historyPosition.value = history.value.length - 1
+  if (history.value.length > 50) {
+    history.value.shift()
+    historyPosition.value--
+  }
+}
+
+const addToHistoryDebounced = debounceFn(addToHistoryFn, 500)
+
+const undo = (): void => {
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable || props.textSecure) return
+  if (historyPosition.value <= 0) {
+    fieldWrapperRef.value?.showMessage('No Undo')
+    historyPosition.value = history.value.length ? 0 : -1
+    return
+  }
+
+  fieldWrapperRef.value?.showMessage('Undo')
+  const index = historyPosition.value - 1
+  const item = history.value[index]!
+  emit('update:model-value', item.value as NonNullable<ModelValue>)
+  nextTick(() => setCaret(item.caret.start, item.caret.end))
+  historyPosition.value = index
+}
+
+const redo = (): void => {
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable || props.textSecure) return
+  if (historyPosition.value >= history.value.length - 1) {
+    fieldWrapperRef.value?.showMessage('No Redo')
+    historyPosition.value = history.value.length -1
+    return
+  }
+
+  fieldWrapperRef.value?.showMessage('Redo')
+  const index = historyPosition.value + 1
+  const item = history.value[index]!
+  emit('update:model-value', item.value as NonNullable<ModelValue>)
+  nextTick(() => setCaret(item.caret.start, item.caret.end))
+  historyPosition.value = index
+}
+
+const handleHistoryKeydown = (event: KeyboardEvent): void => {
+  if (!event.ctrlKey && !event.metaKey) return
+  if (event.key !== 'z' && event.key !== 'Z') return
+  event.preventDefault()
+  event.stopPropagation()
+  if (event.shiftKey) redo()
+  else undo()
+}
+
+const updateModelValue = (value: string | undefined, noDebounce = false): void => {
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
+
+  let newValue: NonNullable<ModelValue>
+  if (props.type === 'number') newValue = (typeof value === 'string' && value.length ? Number.parseFloat(value) : undefined) as NonNullable<ModelValue>
+  else newValue = value as NonNullable<ModelValue>
+
+  if (!props.textSecure) addToHistory(newValue, noDebounce)
+
+  if (asyncState.isAsync.value) {
+    asyncState.value.value = newValue
+  } else {
+    emit('update:model-value', newValue)
+  }
+}
+
+const handleBackspace = (event: KeyboardEvent): void => {
+  if (!props.customBackspaceHandle) return
+
+  event.preventDefault()
+  event.stopPropagation()
+
+  const target = event.target as HTMLInputElement | HTMLTextAreaElement | null
+  const value = target?.value
+
+  if (!value || target.selectionStart === null || target.selectionEnd === null) return
+
+  let substring: string
+  let selectionStart: number
+
+  if (target.selectionStart === target.selectionEnd) {
+    if (target.selectionStart === 0) return
+
+    selectionStart = target.selectionStart - 1
+    substring = value.substring(0, selectionStart) + value.substring(target.selectionEnd)
+  } else {
+    selectionStart = target.selectionStart
+    substring = value.substring(0, selectionStart) + value.substring(target.selectionEnd)
+  }
+  
+  target.value = substring
+  updateModelValue(substring)
+
+  nextTick().then(() => target.setSelectionRange(selectionStart, selectionStart))
+}
+
+const handleInputEvent = (event: Event): void => {
+  const target = event.target as HTMLInputElement | HTMLTextAreaElement | null
+  const value = target?.value
+
+  if (props.maxLength && typeof value === 'string' && value.length > props.maxLength) {
+    event.preventDefault()
+
+    const substring = value.substring(0, props.maxLength)
+
+    if (target) target.value = substring
+    updateModelValue(substring)
+    return
+  }
+
+  updateModelValue(value)
+}
+
+const clearValue = () => {
+  if (isDisabled.value || isReadonly.value || props.unclickable) return
+
+  if (typeof props.modelValue === 'string') updateModelValue('', true)
+  else updateModelValue(undefined, true)
+
+  inputRef.value?.focus()
+  emit('click:clear')
+}
+
+const focus = (): void => {
+  if (isDisabled.value || isReadonly.value) return
+
+  if (props.unclickable) emit('focus', undefined)
+  else inputRef.value?.focus()
+}
+
+const blur = (): void => inputRef.value?.blur()
+
+const onPaste = async (e: ClipboardEvent) => {
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
+
+  const text = e.clipboardData?.getData('text/plain').replace(/\r\n?/g, '\n') ?? ''
+
+  if (!text) {
+    fieldWrapperRef.value?.showMessage('Nothing to paste')
+    return
+  }
+
+  if (inputRef.value && 'insertPlain' in inputRef.value) {
+    inputRef.value.insertPlain(text)
+    return
+  }
+ 
+  const caret = getCaret()
+  const currentValue = (asyncState.isAsync.value ? asyncState.value.value : props.modelValue)?.toString() ?? ''
+  const newValue = currentValue.slice(0, caret.start) + text + currentValue.slice(caret.end)
+
+  updateModelValue(newValue, true)
+
+  if (asyncState.isAsync.value) {
+    asyncState.clearTimeout()
+    asyncState.save()
+  }
+
+  await nextTick()
+  setCaret(Math.min(caret.start + text.length, (asyncState.isAsync.value ? asyncState.value.value : props.modelValue)?.toString().length ?? 0))
+}
+
+const paste = async () => {
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
+
+  focus()
+
+  try {
+    await checkPermissionPaste()
+    await navigator.clipboard
+      .readText()
+      .then(value => {
+        if (!value) {
+          Notify.warn({title: 'Nothing to paste'})
+        } else if (!props.maxLength || props.maxLength <= value.length) {
+          updateModelValue(value, true)
+          Notify.success({title: 'Pasted'})
+          nextTick().then(() => emit('paste'))
+        } else Notify.error({
+          title: 'Unable to paste',
+          caption: 'The length of the pasted value exceeds the allowed limit',
+        })
+      })
+  } catch {
+    Notify.error({
+      title: 'Paste failed',
+      caption: `Please allow the clipboard actions in browser settings for current domain: ${ location.host }`,
+    })
+  }
+}
+
+const scrollToInput = () => {
+  if (!contentRef.value || !inputRef.value || !asyncState.focused.value) return
+
+  contentRef.value.scrollTo({left: contentRef.value.scrollWidth - 40})
+}
+
+const wrapSelection = (value: WrapSelection) => inputRef.value && 'wrapSelection' in inputRef.value ? inputRef.value.wrapSelection(value) : void 0
+
+let timeout: NodeJS.Timeout | undefined
+
+const autofocusDebounced = () => {
+  if (timeout) clearTimeout(timeout)
+
+  if (props.autofocus === 0) {
+    focus()
+    return
+  }
+
+  timeout = setTimeout(() => {
+    if (props.autofocus !== false && props.autofocus !== undefined) focus()
+
+    timeout = undefined
+  }, typeof props.autofocus === 'number' ? props.autofocus : 250)
+}
+
+const maxSizeKb = 10
+const maxSize = maxSizeKb * 1024 // 10 KB
+
+let closeModal: (() => void) | null = null
+
+const processFile = async (file: File) => {
+  if (file.size > maxSize) {
+    fieldWrapperRef.value?.showMessage(`File is too large. Max size is ${ (maxSizeKb).toFixed(0) } KB`, 4000)
+    return
+  }
+
+  const text = await file.text()
+
+  if (text.length === 0) {
+    fieldWrapperRef.value?.showMessage('File is empty', 4000)
+    return
+  } else if (props.maxLength && text.length > props.maxLength) {
+    fieldWrapperRef.value?.showMessage(`File content length exceeds the allowed limit of ${ props.maxLength } characters`, 4000)
+    return
+  }
+
+  if (props.modelValue === text) {
+    fieldWrapperRef.value?.showMessage('File content is already applied', 2000)
+    return
+  }
+
+  updateModelValue(text, true)
+  fieldWrapperRef.value?.showMessage(`File "${ file.name }" applied`, 2000)
+  focus()
+}
+
+const onDrop = async (list: DataTransferItemList) => {
+  closeModal?.()
+  closeModal = null
+
+  const file = list[0]?.getAsFile()
+
+  if (!file) return
+
+  await processFile(file)
+}
+
+const openFilePicker = () => {
+  if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
+
+  closeModal?.()
+  closeModal = null
+
+  const input = document.createElement('input')
+  input.type = 'file'
+
+  input.onchange = async (event) => {
+    const target = event.target as HTMLInputElement
+    const file = target.files?.[0]
+
+    if (!file) return
+
+    await processFile(file)
+  }
+
+  input.click()
+}
+
+const showMessage: ShowMessage = (...args) => fieldWrapperRef.value?.showMessage(...args)
+
+if (props.autofocus !== false && props.autofocus !== undefined) useTabActiveListener(autofocusDebounced)
+
+watch(() => props.autofocus, value => {
+  if (value === false || value === undefined) return
+
+  nextTick(autofocusDebounced)
+})
+
+onMounted(() => {
+  if (props.autofocus !== false && props.autofocus !== undefined) autofocusDebounced()
+})
+
+onBeforeUnmount(() => {
+  if (timeout) {
+    clearTimeout(timeout)
+    timeout = undefined
+  }
+})
+
+defineExpose({
+  focus,
+  blur,
+  wrapSelection,
+  setCaret,
+  getCaret,
+  getFieldEl: () => fieldWrapperRef.value?.getFieldEl() ?? null,
+  scrollToInput,
+  undo,
+  redo,
+  showMessage,
+})
+</script>

@@ -1,0 +1,78 @@
+{
+  "name": "eco-vue-js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rsmple/eco-vue-js.git"
+  },
+  "version": "0.12.51",
+  "scripts": {
+    "build": "run-p type-check \"build-only {@}\" --",
+    "dev": "vite build --mode development --watch",
+    "build-only": "vite build",
+    "build-pack": "vite build && cd package && npm pack",
+    "type-check": "vue-tsc --build --force",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:inspect": "npx eslint --inspect-config"
+  },
+  "dependencies": {
+    "@stylistic/eslint-plugin": "5.10.0",
+    "@tanstack/eslint-plugin-query": "5.96.2",
+    "@vue/eslint-config-typescript": "14.7.0",
+    "eslint-import-resolver-typescript": "4.4.4",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-jsonc": "3.1.2",
+    "eslint-plugin-svgo": "0.12.0",
+    "eslint-plugin-tailwindcss": "3.18.2",
+    "eslint-plugin-unused-imports": "4.4.1",
+    "eslint-plugin-vue": "10.8.0"
+  },
+  "peerDependencies": {
+    "@tanstack/vue-query": ">=5.92.9",
+    "vue": ">=3.5.30"
+  },
+  "peerDependenciesOptional": {
+    "vue-router": ">=5.0.3"
+  },
+  "peerDependenciesMeta": {
+    "vue-router": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@emnapi/core": "1.9.1",
+    "@emnapi/runtime": "1.9.1",
+    "@tsconfig/node22": "22.0.5",
+    "@types/jsdom": "28.0.1",
+    "@types/node": "25.5.2",
+    "@types/postcss-import": "14.0.3",
+    "@vitejs/plugin-vue": "6.0.5",
+    "@vue/tsconfig": "0.9.1",
+    "autoprefixer": "10.4.27",
+    "eslint": "9.39.2",
+    "jsdom": "29.0.2",
+    "npm-run-all2": "8.0.4",
+    "path": "0.12.7",
+    "postcss": "8.5.14",
+    "postcss-import": "16.1.1",
+    "rollup-plugin-watch": "1.0.5",
+    "tailwindcss": "3.4.17",
+    "typescript": "5.9.3",
+    "vite": "8.0.7",
+    "vite-plugin-dts": "4.5.4",
+    "vite-svg-loader": "5.1.1",
+    "vue-router": ">=5.0.4",
+    "vue-tsc": "3.2.6"
+  },
+  "type": "module",
+  "files": [
+    "eslint",
+    "dist",
+    "tailwind-base",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "main": "./dist/main.js",
+  "module": "./dist/main.js",
+  "types": "./dist/main.d.ts"
+}

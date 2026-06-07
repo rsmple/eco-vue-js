@@ -1,0 +1,501 @@
+<template>
+  <WInputSuggest
+    ref="input"
+    v-bind="{
+      ...props,
+      modelValue: search,
+      loading: loading || isLoading || loadingCreate,
+      hideInput: !modelValue?.length && !emptyValue ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
+      filterValue: filterValue === undefined ? modelValue : filterValue,
+      emptyValue: undefined,
+    }"
+    :class="$attrs.class"
+    @update:model-value="!loading && !isLoading && (search = $event as string ?? '')"
+
+    @keypress:enter.stop.prevent="selectCursor"
+    @keypress:up.prevent="cursorUp"
+    @keypress:down.prevent="cursorDown"
+    @keypress:delete="captureDoubleDelete"
+
+    @open="isOpen = true"
+    @close="close"
+    @focus="focused = true; $emit('focus', $event)"
+    @blur="focused = false; $emit('blur', $event)"
+  >
+    <template
+      v-if="$slots.title"
+      #title
+    >
+      <slot name="title" />
+    </template>
+
+    <template
+      v-if="$slots.subtitle"
+      #subtitle
+    >
+      <slot name="subtitle" />
+    </template>
+
+    <template #prefix="{unclickable}">
+      <slot name="prefix" />
+
+      <template v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true">
+        <SelectOptionPrefix
+          v-for="(value, index) in !emptyValue || modelValue?.length !== 0 ? modelValue : emptyValue"
+          :key="value"
+          :option="optionsWithCreated.find(item => valueGetter(item) === value)"
+          :option-component="(optionComponent as SelectOptionComponent<Data>)"
+          :option-component-props="(optionComponentProps as SelectProps<Model, Data, QueryParamsOptions, OptionComponent>['optionComponentProps'])"
+          :index="index"
+          :loading="loading || isLoading"
+          :disabled="isDisabled"
+          :readonly="isReadonly"
+          :disable-clear="disableClear || isReadonly || (seamless && !focused) || modelValue?.length === 0"
+          :search="value"
+          :class="{
+            'cursor-pointer': !isDisabled && !isReadonly,
+            'cursor-not-allowed opacity-50': isDisabled,
+          }"
+          @unselect="unselect(value, $event)"
+        >
+          <template
+            v-if="$slots.option"
+            #option="optionScope"
+          >
+            <slot
+              name="option"
+              v-bind="optionScope"
+              :selected="true"
+              :model="true"
+              :index="index"
+              :skeleton="skeleton ?? false"
+            />
+          </template>
+        </SelectOptionPrefix>
+      </template>
+    </template>
+
+    <template
+      v-if="$slots.right"
+      #right
+    >
+      <slot name="right" />
+    </template>
+
+    <template #content>
+      <div class="max-h-80">
+        <slot name="content" />
+
+        <SelectOption
+          v-if="hasCreateOption"
+          :index="optionsFiltered.length"
+          :is-selected="false"
+          :is-cursor="cursor === optionsFiltered.length"
+          :loading="(loadingCreate || loadingOptionIndex === optionsFiltered.length) && loading"
+          :scroll="isCursorLocked"
+          :hide-option-icon="hideOptionIcon"
+          :disabled="!search || isModelValueSearch"
+          class="first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
+          @select="create(search)"
+          @mouseenter="setCursor(optionsFiltered.length)"
+        >
+          <template #prefix>
+            <div class="w-option w-option-padding-y flex items-center self-start pr-2">
+              New:
+            </div>
+          </template>
+
+          <slot
+            v-if="search && !isModelValueSearch"
+            name="option"
+            :option="undefined"
+            :search="search"
+            :selected="false"
+            :model="false"
+            :index="undefined"
+            :skeleton="false"
+          >
+            <component
+              v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
+              :is="optionComponent"
+              :option="null"
+              :search="search"
+              :selected="false"
+              :model="false"
+            />
+          </slot>
+
+          <div
+            v-else
+            class="text-description w-option w-option-padding-y flex items-center"
+          >
+            Start typing..
+          </div>
+        </SelectOption>
+
+        <div
+          v-if="!optionsFiltered.length && !isModelValueSearch && (!createOption || optionsWithCreated.length)"
+          class="w-select-option first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
+        >
+          <div class="w-option flex cursor-default select-none items-center">
+            {{ !search && emptyStub ? emptyStub : search ? 'No match' : 'Nothing to show' }}
+          </div>
+        </div>
+
+        <SelectOption
+          v-for="(option, index) in optionsFiltered"
+          :key="valueGetter(option)"
+          ref="option"
+          :index="index"
+          :is-selected="modelValue?.includes(valueGetter(option)) ?? false"
+          :is-cursor="index === cursor"
+          :loading="loadingOptionIndex === index && loading"
+          :scroll="isCursorLocked"
+          :hide-option-icon="hideOptionIcon"
+          class="first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
+          @select="select(valueGetter(option), option); setLoadingOptionIndex(index)"
+          @unselect="unselect(valueGetter(option), option); setLoadingOptionIndex(index)"
+          @mouseenter="setCursor(index)"
+        >
+          <template #default="{selected}">
+            <slot
+              name="option"
+              :option="option"
+              :selected="selected"
+              :model="false"
+              :index="index"
+              :skeleton="false"
+              :search="search"
+            >
+              <component
+                v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
+                :is="optionComponent"
+                :option="option"
+                :selected="selected"
+                :model="false"
+              />
+            </slot>
+          </template>
+        </SelectOption>
+      </div>
+    </template>
+  </WInputSuggest>
+</template>
+
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>">
+import type {SelectOptionComponent, SelectOptionComponentProps, SelectOptionProps, SelectProps} from './types'
+
+import {type Ref, computed, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
+
+import WInputSuggest from '@/components/Input/WInputSuggest.vue'
+
+import {ApiError} from '@/utils/api'
+import {useIsMobile} from '@/utils/mobile'
+import {useComponentStates} from '@/utils/useComponentStates'
+import {debounce} from '@/utils/utils'
+
+import SelectOption from './components/SelectOption.vue'
+import SelectOptionPrefix from './components/SelectOptionPrefix.vue'
+
+defineOptions({inheritAttrs: false})
+
+const props = withDefaults(
+  defineProps<SelectProps<Model, Data, QueryParamsOptions, OptionComponent>>(),
+  {
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
+
+const emit = defineEmits<{
+  (e: 'select', item: Model, data: Data): void
+  (e: 'unselect', item: Model, data: Data | undefined): void
+  (e: 'focus', value: FocusEvent | undefined): void
+  (e: 'blur', value: FocusEvent): void
+  (e: 'update:query-options-error', value: string | undefined): void
+  (e: 'init-model'): void
+}>()
+
+const {isReadonly, isDisabled} = useComponentStates(props)
+
+const {isMobile} = useIsMobile()
+
+const isOpen = ref(false)
+const optionRef = useTemplateRef('option')
+const inputRef = useTemplateRef('input')
+const cursor = ref<number>(0)
+const isCursorLocked = ref(false)
+const search = ref('')
+const isModelValueSearch = computed(() => !!search.value && props.modelValue?.includes(search.value as Model))
+const searchPrepared = computed(() => isModelValueSearch.value ? '' : search.value.trim().toLocaleLowerCase())
+const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
+
+const {data, isLoading, error: queryError} = props.useQueryFnOptions
+  ? props.queryParamsOptions === undefined
+    ? (props.useQueryFnOptions as UseQueryEmpty<Data[]>)({enabled: queryEnabled})
+    : props.useQueryFnOptions(toRef(props, 'queryParamsOptions'), {enabled: queryEnabled})
+  : {
+    data: toRef(props, 'options') as Ref<Data[] | undefined>,
+    isLoading: ref(false),
+    error: ref<ApiError | undefined>(undefined),
+  }
+
+const createdOptions = ref([]) as Ref<Data[]>
+const optionsPrepared = computed(() => !data.value ? [] : props.filterOptions ? data.value.filter(option => props.filterOptions?.(option) ?? true) : data.value)
+const optionsWithCreated = computed(() => {
+  if (!props.createdData) {
+    if (!createdOptions.value.length) return optionsPrepared.value
+    else return [
+      ...optionsPrepared.value,
+      ...createdOptions.value,
+    ].filter((option, index, array) => array.findIndex(item => props.valueGetter(item) === props.valueGetter(option)) === index)
+  }
+
+  return [
+    ...optionsPrepared.value,
+    ...props.createdData ?? [],
+    ...createdOptions.value,
+  ].filter((option, index, array) => array.findIndex(item => props.valueGetter(item) === props.valueGetter(option)) === index)
+})
+
+const optionsFiltered = computed(() => searchPrepared.value === '' ? optionsWithCreated.value : optionsWithCreated.value.filter(option => props.searchFn(option, searchPrepared.value)))
+const lastIndex = computed(() => props.createOption ? optionsFiltered.value.length : optionsFiltered.value.length - 1)
+const focused = ref(false)
+const loadingOptionIndex = ref<number | null>(null)
+const loadingCreate = ref(false)
+
+const isDisabledComputed = computed(() => props.loading || isReadonly.value || isDisabled.value)
+
+const hasCreateOption = computed(() => props.createOption && (!optionsFiltered.value.some(option => props.valueGetter(option) === search.value) || isModelValueSearch.value))
+
+const close = () => {
+  if (props.selectOnClose && focused.value && !isModelValueSearch.value) {
+    const optionExact = optionsFiltered.value.find(option => props.valueGetter(option) === search.value)
+
+    if (optionExact) select(props.valueGetter(optionExact), optionExact)
+    else if (search.value && !loadingCreate.value) create(search.value)
+    else if (props.modelValue?.length) {
+      const last = props.modelValue[props.modelValue.length - 1]!
+      unselect(last, optionsWithCreated.value.find(option => props.valueGetter(option) === last))
+    }
+  }
+
+  isOpen.value = false
+  focused.value = false
+  search.value = ''
+}
+
+const setLoadingOptionIndex = (value: number) => {
+  if (isDisabledComputed.value) return
+
+  loadingOptionIndex.value = value
+}
+
+const unlockCursor = debounce(() => {
+  isCursorLocked.value = false
+}, 50)
+
+const lockCursor = () => {
+  isCursorLocked.value = true
+
+  unlockCursor()
+}
+
+const setCursor = (value: number): void => {
+  if (isCursorLocked.value) return
+
+  cursor.value = value
+}
+
+const cursorUp = () => {
+  if (isDisabledComputed.value) return
+
+  lockCursor()
+
+  cursor.value = !optionsFiltered.value.length
+    ? 0
+    : cursor.value < 1
+      ? lastIndex.value
+      : cursor.value - 1
+}
+
+const cursorDown = () => {
+  if (isDisabledComputed.value) return
+
+  lockCursor()
+
+  cursor.value = !optionsFiltered.value.length
+    ? 0
+    : cursor.value >= lastIndex.value
+      ? 0
+      : cursor.value + 1
+}
+
+const selectCursor = () => {
+  if (isDisabledComputed.value) return
+
+  if (cursor.value === optionsFiltered.value.length) {
+    if (search.value && props.createOption) create(search.value)
+
+    return
+  }
+
+  const option = cursor.value !== -1 ? optionsFiltered.value[cursor.value] : undefined
+
+  const value = option ? props.valueGetter(option) : undefined
+
+  if (!value) return
+
+  setLoadingOptionIndex(cursor.value)
+
+  optionRef.value?.forEach(item => item?.toggleCursor())
+}
+
+let deletePressTimeout: NodeJS.Timeout | null = null
+
+const captureDoubleDelete = () => {
+  if (!props.modelValue?.length || search.value.length) return
+
+  if (deletePressTimeout) {
+    const last = props.modelValue[props.modelValue.length - 1]!
+    unselect(last, optionsWithCreated.value.find(option => props.valueGetter(option) === last))
+
+    clearTimeout(deletePressTimeout)
+    deletePressTimeout = null
+  } else {
+    deletePressTimeout = setTimeout(() => {
+      deletePressTimeout = null
+    }, 500)
+  }
+}
+
+const select = (item: Model, data: Data): void => {
+  if (isDisabledComputed.value) return
+
+  emit('select', item, data)
+
+  search.value = ''
+}
+
+const unselect = (item: Model, data: Data | undefined): void => {
+  if (isDisabledComputed.value) return
+
+  emit('unselect', item, data)
+
+  search.value = ''
+
+  const index = createdOptions.value.findIndex(option => props.valueGetter(option) === item)
+
+  if (index !== -1) createdOptions.value.splice(index, 1)
+}
+
+const create = async (value: string) => {
+  if (isDisabledComputed.value) return
+  if (!props.createOption) return
+
+  loadingCreate.value = true
+
+  const option = await props.createOption(value)
+
+  if (option) {
+    createdOptions.value.push(option as Data)
+    setLoadingOptionIndex(optionsFiltered.value.length)
+    select(props.valueGetter(option), option)
+
+    search.value = ''
+  }
+
+  loadingCreate.value = false
+}
+
+const focus = () => {
+  inputRef.value?.focus()
+}
+
+const blur = () => {
+  focused.value = false
+
+  inputRef.value?.blur()
+}
+
+const setSearch = (value: string): void => {
+  search.value = value
+}
+
+watch(isModelValueSearch, async value => {
+  if (!value) return
+
+  await nextTick()
+
+  const index = optionsFiltered.value.findIndex(item => props.valueGetter(item) === search.value)
+
+  if (index !== -1) {
+    cursor.value = index
+    optionRef.value?.find(item => item?.index === index)?.scrollIntoView()
+  }
+})
+
+if (props.useQueryFnDefault) {
+  const {data: defaultData} = props.useQueryFnDefault({enabled: computed(() => !props.disabled)})
+
+  watch(defaultData, value => {
+    if (value && props.modelValue?.length === 0) {
+      select(props.valueGetter(value), value)
+      emit('init-model')
+    }
+  }, {immediate: true})
+}
+
+if (props.useFirstDefault) {
+  watch(data, value => {
+    if (value && props.modelValue?.length === 0 && value[0]) {
+      select(props.valueGetter(value[0]), value[0])
+      emit('init-model')
+    }
+  }, {immediate: true})
+}
+
+watch(() => props.modelValue, async (value, oldValue) => {
+  await nextTick()
+
+  inputRef.value?.updateDropdown()
+
+  if (props.seamless) inputRef.value?.scrollToInput()
+
+  if (!createdOptions.value.length || !oldValue || !value) return
+
+  for (const valueItem of oldValue.filter(item => !value.includes(item))) {
+    const index = createdOptions.value.findIndex(option => props.valueGetter(option) === valueItem)
+
+    if (index !== -1) createdOptions.value.splice(index, 1)
+  }
+})
+
+watch(queryError, error => {
+  if (error instanceof ApiError && error.response?.data?.detail) {
+    emit('update:query-options-error', error.response.data.detail)
+  } else {
+    emit('update:query-options-error', undefined)
+  }
+}, {immediate: true})
+
+watch(() => optionsFiltered.value.length, length => {
+  if (length < cursor.value) cursor.value = length
+})
+
+defineExpose({
+  focus,
+  blur,
+  setSearch,
+})
+
+defineSlots<{
+  title?: () => void
+  subtitle?: () => void
+  option?: (props: PartialNot<SelectOptionProps<Data>>) => void
+  right?: () => void
+  prefix?: () => void
+  content?: () => void
+}>()
+</script>
