@@ -2,7 +2,7 @@ import vue from '@vitejs/plugin-vue'
 import autoprefixer from 'autoprefixer'
 import postcssImport from 'postcss-import'
 import tailwindcss from 'tailwindcss'
-import {defineConfig} from 'vite'
+import {defineConfig, type UserConfig} from 'vite'
 import dts from 'vite-plugin-dts'
 import svgLoader from 'vite-svg-loader'
 
@@ -17,7 +17,7 @@ const tempDir = 'package/dist-temp'
 const finalDir = 'package/dist'
 const mainPath = 'src/main.ts'
 
-export default defineConfig(({mode}) => ({
+export default defineConfig(({mode}): UserConfig => ({
   plugins: [
     dts({
       tsconfigPath: 'tsconfig.vue.json',
