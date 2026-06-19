@@ -53,7 +53,7 @@
     "jsdom": "29.0.2",
     "npm-run-all2": "8.0.4",
     "path": "0.12.7",
-    "postcss": "8.5.14",
+    "postcss": "8.5.15",
     "postcss-import": "16.1.1",
     "rollup-plugin-watch": "1.0.5",
     "tailwindcss": "3.4.17",
