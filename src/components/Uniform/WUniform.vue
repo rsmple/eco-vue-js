@@ -66,7 +66,7 @@
 >
 import type {InnerInstanceExpose, UniformScope, UniformScopeField} from './types'
 
-import {type Ref, type VNode, computed, inject, onUnmounted, provide, reactive, ref, toRef, useId} from 'vue'
+import {type Ref, type VNode, computed, inject, onUnmounted, provide, reactive, toRef, useId} from 'vue'
 
 import {useUniformField} from './use/useUniformField'
 import {useUniformForm} from './use/useUniformForm'
@@ -158,21 +158,9 @@ const slots = defineSlots<{
   default?: (props: UniformScope<ResultModel, InnerModel>) => VNode[]
 }>()
 
-const payloadScope = ref<string[] | undefined>(undefined)
-
 const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
   () => {
     const value = scopeModel.modelValue.value
-
-    if (payloadScope.value && value instanceof Object) {
-      const scoped = {} as ResultModel
-
-      for (const key of payloadScope.value) {
-        scoped[key as keyof ResultModel] = (value as Record<string, unknown>)[key] as ResultModel[keyof ResultModel]
-      }
-
-      return scoped
-    }
 
     if (!scopeForm || !(value instanceof Object) || props.fullPayload) return value
 
@@ -225,7 +213,6 @@ if (scopeSubmit && scope) {
     submit: scopeSubmit.submit,
     submitting: scopeSubmit.submitting,
     hasChanges: (props.noChanges ? toRef(() => false) : scope.hasChanges) as Ref<boolean>,
-    setPayloadScope: fields => { payloadScope.value = fields },
   })
 }
 

@@ -293,13 +293,7 @@ const next = async (update = false): Promise<void> => {
   const item = defaultSlots.value[currentIndex.value]
 
   if (item && getPropValue(item.props, 'requireSave') && stepperController && stepperController.hasChanges.value) {
-    stepperController.setPayloadScope(getPropValue(item.props, 'saveScope'))
-
-    try {
-      if (!await stepperController.submit()) return
-    } finally {
-      stepperController.setPayloadScope(undefined)
-    }
+    if (!await stepperController.submit()) return
   }
 
   switchTab(defaultSlotsKeys.value[currentIndex.value + 1]!)

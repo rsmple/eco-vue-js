@@ -32,5 +32,4 @@ export type TabsItemProps = {
   hasChanges?: boolean
   validate?: () => string | undefined
   requireSave?: boolean
-  saveScope?: string[]
 }

@@ -10,7 +10,6 @@ export type WUniformStepperController = {
   submitting: Ref<boolean>
   hasChanges: Ref<boolean>
   submit: () => Promise<boolean>
-  setPayloadScope: (fields: string[] | undefined) => void
 }
 
 export const wUniformStepperController = Symbol('wUniformStepperController') as InjectionKey<WUniformStepperController>
