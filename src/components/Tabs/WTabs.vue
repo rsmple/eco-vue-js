@@ -141,9 +141,10 @@ import {type Component, type RendererElement, type RendererNode, type VNode, typ
 
 import IconClose from '@/assets/icons/IconClose.svg?component'
 
+import {wUniformStepperController} from '@/components/Uniform/utils/injection'
 import {Notify} from '@/utils/Notify'
 import {useIsMobile} from '@/utils/mobile'
-import {debounce, getHasScrollbar, throttle, unwrapSlots} from '@/utils/utils'
+import {debounce, getHasScrollbar, getPropValue, throttle, unwrapSlots} from '@/utils/utils'
 
 import TabItem from './components/TabItem.vue'
 import TabTitleButton from './components/TabTitleButton.vue'
@@ -278,13 +279,27 @@ const setCurrentDebounced = debounce((value: string) => {
   scrollToTabContent()
 }, 100)
 
-const next = (update = false): void => {
+const stepperController = inject(wUniformStepperController, null)
+
+const next = async (update = false): Promise<void> => {
   const errorMessage = update ? validate(currentIndex.value) : validateIfNoError(currentIndex.value)
 
   if (errorMessage) {
     Notify.warn({title: 'Form contains invalid values', caption: errorMessage.length < 200 ? errorMessage : undefined})
 
     return
+  }
+
+  const item = defaultSlots.value[currentIndex.value]
+
+  if (item && getPropValue(item.props, 'requireSave') && stepperController && stepperController.hasChanges.value) {
+    stepperController.setPayloadScope(getPropValue(item.props, 'saveScope'))
+
+    try {
+      if (!await stepperController.submit()) return
+    } finally {
+      stepperController.setPayloadScope(undefined)
+    }
   }
 
   switchTab(defaultSlotsKeys.value[currentIndex.value + 1]!)

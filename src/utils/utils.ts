@@ -1,5 +1,5 @@
 import type {FieldConfig, FieldConfigMap, GetFieldLabels, ListFields} from '@/components/List/types'
-import type {InjectionKey, VNode} from 'vue'
+import type {InjectionKey, VNode, VNodeProps} from 'vue'
 
 import {isField} from '@/components/List/models/utils'
 
@@ -294,3 +294,7 @@ export enum WrapSelectionType {
 }
 
 export const getOffsetTop = (element: HTMLElement): number => element.offsetParent instanceof HTMLElement ? element.offsetTop + getOffsetTop(element.offsetParent) : element.offsetTop
+
+export const toKebabCase = (value: string): string => value.replace(/\B([A-Z])/g, '-$1').toLowerCase()
+
+export const getPropValue = <Props extends VNodeProps, Key extends keyof Props & string>(props: Props, key: Key): Props[Key] => key in props ? props[key] : props[toKebabCase(key) as Key]

@@ -66,13 +66,13 @@
 >
 import type {InnerInstanceExpose, UniformScope, UniformScopeField} from './types'
 
-import {type Ref, type VNode, computed, inject, onUnmounted, reactive, toRef, useId} from 'vue'
+import {type Ref, type VNode, computed, inject, onUnmounted, provide, reactive, ref, toRef, useId} from 'vue'
 
 import {useUniformField} from './use/useUniformField'
 import {useUniformForm} from './use/useUniformForm'
 import {useUniformModel} from './use/useUniformModel'
 import {useUniformSubmit} from './use/useUniformSubmit'
-import {wUniformUnlistener, wUniformUpdater} from './utils/injection'
+import {wUniformStepperController, wUniformUnlistener, wUniformUpdater} from './utils/injection'
 import {getChangedPayload} from './utils/utils'
 
 import WEmptyComponent from '../EmptyComponent/WEmptyComponent.vue'
@@ -158,11 +158,25 @@ const slots = defineSlots<{
   default?: (props: UniformScope<ResultModel, InnerModel>) => VNode[]
 }>()
 
+const payloadScope = ref<string[] | undefined>(undefined)
+
 const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
   () => {
-    if (!scopeForm || !(scopeModel.modelValue.value instanceof Object) || props.fullPayload) return scopeModel.modelValue.value
+    const value = scopeModel.modelValue.value
 
-    return getChangedPayload<ResultModel>(scopeModel.modelValue.value, scopeModel.modelValueInit.value, Object.values(scopeForm.map.value))
+    if (payloadScope.value && value instanceof Object) {
+      const scoped = {} as ResultModel
+
+      for (const key of payloadScope.value) {
+        scoped[key as keyof ResultModel] = (value as Record<string, unknown>)[key] as ResultModel[keyof ResultModel]
+      }
+
+      return scoped
+    }
+
+    if (!scopeForm || !(value instanceof Object) || props.fullPayload) return value
+
+    return getChangedPayload<ResultModel>(value, scopeModel.modelValueInit.value, Object.values(scopeForm.map.value))
   },
   props.apiMethod,
   (silent?: boolean | undefined, includeMessage?: boolean | undefined) => scope?.validate(silent, includeMessage),
@@ -205,6 +219,15 @@ const scopeForm = slots.default ? useUniformForm(
 ) : undefined
 
 const scope = scopeField ?? scopeForm
+
+if (scopeSubmit && scope) {
+  provide(wUniformStepperController, {
+    submit: scopeSubmit.submit,
+    submitting: scopeSubmit.submitting,
+    hasChanges: (props.noChanges ? toRef(() => false) : scope.hasChanges) as Ref<boolean>,
+    setPayloadScope: fields => { payloadScope.value = fields },
+  })
+}
 
 const updaterInjected = inject(wUniformUpdater, undefined)
 const unlistenerInjected = inject(wUniformUnlistener, undefined)

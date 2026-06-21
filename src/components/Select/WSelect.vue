@@ -134,11 +134,11 @@
         </SelectOption>
 
         <div
-          v-if="!optionsFiltered.length && !isModelValueSearch && (!createOption || optionsWithCreated.length)"
-          class="w-select-option first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
+          v-if="!optionsFiltered.length && !isModelValueSearch && ((!createOption || isLoading) || optionsWithCreated.length)"
+          class="w-select-option first:-pt--w-select-option-padding last:-pb--w-select-option-padding text-description"
         >
           <div class="w-option flex cursor-default select-none items-center">
-            {{ !search && emptyStub ? emptyStub : search ? 'No match' : 'Nothing to show' }}
+            {{ isLoading ? 'Loading..' : !search && emptyStub ? emptyStub : search ? 'No match' : 'Nothing to show' }}
           </div>
         </div>
 
