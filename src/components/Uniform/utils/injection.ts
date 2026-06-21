@@ -1,10 +1,18 @@
-import {type InjectionKey, type Reactive, computed, provide, ref} from 'vue'
+import {type InjectionKey, type Reactive, type Ref, computed, provide, ref} from 'vue'
 
 type UniformState = {hasChanges: boolean, hasValue: boolean | null, hasError: boolean}
 
 export const wUniformUpdater = Symbol('wUniformUpdater') as InjectionKey<(value: Reactive<UniformState>, key: string) => void>
 
 export const wUniformUnlistener = Symbol('wUniformUnlistener') as InjectionKey<(key: string) => void>
+
+export type WUniformStepperController = {
+  submitting: Ref<boolean>
+  hasChanges: Ref<boolean>
+  submit: () => Promise<boolean>
+}
+
+export const wUniformStepperController = Symbol('wUniformStepperController') as InjectionKey<WUniformStepperController>
 
 export const useUniformState = () => {
   const stateMap = ref<Record<string, UniformState>>({})

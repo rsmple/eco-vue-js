@@ -31,4 +31,5 @@ export type TabsItemProps = {
   hasError?: boolean
   hasChanges?: boolean
   validate?: () => string | undefined
+  requireSave?: boolean
 }

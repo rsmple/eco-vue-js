@@ -19,8 +19,8 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
 ) => {
   const submitting = ref(false)
 
-  const submit = () => {
-    if (submitting.value) return
+  const submit = (): Promise<boolean> => {
+    if (submitting.value) return Promise.resolve(false)
 
     const message = validate(false, true)
 
@@ -30,20 +30,16 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
         caption: h(WUniformErrorMessage, {message}),
       })
 
-      return
+      return Promise.resolve(false)
     }
 
     const payload = payloadGetter()
 
-    let promise: ReturnType<typeof apiMethod> | undefined = undefined
-
     submitting.value = true
 
-    promise = apiMethod(payload!)
+    const promise = apiMethod(payload!)
 
-    if (!(promise instanceof Promise)) Promise.resolve(promise)
-
-    return (promise as Promise<OriginalModel> ?? Promise.resolve(undefined))
+    return (promise instanceof Promise ? promise : Promise.resolve(promise as OriginalModel | undefined))
       .then(response => {
         const isResponse = isRequestResponse<OriginalModel>(response)
         const responseData = isResponse ? response.data : response
@@ -52,6 +48,8 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
 
         if (!noInitGetter()) initModel(responseData ?? payload as unknown as OriginalModel)
         onSuccess(responseData ?? payload as unknown as OriginalModel)
+
+        return true
       })
       .catch(error => {
         if (error instanceof ApiError && !(error instanceof ApiErrorCancel)) {
@@ -72,6 +70,8 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
 
           if (messages) invalidate(messages)
         }
+
+        return false
       })
       .finally(() => {
         submitting.value = false

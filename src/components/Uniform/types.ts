@@ -30,7 +30,7 @@ export type UniformInstanceExpose<InnerModel, ModelValue> = UniformInstance & {
   modelValue: ModelValue
   updateModelValue: (newValue: ModelValue) => void
   updateModelValueInner: <Fields extends unknown[] | readonly unknown[]>(newValue: Get<ModelValue, Fields>, field: Fields) => void
-  submit: (() => Promise<void> | undefined) | undefined
+  submit: (() => Promise<boolean>) | undefined
   submitting: boolean
   skeleton: boolean
   initModel: (value?: InnerModel) => void
@@ -54,7 +54,7 @@ export type UniformScope<ModelValue, InitModel = any> = {
   hasChanges: boolean | undefined
   select: (newValue: ModelValue extends unknown[] ? ModelValue[number] : never) => void
   unselect: (newValue: ModelValue extends unknown[] ? ModelValue[number] : never) => void
-  submit: (() => Promise<void> | undefined) | undefined
+  submit: (() => Promise<boolean>) | undefined
   initModel: (value?: InitModel) => void
   onInitModel: () => void
   doValidate: () => void
