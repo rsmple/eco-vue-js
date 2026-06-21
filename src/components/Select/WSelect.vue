@@ -134,7 +134,7 @@
         </SelectOption>
 
         <div
-          v-if="!optionsFiltered.length && !isModelValueSearch && ((!createOption || isLoading) || optionsWithCreated.length)"
+          v-if="isLoading || (!optionsFiltered.length && !isModelValueSearch && (!createOption || optionsWithCreated.length))"
           class="w-select-option first:-pt--w-select-option-padding last:-pb--w-select-option-padding text-description"
         >
           <div class="w-option flex cursor-default select-none items-center">
@@ -267,7 +267,7 @@ const loadingCreate = ref(false)
 
 const isDisabledComputed = computed(() => props.loading || isReadonly.value || isDisabled.value)
 
-const hasCreateOption = computed(() => props.createOption && (!optionsFiltered.value.some(option => props.valueGetter(option) === search.value) || isModelValueSearch.value))
+const hasCreateOption = computed(() => props.createOption && !isLoading.value && (!optionsFiltered.value.some(option => props.valueGetter(option) === search.value) || isModelValueSearch.value))
 
 const close = () => {
   if (props.selectOnClose && focused.value && !isModelValueSearch.value) {
