@@ -211,9 +211,9 @@ const scope = scopeField ?? scopeForm
 if (scopeSubmit && scope) {
   provide(wUniformStepperController, {
     submit: scopeSubmit.submit,
-    submitting: scopeSubmit.submitting,
-    hasChanges: (props.noChanges ? toRef(() => false) : scope.hasChanges) as Ref<boolean>,
-    fullPayload: toRef(props, 'fullPayload'),
+    submitting: () => scopeSubmit.submitting.value,
+    hasChanges: () => props.noChanges ? false : scope.hasChanges?.value ?? false,
+    fullPayload: () => props.fullPayload,
   })
 }
 
