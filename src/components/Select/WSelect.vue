@@ -4,13 +4,13 @@
     v-bind="{
       ...props,
       modelValue: search,
-      loading: loading || isLoading || loadingCreate,
+      loading: loading || isFetching || loadingCreate,
       hideInput: !modelValue?.length && !emptyValue ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
       filterValue: filterValue === undefined ? modelValue : filterValue,
       emptyValue: undefined,
     }"
     :class="$attrs.class"
-    @update:model-value="!loading && !isLoading && (search = $event as string ?? '')"
+    @update:model-value="!loading && !isFetching && (search = $event as string ?? '')"
 
     @keypress:enter.stop.prevent="selectCursor"
     @keypress:up.prevent="cursorUp"
@@ -47,7 +47,7 @@
           :option-component="(optionComponent as SelectOptionComponent<Data>)"
           :option-component-props="(optionComponentProps as SelectProps<Model, Data, QueryParamsOptions, OptionComponent>['optionComponentProps'])"
           :index="index"
-          :loading="loading || isLoading"
+          :loading="loading || isFetching"
           :disabled="isDisabled"
           :readonly="isReadonly"
           :disable-clear="disableClear || isReadonly || (seamless && !focused) || modelValue?.length === 0"
@@ -134,11 +134,11 @@
         </SelectOption>
 
         <div
-          v-if="isLoading || (!optionsFiltered.length && !isModelValueSearch && (!createOption || optionsWithCreated.length))"
+          v-if="isFetching || (!optionsFiltered.length && !isModelValueSearch && (!createOption || optionsWithCreated.length))"
           class="w-select-option first:-pt--w-select-option-padding last:-pb--w-select-option-padding text-description"
         >
           <div class="w-option flex cursor-default select-none items-center">
-            {{ isLoading ? 'Loading..' : !search && emptyStub ? emptyStub : search ? 'No match' : 'Nothing to show' }}
+            {{ isFetching ? 'Loading..' : !search && emptyStub ? emptyStub : search ? 'No match' : 'Nothing to show' }}
           </div>
         </div>
 
@@ -231,18 +231,18 @@ const isModelValueSearch = computed(() => !!search.value && props.modelValue?.in
 const searchPrepared = computed(() => isModelValueSearch.value ? '' : search.value.trim().toLocaleLowerCase())
 const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
 
-const {data, isLoading, error: queryError} = props.useQueryFnOptions
+const {data, isFetching, error: queryError} = props.useQueryFnOptions
   ? props.queryParamsOptions === undefined
     ? (props.useQueryFnOptions as UseQueryEmpty<Data[]>)({enabled: queryEnabled})
     : props.useQueryFnOptions(toRef(props, 'queryParamsOptions'), {enabled: queryEnabled})
   : {
     data: toRef(props, 'options') as Ref<Data[] | undefined>,
-    isLoading: ref(false),
+    isFetching: ref(false),
     error: ref<ApiError | undefined>(undefined),
   }
 
 const createdOptions = ref([]) as Ref<Data[]>
-const optionsPrepared = computed(() => !data.value ? [] : props.filterOptions ? data.value.filter(option => props.filterOptions?.(option) ?? true) : data.value)
+const optionsPrepared = computed(() => !data.value || isFetching.value ? [] : props.filterOptions ? data.value.filter(option => props.filterOptions?.(option) ?? true) : data.value)
 const optionsWithCreated = computed(() => {
   if (!props.createdData) {
     if (!createdOptions.value.length) return optionsPrepared.value
@@ -267,7 +267,7 @@ const loadingCreate = ref(false)
 
 const isDisabledComputed = computed(() => props.loading || isReadonly.value || isDisabled.value)
 
-const hasCreateOption = computed(() => props.createOption && !isLoading.value && (!optionsFiltered.value.some(option => props.valueGetter(option) === search.value) || isModelValueSearch.value))
+const hasCreateOption = computed(() => props.createOption && !isFetching.value && (!optionsFiltered.value.some(option => props.valueGetter(option) === search.value) || isModelValueSearch.value))
 
 const close = () => {
   if (props.selectOnClose && focused.value && !isModelValueSearch.value) {

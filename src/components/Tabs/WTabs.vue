@@ -235,10 +235,16 @@ const hasOnClose = computed(() => defaultSlotsAll.value.some(item => item.props 
 const first = computed<boolean>(() => currentIndex.value === 0)
 const last = computed<boolean>(() => currentIndex.value === defaultSlotsKeys.value.length - 1)
 
-const switchTab = throttle((key: string): void => {
+const switchTab = throttle(async (key: string) => {
   if (current.value === key) {
     scrollToTabContent()
     return
+  }
+
+  const item = defaultSlots.value[currentIndex.value]
+
+  if (item && getPropValue(item.props, 'requireSave') && stepperController && (stepperController.hasChanges.value || stepperController.fullPayload.value)) {
+    if (!await stepperController.submit()) return
   }
 
   updateCurrent(key)
@@ -290,12 +296,6 @@ const next = async (update = false): Promise<void> => {
     return
   }
 
-  const item = defaultSlots.value[currentIndex.value]
-
-  if (item && getPropValue(item.props, 'requireSave') && stepperController && stepperController.hasChanges.value) {
-    if (!await stepperController.submit()) return
-  }
-
   switchTab(defaultSlotsKeys.value[currentIndex.value + 1]!)
 }
 
@@ -303,7 +303,7 @@ const previous = (): void => {
   switchTab(defaultSlotsKeys.value[currentIndex.value - 1]!)
 }
 
-const jump = (name: string, update: boolean): void => {
+const jump = (name: string, update: boolean) => {
   const valid = defaultSlotsKeys.value
     .slice(currentIndex.value, defaultSlotsKeys.value.indexOf(name))
     .every(item => {
