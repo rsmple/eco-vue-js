@@ -4,7 +4,7 @@
     class="relative"
   >
     <template v-if="page && slotList.length !== 0">
-      <div :class="pageClass">
+      <div :class="[pageClass, page !== 1 ? 'pt-[--w-list-gap]' : undefined]">
         <component
           :is="transition ? TransitionGroup : WEmptyComponent"
           v-bind="transition ? {
