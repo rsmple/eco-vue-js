@@ -15,7 +15,7 @@
       v-for="(page, index) in pages"
       ref="pageComponent"
       :key="slotIds[index]"
-      :query-params="{...(queryParams as QueryParams), page}"
+      :query-params="{...(queryParams as QueryParams), page, size: pageLength}"
       :use-query-fn="useQueryFn"
       :skeleton-length="getSkeletonLength(page - 1)"
       :first-page="index === 0"
