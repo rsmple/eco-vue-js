@@ -174,6 +174,7 @@
                 :query-params="queryParams"
                 :has-saved="hasSaved"
                 :mobile="isMobile"
+                :no-mode="noMode"
                 @click:reset="reset(); updateStylesWidth(); updateStylesFixed()"
                 @update:mode="updateMode"
                 @update:field-config-map="updateStylesWidth(); updateStylesFixed()"
@@ -454,6 +455,7 @@ const props = withDefaults(
     noHeaderUpdate?: boolean
     minHeight?: boolean
     toMarkdown?: (data: Data, index: number) => string
+    noMode?: boolean
   }>(),
   {
     count: undefined,

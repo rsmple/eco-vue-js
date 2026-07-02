@@ -21,7 +21,7 @@
         <div class="p-4">
           <div class="grid grid-cols-[auto,auto,auto] items-start">
             <div
-              v-if="!mobile"
+              v-if="!mobile && !noMode"
               class="flex flex-col gap-4"
             >
               <HeaderSettingsModeButton
@@ -35,7 +35,7 @@
             </div>
 
             <div
-              v-if="!mobile"
+              v-if="!mobile && !noMode"
               class="mx-4 h-full border-r border-solid border-gray-200 dark:border-gray-700"
             />
 
@@ -100,6 +100,7 @@ const props = defineProps<{
   hasSaved: boolean
   mobile: boolean
   disabled?: boolean
+  noMode: boolean
 }>()
 
 const emit = defineEmits<{
