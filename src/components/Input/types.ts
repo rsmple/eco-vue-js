@@ -38,6 +38,7 @@ export interface InputProps<Type extends InputType> extends Omit<FieldWrapperPro
   textParts?: TextPart[]
   rich?: boolean
   toolbarActions?: ToolbarAction[]
+  borderClass?: string
 
   async?: boolean
   debounce?: number

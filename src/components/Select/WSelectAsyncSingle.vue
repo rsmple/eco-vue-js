@@ -55,6 +55,13 @@
     >
       <slot name="content" />
     </template>
+
+    <template
+      v-if="$slots.prefix"
+      #prefix
+    >
+      <slot name="prefix" />
+    </template>
   </WSelectAsync>
 </template>
 
@@ -112,5 +119,6 @@ defineSlots<{
   right?: (props: Record<string, never>) => void
   option?: (props: PartialNot<SelectOptionProps<Data>>) => void
   content?: () => void
+  prefix?: () => void
 }>()
 </script>

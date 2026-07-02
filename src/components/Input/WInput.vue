@@ -97,7 +97,7 @@
           'focus-within:border-primary dark:focus-within:border-primary-dark focus-within:outline-primary/20 dark:focus-within:outline-primary-dark/20 focus-within:outline focus-within:outline-2': !isDisabled && !isReadonly && !unclickable,
           'cursor-text': !isDisabled,
           'border-negative dark:border-negative-dark': errorMessage,
-          'border-gray-300 dark:border-gray-700': !isDisabled,
+          [borderClass ?? 'border-gray-300 dark:border-gray-700']: !isDisabled,
           'border-gray-300/50 dark:border-gray-700/50': isDisabled,
           'border-opacity-0 group-hover/seamless:border-opacity-100 dark:border-opacity-0 dark:group-hover/seamless:border-opacity-100': seamless && !focused,
           'bg-[--w-input-bg,inherit]': !seamless || focused,
