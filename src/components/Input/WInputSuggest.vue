@@ -88,9 +88,11 @@
           <slot name="bottom" />
         </template>
 
-        <template #suffix>
+        <template
+          v-if="!isReadonly && !hideToggle && !static"
+          #suffix
+        >
           <InputActionsButton
-            v-if="!isReadonly && !hideToggle && !static"
             label="Show suggest"
             :expanded="isOpen"
             :disabled="isDisabled"

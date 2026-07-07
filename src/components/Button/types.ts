@@ -39,7 +39,7 @@ interface ButtonGroupPropsBase<Model extends number | string | null | boolean>
 
 interface ButtonGroupPropsForModel<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>
   extends ButtonGroupPropsBase<Model> {
-  list: Model[]
+  list: readonly Model[]
   valueGetter?: ValueGetter | undefined
   optionComponent?: ButtonGroupOptionComponent<Model>
 }

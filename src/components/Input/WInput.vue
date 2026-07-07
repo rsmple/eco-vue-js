@@ -189,7 +189,6 @@
                 'w-option-has-bg-input': $slots.prefix,
                 'resize-y': resize && textarea,
                 'resize-none': !resize && textarea,
-                'h-[calc(var(--w-input-height,2.75rem)-2px)]': !textarea && !$slots.suffix,
                 'w-option min-w-40': !textarea && $slots.prefix && !hideInput,
                 'font-mono': mono,
                 'text-black-default dark:text-gray-200': !isDisabled,

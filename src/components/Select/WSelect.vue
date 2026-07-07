@@ -37,9 +37,10 @@
     </template>
 
     <template #prefix="{unclickable}">
-      <slot name="prefix" />
-
-      <template v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true">
+      <slot
+        v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true"
+        name="prefix"
+      >
         <SelectOptionPrefix
           v-for="(value, index) in !emptyValue || modelValue?.length !== 0 ? modelValue : emptyValue"
           :key="value"
@@ -72,7 +73,7 @@
             />
           </template>
         </SelectOptionPrefix>
-      </template>
+      </slot>
     </template>
 
     <template
