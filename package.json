@@ -11,8 +11,8 @@
     "build-only": "vite build",
     "build-pack": "vite build && cd package && npm pack",
     "type-check": "vue-tsc --build --force",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint . --concurrency auto",
+    "lint:fix": "eslint . --concurrency auto --fix",
     "lint:inspect": "npx eslint --inspect-config"
   },
   "dependencies": {

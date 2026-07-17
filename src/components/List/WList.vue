@@ -174,7 +174,7 @@
                 :query-params="queryParams"
                 :has-saved="hasSaved"
                 :mobile="isMobile"
-                :no-mode="noMode"
+                :no-mode="noMode ?? false"
                 @click:reset="reset(); updateStylesWidth(); updateStylesFixed()"
                 @update:mode="updateMode"
                 @update:field-config-map="updateStylesWidth(); updateStylesFixed()"

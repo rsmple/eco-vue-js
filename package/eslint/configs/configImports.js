@@ -35,6 +35,11 @@ const createConfig = (tsConfig, astro = false) => {
       // 'import/extensions': [1, 'never'],
       'import/first': 1,
       'import/newline-after-import': 1,
+      'import/namespace': 'off',
+      'import/named': 'off',
+      'import/default': 'off',
+      'import/no-named-as-default': 'off',
+      'import/no-named-as-default-member': 'off',
     },
     settings: {
       'import/parsers': {
@@ -61,7 +66,6 @@ export default ({tsConfig = './tsconfig.json', astro = false}) => [
       ...importPlugin.flatConfigs.recommended.rules,
       ...(astro ? {
         'import/named': 'off',
-        'import/namespace': 'off',
         'import/default': 'off',
       } : {}),
       'import/order': [
@@ -86,6 +90,7 @@ export default ({tsConfig = './tsconfig.json', astro = false}) => [
       // 'import/extensions': [1, 'never'],
       'import/first': 1,
       'import/newline-after-import': 1,
+      'import/namespace': 'off',
     },
   },
 
