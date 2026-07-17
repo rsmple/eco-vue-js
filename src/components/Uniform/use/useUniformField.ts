@@ -93,7 +93,7 @@ export const useUniformField = <Model>(
     if (message.length === 0) nextTick(() => hasShownError.value = false)
   }
 
-  const validate: UniformValidate = (silent?: boolean, includeMessage?: boolean)=> {
+  const validate: UniformValidate = (silent?: boolean, includeMessage?: boolean) => {
     const message = validateFieldValue(modelValue.value)
 
     errorMessage.value = message

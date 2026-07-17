@@ -36,7 +36,8 @@ export default (config = {}) => [
       'key-spacing': 1,
       '@stylistic/function-call-spacing': 1,
       '@stylistic/member-delimiter-style': [1, {multiline: {delimiter: 'none'}, singleline: {delimiter: 'comma'}}],
-      '@stylistic/type-annotation-spacing': [1, {before: false, after: true, overrides: {arrow: {before: true, after: true}}}],
+      '@stylistic/type-annotation-spacing': [1, {before: false, after: true, overrides: {arrow: 'ignore'}}],
+      '@stylistic/arrow-spacing': [1, {before: true, after: true}], 
       '@stylistic/quote-props': [1, 'as-needed'],
 
       '@typescript-eslint/no-explicit-any': 'error',

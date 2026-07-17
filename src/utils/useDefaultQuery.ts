@@ -26,6 +26,7 @@ export const PAGE_LENGTH = 24
 
 export const makeQueryPaginated = <Data, QueryParams extends {page?: number}>(key: string, getter: (queryParams: QueryParams) => Data[] | undefined, setter?: (data: Data[]) => void, pageLength = PAGE_LENGTH): UseQueryPaginated<Data, QueryParams> => {
   return (queryParams: MaybeRef<QueryParams>, options: QueryOptions<PaginatedResponse<Data>> = {}) => {
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     const query = useDefaultQuery<PaginatedResponse<Data>>({
       queryKey: [key, queryParams],
       queryFn: (): Promise<PaginatedResponse<Data>> => {
