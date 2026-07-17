@@ -131,7 +131,7 @@ const updateHasActive = async () => {
   hasActive.value = innerRef.value?.some(item => item.isActive) ?? false
 }
 
-let timeout: NodeJS.Timeout | null = null
+let timeout: number | null = null
 
 const showDropdown = () => {
   if (timeout) {

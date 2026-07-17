@@ -258,7 +258,7 @@ const updateIndex = (value: number) => {
   setCurrentDebounced(defaultSlotsKeys.value[value]!)
 }
 
-let timeout: NodeJS.Timeout | null = null
+let timeout: number | null = null
 
 const scrollToTabContent = () => {
   if (!isMobile.value || !props.side) return

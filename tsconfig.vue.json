@@ -33,7 +33,8 @@
     "target": "es2020",
     "lib": [
       "ESNext",
-      "DOM"
+      "DOM",
+      "DOM.Iterable"
     ],
     "typeRoots": [
       "./src/types/global.d.ts",

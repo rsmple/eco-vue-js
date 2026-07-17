@@ -145,7 +145,7 @@ const focus = () => {
   else if ('$el' in containerRef.value && containerRef.value.$el instanceof HTMLElement) containerRef.value.$el.focus()
 }
 
-let timeout: NodeJS.Timeout | undefined
+let timeout: number | undefined
 
 const autofocusDebounced = () => {
   if (timeout) clearTimeout(timeout)

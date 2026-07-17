@@ -66,7 +66,7 @@ const observer = new IntersectionObserver(observerCb, {
   threshold: 0.3,
 })
 
-let timeout: NodeJS.Timeout
+let timeout: number
 
 watch(contentRef, (value, oldValue) => {
   if (oldValue) observer.unobserve(oldValue)

@@ -41,7 +41,7 @@ const parent = computed(() => containerRef.value?.parentElement ?? null)
 const triggerElement = computed(() => props.noTrigger ? null : (props.trigger ?? parent.value))
 const isOpen = computed(() => tooltipMeta.value?.id === id)
 
-let timeout: NodeJS.Timeout | null = null
+let timeout: number | null = null
 
 const open = async () => {
   if (timeout) {

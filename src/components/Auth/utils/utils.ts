@@ -50,7 +50,7 @@ export function removeExpirationDate() {
   deleteCookie(EXPIRATION_DATE_KEY)
 }
 
-let refreshTimestampTimeout: NodeJS.Timeout | null = null
+let refreshTimestampTimeout: number | null = null
 
 export function setRefreshTimestamp() {
   localStorage.setItem(REFRESH_TIMESTAMP_KEY, new Date().getTime().toString())

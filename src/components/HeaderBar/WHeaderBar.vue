@@ -80,7 +80,7 @@ const elementRef = useTemplateRef('element')
 
 const isTransparent = ref(false)
 
-let timeout: NodeJS.Timeout | undefined
+let timeout: number | undefined
 let observer: ResizeObserver | null = null
 
 onMounted(() => {

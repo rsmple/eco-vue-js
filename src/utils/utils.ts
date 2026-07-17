@@ -45,7 +45,7 @@ export const hasParent = (parent: Element, current: Element): boolean => {
 type DebounceCb = (...args: any[]) => void
 
 export function debounce<T extends DebounceCb>(cb: T, delay = 200): T {
-  let timeout: NodeJS.Timeout | undefined
+  let timeout: number | undefined
 
   return function (this: unknown, ...args: Parameters<T>) {
     if (timeout) clearTimeout(timeout)
@@ -58,7 +58,7 @@ export function debounce<T extends DebounceCb>(cb: T, delay = 200): T {
 }
 
 export function throttle<T extends DebounceCb>(cb: T, delay = 200): T {
-  let timeout: NodeJS.Timeout | undefined
+  let timeout: number | undefined
 
   return function (this: unknown, ...args: Parameters<T>) {
     if (timeout) return

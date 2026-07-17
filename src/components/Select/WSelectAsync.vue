@@ -220,7 +220,7 @@ const close = () => {
   search.value = ''
 }
 
-let deletePressTimeout: NodeJS.Timeout | null = null
+let deletePressTimeout: number | null = null
 
 const captureDoubleDelete = () => {
   if (!props.modelValue?.length || search.value.length) return

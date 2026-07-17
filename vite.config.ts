@@ -4,9 +4,9 @@ import postcssImport from 'postcss-import'
 import tailwindcss from 'tailwindcss'
 import {type UserConfig, defineConfig} from 'vite'
 import dts from 'vite-plugin-dts'
-import svgLoader from 'vite-svg-loader'
+import {compileTemplate} from 'vue/compiler-sfc'
 
-import {existsSync, renameSync, rmSync} from 'node:fs'
+import {existsSync, readFileSync, renameSync, rmSync} from 'node:fs'
 import {URL, fileURLToPath} from 'node:url'
 
 import {writeImports} from './build/write-imports'
@@ -25,7 +25,19 @@ export default defineConfig(({mode}) => ({
       copyDtsFiles: true,
     }),
     vue(),
-    svgLoader({defaultImport: 'component', svgo: false}),
+    {
+      name: 'svg-component',
+      enforce: 'pre',
+      load: {
+        filter: {id: /\.svg(\?component)?$/},
+        handler(id: string) {
+          const path = id.split('?', 2)[0]
+          const svg = readFileSync(path, 'utf-8')
+          const {code} = compileTemplate({id, source: svg, filename: path, transformAssetUrls: false})
+          return code + '\nexport default {render}'
+        },
+      },
+    },
     {
       name: 'atomic-dist-swap',
       closeBundle() {

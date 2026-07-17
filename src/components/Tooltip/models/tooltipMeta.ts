@@ -15,7 +15,7 @@ export type TooltipMeta = {
 
 const tooltipMeta = ref<TooltipMeta | null>(null)
 
-let timeout: NodeJS.Timeout | undefined
+let timeout: number | undefined
 
 const clearTimeoutOnClose = () => {
   if (!timeout) return

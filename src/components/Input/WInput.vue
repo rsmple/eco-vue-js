@@ -709,7 +709,7 @@ const scrollToInput = () => {
 
 const wrapSelection = (value: WrapSelection) => inputRef.value && 'wrapSelection' in inputRef.value ? inputRef.value.wrapSelection(value) : void 0
 
-let timeout: NodeJS.Timeout | undefined
+let timeout: number | undefined
 
 const autofocusDebounced = () => {
   if (timeout) clearTimeout(timeout)

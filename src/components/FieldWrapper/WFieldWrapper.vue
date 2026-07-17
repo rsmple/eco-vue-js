@@ -232,7 +232,7 @@ const setFocused = (value: boolean): void => {
   focused.value = value
 }
 
-let timeout: NodeJS.Timeout | null = null
+let timeout: number | null = null
 
 const resetMessage = () => {
   message.value = null
