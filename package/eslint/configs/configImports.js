@@ -1,4 +1,5 @@
-import importPlugin from 'eslint-plugin-import-x'
+import {createTypeScriptImportResolver} from 'eslint-import-resolver-typescript'
+import importPlugin, {createNodeResolver} from 'eslint-plugin-import-x'
 
 import {readFileSync} from 'fs'
 
@@ -45,13 +46,13 @@ const createConfig = (tsConfig, astro = false) => {
       'import-x/parsers': {
         '@typescript-eslint/parser': ['.ts', '.js'],
       },
-      'import-x/resolver': {
-        typescript: {
+      'import-x/resolver-next': [
+        createTypeScriptImportResolver({
           alwaysTryTypes: true,
           project: tsConfig,
-        },
-        node: true,
-      },
+        }),
+        createNodeResolver(),
+      ],
     },
   }
 }
