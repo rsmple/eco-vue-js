@@ -120,7 +120,7 @@ const isIntersecting = ref(false)
 const scrollingElement = inject(wScrollingElement, null)
 
 const {data, error, setData, refetch, isFetching} = props.useQueryFn(
-  toRef(props, 'queryParams'),
+  toRef(() => props.queryParams),
   {
     refetchInterval: props.refetchInterval ? (() => isIntersecting.value ? props.refetchInterval : undefined) : undefined,
     ...props.queryOptions ?? {},

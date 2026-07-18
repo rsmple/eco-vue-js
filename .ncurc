@@ -1,0 +1,7 @@
+upgrade: true
+reject:
+  - tailwindcss
+  - eslint-plugin-tailwindcss
+  # TS 7 (native compiler) is not yet supported by typescript-eslint (<6.1.0)
+  # or @tanstack/eslint-plugin-query (^5.4.0 || ^6.0.0) — remove when they are
+  - typescript

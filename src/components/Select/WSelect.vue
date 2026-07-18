@@ -235,7 +235,7 @@ const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
 const {data, isFetching, error: queryError} = props.useQueryFnOptions
   ? props.queryParamsOptions === undefined
     ? (props.useQueryFnOptions as UseQueryEmpty<Data[]>)({enabled: queryEnabled})
-    : props.useQueryFnOptions(toRef(props, 'queryParamsOptions'), {enabled: queryEnabled})
+    : props.useQueryFnOptions(toRef(() => props.queryParamsOptions!), {enabled: queryEnabled})
   : {
     data: toRef(props, 'options') as Ref<Data[] | undefined>,
     isFetching: ref(false),

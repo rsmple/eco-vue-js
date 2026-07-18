@@ -180,7 +180,7 @@ const scopeModel = useUniformModel(
   toRef(props, 'modelValueInit') as Ref<Model>,
   computed(() => props.field),
   props.useQueryFn as UseQueryWithParams<InnerModel, QueryParams>,
-  props.noParams ? undefined : toRef(props, 'queryParams'),
+  props.noParams ? undefined : toRef(() => props.queryParams),
   props.initData,
   props.confimGetter,
   () => props.async,
@@ -195,8 +195,8 @@ const scopeField = slots.field ? useUniformField(
   scopeModel.modelValueInit,
   () => props.field,
   () => props.title,
-  toRef(props, 'required'),
-  toRef(props, 'mandatory'),
+  toRef(() => props.required),
+  toRef(() => props.mandatory),
   props.validate,
   props.noChanges,
 ) : undefined
@@ -224,7 +224,7 @@ updaterInjected?.(reactive({
   hasChanges: scope?.hasChanges ?? false,
   hasValue: (props.initHasValue !== undefined ? toRef(props, 'initHasValue') : scope?.hasValue ?? null) as Ref<boolean | null>,
   hasError: (props.initHasError !== undefined ? toRef(props, 'initHasError') : scope?.hasShownError ?? null) as Ref<boolean>,
-  fullPayload: toRef(props, 'fullPayload'),
+  fullPayload: toRef(() => props.fullPayload),
 }), id)
 
 defineExpose({
@@ -244,9 +244,9 @@ defineExpose({
   modelValue: scopeModel.modelValue,
   updateModelValue: scopeModel.updateModelValue,
   updateModelValueInner: scopeModel.updateModelValueInner as InnerInstanceExpose<InnerModel, ResultModel>['updateModelValueInner'],
-  skeleton: scopeModel.skeleton ?? toRef(props, 'skeleton'),
+  skeleton: scopeModel.skeleton ?? toRef(() => props.skeleton),
   submit: scopeSubmit?.submit,
-  submitting: scopeSubmit?.submitting ?? toRef(props, 'submitting'),
+  submitting: scopeSubmit?.submitting ?? toRef(() => props.submitting),
   initModel: scopeModel.initModel,
 } satisfies InnerInstanceExpose<InnerModel, ResultModel>)
 

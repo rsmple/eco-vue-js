@@ -1,4 +1,4 @@
-import importPlugin from 'eslint-plugin-import'
+import importPlugin from 'eslint-plugin-import-x'
 
 import {readFileSync} from 'fs'
 
@@ -9,11 +9,11 @@ const createConfig = (tsConfig, astro = false) => {
   return {
     files: parsed.include ?? (astro ? ['**/*.{ts,js,vue,astro}'] : ['**/*.{ts,js,vue}']),
     plugins: {
-      import: importPlugin,
+      'import-x': importPlugin,
     },
     rules: {
       ...importPlugin.flatConfigs.recommended.rules,
-      'import/order': [
+      'import-x/order': [
         1,
         {
           'newlines-between': 'always',
@@ -31,21 +31,21 @@ const createConfig = (tsConfig, astro = false) => {
           alphabetize: {order: 'asc', caseInsensitive: false},
         },
       ],
-      'import/no-useless-path-segments': [1, {noUselessIndex: true}],
-      // 'import/extensions': [1, 'never'],
-      'import/first': 1,
-      'import/newline-after-import': 1,
-      'import/namespace': 'off',
-      'import/named': 'off',
-      'import/default': 'off',
-      'import/no-named-as-default': 'off',
-      'import/no-named-as-default-member': 'off',
+      'import-x/no-useless-path-segments': [1, {noUselessIndex: true}],
+      // 'import-x/extensions': [1, 'never'],
+      'import-x/first': 1,
+      'import-x/newline-after-import': 1,
+      'import-x/namespace': 'off',
+      'import-x/named': 'off',
+      'import-x/default': 'off',
+      'import-x/no-named-as-default': 'off',
+      'import-x/no-named-as-default-member': 'off',
     },
     settings: {
-      'import/parsers': {
+      'import-x/parsers': {
         '@typescript-eslint/parser': ['.ts', '.js'],
       },
-      'import/resolver': {
+      'import-x/resolver': {
         typescript: {
           alwaysTryTypes: true,
           project: tsConfig,
@@ -60,15 +60,15 @@ export default ({tsConfig = './tsconfig.json', astro = false}) => [
   {
     files: astro ? ['**/*.{ts,js,vue,astro}'] : ['**/*.{ts,js,vue}'],
     plugins: {
-      import: importPlugin,
+      'import-x': importPlugin,
     },
     rules: {
       ...importPlugin.flatConfigs.recommended.rules,
       ...(astro ? {
-        'import/named': 'off',
-        'import/default': 'off',
+        'import-x/named': 'off',
+        'import-x/default': 'off',
       } : {}),
-      'import/order': [
+      'import-x/order': [
         1,
         {
           'newlines-between': 'always',
@@ -86,11 +86,11 @@ export default ({tsConfig = './tsconfig.json', astro = false}) => [
           alphabetize: {order: 'asc', caseInsensitive: false},
         },
       ],
-      'import/no-useless-path-segments': [1, {noUselessIndex: true}],
-      // 'import/extensions': [1, 'never'],
-      'import/first': 1,
-      'import/newline-after-import': 1,
-      'import/namespace': 'off',
+      'import-x/no-useless-path-segments': [1, {noUselessIndex: true}],
+      // 'import-x/extensions': [1, 'never'],
+      'import-x/first': 1,
+      'import-x/newline-after-import': 1,
+      'import-x/namespace': 'off',
     },
   },
 
