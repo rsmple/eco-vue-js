@@ -8,7 +8,9 @@
     @click="$emit('click', $event)"
   >
     <div class="min-w-20 flex-1 text-start">
-      {{ text }}
+      <slot>
+        {{ text }}
+      </slot>
     </div>
 
     <slot name="icon">
@@ -28,7 +30,7 @@ import type {LinkProps} from '@/types/types'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
 interface Props extends Partial<LinkProps> {
-  text: string
+  text?: string
   icon?: SVGComponent
   disabled?: boolean
   href?: string
