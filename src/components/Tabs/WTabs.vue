@@ -11,7 +11,7 @@
       class="relative"
       :class="{
         'sm-not:snap-start grid grid-cols-[1fr,auto]': side,
-        'no-scrollbar sm-not:-pl--inner-margin sm-not:-mx---inner-margin flex overflow-x-auto overscroll-x-contain': !side,
+        'no-scrollbar sm-not:-pl--inner-margin sm-not:-mx---inner-margin mb-4 flex overflow-x-auto overscroll-x-contain': !side,
         'flex-wrap': !side && wrap,
         'pr-[50%]': !side && !wrap,
         [headerClass ?? '']: true,
