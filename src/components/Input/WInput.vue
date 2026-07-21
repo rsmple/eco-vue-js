@@ -189,7 +189,7 @@
                 'w-option-has-bg-input': $slots.prefix,
                 'resize-y': resize && textarea,
                 'resize-none': !resize && textarea,
-                'w-option min-w-40': !textarea && $slots.prefix && !hideInput,
+                'w-option': !textarea && $slots.prefix && !hideInput,
                 'font-mono': mono,
                 'text-black-default dark:text-gray-200': !isDisabled,
                 'text-black-default/50 dark:text-gray-200/50': isDisabled,
@@ -202,7 +202,7 @@
               <div class="relative flex min-h-full flex-1">
                 <slot
                   name="before"
-                  v-bind="{modelValue}"
+                  v-bind="{modelValue, focused}"
                 />
 
                 <div
@@ -629,7 +629,6 @@ const clearValue = () => {
   if (typeof props.modelValue === 'string') updateModelValue('', true)
   else updateModelValue(undefined, true)
 
-  inputRef.value?.focus()
   emit('click:clear')
 }
 

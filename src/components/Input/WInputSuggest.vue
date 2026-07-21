@@ -75,6 +75,16 @@
         </template>
 
         <template
+          v-if="$slots.before"
+          #before="scope"
+        >
+          <slot
+            name="before"
+            v-bind="scope"
+          />
+        </template>
+
+        <template
           v-if="$slots.bottom || (static && $slots.content)"
           #bottom
         >
@@ -247,6 +257,7 @@ defineSlots<{
   subtitle?: () => void
   toolbar?: () => void
   prefix?: (props: {unclickable?: boolean | null}) => void
+  before?: (props: {modelValue: ModelValue | undefined, focused: boolean}) => void
   right?: (props: {unclickable?: boolean | null}) => void
   content?: (props: {focused: boolean, blur: () => void, focus: () => void}) => VNode[]
 }>()
