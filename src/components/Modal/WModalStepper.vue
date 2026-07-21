@@ -12,6 +12,7 @@
 
     <WTabs
       ref="tabsStepper"
+      :disable-min-height="disableMinHeight"
       stepper
       no-header
       @update:first="first = $event"
@@ -52,7 +53,7 @@
         class="w-full"
         @click="$emit('submit')"
       >
-        Submit
+        {{ submitText ?? 'Submit' }}
       </WButton>
 
       <WButton
@@ -83,6 +84,8 @@ defineProps<{
   loading?: boolean
   disabled?: boolean
   disabledNext?: boolean
+  submitText?: string
+  disableMinHeight?: boolean
 }>()
 
 defineEmits<{
