@@ -1,10 +1,8 @@
 <template>
   <div
     ref="container"
-    class="grid gap-4"
     :class="{
-      'grid grid-cols-1': !side || flat,
-      'sm-not:grid-cols-[repeat(2,100vw)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain grid grid-cols-[minmax(auto,var(--w-tabs-side-width,auto)),1fr] items-start': side,
+      'sm-not:grid-cols-[repeat(2,100vw)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain grid grid-cols-[minmax(auto,var(--w-tabs-side-width,auto)),1fr] items-start gap-4': side,
     }"
   >
     <div
@@ -125,7 +123,6 @@
           :enable-status="(statusIcon || showHasValue || enableStatus) ?? false"
           :flat="flat ?? false"
           @update:height="!disableMinHeight && !flat && updateHeight($event)"
-          @update:active="$emit('update:current-title', slot.props?.title)"
         >
           <component :is="slot" />
         </TabItem>
@@ -208,6 +205,13 @@ const current = ref<string>(props.initTab ?? (props.initTabIndex !== undefined
   : defaultSlots.value.find(slot => !!slot.props?.init)?.props?.name ?? defaultSlotsKeys.value[0]!
 ))
 const currentIndex = computed(() => defaultSlotsKeys.value.indexOf(current.value))
+
+watch(
+  () => unwrapSlots(props.customSlots ?? slots.default?.() ?? []).filter(isTabItem)[currentIndex.value]?.props?.title,
+  value => emit('update:current-title', value),
+  {immediate: true, flush: 'post'},
+)
+
 const isDirect = ref(true)
 const buttonRef = useTemplateRef<ComponentInstance<typeof TabTitleButton>[]>('button')
 const minHeight = ref(0)
