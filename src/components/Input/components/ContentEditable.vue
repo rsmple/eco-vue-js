@@ -222,6 +222,7 @@ const autoPairMap: Record<string, string> = {
 const handleLineBoundaryDelete = (e: InputEvent): boolean => {
   const {start, end} = getCaret()
   const currentText = getCurrentText()
+  const isBackward = e.inputType.endsWith('Backward')
 
   if (start !== end) {
     if (!currentText.slice(start, end).includes('\n')) return false
@@ -232,8 +233,17 @@ const handleLineBoundaryDelete = (e: InputEvent): boolean => {
     return true
   }
 
+  if (isBackward && start === 0) {
+    e.preventDefault()
+    return true
+  }
+  if (!isBackward && start >= currentText.length) {
+    e.preventDefault()
+    return true
+  }
+
   if (e.inputType === 'deleteContentBackward') {
-    if (start === 0 || currentText[start - 1] !== '\n') return false
+    if (currentText[start - 1] !== '\n') return false
     e.preventDefault()
     const newText = currentText.slice(0, start - 1) + currentText.slice(start)
     emit('update:model-value', newText, true)
@@ -241,12 +251,16 @@ const handleLineBoundaryDelete = (e: InputEvent): boolean => {
     return true
   }
 
-  if (start >= currentText.length || currentText[start] !== '\n') return false
-  e.preventDefault()
-  const newText = currentText.slice(0, start) + currentText.slice(start + 1)
-  emit('update:model-value', newText, true)
-  nextTick(() => setCaret(start))
-  return true
+  if (e.inputType === 'deleteContentForward') {
+    if (currentText[start] !== '\n') return false
+    e.preventDefault()
+    const newText = currentText.slice(0, start) + currentText.slice(start + 1)
+    emit('update:model-value', newText, true)
+    nextTick(() => setCaret(start))
+    return true
+  }
+
+  return false
 }
 
 const handleBeforeInput = (e: InputEvent) => {
@@ -263,7 +277,7 @@ const handleBeforeInput = (e: InputEvent) => {
     return
   }
 
-  if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
+  if (e.inputType.startsWith('delete')) {
     if (handleLineBoundaryDelete(e)) return
   }
 
