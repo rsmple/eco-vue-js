@@ -1,5 +1,15 @@
 <template>
-  <button
+  <component
+    v-bind="{
+      ...(disabled
+        ? {}
+        : tag === 'a'
+          ? {href, target}
+          : to !== undefined
+            ? {to, replace, target}
+            : {})
+    }"
+    :is="to !== undefined ? disabled ? 'a' : WRouterLink : tag ?? 'button'"
     :disabled="disabled || disableMessage !== undefined"
     class="
       disabled:text-description relative isolate flex
@@ -56,10 +66,13 @@
     </WTooltip>
 
     <WShine v-if="!disabled && !disableMessage && !loading" />
-  </button>
+  </component>
 </template>
 
 <script lang="ts" setup>
+import type {LinkProps} from '@/types/types'
+
+import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 import WShine from '@/components/Shine/WShine.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
@@ -72,6 +85,11 @@ defineProps<{
   active?: boolean
   loading?: boolean
   tooltipText?: string
+  to?: LinkProps['to']
+  tag?: keyof HTMLElementTagNameMap
+  href?: string
+  target?: '_self' | '_blank' | '_parent' | '_top'
+  replace?: boolean
 }>()
 
 defineEmits<{

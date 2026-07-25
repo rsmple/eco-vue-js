@@ -50,17 +50,6 @@
             v-if="bulk || action || !disableExport"
             #default="{disableMessage, cssClass}"
           >
-            <HeaderExport
-              v-if="!disableExport"
-              :fields="fieldsVisible"
-              :query-params-getter="selectionCount === 0 ? () => queryParams : getQueryParamsBulk"
-              :use-query-fn="useQueryFnExport ?? useQueryFn"
-              :api-method="apiMethodExport"
-              :file-name="exportFileName"
-              :to-markdown="toMarkdown"
-              :class="cssClass"
-            />
-
             <template v-if="selectionCount === 0 && action">
               <template
                 v-for="(item, index) in action"
@@ -76,6 +65,17 @@
             </template>
 
             <template v-else>
+              <HeaderExport
+                v-if="!disableExport"
+                :fields="fieldsVisible"
+                :query-params-getter="selectionCount === 0 ? () => queryParams : getQueryParamsBulk"
+                :use-query-fn="useQueryFnExport ?? useQueryFn"
+                :api-method="apiMethodExport"
+                :file-name="exportFileName"
+                :to-markdown="toMarkdown"
+                :class="cssClass"
+              />
+
               <template
                 v-for="(item, index) in bulk"
                 :key="index"
