@@ -18,11 +18,17 @@ There is no `CHANGELOG.md` — the [GitHub Releases](https://github.com/rsmple/e
 
 - Tag and title are both `vX.Y.Z`.
 - Body is 2–4 hand-written consumer-facing bullets, each starting with `- `.
-- Write what changed for someone using the component, not what the commit did. Start with a verb (`Add`, `Fix`, `Expose`, `Drop`) and name the component:
+- Write what changed for someone using the component, not what the commit did. Start with a verb (`Add`, `Fix`, `Expose`, `Drop`, `Move`) and name the component.
+- Markdown is rendered, so use it:
+  - Backticks for props, slots, emits, classes, packages and rule namespaces — `` `submitText` ``, `` `no-header` ``, `` `mb-4` ``, `` `import-x/` ``.
+  - `**Breaking**: ` as a bold lead-in for breaking changes.
+  - An em-dash clause to add the mechanism or consequence after the main statement.
   ```
-  - Fix ContentEditable allowing backspace/delete to strip the line container and corrupt the editor structure
-  - Add submitText and disableMinHeight props to WModalStepper
+  - Add `submitText` and `disableMinHeight` props to WModalStepper
+  - Fix `update:current-title` in WTabs not emitting the initial title when the header is hidden (`no-header`) — the title is now watched directly instead of relying on tab activation
+  - **Breaking**: eslint config now uses eslint-plugin-import-x — rule namespace changed from `import/` to `import-x/`
   ```
+- Component names stay bare (WTabs, WModalStepper), not in backticks.
 - Internal-only churn (dependency bumps, lint config, build tweaks) can be a single summary bullet or omitted.
 
 ## Release flow
