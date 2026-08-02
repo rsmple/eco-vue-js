@@ -16,10 +16,8 @@
 import type {FilterComponent} from './types'
 import type {UniformScope} from '../Uniform/types'
 
-import {defineAsyncComponent} from 'vue'
-
-const ListFilterGlobal = defineAsyncComponent(() => import('./components/ListFilterGlobal.vue'))
-const ListFilterLocal = defineAsyncComponent(() => import('./components/ListFilterLocal.vue'))
+import ListFilterGlobal from './components/ListFilterGlobal.vue'
+import ListFilterLocal from './components/ListFilterLocal.vue'
 
 defineProps<{
   scope: UniformScope<QueryParams>

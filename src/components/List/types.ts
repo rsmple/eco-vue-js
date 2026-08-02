@@ -94,6 +94,7 @@ export type ListFields<Data, QueryParams = unknown> = (
 export type MenuProps<Data> = {
   item: Data
   readonly: boolean
+  uniformScope: UniformScope<Data> | undefined
   updateItem: (newItem?: Data | undefined) => void
   deleteItem: () => void
 }

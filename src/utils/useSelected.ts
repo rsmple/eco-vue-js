@@ -90,7 +90,13 @@ export const useSelectionHash = () => {
   }
 }
 
-export const useSelected = <Value extends number>(count: MaybeRef<number | undefined>, disabled: Ref<boolean>, selection: Ref<Selection<Value>>, updateSelection: (value: Selection<Value>) => void) => {
+export const useSelected = <Value extends number>(
+  count: MaybeRef<number | undefined>,
+  disabled: Ref<boolean>,
+  selection: Ref<Selection<Value>>,
+  updateSelection: (value: Selection<Value>) => void,
+  getIsSelectOnly: () => boolean,
+) => {
   const resetSelection = (): void => {
     hoverValue.value = null
     preselectValue.value = null
@@ -266,7 +272,7 @@ export const useSelected = <Value extends number>(count: MaybeRef<number | undef
   }
 
   const setIsSelecting = (event?: KeyboardEvent) => {
-    if (isShift.value) return
+    if (isShift.value || getIsSelectOnly()) return
 
     if (event) {
       if (!event.shiftKey || event.ctrlKey || event.altKey || event.metaKey || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {

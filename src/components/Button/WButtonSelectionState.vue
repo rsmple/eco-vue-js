@@ -1,5 +1,5 @@
 <template>
-  <div class="sm-not:gap-1 grid grid-cols-[1fr,auto] gap-3">
+  <div class="sm-not:gap-1 -h--w-input-height grid grid-cols-[1fr,auto] gap-3">
     <div class="sm-not:text-xs text-description self-center truncate whitespace-nowrap font-normal">
       <slot />
     </div>

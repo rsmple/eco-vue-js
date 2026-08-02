@@ -187,6 +187,7 @@
           v-if="!isGrid"
           class="sm-not:hidden"
           :allow-select="allowSelect"
+          :select-only="selectOnly"
           :tooltip-text="selectAllTextGetter(selectAllValue !== true, count ?? listCount ?? 0)"
           :hide-more="!menu && !toMarkdown"
 
@@ -242,10 +243,10 @@
         />
 
         <component
-          :is="formFieldGetter?.(item) !== undefined ? WUniform : WEmptyComponent"
+          :is="formFieldGetter?.(item, index) !== undefined ? WUniform : WEmptyComponent"
           v-bind="formFieldGetter ? {
             ...uniformScope ?? {},
-            field: formFieldGetter(item),
+            field: formFieldGetter(item, index),
           } : undefined"
         >
           <template #default="innerScope">
@@ -270,7 +271,7 @@
               :always-select="alwaysSelect ?? false"
               @toggle:selected="toggleSelected(value as number, position)"
               @hover:selected="hoverSelected(position)"
-              @click:action="$emit('click:action', {item, setter, scope: formFieldGetter?.(item) !== undefined ? innerScope : undefined})"
+              @click:action="$emit('click:action', {item, setter, scope: formFieldGetter?.(item, index) !== undefined ? innerScope : undefined})"
             >
               <template #default="{beforeClass}">
                 <ListCardFieldNested
@@ -347,6 +348,7 @@
                     v-bind="Array.isArray(menuItem) ? menuItem[1] : undefined"
                     :item="item"
                     :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
+                    :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
                     :update-item="setter"
                     :delete-item="() => {
                       setter()
@@ -437,7 +439,7 @@ const props = withDefaults(
     disableMore?: boolean
     readonly?: boolean
     noOrdering?: boolean
-    formFieldGetter?: (data: Data) => string | undefined
+    formFieldGetter?: (data: Data, index: number) => string | undefined
     uniformScope?: UniformScope<Data[]>
     groupBy?: (a: Data, b: Data) => boolean
     cardColumns: CardColumns
@@ -456,6 +458,8 @@ const props = withDefaults(
     minHeight?: boolean
     toMarkdown?: (data: Data, index: number) => string
     noMode?: boolean
+    disableSelect?: boolean
+    selectOnly?: boolean
   }>(),
   {
     count: undefined,
@@ -559,7 +563,7 @@ const columnDataMap = computed<Record<string, ColumnData>>(() => {
   return map
 })
 
-const allowSelect = computed(() => props.bulk !== undefined || !props.disableExport)
+const allowSelect = computed(() => !props.disableSelect && (props.alwaysSelect || props.bulk !== undefined || !props.disableExport))
 const allowOpen = computed(() => props.expansion !== undefined)
 
 const disableSelect = computed(() => !allowSelect.value)
@@ -581,7 +585,7 @@ const {
   selectAll,
   getQueryParams,
   setIsSelecting,
-} = useSelected<number>(countValue, disableSelect, selectionUsed, updateSelection)
+} = useSelected<number>(countValue, disableSelect, selectionUsed, updateSelection, () => props.selectOnly)
 
 const ordering = computed<OrderItem<keyof Data>[]>(() => {
   if (props.queryParams instanceof Object && 'ordering' in props.queryParams && typeof props.queryParams.ordering === 'string') {

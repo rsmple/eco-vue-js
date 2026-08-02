@@ -9,8 +9,12 @@
           'width-[--w-list-header-rounded,1rem]': !allowSelect,
         }"
       >
+        <div
+          v-if="selectOnly"
+          class="mx-[--w-list-padding,1rem] w-[calc(var(--w-checkbox-size,1rem)*1.5)]"
+        />
         <WCheckbox
-          v-if="allowSelect && selection !== undefined"
+          v-else-if="allowSelect && selection !== undefined"
           :disabled="disabled || count === 0 || count === undefined"
           :readonly="false"
           :model-value="selection"
@@ -49,6 +53,7 @@ import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 
 defineProps<{
   allowSelect?: boolean
+  selectOnly?: boolean
   hideMore?: boolean
   disabled?: boolean
   count?: number
