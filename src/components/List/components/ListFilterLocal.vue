@@ -1,7 +1,8 @@
 <template>
-  <div>
-    <template
-      v-if="searchVisible && searchComponent" 
+  <div class="w-button-h-9 w-button-rounded-xl w-input-h-9 flex flex-wrap items-center gap-2 py-2 text-sm">
+    <div
+      v-if="searchComponent"
+      class="w-52 max-w-full"
     >
       <component
         :is="searchComponent[0].default"
@@ -19,75 +20,27 @@
         :readonly="readonly"
         :global="true"
       />
-    </template>
+    </div>
 
-    <div class="pb-2" />
+    <ListFilterLocalItem
+      v-for="item in shownList"
+      :key="item.id"
+      :scope="scope"
+      :item="item.item"
+      :is-open="openId === item.id"
+      :readonly="readonly"
+      @toggle="openId = openId === item.id ? null : item.id"
+      @close="closeFilterItem(item)"
+      @remove="removeFilterItem(item)"
+    />
 
-    <button
-      v-if="allShown.length !== 0"
-      class="w-ripple w-ripple-hover text-description relative grid min-w-[16.25rem] grid-cols-[1fr,1.5rem] items-center gap-2 py-2 text-start font-semibold sm:px-3"
-      @click="isOpen = !isOpen"
-    >
-      <div>
-        <IconFilter class="square-[1.25em] -mt-1 inline" /> {{ title?.(shown.length) ?? `Filters (${ shown.length })` }}
-      </div>
-      <IconArrow
-        class="square-3 justify-self-center transition-transform"
-        :class="{'rotate-180': isOpen}"
-      />
-    </button>
-
-    <WExpansion :is-open="isOpen || allShown.length === 0">
-      <WTabs
-        switch-to-new
-        disable-min-height
-        side
-        status-icon
-        class="w-tabs-side-width-72"
-      >
-        <template v-if="filter || search">
-          <WTabsItem
-            v-for="(item, index) in filterList.filter(item => allShown.includes(filterAll.indexOf(item)))"
-            :key="item.id"
-            :name="filterAll.indexOf(item).toString()"
-            :title="getMetaValue((Array.isArray(item.item) ? item.item[0].meta : item.item.meta).title, scope.modelValue)"
-            :icon="getMetaValue((Array.isArray(item.item) ? item.item[0].meta : item.item.meta).icon, scope.modelValue)"
-            :init="index === 0 && !(scope.modelValue as Record<string, string>).search"
-            :has-value="shown.includes(filterAll.indexOf(item))"
-            v-bind="!readonly ? {
-              onClose: () => clearFilterItem(item)
-            } : undefined"
-          >
-            <div class="sm-not:-px--inner-margin">
-              <component
-                :is="item.item[0].default"
-                v-if="Array.isArray(item.item)"
-                v-bind="item.item[1]"
-                :scope="scope"
-                :readonly="readonly"
-                :global="false"
-              />
-
-              <component
-                :is="item.item.default"
-                v-else
-                :scope="scope"
-                :readonly="readonly"
-                :global="false"
-              />
-            </div>
-          </WTabsItem>
-
-          <ListFilterSelect
-            v-if="!readonly && allShown.length < filterList.length"
-            :filter="filterAll"
-            :exclude="excluded"
-            :query-params="scope.modelValue"
-            @select="selected.push($event)"
-          />
-        </template>
-      </WTabs>
-    </WExpansion>
+    <ListFilterSelect
+      v-if="!readonly && allShown.length < filterList.length"
+      :filter="filterAll"
+      :exclude="excluded"
+      :query-params="scope.modelValue"
+      @select="selected.push($event); openId = filterList[$event].id"
+    />
   </div>
 </template>
 
@@ -95,15 +48,9 @@
 import type {FilterComponent} from '../types'
 import type {UniformScope} from '@/components/Uniform/types'
 
-import {computed, markRaw, ref, useId} from 'vue'
+import {computed, ref, useId} from 'vue'
 
-import WExpansion from '@/components/Expansion/WExpansion.vue'
-import WTabs from '@/components/Tabs/WTabs.vue'
-import WTabsItem from '@/components/Tabs/WTabsItem.vue'
-
-import IconArrow from '@/assets/icons/IconArrow.svg?component'
-import IconFilter from '@/assets/icons/IconFilter.svg?component'
-
+import ListFilterLocalItem from './ListFilterLocalItem.vue'
 import * as ListFilterSearch from './ListFilterSearch.vue'
 import ListFilterSelect from './ListFilterSelect.vue'
 
@@ -120,14 +67,11 @@ const props = defineProps<{
   searchVisible: boolean
 }>()
 
-const isOpen = ref(true)
-
 const searchComponent: FilterComponent<QueryParams> | undefined = props.search ? props.filterSearch ?? ListFilterSearch : undefined
 
-const filterAll = [
-  ...(props.searchVisible || !searchComponent ? [] : [markRaw(searchComponent)]),
-  ...props.filter ?? [],
-].map(item => ({id: useId(), item}))
+const filterAll = (props.filter ?? []).map(item => ({id: useId(), item}))
+
+const openId = ref<string | null>(null)
 
 const filterList = computed(() => {
   return filterAll.filter(item => {
@@ -148,13 +92,19 @@ const selected = ref<number[]>(shown.value.slice())
 
 const allShown = computed(() => [...selected.value, ...shown.value].filter((item, index, array) => array.indexOf(item) === index))
 
+const shownList = computed(() => filterList.value.filter(item => allShown.value.includes(filterAll.indexOf(item))))
+
 const excluded = computed<number[]>(() => {
   const hidden = filterAll.filter(item => !filterList.value.includes(item)).map(item => filterAll.indexOf(item) ?? -1) ?? []
 
   return [...allShown.value, ...hidden]
 })
 
-const clearFilterItem = (item: {id: string, item: FilterComponent<QueryParams>}) => {
+const closeFilterItem = (item: {id: string}) => {
+  if (openId.value === item.id) openId.value = null
+}
+
+const removeFilterItem = (item: {id: string, item: FilterComponent<QueryParams>}) => {
   const result: QueryParams = {...props.scope.modelValue} as QueryParams
   const meta = Array.isArray(item.item) ? item.item[0].meta : item.item.meta
 
@@ -166,6 +116,8 @@ const clearFilterItem = (item: {id: string, item: FilterComponent<QueryParams>})
   const selectedIndex = selected.value.indexOf(index)
 
   if (index !== -1 && selectedIndex !== -1) selected.value.splice(selectedIndex, 1)
+
+  closeFilterItem(item)
 
   props.scope.updateModelValue(result)
 }

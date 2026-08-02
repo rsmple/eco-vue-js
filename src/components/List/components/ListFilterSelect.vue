@@ -1,16 +1,18 @@
 <template>
   <WDropdownMenu
     :is-open="isOpen"
-    :horizontal-align="HorizontalAlign.FILL"
+    :horizontal-align="HorizontalAlign.LEFT_INNER"
     update-align
   >
     <template #toggle>
-      <WButtonTab
-        title="Add filter"
-        :icon="markRaw(IconAdd)"
-        side
-        @click="isOpen = true"
-      />
+      <WButton
+        :semantic-type="SemanticType.SECONDARY"
+        @click="isOpen = !isOpen"
+      >
+        <IconAdd class="square-[1.25em]" />
+
+        <span class="whitespace-nowrap">Add filter</span>
+      </WButton>
     </template>
 
     <template #content>
@@ -45,9 +47,9 @@
 <script setup lang="ts" generic="QueryParams">
 import type {FilterComponent} from '../types'
 
-import {markRaw, ref} from 'vue'
+import {ref} from 'vue'
 
-import WButtonTab from '@/components/Button/WButtonTab.vue'
+import WButton from '@/components/Button/WButton.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
@@ -55,6 +57,7 @@ import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 import IconAdd from '@/assets/icons/IconAdd.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
+import {SemanticType} from '@/utils/SemanticType'
 
 import {getMetaValue} from '../models/utils'
 
