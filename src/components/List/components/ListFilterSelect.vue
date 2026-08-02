@@ -1,8 +1,10 @@
 <template>
-  <WDropdownMenu
+  <WDropdownAdaptive
     :is-open="isOpen"
     :horizontal-align="HorizontalAlign.LEFT_INNER"
     update-align
+    close-on-click-outside
+    @close="isOpen = false"
   >
     <template #toggle>
       <WButton
@@ -15,13 +17,18 @@
       </WButton>
     </template>
 
-    <template #content>
-      <WClickOutside
-        class="
-          bg-default dark:bg-default-dark max-h-80 overflow-y-auto overscroll-y-contain
-          rounded-xl text-start font-normal shadow-md dark:border dark:border-solid dark:border-gray-800
-        "
-        @click="isOpen = false"
+    <template #header>
+      <div class="py-2 text-base font-semibold">
+        Add filter
+      </div>
+    </template>
+
+    <template #content="{isMobile}">
+      <div
+        class="text-start font-normal"
+        :class="{
+          'bg-default dark:bg-default-dark max-h-80 overflow-y-auto overscroll-y-contain rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
+        }"
       >
         <template
           v-for="(item, index) in filter"
@@ -39,9 +46,9 @@
             </div>
           </WMenuItem>
         </template>
-      </WClickOutside>
+      </div>
     </template>
-  </WDropdownMenu>
+  </WDropdownAdaptive>
 </template>
 
 <script setup lang="ts" generic="QueryParams">
@@ -50,8 +57,7 @@ import type {FilterComponent} from '../types'
 import {ref} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
-import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
-import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
 import IconAdd from '@/assets/icons/IconAdd.svg?component'

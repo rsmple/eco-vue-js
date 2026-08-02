@@ -1,7 +1,9 @@
 <template>
-  <WDropdownMenu
+  <WDropdownAdaptive
     :is-open="isOpen"
     :horizontal-align="HorizontalAlign.RIGHT_INNER"
+    close-on-click-outside
+    @close="isOpen = false"
   >
     <template #toggle>
       <WButtonSelectionAction
@@ -13,13 +15,24 @@
       />
     </template>
 
-    <template #content>
-      <WClickOutside
-        class="bg-default dark:bg-default-dark my-2 grid grid-cols-1 overflow-hidden rounded-xl shadow-md dark:outline dark:outline-1 dark:outline-gray-800"
-        @click="isOpen = false"
+    <template #header>
+      <div class="py-2 text-base font-semibold">
+        Table settings
+      </div>
+    </template>
+
+    <template #content="{isMobile}">
+      <div
+        class="grid grid-cols-1 overflow-hidden"
+        :class="{
+          'bg-default dark:bg-default-dark my-2 rounded-xl shadow-md dark:outline dark:outline-1 dark:outline-gray-800': !isMobile,
+        }"
       >
         <div class="p-4">
-          <div class="grid grid-cols-[auto,auto,auto] items-start">
+          <div
+            class="grid items-start"
+            :class="!mobile && !noMode ? 'grid-cols-[auto,auto,auto]' : 'grid-cols-1'"
+          >
             <div
               v-if="!mobile && !noMode"
               class="flex flex-col gap-4"
@@ -67,9 +80,9 @@
             </button>
           </div>
         </div>
-      </WClickOutside>
+      </div>
     </template>
-  </WDropdownMenu>
+  </WDropdownAdaptive>
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
@@ -78,8 +91,7 @@ import type {FieldConfig, ListFields} from '../types'
 import {markRaw, ref} from 'vue'
 
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
-import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
-import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconListSettings from '@/assets/icons/IconListSettings.svg?component'
 

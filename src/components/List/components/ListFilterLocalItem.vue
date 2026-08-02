@@ -1,8 +1,10 @@
 <template>
-  <WDropdownMenu
+  <WDropdownAdaptive
     :is-open="isOpen"
     :horizontal-align="HorizontalAlign.CENTER"
     update-align
+    close-on-click-outside
+    @close="$emit('close')"
   >
     <template #toggle>
       <WButton
@@ -31,10 +33,24 @@
       </WButton>
     </template>
 
-    <template #content>
-      <WClickOutside
-        class="bg-default dark:bg-default-dark my-1 w-96 rounded-xl p-4 text-start font-normal shadow-md dark:border dark:border-solid dark:border-gray-800"
-        @click="emit('close')"
+    <template #header>
+      <div class="flex items-center gap-2 py-2 text-base font-semibold">
+        <component
+          :is="icon"
+          v-if="icon"
+          class="square-[1.25em]"
+        />
+
+        <span>{{ title }}</span>
+      </div>
+    </template>
+
+    <template #content="{isMobile}">
+      <div
+        class="p-4 text-start font-normal"
+        :class="{
+          'bg-default dark:bg-default-dark my-1 w-96 rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
+        }"
       >
         <component
           :is="item[0].default"
@@ -52,9 +68,9 @@
           :readonly="readonly"
           :global="false"
         />
-      </WClickOutside>
+      </div>
     </template>
-  </WDropdownMenu>
+  </WDropdownAdaptive>
 </template>
 
 <script setup lang="ts" generic="QueryParams">
@@ -64,8 +80,7 @@ import type {UniformScope} from '@/components/Uniform/types'
 import {computed} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
-import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
-import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconClose from '@/assets/icons/IconClose.svg?component'
 
@@ -81,7 +96,7 @@ const props = defineProps<{
   readonly: boolean
 }>()
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'toggle'): void
   (e: 'close'): void
   (e: 'remove'): void

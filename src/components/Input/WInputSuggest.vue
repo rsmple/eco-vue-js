@@ -1,16 +1,14 @@
 <template>
   <component
-    :is="static ? InputSuggestStatic : isMobile ? WBottomSheet : WDropdownMenu"
+    :is="static ? InputSuggestStatic : WDropdownAdaptive"
     ref="dropdownMenu"
-    v-bind="static ? undefined : isMobile ? {
-      isOpen,
-      onClose: close
-    } : {
+    v-bind="static ? undefined : {
       isOpen,
       horizontalAlign,
       updateAlign: true,
       parentElement: parentEl,
       dropdownClass: `bg-default rounded-xl dark:bg-default-dark ${dropdownClass ?? ''}`,
+      onClose: close,
     }"
   >
     <template #toggle="toggleScope">
@@ -156,8 +154,7 @@ import type {InputSuggestProps, WrapSelection} from './types'
 
 import {type VNode, computed, ref, shallowRef, useTemplateRef} from 'vue'
 
-import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
-import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
 import WInput from '@/components/Input/WInput.vue'
 

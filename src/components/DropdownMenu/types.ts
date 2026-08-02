@@ -5,3 +5,7 @@ export interface DropdownMenuProps extends Omit<DropdownProps, 'parentElement'> 
   parentElement?: DropdownProps['parentElement']
   dropdownClass?: string
 }
+
+export interface DropdownAdaptiveProps extends DropdownMenuProps {
+  closeOnClickOutside?: boolean
+}
