@@ -99,6 +99,7 @@
         :hide-option-icon="hideOptionIcon"
         :value-getter="valueGetter"
         :loading-create="loadingCreate"
+        :query-options="{placeholderData: keepPreviousData}"
         :search="search"
         :reverse="reverse"
         class="max-h-80"
@@ -143,6 +144,7 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
 import type {SelectAsyncProps, SelectOptionComponent, SelectOptionComponentProps, SelectOptionProps} from './types'
 
+import {keepPreviousData} from '@tanstack/vue-query'
 import {computed, nextTick, ref, useTemplateRef, watch} from 'vue'
 
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
