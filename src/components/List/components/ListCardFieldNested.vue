@@ -1,6 +1,6 @@
 <template>
   <template
-    v-for="field in sortedFields"
+    v-for="field in fields"
     :key="getFirstFieldLabel(field)"
   >
     <slot
@@ -36,7 +36,6 @@
                     >
                       <ListCardFieldNested
                         :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
-                        :field-config-map="fieldConfigMap"
                         :column-data-map="columnDataMap"
                         :item="inner"
                         :skeleton="skeleton"
@@ -70,7 +69,6 @@
       >
         <ListCardFieldNested
           :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
-          :field-config-map="fieldConfigMap"
           :column-data-map="columnDataMap"
           :item="'keyEntity' in field.meta ? item[field.meta.keyEntity] : 'getterEntity' in field.meta ? field.meta.getterEntity(item) : item"
           :skeleton="skeleton"
@@ -92,10 +90,8 @@
 </template>
 
 <script setup lang="ts" generic="Data extends DefaultData, QueryParams">
-import type {ColumnData, FieldComponent, FieldConfig, ListField, ListFieldExport, ListFields} from '../types'
+import type {ColumnData, FieldComponent, ListField, ListFieldExport, ListFields} from '../types'
 import type {UniformScope} from '@/components/Uniform/types'
-
-import {computed} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
@@ -103,13 +99,12 @@ import ListCardFieldNestedArrayItems from './ListCardFieldNestedArrayItems.vue'
 import ListCardFieldNestedItem from './ListCardFieldNestedItem.vue'
 
 import {isField} from '../models/utils'
-import {getFirstFieldLabel, sortFields} from '../use/useListConfig'
+import {getFirstFieldLabel} from '../use/useListConfig'
 
 const config = {width: null, visible: true, order: 0, sticky: false}
 
-const props = defineProps<{
+defineProps<{
   fields: ListFields<Data, QueryParams>
-  fieldConfigMap: Record<string, FieldConfig>
   columnDataMap: Record<string, ColumnData>
   item: Data
   nested?: boolean
@@ -121,8 +116,6 @@ const props = defineProps<{
   results: Data[] | undefined
   intersecting: boolean
 }>()
-
-const sortedFields = computed<ListFields<Data, QueryParams>>(() => props.card ? props.fields : sortFields(props.fields, props.fieldConfigMap) as ListFields<Data, QueryParams>)
 
 defineSlots<{
   default: (props: {field: ListFieldExport<FieldComponent<Data, QueryParams>, ListField<Data, QueryParams>>, item: Data, column: ColumnData, nested: boolean}) => void

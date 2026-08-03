@@ -33,204 +33,79 @@
       @update:error="$emit('update:error', $event)"
     >
       <template #header="{updateHeader, isRefetchingAll, refetchAll}">
-        <slot
-          name="header"
+        <ListToolbar
           :count="listCount"
-        />
-
-        <WButtonSelection
-          :title="selectionTitle"
-          :disable-message="bulkDisableMessage"
-          :selected-count="selectionCount"
-          :style="{zIndex: BASE_ZINDEX_DROPDOWN}"
-          more-toggle-class="[&:nth-child(-n+3)]:hidden sm:[&:nth-child(-n+5)]:hidden"
-          @clear:selection="resetSelection"
-        >
-          <template
-            v-if="bulk || action || !disableExport"
-            #default="{disableMessage, cssClass}"
-          >
-            <template v-if="selectionCount === 0 && action">
-              <template
-                v-for="(item, index) in action"
-                :key="index"
-              >
-                <component
-                  :is="item"
-                  :query-params="queryParams"
-                  :readonly="isReadonly ?? isDisabled ?? false"
-                  :class="cssClass"
-                />
-              </template>
-            </template>
-
-            <template v-else>
-              <HeaderExport
-                v-if="!disableExport"
-                :fields="fieldsVisible"
-                :query-params-getter="selectionCount === 0 ? () => queryParams : getQueryParamsBulk"
-                :use-query-fn="useQueryFnExport ?? useQueryFn"
-                :api-method="apiMethodExport"
-                :file-name="exportFileName"
-                :to-markdown="toMarkdown"
-                :class="cssClass"
-              />
-
-              <template
-                v-for="(item, index) in bulk"
-                :key="index"
-              >
-                <component
-                  :is="item"
-                  :selection-count="selectionCount"
-                  :query-params-getter="getQueryParamsBulk"
-                  :disable-message="disableMessage"
-                  :readonly="isReadonly ?? isDisabled ?? false"
-                  :class="[
-                    cssClass,
-                    'sm-not:[&:nth-child(n+3)]:hidden [&:nth-child(n+5)]:hidden',
-                  ]"
-                  @clear:selected="resetSelection"
-                />
-              </template>
-            </template>
-          </template>
-
-          <template
-            v-if="bulk && bulk.length > 2"
-            #more="scope"
-          >
-            <template
-              v-for="(item, index) in bulk"
-              :key="index"
-            >
-              <component
-                :is="item"
-                :selection-count="selectionCount"
-                :query-params-getter="getQueryParamsBulk"
-                :disable-message="scope?.disableMessage"
-                :readonly="isReadonly ?? isDisabled ?? false"
-                class="last:pb-2 [&:nth-child(-n+1)]:hidden sm:[&:nth-child(-n+3)]:hidden [&:nth-child(2)]:pt-2 sm:[&:nth-child(4)]:pt-2"
-                @clear:selected="resetSelection"
-              />
-            </template>
-          </template>
-
-          <template #settings>
-            <slot
-              v-if="$slots.selection"
-              name="selection"
-            />
-
-            <div
-              v-else
-              class="flex"
-            >
-              <WButtonSelectionAction
-                v-if="allowSelect"
-                :icon="markRaw(IconRange)"
-                :active="isShift"
-                tooltip-text="Select range"
-                class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
-                @click.stop="setIsSelecting()"
-              >
-                <template #tooltip>
-                  <div class="grid grid-cols-[1fr,auto] gap-4">
-                    <div>
-                      Select range
-                    </div>
-
-                    <div class="text-description whitespace-nowrap">
-                      <IconShift class="square-4 -mt-[0.25em] inline" /> Shift
-                    </div>
-                  </div>
-                </template>
-              </WButtonSelectionAction>
-
-              <WButtonSelectionAction
-                v-if="!noRefetch"
-                :icon="markRaw(IconRefresh)"
-                :loading="isRefetchingAll"
-                :active="isRefetchingAll"
-                tooltip-text="Refetch"
-                class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
-                @click="refetchAll"
-              />
-
-              <HeaderSort
-                v-if="!noOrdering"
-                :ordering="ordering"
-                :fields="fieldsFiltered"
-                :query-params="queryParams"
-                class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
-                @update:ordering="updateOrdering"
-              />
-
-              <HeaderSettings
-                v-if="!noHeaderSettings"
-                v-model:field-config-map="fieldConfigMap"
-                :mode="listConfig.mode"
-                :fields="fieldsVisible"
-                :query-params="queryParams"
-                :has-saved="hasSaved"
-                :mobile="isMobile"
-                :no-mode="noMode ?? false"
-                @click:reset="reset(); updateStylesWidth(); updateStylesFixed()"
-                @update:mode="updateMode"
-                @update:field-config-map="updateStylesWidth(); updateStylesFixed()"
-              />
-            </div>
-          </template>
-        </WButtonSelection>
-
-        <WListHeader
-          v-if="!isGrid"
-          class="sm-not:hidden"
+          :total-count="countValue"
+          :selection-title="selectionTitle"
+          :bulk-disable-message="bulkDisableMessage"
+          :selection-count="selectionCount"
+          :select-all-value="selectAllValue"
+          :select-all-text-getter="selectAllTextGetter"
+          :is-shift="isShift"
           :allow-select="allowSelect"
           :select-only="selectOnly"
-          :tooltip-text="selectAllTextGetter(selectAllValue !== true, count ?? listCount ?? 0)"
-          :hide-more="!menu && !toMarkdown"
+          :readonly="isReadonly ?? isDisabled ?? false"
 
-          :count="count ?? listCount"
-          :selection="selectAllValue"
-          :style="{
-            '--list-header-width': getFieldWidthSumStyles(fieldConfigMap),
-          }"
-          @toggle:selection="$event ? selectAll() : resetSelection()"
-          @update:header="updateHeader"
+          :query-params="queryParams"
+          :use-query-fn="useQueryFn"
+          :use-query-fn-export="useQueryFnExport"
+          :api-method-export="apiMethodExport"
+          :export-file-name="exportFileName"
+          :get-query-params-bulk="getQueryParamsBulk"
+          :to-markdown="toMarkdown"
+
+          :bulk="bulk"
+          :action="action"
+          :menu="menu"
+
+          :fields-visible="fieldsVisible"
+          :fields-filtered="fieldsFiltered"
+          :fields-sorted="fieldsSorted"
+          :field-config-map="fieldConfigMap"
+          :styles-width="stylesWidth"
+          :ordering="ordering"
+          :mode="listConfig.mode"
+
+          :card="isGrid"
+          :mobile="isMobile"
+          :has-saved="hasSaved"
+          :no-refetch="noRefetch"
+          :no-ordering="noOrdering"
+          :no-header-settings="noHeaderSettings"
+          :no-mode="noMode"
+          :disable-export="disableExport"
+
+          :is-refetching-all="isRefetchingAll"
+          :refetch-all="refetchAll"
+          :update-header="updateHeader"
+
+          @reset:selection="resetSelection"
+          @toggle:selection="toggleSelectAll"
+          @set:is-selecting="setIsSelecting()"
+          @update:ordering="updateOrdering"
+          @update:mode="updateMode"
+          @update:field-config-map="updateFieldConfigMap"
+          @update:width="updateFieldWidth"
+          @save:width="save"
+          @click:reset="resetConfig"
         >
-          <template #default>
-            <HeaderFieldNested
-              :fields="fieldsFiltered"
-              :field-config-map="fieldConfigMap"
-            >
-              <template #default="{field}">
-                <WListHeaderItem
-                  :title="typeof field.meta.title === 'string' ? field.meta.title : field.meta.title(queryParams)"
-                  :field="typeof field.meta.field === 'string' ? field.meta.field : (field.meta.field?.(queryParams) as keyof Data)"
-                  :ordering="ordering"
-                  :disabled="noOrdering || !field.meta.field"
-                  :allow-resize="field.meta.allowResize"
-                  :item-class="field.meta.cssClassHeader"
-                  :style-value="isGrid ? {gridArea: field.meta.label} : {
-                    minWidth: field.meta.allowResize ? `var(${getFieldVariable('width', field.meta.label)})` : undefined,
-                    maxWidth: field.meta.allowResize ? `var(${getFieldVariable('width', field.meta.label)})` : undefined,
-                    left: fieldConfigMap[field.meta.label]?.sticky ? `var(${getFieldVariable('left', field.meta.label)})` : undefined,
-                    right: fieldConfigMap[field.meta.label]?.sticky ? `var(${getFieldVariable('right', field.meta.label)})` : undefined,
-                  }"
-                  :has-width="stylesWidth[getFieldVariable('width', field.meta.label)] !== undefined"
-                  :class="{
-                    [field.meta.cssClass ?? '']: true,
-                    'sticky z-[1] bg-[inherit]': !isGrid && fieldConfigMap[field.meta.label]?.sticky,
-                  }"
-                  @update:width="fieldConfigMap[field.meta.label]!.width = $event; updateStylesWidth()"
-                  @save:width="save"
-                  @update:ordering="updateOrdering"
-                />
-              </template>
-            </HeaderFieldNested>
+          <template
+            v-if="$slots.header"
+            #header="scope"
+          >
+            <slot
+              name="header"
+              v-bind="scope"
+            />
           </template>
-        </WListHeader>
+
+          <template
+            v-if="$slots.selection"
+            #selection
+          >
+            <slot name="selection" />
+          </template>
+        </ListToolbar>
       </template>
 
       <template #default="{item, skeleton, setter, refetch, previous, index, position, value, results, intersecting}">
@@ -242,126 +117,50 @@
           :skeleton="skeleton"
         />
 
-        <component
-          :is="formFieldGetter?.(item, index) !== undefined ? WUniform : WEmptyComponent"
-          v-bind="formFieldGetter ? {
-            ...uniformScope ?? {},
-            field: formFieldGetter(item, index),
-          } : undefined"
-        >
-          <template #default="innerScope">
-            <WListCard
-              :disabled="skeleton"
-              :disable-more="disableMore"
-              :mobile="isMobile"
-              :card-class="cardClass"
-              :card-wrapper-class="cardWrapperClass"
-              :has-border="hasBorder"
-              :allow-open="allowOpen && !skeleton"
-              :align-top="alignTop"
-              :card="isGrid"
-              :to="skeleton ? undefined : cardTo?.(item)"
-              :has-action="hasAction"
-              :skeleton="skeleton"
-              :position="position"
+        <ListRow
+          :item="item"
+          :skeleton="skeleton"
+          :setter="setter"
+          :refetch="refetch"
+          :index="index"
+          :position="position"
+          :value="(value as number)"
+          :results="results"
+          :intersecting="intersecting"
 
-              :selected="skeleton ? false : getIsSelected(value as number, position)"
-              :allow-select="allowSelect"
-              :allow-select-hover="allowSelectHover"
-              :always-select="alwaysSelect ?? false"
-              @toggle:selected="toggleSelected(value as number, position)"
-              @hover:selected="hoverSelected(position)"
-              @click:action="$emit('click:action', {item, setter, scope: formFieldGetter?.(item, index) !== undefined ? innerScope : undefined})"
-            >
-              <template #default="{beforeClass}">
-                <ListCardFieldNested
-                  :fields="fieldsFiltered"
-                  :field-config-map="fieldConfigMap"
-                  :column-data-map="columnDataMap"
-                  :item="item"
-                  :skeleton="skeleton"
-                  :card="isGrid"
-                  :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
-                  :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
-                  :query-params="queryParams"
-                  :results="results"
-                  :intersecting="intersecting"
-                >
-                  <template #default="defaultScope">
-                    <ListCardFieldItem
-                      :field="defaultScope.field"
-                      :item="defaultScope.item"
-                      :nested="defaultScope.nested"
-                      :column="defaultScope.column"
-                      :config="fieldConfigMap[defaultScope.field.meta.label]!"
-                      :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(defaultScope.item) ?? false)"
-                      :skeleton="skeleton"
-                      :card="isGrid"
-                      :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
-                      :query-params="queryParams"
-                      :results="results"
-                      :intersecting="intersecting"
-                      :before-class="beforeClass"
-                      @update:item="setter"
-                      @delete:item="setter(); refetch()"
-                    />
-                  </template>
-                </ListCardFieldNested>
-              </template>
+          :fields="fieldsSorted"
+          :field-config-map="fieldConfigMap"
+          :column-data-map="columnDataMap"
+          :query-params="queryParams"
+          :readonly="isReadonly ?? isDisabled ?? false"
+          :readonly-getter="readonlyGetter"
+          :form-field-getter="formFieldGetter"
+          :uniform-scope="uniformScope"
+          :expansion="expansion"
+          :menu="menu"
+          :to-markdown="toMarkdown"
 
-              <template
-                v-if="expansion"
-                #expansion
-              >
-                <component
-                  :is="expansion"
-                  :item="item"
-                  :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
-                  :skeleton="skeleton"
-                  :card="isGrid"
-                  :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
-                  :query-params="queryParams"
-                  :results="results"
-                  :intersecting="intersecting"
-                  @update:item="setter"
-                  @delete:item="setter(); refetch()"
-                />
-              </template>
+          :card="isGrid"
+          :mobile="isMobile"
+          :card-class="cardClass"
+          :card-wrapper-class="cardWrapperClass"
+          :has-border="hasBorder"
+          :align-top="alignTop"
+          :allow-open="allowOpen"
+          :disable-more="disableMore"
+          :has-action="hasAction"
+          :card-to="cardTo"
+          :content-visibility="contentVisibility"
 
-              <template
-                v-if="menu || (toMarkdown && !skeleton)"
-                #more
-              >
-                <ListMenuMarkdown
-                  v-if="toMarkdown && !skeleton"
-                  :item="item"
-                  :index="index"
-                  :to-markdown="toMarkdown"
-                />
+          :selected="skeleton ? false : getIsSelected(value as number, position)"
+          :allow-select="allowSelect"
+          :allow-select-hover="allowSelectHover"
+          :always-select="alwaysSelect ?? false"
 
-                <template
-                  v-for="(menuItem, menuIndex) in menu"
-                  :key="menuIndex"
-                >
-                  <component
-                    :is="Array.isArray(menuItem) ? menuItem[0] : menuItem"
-                    v-bind="Array.isArray(menuItem) ? menuItem[1] : undefined"
-                    :item="item"
-                    :readonly="(isReadonly ?? isDisabled) || (readonlyGetter?.(item) ?? false)"
-                    :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
-                    :update-item="setter"
-                    :delete-item="() => {
-                      setter()
-                      refetch()
-                    }"
-                    @update:item="setter"
-                    @delete:item="setter(); refetch()"
-                  />
-                </template>
-              </template>
-            </WListCard>
-          </template>
-        </component>
+          @toggle:selected="toggleSelected"
+          @hover:selected="hoverSelected"
+          @click:action="emitClickAction"
+        />
       </template>
 
       <template
@@ -375,41 +174,25 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>, CardColumns extends readonly GridCol[]">
-import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, ColumnData, ExpansionComponent, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
+import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, ColumnData, ExpansionComponent, FieldConfig, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
 import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type Ref, type StyleValue, computed, markRaw, nextTick, ref, toRef, watch} from 'vue'
+import {type Ref, type StyleValue, computed, nextTick, ref, toRef, watch} from 'vue'
 
-import WButtonSelection from '@/components/Button/WButtonSelection.vue'
-import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
-import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
-import WUniform from '@/components/Uniform/WUniform.vue'
-
-import IconRange from '@/assets/icons/IconRange.svg?component'
-import IconRefresh from '@/assets/icons/IconRefresh.svg?component'
-import IconShift from '@/assets/icons/IconShift.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
 import {type Selection, useSelected, useSelectionHash} from '@/utils/useSelected'
-import {BASE_ZINDEX_DROPDOWN, ListMode} from '@/utils/utils'
+import {ListMode} from '@/utils/utils'
 
-import WListCard from './WListCard.vue'
-import WListHeader from './WListHeader.vue'
-import WListHeaderItem from './WListHeaderItem.vue'
-import HeaderExport from './components/HeaderExport.vue'
-import HeaderFieldNested from './components/HeaderFieldNested.vue'
-import HeaderSettings from './components/HeaderSettings.vue'
-import HeaderSort from './components/HeaderSort.vue'
-import ListCardFieldItem from './components/ListCardFieldItem.vue'
-import ListCardFieldNested from './components/ListCardFieldNested.vue'
-import ListMenuMarkdown from './components/ListMenuMarkdown.vue'
-import {filterFields, forEachField, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, getFieldWidthSumStyles, sortFields, useListConfig} from './use/useListConfig'
+import ListRow from './components/ListRow.vue'
+import ListToolbar from './components/ListToolbar.vue'
+import {filterFields, forEachField, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, sortFields, sortFieldsDeep, useListConfig} from './use/useListConfig'
 
 defineOptions({inheritAttrs: false})
 
@@ -460,6 +243,7 @@ const props = withDefaults(
     noMode?: boolean
     disableSelect?: boolean
     selectOnly?: boolean
+    contentVisibility?: boolean
   }>(),
   {
     count: undefined,
@@ -531,6 +315,8 @@ const {
 )
 
 const fieldsFiltered = computed(() => filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible ?? false))
+
+const fieldsSorted = computed(() => isGrid.value ? fieldsFiltered.value : sortFieldsDeep(fieldsFiltered.value, fieldConfigMap.value))
 
 const columnDataMap = computed<Record<string, ColumnData>>(() => {
   const map: Record<string, ColumnData> = {}
@@ -628,6 +414,35 @@ const updateStylesFixed = async () => {
   await nextTick()
 
   stylesFixed.value = getFieldStylesFixed(sortFields(fieldsFiltered.value, fieldConfigMap.value), fieldConfigMap.value)
+}
+
+const toggleSelectAll = (value: boolean) => {
+  if (value) selectAll()
+  else resetSelection()
+}
+
+const emitClickAction = (value: CardActionParams<Data>) => {
+  emit('click:action', value)
+}
+
+const updateFieldConfigMap = (value: Record<string, FieldConfig>) => {
+  fieldConfigMap.value = value
+
+  updateStylesWidth()
+  updateStylesFixed()
+}
+
+const updateFieldWidth = (label: string, value: number) => {
+  fieldConfigMap.value[label]!.width = value
+
+  updateStylesWidth()
+}
+
+const resetConfig = () => {
+  reset()
+
+  updateStylesWidth()
+  updateStylesFixed()
 }
 
 const unwatch = watch(fieldsFiltered, async () => {

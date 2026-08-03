@@ -67,6 +67,7 @@
       class="sm-not:-px--inner-margin isolate"
       :class="{
         [cardClass ?? '']: true,
+        '[contain-intrinsic-size:auto_3rem] [content-visibility:auto]': contentVisibility,
         'flex flex-1': !card,
         'grid grid-cols-[--w-list-grid-cols] [grid-template-areas:--w-list-grid-areas] sm:rounded-[--w-list-rounded,unset]': card,
         'sm:border-y': hasBorder,
@@ -230,6 +231,7 @@ const props = defineProps<{
   hasAction: boolean | undefined
   skeleton: boolean
   position: number
+  contentVisibility: boolean | undefined
 
   selected: boolean
   allowSelect: boolean

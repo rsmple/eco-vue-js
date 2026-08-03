@@ -37,6 +37,11 @@ export type ListField<Data, QueryParams = unknown> = {
   allowResize?: boolean
   sticky?: boolean
   textFormat?: (item: Data, queryParams: QueryParams) => string | undefined | Promise<string | undefined>
+  /**
+   * By default a skeleton row renders a plain placeholder instead of mounting the field
+   * component. Set this when the field draws a skeleton of its own that is worth the mount.
+   */
+  customSkeleton?: boolean
 }
 
 export type ListFieldNested<Data, QueryParams = unknown> = {

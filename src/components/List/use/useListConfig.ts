@@ -196,6 +196,14 @@ export const sortFields = <Fields extends ListFields<any, any>>(list: Fields, fi
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const sortFieldsDeep = <Fields extends ListFields<any, any>>(list: Fields, fieldConfigMap: Record<string, FieldConfig>): Fields => {
+  return sortFields(list, fieldConfigMap).map(field => 'fields' in field.meta
+    ? {...field, meta: {...field.meta, fields: sortFieldsDeep(field.meta.fields, fieldConfigMap)}}
+    : field,
+  ) as Fields
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const forEachField = <Fields extends ListFields<any, any>>(fields: Fields, callback: (field: Extract<Fields[number], {meta: {label: string}}>) => void) => {
   fields.forEach(field => {
     if ('fields' in field.meta) {

@@ -31,7 +31,7 @@
               >
                 <slot
                   :item="slot.id !== null && data?.results ? data.results[slotIndex]! : ({id: slot.key * -1} as unknown as Data)"
-                  :setter="(newItem?: Data) => setItem(slotIndex, newItem)"
+                  :setter="getSetter(slotIndex)"
                   :refetch="emitRefetch"
                   :skeleton="slot.id === null"
                   :next="slot.id !== null && data?.results ? data.results[slotIndex + 1] : undefined"
@@ -210,6 +210,12 @@ const setItem = (index: number, newItem: Data | undefined) => {
   else newData.results.splice(index, 1)
 
   setData(newData, {index, newItem})
+}
+
+const setterList: ((newItem?: Data) => void)[] = []
+
+const getSetter = (index: number): ((newItem?: Data) => void) => {
+  return setterList[index] ??= (newItem?: Data) => setItem(index, newItem)
 }
 
 const emitRefetch = () => {

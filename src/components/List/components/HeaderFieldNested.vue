@@ -1,6 +1,6 @@
 <template>
   <template
-    v-for="(field, index) in sortedFields"
+    v-for="(field, index) in fields"
     :key="getFirstFieldLabel(field)"
   >
     <slot
@@ -16,7 +16,6 @@
     <template v-else>
       <HeaderFieldNested
         :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
-        :field-config-map="fieldConfigMap"
       >
         <template #default="defaultScope">
           <slot
@@ -45,19 +44,14 @@
 </template>
 
 <script setup lang="ts" generic="Data, QueryParams">
-import type {FieldComponent, FieldConfig, ListField, ListFieldExport, ListFields} from '../types'
-
-import {computed} from 'vue'
+import type {FieldComponent, ListField, ListFieldExport, ListFields} from '../types'
 
 import {isField} from '../models/utils'
-import {getFirstFieldLabel, sortFields} from '../use/useListConfig'
+import {getFirstFieldLabel} from '../use/useListConfig'
 
-const props = defineProps<{
+defineProps<{
   fields: ListFields<Data, QueryParams>
-  fieldConfigMap: Record<string, FieldConfig>
 }>()
-
-const sortedFields = computed<ListFields<Data, QueryParams>>(() => sortFields(props.fields, props.fieldConfigMap) as ListFields<Data, QueryParams>)
 
 defineSlots<{
   default: (props: {
