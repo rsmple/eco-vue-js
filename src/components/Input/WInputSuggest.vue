@@ -127,7 +127,7 @@
 
     <template
       v-if="!static"
-      #content="contentScope"
+      #content
     >
       <WInfiniteListScrollingElement
         :parent="isMobile"
@@ -135,7 +135,6 @@
         :class="{
           'pb-[50vh]': isMobile,
           'max-h-[inherit] overflow-auto overscroll-contain rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
-          'mt-5': 'isTop' in contentScope && contentScope.isTop === false && (errorMessage || maxLength),
         }"
       >
         <template v-if="$slots.content">
