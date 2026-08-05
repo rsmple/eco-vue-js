@@ -11,7 +11,7 @@
         style: $attrs.style as StyleValue,
       }"
     :class="[$attrs.class, {
-      'mb-[1.125rem]': !noMargin && !subgrid,
+      'mb-4.5': !noMargin && !subgrid,
       'col-span-full grid grid-cols-subgrid': subgrid,
     }]"
     @click="$emit('click', $event)"
@@ -98,7 +98,7 @@
 
         <span
           v-if="hasChanges"
-          class="square-2 absolute right-0 top-0 rounded-full bg-[var(--has-changes-bg)] transition-colors"
+          class="square-2 absolute right-0 top-0 rounded-full bg-(--has-changes-bg) transition-colors"
         />
 
         <div
@@ -157,7 +157,7 @@
 
     <div
       v-if="description"
-      class="text-description col-start-1 whitespace-pre-wrap text-pretty break-words text-xs font-normal"
+      class="text-description col-start-1 whitespace-pre-wrap text-pretty wrap-break-word text-xs font-normal"
       :class="{
         'opacity-50': isDisabled && !isReadonly && !isSkeleton,
         'pt-4': !subgrid,

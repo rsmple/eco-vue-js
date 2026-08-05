@@ -19,7 +19,7 @@
   >
     <div
       ref="header"
-      class="bg-default dark:bg-default-dark sticky left-0 top-0 z-[1] w-(--w-width-inner-out)"
+      class="bg-default dark:bg-default-dark sticky left-0 top-0 z-1 w-(--w-width-inner-out)"
       :class="{
         'sm-not:w-full': !maximized,
         'sm-not:w-screen': maximized,

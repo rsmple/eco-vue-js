@@ -2,7 +2,7 @@
   <button
     ref="element"
     v-bind="{class: $attrs.class, style: $attrs.style as StyleValue}"
-    class="w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-[0.08] flex select-none gap-2 outline-none"
+    class="w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-0.08 flex select-none gap-2 outline-none"
     :class="{
       'cursor-progress': loading || isSkeleton,
       'cursor-not-allowed opacity-70': isDisabled || isSkeleton,
@@ -44,11 +44,11 @@
           v-show="modelValue !== false && !loading"
           class="square-full absolute -z-10"
           :class="{
-            'scale-[0.33] rounded-full': radio && intermediate && modelValue === null,
-            'scale-[0.66] rounded': !radio && intermediate && modelValue === null,
-            'scale-[0.66] rounded-full': radio && !(intermediate && modelValue === null),
+            'scale-0.33 rounded-full': radio && intermediate && modelValue === null,
+            'scale-0.66 rounded': !radio && intermediate && modelValue === null,
+            'scale-0.66 rounded-full': radio && !(intermediate && modelValue === null),
             'rounded': !radio && !(intermediate && modelValue === null),
-            'bg-primary dark:bg-primary-dark [.w-hover-checked:hover_&]:[display:block]!': !isDisabled && !isSkeleton,
+            'bg-primary dark:bg-primary-dark [.w-hover-checked:hover_&]:block!': !isDisabled && !isSkeleton,
             'bg-gray-300 dark:bg-gray-700': isDisabled || isSkeleton,
             'transition-[opacity,transform]': !lessTransitions,
           }"

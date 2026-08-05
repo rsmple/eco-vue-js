@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-black-default relative my-2 mr-4 grid min-h-[4.5rem] max-w-[calc(100vw-2rem)] grid-cols-[auto,1fr,auto] rounded-xl shadow-md sm:max-w-lg dark:bg-gray-800">
+  <div class="bg-black-default relative my-2 mr-4 grid min-h-18 max-w-[calc(100vw-2rem)] grid-cols-[auto,1fr,auto] rounded-xl shadow-md sm:max-w-lg dark:bg-gray-800">
     <WCounter
       v-show="count > 1"
       class="absolute left-[-0.625em] top-[-0.625em] text-xs shadow-md"

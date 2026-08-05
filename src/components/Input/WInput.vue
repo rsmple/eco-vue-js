@@ -217,14 +217,14 @@
                   :id="id"
                   ref="input"
                   class="
-                    w-input min-h-full flex-1 basis-auto appearance-none border-none bg-[inherit]
+                    w-input min-h-full flex-1 basis-auto appearance-none border-none bg-inherit
                     outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed dark:placeholder:text-gray-500
                   "
                   :class="{
                     'w-0 max-w-0': hideInput,
                     'text-secure w-input-whitespace-pre-wrap break-all': textSecure && !isSecureVisible,
                     '[-webkit-text-fill-color:transparent]': textTransparent,
-                    'sm-not:text-[1rem]': !unclickable,
+                    'sm-not:text-base': !unclickable,
                     'opacity-0': placeholder && textarea && hasNoValue && !focused,
                     'py---w-option-padding': textarea,
                   }"

@@ -27,12 +27,12 @@
 
     <div
       v-if="!card"
-      class="left---left-inner bg-default dark:bg-default-dark @max-lg:hidden sticky z-[1]"
+      class="left---left-inner bg-default dark:bg-default-dark @max-lg:hidden sticky z-1"
       :class="{
         'width-(--w-list-header-rounded,1rem)': !allowSelect,
       }"
     >
-      <div class="bg-default dark:bg-default-dark w---left-inner absolute right-full top-0 z-[-1] h-full" />
+      <div class="bg-default dark:bg-default-dark w---left-inner absolute right-full top-0 -z-1 h-full" />
 
       <div
         class="h-full rounded-l-(--w-list-rounded,unset)"
@@ -134,13 +134,13 @@
       
     <div
       v-if="!card"
-      class="right---right-inner bg-default dark:bg-default-dark sticky z-[1]"
+      class="right---right-inner bg-default dark:bg-default-dark sticky z-1"
       :class="{
         'width-[calc(var(--w-list-padding,1rem)*2+1.25em)]': $slots.more,
         'width-(--w-list-header-rounded,1rem)': !$slots.more,
       }"
     >
-      <div class="bg-default dark:bg-default-dark w---right-inner absolute left-full top-0 z-[-1] h-full" />
+      <div class="bg-default dark:bg-default-dark w---right-inner absolute left-full top-0 -z-1 h-full" />
 
       <div
         class="h-full rounded-r-(--w-list-rounded,unset)"

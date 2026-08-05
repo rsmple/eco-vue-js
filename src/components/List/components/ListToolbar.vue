@@ -184,7 +184,7 @@
             :has-width="stylesWidth[getFieldVariable('width', field.meta.label)] !== undefined"
             :class="{
               [field.meta.cssClass ?? '']: true,
-              'sticky z-[1] bg-[inherit]': !card && fieldConfigMap[field.meta.label]?.sticky,
+              'sticky z-1 bg-inherit': !card && fieldConfigMap[field.meta.label]?.sticky,
             }"
             @update:width="$emit('update:width', field.meta.label, $event)"
             @save:width="$emit('save:width')"
