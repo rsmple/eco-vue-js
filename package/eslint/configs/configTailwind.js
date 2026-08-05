@@ -16,6 +16,7 @@ export default (config = {}) => [
 
       'tailwindcss/no-custom-classname': 'off',
       'tailwindcss/enforces-negative-arbitrary-values': 'off',
+      'tailwindcss/classnames-order': 'off',
     },
   },
 ]
