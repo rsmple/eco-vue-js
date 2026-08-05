@@ -26,7 +26,7 @@
     @click="!disabled && !disableMessage && !loading && $emit('click', $event)"
   >
     <div
-      class="-h--w-input-height sm-not:-px--inner-margin z-10 flex items-center gap-2 px-[--w-list-padding,1rem]" 
+      class="h---w-input-height sm-not:px---inner-margin z-10 flex items-center gap-2 px-(--w-list-padding,1rem)" 
       :class="{
         'opacity-0': loading,
       }"

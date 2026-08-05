@@ -14,13 +14,13 @@
   >
     <div
       class="
-        no-scrollbar relative col-start-1 row-span-2 grid grid-cols-[--actions-bar-filter-width]
+        no-scrollbar relative col-start-1 row-span-2 grid grid-cols-(--actions-bar-filter-width)
         justify-self-end overflow-y-auto overflow-x-hidden overscroll-contain
       "
     >
 
       <div class="pb-16">
-        <div class="text-accent -px--inner-margin -h--header-height flex items-center text-xl font-semibold">
+        <div class="text-accent px---inner-margin h---header-height flex items-center text-xl font-semibold">
           Filters
         </div>
 

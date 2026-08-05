@@ -1,9 +1,9 @@
 <template>
   <WSkeleton
     v-if="isSkeleton"
-    class="w-skeleton-rounded-[--w-button-rounded,1rem] w-skeleton-w-max -w-skeleton-h--button-height"
+    class="w-skeleton-h---button-height w-skeleton-rounded-(--w-button-rounded,1rem) w-skeleton-w-max"
   >
-    <div class="flex gap-2 px-[--w-button-rounded,1rem] font-medium opacity-0">
+    <div class="flex gap-2 px-(--w-button-rounded,1rem) font-medium opacity-0">
       <slot />
     </div>
   </WSkeleton>
@@ -24,18 +24,18 @@
     v-else
     ref="container"
     class="
-      w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-var(--w-button-border,1px))] -min-h--button-height relative isolate
-      flex select-none items-center
-      justify-center whitespace-nowrap rounded-[--w-button-rounded,1rem]
-      px-[--w-button-rounded,1rem] font-medium outline-none [border-width:--w-button-border,1px]
+      relative isolate flex min-h---button-height
+      items-center justify-center rounded-(--w-button-rounded,1rem)
+      [border-width:var(--w-button-border,1px)] px-(--w-button-rounded,1rem) font-medium
+      whitespace-nowrap outline-none select-none w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-var(--w-button-border,1px))]
     "
     :class="{
       [semanticTypeButtonBackgroundMap[semanticType] ?? semanticTypeBackgroundMap[semanticType]]: !outline,
       [semanticTypeBorderMap[semanticType]]: true,
-      'w-ripple w-ripple-hover before:text-black-default w-ripple-opacity-20 dark:w-ripple-opacity-30 cursor-pointer': !loading && !isDisabled,
+      'w-ripple cursor-pointer w-ripple-hover w-ripple-opacity-20 before:text-black-default dark:w-ripple-opacity-30': !loading && !isDisabled,
       'cursor-progress': loading,
       'cursor-not-allowed opacity-70': isDisabled,
-      'first-not:rounded-l-none first-not:border-l-0 first-not:before:rounded-l-none last-not:rounded-r-none last-not:border-r-0 last-not:before:rounded-r-none': join
+      'last-not:rounded-r-none last-not:border-r-0 last-not:before:rounded-r-none first-not:rounded-l-none first-not:border-l-0 first-not:before:rounded-l-none': join
     }"
     :disabled="!loading && isDisabled"
     :download="download"
@@ -61,7 +61,7 @@
     >
       <WSpinner
         v-if="loading"
-        class="w-spinner-size-[--w-button-spinner-size,1.25em] absolute z-10"
+        class="absolute z-10 w-spinner-size-(--w-button-spinner-size,1.25em)"
       />
     </Transition>
 

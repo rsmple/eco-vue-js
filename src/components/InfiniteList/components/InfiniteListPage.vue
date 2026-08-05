@@ -4,7 +4,7 @@
     class="relative"
   >
     <template v-if="page && slotList.length !== 0">
-      <div :class="[pageClass, page !== 1 ? 'pt-[--w-list-gap]' : undefined]">
+      <div :class="[pageClass, page !== 1 ? 'pt-(--w-list-gap)' : undefined]">
         <component
           :is="transition ? TransitionGroup : WEmptyComponent"
           v-bind="transition ? {
@@ -54,7 +54,7 @@
       v-else
       name="empty"
     >
-      <div class="text-accent sm:-left--left-inner sm:-max-w--width-inner flex justify-center px-8 py-16 text-center font-normal sm:sticky">
+      <div class="text-accent sm:left---left-inner sm:max-w---width-inner flex justify-center px-8 py-16 text-center font-normal sm:sticky">
         {{ emptyStub }}
       </div>
     </slot>

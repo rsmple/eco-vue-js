@@ -46,6 +46,9 @@ const pluginRipple = plugin(function ({matchUtilities, addUtilities, addBase}) {
       }
     }, 
 
+  }
+
+  const configRippleStatic = {
     'w-ripple-active:not(:active)': () => ({
       '&::before': {
         animation: 'ripple-active infinite linear alternate 0.5s',
@@ -55,16 +58,17 @@ const pluginRipple = plugin(function ({matchUtilities, addUtilities, addBase}) {
 
   matchUtilities(configRipple, {
     type: 'generic-name',
-    respectPrefix: false,
     values: {
       list: 'list',
     },
   })
 
-  addUtilities(Object.keys(configRipple).reduce((result, key) => {
-    result[`.${ key }`] = configRipple[key as keyof typeof configRipple]('')
+  const staticUtilities = {...configRipple, ...configRippleStatic}
+
+  addUtilities(Object.keys(staticUtilities).reduce((result, key) => {
+    result[`.${ key }`] = staticUtilities[key as keyof typeof staticUtilities]('')
     return result
-  }, {} as Record<string, ReturnType<typeof configRipple[keyof typeof configRipple]>>))
+  }, {} as Record<string, ReturnType<typeof staticUtilities[keyof typeof staticUtilities]>>))
 
   addBase({
     '@keyframes ripple-active': {

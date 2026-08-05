@@ -5,7 +5,7 @@
   />
 
   <div v-else>
-    <div class="grid h-[--w-chart-heatmap-size,1rem] grid-cols-[1fr,auto] items-center gap-2">
+    <div class="grid h-(--w-chart-heatmap-size,1rem) grid-cols-[1fr,auto] items-center gap-2">
       <div class="text-accent sm-not:text-2xs text-xs font-semibold">
         {{ title }}
       </div>
@@ -29,7 +29,7 @@
         <div
           v-for="(label, i) in DAY_LABELS"
           :key="i"
-          class="my-[--w-chart-heatmap-gap,0.125rem] flex h-[--w-chart-heatmap-size,1rem] items-center"
+          class="my-(--w-chart-heatmap-gap,0.125rem) flex h-(--w-chart-heatmap-size,1rem) items-center"
         >
           {{ label }}
         </div>

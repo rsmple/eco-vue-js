@@ -1,13 +1,13 @@
 <template>
   <div 
-    class="sm-not:-px--inner-margin sm-not:-mx---inner-margin p-4 sm:rounded-3xl"
+    class="sm-not:px---inner-margin sm-not:-mx---inner-margin p-4 sm:rounded-3xl"
     :class="{
       [infoCardSemanticTypeMap[semanticType ?? SemanticType.SECONDARY]]: !noBg,
     }"
   >
     <slot name="top" />
 
-    <div class="-gap--inner-margin grid grid-cols-[auto,1fr]">
+    <div class="gap---inner-margin grid grid-cols-[auto,1fr]">
       <component
         :is="icon ?? IconNegativeInfo"
         v-if="!noIcon"

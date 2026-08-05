@@ -8,7 +8,7 @@
       ref="element"
       class="absolute inset-y-0 left-0"
       :class="{
-        'delay-300 group-hover/overflow:translate-x-[--text-overflow,0px] group-hover/overflow:transition-transform group-hover/overflow:duration-[--text-overflow-duration,150ms] group-hover/overflow:ease-linear': overflow,
+        'delay-300 group-hover/overflow:translate-x-(--text-overflow,0px) group-hover/overflow:transition-transform group-hover/overflow:duration-(--text-overflow-duration,150ms) group-hover/overflow:ease-linear': overflow,
       }"
       :style="overflow ? {
         '--text-overflow': `-${overflow}px`,

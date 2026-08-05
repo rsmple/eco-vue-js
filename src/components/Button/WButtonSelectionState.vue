@@ -1,11 +1,11 @@
 <template>
-  <div class="sm-not:gap-1 -h--w-input-height grid grid-cols-[1fr,auto] gap-3">
+  <div class="sm-not:gap-1 h---w-input-height grid grid-cols-[1fr,auto] gap-3">
     <div class="sm-not:text-xs text-description self-center truncate whitespace-nowrap font-normal">
       <slot />
     </div>
 
     <button
-      class="text-description w-ripple w-ripple-hover sm-not:-px--inner-margin relative flex cursor-pointer select-none items-center justify-self-end px-[--w-list-padding,1rem]"
+      class="text-description w-ripple w-ripple-hover sm-not:px---inner-margin relative flex cursor-pointer select-none items-center justify-self-end px-(--w-list-padding,1rem)"
       aria-label="Clear selection"
       @click="$emit('click', $event)"
     >

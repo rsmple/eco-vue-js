@@ -1,7 +1,5 @@
+import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
-import autoprefixer from 'autoprefixer'
-import postcssImport from 'postcss-import'
-import tailwindcss from 'tailwindcss'
 import {type UserConfig, defineConfig} from 'vite'
 import dts from 'vite-plugin-dts'
 import {compileTemplate} from 'vue/compiler-sfc'
@@ -24,6 +22,7 @@ export default defineConfig(({mode}) => ({
       entryRoot: 'src',
       copyDtsFiles: true,
     }),
+    tailwindcss(),
     vue(),
     {
       name: 'svg-component',
@@ -59,11 +58,6 @@ export default defineConfig(({mode}) => ({
       },
     },
   ],
-  css: {
-    postcss: {
-      plugins: [postcssImport(), tailwindcss({config: './tailwind/tailwind.config.ts'}), autoprefixer()],
-    },
-  },
   build: {
     target: 'esnext',
     minify: false,

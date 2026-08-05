@@ -30,8 +30,8 @@
       :class="{
         'w-ripple w-ripple-hover': !isDisabled && !readonly,
         'opacity-50': isDisabled,
-        'bg-primary dark:bg-primary-dark font-semibold text-[--w-date-picker-day,#ffffff]': isSelected,
-        'bg-negative dark:bg-negative-dark font-semibold text-[--w-date-picker-day,#ffffff]': !isSelected && isToday,
+        'bg-primary dark:bg-primary-dark font-semibold text-(--w-date-picker-day,#ffffff)': isSelected,
+        'bg-negative dark:bg-negative-dark font-semibold text-(--w-date-picker-day,#ffffff)': !isSelected && isToday,
       }"
     >
       <div class="font-normal">

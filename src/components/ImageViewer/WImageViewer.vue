@@ -29,8 +29,8 @@
 
         <div
           class="
-          text-default bg-black-default absolute bottom-0 mt-1 w-full overflow-hidden
-          text-ellipsis bg-opacity-50 px-1 text-start text-xs [-webkit-box-orient:vertical] [-webkit-line-clamp:2] [display:-webkit-box]
+          text-default bg-black-default/50 absolute bottom-0 mt-1 w-full overflow-hidden
+          text-ellipsis px-1 text-start text-xs [-webkit-box-orient:vertical] [-webkit-line-clamp:2] [display:-webkit-box]
         "
         >
           {{ modelValue.substring(modelValue.lastIndexOf('/') + 1) }}

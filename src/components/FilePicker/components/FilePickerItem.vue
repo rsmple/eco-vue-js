@@ -16,7 +16,7 @@
       </slot>
 
       <button
-        class="w-ripple square-5 hover:bg-black-default absolute right-0 top-0 flex items-center justify-center rounded-full outline-none hover:bg-opacity-5"
+        class="w-ripple square-5 hover:bg-black-default/5 absolute right-0 top-0 flex items-center justify-center rounded-full outline-none"
         aria-label="Remove file"
         @click.stop.prevent="$emit('click:cancel')"
       >

@@ -78,7 +78,7 @@
           name="field"
         >
           <div
-            class="flex min-h-[--w-input-height,2.75rem] items-center font-normal"
+            class="flex min-h-(--w-input-height,2.75rem) items-center font-normal"
             :class="{
               'font-mono': mono,
               'border-t border-solid border-gray-300 dark:border-gray-700': title || $slots.title,
@@ -132,7 +132,7 @@
 
       <WSkeleton
         v-else
-        class="w-skeleton-w-full w-skeleton-rounded-[--w-input-rounded,0.75rem] w-skeleton-h-[--w-input-height,2.75rem]"
+        class="w-skeleton-w-full w-skeleton-rounded-(--w-input-rounded,0.75rem) w-skeleton-h-(--w-input-height,2.75rem)"
       />
 
       <div

@@ -74,7 +74,7 @@ const getUtils = () => {
 }
 
 const getPackageExports = (list: ComponentPath[]) => {
-  const result: Record<string, {import: string, require?: string}> = {
+  const result: Record<string, {import: string, require?: string, style?: string}> = {
     '.': {
       import: './dist/main.js',
     },
@@ -87,6 +87,15 @@ const getPackageExports = (list: ComponentPath[]) => {
     './tailwind-base': {
       import: './tailwind-base/index.ts',
       require: './tailwind-base/index.ts',
+    },
+    './tailwind-base/base.css': {
+      style: './tailwind-base/base.css',
+      import: './tailwind-base/base.css',
+      require: './tailwind-base/base.css',
+    },
+    './tailwind-base/*.js': {
+      import: './tailwind-base/*.ts',
+      require: './tailwind-base/*.ts',
     },
     './eslint/plugin': {
       import: './eslint/plugin.js',

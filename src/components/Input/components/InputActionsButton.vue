@@ -7,7 +7,7 @@
       'h-[calc(var(--w-input-height,2.75rem)-2px)]': top,
       'h-full': !top,
     }"
-    class="text-description relative flex w-[calc(var(--w-input-height,2.75rem)-2px)] select-none items-center justify-center rounded-[--w-input-rounded,0.75rem] bg-[--w-input-bg,inherit]"
+    class="text-description relative flex w-[calc(var(--w-input-height,2.75rem)-2px)] select-none items-center justify-center rounded-(--w-input-rounded,0.75rem) bg-(--w-input-bg,inherit)"
     :aria-label="label ?? tooltipText"
     :aria-disabled="disabled"
     :aria-pressed="pressed"

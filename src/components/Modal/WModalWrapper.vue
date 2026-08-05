@@ -5,8 +5,8 @@
       bg-default dark:bg-default-dark w-modal-wrapper
       scrollbar-width-thin grid
       max-h-[calc(100%-var(--inner-margin,2rem)*2)]
-      w-[--w-modal-wrapper-width,35rem] max-w-[calc(100%-var(--inner-margin,2rem)*2)] grid-cols-[1fr] grid-rows-[auto,1fr,auto]
-      overflow-auto overscroll-contain rounded-[--w-modal-wrapper-rounded,1.5rem] shadow-md
+      w-(--w-modal-wrapper-width,35rem) max-w-[calc(100%-var(--inner-margin,2rem)*2)] grid-cols-[1fr] grid-rows-[auto,1fr,auto]
+      overflow-auto overscroll-contain rounded-(--w-modal-wrapper-rounded,1.5rem) shadow-md
     "
     :class="{
       'sm-not:max-w-full sm-not:h-full sm-not:rounded-none sm-not:max-h-full': maximized,
@@ -19,28 +19,28 @@
   >
     <div
       ref="header"
-      class="bg-default dark:bg-default-dark sticky left-0 top-0 z-[1] w-[--w-width-inner-out]"
+      class="bg-default dark:bg-default-dark sticky left-0 top-0 z-[1] w-(--w-width-inner-out)"
       :class="{
         'sm-not:w-full': !maximized,
         'sm-not:w-screen': maximized,
       }"
     >
-      <div class="text-accent -p--w-modal-wrapper-padding flex items-center justify-center text-balance text-center text-xl font-semibold">
+      <div class="text-accent p---w-modal-wrapper-padding flex items-center justify-center text-balance text-center text-xl font-semibold">
         <slot name="title" />
       </div>
 
       <slot name="subtitle" />
     </div>
 
-    <div class="sm:-px--w-modal-wrapper-padding">
+    <div class="sm:px---w-modal-wrapper-padding">
       <slot />
     </div>
 
     <div
       ref="footer"
       class="
-        bg-default dark:bg-default-dark -gap--inner-margin -p--w-modal-wrapper-padding
-        md-not:pb-8 sticky bottom-0 left-0 flex w-[--w-width-inner-out] justify-center
+        bg-default dark:bg-default-dark gap---inner-margin p---w-modal-wrapper-padding
+        md-not:pb-8 sticky bottom-0 left-0 flex w-(--w-width-inner-out) justify-center
       "
       :class="{
         'sm-not:flex-col sm-not:w-full': !maximized,

@@ -3,9 +3,9 @@
     ref="infiniteScroll"
     :style="{'--infinite-list-header-height': headerHeight + 'px'}"
     :class="{
-      '-min-h--height-inner list:pt-[--w-list-gap,1rem] modal:pb-[--w-list-gap,1rem] modal:min-h-[50vh] pb-16': !minHeight && !minHeightOnly,
+      'min-h---height-inner list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem) modal:min-h-[50vh] pb-16': !minHeight && !minHeightOnly,
       'min-h-full': minHeight,
-      'list:pt-[--w-list-gap,1rem] modal:pb-[--w-list-gap,1rem]': minHeightOnly,
+      'list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem)': minHeightOnly,
     }"
   >
     <div :style="{height: topSpacerHeight + 'px'}" />

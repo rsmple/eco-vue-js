@@ -20,9 +20,9 @@
     @mousedown="$emit('mousedown', $event)"
   >
     <div
-      class="square-[1.5em] bg-default dark:bg-default-dark relative isolate flex items-center justify-center border border-solid [font-size:--w-checkbox-size]"
+      class="square-[1.5em] bg-default dark:bg-default-dark relative isolate flex items-center justify-center border border-solid [font-size:var(--w-checkbox-size)]"
       :class="{
-        'text-[--w-checkbox-color,#ffffff]': modelValue && !isDisabled && !isSkeleton,
+        'text-(--w-checkbox-color,#ffffff)': modelValue && !isDisabled && !isSkeleton,
         'text-primary dark:text-primary-dark': !modelValue && !isDisabled && !isSkeleton,
         'text-gray-300 dark:text-gray-700': !modelValue && isDisabled && !isSkeleton,
         'w-ripple w-hover-circle before:text-accent after:text-accent': !isDisabled && !isReadonly && !isSkeleton,
@@ -36,8 +36,8 @@
       <Transition
         enter-active-class="transition-[opacity,transform]"
         leave-active-class="transition-[opacity,transform]"
-        :enter-from-class="radio ? 'opacity-0 scale-[0.25!important]' : 'opacity-0 scale-[0.50!important]'"
-        :leave-to-class="radio ? 'opacity-0 scale-[0.25!important]' : 'opacity-0 scale-[0.50!important]'"
+        :enter-from-class="radio ? 'opacity-0 scale-[0.25]!' : 'opacity-0 scale-[0.50]!'"
+        :leave-to-class="radio ? 'opacity-0 scale-[0.25]!' : 'opacity-0 scale-[0.50]!'"
         :css="!lessTransitions"
       >
         <div
@@ -48,7 +48,7 @@
             'scale-[0.66] rounded': !radio && intermediate && modelValue === null,
             'scale-[0.66] rounded-full': radio && !(intermediate && modelValue === null),
             'rounded': !radio && !(intermediate && modelValue === null),
-            'bg-primary dark:bg-primary-dark [.w-hover-checked:hover_&]:[display:block!important]': !isDisabled && !isSkeleton,
+            'bg-primary dark:bg-primary-dark [.w-hover-checked:hover_&]:[display:block]!': !isDisabled && !isSkeleton,
             'bg-gray-300 dark:bg-gray-700': isDisabled || isSkeleton,
             'transition-[opacity,transform]': !lessTransitions,
           }"
@@ -72,7 +72,7 @@
         v-show="modelValue"
         class="square-[1em]"
         :class="{
-          '[.w-hover-checked:hover_&]:[display:block!important]': !isDisabled && !isSkeleton,
+          '[.w-hover-checked:hover_&]:[display:block]!': !isDisabled && !isSkeleton,
         }"
       />
 

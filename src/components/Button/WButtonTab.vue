@@ -17,7 +17,7 @@
       class="p-8"
     >
       <div
-        class="text-default dark:text-default-dark rounded-full bg-[inherit] bg-opacity-100 p-1 outline transition-[outline-width] duration-500" 
+        class="text-default dark:text-default-dark rounded-full bg-[inherit] p-1 outline transition-[outline-width] duration-500" 
         :class="{
           'bg-negative dark:bg-negative-dark outline-negative/10 dark:outline-negative-dark/10': hasError,
           'bg-positive dark:bg-positive-dark outline-positive/10 dark:outline-positive-dark/10': !hasError && hasValue && showHasValue,
@@ -66,7 +66,7 @@
         <div
           class="whitespace-nowrap px-3"
           :class="{
-            'sm-not:-pl--inner-margin': side,
+            'sm-not:pl---inner-margin': side,
           }"
         >
           <component :is="enableOverflow ? WTextOverflow : WEmptyComponent">
@@ -91,7 +91,7 @@
           v-if="statusIcon"
           :has-value="hasValue"
           :has-error="hasError"
-          class="sm-not:-mr--inner-margin square-4 ml-auto mr-4"
+          class="sm-not:mr---inner-margin square-4 ml-auto mr-4"
         />
 
         <slot
@@ -129,7 +129,7 @@
           :class="{
             'bg-current': indicator,
             'bg-primary dark:bg-primary-dark': !indicator,
-            'sm-not:-left--inner-margin': side,
+            'sm-not:left---inner-margin': side,
           }"
         />
       </Transition>
