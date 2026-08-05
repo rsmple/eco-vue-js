@@ -12,7 +12,7 @@ prepare:
     - builder
 
   script:
-    - npm ci
+    - npm ci --ignore-scripts
   artifacts:
     paths:
       - node_modules/
