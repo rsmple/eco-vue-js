@@ -30,7 +30,7 @@
         <slot name="content" />
       </div>
 
-      <div class="absolute top-full h-screen w-full bg-[inherit]" />
+      <div class="absolute top-full h-screen w-full bg-inherit" />
     </WDismissable>
   </Teleport>
 </template>

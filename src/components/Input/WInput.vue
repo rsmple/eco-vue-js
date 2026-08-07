@@ -159,7 +159,7 @@
           <div
             class="w-skeleton-w-32 flex gap-(--w-input-gap,0.25rem)"
             :class="{
-              '[&:not(:has(.w-option-has-bg))]:px---w-option-padding': !icon && !textarea,
+              'not-has-[.w-option-has-bg]:px---w-option-padding': !icon && !textarea,
               'flex-wrap': !noWrap && !seamless,
               'w-full min-w-max': !textarea && noWrap,
             }"

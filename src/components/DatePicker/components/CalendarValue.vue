@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative w-full select-none rounded-xl bg-gradient-to-tr px-4 py-3"
+    class="relative w-full select-none rounded-xl bg-linear-to-tr px-4 py-3"
     :class="[{
       'w-ripple w-ripple-hover cursor-pointer': clickable,
     }, semanticTypeBackgroundMap[SemanticType.PRIMARY]]"

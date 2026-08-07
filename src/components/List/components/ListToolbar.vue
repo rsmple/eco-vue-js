@@ -9,7 +9,7 @@
     :disable-message="bulkDisableMessage"
     :selected-count="selectionCount"
     :style="{zIndex: BASE_ZINDEX_DROPDOWN}"
-    more-toggle-class="[&:nth-child(-n+3)]:hidden sm:[&:nth-child(-n+5)]:hidden"
+    more-toggle-class="nth-[-n+3]:hidden sm:nth-[-n+5]:hidden"
     @clear:selection="$emit('reset:selection')"
   >
     <template
@@ -54,7 +54,7 @@
             :readonly="readonly"
             :class="[
               cssClass,
-              'sm-not:[&:nth-child(n+3)]:hidden [&:nth-child(n+5)]:hidden',
+              'sm-not:nth-[n+3]:hidden nth-[n+5]:hidden',
             ]"
             @clear:selected="$emit('reset:selection')"
           />
@@ -76,7 +76,7 @@
           :query-params-getter="getQueryParamsBulk"
           :disable-message="scope?.disableMessage"
           :readonly="readonly"
-          class="last:pb-2 [&:nth-child(-n+1)]:hidden sm:[&:nth-child(-n+3)]:hidden [&:nth-child(2)]:pt-2 sm:[&:nth-child(4)]:pt-2"
+          class="last:pb-2 nth-[-n+1]:hidden sm:nth-[-n+3]:hidden nth-2:pt-2 sm:nth-4:pt-2"
           @clear:selected="$emit('reset:selection')"
         />
       </template>
@@ -107,7 +107,7 @@
               </div>
 
               <div class="text-description whitespace-nowrap">
-                <IconShift class="square-4 -mt-[0.25em] inline" /> Shift
+                <IconShift class="square-4 mt-[-0.25em] inline" /> Shift
               </div>
             </div>
           </template>

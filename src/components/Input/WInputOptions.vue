@@ -38,7 +38,7 @@
     <template #content>
       <div
         v-if="!options.length"
-        class="px-[1.0625rem] py-2 first:pt-4 last:pb-4"
+        class="px-4.25 py-2 first:pt-4 last:pb-4"
       >
         <div
           class="w-select-field sm-not:px-3 cursor-default select-none"

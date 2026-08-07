@@ -17,7 +17,7 @@
       class="p-8"
     >
       <div
-        class="text-default dark:text-default-dark rounded-full bg-[inherit] p-1 outline transition-[outline-width] duration-500" 
+        class="text-default dark:text-default-dark rounded-full bg-inherit p-1 outline transition-[outline-width] duration-500" 
         :class="{
           'bg-negative dark:bg-negative-dark outline-negative/10 dark:outline-negative-dark/10': hasError,
           'bg-positive dark:bg-positive-dark outline-positive/10 dark:outline-positive-dark/10': !hasError && hasValue && showHasValue,

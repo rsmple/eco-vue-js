@@ -72,7 +72,7 @@
         v-show="modelValue"
         class="square-[1em]"
         :class="{
-          '[.w-hover-checked:hover_&]:[display:block]!': !isDisabled && !isSkeleton,
+          '[.w-hover-checked:hover_&]:block!': !isDisabled && !isSkeleton,
         }"
       />
 

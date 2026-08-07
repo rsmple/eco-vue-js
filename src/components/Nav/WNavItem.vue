@@ -31,7 +31,7 @@
         v-if="indent && !expand && isActive"
         class="absolute left-3 top-0 flex h-full items-center"
       >
-        <div class="square-1.5 rounded-full bg-[var(--w-nav-item-dot-color)]" />
+        <div class="square-1.5 rounded-full bg-(--w-nav-item-dot-color)" />
       </div>
     </Transition>
 

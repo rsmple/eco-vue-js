@@ -36,7 +36,7 @@
 
       <div
         v-if="caption || userInput"
-        class="text-default whitespace-pre-wrap break-words font-normal [word-break:break-word]"
+        class="text-default whitespace-pre-wrap wrap-break-word font-normal [word-break:break-word]"
       >
         <template v-if="typeof caption === 'string'">
           {{ caption }}

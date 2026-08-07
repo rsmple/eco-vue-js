@@ -25,7 +25,7 @@
       <div
         class="grid grid-cols-1 overflow-hidden"
         :class="{
-          'bg-default dark:bg-default-dark my-2 rounded-xl shadow-md dark:outline dark:outline-1 dark:outline-gray-800': !isMobile,
+          'bg-default dark:bg-default-dark my-2 rounded-xl shadow-md dark:outline-1 dark:outline-gray-800': !isMobile,
         }"
       >
         <div class="p-4">

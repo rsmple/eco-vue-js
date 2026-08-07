@@ -38,7 +38,7 @@
 
       <div
         v-if="title"
-        class="sm-not:hidden sm-not:[.dropdown_&]:block whitespace-nowrap font-normal"
+        class="sm-not:hidden sm-not:in-[.dropdown]:block whitespace-nowrap font-normal"
       >
         {{ title }}
       </div>

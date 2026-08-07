@@ -24,7 +24,7 @@
       <div
         :class="{
           'flex flex-wrap gap-x-4': wrap,
-          'flex gap-x-4 [&>*]:flex-1': stretch,
+          'flex gap-x-4 *:flex-1': stretch,
         }"
       >
         <WCheckbox

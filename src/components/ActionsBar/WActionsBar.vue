@@ -42,7 +42,7 @@
       >
         <IconBack
           class="text-description square-4 transition-transform"
-          :class="{'[transform:rotateY(180deg)]': isOpen}"
+          :class="{'transform-[rotateY(180deg)]': isOpen}"
         />
       </button>
 
