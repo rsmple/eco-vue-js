@@ -42,7 +42,7 @@
 
       <div class="h---w-input-height py-0.75">
         <div
-          class="width-[calc(var(--w-input-height)+0.5rem)] p-0.75 h-full rounded-full bg-[200%_auto] [background-position:right]"
+          class="width-[calc(var(--w-input-height)+0.5rem)] p-0.75 h-full rounded-full bg-size-[200%_auto] bg-right"
           :class="{
             'bg-gray-300 dark:bg-gray-700': !value || loading,
             [semanticTypeBackgroundMap[SemanticType.PRIMARY]]: value && !loading,
@@ -76,7 +76,7 @@
 
     <div
       v-if="description"
-      class="text-description whitespace-pre-wrap break-words text-xs font-normal"
+      class="text-description whitespace-pre-wrap wrap-break-word text-xs font-normal"
     >
       {{ description }}
     </div>

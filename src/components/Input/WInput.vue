@@ -99,7 +99,7 @@
           'border-negative dark:border-negative-dark': errorMessage,
           [borderClass ?? 'border-gray-300 dark:border-gray-700']: !isDisabled,
           'border-gray-300/50 dark:border-gray-700/50': isDisabled,
-          'border-opacity-0 group-hover/seamless:border-opacity-100 dark:border-opacity-0 dark:group-hover/seamless:border-opacity-100': seamless && !focused,
+          'not-group-hover/seamless:border-transparent!': seamless && !focused,
           'bg-(--w-input-bg,inherit)': !seamless || focused,
         }"
         @mousedown="focused ? downed = true : undefined"
