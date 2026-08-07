@@ -44,9 +44,9 @@
           v-show="modelValue !== false && !loading"
           class="square-full absolute -z-10"
           :class="{
-            'scale-0.33 rounded-full': radio && intermediate && modelValue === null,
-            'scale-0.66 rounded': !radio && intermediate && modelValue === null,
-            'scale-0.66 rounded-full': radio && !(intermediate && modelValue === null),
+            'scale-33 rounded-full': radio && intermediate && modelValue === null,
+            'scale-66 rounded': !radio && intermediate && modelValue === null,
+            'scale-66 rounded-full': radio && !(intermediate && modelValue === null),
             'rounded': !radio && !(intermediate && modelValue === null),
             'bg-primary dark:bg-primary-dark [.w-hover-checked:hover_&]:block!': !isDisabled && !isSkeleton,
             'bg-gray-300 dark:bg-gray-700': isDisabled || isSkeleton,

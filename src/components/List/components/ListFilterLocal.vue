@@ -1,8 +1,8 @@
 <template>
-  <div class="w-button-h-9 w-button-rounded-xl w-input-h-9 flex flex-wrap items-center gap-2 py-2 text-sm">
+  <div class="w-button-rounded-xl flex flex-wrap items-center gap-2 py-2 text-sm">
     <div
       v-if="searchComponent"
-      class="w-52 max-w-full"
+      class="min-w-52 max-w-full"
     >
       <component
         :is="searchComponent[0].default"

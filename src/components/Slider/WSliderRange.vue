@@ -15,7 +15,7 @@
         class="relative h-1 w-full rounded-sm bg-gray-200 dark:bg-gray-600"
       >
         <div
-          class="absolute flex h-full items-center rounded-[inherit] bg-gradient-to-r from-[var(--w-slider-from)_50%] to-[var(--w-slider-to)_50%]"
+          class="absolute flex h-full items-center rounded-inherit bg-linear-to-r from-(--w-slider-from) from-50% to-(--w-slider-to) to-50%"
           :class="{
             'bg-gray-400 dark:bg-gray-500': disabled,
           }"
@@ -25,7 +25,7 @@
           }"
         >
           <div
-            class="square-4 absolute left-0 -ml-2 rounded-full bg-[var(--w-slider-from)] transition-transform"
+            class="square-4 absolute left-0 -ml-2 rounded-full bg-(--w-slider-from) transition-transform"
             :class="{
               'scale-180': isCursorFrom === true,
               'hover:scale-200': !readonly && isCursorFrom === null,
@@ -33,7 +33,7 @@
           />
 
           <div
-            class="square-4 absolute right-0 -mr-2 rounded-full bg-[var(--w-slider-to)] transition-transform"
+            class="square-4 absolute right-0 -mr-2 rounded-full bg-(--w-slider-to) transition-transform"
             :class="{
               'scale-180': isCursorFrom === false,
               'hover:scale-200': !readonly && isCursorFrom === null,

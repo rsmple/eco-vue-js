@@ -193,7 +193,7 @@
       :class="{
         'border-gray-300 dark:border-gray-700': hasBorder && !selected,
         'border-primary dark:border-primary-dark': hasBorder && selected,
-        'mt-[calc(var(--w-list-gap,1rem)*-1)] border border-t-0 px-5': !card && hasBorder,
+        '-mt-(--w-list-gap,1rem) border border-t-0 px-5': !card && hasBorder,
         'rounded-b-(--w-list-rounded,unset)': !card,
       }"
     >
@@ -257,7 +257,7 @@ const beforeClass = computed<Record<string, boolean | undefined>>(() => {
 
   return {
     'w-ripple-list w-ripple-hover-list': true,
-    'w-ripple-opacity-[0.05]': !props.allowSelectHover && !props.selected && !moreRef.value?.isOpen,
+    'w-ripple-opacity-5': !props.allowSelectHover && !props.selected && !moreRef.value?.isOpen,
     'before:text-primary dark:before:text-primary-dark w-ripple-opacity-15': props.allowSelectHover || props.selected || moreRef.value?.isOpen,
     'before:opacity-10': props.selected || moreRef.value?.isOpen,
   }

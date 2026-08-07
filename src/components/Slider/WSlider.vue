@@ -15,7 +15,7 @@
         class="h-1 w-full rounded-sm bg-gray-300 dark:bg-gray-600"
       >
         <div
-          class="flex h-full items-center justify-end rounded-[inherit]"
+          class="flex h-full items-center justify-end rounded-inherit"
           :class="{
             [!errorMessage ? semanticType : SemanticType.NEGATIVE]: !disabled,
             'bg-gray-400 dark:bg-gray-500': disabled,
@@ -23,7 +23,7 @@
           :style="{width: percentCompactFormatter.format(rangeScale(cursor ?? modelValue))}"
         >
           <div
-            class="square-4 tw-hover-circle tw-hover-circle-inherit relative -mr-2 rounded-full bg-[inherit]"
+            class="square-4 tw-hover-circle tw-hover-circle-inherit relative -mr-2 rounded-full bg-inherit"
             :style="{
               '--hover-circle-opacity': isMoveStarted ? 1 : 0.35,
             }"

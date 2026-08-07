@@ -4,6 +4,7 @@
     v-bind="{
       ...props,
       modelValue: search,
+      placeholder: !focused ? placeholder : undefined,
       loading: loading || isFetchingPrefix || loadingCreate,
       hideInput: !modelValue?.length && !emptyValue ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
       filterValue: filterValue === undefined ? modelValue : filterValue,
