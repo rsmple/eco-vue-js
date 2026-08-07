@@ -13,8 +13,8 @@
 
     <div class="relative overflow-hidden">
       <Transition
-        enter-active-class="transition-transform duration-[250ms] w-full"
-        leave-active-class="transition-transform duration-[250ms] w-full absolute top-0"
+        enter-active-class="transition-transform duration-250 w-full"
+        leave-active-class="transition-transform duration-250 w-full absolute top-0"
         enter-from-class="translate-x-[calc(100%*var(--direction-factor))]"
         leave-to-class="translate-x-[calc(100%*var(--direction-factor)*-1)]"
       >

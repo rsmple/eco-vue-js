@@ -329,7 +329,7 @@
           </Transition>
 
           <Transition
-            enter-active-class="transition-[width] ease-linear rounded-sm duration-[var(--debounce-duration)]"
+            enter-active-class="transition-[width] ease-linear rounded-sm duration-(--debounce-duration)"
             enter-from-class="w-0"
             enter-to-class="w-full"
             leave-active-class="hidden"

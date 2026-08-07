@@ -8,6 +8,10 @@ export default (config = {}) => [
     plugins: {tailwindcss: tailwind},
     settings: {
       tailwindcss: {
+        attributes: [
+          'enter-active-class',
+          'leave-active-class',
+        ],
         cssConfigPath: config.cssConfigPath ?? DEFAULT_CSS_CONFIG_PATH,
       },
     },
