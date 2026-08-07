@@ -61,7 +61,7 @@
       :class="{
         'pr-9': !title && !$slots.title && filterField,
         'col-start-2 -col-end-1 row-start-1 -row-end-3 grid-cols-subgrid': subgrid,
-        'grid-cols-[1fr,auto]': !subgrid,
+        'grid-cols-[1fr_auto]': !subgrid,
       }"
     >
       <div

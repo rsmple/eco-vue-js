@@ -30,7 +30,7 @@
 
       <div
         v-else-if="'label' in item.meta"
-        class="bg-default dark:bg-default-dark grid select-none grid-cols-[1.75rem,1fr,2.25rem,2.25rem]"
+        class="bg-default dark:bg-default-dark grid select-none grid-cols-[1.75rem_1fr_2.25rem_2.25rem]"
         v-bind="container"
       >
         <button

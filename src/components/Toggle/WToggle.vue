@@ -14,8 +14,8 @@
         'cursor-pointer': !isReadonly && !loading && !isDisabled && !isSkeleton,
         'cursor-auto select-text': isReadonly,
         'select-none': !isReadonly,
-        'grid-cols-[1fr,auto]': (title || $slots.title) && !rightLabel,
-        'grid-cols-[auto,1fr]': (title || $slots.title) && rightLabel,
+        'grid-cols-[1fr_auto]': (title || $slots.title) && !rightLabel,
+        'grid-cols-[auto_1fr]': (title || $slots.title) && rightLabel,
         'gap-4': title || $slots.title,
         'justify-center': center,
       }"

@@ -31,7 +31,7 @@
         <div class="p-4">
           <div
             class="grid items-start"
-            :class="!mobile && !noMode ? 'grid-cols-[auto,auto,auto]' : 'grid-cols-1'"
+            :class="!mobile && !noMode ? 'grid-cols-[auto_auto_auto]' : 'grid-cols-1'"
           >
             <div
               v-if="!mobile && !noMode"

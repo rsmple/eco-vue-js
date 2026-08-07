@@ -5,7 +5,7 @@
   />
 
   <div v-else>
-    <div class="grid h-(--w-chart-heatmap-size,1rem) grid-cols-[1fr,auto] items-center gap-2">
+    <div class="grid h-(--w-chart-heatmap-size,1rem) grid-cols-[1fr_auto] items-center gap-2">
       <div class="text-accent sm-not:text-2xs text-xs font-semibold">
         {{ title }}
       </div>

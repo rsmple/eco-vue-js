@@ -1,7 +1,7 @@
 <template>
   <button
     :disabled="disabled"
-    class="w-ripple-trigger grid select-none grid-cols-[auto,1fr] font-semibold outline-none transition-colors duration-500"
+    class="w-ripple-trigger grid select-none grid-cols-[auto_1fr] font-semibold outline-none transition-colors duration-500"
     :class="{
       'text-primary dark:text-primary-dark': !hasError && active,
       'text-negative dark:text-negative-dark': hasError,
@@ -57,7 +57,7 @@
 
       <div
         v-else
-        class="group/overflow grid grid-cols-[1fr,auto] items-center py-2"
+        class="group/overflow grid grid-cols-[1fr_auto] items-center py-2"
         :class="{
           'justify-center text-center': !side,
           'text-start': side,

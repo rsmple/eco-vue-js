@@ -1,5 +1,5 @@
 <template>
-  <div class="grid max-w-full grid-cols-[1fr,auto] gap-4">
+  <div class="grid max-w-full grid-cols-[1fr_auto] gap-4">
     <div
       tabindex="0"
       class="group/hover-circle relative select-none px-4 py-3.5"

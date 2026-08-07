@@ -5,7 +5,7 @@
       bg-default dark:bg-default-dark w-modal-wrapper
       scrollbar-width-thin grid
       max-h-[calc(100%-var(--inner-margin,2rem)*2)]
-      w-(--w-modal-wrapper-width,35rem) max-w-[calc(100%-var(--inner-margin,2rem)*2)] grid-cols-[1fr] grid-rows-[auto,1fr,auto]
+      w-(--w-modal-wrapper-width,35rem) max-w-[calc(100%-var(--inner-margin,2rem)*2)] grid-cols-[1fr] grid-rows-[auto_1fr_auto]
       overflow-auto overscroll-contain rounded-(--w-modal-wrapper-rounded,1.5rem) shadow-md
     "
     :class="{

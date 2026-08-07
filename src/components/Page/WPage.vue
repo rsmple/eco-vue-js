@@ -4,7 +4,7 @@
     ref="element"
     class="
       not-print:shadow-md bg-default text-black-default light relative isolate grid
-      h-[29.62cm] w-[21.01cm] break-before-page grid-cols-1 grid-rows-[auto,1fr] overflow-hidden px-[1.3cm] py-[1.5cm]
+      h-[29.62cm] w-[21.01cm] break-before-page grid-cols-1 grid-rows-[auto_1fr] overflow-hidden px-[1.3cm] py-[1.5cm]
     "
     :class="{
       '[counter-increment:page]': !empty,
@@ -58,10 +58,10 @@
       <slot v-bind="{updateOverflow, INNER_CLASS}" />
     </div>
 
-    <div class="text-2xs absolute inset-x-[1.3cm] bottom-[0.85cm] grid grid-cols-[1fr,auto,1fr] items-center gap-4 text-gray-400">
+    <div class="text-2xs absolute inset-x-[1.3cm] bottom-[0.85cm] grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-gray-400">
       <div
         v-if="logoComponent || $slots.logo"
-        class="grid grid-cols-[auto,1fr] items-center gap-3"
+        class="grid grid-cols-[auto_1fr] items-center gap-3"
         :class="{
           'col-start-2 justify-self-center': centerLogo,
           'col-start-1': !centerLogo,

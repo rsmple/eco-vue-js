@@ -101,7 +101,7 @@
           @click.stop="$emit('set:is-selecting')"
         >
           <template #tooltip>
-            <div class="grid grid-cols-[1fr,auto] gap-4">
+            <div class="grid grid-cols-[1fr_auto] gap-4">
               <div>
                 Select range
               </div>

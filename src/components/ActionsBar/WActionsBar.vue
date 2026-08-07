@@ -3,7 +3,7 @@
     class="
       height-full w-actions-bar
       sm-not:[--actions-bar-filter-width:calc(100vw-var(--w-actions-bar-width))] fixed right-0 top-0 grid
-      grid-cols-[var(--actions-bar-filter-width-current,0),var(--w-actions-bar-width)] grid-rows-[var(--header-height),1fr]
+      grid-cols-[var(--actions-bar-filter-width-current,0)_var(--w-actions-bar-width)] grid-rows-[var(--header-height)_1fr]
       justify-end overflow-hidden transition-[grid-template-columns]
       duration-300 print:hidden
     "
@@ -46,7 +46,7 @@
         />
       </button>
 
-      <div class="row-start-2 grid grid-rows-[1fr,auto]">
+      <div class="row-start-2 grid grid-rows-[1fr_auto]">
         <div>
           <slot name="top" />
 

@@ -7,7 +7,7 @@
   >
     <slot name="top" />
 
-    <div class="gap---inner-margin grid grid-cols-[auto,1fr]">
+    <div class="gap---inner-margin grid grid-cols-[auto_1fr]">
       <component
         :is="icon ?? IconNegativeInfo"
         v-if="!noIcon"

@@ -37,7 +37,7 @@
 
     <div class="[overflow:inherit]">
       <div
-        class="w-ripple w-ripple-hover relative grid grid-cols-[1.5rem,1fr,auto] items-center rounded-lg pr-2"
+        class="w-ripple w-ripple-hover relative grid grid-cols-[1.5rem_1fr_auto] items-center rounded-lg pr-2"
         :class="{
           'before:opacity-10': hovered,
           'pl-4': indent,
