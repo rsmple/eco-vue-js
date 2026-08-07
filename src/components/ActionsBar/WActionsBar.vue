@@ -3,7 +3,7 @@
     class="
       height-full w-actions-bar
       sm-not:[--actions-bar-filter-width:calc(100vw-var(--w-actions-bar-width))] fixed right-0 top-0 grid
-      grid-cols-[var(--actions-bar-filter-width-current,0),var(--w-actions-bar-width)] grid-rows-[var(--header-height),1fr]
+      grid-cols-[var(--actions-bar-filter-width-current,0)_var(--w-actions-bar-width)] grid-rows-[var(--header-height)_1fr]
       justify-end overflow-hidden transition-[grid-template-columns]
       duration-300 print:hidden
     "
@@ -14,13 +14,13 @@
   >
     <div
       class="
-        no-scrollbar relative col-start-1 row-span-2 grid grid-cols-[--actions-bar-filter-width]
+        no-scrollbar relative col-start-1 row-span-2 grid grid-cols-(--actions-bar-filter-width)
         justify-self-end overflow-y-auto overflow-x-hidden overscroll-contain
       "
     >
 
       <div class="pb-16">
-        <div class="text-accent -px--inner-margin -h--header-height flex items-center text-xl font-semibold">
+        <div class="text-accent px---inner-margin h---header-height flex items-center text-xl font-semibold">
           Filters
         </div>
 
@@ -42,11 +42,11 @@
       >
         <IconBack
           class="text-description square-4 transition-transform"
-          :class="{'[transform:rotateY(180deg)]': isOpen}"
+          :class="{'transform-[rotateY(180deg)]': isOpen}"
         />
       </button>
 
-      <div class="row-start-2 grid grid-rows-[1fr,auto]">
+      <div class="row-start-2 grid grid-rows-[1fr_auto]">
         <div>
           <slot name="top" />
 

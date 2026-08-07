@@ -2,7 +2,7 @@
   <WModalWrapper
     :actions-col="actionsCol"
     :maximized="maximized"
-    class="w-modal-wrapper-w-[--w-modal-confirm-width,40rem]"
+    class="w-modal-wrapper-w-(--w-modal-confirm-width,40rem)"
     :class="wrapperClass"
   >
     <template #title>
@@ -16,7 +16,7 @@
       />
     </template>
 
-    <div class="text-accent sm-not:-px--inner-margin mb-6 min-h-5 text-balance text-center font-normal">
+    <div class="text-accent sm-not:px---inner-margin mb-6 min-h-5 text-balance text-center font-normal">
       <template v-if="typeof description === 'string'">
         {{ description }}
       </template>

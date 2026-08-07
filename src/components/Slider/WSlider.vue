@@ -1,5 +1,5 @@
 <template>
-  <div class="grid max-w-full grid-cols-[1fr,auto] gap-4">
+  <div class="grid max-w-full grid-cols-[1fr_auto] gap-4">
     <div
       tabindex="0"
       class="group/hover-circle relative select-none px-4 py-3.5"
@@ -15,7 +15,7 @@
         class="h-1 w-full rounded-sm bg-gray-300 dark:bg-gray-600"
       >
         <div
-          class="flex h-full items-center justify-end rounded-[inherit]"
+          class="flex h-full items-center justify-end rounded-inherit"
           :class="{
             [!errorMessage ? semanticType : SemanticType.NEGATIVE]: !disabled,
             'bg-gray-400 dark:bg-gray-500': disabled,
@@ -23,7 +23,7 @@
           :style="{width: percentCompactFormatter.format(rangeScale(cursor ?? modelValue))}"
         >
           <div
-            class="square-4 tw-hover-circle tw-hover-circle-inherit relative -mr-2 rounded-full bg-[inherit]"
+            class="square-4 tw-hover-circle tw-hover-circle-inherit relative -mr-2 rounded-full bg-inherit"
             :style="{
               '--hover-circle-opacity': isMoveStarted ? 1 : 0.35,
             }"

@@ -5,7 +5,7 @@
   />
 
   <div v-else>
-    <div class="grid h-[--w-chart-heatmap-size,1rem] grid-cols-[1fr,auto] items-center gap-2">
+    <div class="grid h-(--w-chart-heatmap-size,1rem) grid-cols-[1fr_auto] items-center gap-2">
       <div class="text-accent sm-not:text-2xs text-xs font-semibold">
         {{ title }}
       </div>
@@ -25,11 +25,11 @@
     </div>
 
     <div class="relative isolate grid justify-end">
-      <div class="from-default text-2xs text-description dark:from-default-dark via-default dark:via-default-dark absolute inset-y-0 left-0 z-[1] flex w-5 flex-col bg-gradient-to-r to-transparent pt-4">
+      <div class="from-default text-2xs text-description dark:from-default-dark via-default dark:via-default-dark absolute inset-y-0 left-0 z-1 flex w-5 flex-col bg-linear-to-r to-transparent pt-4">
         <div
           v-for="(label, i) in DAY_LABELS"
           :key="i"
-          class="my-[--w-chart-heatmap-gap,0.125rem] flex h-[--w-chart-heatmap-size,1rem] items-center"
+          class="my-(--w-chart-heatmap-gap,0.125rem) flex h-(--w-chart-heatmap-size,1rem) items-center"
         >
           {{ label }}
         </div>

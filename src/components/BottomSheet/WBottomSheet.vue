@@ -8,7 +8,7 @@
     <WDismissable
       :is-open="isOpen"
       class="bg-primary-light/40 dark:bg-primary-darkest/40 fixed inset-0 backdrop-blur"
-      content-class="bg-default dark:bg-default-dark grid-cols-[1fr] grid-rows-[auto,1fr] height-[90%] rounded-t-3xl shadow-md relative grid"
+      content-class="bg-default dark:bg-default-dark grid-cols-[1fr] grid-rows-[auto_1fr] height-[90%] rounded-t-3xl shadow-md relative grid"
       :style="{zIndex: baseZIndex + BASE_ZINDEX_BOTTOM_SHEET}"
       @close="$emit('close')"
     >
@@ -30,7 +30,7 @@
         <slot name="content" />
       </div>
 
-      <div class="absolute top-full h-screen w-full bg-[inherit]" />
+      <div class="absolute top-full h-screen w-full bg-inherit" />
     </WDismissable>
   </Teleport>
 </template>

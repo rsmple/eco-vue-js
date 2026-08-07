@@ -21,7 +21,7 @@
   >
     <div
       v-if="isDragging"
-      class="bg-default dark:bg-default-dark pointer-events-none absolute z-[1] size-full transition-opacity [grid-column:1/2]"
+      class="bg-default dark:bg-default-dark pointer-events-none absolute z-1 size-full transition-opacity col-[1/2]"
       :style="{gridRow: `${order + 1}/${order + 2}`}"
     />
   </Transition>

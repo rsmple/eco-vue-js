@@ -2,7 +2,7 @@
   <div
     ref="container"
     :class="{
-      'sm-not:grid-cols-[repeat(2,100vw)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain grid grid-cols-[minmax(auto,var(--w-tabs-side-width,auto)),1fr] items-start gap-4': side,
+      'sm-not:grid-cols-[repeat(2,100vw)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain grid grid-cols-[minmax(auto,var(--w-tabs-side-width,auto))_1fr] items-start gap-4': side,
     }"
   >
     <div
@@ -10,8 +10,8 @@
       ref="buttonContainer"
       class="relative"
       :class="{
-        'sm-not:snap-start grid grid-cols-[1fr,auto]': side,
-        'no-scrollbar sm-not:-pl--inner-margin sm-not:-mx---inner-margin mb-4 flex overflow-x-auto overscroll-x-contain': !side,
+        'sm-not:snap-start grid grid-cols-[1fr_auto]': side,
+        'no-scrollbar sm-not:pl---inner-margin sm-not:-mx---inner-margin mb-4 flex overflow-x-auto overscroll-x-contain': !side,
         'flex-wrap': !side && wrap,
         'pr-[50%]': !side && !wrap,
         [headerClass ?? '']: true,

@@ -1,9 +1,9 @@
 <template>
   <div
     :draggable="isDraggable"
-    class="text-description bg-default dark:bg-default-dark grid select-none grid-cols-[1.75rem,1fr,auto]"
+    class="text-description bg-default dark:bg-default-dark grid select-none grid-cols-[1.75rem_1fr_auto]"
     :class="{
-      'opacity-[0.001]': isDragging,
+      'opacity-0.001': isDragging,
       'opacity-50': !fieldConfig.visible && !isDragging,
     }"
     :style="{order}"

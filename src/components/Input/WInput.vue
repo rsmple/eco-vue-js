@@ -43,11 +43,11 @@
           :class="{
             'font-mono': mono,
             'text-secure': textSecure && !isSecureVisible && modelValue,
-            'relative h-[--w-textarea-height,10rem] min-h-[--w-textarea-height,10rem] w-full overflow-auto overscroll-contain whitespace-pre bg-[--w-input-bg,inherit]': textarea,
+            'relative h-(--w-textarea-height,10rem) min-h-(--w-textarea-height,10rem) w-full overflow-auto overscroll-contain whitespace-pre bg-(--w-input-bg,inherit)': textarea,
             'resize-y': resize && textarea,
             'resize-none': !resize && textarea,
           }"
-          class="scrollbar-width-thin group/field -py--w-option-padding overflow-x-auto overscroll-x-contain"
+          class="scrollbar-width-thin group/field py---w-option-padding overflow-x-auto overscroll-x-contain"
         ><slot
            name="before"
            v-bind="{modelValue}"
@@ -90,17 +90,17 @@
     >
       <div
         class="
-          relative isolate grid min-h-[--w-input-min-height,var(--w-input-height,2.75rem)]
-          grid-cols-[auto,1fr,auto] overflow-hidden rounded-[--w-input-rounded,0.75rem] border border-solid
+          relative isolate grid min-h-(--w-input-min-height,var(--w-input-height,2.75rem))
+          grid-cols-[auto_1fr_auto] overflow-hidden rounded-(--w-input-rounded,0.75rem) border border-solid
         "
         :class="{
-          'focus-within:border-primary dark:focus-within:border-primary-dark focus-within:outline-primary/20 dark:focus-within:outline-primary-dark/20 focus-within:outline focus-within:outline-2': !isDisabled && !isReadonly && !unclickable,
+          'focus-within:border-primary dark:focus-within:border-primary-dark focus-within:outline-primary/20 dark:focus-within:outline-primary-dark/20 focus-within:outline-2': !isDisabled && !isReadonly && !unclickable,
           'cursor-text': !isDisabled,
           'border-negative dark:border-negative-dark': errorMessage,
           [borderClass ?? 'border-gray-300 dark:border-gray-700']: !isDisabled,
           'border-gray-300/50 dark:border-gray-700/50': isDisabled,
-          'border-opacity-0 group-hover/seamless:border-opacity-100 dark:border-opacity-0 dark:group-hover/seamless:border-opacity-100': seamless && !focused,
-          'bg-[--w-input-bg,inherit]': !seamless || focused,
+          'not-group-hover/seamless:border-transparent!': seamless && !focused,
+          'bg-(--w-input-bg,inherit)': !seamless || focused,
         }"
         @mousedown="focused ? downed = true : undefined"
         @click="!downed && focus(); downed = false"
@@ -125,7 +125,7 @@
 
         <div
           v-if="icon"
-          class="flex h-full w-[--w-input-height,2.75rem] select-none items-center justify-center"
+          class="flex h-full w-(--w-input-height,2.75rem) select-none items-center justify-center"
           :class="{
             'text-description': !focused,
             'text-primary dark:text-primary-dark': focused,
@@ -141,25 +141,25 @@
           ref="content"
           class="group/input relative col-start-2 grid grid-cols-1"
           :class="{
-            'py-[--w-input-gap,0.25rem] first:pl-[--w-input-gap,0.25rem] last:pr-[--w-input-gap,0.25rem]': $slots.prefix,
+            'py-(--w-input-gap,0.25rem) first:pl-(--w-input-gap,0.25rem) last:pr-(--w-input-gap,0.25rem)': $slots.prefix,
             'scrollbar-width-thin overflow-x-auto overscroll-x-contain': noWrap && !(seamless && !focused),
             'overflow-hidden': seamless && !focused,
           }"
         >
           <div
             v-if="allowDropFile && isDragging"
-            class="text-primary dark:text-primary-dark bg-primary/10 dark:bg-primary-dark/10 pointer-events-none absolute inset-0.5 rounded-[--w-option-rounded]"
+            class="text-primary dark:text-primary-dark bg-primary/10 dark:bg-primary-dark/10 pointer-events-none absolute inset-0.5 rounded-(--w-option-rounded)"
           >
             <FilePickerSvg
               :animate="isDragover"
-              class="w-border-svg-rounded-[--w-option-rounded]"
+              class="w-border-svg-rounded-(--w-option-rounded)"
             />
           </div>
 
           <div
-            class="w-skeleton-w-32 flex gap-[--w-input-gap,0.25rem]"
+            class="w-skeleton-w-32 flex gap-(--w-input-gap,0.25rem)"
             :class="{
-              '[&:not(:has(.w-option-has-bg))]:-px--w-option-padding': !icon && !textarea,
+              'not-has-[.w-option-has-bg]:px---w-option-padding': !icon && !textarea,
               'flex-wrap': !noWrap && !seamless,
               'w-full min-w-max': !textarea && noWrap,
             }"
@@ -171,7 +171,7 @@
 
             <div
               v-if="!errorMessage && ((placeholderSecure && !modelValue) || (textSecure && modelValue as string | true === true)) && (!asyncState.isAsync.value || !asyncState.value.value) && !focused"
-              class="bg-info/10 dark:bg-info-dark/10 pointer-events-none absolute inset-0.5 flex items-center justify-center rounded-[--w-option-rounded]"
+              class="bg-info/10 dark:bg-info-dark/10 pointer-events-none absolute inset-0.5 flex items-center justify-center rounded-(--w-option-rounded)"
             >
               <IconCheckSecret
                 class="text-info dark:text-info-dark"
@@ -193,8 +193,8 @@
                 'font-mono': mono,
                 'text-black-default dark:text-gray-200': !isDisabled,
                 'text-black-default/50 dark:text-gray-200/50': isDisabled,
-                'scrollbar-width-thin min-h-[--w-textarea-height,10rem] w-full overflow-auto overscroll-contain': textarea,
-                'h-[--w-textarea-height,10rem]': textarea && resize,
+                'scrollbar-width-thin min-h-(--w-textarea-height,10rem) w-full overflow-auto overscroll-contain': textarea,
+                'h-(--w-textarea-height,10rem)': textarea && resize,
                 'absolute': hideInput,
                 'opacity-0': textSecure && modelValue as string | true === true && (!asyncState.isAsync.value || !asyncState.value.value) && !focused,
               }"
@@ -207,7 +207,7 @@
 
                 <div
                   v-if="placeholder && textarea && hasNoValue && !focused"
-                  class="text-description -p--w-option-padding pointer-events-none absolute"
+                  class="text-description p---w-option-padding pointer-events-none absolute"
                 >
                   {{ placeholder }}
                 </div>
@@ -217,16 +217,16 @@
                   :id="id"
                   ref="input"
                   class="
-                    w-input min-h-full flex-1 basis-auto appearance-none border-none bg-[inherit]
+                    w-input min-h-full flex-1 basis-auto appearance-none border-none bg-inherit
                     outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed dark:placeholder:text-gray-500
                   "
                   :class="{
                     'w-0 max-w-0': hideInput,
                     'text-secure w-input-whitespace-pre-wrap break-all': textSecure && !isSecureVisible,
                     '[-webkit-text-fill-color:transparent]': textTransparent,
-                    'sm-not:text-[1rem]': !unclickable,
+                    'sm-not:text-base': !unclickable,
                     'opacity-0': placeholder && textarea && hasNoValue && !focused,
-                    '-py--w-option-padding': textarea,
+                    'py---w-option-padding': textarea,
                   }"
                   :value="gateValue(asyncState.isAsync.value ? asyncState.value.value : modelValue)"
                   :placeholder="hasNoValue ? placeholder : undefined"

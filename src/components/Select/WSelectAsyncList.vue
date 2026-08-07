@@ -13,7 +13,7 @@
 
     <WSkeleton
       v-if="isSkeleton"
-      class="w-skeleton-rounded-2xl w-skeleton-h-[24rem] w-skeleton-w-full"
+      class="w-skeleton-rounded-2xl w-skeleton-h-sm w-skeleton-w-full"
     />
 
     <WInfiniteListScrollingElement

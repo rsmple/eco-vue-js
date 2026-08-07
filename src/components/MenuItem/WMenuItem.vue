@@ -18,7 +18,7 @@
       :class="{
         'w-ripple w-ripple-hover': !disabled,
         'before:opacity-10': active && !disabled,
-        'grid-cols-[1fr,1.25rem] gap-4': active !== undefined,
+        'grid-cols-[1fr_1.25rem] gap-4': active !== undefined,
         'grid-cols-[1fr]': active === undefined,
         'opacity-0': loading,
       }"

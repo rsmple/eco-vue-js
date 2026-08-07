@@ -5,7 +5,7 @@
     leave-from-class="opacity-1 grid-rows-[1fr]"
     leave-to-class="opacity-0 grid-rows-[0fr]"
     tag="div"
-    class="fixed right-0 top-2 isolate z-[10000]"
+    class="fixed right-0 top-2 isolate z-10000"
   >
     <div
       v-for="config in list"

@@ -30,13 +30,13 @@
     }, $attrs.class]"
     :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
   >
-    <div class="-mt--header-height overflow-hidden">
+    <div class="mt---header-height overflow-hidden">
       <slot />
     </div>
   </div>
 
   <div
-    class="-square--header-height w-ripple fixed left-0 top-0 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
+    class="square---header-height w-ripple fixed left-0 top-0 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
     :class="{'text-primary': isOpen}"
     :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
     @click.stop="toggle"

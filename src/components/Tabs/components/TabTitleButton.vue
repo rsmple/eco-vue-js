@@ -4,7 +4,7 @@
     class="relative grid" 
     :class="{
       'col-span-2 grid grid-cols-subgrid': side,
-      'grid-cols-[1fr,auto]': !side,
+      'grid-cols-[1fr_auto]': !side,
     }"
   >
     <WButtonTab

@@ -4,7 +4,7 @@
     ref="button"
     role="button"
     tabindex="0"
-    class="w-ripple w-ripple-hover -px--inner-margin relative grid cursor-pointer select-none grid-cols-[1fr,auto] items-center gap-2 py-3 text-start"
+    class="w-ripple w-ripple-hover px---inner-margin relative grid cursor-pointer select-none grid-cols-[1fr_auto] items-center gap-2 py-3 text-start"
     :class="toggleClass"
     @click="toggle"
     @keydown.enter="toggle"

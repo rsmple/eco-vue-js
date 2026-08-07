@@ -1,17 +1,17 @@
 <template>
-  <div class="flex h-[--w-list-header-height,2rem]">
-    <div class="-left--left-inner bg-default dark:bg-default-dark sticky z-[1]">
-      <div class="bg-default dark:bg-default-dark -w--left-inner absolute right-full top-0 z-[-1] h-full" />
+  <div class="flex h-(--w-list-header-height,2rem)">
+    <div class="left---left-inner bg-default dark:bg-default-dark sticky z-1">
+      <div class="bg-default dark:bg-default-dark w---left-inner absolute right-full top-0 -z-1 h-full" />
 
       <div
-        class="h-full rounded-l-[--w-list-header-rounded,0.75rem] border-y border-l border-solid border-gray-300 bg-[--w-list-header-bg,inherit] dark:border-gray-700"
+        class="h-full rounded-l-(--w-list-header-rounded,0.75rem) border-y border-l border-solid border-gray-300 bg-(--w-list-header-bg,inherit) dark:border-gray-700"
         :class="{
-          'width-[--w-list-header-rounded,1rem]': !allowSelect,
+          'width-(--w-list-header-rounded,1rem)': !allowSelect,
         }"
       >
         <div
           v-if="selectOnly"
-          class="mx-[--w-list-padding,1rem] w-[calc(var(--w-checkbox-size,1rem)*1.5)]"
+          class="mx-(--w-list-padding,1rem) w-[calc(var(--w-checkbox-size,1rem)*1.5)]"
         />
         <WCheckbox
           v-else-if="allowSelect && selection !== undefined"
@@ -20,24 +20,24 @@
           :model-value="selection"
           :tooltip-text="tooltipText"
           intermediate
-          class="size-full px-[--w-list-padding,1rem]"
+          class="size-full px-(--w-list-padding,1rem)"
           @update:model-value="$emit('toggle:selection', $event)"
         />
       </div>
     </div>
 
-    <div class="flex min-w-[--list-header-width] flex-1 border-y border-solid border-gray-300 bg-[--w-list-header-bg,inherit] dark:border-gray-700">
+    <div class="flex min-w-(--list-header-width) flex-1 border-y border-solid border-gray-300 bg-(--w-list-header-bg,inherit) dark:border-gray-700">
       <slot />
     </div>
 
-    <div class="-right--right-inner bg-default dark:bg-default-dark sticky z-[1]">
-      <div class="bg-default dark:bg-default-dark -w--right-inner absolute left-full top-0 z-[-1] h-full" />
+    <div class="right---right-inner bg-default dark:bg-default-dark sticky z-1">
+      <div class="bg-default dark:bg-default-dark w---right-inner absolute left-full top-0 -z-1 h-full" />
 
       <div
-        class="h-full rounded-r-[--w-list-header-rounded,0.75rem] border-y border-r border-solid border-gray-300 bg-[--w-list-header-bg,inherit] dark:border-gray-700"
+        class="h-full rounded-r-(--w-list-header-rounded,0.75rem) border-y border-r border-solid border-gray-300 bg-(--w-list-header-bg,inherit) dark:border-gray-700"
         :class="{
           'width-[calc(var(--w-list-padding,1rem)*2+1.25em)]': !hideMore,
-          'width-[--w-list-header-rounded,1rem]': hideMore,
+          'width-(--w-list-header-rounded,1rem)': hideMore,
         }"
       >
         <slot name="settings" />

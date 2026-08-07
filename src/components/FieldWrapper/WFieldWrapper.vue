@@ -11,7 +11,7 @@
         style: $attrs.style as StyleValue,
       }"
     :class="[$attrs.class, {
-      'mb-[1.125rem]': !noMargin && !subgrid,
+      'mb-4.5': !noMargin && !subgrid,
       'col-span-full grid grid-cols-subgrid': subgrid,
     }]"
     @click="$emit('click', $event)"
@@ -61,7 +61,7 @@
       :class="{
         'pr-9': !title && !$slots.title && filterField,
         'col-start-2 -col-end-1 row-start-1 -row-end-3 grid-cols-subgrid': subgrid,
-        'grid-cols-[1fr,auto]': !subgrid,
+        'grid-cols-[1fr_auto]': !subgrid,
       }"
     >
       <div
@@ -78,7 +78,7 @@
           name="field"
         >
           <div
-            class="flex min-h-[--w-input-height,2.75rem] items-center font-normal"
+            class="flex min-h-(--w-input-height,2.75rem) items-center font-normal"
             :class="{
               'font-mono': mono,
               'border-t border-solid border-gray-300 dark:border-gray-700': title || $slots.title,
@@ -98,7 +98,7 @@
 
         <span
           v-if="hasChanges"
-          class="square-2 absolute right-0 top-0 rounded-full bg-[var(--has-changes-bg)] transition-colors"
+          class="square-2 absolute right-0 top-0 rounded-full bg-(--has-changes-bg) transition-colors"
         />
 
         <div
@@ -132,7 +132,7 @@
 
       <WSkeleton
         v-else
-        class="w-skeleton-w-full w-skeleton-rounded-[--w-input-rounded,0.75rem] w-skeleton-h-[--w-input-height,2.75rem]"
+        class="w-skeleton-w-full w-skeleton-rounded-(--w-input-rounded,0.75rem) w-skeleton-h-(--w-input-height,2.75rem)"
       />
 
       <div
@@ -157,7 +157,7 @@
 
     <div
       v-if="description"
-      class="text-description col-start-1 whitespace-pre-wrap text-pretty break-words text-xs font-normal"
+      class="text-description col-start-1 whitespace-pre-wrap text-pretty wrap-break-word text-xs font-normal"
       :class="{
         'opacity-50': isDisabled && !isReadonly && !isSkeleton,
         'pt-4': !subgrid,

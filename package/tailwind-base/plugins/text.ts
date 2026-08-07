@@ -1,17 +1,19 @@
 import plugin from 'tailwindcss/plugin.js'
 
-const pluginDefault = plugin(function ({addBase, theme, config}) {
-  addBase({
+import {DARK_SELECTOR} from '../constants.js'
+
+const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
+  addUtilities({
     '.text-accent': {
-      color: theme('colors.black.default'),
-      [config('darkMode')[1][0]]: {
+      color: theme('colors.black-default'),
+      [DARK_SELECTOR]: {
         color: theme('colors.default'),
       },
     },
     '.text-description': {
-      color: theme('colors.gray.400'),
-      [config('darkMode')[1][0]]: {
-        color: theme('colors.gray.500'),
+      color: theme('colors.gray-400'),
+      [DARK_SELECTOR]: {
+        color: theme('colors.gray-500'),
       },
     },
     '.text-secure': {
@@ -29,19 +31,19 @@ const pluginDefault = plugin(function ({addBase, theme, config}) {
       borderRadius: theme('borderRadius.DEFAULT'),
       userSelect: 'text',
       fontWeight: theme('fontWeight.normal'),
-      [config('darkMode')[1][0]]: {
+      [DARK_SELECTOR]: {
         backgroundColor: 'rgb(75 85 99 / 0.5)',
       },
     },
     '.code-inline.bg-positive': {
       backgroundColor: `${ theme('colors.positive') }4d`,
-      [config('darkMode')[1][0]]: {
+      [DARK_SELECTOR]: {
         backgroundColor: `${ theme('colors.positive-dark') }4d`,
       },
     },
     '.code-inline.bg-negative': {
       backgroundColor: `${ theme('colors.negative') }4d`,
-      [config('darkMode')[1][0]]: {
+      [DARK_SELECTOR]: {
         backgroundColor: `${ theme('colors.negative-dark') }4d`,
       },
     },

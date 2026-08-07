@@ -15,7 +15,7 @@
       :is-no-cursor="cursor === undefined"
       :hide-option-icon="hideOptionIcon"
       :disabled="!search || isModelValueSearch"
-      class="first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
+      class="first:pt---w-select-option-padding last:pb---w-select-option-padding"
       @mouseenter="setCursor(null)"
       @update:cursor="setCursor(null)"
       @select="$emit('create:option'); setLoadingOption(null)"
@@ -79,8 +79,8 @@
           :hide-option-icon="hideOptionIcon"
           :reverse="reverse"
           :class="{
-            '-pt--w-select-option-padding': !noPadding && first && !allowCreate,
-            '-pb--w-select-option-padding': !noPadding && last,
+            'pt---w-select-option-padding': !noPadding && first && !allowCreate,
+            'pb---w-select-option-padding': !noPadding && last,
           }"
           @select="emitSelect(valueGetter(item), item)"
           @unselect="emitUnselect(valueGetter(item), item)"
@@ -108,9 +108,9 @@
 
       <template #empty>
         <div
-          class="w-select-option -pb--w-select-option-padding"
+          class="w-select-option pb---w-select-option-padding"
           :class="{
-            '-pt--w-select-option-padding': !noPadding && !allowCreate,
+            'pt---w-select-option-padding': !noPadding && !allowCreate,
           }"
         >
           <div class="w-option flex cursor-default select-none items-center">

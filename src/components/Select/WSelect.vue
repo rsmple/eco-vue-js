@@ -4,6 +4,7 @@
     v-bind="{
       ...props,
       modelValue: search,
+      placeholder: !focused ? placeholder : undefined,
       loading: loading || isFetching || loadingCreate,
       hideInput: !modelValue?.length && !emptyValue ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
       filterValue: filterValue === undefined ? modelValue : filterValue,
@@ -96,7 +97,7 @@
           :scroll="isCursorLocked"
           :hide-option-icon="hideOptionIcon"
           :disabled="!search || isModelValueSearch"
-          class="first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
+          class="first:pt---w-select-option-padding last:pb---w-select-option-padding"
           @select="create(search)"
           @mouseenter="setCursor(optionsFiltered.length)"
         >
@@ -136,7 +137,7 @@
 
         <div
           v-if="isFetching || (!optionsFiltered.length && !isModelValueSearch && (!createOption || optionsWithCreated.length))"
-          class="w-select-option first:-pt--w-select-option-padding last:-pb--w-select-option-padding text-description"
+          class="w-select-option first:pt---w-select-option-padding last:pb---w-select-option-padding text-description"
         >
           <div class="w-option flex cursor-default select-none items-center">
             {{ isFetching ? 'Loading..' : !search && emptyStub ? emptyStub : search ? 'No match' : 'Nothing to show' }}
@@ -153,7 +154,7 @@
           :loading="loadingOptionIndex === index && loading"
           :scroll="isCursorLocked"
           :hide-option-icon="hideOptionIcon"
-          class="first:-pt--w-select-option-padding last:-pb--w-select-option-padding"
+          class="first:pt---w-select-option-padding last:pb---w-select-option-padding"
           @select="select(valueGetter(option), option); setLoadingOptionIndex(index)"
           @unselect="unselect(valueGetter(option), option); setLoadingOptionIndex(index)"
           @mouseenter="setCursor(index)"

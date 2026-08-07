@@ -28,13 +28,13 @@
       :is-open="open === index"
       :disabled-filter-fields="disabledFilterFields"
       :readonly="readonly"
-      class="-px--inner-margin"
+      class="px---inner-margin"
       @toggle="open = open === index ? null : index"
     />
 
-    <div class="-mx--inner-margin my-8 h-0.5 rounded bg-gray-400" />
+    <div class="mx---inner-margin my-8 h-0.5 rounded bg-gray-400" />
 
-    <div class="-px--inner-margin grid grid-cols-2 gap-4">
+    <div class="px---inner-margin grid grid-cols-2 gap-4">
       <slot name="bottom" />
 
       <WButton

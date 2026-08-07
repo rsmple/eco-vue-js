@@ -27,20 +27,20 @@
 
     <div
       v-if="!card"
-      class="-left--left-inner bg-default dark:bg-default-dark @not-lg:hidden sticky z-[1]"
+      class="left---left-inner bg-default dark:bg-default-dark @max-lg:hidden sticky z-1"
       :class="{
-        'width-[--w-list-header-rounded,1rem]': !allowSelect,
+        'width-(--w-list-header-rounded,1rem)': !allowSelect,
       }"
     >
-      <div class="bg-default dark:bg-default-dark -w--left-inner absolute right-full top-0 z-[-1] h-full" />
+      <div class="bg-default dark:bg-default-dark w---left-inner absolute right-full top-0 -z-1 h-full" />
 
       <div
-        class="h-full rounded-l-[--w-list-rounded,unset]"
+        class="h-full rounded-l-(--w-list-rounded,unset)"
         :class="{
           'border border-r-0': hasBorder,
           'border-gray-300 dark:border-gray-700': hasBorder && !selected,
           'border-primary dark:border-primary-dark': hasBorder && selected,
-          'rounded-bl-[unset!important]': isOpen,
+          'rounded-bl-[unset]!': isOpen,
           'border-b-transparent dark:border-b-transparent': hasBorder && isOpen,
           'pl-px': !hasBorder,
           ...beforeClass,
@@ -53,7 +53,7 @@
           :readonly="false"
           :align-top="alignTop"
           :less-transitions="allowSelectHover"
-          class="h-full px-[--w-list-padding,1rem]"
+          class="h-full px-(--w-list-padding,1rem)"
           :class="{
             'opacity-50': allowSelectHover,
             'pt-4.5': alignTop,
@@ -64,12 +64,12 @@
     </div>
 
     <div
-      class="sm-not:-px--inner-margin isolate"
+      class="sm-not:px---inner-margin isolate"
       :class="{
         [cardClass ?? '']: true,
         '[contain-intrinsic-size:auto_3rem] [content-visibility:auto]': contentVisibility,
         'flex flex-1': !card,
-        'grid grid-cols-[--w-list-grid-cols] [grid-template-areas:--w-list-grid-areas] sm:rounded-[--w-list-rounded,unset]': card,
+        'grid grid-cols-(--w-list-grid-cols) [grid-template-areas:var(--w-list-grid-areas)] sm:rounded-(--w-list-rounded,unset)': card,
         'sm:border-y': hasBorder,
         'border-gray-300 dark:border-gray-700': hasBorder && !selected,
         'border-primary dark:border-primary-dark': hasBorder && selected,
@@ -82,7 +82,7 @@
         :model-value="selected"
         :disabled="disabled ?? false"
         :readonly="false"
-        class="-p--inner-margin -my---inner-margin -mr---inner-margin justify-end self-start"
+        class="p---inner-margin -my---inner-margin -mr---inner-margin justify-end self-start"
         :class="{
           'opacity-50': allowSelectHover,
         }"
@@ -114,7 +114,7 @@
       <WButtonMore
         v-if="card && $slots.more"
         ref="more"
-        class="-p--inner-margin -my---inner-margin -mr---inner-margin flex items-center"
+        class="p---inner-margin -my---inner-margin -mr---inner-margin flex items-center"
         :disabled="disabled || disableMore"
         :style="{gridArea: AREA_MORE}"
         :anchor="anchorRef ?? undefined"
@@ -134,21 +134,21 @@
       
     <div
       v-if="!card"
-      class="-right--right-inner bg-default dark:bg-default-dark sticky z-[1]"
+      class="right---right-inner bg-default dark:bg-default-dark sticky z-1"
       :class="{
         'width-[calc(var(--w-list-padding,1rem)*2+1.25em)]': $slots.more,
-        'width-[--w-list-header-rounded,1rem]': !$slots.more,
+        'width-(--w-list-header-rounded,1rem)': !$slots.more,
       }"
     >
-      <div class="bg-default dark:bg-default-dark -w--right-inner absolute left-full top-0 z-[-1] h-full" />
+      <div class="bg-default dark:bg-default-dark w---right-inner absolute left-full top-0 -z-1 h-full" />
 
       <div
-        class="h-full rounded-r-[--w-list-rounded,unset]"
+        class="h-full rounded-r-(--w-list-rounded,unset)"
         :class="{
-          'rounded-tr-[--w-list-rounded,unset] border border-l-0': hasBorder,
+          'rounded-tr-(--w-list-rounded,unset) border border-l-0': hasBorder,
           'border-gray-300 dark:border-gray-700': hasBorder && !selected,
           'border-primary dark:border-primary-dark': hasBorder && selected,
-          'rounded-br-[unset!important]': isOpen,
+          'rounded-br-[unset]!': isOpen,
           'border-b-transparent dark:border-b-transparent': hasBorder && isOpen,
           ...beforeClass,
         }"
@@ -156,7 +156,7 @@
         <WButtonMore
           v-if="$slots.more"
           ref="more"
-          class="flex h-full px-[--w-list-padding,1rem]"
+          class="flex h-full px-(--w-list-padding,1rem)"
           :class="{
             'pt-4.5 items-start': alignTop,
             'items-center': !alignTop,
@@ -189,12 +189,12 @@
   <template v-if="$slots.expansion">
     <div
       v-if="isOpen"
-      class="list:-w--width-inner list:-left--left-inner list:sticky col-span-full"
+      class="list:w---width-inner list:left---left-inner list:sticky col-span-full"
       :class="{
         'border-gray-300 dark:border-gray-700': hasBorder && !selected,
         'border-primary dark:border-primary-dark': hasBorder && selected,
-        'mt-[calc(var(--w-list-gap,1rem)*-1)] border border-t-0 px-5': !card && hasBorder,
-        'rounded-b-[--w-list-rounded,unset]': !card,
+        '-mt-(--w-list-gap,1rem) border border-t-0 px-5': !card && hasBorder,
+        'rounded-b-(--w-list-rounded,unset)': !card,
       }"
     >
       <slot name="expansion" />
@@ -257,7 +257,7 @@ const beforeClass = computed<Record<string, boolean | undefined>>(() => {
 
   return {
     'w-ripple-list w-ripple-hover-list': true,
-    'w-ripple-opacity-[0.05]': !props.allowSelectHover && !props.selected && !moreRef.value?.isOpen,
+    'w-ripple-opacity-5': !props.allowSelectHover && !props.selected && !moreRef.value?.isOpen,
     'before:text-primary dark:before:text-primary-dark w-ripple-opacity-15': props.allowSelectHover || props.selected || moreRef.value?.isOpen,
     'before:opacity-10': props.selected || moreRef.value?.isOpen,
   }

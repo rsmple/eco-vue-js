@@ -1,6 +1,8 @@
 import plugin from 'tailwindcss/plugin.js'
 
-const pluginDefault = plugin(function ({addBase, theme, config}) {
+import {DARK_SELECTOR} from '../constants.js'
+
+const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
   addBase({
     '*': {
       '--w-left-inner': 'calc(var(--left-margin, 0px) + var(--nav-bar-width, 0px) + var(--inner-margin, 0px))',
@@ -28,10 +30,10 @@ const pluginDefault = plugin(function ({addBase, theme, config}) {
       outline: 'none',
 
       '--input-autofill-bg': theme('colors.default'),
-      '--input-autofull-text': theme('colors.black.default'),
-      [config('darkMode')[1][0]]: {
+      '--input-autofull-text': theme('colors.black-default'),
+      [DARK_SELECTOR]: {
         '--input-autofill-bg': theme('colors.default-dark'),
-        '--input-autofull-text': theme('colors.gray.100'),
+        '--input-autofull-text': theme('colors.gray-100'),
       },
 
       '&:focus-visible': {
@@ -80,11 +82,11 @@ const pluginDefault = plugin(function ({addBase, theme, config}) {
       'transform-origin': 'top left',
       'background-size': '7px 7px',
       'background-position': 'top',
-      color: theme('colors.gray.300'),
+      color: theme('colors.gray-300'),
       '--resizer-bg': theme('colors.default'),
       'background-image': 'linear-gradient(135deg, currentColor 10%, var(--resizer-bg) 10%, var(--resizer-bg) 50%, currentColor 50%, currentColor 60%, var(--resizer-bg) 60%, var(--resizer-bg) 100%)',
-      [config('darkMode')[1][0]]: {
-        color: theme('colors.gray.700'),
+      [DARK_SELECTOR]: {
+        color: theme('colors.gray-700'),
         '--resizer-bg': theme('colors.default-dark'),
       },
     },
@@ -158,7 +160,7 @@ const pluginDefault = plugin(function ({addBase, theme, config}) {
         'background-size': '40px 40px',
         animation: theme('animation.move-horizontal'),
       },
-      [config('darkMode')[1][0]]: {
+      [DARK_SELECTOR]: {
         '&::before': {
           'background-image': 'linear-gradient(135deg, hsla(0,0%,10%,.125) 25%, transparent 0, transparent 50%, hsla(0,0%,10%,.125) 0, hsla(0,0%,10%,.125) 75%, transparent 0, transparent)',
         },
@@ -198,6 +200,9 @@ const pluginDefault = plugin(function ({addBase, theme, config}) {
         animation: theme('animation.ticker'),
       },
     },
+  })
+
+  addUtilities({
     '.w-skeleton-static': {
       '& .w-skeleton:before, &.w-skeleton:before': {
         display: 'none',

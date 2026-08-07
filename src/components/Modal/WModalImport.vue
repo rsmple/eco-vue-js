@@ -1,5 +1,5 @@
 <template>
-  <WModalWrapper class="w-modal-wrapper-w-[40rem]">
+  <WModalWrapper class="w-modal-wrapper-w-160">
     <template #title>
       {{ title ?? `Importing ${numberFormatter.format(items.length)} item${items.length === 1 ? '' : 's'}` }}
     </template>

@@ -4,9 +4,9 @@
       'w-card': isGrid,
       'w-list': !isGrid,
       '[--w-list-right:calc(var(--w-list-padding,1rem)*2+1.25em)]': menu,
-      '[--w-list-right:--w-list-header-rounded,1rem]': !menu,
+      '[--w-list-right:var(--w-list-header-rounded,1rem)]': !menu,
       '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em+1px)]': allowSelect,
-      '[--w-list-left:--w-list-header-rounded,1rem]': !allowSelect,
+      '[--w-list-left:var(--w-list-header-rounded,1rem)]': !allowSelect,
     }"
     :style="[stylesWidth, stylesFixed]"
   >
@@ -21,8 +21,8 @@
       :count="count ?? listCount"
       :page-class="
         isGrid
-          ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-[--w-list-gap,0] isolate'
-          : 'grid grid-cols-1 gap-[--w-list-gap,0] isolate'
+          ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-(--w-list-gap,0) isolate'
+          : 'grid grid-cols-1 gap-(--w-list-gap,0) isolate'
       "
       :min-height-only="minHeight"
       :no-header-update="noHeaderUpdate"

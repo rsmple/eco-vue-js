@@ -26,7 +26,7 @@
     @click="!disabled && !disableMessage && !loading && $emit('click', $event)"
   >
     <div
-      class="-h--w-input-height sm-not:-px--inner-margin z-10 flex items-center gap-2 px-[--w-list-padding,1rem]" 
+      class="h---w-input-height sm-not:px---inner-margin z-10 flex items-center gap-2 px-(--w-list-padding,1rem)" 
       :class="{
         'opacity-0': loading,
       }"
@@ -38,7 +38,7 @@
 
       <div
         v-if="title"
-        class="sm-not:hidden sm-not:[.dropdown_&]:block whitespace-nowrap font-normal"
+        class="sm-not:hidden sm-not:in-[.dropdown]:block whitespace-nowrap font-normal"
       >
         {{ title }}
       </div>

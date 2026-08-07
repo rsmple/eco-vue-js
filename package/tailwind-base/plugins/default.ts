@@ -1,5 +1,6 @@
-import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 import plugin from 'tailwindcss/plugin.js'
+
+import {colorValues} from '../utils.js'
 
 const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities, addBase, theme}) {
   matchUtilities(
@@ -38,7 +39,7 @@ const pluginDefault = plugin(function ({matchUtilities, addVariant, addUtilities
       'scrollbar-bar-color': value => ({'--scrollbar-bar-color': value, 'scrollbar-color': 'var(--scrollbar-bar-color) var(--scrollbar-gutter-color)'}),
       'scrollbar-gutter-color': value => ({'--scrollbar-gutter-color': value, 'scrollbar-color': 'var(--scrollbar-bar-color) var(--scrollbar-gutter-color)'}),
     },
-    {values: flattenColorPalette(theme('colors'))},
+    {values: colorValues(theme('colors'))},
   )
 
   addBase({

@@ -8,9 +8,9 @@
     :is-intersecting="isIntersecting"
     class="sticky print:hidden"
     :class="{
-      '-top--header-height': !isModal,
+      'top---header-height': !isModal,
       'bg-default dark:bg-default-dark': noHeaderUpdate || isModal,
-      '-top--modal-header-height': isModal,
+      'top---modal-header-height': isModal,
     }"
     :style="{zIndex: isIntersecting ? BASE_ZINDEX_DROPDOWN : BASE_ZINDEX_LIST_HEADER}"
   >

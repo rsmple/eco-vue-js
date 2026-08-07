@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 import recommended from './package/eslint/recommended.js'
 
 export default [
@@ -13,6 +15,7 @@ export default [
 
   ...recommended({
     noCustom: true,
+    cssConfigPath: path.join(import.meta.dirname, 'src/assets/styles/index.css'),
     tsConfig: [
       'tsconfig.json',
       'tsconfig.node.json',

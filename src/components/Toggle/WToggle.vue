@@ -14,8 +14,8 @@
         'cursor-pointer': !isReadonly && !loading && !isDisabled && !isSkeleton,
         'cursor-auto select-text': isReadonly,
         'select-none': !isReadonly,
-        'grid-cols-[1fr,auto]': (title || $slots.title) && !rightLabel,
-        'grid-cols-[auto,1fr]': (title || $slots.title) && rightLabel,
+        'grid-cols-[1fr_auto]': (title || $slots.title) && !rightLabel,
+        'grid-cols-[auto_1fr]': (title || $slots.title) && rightLabel,
         'gap-4': title || $slots.title,
         'justify-center': center,
       }"
@@ -40,9 +40,9 @@
         </slot>
       </div>
 
-      <div class="-h--w-input-height py-0.75">
+      <div class="h---w-input-height py-0.75">
         <div
-          class="width-[calc(var(--w-input-height)+0.5rem)] p-0.75 h-full rounded-full bg-[200%_auto] [background-position:right]"
+          class="width-[calc(var(--w-input-height)+0.5rem)] p-0.75 h-full rounded-full bg-size-[200%_auto] bg-right"
           :class="{
             'bg-gray-300 dark:bg-gray-700': !value || loading,
             [semanticTypeBackgroundMap[SemanticType.PRIMARY]]: value && !loading,
@@ -50,7 +50,7 @@
         >
           <div class="relative grid size-full grid-cols-3">
             <div
-              class="text-primary dark:text-primary-dark absolute z-10 flex aspect-square h-full items-center justify-center rounded-full bg-[--w-toggle-caret,#ffffff] shadow-md transition-[right]"
+              class="text-primary dark:text-primary-dark absolute z-10 flex aspect-square h-full items-center justify-center rounded-full bg-(--w-toggle-caret,#ffffff) shadow-md transition-[right]"
               :class="{
                 'right-[calc(100%-(var(--w-input-height)-0.75rem))]': value === false,
                 'right-[calc(50%-(var(--w-input-height)-0.75rem)/2)]': value === null,
@@ -76,7 +76,7 @@
 
     <div
       v-if="description"
-      class="text-description whitespace-pre-wrap break-words text-xs font-normal"
+      class="text-description whitespace-pre-wrap wrap-break-word text-xs font-normal"
     >
       {{ description }}
     </div>

@@ -25,13 +25,13 @@
       <div
         class="grid grid-cols-1 overflow-hidden"
         :class="{
-          'bg-default dark:bg-default-dark my-2 rounded-xl shadow-md dark:outline dark:outline-1 dark:outline-gray-800': !isMobile,
+          'bg-default dark:bg-default-dark my-2 rounded-xl shadow-md dark:outline-1 dark:outline-gray-800': !isMobile,
         }"
       >
         <div class="p-4">
           <div
             class="grid items-start"
-            :class="!mobile && !noMode ? 'grid-cols-[auto,auto,auto]' : 'grid-cols-1'"
+            :class="!mobile && !noMode ? 'grid-cols-[auto_auto_auto]' : 'grid-cols-1'"
           >
             <div
               v-if="!mobile && !noMode"

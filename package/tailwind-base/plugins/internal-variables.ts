@@ -1,5 +1,6 @@
-import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 import plugin from 'tailwindcss/plugin.js'
+
+import {colorValues} from '../utils.js'
 
 const pluginDefault = plugin(function ({matchUtilities, theme, addBase}) {
   addBase({
@@ -18,7 +19,7 @@ const pluginDefault = plugin(function ({matchUtilities, theme, addBase}) {
       'w-date-picker-day': value => ({'--w-date-picker-day': value}),
       'w-list-header-bg': value => ({'--w-list-header-bg': value}),
     },
-    {values: flattenColorPalette(theme('colors'))},
+    {values: colorValues(theme('colors'))},
   )
 
   matchUtilities(

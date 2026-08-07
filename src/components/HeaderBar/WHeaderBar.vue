@@ -1,23 +1,23 @@
 <template>
   <div
     ref="element"
-    class="-h--header-height fixed inset-x-0 top-0 grid grid-cols-1 print:hidden"
+    class="h---header-height fixed inset-x-0 top-0 grid grid-cols-1 print:hidden"
     :style="{zIndex: BASE_ZINDEX_HEADER_BAR}"
   >
     <div
       :key="headerPadding"
       class="bg-default dark:bg-default-dark supports-backdrop:backdrop-blur fixed inset-x-0 top-0 h-[calc(var(--header-height)+var(--header-height-padding))] print:hidden"
       :class="{
-        'supports-backdrop:bg-opacity-40 supports-backdrop:dark:bg-opacity-60': isTransparent,
+        'supports-backdrop:bg-default/40 supports-backdrop:dark:bg-default-dark/60': isTransparent,
       }"
       :style="{'--header-height-padding': headerPadding + 'px'}"
     />
 
     <div
       v-show="!visible"
-      class="-pl--inner-margin xl-not:-pl--header-height relative flex items-center"
+      class="pl---inner-margin xl-not:pl---header-height relative flex items-center"
       :class="{
-        '-pr--inner-margin': !search
+        'pr---inner-margin': !search
       }"
     >
       <div class="text-accent sm:text-2.5xl flex-1 truncate text-xl font-semibold">
@@ -28,11 +28,11 @@
 
       <button
         v-if="search"
-        class="w-ripple-trigger sm:-pr--inner-margin h-full select-none"
+        class="w-ripple-trigger sm:pr---inner-margin h-full select-none"
         aria-label="Open search"
         @click="updateVisible(true)"
       >
-        <div class="w-ripple w-ripple-hover sm-not:-px--inner-margin relative flex h-full items-center px-[--w-list-padding,1rem]">
+        <div class="w-ripple w-ripple-hover sm-not:px---inner-margin relative flex h-full items-center px-(--w-list-padding,1rem)">
           <IconSearch class="square-[1.25em] text-accent" />
         </div>
       </button>
@@ -41,7 +41,7 @@
     <div
       v-if="search"
       v-show="visible"
-      class="xl-not:-pl--header-height -px--inner-margin grid items-center"
+      class="xl-not:pl---header-height px---inner-margin grid items-center"
     >
       <component
         :is="slot"
