@@ -93,26 +93,6 @@
   scrollbar-width: none;
 }
 
-@utility overflow-y-overlay {
-  @supports (overflow: overlay) {
-    overflow-y: overlay;
-  }
-
-  @supports not (overflow: overlay) {
-    overflow-y: auto;
-  }
-}
-
-@utility overflow-x-overlay {
-  @supports (overflow: overlay) {
-    overflow-x: overlay;
-  }
-
-  @supports not (overflow: overlay) {
-    overflow-x: auto;
-  }
-}
-
 @custom-variant dark (.dark &:not(:is(.light *)));
 
 @custom-variant supports-backdrop (@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)));
