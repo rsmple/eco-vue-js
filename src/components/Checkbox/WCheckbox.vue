@@ -34,8 +34,8 @@
       @keypress.enter.stop.prevent="toggle"
     >
       <Transition
-        enter-active-class="transition-[transform_opacity]"
-        leave-active-class="transition-[transform_opacity]"
+        enter-active-class="transition-[scale,opacity]"
+        leave-active-class="transition-[scale,opacity]"
         :enter-from-class="radio ? 'opacity-0 scale-25!' : 'opacity-0 scale-50!'"
         :leave-to-class="radio ? 'opacity-0 scale-25!' : 'opacity-0 scale-50!'"
         :css="!lessTransitions"
@@ -50,7 +50,7 @@
             'rounded': !radio && !(intermediate && modelValue === null),
             'bg-primary dark:bg-primary-dark [.w-hover-checked:hover_&]:block!': !isDisabled && !isSkeleton,
             'bg-gray-300 dark:bg-gray-700': isDisabled || isSkeleton,
-            'transition-[transform_opacity]': !lessTransitions,
+            'transition-[scale,opacity]': !lessTransitions,
           }"
         />
       </Transition>

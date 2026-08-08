@@ -117,8 +117,8 @@
       </Transition>
 
       <Transition
-        enter-active-class="transition-[transform_opacity] origin-center duration-300"
-        leave-active-class="transition-[transform_opacity] origin-center duration-300"
+        enter-active-class="transition-[scale,opacity] origin-center duration-300"
+        leave-active-class="transition-[scale,opacity] origin-center duration-300"
         enter-from-class="scale-x-0 opacity-0"
         leave-to-class="scale-x-0 opacity-0"
         :css="!indicator"
