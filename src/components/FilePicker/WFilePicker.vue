@@ -99,7 +99,7 @@
         v-else
         class="flex h-full items-center justify-center"
       >
-        <div class="overflow-x-overlay flex items-center gap-6">
+        <div class="flex items-center gap-6 overflow-x-auto">
           <FilePickerItem
             v-for="(file, index) in modelValue"
             :key="index"
