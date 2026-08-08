@@ -1,0 +1,279 @@
+@theme inline {
+  --w-radius-none: 0;
+  --w-radius-full: calc(infinity * 1px);
+
+  --w-svg-stroke-3xs: 0.5;
+  --w-svg-stroke-2xs: 0.75;
+  --w-svg-stroke-xs: 1;
+  --w-svg-stroke-sm: 1.25;
+  --w-svg-stroke-md: 1.5;
+}
+
+/* Colors */
+
+@utility w-has-changes-color-* {
+  --has-changes-bg: --value(--color-*, [color]);
+  --has-changes-bg: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
+  --has-changes-bg: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
+}
+
+@utility w-input-bg-* {
+  --w-input-bg: --value(--color-*, [color]);
+  --w-input-bg: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
+  --w-input-bg: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
+}
+
+@utility w-slider-from-* {
+  --w-slider-from: --value(--color-*, [color]);
+  --w-slider-from: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
+  --w-slider-from: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
+}
+
+@utility w-slider-to-* {
+  --w-slider-to: --value(--color-*, [color]);
+  --w-slider-to: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
+  --w-slider-to: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
+}
+
+@utility w-toggle-caret-* {
+  --w-toggle-caret: --value(--color-*, [color]);
+  --w-toggle-caret: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
+  --w-toggle-caret: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
+}
+
+@utility w-checkbox-color-* {
+  --w-checkbox-color: --value(--color-*, [color]);
+  --w-checkbox-color: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
+  --w-checkbox-color: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
+}
+
+@utility w-nav-item-dot-color-* {
+  --w-nav-item-dot-color: --value(--color-*, [color]);
+  --w-nav-item-dot-color: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
+  --w-nav-item-dot-color: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
+}
+
+@utility w-date-picker-day-* {
+  --w-date-picker-day: --value(--color-*, [color]);
+  --w-date-picker-day: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
+  --w-date-picker-day: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
+}
+
+@utility w-list-header-bg-* {
+  --w-list-header-bg: --value(--color-*, [color]);
+  --w-list-header-bg: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
+  --w-list-header-bg: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
+}
+
+/* Opacity */
+
+@utility w-ripple-opacity-* {
+  --w-ripple-opacity: calc(--value(integer) * 1%);
+  --w-ripple-opacity: --value([percentage], [*]);
+}
+
+@utility w-hover-circle-opacity-* {
+  --w-hover-circle-opacity: calc(--value(integer) * 1%);
+  --w-hover-circle-opacity: --value([percentage], [*]);
+}
+
+@utility w-skeleton-opacity-* {
+  --w-skeleton-opacity: calc(--value(integer) * 1%);
+  --w-skeleton-opacity: --value([percentage], [*]);
+}
+
+/* Spacing */
+
+@utility w-skeleton-w-* {
+  --skeleton-width: --spacing(--value(number));
+  --skeleton-width: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-skeleton-h-* {
+  --skeleton-height: --spacing(--value(number));
+  --skeleton-height: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-list-card-w-* {
+  --w-list-card-width: --spacing(--value(number));
+  --w-list-card-width: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-checkbox-size-* {
+  --w-checkbox-size: --spacing(--value(number));
+  --w-checkbox-size: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-input-gap-* {
+  --w-input-gap: --spacing(--value(number));
+  --w-input-gap: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-spinner-size-* {
+  --w-spinner-size: --spacing(--value(number));
+  --w-spinner-size: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-button-spinner-size-* {
+  --w-button-spinner-size: --spacing(--value(number));
+  --w-button-spinner-size: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-modal-wrapper-p-* {
+  --w-modal-wrapper-padding: --spacing(--value(number));
+  --w-modal-wrapper-padding: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-modal-wrapper-w-* {
+  --w-modal-wrapper-width: --spacing(--value(number));
+  --w-modal-wrapper-width: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-modal-confirm-w-* {
+  --w-modal-confirm-width: --spacing(--value(number));
+  --w-modal-confirm-width: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-list-header-h-* {
+  --w-list-header-height: --spacing(--value(number));
+  --w-list-header-height: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-list-padding-* {
+  --w-list-padding: --spacing(--value(number));
+  --w-list-padding: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-list-gap-* {
+  --w-list-gap: --spacing(--value(number));
+  --w-list-gap: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-tabs-side-width-* {
+  --w-tabs-side-width: --spacing(--value(number));
+  --w-tabs-side-width: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-dropdown-x-min-* {
+  --w-dropdown-x-min: --spacing(--value(number));
+  --w-dropdown-x-min: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-dropdown-x-max-* {
+  --w-dropdown-x-max: --spacing(--value(number));
+  --w-dropdown-x-max: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-dropdown-y-min-* {
+  --w-dropdown-y-min: --spacing(--value(number));
+  --w-dropdown-y-min: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-dropdown-y-max-* {
+  --w-dropdown-y-max: --spacing(--value(number));
+  --w-dropdown-y-max: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-chart-size-* {
+  --w-chart-size: --spacing(--value(number));
+  --w-chart-size: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-chart-heatmap-size-* {
+  --w-chart-heatmap-size: --spacing(--value(number));
+  --w-chart-heatmap-size: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-chart-heatmap-gap-* {
+  --w-chart-heatmap-gap: --spacing(--value(number));
+  --w-chart-heatmap-gap: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-input-h-* {
+  --w-input-height: --spacing(--value(number));
+  --w-input-height: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-input-min-h-* {
+  --w-input-min-height: --spacing(--value(number));
+  --w-input-min-height: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-textarea-h-* {
+  --w-textarea-height: --spacing(--value(number));
+  --w-textarea-height: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-button-h-* {
+  --w-button-height: --spacing(--value(number));
+  --w-button-height: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-border-svg-padding-* {
+  --w-border-svg-padding: --spacing(--value(number));
+  --w-border-svg-padding: --value(--spacing-*, --w-size-*, [*]);
+}
+
+@utility w-input-rounded-* {
+  --w-input-rounded: --value(--radius-*, --w-radius-*, [*]);
+}
+
+@utility w-button-rounded-* {
+  --w-button-rounded: --value(--radius-*, --w-radius-*, [*]);
+}
+
+@utility w-skeleton-rounded-* {
+  --w-skeleton-rounded: --value(--radius-*, --w-radius-*, [*]);
+}
+
+@utility w-ripple-rounded-* {
+  --w-ripple-rounded: --value(--radius-*, --w-radius-*, [*]);
+}
+
+@utility w-list-rounded-* {
+  --w-list-rounded: --value(--radius-*, --w-radius-*, [*]);
+}
+
+@utility w-option-rounded-* {
+  --w-option-rounded: --value(--radius-*, --w-radius-*, [*]);
+}
+
+@utility w-modal-wrapper-rounded-* {
+  --w-modal-wrapper-rounded: --value(--radius-*, --w-radius-*, [*]);
+}
+
+@utility w-list-header-rounded-* {
+  --w-list-header-rounded: --value(--radius-*, --w-radius-*, [*]);
+}
+
+@utility w-button-action-rounded-* {
+  --w-button-action-rounded: --value(--radius-*, --w-radius-*, [*]);
+}
+
+@utility w-border-svg-rounded-* {
+  --w-border-svg-rounded: --value(--radius-*, --w-radius-*, [*]);
+}
+
+@utility w-border-svg-stroke-* {
+  --w-border-svg-stroke-width: --value(number, [*]);
+}
+
+@utility w-button-border-* {
+  --w-button-border: calc(--value(number) * 1px);
+  --w-button-border: --value([length], [*]);
+}
+
+@utility w-svg-stroke-width-* {
+  & path {
+    stroke-width: --value(--w-svg-stroke-*, number, [*]);
+  }
+}
+
+@utility w-expansion-duration-* {
+  --expansion-duration: calc(--value(number) * 1ms);
+  --expansion-duration: --value(--duration-*, [duration], [*]);
+}
+
+@utility w-input-whitespace-* {
+  --w-input-whitespace: --value('normal', 'nowrap', 'pre', 'pre-line', 'pre-wrap', 'break-spaces', [*]);
+}

@@ -1,0 +1,6 @@
+@custom-variant card (.w-card &);
+@custom-variant card-l (&.w-card);
+@custom-variant list (.w-list &);
+@custom-variant list-l (&.w-list);
+
+@custom-variant modal (.w-modal &);

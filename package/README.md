@@ -9,21 +9,14 @@ npm i eco-vue-js
 
 ### Tailwind configuration
 
-1. Add the library's [Tailwind preset](https://tailwindcss.com/docs/presets) to your [Tailwind configuration file](https://tailwindcss.com/docs/content-configuration):
-    ```
-    import tailwindBase from 'eco-vue-js/tailwind-base'
+Requires Tailwind CSS v4. Import the library's base after Tailwind itself in your CSS entry:
+```css
+@import "tailwindcss";
+@import "eco-vue-js/tailwind-base/base.css";
+```
 
-    presets: [
-      tailwindBase,
-    ]
-    ```
-
-2. Add the following lines to the `content` section in your configuration file:
-    ```
-    content: [
-      ...tailwindBase.content,
-    ]
-    ```
+It brings the theme (colors, sizes, breakpoints, animations), the `w-*` utilities and the variants with
+it, and registers the library's components as a source, so no Tailwind configuration file is needed.
 
 ### Import components
 

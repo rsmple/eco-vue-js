@@ -1,14 +1,12 @@
-@theme {
-  --color-*: initial;
-  --font-*: initial;
-}
+@import "./css/theme.css";
+@import "./css/breakpoints.css";
+@import "./css/animations.css";
+@import "./css/default.css";
+@import "./css/internal-variants.css";
+@import "./css/internal-variables.css";
 
 @source "../dist/components";
 
-@plugin "./index.ts";
-@plugin "./plugins/default.ts";
-@plugin "./plugins/internal-variables.ts";
-@plugin "./plugins/internal-variants.ts";
 @plugin "./plugins/internal-classes.ts";
 @plugin "./plugins/text.ts";
 @plugin "./plugins/w-ripple.ts";

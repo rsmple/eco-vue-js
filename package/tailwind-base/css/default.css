@@ -1,0 +1,127 @@
+@utility square-* {
+  min-width: --spacing(--value(number));
+  max-width: --spacing(--value(number));
+  width: --spacing(--value(number));
+  height: --spacing(--value(number));
+  max-height: --spacing(--value(number));
+  min-height: --spacing(--value(number));
+
+  min-width: --value(--spacing-*, --w-size-*, [*]);
+  max-width: --value(--spacing-*, --w-size-*, [*]);
+  width: --value(--spacing-*, --w-size-*, [*]);
+  height: --value(--spacing-*, --w-size-*, [*]);
+  max-height: --value(--spacing-*, --w-size-*, [*]);
+  min-height: --value(--spacing-*, --w-size-*, [*]);
+
+  min-width: calc(--value(ratio) * 100%);
+  max-width: calc(--value(ratio) * 100%);
+  width: calc(--value(ratio) * 100%);
+  height: calc(--value(ratio) * 100%);
+  max-height: calc(--value(ratio) * 100%);
+  min-height: calc(--value(ratio) * 100%);
+}
+
+@utility width-* {
+  min-width: --spacing(--value(number));
+  max-width: --spacing(--value(number));
+  width: --spacing(--value(number));
+
+  min-width: --value(--spacing-*, --w-size-*, [*]);
+  max-width: --value(--spacing-*, --w-size-*, [*]);
+  width: --value(--spacing-*, --w-size-*, [*]);
+
+  min-width: calc(--value(ratio) * 100%);
+  max-width: calc(--value(ratio) * 100%);
+  width: calc(--value(ratio) * 100%);
+}
+
+@utility height-* {
+  min-height: --spacing(--value(number));
+  max-height: --spacing(--value(number));
+  height: --spacing(--value(number));
+
+  min-height: --value(--spacing-*, --w-size-*, [*]);
+  max-height: --value(--spacing-*, --w-size-*, [*]);
+  height: --value(--spacing-*, --w-size-*, [*]);
+
+  min-height: calc(--value(ratio) * 100%);
+  max-height: calc(--value(ratio) * 100%);
+  height: calc(--value(ratio) * 100%);
+}
+
+@utility grid-cols-fill-* {
+  grid-template-columns: repeat(auto-fill, minmax(--spacing(--value(number)), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(--value(--spacing-*, --w-size-*, [*]), 1fr));
+}
+
+@utility grid-cols-fit-* {
+  grid-template-columns: repeat(auto-fit, minmax(--spacing(--value(number)), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(--value(--spacing-*, --w-size-*, [*]), 1fr));
+}
+
+@utility stop-color-* {
+  stop-color: --value(--color-*, [color]);
+  stop-color: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
+  stop-color: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
+}
+
+@utility scrollbar-bar-color-* {
+  --scrollbar-bar-color: --value(--color-*, [color]);
+  --scrollbar-bar-color: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
+  --scrollbar-bar-color: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
+
+  scrollbar-color: var(--scrollbar-bar-color) var(--scrollbar-gutter-color);
+}
+
+@utility scrollbar-gutter-color-* {
+  --scrollbar-gutter-color: --value(--color-*, [color]);
+  --scrollbar-gutter-color: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
+  --scrollbar-gutter-color: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
+
+  scrollbar-color: var(--scrollbar-bar-color) var(--scrollbar-gutter-color);
+}
+
+@utility scrollbar-width-* {
+  scrollbar-width: --value('auto', 'none', 'thin');
+}
+
+@utility rounded-inherit {
+  border-radius: inherit;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+}
+
+@utility overflow-y-overlay {
+  @supports (overflow: overlay) {
+    overflow-y: overlay;
+  }
+
+  @supports not (overflow: overlay) {
+    overflow-y: auto;
+  }
+}
+
+@utility overflow-x-overlay {
+  @supports (overflow: overlay) {
+    overflow-x: overlay;
+  }
+
+  @supports not (overflow: overlay) {
+    overflow-x: auto;
+  }
+}
+
+@custom-variant dark (.dark &:not(:is(.light *)));
+
+@custom-variant supports-backdrop (@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)));
+@custom-variant supports-overlay (@supports (overflow: overlay));
+@custom-variant supports-overlay-not (@supports (not (overflow: overlay)));
+@custom-variant touch (.touch &);
+@custom-variant touch-not (.touch-not &);
+@custom-variant focus-within-not (&:not(:focus-within));
+@custom-variant resizer (&::-webkit-resizer);
+@custom-variant last-not (&:not(:last-child));
+@custom-variant first-not (&:not(:first-child));
+@custom-variant not-print (@media not print);

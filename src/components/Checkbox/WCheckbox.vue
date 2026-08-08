@@ -2,7 +2,7 @@
   <button
     ref="element"
     v-bind="{class: $attrs.class, style: $attrs.style as StyleValue}"
-    class="w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-0.08 flex select-none gap-2 outline-none"
+    class="w-ripple-trigger w-hover-circle-trigger w-hover-circle-opacity-8 flex select-none gap-2 outline-none"
     :class="{
       'cursor-progress': loading || isSkeleton,
       'cursor-not-allowed opacity-70': isDisabled || isSkeleton,
