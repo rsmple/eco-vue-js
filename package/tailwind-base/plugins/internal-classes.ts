@@ -86,7 +86,7 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
       '--resizer-bg': theme('colors.default'),
       'background-image': 'linear-gradient(135deg, currentColor 10%, var(--resizer-bg) 10%, var(--resizer-bg) 50%, currentColor 50%, currentColor 60%, var(--resizer-bg) 60%, var(--resizer-bg) 100%)',
     },
-    '.dark *::-webkit-resizer': {
+    '.dark *:not(:is(.light *))::-webkit-resizer': {
       color: theme('colors.gray-700'),
       '--resizer-bg': theme('colors.default-dark'),
     },
