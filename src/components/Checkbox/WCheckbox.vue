@@ -34,10 +34,10 @@
       @keypress.enter.stop.prevent="toggle"
     >
       <Transition
-        enter-active-class="transition-[opacity,transform]"
-        leave-active-class="transition-[opacity,transform]"
-        :enter-from-class="radio ? 'opacity-0 scale-[0.25]!' : 'opacity-0 scale-[0.50]!'"
-        :leave-to-class="radio ? 'opacity-0 scale-[0.25]!' : 'opacity-0 scale-[0.50]!'"
+        enter-active-class="transition-[transform_opacity]"
+        leave-active-class="transition-[transform_opacity]"
+        :enter-from-class="radio ? 'opacity-0 scale-25!' : 'opacity-0 scale-50!'"
+        :leave-to-class="radio ? 'opacity-0 scale-25!' : 'opacity-0 scale-50!'"
         :css="!lessTransitions"
       >
         <div
@@ -50,7 +50,7 @@
             'rounded': !radio && !(intermediate && modelValue === null),
             'bg-primary dark:bg-primary-dark [.w-hover-checked:hover_&]:block!': !isDisabled && !isSkeleton,
             'bg-gray-300 dark:bg-gray-700': isDisabled || isSkeleton,
-            'transition-[opacity,transform]': !lessTransitions,
+            'transition-[transform_opacity]': !lessTransitions,
           }"
         />
       </Transition>

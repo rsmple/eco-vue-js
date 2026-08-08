@@ -10,7 +10,7 @@
     <div
       v-for="config in list"
       :key="config.id"
-      class="grid justify-end transition-[opacity,transform,grid-template-rows] duration-500"
+      class="grid justify-end transition-[transform_opacity_grid-template-rows] duration-500"
     >
       <div class="min-h-0">
         <NotifyCard

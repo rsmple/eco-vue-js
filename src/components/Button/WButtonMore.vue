@@ -29,7 +29,7 @@
         >
           <component
             :is="icon ?? IconMore"
-            class="square-[1.25em]"
+            class="square-[1.125em]"
           />
         </div>
       </template>
