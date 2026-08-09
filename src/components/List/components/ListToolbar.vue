@@ -172,7 +172,7 @@
             :title="typeof field.meta.title === 'string' ? field.meta.title : field.meta.title(queryParams)"
             :field="typeof field.meta.field === 'string' ? field.meta.field : (field.meta.field?.(queryParams) as keyof Data)"
             :ordering="ordering"
-            :disabled="noOrdering || !field.meta.field"
+            :disabled="noOrdering"
             :allow-resize="field.meta.allowResize"
             :item-class="field.meta.cssClassHeader"
             :style-value="card ? {gridArea: field.meta.label} : {

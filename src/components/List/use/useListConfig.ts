@@ -1,4 +1,4 @@
-import {type MaybeRefOrGetter, computed, isRef, markRaw, ref, toValue, unref, watch} from 'vue'
+import {computed, markRaw, ref, watch} from 'vue'
 
 import IconGrid from '@/assets/icons/IconGrid.svg?component'
 import IconList from '@/assets/icons/IconList.svg?component'
@@ -118,23 +118,23 @@ export const getFirstFieldLabel = <F extends ListFields<any, any>[number]>(field
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const useListConfig = <Fields extends ListFields<any, any>>(
-  key: MaybeRefOrGetter<string>,
-  fields: MaybeRefOrGetter<Fields>,
-  defaultConfigMap: MaybeRefOrGetter<FieldConfigMap<Fields>>,
-  defailtMode: MaybeRefOrGetter<ListMode>,
+  key: () => string,
+  fields: () => Fields,
+  defaultConfigMap: () => FieldConfigMap<Fields>,
+  defailtMode: () => ListMode,
   disable?: boolean,
 ) => {
   const {isMobile} = useIsMobile()
 
   const value = ref<ListConfig<Fields>>(
     parseListConfig(
-      disable ? undefined : getListConfig(toValue(key)),
-      toValue(fields),
-      toValue(defaultConfigMap),
-      toValue(defailtMode),
+      disable ? undefined : getListConfig(key()),
+      fields(),
+      defaultConfigMap(),
+      defailtMode(),
     ),
   )
-  const hasSaved = ref(disable ? false : localStorage.getItem(toValue(key)) !== null)
+  const hasSaved = ref(disable ? false : localStorage.getItem(key()) !== null)
 
   const listConfig = computed<ListConfig<Fields>>(() => value.value as ListConfig<Fields>)
   const fieldConfigMap = computed<Record<string, FieldConfig>>({
@@ -151,15 +151,15 @@ export const useListConfig = <Fields extends ListFields<any, any>>(
   const reset = () => {
     if (disable) return
 
-    value.value = parseListConfig(undefined, toValue(fields), toValue(defaultConfigMap), toValue(defailtMode))
+    value.value = parseListConfig(undefined, fields(), defaultConfigMap(), defailtMode())
     hasSaved.value = false
-    localStorage.removeItem(toValue(key))
+    localStorage.removeItem(key())
   }
 
   const save = () => {
     if (disable) return
 
-    localStorage.setItem(toValue(key), JSON.stringify(value.value))
+    localStorage.setItem(key(), JSON.stringify(value.value))
     hasSaved.value = true
   }
 
@@ -169,15 +169,16 @@ export const useListConfig = <Fields extends ListFields<any, any>>(
     save()
   }
 
-  if (!disable && isRef(key)) watch(key, newKey => {
-    value.value = parseListConfig(getListConfig(unref(newKey)), toValue(fields), toValue(defaultConfigMap), toValue(defailtMode))
-    hasSaved.value = localStorage.getItem(unref(key)) !== null
-  })
-
-  if (!disable && isRef(defaultConfigMap)) watch(defaultConfigMap, (newValue: FieldConfigMap<Fields>) => {
-    value.value = parseListConfig(getListConfig(toValue(key)), toValue(fields), newValue, toValue(defailtMode))
-    hasSaved.value = localStorage.getItem(toValue(key)) !== null
-  })
+  if (!disable) {
+    watch(key, newKey => {
+      value.value = parseListConfig(getListConfig(newKey), fields(), defaultConfigMap(), defailtMode())
+      hasSaved.value = localStorage.getItem(newKey) !== null
+    })
+    watch(defaultConfigMap, (newValue: FieldConfigMap<Fields>) => {
+      value.value = parseListConfig(getListConfig(key()), fields(), newValue, defailtMode())
+      hasSaved.value = localStorage.getItem(key()) !== null
+    })
+  }
 
   return {
     listConfig,

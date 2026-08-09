@@ -11,27 +11,23 @@
     @update:width="$emit('update:width', $event)"
   >
     <component
-      :is="disabled ? 'div' : 'button'"
+      :is="allowSort ? 'button' : 'div'"
       class="group flex size-full gap-2 overflow-clip" 
       :class="{
-        'cursor-pointer': !disabled,
+        'cursor-pointer': allowSort,
         [itemClass ?? '']: true,
         'items-center whitespace-nowrap font-semibold': !itemClass,
       }"
-      @click="!disabled && setOrdering()"
+      @click="allowSort && setOrdering()"
     >
-      <div
-        :class="{
-          'group-hover:underline': !disabled,
-        }"
-      >
+      <div :class="allowSort ? 'group-hover:underline' : undefined">
         <slot>
           {{ title }}
         </slot>
       </div>
 
       <Transition
-        v-if="!disabled"
+        v-if="allowSort"
         enter-active-class="transition-opacity"
         leave-active-class="transition-opacity"
         enter-from-class="opacity-0"
@@ -84,6 +80,8 @@ const emit = defineEmits<{
   (e: 'save:width'): void
   (e: 'update:ordering', value: OrderItem<Field>[]): void
 }>()
+
+const allowSort = computed(() => !props.disabled && !!props.field)
 
 const containerRef = useTemplateRef<ComponentInstance<typeof HeaderItemResizer> | HTMLDivElement>('container')
 
