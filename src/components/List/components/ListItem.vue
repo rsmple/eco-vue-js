@@ -105,7 +105,7 @@
             :skeleton="skeleton"
             :card="card"
             :readonly="isReadonly"
-            :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
+            :uniform-scope="uniformField !== undefined ? innerScope : undefined"
             :query-params="queryParams"
             :results="results"
             :intersecting="intersecting"
@@ -120,7 +120,7 @@
                 :readonly="readonly || (readonlyGetter?.(defaultScope.item as Data) ?? false)"
                 :skeleton="skeleton"
                 :card="card"
-                :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
+                :uniform-scope="uniformField !== undefined ? innerScope : undefined"
                 :query-params="queryParams"
                 :results="results"
                 :intersecting="intersecting"
@@ -134,21 +134,14 @@
 
           <ListCardAction
             v-if="isActionShown"
-            v-bind="allowSelect && (allowSelectHover || alwaysSelect)
-              ? {tag: 'button', card, onClick: () => $emit('toggle:selected', value, position)}
-              : hasAction
-                ? {tag: 'button', card, class: 'z-[-1]', onClick: () => $emit('click:action', {item, setter, scope: uniformField !== undefined ? innerScope : undefined})}
-                : to
-                  ? {tag: markRaw(WRouterLink), card, class: 'z-[-1]', props: {to}}
-                  : allowOpen
-                    ? {tag: 'button', card, class: 'z-[-1]', onClick: toggle}
-                    : {tag: 'div', card, class: 'z-[-1]'}
-            "
+            :card="card"
+            v-bind="getActionProps(uniformField !== undefined ? innerScope : undefined)"
             :class="{
-              'before:text-primary dark:before:text-primary-dark': allowSelectHover || selected || moreRef?.isOpen,
-              'before:opacity-10': selected || moreRef?.isOpen,
+              'z-[-1]': action !== 'select',
+              'before:text-primary dark:before:text-primary-dark': isHighlighted,
+              'before:opacity-10': isAccented,
             }"
-            :opacity-class="allowSelectHover || selected || moreRef?.isOpen ? 'w-ripple-opacity-15' : undefined"
+            :opacity-class="isHighlighted ? 'w-ripple-opacity-15' : undefined"
           />
 
           <WButtonMore
@@ -163,7 +156,7 @@
             <WButtonMoreItem
               v-if="alwaysSelect && allowSelect && to"
               text="View"
-              :icon="markRaw(IconTo)"
+              :icon="IconToRaw"
               :to="to"
               @click="$emit('toggle:selected', value, position)"
             />
@@ -175,25 +168,22 @@
               :to-markdown="toMarkdown"
             />
 
-            <template
+            <component
+              :is="Array.isArray(menuItem) ? menuItem[0] : menuItem"
               v-for="(menuItem, menuIndex) in menu"
               :key="menuIndex"
-            >
-              <component
-                :is="Array.isArray(menuItem) ? menuItem[0] : menuItem"
-                v-bind="Array.isArray(menuItem) ? menuItem[1] : undefined"
-                :item="item"
-                :readonly="isReadonly"
-                :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
-                :update-item="setter"
-                :delete-item="() => {
-                  setter()
-                  refetch()
-                }"
-                @update:item="setter"
-                @delete:item="setter(); refetch()"
-              />
-            </template>
+              v-bind="Array.isArray(menuItem) ? menuItem[1] : undefined"
+              :item="item"
+              :readonly="isReadonly"
+              :uniform-scope="uniformField !== undefined ? innerScope : undefined"
+              :update-item="setter"
+              :delete-item="() => {
+                setter()
+                refetch()
+              }"
+              @update:item="setter"
+              @delete:item="setter(); refetch()"
+            />
           </WButtonMore>
         </div>
 
@@ -233,7 +223,7 @@
               <WButtonMoreItem
                 v-if="alwaysSelect && allowSelect && to"
                 text="View"
-                :icon="markRaw(IconTo)"
+                :icon="IconToRaw"
                 :to="to"
                 @click="$emit('toggle:selected', value, position)"
               />
@@ -245,25 +235,22 @@
                 :to-markdown="toMarkdown"
               />
 
-              <template
+              <component
+                :is="Array.isArray(menuItem) ? menuItem[0] : menuItem"
                 v-for="(menuItem, menuIndex) in menu"
                 :key="menuIndex"
-              >
-                <component
-                  :is="Array.isArray(menuItem) ? menuItem[0] : menuItem"
-                  v-bind="Array.isArray(menuItem) ? menuItem[1] : undefined"
-                  :item="item"
-                  :readonly="isReadonly"
-                  :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
-                  :update-item="setter"
-                  :delete-item="() => {
-                    setter()
-                    refetch()
-                  }"
-                  @update:item="setter"
-                  @delete:item="setter(); refetch()"
-                />
-              </template>
+                v-bind="Array.isArray(menuItem) ? menuItem[1] : undefined"
+                :item="item"
+                :readonly="isReadonly"
+                :uniform-scope="uniformField !== undefined ? innerScope : undefined"
+                :update-item="setter"
+                :delete-item="() => {
+                  setter()
+                  refetch()
+                }"
+                @update:item="setter"
+                @delete:item="setter(); refetch()"
+              />
             </WButtonMore>
           </div>
         </div>
@@ -292,7 +279,7 @@
           :readonly="isReadonly"
           :skeleton="skeleton"
           :card="card"
-          :uniform-scope="(formFieldGetter as Function | undefined) ? innerScope : undefined"
+          :uniform-scope="uniformField !== undefined ? innerScope : undefined"
           :query-params="queryParams"
           :results="results"
           :intersecting="intersecting"
@@ -305,7 +292,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
-import type {CardActionParams, ColumnData, ExpansionComponent, FieldConfig, ListFields, MenuComponent} from '../types'
+import type {CardActionParams, ColumnData, ExpansionComponent, FieldConfig, ListActionMode, ListFields, MenuComponent} from '../types'
 import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 
@@ -358,7 +345,7 @@ const props = defineProps<{
   alignTop: boolean | undefined
   allowOpen: boolean
   disableMore: boolean | undefined
-  hasAction: boolean | undefined
+  actionMode: ListActionMode
   cardTo: ((item: Data) => LinkProps['to'] | undefined) | undefined
   contentVisibility: boolean | undefined
 
@@ -368,11 +355,14 @@ const props = defineProps<{
   alwaysSelect: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'toggle:selected', value: number, position: number): void
   (e: 'hover:selected', position: number): void
   (e: 'click:action', value: CardActionParams<Data>): void
 }>()
+
+const WRouterLinkRaw = markRaw(WRouterLink)
+const IconToRaw = markRaw(IconTo)
 
 const containerRef = useTemplateRef('container')
 const moreRef = useTemplateRef<ComponentInstance<typeof WButtonMore>>('more')
@@ -381,30 +371,50 @@ const isOpen = ref(false)
 const positionMenu = ref<{left: string, top: string} | null>(null)
 const anchorRef = useTemplateRef<HTMLDivElement>('anchor')
 
+const toggle = () => {
+  isOpen.value = !isOpen.value
+}
+
 const uniformField = computed(() => props.formFieldGetter?.(props.item, props.index))
 
 const isReadonly = computed(() => props.readonly || (props.readonlyGetter?.(props.item) ?? false))
 
 const to = computed(() => props.skeleton ? undefined : props.cardTo?.(props.item))
 
-const hasMenu = computed(() => props.menu !== undefined || (props.toMarkdown !== undefined && !props.skeleton))
+const hasMenu = computed(() => props.menu !== undefined || props.toMarkdown !== undefined)
+
+const isAccented = computed(() => props.selected || moreRef.value?.isOpen === true)
+
+const isHighlighted = computed(() => props.allowSelectHover || isAccented.value)
+
+const action = computed<ListActionMode>(() => {
+  if (props.actionMode !== 'link' || to.value !== undefined) return props.actionMode
+
+  return props.allowOpen ? 'open' : 'none'
+})
+
+const isActionShown = computed<boolean>(() => !props.skeleton && (action.value !== 'none' || isAccented.value))
+
+const getActionProps = (scope: UniformScope<Data> | undefined) => {
+  switch (action.value) {
+    case 'select': return {tag: 'button' as const, onClick: () => emit('toggle:selected', props.value, props.position)}
+    case 'action': return {tag: 'button' as const, onClick: () => emit('click:action', {item: props.item, setter: props.setter, scope})}
+    case 'link': return {tag: WRouterLinkRaw, props: {to: to.value}}
+    case 'open': return {tag: 'button' as const, onClick: toggle}
+    default: return {tag: 'div' as const}
+  }
+}
 
 const beforeClass = computed<Record<string, boolean | undefined>>(() => {
   if (!isActionShown.value) return {}
 
   return {
     'w-ripple-list w-ripple-hover-list': true,
-    'w-ripple-opacity-5': !props.allowSelectHover && !props.selected && !moreRef.value?.isOpen,
-    'before:text-primary dark:before:text-primary-dark w-ripple-opacity-15': props.allowSelectHover || props.selected || moreRef.value?.isOpen,
-    'before:opacity-10': props.selected || moreRef.value?.isOpen,
+    'w-ripple-opacity-5': !isHighlighted.value,
+    'before:text-primary dark:before:text-primary-dark w-ripple-opacity-15': isHighlighted.value,
+    'before:opacity-10': isAccented.value,
   }
 })
-
-const toggle = () => {
-  isOpen.value = !isOpen.value
-}
-
-const isActionShown = computed<boolean>(() => !props.skeleton && !(props.alwaysSelect && !props.allowSelect) && (props.allowOpen || to.value !== undefined || props.allowSelectHover || props.hasAction || props.selected || moreRef.value?.isOpen === true))
 
 const toggleMenu = (event: MouseEvent) => {
   if (props.skeleton || props.disableMore || !containerRef.value || !moreRef.value || event.ctrlKey) return

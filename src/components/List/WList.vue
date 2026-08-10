@@ -3,8 +3,8 @@
     :class="{
       'w-card': isGrid,
       'w-list': !isGrid,
-      '[--w-list-right:calc(var(--w-list-padding,1rem)*2+1.25em)]': menu,
-      '[--w-list-right:var(--w-list-header-rounded,1rem)]': !menu,
+      '[--w-list-right:calc(var(--w-list-padding,1rem)*2+1.25em)]': hasMenu,
+      '[--w-list-right:var(--w-list-header-rounded,1rem)]': !hasMenu,
       '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em+1px)]': allowSelect,
       '[--w-list-left:var(--w-list-header-rounded,1rem)]': !allowSelect,
     }"
@@ -148,7 +148,7 @@
           :align-top="alignTop"
           :allow-open="allowOpen"
           :disable-more="disableMore"
-          :has-action="hasAction"
+          :action-mode="actionMode"
           :card-to="cardTo"
           :content-visibility="contentVisibility"
 
@@ -174,7 +174,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>, CardColumns extends readonly GridCol[]">
-import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, ColumnData, ExpansionComponent, FieldConfig, FieldConfigMap, GridCol, ListFields, MenuComponent} from './types'
+import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, ColumnData, ExpansionComponent, FieldConfig, FieldConfigMap, GridCol, ListActionMode, ListFields, MenuComponent} from './types'
 import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
@@ -351,6 +351,7 @@ const columnDataMap = computed<Record<string, ColumnData>>(() => {
 
 const allowSelect = computed(() => !props.disableSelect && (props.alwaysSelect || props.bulk !== undefined || !props.disableExport))
 const allowOpen = computed(() => props.expansion !== undefined)
+const hasMenu = computed(() => props.menu !== undefined || props.toMarkdown !== undefined)
 
 const disableSelect = computed(() => !allowSelect.value)
 
@@ -372,6 +373,15 @@ const {
   getQueryParams,
   setIsSelecting,
 } = useSelected<number>(countValue, disableSelect, selectionUsed, updateSelection, () => props.selectOnly)
+
+const actionMode = computed<ListActionMode>(() => {
+  if (props.alwaysSelect && !allowSelect.value) return 'none'
+  if (allowSelectHover.value || props.alwaysSelect) return 'select'
+  if (props.hasAction) return 'action'
+  if (props.cardTo) return 'link'
+  if (allowOpen.value) return 'open'
+  return 'none'
+})
 
 const ordering = computed<OrderItem<keyof Data>[]>(() => {
   if (props.queryParams instanceof Object && 'ordering' in props.queryParams && typeof props.queryParams.ordering === 'string') {

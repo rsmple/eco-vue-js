@@ -18,6 +18,8 @@ export type FieldProps<Data, QueryParams = any> = {
 export type FieldComponent<Data, QueryParams> = Component<FieldProps<Data, QueryParams>>
 export type ExpansionComponent<Data, QueryParams> = Component<Omit<FieldProps<Data | undefined, QueryParams>, 'config'>>
 
+export type ListActionMode = 'select' | 'action' | 'link' | 'open' | 'none'
+
 export type FieldComponentItem<Data> = Component<{
   item: Data
   skeleton: boolean
