@@ -2,6 +2,7 @@
   <WSkeleton
     v-if="isSkeleton"
     class="w-skeleton-h---button-height w-skeleton-rounded-(--w-button-rounded,1rem) w-skeleton-w-max"
+    :class="$attrs.class"
   >
     <div class="flex gap-2 px-(--w-button-rounded,1rem) font-medium opacity-0">
       <slot />

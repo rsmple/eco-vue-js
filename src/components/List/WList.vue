@@ -117,7 +117,7 @@
           :skeleton="skeleton"
         />
 
-        <ListRow
+        <ListItem
           :item="item"
           :skeleton="skeleton"
           :setter="setter"
@@ -190,7 +190,7 @@ import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
 import {type Selection, useSelected, useSelectionHash} from '@/utils/useSelected'
 import {ListMode} from '@/utils/utils'
 
-import ListRow from './components/ListRow.vue'
+import ListItem from './components/ListItem.vue'
 import ListToolbar from './components/ListToolbar.vue'
 import {filterFields, forEachField, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, sortFields, sortFieldsDeep, useListConfig} from './use/useListConfig'
 
