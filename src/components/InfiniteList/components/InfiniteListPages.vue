@@ -135,10 +135,12 @@ const slotIds = ref<number[]>([slotIdCounter])
 const pagesCount = ref(1)
 const count = ref(0)
 const nextPage = computed(() => {
-  const max = Math.max(...pages.value)
+  if (pagesCount.value === 0) return null
+  const max = Math.max(...pages.value, 0)
   return max < pagesCount.value ? max + 1 : null
 })
 const previousPage = computed(() => {
+  if (pagesCount.value === 0 || pages.value.length === 0) return null
   const min = Math.min(...pages.value)
   return min > 1 ? min - 1 : null
 })
