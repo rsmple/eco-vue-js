@@ -152,6 +152,7 @@ import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 import {useIsMobile} from '@/utils/mobile'
 import {useComponentStates} from '@/utils/useComponentStates'
+import {PAGE_LENGTH} from '@/utils/useDefaultQuery.ts'
 
 import SelectAsyncList from './components/SelectAsyncList.vue'
 import SelectAsyncPrefix from './components/SelectAsyncPrefix.vue'
@@ -194,7 +195,7 @@ const loadingCreate = ref(false)
 const isDisabledComputed = computed(() => props.loading || isReadonly.value || isDisabled.value)
 const isModelValueSearch = computed(() => !!search.value && props.modelValue?.includes(search.value as Model))
 const queryParams = computed(() => ({...props.queryParamsOptions, [props.searchField ?? 'search']: search.value}))
-const queryParamsFirstPage = computed(() => ({...queryParams.value, page: 1}))
+const queryParamsFirstPage = computed(() => ({...queryParams.value, size: PAGE_LENGTH, page: 1}))
 const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
 
 const {data: firstPageData} = props.useQueryFnOptions(queryParamsFirstPage, {enabled: queryEnabled})
