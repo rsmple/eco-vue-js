@@ -125,6 +125,8 @@ const hasActive = ref(false)
 const isActive = computed(() => hasActive.value || (componentRef.value?.isActive ?? false))
 const hasInnerActive = computed(() => innerRef.value?.some(item => item.isActive) ?? false)
 
+const isVisible = computed(() => isDropdownOpen.value || isActive.value)
+
 const updateHasActive = async () => {
   await nextTick()
 
@@ -172,5 +174,6 @@ defineSlots<{
 
 defineExpose({
   isActive,
+  isVisible,
 })
 </script>
