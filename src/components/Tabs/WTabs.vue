@@ -2,8 +2,9 @@
   <div
     ref="container"
     :class="{
-      'sm-not:grid-cols-[repeat(2,100vw)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain grid grid-cols-[minmax(auto,var(--w-tabs-side-width,auto))_1fr] items-start gap-4': side,
+      'sm-not:grid-cols-[repeat(2,100vw)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain grid-cols-[minmax(auto,var(--w-tabs-side-width,auto))_1fr] items-start gap-4': side && !flat,
     }"
+    class="grid"
   >
     <div
       v-if="!noHeader && !flat"
@@ -39,6 +40,7 @@
           :side="side"
           :status-icon="statusIcon"
           :enable-overflow="side"
+          :indicator="indicator"
           @update:scroll-position="updateScrollPosition"
           @click="switchTab(slot.props?.name)"
         >

@@ -1,5 +1,14 @@
 <template>
-  <div>
+  <WNavItem
+    v-if="!slotsDefault.length"
+    v-bind="($props as LinkProps)"
+  >
+    <template #icon>
+      <slot name="icon" />
+    </template>
+  </WNavItem>
+
+  <div v-else>
     <WDropdownMenu
       :is-open="isDropdownOpen && !isActive"
       :horizontal-align="HorizontalAlign.RIGHT_OUTER"
@@ -88,6 +97,7 @@
 
 <script lang="ts" setup>
 import type {NavItemExpandProps} from './types'
+import type {LinkProps} from '@/types/types.js'
 
 import {type VNode, computed, nextTick, onBeforeUnmount, ref, useSlots, useTemplateRef, watch} from 'vue'
 

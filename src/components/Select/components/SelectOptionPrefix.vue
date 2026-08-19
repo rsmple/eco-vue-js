@@ -13,7 +13,7 @@
         v-if="!disableClear"
         :loading="loading"
         :disabled="disabled"
-        class="w-option-button ml-1 mr-2"
+        class="w-option-button"
         @mousedown.stop.prevent=""
         @click.stop.prevent="$emit('unselect', option)"
       />
@@ -34,7 +34,7 @@
       v-if="!disableClear"
       :loading="loading"
       :disabled="disabled"
-      class="mx-1 mr-2"
+      class="ml-1 mr-2"
       @mousedown.stop.prevent=""
       @click.stop.prevent="$emit('unselect', option)"
     />

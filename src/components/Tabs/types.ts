@@ -17,6 +17,7 @@ export interface TabsProps {
   statusIcon?: boolean
   flat?: boolean
   enableStatus?: boolean
+  indicator?: boolean
 }
 
 export type TabsItemProps = {

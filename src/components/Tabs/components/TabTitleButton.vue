@@ -13,7 +13,7 @@
       :has-changes="hasChanges"
       :has-error="hasError"
       :has-value="hasValue"
-      :indicator="stepper && !side"
+      :indicator="indicator"
       :side="side"
       :title="stepper ? `${index + 1}. ${title}` : title"
       :icon="icon"
@@ -61,6 +61,7 @@ const props = defineProps<{
   side?: boolean
   statusIcon?: boolean
   enableOverflow?: boolean
+  indicator?: boolean
 }>()
 
 const emit = defineEmits<{
