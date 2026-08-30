@@ -122,7 +122,6 @@
           :title="slot.props.title"
           :active="slot.props.name === current"
           :removable="slot.props.removable ?? false"
-          :enable-status="(statusIcon || showHasValue || enableStatus) ?? false"
           :flat="flat ?? false"
           @update:height="!disableMinHeight && !flat && updateHeight($event)"
         >
@@ -424,10 +423,8 @@ if (props.stepper) {
 if (!props.noSwitchOnInvalid) {
   const switchTabDebounced = debounce(switchTab, 50)
 
-  const invalidName = computed<string | undefined>(() => defaultSlots.value.find(slot => slot.props.hasError)?.props?.name)
-
-  watch(invalidName, value => {
-    if (value && value !== current.value) switchTabDebounced(value)
+  watch(() => defaultSlots.value.filter(slot => getPropValue(slot.props, 'hasError') || tabItemRefByName.value[slot.props.name]?.hasError).map(item => item.props?.name), value => {
+    if (value.length && !value.includes(current.value)) switchTabDebounced(value[0])
   })
 }
 

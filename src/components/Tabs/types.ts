@@ -16,7 +16,6 @@ export interface TabsProps {
   wrap?: boolean
   statusIcon?: boolean
   flat?: boolean
-  enableStatus?: boolean
   indicator?: boolean
 }
 

@@ -28,7 +28,6 @@ const props = defineProps<{
   title: string | undefined
   active: boolean
   removable: boolean
-  enableStatus: boolean
   flat: boolean
 }>()
 
@@ -37,7 +36,7 @@ const emit = defineEmits<{
   (e: 'update:active'): void
 }>()
 
-const {hasChanges, hasValue, hasError} = props.enableStatus ? useUniformState() : {}
+const {hasChanges, hasValue, hasError} = useUniformState()
 
 const {callListeners} = useTabItemActiveListener()
 

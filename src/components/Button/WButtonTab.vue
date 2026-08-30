@@ -125,10 +125,8 @@
       >
         <div
           v-if="active || indicator"
-          class="absolute inset-x-0 bottom-0 h-0.5 rounded-sm"
+          class="absolute inset-x-0 bg-current bottom-0 h-0.5 rounded-sm"
           :class="{
-            'bg-current': indicator,
-            'bg-primary dark:bg-primary-dark': !indicator,
             'sm-not:left---inner-margin': side,
           }"
         />
