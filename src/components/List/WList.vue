@@ -29,7 +29,7 @@
       :style="cardStyles"
       :class="$attrs.class"
 
-      @update:count="listCount = $event"
+      @update:count="listCount = $event; $emit('update:count', $event)"
       @update:error="$emit('update:error', $event)"
     >
       <template #header="{updateHeader, isRefetchingAll, refetchAll}">
@@ -463,6 +463,4 @@ const unwatch = watch(fieldsFiltered, async () => {
 
   if (Object.keys(stylesWidth.value).length !== 0 || Object.keys(stylesFixed.value).length !== 0) unwatch.stop()
 }, {immediate: true})
-
-watch(listCount, value => value !== undefined && emit('update:count', value), {immediate: true})
 </script>
