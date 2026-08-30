@@ -247,9 +247,13 @@ const switchTab = throttle(async (key: string) => {
     return
   }
 
-  const item = defaultSlots.value[currentIndex.value]
+  const targetIndex = defaultSlotsKeys.value.indexOf(key)
 
-  if (item && getPropValue(item.props, 'requireSave') && stepperController && (stepperController.hasChanges() || stepperController.fullPayload())) {
+  const requireSave = targetIndex > currentIndex.value && defaultSlots.value
+    .slice(Math.max(currentIndex.value, 0), targetIndex)
+    .some(item => getPropValue(item.props, 'requireSave'))
+
+  if (requireSave && stepperController && (stepperController.hasChanges() || stepperController.fullPayload())) {
     if (!await stepperController.submit()) return
   }
 
