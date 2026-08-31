@@ -6,7 +6,7 @@
 
   <div
     v-else
-    class="w-min rounded-md bg-gray-100 px-2 py-0.5 text-xs font-semibold dark:bg-gray-800"
+    class="w-max rounded-md bg-gray-100 px-2 py-0.5 text-xs font-semibold dark:bg-gray-800"
     :class="classMap[semanticType]"
   >
     <slot>
