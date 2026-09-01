@@ -56,6 +56,7 @@ export interface SelectProps<Model extends number | string, Data extends Default
   selectOnClose?: boolean
   emptyValue?: Model[]
   lazy?: boolean
+  placeholderEmpty?: string
 }
 
 export interface SelectPrefixProps<Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>>
