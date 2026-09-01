@@ -14,7 +14,7 @@
       :top="tooltipMeta.top"
       :bottom="tooltipMeta.bottom"
       emit-update
-      class="isolate z-10000"
+      class="isolate z-10000 pointer-events-none"
       inner-class="w-tooltip-dropdown w-max"
       @update:rect="close"
     >
