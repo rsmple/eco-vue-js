@@ -73,6 +73,7 @@
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import type {ApiError} from '@/utils/api'
+import type {UseQueryOptions} from '@tanstack/vue-query'
 
 import {computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref, useTemplateRef, watch} from 'vue'
 
@@ -86,7 +87,7 @@ import {useRefetchNextPages} from '../use/useRefetchNextPages'
 
 const props = withDefaults(
   defineProps<{
-    useQueryFn: UseQueryPaginated<Data, QueryParams>
+    useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
     queryParams: QueryParams
     skeletonLength?: number
     transition?: boolean
@@ -101,7 +102,7 @@ const props = withDefaults(
     pageClass?: string
     maxPages?: number
     refetchInterval?: number | false
-    queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
+    queryOptions?: Partial<UseQueryOptions<PaginatedResponse<Data>>>
 
     valueGetter: (data: Data) => Model
   }>(),

@@ -135,7 +135,7 @@ import SelectOption from './SelectOption.vue'
 
 const props = defineProps<{
   modelValue: Model[]
-  useQueryFn: UseQueryPaginated<Data, QueryParams>
+  useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
   queryParams: QueryParams
   loading?: boolean
   disabled?: boolean
@@ -148,7 +148,7 @@ const props = defineProps<{
   allowCreate?: boolean
   hideOptionIcon?: boolean
   valueGetter: (data: Data) => Model
-  queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
+  queryOptions?: Partial<Parameters<UseQueryDefault<PaginatedResponse<Data>, QueryParams>>[1]>
   loadingCreate?: boolean
   search?: string
   reverse?: boolean

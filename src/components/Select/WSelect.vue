@@ -234,9 +234,7 @@ const searchPrepared = computed(() => isModelValueSearch.value ? '' : search.val
 const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
 
 const {data, isFetching, error: queryError} = props.useQueryFnOptions
-  ? props.queryParamsOptions === undefined
-    ? (props.useQueryFnOptions as UseQueryEmpty<Data[]>)({enabled: queryEnabled})
-    : props.useQueryFnOptions(toRef(() => props.queryParamsOptions!), {enabled: queryEnabled})
+  ? props.useQueryFnOptions(toRef(() => props.queryParamsOptions!), {enabled: queryEnabled})
   : {
     data: toRef(props, 'options') as Ref<Data[] | undefined>,
     isFetching: ref(false),
@@ -439,7 +437,7 @@ watch(isModelValueSearch, async value => {
 })
 
 if (props.useQueryFnDefault) {
-  const {data: defaultData} = props.useQueryFnDefault({enabled: computed(() => !props.disabled)})
+  const {data: defaultData} = props.useQueryFnDefault(undefined, {enabled: computed(() => !props.disabled)})
 
   watch(defaultData, value => {
     if (value && props.modelValue?.length === 0) {

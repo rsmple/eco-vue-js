@@ -32,7 +32,7 @@ export type ModalExportProps<Model, QueryParams> = {
   title?: string | ((count: number) => string)
   cancelText?: string
   downloadText?: string
-  useQueryFn?: UseQueryPaginated<Model, QueryParams> | UseQueryWithParams<Model[], QueryParams>
+  useQueryFn?: UseQueryDefault<PaginatedResponse<Model>, QueryParams> | UseQueryDefault<Model[], QueryParams>
   initQueryParams: QueryParams
   apiMethod?: (queryParams: QueryParams) => Promise<Model[]>
   header?: string[]

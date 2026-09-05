@@ -178,6 +178,7 @@ import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, Column
 import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
+import type {UseQueryOptions} from '@tanstack/vue-query'
 
 import {type Ref, type StyleValue, computed, nextTick, ref, toRef, watch} from 'vue'
 
@@ -201,10 +202,10 @@ const props = withDefaults(
     count?: number
     fields: Fields
     expansion?: ExpansionComponent<Data, QueryParams>
-    useQueryFn: UseQueryPaginated<Data, QueryParams>
-    useQueryFnExport?: UseQueryPaginated<Data, QueryParams>
+    useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
+    useQueryFnExport?: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
     queryParams: QueryParams
-    queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
+    queryOptions?: Partial<UseQueryOptions<PaginatedResponse<Data>>>
     bulkDisableMessage?: string
     selectionTitle: string
     bulk?: BulkComponent<QueryParams>[]

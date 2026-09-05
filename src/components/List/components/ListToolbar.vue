@@ -237,8 +237,8 @@ defineProps<{
   readonly: boolean
 
   queryParams: QueryParams
-  useQueryFn: UseQueryPaginated<Data, QueryParams>
-  useQueryFnExport: UseQueryPaginated<Data, QueryParams> | undefined
+  useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
+  useQueryFnExport: UseQueryDefault<PaginatedResponse<Data>, QueryParams> | undefined
   apiMethodExport: ((queryParams: QueryParams) => Promise<Data[]>) | undefined
   exportFileName: string | undefined
   getQueryParamsBulk: () => QueryParams

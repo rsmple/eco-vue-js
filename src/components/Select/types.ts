@@ -18,13 +18,13 @@ export interface SelectOptionComponentProps<Option, OptionComponent extends Sele
 }
 
 interface SelectPropsNoParams<Data extends DefaultData> {
-  useQueryFnOptions: UseQueryEmpty<Data[]>
+  useQueryFnOptions: UseQueryDefault<Data[], unknown>
   queryParamsOptions?: never
   options?: never
 }
 
 interface SelectPropsWithParams<Data extends DefaultData, QueryParams> {
-  useQueryFnOptions: UseQueryWithParams<Data[], QueryParams>
+  useQueryFnOptions: UseQueryDefault<Data[], QueryParams>
   queryParamsOptions: QueryParams
   options?: never
 }
@@ -44,7 +44,7 @@ export interface SelectProps<Model extends number | string, Data extends Default
   modelValue: Model[] | undefined
   valueGetter: (value: Data) => Model
   searchFn: (option: Data, search: string) => boolean
-  useQueryFnDefault?: UseQueryEmpty<Data>
+  useQueryFnDefault?: UseQueryDefault<Data, undefined>
   useFirstDefault?: boolean
   emptyStub?: string
   disableClear?: boolean
@@ -89,8 +89,8 @@ export interface SelectStringifiedProps<Model extends string, Data extends Defau
 export interface SelectAsyncProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
   extends Omit<SelectProps<Model, Data, QueryParams, Component>, 'options' | 'optionComponent' | 'optionComponentProps' | 'searchFn' | 'useQueryFnOptions' | 'queryParamsOptions' | 'options' | 'filterOptions'>,
   SelectOptionComponentProps<Data, OptionComponent> {
-  useQueryFnOptions: UseQueryPaginated<Data, QueryParams>
-  useQueryFnPrefix?: UseQueryPaginated<Data, QueryParams>
+  useQueryFnOptions: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
+  useQueryFnPrefix?: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
   queryParamsOptions: QueryParams
   searchField?: keyof QueryParams
   previewData?: Data[]
@@ -102,7 +102,7 @@ export interface SelectAsyncProps<Model extends number | string, Data extends De
 
 export interface SelectAsyncPrefixProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
   extends SelectOptionComponentProps<Data, OptionComponent> {
-  useQueryFn: UseQueryPaginated<Data, QueryParams>
+  useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
   modelValue: Model[]
   disabled: boolean | undefined
   loading: boolean | undefined
@@ -118,7 +118,7 @@ export interface SelectAsyncPrefixProps<Model extends number | string, Data exte
 
 export interface SelectAsyncPrefixPageProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
   extends SelectOptionComponentProps<Data, OptionComponent> {
-  useQueryFn: UseQueryPaginated<Data, QueryParams>
+  useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
   queryParams: QueryParams
   disabled?: boolean
   loading?: boolean

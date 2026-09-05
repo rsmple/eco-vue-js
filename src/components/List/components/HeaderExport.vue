@@ -59,7 +59,7 @@ const WModalExport = defineAsyncComponent(() => import('@/components/Modal/WModa
 const props = defineProps<{
   fields: ListFields<Data, QueryParams>
   queryParamsGetter: () => QueryParams
-  useQueryFn: UseQueryPaginated<Data, QueryParams>
+  useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
   apiMethod: ((queryParams: QueryParams) => Promise<Data[]>) | undefined
   fileName: string | undefined
   toMarkdown: ((item: Data, index: number) => string) | undefined
