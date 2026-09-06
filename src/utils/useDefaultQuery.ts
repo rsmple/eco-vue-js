@@ -2,7 +2,7 @@ import {type Query, type QueryClient, type QueryFunction, type UseQueryOptions, 
 import {type MaybeRef, toValue, unref, watch} from 'vue'
 
 import {ApiError} from './api'
-import {type QueryModel, type QueryModelId, type QueryScope, type QueryScopeItem, type QueryScopeModel, removeQueryItem, setListItem, setQueryItem} from './queryCache'
+import {type QueryModel, type QueryModelId, type QueryScope, type QueryScopeItem, removeQueryItem, setListItem, setQueryItem} from './queryCache'
 
 export type {QueryItemUpdater, QueryModel, QueryModelId, QueryScope, QueryScopeItem, QueryScopeModel} from './queryCache'
 export {removeQueryItem, removeQueryItems, setQueryItem, setQueryItems, snapshotQueries, updateQueryItems} from './queryCache'
@@ -24,7 +24,7 @@ export type UseQueryDefaultFn<Data, QueryParams> = (
 ) => UseQueryReturnTypeDefault<Data>
 
 export type CreateDefaultQuery = {
-  <ModelKey extends string, Scope extends QueryScope, Data extends QueryScopeModel<QueryModel>[Scope]>(
+  <ModelKey extends string, Scope extends QueryScope, Data>(
     modelKey: ModelKey,
     scope: Scope,
     queryFn: QueryFunction<Data, [ModelKey, Scope]>,
@@ -45,7 +45,7 @@ export type CreateDefaultQuery = {
     removeItem: (id: QueryModelId, queryClient?: QueryClient) => void
   }
 
-  <ModelKey extends string, Scope extends QueryScope, Data extends QueryScopeModel<QueryModel>[Scope], QueryParams>(
+  <ModelKey extends string, Scope extends QueryScope, Data, QueryParams>(
     modelKey: ModelKey,
     scope: Scope,
     queryFn: QueryFunction<Data, [ModelKey, Scope, QueryParams]>,
@@ -81,11 +81,36 @@ export const createDefaultQuery = (<
     isQueryParams?: (value: unknown) => value is QueryParams,
     optionsDefault: DefaultQueryOptions<QueryData> = {},
   ) => {
-  const withItemSetters = (query: UseQueryReturnTypeDefault<QueryData>, resolvedClient: QueryClient) => {
-    query.setItem = (item: QueryScopeItem<QueryData>) => setQueryItem(modelKey, item as QueryModel, resolvedClient)
-    query.removeItem = (id: QueryModelId) => removeQueryItem(modelKey, id, resolvedClient)
+  /**
+   * `single` holds one standalone object instead of model items, so its setters work on the query`s own data -
+   * there is no id to look the item up by, and the model-wide updaters never visit that scope.
+   */
+  const withItemSetters = (query: UseQueryReturnTypeDefault<QueryData>, resolvedClient: QueryClient, queryKey: unknown[]) => {
+    query.setItem = scope === 'single'
+      ? (item: QueryScopeItem<QueryData>) => void query.setData(item as QueryData)
+      : (item: QueryScopeItem<QueryData>) => setQueryItem(modelKey, item as QueryModel, resolvedClient)
+
+    query.removeItem = scope === 'single'
+      ? () => void resolvedClient.removeQueries({queryKey, exact: true})
+      : (id: QueryModelId) => removeQueryItem(modelKey, id, resolvedClient)
 
     return query
+  }
+
+  /**
+   * The same setters detached from a query instance. A `single` scope has no instance key to narrow by, so they
+   * write the whole scope - exact for the usual param-less singleton, every instance for a parameterized one.
+   */
+  const setItemStatic = (item: QueryScopeItem<QueryData>, queryClient?: QueryClient) => {
+    if (scope !== 'single') return setQueryItem(modelKey, item as QueryModel, queryClient)
+
+    void (queryClient ?? useQueryClient()).setQueriesData({queryKey: [modelKey, scope]}, item)
+  }
+
+  const removeItemStatic = (id: QueryModelId, queryClient?: QueryClient) => {
+    if (scope !== 'single') return removeQueryItem(modelKey, id, queryClient)
+
+    void (queryClient ?? useQueryClient()).removeQueries({queryKey: [modelKey, scope]})
   }
 
   if (isQueryParams) {
@@ -111,7 +136,7 @@ export const createDefaultQuery = (<
 
       query.setData = (data: QueryData) => resolvedClient.setQueriesData({queryKey: [modelKey, scope, queryParams]}, data)
 
-      return withItemSetters(query, resolvedClient)
+      return withItemSetters(query, resolvedClient, [modelKey, scope, queryParams])
     }
 
     useFn.config = (queryParams: QueryParams, options: DefaultQueryOptions<QueryData> = {}) => ({
@@ -133,9 +158,9 @@ export const createDefaultQuery = (<
       return resolvedClient.setQueriesData({queryKey: [modelKey, scope, queryParams]}, data)
     }
 
-    useFn.setItem = (item: QueryScopeItem<QueryData>, queryClient?: QueryClient) => setQueryItem(modelKey, item as QueryModel, queryClient)
+    useFn.setItem = setItemStatic
 
-    useFn.removeItem = (id: QueryModelId, queryClient?: QueryClient) => removeQueryItem(modelKey, id, queryClient)
+    useFn.removeItem = removeItemStatic
 
     return useFn
   }
@@ -161,7 +186,7 @@ export const createDefaultQuery = (<
 
     query.setData = (data: QueryData) => resolvedClient.setQueriesData({queryKey: [modelKey, scope]}, data)
 
-    return withItemSetters(query, resolvedClient)
+    return withItemSetters(query, resolvedClient, [modelKey, scope])
   }
 
   useFn.config = (queryParams?: undefined, options: DefaultQueryOptions<QueryData> = {}) => ({
@@ -182,9 +207,9 @@ export const createDefaultQuery = (<
     return resolvedClient.setQueriesData({queryKey: [modelKey, scope]}, data)
   }
 
-  useFn.setItem = (item: QueryScopeItem<QueryData>, queryClient?: QueryClient) => setQueryItem(modelKey, item as QueryModel, queryClient)
+  useFn.setItem = setItemStatic
 
-  useFn.removeItem = (id: QueryModelId, queryClient?: QueryClient) => removeQueryItem(modelKey, id, queryClient)
+  useFn.removeItem = removeItemStatic
 
   return useFn
 }) as unknown as CreateDefaultQuery
@@ -398,6 +423,23 @@ queryDockerCredentialsPaginated.removeItem(2)
 useQueryDockerCredentialsPaginated.setItem({id: 2, name: '123'})
 
 export const configDockerCredentialsPaginated = useQueryDockerCredentialsPaginated.config({page: 1})
+
+// Single - a standalone object with no `id` at all
+
+const useQuerySettings = createDefaultQuery(
+  'SETTINGS',
+  'single',
+  () => Promise.resolve<{enabled: boolean}>({enabled: true}), // /settings/
+)
+
+const querySettings = useQuerySettings()
+
+querySettings.setData({enabled: false})
+querySettings.setItem({enabled: false})
+querySettings.removeItem(1)
+useQuerySettings.setItem({enabled: false})
+
+export const configSettings = useQuerySettings.config()
 
 // In-memory paginated
 

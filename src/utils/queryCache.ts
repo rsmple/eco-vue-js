@@ -4,9 +4,10 @@ export type QueryModelId = number | string
 
 export type QueryModel = {id: QueryModelId}
 
-export type QueryScope = 'item' | 'list' | 'paginated'
+export type QueryScope = 'single' | 'item' | 'list' | 'paginated'
 
 export type QueryScopeModel<Model> = {
+  single: Model
   item: Model
   list: Model[]
   paginated: PaginatedResponse<Model>
@@ -56,9 +57,9 @@ export const setListItem = <Model extends QueryModel>(list: Model[] | undefined,
 }
 
 /**
- * Applies `updater` to the cached items of the model across all scopes - to every one of them when `ids` is
- * `undefined` - keeping the paginated `count` in sync and dropping item queries whose item the updater removed.
- * Only updates what is already cached: nothing is seeded.
+ * Applies `updater` to the cached items of the model across the id-bearing scopes - to every one of them when `ids`
+ * is `undefined` - keeping the paginated `count` in sync and dropping item queries whose item the updater removed.
+ * Only updates what is already cached: nothing is seeded, and the `single` scope is never touched.
  */
 export const updateQueryItems = <Model extends QueryModel>(
   modelKey: string,
