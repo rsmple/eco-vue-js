@@ -217,6 +217,27 @@ export const createDefaultQuery = (<
 export const PAGE_LENGTH = 24
 
 /**
+ * Cuts one page out of a list the client already holds, shaped like the response a paginated endpoint would
+ * have sent. A page past the end is the 404 that endpoint would have answered with, so a query fed by this
+ * fails the way its server-paginated counterpart does.
+ */
+export const paginateList = <Data>(list: Data[], page = 1, pageLength = PAGE_LENGTH): PaginatedResponse<Data> => {
+  const current = Math.max(page, 1)
+  const pages_count = Math.max(Math.ceil(list.length / pageLength), 1)
+
+  if (current > pages_count) throw new ApiError({status: 404} as RequestResponse<unknown>)
+
+  return {
+    count: list.length,
+    pages_count,
+    current,
+    next: pages_count > current ? current + 1 : null,
+    previous: current !== 1 ? current - 1 : null,
+    results: list.slice(pageLength * (current - 1), pageLength * current),
+  }
+}
+
+/**
  * Paginates an in-memory list under `[modelKey, 'paginated']`, so a plain array can back the same components
  * as a server-paginated query. `setter`, when given, receives the source list on every item update, keeping
  * the array the `getter` reads from in sync with the cache.
@@ -237,18 +258,11 @@ export const makeQueryPaginated = <Data extends QueryModel, QueryParams extends 
 
         if (!currentList) return resolve(null as never)
 
-        const current = Math.max(queryParams.page ?? 1, 1)
-        const pages_count = Math.max(Math.ceil(currentList.length / pageLength), 1)
-
-        if (current > pages_count) reject(new ApiError({status: 404} as RequestResponse<unknown>))
-        else resolve({
-          count: currentList.length,
-          pages_count,
-          current,
-          next: pages_count > current ? current + 1 : null,
-          previous: current !== 1 ? current - 1 : null,
-          results: currentList.slice(pageLength * (current - 1), pageLength * current),
-        })
+        try {
+          resolve(paginateList(currentList, queryParams.page, pageLength))
+        } catch (error) {
+          reject(error)
+        }
       })
     },
     (value: unknown): value is QueryParams => value instanceof Object,
