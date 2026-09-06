@@ -2,28 +2,12 @@ import {type Query, type QueryClient, type QueryFunction, type UseQueryOptions, 
 import {type MaybeRef, toValue, unref, watch} from 'vue'
 
 import {ApiError} from './api'
+import {type QueryModel, type QueryModelId, type QueryScope, type QueryScopeItem, type QueryScopeModel, removeQueryItem, setListItem, setQueryItem} from './queryCache'
 
-export type QueryModelId = number | string
-
-export type QueryModel = {id: QueryModelId}
-
-export type QueryScope = 'item' | 'list' | 'paginated'
-
-export type QueryScopeModel<Model> = {
-  item: Model
-  list: Model[]
-  paginated: PaginatedResponse<Model>
-}
-
-export type QueryScopeItem<Data> = Data extends PaginatedResponse<infer Item>
-  ? Item
-  : Data extends (infer Item)[]
-    ? Item
-    : Data
+export type {QueryItemUpdater, QueryModel, QueryModelId, QueryScope, QueryScopeItem, QueryScopeModel} from './queryCache'
+export {removeQueryItem, removeQueryItems, setQueryItem, setQueryItems, snapshotQueries, updateQueryItems} from './queryCache'
 
 type SetQueriesDataResult = ReturnType<QueryClient['setQueriesData']>
-
-type QueryFilters = Parameters<QueryClient['setQueriesData']>[0]
 
 export type DefaultQueryOptions<Data> = Omit<Partial<UseQueryOptions<Data, ApiError, Data>>, 'queryKey' | 'queryFn'>
 
@@ -38,59 +22,6 @@ export type UseQueryDefaultFn<Data, QueryParams> = (
   options?: DefaultQueryOptions<Data>,
   queryClient?: QueryClient,
 ) => UseQueryReturnTypeDefault<Data>
-
-const setListItem = <Model extends QueryModel>(list: Model[] | undefined, id: QueryModelId, item: Model | undefined): Model[] | undefined => {
-  if (!list) return undefined
-
-  const index = list.findIndex(current => current.id === id)
-
-  if (index === -1) return list
-
-  const result = list.slice()
-
-  if (item === undefined) result.splice(index, 1)
-  else result.splice(index, 1, item)
-
-  return result
-}
-
-const setQueriesItem = <Model extends QueryModel>(modelKey: string, id: QueryModelId, item: Model | undefined, queryClient?: QueryClient): void => {
-  const resolvedClient = queryClient ?? useQueryClient()
-
-  if (item === undefined) {
-    resolvedClient
-      .getQueriesData<Model>({queryKey: [modelKey, 'item' satisfies QueryScope]} as QueryFilters)
-      .forEach(([queryKey, data]) => {
-        if (data?.id === id) resolvedClient.removeQueries({queryKey, exact: true})
-      })
-  } else {
-    resolvedClient.setQueriesData<Model>({queryKey: [modelKey, 'item' satisfies QueryScope]} as QueryFilters, data => data?.id === id ? item : data)
-  }
-
-  resolvedClient.setQueriesData<Model[]>({queryKey: [modelKey, 'list' satisfies QueryScope]} as QueryFilters, data => setListItem(data, id, item))
-
-  resolvedClient.setQueriesData<PaginatedResponse<Model>>({queryKey: [modelKey, 'paginated' satisfies QueryScope]} as QueryFilters, data => {
-    if (!data) return undefined
-
-    const results = setListItem(data.results, id, item)
-
-    if (!results || results === data.results) return data
-
-    return {
-      ...data,
-      count: Math.max(data.count - (data.results.length - results.length), 0),
-      results,
-    }
-  })
-}
-
-export const setQueryItem = <Model extends QueryModel>(modelKey: string, item: Model, queryClient?: QueryClient): void => {
-  setQueriesItem(modelKey, item.id, item, queryClient)
-}
-
-export const removeQueryItem = (modelKey: string, id: QueryModelId, queryClient?: QueryClient): void => {
-  setQueriesItem(modelKey, id, undefined, queryClient)
-}
 
 export type CreateDefaultQuery = {
   <ModelKey extends string, Scope extends QueryScope, Data extends QueryScopeModel<QueryModel>[Scope]>(
