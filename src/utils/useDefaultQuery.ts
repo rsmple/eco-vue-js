@@ -15,9 +15,6 @@ export type QueryScopeModel<Model> = {
   paginated: PaginatedResponse<Model>
 }
 
-/**
- * The model behind a scope payload - unwraps `Model[]` and `PaginatedResponse<Model>` back to `Model`.
- */
 export type QueryScopeItem<Data> = Data extends PaginatedResponse<infer Item>
   ? Item
   : Data extends (infer Item)[]
@@ -42,10 +39,6 @@ export type UseQueryDefaultFn<Data, QueryParams> = (
   queryClient?: QueryClient,
 ) => UseQueryReturnTypeDefault<Data>
 
-/**
- * Replaces (or drops, when `item` is `undefined`) the entry with the given id, keeping the list identity
- * when nothing matched so that `setQueriesData` skips untouched queries.
- */
 const setListItem = <Model extends QueryModel>(list: Model[] | undefined, id: QueryModelId, item: Model | undefined): Model[] | undefined => {
   if (!list) return undefined
 
@@ -61,10 +54,6 @@ const setListItem = <Model extends QueryModel>(list: Model[] | undefined, id: Qu
   return result
 }
 
-/**
- * Propagates a single item to every cached query of the model - `item`, `list` and `paginated` - matching by id.
- * Only cached entries are touched: an item that was never fetched is not seeded into the cache.
- */
 const setQueriesItem = <Model extends QueryModel>(modelKey: string, id: QueryModelId, item: Model | undefined, queryClient?: QueryClient): void => {
   const resolvedClient = queryClient ?? useQueryClient()
 
@@ -95,40 +84,28 @@ const setQueriesItem = <Model extends QueryModel>(modelKey: string, id: QueryMod
   })
 }
 
-/**
- * Updates a single item in every cached scope of `modelKey`, matching by `item.id`.
- * Without a `queryClient` it resolves one from the component instance, so it must then be called during setup.
- */
 export const setQueryItem = <Model extends QueryModel>(modelKey: string, item: Model, queryClient?: QueryClient): void => {
   setQueriesItem(modelKey, item.id, item, queryClient)
 }
 
-/**
- * Drops a single item from every cached scope of `modelKey`.
- * Without a `queryClient` it resolves one from the component instance, so it must then be called during setup.
- */
 export const removeQueryItem = (modelKey: string, id: QueryModelId, queryClient?: QueryClient): void => {
   setQueriesItem(modelKey, id, undefined, queryClient)
 }
 
-// `Data` is inferred from `queryFn`, not the model behind it: `QueryScopeModel<Model>[Scope]` is an indexed access
-// and TypeScript cannot infer through one, so `Model` silently fell back to its `QueryModel` constraint and every
-// `setData` accepted any `{id}` shape. `Scope` still constrains the payload, and the model is read back out of
-// `Data` with `QueryScopeItem`.
-type CreateDefaultQuery = {
+export type CreateDefaultQuery = {
   <ModelKey extends string, Scope extends QueryScope, Data extends QueryScopeModel<QueryModel>[Scope]>(
     modelKey: ModelKey,
     scope: Scope,
     queryFn: QueryFunction<Data, [ModelKey, Scope]>,
+    isQueryParams?: undefined,
+    options?: DefaultQueryOptions<Data>,
   ): {
-    // `MaybeRef<undefined>` rather than `undefined`, so a param-less query stays assignable to
-    // `UseQueryDefaultFn<Data, undefined>` and can be handed to a component expecting one.
     (
       queryParams?: MaybeRef<undefined>,
       options?: DefaultQueryOptions<Data>,
       queryClient?: QueryClient,
     ): UseQueryReturnTypeDefault<Data>
-    config: (queryParams?: MaybeRef<undefined>) => {
+    config: (queryParams?: MaybeRef<undefined>, options?: DefaultQueryOptions<Data>) => {
       queryKey: [ModelKey, Scope]
       queryFn: QueryFunction<Data, [ModelKey, Scope]>
     }
@@ -142,13 +119,14 @@ type CreateDefaultQuery = {
     scope: Scope,
     queryFn: QueryFunction<Data, [ModelKey, Scope, QueryParams]>,
     isQueryParams: (value: unknown) => value is QueryParams,
+    options?: DefaultQueryOptions<Data>,
   ): {
     (
       queryParams: MaybeRef<QueryParams>,
       options?: DefaultQueryOptions<Data>,
       queryClient?: QueryClient,
     ): UseQueryReturnTypeDefault<Data>
-    config: (queryParams: QueryParams) => {
+    config: (queryParams: QueryParams, options?: DefaultQueryOptions<Data>) => {
       queryKey: [ModelKey, Scope, QueryParams]
       queryFn: QueryFunction<Data, [ModelKey, Scope, QueryParams]>
       enabled: () => (query: Query<Data, ApiError, Data, [ModelKey, Scope, QueryParams]>) => boolean
@@ -170,6 +148,7 @@ export const createDefaultQuery = (<
     scope: Scope,
     queryFn: QueryFunction<QueryData, QueryKey>,
     isQueryParams?: (value: unknown) => value is QueryParams,
+    optionsDefault: DefaultQueryOptions<QueryData> = {},
   ) => {
   const withItemSetters = (query: UseQueryReturnTypeDefault<QueryData>, resolvedClient: QueryClient) => {
     query.setItem = (item: QueryScopeItem<QueryData>) => setQueryItem(modelKey, item as QueryModel, resolvedClient)
@@ -190,9 +169,13 @@ export const createDefaultQuery = (<
         queryKey: [modelKey, scope, queryParams],
         queryFn,
 
+        ...optionsDefault,
         ...options,
 
-        enabled: () => (query: Query<QueryData, ApiError, QueryData, QueryKey>) => isQueryParams(unref(query.queryKey[2])) && (!('enabled' in options) || toValue(options.enabled) === true),
+        enabled: () => (query: Query<QueryData, ApiError, QueryData, QueryKey>) =>
+          isQueryParams(unref(query.queryKey[2])) &&
+          (!('enabled' in options) || toValue(options.enabled) === true) &&
+          (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true),
       } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
 
       query.setData = (data: QueryData) => resolvedClient.setQueriesData({queryKey: [modelKey, scope, queryParams]}, data)
@@ -200,11 +183,17 @@ export const createDefaultQuery = (<
       return withItemSetters(query, resolvedClient)
     }
 
-    useFn.config = (queryParams: QueryParams) => ({
+    useFn.config = (queryParams: QueryParams, options: DefaultQueryOptions<QueryData> = {}) => ({
       queryKey: [modelKey, scope, queryParams],
       queryFn,
 
-      enabled: () => (query: Query<QueryData, ApiError, QueryData, QueryKey>) => isQueryParams(unref(query.queryKey[2])),
+      ...optionsDefault,
+      ...options,
+
+      enabled: () => (query: Query<QueryData, ApiError, QueryData, QueryKey>) =>
+        isQueryParams(unref(query.queryKey[2])) &&
+          (!('enabled' in options) || toValue(options.enabled) === true) &&
+          (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true),
     })
 
     useFn.setData = (data: QueryData, queryParams: MaybeRef<QueryParams>, queryClient?: QueryClient) => {
@@ -231,7 +220,12 @@ export const createDefaultQuery = (<
       queryKey: [modelKey, scope],
       queryFn,
 
+      ...optionsDefault,
       ...options,
+
+      enabled: () =>
+        (!('enabled' in options) || toValue(options.enabled) === true) &&
+          (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true),
     } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
 
     query.setData = (data: QueryData) => resolvedClient.setQueriesData({queryKey: [modelKey, scope]}, data)
@@ -239,9 +233,16 @@ export const createDefaultQuery = (<
     return withItemSetters(query, resolvedClient)
   }
 
-  useFn.config = () => ({
+  useFn.config = (queryParams?: undefined, options: DefaultQueryOptions<QueryData> = {}) => ({
     queryKey: [modelKey, scope],
     queryFn,
+
+    ...optionsDefault,
+    ...options,
+
+    enabled: () =>
+      (!('enabled' in options) || toValue(options.enabled) === true) &&
+          (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true),
   })
 
   useFn.setData = (data: QueryData, queryParams?: undefined, queryClient?: QueryClient) => {

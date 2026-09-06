@@ -104,9 +104,17 @@ declare type OmitReqursive<Model extends object, Field extends keyof Model | str
 
 declare type PickByType<Model, FieldType, IncludeNull = false> = {
   [
-  Key in keyof Model as IncludeNull extends true
-  ? Exclude<Model[Key], null | undefined> extends FieldType ? Key : never
-  : Model[Key] extends FieldType ? Key : never
+    Key in keyof Model as IncludeNull extends true
+      ? Exclude<Model[Key], null | undefined> extends FieldType ? Key : never
+      : Model[Key] extends FieldType ? Key : never
+  ]: Model[Key]
+}
+
+declare type OmitByType<Model, FieldType, IncludeNull = false> = {
+  [
+    Key in keyof Model as IncludeNull extends true
+      ? Exclude<Model[Key], null | undefined> extends FieldType ? never : Key
+      : Model[Key] extends FieldType ? never : Key
   ]: Model[Key]
 }
 
