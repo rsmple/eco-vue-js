@@ -4,9 +4,6 @@ import {type MaybeRef, toValue, unref, watch} from 'vue'
 import {ApiError} from './api'
 import {type QueryModel, type QueryModelId, type QueryScope, type QueryScopeItem, removeQueryItem, setListItem, setQueryItem} from './queryCache'
 
-export type {QueryItemUpdater, QueryModel, QueryModelId, QueryScope, QueryScopeItem, QueryScopeModel} from './queryCache'
-export {removeQueryItem, removeQueryItems, setQueryItem, setQueryItems, snapshotQueries, updateQueryItems} from './queryCache'
-
 export const PAGE_LENGTH = 24
 
 type SetQueriesDataResult = ReturnType<QueryClient['setQueriesData']>
