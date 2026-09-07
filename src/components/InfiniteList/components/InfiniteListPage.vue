@@ -62,7 +62,7 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
-import type {UseQueryOptions} from '@tanstack/vue-query'
+import type {DefaultQueryOptions} from '@/utils/useDefaultQuery'
 
 import {type Ref, TransitionGroup, computed, inject, onBeforeUnmount, onMounted, ref, toRef, toValue, useTemplateRef, watch} from 'vue'
 
@@ -86,7 +86,7 @@ const props = withDefaults(
     lastChild?: boolean
     pageClass?: string
     refetchInterval?: number | false
-    queryOptions?: Partial<UseQueryOptions<PaginatedResponse<Data>>>
+    queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>
     enabled?: boolean
 
     valueGetter: (data: Data) => Model

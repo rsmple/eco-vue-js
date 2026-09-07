@@ -73,7 +73,7 @@
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import type {ApiError} from '@/utils/api'
-import type {UseQueryOptions} from '@tanstack/vue-query'
+import type {DefaultQueryOptions} from '@/utils/useDefaultQuery'
 
 import {computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref, useTemplateRef, watch} from 'vue'
 
@@ -102,7 +102,7 @@ const props = withDefaults(
     pageClass?: string
     maxPages?: number
     refetchInterval?: number | false
-    queryOptions?: Partial<UseQueryOptions<PaginatedResponse<Data>>>
+    queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>
 
     valueGetter: (data: Data) => Model
   }>(),

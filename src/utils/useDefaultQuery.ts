@@ -9,7 +9,15 @@ export {removeQueryItem, removeQueryItems, setQueryItem, setQueryItems, snapshot
 
 type SetQueriesDataResult = ReturnType<QueryClient['setQueriesData']>
 
-export type DefaultQueryOptions<Data> = Omit<Partial<UseQueryOptions<Data, ApiError, Data>>, 'queryKey' | 'queryFn'>
+/**
+ * `UseQueryOptions` is a `MaybeRef` union of the options object and the three ref wrappers of it. `Partial` and
+ * `Omit` distribute over that union and keep only the keys every member shares - none of them - which collapsed
+ * this to `{}`: it accepted any object at all and contextually typed nothing inside it. The ref members are the
+ * ones carrying `value`, so dropping those leaves the options object itself.
+ */
+type QueryOptionsObject<Data> = Exclude<UseQueryOptions<Data, ApiError, Data>, {value: unknown}>
+
+export type DefaultQueryOptions<Data> = Omit<Partial<QueryOptionsObject<Data>>, 'queryKey' | 'queryFn'>
 
 export type UseQueryReturnTypeDefault<Data> = UseQueryReturnType<Data, ApiError> & {
   setData: (data: Data) => SetQueriesDataResult
@@ -320,7 +328,12 @@ export const wrapUseQueryPaginated = <Data extends QueryModel, QueryParams exten
   pageLength = PAGE_LENGTH,
 ): UseQueryDefaultFn<PaginatedResponse<Data>, QueryParams> => {
   return (queryParams, options = {}, queryClient) => {
-    const query = useQueryFn(undefined, options as DefaultQueryOptions<Data[]>, queryClient)
+    /**
+     * These options were written for the paginated shape, and only the ones that say nothing about the data -
+     * `enabled` and the refetch timings - mean anything to the list query underneath. The rest are handed over
+     * as they always were rather than filtered out, since the wrapper is on its way out.
+     */
+    const query = useQueryFn(undefined, options as unknown as DefaultQueryOptions<Data[]>, queryClient)
 
     const newQuery = makeQueryPaginated<Data, QueryParams>(
       modelKey,

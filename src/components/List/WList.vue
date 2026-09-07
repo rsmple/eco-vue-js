@@ -178,7 +178,6 @@ import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, Column
 import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
-import type {UseQueryOptions} from '@tanstack/vue-query'
 
 import {type Ref, type StyleValue, computed, nextTick, ref, toRef, watch} from 'vue'
 
@@ -187,7 +186,7 @@ import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
 import {useComponentStates} from '@/utils/useComponentStates'
-import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
+import {type DefaultQueryOptions, PAGE_LENGTH} from '@/utils/useDefaultQuery'
 import {type Selection, useSelected, useSelectionHash} from '@/utils/useSelected'
 import {ListMode} from '@/utils/utils'
 
@@ -205,7 +204,7 @@ const props = withDefaults(
     useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
     useQueryFnExport?: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
     queryParams: QueryParams
-    queryOptions?: Partial<UseQueryOptions<PaginatedResponse<Data>>>
+    queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>
     bulkDisableMessage?: string
     selectionTitle: string
     bulk?: BulkComponent<QueryParams>[]
