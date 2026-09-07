@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {QueryParamsListBulk, QueryParamsListBulkString} from './queryParams'
 import type {QueryFunction, QueryKey} from '@tanstack/vue-query'
 import type {MaybeRef} from 'vue'
@@ -21,6 +20,7 @@ import {isId} from '@/utils/utils'
 import {getMatchingCollectionIds} from './getMatchingCollectionIds'
 import {getQueryClient} from './queryClient'
  
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyAction = (...args: any) => any
 type ScopeMap = Record<string, QueryScope>
 type ParamsMap = Record<string, unknown>
@@ -61,9 +61,9 @@ type ActionResult<Result, Updater> = Result extends Updater ? void : Result
 type QueryRuntime = {
   scope: QueryScope
   isQueryParams?: (value: unknown) => value is unknown
-   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   queryFn: QueryFunction<any, any>
-   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   options?: DefaultQueryOptions<any>
   actions?: Record<string, AnyAction>
 }
@@ -99,21 +99,22 @@ type UpdaterOf<Scopes, Datas, Model, Key> = IsSingle<Scopes, Key> extends true
 type ParamsArgs<Params, Key> = HasParams<Params, Key> extends true ? [params: ParamsOf<Params, Key>] : []
 
 type PayloadOf<Fn, WithParams> = WithParams extends true
-   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ? Fn extends (ctx: any, params: any, payload: infer Payload) => any ? Payload : never
-   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   : Fn extends (ctx: any, payload: infer Payload) => any ? Payload : never
 
 type DeclaredPayload<Payload> = unknown extends Payload
   ? never
-   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   : Payload extends ActionContext<any> | SingleActionContext<any> ? never : Payload
 
 type PayloadArgs<Fn, WithParams> = [DeclaredPayload<PayloadOf<Fn, WithParams>>] extends [never]
   ? []
   : [payload: DeclaredPayload<PayloadOf<Fn, WithParams>>]
  
-type ReturnTypeOf<Fn> =  Fn extends (...args: any) => any ? ReturnType<Fn> : never
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ReturnTypeOf<Fn> = Fn extends (...args: any) => any ? ReturnType<Fn> : never
 
 type KeyOf<ModelKey extends string, Scopes, Params, Key> = [
   ModelKey,
@@ -151,8 +152,10 @@ type QueryShapes<
         ...args: [
           context: ContextOf<Scopes, Datas, Model, Key>,
           ...ParamsArgs<Params, Key>,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           payload?: any,
         ]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ) => any
     }
   }
