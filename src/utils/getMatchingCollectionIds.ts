@@ -4,7 +4,7 @@ import type {QueryClient, QueryKey} from '@tanstack/vue-query'
 
 import {unref} from 'vue'
 
-import {useQueryParamsListBulk} from './queryParams'
+import {useQueryParamsId, useQueryParamsPage} from './queryParams'
 import {PAGE_LENGTH} from './useDefaultQuery'
 
 type CollectionScope = Exclude<QueryScope, 'single' | 'item'>
@@ -15,7 +15,7 @@ type QueryKeyInfo<Model extends string = string> = {
   params?: QueryParamsPage
 }
 
-const selectionParamKeys = new Set<string>(Object.keys(useQueryParamsListBulk.config))
+const selectionParamKeys = new Set([...Object.keys(useQueryParamsId.config), ...Object.keys(useQueryParamsPage.config)])
 
 const getQueryKeyInfo = <Model extends string>(queryKey: QueryKey): QueryKeyInfo<Model> | undefined => {
   const [model, scope, params] = queryKey as [Model, QueryScope, QueryParamsPage | undefined]
