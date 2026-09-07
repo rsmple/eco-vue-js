@@ -71,6 +71,8 @@ export const getMatchingCollectionIds = <Model extends QueryModel, Params extend
   model: string,
   params: Params,
 ): Set<QueryModelId> => {
+  if (params.id__in?.length) return new Set<QueryModelId>(params.id__in)
+
   const ids = new Set<QueryModelId>()
   const collectionQueries = queryClient.getQueriesData<Model[] | PaginatedResponse<Model>>({queryKey: [model]})
 
