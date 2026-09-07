@@ -127,7 +127,9 @@ export const createDefaultQuery = (<
           (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true),
       } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
 
-      query.setData = (data: QueryData) => resolvedClient.setQueriesData({queryKey: [modelKey, scope, queryParams]}, data)
+      query.setData = (data: QueryData) => isQueryParams(unref(queryParams))
+        ? resolvedClient.setQueriesData({queryKey: [modelKey, scope, queryParams]}, data)
+        : []
 
       return withItemSetters(query, resolvedClient, [modelKey, scope, queryParams])
     }
@@ -146,6 +148,8 @@ export const createDefaultQuery = (<
     })
 
     useFn.setData = (data: QueryData, queryParams: MaybeRef<QueryParams>, queryClient?: QueryClient) => {
+      if (!isQueryParams(unref(queryParams))) return []
+
       const resolvedClient = queryClient ?? useQueryClient()
 
       return resolvedClient.setQueriesData({queryKey: [modelKey, scope, queryParams]}, data)
