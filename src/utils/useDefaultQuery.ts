@@ -7,14 +7,10 @@ import {type QueryModel, type QueryModelId, type QueryScope, type QueryScopeItem
 export type {QueryItemUpdater, QueryModel, QueryModelId, QueryScope, QueryScopeItem, QueryScopeModel} from './queryCache'
 export {removeQueryItem, removeQueryItems, setQueryItem, setQueryItems, snapshotQueries, updateQueryItems} from './queryCache'
 
+export const PAGE_LENGTH = 24
+
 type SetQueriesDataResult = ReturnType<QueryClient['setQueriesData']>
 
-/**
- * `UseQueryOptions` is a `MaybeRef` union of the options object and the three ref wrappers of it. `Partial` and
- * `Omit` distribute over that union and keep only the keys every member shares - none of them - which collapsed
- * this to `{}`: it accepted any object at all and contextually typed nothing inside it. The ref members are the
- * ones carrying `value`, so dropping those leaves the options object itself.
- */
 type QueryOptionsObject<Data> = Exclude<UseQueryOptions<Data, ApiError, Data>, {value: unknown}>
 
 export type DefaultQueryOptions<Data> = Omit<Partial<QueryOptionsObject<Data>>, 'queryKey' | 'queryFn'>
@@ -89,10 +85,6 @@ export const createDefaultQuery = (<
     isQueryParams?: (value: unknown) => value is QueryParams,
     optionsDefault: DefaultQueryOptions<QueryData> = {},
   ) => {
-  /**
-   * `single` holds one standalone object instead of model items, so its setters work on the query`s own data -
-   * there is no id to look the item up by, and the model-wide updaters never visit that scope.
-   */
   const withItemSetters = (query: UseQueryReturnTypeDefault<QueryData>, resolvedClient: QueryClient, queryKey: unknown[]) => {
     query.setItem = scope === 'single'
       ? (item: QueryScopeItem<QueryData>) => void query.setData(item as QueryData)
@@ -105,10 +97,6 @@ export const createDefaultQuery = (<
     return query
   }
 
-  /**
-   * The same setters detached from a query instance. A `single` scope has no instance key to narrow by, so they
-   * write the whole scope - exact for the usual param-less singleton, every instance for a parameterized one.
-   */
   const setItemStatic = (item: QueryScopeItem<QueryData>, queryClient?: QueryClient) => {
     if (scope !== 'single') return setQueryItem(modelKey, item as QueryModel, queryClient)
 
@@ -222,13 +210,6 @@ export const createDefaultQuery = (<
   return useFn
 }) as unknown as CreateDefaultQuery
 
-export const PAGE_LENGTH = 24
-
-/**
- * Cuts one page out of a list the client already holds, shaped like the response a paginated endpoint would
- * have sent. A page past the end is the 404 that endpoint would have answered with, so a query fed by this
- * fails the way its server-paginated counterpart does.
- */
 export const paginateList = <Data>(list: Data[], page = 1, pageLength = PAGE_LENGTH): PaginatedResponse<Data> => {
   const current = Math.max(page, 1)
   const pages_count = Math.max(Math.ceil(list.length / pageLength), 1)
@@ -245,11 +226,6 @@ export const paginateList = <Data>(list: Data[], page = 1, pageLength = PAGE_LEN
   }
 }
 
-/**
- * Paginates an in-memory list under `[modelKey, 'paginated']`, so a plain array can back the same components
- * as a server-paginated query. `setter`, when given, receives the source list on every item update, keeping
- * the array the `getter` reads from in sync with the cache.
- */
 export const makeQueryPaginated = <Data extends QueryModel, QueryParams extends {page?: number}>(
   modelKey: string,
   getter: (queryParams: QueryParams) => Data[] | undefined,
@@ -319,20 +295,12 @@ export const makeQueryPaginated = <Data extends QueryModel, QueryParams extends 
   ) as typeof useQueryPaginated
 }
 
-/**
- * Paginates the result of a list query under `[modelKey, 'paginated']` and keeps it in sync with the source list.
- */
 export const wrapUseQueryPaginated = <Data extends QueryModel, QueryParams extends {page?: number}>(
   modelKey: string,
   useQueryFn: UseQueryDefaultFn<Data[], undefined>,
   pageLength = PAGE_LENGTH,
 ): UseQueryDefaultFn<PaginatedResponse<Data>, QueryParams> => {
   return (queryParams, options = {}, queryClient) => {
-    /**
-     * These options were written for the paginated shape, and only the ones that say nothing about the data -
-     * `enabled` and the refetch timings - mean anything to the list query underneath. The rest are handed over
-     * as they always were rather than filtered out, since the wrapper is on its way out.
-     */
     const query = useQueryFn(undefined, options as unknown as DefaultQueryOptions<Data[]>, queryClient)
 
     const newQuery = makeQueryPaginated<Data, QueryParams>(
@@ -349,138 +317,3 @@ export const wrapUseQueryPaginated = <Data extends QueryModel, QueryParams exten
     return newQuery
   }
 }
-
-// Test types
-
-type ResposeData = {
-  id: number
-  name: string
-}
-
-// Item
-
-const useQueryDockerCredentials = createDefaultQuery(
-  'DOCKER_CREDENTIALS',
-  'item',
-  (query) => Promise.resolve<ResposeData>({id: query.queryKey[2], name: '123'}), // /docker-credentials/${id}
-  (value: unknown): value is number => Number.isFinite(value),
-)
-
-const queryDockerCredentials = useQueryDockerCredentials(1)
-
-queryDockerCredentials.setData({id: 2, name: '123'})
-queryDockerCredentials.setItem({id: 2, name: '123'})
-queryDockerCredentials.removeItem(2)
-useQueryDockerCredentials.setData({id: 2, name: '123'}, 1)
-useQueryDockerCredentials.setItem({id: 2, name: '123'})
-
-export const configDockerCredentials = useQueryDockerCredentials.config(1)
-
-// List
-
-const useQueryDockerCredentialsList = createDefaultQuery(
-  'DOCKER_CREDENTIALS',
-  'list',
-  () => Promise.resolve<ResposeData[]>([{id: 1, name: '123'}]), // /docker-credentials/
-)
-
-useQueryDockerCredentialsList.setData([{id: 2, name: '123'}])
-useQueryDockerCredentialsList.setItem({id: 2, name: '123'})
-
-const queryDockerCredentialsList = useQueryDockerCredentialsList(undefined)
-
-queryDockerCredentialsList.setData([{id: 2, name: '123'}])
-queryDockerCredentialsList.setItem({id: 2, name: '123'})
-export const configDockerCredentialsList = useQueryDockerCredentialsList.config()
-
-// Item nested
-
-const useQueryDockerCredentialsProduct = createDefaultQuery(
-  'DOCKER_CREDENTIALS_PRODUCT',
-  'item',
-  (query) => Promise.resolve<ResposeData & {product: number}>({id: query.queryKey[2].id, name: '123', product: query.queryKey[2].product}), // /products/${product}/docker-credentials/${id}
-  (value: unknown): value is {id: number, product: number} => value instanceof Object && 'id' in value && 'product' in value,
-)
-
-const queryDockerCredentialsProduct = useQueryDockerCredentialsProduct({id: 1, product: 2})
-
-queryDockerCredentialsProduct.setData({id: 1, name: 'product', product: 2})
-useQueryDockerCredentialsProduct.setData({id: 1, name: 'product', product: 2}, {id: 1, product: 2})
-
-export const configDockerCredentialsProduct = useQueryDockerCredentialsProduct.config({id: 1, product: 2})
-
-// List nested
-
-const useQueryDockerCredentialsProductList = createDefaultQuery(
-  'DOCKER_CREDENTIALS_PRODUCT',
-  'list',
-  (query) => Promise.resolve<(ResposeData & {product: number})[]>([{id: 1, name: '123', product: query.queryKey[2].product}]), // /products/${product}/docker-credentials/
-  (value: unknown): value is {product: number} => value instanceof Object && 'product' in value,
-)
-
-useQueryDockerCredentialsProductList.setData([{id: 2, name: '123', product: 2}], {product: 2})
-
-const queryDockerCredentialsProductList = useQueryDockerCredentialsProductList({product: 2})
-
-// `product` is required now that `Data` is inferred from `queryFn` - it was silently accepted while `Model` collapsed
-queryDockerCredentialsProductList.setData([{id: 2, name: '123', product: 2}])
-queryDockerCredentialsProductList.setItem({id: 2, name: '123', product: 2})
-export const configDockerCredentialsProductList = useQueryDockerCredentialsProductList.config({product: 2})
-
-// Paginated
-
-const useQueryDockerCredentialsPaginated = createDefaultQuery(
-  'DOCKER_CREDENTIALS',
-  'paginated',
-  (query) => Promise.resolve<PaginatedResponse<ResposeData>>({
-    count: 1,
-    pages_count: 1,
-    current: query.queryKey[2].page ?? 1,
-    next: null,
-    previous: null,
-    results: [{id: 1, name: '123'}],
-  }), // /docker-credentials/?page=${page}
-  (value: unknown): value is {page?: number} => value instanceof Object,
-)
-
-const queryDockerCredentialsPaginated = useQueryDockerCredentialsPaginated({page: 1})
-
-queryDockerCredentialsPaginated.setItem({id: 2, name: '123'})
-queryDockerCredentialsPaginated.removeItem(2)
-useQueryDockerCredentialsPaginated.setItem({id: 2, name: '123'})
-
-export const configDockerCredentialsPaginated = useQueryDockerCredentialsPaginated.config({page: 1})
-
-// Single - a standalone object with no `id` at all
-
-const useQuerySettings = createDefaultQuery(
-  'SETTINGS',
-  'single',
-  () => Promise.resolve<{enabled: boolean}>({enabled: true}), // /settings/
-)
-
-const querySettings = useQuerySettings()
-
-querySettings.setData({enabled: false})
-querySettings.setItem({enabled: false})
-querySettings.removeItem(1)
-useQuerySettings.setItem({enabled: false})
-
-export const configSettings = useQuerySettings.config()
-
-// In-memory paginated
-
-const useQueryDockerCredentialsMemory = makeQueryPaginated<ResposeData, {page?: number}>(
-  'DOCKER_CREDENTIALS_MEMORY',
-  () => [{id: 1, name: '123'}],
-)
-
-useQueryDockerCredentialsMemory.setItem({id: 2, name: '123'})
-useQueryDockerCredentialsMemory.removeItem(2)
-
-export const useQueryDockerCredentialsWrapped = wrapUseQueryPaginated<ResposeData, {page?: number}>(
-  'DOCKER_CREDENTIALS_WRAPPED',
-  useQueryDockerCredentialsList,
-)
-
-// End test
