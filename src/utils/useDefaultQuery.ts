@@ -168,9 +168,9 @@ export const createDefaultQuery = (<
         ...options,
 
         enabled: () => (query: Query<QueryData, ApiError, QueryData, QueryKey>) =>
-          isQueryParams(unref(query.queryKey[2])) &&
+          computed(() => isQueryParams(unref(query.queryKey[2])) &&
           (!('enabled' in options) || toValue(options.enabled) === true) &&
-          (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true),
+          (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true)),
       } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
 
       query.setData = (data: QueryData) => isQueryParams(unref(normalizedParams))
@@ -188,9 +188,9 @@ export const createDefaultQuery = (<
       ...options,
 
       enabled: () => (query: Query<QueryData, ApiError, QueryData, QueryKey>) =>
-        isQueryParams(unref(query.queryKey[2])) &&
-          (!('enabled' in options) || toValue(options.enabled) === true) &&
-          (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true),
+        computed(() => isQueryParams(unref(query.queryKey[2])) &&
+        (!('enabled' in options) || toValue(options.enabled) === true) &&
+        (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true)),
     })
 
     useFn.setData = (data: QueryData, queryParams: MaybeRef<QueryParams>, queryClient?: QueryClient) => {
