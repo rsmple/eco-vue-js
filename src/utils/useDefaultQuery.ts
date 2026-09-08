@@ -32,6 +32,10 @@ type QueryParamsArgValue<QueryParams> = undefined extends QueryParams
   ? [queryParams?: QueryParams]
   : [queryParams: QueryParams]
 
+// The name closes the key so queries sharing a scope do not collide, leaving the scope prefix the cache updaters
+// match on intact.
+type QueryKeyName<Name> = [Name] extends [undefined] ? [] : [name: Name]
+
 export type UseQueryReturnTypeDefault<Data> = UseQueryReturnType<Data, ApiError> & {
   setData: (data: Data) => SetQueriesDataResult
   setItem: (item: QueryScopeItem<Data>) => void
@@ -45,10 +49,11 @@ export type UseQueryDefaultFn<Data, QueryParams> = (
 ) => UseQueryReturnTypeDefault<Data>
 
 export type CreateDefaultQuery = {
-  <ModelKey extends string, Scope extends QueryScope, Data>(
+  <ModelKey extends string, Scope extends QueryScope, Name extends string | undefined, Data>(
     modelKey: ModelKey,
     scope: Scope,
-    queryFn: QueryFunction<Data, [ModelKey, Scope]>,
+    name: Name,
+    queryFn: QueryFunction<Data, [ModelKey, Scope, ...QueryKeyName<Name>]>,
     isQueryParams?: undefined,
     options?: DefaultQueryOptions<Data>,
   ): {
@@ -58,18 +63,19 @@ export type CreateDefaultQuery = {
       queryClient?: QueryClient,
     ): UseQueryReturnTypeDefault<Data>
     config: (queryParams?: MaybeRef<undefined>, options?: DefaultQueryOptions<Data>) => {
-      queryKey: [ModelKey, Scope]
-      queryFn: QueryFunction<Data, [ModelKey, Scope]>
+      queryKey: [ModelKey, Scope, ...QueryKeyName<Name>]
+      queryFn: QueryFunction<Data, [ModelKey, Scope, ...QueryKeyName<Name>]>
     }
     setData: (data: Data, queryParams?: MaybeRef<undefined>, queryClient?: QueryClient) => SetQueriesDataResult
     setItem: (item: QueryScopeItem<Data>, queryClient?: QueryClient) => void
     removeItem: (id: QueryModelId, queryClient?: QueryClient) => void
   }
 
-  <ModelKey extends string, Scope extends QueryScope, Data, QueryParams>(
+  <ModelKey extends string, Scope extends QueryScope, Name extends string | undefined, Data, QueryParams>(
     modelKey: ModelKey,
     scope: Scope,
-    queryFn: QueryFunction<Data, [ModelKey, Scope, QueryParams]>,
+    name: Name,
+    queryFn: QueryFunction<Data, [ModelKey, Scope, QueryParams, ...QueryKeyName<Name>]>,
     isQueryParams: (value: unknown) => value is QueryParams,
     options?: DefaultQueryOptions<Data>,
   ): {
@@ -81,9 +87,9 @@ export type CreateDefaultQuery = {
       ]
     ): UseQueryReturnTypeDefault<Data>
     config: (...args: [...QueryParamsArgValue<QueryParams>, options?: DefaultQueryOptions<Data>]) => {
-      queryKey: [ModelKey, Scope, QueryParams]
-      queryFn: QueryFunction<Data, [ModelKey, Scope, QueryParams]>
-      enabled: () => (query: Query<Data, ApiError, Data, [ModelKey, Scope, QueryParams]>) => boolean
+      queryKey: [ModelKey, Scope, QueryParams, ...QueryKeyName<Name>]
+      queryFn: QueryFunction<Data, [ModelKey, Scope, QueryParams, ...QueryKeyName<Name>]>
+      enabled: () => (query: Query<Data, ApiError, Data, [ModelKey, Scope, QueryParams, ...QueryKeyName<Name>]>) => boolean
     }
     setData: (...args: [data: Data, ...QueryParamsArg<QueryParams>, queryClient?: QueryClient]) => SetQueriesDataResult
     setItem: (item: QueryScopeItem<Data>, queryClient?: QueryClient) => void
@@ -100,10 +106,15 @@ export const createDefaultQuery = (<
   >(
     modelKey: ModelKey,
     scope: Scope,
+    queryName: string | undefined,
     queryFn: QueryFunction<QueryData, QueryKey>,
     isQueryParams?: (value: unknown) => value is QueryParams,
     optionsDefault: DefaultQueryOptions<QueryData> = {},
   ) => {
+  const nameKey = queryName === undefined ? [] : [queryName]
+
+  const keyOf = (...params: unknown[]): unknown[] => [modelKey, scope, ...params, ...nameKey]
+
   const withItemSetters = (query: UseQueryReturnTypeDefault<QueryData>, resolvedClient: QueryClient, queryKey: unknown[]) => {
     query.setItem = scope === 'single'
       ? (item: QueryScopeItem<QueryData>) => void query.setData(item as QueryData)
@@ -119,13 +130,13 @@ export const createDefaultQuery = (<
   const setItemStatic = (item: QueryScopeItem<QueryData>, queryClient?: QueryClient) => {
     if (scope !== 'single') return setQueryItem(modelKey, item as QueryModel, queryClient)
 
-    void (queryClient ?? useQueryClient()).setQueriesData({queryKey: [modelKey, scope]}, item)
+    void (queryClient ?? useQueryClient()).setQueriesData({queryKey: keyOf()}, item)
   }
 
   const removeItemStatic = (id: QueryModelId, queryClient?: QueryClient) => {
     if (scope !== 'single') return removeQueryItem(modelKey, id, queryClient)
 
-    void (queryClient ?? useQueryClient()).removeQueries({queryKey: [modelKey, scope]})
+    void (queryClient ?? useQueryClient()).removeQueries({queryKey: keyOf()})
   }
 
   if (isQueryParams) {
@@ -150,7 +161,7 @@ export const createDefaultQuery = (<
       const normalizedParams = normalize(queryParams)
 
       const query = useQuery<QueryData, ApiError, QueryData, QueryKey>({
-        queryKey: [modelKey, scope, normalizedParams],
+        queryKey: keyOf(normalizedParams),
         queryFn,
 
         ...optionsDefault,
@@ -163,14 +174,14 @@ export const createDefaultQuery = (<
       } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
 
       query.setData = (data: QueryData) => isQueryParams(unref(normalizedParams))
-        ? resolvedClient.setQueriesData({queryKey: [modelKey, scope, normalizedParams]}, data)
+        ? resolvedClient.setQueriesData({queryKey: keyOf(normalizedParams)}, data)
         : []
 
-      return withItemSetters(query, resolvedClient, [modelKey, scope, normalizedParams])
+      return withItemSetters(query, resolvedClient, keyOf(normalizedParams))
     }
 
     useFn.config = (queryParams: QueryParams, options: DefaultQueryOptions<QueryData> = {}) => ({
-      queryKey: [modelKey, scope, normalizeValue(queryParams)],
+      queryKey: keyOf(normalizeValue(queryParams)),
       queryFn,
 
       ...optionsDefault,
@@ -189,7 +200,7 @@ export const createDefaultQuery = (<
 
       const resolvedClient = queryClient ?? useQueryClient()
 
-      return resolvedClient.setQueriesData({queryKey: [modelKey, scope, normalizedParams]}, data)
+      return resolvedClient.setQueriesData({queryKey: keyOf(normalizedParams)}, data)
     }
 
     useFn.setItem = setItemStatic
@@ -207,7 +218,7 @@ export const createDefaultQuery = (<
     const resolvedClient = queryClient ?? useQueryClient()
 
     const query = useQuery<QueryData, ApiError, QueryData, QueryKey>({
-      queryKey: [modelKey, scope],
+      queryKey: keyOf(),
       queryFn,
 
       ...optionsDefault,
@@ -218,13 +229,13 @@ export const createDefaultQuery = (<
           (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true),
     } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
 
-    query.setData = (data: QueryData) => resolvedClient.setQueriesData({queryKey: [modelKey, scope]}, data)
+    query.setData = (data: QueryData) => resolvedClient.setQueriesData({queryKey: keyOf()}, data)
 
-    return withItemSetters(query, resolvedClient, [modelKey, scope])
+    return withItemSetters(query, resolvedClient, keyOf())
   }
 
   useFn.config = (queryParams?: undefined, options: DefaultQueryOptions<QueryData> = {}) => ({
-    queryKey: [modelKey, scope],
+    queryKey: keyOf(),
     queryFn,
 
     ...optionsDefault,
@@ -238,7 +249,7 @@ export const createDefaultQuery = (<
   useFn.setData = (data: QueryData, queryParams?: undefined, queryClient?: QueryClient) => {
     const resolvedClient = queryClient ?? useQueryClient()
 
-    return resolvedClient.setQueriesData({queryKey: [modelKey, scope]}, data)
+    return resolvedClient.setQueriesData({queryKey: keyOf()}, data)
   }
 
   useFn.setItem = setItemStatic
@@ -273,6 +284,7 @@ export const makeQueryPaginated = <Data extends QueryModel, QueryParams extends 
   const useQueryPaginated = createDefaultQuery(
     modelKey,
     'paginated',
+    undefined,
     (query): Promise<PaginatedResponse<Data>> => {
       return new Promise((resolve, reject) => {
         const queryParams = unref(query.queryKey[2])

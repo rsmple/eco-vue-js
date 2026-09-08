@@ -25,6 +25,7 @@ type AnyAction = (...args: any) => any
 type ScopeMap = Record<string, QueryScope>
 type ParamsMap = Record<string, unknown>
 type DataMap = Record<string, unknown>
+type TypeMap = Record<string, unknown>
 
 type ModelBound<Scopes extends ScopeMap> = [Exclude<Scopes[keyof Scopes], 'single'>] extends [never] ? unknown : QueryModel
 
@@ -59,6 +60,7 @@ type QuerySingleUpdater<Data> = (data: Data) => Data
 type ActionResult<Result, Updater> = Result extends Updater ? void : Result
 
 type QueryRuntime = {
+  name: string
   scope: QueryScope
   isQueryParams?: (value: unknown) => value is unknown
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,6 +73,7 @@ type QueryRuntime = {
 type ApiRuntime = Record<string, {use: unknown, actions?: Record<string, AnyAction>}>
 
 type ScopeShapes<S extends ScopeMap> = { [K in keyof S]: { scope: S[K] } }
+type TypeShapes<T extends TypeMap> = { [K in keyof T]: { dataType?: T[K] } }
 type InferQueries<Q extends QueryMap> = { [K in keyof Q]: Q[K] }
 
 type ActionsOf<Queries extends QueryMap, Key> = Key extends keyof Queries
@@ -86,14 +89,20 @@ type HasParams<Params, Key> = Key extends keyof Params ? unknown extends Params[
 
 type IsSingle<Scopes, Key> = Key extends keyof Scopes ? Scopes[Key] extends 'single' ? true : false : false
 
-type DataOf<Datas, Key> = Key extends keyof Datas ? Datas[Key] : never
+// dataType wins over the model-derived bound: a queryFn that reads its own queryKey is context sensitive, which
+// settles the data of every query in the model to the model itself, so its return type cannot be relied on.
+type DeclaredOf<Types, Key> = Key extends keyof Types ? unknown extends Types[Key] ? never : Types[Key] : never
 
-type ContextOf<Scopes, Datas, Model, Key> = IsSingle<Scopes, Key> extends true
-  ? SingleActionContext<DataOf<Datas, Key>>
+type DataOf<Types, Datas, Key> = [DeclaredOf<Types, Key>] extends [never]
+  ? Key extends keyof Datas ? Datas[Key] : never
+  : DeclaredOf<Types, Key>
+
+type ContextOf<Scopes, Types, Datas, Model, Key> = IsSingle<Scopes, Key> extends true
+  ? SingleActionContext<DataOf<Types, Datas, Key>>
   : ActionContext<Model>
 
-type UpdaterOf<Scopes, Datas, Model, Key> = IsSingle<Scopes, Key> extends true
-  ? QuerySingleUpdater<DataOf<Datas, Key>>
+type UpdaterOf<Scopes, Types, Datas, Model, Key> = IsSingle<Scopes, Key> extends true
+  ? QuerySingleUpdater<DataOf<Types, Datas, Key>>
   : QueryItemUpdater<Model>
 
 type ParamsArgs<Params, Key> = HasParams<Params, Key> extends true ? [params: ParamsOf<Params, Key>] : []
@@ -120,6 +129,7 @@ type KeyOf<ModelKey extends string, Scopes, Params, Key> = [
   ModelKey,
   Key extends keyof Scopes ? Scopes[Key] : never,
   ...(Key extends keyof Params ? unknown extends Params[Key] ? [] : [Params[Key]] : []),
+  Key & string,
 ]
 
 type DataShapes<
@@ -129,11 +139,8 @@ type DataShapes<
   Datas extends DataMap,
 > = {
   [Key in keyof Datas]: {
-    // Query type is defined by root model. For case when a query needs to extend root model,
-    // it requies one of these: annotating queryFn arguments, set dataType: {} as TargetModel,
-    // or annotated options: {select}. Without annotation data type sattles to root model.
+    // The model is the shape every query of it shares - a query serving a richer one declares it with dataType.
     queryFn: QueryFunction<Datas[Key], KeyOf<ModelKey, Scopes, Params, Key>>
-    dataType?: Datas[Key]
     options?: DefaultQueryOptions<Datas[Key]>
   }
 }
@@ -142,6 +149,7 @@ type QueryShapes<
   Model,
   Scopes extends ScopeMap,
   Params extends ParamsMap,
+  Types extends TypeMap,
   Datas extends DataMap,
   Queries extends QueryMap,
 > = {
@@ -150,7 +158,7 @@ type QueryShapes<
     actions?: {
       [KeyAction in keyof ActionsOf<Queries, Key>]: (
         ...args: [
-          context: ContextOf<Scopes, Datas, Model, Key>,
+          context: ContextOf<Scopes, Types, Datas, Model, Key>,
           ...ParamsArgs<Params, Key>,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           payload?: any,
@@ -166,13 +174,14 @@ type RestModelApi<
   Model,
   Scopes extends ScopeMap,
   Params extends ParamsMap,
+  Types extends TypeMap,
   Datas extends DataMap,
   Queries extends QueryMap,
 > = {
   [Key in keyof Scopes]: OmitByType<{
     use: HasParams<Params, Key> extends true
-        ? ReturnType<typeof createDefaultQuery<ModelKey, Scopes[Key], DataOf<Datas, Key>, ParamsOf<Params, Key>>>
-        : ReturnType<typeof createDefaultQuery<ModelKey, Scopes[Key], DataOf<Datas, Key>>>
+        ? ReturnType<typeof createDefaultQuery<ModelKey, Scopes[Key], Key & string, DataOf<Types, Datas, Key>, ParamsOf<Params, Key>>>
+        : ReturnType<typeof createDefaultQuery<ModelKey, Scopes[Key], Key & string, DataOf<Types, Datas, Key>>>
 
     actions: HasActions<Queries, Key> extends true ? {
       [KeyAction in keyof ActionsOf<Queries, Key>]: (
@@ -180,7 +189,7 @@ type RestModelApi<
           ...ParamsArgs<Params, Key>,
           ...PayloadArgs<ActionsOf<Queries, Key>[KeyAction], HasParams<Params, Key>>,
         ]
-      ) => Promise<ActionResult<Awaited<ReturnTypeOf<ActionsOf<Queries, Key>[KeyAction]>>, UpdaterOf<Scopes, Datas, Model, Key>>>
+      ) => Promise<ActionResult<Awaited<ReturnTypeOf<ActionsOf<Queries, Key>[KeyAction]>>, UpdaterOf<Scopes, Types, Datas, Model, Key>>>
     } : never
   }, never>
 } & {
@@ -192,6 +201,7 @@ export const createRestModelApi = <
   Model extends ModelBound<Scopes>,
   Scopes extends ScopeMap,
   Params extends ParamsMap,
+  Types extends TypeMap,
   Datas extends {[Key in keyof Scopes]: DataBound<Model, Scopes, Key>},
   Queries extends QueryMap,
 >(
@@ -201,11 +211,12 @@ export const createRestModelApi = <
       queries: 
         & InferQueries<Queries>
         & ScopeShapes<Scopes>
+        & TypeShapes<Types>
         & DataShapes<ModelKey, Scopes, Params, Datas>
-        & QueryShapes<Model, Scopes, Params, Datas, Queries>
+        & QueryShapes<Model, Scopes, Params, Types, Datas, Queries>
     },
-  ): RestModelApi<ModelKey, Model, Scopes, Params, Datas, Queries> => {
-  const queries: Record<string, QueryRuntime> = config.queries
+  ): RestModelApi<ModelKey, Model, Scopes, Params, Types, Datas, Queries> => {
+  const queries: Record<string, Omit<QueryRuntime, 'name'>> = config.queries
   const result: ApiRuntime = {}
 
   const invalidateModel = (scope?: QueryScope) => getQueryClient().invalidateQueries({
@@ -220,8 +231,8 @@ export const createRestModelApi = <
 
   const queryKeyOf = (query: QueryRuntime, args: unknown[]): QueryKey => {
     return query.isQueryParams
-      ? [config.modelKey, query.scope, paramsOf(query, args)]
-      : [config.modelKey, query.scope]
+      ? [config.modelKey, query.scope, paramsOf(query, args), query.name]
+      : [config.modelKey, query.scope, query.name]
   }
 
   const resolveIds = (query: QueryRuntime, args: unknown[]): Set<QueryModelId> | undefined => {
@@ -327,12 +338,12 @@ export const createRestModelApi = <
   }
 
   Object.keys(queries).forEach(key => {
-    const query = queries[key]
+    const query: QueryRuntime = {...queries[key], name: key}
 
     result[key] = {
       use: query.isQueryParams
-        ? createDefaultQuery(config.modelKey, query.scope, query.queryFn, query.isQueryParams, query.options)
-        : createDefaultQuery(config.modelKey, query.scope, query.queryFn, undefined, query.options),
+        ? createDefaultQuery(config.modelKey, query.scope, key, query.queryFn, query.isQueryParams, query.options)
+        : createDefaultQuery(config.modelKey, query.scope, key, query.queryFn, undefined, query.options),
     }
 
     if (query.actions) {
@@ -344,5 +355,5 @@ export const createRestModelApi = <
 
   return Object.assign(result, {
     invalidate: (scope?: QueryScope) => invalidateModel(scope),
-  }) as unknown as RestModelApi<ModelKey, Model, Scopes, Params, Datas, Queries>
+  }) as unknown as RestModelApi<ModelKey, Model, Scopes, Params, Types, Datas, Queries>
 }
