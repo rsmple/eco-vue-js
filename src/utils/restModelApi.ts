@@ -14,7 +14,7 @@ import {
   snapshotQueries,
   updateQueryItems,
 } from '@/utils/queryCache'
-import {type DefaultQueryOptions, createDefaultQuery} from '@/utils/useDefaultQuery'
+import {type DefaultQueryOptions, createDefaultQuery, normalizeQueryParamsValue} from '@/utils/useDefaultQuery'
 import {isId} from '@/utils/utils'
 
 import {getMatchingCollectionIds} from './getMatchingCollectionIds'
@@ -212,9 +212,15 @@ export const createRestModelApi = <
     queryKey: scope ? [config.modelKey, scope] : [config.modelKey],
   })
 
+  const paramsOf = (query: QueryRuntime, args: unknown[]): unknown => {
+    const params = unref(args[0] as MaybeRef<unknown>)
+
+    return query.isQueryParams?.(undefined) ? normalizeQueryParamsValue(params) : params
+  }
+
   const queryKeyOf = (query: QueryRuntime, args: unknown[]): QueryKey => {
     return query.isQueryParams
-      ? [config.modelKey, query.scope, unref(args[0] as MaybeRef<unknown>)]
+      ? [config.modelKey, query.scope, paramsOf(query, args)]
       : [config.modelKey, query.scope]
   }
 
@@ -231,7 +237,7 @@ export const createRestModelApi = <
 
     if (!query.isQueryParams) return undefined
 
-    return getMatchingCollectionIds<QueryModel, QueryParamsListBulk | QueryParamsListBulkString>(queryClient, config.modelKey, args[0] as QueryParamsListBulk | QueryParamsListBulkString)
+    return getMatchingCollectionIds<QueryModel, QueryParamsListBulk | QueryParamsListBulkString>(queryClient, config.modelKey, paramsOf(query, args) as QueryParamsListBulk | QueryParamsListBulkString | undefined)
   }
 
   const setItems = (query: QueryRuntime, args: unknown[], item: QueryModel | QueryModel[]) => {

@@ -1,5 +1,5 @@
 import {type Query, type QueryClient, type QueryFunction, type UseQueryOptions, type UseQueryReturnType, useQuery, useQueryClient} from '@tanstack/vue-query'
-import {type MaybeRef, toValue, unref, watch} from 'vue'
+import {type MaybeRef, computed, isRef, toValue, unref, watch} from 'vue'
 
 import {ApiError} from './api'
 import {type QueryModel, type QueryModelId, type QueryScope, type QueryScopeItem, removeQueryItem, setListItem, setQueryItem} from './queryCache'
@@ -11,6 +11,26 @@ type SetQueriesDataResult = ReturnType<QueryClient['setQueriesData']>
 type QueryOptionsObject<Data> = Exclude<UseQueryOptions<Data, ApiError, Data>, {value: unknown}>
 
 export type DefaultQueryOptions<Data> = Omit<Partial<QueryOptionsObject<Data>>, 'queryKey' | 'queryFn'>
+
+export const normalizeQueryParamsValue = <QueryParams>(value: QueryParams): QueryParams => {
+  return value !== null && typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0
+    ? undefined as QueryParams
+    : value
+}
+
+export const normalizeQueryParams = <QueryParams>(queryParams: MaybeRef<QueryParams>): MaybeRef<QueryParams> => {
+  return isRef(queryParams)
+    ? computed(() => normalizeQueryParamsValue(queryParams.value))
+    : normalizeQueryParamsValue(queryParams)
+}
+
+type QueryParamsArg<QueryParams> = undefined extends QueryParams
+  ? [queryParams?: MaybeRef<QueryParams>]
+  : [queryParams: MaybeRef<QueryParams>]
+
+type QueryParamsArgValue<QueryParams> = undefined extends QueryParams
+  ? [queryParams?: QueryParams]
+  : [queryParams: QueryParams]
 
 export type UseQueryReturnTypeDefault<Data> = UseQueryReturnType<Data, ApiError> & {
   setData: (data: Data) => SetQueriesDataResult
@@ -54,16 +74,18 @@ export type CreateDefaultQuery = {
     options?: DefaultQueryOptions<Data>,
   ): {
     (
-      queryParams: MaybeRef<QueryParams>,
-      options?: DefaultQueryOptions<Data>,
-      queryClient?: QueryClient,
+      ...args: [
+        ...QueryParamsArg<QueryParams>,
+        options?: DefaultQueryOptions<Data>,
+        queryClient?: QueryClient,
+      ]
     ): UseQueryReturnTypeDefault<Data>
-    config: (queryParams: QueryParams, options?: DefaultQueryOptions<Data>) => {
+    config: (...args: [...QueryParamsArgValue<QueryParams>, options?: DefaultQueryOptions<Data>]) => {
       queryKey: [ModelKey, Scope, QueryParams]
       queryFn: QueryFunction<Data, [ModelKey, Scope, QueryParams]>
       enabled: () => (query: Query<Data, ApiError, Data, [ModelKey, Scope, QueryParams]>) => boolean
     }
-    setData: (data: Data, queryParams: MaybeRef<QueryParams>, queryClient?: QueryClient) => SetQueriesDataResult
+    setData: (...args: [data: Data, ...QueryParamsArg<QueryParams>, queryClient?: QueryClient]) => SetQueriesDataResult
     setItem: (item: QueryScopeItem<Data>, queryClient?: QueryClient) => void
     removeItem: (id: QueryModelId, queryClient?: QueryClient) => void
   }
@@ -107,15 +129,28 @@ export const createDefaultQuery = (<
   }
 
   if (isQueryParams) {
+    // An empty params object and undefined address the same data, so they must not split the cache.
+    // Only queries that accept undefined can collapse it — for the rest undefined keeps the query disabled.
+    const acceptsEmptyParams = isQueryParams(undefined)
+
+    const normalize = acceptsEmptyParams
+      ? normalizeQueryParams<QueryParams>
+      : (queryParams: MaybeRef<QueryParams>) => queryParams
+
+    const normalizeValue = acceptsEmptyParams
+      ? normalizeQueryParamsValue<QueryParams>
+      : (queryParams: QueryParams) => queryParams
+
     const useFn = (
       queryParams: MaybeRef<QueryParams>,
       options: DefaultQueryOptions<QueryData> = {},
       queryClient?: QueryClient,
     ): UseQueryReturnTypeDefault<QueryData> => {
       const resolvedClient = queryClient ?? useQueryClient()
+      const normalizedParams = normalize(queryParams)
 
       const query = useQuery<QueryData, ApiError, QueryData, QueryKey>({
-        queryKey: [modelKey, scope, queryParams],
+        queryKey: [modelKey, scope, normalizedParams],
         queryFn,
 
         ...optionsDefault,
@@ -127,15 +162,15 @@ export const createDefaultQuery = (<
           (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true),
       } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
 
-      query.setData = (data: QueryData) => isQueryParams(unref(queryParams))
-        ? resolvedClient.setQueriesData({queryKey: [modelKey, scope, queryParams]}, data)
+      query.setData = (data: QueryData) => isQueryParams(unref(normalizedParams))
+        ? resolvedClient.setQueriesData({queryKey: [modelKey, scope, normalizedParams]}, data)
         : []
 
-      return withItemSetters(query, resolvedClient, [modelKey, scope, queryParams])
+      return withItemSetters(query, resolvedClient, [modelKey, scope, normalizedParams])
     }
 
     useFn.config = (queryParams: QueryParams, options: DefaultQueryOptions<QueryData> = {}) => ({
-      queryKey: [modelKey, scope, queryParams],
+      queryKey: [modelKey, scope, normalizeValue(queryParams)],
       queryFn,
 
       ...optionsDefault,
@@ -148,11 +183,13 @@ export const createDefaultQuery = (<
     })
 
     useFn.setData = (data: QueryData, queryParams: MaybeRef<QueryParams>, queryClient?: QueryClient) => {
-      if (!isQueryParams(unref(queryParams))) return []
+      const normalizedParams = normalize(queryParams)
+
+      if (!isQueryParams(unref(normalizedParams))) return []
 
       const resolvedClient = queryClient ?? useQueryClient()
 
-      return resolvedClient.setQueriesData({queryKey: [modelKey, scope, queryParams]}, data)
+      return resolvedClient.setQueriesData({queryKey: [modelKey, scope, normalizedParams]}, data)
     }
 
     useFn.setItem = setItemStatic
@@ -304,12 +341,14 @@ export const wrapUseQueryPaginated = <Data extends QueryModel, QueryParams exten
   return (queryParams, options = {}, queryClient) => {
     const query = useQueryFn(undefined, options as unknown as DefaultQueryOptions<Data[]>, queryClient)
 
-    const newQuery = makeQueryPaginated<Data, QueryParams>(
+    const useQueryPaginated = makeQueryPaginated<Data, QueryParams>(
       modelKey,
       () => query.data.value,
       data => void query.setData(data),
       pageLength,
-    )(queryParams, options, queryClient)
+    ) as unknown as UseQueryDefaultFn<PaginatedResponse<Data>, QueryParams>
+
+    const newQuery = useQueryPaginated(queryParams, options, queryClient)
 
     watch(query.data, () => {
       newQuery.refetch()

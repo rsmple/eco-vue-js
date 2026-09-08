@@ -69,9 +69,9 @@ const isPaginatedResponse = <Model extends QueryModel>(value: unknown): value is
 export const getMatchingCollectionIds = <Model extends QueryModel, Params extends QueryParamsListBulk | QueryParamsListBulkString>(
   queryClient: QueryClient,
   model: string,
-  params: Params,
+  params: Params | undefined,
 ): Set<QueryModelId> => {
-  if (params.id__in?.length) return new Set<QueryModelId>(params.id__in)
+  if (params?.id__in?.length) return new Set<QueryModelId>(params.id__in)
 
   const ids = new Set<QueryModelId>()
   const collectionQueries = queryClient.getQueriesData<Model[] | PaginatedResponse<Model>>({queryKey: [model]})
@@ -83,7 +83,7 @@ export const getMatchingCollectionIds = <Model extends QueryModel, Params extend
     if (JSON.stringify(normalizeValue(queryKeyInfo.params ?? {})) !== JSON.stringify(normalizeValue(params ?? {}))) return
 
     if (Array.isArray(data)) {
-      if (params.id__not_in) {
+      if (params?.id__not_in) {
         data.forEach(item => {
           if (!params.id__not_in?.includes(item.id as never)) ids.add(item.id)
         })
@@ -95,9 +95,9 @@ export const getMatchingCollectionIds = <Model extends QueryModel, Params extend
     if (!isPaginatedResponse<Model>(data)) return
 
     data.results.forEach((item, index) => {
-      if (params.id__not_in && !params.id__not_in.includes(item.id as never)) ids.add(item.id)
+      if (params?.id__not_in && !params.id__not_in.includes(item.id as never)) ids.add(item.id)
 
-      if (params.slice_indexes) {
+      if (params?.slice_indexes) {
         const globalIndex = ((data.current - 1) * (queryKeyInfo.params?.size ?? PAGE_LENGTH)) + index
 
         if (globalIndex >= params.slice_indexes[0] && globalIndex <= params.slice_indexes[1]) ids.add(item.id)
