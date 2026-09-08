@@ -115,6 +115,17 @@ export const createDefaultQuery = (<
 
   const keyOf = (...params: unknown[]): unknown[] => [modelKey, scope, ...params, ...nameKey]
 
+  const isParams = isQueryParams
+
+  const enabledOf = (options: DefaultQueryOptions<QueryData>) => () => {
+    const enabled = (!('enabled' in options) || toValue(options.enabled) === true) &&
+      (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true)
+
+    if (!isParams) return enabled
+
+    return (query: Query<QueryData, ApiError, QueryData, QueryKey>) => enabled && isParams(unref(query.queryKey[2]))
+  }
+
   const withItemSetters = (query: UseQueryReturnTypeDefault<QueryData>, resolvedClient: QueryClient, queryKey: unknown[]) => {
     query.setItem = scope === 'single'
       ? (item: QueryScopeItem<QueryData>) => void query.setData(item as QueryData)
@@ -140,8 +151,6 @@ export const createDefaultQuery = (<
   }
 
   if (isQueryParams) {
-    // An empty params object and undefined address the same data, so they must not split the cache.
-    // Only queries that accept undefined can collapse it — for the rest undefined keeps the query disabled.
     const acceptsEmptyParams = isQueryParams(undefined)
 
     const normalize = acceptsEmptyParams
@@ -167,10 +176,7 @@ export const createDefaultQuery = (<
         ...optionsDefault,
         ...options,
 
-        enabled: () => (query: Query<QueryData, ApiError, QueryData, QueryKey>) =>
-          isQueryParams(unref(query.queryKey[2])) &&
-          (!('enabled' in options) || toValue(options.enabled) === true) &&
-          (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true),
+        enabled: enabledOf(options),
       } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
 
       query.setData = (data: QueryData) => isQueryParams(unref(normalizedParams))
@@ -187,10 +193,7 @@ export const createDefaultQuery = (<
       ...optionsDefault,
       ...options,
 
-      enabled: () => (query: Query<QueryData, ApiError, QueryData, QueryKey>) =>
-        isQueryParams(unref(query.queryKey[2])) &&
-        (!('enabled' in options) || toValue(options.enabled) === true) &&
-        (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true),
+      enabled: enabledOf(options),
     })
 
     useFn.setData = (data: QueryData, queryParams: MaybeRef<QueryParams>, queryClient?: QueryClient) => {
@@ -224,9 +227,7 @@ export const createDefaultQuery = (<
       ...optionsDefault,
       ...options,
 
-      enabled: () =>
-        (!('enabled' in options) || toValue(options.enabled) === true) &&
-          (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true),
+      enabled: enabledOf(options),
     } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
 
     query.setData = (data: QueryData) => resolvedClient.setQueriesData({queryKey: keyOf()}, data)
@@ -241,9 +242,7 @@ export const createDefaultQuery = (<
     ...optionsDefault,
     ...options,
 
-    enabled: () =>
-      (!('enabled' in options) || toValue(options.enabled) === true) &&
-          (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true),
+    enabled: enabledOf(options),
   })
 
   useFn.setData = (data: QueryData, queryParams?: undefined, queryClient?: QueryClient) => {
