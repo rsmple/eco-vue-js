@@ -62,6 +62,8 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
+import type {DefaultQueryOptions} from '@/utils/useDefaultQuery'
+
 import {type Ref, TransitionGroup, computed, inject, onBeforeUnmount, onMounted, ref, toRef, toValue, useTemplateRef, watch} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
@@ -73,7 +75,7 @@ import {wScrollingElement} from '../models/injection'
 const props = withDefaults(
   defineProps<{
     queryParams: QueryParams
-    useQueryFn: UseQueryPaginated<Data, QueryParams>
+    useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
     skeletonLength: number
     firstPage: boolean
     lastPage: boolean
@@ -84,7 +86,7 @@ const props = withDefaults(
     lastChild?: boolean
     pageClass?: string
     refetchInterval?: number | false
-    queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
+    queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>
     enabled?: boolean
 
     valueGetter: (data: Data) => Model
@@ -119,7 +121,7 @@ const isIntersecting = ref(false)
 
 const scrollingElement = inject(wScrollingElement, null)
 
-const {data, error, setData, refetch, isFetching} = props.useQueryFn(
+const {data, error, setItem, removeItem, refetch, isFetching} = props.useQueryFn(
   toRef(() => props.queryParams),
   {
     refetchInterval: props.refetchInterval ? (() => isIntersecting.value ? props.refetchInterval : undefined) : undefined,
@@ -198,24 +200,21 @@ const previousPage = computed(() => data.value?.previous)
 
 const page = computed<number | null>(() => props.queryParams instanceof Object && 'page' in props.queryParams && Number.isInteger(props.queryParams.page) ? (props.queryParams.page as number) : null)
 
-const setItem = (index: number, newItem: Data | undefined) => {
-  if (!data.value) return
+// The item is written to every cached scope of the model - this page, the other loaded pages, and any list or
+// item query sharing the model key - so the index only serves to find which item was edited.
+const updateItem = (index: number, newItem: Data | undefined) => {
+  const oldItem = data.value?.results[index]
 
-  const newData: PaginatedResponse<Data> = {
-    ...data.value,
-    results: [...data.value.results],
-  }
+  if (oldItem === undefined) return
 
-  if (newItem) newData.results.splice(index, 1, newItem)
-  else newData.results.splice(index, 1)
-
-  setData(newData, {index, newItem})
+  if (newItem) setItem(newItem)
+  else removeItem(props.valueGetter(oldItem))
 }
 
 const setterList: ((newItem?: Data) => void)[] = []
 
 const getSetter = (index: number): ((newItem?: Data) => void) => {
-  return setterList[index] ??= (newItem?: Data) => setItem(index, newItem)
+  return setterList[index] ??= (newItem?: Data) => updateItem(index, newItem)
 }
 
 const emitRefetch = () => {

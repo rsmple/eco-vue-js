@@ -111,7 +111,7 @@ type PropsNoQuery = {
 
 type PropsQueryWithParams = {
   // eslint-disable-next-line vue/no-required-prop-with-default
-  useQueryFn: UseQueryWithParams<InnerModel, QueryParams>
+  useQueryFn: UseQueryDefault<InnerModel, QueryParams>
   // eslint-disable-next-line vue/no-required-prop-with-default
   queryParams: QueryParams
   noParams?: never
@@ -119,7 +119,7 @@ type PropsQueryWithParams = {
 
 type PropsQueryWithNoParams = {
   // eslint-disable-next-line vue/no-required-prop-with-default
-  useQueryFn: UseQueryEmpty<InnerModel>
+  useQueryFn: UseQueryDefault<InnerModel, undefined>
   queryParams?: never
   // eslint-disable-next-line vue/no-required-prop-with-default
   noParams: true
@@ -179,7 +179,7 @@ const scopeModel = useUniformModel(
   toRef(props, 'modelValue') as Ref<Model>,
   toRef(props, 'modelValueInit') as Ref<Model>,
   computed(() => props.field),
-  props.useQueryFn as UseQueryWithParams<InnerModel, QueryParams>,
+  props.useQueryFn as UseQueryDefault<InnerModel, QueryParams>,
   props.noParams ? undefined : toRef(() => props.queryParams),
   props.initData,
   props.confimGetter,

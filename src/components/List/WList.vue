@@ -186,7 +186,7 @@ import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
 import {useComponentStates} from '@/utils/useComponentStates'
-import {PAGE_LENGTH} from '@/utils/useDefaultQuery'
+import {type DefaultQueryOptions, PAGE_LENGTH} from '@/utils/useDefaultQuery'
 import {type Selection, useSelected, useSelectionHash} from '@/utils/useSelected'
 import {ListMode} from '@/utils/utils'
 
@@ -201,10 +201,10 @@ const props = withDefaults(
     count?: number
     fields: Fields
     expansion?: ExpansionComponent<Data, QueryParams>
-    useQueryFn: UseQueryPaginated<Data, QueryParams>
-    useQueryFnExport?: UseQueryPaginated<Data, QueryParams>
+    useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
+    useQueryFnExport?: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
     queryParams: QueryParams
-    queryOptions?: Partial<QueryOptions<PaginatedResponse<Data>>>
+    queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>
     bulkDisableMessage?: string
     selectionTitle: string
     bulk?: BulkComponent<QueryParams>[]

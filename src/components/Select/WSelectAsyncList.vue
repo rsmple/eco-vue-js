@@ -71,7 +71,7 @@ const props = withDefaults(
     title?: string
     emptyStub?: string
     modelValue: Model[]
-    useQueryFn: UseQueryPaginated<Data, QueryParams>
+    useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
     queryParams: QueryParams
     skeleton?: boolean
     excludeParams?: (keyof QueryParams)[]
@@ -79,7 +79,7 @@ const props = withDefaults(
     unselectOnly?: boolean
     hideOptionIcon?: boolean
     valueGetter?: (data: Data) => Model
-    queryOptions?: Partial<Parameters<UseQueryPaginated<Data, QueryParams>>[1]>
+    queryOptions?: Partial<Parameters<UseQueryDefault<PaginatedResponse<Data>, QueryParams>>[1]>
     disabled?: boolean
     readonly?: boolean
   }>(),

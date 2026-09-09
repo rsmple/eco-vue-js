@@ -1,94 +1,365 @@
-import {type QueryClient, type QueryKey, type SetDataOptions, type UseQueryOptions, type UseQueryReturnType, useQuery, useQueryClient} from '@tanstack/vue-query'
-import {type MaybeRef, unref, watch} from 'vue'
+import {type Query, type QueryClient, type QueryFunction, type UseQueryOptions, type UseQueryReturnType, useQuery, useQueryClient} from '@tanstack/vue-query'
+import {type MaybeRef, computed, isRef, toValue, unref, watch} from 'vue'
 
 import {ApiError} from './api'
-
-type SetData<TQueryFnData = unknown> = (updater: TQueryFnData, options?: SetDataOptions) => ReturnType<QueryClient['setQueriesData']>;
-
-export type UseQueryReturnTypeSetData<TQueryFnData = unknown, TData = TQueryFnData> = UseQueryReturnType<TData, ApiError> & {
-  setData: SetData<TQueryFnData>
-}
-
-export const useDefaultQuery = <
-  TQueryFnData = unknown,
-  TData = TQueryFnData,
-  TQueryKey extends QueryKey = QueryKey,
->(options: UseQueryOptions<TQueryFnData, ApiError, TData, TQueryFnData, TQueryKey>, queryClient?: QueryClient): UseQueryReturnTypeSetData<TQueryFnData, TData> => {
-  const query = useQuery<TQueryFnData, ApiError, TData, TQueryKey>(options, queryClient) as UseQueryReturnTypeSetData<TQueryFnData, TData>
-  const resolvedClient = queryClient ?? useQueryClient()
-
-  query.setData = (updater: TQueryFnData, setOptions?: SetDataOptions) => resolvedClient.setQueriesData({queryKey: 'queryKey' in options ? options.queryKey : undefined}, updater, setOptions)
-
-  return query
-}
+import {type QueryModel, type QueryModelId, type QueryScope, type QueryScopeItem, removeQueryItem, setListItem, setQueryItem} from './queryCache'
 
 export const PAGE_LENGTH = 24
 
-export const makeQueryPaginated = <Data, QueryParams extends {page?: number}>(key: string, getter: (queryParams: QueryParams) => Data[] | undefined, setter?: (data: Data[]) => void, pageLength = PAGE_LENGTH): UseQueryPaginated<Data, QueryParams> => {
-  return (queryParams: MaybeRef<QueryParams>, options: QueryOptions<PaginatedResponse<Data>> = {}) => {
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    const query = useDefaultQuery<PaginatedResponse<Data>>({
-      queryKey: [key, queryParams],
-      queryFn: (): Promise<PaginatedResponse<Data>> => {
-        return new Promise((resolve, reject) => {
-          const currentList = getter(unref(queryParams))
+type SetQueriesDataResult = ReturnType<QueryClient['setQueriesData']>
 
-          if (!currentList) return resolve(null as never)
-  
-          const current = Math.max(unref(queryParams).page ?? 1, 1)
-          const pages_count = Math.max(Math.ceil(currentList.length / pageLength), 1)
-  
-          if (current > pages_count) reject(new ApiError({status: 404} as RequestResponse<unknown>))
-          else resolve({
-            count: currentList.length,
-            pages_count,
-            current,
-            next: pages_count > current ? current + 1 : null,
-            previous: current !== 1 ? current - 1 : null,
-            results: currentList.slice(pageLength * (current - 1), pageLength * current),
-          })
-        })
-      },
+type QueryOptionsObject<Data> = Exclude<UseQueryOptions<Data, ApiError, Data>, {value: unknown}>
 
-      ...options as NonNullable<unknown>,
-    })
+export type DefaultQueryOptions<Data> = Omit<Partial<QueryOptionsObject<Data>>, 'queryKey' | 'queryFn'>
 
-    const setDataOld = query.setData
+export const normalizeQueryParamsValue = <QueryParams>(value: QueryParams): QueryParams => {
+  return value !== null && typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0
+    ? undefined as QueryParams
+    : value
+}
 
-    query.setData = (data: PaginatedResponse<Data>, options?: Parameters<typeof query.setData>[1]) => {
-      if (setter && unref(options)?.index !== undefined) {
-        const index = unref(unref(options)?.index)
+export const normalizeQueryParams = <QueryParams>(queryParams: MaybeRef<QueryParams>): MaybeRef<QueryParams> => {
+  return isRef(queryParams)
+    ? computed(() => normalizeQueryParamsValue(queryParams.value))
+    : normalizeQueryParamsValue(queryParams)
+}
 
-        if (index !== undefined) {
-          const newList = getter({} as QueryParams)?.slice() ?? []
-          const oldItem = query.data.value?.results[index]
+type QueryParamsArg<QueryParams> = undefined extends QueryParams
+  ? [queryParams?: MaybeRef<QueryParams>]
+  : [queryParams: MaybeRef<QueryParams>]
 
-          if (oldItem !== undefined) {
-            const itemIndex = newList.findIndex(item => (item as {id: number}).id === (oldItem as {id: number}).id)
-            const newItem = unref(unref(options)?.newItem)
+type QueryParamsArgValue<QueryParams> = undefined extends QueryParams
+  ? [queryParams?: QueryParams]
+  : [queryParams: QueryParams]
 
-            if (index !== -1) {
-              if (newItem === undefined) newList.splice(itemIndex, 1)
-              else newList.splice(itemIndex, 1, newItem as Data)
+// The name closes the key so queries sharing a scope do not collide, leaving the scope prefix the cache updaters
+// match on intact.
+type QueryKeyName<Name> = [Name] extends [undefined] ? [] : [name: Name]
 
-              setter(newList)
-            }
-          }
-        }
-      }
+export type UseQueryReturnTypeDefault<Data> = UseQueryReturnType<Data, ApiError> & {
+  setData: (data: Data) => SetQueriesDataResult
+  setItem: (item: QueryScopeItem<Data>) => void
+  removeItem: (id: QueryModelId) => void
+}
 
-      return setDataOld(data, options)
+export type UseQueryDefaultFn<Data, QueryParams> = (
+  queryParams: MaybeRef<QueryParams>,
+  options?: DefaultQueryOptions<Data>,
+  queryClient?: QueryClient,
+) => UseQueryReturnTypeDefault<Data>
+
+export type CreateDefaultQuery = {
+  <ModelKey extends string, Scope extends QueryScope, Name extends string | undefined, Data>(
+    modelKey: ModelKey,
+    scope: Scope,
+    name: Name,
+    queryFn: QueryFunction<Data, [ModelKey, Scope, ...QueryKeyName<Name>]>,
+    isQueryParams?: undefined,
+    options?: DefaultQueryOptions<Data>,
+  ): {
+    (
+      queryParams?: MaybeRef<undefined>,
+      options?: DefaultQueryOptions<Data>,
+      queryClient?: QueryClient,
+    ): UseQueryReturnTypeDefault<Data>
+    config: (queryParams?: MaybeRef<undefined>, options?: DefaultQueryOptions<Data>) => {
+      queryKey: [ModelKey, Scope, ...QueryKeyName<Name>]
+      queryFn: QueryFunction<Data, [ModelKey, Scope, ...QueryKeyName<Name>]>
     }
+    setData: (data: Data, queryParams?: MaybeRef<undefined>, queryClient?: QueryClient) => SetQueriesDataResult
+    setItem: (item: QueryScopeItem<Data>, queryClient?: QueryClient) => void
+    removeItem: (id: QueryModelId, queryClient?: QueryClient) => void
+  }
 
-    return query
+  <ModelKey extends string, Scope extends QueryScope, Name extends string | undefined, Data, QueryParams>(
+    modelKey: ModelKey,
+    scope: Scope,
+    name: Name,
+    queryFn: QueryFunction<Data, [ModelKey, Scope, QueryParams, ...QueryKeyName<Name>]>,
+    isQueryParams: (value: unknown) => value is QueryParams,
+    options?: DefaultQueryOptions<Data>,
+  ): {
+    (
+      ...args: [
+        ...QueryParamsArg<QueryParams>,
+        options?: DefaultQueryOptions<Data>,
+        queryClient?: QueryClient,
+      ]
+    ): UseQueryReturnTypeDefault<Data>
+    config: (...args: [...QueryParamsArgValue<QueryParams>, options?: DefaultQueryOptions<Data>]) => {
+      queryKey: [ModelKey, Scope, QueryParams, ...QueryKeyName<Name>]
+      queryFn: QueryFunction<Data, [ModelKey, Scope, QueryParams, ...QueryKeyName<Name>]>
+      enabled: () => (query: Query<Data, ApiError, Data, [ModelKey, Scope, QueryParams, ...QueryKeyName<Name>]>) => boolean
+    }
+    setData: (...args: [data: Data, ...QueryParamsArg<QueryParams>, queryClient?: QueryClient]) => SetQueriesDataResult
+    setItem: (item: QueryScopeItem<Data>, queryClient?: QueryClient) => void
+    removeItem: (id: QueryModelId, queryClient?: QueryClient) => void
   }
 }
 
-export const wrapUseQueryPaginated = <Data, QueryParams extends {page?: number}>(key: string, queryFn: UseQueryDefault<Data[]>): UseQueryPaginated<Data, QueryParams> => {
-  return (queryParams: MaybeRef<QueryParams>, options: QueryOptions<PaginatedResponse<Data>> = {}) => {
-    const query = queryFn(options as Parameters<UseQueryDefault<Data[]>>[0])
+export const createDefaultQuery = (<
+  ModelKey extends string,
+  Scope extends QueryScope,
+  QueryData,
+  QueryParams = never,
+  QueryKey extends unknown[] = [QueryParams] extends [never] ? [ModelKey, Scope] : [ModelKey, Scope, QueryParams],
+  >(
+    modelKey: ModelKey,
+    scope: Scope,
+    queryName: string | undefined,
+    queryFn: QueryFunction<QueryData, QueryKey>,
+    isQueryParams?: (value: unknown) => value is QueryParams,
+    optionsDefault: DefaultQueryOptions<QueryData> = {},
+  ) => {
+  const nameKey = queryName === undefined ? [] : [queryName]
 
-    const newQuery = makeQueryPaginated(key, () => query.data.value, query.setData)(queryParams, options)
+  const keyOf = (...params: unknown[]): unknown[] => [modelKey, scope, ...params, ...nameKey]
+
+  const isParams = isQueryParams
+
+  const enabledOf = (options: DefaultQueryOptions<QueryData>) => () => {
+    const enabled = (!('enabled' in options) || toValue(options.enabled) === true) &&
+      (!('enabled' in optionsDefault) || toValue(optionsDefault.enabled) === true)
+
+    if (!isParams) return enabled
+
+    return (query: Query<QueryData, ApiError, QueryData, QueryKey>) => enabled && isParams(unref(query.queryKey[2]))
+  }
+
+  const withItemSetters = (query: UseQueryReturnTypeDefault<QueryData>, resolvedClient: QueryClient, queryKey: unknown[]) => {
+    query.setItem = scope === 'single'
+      ? (item: QueryScopeItem<QueryData>) => void query.setData(item as QueryData)
+      : (item: QueryScopeItem<QueryData>) => setQueryItem(modelKey, item as QueryModel, resolvedClient)
+
+    query.removeItem = scope === 'single'
+      ? () => void resolvedClient.removeQueries({queryKey, exact: true})
+      : (id: QueryModelId) => removeQueryItem(modelKey, id, resolvedClient)
+
+    return query
+  }
+
+  const setItemStatic = (item: QueryScopeItem<QueryData>, queryClient?: QueryClient) => {
+    if (scope !== 'single') return setQueryItem(modelKey, item as QueryModel, queryClient)
+
+    void (queryClient ?? useQueryClient()).setQueriesData({queryKey: keyOf()}, item)
+  }
+
+  const removeItemStatic = (id: QueryModelId, queryClient?: QueryClient) => {
+    if (scope !== 'single') return removeQueryItem(modelKey, id, queryClient)
+
+    void (queryClient ?? useQueryClient()).removeQueries({queryKey: keyOf()})
+  }
+
+  if (isQueryParams) {
+    const acceptsEmptyParams = isQueryParams(undefined)
+
+    const normalize = acceptsEmptyParams
+      ? normalizeQueryParams<QueryParams>
+      : (queryParams: MaybeRef<QueryParams>) => queryParams
+
+    const normalizeValue = acceptsEmptyParams
+      ? normalizeQueryParamsValue<QueryParams>
+      : (queryParams: QueryParams) => queryParams
+
+    const useFn = (
+      queryParams: MaybeRef<QueryParams>,
+      options: DefaultQueryOptions<QueryData> = {},
+      queryClient?: QueryClient,
+    ): UseQueryReturnTypeDefault<QueryData> => {
+      const resolvedClient = queryClient ?? useQueryClient()
+      const normalizedParams = normalize(queryParams)
+
+      const query = useQuery<QueryData, ApiError, QueryData, QueryKey>({
+        queryKey: keyOf(normalizedParams),
+        queryFn,
+
+        ...optionsDefault,
+        ...options,
+
+        enabled: enabledOf(options),
+      } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
+
+      query.setData = (data: QueryData) => isQueryParams(unref(normalizedParams))
+        ? resolvedClient.setQueriesData({queryKey: keyOf(normalizedParams)}, data)
+        : []
+
+      return withItemSetters(query, resolvedClient, keyOf(normalizedParams))
+    }
+
+    useFn.config = (queryParams: QueryParams, options: DefaultQueryOptions<QueryData> = {}) => ({
+      queryKey: keyOf(normalizeValue(queryParams)),
+      queryFn,
+
+      ...optionsDefault,
+      ...options,
+
+      enabled: enabledOf(options),
+    })
+
+    useFn.setData = (data: QueryData, queryParams: MaybeRef<QueryParams>, queryClient?: QueryClient) => {
+      const normalizedParams = normalize(queryParams)
+
+      if (!isQueryParams(unref(normalizedParams))) return []
+
+      const resolvedClient = queryClient ?? useQueryClient()
+
+      return resolvedClient.setQueriesData({queryKey: keyOf(normalizedParams)}, data)
+    }
+
+    useFn.setItem = setItemStatic
+
+    useFn.removeItem = removeItemStatic
+
+    return useFn
+  }
+
+  const useFn = (
+    queryParams?: undefined,
+    options: DefaultQueryOptions<QueryData> = {},
+    queryClient?: QueryClient,
+  ): UseQueryReturnTypeDefault<QueryData> => {
+    const resolvedClient = queryClient ?? useQueryClient()
+
+    const query = useQuery<QueryData, ApiError, QueryData, QueryKey>({
+      queryKey: keyOf(),
+      queryFn,
+
+      ...optionsDefault,
+      ...options,
+
+      enabled: enabledOf(options),
+    } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
+
+    query.setData = (data: QueryData) => resolvedClient.setQueriesData({queryKey: keyOf()}, data)
+
+    return withItemSetters(query, resolvedClient, keyOf())
+  }
+
+  useFn.config = (queryParams?: undefined, options: DefaultQueryOptions<QueryData> = {}) => ({
+    queryKey: keyOf(),
+    queryFn,
+
+    ...optionsDefault,
+    ...options,
+
+    enabled: enabledOf(options),
+  })
+
+  useFn.setData = (data: QueryData, queryParams?: undefined, queryClient?: QueryClient) => {
+    const resolvedClient = queryClient ?? useQueryClient()
+
+    return resolvedClient.setQueriesData({queryKey: keyOf()}, data)
+  }
+
+  useFn.setItem = setItemStatic
+
+  useFn.removeItem = removeItemStatic
+
+  return useFn
+}) as unknown as CreateDefaultQuery
+
+export const paginateList = <Data>(list: Data[], page = 1, pageLength = PAGE_LENGTH): PaginatedResponse<Data> => {
+  const current = Math.max(page, 1)
+  const pages_count = Math.max(Math.ceil(list.length / pageLength), 1)
+
+  if (current > pages_count) throw new ApiError({status: 404} as RequestResponse<unknown>)
+
+  return {
+    count: list.length,
+    pages_count,
+    current,
+    next: pages_count > current ? current + 1 : null,
+    previous: current !== 1 ? current - 1 : null,
+    results: list.slice(pageLength * (current - 1), pageLength * current),
+  }
+}
+
+export const makeQueryPaginated = <Data extends QueryModel, QueryParams extends {page?: number}>(
+  modelKey: string,
+  getter: (queryParams: QueryParams) => Data[] | undefined,
+  setter?: (data: Data[]) => void,
+  pageLength = PAGE_LENGTH,
+) => {
+  const useQueryPaginated = createDefaultQuery(
+    modelKey,
+    'paginated',
+    undefined,
+    (query): Promise<PaginatedResponse<Data>> => {
+      return new Promise((resolve, reject) => {
+        const queryParams = unref(query.queryKey[2])
+        const currentList = getter(queryParams)
+
+        if (!currentList) return resolve(null as never)
+
+        try {
+          resolve(paginateList(currentList, queryParams.page, pageLength))
+        } catch (error) {
+          reject(error)
+        }
+      })
+    },
+    (value: unknown): value is QueryParams => value instanceof Object,
+  )
+
+  const setSourceItem = (id: QueryModelId, item: Data | undefined) => {
+    if (!setter) return
+
+    const currentList = getter({} as QueryParams)
+    const newList = setListItem(currentList, id, item)
+
+    if (newList && newList !== currentList) setter(newList)
+  }
+
+  return Object.assign(
+    (...args: Parameters<typeof useQueryPaginated>): UseQueryReturnTypeDefault<PaginatedResponse<Data>> => {
+      const query = useQueryPaginated(...args)
+      const {setItem, removeItem} = query
+
+      query.setItem = item => {
+        setSourceItem(item.id, item)
+        setItem(item)
+      }
+
+      query.removeItem = id => {
+        setSourceItem(id, undefined)
+        removeItem(id)
+      }
+
+      return query
+    },
+    {
+      config: useQueryPaginated.config,
+      setData: useQueryPaginated.setData,
+
+      setItem: (item: Data, queryClient?: QueryClient) => {
+        setSourceItem(item.id, item)
+        useQueryPaginated.setItem(item, queryClient)
+      },
+
+      removeItem: (id: QueryModelId, queryClient?: QueryClient) => {
+        setSourceItem(id, undefined)
+        useQueryPaginated.removeItem(id, queryClient)
+      },
+    },
+  ) as typeof useQueryPaginated
+}
+
+export const wrapUseQueryPaginated = <Data extends QueryModel, QueryParams extends {page?: number}>(
+  modelKey: string,
+  useQueryFn: UseQueryDefaultFn<Data[], undefined>,
+  pageLength = PAGE_LENGTH,
+): UseQueryDefaultFn<PaginatedResponse<Data>, QueryParams> => {
+  return (queryParams, options = {}, queryClient) => {
+    const query = useQueryFn(undefined, options as unknown as DefaultQueryOptions<Data[]>, queryClient)
+
+    const useQueryPaginated = makeQueryPaginated<Data, QueryParams>(
+      modelKey,
+      () => query.data.value,
+      data => void query.setData(data),
+      pageLength,
+    ) as unknown as UseQueryDefaultFn<PaginatedResponse<Data>, QueryParams>
+
+    const newQuery = useQueryPaginated(queryParams, options, queryClient)
 
     watch(query.data, () => {
       newQuery.refetch()

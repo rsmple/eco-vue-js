@@ -58,19 +58,7 @@ declare module 'eco-vue-js/dist/assets/icons/*' {
 
 declare type DefaultData = NonNullable<unknown>
 
-type Params = Parameters<import('@tanstack/vue-query').QueryClient['setQueriesData']>
-
-declare type UseQueryDefault<TQueryFnData = unknown, TData = TQueryFnData, TQueryKey extends import('@tanstack/vue-query').QueryKey = import('@tanstack/vue-query').QueryKey> =
-  typeof import('@/utils/useDefaultQuery').useDefaultQuery<TQueryFnData, TData, TQueryKey>
-
-declare type QueryOptions<Data> = Partial<Parameters<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Data>>[0]>
-
-declare type UseQueryEmpty<Model> = (options?: QueryOptions<Model>) => Omit<ReturnType<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Model>>, 'isError'> & {isError: import('vue').Ref<boolean>}
-
-declare type UseQueryWithParams<Model, QueryParams> =
-  (queryParams: import('vue').MaybeRef<QueryParams>, options?: QueryOptions<Model>) => Omit<ReturnType<typeof import('@/utils/useDefaultQuery').useDefaultQuery<Model>>, 'isError'> & {isError: import('vue').Ref<boolean>}
-
-declare type UseQueryPaginated<Model, QueryParams> = UseQueryWithParams<PaginatedResponse<Model>, QueryParams>
+declare type UseQueryDefault<Model, QueryParams> = import('@/utils/useDefaultQuery').UseQueryDefaultFn<Model, QueryParams>
 
 declare type ConfirmProps = Omit<import('@/components/Modal/types').ConfirmModalProps, 'onAccept' | 'onCancel' | 'onIntermediate'>
 
@@ -116,9 +104,17 @@ declare type OmitReqursive<Model extends object, Field extends keyof Model | str
 
 declare type PickByType<Model, FieldType, IncludeNull = false> = {
   [
-  Key in keyof Model as IncludeNull extends true
-  ? Exclude<Model[Key], null | undefined> extends FieldType ? Key : never
-  : Model[Key] extends FieldType ? Key : never
+    Key in keyof Model as IncludeNull extends true
+      ? Exclude<Model[Key], null | undefined> extends FieldType ? Key : never
+      : Model[Key] extends FieldType ? Key : never
+  ]: Model[Key]
+}
+
+declare type OmitByType<Model, FieldType, IncludeNull = false> = {
+  [
+    Key in keyof Model as IncludeNull extends true
+      ? Exclude<Model[Key], null | undefined> extends FieldType ? never : Key
+      : Model[Key] extends FieldType ? never : Key
   ]: Model[Key]
 }
 

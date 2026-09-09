@@ -15,7 +15,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   parentModel: Ref<ParentModel>,
   parentModelInit: Ref<ParentModel>,
   field: Ref<Field | undefined>,
-  useQueryFn: UseQueryWithParams<InnerModel, QueryParams> | undefined,
+  useQueryFn: UseQueryDefault<InnerModel, QueryParams> | undefined,
   queryParams: Ref<QueryParams | undefined> | undefined,
   initFn: ((value: InnerModel) => ResultModel) | undefined,
   confimGetter: ((payload: ResultModel, data: ParentModel) => ConfirmProps | Promise<ConfirmProps | undefined> | undefined) | undefined,
@@ -26,9 +26,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   validateOnUpdate: ((newValue: ResultModel) => void) | undefined,
 ) => {
   const query = useQueryFn
-    ? queryParams !== undefined
-      ? (useQueryFn as UseQueryWithParams<InnerModel, QueryParams>)(queryParams as Ref<QueryParams>, {enabled: computed(() => !parentModel.value)})
-      : (useQueryFn as UseQueryEmpty<InnerModel>)({enabled: computed(() => !parentModel.value)})
+    ? useQueryFn(queryParams as Ref<QueryParams>, {enabled: computed(() => !parentModel.value)})
     : undefined
 
   const getParentValue = () => field.value !== undefined ? parentModel.value?.[field.value] as InnerModel : parentModel.value as unknown as InnerModel

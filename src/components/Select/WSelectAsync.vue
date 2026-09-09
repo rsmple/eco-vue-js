@@ -302,7 +302,7 @@ const setSearch = (value: string): void => {
 }
 
 if (props.useQueryFnDefault) {
-  const {data: defaultData} = props.useQueryFnDefault({enabled: computed(() => !props.disabled)})
+  const {data: defaultData} = props.useQueryFnDefault(undefined, {enabled: computed(() => !props.disabled)})
 
   watch(defaultData, value => {
     if (value && props.modelValue?.length === 0) {
