@@ -6,8 +6,8 @@
 
   <div
     v-else
-    class="w-max rounded-md bg-gray-100 px-2 py-0.5 text-xs font-semibold dark:bg-gray-800"
-    :class="classMap[semanticType]"
+    class="w-max rounded-md px-2 py-0.5 text-xs font-semibold text-default"
+    :class="semanticTypeChipMap[semanticType]"
   >
     <slot>
       {{ text }}
@@ -18,7 +18,7 @@
 <script lang="ts" setup>
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
-import {SemanticType} from '@/utils/SemanticType'
+import {SemanticType, useSemanticTypeChipMap} from '@/utils/SemanticType'
 import {useComponentStatesSkeleton} from '@/utils/useComponentStates'
 
 const props = withDefaults(
@@ -36,12 +36,5 @@ const props = withDefaults(
 
 const {isSkeleton} = useComponentStatesSkeleton(props)
 
-const classMap: Record<SemanticType, string> = {
-  [SemanticType.PRIMARY]: 'text-primary dark:text-primary-dark',
-  [SemanticType.SECONDARY]: 'text-description',
-  [SemanticType.POSITIVE]: 'text-positive dark:text-positive-dark',
-  [SemanticType.NEGATIVE]: 'text-negative dark:text-negative-dark',
-  [SemanticType.WARNING]: 'text-warning dark:text-warning-dark',
-  [SemanticType.INFO]: 'text-info dark:text-info-dark',
-}
+const semanticTypeChipMap = useSemanticTypeChipMap()
 </script>
