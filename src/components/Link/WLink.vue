@@ -1,6 +1,6 @@
 <template>
   <component
-    v-bind="!to ? {target, href} : {to}"
+    v-bind="!to ? {href, target} : {to, target}"
     :is="to ? WRouterLink : 'a'"
     class="cursor-pointer overflow-hidden truncate whitespace-normal font-normal no-underline hover:underline"
     :class="semanticTypeTextMap[semanticType]"
