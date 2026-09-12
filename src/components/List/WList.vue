@@ -192,6 +192,7 @@ import {ListMode} from '@/utils/utils'
 
 import ListItem from './components/ListItem.vue'
 import ListToolbar from './components/ListToolbar.vue'
+import {AREA_MORE, AREA_SELECT} from './types'
 import {filterFields, forEachField, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, sortFields, sortFieldsDeep, useListConfig} from './use/useListConfig'
 
 defineOptions({inheritAttrs: false})
@@ -287,15 +288,6 @@ const listCount = ref<number | undefined>(undefined)
 
 const countValue = computed(() => props.count ?? listCount.value)
 
-const cardStyles = computed<StyleValue>(() => {
-  if (!props.cardColumns || !props.cardAreas) return
-
-  return {
-    '--w-list-grid-cols': props.cardColumns.join(' '),
-    '--w-list-grid-areas': props.cardAreas.map(inner => `"${ inner.join(' ') }"`).join('\n'),
-  }
-})
-
 const fieldsVisible = computed(() => filterFields(props.fields, field => field.visibleGetter?.(props.queryParams) ?? true))
 
 const {
@@ -354,6 +346,34 @@ const allowOpen = computed(() => props.expansion !== undefined)
 const hasMenu = computed(() => props.menu !== undefined || props.toMarkdown !== undefined)
 
 const disableSelect = computed(() => !allowSelect.value)
+
+const cardStyles = computed<StyleValue>(() => {
+  const cardColumns = props.cardColumns
+  const cardAreas = props.cardAreas
+
+  if (!cardColumns || !cardAreas) return
+
+  const isAreaShown = (area: string): boolean => {
+    if (area === AREA_SELECT) return allowSelect.value
+    if (area === AREA_MORE) return hasMenu.value
+
+    return area in columnDataMap.value
+  }
+
+  const areas = cardAreas.map(row => row.map(area => isAreaShown(area) ? area : '.'))
+
+  const colsShown = cardColumns.map((_, index) => areas.some(row => row[index] !== '.'))
+  const areasShown = areas
+    .filter(row => row.some(area => area !== '.'))
+    .map(row => row.filter((_, index) => colsShown[index]))
+
+  if (!areasShown.length) return
+
+  return {
+    '--w-list-grid-cols': cardColumns.filter((_, index) => colsShown[index]).join(' '),
+    '--w-list-grid-areas': areasShown.map(row => `"${ row.join(' ') }"`).join('\n'),
+  }
+})
 
 const {selection: selectionUsed, updateSelection} = props.selection ? {
   selection: toRef(props, 'selection') as Ref<Selection<number>>,
