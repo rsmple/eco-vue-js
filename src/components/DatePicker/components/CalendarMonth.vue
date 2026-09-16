@@ -134,9 +134,9 @@ const isEmpty = computed(() => {
 const isDisabled = computed(() => {
   if (props.disabled) return true
 
-  if (props.minDate) return props.minDate > endOfLastWeek.value
+  if (props.minDate && props.minDate > endOfLastWeek.value) return true
 
-  if (props.maxDate) return props.maxDate < startOfFirstWeek.value
+  if (props.maxDate && props.maxDate < startOfFirstWeek.value) return true
 
   return false
 })

@@ -24,14 +24,18 @@
       <div class="grid grid-cols-2 gap-5 px-3 pb-4">
         <CalendarToggle
           :text="monthShortFormatter.format(currentDate).toLocaleUpperCase()"
-          @click:previous="setCurrentDate(addMonth(currentDate, -1))"
-          @click:next="setCurrentDate(addMonth(currentDate, 1))"
+          :disabled-previous="isPreviousDisabled"
+          :disabled-next="isNextDisabled"
+          @click:previous="toPreviousMonth"
+          @click:next="toNextMonth"
         />
 
         <CalendarToggle
           :text="year.toString()"
-          @click:previous="setCurrentDate(addYear(currentDate, -1))"
-          @click:next="setCurrentDate(addYear(currentDate, 1))"
+          :disabled-previous="isPreviousDisabled"
+          :disabled-next="isNextDisabled"
+          @click:previous="toPreviousYear"
+          @click:next="toNextYear"
         />
       </div>
 
@@ -64,14 +68,15 @@
 <script lang="ts" setup>
 import type {DateRange} from './models/types'
 
-import {computed, ref, toRef, watch} from 'vue'
+import {ref, toRef, watch} from 'vue'
 
-import {addDay, addMonth, addYear, getStartOfDay, getStartOfMonth, getStartOfWeek, isSameMonth, monthShortFormatter} from '@/utils/dateTime'
+import {getStartOfDay, isSameMonth, monthShortFormatter} from '@/utils/dateTime'
 import {useComponentStates} from '@/utils/useComponentStates'
 
 import CalendarMonth from './components/CalendarMonth.vue'
 import CalendarToggle from './components/CalendarToggle.vue'
 import CalendarValue from './components/CalendarValue.vue'
+import {useCalendarNavigation} from './use/useCalendarNavigation'
 
 const props = withDefaults(
   defineProps<{
@@ -97,19 +102,24 @@ const emit = defineEmits<{
   (e: 'update:model-value', value: DateRange | undefined): void
 }>()
 
-const currentDate = ref(getStartOfMonth())
+const {
+  currentDate,
+  isDirect,
+  year,
+  isPreviousDisabled,
+  isNextDisabled,
+  setCurrentDate,
+  toPreviousMonth,
+  toNextMonth,
+  toPreviousYear,
+  toNextYear,
+  isSameCalendarPage,
+} = useCalendarNavigation(props)
+
 const dateRange = ref<DateRange | undefined>(props.modelValue)
 const preselectedValue = ref<Date | null>(null)
-const isDirect = ref(false)
 
 const today = ref(getStartOfDay())
-
-const year = computed<number>(() => currentDate.value.getFullYear())
-
-const setCurrentDate = (value: Date): void => {
-  isDirect.value = value > currentDate.value
-  currentDate.value = value
-}
 
 const onClickDay = (value: Date): void => {
   if (!preselectedValue.value) {
@@ -150,20 +160,13 @@ const setRange = (value: Date): void => {
   }
 }
 
-const firstDay = computed(() => getStartOfWeek(currentDate.value))
-const lastDay = computed(() => addDay(firstDay.value, 41))
-
-const isSameCalendarPage = (value: Date) => {
-  return value >= firstDay.value && value <= lastDay.value
-}
-
 watch(toRef(props, 'modelValue'), modelValue => {
   dateRange.value = modelValue
 
   if (!modelValue) return
 
   if (!isSameCalendarPage(modelValue.from) && !isSameCalendarPage(modelValue.to)) {
-    setCurrentDate(getStartOfMonth(modelValue.from))
+    setCurrentDate(modelValue.from)
   }
 })
 </script>

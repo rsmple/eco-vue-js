@@ -6,14 +6,18 @@
     <div class="grid grid-cols-2 gap-8 px-3 pb-4">
       <CalendarToggle
         :text="monthShortFormatter.format(currentDate).toLocaleUpperCase()"
-        @click:previous="setCurrentDate(addMonth(currentDate, -1))"
-        @click:next="setCurrentDate(addMonth(currentDate, 1))"
+        :disabled-previous="isPreviousDisabled"
+        :disabled-next="isNextDisabled"
+        @click:previous="toPreviousMonth"
+        @click:next="toNextMonth"
       />
 
       <CalendarToggle
         :text="year.toString()"
-        @click:previous="setCurrentDate(addYear(currentDate, -1))"
-        @click:next="setCurrentDate(addYear(currentDate, 1))"
+        :disabled-previous="isPreviousDisabled"
+        :disabled-next="isNextDisabled"
+        @click:previous="toPreviousYear"
+        @click:next="toNextYear"
       />
     </div>
 
@@ -44,13 +48,14 @@
 <script lang="ts" setup>
 import type {DateRange} from './models/types'
 
-import {computed, ref, toRef, watch} from 'vue'
+import {ref, toRef, watch} from 'vue'
 
-import {addDay, addMonth, addYear, getStartOfDay, getStartOfMonth, getStartOfWeek, monthShortFormatter} from '@/utils/dateTime'
+import {getStartOfDay, monthShortFormatter} from '@/utils/dateTime'
 import {useComponentStates} from '@/utils/useComponentStates'
 
 import CalendarMonth from './components/CalendarMonth.vue'
 import CalendarToggle from './components/CalendarToggle.vue'
+import {useCalendarNavigation} from './use/useCalendarNavigation'
 
 const props = withDefaults(
   defineProps<{
@@ -78,28 +83,26 @@ const emit = defineEmits<{
   (e: 'update:model-value', value: Date | undefined): void
 }>()
 
-const currentDate = ref(getStartOfMonth())
+const {
+  currentDate,
+  isDirect,
+  year,
+  isPreviousDisabled,
+  isNextDisabled,
+  setCurrentDate,
+  toPreviousMonth,
+  toNextMonth,
+  toPreviousYear,
+  toNextYear,
+  isSameCalendarPage,
+} = useCalendarNavigation(props)
+
 const dateRange = ref<DateRange | undefined>(undefined)
 const preselectedValue = ref<Date | null>(null)
-const isDirect = ref(false)
 const today = ref(getStartOfDay())
-
-const year = computed<number>(() => currentDate.value.getFullYear())
-
-const setCurrentDate = (value: Date): void => {
-  isDirect.value = value > currentDate.value
-  currentDate.value = value
-}
 
 const onClickDay = (value: Date): void => {
   emit('update:model-value', value)
-}
-
-const firstDay = computed(() => getStartOfWeek(currentDate.value))
-const lastDay = computed(() => addDay(firstDay.value, 41))
-
-const isSameCalendarPage = (value: Date) => {
-  return value >= firstDay.value && value <= lastDay.value
 }
 
 watch(toRef(props, 'modelValue'), modelValue => {
@@ -108,7 +111,7 @@ watch(toRef(props, 'modelValue'), modelValue => {
   if (!modelValue) return
 
   if (!isSameCalendarPage(modelValue)) {
-    setCurrentDate(getStartOfMonth(modelValue))
+    setCurrentDate(modelValue)
   }
 }, {immediate: true})
 </script>

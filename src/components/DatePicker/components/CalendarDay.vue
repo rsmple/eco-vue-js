@@ -115,9 +115,9 @@ const isBetweenRange = computed(() => {
 const isDisabled = computed(() => {
   if (props.disabled) return true
 
-  if (props.minDate) return props.minDate > props.startOfDay
+  if (props.minDate && props.minDate > props.startOfDay) return true
 
-  if (props.maxDate) return props.maxDate < props.startOfDay
+  if (props.maxDate && props.maxDate < props.startOfDay) return true
 
   return false
 })
