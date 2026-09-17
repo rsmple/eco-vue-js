@@ -1,6 +1,6 @@
 <template>
   <component
-    v-bind="!to ? {href, target} : {to, target}"
+    v-bind="!to ? {href, target, rel} : {to, target, rel}"
     :is="to ? WRouterLink : 'a'"
     class="cursor-pointer overflow-hidden truncate whitespace-normal font-normal no-underline hover:underline"
     :class="semanticTypeTextMap[semanticType]"
@@ -25,6 +25,7 @@ import {SemanticType, useSemanticTypeChipMap, useSemanticTypeTextMap} from '@/ut
 interface Props extends Partial<LinkProps> {
   href?: string
   target?: '_self' | '_blank' | '_parent' | '_top'
+  rel?: string
   text?: string
   semanticType?: SemanticType
   icon?: SVGComponent
@@ -37,6 +38,7 @@ withDefaults(
     to: undefined,
     href: undefined,
     target: undefined,
+    rel: undefined,
     text: undefined,
     icon: undefined,
   },
