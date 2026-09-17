@@ -14,6 +14,7 @@ export interface ButtonProps extends Partial<LinkProps> {
   replace?: boolean
   href?: string
   target?: '_self' | '_blank' | '_parent' | '_top'
+  rel?: string
   join?: boolean
   tooltipText?: string
   download?: string
@@ -28,7 +29,7 @@ export type ButtonGroupOptionComponent<Option> = Component<SelectOptionProps<Opt
 
 interface ButtonGroupPropsBase<Model extends number | string | null | boolean>
   extends Omit<FieldWrapperProps, 'modelValue'>,
-  Omit<ButtonProps, 'tag' | 'type' | 'replace' | 'href' | 'target' | 'join'> {
+  Omit<ButtonProps, 'tag' | 'type' | 'replace' | 'href' | 'target' | 'rel' | 'join'> {
   modelValue: Model
   wrap?: boolean
   col?: boolean

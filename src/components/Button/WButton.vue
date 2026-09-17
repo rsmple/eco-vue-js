@@ -16,9 +16,9 @@
       ...(isDisabled
         ? {}
         : tag === 'a'
-          ? {href, target}
+          ? {href, target, rel}
           : to !== undefined
-            ? {to, replace, target}
+            ? {to, replace, target, rel}
             : {})
     }"
     :is="to !== undefined ? isDisabled ? 'a' : WRouterLink : tag"
@@ -105,6 +105,7 @@ const props = withDefaults(
     type: undefined,
     href: undefined,
     target: undefined,
+    rel: undefined,
     semanticTypeMap: undefined,
     disabled: undefined,
     skeleton: undefined,
