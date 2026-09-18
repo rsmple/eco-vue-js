@@ -3,6 +3,7 @@ import {
   defineConfigWithVueTs,
   vueTsConfigs,
 } from '@vue/eslint-config-typescript'
+import pluginTemplateSecurity from 'eslint-plugin-template-security'
 import pluginVue from 'eslint-plugin-vue'
 
 import configAstro from './configs/configAstro.js'
@@ -22,6 +23,11 @@ export default (config = {}) => [
   ...config.noVue ? [] : configVue,
 
   ...pluginQuery.configs['flat/recommended'],
+
+  {
+    ...pluginTemplateSecurity.configs.recommended,
+    files: config.astro ? ['**/*.{ts,tsx,js,vue,astro}'] : ['**/*.{ts,tsx,js,vue}'],
+  },
 
   ...configJson,
   ...configTypescript(config),
