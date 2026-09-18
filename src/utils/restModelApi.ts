@@ -10,12 +10,12 @@ import {
   type QueryModelId,
   type QueryScope,
   type QueryScopeModel,
+  isQueryModelId,
   setQueryItems,
   snapshotQueries,
   updateQueryItems,
 } from '@/utils/queryCache'
 import {type DefaultQueryOptions, createDefaultQuery, normalizeQueryParamsValue} from '@/utils/useDefaultQuery'
-import {isId} from '@/utils/utils'
 
 import {getMatchingCollectionIds} from './getMatchingCollectionIds'
 import {getQueryClient} from './queryClient'
@@ -243,7 +243,7 @@ export const createRestModelApi = <
         ? unref(args[0] as MaybeRef<unknown>)
         : queryClient.getQueryData<QueryModel>(queryKeyOf(query, args))?.id
 
-      return isId(id) ? new Set([id]) : new Set()
+      return isQueryModelId(id) ? new Set([id]) : new Set()
     }
 
     if (!query.isQueryParams) return undefined

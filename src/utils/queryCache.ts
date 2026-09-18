@@ -1,6 +1,12 @@
 import {type QueryClient, useQueryClient} from '@tanstack/vue-query'
 
+import {isId} from '@/utils/utils'
+
 export type QueryModelId = number | string
+
+export const isQueryModelId = (value: unknown): value is QueryModelId => {
+  return isId(value) || (typeof value === 'string' && value !== '')
+}
 
 export type QueryModel = {id: QueryModelId}
 
