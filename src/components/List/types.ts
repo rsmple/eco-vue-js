@@ -169,8 +169,9 @@ export const AREA_MORE = 'area_more'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type CardAreas<Fields extends ListFields<any, any>, Length extends number> = (readonly (GetFieldLabels<Fields> | typeof AREA_SELECT | typeof AREA_MORE | '.')[] & { length: Length })[]
 
-type GridColValue = 'auto' | '1fr' | `${ number }rem`
-export type GridCol = GridColValue | `minmax(${ GridColValue }, ${ GridColValue })`
+type GridColFixed = 'auto' | `${ number }rem`
+type GridColValue = GridColFixed | `${ number }fr`
+export type GridCol = GridColValue | `minmax(${ GridColFixed }, ${ GridColValue })`
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ListConfig<Fields extends ListFields<any, any>> = {
