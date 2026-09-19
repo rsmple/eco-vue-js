@@ -3,7 +3,7 @@ import {type VNode, markRaw, ref} from 'vue'
 export type TooltipMeta = {
   id: string
   parent: HTMLElement
-  slot?: VNode
+  slot?: () => VNode[] | undefined
   text?: string
   maxHeight?: number
   top?: boolean

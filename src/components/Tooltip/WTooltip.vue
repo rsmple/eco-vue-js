@@ -43,16 +43,19 @@ const isOpen = computed(() => tooltipMeta.value?.id === id)
 
 let timeout: number | null = null
 
+// Rendered by WTooltipContainer as a functional component, so the slot is re-evaluated reactively while open
+const renderSlot = markRaw(() => slots.default?.())
+
 const open = async () => {
   if (timeout) {
     clearTimeout(timeout)
     timeout = null
   }
 
-  const slot = slots.default?.()?.[0]
+  const hasSlot = !!slots.default?.()?.[0]
 
   if (!parent.value) return
-  if (!slot && !props.text) return
+  if (!hasSlot && !props.text) return
 
   if (props.overflowOnly) {
     const rect = parent.value.getBoundingClientRect()
@@ -62,7 +65,7 @@ const open = async () => {
 
   const payload: TooltipMeta = {
     parent: parent.value,
-    slot: slot ? markRaw(slot) : undefined,
+    slot: hasSlot ? renderSlot : undefined,
     text: props.text,
     id,
     maxHeight: props.maxHeight,
