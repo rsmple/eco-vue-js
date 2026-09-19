@@ -360,12 +360,20 @@ const cardStyles = computed<StyleValue>(() => {
     return area in columnDataMap.value
   }
 
-  const areas = cardAreas.map(row => row.map(area => isAreaShown(area) ? area : '.'))
-
-  const colsShown = cardColumns.map((_, index) => areas.some(row => row[index] !== '.'))
-  const areasShown = areas
+  const areas = cardAreas
+    .map(row => row.map(area => isAreaShown(area) ? area : '.'))
     .filter(row => row.some(area => area !== '.'))
-    .map(row => row.filter((_, index) => colsShown[index]))
+
+  // drop rows left with only areas that span into another kept row (e.g. AREA_SELECT beside a hidden field)
+  const rowsKept = areas.map(() => true)
+  areas.forEach((row, rowIndex) => {
+    const isRedundant = row.every(area => area === '.' || areas.some((other, otherIndex) => otherIndex !== rowIndex && rowsKept[otherIndex] && other.includes(area)))
+    if (isRedundant) rowsKept[rowIndex] = false
+  })
+  const rows = areas.filter((_, index) => rowsKept[index])
+
+  const colsShown = cardColumns.map((_, index) => rows.some(row => row[index] !== '.'))
+  const areasShown = rows.map(row => row.filter((_, index) => colsShown[index]))
 
   if (!areasShown.length) return
 
