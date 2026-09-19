@@ -8,13 +8,15 @@ import {onUnmounted, watch} from 'vue'
 import {useHeader} from '@/components/HeaderBar/use/useHeader'
 
 const props = defineProps<{
-  isIntersecting: boolean
+  isIntersecting: boolean | null
   headerHeight: number
 }>()
 
 const {updateHeaderPadding} = useHeader()
 
 const updateHeaderHeight = () => {
+  if (props.isIntersecting === null) return
+
   if (!props.isIntersecting && props.headerHeight) {
     updateHeaderPadding(props.headerHeight)
   } else {

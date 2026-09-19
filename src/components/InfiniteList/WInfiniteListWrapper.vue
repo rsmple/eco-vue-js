@@ -67,7 +67,8 @@ const props = defineProps<{
 
 const isModal = inject(wIsModal, false)
 
-const isIntersecting = ref(props.initIsIntersecting)
+// null until the observer reports, so the header padding is not applied before the real position is known
+const isIntersecting = ref<boolean | null>(props.initIsIntersecting ?? null)
 const indicatorRef = useTemplateRef('indicator')
 
 const observerCb = (entries: IntersectionObserverEntry[]) => {

@@ -24,7 +24,7 @@ import {getIsClientSide} from '@/utils/utils'
 import {wScrollingElement} from '../models/injection'
 
 defineProps<{
-  isIntersecting: boolean
+  isIntersecting: boolean | null
 }>()
 
 const headerRef = useTemplateRef('header')
