@@ -53,7 +53,9 @@ export function dateFormat(date: Date): string {
 }
 
 export function dateFormatShort(date: Date): string {
-  return `${ date.getDate().toString().padStart(2, '0') } ${ monthShortFormatter.format(date) }`
+  const dayMonth = `${ date.getDate().toString().padStart(2, '0') } ${ monthShortFormatter.format(date) }`
+
+  return isSameYear(date, new Date()) ? dayMonth : `${ dayMonth } ${ date.getFullYear() }`
 }
 
 export function timeFormat(date: Date): string {
