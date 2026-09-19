@@ -66,8 +66,8 @@ export function timeFormatShort(date: Date): string {
   return date.toLocaleTimeString('en-GB', {timeStyle: 'short'})
 }
 
-export function datetimeFormat(date: Date): string {
-  return `${ dateFormat(date) } ${ timeFormat(date) }`
+export function datetimeFormat(date: Date, short?: boolean): string {
+  return `${ (short ? timeFormatShort : timeFormat)(date) } - ${ (short ? dateFormatShort : dateFormat)(date) }`
 }
 
 export function durationHumanize(durationSeconds: number, full?: boolean, round?: boolean): string {
