@@ -1,7 +1,7 @@
 <template>
   <WFieldWrapper
     v-bind="props"
-    :class="$attrs.class"
+    :class="[$attrs.class, {'py-1': embedded}]"
   >
     <template
       v-if="$slots.title"

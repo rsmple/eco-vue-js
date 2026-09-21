@@ -8,7 +8,8 @@
   >
     <template #toggle>
       <WButton
-        :semantic-type="SemanticType.SECONDARY"
+        :semantic-type="isOpen ? SemanticType.PRIMARY : SemanticType.SECONDARY"
+        outline
         @click="$emit('toggle')"
       >
         <component
@@ -47,9 +48,13 @@
 
     <template #content="{isMobile}">
       <div
-        class="p-4 text-start font-normal"
+        class="text-start font-normal"
         :class="{
-          'bg-default dark:bg-default-dark my-1 w-96 rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
+          'p-4': !meta.embedded,
+          'bg-default dark:bg-default-dark my-1 rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
+          'w-96': !isMobile && !meta.embedded,
+          'max-w-96': !isMobile && meta.embedded,
+          'w-screen': isMobile && meta.embedded,
         }"
       >
         <component

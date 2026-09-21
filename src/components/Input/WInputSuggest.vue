@@ -1,8 +1,8 @@
 <template>
   <component
-    :is="static ? InputSuggestStatic : WDropdownAdaptive"
+    :is="isStatic ? InputSuggestStatic : WDropdownAdaptive"
     ref="dropdownMenu"
-    v-bind="static ? undefined : {
+    v-bind="isStatic ? undefined : {
       isOpen,
       horizontalAlign,
       updateAlign: true,
@@ -21,12 +21,14 @@
           unclickable: toggleScope?.unclickable,
           description: toggleScope?.unclickable === false ? undefined : description,
           seamless: toggleScope?.unclickable === false ? false : props.seamless,
-          topText: topText || (isOpen && !toggleScope?.isTop)
+          topText: topText || (isOpen && !toggleScope?.isTop),
+          autofocus: autofocus ?? embedded,
         }"
         :class="{
           'cursor-pointer': !isDisabled && !isReadonly,
           'cursor-not-allowed': isDisabled && !isReadonly,
           'mb-3': isMobile && !toggleScope?.unclickable,
+          'sm:pt-3': embedded,
         }"
         @update:model-value="!loading && $emit('update:model-value', $event as NonNullable<ModelValue>)"
 
@@ -83,10 +85,20 @@
         </template>
 
         <template
-          v-if="$slots.bottom || (static && $slots.content)"
+          v-if="$slots.bottom || (isStatic && $slots.content)"
           #bottom
         >
-          <template v-if="static">
+          <template v-if="embedded">
+            <div class="pb-4" />
+            <WInfiniteListScrollingElement class="overflow-y-auto overscroll-y-contain">
+              <slot
+                name="content"
+                v-bind="{focused, focus, blur}"
+              />
+            </WInfiniteListScrollingElement>
+          </template>
+
+          <template v-else-if="static">
             <div class="pb-4" />
             <slot
               name="content"
@@ -97,7 +109,7 @@
         </template>
 
         <template
-          v-if="!isReadonly && !hideToggle && !static"
+          v-if="!isReadonly && !hideToggle && !isStatic"
           #suffix
         >
           <InputActionsButton
@@ -126,7 +138,7 @@
     </template>
 
     <template
-      v-if="!static"
+      v-if="!isStatic"
       #content
     >
       <WInfiniteListScrollingElement
@@ -205,6 +217,8 @@ const parentEl = shallowRef<Element | null>(null)
 const {isMobile} = useIsMobile()
 
 const isDisabledComputed = computed(() => isReadonly.value || isDisabled.value)
+
+const isStatic = computed(() => props.static || props.embedded)
 
 const open = () => {
   if (isDisabledComputed.value) return
