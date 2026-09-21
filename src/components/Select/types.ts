@@ -131,7 +131,7 @@ export interface SelectAsyncPrefixPageProps<Model extends number | string, Data 
 
 export interface SelectAsyncSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean>
   extends Omit<SelectAsyncProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'previewData' | 'createdData' | 'emptyValue'> {
-  modelValue: Model | null | undefined
+  modelValue: Model | null
   allowClear?: boolean & AllowClear
   searchModel?: boolean
   previewData?: Data

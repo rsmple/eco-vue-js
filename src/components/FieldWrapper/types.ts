@@ -25,5 +25,5 @@ export interface FieldWrapperProps {
   topText?: boolean
   allowDropFile?: boolean
   hideTitle?: boolean
-  fieldClass?: string
+  embedded?: boolean
 }

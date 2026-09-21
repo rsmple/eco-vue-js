@@ -85,7 +85,7 @@
     </template>
 
     <template #content>
-      <div :class="static ? undefined : 'max-h-80'">
+      <div class="max-h-80">
         <slot name="content" />
 
         <SelectOption

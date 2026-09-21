@@ -11,13 +11,13 @@
         style: $attrs.style as StyleValue,
       }"
     :class="[$attrs.class, {
-      'mb-4.5': !noMargin && !subgrid,
+      'mb-4.5': !noMargin && !embedded && !subgrid,
       'col-span-full grid grid-cols-subgrid': subgrid,
     }]"
     @click="$emit('click', $event)"
   >
     <label
-      v-if="!hideTitle && !seamless && (title || $slots.title)"
+      v-if="!hideTitle && !embedded && !seamless && (title || $slots.title)"
       :for="id"
       class="text-accent relative block text-xs font-semibold leading-loose"
       :class="{
@@ -58,11 +58,12 @@
     <div
       ref="field"
       class="grid"
-      :class="[{
+      :class="{
         'pr-9': !title && !$slots.title && filterField,
         'col-start-2 -col-end-1 row-start-1 -row-end-3 grid-cols-subgrid': subgrid,
         'grid-cols-[1fr_auto]': !subgrid,
-      }, fieldClass]"
+        'px-3': embedded,
+      }"
     >
       <div
         v-if="!isSkeleton"

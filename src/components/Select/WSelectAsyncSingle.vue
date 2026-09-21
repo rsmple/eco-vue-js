@@ -14,7 +14,7 @@
     }"
     :class="$attrs.class"
     @select="updateModelValue"
-    @unselect="(value, data) => allowClear && updateModelValue(undefined, data)"
+    @unselect="(value, data) => allowClear && updateModelValue(null as EmitType, data)"
     @focus="searchModel && typeof modelValue === 'string' ? selectComponentRef?.setSearch(modelValue) : undefined"
     @init-model="$emit('init-model')"
   >
@@ -72,7 +72,7 @@ import {computed, toRef, useTemplateRef, watch} from 'vue'
 
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 
-type EmitType = AllowClear extends true ? Model | undefined : NonNullable<Model>
+type EmitType = AllowClear extends true ? Model | null : NonNullable<Model>
 
 defineOptions({inheritAttrs: false})
 
@@ -94,7 +94,7 @@ const selectComponentRef = useTemplateRef('selectComponent')
 
 const arrayValue = computed<Model[]>(() => props.modelValue ? [props.modelValue] : [])
 
-const updateModelValue = (value: Model | undefined, data: Data | undefined): void => {
+const updateModelValue = (value: Model | null, data: Data | undefined): void => {
   emit('update:model-value', value as EmitType, data)
 }
 
