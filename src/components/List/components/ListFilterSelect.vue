@@ -30,22 +30,18 @@
           'bg-default dark:bg-default-dark max-h-80 overflow-y-auto overscroll-y-contain rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
         }"
       >
-        <template
-          v-for="(item, index) in filter"
-          :key="index"
+        <WMenuItem
+          v-for="item in filter"
+          :key="item.id"
+          @click="$emit('select', item.id); isOpen = false"
         >
-          <WMenuItem
-            v-if="!exclude?.includes(index)"
-            @click="$emit('select', index); isOpen = false"
-          >
-            <div>
-              <component
-                :is="getMetaValue((Array.isArray(item.item) ? item.item[0].meta : item.item.meta).icon, queryParams)"
-                class="square-[1.25em] -mt-1 inline"
-              /> {{ getMetaValue((Array.isArray(item.item) ? item.item[0].meta : item.item.meta).title, queryParams) ?? '' }}
-            </div>
-          </WMenuItem>
-        </template>
+          <div>
+            <component
+              :is="getMetaValue((Array.isArray(item.item) ? item.item[0].meta : item.item.meta).icon, queryParams)"
+              class="square-[1.25em] -mt-1 inline"
+            /> {{ getMetaValue((Array.isArray(item.item) ? item.item[0].meta : item.item.meta).title, queryParams) ?? '' }}
+          </div>
+        </WMenuItem>
       </div>
     </template>
   </WDropdownAdaptive>
@@ -69,12 +65,11 @@ import {getMetaValue} from '../models/utils'
 
 defineProps<{
   filter: {id: string, item: FilterComponent<QueryParams>}[]
-  exclude: number[]
   queryParams: QueryParams
 }>()
 
 defineEmits<{
-  (e: 'select', value: number): void
+  (e: 'select', value: string): void
 }>()
 
 const isOpen = ref(false)

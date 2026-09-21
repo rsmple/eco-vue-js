@@ -35,11 +35,10 @@
     />
 
     <ListFilterSelect
-      v-if="!readonly && allShown.length < filterList.length"
-      :filter="filterAll"
-      :exclude="excluded"
+      v-if="!readonly && availableList.length"
+      :filter="availableList"
       :query-params="scope.modelValue"
-      @select="selected.push($event); openId = filterList[$event].id"
+      @select="selected.push($event); openId = $event"
     />
   </div>
 </template>
@@ -86,19 +85,15 @@ const filterList = computed(() => {
 
 const shown = computed(() => filterList.value
   .filter(item => (Array.isArray(item.item) ? item.item[0].meta.fields : item.item.meta.fields)?.some(field => field in (props.scope.modelValue as Record<string, unknown>) && props.scope.modelValue[field] !== undefined))
-  .map(item => filterAll.indexOf(item)))
+  .map(item => item.id))
 
-const selected = ref<number[]>(shown.value.slice())
+const selected = ref<string[]>(shown.value.slice())
 
 const allShown = computed(() => [...selected.value, ...shown.value].filter((item, index, array) => array.indexOf(item) === index))
 
-const shownList = computed(() => filterList.value.filter(item => allShown.value.includes(filterAll.indexOf(item))))
+const shownList = computed(() => filterList.value.filter(item => allShown.value.includes(item.id)))
 
-const excluded = computed<number[]>(() => {
-  const hidden = filterAll.filter(item => !filterList.value.includes(item)).map(item => filterAll.indexOf(item) ?? -1) ?? []
-
-  return [...allShown.value, ...hidden]
-})
+const availableList = computed(() => filterList.value.filter(item => !allShown.value.includes(item.id)))
 
 const closeFilterItem = (item: {id: string}) => {
   if (openId.value === item.id) openId.value = null
@@ -112,10 +107,9 @@ const removeFilterItem = (item: {id: string, item: FilterComponent<QueryParams>}
     result[field as keyof QueryParams] = undefined as never
   })
 
-  const index = filterAll.indexOf(item)
-  const selectedIndex = selected.value.indexOf(index)
+  const selectedIndex = selected.value.indexOf(item.id)
 
-  if (index !== -1 && selectedIndex !== -1) selected.value.splice(selectedIndex, 1)
+  if (selectedIndex !== -1) selected.value.splice(selectedIndex, 1)
 
   closeFilterItem(item)
 
