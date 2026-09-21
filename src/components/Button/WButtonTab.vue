@@ -83,7 +83,7 @@
               </template>
             </Suspense>
 
-            {{ title }}
+            {{ title }} {{ count !== undefined ? `(${numberFormatter.format(count)})` : '' }}
           </component>
         </div>
 
@@ -140,6 +140,8 @@ import IconCheckCircle from '@/assets/icons/IconCheckCircle.svg?component'
 import IconClose from '@/assets/icons/IconClose.svg?component'
 import IconNegativeInfo from '@/assets/icons/IconNegativeInfo.svg?component'
 
+import {numberFormatter} from '@/utils/utils.ts'
+
 import WEmptyComponent from '../EmptyComponent/WEmptyComponent.vue'
 import WStatusIcon from '../Status/WStatusIcon.vue'
 import WTextOverflow from '../TextOverflow/WTextOverflow.vue'
@@ -157,6 +159,7 @@ defineProps<{
   statusIcon?: boolean
   showHasValue?: boolean
   enableOverflow?: boolean
+  count?: number
 }>()
 
 defineEmits<{

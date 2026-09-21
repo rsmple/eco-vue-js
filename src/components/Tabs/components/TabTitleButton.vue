@@ -20,6 +20,7 @@
       :status-icon="statusIcon"
       :show-has-value="showHasValue"
       :enable-overflow="enableOverflow"
+      :count="count"
       @click="$emit('click', $event)"
     >
       <template
@@ -62,6 +63,7 @@ const props = defineProps<{
   statusIcon?: boolean
   enableOverflow?: boolean
   indicator?: boolean
+  count: number | undefined
 }>()
 
 const emit = defineEmits<{

@@ -32,4 +32,5 @@ export type TabsItemProps = {
   hasChanges?: boolean
   validate?: () => string | undefined
   requireSave?: boolean
+  count?: number
 }
