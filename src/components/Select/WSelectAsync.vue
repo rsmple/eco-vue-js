@@ -103,7 +103,7 @@
         :query-options="{placeholderData: keepPreviousData}"
         :search="search"
         :reverse="reverse"
-        class="max-h-80"
+        :class="static ? undefined : 'max-h-80'"
         @select="select"
         @unselect="unselect"
         @create:option="create(search)"

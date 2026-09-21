@@ -13,7 +13,7 @@
     }"
     :class="$attrs.class"
     @select="updateModelValue"
-    @unselect="(value, data) => allowClear && updateModelValue(null, data)"
+    @unselect="(value, data) => allowClear && updateModelValue(undefined, data)"
     @focus="searchModel && typeof modelValue === 'string' ? selectComponentRef?.setSearch(modelValue) : undefined; $emit('focus', $event)"
     @blur="$emit('blur', $event)"
     @update:query-options-error="$emit('update:query-options-error', $event)"
@@ -73,7 +73,7 @@ import {type VNode, computed, toRef, useTemplateRef, watch} from 'vue'
 
 import WSelect from '@/components/Select/WSelect.vue'
 
-type EmitType = AllowClear extends true ? Model | null : NonNullable<Model>
+type EmitType = AllowClear extends true ? Model | undefined : NonNullable<Model>
 
 defineOptions({inheritAttrs: false})
 
@@ -98,7 +98,7 @@ const selectComponentRef = useTemplateRef('selectComponent')
 
 const arrayValue = computed<Model[]>(() => props.modelValue !== null && props.modelValue !== undefined && props.modelValue !== '' ? [props.modelValue] : [])
 
-const updateModelValue = (value: Model | null, data: Data | undefined): void => {
+const updateModelValue = (value: Model | undefined, data: Data | undefined): void => {
   emit('update:model-value', value as EmitType, data)
 
   blur()

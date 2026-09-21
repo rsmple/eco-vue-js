@@ -21,7 +21,8 @@
           unclickable: toggleScope?.unclickable,
           description: toggleScope?.unclickable === false ? undefined : description,
           seamless: toggleScope?.unclickable === false ? false : props.seamless,
-          topText: topText || (isOpen && !toggleScope?.isTop)
+          topText: topText || (isOpen && !toggleScope?.isTop),
+          fieldClass: static ? `pb-4 ${fieldClass ?? ''}` : fieldClass,
         }"
         :class="{
           'cursor-pointer': !isDisabled && !isReadonly,
@@ -87,7 +88,6 @@
           #bottom
         >
           <template v-if="static">
-            <div class="pb-4" />
             <slot
               name="content"
               v-bind="{focused, focus, blur}"
