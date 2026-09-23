@@ -92,6 +92,7 @@
 @utility w-skeleton-h-* {
   --skeleton-height: --spacing(--value(number));
   --skeleton-height: --value(--spacing-*, --w-size-*, [*]);
+  --skeleton-margin-y: 0px;
 }
 
 @utility w-list-card-w-* {

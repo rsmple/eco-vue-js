@@ -28,12 +28,12 @@ export interface ButtonProps extends Partial<LinkProps> {
 export type ButtonGroupOptionComponent<Option> = Component<SelectOptionProps<Option>>
 
 interface ButtonGroupPropsBase<Model extends number | string | null | boolean>
-  extends Omit<FieldWrapperProps, 'modelValue'>,
-  Omit<ButtonProps, 'tag' | 'type' | 'replace' | 'href' | 'target' | 'rel' | 'join'> {
+  extends Omit<FieldWrapperProps, 'modelValue'> {
   modelValue: Model
   wrap?: boolean
   col?: boolean
   semanticType?: SemanticType
+  loading?: boolean
   stretch?: boolean
   allowClear?: boolean
 }

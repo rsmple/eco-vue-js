@@ -46,44 +46,74 @@
       v-else
       #field
     >
+      <WSkeleton
+        v-if="skeleton"
+        class="w-skeleton-h---w-input-height w-skeleton-rounded-[0.625rem]"
+      />
       <div
-        class="flex"
+        v-else
+        role="group"
+        class="flex max-w-full gap-0.5 rounded-[0.625rem] p-0.75 bg-gray-100 dark:bg-gray-800"
         :class="{
-          'flex-wrap gap-2': wrap,
-          'flex-col gap-2': col,
-          'items-start': col && !stretch,
+          'flex-wrap': wrap,
+          'flex-col': col,
+          'w-fit': !stretch,
         }"
       >
-        <WButton
+        <button
           v-for="(item, index) in list"
           :key="index"
-          v-bind="{
-            ...props,
-            semanticType: getValue(item as Model | Entity) === modelValue ? semanticType ?? SemanticType.PRIMARY : SemanticType.SECONDARY,
-            noBorderComponent: getValue(item as Model | Entity) !== modelValue,
-            loading: loading && getValue(item as Model | Entity) === loadingItem,
-            disabled: isDisabled || isReadonly || (loading && getValue(item as Model | Entity) !== loadingItem),
-            join: !wrap && !col,
-            tooltipText: undefined,
-          }"
+          type="button"
+          :aria-pressed="getValue(item as Model | Entity) === modelValue"
+          class="
+            relative isolate flex h-[calc(var(--w-input-height,2.75rem)-0.375rem)]
+            bg-size-[200%] bg-position-[100%] items-center justify-center gap-2
+            rounded-lg px-3 font-medium whitespace-nowrap outline-none select-none
+          "
           :class="{
+            [semanticTypeButtonBackgroundMap[semanticType] ?? semanticTypeBackgroundMap[semanticType]]: getValue(item as Model | Entity) === modelValue,
+            'shadow-sm': getValue(item as Model | Entity) === modelValue,
+            'text-black-default dark:text-gray-200 bg-transparent': getValue(item as Model | Entity) !== modelValue,
+            'w-ripple cursor-pointer w-ripple-hover w-ripple-opacity-20 before:text-black-default dark:w-ripple-opacity-30': !loading && !isItemDisabled(item),
+            'cursor-progress': loading && getValue(item as Model | Entity) === loadingItem,
+            'cursor-not-allowed opacity-70': isItemDisabled(item),
             'flex-1': stretch,
           }"
+          :disabled="isItemDisabled(item)"
           @click="updateModelValue(getValue(item as Model | Entity))"
         >
-          <slot
-            name="option"
-            :option="(item as ValueGetter extends undefined ? Model : Entity)"
-            :selected="getValue(item) === modelValue"
+          <div
+            class="z-10 flex items-center justify-center gap-2"
+            :class="{
+              'opacity-0': loading && getValue(item as Model | Entity) === loadingItem,
+            }"
           >
-            <component
-              :is="optionComponent"
-              v-if="optionComponent"
-              :option="item"
+            <slot
+              name="option"
+              :option="(item as ValueGetter extends undefined ? Model : Entity)"
               :selected="getValue(item) === modelValue"
+            >
+              <component
+                :is="optionComponent"
+                v-if="optionComponent"
+                :option="item"
+                :selected="getValue(item) === modelValue"
+              />
+            </slot>
+          </div>
+
+          <Transition
+            enter-active-class="transition-opacity"
+            leave-active-class="transition-opacity"
+            enter-from-class="opacity-0"
+            leave-to-class="opacity-0"
+          >
+            <WSpinner
+              v-if="loading && getValue(item as Model | Entity) === loadingItem"
+              class="absolute z-10 w-spinner-size-(--w-button-spinner-size,1.25em)"
             />
-          </slot>
-        </WButton>
+          </Transition>
+        </button>
       </div>
     </template>
 
@@ -102,22 +132,27 @@ import type {ButtonGroupProps} from './types'
 import {computed, ref} from 'vue'
 
 import WFieldWrapper from '@/components/FieldWrapper/WFieldWrapper.vue'
+import WSpinner from '@/components/Spinner/WSpinner.vue'
 
-import {SemanticType} from '@/utils/SemanticType'
+import {SemanticType, useSemanticTypeBackgroundMap, useSemanticTypeButtonBackgroundMap} from '@/utils/SemanticType'
 import {useComponentStates} from '@/utils/useComponentStates'
 
-import WButton from './WButton.vue'
+import WSkeleton from '../Skeleton/WSkeleton.vue'
 
 defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
   defineProps<ButtonGroupProps<Model, Entity, ValueGetter>>(),
   {
+    semanticType: SemanticType.PRIMARY,
     readonly: undefined,
     disabled: undefined,
     skeleton: undefined,
   },
 )
+
+const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()
+const semanticTypeButtonBackgroundMap = useSemanticTypeButtonBackgroundMap()
 
 const emit = defineEmits<{
   (e: 'update:model-value', value: Model): void
@@ -135,6 +170,10 @@ const getValue = (item: Model | Entity): Model => {
   }
 }
 
+const isItemDisabled = (item: Model | Entity): boolean => {
+  return !!(isDisabled.value || isReadonly.value || (props.loading && getValue(item) !== loadingItem.value))
+}
+
 const modelValueItem = computed(() => props.list.find(item => getValue(item) === props.modelValue))
 
 const emitUpdateModelValue = (value: Model): void => {
@@ -144,6 +183,8 @@ const emitUpdateModelValue = (value: Model): void => {
 }
 
 const updateModelValue = (value: Model): void => {
+  if (props.loading) return
+
   if (value !== props.modelValue) emitUpdateModelValue(value)
   else if (props.allowClear) emitUpdateModelValue(null as Model)
 }

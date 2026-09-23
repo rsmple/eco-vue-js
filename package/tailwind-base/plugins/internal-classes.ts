@@ -104,7 +104,8 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
       'min-height': 'var(--w-option-height)',
       'border-radius': 'var(--w-option-rounded)',
 
-      '--w-skeleton-height': 'var(--w-option-height)',
+      '--skeleton-height': 'var(--w-option-height)',
+      '--skeleton-margin-y': '0px',
       '--w-skeleton-rounded': 'var(--w-option-rounded)',
     },
     '.w-option-has-bg, *:has(.w-option-has-bg) + .w-option-has-bg-input, .w-option-has-bg + .w-option-has-bg-input': {
@@ -186,6 +187,8 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
       position: 'relative',
       width: 'var(--skeleton-width,var(--skeleton-width-internal,70%))',
       height: 'var(--skeleton-height,1em)',
+      'margin-block': 'var(--skeleton-margin-y,calc((1lh - 1em) / 2))',
+      'vertical-align': 'top',
       'border-radius': 'var(--w-skeleton-rounded,0.5rem)',
       overflow: 'hidden',
       cursor: 'progress',
