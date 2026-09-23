@@ -74,7 +74,7 @@
             [semanticTypeButtonBackgroundMap[semanticType] ?? semanticTypeBackgroundMap[semanticType]]: getValue(item as Model | Entity) === modelValue,
             'shadow-sm': getValue(item as Model | Entity) === modelValue,
             'text-black-default dark:text-gray-200 bg-transparent': getValue(item as Model | Entity) !== modelValue,
-            'w-ripple cursor-pointer w-ripple-hover w-ripple-opacity-20 before:text-black-default dark:w-ripple-opacity-30': !loading && !isItemDisabled(item),
+            'w-ripple cursor-pointer w-ripple-hover': !loading && !isItemDisabled(item),
             'cursor-progress': loading && getValue(item as Model | Entity) === loadingItem,
             'cursor-not-allowed opacity-70': isItemDisabled(item),
             'flex-1': stretch,
