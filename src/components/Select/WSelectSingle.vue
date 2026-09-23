@@ -9,11 +9,10 @@
       hidePrefix: true,
       filterValue: filterValue === undefined ? modelValue : filterValue,
       selectOnClose: props.searchModel ? props.searchModel : props.selectOnClose,
-      emptyValue: props.emptyValue !== undefined && props.emptyValue !== null ? [props.emptyValue] : undefined,
     }"
     :class="$attrs.class"
     @select="updateModelValue"
-    @unselect="(value, data) => allowClear && updateModelValue(null, data)"
+    @unselect="(value, data) => allowClear && updateModelValue(getClearValue(), data)"
     @focus="searchModel && typeof modelValue === 'string' ? selectComponentRef?.setSearch(modelValue) : undefined; $emit('focus', $event)"
     @blur="$emit('blur', $event)"
     @update:query-options-error="$emit('update:query-options-error', $event)"
@@ -66,19 +65,21 @@
   </WSelect>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false">
-import type {SelectOptionComponent, SelectOptionProps, SelectSingleProps} from './types'
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false, ClearValue extends SelectClearValue = null">
+import type {SelectClearValue, SelectOptionComponent, SelectOptionProps, SelectSingleProps} from './types'
 
 import {type VNode, computed, toRef, useTemplateRef, watch} from 'vue'
 
 import WSelect from '@/components/Select/WSelect.vue'
 
-type EmitType = AllowClear extends true ? Model | null : NonNullable<Model>
+import {useClearValue} from './models/useClearValue'
+
+type EmitType = AllowClear extends true ? Model | ClearValue : NonNullable<Model>
 
 defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
-  defineProps<SelectSingleProps<Model, Data, QueryParamsOptions, OptionComponent, AllowClear>>(),
+  defineProps<SelectSingleProps<Model, Data, QueryParamsOptions, OptionComponent, AllowClear, ClearValue>>(),
   {
     readonly: undefined,
     disabled: undefined,
@@ -96,9 +97,11 @@ const emit = defineEmits<{
 
 const selectComponentRef = useTemplateRef('selectComponent')
 
+const getClearValue = useClearValue(props)
+
 const arrayValue = computed<Model[]>(() => props.modelValue !== null && props.modelValue !== undefined && props.modelValue !== '' ? [props.modelValue] : [])
 
-const updateModelValue = (value: Model | null, data: Data | undefined): void => {
+const updateModelValue = (value: Model | ClearValue, data: Data | undefined): void => {
   emit('update:model-value', value as EmitType, data)
 
   blur()

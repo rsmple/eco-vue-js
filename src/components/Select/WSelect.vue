@@ -6,9 +6,8 @@
       modelValue: search,
       placeholder: !focused && !modelValue?.length ? placeholderEmpty ?? placeholder : placeholder,
       loading: loading || isFetching || loadingCreate,
-      hideInput: !modelValue?.length && !emptyValue ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
+      hideInput: !modelValue?.length ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
       filterValue: filterValue === undefined ? modelValue : filterValue,
-      emptyValue: undefined,
     }"
     :class="$attrs.class"
     @update:model-value="!loading && !isFetching && (search = $event as string ?? '')"
@@ -43,7 +42,7 @@
         name="prefix"
       >
         <SelectOptionPrefix
-          v-for="(value, index) in !emptyValue || modelValue?.length !== 0 ? modelValue : emptyValue"
+          v-for="(value, index) in modelValue"
           :key="value"
           :option="optionsWithCreated.find(item => valueGetter(item) === value)"
           :option-component="(optionComponent as SelectOptionComponent<Data>)"

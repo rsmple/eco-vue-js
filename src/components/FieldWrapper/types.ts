@@ -15,7 +15,6 @@ export interface FieldWrapperProps {
   mandatory?: boolean
   noMargin?: boolean
   allowCopy?: boolean
-  emptyValue?: string
   leftError?: boolean
   filterField?: string
   filterValue?: unknown

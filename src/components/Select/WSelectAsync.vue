@@ -6,9 +6,8 @@
       modelValue: search,
       placeholder: !focused && !modelValue?.length ? placeholderEmpty ?? placeholder : placeholder,
       loading: loading || isFetchingPrefix || loadingCreate,
-      hideInput: !modelValue?.length && !emptyValue ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
+      hideInput: !modelValue?.length ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
       filterValue: filterValue === undefined ? modelValue : filterValue,
-      emptyValue: undefined,
     }"
     :class="$attrs.class"
     @update:model-value="!loading && !isFetchingPrefix && (search = $event as string ?? '')"
@@ -45,7 +44,7 @@
       >
         <SelectAsyncPrefix
           :use-query-fn="useQueryFnPrefix ?? useQueryFnOptions"
-          :model-value="!emptyValue || modelValue?.length !== 0 ? modelValue ?? [] : emptyValue"
+          :model-value="modelValue ?? []"
           :disabled="isDisabled"
           :loading="loading || isFetchingPrefix"
           :option-component="(optionComponent as SelectOptionComponent<Data>)"

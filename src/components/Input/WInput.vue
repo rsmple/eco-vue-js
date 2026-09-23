@@ -78,7 +78,7 @@
             </div>
           </template>
           <template v-else>
-            {{ modelValue || emptyValue }}
+            {{ modelValue }}
           </template>
         </component>
       </div>
@@ -465,7 +465,7 @@ const historyPosition = ref(-1)
 const hasNoValue = computed(() => (asyncState.isAsync.value ? !asyncState.value.value : !props.modelValue) && !props.textParts?.length && (!props.textSecure || !props.modelValue))
 
 const readonlyLines = computed(() => {
-  const sourceParts: TextPart[] = props.textParts ?? [(props.modelValue || props.emptyValue)?.toString() ?? '']
+  const sourceParts: TextPart[] = props.textParts ?? [props.modelValue?.toString() ?? '']
   return buildLines(sourceParts)
 })
 

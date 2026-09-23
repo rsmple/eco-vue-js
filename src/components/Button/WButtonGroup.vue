@@ -35,10 +35,6 @@
             :selected="true"
           />
         </slot>
-
-        <template v-else>
-          {{ emptyValue }}
-        </template>
       </div>
     </template>
 

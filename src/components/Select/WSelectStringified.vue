@@ -6,7 +6,6 @@
       modelValue: arrayValue,
       filterValue: filterValue === undefined ? arrayValue : filterValue,
       createdData: createOption ? arrayValue.map(createOption) : undefined,
-      emptyValue: arrayValueEmpty,
     }"
     :class="$attrs.class"
     @select="updateModelValue($event, true)"
@@ -104,8 +103,6 @@ const encodeValue = (value: string[]): string => {
 }
 
 const arrayValue = computed<string[]>(() => decodeValue(props.modelValue))
-
-const arrayValueEmpty = computed<string[] | undefined>(() => props.emptyValue ? decodeValue(props.emptyValue) : undefined)
 
 const updateModelValue = (value: string, isSelect: boolean): void => {
   const valueList = props.divider === 'json' ? [value] : value.split(props.divider)

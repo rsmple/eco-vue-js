@@ -38,7 +38,7 @@ interface SelectPropsWithOptions<Data extends DefaultData> {
 type SelectPropsOptions<Data extends DefaultData, QueryParams> = SelectPropsNoParams<Data> | SelectPropsWithParams<Data, QueryParams> | SelectPropsWithOptions<Data>
 
 export interface SelectProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
-  extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'emptyValue' | 'async' | 'debounce' | 'hideDebounce'>,
+  extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'async' | 'debounce' | 'hideDebounce'>,
   SelectOptionComponentProps<Data, OptionComponent>,
   Omit<SelectPropsOptions<Data, QueryParams>, 'modelValue'> {
   modelValue: Model[] | undefined
@@ -54,7 +54,6 @@ export interface SelectProps<Model extends number | string, Data extends Default
   hideOptionIcon?: boolean
   createdData?: Data[]
   selectOnClose?: boolean
-  emptyValue?: Model[]
   lazy?: boolean
   placeholderEmpty?: string
 }
@@ -70,20 +69,21 @@ export interface SelectPrefixProps<Data extends DefaultData, OptionComponent ext
   disableClear: boolean | undefined
 }
 
-export interface SelectSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean>
-  extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'createdData' | 'emptyValue'> {
-  modelValue: Model | null | undefined
+export type SelectClearValue = null | undefined | ''
+
+export interface SelectSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean, ClearValue extends SelectClearValue = null>
+  extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'createdData'> {
+  modelValue: Model | ClearValue | null | undefined
   allowClear?: boolean & AllowClear
+  clearValue?: ClearValue
   searchModel?: boolean
   createdData?: Data
-  emptyValue?: Model | null
 }
 
 export interface SelectStringifiedProps<Model extends string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
-  extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'emptyValue'> {
+  extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue'> {
   modelValue: Model | null | undefined
   divider: string | 'json'
-  emptyValue?: Model | null
 }
 
 export interface SelectAsyncProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
@@ -129,12 +129,12 @@ export interface SelectAsyncPrefixPageProps<Model extends number | string, Data 
   readonly: boolean | undefined
 }
 
-export interface SelectAsyncSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean>
-  extends Omit<SelectAsyncProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'previewData' | 'createdData' | 'emptyValue'> {
-  modelValue: Model | null
+export interface SelectAsyncSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean, ClearValue extends SelectClearValue = null>
+  extends Omit<SelectAsyncProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'previewData' | 'createdData'> {
+  modelValue: Model | ClearValue | null
   allowClear?: boolean & AllowClear
+  clearValue?: ClearValue
   searchModel?: boolean
   previewData?: Data
   createdData?: Data
-  emptyValue?: Model | null
 }

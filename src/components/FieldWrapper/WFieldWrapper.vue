@@ -86,7 +86,7 @@
             }"
           >
             <slot v-bind="{id, setFocused, focused, isDragover}">
-              {{ typeof modelValue === 'number' ? numberFormatter.format(modelValue) : modelValue === null ? (emptyValue ?? 'N / A') : (modelValue || emptyValue) }}
+              {{ typeof modelValue === 'number' ? numberFormatter.format(modelValue) : modelValue === null ? 'N / A' : modelValue }}
             </slot>
 
             <WButtonCopy

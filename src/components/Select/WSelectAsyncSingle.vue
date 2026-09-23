@@ -10,11 +10,10 @@
       hidePrefix: true,
       filterValue: filterValue === undefined ? modelValue : filterValue,
       selectOnClose: props.searchModel ? props.searchModel : props.selectOnClose,
-      emptyValue: props.emptyValue !== undefined && props.emptyValue !== null ? [props.emptyValue] : undefined,
     }"
     :class="$attrs.class"
     @select="updateModelValue"
-    @unselect="(value, data) => allowClear && updateModelValue(null as EmitType, data)"
+    @unselect="(value, data) => allowClear && updateModelValue(getClearValue(), data)"
     @focus="searchModel && typeof modelValue === 'string' ? selectComponentRef?.setSearch(modelValue) : undefined"
     @init-model="$emit('init-model')"
   >
@@ -65,19 +64,21 @@
   </WSelectAsync>
 </template>
 
-<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false">
-import type {SelectAsyncSingleProps, SelectOptionComponent, SelectOptionProps} from './types'
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false, ClearValue extends SelectClearValue = null">
+import type {SelectAsyncSingleProps, SelectClearValue, SelectOptionComponent, SelectOptionProps} from './types'
 
 import {computed, toRef, useTemplateRef, watch} from 'vue'
 
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 
-type EmitType = AllowClear extends true ? Model | null : NonNullable<Model>
+import {useClearValue} from './models/useClearValue'
+
+type EmitType = AllowClear extends true ? Model | ClearValue : NonNullable<Model>
 
 defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
-  defineProps<SelectAsyncSingleProps<Model, Data, QueryParams, OptionComponent, AllowClear>>(),
+  defineProps<SelectAsyncSingleProps<Model, Data, QueryParams, OptionComponent, AllowClear, ClearValue>>(),
   {
     readonly: undefined,
     disabled: undefined,
@@ -92,9 +93,11 @@ const emit = defineEmits<{
 
 const selectComponentRef = useTemplateRef('selectComponent')
 
+const getClearValue = useClearValue(props)
+
 const arrayValue = computed<Model[]>(() => props.modelValue ? [props.modelValue] : [])
 
-const updateModelValue = (value: Model | null, data: Data | undefined): void => {
+const updateModelValue = (value: Model | ClearValue, data: Data | undefined): void => {
   emit('update:model-value', value as EmitType, data)
 }
 
