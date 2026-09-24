@@ -20,11 +20,11 @@
         'pr---inner-margin': !search
       }"
     >
-      <div class="text-accent sm:text-2.5xl flex-1 truncate text-xl font-semibold">
+      <h1 class="text-accent sm:text-2.5xl flex-1 truncate text-xl font-semibold">
         <slot name="title">
           {{ title }}
         </slot>
-      </div>
+      </h1>
 
       <button
         v-if="search"

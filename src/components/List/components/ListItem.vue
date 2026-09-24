@@ -10,6 +10,7 @@
       <div
         v-bind="allowSelect ? {'onMouseover': () => $emit('hover:selected', position)} : undefined"
         ref="container"
+        :role="skeleton ? undefined : 'listitem'"
         class="relative"
         :class="{
           [cardWrapperClass ?? '']: true,

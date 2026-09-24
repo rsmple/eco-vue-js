@@ -1,5 +1,6 @@
 <template>
   <div
+    role="list"
     :class="{
       'w-card': isGrid,
       'w-list': !isGrid,
