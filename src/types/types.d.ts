@@ -1,4 +1,5 @@
 export interface LinkProps {
+  /** Router location — renders a router link. Needs vue-router installed in the app. */
   to: import('vue-router').RouterLinkProps['to']
 }
 

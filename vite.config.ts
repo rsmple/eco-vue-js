@@ -2,11 +2,11 @@ import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import {type UserConfig, defineConfig} from 'vite'
 import dts from 'vite-plugin-dts'
-import {compileTemplate} from 'vue/compiler-sfc'
 
-import {existsSync, readFileSync, renameSync, rmSync} from 'node:fs'
+import {existsSync, renameSync, rmSync} from 'node:fs'
 import {URL, fileURLToPath} from 'node:url'
 
+import {svgComponent} from './build/svg-component'
 import {writeImports} from './build/write-imports'
 
 await writeImports()
@@ -24,19 +24,7 @@ export default defineConfig(({mode}) => ({
     }),
     tailwindcss(),
     vue(),
-    {
-      name: 'svg-component',
-      enforce: 'pre',
-      load: {
-        filter: {id: /\.svg(\?component)?$/},
-        handler(id: string) {
-          const path = id.split('?', 2)[0]
-          const svg = readFileSync(path, 'utf-8')
-          const {code} = compileTemplate({id, source: svg, filename: path, transformAssetUrls: false})
-          return code + '\nexport default {render}'
-        },
-      },
-    },
+    svgComponent(),
     {
       name: 'atomic-dist-swap',
       closeBundle() {

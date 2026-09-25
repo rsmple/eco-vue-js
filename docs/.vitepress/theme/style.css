@@ -1,0 +1,24 @@
+@import "tailwindcss" source(none);
+
+@source "../../../src";
+@source "../../examples";
+@source "./components";
+
+@import "../../../package/tailwind-base/base.css";
+
+/* VitePress styles are unlayered, so they win over Tailwind layers inside `.vp-doc`. Demos opt out with `vp-raw`. */
+
+.demo {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem 0 0;
+  overflow-x: auto;
+  background: var(--vp-c-bg);
+}
+
+.demo + div[class*="language-"] {
+  margin-top: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}

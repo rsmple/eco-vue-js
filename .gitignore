@@ -34,3 +34,6 @@ coverage
 src/main.ts
 
 eco-vue-js-*.*.*.tgz
+
+docs/.vitepress/cache
+docs/.vitepress/dist
