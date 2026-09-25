@@ -18,6 +18,7 @@
   >
     <label
       v-if="!hideTitle && !embedded && !seamless && (title || $slots.title)"
+      :id="`${id}-label`"
       :for="id"
       class="text-accent relative block text-xs font-semibold leading-loose"
       :class="{

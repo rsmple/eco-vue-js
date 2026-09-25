@@ -216,6 +216,7 @@
                   :is="textarea ? ContentEditable : 'input'"
                   :id="id"
                   ref="input"
+                  :aria-labelledby="textarea ? `${id}-label` : undefined"
                   class="
                     w-input min-h-full flex-1 basis-auto appearance-none border-none bg-inherit
                     outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed dark:placeholder:text-gray-500
@@ -710,6 +711,8 @@ const wrapSelection = (value: WrapSelection) => inputRef.value && 'wrapSelection
 
 let timeout: number | undefined
 
+const isEditableElement = (element: Element | null): boolean => element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement || (element instanceof HTMLElement && element.isContentEditable)
+
 const autofocusDebounced = () => {
   if (timeout) clearTimeout(timeout)
 
@@ -719,7 +722,7 @@ const autofocusDebounced = () => {
   }
 
   timeout = setTimeout(() => {
-    if (props.autofocus !== false && props.autofocus !== undefined) focus()
+    if (props.autofocus !== false && props.autofocus !== undefined && !isEditableElement(document.activeElement)) focus()
 
     timeout = undefined
   }, typeof props.autofocus === 'number' ? props.autofocus : 250)

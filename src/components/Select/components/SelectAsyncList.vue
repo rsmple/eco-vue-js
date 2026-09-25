@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div role="listbox">
     <slot name="content" />
 
     <SelectOption

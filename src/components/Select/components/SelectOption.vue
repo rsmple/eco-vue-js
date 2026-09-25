@@ -1,6 +1,9 @@
 <template>
   <div
     ref="element"
+    role="option"
+    :aria-selected="selectedVisible"
+    :aria-disabled="disabled || undefined"
     class="w-select-option relative grid w-full grid-cols-[auto_1fr_1.25em]"
     :class="{
       'bg-primary-light/30 dark:bg-primary-darkest/30': selectedVisible,

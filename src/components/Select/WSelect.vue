@@ -84,7 +84,10 @@
     </template>
 
     <template #content>
-      <div class="max-h-80">
+      <div
+        role="listbox"
+        class="max-h-80"
+      >
         <slot name="content" />
 
         <SelectOption

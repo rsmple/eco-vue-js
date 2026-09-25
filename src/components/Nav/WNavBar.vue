@@ -19,7 +19,7 @@
     </div>
   </Transition>
 
-  <div
+  <nav
     class="
       w-nav-bar fixed left-0 top-0 grid h-full overflow-hidden
       transition-[grid-template-columns] duration-200 xl:grid-cols-[1fr] print:hidden 
@@ -33,7 +33,7 @@
     <div class="mt---header-height overflow-hidden">
       <slot />
     </div>
-  </div>
+  </nav>
 
   <div
     class="square---header-height w-ripple fixed left-0 top-0 flex cursor-pointer items-center justify-center xl:hidden print:hidden"

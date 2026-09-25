@@ -1,6 +1,9 @@
 <template>
   <WInfiniteListScrollingElement
     ref="content"
+    role="dialog"
+    aria-modal="true"
+    :aria-labelledby="$slots.title ? titleId : undefined"
     class="
       bg-default dark:bg-default-dark w-modal-wrapper
       scrollbar-width-thin grid
@@ -25,9 +28,12 @@
         'sm-not:w-screen': maximized,
       }"
     >
-      <div class="text-accent p---w-modal-wrapper-padding flex items-center justify-center text-balance text-center text-xl font-semibold">
+      <h2
+        :id="titleId"
+        class="text-accent p---w-modal-wrapper-padding flex items-center justify-center text-balance text-center text-xl font-semibold"
+      >
         <slot name="title" />
-      </div>
+      </h2>
 
       <slot name="subtitle" />
     </div>
@@ -55,7 +61,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch} from 'vue'
+import {onBeforeUnmount, onMounted, provide, ref, useId, useTemplateRef, watch} from 'vue'
 
 import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
 
@@ -67,6 +73,8 @@ defineProps<{
   maximized?: boolean
   actionsCol?: boolean
 }>()
+
+const titleId = useId()
 
 const headerRef = useTemplateRef('header')
 const footerRef = useTemplateRef('footer')

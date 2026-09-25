@@ -8,6 +8,7 @@
       'cursor-progress': skeleton,
     }"
     :disabled="disabled || skeleton"
+    :aria-label="titleText ? undefined : title"
     @click="!disabled && !skeleton && $emit('click', $event)"
   >
     <WSkeleton

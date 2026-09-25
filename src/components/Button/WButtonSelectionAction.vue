@@ -11,6 +11,7 @@
     }"
     :is="to !== undefined ? disabled ? 'a' : WRouterLink : tag ?? 'button'"
     :disabled="disabled || disableMessage !== undefined"
+    :aria-label="title ? undefined : tooltipText"
     class="
       disabled:text-description relative isolate flex
       select-none items-center bg-none
