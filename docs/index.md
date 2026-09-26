@@ -11,7 +11,7 @@ hero:
       link: /guide/getting-started
     - theme: alt
       text: Components
-      link: /components/Button
+      link: /components/button
     - theme: alt
       text: llms.txt
       link: /llms.txt

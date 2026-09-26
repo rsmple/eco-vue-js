@@ -1,10 +1,11 @@
 ---
-description: WButton and its variants — semantic colors, loading and disabled states, links, tooltips and segmented groups (WButtonGroup).
+group: Actions
+description: WButton — the base action element with semantic colors, loading and disabled states, links and tooltips.
 ---
 
 # Button
 
-`WButton` is the base action element. It renders a `<button>` by default, a router link when `to` is set, and an `<a>` with `tag="a"` and `href`. Every other button in this folder (`WButtonGroup`, `WButtonMore`, `WButtonCopy`, `WButtonSelection`…) builds on it.
+`WButton` is the base action element. It renders a `<button>` by default, a router link when `to` is set, and an `<a>` with `tag="a"` and `href`. Every other button in this folder (`WButtonMore`, `WButtonCopy`, `WButtonSelection`…) builds on it. For picking one value out of a few, see [Button group](./button-group).
 
 ## Basic usage
 
@@ -120,40 +121,6 @@ const save = () => {
 
 <!-- @example-end -->
 
-## Button group
-
-`WButtonGroup` is a segmented control bound with `v-model`. `list` takes plain values; for objects, also pass `valueGetter` to pick the model value out of each item.
-
-<!-- @example Button/Group -->
-
-<DocsDemo name="Button/Group" />
-
-```vue
-<template>
-  <WButtonGroup
-    v-model="period"
-    :list="periods"
-    title="Period"
-  />
-
-  <p class="mt-2 text-sm text-gray-500">
-    Selected: {{ period }}
-  </p>
-</template>
-
-<script lang="ts" setup>
-import {ref} from 'vue'
-
-import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
-
-const periods = ['day', 'week', 'month'] as const
-
-const period = ref<typeof periods[number]>('week')
-</script>
-```
-
-<!-- @example-end -->
-
 ## API
 
 <!-- @api WButton -->
@@ -199,77 +166,5 @@ import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 | Slot | Props | Description |
 | --- | --- | --- |
 | `default` | — | — |
-
-<!-- @api-end -->
-
-<!-- @api WButtonGroup -->
-
-### WButtonGroup
-
-```ts
-import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
-```
-
-#### Props
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `list` | `Entity[] \| readonly Model[]` | **required** | — |
-| `valueGetter` | `ValueGetter \| ((value: Entity) => Model)` | — | — |
-| `optionComponent` | `ButtonGroupOptionComponent<Entity> \| ButtonGroupOptionComponent<Model>` | — | — |
-| `modelValue` | `Model` | **required** | — |
-| `wrap` | `boolean` | — | — |
-| `col` | `boolean` | — | — |
-| `semanticType` | `SemanticType` | `SemanticType.PRIMARY` | — |
-| `loading` | `boolean` | — | — |
-| `stretch` | `boolean` | — | — |
-| `allowClear` | `boolean` | — | — |
-
-::: details Inherited from `src/components/FieldWrapper/types.ts` (25)
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `disabled` | `boolean` | — | — |
-| `tooltipText` | `string` | — | — |
-| `skeleton` | `boolean` | — | — |
-| `title` | `string` | — | — |
-| `titleIcon` | `SVGComponent` | — | — |
-| `description` | `string` | — | — |
-| `errorMessage` | `string` | — | — |
-| `maxLength` | `number` | — | — |
-| `mono` | `boolean` | — | — |
-| `hasChanges` | `boolean` | — | — |
-| `readonly` | `boolean` | — | — |
-| `required` | `boolean` | — | — |
-| `mandatory` | `boolean` | — | — |
-| `noMargin` | `boolean` | — | — |
-| `allowCopy` | `boolean` | — | — |
-| `leftError` | `boolean` | — | — |
-| `filterField` | `string` | — | — |
-| `filterValue` | `unknown` | — | — |
-| `subgrid` | `boolean` | — | — |
-| `seamless` | `boolean` | — | — |
-| `savedText` | `string` | — | — |
-| `topText` | `boolean` | — | — |
-| `allowDropFile` | `boolean` | — | — |
-| `hideTitle` | `boolean` | — | — |
-| `embedded` | `boolean` | — | — |
-
-:::
-
-#### Events
-
-| Event | Payload | Description |
-| --- | --- | --- |
-| `update:model-value` | `(Model)` | — |
-
-#### Slots
-
-| Slot | Props | Description |
-| --- | --- | --- |
-| `title` | — | — |
-| `subtitle` | — | — |
-| `option` | `{ option: Model \| Entity; selected: boolean; }` | — |
-| `right` | — | — |
 
 <!-- @api-end -->

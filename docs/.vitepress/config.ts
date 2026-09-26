@@ -5,8 +5,11 @@ import llmstxt, {copyOrDownloadAsMarkdownButtons} from 'vitepress-plugin-llms'
 import {existsSync} from 'node:fs'
 import {URL, fileURLToPath} from 'node:url'
 
+import {buildSidebar, rewrite} from './sidebar'
+
 import {svgComponent} from '../../build/svg-component'
 
+const root = fileURLToPath(new URL('../..', import.meta.url))
 const src = fileURLToPath(new URL('../../src', import.meta.url))
 
 export default defineConfig({
@@ -18,43 +21,13 @@ export default defineConfig({
   // Component pages live next to their component; guides and recipes live in docs/.
   srcDir: '..',
   srcExclude: ['node_modules/**', 'package/**', '*.md', 'docs/.vitepress/**'],
-  rewrites: {
-    'docs/:page.md': ':page.md',
-    'docs/:section/:page.md': ':section/:page.md',
-    'src/components/:component/docs/index.md': 'components/:component.md',
-  },
+  rewrites: rewrite,
   lastUpdated: true,
 
   themeConfig: {
     search: {provider: 'local'},
 
-    sidebar: [
-      {
-        text: 'Guide',
-        items: [
-          {text: 'Getting started', link: '/guide/getting-started'},
-          {text: 'Conventions', link: '/guide/conventions'},
-        ],
-      },
-      {
-        text: 'Components',
-        items: [
-          {text: 'Button', link: '/components/Button'},
-        ],
-      },
-      {
-        text: 'Assets',
-        items: [
-          {text: 'Icons', link: '/icons'},
-        ],
-      },
-      {
-        text: 'Recipes',
-        items: [
-          {text: 'List with fields', link: '/recipes/list-with-fields'},
-        ],
-      },
-    ],
+    sidebar: buildSidebar(root),
 
     editLink: {
       pattern: 'https://github.com/rsmple/eco-vue-js/edit/main/:path',

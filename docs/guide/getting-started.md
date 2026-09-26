@@ -1,4 +1,6 @@
 ---
+group: Guide
+order: 1
 description: Install eco-vue-js, wire Tailwind v4, vue-query and the global containers (modals, notifications, tooltips), and import components.
 ---
 

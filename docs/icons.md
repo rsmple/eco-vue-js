@@ -1,4 +1,5 @@
 ---
+group: Assets
 description: Every icon shipped with eco-vue-js, with a searchable gallery and the import path for each.
 ---
 

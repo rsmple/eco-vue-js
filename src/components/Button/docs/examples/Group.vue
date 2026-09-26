@@ -3,7 +3,11 @@
     v-model="period"
     :list="periods"
     title="Period"
-  />
+  >
+    <template #option="{option}">
+      {{ option }}
+    </template>
+  </WButtonGroup>
 
   <p class="mt-2 text-sm text-gray-500">
     Selected: {{ period }}

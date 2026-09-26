@@ -1,4 +1,5 @@
 ---
+group: Recipes
 aside: false
 description: Build a paginated, sortable, searchable WList with one component per column, an expansion row and a row menu — the pattern used for every data table in eco-vue-js apps.
 ---
