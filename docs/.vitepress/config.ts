@@ -5,9 +5,9 @@ import llmstxt, {copyOrDownloadAsMarkdownButtons} from 'vitepress-plugin-llms'
 import {existsSync, readFileSync} from 'node:fs'
 import {URL, fileURLToPath} from 'node:url'
 
-import {buildSidebar, rewrite} from './sidebar'
+import {buildSidebar, rewrite} from './sidebar.ts'
 
-import {svgComponent} from '../../build/svg-component'
+import {svgComponent} from '../../build/svg-component.ts'
 
 const root = fileURLToPath(new URL('../..', import.meta.url))
 const src = fileURLToPath(new URL('../../src', import.meta.url))

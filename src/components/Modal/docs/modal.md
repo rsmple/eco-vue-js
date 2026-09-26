@@ -83,7 +83,7 @@ import {Modal} from 'eco-vue-js/dist/utils/Modal'
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 
 // Loaded on first open, so the modal's code stays out of the page bundle.
-const RenameModal = defineAsyncComponent(() => import('./RenameModal.vue'))
+const RenameModal = defineAsyncComponent(() => import('./parts/RenameModal.vue'))
 
 const name = ref('Roadmap')
 
@@ -98,7 +98,7 @@ const rename = () => {
 
 <!-- @example-end -->
 
-<!-- @source src/components/Modal/docs/examples/RenameModal.vue -->
+<!-- @source src/components/Modal/docs/examples/parts/RenameModal.vue -->
 
 ```vue [RenameModal.vue]
 <template>
