@@ -15,7 +15,7 @@ description: WList — paginated, sortable collections shown as a table on deskt
 
 The [List with fields](/recipes/list-with-fields) recipe builds this step by step; the list below is its result.
 
-<DocsDemo name="recipes/book-list/BookList" client-only />
+<DocsDemo name="recipes/book-list/BookList" />
 
 ## Layout variables
 

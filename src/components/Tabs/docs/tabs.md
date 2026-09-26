@@ -13,7 +13,10 @@ description: WTabs and WTabsItem — tabbed content with icons, counters and dis
 
 ```vue
 <template>
-  <WTabs @update:current="current = $event">
+  <WTabs
+    :init-tab="current"
+    @update:current="current = $event"
+  >
     <WTabsItem
       name="profile"
       title="Profile"
@@ -64,7 +67,7 @@ import IconAlarm from 'eco-vue-js/dist/assets/icons/IconAlarm'
 import IconLock from 'eco-vue-js/dist/assets/icons/IconLock'
 import IconUser from 'eco-vue-js/dist/assets/icons/IconUser'
 
-const current = ref<string>()
+const current = ref('security')
 </script>
 ```
 
@@ -72,7 +75,7 @@ const current = ref<string>()
 
 Switching slides the content in from the side of the new tab, and the content area keeps the height of the tallest tab opened so far, so what's below it doesn't jump — `disableMinHeight` turns that off, `lessTransitions` fades instead of sliding. A header wider than its space scrolls sideways and keeps the active tab in view.
 
-`update:current` and `update:current-index` emit the active tab, and `update:current-title` its title — for putting it in a page header when the tabs' own header is hidden with `noHeader`. To switch from code, call `updateCurrent(name)` or `updateIndex(index)` on a template ref.
+`update:current` and `update:current-index` emit the active tab, and `update:current-title` its title — for putting it in a page header when the tabs' own header is hidden with `noHeader`. To switch from code, call `updateCurrent(name)` or `updateIndex(index)` on a template ref. The first `update:current` comes during setup, so when the parent shows the current tab, seed it and pass it as `initTab`, as the demo does — otherwise a server-rendered page shows a different value than the first client render.
 
 ## Closable and added tabs
 

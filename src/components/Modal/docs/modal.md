@@ -11,9 +11,9 @@ Modals are not placed in templates. They are opened from code, rendered by the s
 
 `Modal.addConfirm` opens a ready-made dialog with a title, description and up to three actions. `onAccept` may return a promise — the accept button shows a spinner until it resolves, then the modal closes. If it rejects, the modal stays open.
 
-<!-- @example Modal/Confirm client -->
+<!-- @example Modal/Confirm -->
 
-<DocsDemo name="Modal/Confirm" client-only />
+<DocsDemo name="Modal/Confirm" />
 
 ```vue
 <template>
@@ -64,9 +64,9 @@ const confirmDelete = () => {
 
 Pass callbacks as props to get results back. Load the modal with `defineAsyncComponent`, so its code is fetched on first open, and wrap it in `markRaw`, as for every component passed as a prop.
 
-<!-- @example Modal/Custom client -->
+<!-- @example Modal/Custom -->
 
-<DocsDemo name="Modal/Custom" client-only />
+<DocsDemo name="Modal/Custom" />
 
 ```vue
 <template>

@@ -1,5 +1,8 @@
 <template>
-  <WTabs @update:current="current = $event">
+  <WTabs
+    :init-tab="current"
+    @update:current="current = $event"
+  >
     <WTabsItem
       name="profile"
       title="Profile"
@@ -50,5 +53,5 @@ import IconAlarm from 'eco-vue-js/dist/assets/icons/IconAlarm'
 import IconLock from 'eco-vue-js/dist/assets/icons/IconLock'
 import IconUser from 'eco-vue-js/dist/assets/icons/IconUser'
 
-const current = ref<string>()
+const current = ref('security')
 </script>

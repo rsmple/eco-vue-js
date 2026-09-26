@@ -1,10 +1,10 @@
-import {computed, markRaw, ref, watch} from 'vue'
+import {computed, markRaw, onMounted, ref, watch} from 'vue'
 
 import IconGrid from '@/assets/icons/IconGrid.svg?component'
 import IconList from '@/assets/icons/IconList.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
-import {ListMode} from '@/utils/utils'
+import {ListMode, getIsClientSide} from '@/utils/utils'
 
 import {type FieldConfig, type FieldConfigMap, type ListConfig, type ListField, type ListFields} from '../types'
 
@@ -86,7 +86,11 @@ const parseListConfig = <Fields extends ListFields<unknown>>(value: unknown, fie
   }
 }
 
+const getHasSavedConfig = (key: string): boolean => getIsClientSide() && localStorage.getItem(key) !== null
+
 const getListConfig = (key: string): unknown | undefined => {
+  if (!getIsClientSide()) return undefined
+
   const value = localStorage.getItem(key)
 
   if (typeof value !== 'string') return undefined
@@ -126,15 +130,17 @@ export const useListConfig = <Fields extends ListFields<any, any>>(
 ) => {
   const {isMobile} = useIsMobile()
 
-  const value = ref<ListConfig<Fields>>(
-    parseListConfig(
-      disable ? undefined : getListConfig(key()),
-      fields(),
-      defaultConfigMap(),
-      defailtMode(),
-    ),
-  )
-  const hasSaved = ref(disable ? false : localStorage.getItem(key()) !== null)
+  // The saved config is read on mount, not in setup: the server has no storage, so the first render uses the
+  // defaults on both sides and hydrates cleanly. The update lands before the first paint.
+  const value = ref<ListConfig<Fields>>(parseListConfig(undefined, fields(), defaultConfigMap(), defailtMode()))
+  const hasSaved = ref(false)
+
+  if (!disable) {
+    onMounted(() => {
+      value.value = parseListConfig(getListConfig(key()), fields(), defaultConfigMap(), defailtMode())
+      hasSaved.value = getHasSavedConfig(key())
+    })
+  }
 
   const listConfig = computed<ListConfig<Fields>>(() => value.value as ListConfig<Fields>)
   const fieldConfigMap = computed<Record<string, FieldConfig>>({
@@ -172,11 +178,11 @@ export const useListConfig = <Fields extends ListFields<any, any>>(
   if (!disable) {
     watch(key, newKey => {
       value.value = parseListConfig(getListConfig(newKey), fields(), defaultConfigMap(), defailtMode())
-      hasSaved.value = localStorage.getItem(newKey) !== null
+      hasSaved.value = getHasSavedConfig(newKey)
     })
     watch(defaultConfigMap, (newValue: FieldConfigMap<Fields>) => {
       value.value = parseListConfig(getListConfig(key()), fields(), newValue, defailtMode())
-      hasSaved.value = localStorage.getItem(key()) !== null
+      hasSaved.value = getHasSavedConfig(key())
     })
   }
 

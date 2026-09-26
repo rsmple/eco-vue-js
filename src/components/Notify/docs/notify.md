@@ -7,9 +7,9 @@ description: Showing success, warning and error notifications with Notify.succes
 
 Notifications are shown from code, from anywhere — setup, a store, a query's error handler. `Notify.success`, `Notify.warn` and `Notify.error` add one to the `WNotify` container mounted once at the app root (see [Getting started](/guide/getting-started#global-containers)); before it is mounted, the calls do nothing.
 
-<!-- @example Notify/Basic client -->
+<!-- @example Notify/Basic -->
 
-<DocsDemo name="Notify/Basic" client-only />
+<DocsDemo name="Notify/Basic" />
 
 ```vue
 <template>

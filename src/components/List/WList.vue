@@ -180,7 +180,7 @@ import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type Ref, type StyleValue, computed, nextTick, ref, toRef, watch} from 'vue'
+import {type Ref, type StyleValue, computed, nextTick, onMounted, ref, toRef, watch} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
@@ -483,6 +483,12 @@ const resetConfig = () => {
   updateStylesWidth()
   updateStylesFixed()
 }
+
+// The saved config loads on mount, after the watcher below may have stopped on the defaults' styles.
+onMounted(() => {
+  updateStylesWidth()
+  updateStylesFixed()
+})
 
 const unwatch = watch(fieldsFiltered, async () => {
   await Promise.all([

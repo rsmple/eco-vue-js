@@ -7,9 +7,9 @@ description: WTooltip — a hover tooltip placed inside the element it describes
 
 `WTooltip` goes *inside* the element it describes and opens while the pointer is over that element — its parent. It renders nothing in place: the tooltip itself is drawn by the `WTooltipContainer` mounted once at the app root (see [Getting started](/guide/getting-started#global-containers)), so it is never clipped by an `overflow: hidden` ancestor.
 
-<!-- @example Tooltip/Basic client -->
+<!-- @example Tooltip/Basic -->
 
-<DocsDemo name="Tooltip/Basic" client-only />
+<DocsDemo name="Tooltip/Basic" />
 
 ```vue
 <template>

@@ -18,9 +18,9 @@ description: Build a paginated, sortable, searchable WList with one component pe
 | Menu components | Row actions, typed with `MenuProps<T>` / `MenuEmits<T>`. |
 | An expansion component | Optional detail row, opened from the field marked `allow-open`. |
 
-<!-- @example recipes/book-list/BookList client -->
+<!-- @example recipes/book-list/BookList -->
 
-<DocsDemo name="recipes/book-list/BookList" client-only />
+<DocsDemo name="recipes/book-list/BookList" />
 
 ```vue
 <template>

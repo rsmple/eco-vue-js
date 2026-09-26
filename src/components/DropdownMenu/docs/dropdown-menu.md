@@ -15,9 +15,9 @@ For a menu of actions, use a ready-made button. For anything else anchored to an
 
 Menu items are `WButtonMoreItem`s: a `text` (or the default slot), an `icon`, and `to` or `href` to make the item a link. A disabled item can explain itself with `tooltipText`.
 
-<!-- @example DropdownMenu/ButtonMore client -->
+<!-- @example DropdownMenu/ButtonMore -->
 
-<DocsDemo name="DropdownMenu/ButtonMore" client-only />
+<DocsDemo name="DropdownMenu/ButtonMore" />
 
 ```vue
 <template>
@@ -101,9 +101,9 @@ const action = ref<string>()
 
 `WDropdownMenu` renders the `toggle` slot in place and, while `isOpen` is true, the `content` slot in a layer on `<body>`, positioned against the toggle. It has no state of its own: the parent opens and closes it, usually with a `WClickOutside` around the content to close it on a click elsewhere.
 
-<!-- @example DropdownMenu/Custom client -->
+<!-- @example DropdownMenu/Custom -->
 
-<DocsDemo name="DropdownMenu/Custom" client-only />
+<DocsDemo name="DropdownMenu/Custom" />
 
 ```vue
 <template>

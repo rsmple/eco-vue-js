@@ -63,12 +63,15 @@
         </template>
 
         <template #footer>
-          <WToggleTheme
-            :model-value="isDark ? Theme.DARK : Theme.LIGHT"
-            center
-            class="mb-4"
-            @update:model-value="isDark = $event === Theme.DARK"
-          />
+          <!-- The theme is only known in the browser, so the server can't render the right icon. -->
+          <ClientOnly>
+            <WToggleTheme
+              :model-value="isDark ? Theme.DARK : Theme.LIGHT"
+              center
+              class="mb-4"
+              @update:model-value="isDark = $event === Theme.DARK"
+            />
+          </ClientOnly>
         </template>
       </WActionsBar>
     </Transition>

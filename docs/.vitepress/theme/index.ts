@@ -12,11 +12,15 @@ import {installKitRouter} from './router'
 
 import './style.css'
 
-const queryClient = new QueryClient({
+const createQueryClient = () => new QueryClient({
   defaultOptions: {queries: {retry: false, refetchOnWindowFocus: false}},
 })
 
-if (inBrowser) setQueryClient(queryClient)
+// One client in the browser. On the server every page render gets its own, like one per request in an SSR app:
+// pages render in one process, so a shared cache would leak data fetched during one render into the next.
+const browserQueryClient = inBrowser ? createQueryClient() : undefined
+
+if (browserQueryClient) setQueryClient(browserQueryClient)
 
 export default {
   extends: DefaultTheme,
@@ -24,7 +28,7 @@ export default {
   Layout: DocsLayout,
   enhanceApp({app, router, siteData}) {
     installKitRouter(app, router, siteData.value.base)
-    app.use(VueQueryPlugin, {queryClient})
+    app.use(VueQueryPlugin, {queryClient: browserQueryClient ?? createQueryClient()})
     app.component('CopyOrDownloadAsMarkdownButtons', CopyOrDownloadAsMarkdownButtons)
     app.component('DocsDemo', DocsDemo)
     app.component('IconGallery', IconGallery)
