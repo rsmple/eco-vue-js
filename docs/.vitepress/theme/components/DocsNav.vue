@@ -2,33 +2,21 @@
   <WNavBar @update:is-open="$emit('update:isOpen', $event)">
     <div class="w-nav-bar-width no-scrollbar flex h-full flex-col overflow-y-auto overscroll-contain">
       <WNavItemTransition class="mb-auto pb-4">
-        <template
+        <WNavItemExpand
           v-for="group in groups"
           :key="group.text"
+          :title="group.text"
+          :icon="group.icon"
+          :query-fields="[]"
         >
-          <WNavItemExpand
-            v-if="group.items.length > 1"
-            :title="group.text"
-            :icon="group.icon"
-            :query-fields="[]"
-          >
-            <WNavItem
-              v-for="item in group.items"
-              :key="item.link"
-              :to="item.link"
-              :title="item.text"
-              :query-fields="[]"
-            />
-          </WNavItemExpand>
-
           <WNavItem
-            v-else
-            :to="group.items[0].link"
-            :title="group.items[0].text"
-            :icon="group.icon"
+            v-for="item in group.items"
+            :key="item.link"
+            :to="item.link"
+            :title="item.text"
             :query-fields="[]"
           />
-        </template>
+        </WNavItemExpand>
       </WNavItemTransition>
     </div>
   </WNavBar>
