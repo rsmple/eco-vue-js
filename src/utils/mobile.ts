@@ -3,11 +3,11 @@ import {computed, onMounted, ref} from 'vue'
 import {debounce, getIsClientSide} from './utils'
 
 export const getIsMobile = (): boolean => {
-  return getIsClientSide() && window.innerWidth < 641
+  return getIsClientSide() && window.innerWidth < 640
 }
 
 export const getIsTablet = (): boolean => {
-  return getIsClientSide() && window.innerWidth < 1281
+  return getIsClientSide() && window.innerWidth < 1280
 }
 
 const isMobileGlobal = ref(false)
