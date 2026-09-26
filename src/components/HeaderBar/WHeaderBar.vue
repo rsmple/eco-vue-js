@@ -26,6 +26,8 @@
         </slot>
       </h1>
 
+      <slot name="right" />
+
       <button
         v-if="search"
         class="w-ripple-trigger sm:pr---inner-margin h-full select-none"
@@ -80,7 +82,7 @@ const elementRef = useTemplateRef('element')
 
 const isTransparent = ref(false)
 
-let timeout: number | undefined
+let timeout: ReturnType<typeof setTimeout> | undefined
 let observer: ResizeObserver | null = null
 
 onMounted(() => {

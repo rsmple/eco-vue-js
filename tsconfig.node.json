@@ -8,6 +8,8 @@
     "nightwatch.conf.*",
     "playwright.config.*",
     "build/**/*",
+    "docs/.vitepress/config.ts",
+    "docs/.vitepress/sidebar.ts",
     "tailwind/**/*",
     "package/tailwind-base/**/*"
   ],

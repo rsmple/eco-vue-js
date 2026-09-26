@@ -354,7 +354,7 @@ const selectCursor = () => {
   optionRef.value?.forEach(item => item?.toggleCursor())
 }
 
-let deletePressTimeout: number | null = null
+let deletePressTimeout: ReturnType<typeof setTimeout> | null = null
 
 const captureDoubleDelete = () => {
   if (!props.modelValue?.length || search.value.length) return

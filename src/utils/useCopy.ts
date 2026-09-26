@@ -51,7 +51,7 @@ export const doCopy = async (text: string | number | undefined | null) => {
 
 export const useCopy = (value: MaybeRefOrGetter<string | number | undefined | null>) => {
   const copied = ref(false)
-  let timeout: number | undefined
+  let timeout: ReturnType<typeof setTimeout> | undefined
 
   const iconCopy = computed(() => copied.value ? markRaw(IconCopySuccess) : markRaw(IconCopy))
 

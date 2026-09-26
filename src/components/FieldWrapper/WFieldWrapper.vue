@@ -234,7 +234,7 @@ const setFocused = (value: boolean): void => {
   focused.value = value
 }
 
-let timeout: number | null = null
+let timeout: ReturnType<typeof setTimeout> | null = null
 
 const resetMessage = () => {
   message.value = null

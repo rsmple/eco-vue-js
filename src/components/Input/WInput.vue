@@ -43,7 +43,7 @@
           :class="{
             'font-mono': mono,
             'text-secure': textSecure && !isSecureVisible && modelValue,
-            'relative h-(--w-textarea-height,10rem) min-h-(--w-textarea-height,10rem) w-full overflow-auto overscroll-contain whitespace-pre bg-(--w-input-bg,inherit)': textarea,
+            'w-textarea relative h-(--w-textarea-height,10rem) min-h-(--w-textarea-height,10rem) w-full overflow-auto overscroll-contain whitespace-pre bg-(--w-input-bg,inherit)': textarea,
             'resize-y': resize && textarea,
             'resize-none': !resize && textarea,
           }"
@@ -709,7 +709,7 @@ const scrollToInput = () => {
 
 const wrapSelection = (value: WrapSelection) => inputRef.value && 'wrapSelection' in inputRef.value ? inputRef.value.wrapSelection(value) : void 0
 
-let timeout: number | undefined
+let timeout: ReturnType<typeof setTimeout> | undefined
 
 const isEditableElement = (element: Element | null): boolean => element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement || (element instanceof HTMLElement && element.isContentEditable)
 

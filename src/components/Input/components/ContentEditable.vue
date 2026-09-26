@@ -5,7 +5,7 @@
     role="textbox"
     aria-multiline="true"
     spellcheck="false"
-    class="relative [white-space:var(--w-input-whitespace,pre)]"
+    class="w-textarea relative [white-space:var(--w-input-whitespace,pre)]"
     @input="onInput"
     @beforeinput="handleBeforeInput($event as InputEvent)"
     @keydown="$emit('keydown', $event)"
@@ -27,8 +27,8 @@ import {getCaretOffset, setCaretOffset} from '../models/utils'
 
 const props = defineProps<{
   value: string
-  placeholder: string
-  maxLength: number
+  placeholder?: string
+  maxLength?: number
   textParts: TextPart[] | undefined
   readonly: boolean | undefined
   disabled: boolean | undefined

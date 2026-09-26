@@ -4,6 +4,7 @@
 @import "./css/default.css";
 @import "./css/internal-variants.css";
 @import "./css/internal-variables.css";
+@import "./css/textarea.css";
 
 @source "../dist/components";
 

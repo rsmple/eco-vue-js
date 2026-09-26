@@ -130,7 +130,7 @@ const value = computed<boolean | null>({
     const newValue = (value === null ? null : props.negate ? !value : value) as Value
 
     const errorMessage = Array.isArray(props.validate)
-      ? props.validate.map(item => item(newValue)).join(', ')
+      ? props.validate.map(item => item(newValue)).filter(item => item).join(', ')
       : props.validate?.(newValue)
 
     if (errorMessage) {

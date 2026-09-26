@@ -22,7 +22,7 @@
 
   <div
     v-else
-    class="text-description group/model relative grid grid-cols-[1fr_auto] items-center"
+    class="text-black-default dark:text-gray-200 group/model relative grid grid-cols-[1fr_auto] items-center"
   >
     <slot
       name="option"

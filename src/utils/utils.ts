@@ -45,7 +45,7 @@ export const hasParent = (parent: Element, current: Element): boolean => {
 type DebounceCb = (...args: any[]) => void
 
 export function debounce<T extends DebounceCb>(cb: T, delay = 200): T {
-  let timeout: number | undefined
+  let timeout: ReturnType<typeof setTimeout> | undefined
 
   return function (this: unknown, ...args: Parameters<T>) {
     if (timeout) clearTimeout(timeout)
@@ -58,7 +58,7 @@ export function debounce<T extends DebounceCb>(cb: T, delay = 200): T {
 }
 
 export function throttle<T extends DebounceCb>(cb: T, delay = 200): T {
-  let timeout: number | undefined
+  let timeout: ReturnType<typeof setTimeout> | undefined
 
   return function (this: unknown, ...args: Parameters<T>) {
     if (timeout) return
@@ -286,7 +286,7 @@ export const BASE_ZINDEX_LIST_HEADER = 20
 export const BASE_ZINDEX_HEADER_BAR = 10
 export const BASE_ZINDEX_DROPDOWN = 2
 
-export const getHasScrollbar = () => window.innerWidth - document.documentElement.clientWidth > 0
+export const getHasScrollbar = () => getIsClientSide() && window.innerWidth - document.documentElement.clientWidth > 0
 
 export enum WrapSelectionType {
   LINE_PREFIX = 'LINE_PREFIX',

@@ -27,7 +27,7 @@ const props = withDefaults(
 
 const isShake = ref(false)
 
-let timeout: number | null = null
+let timeout: ReturnType<typeof setTimeout> | null = null
 
 watch(toRef(props, 'count'), value => {
   if (value >= props.trigger) {

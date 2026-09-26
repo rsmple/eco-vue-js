@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.docs.json",
+  "include": [
+    "../../env.d.ts",
+    "../../src/**/*.d.ts",
+    "theme/**/*.ts",
+    "theme/**/*.vue"
+  ],
+  "exclude": [],
+  "compilerOptions": {
+    "composite": false,
+    "rootDir": "../..",
+    "tsBuildInfoFile": "../../node_modules/.tmp/tsconfig.docs-theme.tsbuildinfo"
+  }
+}

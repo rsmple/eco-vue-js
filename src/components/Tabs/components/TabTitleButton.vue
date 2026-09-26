@@ -49,9 +49,9 @@ import WButtonTab from '@/components/Button/WButtonTab.vue'
 const props = defineProps<{
   active: boolean
   index: number
-  hasError: boolean
-  hasChanges: boolean
-  hasValue: boolean
+  hasError?: boolean
+  hasChanges?: boolean
+  hasValue?: boolean
   title?: string
   icon: SVGComponent | undefined
   first: boolean
