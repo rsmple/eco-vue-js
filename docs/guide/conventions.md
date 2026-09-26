@@ -1,6 +1,6 @@
 ---
 group: Guide
-order: 2
+order: 3
 description: Rules every eco-vue-js consumer follows — import paths, markRaw for component props, inherited disabled/readonly/skeleton state, semantic types, and typing list extension components.
 ---
 
