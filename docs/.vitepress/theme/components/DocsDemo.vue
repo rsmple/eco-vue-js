@@ -2,6 +2,7 @@
   <div
     ref="element"
     class="demo vp-raw"
+    :class="overflow ? 'overflow-auto overscroll-contain max-h-(--docs-demo-max-height)' : overflowHidden ? 'overflow-hidden' : undefined"
   >
     <div class="demo-content">
       <ClientOnly v-if="component && clientOnly">
@@ -30,6 +31,8 @@ const props = defineProps<{
   name: string
   /** For examples whose components touch browser-only APIs during setup. */
   clientOnly?: boolean
+  overflow?: boolean
+  overflowHidden?: boolean
 }>()
 
 // Eager so demos render during SSR and their markup lands in the static HTML.

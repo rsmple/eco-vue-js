@@ -9,7 +9,7 @@ description: WTabs and WTabsItem — tabbed content with icons, counters and dis
 
 <!-- @example Tabs/Basic -->
 
-<DocsDemo name="Tabs/Basic" />
+<DocsDemo name="Tabs/Basic" overflowHidden />
 
 ```vue
 <template>
@@ -83,7 +83,7 @@ A tab with a `close` listener gets a close button. Children that aren't `WTabsIt
 
 <!-- @example Tabs/Closable -->
 
-<DocsDemo name="Tabs/Closable" />
+<DocsDemo name="Tabs/Closable" overflowHidden />
 
 ```vue
 <template>

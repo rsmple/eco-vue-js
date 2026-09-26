@@ -160,11 +160,8 @@ body {
   border: 1px solid var(--vp-c-divider);
   border-radius: 8px;
   margin: 1rem 0 0;
-  max-height: var(--docs-demo-max-height);
-  overflow: auto;
   /* Kit layers (list header 20, header bar 10) stay inside the box instead of competing with the page shell. */
   isolation: isolate;
-  overscroll-behavior: contain;
   background: var(--vp-c-bg);
 }
 

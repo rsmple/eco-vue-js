@@ -20,7 +20,7 @@ description: Build a paginated, sortable, searchable WList with one component pe
 
 <!-- @example recipes/book-list/BookList -->
 
-<DocsDemo name="recipes/book-list/BookList" />
+<DocsDemo name="recipes/book-list/BookList" overflow />
 
 ```vue
 <template>
