@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="docs-shell"
-    :class="{'docs-home': isHome}"
-  >
+  <div class="docs-shell">
     <DocsNav
       v-if="!isHome || isTablet"
       @update:is-open="isNavOpen = $event"
@@ -16,6 +13,22 @@
         >
           {{ site.title }}
         </a>
+      </template>
+
+      <template #right>
+        <nav class="hidden items-center gap-6 pl-6 text-sm font-medium md:flex">
+          <a
+            v-for="item in navItems"
+            :key="item.link"
+            :href="item.isExternal ? item.link : withBase(item.link)"
+            :target="item.isExternal ? '_blank' : undefined"
+            :rel="item.isExternal ? 'noopener' : undefined"
+            class="transition-colors hover:text-accent"
+            :class="item.isActive ? 'text-accent' : 'text-description'"
+          >
+            {{ item.text }}
+          </a>
+        </nav>
       </template>
     </WHeaderBar>
 
@@ -70,7 +83,7 @@
 </template>
 
 <script lang="ts" setup>
-import {useData, withBase} from 'vitepress'
+import {type DefaultTheme, useData, withBase} from 'vitepress'
 import VPContent from 'vitepress/dist/client/theme-default/components/VPContent.vue'
 import {layoutInfoInjectionKey, registerWatchers} from 'vitepress/dist/client/theme-default/composables/layout.js'
 import {computed, defineAsyncComponent, markRaw, onBeforeUnmount, onMounted, provide, ref} from 'vue'
@@ -98,15 +111,22 @@ const SOCIAL_LINKS = [
   {title: 'npm', icon: markRaw(IconNpm), href: 'https://www.npmjs.com/package/eco-vue-js'},
 ]
 
-const {site, isDark, frontmatter} = useData()
+const {site, theme, page, isDark, frontmatter} = useData()
 
 const isHome = computed(() => frontmatter.value.layout === 'home')
+
+const navItems = computed(() => ((theme.value.nav ?? []) as DefaultTheme.NavItemWithLink[]).map(item => ({
+  text: item.text,
+  link: item.link,
+  isExternal: /^https?:/.test(item.link),
+  isActive: !!item.activeMatch && new RegExp(item.activeMatch).test('/' + page.value.relativePath),
+})))
 
 // The parts of VitePress's own Layout that its content components rely on: sidebar and outline state, hero slots.
 registerWatchers({closeSidebar: () => undefined})
 provide(layoutInfoInjectionKey, {heroImageSlotExists: computed(() => false)})
 
-// The home page drops the nav on wide screens; below xl the nav is an overlay behind the menu button anyway.
+// The home page hides the nav on wide screens but keeps its space; below xl the nav is an overlay behind the menu button anyway.
 const {isMobile, isTablet} = useIsMobile()
 
 const isNavOpen = ref(false)

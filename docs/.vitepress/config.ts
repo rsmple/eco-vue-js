@@ -2,7 +2,7 @@ import tailwindcss from '@tailwindcss/vite'
 import {defineConfig, postcssIsolateStyles} from 'vitepress'
 import llmstxt, {copyOrDownloadAsMarkdownButtons} from 'vitepress-plugin-llms'
 
-import {existsSync} from 'node:fs'
+import {existsSync, readFileSync} from 'node:fs'
 import {URL, fileURLToPath} from 'node:url'
 
 import {buildSidebar, rewrite} from './sidebar'
@@ -11,6 +11,7 @@ import {svgComponent} from '../../build/svg-component'
 
 const root = fileURLToPath(new URL('../..', import.meta.url))
 const src = fileURLToPath(new URL('../../src', import.meta.url))
+const {version} = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')) as {version: string}
 
 export default defineConfig({
   title: 'eco-vue-js',
@@ -26,6 +27,14 @@ export default defineConfig({
 
   themeConfig: {
     search: {provider: 'local'},
+
+    // Shown in the header bar; the releases page is the changelog.
+    nav: [
+      {text: 'Guide', link: '/guide/getting-started', activeMatch: '^/guide/'},
+      {text: 'Components', link: '/components/button', activeMatch: '^/components/'},
+      {text: 'Recipes', link: '/recipes/list-with-fields', activeMatch: '^/recipes/'},
+      {text: `v${ version }`, link: 'https://github.com/rsmple/eco-vue-js/releases'},
+    ],
 
     sidebar: buildSidebar(root),
 

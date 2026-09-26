@@ -9,7 +9,9 @@
 @theme {
   --spacing-nav-bar-width: 15rem;
   --spacing-actions-bar-width: 3.5rem;
-  --spacing-docs-max-width: 100rem;
+  --spacing-docs-max-width: 96rem;
+  --spacing-docs-content-width: 56rem;
+  --spacing-docs-aside-width: 16rem;
 }
 
 /* The app-shell setup a consumer app makes: layout variables the kit's bars, lists and sticky headers read. */
@@ -79,9 +81,17 @@ body {
   padding: var(--header-height) 0 0;
 }
 
-/* The home page has no nav bar: the hero spans the whole frame. */
-.docs-home {
-  --nav-bar-width: 0px;
+/* The home page keeps the frame of a doc page: the nav bar's space stays empty, and the hero and features take the
+   text and outline width, from the same left edge. */
+#VPContent .VPHero,
+#VPContent .VPFeatures {
+  padding-inline: var(--inner-margin);
+}
+
+#VPContent .VPHero .container,
+#VPContent .VPFeatures .container {
+  max-width: calc(var(--spacing-docs-content-width) + var(--spacing-docs-aside-width));
+  margin-inline: 0;
 }
 
 /* Content starts at the app's inner margin, like a page in a kit app, so it lines up with the header title. */
@@ -89,13 +99,33 @@ body {
   padding-inline: var(--inner-margin);
 }
 
-#VPContent .VPDoc .container,
-#VPContent .VPDoc .content-container {
+/* One text width on every page, with or without the outline: VitePress narrows the text to 43rem next to the outline
+   and lets it run the full frame without one. The outline keeps its own width at the right edge. */
+#VPContent .VPDoc .container {
+  justify-content: flex-start;
+  max-width: none;
   margin-inline: 0 auto;
 }
 
-#VPContent .VPDoc .content {
-  padding-left: 0;
+/* `.container >`: the outline has a `.content` box of its own. */
+#VPContent .VPDoc .container > .content {
+  flex: 0 1 var(--spacing-docs-content-width);
+  min-width: 0;
+  max-width: var(--spacing-docs-content-width);
+  margin: 0;
+  padding-inline: 0;
+}
+
+#VPContent .VPDoc .content-container {
+  max-width: none;
+  margin-inline: 0;
+}
+
+/* The outline ends at the frame's inner margin, under the header links. */
+#VPContent .VPDoc .aside {
+  flex: none;
+  width: var(--spacing-docs-aside-width);
+  margin-left: auto;
 }
 
 /* On phones VitePress runs code blocks to the screen edge with a fixed 24px; the gutter here is the inner margin. */
