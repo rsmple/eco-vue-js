@@ -286,7 +286,7 @@ export const BASE_ZINDEX_LIST_HEADER = 20
 export const BASE_ZINDEX_HEADER_BAR = 10
 export const BASE_ZINDEX_DROPDOWN = 2
 
-export const getHasScrollbar = () => window.innerWidth - document.documentElement.clientWidth > 0
+export const getHasScrollbar = () => getIsClientSide() && window.innerWidth - document.documentElement.clientWidth > 0
 
 export enum WrapSelectionType {
   LINE_PREFIX = 'LINE_PREFIX',
