@@ -709,7 +709,7 @@ const scrollToInput = () => {
 
 const wrapSelection = (value: WrapSelection) => inputRef.value && 'wrapSelection' in inputRef.value ? inputRef.value.wrapSelection(value) : void 0
 
-let timeout: number | undefined
+let timeout: ReturnType<typeof setTimeout> | undefined
 
 const isEditableElement = (element: Element | null): boolean => element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement || (element instanceof HTMLElement && element.isContentEditable)
 

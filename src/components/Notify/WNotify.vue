@@ -39,7 +39,7 @@ import NotifyCard from './components/NotifyCard.vue'
 type NotifyMeta = {
   id: number
   count: number
-  timeout: number
+  timeout: ReturnType<typeof setTimeout>
 }
 
 const NOTIFY_DELAY = 5000

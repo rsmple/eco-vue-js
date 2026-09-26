@@ -317,6 +317,8 @@ watch([pageComponentRef, slotIds], () => {
   }
 }, {flush: 'post', immediate: true})
 
+const SENTINEL_MARGIN = 200
+
 let intersectionObserver: IntersectionObserver | null = null
 const topSentinelIntersecting = ref(false)
 const bottomSentinelIntersecting = ref(false)
@@ -336,7 +338,7 @@ const handleIntersection: IntersectionObserverCallback = (entries) => {
 onMounted(() => {
   intersectionObserver = new IntersectionObserver(handleIntersection, {
     root: scrollingElement?.value ?? null,
-    rootMargin: '200px 0px',
+    rootMargin: `${ SENTINEL_MARGIN }px 0px`,
   })
 
   if (topSentinelRef.value) intersectionObserver.observe(topSentinelRef.value)
@@ -351,6 +353,27 @@ onBeforeUnmount(() => {
 watch(nextPage, (value, oldValue) => {
   if (oldValue === null && value !== null && bottomSentinelIntersecting.value) addNextPage()
 })
+
+const isInViewport = (element: HTMLElement): boolean => {
+  // No box: the list is hidden (display: none), which the observer does not count as intersecting either.
+  if (element.getClientRects().length === 0) return false
+
+  const rect = element.getBoundingClientRect()
+  const viewport = scrollingElement?.value?.getBoundingClientRect() ?? {top: 0, bottom: window.innerHeight}
+
+  return rect.bottom >= viewport.top - SENTINEL_MARGIN && rect.top <= viewport.bottom + SENTINEL_MARGIN
+}
+
+// The observer only reports a sentinel entering or leaving the viewport. When an added page is too short to push the
+// sentinel back out, nothing is reported and the next page would wait for a scroll, so the sentinels are checked
+// again once the pages have rendered. Only while pages can still be added: recycling is left to scrolling, as with
+// fewer pages than fill the viewport it would swap pages back and forth.
+watch(pages, () => {
+  if (!intersectionObserver || pages.value.length >= props.maxPages) return
+
+  if (bottomSentinelRef.value && isInViewport(bottomSentinelRef.value)) addNextPage()
+  else if (topSentinelRef.value && isInViewport(topSentinelRef.value)) addPreviousPage()
+}, {deep: true, flush: 'post'})
 
 watch(previousPage, (value, oldValue) => {
   if (oldValue === null && value !== null && topSentinelIntersecting.value) addPreviousPage()

@@ -72,7 +72,7 @@ defineEmits<{
 
 const isOpen = ref(false)
 
-let timeout: number | null = null
+let timeout: ReturnType<typeof setTimeout> | null = null
 
 const enter = () => {
   if (timeout) {

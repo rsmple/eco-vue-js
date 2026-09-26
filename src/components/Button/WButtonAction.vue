@@ -1,7 +1,7 @@
 <template>
   <component
     :is="to !== undefined ? disabled || skeleton ? 'a' : WRouterLink : tag"
-    v-bind="to !== undefined && !disabled && !skeleton ? {to} : undefined"
+    v-bind="disabled || skeleton ? undefined : to !== undefined ? {to} : tag === 'a' ? {href, target, rel} : undefined"
     class="w-ripple-trigger group grid w-full grid-cols-1 py-1"
     :class="{
       'cursor-not-allowed opacity-50': disabled,
@@ -87,6 +87,10 @@ interface Props extends Partial<LinkProps> {
   title: string
   active?: boolean
   tag?: 'button' | 'a'
+  /** Link target when `tag` is `a`. */
+  href?: string
+  target?: '_self' | '_blank' | '_parent' | '_top'
+  rel?: string
   count?: number
   semanticType?: SemanticType
   disabled?: boolean
@@ -100,6 +104,9 @@ withDefaults(
   {
     icon: undefined,
     tag: 'button',
+    href: undefined,
+    target: undefined,
+    rel: undefined,
     to: undefined,
     count: undefined,
     semanticType: SemanticType.SECONDARY,

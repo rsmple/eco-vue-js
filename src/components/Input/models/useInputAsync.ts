@@ -25,7 +25,7 @@ export const useInputAsync = (context: InputAsyncContext) => {
   const focused = ref(false)
   const saved = ref(false)
   const value = ref<NonNullable<ModelValue> | undefined>()
-  const timeout = ref<number | null>(null)
+  const timeout = ref<ReturnType<typeof setTimeout> | null>(null)
 
   const hasChanges = computed(() => isAsync.value && (props.modelValue ?? undefined) !== value.value && !(props.textSecure && typeof props.modelValue !== 'string' && !value.value))
 

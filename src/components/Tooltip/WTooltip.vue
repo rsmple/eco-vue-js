@@ -41,7 +41,7 @@ const parent = computed(() => containerRef.value?.parentElement ?? null)
 const triggerElement = computed(() => props.noTrigger ? null : (props.trigger ?? parent.value))
 const isOpen = computed(() => tooltipMeta.value?.id === id)
 
-let timeout: number | null = null
+let timeout: ReturnType<typeof setTimeout> | null = null
 
 // Rendered by WTooltipContainer as a functional component, so the slot is re-evaluated reactively while open
 const renderSlot = markRaw(() => slots.default?.())

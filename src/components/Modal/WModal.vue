@@ -124,7 +124,7 @@ const closeModalWithConfirm = (modalMeta: ModalMeta<unknown>, index: number): vo
   }, () => closeConfirm = null)
 }
 
-let timeout: number | undefined
+let timeout: ReturnType<typeof setTimeout> | undefined
 
 watch(modalMetaList, value => {
   if (timeout) clearTimeout(timeout)
