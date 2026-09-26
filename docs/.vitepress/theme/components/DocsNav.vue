@@ -38,13 +38,17 @@ import IconGrid from 'eco-vue-js/dist/assets/icons/IconGrid'
 import IconLayer from 'eco-vue-js/dist/assets/icons/IconLayer'
 import IconNote from 'eco-vue-js/dist/assets/icons/IconNote'
 import IconSettings from 'eco-vue-js/dist/assets/icons/IconSettings'
+import IconTable from 'eco-vue-js/dist/assets/icons/IconTable'
+import IconTask from 'eco-vue-js/dist/assets/icons/IconTask'
 
 const ICONS: Record<Group, SVGComponent> = {
   Guide: markRaw(IconNote),
   Actions: markRaw(IconElement),
   Controls: markRaw(IconSettings),
+  Data: markRaw(IconTable),
+  Overlays: markRaw(IconLayer),
   Assets: markRaw(IconGrid),
-  Recipes: markRaw(IconLayer),
+  Recipes: markRaw(IconTask),
 }
 
 defineEmits<{

@@ -40,6 +40,31 @@ setQueryClient(queryClient)
 app.use(VueQueryPlugin, {queryClient})
 ```
 
+## App layout
+
+Sticky list headers and columns, full-width rows, dropdowns and modals position themselves from a few CSS variables that describe the app's frame. Set them on `body`, with the values your header and side bars actually take at each breakpoint — all default to `0px`:
+
+| Variable | What it is |
+| --- | --- |
+| `--header-height` | Height of the fixed top bar (`WHeaderBar`). |
+| `--nav-bar-width` | Width taken by the left nav (`WNavBar`) — `0px` where it collapses into an overlay. |
+| `--actions-bar-width` | Width taken by the right bar (`WActionsBar`). |
+| `--inner-margin` | Horizontal padding of the page content. |
+| `--left-margin`, `--right-margin` | Space outside the frame when the app is narrower than the screen and centred; the bars are offset by it. |
+
+```css
+body {
+  --header-height: 3.5rem;
+  --nav-bar-width: 0px;
+  --actions-bar-width: 0px;
+  --inner-margin: 1rem;
+
+  @apply sm:[--actions-bar-width:3.5rem] xl:[--nav-bar-width:15rem];
+}
+```
+
+From these the kit derives the content box every component measures against (`--w-left-inner`, `--w-width-inner`…). Inside a modal, the modal replaces them with its own.
+
 ## Global containers
 
 Modals, notifications and tooltips render into containers mounted once at the root of the app:

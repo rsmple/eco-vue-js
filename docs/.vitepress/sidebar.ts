@@ -8,7 +8,7 @@ import path from 'node:path'
  * sorted by `order` and then by title (its `title` frontmatter or first heading). Pages without `group`
  * (the home page) stay out of it. Nav icons for the groups are in DocsNav.
  */
-export const GROUPS = ['Guide', 'Actions', 'Controls', 'Assets', 'Recipes'] as const
+export const GROUPS = ['Guide', 'Actions', 'Controls', 'Data', 'Overlays', 'Assets', 'Recipes'] as const
 
 export type Group = typeof GROUPS[number]
 

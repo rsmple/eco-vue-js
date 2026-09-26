@@ -19,6 +19,8 @@ export type QueryParamsBooks = {
   page?: number
   ordering?: string
   search?: string
+  /** Comma-separated ids — how async selects look up the items behind their model value. */
+  id__in?: string
 }
 
 const SOURCE: [string, string, Genre, number][] = [

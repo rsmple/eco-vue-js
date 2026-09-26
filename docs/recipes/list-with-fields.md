@@ -123,6 +123,8 @@ export type QueryParamsBooks = {
   page?: number
   ordering?: string
   search?: string
+  /** Comma-separated ids — how async selects look up the items behind their model value. */
+  id__in?: string
 }
 
 const SOURCE: [string, string, Genre, number][] = [
@@ -197,9 +199,12 @@ export const useQueryBooks = makeQueryPaginated<Book, QueryParamsBooks>(
   'book',
   queryParams => {
     const search = queryParams.search?.trim().toLowerCase()
+    const ids = queryParams.id__in?.split(',').map(Number)
     let result = search
       ? source.filter(book => book.title.toLowerCase().includes(search) || book.author.toLowerCase().includes(search))
       : source
+
+    if (ids) result = result.filter(book => ids.includes(book.id))
 
     if (queryParams.ordering) {
       const [{field, order}] = parseOrdering<keyof Book>(queryParams.ordering)

@@ -172,7 +172,13 @@ const fence = (file: string, title?: string) => async () => {
 const renderers: Record<string, (arg: string) => Promise<string>> = {
   async api(name) {
     const file = await findComponent(name)
-    return renderApi(name, file, getChecker().getComponentMeta(file))
+    const checker = getChecker()
+
+    // A fresh type checker per component: TypeScript orders union members and inherited props by the order it first
+    // saw the types, so a shared checker would reshuffle one page's tables whenever another page is added.
+    checker.reload()
+
+    return renderApi(name, file, checker.getComponentMeta(file))
   },
 
   async example(arg) {
