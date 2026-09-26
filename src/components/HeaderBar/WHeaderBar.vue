@@ -26,6 +26,8 @@
         </slot>
       </h1>
 
+      <slot name="right" />
+
       <button
         v-if="search"
         class="w-ripple-trigger sm:pr---inner-margin h-full select-none"
