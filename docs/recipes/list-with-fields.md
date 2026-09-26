@@ -18,7 +18,7 @@ description: Build a paginated, sortable, searchable WList with one component pe
 | Menu components | Row actions, typed with `MenuProps<T>` / `MenuEmits<T>`. |
 | An expansion component | Optional detail row, opened from the field marked `allow-open`. |
 
-<!-- @example recipes/book-list/BookList -->
+<!-- @example recipes/book-list/BookList overflow -->
 
 <DocsDemo name="recipes/book-list/BookList" overflow />
 

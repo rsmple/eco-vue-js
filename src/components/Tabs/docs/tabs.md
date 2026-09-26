@@ -7,7 +7,7 @@ description: WTabs and WTabsItem — tabbed content with icons, counters and dis
 
 `WTabs` takes `WTabsItem` children and renders a header of tab buttons above the active tab's content. Each item needs a unique `name`; `title`, `icon` and `count` go on its button. The first tab opens unless `initTab`, `initTabIndex` or an item's `init` says otherwise.
 
-<!-- @example Tabs/Basic -->
+<!-- @example Tabs/Basic overflowHidden -->
 
 <DocsDemo name="Tabs/Basic" overflowHidden />
 
@@ -81,7 +81,7 @@ Switching slides the content in from the side of the new tab, and the content ar
 
 A tab with a `close` listener gets a close button. Children that aren't `WTabsItem` render in the header after the tab buttons, which is where an add button goes; `switchToNew` opens a tab as soon as it is added. When the active tab is removed, the one before it opens.
 
-<!-- @example Tabs/Closable -->
+<!-- @example Tabs/Closable overflowHidden -->
 
 <DocsDemo name="Tabs/Closable" overflowHidden />
 

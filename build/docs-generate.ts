@@ -4,7 +4,8 @@
  * it is what VitePress search indexes and what the llms.txt output serves verbatim.
  *
  *   <!-- @api WButton --> … <!-- @api-end -->                   props, events and slots from vue-component-meta
- *   <!-- @example Button/Basic --> … <!-- @example-end -->       live demo + the example's source (`client` suffix skips SSR)
+ *   <!-- @example Button/Basic --> … <!-- @example-end -->       live demo + the example's source (`client` flag skips SSR, other
+ *                                                                flags like `overflow` pass through as DocsDemo attributes)
  *   <!-- @source docs/examples/x.ts --> … <!-- @source-end -->   any file's source as a code block
  *   <!-- @icons --> … <!-- @icons-end -->                        every icon name
  *
@@ -182,9 +183,10 @@ const renderers: Record<string, (arg: string) => Promise<string>> = {
   },
 
   async example(arg) {
-    const [name, flag] = arg.split(/\s+/, 2)
+    const [name, ...flags] = arg.split(/\s+/)
     const file = findExample(name)
-    return `<DocsDemo name="${ name }"${ flag === 'client' ? ' client-only' : '' } />\n\n${ await fence(file)() }`
+    const attrs = flags.map(flag => ` ${ flag === 'client' ? 'client-only' : flag }`).join('')
+    return `<DocsDemo name="${ name }"${ attrs } />\n\n${ await fence(file)() }`
   },
 
   async source(arg) {
@@ -208,39 +210,65 @@ const renderers: Record<string, (arg: string) => Promise<string>> = {
 
 const REGION = /(<!-- @(api|example|source|icons)\b ?(.*?) -->\n)[\s\S]*?(<!-- @\2-end -->)/g
 
-const processFile = async (file: string): Promise<boolean> => {
-  const content = await readFile(file, 'utf8')
-  const replacements: string[] = []
+// Where a stale region first diverges, so `--check` says what changed and not only which file.
+const describeStale = (content: string, offset: number, current: string, expected: string) => {
+  const currentLines = current.split('\n')
+  const expectedLines = expected.split('\n')
+  let index = 0
+  while (index < currentLines.length && currentLines[index] === expectedLines[index]) index++
 
-  for (const [, , kind, arg] of content.matchAll(REGION)) {
-    replacements.push(await renderers[kind](arg.trim()))
+  const line = content.slice(0, offset).split('\n').length + index
+  const show = (value: string | undefined) => value === undefined ? '(end of region)' : value.trim() || '(empty line)'
+
+  return [
+    `line ${ line }:`,
+    `      - ${ show(currentLines[index]) }`,
+    `      + ${ show(expectedLines[index]) }`,
+  ].join('\n')
+}
+
+const processFile = async (file: string): Promise<string[]> => {
+  const content = await readFile(file, 'utf8')
+  const regions: {open: string, kind: string, arg: string, body: string, offset: number, expected: string}[] = []
+
+  for (const match of content.matchAll(REGION)) {
+    const [whole, open, kind, arg, close] = match
+    const body = whole.slice(open.length, whole.length - close.length)
+    const expected = `\n${ await renderers[kind](arg.trim()) }\n\n`
+    regions.push({open, kind, arg: arg.trim(), body, offset: match.index + open.length, expected})
   }
 
-  if (!replacements.length) return false
+  const stale = regions.filter(region => region.body !== region.expected)
 
-  let index = 0
-  const result = content.replace(REGION, (_, open, _kind, _arg, close) => `${ open }\n${ replacements[index++] }\n\n${ close }`)
+  if (!stale.length) return []
 
-  if (result === content) return false
+  if (!CHECK) {
+    let index = 0
+    const result = content.replace(REGION, (_, open, _kind, _arg, close) => `${ open }${ regions[index++].expected }${ close }`)
+    await writeFile(file, result, 'utf8')
+  }
 
-  if (!CHECK) await writeFile(file, result, 'utf8')
-
-  return true
+  return stale.map(region => `@${ region.kind }${ region.arg ? ` ${ region.arg }` : '' } — ${ describeStale(content, region.offset, region.body, region.expected) }`)
 }
 
 const start = performance.now()
 const changed: string[] = []
+const details: string[] = []
 
 for (const pattern of MARKDOWN_GLOBS) {
   for await (const file of glob(pattern, {cwd: ROOT})) {
-    if (await processFile(path.join(ROOT, file))) changed.push(file)
+    const stale = await processFile(path.join(ROOT, file))
+    if (!stale.length) continue
+
+    changed.push(file)
+    details.push(`  ${ file }`, ...stale.map(item => `    ${ item }`))
   }
 }
 
 const seconds = ((performance.now() - start) / 1000).toFixed(1)
 
 if (CHECK && changed.length) {
-  console.error(`Generated docs are stale — run \`npm run docs:generate\`:\n${ changed.map(file => `  ${ file }`).join('\n') }`)
+  console.error(`Generated docs are stale — run \`npm run docs:generate\`:\n${ details.join('\n') }`)
   process.exit(1)
 }
 

@@ -69,6 +69,7 @@ import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
 | `loading` | `boolean` | — | — |
 | `stretch` | `boolean` | — | — |
 | `allowClear` | `boolean` | — | — |
+| `disabledItems` | `Model[]` | — | — |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (25)
 
