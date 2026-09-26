@@ -79,17 +79,22 @@ const emit = defineEmits<{
 
 const errorMessageValue = ref<string | undefined>()
 
-watch(() => props.modelValue, (newValue: ModelValue | undefined): void => {
-  if (!props.validate) return
+const getErrorMessage = (value: ModelValue | undefined): string | undefined => {
+  if (!props.validate) return undefined
 
-  if (props.validate instanceof Array) {
-    errorMessageValue.value = props.validate.map(fn => fn(newValue)).filter(item => item).join(', ') || undefined
-  } else {
-    errorMessageValue.value = props.validate(newValue) || undefined
-  }
+  if (props.validate instanceof Array) return props.validate.map(fn => fn(value)).filter(item => item).join(', ') || undefined
+
+  return props.validate(value) || undefined
+}
+
+watch(() => props.modelValue, (newValue: ModelValue | undefined): void => {
+  errorMessageValue.value = getErrorMessage(newValue)
 })
 
 const onUpdateModelValue = (newValue: NonNullable<ModelValue> | undefined) => {
+  // Validate the value being saved, not the last accepted one — otherwise one invalid value blocks every later save.
+  errorMessageValue.value = getErrorMessage(newValue)
+
   if (errorMessageValue.value) return
 
   emit('update:model-value', newValue)

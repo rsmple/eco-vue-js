@@ -37,11 +37,14 @@ const modalHeaderHeight = inject(wModalHeaderHeight, undefined)
 
 const scrollingElement = inject(wScrollingElement, null)
 
+// What the header sticks under: the modal's title bar, nothing in another scroll container, or the page header.
+const getTopOffset = () => modalHeaderHeight?.value ?? (scrollingElement ? 0 : headerHeightLayout.value)
+
 const updateHeaderTop = () => {
   if (!headerRef.value) return
 
   const rect = headerRef.value.getBoundingClientRect()
-  headerTop.value = rect.top + (scrollingElement?.value?.scrollTop ?? document.scrollingElement?.scrollTop ?? 0) - (modalHeaderHeight?.value ?? headerHeightLayout.value)
+  headerTop.value = rect.top + (scrollingElement?.value?.scrollTop ?? document.scrollingElement?.scrollTop ?? 0) - getTopOffset()
 }
 
 const updateHeader = () => {
@@ -49,7 +52,7 @@ const updateHeader = () => {
 
   const rect = headerRef.value.getBoundingClientRect()
   headerHeight.value = rect.height
-  headerTop.value = rect.top + (scrollingElement?.value?.scrollTop ?? document.scrollingElement?.scrollTop ?? 0) - (modalHeaderHeight?.value ?? headerHeightLayout.value)
+  headerTop.value = rect.top + (scrollingElement?.value?.scrollTop ?? document.scrollingElement?.scrollTop ?? 0) - getTopOffset()
 }
 
 let observer: ResizeObserver | null = null
@@ -73,7 +76,7 @@ onBeforeUnmount(() => {
   observer = null
 })
 
-watch(() => modalHeaderHeight?.value ?? headerHeightLayout.value, updateHeaderTop)
+watch(getTopOffset, updateHeaderTop)
 
 defineSlots<{
   header: (props: InfiniteListHeaderScope) => VNode[]

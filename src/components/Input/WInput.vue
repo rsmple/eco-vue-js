@@ -43,7 +43,7 @@
           :class="{
             'font-mono': mono,
             'text-secure': textSecure && !isSecureVisible && modelValue,
-            'relative h-(--w-textarea-height,10rem) min-h-(--w-textarea-height,10rem) w-full overflow-auto overscroll-contain whitespace-pre bg-(--w-input-bg,inherit)': textarea,
+            'w-textarea relative h-(--w-textarea-height,10rem) min-h-(--w-textarea-height,10rem) w-full overflow-auto overscroll-contain whitespace-pre bg-(--w-input-bg,inherit)': textarea,
             'resize-y': resize && textarea,
             'resize-none': !resize && textarea,
           }"

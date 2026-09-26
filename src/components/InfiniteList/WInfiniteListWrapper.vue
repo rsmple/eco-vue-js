@@ -8,14 +8,15 @@
     :is-intersecting="isIntersecting"
     class="sticky print:hidden"
     :class="{
-      'top---header-height': !isModal,
-      'bg-default dark:bg-default-dark': noHeaderUpdate || isModal,
+      'top---header-height': !isContained,
+      'top-0 not-empty:pt-3': isContained && !isModal,
       'top---modal-header-height': isModal,
+      'bg-default dark:bg-default-dark': noHeaderUpdate || isContained,
     }"
     :style="{zIndex: isIntersecting ? BASE_ZINDEX_DROPDOWN : BASE_ZINDEX_LIST_HEADER}"
   >
     <template
-      v-if="isModal || noHeaderUpdate"
+      v-if="isContained || noHeaderUpdate"
       #header="scope"
     >
       <slot
@@ -55,6 +56,7 @@ import {BASE_ZINDEX_DROPDOWN, BASE_ZINDEX_LIST_HEADER, getIsClientSide} from '@/
 
 import InfiniteListHeaderHeight from './components/InfiniteListHeaderHeight.vue'
 import InfiniteListHeaderPadding from './components/InfiniteListHeaderPadding.vue'
+import {wScrollingElement} from './models/injection'
 
 import {useHeader} from '../HeaderBar/use/useHeader'
 
@@ -66,6 +68,11 @@ const props = defineProps<{
 }>()
 
 const isModal = inject(wIsModal, false)
+
+// Inside its own scroll container (a modal, or any WInfiniteListScrollingElement) the header sticks to that
+// container: it has its own background and leaves the page header alone. Outside a modal nothing sits above it,
+// so it keeps its own gap from the container's top edge.
+const isContained = isModal || inject(wScrollingElement, null) !== null
 
 // null until the observer reports, so the header padding is not applied before the real position is known
 const isIntersecting = ref<boolean | null>(props.initIsIntersecting ?? null)
