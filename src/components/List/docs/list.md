@@ -19,7 +19,7 @@ The [List with fields](/recipes/list-with-fields) recipe builds this step by ste
 
 ## Layout variables
 
-The sticky header, the checkbox column and full-width rows position themselves from the app's layout variables — `--header-height`, `--nav-bar-width`, `--actions-bar-width` and `--inner-margin` — so the app has to set them (see [App layout](/guide/getting-started#app-layout)). Inside a modal, the modal sets its own.
+The sticky header, the checkbox column and full-width rows position themselves from the app's layout variables — `--header-height`, `--nav-bar-width`, `--actions-bar-width` and `--inner-margin` — so the app has to set them (see [App shell](/guide/app-shell)). Inside a modal, the modal sets its own.
 
 ## API
 
