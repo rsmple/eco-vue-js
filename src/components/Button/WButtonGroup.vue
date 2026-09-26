@@ -167,7 +167,7 @@ const getValue = (item: Model | Entity): Model => {
 }
 
 const isItemDisabled = (item: Model | Entity): boolean => {
-  return !!(isDisabled.value || isReadonly.value || (props.loading && getValue(item) !== loadingItem.value))
+  return !!(isDisabled.value || isReadonly.value || (props.loading && getValue(item) !== loadingItem.value)) || (props.disabledItems?.includes(getValue(item)) ?? false)
 }
 
 const modelValueItem = computed(() => props.list.find(item => getValue(item) === props.modelValue))

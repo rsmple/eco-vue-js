@@ -51,6 +51,7 @@ interface ButtonGroupPropsBase<Model extends number | string | null | boolean>
   loading?: boolean
   stretch?: boolean
   allowClear?: boolean
+  disabledItems?: Model[]
 }
 
 interface ButtonGroupPropsForModel<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>
