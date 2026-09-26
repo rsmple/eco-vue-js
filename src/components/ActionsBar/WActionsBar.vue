@@ -2,7 +2,7 @@
   <div 
     class="
       height-full w-actions-bar
-      sm-not:[--actions-bar-filter-width:calc(100vw-var(--w-actions-bar-width))] fixed right-0 top-0 grid
+      sm-not:[--actions-bar-filter-width:calc(100vw-var(--w-actions-bar-width))] fixed right-(--right-margin,0px) top-0 grid
       grid-cols-[var(--actions-bar-filter-width-current,0)_var(--w-actions-bar-width)] grid-rows-[var(--header-height)_1fr]
       justify-end overflow-hidden transition-[grid-template-columns]
       duration-300 print:hidden

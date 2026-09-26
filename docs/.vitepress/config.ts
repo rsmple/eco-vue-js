@@ -28,13 +28,6 @@ export default defineConfig({
   themeConfig: {
     search: {provider: 'local'},
 
-    nav: [
-      {text: 'Guide', link: '/guide/getting-started'},
-      {text: 'Components', link: '/components/Button'},
-      {text: 'Icons', link: '/icons'},
-      {text: 'Recipes', link: '/recipes/list-with-fields'},
-    ],
-
     sidebar: [
       {
         text: 'Guide',
@@ -63,13 +56,8 @@ export default defineConfig({
       },
     ],
 
-    socialLinks: [
-      {icon: 'github', link: 'https://github.com/rsmple/eco-vue-js'},
-      {icon: 'npm', link: 'https://www.npmjs.com/package/eco-vue-js'},
-    ],
-
     editLink: {
-      pattern: 'https://github.com/rsmple/eco-vue-js/edit/main/docs/:path',
+      pattern: 'https://github.com/rsmple/eco-vue-js/edit/main/:path',
     },
   },
 

@@ -2,19 +2,105 @@
 
 @source "../../../src";
 @source "../../examples";
-@source "./components";
+@source "./";
 
 @import "../../../package/tailwind-base/base.css";
 
+@theme {
+  --spacing-nav-bar-width: 15rem;
+  --spacing-actions-bar-width: 3.5rem;
+  --spacing-docs-max-width: 100rem;
+}
+
+/* The app-shell setup a consumer app makes: layout variables the kit's bars, lists and sticky headers read. */
+body {
+  --header-height: 3.5rem;
+  --nav-bar-width: 0px;
+  --actions-bar-width: 0px;
+  --inner-margin: 1rem;
+  --inner-width-diff: calc(var(--nav-bar-width) + var(--actions-bar-width) + (var(--inner-margin) * 2));
+  --w-actions-bar-width: var(--spacing-actions-bar-width);
+
+  /* On wide screens the whole shell is centred; the bars are offset by the same margins. */
+  --left-margin: max(0px, (100vw - var(--spacing-docs-max-width)) / 2);
+  --right-margin: var(--left-margin);
+
+  @apply
+    bg-default dark:bg-default-dark text-black-default dark:text-gray-100
+    w-checkbox-size-3
+    w-input-h-9 w-input-rounded-lg w-button-rounded-xl
+    w-list-header-h-9 w-list-header-rounded-xl w-list-padding-3
+    w-list-header-bg-primary-light dark:w-list-header-bg-primary-darkest
+    sm:[--actions-bar-width:var(--spacing-actions-bar-width)]
+    xl:[--nav-bar-width:var(--spacing-nav-bar-width)];
+}
+
+.w-nav-bar {
+  @apply bg-default dark:bg-default-dark shadow-md xl:shadow-none;
+}
+
+.w-actions-bar {
+  @apply bg-default dark:bg-default-dark shadow-md sm:shadow-none;
+}
+
+/* VitePress content styles, driven by the kit's tokens and the shell's header. Set on body, where the shell variables live. */
+body {
+  --vp-nav-height: var(--header-height);
+  --vp-c-bg: var(--color-default);
+  --vp-c-bg-alt: var(--color-gray-50);
+  --vp-c-bg-soft: var(--color-gray-100);
+  --vp-c-brand-1: var(--color-primary-dark);
+  --vp-c-brand-2: var(--color-primary);
+  --vp-c-brand-3: var(--color-primary-dark);
+  --vp-c-brand-soft: color-mix(in oklab, var(--color-primary) 16%, transparent);
+  --vp-c-text-1: var(--color-black-default);
+  --vp-code-color: var(--vp-c-brand-1);
+}
+
+.dark body {
+  --vp-c-bg: var(--color-default-dark);
+  --vp-c-bg-alt: var(--color-gray-850);
+  --vp-c-bg-soft: var(--color-gray-800);
+  --vp-c-brand-1: var(--color-primary);
+  --vp-c-brand-2: var(--color-primary-dark);
+  --vp-c-brand-3: var(--color-primary-dark);
+  --vp-c-text-1: var(--color-gray-100);
+}
+
+/* VPContent pads itself for VitePress's own nav and sidebar; the shell wrapper handles that instead. */
+#VPContent.VPContent {
+  margin: 0;
+  padding: var(--header-height) 0 0;
+}
+
 /* VitePress styles are unlayered, so they win over Tailwind layers inside `.vp-doc`. Demos opt out with `vp-raw`. */
 
+/* A demo is its own horizontal scroll container, like a modal: the shell's bars are outside it, so sticky list
+   columns and full-width rows measure from its edges. The padding sits on an inner box and plays the part of the
+   app's inner margin: sticky offsets are measured inside a scroll container's padding, so it can't go on `.demo`. */
 .demo {
+  --left-margin: 0px;
+  --right-margin: 0px;
+  --nav-bar-width: 0px;
+  --actions-bar-width: 0px;
+  --inner-margin: 1.5rem;
+
   border: 1px solid var(--vp-c-divider);
   border-radius: 8px;
-  padding: 1.5rem;
   margin: 1rem 0 0;
   overflow-x: auto;
   background: var(--vp-c-bg);
+}
+
+.demo-content {
+  width: max-content;
+  min-width: 100%;
+  padding: var(--inner-margin);
+}
+
+/* The kit derives this from 100vw on every element; DocsDemo measures the box instead. */
+.demo * {
+  --w-width-inner: calc(var(--docs-demo-width, 100%) - var(--w-left-inner) - var(--w-right-inner));
 }
 
 .demo + div[class*="language-"] {

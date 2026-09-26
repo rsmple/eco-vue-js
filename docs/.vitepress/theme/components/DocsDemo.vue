@@ -1,23 +1,28 @@
 <template>
-  <div class="demo vp-raw">
-    <ClientOnly v-if="component && clientOnly">
-      <component :is="component" />
-    </ClientOnly>
-    <component
-      :is="component"
-      v-else-if="component"
-    />
-    <p
-      v-else
-      class="text-negative"
-    >
-      Example not found: {{ name }}
-    </p>
+  <div
+    ref="element"
+    class="demo vp-raw"
+  >
+    <div class="demo-content">
+      <ClientOnly v-if="component && clientOnly">
+        <component :is="component" />
+      </ClientOnly>
+      <component
+        :is="component"
+        v-else-if="component"
+      />
+      <p
+        v-else
+        class="text-negative"
+      >
+        Example not found: {{ name }}
+      </p>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import type {Component} from 'vue'
+import {type Component, onBeforeUnmount, onMounted, useTemplateRef} from 'vue'
 
 const props = defineProps<{
   name: string
@@ -35,4 +40,25 @@ const resolve = (name: string): Component | undefined => {
 }
 
 const component = resolve(props.name)
+
+// The demo box is the scroll container its content measures against — `--w-width-inner` is 100vw in an app.
+const elementRef = useTemplateRef('element')
+
+let observer: ResizeObserver | null = null
+
+onMounted(() => {
+  if (!elementRef.value) return
+
+  // clientWidth: the scrollport, padding included and scrollbar excluded — what 100vw stands for in an app.
+  observer = new ResizeObserver(() => {
+    elementRef.value?.style.setProperty('--docs-demo-width', `${ elementRef.value.clientWidth }px`)
+  })
+
+  observer.observe(elementRef.value)
+})
+
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  observer = null
+})
 </script>

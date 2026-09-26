@@ -40,9 +40,9 @@ export default [
 
   {
     name: 'app/docs-examples',
-    files: ['docs/examples/**/*.{ts,vue}', 'src/components/*/docs/**/*.vue'],
+    files: ['docs/examples/**/*.{ts,vue}', 'src/components/*/docs/**/*.vue', 'docs/.vitepress/theme/**/*.{ts,vue}'],
     rules: {
-      // Examples import the kit the way consumers do; icons resolve through the ambient module declaration.
+      // Examples and the docs theme import the kit the way consumers do; icons resolve through the ambient module declaration.
       'import-x/no-unresolved': ['error', {ignore: ['^eco-vue-js/dist/assets/icons/']}],
       // Example files are demos named after what they show, never registered as components.
       'vue/multi-word-component-names': 'off',

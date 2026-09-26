@@ -21,7 +21,7 @@
 
   <nav
     class="
-      w-nav-bar fixed left-0 top-0 grid h-full overflow-hidden
+      w-nav-bar fixed left-(--left-margin,0px) top-0 grid h-full overflow-hidden
       transition-[grid-template-columns] duration-200 xl:grid-cols-[1fr] print:hidden 
     "
     :class="[{
@@ -36,7 +36,7 @@
   </nav>
 
   <div
-    class="square---header-height w-ripple fixed left-0 top-0 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
+    class="square---header-height w-ripple fixed left-(--left-margin,0px) top-0 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
     :class="{'text-primary': isOpen}"
     :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
     @click.stop="toggle"
