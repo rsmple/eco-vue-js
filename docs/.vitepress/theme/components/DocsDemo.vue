@@ -22,7 +22,9 @@
 </template>
 
 <script lang="ts" setup>
-import {type Component, onBeforeUnmount, onMounted, useTemplateRef} from 'vue'
+import {type Component, onBeforeUnmount, onMounted, provide, useTemplateRef} from 'vue'
+
+import {wScrollingElement} from '@/components/InfiniteList/models/injection'
 
 const props = defineProps<{
   name: string
@@ -43,6 +45,9 @@ const component = resolve(props.name)
 
 // The demo box is the scroll container its content measures against — `--w-width-inner` is 100vw in an app.
 const elementRef = useTemplateRef('element')
+
+// Lists inside page and stick against the demo box, as they do inside a modal.
+provide(wScrollingElement, elementRef)
 
 let observer: ResizeObserver | null = null
 

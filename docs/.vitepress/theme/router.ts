@@ -17,7 +17,8 @@ export const installKitRouter = (app: App, router: Router, base: string) => {
   const sync = () => {
     route.name = stripBase(router.route.path)
     route.query = inBrowser ? Object.fromEntries(new URLSearchParams(location.search)) : {}
-    route.hash = inBrowser ? location.hash : ''
+    // vue-router hands out the decoded hash; the list keeps its selection there as JSON.
+    route.hash = inBrowser ? decodeURIComponent(location.hash) : ''
     route.fullPath = router.route.path
   }
 

@@ -119,7 +119,7 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 
 ## Validation
 
-`WInputAsync` takes `validate` — one function or a list — that returns an error message or `undefined`. While the value is invalid, the error is shown and the model is not updated, so the parent only ever receives valid values.
+`WInputAsync` edits a local copy and saves it on Enter or blur (or after `debounce`). `validate` — one function or a list — returns an error message or `undefined`; an invalid value shows the error and is not saved, so the parent only ever receives valid values.
 
 <!-- @example Input/Validate -->
 

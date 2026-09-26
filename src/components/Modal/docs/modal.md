@@ -60,7 +60,7 @@ const confirmDelete = () => {
 
 ## Custom modal
 
-`Modal.add(component, props)` opens any component. Wrap its content in `WModalWrapper`, which provides the title, a scrolling body and a sticky footer with the actions. The modal closes when it emits `close:modal`, when the backdrop's close button is clicked, or when the function returned by `Modal.add` is called.
+`Modal.add(component, props)` opens any component. Wrap its content in `WModalWrapper`, which provides the title, a scrolling body and a sticky footer with the actions. Its padding comes from `--w-modal-wrapper-padding`, set once for the app (`w-modal-wrapper-p---inner-margin` on `body`); on phones the body is edge to edge, so pad the content with `sm-not:px---inner-margin`. Give the action buttons `w-full` to share the footer width. The modal closes when it emits `close:modal`, when the backdrop's close button is clicked, or when the function returned by `Modal.add` is called.
 
 Pass callbacks as props to get results back. Load the modal with `defineAsyncComponent`, so its code is fetched on first open, and wrap it in `markRaw`, as for every component passed as a prop.
 
@@ -111,11 +111,13 @@ const rename = () => {
       v-model="value"
       title="Name"
       autofocus
+      class="sm-not:px---inner-margin"
     />
 
     <template #actions>
       <WButton
         outline
+        class="w-full"
         @click="$emit('close:modal')"
       >
         Cancel
@@ -123,6 +125,7 @@ const rename = () => {
 
       <WButton
         :disabled="!value"
+        class="w-full"
         @click="save"
       >
         Save

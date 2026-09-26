@@ -8,11 +8,13 @@
       v-model="value"
       title="Name"
       autofocus
+      class="sm-not:px---inner-margin"
     />
 
     <template #actions>
       <WButton
         outline
+        class="w-full"
         @click="$emit('close:modal')"
       >
         Cancel
@@ -20,6 +22,7 @@
 
       <WButton
         :disabled="!value"
+        class="w-full"
         @click="save"
       >
         Save

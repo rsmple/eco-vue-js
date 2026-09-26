@@ -6,7 +6,7 @@
     :icon="markRaw(IconSearch)"
     allow-clear
     no-margin
-    class="mb-4"
+    class="sticky left---left-inner mb-4 w---width-inner"
   />
 
   <WList
@@ -22,13 +22,17 @@
     ]"
     selection-title="book"
     :select-all-text-getter="selectAllTextGetter"
-    :card-columns="(['1fr', 'auto'] as const)"
+    :card-columns="(['minmax(0rem, 1fr)', 'auto', 'auto'] as const)"
     :card-areas="[
-      ['title', 'area_select'],
-      ['author', 'area_more'],
-      ['year', 'available'],
+      ['title', 'title', 'area_select'],
+      ['author','author', 'area_more'],
+      ['year', 'available', 'available'],
+      ['genre', 'genre', 'genre'],
     ]"
+    card-class="list:h-11 card:gap-2 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-gray-100 dark:border-gray-800"
+    card-wrapper-class="card:self-start"
     min-height
+    class="sm:w-list-gap-3"
     @update:query-params="ordering = $event.ordering"
   />
 </template>

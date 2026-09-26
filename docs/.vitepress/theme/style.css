@@ -28,9 +28,11 @@ body {
   @apply
     bg-default dark:bg-default-dark text-black-default dark:text-gray-100
     w-checkbox-size-3
+    w-modal-wrapper-p---inner-margin
     w-input-h-9 w-input-rounded-lg w-button-rounded-xl
     w-list-header-h-9 w-list-header-rounded-xl w-list-padding-3
     w-list-header-bg-primary-light dark:w-list-header-bg-primary-darkest
+    sm:[--inner-margin:1.5rem]
     sm:[--actions-bar-width:var(--spacing-actions-bar-width)]
     xl:[--nav-bar-width:var(--spacing-nav-bar-width)];
 }
@@ -43,9 +45,9 @@ body {
   @apply bg-default dark:bg-default-dark shadow-md sm:shadow-none;
 }
 
-/* VitePress content styles, driven by the kit's tokens and the shell's header. Set on body, where the shell variables live. */
-body {
-  --vp-nav-height: var(--header-height);
+/* VitePress styles, driven by the kit's tokens. Colors go on :root, where VitePress derives its own variables from
+   them (hero, buttons); the header height lives on body with the rest of the shell variables. */
+:root {
   --vp-c-bg: var(--color-default);
   --vp-c-bg-alt: var(--color-gray-50);
   --vp-c-bg-soft: var(--color-gray-100);
@@ -57,14 +59,18 @@ body {
   --vp-code-color: var(--vp-c-brand-1);
 }
 
-.dark body {
+.dark {
   --vp-c-bg: var(--color-default-dark);
   --vp-c-bg-alt: var(--color-gray-850);
-  --vp-c-bg-soft: var(--color-gray-800);
+  --vp-c-bg-soft: color-mix(in oklab, var(--color-gray-850) 50%, transparent);
   --vp-c-brand-1: var(--color-primary);
   --vp-c-brand-2: var(--color-primary-dark);
   --vp-c-brand-3: var(--color-primary-dark);
   --vp-c-text-1: var(--color-gray-100);
+}
+
+body {
+  --vp-nav-height: var(--header-height);
 }
 
 /* VPContent pads itself for VitePress's own nav and sidebar; the shell wrapper handles that instead. */
@@ -73,38 +79,85 @@ body {
   padding: var(--header-height) 0 0;
 }
 
+/* The home page has no nav bar: the hero spans the whole frame. */
+.docs-home {
+  --nav-bar-width: 0px;
+}
+
+/* Content starts at the app's inner margin, like a page in a kit app, so it lines up with the header title. */
+#VPContent .VPDoc {
+  padding-inline: var(--inner-margin);
+}
+
+#VPContent .VPDoc .container,
+#VPContent .VPDoc .content-container {
+  margin-inline: 0 auto;
+}
+
+#VPContent .VPDoc .content {
+  padding-left: 0;
+}
+
+/* On phones VitePress runs code blocks to the screen edge with a fixed 24px; the gutter here is the inner margin. */
+@media (width < 40rem) {
+  #VPContent .vp-doc div[class*="language-"],
+  #VPContent .vp-doc .vp-code-group .tabs {
+    margin-inline: calc(var(--inner-margin) * -1);
+  }
+}
+
 /* VitePress styles are unlayered, so they win over Tailwind layers inside `.vp-doc`. Demos opt out with `vp-raw`. */
 
-/* A demo is its own horizontal scroll container, like a modal: the shell's bars are outside it, so sticky list
-   columns and full-width rows measure from its edges. The padding sits on an inner box and plays the part of the
-   app's inner margin: sticky offsets are measured inside a scroll container's padding, so it can't go on `.demo`. */
+body {
+  /* The page gutter, kept under another name: demos redefine --inner-margin for their own content. */
+  --docs-page-margin: var(--inner-margin);
+}
+
+/* A demo is a small app window: its own scroll container in both directions (overflow-x: auto makes overflow-y
+   auto too, so it could not scroll along with the page anyway), with no header or bars inside. Sticky list headers
+   and columns stick to its edges, and DocsDemo hands it to the kit as the scrolling element, so lists page against
+   it. The padding sits on an inner box and plays the part of the app's inner margin: sticky offsets are measured
+   inside a scroll container's padding, so it can't go on `.demo`. */
 .demo {
+  --header-height: 0px;
   --left-margin: 0px;
   --right-margin: 0px;
   --nav-bar-width: 0px;
   --actions-bar-width: 0px;
   --inner-margin: 1.5rem;
+  --docs-demo-max-height: min(40rem, 80vh);
 
   border: 1px solid var(--vp-c-divider);
   border-radius: 8px;
   margin: 1rem 0 0;
-  overflow-x: auto;
+  max-height: var(--docs-demo-max-height);
+  overflow: auto;
+  /* Kit layers (list header 20, header bar 10) stay inside the box instead of competing with the page shell. */
+  isolation: isolate;
+  overscroll-behavior: contain;
   background: var(--vp-c-bg);
 }
 
+/* Phones: edge to edge like VitePress code blocks, with the app's own inner margin — the width an app would have. */
+@media (width < 40rem) {
+  .demo {
+    --inner-margin: 1rem;
+
+    margin-inline: calc(var(--docs-page-margin) * -1);
+    border-inline: none;
+    border-radius: 0;
+  }
+}
+
 .demo-content {
-  width: max-content;
+  width: fit-content;
   min-width: 100%;
   padding: var(--inner-margin);
 }
 
-/* The kit derives this from 100vw on every element; DocsDemo measures the box instead. */
+/* The kit derives these from 100vw and 100vh on every element; in a demo the box is the viewport. */
 .demo * {
   --w-width-inner: calc(var(--docs-demo-width, 100%) - var(--w-left-inner) - var(--w-right-inner));
+  --w-height-inner: calc(var(--docs-demo-max-height) - var(--w-top-inner) - var(--w-bottom-inner));
 }
 
-.demo + div[class*="language-"] {
-  margin-top: 0 !important;
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 0 !important;
-}

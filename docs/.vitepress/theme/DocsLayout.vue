@@ -1,6 +1,12 @@
 <template>
-  <div class="docs-shell">
-    <DocsNav @update:is-open="isNavOpen = $event" />
+  <div
+    class="docs-shell"
+    :class="{'docs-home': isHome}"
+  >
+    <DocsNav
+      v-if="!isHome || isTablet"
+      @update:is-open="isNavOpen = $event"
+    />
 
     <WHeaderBar class="pl-[calc(var(--left-margin)+var(--nav-bar-width))] pr-[calc(var(--right-margin)+var(--actions-bar-width))]">
       <template #title>
@@ -92,13 +98,16 @@ const SOCIAL_LINKS = [
   {title: 'npm', icon: markRaw(IconNpm), href: 'https://www.npmjs.com/package/eco-vue-js'},
 ]
 
-const {site, isDark} = useData()
+const {site, isDark, frontmatter} = useData()
+
+const isHome = computed(() => frontmatter.value.layout === 'home')
 
 // The parts of VitePress's own Layout that its content components rely on: sidebar and outline state, hero slots.
 registerWatchers({closeSidebar: () => undefined})
 provide(layoutInfoInjectionKey, {heroImageSlotExists: computed(() => false)})
 
-const {isMobile} = useIsMobile()
+// The home page drops the nav on wide screens; below xl the nav is an overlay behind the menu button anyway.
+const {isMobile, isTablet} = useIsMobile()
 
 const isNavOpen = ref(false)
 const isSearchOpen = ref(false)

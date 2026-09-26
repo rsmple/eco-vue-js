@@ -31,7 +31,7 @@ description: Build a paginated, sortable, searchable WList with one component pe
     :icon="markRaw(IconSearch)"
     allow-clear
     no-margin
-    class="mb-4"
+    class="sticky left---left-inner mb-4 w---width-inner"
   />
 
   <WList
@@ -47,13 +47,17 @@ description: Build a paginated, sortable, searchable WList with one component pe
     ]"
     selection-title="book"
     :select-all-text-getter="selectAllTextGetter"
-    :card-columns="(['1fr', 'auto'] as const)"
+    :card-columns="(['minmax(0rem, 1fr)', 'auto', 'auto'] as const)"
     :card-areas="[
-      ['title', 'area_select'],
-      ['author', 'area_more'],
-      ['year', 'available'],
+      ['title', 'title', 'area_select'],
+      ['author','author', 'area_more'],
+      ['year', 'available', 'available'],
+      ['genre', 'genre', 'genre'],
     ]"
+    card-class="list:h-11 card:gap-2 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-gray-100 dark:border-gray-800"
+    card-wrapper-class="card:self-start"
     min-height
+    class="sm:w-list-gap-3"
     @update:query-params="ordering = $event.ordering"
   />
 </template>
@@ -485,7 +489,7 @@ defineProps<Omit<FieldProps<Book | undefined, QueryParamsBooks>, 'config'>>()
 
 - **One component per column** makes columns reusable across lists of the same model, lets each cell own its formatting and loading state, and keeps the column list declarative, so `WList` can reorder, hide and resize columns without knowing what they render.
 - **Query params are the whole state.** Search, filters and ordering go into `queryParams`; `WList` adds `page` and emits `update:query-params` when the user sorts. Store them in the route query and the list becomes linkable and survives reloads.
-- **Card layout is data, not markup.** `cardColumns` and `cardAreas` place the same field components into a CSS grid for the mobile card view, using the field labels as area names. `area_select` and `area_more` place the checkbox and the menu.
+- **Card layout is data, not markup.** `cardColumns` and `cardAreas` place the same field components into a CSS grid for the mobile card view, using the field labels as area names. `area_select` and `area_more` place the checkbox and the menu. Name every field, including ones hidden by default: a field left out still renders in card mode, in an extra column the grid adds for it. A row whose fields are all hidden drops out, so the `genre` row costs nothing until the user shows that column.
 - **Cache updates instead of refetching.** Menus update the item in place, so the user keeps their scroll position and loaded pages.
 
 ## Variations

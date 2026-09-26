@@ -1,5 +1,6 @@
 ---
 group: Data
+aside: false
 description: WList — paginated, sortable collections shown as a table on desktop and cards on mobile, with one field component per column.
 ---
 
@@ -9,6 +10,7 @@ description: WList — paginated, sortable collections shown as a table on deskt
 
 - `useQueryFn` and `queryParams` — a paginated query.
 - `fields` — one component per column. Each has a `meta` export with its title, ordering field and CSS class, and renders one cell from `item`.
+- `cardColumns` and `cardAreas` — the card layout as a CSS grid, with field labels as area names. Every field must appear in `cardAreas`, even ones hidden by default; a field left out renders in an extra grid column.
 - Optionally an expansion component for a detail row and a menu component for row actions.
 
 The [List with fields](/recipes/list-with-fields) recipe builds this step by step; the list below is its result.
