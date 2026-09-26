@@ -6,7 +6,9 @@
     "src/**/*.ts",
     "src/**/*.vue",
     "docs/**/*.ts",
-    "docs/**/*.vue"
+    "docs/**/*.vue",
+    "docs/.vitepress/**/*.ts",
+    "docs/.vitepress/**/*.vue"
   ],
   "exclude": [
     "node_modules",

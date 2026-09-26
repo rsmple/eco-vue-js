@@ -115,12 +115,16 @@ const {site, theme, page, isDark, frontmatter} = useData()
 
 const isHome = computed(() => frontmatter.value.layout === 'home')
 
-const navItems = computed(() => ((theme.value.nav ?? []) as DefaultTheme.NavItemWithLink[]).map(item => ({
-  text: item.text,
-  link: item.link,
-  isExternal: /^https?:/.test(item.link),
-  isActive: !!item.activeMatch && new RegExp(item.activeMatch).test('/' + page.value.relativePath),
-})))
+const navItems = computed(() => ((theme.value.nav ?? []) as DefaultTheme.NavItemWithLink[]).map(item => {
+  const link = typeof item.link === 'function' ? item.link(page.value) : item.link
+
+  return {
+    text: item.text,
+    link,
+    isExternal: /^https?:/.test(link),
+    isActive: !!item.activeMatch && new RegExp(item.activeMatch).test('/' + page.value.relativePath),
+  }
+}))
 
 // The parts of VitePress's own Layout that its content components rely on: sidebar and outline state, hero slots.
 registerWatchers({closeSidebar: () => undefined})
