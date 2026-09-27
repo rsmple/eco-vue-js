@@ -181,19 +181,19 @@ import WDropdownMenu from 'eco-vue-js/dist/components/DropdownMenu/WDropdownMenu
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `isOpen` | `boolean` | **required** | — |
-| `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | — |
-| `dropdownClass` | `string` | — | — |
+| `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | Element the menu is positioned against. Defaults to the element rendered by the `toggle` slot. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. |
 
 ::: details Inherited from `src/components/Dropdown/types.ts` (6)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `horizontalAlign` | `HorizontalAlign` | **required** | — |
-| `top` | `boolean` | — | — |
-| `bottom` | `boolean` | — | — |
-| `updateAlign` | `boolean` | — | — |
-| `emitUpdate` | `boolean` | — | — |
-| `innerClass` | `string` | — | — |
+| `horizontalAlign` | `HorizontalAlign` | **required** | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
+| `top` | `boolean` | — | Prefers opening above the parent. |
+| `bottom` | `boolean` | — | Always opens below the parent. |
+| `updateAlign` | `boolean` | — | Picks the placement again as the parent moves, instead of keeping the first one. |
+| `emitUpdate` | `boolean` | — | Emits `update:rect` on scroll and resize instead of following the parent. |
+| `innerClass` | `string` | — | Classes for the dropdown's content box. Defaults to `w-max`. |
 
 :::
 
@@ -226,19 +226,19 @@ import WDropdownAdaptive from 'eco-vue-js/dist/components/DropdownMenu/WDropdown
 | --- | --- | --- | --- |
 | `closeOnClickOutside` | `boolean` | — | — |
 | `isOpen` | `boolean` | **required** | — |
-| `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | — |
-| `dropdownClass` | `string` | — | — |
+| `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | Element the menu is positioned against. Defaults to the element rendered by the `toggle` slot. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. |
 
 ::: details Inherited from `src/components/Dropdown/types.ts` (6)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `horizontalAlign` | `HorizontalAlign` | **required** | — |
-| `top` | `boolean` | — | — |
-| `bottom` | `boolean` | — | — |
-| `updateAlign` | `boolean` | — | — |
-| `emitUpdate` | `boolean` | — | — |
-| `innerClass` | `string` | — | — |
+| `horizontalAlign` | `HorizontalAlign` | **required** | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
+| `top` | `boolean` | — | Prefers opening above the parent. |
+| `bottom` | `boolean` | — | Always opens below the parent. |
+| `updateAlign` | `boolean` | — | Picks the placement again as the parent moves, instead of keeping the first one. |
+| `emitUpdate` | `boolean` | — | Emits `update:rect` on scroll and resize instead of following the parent. |
+| `innerClass` | `string` | — | Classes for the dropdown's content box. Defaults to `w-max`. |
 
 :::
 
@@ -305,17 +305,17 @@ import WButtonDropdown from 'eco-vue-js/dist/components/Button/WButtonDropdown.v
 | `leftToggle` | `boolean` | — | — |
 | `disabled` | `boolean` | — | — |
 | `tooltipText` | `string` | — | — |
-| `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | — |
-| `dropdownClass` | `string` | — | — |
+| `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | Element the menu is positioned against. Defaults to the element rendered by the `toggle` slot. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. |
 
 ::: details Inherited from `src/components/Dropdown/types.ts` (4)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `top` | `boolean` | — | — |
-| `bottom` | `boolean` | — | — |
-| `innerClass` | `string` | — | — |
-| `horizontalAlign` | `HorizontalAlign` | `HorizontalAlign.LEFT_INNER` | — |
+| `top` | `boolean` | — | Prefers opening above the parent. |
+| `bottom` | `boolean` | — | Always opens below the parent. |
+| `innerClass` | `string` | — | Classes for the dropdown's content box. Defaults to `w-max`. |
+| `horizontalAlign` | `HorizontalAlign` | `HorizontalAlign.LEFT_INNER` | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
 
 :::
 

@@ -424,19 +424,29 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
+  /** The new value — on every change, or only when saved with `async`. */
   (e: 'update:model-value', value: NonNullable<ModelValue> | undefined): void
+  /** Enter without modifiers. Not emitted by an `async` single-line input, where Enter saves. */
   (e: 'keypress:enter', value: KeyboardEvent): void
+  /** Arrow Up without modifiers. */
   (e: 'keypress:up', value: KeyboardEvent): void
+  /** Arrow Down without modifiers. */
   (e: 'keypress:down', value: KeyboardEvent): void
+  /** Backspace or Delete without modifiers. */
   (e: 'keypress:delete', value: KeyboardEvent): void
-  (e: 'keypress:backspace', value: KeyboardEvent): void
+  /** The clear button was clicked. */
   (e: 'click:clear'): void
+  /** The input got focus. With `unclickable`, emitted on click with no event. */
   (e: 'focus', value: FocusEvent | undefined): void
+  /** The input lost focus. */
   (e: 'blur', value: FocusEvent): void
   (e: 'click', value: MouseEvent): void
   (e: 'mousedown', value: MouseEvent): void
+  /** Native `select` event of the input — the text selection changed. */
   (e: 'select:input', value: Event): void
+  /** A value was pasted with the paste button. */
   (e: 'paste'): void
+  /** The textarea rendered its `textParts`, with the tagged elements in order. */
   (e: 'rendered', taggedList: HTMLElement[]): void
 }>()
 
@@ -684,7 +694,7 @@ const paste = async () => {
       .then(value => {
         if (!value) {
           Notify.warn({title: 'Nothing to paste'})
-        } else if (!props.maxLength || props.maxLength <= value.length) {
+        } else if (!props.maxLength || value.length <= props.maxLength) {
           updateModelValue(value, true)
           Notify.success({title: 'Pasted'})
           nextTick().then(() => emit('paste'))

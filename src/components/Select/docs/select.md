@@ -205,8 +205,8 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 | `placeholderEmpty` | `string` | — | — |
 | `optionComponent` | `OptionComponent` | — | — |
 | `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | — |
-| `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | — |
-| `dropdownClass` | `string` | — | — |
+| `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 
@@ -240,51 +240,40 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `maxLength` | `number` | — | Shows a `length / maxLength` counter under the field while it is focused. |
-| `readonly` | `boolean` | — | Shows the value without allowing changes. When unset, inherits the readonly state provided by a parent. |
-| `type` | `"text"` | — | — |
-| `textarea` | `boolean` | — | — |
-| `resize` | `boolean` | — | — |
-| `placeholder` | `string` | — | — |
-| `icon` | `SVGComponent` | — | — |
-| `size` | `number` | — | — |
-| `step` | `number` | — | — |
-| `min` | `number` | — | — |
-| `max` | `number` | — | — |
-| `name` | `string` | — | — |
-| `autocomplete` | `string` | — | — |
-| `autofocus` | `number \| boolean` | — | — |
-| `disabledActions` | `boolean` | — | — |
-| `loading` | `boolean` | — | — |
-| `spellcheck` | `boolean` | — | — |
-| `customBackspaceHandle` | `boolean` | — | — |
-| `textSecure` | `boolean` | — | — |
-| `placeholderSecure` | `boolean` | — | — |
-| `allowPaste` | `boolean` | — | — |
-| `hideInput` | `boolean` | — | — |
-| `noWrap` | `boolean` | — | — |
-| `textTransparent` | `boolean` | — | — |
-| `textParts` | `TextPart[]` | — | — |
-| `rich` | `boolean` | — | — |
-| `toolbarActions` | `ToolbarAction[]` | — | — |
-| `borderClass` | `string` | — | — |
-| `explicit` | `boolean` | — | — |
-| `mobileTitle` | `string` | — | — |
-| `persist` | `boolean` | — | — |
-| `closeOnClear` | `boolean` | — | — |
-| `static` | `boolean` | — | — |
-| `hideToggle` | `boolean` | — | — |
-
-:::
-
-::: details Inherited from `src/components/Dropdown/types.ts` (4)
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `horizontalAlign` | `HorizontalAlign` | — | — |
-| `top` | `boolean` | — | — |
-| `bottom` | `boolean` | — | — |
-| `innerClass` | `string` | — | — |
+| `maxLength` | `number` | — | Cuts off input longer than this, and shows a `length / maxLength` counter under the field while it is focused. |
+| `readonly` | `boolean` | — | Shows the value as text without an input. When unset, inherits the readonly state provided by a parent. |
+| `type` | `"text"` | — | Native input type. `number` parses the value into a number. |
+| `textarea` | `boolean` | — | Multi-line editor instead of a single-line input, with undo and redo. |
+| `resize` | `boolean` | — | Lets the user drag the textarea's height. |
+| `placeholder` | `string` | — | Hint shown while the field is empty. |
+| `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
+| `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `step` | `number` | — | Native `step` attribute for `type="number"`. |
+| `min` | `number` | — | Native `min` attribute for `type="number"`. |
+| `max` | `number` | — | Native `max` attribute for `type="number"`. |
+| `name` | `string` | — | Native `name` attribute. |
+| `autocomplete` | `string` | — | Native `autocomplete` attribute. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
+| `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
+| `spellcheck` | `boolean` | — | Enables the browser's spell check. |
+| `customBackspaceHandle` | `boolean` | — | Handles Backspace in code — removes the character or selection and emits the new value — instead of leaving it to the browser. |
+| `textSecure` | `boolean` | — | Masks the value, with a button to reveal it, for secrets. A model value of `true` means a secret is set but not sent to the client, and shows a check mark instead. |
+| `placeholderSecure` | `boolean` | — | Shows the secret-set check mark while the field is empty. |
+| `allowPaste` | `boolean` | — | Adds a button that pastes from the clipboard, replacing the value. |
+| `hideInput` | `boolean` | — | Hides the text input, leaving only the `prefix` content. |
+| `noWrap` | `boolean` | — | Keeps the `prefix` content on one line, scrolling sideways instead of wrapping. |
+| `textTransparent` | `boolean` | — | Makes the typed text transparent while keeping the caret, for an overlay that draws the text itself. |
+| `textParts` | `TextPart[]` | — | Textarea content as a list of strings and tagged parts, for highlighting parts of the text. |
+| `rich` | `boolean` | — | Adds a formatting toolbar to the textarea. |
+| `toolbarActions` | `ToolbarAction[]` | — | Custom buttons for the textarea toolbar. |
+| `borderClass` | `string` | — | Border color classes, replacing the default gray. |
+| `explicit` | `boolean` | — | With `async`, shows Save and Cancel buttons while there are unsaved edits. Always on for `textarea` and `textSecure`. |
+| `mobileTitle` | `string` | — | Title for the mobile bottom sheet the menu opens in. Defaults to `title`. |
+| `persist` | `boolean` | — | Keeps the menu open when the input loses focus. |
+| `closeOnClear` | `boolean` | — | Closes the menu when the value is cleared. |
+| `static` | `boolean` | — | Renders the menu content under the input instead of in a dropdown. |
+| `hideToggle` | `boolean` | — | Hides the button that opens and closes the menu. |
 
 :::
 
@@ -343,8 +332,8 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 | `useQueryFnOptions` | `UseQueryDefault<Data[], unknown> \| UseQueryDefault<Data[], QueryParamsOptions>` | — | — |
 | `queryParamsOptions` | `QueryParamsOptions` | — | — |
 | `options` | `Data[]` | — | — |
-| `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | — |
-| `dropdownClass` | `string` | — | — |
+| `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 
@@ -378,51 +367,40 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `maxLength` | `number` | — | Shows a `length / maxLength` counter under the field while it is focused. |
-| `readonly` | `boolean` | — | Shows the value without allowing changes. When unset, inherits the readonly state provided by a parent. |
-| `type` | `"text"` | — | — |
-| `textarea` | `boolean` | — | — |
-| `resize` | `boolean` | — | — |
-| `placeholder` | `string` | — | — |
-| `icon` | `SVGComponent` | — | — |
-| `size` | `number` | — | — |
-| `step` | `number` | — | — |
-| `min` | `number` | — | — |
-| `max` | `number` | — | — |
-| `name` | `string` | — | — |
-| `autocomplete` | `string` | — | — |
-| `autofocus` | `number \| boolean` | — | — |
-| `disabledActions` | `boolean` | — | — |
-| `loading` | `boolean` | — | — |
-| `spellcheck` | `boolean` | — | — |
-| `customBackspaceHandle` | `boolean` | — | — |
-| `textSecure` | `boolean` | — | — |
-| `placeholderSecure` | `boolean` | — | — |
-| `allowPaste` | `boolean` | — | — |
-| `hideInput` | `boolean` | — | — |
-| `noWrap` | `boolean` | — | — |
-| `textTransparent` | `boolean` | — | — |
-| `textParts` | `TextPart[]` | — | — |
-| `rich` | `boolean` | — | — |
-| `toolbarActions` | `ToolbarAction[]` | — | — |
-| `borderClass` | `string` | — | — |
-| `explicit` | `boolean` | — | — |
-| `mobileTitle` | `string` | — | — |
-| `persist` | `boolean` | — | — |
-| `closeOnClear` | `boolean` | — | — |
-| `static` | `boolean` | — | — |
-| `hideToggle` | `boolean` | — | — |
-
-:::
-
-::: details Inherited from `src/components/Dropdown/types.ts` (4)
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `horizontalAlign` | `HorizontalAlign` | — | — |
-| `top` | `boolean` | — | — |
-| `bottom` | `boolean` | — | — |
-| `innerClass` | `string` | — | — |
+| `maxLength` | `number` | — | Cuts off input longer than this, and shows a `length / maxLength` counter under the field while it is focused. |
+| `readonly` | `boolean` | — | Shows the value as text without an input. When unset, inherits the readonly state provided by a parent. |
+| `type` | `"text"` | — | Native input type. `number` parses the value into a number. |
+| `textarea` | `boolean` | — | Multi-line editor instead of a single-line input, with undo and redo. |
+| `resize` | `boolean` | — | Lets the user drag the textarea's height. |
+| `placeholder` | `string` | — | Hint shown while the field is empty. |
+| `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
+| `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `step` | `number` | — | Native `step` attribute for `type="number"`. |
+| `min` | `number` | — | Native `min` attribute for `type="number"`. |
+| `max` | `number` | — | Native `max` attribute for `type="number"`. |
+| `name` | `string` | — | Native `name` attribute. |
+| `autocomplete` | `string` | — | Native `autocomplete` attribute. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
+| `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
+| `spellcheck` | `boolean` | — | Enables the browser's spell check. |
+| `customBackspaceHandle` | `boolean` | — | Handles Backspace in code — removes the character or selection and emits the new value — instead of leaving it to the browser. |
+| `textSecure` | `boolean` | — | Masks the value, with a button to reveal it, for secrets. A model value of `true` means a secret is set but not sent to the client, and shows a check mark instead. |
+| `placeholderSecure` | `boolean` | — | Shows the secret-set check mark while the field is empty. |
+| `allowPaste` | `boolean` | — | Adds a button that pastes from the clipboard, replacing the value. |
+| `hideInput` | `boolean` | — | Hides the text input, leaving only the `prefix` content. |
+| `noWrap` | `boolean` | — | Keeps the `prefix` content on one line, scrolling sideways instead of wrapping. |
+| `textTransparent` | `boolean` | — | Makes the typed text transparent while keeping the caret, for an overlay that draws the text itself. |
+| `textParts` | `TextPart[]` | — | Textarea content as a list of strings and tagged parts, for highlighting parts of the text. |
+| `rich` | `boolean` | — | Adds a formatting toolbar to the textarea. |
+| `toolbarActions` | `ToolbarAction[]` | — | Custom buttons for the textarea toolbar. |
+| `borderClass` | `string` | — | Border color classes, replacing the default gray. |
+| `explicit` | `boolean` | — | With `async`, shows Save and Cancel buttons while there are unsaved edits. Always on for `textarea` and `textSecure`. |
+| `mobileTitle` | `string` | — | Title for the mobile bottom sheet the menu opens in. Defaults to `title`. |
+| `persist` | `boolean` | — | Keeps the menu open when the input loses focus. |
+| `closeOnClear` | `boolean` | — | Closes the menu when the value is cleared. |
+| `static` | `boolean` | — | Renders the menu content under the input instead of in a dropdown. |
+| `hideToggle` | `boolean` | — | Hides the button that opens and closes the menu. |
 
 :::
 
@@ -488,8 +466,8 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 | `prefixText` | `string` | — | — |
 | `prefixMax` | `number` | — | — |
 | `reverse` | `boolean` | — | — |
-| `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | — |
-| `dropdownClass` | `string` | — | — |
+| `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 
@@ -523,51 +501,40 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `maxLength` | `number` | — | Shows a `length / maxLength` counter under the field while it is focused. |
-| `readonly` | `boolean` | — | Shows the value without allowing changes. When unset, inherits the readonly state provided by a parent. |
-| `type` | `"text"` | — | — |
-| `textarea` | `boolean` | — | — |
-| `resize` | `boolean` | — | — |
-| `placeholder` | `string` | — | — |
-| `icon` | `SVGComponent` | — | — |
-| `size` | `number` | — | — |
-| `step` | `number` | — | — |
-| `min` | `number` | — | — |
-| `max` | `number` | — | — |
-| `name` | `string` | — | — |
-| `autocomplete` | `string` | — | — |
-| `autofocus` | `number \| boolean` | — | — |
-| `disabledActions` | `boolean` | — | — |
-| `loading` | `boolean` | — | — |
-| `spellcheck` | `boolean` | — | — |
-| `customBackspaceHandle` | `boolean` | — | — |
-| `textSecure` | `boolean` | — | — |
-| `placeholderSecure` | `boolean` | — | — |
-| `allowPaste` | `boolean` | — | — |
-| `hideInput` | `boolean` | — | — |
-| `noWrap` | `boolean` | — | — |
-| `textTransparent` | `boolean` | — | — |
-| `textParts` | `TextPart[]` | — | — |
-| `rich` | `boolean` | — | — |
-| `toolbarActions` | `ToolbarAction[]` | — | — |
-| `borderClass` | `string` | — | — |
-| `explicit` | `boolean` | — | — |
-| `mobileTitle` | `string` | — | — |
-| `persist` | `boolean` | — | — |
-| `closeOnClear` | `boolean` | — | — |
-| `static` | `boolean` | — | — |
-| `hideToggle` | `boolean` | — | — |
-
-:::
-
-::: details Inherited from `src/components/Dropdown/types.ts` (4)
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `horizontalAlign` | `HorizontalAlign` | — | — |
-| `top` | `boolean` | — | — |
-| `bottom` | `boolean` | — | — |
-| `innerClass` | `string` | — | — |
+| `maxLength` | `number` | — | Cuts off input longer than this, and shows a `length / maxLength` counter under the field while it is focused. |
+| `readonly` | `boolean` | — | Shows the value as text without an input. When unset, inherits the readonly state provided by a parent. |
+| `type` | `"text"` | — | Native input type. `number` parses the value into a number. |
+| `textarea` | `boolean` | — | Multi-line editor instead of a single-line input, with undo and redo. |
+| `resize` | `boolean` | — | Lets the user drag the textarea's height. |
+| `placeholder` | `string` | — | Hint shown while the field is empty. |
+| `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
+| `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `step` | `number` | — | Native `step` attribute for `type="number"`. |
+| `min` | `number` | — | Native `min` attribute for `type="number"`. |
+| `max` | `number` | — | Native `max` attribute for `type="number"`. |
+| `name` | `string` | — | Native `name` attribute. |
+| `autocomplete` | `string` | — | Native `autocomplete` attribute. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
+| `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
+| `spellcheck` | `boolean` | — | Enables the browser's spell check. |
+| `customBackspaceHandle` | `boolean` | — | Handles Backspace in code — removes the character or selection and emits the new value — instead of leaving it to the browser. |
+| `textSecure` | `boolean` | — | Masks the value, with a button to reveal it, for secrets. A model value of `true` means a secret is set but not sent to the client, and shows a check mark instead. |
+| `placeholderSecure` | `boolean` | — | Shows the secret-set check mark while the field is empty. |
+| `allowPaste` | `boolean` | — | Adds a button that pastes from the clipboard, replacing the value. |
+| `hideInput` | `boolean` | — | Hides the text input, leaving only the `prefix` content. |
+| `noWrap` | `boolean` | — | Keeps the `prefix` content on one line, scrolling sideways instead of wrapping. |
+| `textTransparent` | `boolean` | — | Makes the typed text transparent while keeping the caret, for an overlay that draws the text itself. |
+| `textParts` | `TextPart[]` | — | Textarea content as a list of strings and tagged parts, for highlighting parts of the text. |
+| `rich` | `boolean` | — | Adds a formatting toolbar to the textarea. |
+| `toolbarActions` | `ToolbarAction[]` | — | Custom buttons for the textarea toolbar. |
+| `borderClass` | `string` | — | Border color classes, replacing the default gray. |
+| `explicit` | `boolean` | — | With `async`, shows Save and Cancel buttons while there are unsaved edits. Always on for `textarea` and `textSecure`. |
+| `mobileTitle` | `string` | — | Title for the mobile bottom sheet the menu opens in. Defaults to `title`. |
+| `persist` | `boolean` | — | Keeps the menu open when the input loses focus. |
+| `closeOnClear` | `boolean` | — | Closes the menu when the value is cleared. |
+| `static` | `boolean` | — | Renders the menu content under the input instead of in a dropdown. |
+| `hideToggle` | `boolean` | — | Hides the button that opens and closes the menu. |
 
 :::
 
@@ -627,8 +594,8 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 | `placeholderEmpty` | `string` | — | — |
 | `optionComponent` | `OptionComponent` | — | — |
 | `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | — |
-| `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | — |
-| `dropdownClass` | `string` | — | — |
+| `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 
@@ -662,51 +629,40 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `maxLength` | `number` | — | Shows a `length / maxLength` counter under the field while it is focused. |
-| `readonly` | `boolean` | — | Shows the value without allowing changes. When unset, inherits the readonly state provided by a parent. |
-| `type` | `"text"` | — | — |
-| `textarea` | `boolean` | — | — |
-| `resize` | `boolean` | — | — |
-| `placeholder` | `string` | — | — |
-| `icon` | `SVGComponent` | — | — |
-| `size` | `number` | — | — |
-| `step` | `number` | — | — |
-| `min` | `number` | — | — |
-| `max` | `number` | — | — |
-| `name` | `string` | — | — |
-| `autocomplete` | `string` | — | — |
-| `autofocus` | `number \| boolean` | — | — |
-| `disabledActions` | `boolean` | — | — |
-| `loading` | `boolean` | — | — |
-| `spellcheck` | `boolean` | — | — |
-| `customBackspaceHandle` | `boolean` | — | — |
-| `textSecure` | `boolean` | — | — |
-| `placeholderSecure` | `boolean` | — | — |
-| `allowPaste` | `boolean` | — | — |
-| `hideInput` | `boolean` | — | — |
-| `noWrap` | `boolean` | — | — |
-| `textTransparent` | `boolean` | — | — |
-| `textParts` | `TextPart[]` | — | — |
-| `rich` | `boolean` | — | — |
-| `toolbarActions` | `ToolbarAction[]` | — | — |
-| `borderClass` | `string` | — | — |
-| `explicit` | `boolean` | — | — |
-| `mobileTitle` | `string` | — | — |
-| `persist` | `boolean` | — | — |
-| `closeOnClear` | `boolean` | — | — |
-| `static` | `boolean` | — | — |
-| `hideToggle` | `boolean` | — | — |
-
-:::
-
-::: details Inherited from `src/components/Dropdown/types.ts` (4)
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `horizontalAlign` | `HorizontalAlign` | — | — |
-| `top` | `boolean` | — | — |
-| `bottom` | `boolean` | — | — |
-| `innerClass` | `string` | — | — |
+| `maxLength` | `number` | — | Cuts off input longer than this, and shows a `length / maxLength` counter under the field while it is focused. |
+| `readonly` | `boolean` | — | Shows the value as text without an input. When unset, inherits the readonly state provided by a parent. |
+| `type` | `"text"` | — | Native input type. `number` parses the value into a number. |
+| `textarea` | `boolean` | — | Multi-line editor instead of a single-line input, with undo and redo. |
+| `resize` | `boolean` | — | Lets the user drag the textarea's height. |
+| `placeholder` | `string` | — | Hint shown while the field is empty. |
+| `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
+| `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `step` | `number` | — | Native `step` attribute for `type="number"`. |
+| `min` | `number` | — | Native `min` attribute for `type="number"`. |
+| `max` | `number` | — | Native `max` attribute for `type="number"`. |
+| `name` | `string` | — | Native `name` attribute. |
+| `autocomplete` | `string` | — | Native `autocomplete` attribute. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
+| `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
+| `spellcheck` | `boolean` | — | Enables the browser's spell check. |
+| `customBackspaceHandle` | `boolean` | — | Handles Backspace in code — removes the character or selection and emits the new value — instead of leaving it to the browser. |
+| `textSecure` | `boolean` | — | Masks the value, with a button to reveal it, for secrets. A model value of `true` means a secret is set but not sent to the client, and shows a check mark instead. |
+| `placeholderSecure` | `boolean` | — | Shows the secret-set check mark while the field is empty. |
+| `allowPaste` | `boolean` | — | Adds a button that pastes from the clipboard, replacing the value. |
+| `hideInput` | `boolean` | — | Hides the text input, leaving only the `prefix` content. |
+| `noWrap` | `boolean` | — | Keeps the `prefix` content on one line, scrolling sideways instead of wrapping. |
+| `textTransparent` | `boolean` | — | Makes the typed text transparent while keeping the caret, for an overlay that draws the text itself. |
+| `textParts` | `TextPart[]` | — | Textarea content as a list of strings and tagged parts, for highlighting parts of the text. |
+| `rich` | `boolean` | — | Adds a formatting toolbar to the textarea. |
+| `toolbarActions` | `ToolbarAction[]` | — | Custom buttons for the textarea toolbar. |
+| `borderClass` | `string` | — | Border color classes, replacing the default gray. |
+| `explicit` | `boolean` | — | With `async`, shows Save and Cancel buttons while there are unsaved edits. Always on for `textarea` and `textSecure`. |
+| `mobileTitle` | `string` | — | Title for the mobile bottom sheet the menu opens in. Defaults to `title`. |
+| `persist` | `boolean` | — | Keeps the menu open when the input loses focus. |
+| `closeOnClear` | `boolean` | — | Closes the menu when the value is cleared. |
+| `static` | `boolean` | — | Renders the menu content under the input instead of in a dropdown. |
+| `hideToggle` | `boolean` | — | Hides the button that opens and closes the menu. |
 
 :::
 

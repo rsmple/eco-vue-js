@@ -185,8 +185,6 @@ defineOptions({inheritAttrs: false})
 const props = withDefaults(
   defineProps<InputSuggestProps<Type>>(),
   {
-    maxHeight: 320,
-    maxWidth: 600,
     horizontalAlign: HorizontalAlign.FILL,
     readonly: undefined,
     disabled: undefined,

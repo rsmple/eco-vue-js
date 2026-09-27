@@ -201,41 +201,41 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `modelValue` | `(Type extends "number" ? number : string) \| null` | — | — |
-| `type` | `Type` | — | — |
-| `textarea` | `boolean` | — | — |
-| `resize` | `boolean` | — | — |
-| `placeholder` | `string` | — | — |
-| `icon` | `SVGComponent` | — | — |
-| `size` | `number` | `10` | — |
-| `maxLength` | `number` | — | Shows a `length / maxLength` counter under the field while it is focused. |
-| `step` | `number` | — | — |
-| `min` | `number` | — | — |
-| `max` | `number` | — | — |
-| `name` | `string` | — | — |
-| `autocomplete` | `string` | `"off"` | — |
-| `autofocus` | `number \| boolean` | — | — |
-| `readonly` | `boolean` | — | Shows the value without allowing changes. When unset, inherits the readonly state provided by a parent. |
-| `unclickable` | `boolean \| null` | `null` | — |
-| `disabledActions` | `boolean` | — | — |
-| `loading` | `boolean` | — | — |
-| `spellcheck` | `boolean` | — | — |
-| `customBackspaceHandle` | `boolean` | — | — |
-| `textSecure` | `boolean` | — | — |
-| `placeholderSecure` | `boolean` | — | — |
-| `allowClear` | `boolean` | — | — |
-| `allowPaste` | `boolean` | — | — |
-| `hideInput` | `boolean` | — | — |
-| `noWrap` | `boolean` | — | — |
-| `textTransparent` | `boolean` | — | — |
-| `textParts` | `TextPart[]` | — | — |
-| `rich` | `boolean` | — | — |
-| `toolbarActions` | `ToolbarAction[]` | — | — |
-| `borderClass` | `string` | — | — |
-| `async` | `boolean` | — | — |
-| `debounce` | `number` | — | — |
-| `hideDebounce` | `boolean` | — | — |
-| `explicit` | `boolean` | — | — |
+| `modelValue` | `(Type extends "number" ? number : string) \| null` | — | Field value — a `number` when `type` is `number`, otherwise a `string`. |
+| `type` | `Type` | — | Native input type. `number` parses the value into a number. |
+| `textarea` | `boolean` | — | Multi-line editor instead of a single-line input, with undo and redo. |
+| `resize` | `boolean` | — | Lets the user drag the textarea's height. |
+| `placeholder` | `string` | — | Hint shown while the field is empty. |
+| `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
+| `size` | `number` | `10` | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxLength` | `number` | — | Cuts off input longer than this, and shows a `length / maxLength` counter under the field while it is focused. |
+| `step` | `number` | — | Native `step` attribute for `type="number"`. |
+| `min` | `number` | — | Native `min` attribute for `type="number"`. |
+| `max` | `number` | — | Native `max` attribute for `type="number"`. |
+| `name` | `string` | — | Native `name` attribute. |
+| `autocomplete` | `string` | `"off"` | Native `autocomplete` attribute. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `readonly` | `boolean` | — | Shows the value as text without an input. When unset, inherits the readonly state provided by a parent. |
+| `unclickable` | `boolean \| null` | `null` | Blocks typing and turns a click into a `focus` event, for fields that open a menu instead of taking text. |
+| `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
+| `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
+| `spellcheck` | `boolean` | — | Enables the browser's spell check. |
+| `customBackspaceHandle` | `boolean` | — | Handles Backspace in code — removes the character or selection and emits the new value — instead of leaving it to the browser. |
+| `textSecure` | `boolean` | — | Masks the value, with a button to reveal it, for secrets. A model value of `true` means a secret is set but not sent to the client, and shows a check mark instead. |
+| `placeholderSecure` | `boolean` | — | Shows the secret-set check mark while the field is empty. |
+| `allowClear` | `boolean` | — | Adds a button that clears the value. |
+| `allowPaste` | `boolean` | — | Adds a button that pastes from the clipboard, replacing the value. |
+| `hideInput` | `boolean` | — | Hides the text input, leaving only the `prefix` content. |
+| `noWrap` | `boolean` | — | Keeps the `prefix` content on one line, scrolling sideways instead of wrapping. |
+| `textTransparent` | `boolean` | — | Makes the typed text transparent while keeping the caret, for an overlay that draws the text itself. |
+| `textParts` | `TextPart[]` | — | Textarea content as a list of strings and tagged parts, for highlighting parts of the text. |
+| `rich` | `boolean` | — | Adds a formatting toolbar to the textarea. |
+| `toolbarActions` | `ToolbarAction[]` | — | Custom buttons for the textarea toolbar. |
+| `borderClass` | `string` | — | Border color classes, replacing the default gray. |
+| `async` | `boolean` | — | Keeps edits local and emits them only when saved — on Enter or blur — instead of on every keystroke. |
+| `debounce` | `number` | — | With `async`, also saves after this many ms without typing, showing a progress bar under the text. |
+| `hideDebounce` | `boolean` | — | Hides the `debounce` progress bar. |
+| `explicit` | `boolean` | — | With `async`, shows Save and Cancel buttons while there are unsaved edits. Always on for `textarea` and `textSecure`. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 
@@ -269,20 +269,19 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:model-value` | `(((Type extends "number" ? number : string) & {}) \| undefined)` | — |
-| `keypress:enter` | `(KeyboardEvent)` | — |
-| `keypress:up` | `(KeyboardEvent)` | — |
-| `keypress:down` | `(KeyboardEvent)` | — |
-| `keypress:delete` | `(KeyboardEvent)` | — |
-| `keypress:backspace` | `(KeyboardEvent)` | — |
-| `click:clear` | — | — |
-| `focus` | `(FocusEvent \| undefined)` | — |
-| `blur` | `(FocusEvent)` | — |
+| `update:model-value` | `(((Type extends "number" ? number : string) & {}) \| undefined)` | The new value — on every change, or only when saved with `async`. |
+| `keypress:enter` | `(KeyboardEvent)` | Enter without modifiers. Not emitted by an `async` single-line input, where Enter saves. |
+| `keypress:up` | `(KeyboardEvent)` | Arrow Up without modifiers. |
+| `keypress:down` | `(KeyboardEvent)` | Arrow Down without modifiers. |
+| `keypress:delete` | `(KeyboardEvent)` | Backspace or Delete without modifiers. |
+| `click:clear` | — | The clear button was clicked. |
+| `focus` | `(FocusEvent \| undefined)` | The input got focus. With `unclickable`, emitted on click with no event. |
+| `blur` | `(FocusEvent)` | The input lost focus. |
 | `click` | `(MouseEvent)` | — |
 | `mousedown` | `(MouseEvent)` | — |
-| `select:input` | `(Event)` | — |
-| `paste` | — | — |
-| `rendered` | `(HTMLElement[])` | — |
+| `select:input` | `(Event)` | Native `select` event of the input — the text selection changed. |
+| `paste` | — | A value was pasted with the paste button. |
+| `rendered` | `(HTMLElement[])` | The textarea rendered its `textParts`, with the tagged elements in order. |
 
 #### Slots
 
@@ -313,42 +312,42 @@ import WInputAsync from 'eco-vue-js/dist/components/Input/WInputAsync.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `validate` | `ValidateFn \| ValidateFn[]` | — | — |
-| `modelValue` | `(Type extends "number" ? number : string) \| null` | — | — |
-| `type` | `Type` | — | — |
-| `textarea` | `boolean` | — | — |
-| `resize` | `boolean` | — | — |
-| `placeholder` | `string` | — | — |
-| `icon` | `SVGComponent` | — | — |
-| `size` | `number` | — | — |
-| `maxLength` | `number` | — | Shows a `length / maxLength` counter under the field while it is focused. |
-| `step` | `number` | — | — |
-| `min` | `number` | — | — |
-| `max` | `number` | — | — |
-| `name` | `string` | — | — |
-| `autocomplete` | `string` | — | — |
-| `autofocus` | `number \| boolean` | — | — |
-| `readonly` | `boolean` | — | Shows the value without allowing changes. When unset, inherits the readonly state provided by a parent. |
-| `unclickable` | `boolean \| null` | `null` | — |
-| `disabledActions` | `boolean` | — | — |
-| `loading` | `boolean` | — | — |
-| `spellcheck` | `boolean` | — | — |
-| `customBackspaceHandle` | `boolean` | — | — |
-| `textSecure` | `boolean` | — | — |
-| `placeholderSecure` | `boolean` | — | — |
-| `allowClear` | `boolean` | — | — |
-| `allowPaste` | `boolean` | — | — |
-| `hideInput` | `boolean` | — | — |
-| `noWrap` | `boolean` | — | — |
-| `textTransparent` | `boolean` | — | — |
-| `textParts` | `TextPart[]` | — | — |
-| `rich` | `boolean` | — | — |
-| `toolbarActions` | `ToolbarAction[]` | — | — |
-| `borderClass` | `string` | — | — |
-| `async` | `boolean` | — | — |
-| `debounce` | `number` | — | — |
-| `hideDebounce` | `boolean` | — | — |
-| `explicit` | `boolean` | — | — |
+| `validate` | `ValidateFn \| ValidateFn[]` | — | Checks the value before it is saved. A returned error message is shown under the field and the value is not emitted. |
+| `modelValue` | `(Type extends "number" ? number : string) \| null` | — | Field value — a `number` when `type` is `number`, otherwise a `string`. |
+| `type` | `Type` | — | Native input type. `number` parses the value into a number. |
+| `textarea` | `boolean` | — | Multi-line editor instead of a single-line input, with undo and redo. |
+| `resize` | `boolean` | — | Lets the user drag the textarea's height. |
+| `placeholder` | `string` | — | Hint shown while the field is empty. |
+| `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
+| `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxLength` | `number` | — | Cuts off input longer than this, and shows a `length / maxLength` counter under the field while it is focused. |
+| `step` | `number` | — | Native `step` attribute for `type="number"`. |
+| `min` | `number` | — | Native `min` attribute for `type="number"`. |
+| `max` | `number` | — | Native `max` attribute for `type="number"`. |
+| `name` | `string` | — | Native `name` attribute. |
+| `autocomplete` | `string` | — | Native `autocomplete` attribute. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `readonly` | `boolean` | — | Shows the value as text without an input. When unset, inherits the readonly state provided by a parent. |
+| `unclickable` | `boolean \| null` | `null` | Blocks typing and turns a click into a `focus` event, for fields that open a menu instead of taking text. |
+| `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
+| `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
+| `spellcheck` | `boolean` | — | Enables the browser's spell check. |
+| `customBackspaceHandle` | `boolean` | — | Handles Backspace in code — removes the character or selection and emits the new value — instead of leaving it to the browser. |
+| `textSecure` | `boolean` | — | Masks the value, with a button to reveal it, for secrets. A model value of `true` means a secret is set but not sent to the client, and shows a check mark instead. |
+| `placeholderSecure` | `boolean` | — | Shows the secret-set check mark while the field is empty. |
+| `allowClear` | `boolean` | — | Adds a button that clears the value. |
+| `allowPaste` | `boolean` | — | Adds a button that pastes from the clipboard, replacing the value. |
+| `hideInput` | `boolean` | — | Hides the text input, leaving only the `prefix` content. |
+| `noWrap` | `boolean` | — | Keeps the `prefix` content on one line, scrolling sideways instead of wrapping. |
+| `textTransparent` | `boolean` | — | Makes the typed text transparent while keeping the caret, for an overlay that draws the text itself. |
+| `textParts` | `TextPart[]` | — | Textarea content as a list of strings and tagged parts, for highlighting parts of the text. |
+| `rich` | `boolean` | — | Adds a formatting toolbar to the textarea. |
+| `toolbarActions` | `ToolbarAction[]` | — | Custom buttons for the textarea toolbar. |
+| `borderClass` | `string` | — | Border color classes, replacing the default gray. |
+| `async` | `boolean` | — | Keeps edits local and emits them only when saved — on Enter or blur — instead of on every keystroke. |
+| `debounce` | `number` | — | With `async`, also saves after this many ms without typing, showing a progress bar under the text. |
+| `hideDebounce` | `boolean` | — | Hides the `debounce` progress bar. |
+| `explicit` | `boolean` | — | With `async`, shows Save and Cancel buttons while there are unsaved edits. Always on for `textarea` and `textSecure`. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 
@@ -408,49 +407,49 @@ import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `modelValue` | `Date` | — | — |
-| `minDate` | `Date` | — | — |
-| `maxDate` | `Date` | — | — |
-| `maxLength` | `number` | — | Shows a `length / maxLength` counter under the field while it is focused. |
-| `readonly` | `boolean` | — | Shows the value without allowing changes. When unset, inherits the readonly state provided by a parent. |
-| `type` | `"text"` | — | — |
-| `textarea` | `boolean` | — | — |
-| `resize` | `boolean` | — | — |
-| `placeholder` | `string` | — | — |
-| `icon` | `SVGComponent` | — | — |
-| `size` | `number` | — | — |
-| `step` | `number` | — | — |
-| `min` | `number` | — | — |
-| `max` | `number` | — | — |
-| `name` | `string` | — | — |
-| `autocomplete` | `string` | — | — |
-| `autofocus` | `number \| boolean` | — | — |
-| `disabledActions` | `boolean` | — | — |
-| `loading` | `boolean` | — | — |
-| `spellcheck` | `boolean` | — | — |
-| `customBackspaceHandle` | `boolean` | — | — |
-| `textSecure` | `boolean` | — | — |
-| `placeholderSecure` | `boolean` | — | — |
-| `allowClear` | `boolean` | — | — |
-| `allowPaste` | `boolean` | — | — |
-| `hideInput` | `boolean` | — | — |
-| `noWrap` | `boolean` | — | — |
-| `textTransparent` | `boolean` | — | — |
-| `textParts` | `TextPart[]` | — | — |
-| `rich` | `boolean` | — | — |
-| `toolbarActions` | `ToolbarAction[]` | — | — |
-| `borderClass` | `string` | — | — |
-| `async` | `boolean` | — | — |
-| `debounce` | `number` | — | — |
-| `hideDebounce` | `boolean` | — | — |
-| `explicit` | `boolean` | — | — |
-| `mobileTitle` | `string` | — | — |
-| `persist` | `boolean` | — | — |
-| `closeOnClear` | `boolean` | — | — |
-| `static` | `boolean` | — | — |
-| `hideToggle` | `boolean` | — | — |
-| `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | — |
-| `dropdownClass` | `string` | — | — |
+| `modelValue` | `Date` | — | Selected date. Typed text is parsed into a date as it changes. |
+| `minDate` | `Date` | — | Earliest selectable date. A typed date before it is replaced with it. |
+| `maxDate` | `Date` | — | Latest selectable date. A typed date after it is replaced with it. |
+| `maxLength` | `number` | — | Cuts off input longer than this, and shows a `length / maxLength` counter under the field while it is focused. |
+| `readonly` | `boolean` | — | Shows the value as text without an input. When unset, inherits the readonly state provided by a parent. |
+| `type` | `"text"` | — | Native input type. `number` parses the value into a number. |
+| `textarea` | `boolean` | — | Multi-line editor instead of a single-line input, with undo and redo. |
+| `resize` | `boolean` | — | Lets the user drag the textarea's height. |
+| `placeholder` | `string` | — | Hint shown while the field is empty. |
+| `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
+| `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `step` | `number` | — | Native `step` attribute for `type="number"`. |
+| `min` | `number` | — | Native `min` attribute for `type="number"`. |
+| `max` | `number` | — | Native `max` attribute for `type="number"`. |
+| `name` | `string` | — | Native `name` attribute. |
+| `autocomplete` | `string` | — | Native `autocomplete` attribute. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
+| `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
+| `spellcheck` | `boolean` | — | Enables the browser's spell check. |
+| `customBackspaceHandle` | `boolean` | — | Handles Backspace in code — removes the character or selection and emits the new value — instead of leaving it to the browser. |
+| `textSecure` | `boolean` | — | Masks the value, with a button to reveal it, for secrets. A model value of `true` means a secret is set but not sent to the client, and shows a check mark instead. |
+| `placeholderSecure` | `boolean` | — | Shows the secret-set check mark while the field is empty. |
+| `allowClear` | `boolean` | — | Adds a button that clears the value. |
+| `allowPaste` | `boolean` | — | Adds a button that pastes from the clipboard, replacing the value. |
+| `hideInput` | `boolean` | — | Hides the text input, leaving only the `prefix` content. |
+| `noWrap` | `boolean` | — | Keeps the `prefix` content on one line, scrolling sideways instead of wrapping. |
+| `textTransparent` | `boolean` | — | Makes the typed text transparent while keeping the caret, for an overlay that draws the text itself. |
+| `textParts` | `TextPart[]` | — | Textarea content as a list of strings and tagged parts, for highlighting parts of the text. |
+| `rich` | `boolean` | — | Adds a formatting toolbar to the textarea. |
+| `toolbarActions` | `ToolbarAction[]` | — | Custom buttons for the textarea toolbar. |
+| `borderClass` | `string` | — | Border color classes, replacing the default gray. |
+| `async` | `boolean` | — | Keeps edits local and emits them only when saved — on Enter or blur — instead of on every keystroke. |
+| `debounce` | `number` | — | With `async`, also saves after this many ms without typing, showing a progress bar under the text. |
+| `hideDebounce` | `boolean` | — | Hides the `debounce` progress bar. |
+| `explicit` | `boolean` | — | With `async`, shows Save and Cancel buttons while there are unsaved edits. Always on for `textarea` and `textSecure`. |
+| `mobileTitle` | `string` | — | Title for the mobile bottom sheet the menu opens in. Defaults to `title`. |
+| `persist` | `boolean` | — | Keeps the menu open when the input loses focus. |
+| `closeOnClear` | `boolean` | — | Closes the menu when the value is cleared. |
+| `static` | `boolean` | — | Renders the menu content under the input instead of in a dropdown. |
+| `hideToggle` | `boolean` | — | Hides the button that opens and closes the menu. |
+| `horizontalAlign` | `HorizontalAlign` | `HorizontalAlign.RIGHT_INNER` | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 
@@ -477,17 +476,6 @@ import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
 | `allowDropFile` | `boolean` | — | Accepts files dropped onto the field. |
 | `hideTitle` | `boolean` | — | Hides the title while keeping the rest of the layout. |
 | `embedded` | `boolean` | — | For a field placed inside another component, such as a dropdown: no title, no margin, and horizontal padding. |
-
-:::
-
-::: details Inherited from `src/components/Dropdown/types.ts` (4)
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `horizontalAlign` | `HorizontalAlign` | `HorizontalAlign.RIGHT_INNER` | — |
-| `top` | `boolean` | — | — |
-| `bottom` | `boolean` | — | — |
-| `innerClass` | `string` | — | — |
 
 :::
 

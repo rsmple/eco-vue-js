@@ -68,8 +68,6 @@ const props = withDefaults(
   defineProps<InputDateProps>(),
   {
     modelValue: undefined,
-    maxHeight: 440,
-    maxWidth: 480,
     horizontalAlign: HorizontalAlign.RIGHT_INNER,
     minDate: undefined,
     maxDate: undefined,
