@@ -4,7 +4,7 @@
       ...props,
       modelValue: undefined as never,
     }"
-    :class="$attrs.class"
+    :class="[$attrs.class, {'py-1': embedded}]"
   >
     <template
       v-if="$slots.title"
@@ -23,8 +23,9 @@
     <template #field>
       <div
         :class="{
-          'flex flex-wrap gap-x-4': wrap,
-          'flex gap-x-4 *:flex-1': stretch,
+          'flex flex-wrap items-center gap-x-4': wrap,
+          'flex items-center gap-x-4 *:flex-1': stretch,
+          'col-span-full grid grid-cols-subgrid': subgrid,
         }"
       >
         <WCheckbox
