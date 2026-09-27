@@ -13,7 +13,7 @@
  */
 import {type ComponentMeta, type PropertyMeta, createChecker} from 'vue-component-meta'
 
-import {existsSync} from 'node:fs'
+import {existsSync, readFileSync} from 'node:fs'
 import {glob, readFile, readdir, writeFile} from 'node:fs/promises'
 import path from 'node:path'
 
@@ -92,6 +92,14 @@ const propsTable = (props: PropertyMeta[]) => [
   }),
 ].join('\n')
 
+// vue-component-meta drops emit JSDoc on non-generic components, so read it from the `defineEmits` source.
+const sourceEmitDescriptions = (file: string): Map<string, string> => {
+  const block = readFileSync(file, 'utf8').match(/defineEmits<\{([\s\S]*?)\n\}>\(\)/)?.[1] ?? ''
+  const pattern = /\/\*\*\s*([\s\S]*?)\s*\*\/\s*(?:\(e: )?'([^']+)'/g
+
+  return new Map([...block.matchAll(pattern)].map(([, text, name]) => [name!, text!.replace(/\s*\n\s*\*\s?/g, ' ')]))
+}
+
 const declarationFile = (prop: PropertyMeta) => {
   const file = prop.getDeclarations()[0]?.file
   return file ? path.relative(ROOT, file) : undefined
@@ -135,6 +143,8 @@ const renderApi = (name: string, file: string, meta: ComponentMeta): string => {
   }
 
   if (meta.events.length) {
+    const sourceDescriptions = sourceEmitDescriptions(file)
+
     lines.push(
       '',
       '#### Events',
@@ -143,7 +153,7 @@ const renderApi = (name: string, file: string, meta: ComponentMeta): string => {
       '| --- | --- | --- |',
       ...meta.events.map(event => {
         const payload = event.type.replace(/^\[(.*)\]$/s, '($1)')
-        return `| \`${ event.name }\` | ${ payload === '()' ? '—' : code(formatType(payload, true)) } | ${ formatDescription(event) } |`
+        return `| \`${ event.name }\` | ${ payload === '()' ? '—' : code(formatType(payload, true)) } | ${ formatDescription({...event, description: event.description || sourceDescriptions.get(event.name) || ''}) } |`
       }),
     )
   }

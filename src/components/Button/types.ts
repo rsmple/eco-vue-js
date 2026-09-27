@@ -20,7 +20,9 @@ export interface ButtonProps extends Partial<LinkProps> {
   replace?: boolean
   /** Link target when `tag` is `a`. */
   href?: string
+  /** Native `target` of the link, with `href` or `to`. */
   target?: '_self' | '_blank' | '_parent' | '_top'
+  /** Native `rel` of the link, with `href` or `to`. */
   rel?: string
   /** Squares off inner corners and borders so adjacent buttons read as one segmented control. */
   join?: boolean

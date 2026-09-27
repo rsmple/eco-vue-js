@@ -36,7 +36,10 @@
           'w-full': textarea,
         }"
       >
-        <slot name="prefix" />
+        <slot
+          name="prefix"
+          v-bind="{modelValue}"
+        />
         <component
           :is="textarea ? 'code' : 'div'"
           v-if="!hideInput"
@@ -50,7 +53,7 @@
           class="scrollbar-width-thin group/field py---w-option-padding overflow-x-auto overscroll-x-contain"
         ><slot
            name="before"
-           v-bind="{modelValue}"
+           v-bind="{modelValue, focused: false}"
          />
           <template v-if="textarea">
             <div
@@ -440,7 +443,9 @@ const emit = defineEmits<{
   (e: 'focus', value: FocusEvent | undefined): void
   /** The input lost focus. */
   (e: 'blur', value: FocusEvent): void
+  /** Click on the input, or on the button that reveals a `textSecure` value. */
   (e: 'click', value: MouseEvent): void
+  /** Mouse down on the input. Stopped from reaching the field. */
   (e: 'mousedown', value: MouseEvent): void
   /** Native `select` event of the input — the text selection changed. */
   (e: 'select:input', value: Event): void
@@ -448,6 +453,29 @@ const emit = defineEmits<{
   (e: 'paste'): void
   /** The textarea rendered its `textParts`, with the tagged elements in order. */
   (e: 'rendered', taggedList: HTMLElement[]): void
+}>()
+
+defineSlots<{
+  /** Replaces the `title` text. */
+  title?: () => void
+  /** Content between the title and the field. */
+  subtitle?: () => void
+  /** Content before the text inside the field, such as chips. Also shown while readonly. */
+  prefix?: (props: {modelValue: InputProps<Type>['modelValue']}) => void
+  /** Content right before the text, in the same box as the input. */
+  before?: (props: {modelValue: InputProps<Type>['modelValue'], focused: boolean}) => void
+  /** Extra buttons in the textarea toolbar — `wrapSelection` applies a formatting to the selected text. Shows the toolbar on its own. */
+  toolbar?: (props: {wrapSelection: (value: WrapSelection) => void}) => void
+  /** Content right after the text, in the same box as the input. */
+  after?: () => void
+  /** Buttons after the clear, paste and copy buttons. `disabled` is also set by `disabledActions`. */
+  suffix?: (props: {loading: boolean, disabled: boolean}) => void
+  /** Content at the end of the field box, after the action buttons. */
+  inner?: () => void
+  /** Content to the right of the field. */
+  right?: () => void
+  /** Content under the field, above the Save and Cancel buttons of an `async` input. */
+  bottom?: () => void
 }>()
 
 const {isReadonly, isDisabled} = useComponentStates(props)

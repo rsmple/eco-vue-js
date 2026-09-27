@@ -277,8 +277,8 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 | `click:clear` | — | The clear button was clicked. |
 | `focus` | `(FocusEvent \| undefined)` | The input got focus. With `unclickable`, emitted on click with no event. |
 | `blur` | `(FocusEvent)` | The input lost focus. |
-| `click` | `(MouseEvent)` | — |
-| `mousedown` | `(MouseEvent)` | — |
+| `click` | `(MouseEvent)` | Click on the input, or on the button that reveals a `textSecure` value. |
+| `mousedown` | `(MouseEvent)` | Mouse down on the input. Stopped from reaching the field. |
 | `select:input` | `(Event)` | Native `select` event of the input — the text selection changed. |
 | `paste` | — | A value was pasted with the paste button. |
 | `rendered` | `(HTMLElement[])` | The textarea rendered its `textParts`, with the tagged elements in order. |
@@ -287,16 +287,16 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `title` | — | — |
-| `subtitle` | — | — |
-| `prefix` | — | — |
-| `before` | `{ modelValue: (Type extends "number" ? number : string) \| null \| undefined; }` | — |
-| `toolbar` | `{ wrapSelection: (value: WrapSelection) => void; }` | — |
-| `after` | — | — |
-| `suffix` | `{ loading: boolean; disabled: boolean; }` | — |
-| `inner` | — | — |
-| `right` | — | — |
-| `bottom` | — | — |
+| `title` | — | Replaces the `title` text. |
+| `subtitle` | — | Content between the title and the field. |
+| `prefix` | `{ modelValue: (Type extends "number" ? number : string) \| null \| undefined; }` | Content before the text inside the field, such as chips. Also shown while readonly. |
+| `before` | `{ modelValue: (Type extends "number" ? number : string) \| null \| undefined; focused: boolean; }` | Content right before the text, in the same box as the input. |
+| `toolbar` | `{ wrapSelection: (value: WrapSelection) => void; }` | Extra buttons in the textarea toolbar — `wrapSelection` applies a formatting to the selected text. Shows the toolbar on its own. |
+| `after` | — | Content right after the text, in the same box as the input. |
+| `suffix` | `{ loading: boolean; disabled: boolean; }` | Buttons after the clear, paste and copy buttons. `disabled` is also set by `disabledActions`. |
+| `inner` | — | Content at the end of the field box, after the action buttons. |
+| `right` | — | Content to the right of the field. |
+| `bottom` | — | Content under the field, above the Save and Cancel buttons of an `async` input. |
 
 <!-- @api-end -->
 
@@ -381,17 +381,17 @@ import WInputAsync from 'eco-vue-js/dist/components/Input/WInputAsync.vue'
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:model-value` | `(((Type extends "number" ? number : string) & {}) \| undefined)` | — |
+| `update:model-value` | `(((Type extends "number" ? number : string) & {}) \| undefined)` | The saved value — on Enter, blur, `debounce` or Save — once it passes `validate`. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `title` | — | — |
-| `subtitle` | — | — |
-| `right` | — | — |
-| `prefix` | `{ modelValue: (Type extends "number" ? number : string) \| null \| undefined; }` | — |
-| `before` | `{ modelValue: (Type extends "number" ? number : string) \| null \| undefined; focused: boolean; }` | — |
+| `title` | — | Replaces the `title` text. |
+| `subtitle` | — | Content between the title and the field. |
+| `right` | — | Content to the right of the field. |
+| `prefix` | `{ modelValue: (Type extends "number" ? number : string) \| null \| undefined; }` | Content before the text inside the field, such as chips. Also shown while readonly. |
+| `before` | `{ modelValue: (Type extends "number" ? number : string) \| null \| undefined; focused: boolean; }` | Content right before the text, in the same box as the input. |
 
 <!-- @api-end -->
 
@@ -483,14 +483,14 @@ import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:model-value` | `(value: Date \| undefined)` | — |
+| `update:model-value` | `(value: Date \| undefined)` | The picked or typed date, clamped to `minDate` and `maxDate`. `undefined` when the text is cleared. Text that is not a date emits nothing. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `title` | — | — |
-| `subtitle` | — | — |
-| `right` | `{ unclickable?: boolean \| null \| undefined; }` | — |
+| `title` | — | Replaces the `title` text. |
+| `subtitle` | — | Content between the title and the field. |
+| `right` | `{ unclickable?: boolean \| null \| undefined; }` | Content to the right of the field. On mobile, `unclickable` is `true` for the field on the page and `false` for its copy in the bottom sheet. |
 
 <!-- @api-end -->

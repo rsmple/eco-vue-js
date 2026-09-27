@@ -78,7 +78,17 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
+  /** The picked or typed date, clamped to `minDate` and `maxDate`. `undefined` when the text is cleared. Text that is not a date emits nothing. */
   (e: 'update:model-value', value: Date | undefined): void
+}>()
+
+defineSlots<{
+  /** Replaces the `title` text. */
+  title?: () => void
+  /** Content between the title and the field. */
+  subtitle?: () => void
+  /** Content to the right of the field. On mobile, `unclickable` is `true` for the field on the page and `false` for its copy in the bottom sheet. */
+  right?: (props: {unclickable?: boolean | null}) => void
 }>()
 
 const inputComponentRef = useTemplateRef('inputComponent')

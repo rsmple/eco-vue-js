@@ -142,8 +142,8 @@ import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 | `type` | `string` | — | Native `type` attribute, e.g. `submit` inside a form. |
 | `replace` | `boolean` | — | With `to`, replaces the current history entry instead of pushing a new one. |
 | `href` | `string` | — | Link target when `tag` is `a`. |
-| `target` | `"_self" \| "_blank" \| "_parent" \| "_top"` | — | — |
-| `rel` | `string` | — | — |
+| `target` | `"_self" \| "_blank" \| "_parent" \| "_top"` | — | Native `target` of the link, with `href` or `to`. |
+| `rel` | `string` | — | Native `rel` of the link, with `href` or `to`. |
 | `join` | `boolean` | — | Squares off inner corners and borders so adjacent buttons read as one segmented control. |
 | `tooltipText` | `string` | — | Shows a tooltip on hover — also the accessible hint for icon-only buttons. |
 | `download` | `string` | — | Native `download` attribute, used with `tag="a"` and `href`. |
@@ -158,13 +158,13 @@ import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `click` | `(event: MouseEvent \| KeyboardEvent)` | — |
-| `mousedown` | `(event: MouseEvent \| KeyboardEvent)` | — |
+| `click` | `(event: MouseEvent \| KeyboardEvent)` | Click or Enter. Not emitted while disabled or `loading`. |
+| `mousedown` | `(event: MouseEvent)` | Mouse down. Not emitted while disabled or `loading`. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `default` | — | — |
+| `default` | — | Button content. |
 
 <!-- @api-end -->

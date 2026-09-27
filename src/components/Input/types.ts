@@ -100,9 +100,13 @@ export interface InputSuggestProps<Type extends InputType> extends Omit<InputPro
 }
 
 export interface InputOptionsProps<Type extends InputType, Option> extends InputSuggestProps<Type> {
+  /** Suggestions shown in the menu. Picking one sets the value and blurs the input. */
   options: Option[]
+  /** Value an option puts into the input. */
   valueGetter: (option: Option) => Required<InputSuggestProps<Type>>['modelValue']
+  /** Text shown when `options` is empty. Defaults to "No suggestion". */
   emptyStub?: string
+  /** Renders an option in the menu. The `option` slot replaces it. */
   optionComponent?: Component<{option: Option, selected?: boolean, model?: boolean}>
 }
 

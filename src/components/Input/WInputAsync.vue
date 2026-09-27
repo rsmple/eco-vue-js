@@ -74,7 +74,21 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
+  /** The saved value — on Enter, blur, `debounce` or Save — once it passes `validate`. */
   (e: 'update:model-value', value: NonNullable<ModelValue> | undefined): void
+}>()
+
+defineSlots<{
+  /** Replaces the `title` text. */
+  title?: () => void
+  /** Content between the title and the field. */
+  subtitle?: () => void
+  /** Content to the right of the field. */
+  right?: () => void
+  /** Content before the text inside the field, such as chips. Also shown while readonly. */
+  prefix?: (props: {modelValue: ModelValue | undefined}) => void
+  /** Content right before the text, in the same box as the input. */
+  before?: (props: {modelValue: ModelValue | undefined, focused: boolean}) => void
 }>()
 
 const errorMessageValue = ref<string | undefined>()

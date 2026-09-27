@@ -122,8 +122,15 @@ const semanticTypeBorderMap = useSemanticTypeBorderMap()
 const semanticTypeBorderComponentMap = useSemanticTypeBorderComponentMap()
 
 const emit = defineEmits<{
+  /** Click or Enter. Not emitted while disabled or `loading`. */
   (e: 'click', event: MouseEvent | KeyboardEvent): void
-  (e: 'mousedown', event: MouseEvent | KeyboardEvent): void
+  /** Mouse down. Not emitted while disabled or `loading`. */
+  (e: 'mousedown', event: MouseEvent): void
+}>()
+
+defineSlots<{
+  /** Button content. */
+  default?: () => void
 }>()
 
 const click = (event: MouseEvent | KeyboardEvent): void => {
