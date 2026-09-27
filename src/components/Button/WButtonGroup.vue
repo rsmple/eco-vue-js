@@ -18,7 +18,7 @@
     </template>
 
     <template
-      v-if="readonly" 
+      v-if="isReadonly"
       #default
     >
       <div class="flex gap-1">
@@ -43,7 +43,7 @@
       #field
     >
       <WSkeleton
-        v-if="skeleton"
+        v-if="isSkeleton"
         class="w-skeleton-h---w-button-height w-skeleton-rounded-[0.625rem]"
       />
       <div
@@ -166,7 +166,7 @@ defineSlots<{
   right?: () => void
 }>()
 
-const {isDisabled, isReadonly} = useComponentStates(props)
+const {isDisabled, isReadonly, isSkeleton} = useComponentStates(props)
 
 const loadingItem = ref<Model | undefined>(undefined)
 
