@@ -248,7 +248,7 @@ import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `default` | `any` | — |
+| `default` | — | — |
 
 <!-- @api-end -->
 
@@ -288,9 +288,9 @@ import WTabsItem from 'eco-vue-js/dist/components/Tabs/WTabsItem.vue'
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `default` | `any` | — |
-| `title` | `any` | — |
-| `suffix` | `any` | — |
-| `right` | `any` | — |
+| `default` | — | — |
+| `title` | — | — |
+| `suffix` | — | — |
+| `right` | — | — |
 
 <!-- @api-end -->

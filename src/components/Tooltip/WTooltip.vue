@@ -14,18 +14,27 @@ import {getIsTouchDevice} from '@/utils/mobile'
 import {type TooltipMeta, useTooltipMeta} from './models/tooltipMeta'
 
 const props = defineProps<{
+  /** Plain text content, shown on one line. The default slot takes precedence. Nothing opens when both are empty. */
   text?: string
+  /** Skips the tooltip entirely on touch devices. */
   noTouch?: boolean
+  /** Opens only when the trigger's content overflows it — for truncated text. */
   overflowOnly?: boolean
-  light?: boolean
+  /** Element that opens the tooltip on hover. Defaults to the tooltip's parent element. */
   trigger?: Element
+  /** Attaches no hover listeners; open and close it through the exposed `open` and `close`. */
   noTrigger?: boolean
-  maxHeight?: number
+  /** Prefers placing the tooltip above the parent. */
   top?: boolean
+  /** Prefers placing the tooltip below the parent. */
   bottom?: boolean
+  /** Places the tooltip to the left of the parent. */
   left?: boolean
+  /** Places the tooltip to the right of the parent. */
   right?: boolean
+  /** Makes the tooltip ignore the cursor, so it closes when the pointer leaves the trigger and its content cannot be interacted with. For small hints that would otherwise block content underneath. */
   static?: boolean
+  /** Milliseconds to wait on hover before opening. */
   delay?: number
 }>()
 
@@ -68,7 +77,6 @@ const open = async () => {
     slot: hasSlot ? renderSlot : undefined,
     text: props.text,
     id,
-    maxHeight: props.maxHeight,
     top: props.top,
     bottom: props.bottom,
     left: props.left,
@@ -112,6 +120,7 @@ onBeforeUnmount(() => {
 })
 
 defineSlots<{
+  /** Rich tooltip content, replacing `text`. It stays reactive while the tooltip is open. */
   default?: () => VNode[]
 }>()
 

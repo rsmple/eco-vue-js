@@ -70,7 +70,7 @@ import WTooltip from 'eco-vue-js/dist/components/Tooltip/WTooltip.vue'
 - **`delay`** waits that many milliseconds before opening.
 - **`trigger`** listens on another element instead of the parent; `noTouch` skips the tooltip on touch devices.
 
-The tooltip stays open while the pointer moves onto it, so its text can be selected and its links clicked; `static` closes it as soon as the pointer leaves the element.
+The tooltip stays open while the pointer moves onto it, so its text can be selected and its links clicked; `static` makes it ignore the cursor instead, so it closes as soon as the pointer leaves the element. Use it for short hints, where a tooltip that holds on to the cursor only gets in the way of the content under it.
 
 Many components take a `tooltipText` prop that does the same without a child — `WButton`, `WCheckbox`, `WButtonMoreItem` and others.
 
@@ -88,24 +88,22 @@ import WTooltip from 'eco-vue-js/dist/components/Tooltip/WTooltip.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `text` | `string` | — | — |
-| `noTouch` | `boolean` | — | — |
-| `overflowOnly` | `boolean` | — | — |
-| `light` | `boolean` | — | — |
-| `trigger` | `Element` | — | — |
-| `noTrigger` | `boolean` | — | — |
-| `maxHeight` | `number` | — | — |
-| `top` | `boolean` | — | — |
-| `bottom` | `boolean` | — | — |
-| `left` | `boolean` | — | — |
-| `right` | `boolean` | — | — |
-| `static` | `boolean` | — | — |
-| `delay` | `number` | — | — |
+| `text` | `string` | — | Plain text content, shown on one line. The default slot takes precedence. Nothing opens when both are empty. |
+| `noTouch` | `boolean` | — | Skips the tooltip entirely on touch devices. |
+| `overflowOnly` | `boolean` | — | Opens only when the trigger's content overflows it — for truncated text. |
+| `trigger` | `Element` | — | Element that opens the tooltip on hover. Defaults to the tooltip's parent element. |
+| `noTrigger` | `boolean` | — | Attaches no hover listeners; open and close it through the exposed `open` and `close`. |
+| `top` | `boolean` | — | Prefers placing the tooltip above the parent. |
+| `bottom` | `boolean` | — | Prefers placing the tooltip below the parent. |
+| `left` | `boolean` | — | Places the tooltip to the left of the parent. |
+| `right` | `boolean` | — | Places the tooltip to the right of the parent. |
+| `static` | `boolean` | — | Makes the tooltip ignore the cursor, so it closes when the pointer leaves the trigger and its content cannot be interacted with. For small hints that would otherwise block content underneath. |
+| `delay` | `number` | — | Milliseconds to wait on hover before opening. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `default` | `any` | — |
+| `default` | — | Rich tooltip content, replacing `text`. It stays reactive while the tooltip is open. |
 
 <!-- @api-end -->

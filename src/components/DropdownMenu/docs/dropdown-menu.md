@@ -254,7 +254,7 @@ import WDropdownAdaptive from 'eco-vue-js/dist/components/DropdownMenu/WDropdown
 | Slot | Props | Description |
 | --- | --- | --- |
 | `toggle` | `{ isTop?: boolean \| undefined; unclickable?: boolean \| undefined; isMobile: boolean; }` | — |
-| `header` | `any` | — |
+| `header` | — | — |
 | `content` | `Partial<DropdownDefaultSlotScope> & { isMobile: boolean; }` | — |
 
 <!-- @api-end -->
@@ -323,7 +323,7 @@ import WButtonDropdown from 'eco-vue-js/dist/components/Button/WButtonDropdown.v
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `button` | `any` | — |
+| `button` | — | — |
 | `content` | `{ close: () => void; }` | — |
 
 <!-- @api-end -->

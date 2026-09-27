@@ -109,7 +109,13 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
+  /** The new state, after `negate` is applied and `validate` passes. */
   (e: 'update:model-value', value: Value): void
+}>()
+
+defineSlots<{
+  /** Replaces the `title` text. */
+  title?: () => void
 }>()
 
 const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)

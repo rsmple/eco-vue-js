@@ -85,7 +85,8 @@ const propsTable = (props: PropertyMeta[]) => [
   '| --- | --- | --- | --- |',
   ...props.map(prop => {
     const hasDefault = prop.default !== undefined && prop.default !== 'undefined'
-    const defaultValue = prop.required ? '**required**' : hasDefault ? code(prop.default!) : '—'
+    // `false as unknown as undefined` keeps a boolean prop's type optional in withDefaults; only the value is useful here.
+    const defaultValue = prop.required ? '**required**' : hasDefault ? code(prop.default!.replace(/(?: as \w+)+$/, '')) : '—'
 
     return `| \`${ prop.name }\` | ${ code(formatType(prop.type, prop.required)) } | ${ defaultValue } | ${ formatDescription(prop) } |`
   }),
@@ -154,7 +155,7 @@ const renderApi = (name: string, file: string, meta: ComponentMeta): string => {
       '',
       '| Slot | Props | Description |',
       '| --- | --- | --- |',
-      ...meta.slots.map(slot => `| \`${ slot.name }\` | ${ slot.type === '{}' ? '—' : code(slot.type) } | ${ cell(slot.description) || '—' } |`),
+      ...meta.slots.map(slot => `| \`${ slot.name }\` | ${ slot.type === '{}' || slot.type === 'any' ? '—' : code(slot.type) } | ${ cell(slot.description) || '—' } |`),
     )
   }
 

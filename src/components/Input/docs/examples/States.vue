@@ -4,7 +4,7 @@
       model-value="Moby-Dick"
       title="Required"
       description="Shown under the title."
-      mandatory
+      required
     />
 
     <WInput

@@ -68,7 +68,7 @@ const notes = ref<string>()
 
 ## States
 
-- `title`, `description` and `errorMessage` render around the field. `mandatory` marks the title as required.
+- `title`, `description` and `errorMessage` render around the field. `required` adds an asterisk to the title.
 - `readonly`, `disabled` and `skeleton` fall back to the state provided by a parent, the same way as for buttons — a readonly form makes every input inside it readonly.
 
 <!-- @example Input/States -->
@@ -82,7 +82,7 @@ const notes = ref<string>()
       model-value="Moby-Dick"
       title="Required"
       description="Shown under the title."
-      mandatory
+      required
     />
 
     <WInput
@@ -208,14 +208,14 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 | `placeholder` | `string` | — | — |
 | `icon` | `SVGComponent` | — | — |
 | `size` | `number` | `10` | — |
-| `maxLength` | `number` | — | — |
+| `maxLength` | `number` | — | Shows a `length / maxLength` counter under the field while it is focused. |
 | `step` | `number` | — | — |
 | `min` | `number` | — | — |
 | `max` | `number` | — | — |
 | `name` | `string` | — | — |
 | `autocomplete` | `string` | `"off"` | — |
 | `autofocus` | `number \| boolean` | — | — |
-| `readonly` | `boolean` | — | — |
+| `readonly` | `boolean` | — | Shows the value without allowing changes. When unset, inherits the readonly state provided by a parent. |
 | `unclickable` | `boolean \| null` | `null` | — |
 | `disabledActions` | `boolean` | — | — |
 | `loading` | `boolean` | — | — |
@@ -237,33 +237,31 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 | `hideDebounce` | `boolean` | — | — |
 | `explicit` | `boolean` | — | — |
 
-::: details Inherited from `src/components/FieldWrapper/types.ts` (23)
+::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `title` | `string` | — | — |
-| `titleIcon` | `SVGComponent` | — | — |
-| `description` | `string` | — | — |
-| `errorMessage` | `string` | — | — |
-| `tooltipText` | `string` | — | — |
-| `mono` | `boolean` | — | — |
-| `hasChanges` | `boolean` | — | — |
-| `skeleton` | `boolean` | — | — |
-| `disabled` | `boolean` | — | — |
-| `required` | `boolean` | — | — |
-| `mandatory` | `boolean` | — | — |
-| `noMargin` | `boolean` | — | — |
-| `allowCopy` | `boolean` | — | — |
-| `leftError` | `boolean` | — | — |
-| `filterField` | `string` | — | — |
-| `filterValue` | `unknown` | — | — |
-| `subgrid` | `boolean` | — | — |
-| `seamless` | `boolean` | — | — |
-| `savedText` | `string` | — | — |
-| `topText` | `boolean` | — | — |
-| `allowDropFile` | `boolean` | — | — |
-| `hideTitle` | `boolean` | — | — |
-| `embedded` | `boolean` | — | — |
+| `title` | `string` | — | Label above the field; the `title` slot replaces it. |
+| `titleIcon` | `SVGComponent` | — | Icon before the title text. |
+| `description` | `string` | — | Secondary text under the field. |
+| `errorMessage` | `string` | — | Validation message under the field, which also colors the changes marker. |
+| `tooltipText` | `string` | — | Tooltip on hover over the whole field. Not shown while readonly or loading as a skeleton. |
+| `mono` | `boolean` | — | Monospace font for the value. |
+| `hasChanges` | `boolean` | — | Shows a dot in the field's corner, marking an unsaved change. |
+| `skeleton` | `boolean` | — | Renders skeleton placeholders for the title, field and description. When unset, inherits the skeleton state provided by a parent. |
+| `disabled` | `boolean` | — | Blocks input and dims the field. When unset, inherits the disabled state provided by a parent. |
+| `required` | `boolean` | — | Adds an asterisk to the title. |
+| `noMargin` | `boolean` | — | Drops the default bottom margin. |
+| `allowCopy` | `boolean` | — | Adds a button that copies the value. |
+| `leftError` | `boolean` | — | Aligns the error message to the left instead of the right. |
+| `filterField` | `string` | — | Route query key for a filter button next to the title — clicking it toggles `filterField=<value>` in the URL. |
+| `filterValue` | `unknown` | — | Value the filter button puts in the query. Defaults to `modelValue`. |
+| `subgrid` | `boolean` | — | Lays the field out on the parent grid's columns, with the title in the first column, so titles and fields line up across rows. |
+| `seamless` | `boolean` | — | Hides the title and drops the field's own chrome until it is hovered or focused, for inline editing. |
+| `topText` | `boolean` | — | Moves the counter and messages above the field instead of below it. |
+| `allowDropFile` | `boolean` | — | Accepts files dropped onto the field. |
+| `hideTitle` | `boolean` | — | Hides the title while keeping the rest of the layout. |
+| `embedded` | `boolean` | — | For a field placed inside another component, such as a dropdown: no title, no margin, and horizontal padding. |
 
 :::
 
@@ -323,14 +321,14 @@ import WInputAsync from 'eco-vue-js/dist/components/Input/WInputAsync.vue'
 | `placeholder` | `string` | — | — |
 | `icon` | `SVGComponent` | — | — |
 | `size` | `number` | — | — |
-| `maxLength` | `number` | — | — |
+| `maxLength` | `number` | — | Shows a `length / maxLength` counter under the field while it is focused. |
 | `step` | `number` | — | — |
 | `min` | `number` | — | — |
 | `max` | `number` | — | — |
 | `name` | `string` | — | — |
 | `autocomplete` | `string` | — | — |
 | `autofocus` | `number \| boolean` | — | — |
-| `readonly` | `boolean` | — | — |
+| `readonly` | `boolean` | — | Shows the value without allowing changes. When unset, inherits the readonly state provided by a parent. |
 | `unclickable` | `boolean \| null` | `null` | — |
 | `disabledActions` | `boolean` | — | — |
 | `loading` | `boolean` | — | — |
@@ -352,33 +350,31 @@ import WInputAsync from 'eco-vue-js/dist/components/Input/WInputAsync.vue'
 | `hideDebounce` | `boolean` | — | — |
 | `explicit` | `boolean` | — | — |
 
-::: details Inherited from `src/components/FieldWrapper/types.ts` (23)
+::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `title` | `string` | — | — |
-| `titleIcon` | `SVGComponent` | — | — |
-| `description` | `string` | — | — |
-| `errorMessage` | `string` | — | — |
-| `tooltipText` | `string` | — | — |
-| `mono` | `boolean` | — | — |
-| `hasChanges` | `boolean` | — | — |
-| `skeleton` | `boolean` | — | — |
-| `disabled` | `boolean` | — | — |
-| `required` | `boolean` | — | — |
-| `mandatory` | `boolean` | — | — |
-| `noMargin` | `boolean` | — | — |
-| `allowCopy` | `boolean` | — | — |
-| `leftError` | `boolean` | — | — |
-| `filterField` | `string` | — | — |
-| `filterValue` | `unknown` | — | — |
-| `subgrid` | `boolean` | — | — |
-| `seamless` | `boolean` | — | — |
-| `savedText` | `string` | — | — |
-| `topText` | `boolean` | — | — |
-| `allowDropFile` | `boolean` | — | — |
-| `hideTitle` | `boolean` | — | — |
-| `embedded` | `boolean` | — | — |
+| `title` | `string` | — | Label above the field; the `title` slot replaces it. |
+| `titleIcon` | `SVGComponent` | — | Icon before the title text. |
+| `description` | `string` | — | Secondary text under the field. |
+| `errorMessage` | `string` | — | Validation message under the field, which also colors the changes marker. |
+| `tooltipText` | `string` | — | Tooltip on hover over the whole field. Not shown while readonly or loading as a skeleton. |
+| `mono` | `boolean` | — | Monospace font for the value. |
+| `hasChanges` | `boolean` | — | Shows a dot in the field's corner, marking an unsaved change. |
+| `skeleton` | `boolean` | — | Renders skeleton placeholders for the title, field and description. When unset, inherits the skeleton state provided by a parent. |
+| `disabled` | `boolean` | — | Blocks input and dims the field. When unset, inherits the disabled state provided by a parent. |
+| `required` | `boolean` | — | Adds an asterisk to the title. |
+| `noMargin` | `boolean` | — | Drops the default bottom margin. |
+| `allowCopy` | `boolean` | — | Adds a button that copies the value. |
+| `leftError` | `boolean` | — | Aligns the error message to the left instead of the right. |
+| `filterField` | `string` | — | Route query key for a filter button next to the title — clicking it toggles `filterField=<value>` in the URL. |
+| `filterValue` | `unknown` | — | Value the filter button puts in the query. Defaults to `modelValue`. |
+| `subgrid` | `boolean` | — | Lays the field out on the parent grid's columns, with the title in the first column, so titles and fields line up across rows. |
+| `seamless` | `boolean` | — | Hides the title and drops the field's own chrome until it is hovered or focused, for inline editing. |
+| `topText` | `boolean` | — | Moves the counter and messages above the field instead of below it. |
+| `allowDropFile` | `boolean` | — | Accepts files dropped onto the field. |
+| `hideTitle` | `boolean` | — | Hides the title while keeping the rest of the layout. |
+| `embedded` | `boolean` | — | For a field placed inside another component, such as a dropdown: no title, no margin, and horizontal padding. |
 
 :::
 
@@ -415,8 +411,8 @@ import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
 | `modelValue` | `Date` | — | — |
 | `minDate` | `Date` | — | — |
 | `maxDate` | `Date` | — | — |
-| `maxLength` | `number` | — | — |
-| `readonly` | `boolean` | — | — |
+| `maxLength` | `number` | — | Shows a `length / maxLength` counter under the field while it is focused. |
+| `readonly` | `boolean` | — | Shows the value without allowing changes. When unset, inherits the readonly state provided by a parent. |
 | `type` | `"text"` | — | — |
 | `textarea` | `boolean` | — | — |
 | `resize` | `boolean` | — | — |
@@ -456,33 +452,31 @@ import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
 | `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | — |
 | `dropdownClass` | `string` | — | — |
 
-::: details Inherited from `src/components/FieldWrapper/types.ts` (23)
+::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `title` | `string` | — | — |
-| `titleIcon` | `SVGComponent` | — | — |
-| `description` | `string` | — | — |
-| `errorMessage` | `string` | — | — |
-| `tooltipText` | `string` | — | — |
-| `mono` | `boolean` | — | — |
-| `hasChanges` | `boolean` | — | — |
-| `skeleton` | `boolean` | — | — |
-| `disabled` | `boolean` | — | — |
-| `required` | `boolean` | — | — |
-| `mandatory` | `boolean` | — | — |
-| `noMargin` | `boolean` | — | — |
-| `allowCopy` | `boolean` | — | — |
-| `leftError` | `boolean` | — | — |
-| `filterField` | `string` | — | — |
-| `filterValue` | `unknown` | — | — |
-| `subgrid` | `boolean` | — | — |
-| `seamless` | `boolean` | — | — |
-| `savedText` | `string` | — | — |
-| `topText` | `boolean` | — | — |
-| `allowDropFile` | `boolean` | — | — |
-| `hideTitle` | `boolean` | — | — |
-| `embedded` | `boolean` | — | — |
+| `title` | `string` | — | Label above the field; the `title` slot replaces it. |
+| `titleIcon` | `SVGComponent` | — | Icon before the title text. |
+| `description` | `string` | — | Secondary text under the field. |
+| `errorMessage` | `string` | — | Validation message under the field, which also colors the changes marker. |
+| `tooltipText` | `string` | — | Tooltip on hover over the whole field. Not shown while readonly or loading as a skeleton. |
+| `mono` | `boolean` | — | Monospace font for the value. |
+| `hasChanges` | `boolean` | — | Shows a dot in the field's corner, marking an unsaved change. |
+| `skeleton` | `boolean` | — | Renders skeleton placeholders for the title, field and description. When unset, inherits the skeleton state provided by a parent. |
+| `disabled` | `boolean` | — | Blocks input and dims the field. When unset, inherits the disabled state provided by a parent. |
+| `required` | `boolean` | — | Adds an asterisk to the title. |
+| `noMargin` | `boolean` | — | Drops the default bottom margin. |
+| `allowCopy` | `boolean` | — | Adds a button that copies the value. |
+| `leftError` | `boolean` | — | Aligns the error message to the left instead of the right. |
+| `filterField` | `string` | — | Route query key for a filter button next to the title — clicking it toggles `filterField=<value>` in the URL. |
+| `filterValue` | `unknown` | — | Value the filter button puts in the query. Defaults to `modelValue`. |
+| `subgrid` | `boolean` | — | Lays the field out on the parent grid's columns, with the title in the first column, so titles and fields line up across rows. |
+| `seamless` | `boolean` | — | Hides the title and drops the field's own chrome until it is hovered or focused, for inline editing. |
+| `topText` | `boolean` | — | Moves the counter and messages above the field instead of below it. |
+| `allowDropFile` | `boolean` | — | Accepts files dropped onto the field. |
+| `hideTitle` | `boolean` | — | Hides the title while keeping the rest of the layout. |
+| `embedded` | `boolean` | — | For a field placed inside another component, such as a dropdown: no title, no margin, and horizontal padding. |
 
 :::
 
