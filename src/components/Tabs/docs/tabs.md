@@ -214,41 +214,41 @@ import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `customSlots` | `VNode[]` | — | — |
-| `lessTransitions` | `boolean` | — | — |
-| `initTab` | `string` | — | — |
-| `initTabIndex` | `number` | — | — |
-| `side` | `boolean` | — | — |
-| `disableMinHeight` | `boolean` | — | — |
-| `noHeader` | `boolean` | — | — |
-| `headerClass` | `string` | — | — |
-| `switchToNew` | `boolean` | — | — |
-| `stepper` | `boolean` | — | — |
-| `showHasValue` | `boolean` | — | — |
-| `noSwitchOnInvalid` | `boolean` | — | — |
-| `wrap` | `boolean` | — | — |
-| `statusIcon` | `boolean` | — | — |
-| `flat` | `boolean` | — | — |
-| `indicator` | `boolean` | — | — |
+| `customSlots` | `VNode[]` | — | Tab items rendered instead of the `default` slot. |
+| `lessTransitions` | `boolean` | — | Fades between tabs instead of sliding. |
+| `initTab` | `string` | — | Name of the tab opened first. |
+| `initTabIndex` | `number` | — | Index of the tab opened first, when `initTab` is not set. |
+| `side` | `boolean` | — | Puts the tab buttons in a column beside the content. On small screens the buttons and the content become two swipeable screens, and picking a tab scrolls to its content. |
+| `disableMinHeight` | `boolean` | — | Lets the content shrink to the current tab's height. By default it keeps the height of the tallest tab shown so far. |
+| `noHeader` | `boolean` | — | Hides the tab buttons. Switch tabs through the exposed methods. |
+| `headerClass` | `string` | — | Classes for the row of tab buttons. |
+| `switchToNew` | `boolean` | — | Switches to a tab when it is added. |
+| `stepper` | `boolean` | — | Numbers the tab titles and disables every tab after the first one with `hasValue` false. Enables `update:progress`, `update:first` and `update:last`. |
+| `showHasValue` | `boolean` | — | Colors the titles of tabs that have a value. |
+| `noSwitchOnInvalid` | `boolean` | — | Stays on the current tab when another one gets an error. By default the first tab with an error is opened. |
+| `wrap` | `boolean` | — | Wraps the tab buttons onto new lines instead of scrolling sideways. |
+| `statusIcon` | `boolean` | — | Shows a value and error status icon next to each title. |
+| `flat` | `boolean` | — | Renders all tabs one after another, each under its title, without the buttons. |
+| `indicator` | `boolean` | — | Shows a large status circle on each tab button — error, has value or empty. |
 
 #### Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:current` | `(value: string)` | — |
-| `update:current-index` | `(value: number)` | — |
+| `update:current` | `(value: string)` | Name of the open tab. Also emitted on mount. |
+| `update:current-index` | `(value: number)` | Index of the open tab. Also emitted on mount. |
 | `update:has-changes` | `(value: boolean)` | — |
-| `update:current-title` | `(value: string \| undefined)` | — |
-| `update:tabs-length` | `(value: number)` | — |
-| `update:progress` | `(value: number)` | — |
-| `update:first` | `(value: boolean)` | — |
-| `update:last` | `(value: boolean)` | — |
+| `update:current-title` | `(value: string \| undefined)` | Title of the open tab, also when the title itself changes. |
+| `update:tabs-length` | `(value: number)` | Number of tabs. Also emitted on mount. |
+| `update:progress` | `(value: number)` | With `stepper`, the share of steps reached, in percent. |
+| `update:first` | `(value: boolean)` | With `stepper`, whether the first tab is open. |
+| `update:last` | `(value: boolean)` | With `stepper`, whether the last tab is open. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `default` | — | — |
+| `default` | — | WTabsItem elements. Anything else is rendered among the tab buttons. |
 
 <!-- @api-end -->
 
@@ -264,33 +264,32 @@ import WTabsItem from 'eco-vue-js/dist/components/Tabs/WTabsItem.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `title` | `string` | — | — |
-| `name` | `string` | **required** | — |
-| `icon` | `SVGComponent` | — | — |
-| `disabled` | `boolean` | — | — |
-| `removable` | `boolean` | — | — |
-| `divided` | `boolean` | — | — |
-| `init` | `boolean` | — | — |
-| `hasValue` | `boolean \| null` | — | — |
-| `hasError` | `boolean` | — | — |
-| `hasChanges` | `boolean` | — | — |
-| `validate` | `(() => string \| undefined)` | — | — |
-| `requireSave` | `boolean` | — | — |
-| `count` | `number` | — | — |
+| `title` | `string` | — | Title of the tab button. The `title` slot replaces it. |
+| `name` | `string` | **required** | Unique key of the tab, used by `initTab`, `update:current` and the exposed methods. |
+| `icon` | `SVGComponent` | — | Icon before the title. |
+| `disabled` | `boolean` | — | Disables the tab button. |
+| `removable` | `boolean` | — | Unmounts the content while the tab is not open, instead of hiding it. |
+| `init` | `boolean` | — | Opens this tab first, when WTabs has no `initTab` or `initTabIndex`. |
+| `hasValue` | `boolean \| null` | — | Marks the tab as filled in. By default it is read from the forms inside the tab. |
+| `hasError` | `boolean` | — | Marks the tab as invalid. By default it is read from the forms inside the tab. |
+| `hasChanges` | `boolean` | — | Shows the unsaved changes dot. By default it is read from the forms inside the tab. |
+| `validate` | `(() => string \| undefined)` | — | Checks the tab before the exposed `next` and `jump` leave it. A returned error message is shown as a warning and the tab stays open. |
+| `requireSave` | `boolean` | — | Submits the enclosing stepper form before moving forward past this tab, and stays on it if the submit fails. |
+| `count` | `number` | — | Number shown in brackets after the title. |
 
 #### Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `close` | — | — |
+| `close` | — | The close button was clicked. Listening to it adds the button to the tab. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `default` | — | — |
-| `title` | — | — |
-| `suffix` | — | — |
-| `right` | — | — |
+| `default` | — | Content of the tab. |
+| `title` | `StateScope` | Replaces the content of the tab button. |
+| `suffix` | `StateScope` | Content after the title, inside the tab button. |
+| `right` | `StateScope` | Content after the tab button. |
 
 <!-- @api-end -->

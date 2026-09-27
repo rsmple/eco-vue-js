@@ -32,6 +32,16 @@
           v-bind="scope"
         />
       </template>
+
+      <template
+        v-if="$slots.suffix"
+        #suffix="scope"
+      >
+        <slot
+          name="suffix"
+          v-bind="scope"
+        />
+      </template>
     </WButtonTab>
 
     <slot

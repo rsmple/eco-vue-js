@@ -1,36 +1,63 @@
 import type {VNode} from 'vue'
 
 export interface TabsProps {
+  /** Tab items rendered instead of the `default` slot. */
   customSlots?: VNode[]
+  /** Fades between tabs instead of sliding. */
   lessTransitions?: boolean
+  /** Name of the tab opened first. */
   initTab?: string
+  /** Index of the tab opened first, when `initTab` is not set. */
   initTabIndex?: number
+  /** Puts the tab buttons in a column beside the content. On small screens the buttons and the content become two swipeable screens, and picking a tab scrolls to its content. */
   side?: boolean
+  /** Lets the content shrink to the current tab's height. By default it keeps the height of the tallest tab shown so far. */
   disableMinHeight?: boolean
+  /** Hides the tab buttons. Switch tabs through the exposed methods. */
   noHeader?: boolean
+  /** Classes for the row of tab buttons. */
   headerClass?: string
+  /** Switches to a tab when it is added. */
   switchToNew?: boolean
+  /** Numbers the tab titles and disables every tab after the first one with `hasValue` false. Enables `update:progress`, `update:first` and `update:last`. */
   stepper?: boolean
+  /** Colors the titles of tabs that have a value. */
   showHasValue?: boolean
+  /** Stays on the current tab when another one gets an error. By default the first tab with an error is opened. */
   noSwitchOnInvalid?: boolean
+  /** Wraps the tab buttons onto new lines instead of scrolling sideways. */
   wrap?: boolean
+  /** Shows a value and error status icon next to each title. */
   statusIcon?: boolean
+  /** Renders all tabs one after another, each under its title, without the buttons. */
   flat?: boolean
+  /** Shows a large status circle on each tab button — error, has value or empty. */
   indicator?: boolean
 }
 
 export type TabsItemProps = {
+  /** Title of the tab button. The `title` slot replaces it. */
   title?: string
+  /** Unique key of the tab, used by `initTab`, `update:current` and the exposed methods. */
   name: string
+  /** Icon before the title. */
   icon?: SVGComponent
+  /** Disables the tab button. */
   disabled?: boolean
+  /** Unmounts the content while the tab is not open, instead of hiding it. */
   removable?: boolean
-  divided?: boolean
+  /** Opens this tab first, when WTabs has no `initTab` or `initTabIndex`. */
   init?: boolean
+  /** Marks the tab as filled in. By default it is read from the forms inside the tab. */
   hasValue?: boolean | null
+  /** Marks the tab as invalid. By default it is read from the forms inside the tab. */
   hasError?: boolean
+  /** Shows the unsaved changes dot. By default it is read from the forms inside the tab. */
   hasChanges?: boolean
+  /** Checks the tab before the exposed `next` and `jump` leave it. A returned error message is shown as a warning and the tab stays open. */
   validate?: () => string | undefined
+  /** Submits the enclosing stepper form before moving forward past this tab, and stays on it if the submit fails. */
   requireSave?: boolean
+  /** Number shown in brackets after the title. */
   count?: number
 }

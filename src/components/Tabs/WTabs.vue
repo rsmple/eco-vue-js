@@ -34,7 +34,7 @@
           :has-value="slot.props.hasValue ?? slot.props['has-value' as never] ?? tabItemRefByName[slot.props.name]?.hasValue"
           :first="defaultSlotsIndexByName[slot.props.name] === 0"
           :last="defaultSlotsIndexByName[slot.props.name] === defaultSlots.length - 1"
-          :disabled="stepper ? (defaultSlotsIndexByName[slot.props.name] ?? 0) > hasNoValueFirst : false"
+          :disabled="isSlotDisabled(slot) || (stepper ? (defaultSlotsIndexByName[slot.props.name] ?? 0) > hasNoValueFirst : false)"
           :stepper="stepper"
           :show-has-value="showHasValue"
           :side="side"
@@ -151,13 +151,20 @@ import {wTabItemListener, wTabItemUnlistener} from './models/injection'
 const props = defineProps<TabsProps>()
 
 const emit = defineEmits<{
+  /** Name of the open tab. Also emitted on mount. */
   (e: 'update:current', value: string): void
+  /** Index of the open tab. Also emitted on mount. */
   (e: 'update:current-index', value: number): void
   (e: 'update:has-changes', value: boolean): void
+  /** Title of the open tab, also when the title itself changes. */
   (e: 'update:current-title', value: string | undefined): void
+  /** Number of tabs. Also emitted on mount. */
   (e: 'update:tabs-length', value: number): void
+  /** With `stepper`, the share of steps reached, in percent. */
   (e: 'update:progress', value: number): void
+  /** With `stepper`, whether the first tab is open. */
   (e: 'update:first', value: boolean): void
+  /** With `stepper`, whether the last tab is open. */
   (e: 'update:last', value: boolean): void
 }>()
 
@@ -166,6 +173,7 @@ const {isMobile} = useIsMobile()
 const hasScrollbar = getHasScrollbar()
 
 const slots = defineSlots<{
+  /** WTabsItem elements. Anything else is rendered among the tab buttons. */
   default: () => VNode[]
 }>()
 
@@ -174,6 +182,12 @@ const buttonContainerRef = useTemplateRef('buttonContainer')
 
 const isTabItem = (slot: VNode): slot is VNode<RendererNode, RendererElement, TabsItemProps> & {props: TabsItemProps} => {
   return slot.type instanceof Object && '__name' in slot.type && slot.type.__name === 'WTabsItem'
+}
+
+const isSlotDisabled = (slot: VNode): boolean => {
+  const value = slot.props?.disabled
+
+  return value !== undefined && value !== false
 }
 
 const defaultSlotsRaw = shallowRef<VNode[]>(props.customSlots ?? slots.default?.() ?? [])
@@ -286,7 +300,8 @@ const scrollToTabContent = () => {
 
 const setCurrentDebounced = debounce((value: string) => {
   if (current.value === value || !defaultSlotsKeys.value.includes(value)) return
-  if (defaultSlots.value[defaultSlotsKeys.value.indexOf(value)]?.props?.disabled !== undefined) return
+  const slot = defaultSlots.value[defaultSlotsKeys.value.indexOf(value)]
+  if (slot && isSlotDisabled(slot)) return
 
   isDirect.value = defaultSlotsKeys.value.indexOf(current.value) < defaultSlotsKeys.value.indexOf(value)
   current.value = value
