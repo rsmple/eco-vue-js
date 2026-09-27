@@ -67,7 +67,9 @@ defineOptions({inheritAttrs: false})
 defineProps<DropdownAdaptiveProps>()
 
 defineEmits<{
+  /** The bottom sheet was dismissed on mobile, or a click landed outside the menu with `closeOnClickOutside`. */
   (e: 'close'): void
+  /** The parent moved on scroll or resize, with `emitUpdate` set. Desktop only. */
   (e: 'update:rect'): void
 }>()
 
@@ -75,8 +77,11 @@ const dropdownRef = useTemplateRef('dropdown')
 const {isMobile} = useIsMobile()
 
 defineSlots<{
+  /** Element that opens the menu. On mobile it is also repeated at the top of the bottom sheet — `unclickable` is true for the one on the page and false for the copy in the sheet. */
   toggle?: (props: {isTop?: boolean, unclickable?: boolean, isMobile: boolean}) => VNode[]
+  /** Replaces the copy of `toggle` at the top of the bottom sheet on mobile. */
   header?: () => void
+  /** Menu content, rendered in a dropdown on desktop and in a bottom sheet on mobile. The placement props of WDropdownMenu are passed on desktop only. */
   content?: (props: Partial<DropdownDefaultSlotScope> & {isMobile: boolean}) => VNode[]
 }>()
 

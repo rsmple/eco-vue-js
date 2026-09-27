@@ -72,10 +72,13 @@ interface ButtonGroupPropsForEntity<Model extends number | string | null | boole
 
 export type ButtonGroupProps<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined> = ButtonGroupPropsForEntity<Model, Entity, ValueGetter> | ButtonGroupPropsForModel<Model, Entity, ValueGetter>
 
-export interface ButtonDropdownProps extends Omit<DropdownMenuProps, 'isOpen' | 'updateAlign' | 'emitUpdate' | 'horizontalAlign'>,
-  Partial<Pick<DropdownMenuProps, 'horizontalAlign'>> {
+export interface ButtonDropdownProps extends Partial<Pick<DropdownMenuProps, 'horizontalAlign'>> {
+  /** Color scheme of the arrow button. */
   semanticType?: SemanticType
+  /** Puts the arrow button before the `button` slot instead of after it. */
   leftToggle?: boolean
+  /** Disables the arrow button. Buttons in the `button` slot keep their own state. */
   disabled?: boolean
+  /** Tooltip over the whole button row. */
   tooltipText?: string
 }

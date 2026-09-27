@@ -72,13 +72,22 @@ import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {useButtonMoreId} from './models/buttonMore'
 
 const props = defineProps<{
+  /** Icon of the button. Defaults to three dots. */
   icon?: SVGComponent
+  /** Blocks opening and dims the button. */
   disabled?: boolean
+  /** Element the menu is positioned against instead of the button, aligned to its right edge — for a menu opened at a cursor or row. */
   anchor?: DropdownProps['parentElement']
 }>()
 
 const emit = defineEmits<{
+  /** The menu closed — by a click on the button or inside the menu. */
   (e: 'close'): void
+}>()
+
+defineSlots<{
+  /** Menu items, usually WButtonMoreItem. A click inside closes the menu. Only one WButtonMore menu is open at a time. */
+  default?: () => void
 }>()
 
 const id = useId()

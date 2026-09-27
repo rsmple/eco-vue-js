@@ -205,7 +205,7 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 | `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |
 | `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | Extra props passed to every `optionComponent`. |
 | `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
-| `dropdownClass` | `string` | — | Classes for the menu's content box. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 
@@ -332,7 +332,7 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 | `queryParamsOptions` | `QueryParamsOptions` | — | Parameters for `useQueryFnOptions`. |
 | `options` | `Data[]` | — | Static list of options, instead of loading them with `useQueryFnOptions`. |
 | `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
-| `dropdownClass` | `string` | — | Classes for the menu's content box. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 
@@ -464,7 +464,7 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 | `prefixMax` | `number` | — | Most selected values shown as chips; above it, a count with a clear-all button is shown instead. |
 | `reverse` | `boolean` | — | Shows the check mark on options that are not selected instead of those that are — for a select that picks what to exclude. |
 | `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
-| `dropdownClass` | `string` | — | Classes for the menu's content box. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 
@@ -593,7 +593,7 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 | `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |
 | `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | Extra props passed to every `optionComponent`. |
 | `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
-| `dropdownClass` | `string` | — | Classes for the menu's content box. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 

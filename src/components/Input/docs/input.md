@@ -449,7 +449,7 @@ import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
 | `static` | `boolean` | — | Renders the menu content under the input instead of in a dropdown. |
 | `hideToggle` | `boolean` | — | Hides the button that opens and closes the menu. |
 | `horizontalAlign` | `HorizontalAlign` | `HorizontalAlign.RIGHT_INNER` | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
-| `dropdownClass` | `string` | — | Classes for the menu's content box. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 

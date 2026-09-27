@@ -30,17 +30,31 @@ import type {LinkProps} from '@/types/types'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
 interface Props extends Partial<LinkProps> {
+  /** Label. The `default` slot replaces it. */
   text?: string
+  /** Icon after the label. The `icon` slot replaces it. */
   icon?: SVGComponent
+  /** Blocks clicks and dims the item. */
   disabled?: boolean
+  /** Renders the item as a link to this URL. */
   href?: string
+  /** Native `download` attribute, with `href`. */
   download?: string
+  /** Tooltip over the item. */
   tooltipText?: string
 }
 
 defineProps<Props>()
 
 defineEmits<{
+  /** The item was clicked. */
   (e: 'click', value: MouseEvent): void
+}>()
+
+defineSlots<{
+  /** Label. Replaces `text`. */
+  default?: () => void
+  /** Icon after the label. Replaces `icon`. */
+  icon?: () => void
 }>()
 </script>

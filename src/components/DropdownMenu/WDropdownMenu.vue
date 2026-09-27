@@ -18,6 +18,7 @@
       :emit-update="emitUpdate"
       :style="{zIndex: baseZIndex + BASE_ZINDEX_DROPDOWN}"
       :top="top"
+      :bottom="bottom"
       :inner-class="dropdownClass"
       @update:rect="$emit('update:rect')"
     >
@@ -44,6 +45,7 @@ import {BASE_ZINDEX_DROPDOWN, getIsClientSide, unwrapSlots, wBaseZIndex} from '@
 defineProps<DropdownMenuProps>()
 
 defineEmits<{
+  /** The parent moved on scroll or resize, with `emitUpdate` set. */
   (e: 'update:rect'): void
 }>()
 
@@ -57,7 +59,9 @@ const element = computed(() => getIsClientSide() ? containerRef.value instanceof
 const isTop = computed(() => dropdownRef.value?.top ?? false)
 
 defineSlots<{
+  /** Element that opens the menu, and that it is positioned against. `isTop` is true while the menu is open above it. */
   toggle?: (props: {isTop: boolean, unclickable: undefined}) => VNode[]
+  /** Menu content, rendered while open. `isTop`, `isLeft` and `isRight` tell where it opened relative to the parent, `atBottom` that it sits in the lower half of the viewport. */
   content?: (props: DropdownDefaultSlotScope) => VNode[]
 }>()
 

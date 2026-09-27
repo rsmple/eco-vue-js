@@ -96,7 +96,9 @@ const close = () => {
 }
 
 defineSlots<{
+  /** Buttons joined to the arrow button. They keep their own click handlers. */
   button?: () => VNode[]
+  /** Menu content, usually WButtonMoreItem. A click inside closes the menu, and so does `close`. */
   content?: (props: {close: typeof close}) => VNode[]
 }>()
 </script>

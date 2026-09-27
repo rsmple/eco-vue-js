@@ -180,11 +180,11 @@ import WDropdownMenu from 'eco-vue-js/dist/components/DropdownMenu/WDropdownMenu
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `isOpen` | `boolean` | **required** | — |
+| `isOpen` | `boolean` | **required** | Shows the menu. |
 | `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | Element the menu is positioned against. Defaults to the element rendered by the `toggle` slot. |
-| `dropdownClass` | `string` | — | Classes for the menu's content box. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
 
-::: details Inherited from `src/components/Dropdown/types.ts` (6)
+::: details Inherited from `src/components/Dropdown/types.ts` (5)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -193,7 +193,6 @@ import WDropdownMenu from 'eco-vue-js/dist/components/DropdownMenu/WDropdownMenu
 | `bottom` | `boolean` | — | Always opens below the parent. |
 | `updateAlign` | `boolean` | — | Picks the placement again as the parent moves, instead of keeping the first one. |
 | `emitUpdate` | `boolean` | — | Emits `update:rect` on scroll and resize instead of following the parent. |
-| `innerClass` | `string` | — | Classes for the dropdown's content box. Defaults to `w-max`. |
 
 :::
 
@@ -201,14 +200,14 @@ import WDropdownMenu from 'eco-vue-js/dist/components/DropdownMenu/WDropdownMenu
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:rect` | — | — |
+| `update:rect` | — | The parent moved on scroll or resize, with `emitUpdate` set. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `toggle` | `{ isTop: boolean; unclickable: undefined; }` | — |
-| `content` | `DropdownDefaultSlotScope` | — |
+| `toggle` | `{ isTop: boolean; unclickable: undefined; }` | Element that opens the menu, and that it is positioned against. `isTop` is true while the menu is open above it. |
+| `content` | `DropdownDefaultSlotScope` | Menu content, rendered while open. `isTop`, `isLeft` and `isRight` tell where it opened relative to the parent, `atBottom` that it sits in the lower half of the viewport. |
 
 <!-- @api-end -->
 
@@ -224,12 +223,12 @@ import WDropdownAdaptive from 'eco-vue-js/dist/components/DropdownMenu/WDropdown
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `closeOnClickOutside` | `boolean` | — | — |
-| `isOpen` | `boolean` | **required** | — |
+| `closeOnClickOutside` | `boolean` | — | Emits `close` on a click outside the menu. On mobile the bottom sheet emits `close` on its own. |
+| `isOpen` | `boolean` | **required** | Shows the menu. |
 | `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | Element the menu is positioned against. Defaults to the element rendered by the `toggle` slot. |
-| `dropdownClass` | `string` | — | Classes for the menu's content box. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
 
-::: details Inherited from `src/components/Dropdown/types.ts` (6)
+::: details Inherited from `src/components/Dropdown/types.ts` (5)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -238,7 +237,6 @@ import WDropdownAdaptive from 'eco-vue-js/dist/components/DropdownMenu/WDropdown
 | `bottom` | `boolean` | — | Always opens below the parent. |
 | `updateAlign` | `boolean` | — | Picks the placement again as the parent moves, instead of keeping the first one. |
 | `emitUpdate` | `boolean` | — | Emits `update:rect` on scroll and resize instead of following the parent. |
-| `innerClass` | `string` | — | Classes for the dropdown's content box. Defaults to `w-max`. |
 
 :::
 
@@ -246,16 +244,16 @@ import WDropdownAdaptive from 'eco-vue-js/dist/components/DropdownMenu/WDropdown
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `close` | — | — |
-| `update:rect` | — | — |
+| `close` | — | The bottom sheet was dismissed on mobile, or a click landed outside the menu with `closeOnClickOutside`. |
+| `update:rect` | — | The parent moved on scroll or resize, with `emitUpdate` set. Desktop only. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `toggle` | `{ isTop?: boolean \| undefined; unclickable?: boolean \| undefined; isMobile: boolean; }` | — |
-| `header` | — | — |
-| `content` | `Partial<DropdownDefaultSlotScope> & { isMobile: boolean; }` | — |
+| `toggle` | `{ isTop?: boolean \| undefined; unclickable?: boolean \| undefined; isMobile: boolean; }` | Element that opens the menu. On mobile it is also repeated at the top of the bottom sheet — `unclickable` is true for the one on the page and false for the copy in the sheet. |
+| `header` | — | Replaces the copy of `toggle` at the top of the bottom sheet on mobile. |
+| `content` | `Partial<DropdownDefaultSlotScope> & { isMobile: boolean; }` | Menu content, rendered in a dropdown on desktop and in a bottom sheet on mobile. The placement props of WDropdownMenu are passed on desktop only. |
 
 <!-- @api-end -->
 
@@ -271,21 +269,21 @@ import WButtonMore from 'eco-vue-js/dist/components/Button/WButtonMore.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `icon` | `SVGComponent` | — | — |
-| `disabled` | `boolean` | — | — |
-| `anchor` | `Pick<Element, "getBoundingClientRect">` | — | — |
+| `icon` | `SVGComponent` | — | Icon of the button. Defaults to three dots. |
+| `disabled` | `boolean` | — | Blocks opening and dims the button. |
+| `anchor` | `Pick<Element, "getBoundingClientRect">` | — | Element the menu is positioned against instead of the button, aligned to its right edge — for a menu opened at a cursor or row. |
 
 #### Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `close` | — | — |
+| `close` | — | The menu closed — by a click on the button or inside the menu. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `default` | — | — |
+| `default` | — | Menu items, usually WButtonMoreItem. A click inside closes the menu. Only one WButtonMore menu is open at a time. |
 
 <!-- @api-end -->
 
@@ -301,30 +299,18 @@ import WButtonDropdown from 'eco-vue-js/dist/components/Button/WButtonDropdown.v
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `semanticType` | `SemanticType` | — | — |
-| `leftToggle` | `boolean` | — | — |
-| `disabled` | `boolean` | — | — |
-| `tooltipText` | `string` | — | — |
-| `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | Element the menu is positioned against. Defaults to the element rendered by the `toggle` slot. |
-| `dropdownClass` | `string` | — | Classes for the menu's content box. |
-
-::: details Inherited from `src/components/Dropdown/types.ts` (4)
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `top` | `boolean` | — | Prefers opening above the parent. |
-| `bottom` | `boolean` | — | Always opens below the parent. |
-| `innerClass` | `string` | — | Classes for the dropdown's content box. Defaults to `w-max`. |
+| `semanticType` | `SemanticType` | — | Color scheme of the arrow button. |
+| `leftToggle` | `boolean` | — | Puts the arrow button before the `button` slot instead of after it. |
+| `disabled` | `boolean` | — | Disables the arrow button. Buttons in the `button` slot keep their own state. |
+| `tooltipText` | `string` | — | Tooltip over the whole button row. |
 | `horizontalAlign` | `HorizontalAlign` | `HorizontalAlign.LEFT_INNER` | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
-
-:::
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `button` | — | — |
-| `content` | `{ close: () => void; }` | — |
+| `button` | — | Buttons joined to the arrow button. They keep their own click handlers. |
+| `content` | `{ close: () => void; }` | Menu content, usually WButtonMoreItem. A click inside closes the menu, and so does `close`. |
 
 <!-- @api-end -->
 
@@ -340,25 +326,25 @@ import WButtonMoreItem from 'eco-vue-js/dist/components/Button/WButtonMoreItem.v
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `text` | `string` | — | — |
-| `icon` | `SVGComponent` | — | — |
-| `disabled` | `boolean` | — | — |
-| `href` | `string` | — | — |
-| `download` | `string` | — | — |
-| `tooltipText` | `string` | — | — |
+| `text` | `string` | — | Label. The `default` slot replaces it. |
+| `icon` | `SVGComponent` | — | Icon after the label. The `icon` slot replaces it. |
+| `disabled` | `boolean` | — | Blocks clicks and dims the item. |
+| `href` | `string` | — | Renders the item as a link to this URL. |
+| `download` | `string` | — | Native `download` attribute, with `href`. |
+| `tooltipText` | `string` | — | Tooltip over the item. |
 | `to` | `RouteLocationRaw` | — | Router location — renders a router link. Needs vue-router installed in the app. |
 
 #### Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `click` | `(value: MouseEvent)` | — |
+| `click` | `(value: MouseEvent)` | The item was clicked. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `default` | — | — |
-| `icon` | — | — |
+| `default` | — | Label. Replaces `text`. |
+| `icon` | — | Icon after the label. Replaces `icon`. |
 
 <!-- @api-end -->
