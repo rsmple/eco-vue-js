@@ -237,7 +237,7 @@ import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 | --- | --- | --- |
 | `update:current` | `(value: string)` | Name of the open tab. Also emitted on mount. |
 | `update:current-index` | `(value: number)` | Index of the open tab. Also emitted on mount. |
-| `update:has-changes` | `(value: boolean)` | — |
+| `update:has-changes` | `(value: boolean)` | Whether any tab has unsaved changes. |
 | `update:current-title` | `(value: string \| undefined)` | Title of the open tab, also when the title itself changes. |
 | `update:tabs-length` | `(value: number)` | Number of tabs. Also emitted on mount. |
 | `update:progress` | `(value: number)` | With `stepper`, the share of steps reached, in percent. |

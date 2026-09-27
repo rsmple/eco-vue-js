@@ -155,6 +155,7 @@ const emit = defineEmits<{
   (e: 'update:current', value: string): void
   /** Index of the open tab. Also emitted on mount. */
   (e: 'update:current-index', value: number): void
+  /** Whether any tab has unsaved changes. */
   (e: 'update:has-changes', value: boolean): void
   /** Title of the open tab, also when the title itself changes. */
   (e: 'update:current-title', value: string | undefined): void
@@ -247,6 +248,12 @@ const hasNoValueFirst = computed<number>(() => {
   if (index === -1) return defaultSlotsKeys.value.length
 
   return index
+})
+
+const hasChanges = computed<boolean>(() => defaultSlots.value.some(slot => getPropValue(slot.props, 'hasChanges') ?? tabItemRefByName.value[slot.props.name]?.hasChanges))
+
+watch(hasChanges, value => {
+  emit('update:has-changes', value)
 })
 
 const hasOnClose = computed(() => defaultSlotsAll.value.some(item => item.props && 'onClose' in item.props))
