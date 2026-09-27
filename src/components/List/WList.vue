@@ -200,51 +200,97 @@ defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
   defineProps<{
+    /** Total number of items, when known in advance. Sizes the skeleton and the select-all. Defaults to the count the query returns. */
     count?: number
+    /** Field components, one per column, each with a `meta` export for its title, label, ordering field and classes. A meta with `fields` groups nested fields. */
     fields: Fields
+    /** Detail component shown under a row when the row is clicked. Receives the same props as a field, except `config`. */
     expansion?: ExpansionComponent<Data, QueryParams>
+    /** Paginated query the pages are loaded with. */
     useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
+    /** Paginated query for export, when it differs from `useQueryFn`. */
     useQueryFnExport?: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
+    /** Params for `useQueryFn`. An `ordering` param drives the sort controls and the sortable column headers. */
     queryParams: QueryParams
+    /** Options for every page query. */
     queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>
+    /** Tooltip on the `bulk` actions while nothing is selected. Defaults to "No selected items". */
     bulkDisableMessage?: string
+    /** Singular noun in the "Selected N items" counter of the selection bar. */
     selectionTitle: string
+    /** Actions in the selection bar while items are selected. Each gets the selection count and a getter of the query params narrowed to the selection. From the third on they move into a More menu. */
     bulk?: BulkComponent<QueryParams>[]
+    /** Actions in the selection bar while nothing is selected, with the current query params. */
     action?: ActionComponent<QueryParams>[]
+    /** Row menu items, opened by the row's more button or a right click. A `[component, props]` tuple passes extra props. */
     menu?: MenuComponent<Data>[]
+    /** Makes a single row readonly. */
     readonlyGetter?: (item: Data) => boolean
+    /** Classes for each row's content box. */
     cardClass?: string
+    /** Classes for each row's outer box. */
     cardWrapperClass?: string
+    /** Tooltip of the select-all checkbox in the table header. */
     selectAllTextGetter: (isUnselect: boolean, count: number) => string
+    /** Draws a border around each row. */
     hasBorder?: boolean
+    /** `localStorage` key the column settings and view mode are saved under. */
     configKey: string
+    /** Width, visibility, order and stickiness of each field by label, until the user changes them. */
     defaultConfigMap: FieldConfigMap<Fields>
+    /** Table or grid view, until the user picks one. Small screens always show cards. */
     defaultMode?: ListMode
+    /** Aligns cells and the checkbox to the top of the row instead of centering them. */
     alignTop?: boolean
+    /** Disables the row menu, both the more button and the right click. */
     disableMore?: boolean
+    /** Makes every row readonly, and passes `readonly` to the `bulk`, `action` and `menu` components. When unset, inherits the readonly state provided by a parent. */
     readonly?: boolean
+    /** Hides the sort control and makes the column headers not sortable. */
     noOrdering?: boolean
+    /** Wraps a row in WUniform for the returned field of `uniformScope`, so its fields can edit the item as part of a form. `undefined` leaves the row unwrapped. */
     formFieldGetter?: (data: Data, index: number) => string | undefined
+    /** Form scope of the items, for `formFieldGetter`. */
     uniformScope?: UniformScope<Data[]>
+    /** Whether two neighbouring items are in the same group. The `group` slot renders before each new group. */
     groupBy?: (a: Data, b: Data) => boolean
+    /** Column widths of the card grid. */
     cardColumns: CardColumns
+    /** Rows of the card grid, as area names: field labels, `AREA_SELECT`, `AREA_MORE` or `.`. Areas of hidden fields are dropped, and so are rows and columns left empty. */
     cardAreas: CardAreas<Fields, CardColumns['length']>
+    /** Route a row links to. */
     cardTo?: (item: Data) => LinkProps['to'] | undefined
+    /** Makes a row click emit `click:action`. */
     hasAction?: boolean
+    /** Hides the column settings button, and neither loads nor saves column settings. */
     noHeaderSettings?: boolean
+    /** Hides the refetch button. */
     noRefetch?: boolean
+    /** Refetches the loaded pages every this many ms. */
     refetchInterval?: number
+    /** Loads the items to export in one call, instead of paging through the export query. */
     apiMethodExport?: (queryParams: QueryParams) => Promise<Data[]>
+    /** Name of the exported file. */
     exportFileName?: string
+    /** Hides the export button. Rows are then selectable only with `bulk` or `alwaysSelect`. */
     disableExport?: boolean
+    /** Shows the checkboxes even without `bulk` or export, and makes a row click toggle its selection. With `cardTo`, the row link moves into a View menu item. */
     alwaysSelect?: boolean
+    /** Selected items, controlled from outside with `update:selection`. By default the selection is kept in the URL hash. */
     selection?: Selection<number>
+    /** Keeps the sticky list header out of the app header bar's padding while scrolled. */
     noHeaderUpdate?: boolean
+    /** Drops the full-screen minimum height and the bottom padding, for a list inside other content. */
     minHeight?: boolean
+    /** Converts an item to Markdown. Adds a Copy as Markdown item to the row menu and a Markdown option to export. */
     toMarkdown?: (data: Data, index: number) => string
+    /** Hides the table and grid switch in the column settings. */
     noMode?: boolean
+    /** Hides the checkboxes and turns selection off. */
     disableSelect?: boolean
+    /** Allows only picking rows one by one — no select-all and no Shift range selection. */
     selectOnly?: boolean
+    /** Skips rendering rows outside the viewport with `content-visibility: auto`, for long lists. */
     contentVisibility?: boolean
   }>(),
   {
@@ -274,11 +320,27 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
+  /** A page query failed. */
   (e: 'update:error', value: ApiError): void
+  /** A row was clicked, with `hasAction`. Carries the item, a setter that replaces it and its form scope. */
   (e: 'click:action', value: CardActionParams<Data>): void
+  /** The changed params only — the new `ordering`, from the sort control or a column header. */
   (e: 'update:query-params', value: QueryParams): void
+  /** Total count returned by the query. */
   (e: 'update:count', value: number | undefined): void
+  /** The new selection, with `selection`. */
   (e: 'update:selection', value: Selection<number>): void
+}>()
+
+defineSlots<{
+  /** Content above the selection bar, with the count returned by the query. */
+  header?: (props: {count: number | undefined}) => void
+  /** Replaces the buttons at the end of the selection bar — range select, refetch, sort and column settings. */
+  selection?: () => void
+  /** Heading before each group of rows, with `groupBy`. `skeleton` is true while the page loads. */
+  group?: (props: {item: Data, previous: Data | undefined, skeleton: boolean}) => void
+  /** Shown instead of the rows when the query returns no items. */
+  empty?: () => void
 }>()
 
 const {isDisabled, isReadonly} = useComponentStates(props)

@@ -23,9 +23,18 @@
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 defineProps<{
+  /** Value shown as truncated text. The `inner` and `default` slots replace it. */
   modelValue?: string | number
+  /** Shows a placeholder instead of the content. */
   skeleton?: boolean
+  /** Lets clicks through to the row, so they open its expansion. */
   allowOpen?: boolean
-  noPadding?: boolean
+}>()
+
+defineSlots<{
+  /** Replaces the whole content, including the truncating wrapper. */
+  default?: () => void
+  /** Replaces `modelValue` inside the truncating wrapper. */
+  inner?: () => void
 }>()
 </script>
