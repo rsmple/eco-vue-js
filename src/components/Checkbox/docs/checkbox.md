@@ -132,32 +132,32 @@ import WCheckbox from 'eco-vue-js/dist/components/Checkbox/WCheckbox.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `modelValue` | `boolean \| null` | **required** | — |
-| `title` | `string` | — | — |
-| `disabled` | `boolean` | — | — |
-| `readonly` | `boolean` | — | — |
-| `icon` | `SVGComponent` | — | — |
-| `radio` | `boolean` | — | — |
-| `loading` | `boolean` | — | — |
-| `skeleton` | `boolean` | — | — |
-| `intermediate` | `boolean` | — | — |
-| `tooltipText` | `string` | — | — |
-| `alignTop` | `boolean` | — | — |
-| `noMargin` | `boolean` | — | — |
-| `lessTransitions` | `boolean` | — | — |
+| `modelValue` | `boolean \| null` | **required** | Checked state. `null` is the mixed state — drawn as a smaller mark with `intermediate`. |
+| `title` | `string` | — | Label next to the box; the default slot replaces it. |
+| `disabled` | `boolean` | — | Blocks changes and dims the checkbox. When unset, inherits the disabled state provided by a parent. |
+| `readonly` | `boolean` | — | Shows the state without allowing changes. When unset, inherits the readonly state provided by a parent. |
+| `icon` | `SVGComponent` | — | Icon drawn inside the box instead of the check mark. |
+| `radio` | `boolean` | — | Round radio button with a dot instead of a square box with a check mark. |
+| `loading` | `boolean` | — | Shows a spinner in the box and ignores clicks. |
+| `skeleton` | `boolean` | — | Renders in a gray loading state and ignores clicks. When unset, inherits the skeleton state provided by a parent. |
+| `intermediate` | `boolean` | — | Draws a `null` model as a smaller mark, the mixed state, instead of a filled box. |
+| `tooltipText` | `string` | — | Tooltip on hover over the box. Not shown on touch devices. |
+| `alignTop` | `boolean` | — | Aligns the box with the first line of a multi-line title instead of centering it. |
+| `noMargin` | `boolean` | — | Drops the bottom padding added under a checkbox with a title. |
+| `lessTransitions` | `boolean` | — | Checks and unchecks without the scale animation. |
 
 #### Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:model-value` | `(value: boolean)` | — |
-| `mousedown` | `(value: MouseEvent)` | — |
+| `update:model-value` | `(value: boolean)` | The opposite of the current state — a `null` model becomes `true`. |
+| `mousedown` | `(value: MouseEvent)` | Mouse down on the checkbox. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `default` | — | — |
+| `default` | — | Label next to the box. Replaces `title`. |
 
 <!-- @api-end -->
 
@@ -173,22 +173,22 @@ import WCheckboxGroup from 'eco-vue-js/dist/components/Checkbox/WCheckboxGroup.v
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `list` | `Model[] \| Entity[] \| readonly Entity[] \| readonly Model[]` | **required** | — |
-| `valueGetter` | `ValueGetter \| ((value: Entity) => Model)` | — | — |
-| `optionComponent` | `CheckboxGroupOptionComponent<Entity> \| CheckboxGroupOptionComponent<Model>` | — | — |
-| `modelValue` | `Model \| undefined` | **required** | — |
-| `wrap` | `boolean` | — | — |
-| `stretch` | `boolean` | — | — |
-| `allowClear` | `boolean` | — | — |
-| `iconMap` | `Record<GroupModelStringified<Model>, SVGComponent>` | — | — |
-| `titleMap` | `Record<GroupModelStringified<Model>, string>` | — | — |
-| `tooltipTextMap` | `Record<GroupModelStringified<Model>, string>` | — | — |
-| `classMap` | `Record<GroupModelStringified<Model>, string>` | — | — |
-| `optionClass` | `string` | — | — |
-| `radio` | `boolean` | — | — |
-| `loading` | `boolean` | — | — |
-| `alignTop` | `boolean` | — | — |
-| `lessTransitions` | `boolean` | — | — |
+| `list` | `Model[] \| Entity[] \| readonly Entity[] \| readonly Model[]` | **required** | Option objects, turned into values by `valueGetter`. Option values. |
+| `valueGetter` | `ValueGetter \| ((value: Entity) => Model)` | — | Maps a `list` item to its value. Maps a `list` item to its value. Required when `list` holds objects. |
+| `optionComponent` | `CheckboxGroupOptionComponent<Entity> \| CheckboxGroupOptionComponent<Model>` | — | Renders an option's label. The `option` slot replaces it. |
+| `modelValue` | `Model \| undefined` | **required** | Selected value. |
+| `wrap` | `boolean` | — | Lays the options out in a row that wraps, instead of a column. |
+| `stretch` | `boolean` | — | Lays the options out in one row, stretched to equal widths. |
+| `loading` | `boolean` | — | Shows a spinner in the last clicked option and disables the others, while its change is saved. |
+| `allowClear` | `boolean` | — | Clicking the selected option again emits `null`. |
+| `iconMap` | `Record<GroupModelStringified<Model>, SVGComponent>` | — | Icon inside each option's box, keyed by the option's value as a string. |
+| `titleMap` | `Record<GroupModelStringified<Model>, string>` | — | Label of each option, keyed by the option's value as a string. |
+| `tooltipTextMap` | `Record<GroupModelStringified<Model>, string>` | — | Tooltip on each option's box, keyed by the option's value as a string. |
+| `classMap` | `Record<GroupModelStringified<Model>, string>` | — | Classes for each option, keyed by the option's value as a string. |
+| `optionClass` | `string` | — | Classes for every option. |
+| `radio` | `boolean` | — | Round radio button with a dot instead of a square box with a check mark. |
+| `alignTop` | `boolean` | — | Aligns the box with the first line of a multi-line title instead of centering it. |
+| `lessTransitions` | `boolean` | — | Checks and unchecks without the scale animation. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (23)
 
@@ -224,16 +224,16 @@ import WCheckboxGroup from 'eco-vue-js/dist/components/Checkbox/WCheckboxGroup.v
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:model-value` | `(Model)` | — |
+| `update:model-value` | `(Model)` | The clicked option's value, or `null` when `allowClear` unselects it. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `title` | — | — |
-| `subtitle` | — | — |
-| `option` | `{ option: ValueGetter extends undefined ? Model : Entity; selected: boolean; }` | — |
-| `right` | — | — |
+| `title` | — | Replaces the `title` text. |
+| `subtitle` | — | Content between the title and the options. |
+| `option` | `{ option: ValueGetter extends undefined ? Model : Entity; selected: boolean; }` | Renders an option's label. Replaces `optionComponent` and `titleMap`. |
+| `right` | — | Content to the right of the options. |
 
 <!-- @api-end -->
 
@@ -249,21 +249,21 @@ import WCheckboxGroupMultiple from 'eco-vue-js/dist/components/Checkbox/WCheckbo
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `list` | `Model[] \| Entity[] \| readonly Entity[] \| readonly Model[]` | **required** | — |
-| `valueGetter` | `ValueGetter \| ((value: Entity) => Model)` | — | — |
-| `optionComponent` | `CheckboxGroupOptionComponent<Entity> \| CheckboxGroupOptionComponent<Model>` | — | — |
-| `modelValue` | `Model[] \| undefined` | **required** | — |
-| `radio` | `boolean` | — | — |
-| `loading` | `boolean` | — | — |
-| `alignTop` | `boolean` | — | — |
-| `lessTransitions` | `boolean` | — | — |
-| `wrap` | `boolean` | — | — |
-| `stretch` | `boolean` | — | — |
-| `iconMap` | `Record<GroupModelStringified<Model>, SVGComponent>` | — | — |
-| `titleMap` | `Record<GroupModelStringified<Model>, string>` | — | — |
-| `tooltipTextMap` | `Record<GroupModelStringified<Model>, string>` | — | — |
-| `classMap` | `Record<GroupModelStringified<Model>, string>` | — | — |
-| `optionClass` | `string` | — | — |
+| `list` | `Model[] \| Entity[] \| readonly Entity[] \| readonly Model[]` | **required** | Option objects, turned into values by `valueGetter`. Option values. |
+| `valueGetter` | `ValueGetter \| ((value: Entity) => Model)` | — | Maps a `list` item to its value. Maps a `list` item to its value. Required when `list` holds objects. |
+| `optionComponent` | `CheckboxGroupOptionComponent<Entity> \| CheckboxGroupOptionComponent<Model>` | — | Renders an option's label. The `option` slot replaces it. |
+| `modelValue` | `Model[] \| undefined` | **required** | Selected values. |
+| `radio` | `boolean` | — | Round radio button with a dot instead of a square box with a check mark. |
+| `loading` | `boolean` | — | Shows a spinner in the last clicked option and disables the others, while its change is saved. |
+| `alignTop` | `boolean` | — | Aligns the box with the first line of a multi-line title instead of centering it. |
+| `lessTransitions` | `boolean` | — | Checks and unchecks without the scale animation. |
+| `wrap` | `boolean` | — | Lays the options out in a row that wraps, instead of a column. |
+| `stretch` | `boolean` | — | Lays the options out in one row, stretched to equal widths. |
+| `iconMap` | `Record<GroupModelStringified<Model>, SVGComponent>` | — | Icon inside each option's box, keyed by the option's value as a string. |
+| `titleMap` | `Record<GroupModelStringified<Model>, string>` | — | Label of each option, keyed by the option's value as a string. |
+| `tooltipTextMap` | `Record<GroupModelStringified<Model>, string>` | — | Tooltip on each option's box, keyed by the option's value as a string. |
+| `classMap` | `Record<GroupModelStringified<Model>, string>` | — | Classes for each option, keyed by the option's value as a string. |
+| `optionClass` | `string` | — | Classes for every option. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (23)
 
@@ -299,16 +299,16 @@ import WCheckboxGroupMultiple from 'eco-vue-js/dist/components/Checkbox/WCheckbo
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `select` | `(Model)` | — |
-| `unselect` | `(Model)` | — |
+| `select` | `(Model)` | An unselected option was clicked. |
+| `unselect` | `(Model)` | A selected option was clicked. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `title` | — | — |
-| `subtitle` | — | — |
-| `option` | `{ option: ValueGetter extends undefined ? Model : Entity; selected: boolean \| undefined; }` | — |
-| `right` | — | — |
+| `title` | — | Replaces the `title` text. |
+| `subtitle` | — | Content between the title and the options. |
+| `option` | `{ option: ValueGetter extends undefined ? Model : Entity; selected: boolean; }` | Renders an option's label. Replaces `optionComponent` and `titleMap`. |
+| `right` | — | Content to the right of the options. |
 
 <!-- @api-end -->

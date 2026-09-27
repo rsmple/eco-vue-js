@@ -122,8 +122,15 @@ const props = withDefaults(
 const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 const emit = defineEmits<{
+  /** The opposite of the current state — a `null` model becomes `true`. */
   (e: 'update:model-value', value: boolean): void
+  /** Mouse down on the checkbox. */
   (e: 'mousedown', value: MouseEvent): void
+}>()
+
+defineSlots<{
+  /** Label next to the box. Replaces `title`. */
+  default?: () => void
 }>()
 
 const elementRef = useTemplateRef('element')

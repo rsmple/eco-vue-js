@@ -49,13 +49,13 @@
             <slot
               name="option"
               :option="(item as ValueGetter extends undefined ? Model : Entity)"
-              :selected="modelValue?.includes(getValue(item))"
+              :selected="modelValue?.includes(getValue(item)) ?? false"
             >
               <component
                 :is="optionComponent"
                 v-if="optionComponent"
                 :option="item"
-                :selected="modelValue?.includes(getValue(item))"
+                :selected="modelValue?.includes(getValue(item)) ?? false"
               />
             </slot>
           </template>
@@ -86,8 +86,21 @@ defineOptions({inheritAttrs: false})
 const props = defineProps<CheckboxGroupMultipleProps<Model, Entity, ValueGetter>>()
 
 const emit = defineEmits<{
+  /** An unselected option was clicked. */
   (e: 'select', value: Model): void
+  /** A selected option was clicked. */
   (e: 'unselect', value: Model): void
+}>()
+
+defineSlots<{
+  /** Replaces the `title` text. */
+  title?: () => void
+  /** Content between the title and the options. */
+  subtitle?: () => void
+  /** Renders an option's label. Replaces `optionComponent` and `titleMap`. */
+  option?: (props: {option: ValueGetter extends undefined ? Model : Entity, selected: boolean}) => void
+  /** Content to the right of the options. */
+  right?: () => void
 }>()
 
 const loadingItem = ref<Model | undefined>(undefined)

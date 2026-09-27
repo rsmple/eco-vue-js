@@ -85,7 +85,19 @@ defineOptions({inheritAttrs: false})
 const props = defineProps<CheckboxGroupProps<Model, Entity, ValueGetter>>()
 
 const emit = defineEmits<{
+  /** The clicked option's value, or `null` when `allowClear` unselects it. */
   (e: 'update:model-value', value: Model): void
+}>()
+
+defineSlots<{
+  /** Replaces the `title` text. */
+  title?: () => void
+  /** Content between the title and the options. */
+  subtitle?: () => void
+  /** Renders an option's label. Replaces `optionComponent` and `titleMap`. */
+  option?: (props: {option: ValueGetter extends undefined ? Model : Entity, selected: boolean}) => void
+  /** Content to the right of the options. */
+  right?: () => void
 }>()
 
 const loadingItem = ref<Model | undefined>(undefined)
