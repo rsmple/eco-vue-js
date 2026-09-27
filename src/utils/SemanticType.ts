@@ -28,7 +28,7 @@ export const setSemanticTypeBackgroundMap = (value: Partial<Record<SemanticType,
 
 const semanticTypeChipMap = reactive<Record<SemanticType, string>>({
   ...semanticTypeConfig,
-  [SemanticType.SECONDARY]: 'bg-gray-200 dark:bg-gray-800 text-default',
+  [SemanticType.SECONDARY]: 'bg-gray-200 dark:bg-gray-800 text-accent',
 })
 
 export const useSemanticTypeChipMap = () => {
