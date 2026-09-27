@@ -78,9 +78,9 @@
   --color-score-undefinedly-bg: #7affff10;
   --color-score-undefinedly-text: #c9e3ef;
 
-  --font-sans: MontSerrat, system-ui;
-  --font-roboto: Roboto, system-ui;
-  --font-mono: RobotoMono, system-ui;
+  --font-sans: MontSerrat, system-ui, sans-serif;
+  --font-roboto: Roboto, system-ui, sans-serif;
+  --font-mono: RobotoMono, ui-monospace, monospace;
 
   --text-4xs: 0.4375rem;
   --text-4xs--line-height: 1.3;

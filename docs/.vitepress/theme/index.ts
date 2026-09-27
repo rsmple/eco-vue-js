@@ -1,6 +1,6 @@
 import {QueryClient, VueQueryPlugin} from '@tanstack/vue-query'
 import {type Theme, inBrowser} from 'vitepress'
-import DefaultTheme from 'vitepress/theme'
+import DefaultTheme from 'vitepress/theme-without-fonts'
 import CopyOrDownloadAsMarkdownButtons from 'vitepress-plugin-llms/vitepress-components/CopyOrDownloadAsMarkdownButtons.vue'
 
 import {setQueryClient} from '@/utils/queryClient'

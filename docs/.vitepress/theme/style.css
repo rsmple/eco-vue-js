@@ -6,6 +6,23 @@
 
 @import "../../../package/tailwind-base/base.css";
 
+/* The fonts the kit's theme names, under the same family names a consumer app registers. Latin only. */
+@font-face {
+  font-family: MontSerrat;
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./fonts/montserrat-latin-wght-normal.woff2") format("woff2-variations");
+}
+
+@font-face {
+  font-family: RobotoMono;
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url("./fonts/roboto-mono-latin-wght-normal.woff2") format("woff2-variations");
+}
+
 @theme {
   --spacing-nav-bar-width: 15rem;
   --spacing-actions-bar-width: 3.5rem;
@@ -59,6 +76,8 @@ body {
   --vp-c-brand-soft: color-mix(in oklab, var(--color-primary) 16%, transparent);
   --vp-c-text-1: var(--color-black-default);
   --vp-code-color: var(--vp-c-brand-1);
+  --vp-font-family-base: var(--font-sans);
+  --vp-font-family-mono: var(--font-mono);
 }
 
 .dark {

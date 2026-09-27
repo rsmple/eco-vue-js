@@ -13,11 +13,39 @@ const root = fileURLToPath(new URL('../..', import.meta.url))
 const src = fileURLToPath(new URL('../../src', import.meta.url))
 const {version} = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')) as {version: string}
 
+const base = '/eco-vue-js/'
+const siteUrl = `https://rsmple.github.io${ base }`
+
 export default defineConfig({
-  title: 'eco-vue-js',
+  title: 'EcoVue UI Library',
   description: 'Vue 3 UI kit with Tailwind v4 — components, utilities, icons and recipes.',
-  base: '/eco-vue-js/',
+  base,
   cleanUrls: true,
+
+  // `head` hrefs are not prefixed with `base`; crawlers need absolute image URLs.
+  head: [
+    ['link', {rel: 'icon', href: `${ base }favicon.ico`, sizes: '48x48'}],
+    ['link', {rel: 'icon', href: `${ base }favicon.svg`, type: 'image/svg+xml'}],
+    ['link', {rel: 'apple-touch-icon', href: `${ base }apple-touch-icon.png`}],
+    ['meta', {property: 'og:type', content: 'website'}],
+    ['meta', {property: 'og:site_name', content: 'EcoVue UI Library'}],
+    ['meta', {property: 'og:image', content: `${ siteUrl }og.png`}],
+    ['meta', {property: 'og:image:width', content: '1200'}],
+    ['meta', {property: 'og:image:height', content: '630'}],
+    ['meta', {name: 'twitter:card', content: 'summary_large_image'}],
+  ],
+
+  transformHead({pageData, title, description}) {
+    const path = pageData.relativePath.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '')
+
+    return [
+      ['meta', {property: 'og:title', content: title}],
+      ['meta', {property: 'og:description', content: description}],
+      ['meta', {property: 'og:url', content: siteUrl + path}],
+    ]
+  },
+
+  sitemap: {hostname: siteUrl},
 
   // Component pages live next to their component; guides and recipes live in docs/.
   srcDir: '..',
@@ -52,6 +80,8 @@ export default defineConfig({
   vite: {
     // srcDir is the repo root, where Vite would otherwise pick up the library build config.
     configFile: false,
+    // Resolved from srcDir, which is the repo root.
+    publicDir: 'docs/public',
     plugins: [
       tailwindcss(),
       svgComponent(),

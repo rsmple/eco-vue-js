@@ -2,9 +2,12 @@
 layout: home
 
 hero:
-  name: eco-vue-js
+  name: EcoVue UI Library
   text: Vue 3 UI kit on Tailwind v4
   tagline: Components, list and form building blocks, query utilities, icons — plus a shared eslint config.
+  image:
+    src: /logo.svg
+    alt: EcoVue UI Library
   actions:
     - theme: brand
       text: Get started

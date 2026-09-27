@@ -9,9 +9,19 @@
       <template #title>
         <a
           :href="withBase('/')"
-          class="text-accent no-underline"
+          :aria-label="site.title"
+          class="inline-flex items-center gap-2.5 no-underline"
         >
-          {{ site.title }}
+          <img
+            :src="withBase('/logo.svg')"
+            alt=""
+            class="size-8"
+          >
+
+          <span class="leading-none">
+            <span class="text-accent text-xl font-semibold tracking-tight sm:text-2xl leading-none">EcoVue</span>
+            <span class="text-description text-base font-medium tracking-[0.2em] uppercase mx-4">UI Library</span>
+          </span>
         </a>
       </template>
 

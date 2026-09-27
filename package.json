@@ -5,6 +5,7 @@
     "url": "https://github.com/rsmple/eco-vue-js.git"
   },
   "version": "0.18.3",
+  "homepage": "https://rsmple.github.io/eco-vue-js/",
   "scripts": {
     "build": "run-p type-check \"build-only {@}\" --",
     "dev": "vite build --mode development --watch",
