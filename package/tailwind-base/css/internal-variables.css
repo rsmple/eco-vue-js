@@ -65,6 +65,12 @@
   --w-list-header-bg: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
 }
 
+@utility w-drag-item-overlay-* {
+  --w-drag-item-overlay: --value(--color-*, [color]);
+  --w-drag-item-overlay: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
+  --w-drag-item-overlay: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
+}
+
 /* Opacity */
 
 @utility w-ripple-opacity-* {

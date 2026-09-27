@@ -6,7 +6,7 @@
 
   <div
     v-else
-    class="w-max rounded-md px-2 py-0.5 text-xs font-semibold text-default"
+    class="w-max rounded-md px-2 py-0.5 text-xs font-semibold"
     :class="semanticTypeChipMap[semanticType]"
   >
     <slot>
