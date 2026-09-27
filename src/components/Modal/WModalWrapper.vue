@@ -70,8 +70,21 @@ import {BASE_ZINDEX_DROPDOWN} from '@/utils/utils'
 import {wModalHeaderHeight} from './models/injection'
 
 defineProps<{
+  /** Fills the whole screen on small screens instead of floating with a margin. */
   maximized?: boolean
+  /** Stacks the `actions` buttons vertically on every screen size, not only on small ones. */
   actionsCol?: boolean
+}>()
+
+defineSlots<{
+  /** Heading of the dialog, also used as its accessible name. Stays pinned at the top while the content scrolls. */
+  title?: () => void
+  /** Content under the heading, pinned with it. */
+  subtitle?: () => void
+  /** Body of the modal. */
+  default?: () => void
+  /** Buttons pinned at the bottom. */
+  actions?: () => void
 }>()
 
 const titleId = useId()

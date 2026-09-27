@@ -46,27 +46,41 @@ export type ButtonGroupOptionComponent<Option> = Component<SelectOptionProps<Opt
 
 interface ButtonGroupPropsBase<Model extends number | string | null | boolean>
   extends Omit<FieldWrapperProps, 'modelValue'> {
+  /** Value of the pressed option. */
   modelValue: Model
+  /** Wraps the options onto new lines instead of overflowing. */
   wrap?: boolean
+  /** Stacks the options vertically. */
   col?: boolean
+  /** Color scheme of the pressed option. */
   semanticType?: SemanticType
+  /** Shows a spinner in the last clicked option and disables the others, while its change is saved. */
   loading?: boolean
+  /** Stretches the group to the full width, sharing it equally between the options. */
   stretch?: boolean
+  /** A click on the pressed option emits `null`. */
   allowClear?: boolean
+  /** Values of the options to disable. */
   disabledItems?: Model[]
 }
 
 interface ButtonGroupPropsForModel<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>
   extends ButtonGroupPropsBase<Model> {
+  /** Options, each passed to the `option` slot. A primitive is its own value, an object needs `valueGetter`. */
   list: readonly Model[]
+  /** Value of an option. Needed when `list` holds objects. */
   valueGetter?: ValueGetter | undefined
+  /** Renders an option's content. The `option` slot replaces it. */
   optionComponent?: ButtonGroupOptionComponent<Model>
 }
 
 interface ButtonGroupPropsForEntity<Model extends number | string | null | boolean, Entity extends Record<string, unknown>, ValueGetter extends {fn(value: Entity): Model}['fn'] | undefined = undefined>
   extends ButtonGroupPropsBase<Model> {
+  /** Options, each passed to the `option` slot. A primitive is its own value, an object needs `valueGetter`. */
   list: Entity[]
+  /** Value of an option. Needed when `list` holds objects. */
   valueGetter: ValueGetter | ((value: Entity) => Model)
+  /** Renders an option's content. The `option` slot replaces it. */
   optionComponent?: ButtonGroupOptionComponent<Entity>
 }
 

@@ -179,16 +179,16 @@ import WModalWrapper from 'eco-vue-js/dist/components/Modal/WModalWrapper.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `maximized` | `boolean` | — | — |
-| `actionsCol` | `boolean` | — | — |
+| `maximized` | `boolean` | — | Fills the whole screen on small screens instead of floating with a margin. |
+| `actionsCol` | `boolean` | — | Stacks the `actions` buttons vertically on every screen size, not only on small ones. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `title` | — | — |
-| `subtitle` | — | — |
-| `default` | — | — |
-| `actions` | — | — |
+| `title` | — | Heading of the dialog, also used as its accessible name. Stays pinned at the top while the content scrolls. |
+| `subtitle` | — | Content under the heading, pinned with it. |
+| `default` | — | Body of the modal. |
+| `actions` | — | Buttons pinned at the bottom. |
 
 <!-- @api-end -->

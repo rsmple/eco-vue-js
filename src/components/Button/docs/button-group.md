@@ -59,17 +59,17 @@ import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `list` | `Entity[] \| readonly Model[]` | **required** | — |
-| `valueGetter` | `ValueGetter \| ((value: Entity) => Model)` | — | — |
-| `optionComponent` | `ButtonGroupOptionComponent<Entity> \| ButtonGroupOptionComponent<Model>` | — | — |
-| `modelValue` | `Model` | **required** | — |
-| `wrap` | `boolean` | — | — |
-| `col` | `boolean` | — | — |
-| `semanticType` | `SemanticType` | `SemanticType.PRIMARY` | — |
-| `loading` | `boolean` | — | — |
-| `stretch` | `boolean` | — | — |
-| `allowClear` | `boolean` | — | — |
-| `disabledItems` | `Model[]` | — | — |
+| `list` | `Entity[] \| readonly Model[]` | **required** | Options, each passed to the `option` slot. A primitive is its own value, an object needs `valueGetter`. |
+| `valueGetter` | `ValueGetter \| ((value: Entity) => Model)` | — | Value of an option. Needed when `list` holds objects. |
+| `optionComponent` | `ButtonGroupOptionComponent<Entity> \| ButtonGroupOptionComponent<Model>` | — | Renders an option's content. The `option` slot replaces it. |
+| `modelValue` | `Model` | **required** | Value of the pressed option. |
+| `wrap` | `boolean` | — | Wraps the options onto new lines instead of overflowing. |
+| `col` | `boolean` | — | Stacks the options vertically. |
+| `semanticType` | `SemanticType` | `SemanticType.PRIMARY` | Color scheme of the pressed option. |
+| `loading` | `boolean` | — | Shows a spinner in the last clicked option and disables the others, while its change is saved. |
+| `stretch` | `boolean` | — | Stretches the group to the full width, sharing it equally between the options. |
+| `allowClear` | `boolean` | — | A click on the pressed option emits `null`. |
+| `disabledItems` | `Model[]` | — | Values of the options to disable. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (23)
 
@@ -105,15 +105,15 @@ import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:model-value` | `(Model)` | — |
+| `update:model-value` | `(Model)` | Value of the clicked option, or `null` when the pressed one is clicked with `allowClear`. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `title` | — | — |
-| `subtitle` | — | — |
-| `option` | `{ option: Model \| Entity; selected: boolean; }` | — |
-| `right` | — | — |
+| `title` | — | Replaces the `title` text. |
+| `subtitle` | — | Content between the title and the options. |
+| `option` | `{ option: ValueGetter extends undefined ? Model : Entity; selected: boolean; }` | Content of an option's button. While readonly, only the pressed option is shown. |
+| `right` | — | Content to the right of the options. |
 
 <!-- @api-end -->

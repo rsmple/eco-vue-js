@@ -25,7 +25,7 @@
         <slot
           v-if="modelValueItem !== undefined"
           name="option"
-          :option="modelValueItem"
+          :option="(modelValueItem as ValueGetter extends undefined ? Model : Entity)"
           :selected="true"
         >
           <component
@@ -151,7 +151,19 @@ const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()
 const semanticTypeButtonBackgroundMap = useSemanticTypeButtonBackgroundMap()
 
 const emit = defineEmits<{
+  /** Value of the clicked option, or `null` when the pressed one is clicked with `allowClear`. */
   (e: 'update:model-value', value: Model): void
+}>()
+
+defineSlots<{
+  /** Replaces the `title` text. */
+  title?: () => void
+  /** Content between the title and the options. */
+  subtitle?: () => void
+  /** Content of an option's button. While readonly, only the pressed option is shown. */
+  option?: (props: {option: ValueGetter extends undefined ? Model : Entity, selected: boolean}) => void
+  /** Content to the right of the options. */
+  right?: () => void
 }>()
 
 const {isDisabled, isReadonly} = useComponentStates(props)
