@@ -154,6 +154,60 @@ const isEmail: ValidateFn = value => typeof value === 'string' && value.includes
 
 <!-- @example-end -->
 
+## Suggestions
+
+`WInputOptions` is a free-text input with a list of suggestions under it. Arrow keys move through the list, Enter or a click puts the option's `valueGetter` value into the input. The list is not filtered for you — pass the options that match the current text.
+
+`WInputSuggest` is the same input with an empty menu: put anything into its `content` slot, and call the slot's `blur` to close it.
+
+<!-- @example Input/Options -->
+
+<DocsDemo name="Input/Options" />
+
+```vue
+<template>
+  <WInputOptions
+    v-model="country"
+    title="Country"
+    placeholder="Start typing"
+    :options="filtered"
+    :value-getter="option => option.name"
+    empty-stub="No such country"
+    allow-clear
+    class="max-w-md"
+  >
+    <template #option="{option}">
+      {{ option.flag }} {{ option.name }}
+    </template>
+  </WInputOptions>
+
+  <p class="text-sm text-gray-500">
+    Model: {{ country || '—' }}
+  </p>
+</template>
+
+<script lang="ts" setup>
+import {computed, ref} from 'vue'
+
+import WInputOptions from 'eco-vue-js/dist/components/Input/WInputOptions.vue'
+
+const countries = [
+  {id: 1, name: 'Austria', flag: '🇦🇹'},
+  {id: 2, name: 'Belgium', flag: '🇧🇪'},
+  {id: 3, name: 'Denmark', flag: '🇩🇰'},
+  {id: 4, name: 'France', flag: '🇫🇷'},
+  {id: 5, name: 'Germany', flag: '🇩🇪'},
+  {id: 6, name: 'Norway', flag: '🇳🇴'},
+]
+
+const country = ref<string | null>()
+
+const filtered = computed(() => countries.filter(item => item.name.toLowerCase().includes(country.value?.toLowerCase() ?? '')))
+</script>
+```
+
+<!-- @example-end -->
+
 ## Date
 
 `WInputDate` binds a `Date` and opens a calendar. The user can also type a date; `minDate` and `maxDate` limit both.
@@ -392,6 +446,221 @@ import WInputAsync from 'eco-vue-js/dist/components/Input/WInputAsync.vue'
 | `right` | — | Content to the right of the field. |
 | `prefix` | `{ modelValue: (Type extends "number" ? number : string) \| null \| undefined; }` | Content before the text inside the field, such as chips. Also shown while readonly. |
 | `before` | `{ modelValue: (Type extends "number" ? number : string) \| null \| undefined; focused: boolean; }` | Content right before the text, in the same box as the input. |
+
+<!-- @api-end -->
+
+<!-- @api WInputSuggest -->
+
+### WInputSuggest
+
+```ts
+import WInputSuggest from 'eco-vue-js/dist/components/Input/WInputSuggest.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mobileTitle` | `string` | — | Title for the mobile bottom sheet the menu opens in. Defaults to `title`. |
+| `persist` | `boolean` | — | Keeps the menu open when the input loses focus. |
+| `closeOnClear` | `boolean` | — | Closes the menu when the value is cleared. |
+| `static` | `boolean` | — | Renders the menu content under the input instead of in a dropdown. |
+| `hideToggle` | `boolean` | — | Hides the button that opens and closes the menu. |
+| `modelValue` | `(Type extends "number" ? number : string) \| null` | — | Field value — a `number` when `type` is `number`, otherwise a `string`. |
+| `maxLength` | `number` | — | Cuts off input longer than this, and shows a `length / maxLength` counter under the field while it is focused. |
+| `readonly` | `boolean` | — | Shows the value as text without an input. When unset, inherits the readonly state provided by a parent. |
+| `type` | `Type` | — | Native input type. `number` parses the value into a number. |
+| `textarea` | `boolean` | — | Multi-line editor instead of a single-line input, with undo and redo. |
+| `resize` | `boolean` | — | Lets the user drag the textarea's height. |
+| `placeholder` | `string` | — | Hint shown while the field is empty. |
+| `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
+| `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `step` | `number` | — | Native `step` attribute for `type="number"`. |
+| `min` | `number` | — | Native `min` attribute for `type="number"`. |
+| `max` | `number` | — | Native `max` attribute for `type="number"`. |
+| `name` | `string` | — | Native `name` attribute. |
+| `autocomplete` | `string` | — | Native `autocomplete` attribute. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
+| `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
+| `spellcheck` | `boolean` | — | Enables the browser's spell check. |
+| `customBackspaceHandle` | `boolean` | — | Handles Backspace in code — removes the character or selection and emits the new value — instead of leaving it to the browser. |
+| `textSecure` | `boolean` | — | Masks the value, with a button to reveal it, for secrets. A model value of `true` means a secret is set but not sent to the client, and shows a check mark instead. |
+| `placeholderSecure` | `boolean` | — | Shows the secret-set check mark while the field is empty. |
+| `allowClear` | `boolean` | — | Adds a button that clears the value. |
+| `allowPaste` | `boolean` | — | Adds a button that pastes from the clipboard, replacing the value. |
+| `hideInput` | `boolean` | — | Hides the text input, leaving only the `prefix` content. |
+| `noWrap` | `boolean` | — | Keeps the `prefix` content on one line, scrolling sideways instead of wrapping. |
+| `textTransparent` | `boolean` | — | Makes the typed text transparent while keeping the caret, for an overlay that draws the text itself. |
+| `textParts` | `TextPart[]` | — | Textarea content as a list of strings and tagged parts, for highlighting parts of the text. |
+| `rich` | `boolean` | — | Adds a formatting toolbar to the textarea. |
+| `toolbarActions` | `ToolbarAction[]` | — | Custom buttons for the textarea toolbar. |
+| `borderClass` | `string` | — | Border color classes, replacing the default gray. |
+| `async` | `boolean` | — | Keeps edits local and emits them only when saved — on Enter or blur — instead of on every keystroke. |
+| `debounce` | `number` | — | With `async`, also saves after this many ms without typing, showing a progress bar under the text. |
+| `hideDebounce` | `boolean` | — | Hides the `debounce` progress bar. |
+| `explicit` | `boolean` | — | With `async`, shows Save and Cancel buttons while there are unsaved edits. Always on for `textarea` and `textSecure`. |
+| `horizontalAlign` | `HorizontalAlign` | `HorizontalAlign.FILL` | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
+
+::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `string` | — | Label above the field; the `title` slot replaces it. |
+| `titleIcon` | `SVGComponent` | — | Icon before the title text. |
+| `description` | `string` | — | Secondary text under the field. |
+| `errorMessage` | `string` | — | Validation message under the field, which also colors the changes marker. |
+| `tooltipText` | `string` | — | Tooltip on hover over the whole field. Not shown while readonly or loading as a skeleton. |
+| `mono` | `boolean` | — | Monospace font for the value. |
+| `hasChanges` | `boolean` | — | Shows a dot in the field's corner, marking an unsaved change. |
+| `skeleton` | `boolean` | — | Renders skeleton placeholders for the title, field and description. When unset, inherits the skeleton state provided by a parent. |
+| `disabled` | `boolean` | — | Blocks input and dims the field. When unset, inherits the disabled state provided by a parent. |
+| `required` | `boolean` | — | Adds an asterisk to the title. |
+| `noMargin` | `boolean` | — | Drops the default bottom margin. |
+| `allowCopy` | `boolean` | — | Adds a button that copies the value. |
+| `leftError` | `boolean` | — | Aligns the error message to the left instead of the right. |
+| `filterField` | `string` | — | Route query key for a filter button next to the title — clicking it toggles `filterField=<value>` in the URL. |
+| `filterValue` | `unknown` | — | Value the filter button puts in the query. Defaults to `modelValue`. |
+| `subgrid` | `boolean` | — | Lays the field out on the parent grid's columns, with the title in the first column, so titles and fields line up across rows. |
+| `seamless` | `boolean` | — | Hides the title and drops the field's own chrome until it is hovered or focused, for inline editing. |
+| `topText` | `boolean` | — | Moves the counter and messages above the field instead of below it. |
+| `allowDropFile` | `boolean` | — | Accepts files dropped onto the field. |
+| `hideTitle` | `boolean` | — | Hides the title while keeping the rest of the layout. |
+| `embedded` | `boolean` | — | For a field placed inside another component, such as a dropdown: no title, no margin, and horizontal padding. |
+
+:::
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `update:model-value` | `((Type extends "number" ? number : string) & {})` | The typed value. Not emitted while `loading`. |
+| `keypress:enter` | `(KeyboardEvent)` | Enter without modifiers. |
+| `keypress:up` | `(KeyboardEvent)` | Arrow Up without modifiers. |
+| `keypress:down` | `(KeyboardEvent)` | Arrow Down without modifiers. |
+| `keypress:delete` | `(KeyboardEvent)` | Backspace or Delete without modifiers. |
+| `open` | — | The menu opened, on focus. |
+| `close` | — | The menu closed. |
+| `click:clear` | — | The clear button was clicked. |
+| `focus` | `(FocusEvent \| undefined)` | The input got focus. On mobile, not emitted by the field that opens the bottom sheet. |
+| `blur` | `(FocusEvent)` | The input lost focus. On mobile, not emitted by the field that opens the bottom sheet. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `title` | — | Replaces the `title` text. |
+| `subtitle` | — | Content between the title and the field. |
+| `toolbar` | `{ wrapSelection: (value: WrapSelection) => void; }` | Extra buttons in the textarea toolbar — `wrapSelection` applies a formatting to the selected text. Shows the toolbar on its own. |
+| `prefix` | `{ unclickable?: boolean \| null \| undefined; }` | Content before the text inside the field, such as chips. `unclickable` is `true` for the field that opens the mobile bottom sheet. |
+| `before` | `{ modelValue: (Type extends "number" ? number : string) \| null \| undefined; focused: boolean; }` | Content right before the text, in the same box as the input. |
+| `right` | `{ unclickable?: boolean \| null \| undefined; }` | Content to the right of the field. `unclickable` is `true` for the field that opens the mobile bottom sheet. |
+| `bottom` | — | Content under the field, after a `static` or `embedded` menu. |
+| `content` | `{ focused: boolean; blur: () => void; focus: () => void; }` | Menu content. `focus` and `blur` move focus to and from the input, which opens and closes the menu. |
+
+<!-- @api-end -->
+
+<!-- @api WInputOptions -->
+
+### WInputOptions
+
+```ts
+import WInputOptions from 'eco-vue-js/dist/components/Input/WInputOptions.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `options` | `Option[]` | **required** | Suggestions shown in the menu. Picking one sets the value and blurs the input. |
+| `valueGetter` | `(option: Option) => (Type extends "number" ? number : string) \| null` | **required** | Value an option puts into the input. |
+| `emptyStub` | `string` | — | Text shown when `options` is empty. Defaults to "No suggestion". |
+| `optionComponent` | `Component<{ option: Option; selected?: boolean \| undefined; model?: boolean \| undefined; }>` | — | Renders an option in the menu. The `option` slot replaces it. |
+| `mobileTitle` | `string` | — | Title for the mobile bottom sheet the menu opens in. Defaults to `title`. |
+| `persist` | `boolean` | — | Keeps the menu open when the input loses focus. |
+| `closeOnClear` | `boolean` | — | Closes the menu when the value is cleared. |
+| `static` | `boolean` | — | Renders the menu content under the input instead of in a dropdown. |
+| `hideToggle` | `boolean` | — | Hides the button that opens and closes the menu. |
+| `modelValue` | `(Type extends "number" ? number : string) \| null` | — | Field value — a `number` when `type` is `number`, otherwise a `string`. |
+| `maxLength` | `number` | — | Cuts off input longer than this, and shows a `length / maxLength` counter under the field while it is focused. |
+| `readonly` | `boolean` | — | Shows the value as text without an input. When unset, inherits the readonly state provided by a parent. |
+| `type` | `Type` | — | Native input type. `number` parses the value into a number. |
+| `textarea` | `boolean` | — | Multi-line editor instead of a single-line input, with undo and redo. |
+| `resize` | `boolean` | — | Lets the user drag the textarea's height. |
+| `placeholder` | `string` | — | Hint shown while the field is empty. |
+| `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
+| `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `step` | `number` | — | Native `step` attribute for `type="number"`. |
+| `min` | `number` | — | Native `min` attribute for `type="number"`. |
+| `max` | `number` | — | Native `max` attribute for `type="number"`. |
+| `name` | `string` | — | Native `name` attribute. |
+| `autocomplete` | `string` | — | Native `autocomplete` attribute. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
+| `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
+| `spellcheck` | `boolean` | — | Enables the browser's spell check. |
+| `customBackspaceHandle` | `boolean` | — | Handles Backspace in code — removes the character or selection and emits the new value — instead of leaving it to the browser. |
+| `textSecure` | `boolean` | — | Masks the value, with a button to reveal it, for secrets. A model value of `true` means a secret is set but not sent to the client, and shows a check mark instead. |
+| `placeholderSecure` | `boolean` | — | Shows the secret-set check mark while the field is empty. |
+| `allowClear` | `boolean` | — | Adds a button that clears the value. |
+| `allowPaste` | `boolean` | — | Adds a button that pastes from the clipboard, replacing the value. |
+| `hideInput` | `boolean` | — | Hides the text input, leaving only the `prefix` content. |
+| `noWrap` | `boolean` | — | Keeps the `prefix` content on one line, scrolling sideways instead of wrapping. |
+| `textTransparent` | `boolean` | — | Makes the typed text transparent while keeping the caret, for an overlay that draws the text itself. |
+| `textParts` | `TextPart[]` | — | Textarea content as a list of strings and tagged parts, for highlighting parts of the text. |
+| `rich` | `boolean` | — | Adds a formatting toolbar to the textarea. |
+| `toolbarActions` | `ToolbarAction[]` | — | Custom buttons for the textarea toolbar. |
+| `borderClass` | `string` | — | Border color classes, replacing the default gray. |
+| `async` | `boolean` | — | Keeps edits local and emits them only when saved — on Enter or blur — instead of on every keystroke. |
+| `debounce` | `number` | — | With `async`, also saves after this many ms without typing, showing a progress bar under the text. |
+| `hideDebounce` | `boolean` | — | Hides the `debounce` progress bar. |
+| `explicit` | `boolean` | — | With `async`, shows Save and Cancel buttons while there are unsaved edits. Always on for `textarea` and `textSecure`. |
+| `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
+| `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
+
+::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `string` | — | Label above the field; the `title` slot replaces it. |
+| `titleIcon` | `SVGComponent` | — | Icon before the title text. |
+| `description` | `string` | — | Secondary text under the field. |
+| `errorMessage` | `string` | — | Validation message under the field, which also colors the changes marker. |
+| `tooltipText` | `string` | — | Tooltip on hover over the whole field. Not shown while readonly or loading as a skeleton. |
+| `mono` | `boolean` | — | Monospace font for the value. |
+| `hasChanges` | `boolean` | — | Shows a dot in the field's corner, marking an unsaved change. |
+| `skeleton` | `boolean` | — | Renders skeleton placeholders for the title, field and description. When unset, inherits the skeleton state provided by a parent. |
+| `disabled` | `boolean` | — | Blocks input and dims the field. When unset, inherits the disabled state provided by a parent. |
+| `required` | `boolean` | — | Adds an asterisk to the title. |
+| `noMargin` | `boolean` | — | Drops the default bottom margin. |
+| `allowCopy` | `boolean` | — | Adds a button that copies the value. |
+| `leftError` | `boolean` | — | Aligns the error message to the left instead of the right. |
+| `filterField` | `string` | — | Route query key for a filter button next to the title — clicking it toggles `filterField=<value>` in the URL. |
+| `filterValue` | `unknown` | — | Value the filter button puts in the query. Defaults to `modelValue`. |
+| `subgrid` | `boolean` | — | Lays the field out on the parent grid's columns, with the title in the first column, so titles and fields line up across rows. |
+| `seamless` | `boolean` | — | Hides the title and drops the field's own chrome until it is hovered or focused, for inline editing. |
+| `topText` | `boolean` | — | Moves the counter and messages above the field instead of below it. |
+| `allowDropFile` | `boolean` | — | Accepts files dropped onto the field. |
+| `hideTitle` | `boolean` | — | Hides the title while keeping the rest of the layout. |
+| `embedded` | `boolean` | — | For a field placed inside another component, such as a dropdown: no title, no margin, and horizontal padding. |
+
+:::
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `update:model-value` | `((Type extends "number" ? number : string) \| null)` | The typed value, or the value of a picked option. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `title` | — | Replaces the `title` text. |
+| `subtitle` | — | Content between the title and the field. |
+| `right` | — | Content to the right of the field. |
+| `option` | `{ option: Option; selected: boolean; model: boolean; }` | Content of an option in the menu. Replaces `optionComponent`. |
 
 <!-- @api-end -->
 

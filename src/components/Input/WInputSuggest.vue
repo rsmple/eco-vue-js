@@ -193,15 +193,25 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
+  /** The typed value. Not emitted while `loading`. */
   (e: 'update:model-value', event: NonNullable<ModelValue>): void
+  /** Enter without modifiers. */
   (e: 'keypress:enter', event: KeyboardEvent): void
+  /** Arrow Up without modifiers. */
   (e: 'keypress:up', event: KeyboardEvent): void
+  /** Arrow Down without modifiers. */
   (e: 'keypress:down', event: KeyboardEvent): void
+  /** Backspace or Delete without modifiers. */
   (e: 'keypress:delete', event: KeyboardEvent): void
+  /** The menu opened, on focus. */
   (e: 'open'): void
+  /** The menu closed. */
   (e: 'close'): void
+  /** The clear button was clicked. */
   (e: 'click:clear'): void
+  /** The input got focus. On mobile, not emitted by the field that opens the bottom sheet. */
   (e: 'focus', value: FocusEvent | undefined): void
+  /** The input lost focus. On mobile, not emitted by the field that opens the bottom sheet. */
   (e: 'blur', value: FocusEvent): void
 }>()
 
@@ -260,13 +270,21 @@ defineExpose({
 })
 
 defineSlots<{
+  /** Replaces the `title` text. */
   title?: () => void
-  bottom?: () => void
+  /** Content between the title and the field. */
   subtitle?: () => void
-  toolbar?: () => void
+  /** Extra buttons in the textarea toolbar — `wrapSelection` applies a formatting to the selected text. Shows the toolbar on its own. */
+  toolbar?: (props: {wrapSelection: (value: WrapSelection) => void}) => void
+  /** Content before the text inside the field, such as chips. `unclickable` is `true` for the field that opens the mobile bottom sheet. */
   prefix?: (props: {unclickable?: boolean | null}) => void
+  /** Content right before the text, in the same box as the input. */
   before?: (props: {modelValue: ModelValue | undefined, focused: boolean}) => void
+  /** Content to the right of the field. `unclickable` is `true` for the field that opens the mobile bottom sheet. */
   right?: (props: {unclickable?: boolean | null}) => void
+  /** Content under the field, after a `static` or `embedded` menu. */
+  bottom?: () => void
+  /** Menu content. `focus` and `blur` move focus to and from the input, which opens and closes the menu. */
   content?: (props: {focused: boolean, blur: () => void, focus: () => void}) => VNode[]
 }>()
 </script>

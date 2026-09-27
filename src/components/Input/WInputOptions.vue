@@ -102,7 +102,19 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
+  /** The typed value, or the value of a picked option. */
   (e: 'update:model-value', value: ModelValue): void
+}>()
+
+defineSlots<{
+  /** Replaces the `title` text. */
+  title?: () => void
+  /** Content between the title and the field. */
+  subtitle?: () => void
+  /** Content to the right of the field. */
+  right?: () => void
+  /** Content of an option in the menu. Replaces `optionComponent`. */
+  option?: (props: {option: Option, selected: boolean, model: boolean}) => void
 }>()
 
 const {isReadonly, isDisabled} = useComponentStates(props)
