@@ -163,6 +163,7 @@ const props = withDefaults(
     emptyStub: 'No match',
     valueGetter: (data: Data) => (data as unknown as {id: Model}).id,
     valueQueryKey: 'id__in',
+    prefixMax: 8,
     readonly: undefined,
     disabled: undefined,
     skeleton: undefined,
@@ -214,7 +215,7 @@ const close = () => {
   isOpen.value = false
   focused.value = false
 
-  if (props.selectOnClose && search.value && !isModelValueSearch.value) {
+  if (props.searchModel && search.value && !isModelValueSearch.value) {
     const optionExact = firstPageData.value?.results.find(option => props.valueGetter(option) === search.value)
 
     if (optionExact) select(props.valueGetter(optionExact), optionExact)

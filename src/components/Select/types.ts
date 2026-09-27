@@ -71,8 +71,8 @@ export interface SelectProps<Model extends number | string, Data extends Default
   hideOptionIcon?: boolean
   /** Options to add to the loaded ones — for selected values the query does not return, such as ones created elsewhere. */
   createdData?: Data[]
-  /** When the menu closes with text typed, selects the option matching it exactly, or creates one with `createOption`. */
-  selectOnClose?: boolean
+  /** Commits the typed text when the menu closes — selects the option matching it exactly, or creates one with `createOption`. In a single select, the selected value is also put into the search text on focus, so it can be edited. For string values. */
+  searchModel?: boolean
   /** Waits until the menu is first opened before loading the options. */
   lazy?: boolean
   /** Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. */
@@ -100,8 +100,6 @@ export interface SelectSingleProps<Model extends number | string, Data extends D
   allowClear?: boolean & AllowClear
   /** Value emitted when cleared. Defaults to `null`; set it explicitly to emit `undefined` or `''`. */
   clearValue?: ClearValue
-  /** Puts the selected value into the search text on focus, so it can be edited, and turns on `selectOnClose`. For string values. */
-  searchModel?: boolean
   /** Option to add to the loaded ones — for a selected value the query does not return, such as one created elsewhere. */
   createdData?: Data
 }
@@ -129,7 +127,7 @@ export interface SelectAsyncProps<Model extends number | string, Data extends De
   valueQueryKey?: string
   /** Word after the count shown instead of chips when more than `prefixMax` values are selected. Defaults to "items". */
   prefixText?: string
-  /** Most selected values shown as chips; above it, a count with a clear-all button is shown. Defaults to 8, which is also the upper limit. */
+  /** Most selected values shown as chips; above it, a count with a clear-all button is shown instead. */
   prefixMax?: number
   /** Shows the check mark on options that are not selected instead of those that are — for a select that picks what to exclude. */
   reverse?: boolean
@@ -148,7 +146,7 @@ export interface SelectAsyncPrefixProps<Model extends number | string, Data exte
   valueQueryKey: string
   readonly: boolean | undefined
   prefixText: string | undefined
-  prefixMax: number | undefined
+  prefixMax: number
 }
 
 export interface SelectAsyncPrefixPageProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
@@ -172,8 +170,6 @@ export interface SelectAsyncSingleProps<Model extends number | string, Data exte
   allowClear?: boolean & AllowClear
   /** Value emitted when cleared. Defaults to `null`; set it explicitly to emit `undefined` or `''`. */
   clearValue?: ClearValue
-  /** Puts the selected value into the search text on focus, so it can be edited, and turns on `selectOnClose`. For string values. */
-  searchModel?: boolean
   /** Selected option, shown in the field instead of loading it. */
   previewData?: Data
   /** Option to add to the loaded ones — for a selected value the query does not return, such as one created elsewhere. */

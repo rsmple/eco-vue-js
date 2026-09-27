@@ -1,9 +1,9 @@
 <template>
   <template v-if="valueInString.length !== 0">
     <SelectAsyncPrefixPage
-      v-if="modelValue.length <= (prefixMax ?? PAGE_LENGTH)"
+      v-if="modelValue.length <= prefixMax"
       :use-query-fn="useQueryFn"
-      :query-params="({page: 1, [valueQueryKey]: valueInString} as QueryParams)"
+      :query-params="({page: 1, size: prefixMax, [valueQueryKey]: valueInString} as QueryParams)"
       :option-component="(optionComponent as SelectOptionComponent<Data>)"
       :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
       :disable-clear="disableClear"
@@ -55,8 +55,6 @@ import {numberFormatter} from '@/utils/utils'
 
 import SelectAsyncPrefixPage from './SelectAsyncPrefixPage.vue'
 
-const PAGE_LENGTH = 8
-
 const props = defineProps<SelectAsyncPrefixProps<Model, Data, QueryParams, OptionComponent>>()
 
 const emit = defineEmits<{
@@ -65,7 +63,7 @@ const emit = defineEmits<{
   (e: 'update:model-value', value: Model[]): void
 }>()
 
-const valueInString = computed(() => props.modelValue.slice(0, PAGE_LENGTH).join(','))
+const valueInString = computed(() => props.modelValue.slice(0, props.prefixMax).join(','))
 
 defineSlots<{
   option?: (props: {option: Data | undefined, index: number, skeleton: boolean}) => void

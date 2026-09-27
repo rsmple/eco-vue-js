@@ -186,7 +186,6 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 | `modelValue` | `Model \| ClearValue \| null \| undefined` | **required** | Selected value. |
 | `allowClear` | `AllowClear` | — | Adds a button that clears the value, emitting `clearValue`. |
 | `clearValue` | `ClearValue` | — | Value emitted when cleared. Defaults to `null`; set it explicitly to emit `undefined` or `''`. |
-| `searchModel` | `boolean` | — | Puts the selected value into the search text on focus, so it can be edited, and turns on `selectOnClose`. For string values. |
 | `createdData` | `Data` | — | Option to add to the loaded ones — for a selected value the query does not return, such as one created elsewhere. |
 | `useQueryFnOptions` | `UseQueryDefault<Data[], unknown> \| UseQueryDefault<Data[], QueryParamsOptions>` | — | Query that loads the options. Takes `queryParamsOptions` when the query has parameters. Use either this or `options`. |
 | `queryParamsOptions` | `QueryParamsOptions` | — | Parameters for `useQueryFnOptions`. |
@@ -200,7 +199,7 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 | `createOption` | `((search: string) => Data \| Promise<Data \| undefined> \| undefined)` | — | Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. |
 | `filterOptions` | `((option: Data) => boolean)` | — | Hides options for which it returns `false`. |
 | `hideOptionIcon` | `boolean` | — | Hides the check mark next to selected options in the menu. |
-| `selectOnClose` | `boolean` | — | When the menu closes with text typed, selects the option matching it exactly, or creates one with `createOption`. |
+| `searchModel` | `boolean` | — | Commits the typed text when the menu closes — selects the option matching it exactly, or creates one with `createOption`. In a single select, the selected value is also put into the search text on focus, so it can be edited. For string values. |
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
 | `placeholderEmpty` | `string` | — | Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. |
 | `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |
@@ -324,7 +323,7 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 | `filterOptions` | `((option: Data) => boolean)` | — | Hides options for which it returns `false`. |
 | `hideOptionIcon` | `boolean` | — | Hides the check mark next to selected options in the menu. |
 | `createdData` | `Data[]` | — | Options to add to the loaded ones — for selected values the query does not return, such as ones created elsewhere. |
-| `selectOnClose` | `boolean` | — | When the menu closes with text typed, selects the option matching it exactly, or creates one with `createOption`. |
+| `searchModel` | `boolean` | — | Commits the typed text when the menu closes — selects the option matching it exactly, or creates one with `createOption`. In a single select, the selected value is also put into the search text on focus, so it can be edited. For string values. |
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
 | `placeholderEmpty` | `string` | — | Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. |
 | `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |
@@ -443,7 +442,6 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 | `modelValue` | `Model \| ClearValue \| null` | **required** | Selected value. |
 | `allowClear` | `AllowClear` | — | Adds a button that clears the value, emitting `clearValue`. |
 | `clearValue` | `ClearValue` | — | Value emitted when cleared. Defaults to `null`; set it explicitly to emit `undefined` or `''`. |
-| `searchModel` | `boolean` | — | Puts the selected value into the search text on focus, so it can be edited, and turns on `selectOnClose`. For string values. |
 | `previewData` | `Data` | — | Selected option, shown in the field instead of loading it. |
 | `createdData` | `Data` | — | Option to add to the loaded ones — for a selected value the query does not return, such as one created elsewhere. |
 | `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |
@@ -456,14 +454,14 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 | `hidePrefix` | `boolean` | — | Hides the selected chips while the menu is open, leaving room to type. |
 | `createOption` | `((search: string) => Data \| Promise<Data \| undefined> \| undefined)` | — | Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. |
 | `hideOptionIcon` | `boolean` | — | Hides the check mark next to selected options in the menu. |
-| `selectOnClose` | `boolean` | — | When the menu closes with text typed, selects the option matching it exactly, or creates one with `createOption`. |
+| `searchModel` | `boolean` | — | Commits the typed text when the menu closes — selects the option matching it exactly, or creates one with `createOption`. In a single select, the selected value is also put into the search text on focus, so it can be edited. For string values. |
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
 | `placeholderEmpty` | `string` | — | Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. |
 | `useQueryFnPrefix` | `UseQueryDefault<PaginatedResponse<Data>, QueryParams>` | — | Paginated query that loads the selected options for the chips. Defaults to `useQueryFnOptions`. |
 | `searchField` | `keyof QueryParams` | — | Query parameter that receives the search text. Defaults to `search`. |
 | `valueQueryKey` | `string` | — | Query parameter that receives the selected values, comma-separated, when loading the chips. |
 | `prefixText` | `string` | — | Word after the count shown instead of chips when more than `prefixMax` values are selected. Defaults to "items". |
-| `prefixMax` | `number` | — | Most selected values shown as chips; above it, a count with a clear-all button is shown. Defaults to 8, which is also the upper limit. |
+| `prefixMax` | `number` | — | Most selected values shown as chips; above it, a count with a clear-all button is shown instead. |
 | `reverse` | `boolean` | — | Shows the check mark on options that are not selected instead of those that are — for a select that picks what to exclude. |
 | `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
 | `dropdownClass` | `string` | — | Classes for the menu's content box. |
@@ -543,6 +541,8 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 | --- | --- | --- |
 | `update:model-value` | `(EmitType, Data \| undefined)` | The new value, with its option — `clearValue` when cleared. |
 | `init-model` | — | A default value was selected by `useQueryFnDefault`. |
+| `focus` | `(FocusEvent \| undefined)` | The field was focused. |
+| `blur` | `(FocusEvent)` | The field lost focus. |
 
 #### Slots
 
@@ -576,7 +576,7 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 | `previewData` | `Data[]` | — | Selected options, used for the chips instead of loading them. |
 | `valueQueryKey` | `string` | `"id__in"` | Query parameter that receives the selected values, comma-separated, when loading the chips. |
 | `prefixText` | `string` | — | Word after the count shown instead of chips when more than `prefixMax` values are selected. Defaults to "items". |
-| `prefixMax` | `number` | — | Most selected values shown as chips; above it, a count with a clear-all button is shown. Defaults to 8, which is also the upper limit. |
+| `prefixMax` | `number` | `8` | Most selected values shown as chips; above it, a count with a clear-all button is shown instead. |
 | `reverse` | `boolean` | — | Shows the check mark on options that are not selected instead of those that are — for a select that picks what to exclude. |
 | `modelValue` | `Model[] \| undefined` | **required** | Selected values. The component does not change it — update it from `select` and `unselect`. |
 | `valueGetter` | `(value: Data) => Model` | **required** | Gets the value stored in the model from an option. |
@@ -587,7 +587,7 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 | `createOption` | `((search: string) => Data \| Promise<Data \| undefined> \| undefined)` | — | Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. |
 | `hideOptionIcon` | `boolean` | — | Hides the check mark next to selected options in the menu. |
 | `createdData` | `Data[]` | — | Options to add to the loaded ones — for selected values the query does not return, such as ones created elsewhere. |
-| `selectOnClose` | `boolean` | — | When the menu closes with text typed, selects the option matching it exactly, or creates one with `createOption`. |
+| `searchModel` | `boolean` | — | Commits the typed text when the menu closes — selects the option matching it exactly, or creates one with `createOption`. In a single select, the selected value is also put into the search text on focus, so it can be edited. For string values. |
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
 | `placeholderEmpty` | `string` | — | Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. |
 | `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |

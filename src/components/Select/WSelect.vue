@@ -278,7 +278,7 @@ const isDisabledComputed = computed(() => props.loading || isReadonly.value || i
 const hasCreateOption = computed(() => props.createOption && !isFetching.value && (!optionsFiltered.value.some(option => props.valueGetter(option) === search.value) || isModelValueSearch.value))
 
 const close = () => {
-  if (props.selectOnClose && focused.value && !isModelValueSearch.value) {
+  if (props.searchModel && focused.value && !isModelValueSearch.value) {
     const optionExact = optionsFiltered.value.find(option => props.valueGetter(option) === search.value)
 
     if (optionExact) select(props.valueGetter(optionExact), optionExact)

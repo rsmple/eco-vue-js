@@ -9,12 +9,12 @@
       createdData: createdData ? [createdData] as Data[] : undefined,
       hidePrefix: true,
       filterValue: filterValue === undefined ? modelValue : filterValue,
-      selectOnClose: props.searchModel ? props.searchModel : props.selectOnClose,
     }"
     :class="$attrs.class"
     @select="updateModelValue"
     @unselect="(value, data) => allowClear && updateModelValue(getClearValue(), data)"
-    @focus="searchModel && typeof modelValue === 'string' ? selectComponentRef?.setSearch(modelValue) : undefined"
+    @focus="searchModel && typeof modelValue === 'string' ? selectComponentRef?.setSearch(modelValue) : undefined; $emit('focus', $event)"
+    @blur="$emit('blur', $event)"
     @init-model="$emit('init-model')"
   >
     <template
@@ -91,6 +91,10 @@ const emit = defineEmits<{
   (e: 'update:model-value', value: EmitType, data: Data | undefined): void
   /** A default value was selected by `useQueryFnDefault`. */
   (e: 'init-model'): void
+  /** The field was focused. */
+  (e: 'focus', value: FocusEvent | undefined): void
+  /** The field lost focus. */
+  (e: 'blur', value: FocusEvent): void
 }>()
 
 const selectComponentRef = useTemplateRef('selectComponent')
