@@ -37,3 +37,4 @@ eco-vue-js-*.*.*.tgz
 
 docs/.vitepress/cache
 docs/.vitepress/dist
+docs/releases.md

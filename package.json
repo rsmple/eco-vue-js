@@ -16,8 +16,8 @@
     "lint:fix": "eslint . --concurrency auto --fix",
     "lint:inspect": "npx eslint --inspect-config",
     "docs:generate": "node build/docs-generate.ts",
-    "docs:dev": "npm run docs:generate && vitepress dev docs",
-    "docs:build": "node build/docs-generate.ts --check && vitepress build docs",
+    "docs:dev": "npm run docs:generate && node build/docs-releases.ts && vitepress dev docs",
+    "docs:build": "node build/docs-generate.ts --check && node build/docs-releases.ts && vitepress build docs",
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {

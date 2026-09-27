@@ -34,6 +34,8 @@ jobs:
 
       # Fails if generated API tables or example sources are stale.
       - run: npm run docs:build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # release notes for docs/releases.md
 
       - uses: actions/upload-pages-artifact@v4
         with:

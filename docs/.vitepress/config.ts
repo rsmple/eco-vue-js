@@ -56,12 +56,12 @@ export default defineConfig({
   themeConfig: {
     search: {provider: 'local'},
 
-    // Shown in the header bar; the releases page is the changelog.
+    // Shown in the header bar; the releases page is generated from GitHub releases by build/docs-releases.ts.
     nav: [
       {text: 'Guide', link: '/guide/getting-started', activeMatch: '^/guide/'},
       {text: 'Components', link: '/components/button', activeMatch: '^/components/'},
       {text: 'Recipes', link: '/recipes/list-with-fields', activeMatch: '^/recipes/'},
-      {text: `v${ version }`, link: 'https://github.com/rsmple/eco-vue-js/releases'},
+      {text: `v${ version }`, link: '/releases', activeMatch: '^/releases'},
     ],
 
     sidebar: buildSidebar(root),
