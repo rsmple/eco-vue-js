@@ -213,11 +213,17 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
+  /** An option was picked. Add it to `modelValue`. */
   (e: 'select', item: Model, data: Data): void
+  /** An option was removed, from its chip or the menu. Remove it from `modelValue`. */
   (e: 'unselect', item: Model, data: Data | undefined): void
+  /** The field was focused. */
   (e: 'focus', value: FocusEvent | undefined): void
+  /** The field lost focus. */
   (e: 'blur', value: FocusEvent): void
+  /** Error detail from a failed `useQueryFnOptions`, or `undefined` once it loads. */
   (e: 'update:query-options-error', value: string | undefined): void
+  /** A default value was selected by `useQueryFnDefault` or `useFirstDefault`. */
   (e: 'init-model'): void
 }>()
 
@@ -493,11 +499,17 @@ defineExpose({
 })
 
 defineSlots<{
+  /** Replaces the `title` text. */
   title?: () => void
+  /** Content between the title and the field. */
   subtitle?: () => void
+  /** Renders an option, in the menu and in the selected chips — `model` is `true` in a chip. Replaces `optionComponent`. */
   option?: (props: PartialNot<SelectOptionProps<Data>>) => void
+  /** Content to the right of the field. */
   right?: () => void
+  /** Replaces the selected chips. */
   prefix?: () => void
+  /** Content at the top of the menu, above the options. */
   content?: () => void
 }>()
 </script>

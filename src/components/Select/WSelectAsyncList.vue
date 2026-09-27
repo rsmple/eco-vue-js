@@ -36,7 +36,6 @@
         @select="$emit('select', $event)"
         @unselect="$emit('unselect', $event)"
         @update:count="$emit('update:count', $event)"
-        @update:model-value="$emit('update:model-value', $event)"
       >
         <template
           v-if="$slots.default"
@@ -98,7 +97,6 @@ const props = withDefaults(
 defineEmits<{
   (e: 'select', value: Model): void
   (e: 'unselect', value: Model): void
-  (e: 'update:model-value', value: Model[]): void
   (e: 'update:count', value: number): void
 }>()
 

@@ -106,7 +106,6 @@
         @select="select"
         @unselect="unselect"
         @create:option="create(search)"
-        @update:model-value="updateSelected"
       >
         <template #default="{option, selected, skeleton: skeletonList, index}">
           <slot
@@ -171,11 +170,17 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
+  /** An option was picked. Add it to `modelValue`. */
   (e: 'select', item: Model, data: Data): void
+  /** An option was removed, from its chip or the menu. Remove it from `modelValue`. */
   (e: 'unselect', item: Model, data: Data | undefined): void
+  /** Emits `[]` from the clear-all button shown with the count, when more than `prefixMax` values are selected. */
   (e: 'update:model-value', value: Model[]): void
+  /** A default value was selected by `useQueryFnDefault`. */
   (e: 'init-model'): void
+  /** The field was focused. */
   (e: 'focus', value: FocusEvent | undefined): void
+  /** The field lost focus. */
   (e: 'blur', value: FocusEvent): void
 }>()
 
@@ -326,11 +331,17 @@ defineExpose({
 })
 
 defineSlots<{
+  /** Replaces the `title` text. */
   title?: () => void
+  /** Content between the title and the field. */
   subtitle?: () => void
+  /** Content to the right of the field. */
   right?: (props: Record<string, never>) => void
+  /** Renders an option, in the menu and in the selected chips — `model` is `true` in a chip. Replaces `optionComponent`. */
   option?: (props: PartialNot<SelectOptionProps<Data>>) => void
+  /** Content at the top of the menu, above the options. */
   content?: () => void
+  /** Replaces the selected chips. */
   prefix?: (props: {modelValue: Model[]}) => void
 }>()
 </script>
