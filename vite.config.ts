@@ -6,8 +6,8 @@ import dts from 'vite-plugin-dts'
 import {existsSync, renameSync, rmSync} from 'node:fs'
 import {URL, fileURLToPath} from 'node:url'
 
-import {svgComponent} from './build/svg-component'
-import {writeImports} from './build/write-imports'
+import {svgComponent} from './build/svg-component.ts'
+import {writeImports} from './build/write-imports.ts'
 
 await writeImports()
 
