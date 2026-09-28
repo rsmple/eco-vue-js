@@ -9,7 +9,7 @@
     }"
     :disabled="disabled || skeleton"
     :aria-label="titleText ? undefined : title"
-    @click="!disabled && !skeleton && $emit('click', $event)"
+    @click="handleClick"
   >
     <WSkeleton
       v-if="skeleton"
@@ -45,7 +45,14 @@
         </template>
       </slot>
 
-      <WShine v-if="!disabled && !isBackdrop" />
+      <WShine v-if="!disabled && !isBackdrop && !loading" />
+
+      <div
+        v-if="loading"
+        class="absolute inset-0 rounded-inherit overflow-clip text-primary-darkest/10 dark:text-primary-light/20"
+      >
+        <div class="absolute inset-0 bg-linear-90 from-current/0 to-current/0 via-current animate-ticker" />
+      </div>
     </div>
 
     <div
@@ -64,6 +71,7 @@
 
     <WTooltip
       v-if="tooltipText || (!titleText && title)"
+      ref="tooltip"
       :text="tooltipText ?? (titleText ? undefined : title)"
       left
     />
@@ -72,6 +80,8 @@
 
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
+
+import {useTemplateRef} from 'vue'
 
 import WCounter from '@/components/Counter/WCounter.vue'
 import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
@@ -97,9 +107,10 @@ interface Props extends Partial<LinkProps> {
   skeleton?: boolean
   tooltipText?: string
   titleText?: boolean
+  loading?: boolean
 }
 
-withDefaults(
+const props = withDefaults(
   defineProps<Props>(),
   {
     icon: undefined,
@@ -117,10 +128,18 @@ withDefaults(
   },
 )
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'click', event: MouseEvent): void
 }>()
 
 const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()
 const isBackdrop = useIsBackdrop()
+const tooltipRef = useTemplateRef('tooltip')
+
+const handleClick = (event: MouseEvent) => {
+  if (props.disabled || props.skeleton) return
+
+  tooltipRef.value?.close()
+  emit('click', event)
+}
 </script>
