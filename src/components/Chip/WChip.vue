@@ -23,8 +23,11 @@ import {useComponentStatesSkeleton} from '@/utils/useComponentStates'
 
 const props = withDefaults(
   defineProps<{
+    /** Label of the chip. The default slot replaces it. */
     text?: string
+    /** Color scheme of the chip. */
     semanticType?: SemanticType
+    /** Shows a placeholder instead of the chip. When unset, inherits the skeleton state provided by a parent. */
     skeleton?: boolean
   }>(),
   {
@@ -33,6 +36,11 @@ const props = withDefaults(
     skeleton: undefined,
   },
 )
+
+defineSlots<{
+  /** Content of the chip, replacing `text`. */
+  default?: () => void
+}>()
 
 const {isSkeleton} = useComponentStatesSkeleton(props)
 

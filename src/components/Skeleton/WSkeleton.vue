@@ -10,6 +10,11 @@
 <script lang="ts" setup>
 import {computed, useId} from 'vue'
 
+defineSlots<{
+  /** Content inside the placeholder. With `w-skeleton-w-max` and hidden with `opacity-0`, it sizes the skeleton to the content it stands for. */
+  default?: () => void
+}>()
+
 const id = useId()
 
 const skeletonWidth = computed(() => {

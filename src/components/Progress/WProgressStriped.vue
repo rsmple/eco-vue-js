@@ -13,9 +13,6 @@
     <div
       v-if="modelValue < 100 && modelValue > 0"
       class="absolute right-0 h-full bg-gray-200 transition-[width] dark:bg-gray-800"
-      :class="{
-        'w-progress-striped before:animate-move-horizontal': modelValue === 0,
-      }"
       :style="{
         width: (100 - modelValue) + '%',
       }"
@@ -25,6 +22,7 @@
 
 <script setup lang="ts">
 defineProps<{
+  /** Filled part, from 0 to 100. At 0 a shimmer runs over the empty track, while waiting to start; at 100 the full bar pulses. */
   modelValue: number
 }>()
 </script>

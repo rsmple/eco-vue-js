@@ -11,6 +11,7 @@
 
 <script setup lang="ts">
 defineProps<{
+  /** Filled part, from 0 to 100. */
   modelValue: number
 }>()
 </script>

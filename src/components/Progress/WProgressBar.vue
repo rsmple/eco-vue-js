@@ -39,7 +39,9 @@ import {progressBarBorderClass, progressBarClass} from './utils/progressBarClass
 
 withDefaults(
   defineProps<{
+    /** Filled part, from 0 to 1, shown as a percentage. `null` shows the whole bar striped with a spinner, for progress not known yet. */
     modelValue: number | null
+    /** Color scheme of the fill and the border. */
     semanticType?: SemanticType
   }>(),
   {

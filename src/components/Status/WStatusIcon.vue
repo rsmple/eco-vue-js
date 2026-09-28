@@ -19,7 +19,9 @@ import IconNegativeInfo from '@/assets/icons/IconNegativeInfo.svg?component'
 import IconSlash from '@/assets/icons/IconSlash.svg?component'
 
 defineProps<{
+  /** Shows a green check. */
   hasValue?: boolean
+  /** Shows a red exclamation mark, over `hasValue`. */
   hasError?: boolean
 }>()
 </script>

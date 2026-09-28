@@ -17,9 +17,11 @@ import {numberCompactFormatter} from '@/utils/utils'
 
 const props = withDefaults(
   defineProps<{
+    /** Number shown, in compact notation — 1.2K for 1200. */
     count: number
+    /** Lowest count that makes the counter shake when it changes. */
     trigger?: number
-    small?: boolean
+    /** Color scheme of the badge. */
     semanticType?: SemanticType
   }>(),
   {
