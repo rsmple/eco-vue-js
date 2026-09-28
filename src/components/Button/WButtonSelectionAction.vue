@@ -11,7 +11,8 @@
     }"
     :is="to !== undefined ? disabled ? 'a' : WRouterLink : tag ?? 'button'"
     :disabled="disabled || disableMessage !== undefined"
-    :aria-label="title ? undefined : tooltipText"
+    :aria-label="label ?? tooltipText ?? title"
+    :aria-busy="loading || undefined"
     class="
       disabled:text-description relative isolate flex
       select-none items-center bg-none
@@ -80,6 +81,7 @@ import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 defineProps<{
   title?: string
+  label?: string
   icon: SVGComponent
   disableMessage?: string
   disabled?: boolean

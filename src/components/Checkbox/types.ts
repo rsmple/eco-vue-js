@@ -24,8 +24,10 @@ export interface CheckboxProps {
   skeleton?: boolean
   /** Draws a `null` model as a smaller mark, the mixed state, instead of a filled box. */
   intermediate?: boolean
-  /** Tooltip on hover over the box. Not shown on touch devices. */
+  /** Tooltip on hover over the box. Not shown on touch devices. Also names a checkbox without `title` or `label` for screen readers. */
   tooltipText?: string
+  /** Names a checkbox without a visible `title` for screen readers. */
+  label?: string
   /** Aligns the box with the first line of a multi-line title instead of centering it. */
   alignTop?: boolean
   /** Drops the bottom padding added under a checkbox with a title. */
@@ -46,7 +48,7 @@ export type GroupModelStringified<Model> = Exclude<Model, null | boolean | undef
 
 interface CheckboxGroupPropsBase<Model extends number | string | null | boolean | undefined>
   extends Omit<FieldWrapperProps, 'modelValue'>,
-  Omit<CheckboxProps, 'modelValue' | 'title' | 'icon' | 'intermediate' | 'tooltipText'> {
+  Omit<CheckboxProps, 'modelValue' | 'title' | 'icon' | 'intermediate' | 'tooltipText' | 'label'> {
   /** Selected value. */
   modelValue: Model | undefined
   /** Lays the options out in a row that wraps, instead of a column. */

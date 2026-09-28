@@ -10,6 +10,8 @@
         :disabled="disabled"
         :active="isOpen"
         :tooltip-text="isOpen ? undefined : 'Sort'"
+        label="Sort"
+        :aria-expanded="isOpen"
         @click="isOpen = !isOpen"
       />
     </template>

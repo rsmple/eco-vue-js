@@ -11,6 +11,8 @@
         :disabled="disabled"
         :active="isOpen"
         :tooltip-text="isOpen ? undefined : 'Table settings'"
+        label="Table settings"
+        :aria-expanded="isOpen"
         @click="isOpen = !isOpen"
       />
     </template>

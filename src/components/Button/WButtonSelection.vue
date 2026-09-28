@@ -18,6 +18,7 @@
           <WButtonSelectionAction
             title="More"
             :icon="markRaw(IconMore)"
+            :aria-expanded="isOpen"
             :disable-message="disableMessageValue"
             class="border-l border-solid border-gray-300 dark:border-gray-700"
             @click="isOpen = !isOpen"

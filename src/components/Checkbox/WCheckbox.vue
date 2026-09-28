@@ -16,6 +16,7 @@
     :aria-checked="modelValue === null ? 'mixed' : modelValue"
     :aria-disabled="isDisabled || isSkeleton"
     :aria-readonly="isReadonly"
+    :aria-label="title || $slots.default ? undefined : label ?? tooltipText"
     @click="toggle"
     @mousedown="$emit('mousedown', $event)"
   >

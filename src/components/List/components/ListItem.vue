@@ -60,6 +60,7 @@
               :model-value="selected"
               :disabled="skeleton"
               :readonly="false"
+              label="Select row"
               :align-top="alignTop"
               :less-transitions="allowSelectHover"
               class="h-full px-(--w-list-padding,1rem)"
@@ -91,6 +92,7 @@
             :model-value="selected"
             :disabled="skeleton"
             :readonly="false"
+            label="Select row"
             class="p---inner-margin -my---inner-margin -mr---inner-margin justify-end self-start"
             :class="{
               'opacity-50': allowSelectHover,
@@ -398,10 +400,10 @@ const isActionShown = computed<boolean>(() => !props.skeleton && (action.value !
 
 const getActionProps = (scope: UniformScope<Data> | undefined) => {
   switch (action.value) {
-    case 'select': return {tag: 'button' as const, onClick: () => emit('toggle:selected', props.value, props.position)}
-    case 'action': return {tag: 'button' as const, onClick: () => emit('click:action', {item: props.item, setter: props.setter, scope})}
-    case 'link': return {tag: WRouterLinkRaw, props: {to: to.value}}
-    case 'open': return {tag: 'button' as const, onClick: toggle}
+    case 'select': return {tag: 'button' as const, 'aria-label': 'Select row', onClick: () => emit('toggle:selected', props.value, props.position)}
+    case 'action': return {tag: 'button' as const, 'aria-label': 'Open row', onClick: () => emit('click:action', {item: props.item, setter: props.setter, scope})}
+    case 'link': return {tag: WRouterLinkRaw, 'aria-label': 'Open row', props: {to: to.value}}
+    case 'open': return {tag: 'button' as const, 'aria-label': 'Expand row', 'aria-expanded': isOpen.value, onClick: toggle}
     default: return {tag: 'div' as const}
   }
 }

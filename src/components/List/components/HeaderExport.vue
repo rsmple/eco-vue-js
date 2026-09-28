@@ -8,6 +8,7 @@
         :icon="markRaw(IconExport)"
         :active="isOpen"
         title="Export"
+        :aria-expanded="isOpen"
         @click="isOpen = !isOpen"
       />
     </template>

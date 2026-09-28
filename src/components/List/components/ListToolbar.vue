@@ -96,6 +96,7 @@
           v-if="allowSelect"
           :icon="markRaw(IconRange)"
           :active="isShift"
+          :aria-pressed="isShift"
           tooltip-text="Select range"
           class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
           @click.stop="$emit('set:is-selecting')"

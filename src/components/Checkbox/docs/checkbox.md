@@ -141,7 +141,8 @@ import WCheckbox from 'eco-vue-js/dist/components/Checkbox/WCheckbox.vue'
 | `loading` | `boolean` | — | Shows a spinner in the box and ignores clicks. |
 | `skeleton` | `boolean` | — | Renders in a gray loading state and ignores clicks. When unset, inherits the skeleton state provided by a parent. |
 | `intermediate` | `boolean` | — | Draws a `null` model as a smaller mark, the mixed state, instead of a filled box. |
-| `tooltipText` | `string` | — | Tooltip on hover over the box. Not shown on touch devices. |
+| `tooltipText` | `string` | — | Tooltip on hover over the box. Not shown on touch devices. Also names a checkbox without `title` or `label` for screen readers. |
+| `label` | `string` | — | Names a checkbox without a visible `title` for screen readers. |
 | `alignTop` | `boolean` | — | Aligns the box with the first line of a multi-line title instead of centering it. |
 | `noMargin` | `boolean` | — | Drops the bottom padding added under a checkbox with a title. |
 | `lessTransitions` | `boolean` | — | Checks and unchecks without the scale animation. |
