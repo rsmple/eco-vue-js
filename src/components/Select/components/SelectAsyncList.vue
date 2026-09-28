@@ -57,8 +57,6 @@
       :value-getter="valueGetter"
       :query-options="queryOptions"
       :skeleton-length="count || 1"
-      :last-child="!allowCreate"
-      header-top-ignore
       min-height
       @update:count="$emit('update:count', $event); count = $event; updateCursor(undefined)"
     >

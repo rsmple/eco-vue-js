@@ -82,8 +82,6 @@ const props = withDefaults(
     transition?: boolean
     resetting?: boolean
     emptyStub?: string
-    minHeight?: boolean
-    lastChild?: boolean
     pageClass?: string
     refetchInterval?: number | false
     queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>

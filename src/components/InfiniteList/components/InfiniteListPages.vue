@@ -23,8 +23,6 @@
       :transition="transition"
       :resetting="isResettingPage"
       :empty-stub="emptyStub"
-      :min-height="minHeight"
-      :last-child="lastChild"
       :page-class="pageClass"
       :refetch-interval="refetchInterval"
       :query-options="queryOptions"
@@ -35,7 +33,7 @@
       @update:count="updateCount($event); $emit('update:count', $event)"
       @update:pages-count="updatePagesCount"
       @remove:page="removePage"
-      @refetch="refetchNextPages(index)"
+      @refetch="refetchNextPages(page)"
       @fetched="isResettingPage = false"
       @update:error="$emit('update:error', $event)"
     >
@@ -92,11 +90,9 @@ const props = withDefaults(
     skeletonLength?: number
     transition?: boolean
     pageLength?: number
-    headerTop?: number
     headerHeight?: number
     minHeight?: boolean
     minHeightOnly?: boolean
-    lastChild?: boolean
     excludeParams?: (keyof QueryParams)[]
     emptyStub?: string
     pageClass?: string
@@ -109,7 +105,6 @@ const props = withDefaults(
   {
     skeletonLength: undefined,
     pageLength: 24,
-    headerTop: 0,
     headerHeight: 0,
     excludeParams: undefined,
     emptyStub: undefined,

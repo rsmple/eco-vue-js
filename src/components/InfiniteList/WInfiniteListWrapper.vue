@@ -63,7 +63,9 @@ import {useHeader} from '../HeaderBar/use/useHeader'
 defineOptions({inheritAttrs: false})
 
 const props = defineProps<{
+  /** Whether the top of the content starts in view, before the first scroll is observed. `false` when opening at a later page. */
   initIsIntersecting?: boolean
+  /** Keeps the sticky header out of the app header bar's padding while scrolled. */
   noHeaderUpdate?: boolean
 }>()
 
@@ -109,7 +111,9 @@ onBeforeUnmount(() => {
 })
 
 defineSlots<{
+  /** Content that sticks to the top while the page scrolls. `updateHeader` re-measures it right away. */
   header: (props: InfiniteListHeaderScope) => VNode[]
+  /** The scrolling content. Gets the header's `headerHeight` and `headerTop`. */
   default: (props: InfiniteListHeaderScope) => VNode[]
 }>()
 </script>
