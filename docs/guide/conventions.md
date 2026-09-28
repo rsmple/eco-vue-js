@@ -32,7 +32,7 @@ Props that take a component — icons, list fields, menus, bulk actions, option 
 
 ## Disabled, readonly and skeleton are inherited
 
-Inputs and buttons read `disabled`, `readonly` and `skeleton` from the nearest parent that provides them (a form, a list row, a modal) when the prop is left unset. Only pass the prop to override the inherited state — passing `false` forces the control enabled even inside a disabled form.
+Inputs and buttons read `disabled`, `readonly` and `skeleton` from the nearest parent that provides them with `useProvideDisabled`, `useProvideReadonly` or `useProvideSkeleton` from `eco-vue-js/dist/utils/provide` when the prop is left unset. A [form](/components/form) passes its states to its fields through the scope instead. Only pass the prop to override the inherited state — passing `false` forces the control enabled even inside a disabled form.
 
 ## Semantic types, not colors
 

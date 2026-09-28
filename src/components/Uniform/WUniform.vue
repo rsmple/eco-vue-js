@@ -78,28 +78,50 @@ import {getChangedPayload} from './utils/utils'
 import WEmptyComponent from '../EmptyComponent/WEmptyComponent.vue'
 
 type PropsBase = {
+  /** Key the form registers under with its parent form and with tabs. Generated when unset. */
   id?: string
+  /** The model to edit. A field gets its parent's model with the scope and reads the value at `field`. */
   modelValue?: Model
+  /** Initial model that `hasChanges` compares against, when the form has no copy of its own. */
   modelValueInit?: Model
+  /** Key in the parent's model that this form or field edits. */
   field?: Field
+  /** Builds the editable model from the given or loaded value. With it, the form keeps its own copy of the model instead of emitting `update:model-value`. */
   initData?: (value: InnerModel) => ResultModel
+  /** Saves the model on submit. Gets only the changed fields unless `fullPayload`. The result becomes the new initial model and is emitted with `success`; the field errors of a rejected `ApiError` are shown on the fields. */
   apiMethod?: (value: Partial<ResultModel>) => Promise<RequestResponse<InnerModel>> | Promise<InnerModel> | InnerModel | undefined | void
+  /** Passed to the slots, and with the scope to every field of the form. */
   readonly?: boolean
+  /** Passed to the slots, and with the scope to every field of the form. */
   disabled?: boolean
 
+  /** Element to wrap the content in. Renders no wrapper when unset. */
   tag?: string
+  /** Title of the field, passed to the `field` slot. Also names the field in validation messages. */
   title?: string
+  /** The field must have a value. Checked before `validate` and passed to the `field` slot. */
   required?: boolean
+  /** Counts the field in the form's `hasValue`, which tabs show with `showHasValue`, without making it required. */
   mandatory?: boolean
+  /** Passed to the slots, and with the scope to every field of the form. Set on its own while `useQueryFn` loads. */
   skeleton?: boolean
+  /** Saves every change right away. The changed field shows a spinner instead of the whole form being disabled. */
   async?: boolean
+  /** Functions returning an error message for an invalid value. Errors show after a submit attempt and clear as soon as the value is valid. */
   validate?: ValidateFn | ValidateFn[]
+  /** Submitting state of a parent form, received with the scope. */
   submitting?: boolean
+  /** Keeps the current model after a successful submit instead of taking the result as the new initial model. */
   noInit?: boolean
+  /** Submits the whole model instead of only the changed fields. On a field, sends its whole object when anything in it changed. */
   fullPayload?: boolean
+  /** Overrides the `hasValue` state reported to the parent, e.g. while the fields are not mounted. */
   initHasValue?: boolean | null
+  /** Overrides the error state reported to the parent, e.g. while the fields are not mounted. */
   initHasError?: boolean
+  /** Never reports unsaved changes. */
   noChanges?: boolean
+  /** Returns the props of a confirm modal to show before a change is applied. The change is dropped on cancel; returning nothing applies it at once. */
   confimGetter?: (payload: ResultModel, data: Model) => ConfirmProps | Promise<ConfirmProps | undefined> | undefined
 }
 
@@ -110,8 +132,10 @@ type PropsNoQuery = {
 }
 
 type PropsQueryWithParams = {
+  /** Query that loads the model when `modelValue` is not given. The form shows skeletons until it loads. */
   // eslint-disable-next-line vue/no-required-prop-with-default
   useQueryFn: UseQueryDefault<InnerModel, QueryParams>
+  /** Params of `useQueryFn`. */
   // eslint-disable-next-line vue/no-required-prop-with-default
   queryParams: QueryParams
   noParams?: never
@@ -121,6 +145,7 @@ type PropsQueryWithNoParams = {
   // eslint-disable-next-line vue/no-required-prop-with-default
   useQueryFn: UseQueryDefault<InnerModel, undefined>
   queryParams?: never
+  /** `useQueryFn` takes no params. */
   // eslint-disable-next-line vue/no-required-prop-with-default
   noParams: true
 }
@@ -145,16 +170,22 @@ const props = withDefaults(defineProps<PropsBase & (PropsNoQuery | PropsQueryWit
 })
 
 const emit = defineEmits<{
+  /** A changed value and the path of keys to it, from a form without its own copy of the model. */
   (e: 'update:model-value', value: ResultModel, fields: (string | number)[]): void
+  /** `apiMethod` resolved, with its result or, when it returned nothing, the submitted payload. */
   (e: 'success', value: InnerModel): void
+  /** The form was unmounted, with its `id`. */
   (e: 'unmounted', id: string): void
+  /** Asks the parent to take the current model as the initial one, from a form without its own copy of the model. */
   (e: 'init-model'): void
 }>()
 
 const id = props.id ?? useId()
 
 const slots = defineSlots<{
+  /** Renders the control of a field. Spread the scope onto it with `v-bind`: it carries the model, title, error message and states. */
   field?: (props: UniformScopeField<ResultModel>) => VNode[]
+  /** Renders the fields of a form. Spread the scope onto each nested WUniform with `v-bind`; it also has `submit`, `submitting` and `hasChanges`. */
   default?: (props: UniformScope<ResultModel, InnerModel>) => VNode[]
 }>()
 
