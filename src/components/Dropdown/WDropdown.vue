@@ -46,6 +46,7 @@ import {type HorizontalGetter, OriginX, type VerticalGetter, horizontalGetterOrd
 const props = defineProps<DropdownProps>()
 
 const emit = defineEmits<{
+  /** The page scrolled or resized while `emitUpdate` is set, e.g. to close the dropdown. */
   (e: 'update:rect'): void
 }>()
 
@@ -136,6 +137,7 @@ watch(toRef(props, 'parentElement'), () => {
 })
 
 defineSlots<{
+  /** Content of the dropdown. `isTop` is true when it opened above the parent, `isLeft` and `isRight` when it opened to that side, and `atBottom` when the parent is in the lower half of the screen. */
   default: (props: DropdownDefaultSlotScope) => VNode[]
 }>()
 

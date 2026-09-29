@@ -43,11 +43,20 @@ import WDismissable from '@/components/Dismissable/WDismissable.vue'
 import {BASE_ZINDEX_BOTTOM_SHEET, wBaseZIndex} from '@/utils/utils'
 
 defineProps<{
+  /** Opens the sheet. */
   isOpen: boolean
 }>()
 
 defineEmits<{
+  /** The sheet was swiped down or the backdrop was clicked. Set `isOpen` to `false` on it. */
   (e: 'close'): void
+}>()
+
+defineSlots<{
+  /** Element that opens the sheet, rendered in place and again at the top of the sheet — `unclickable` is `true` for the one in place and `false` for the copy. */
+  toggle?: (props: {unclickable: boolean, isTop?: boolean}) => void
+  /** Content of the sheet, which scrolls under the toggle. */
+  content?: () => void
 }>()
 
 const baseZIndex = inject(wBaseZIndex, 0)

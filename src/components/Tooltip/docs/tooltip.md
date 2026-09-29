@@ -107,3 +107,17 @@ import WTooltip from 'eco-vue-js/dist/components/Tooltip/WTooltip.vue'
 | `default` | — | Rich tooltip content, replacing `text`. It stays reactive while the tooltip is open. |
 
 <!-- @api-end -->
+
+<!-- @api WTooltipContainer -->
+
+### WTooltipContainer
+
+```ts
+import WTooltipContainer from 'eco-vue-js/dist/components/Tooltip/WTooltipContainer.vue'
+```
+
+#### Props
+
+_No props._
+
+<!-- @api-end -->

@@ -1,6 +1,6 @@
 ---
 group: Data
-description: WInfoCard and WInfoCardNegative notes, WExpansion and WExpansionItem for content that expands, WNumberFormatter for numbers and percentages, and WTextOverflow for one line that scrolls on hover.
+description: WInfoCard and WInfoCardNegative notes, WExpansion and WExpansionItem for content that expands, WNumberFormatter for numbers and percentages, WTextOverflow for one line that scrolls on hover, and WImageViewer for an image thumbnail.
 ---
 
 # Content blocks
@@ -79,6 +79,8 @@ import IconCheckCircle from 'eco-vue-js/dist/assets/icons/IconCheckCircle'
 `WExpansionItem` adds a toggle row with a title and an arrow. It doesn't open itself: it emits `toggle` and takes `isOpen`, so the page decides — e.g. one item open at a time, as below. `hasFlag` puts a dot after the title. The row spans the content's inner margin (`--inner-margin`), like list rows.
 
 `WNumberFormatter` shows a number with thousands separators, or a fraction as a percentage with `percent`. `compact` shortens it, 12840 to 13K, with the full number in a tooltip. `WTextOverflow` shows one line cut at its width, and scrolls the rest into view on hover — or on hover of a parent with the `group/overflow` class, such as a list row.
+
+`WImageViewer` shows an image URL as a thumbnail with its file name, under an optional `title`; a click opens the full image in a modal.
 
 <!-- @example Expansion/Basic -->
 
@@ -311,5 +313,23 @@ _No props._
 | Slot | Props | Description |
 | --- | --- | --- |
 | `default` | — | One line of text. When it is wider than the component, hovering scrolls it to its end. |
+
+<!-- @api-end -->
+
+<!-- @api WImageViewer -->
+
+### WImageViewer
+
+```ts
+import WImageViewer from 'eco-vue-js/dist/components/ImageViewer/WImageViewer.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `modelValue` | `string` | — | URL of the image. Clicking the thumbnail opens it full size in a modal. Without it, a placeholder is shown. |
+| `title` | `string` | — | Label above the thumbnail. |
+| `skeleton` | `boolean` | — | Shows placeholders for the title and the thumbnail. |
 
 <!-- @api-end -->

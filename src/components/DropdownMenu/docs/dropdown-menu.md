@@ -168,6 +168,15 @@ const visible = ref(['Title', 'Author', 'Year'])
 
 `WMenuItem` is a row for the content of a custom menu — the row that `WButtonMoreItem` and the list menus are built from. It is a button, a router link with `to`, or a plain link with `href` (and `download` for a file). `active` marks the picked option with a check; `false` keeps room for the check, so that the rows of a picker line up. `loading` shows a spinner over it while its action runs.
 
+## Building blocks
+
+The menus are made of smaller parts, which also work on their own:
+
+- **`WDropdown`** places its content in a fixed layer against `parentElement` — an element or a text selection `Range` — and follows it as the page scrolls. `WDropdownMenu` adds the toggle and the teleport to `<body>`; the tooltips use it as well.
+- **`WClickOutside`** emits `click` on a click or right-click anywhere outside it. The click that mounted it doesn't count, so it can wrap content opened by a click.
+- **`WBottomSheet`** is the phone version of a dropdown: a sheet that slides up from the bottom with the toggle repeated at its top, and emits `close` when swiped down or when the backdrop is clicked.
+- **`WDismissable`** is the swipe under the sheet: a full-screen layer whose content scrolls up into view when `isOpen` turns on, and emits `close` when it is scrolled mostly out of view.
+
 ## API
 
 <!-- @api WDropdownMenu -->
@@ -382,5 +391,128 @@ import WButtonMoreItem from 'eco-vue-js/dist/components/Button/WButtonMoreItem.v
 | --- | --- | --- |
 | `default` | — | Label. Replaces `text`. |
 | `icon` | — | Icon after the label. Replaces `icon`. |
+
+<!-- @api-end -->
+
+<!-- @api WDropdown -->
+
+### WDropdown
+
+```ts
+import WDropdown from 'eco-vue-js/dist/components/Dropdown/WDropdown.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `horizontalAlign` | `HorizontalAlign` | **required** | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
+| `top` | `boolean` | — | Prefers opening above the parent. |
+| `bottom` | `boolean` | — | Always opens below the parent. |
+| `parentElement` | `Pick<Element, "getBoundingClientRect">` | **required** | Element (or range) the dropdown is positioned against. |
+| `updateAlign` | `boolean` | — | Picks the placement again as the parent moves, instead of keeping the first one. |
+| `emitUpdate` | `boolean` | — | Emits `update:rect` on scroll and resize instead of following the parent. |
+| `innerClass` | `string` | — | Classes for the dropdown's content box. Defaults to `w-max`. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `update:rect` | — | The page scrolled or resized while `emitUpdate` is set, e.g. to close the dropdown. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `default` | `DropdownDefaultSlotScope` | Content of the dropdown. `isTop` is true when it opened above the parent, `isLeft` and `isRight` when it opened to that side, and `atBottom` when the parent is in the lower half of the screen. |
+
+<!-- @api-end -->
+
+<!-- @api WClickOutside -->
+
+### WClickOutside
+
+```ts
+import WClickOutside from 'eco-vue-js/dist/components/ClickOutside/WClickOutside.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `noFilter` | `boolean` | — | Emits `click` on clicks inside the element too. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `click` | — | A click or right-click outside the element. Clicks in the same tick as mounting, such as the one that opened it, are ignored. |
+| `mouseenter` | `(value: MouseEvent)` | The pointer entered the element. |
+| `mouseleave` | `(value: MouseEvent)` | The pointer left the element. |
+| `mousedown` | `(value: MouseEvent)` | A mouse button was pressed on the element. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `default` | — | Content that clicks count as inside of, such as a dropdown's content. |
+
+<!-- @api-end -->
+
+<!-- @api WBottomSheet -->
+
+### WBottomSheet
+
+```ts
+import WBottomSheet from 'eco-vue-js/dist/components/BottomSheet/WBottomSheet.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `isOpen` | `boolean` | **required** | Opens the sheet. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `close` | — | The sheet was swiped down or the backdrop was clicked. Set `isOpen` to `false` on it. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `toggle` | `{ unclickable: boolean; isTop?: boolean \| undefined; }` | Element that opens the sheet, rendered in place and again at the top of the sheet — `unclickable` is `true` for the one in place and `false` for the copy. |
+| `content` | — | Content of the sheet, which scrolls under the toggle. |
+
+<!-- @api-end -->
+
+<!-- @api WDismissable -->
+
+### WDismissable
+
+```ts
+import WDismissable from 'eco-vue-js/dist/components/Dismissable/WDismissable.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `isOpen` | `boolean` | **required** | Shows the layer and scrolls the content into view. |
+| `contentClass` | `string` | — | Class of the content's box. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `close` | — | The content was swiped or scrolled mostly out of view, or the space above it was clicked. Set `isOpen` to `false` on it. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `default` | `{ hide: () => void; }` | Content that slides up from the bottom. `hide` slides it out, which then emits `close`. |
 
 <!-- @api-end -->

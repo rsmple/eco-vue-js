@@ -34,12 +34,20 @@
 import {onBeforeUnmount, onMounted, useTemplateRef, watch} from 'vue'
 
 const props = defineProps<{
+  /** Shows the layer and scrolls the content into view. */
   isOpen: boolean
+  /** Class of the content's box. */
   contentClass?: string
 }>()
 
 const emit = defineEmits<{
+  /** The content was swiped or scrolled mostly out of view, or the space above it was clicked. Set `isOpen` to `false` on it. */
   (e: 'close'): void
+}>()
+
+defineSlots<{
+  /** Content that slides up from the bottom. `hide` slides it out, which then emits `close`. */
+  default?: (props: {hide: () => void}) => void
 }>()
 
 const containerRef = useTemplateRef('container')

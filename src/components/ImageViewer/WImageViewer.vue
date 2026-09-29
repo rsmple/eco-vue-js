@@ -55,8 +55,11 @@ import {Modal} from '@/utils/Modal'
 const ImageModal = defineAsyncComponent(() => import('./components/ImageModal.vue'))
 
 const props = defineProps<{
+  /** URL of the image. Clicking the thumbnail opens it full size in a modal. Without it, a placeholder is shown. */
   modelValue?: string
+  /** Label above the thumbnail. */
   title?: string
+  /** Shows placeholders for the title and the thumbnail. */
   skeleton?: boolean
 }>()
 
