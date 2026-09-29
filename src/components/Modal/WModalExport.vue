@@ -78,6 +78,7 @@ import WSpinner from '../Spinner/WSpinner.vue'
 const props = defineProps<ModalExportProps<Model, QueryParams>>()
 
 const emit = defineEmits<{
+  /** The file was downloaded, or the modal was closed. */
   (e: 'close:modal'): void
 }>()
 

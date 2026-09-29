@@ -27,16 +27,28 @@ export interface ConfirmModalProps {
 }
 
 export type ModalExportProps<Model, QueryParams> = {
+  /** Format of the file: the items as JSON, rows of CSV, or Markdown sections. */
   format: 'json' | 'csv' | 'md'
+  /** Start of the file name, before the date. */
   fileName?: string
+  /** Title of the modal, or a function of the number of items. Defaults to one that names the format. */
   title?: string | ((count: number) => string)
+  /** Text of the close button. Defaults to "Close". */
   cancelText?: string
+  /** Text of the download button. Defaults to "Download". */
   downloadText?: string
+  /** Query the items are loaded with, page by page when it is paginated. */
   useQueryFn?: UseQueryDefault<PaginatedResponse<Model>, QueryParams> | UseQueryDefault<Model[], QueryParams>
+  /** Params of the query or `apiMethod`, such as the list's filters. */
   initQueryParams: QueryParams
+  /** Loads all the items in one request, instead of `useQueryFn`. */
   apiMethod?: (queryParams: QueryParams) => Promise<Model[]>
+  /** Header row of the CSV. */
   header?: string[]
+  /** Rows of the CSV for an item. Needed for `csv`. */
   prepare?: (item: Model, index: number) => string[][] | Promise<string[][]>
+  /** Markdown of an item. Needed for `md`. */
   toMarkdown?: (item: Model, index: number) => string
+  /** Called once the file is downloaded. */
   resolve?: () => void
 }

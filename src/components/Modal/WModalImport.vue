@@ -8,7 +8,7 @@
       <div class="mb-4">
         <WProgressStriped
           :model-value="progress"
-          class="bg-primary dark:bg-primary-dark"
+          class="h-1.5"
         />
 
         <div class="text-description mt-1 text-end text-xs">
@@ -42,16 +42,24 @@ import {numberFormatter} from '@/utils/utils'
 import WProgressStriped from '../Progress/WProgressStriped.vue'
 
 const props = defineProps<{
+  /** Creates one item. All items are sent at once; `config.signal` aborts a request. */
   createMethod: (item: Item, config: RequestConfig) => Promise<RequestResponse<unknown>>
+  /** Items to create. */
   items: Item[]
+  /** Title of the modal. Defaults to "Importing N items". */
   title?: string
+  /** Text of the button once every item is sent. Defaults to "Done". */
   successText?: string
+  /** Text of the button while items are being sent. Defaults to "Abort upload". */
   abortText?: string
+  /** Called when every item is sent, or when the modal is closed after that. */
   resolve?: () => void
+  /** Called with the number of aborted requests when the upload is aborted. */
   reject?: (length: number) => void
 }>()
 
 const emit = defineEmits<{
+  /** Every item was sent, or the button was clicked. */
   (e: 'close:modal'): void
 }>()
 
@@ -86,7 +94,9 @@ const doUpload = () => {
   
   props.items.forEach(item => {
     const controller = new AbortController()
-    abortList.value.push(() => controller.abort())
+    const abort = () => controller.abort()
+
+    abortList.value.push(abort)
 
     const promise = props
       .createMethod(item, {signal: controller.signal})
@@ -94,7 +104,7 @@ const doUpload = () => {
       .finally(() => {
         itemIndex.value = itemIndex.value + 1
 
-        const index = abortList.value.indexOf(controller.abort)
+        const index = abortList.value.indexOf(abort)
 
         if (index !== -1) abortList.value.splice(index, 1)
       })

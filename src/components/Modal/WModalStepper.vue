@@ -81,17 +81,32 @@ import WTabs from '@/components/Tabs/WTabs.vue'
 import {SemanticType} from '@/utils/SemanticType'
 
 defineProps<{
+  /** Shows a spinner in the Next or Submit button and disables Back and Close, e.g. while the form submits. */
   loading?: boolean
+  /** Disables all the buttons. */
   disabled?: boolean
+  /** Disables the Next or Submit button, e.g. until something is picked on the step. */
   disabledNext?: boolean
+  /** Text of the submit button on the last step. Defaults to "Submit". */
   submitText?: string
+  /** Lets the modal shrink to the current step's height. By default it keeps the height of the tallest step shown so far. */
   disableMinHeight?: boolean
 }>()
 
 defineEmits<{
+  /** Close was clicked on the first step. */
   (e: 'close:modal'): void
+  /** Submit was clicked on the last step. */
   (e: 'submit'): void
+  /** Whether a form inside has unsaved changes, for the modal to ask before closing. */
   (e: 'update:has-changes', value: boolean): void
+}>()
+
+defineSlots<{
+  /** The steps, as WTabsItem items. Their `validate`, `hasValue` and `requireSave` work as in a stepper WTabs. */
+  default?: () => void
+  /** Replaces the title, which is the current step's title by default. */
+  title?: () => void
 }>()
 
 const tabsStepperRef = useTemplateRef('tabsStepper')
