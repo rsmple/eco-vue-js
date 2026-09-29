@@ -1,7 +1,7 @@
 ---
 group: Guide
 order: 2
-description: Set up the frame of an eco-vue-js app — the fixed header, nav and actions bars, the CSS variables that describe them, the content padding, filters and search in the bars, dark mode and a centred layout.
+description: Set up the frame of an eco-vue-js app with WNavBar, WHeaderBar and WActionsBar — the fixed header, nav and actions bars, the CSS variables that describe them, the content padding, filters and search in the bars, dark mode and a centred layout.
 ---
 
 # App shell
@@ -178,6 +178,47 @@ What each part does:
 - **`WActionsBar`** holds icon buttons: `WButtonAction` in the `#top` and `#bottom` slots, with `to` for routes or `tag="a"` with `href` for links, and settings in `#footer`. On phones it is off-screen, so it slides in together with the open nav.
 - **Dark mode** is a `dark` class on an ancestor, usually `<html>`. `WToggleTheme` only switches a `Theme` value — applying and persisting it is up to the app.
 
+## Nav items
+
+`WNavItem` is a router link with an icon and a title. Both default to the route's `meta.icon` and `meta.titleShort` (or `meta.title`), so an item is often just `<WNavItem :to="{name: RouteName.PROJECTS}" />`. It is active while the current route has the same name; `queryFields` lists the query params that must match too, for items that open the same route with different filters. `count` shows a number in brackets after the title and `counter` a badge, with `skeleton` while they load.
+
+`WNavItemExpand` groups items under a title. The items show under it while one of them is active; otherwise hovering the group opens them in a menu to the right. With `to`, the group is a link of its own. `even` keeps the items always shown and not indented, for a nav inside a page.
+
+`WNavItemTransition` wraps a list of items so that the ones added or removed with `v-if` — such as an item for the current record — expand and collapse.
+
+```vue
+<WNavItemTransition>
+  <WNavItem :to="{name: RouteName.PROJECTS}" />
+
+  <WNavItem
+    v-if="$route.name === RouteName.PROJECT"
+    :to="{name: RouteName.PROJECT, params: {projectId: $route.params.projectId}}"
+  />
+
+  <WNavItemExpand
+    title="Findings"
+    :icon="markRaw(IconBug)"
+    :count="findingCount"
+  >
+    <WNavItem
+      :to="{name: RouteName.FINDINGS, query: {status: 'open'}}"
+      title="Open"
+      :query-fields="['status']"
+    />
+
+    <WNavItem
+      :to="{name: RouteName.FINDINGS, query: {status: 'closed'}}"
+      title="Closed"
+      :query-fields="['status']"
+    />
+  </WNavItemExpand>
+</WNavItemTransition>
+```
+
+## Action buttons
+
+`WButtonAction` is the icon button of the actions bar. `title` names it in a tooltip, or under the icon with `titleText`, and for screen readers. It is a router link with `to`, an external link with `tag="a"` and `href`, and a button otherwise. `count` adds a badge, `active` colors the icon for a toggle that is on, and `loading` runs a shimmer while its action is in progress.
+
 ## Filters and search
 
 Pages put their own content into the bars without touching the layout:
@@ -230,3 +271,282 @@ body {
 ```vue
 <WHeaderBar class="pl-[calc(var(--left-margin)+var(--nav-bar-width))] pr-[calc(var(--right-margin)+var(--actions-bar-width))]" />
 ```
+
+## API
+
+<!-- @api WNavBar -->
+
+### WNavBar
+
+```ts
+import WNavBar from 'eco-vue-js/dist/components/Nav/WNavBar.vue'
+```
+
+#### Props
+
+_No props._
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `update:is-open` | `(value: boolean)` | The nav opened or closed below `xl`, where it is an overlay. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `default` | — | Content of the nav, such as WNavItem items. |
+
+<!-- @api-end -->
+
+<!-- @api WNavItem -->
+
+### WNavItem
+
+```ts
+import WNavItem from 'eco-vue-js/dist/components/Nav/WNavItem.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `icon` | `SVGComponent` | — | Icon before the title. Defaults to the route's `meta.icon`. |
+| `title` | `string` | — | Title of the item. Defaults to the route's `meta.titleShort`, then `meta.title`. |
+| `count` | `number` | — | Number after the title in brackets, such as the number of items on the page it opens. |
+| `counter` | `number` | — | Number in a badge over the end of the title, such as unread items. Hidden at 0. |
+| `skeleton` | `boolean` | — | Shows a placeholder for `count` and hides `counter`, while they load. |
+| `hasActive` | `boolean` | — | Marks the item as the parent of the active item. Set by WNavItemExpand. |
+| `expand` | `boolean` | — | Marks the item as the toggle of a group without a route of its own. Set by WNavItemExpand. |
+| `indent` | `boolean` | — | Indents the item as a child of a group. Set by WNavItemExpand. |
+| `queryFields` | `string[]` | — | Query params that must match the current route's for the item to be active, besides its route name. Other params, such as filters, are ignored. |
+| `hovered` | `boolean` | — | Highlights the item as hovered. Set by WNavItemExpand while its menu is open. |
+| `even` | `boolean` | — | Lays the item out without the indent of a group. Set by WNavItemExpand. |
+| `to` | `RouteLocationRaw` | **required** | Router location — renders a router link. Needs vue-router installed in the app. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `icon` | — | Icon before the title, when neither `icon` nor the route's `meta.icon` is set. |
+| `right` | — | Content at the end of the item. |
+
+<!-- @api-end -->
+
+<!-- @api WNavItemExpand -->
+
+### WNavItemExpand
+
+```ts
+import WNavItemExpand from 'eco-vue-js/dist/components/Nav/WNavItemExpand.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `icon` | `SVGComponent` | — | Icon before the title. |
+| `title` | `string` | **required** | Title of the group. |
+| `count` | `number` | — | Number after the title in brackets. |
+| `counter` | `number` | — | Number in a badge over the end of the title. Hidden at 0. |
+| `skeleton` | `boolean` | — | Shows a placeholder for `count` and hides `counter`, while they load. |
+| `indent` | `boolean` | — | Indents the group as a child of another group. |
+| `queryFields` | `string[]` | — | Query params that must match the current route's for the group's own route to be active. |
+| `even` | `boolean` | — | Keeps the items always shown, without indent and without the menu on hover, e.g. for a nav inside a page. |
+| `to` | `RouteLocationRaw` | — | Router location — renders a router link. Needs vue-router installed in the app. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `default` | — | WNavItem items of the group. They show under the group while one of them is active, and in a menu on hover otherwise. |
+| `icon` | — | Icon before the title, when `icon` isn't set. |
+
+<!-- @api-end -->
+
+<!-- @api WNavItemTransition -->
+
+### WNavItemTransition
+
+```ts
+import WNavItemTransition from 'eco-vue-js/dist/components/Nav/WNavItemTransition.vue'
+```
+
+#### Props
+
+_No props._
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `default` | — | Nav items. Items added or removed with `v-if` expand and collapse. |
+
+<!-- @api-end -->
+
+<!-- @api WHeaderBar -->
+
+### WHeaderBar
+
+```ts
+import WHeaderBar from 'eco-vue-js/dist/components/HeaderBar/WHeaderBar.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `string` | — | Title of the page. The `title` slot replaces it. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `title` | — | Replaces the `title` text. |
+| `right` | — | Content after the title, before the search button. |
+
+<!-- @api-end -->
+
+<!-- @api WHeaderBarSearch -->
+
+### WHeaderBarSearch
+
+```ts
+import WHeaderBarSearch from 'eco-vue-js/dist/components/HeaderBar/WHeaderBarSearch.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `shown` | `boolean` | — | Opens the search right away, and again whenever it becomes `true`. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `default` | `{ visible?: boolean \| undefined; hide?: (() => void) \| undefined; show?: (() => void) \| undefined; }` | Search content shown in place of the header's title row when the search button is clicked. `hide` goes back to the title. |
+
+<!-- @api-end -->
+
+<!-- @api WActionsBar -->
+
+### WActionsBar
+
+```ts
+import WActionsBar from 'eco-vue-js/dist/components/ActionsBar/WActionsBar.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `textFilter` | `string` | — | Title of the filter button and heading of the filter panel. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `top` | — | WButtonAction buttons at the top, above the filter button. |
+| `bottom` | — | WButtonAction buttons under the filter button. |
+| `footer` | — | Content at the bottom of the bar, such as settings. |
+
+<!-- @api-end -->
+
+<!-- @api WActionsBarFilter -->
+
+### WActionsBarFilter
+
+```ts
+import WActionsBarFilter from 'eco-vue-js/dist/components/ActionsBar/WActionsBarFilter.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `count` | `number` | **required** | Number of filters set, shown as a badge on the filter button. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `default` | — | Filters, shown in the panel that slides out of the actions bar. |
+
+<!-- @api-end -->
+
+<!-- @api WButtonAction -->
+
+### WButtonAction
+
+```ts
+import WButtonAction from 'eco-vue-js/dist/components/Button/WButtonAction.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `icon` | `SVGComponent` | — | Icon of the button. The `icon` slot replaces it. |
+| `title` | `string` | **required** | Name of the action, shown in a tooltip — or under the icon with `titleText` — and read by screen readers. |
+| `active` | `boolean` | — | Colors the icon primary, for a toggle that is on. Only with the default `SECONDARY` type. |
+| `tag` | `"button" \| "a"` | `"button"` | Element rendered without `to`: a `button`, or an `a` for an external link with `href`. |
+| `href` | `string` | — | Link target when `tag` is `a`. |
+| `target` | `"_self" \| "_blank" \| "_parent" \| "_top"` | — | `target` attribute of the link when `tag` is `a`. |
+| `rel` | `string` | — | `rel` attribute of the link when `tag` is `a`. |
+| `count` | `number` | — | Number in a badge on the corner, hidden at 0. |
+| `semanticType` | `SemanticType` | `SemanticType.SECONDARY` | Color scheme of the button. |
+| `disabled` | `boolean` | — | Grays the button out and ignores clicks. |
+| `skeleton` | `boolean` | — | Shows a placeholder instead of the button and ignores clicks. |
+| `tooltipText` | `string` | — | Tooltip text instead of `title`. |
+| `titleText` | `boolean` | — | Shows `title` under the icon instead of in the tooltip. |
+| `loading` | `boolean` | — | Runs a shimmer over the button while its action is in progress. |
+| `to` | `RouteLocationRaw` | — | Router location — renders a router link. Needs vue-router installed in the app. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `click` | `(event: MouseEvent)` | The button was clicked, unless it is disabled or a skeleton. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `icon` | — | Content of the button, replacing `icon`. |
+
+<!-- @api-end -->
+
+<!-- @api WToggleTheme -->
+
+### WToggleTheme
+
+```ts
+import WToggleTheme from 'eco-vue-js/dist/components/Toggle/WToggleTheme.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `modelValue` | `Theme` | **required** | Current theme: the toggle is on, with a sun, for `Theme.LIGHT`, and off, with a moon, for `Theme.DARK`. |
+| `title` | `string` | — | Label next to the switch; the `title` slot replaces it. |
+| `small` | `boolean` | — | Smaller title text. |
+| `disabled` | `boolean` | — | Blocks changes and dims the toggle. When unset, inherits the disabled state provided by a parent. |
+| `loading` | `boolean` | — | Shows a spinner in the caret and ignores clicks. |
+| `readonly` | `boolean` | — | Shows the state without allowing changes, and keeps the title selectable. When unset, inherits the readonly state provided by a parent. |
+| `rightLabel` | `boolean` | — | Puts the title after the switch instead of before it. |
+| `noMargin` | `boolean` | — | Drops the default vertical margin around the toggle. |
+| `description` | `string` | — | Secondary text under the toggle. |
+| `validate` | `ValidateFn \| ValidateFn[]` | — | Checks the new value before it is emitted. A returned error message cancels the change and is shown as a warning notification. |
+| `center` | `boolean` | — | Centers the switch in its row. |
+| `skeleton` | `boolean` | — | Renders a skeleton placeholder. When unset, inherits the skeleton state provided by a parent. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `update:model-value` | `(value: Theme)` | The picked theme. |
+
+<!-- @api-end -->

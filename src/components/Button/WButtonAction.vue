@@ -93,20 +93,33 @@ import {useIsBackdrop} from '@/components/Modal/use/useIsBackdrop'
 import {SemanticType, useSemanticTypeBackgroundMap} from '@/utils/SemanticType'
 
 interface Props extends Partial<LinkProps> {
+  /** Icon of the button. The `icon` slot replaces it. */
   icon?: SVGComponent
+  /** Name of the action, shown in a tooltip — or under the icon with `titleText` — and read by screen readers. */
   title: string
+  /** Colors the icon primary, for a toggle that is on. Only with the default `SECONDARY` type. */
   active?: boolean
+  /** Element rendered without `to`: a `button`, or an `a` for an external link with `href`. */
   tag?: 'button' | 'a'
   /** Link target when `tag` is `a`. */
   href?: string
+  /** `target` attribute of the link when `tag` is `a`. */
   target?: '_self' | '_blank' | '_parent' | '_top'
+  /** `rel` attribute of the link when `tag` is `a`. */
   rel?: string
+  /** Number in a badge on the corner, hidden at 0. */
   count?: number
+  /** Color scheme of the button. */
   semanticType?: SemanticType
+  /** Grays the button out and ignores clicks. */
   disabled?: boolean
+  /** Shows a placeholder instead of the button and ignores clicks. */
   skeleton?: boolean
+  /** Tooltip text instead of `title`. */
   tooltipText?: string
+  /** Shows `title` under the icon instead of in the tooltip. */
   titleText?: boolean
+  /** Runs a shimmer over the button while its action is in progress. */
   loading?: boolean
 }
 
@@ -122,14 +135,19 @@ const props = withDefaults(
     count: undefined,
     semanticType: SemanticType.SECONDARY,
     tooltipText: undefined,
-    semanticTypeMap: undefined,
     disabled: undefined,
     skeleton: undefined,
   },
 )
 
 const emit = defineEmits<{
+  /** The button was clicked, unless it is disabled or a skeleton. */
   (e: 'click', event: MouseEvent): void
+}>()
+
+defineSlots<{
+  /** Content of the button, replacing `icon`. */
+  icon?: () => void
 }>()
 
 const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()

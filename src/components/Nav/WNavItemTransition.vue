@@ -12,4 +12,8 @@
 </template>
 
 <script setup lang="ts">
+defineSlots<{
+  /** Nav items. Items added or removed with `v-if` expand and collapse. */
+  default?: () => void
+}>()
 </script>

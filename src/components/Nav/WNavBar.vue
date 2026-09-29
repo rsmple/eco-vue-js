@@ -54,7 +54,13 @@ import {useIsMobile} from '@/utils/mobile'
 import {BASE_ZINDEX_NAV_BAR, wBaseZIndex} from '@/utils/utils'
 
 const emit = defineEmits<{
-  (e: 'update:isOpen', value: boolean): void
+  /** The nav opened or closed below `xl`, where it is an overlay. */
+  (e: 'update:is-open', value: boolean): void
+}>()
+
+defineSlots<{
+  /** Content of the nav, such as WNavItem items. */
+  default?: () => void
 }>()
 
 provide(wBaseZIndex, BASE_ZINDEX_NAV_BAR)
@@ -64,7 +70,7 @@ const {isTablet} = useIsMobile()
 const isOpen = ref(false)
 
 const emitIsOpen = () => {
-  emit('update:isOpen', isOpen.value)
+  emit('update:is-open', isOpen.value)
 }
 
 const toggle = () => {

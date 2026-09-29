@@ -34,5 +34,6 @@ export interface ToggleProps<Value extends boolean | null> {
 }
 
 export interface ToggleThemeProps extends Omit<ToggleProps<boolean>, 'modelValue' | 'icon' | 'negate' | 'intermediate'> {
+  /** Current theme: the toggle is on, with a sun, for `Theme.LIGHT`, and off, with a moon, for `Theme.DARK`. */
   modelValue: Theme
 }

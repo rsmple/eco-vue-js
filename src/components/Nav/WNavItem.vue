@@ -104,6 +104,13 @@ const EXCLUDE_QUERY_FIELDS = ['ordering', 'page']
 
 const props = defineProps<NavItemProps>()
 
+defineSlots<{
+  /** Icon before the title, when neither `icon` nor the route's `meta.icon` is set. */
+  icon?: () => void
+  /** Content at the end of the item. */
+  right?: () => void
+}>()
+
 const route = useOptionalRoute()
 const router = useOptionalRouter()
 

@@ -66,11 +66,15 @@ import {useHeaderSearch} from './use/useHeaderSearch'
 import {useHeaderSearchVisible} from './use/useHeaderSearchVisible'
 
 defineProps<{
+  /** Title of the page. The `title` slot replaces it. */
   title?: string
 }>()
 
-defineEmits<{
-  (e: 'update:search', value: string | undefined): void
+defineSlots<{
+  /** Replaces the `title` text. */
+  title?: () => void
+  /** Content after the title, before the search button. */
+  right?: () => void
 }>()
 
 provide(wBaseZIndex, BASE_ZINDEX_HEADER_BAR)

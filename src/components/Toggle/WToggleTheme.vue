@@ -24,6 +24,7 @@ import WToggle from './WToggle.vue'
 const props = defineProps<ToggleThemeProps>()
 
 defineEmits<{
+  /** The picked theme. */
   (e: 'update:model-value', value: Theme): void
 }>()
 </script>

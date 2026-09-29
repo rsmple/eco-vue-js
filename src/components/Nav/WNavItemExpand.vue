@@ -178,7 +178,9 @@ onBeforeUnmount(() => {
 })
 
 defineSlots<{
+  /** WNavItem items of the group. They show under the group while one of them is active, and in a menu on hover otherwise. */
   default?: () => VNode[]
+  /** Icon before the title, when `icon` isn't set. */
   icon?: () => VNode[]
 }>()
 

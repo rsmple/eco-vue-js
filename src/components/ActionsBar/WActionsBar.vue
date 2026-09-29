@@ -21,7 +21,7 @@
 
       <div class="pb-16">
         <div class="text-accent px---inner-margin h---header-height flex items-center text-xl font-semibold">
-          Filters
+          {{ textFilter ?? 'Filters' }}
         </div>
 
         <component
@@ -51,7 +51,7 @@
           <slot name="top" />
 
           <div
-            v-if="$slots.top && (hasFilter || bottom || $slots.bottom)"
+            v-if="$slots.top && (hasFilter || $slots.bottom)"
             class="mx-1 my-2 h-0.5 rounded bg-gray-200 md:my-4 dark:bg-gray-700"
           />
 
@@ -65,12 +65,7 @@
             @click="toggle"
           />
 
-          <slot name="bottom">
-            <component
-              :is="bottom"
-              v-if="bottom"
-            />
-          </slot>
+          <slot name="bottom" />
         </div>
 
         <slot name="footer" />
@@ -80,7 +75,7 @@
 </template>
 
 <script lang="ts" setup>
-import {type Component, type VNode, computed, markRaw, onUnmounted, provide, ref, watch} from 'vue'
+import {type VNode, computed, markRaw, provide, ref, watch} from 'vue'
 
 import WButtonAction from '@/components/Button/WButtonAction.vue'
 
@@ -93,13 +88,11 @@ import {BASE_ZINDEX_ACTIONS_BAR, wBaseZIndex} from '@/utils/utils'
 import {useActionBarFilter} from './use/useActionsBarFilter'
 
 defineProps<{
-  bottom?: Component
+  /** Title of the filter button and heading of the filter panel. */
   textFilter?: string
 }>()
 
 provide(wBaseZIndex, BASE_ZINDEX_ACTIONS_BAR)
-
-let closeModal: (() => void) | null = null
 
 const {filter, count} = useActionBarFilter()
 
@@ -115,19 +108,16 @@ const close = () => {
   isOpen.value = false
 }
 
-onUnmounted(() => {
-  closeModal?.()
-
-  closeModal = null
-})
-
 watch(hasFilter, value => {
   if (!value) close()
 })
 
 defineSlots<{
+  /** WButtonAction buttons at the top, above the filter button. */
   top?: () => VNode[]
+  /** WButtonAction buttons under the filter button. */
   bottom?: () => VNode[]
+  /** Content at the bottom of the bar, such as settings. */
   footer?: () => VNode[]
 }>()
 </script>

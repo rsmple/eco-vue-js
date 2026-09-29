@@ -4,6 +4,7 @@ import {type VNode, computed, onBeforeUnmount, useSlots, watch} from 'vue'
 import {useActionBarFilter} from './use/useActionsBarFilter'
 
 const props = defineProps<{
+  /** Number of filters set, shown as a badge on the filter button. */
   count: number
 }>()
 
@@ -23,6 +24,7 @@ onBeforeUnmount(() => {
 })
 
 defineSlots<{
+  /** Filters, shown in the panel that slides out of the actions bar. */
   default: () => VNode[]
 }>()
 </script>
