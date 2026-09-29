@@ -25,18 +25,34 @@
 </template>
 
 <script lang="ts" setup generic="Data">
-import {ref, watch} from 'vue'
+import {type HTMLAttributes, ref, watch} from 'vue'
 
 import DragItem from './components/DragItem.vue'
 import {useDragContainer} from './use/useDragContainer'
 
 const props = defineProps<{
+  /** Items in their saved order. */
   list: Data[]
+  /** Stops dragging and dims the items. */
   disabled?: boolean
 }>()
 
 const emit = defineEmits<{
+  /** The items in their new order, once an item is dropped. */
   (e: 'update:list', value: Data[]): void
+}>()
+
+defineSlots<{
+  /** An item. Bind `container` to its root element, and call `initDrag` on mousedown of its drag handle — or of the whole item — to make it draggable. `index` and `last` follow the order while dragging, and `dragging` is true while an item of this list is dragged. */
+  default?: (props: {
+    item: Data
+    index: number
+    last: boolean
+    orderedList: Data[]
+    dragging: boolean
+    initDrag: () => void
+    container: HTMLAttributes
+  }) => void
 }>()
 
 const {draggable, dragging, startDrag, stopDrag} = useDragContainer()

@@ -28,10 +28,20 @@
 import type {SVGAttributes} from 'vue'
 
 defineProps<{
+  /** Color of the border, e.g. `currentColor`. */
   stroke?: string
+  /** Dash pattern of the border, e.g. `4px 8px`. */
   strokeDasharray?: string
+  /** Offset of the dash pattern, e.g. to animate it. */
   strokeDashoffset?: string
+  /** Shape of the dashes' ends. */
   strokeLinecap?: SVGAttributes['stroke-linecap']
+  /** Class of the border's `rect`. */
   rectClass?: string
+}>()
+
+defineSlots<{
+  /** SVG animation elements for the border, such as an `animate` of `stroke-dashoffset`. */
+  default?: () => void
 }>()
 </script>

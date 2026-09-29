@@ -59,7 +59,7 @@ body {
 
 ## Global containers
 
-Modals, notifications and tooltips render into containers mounted once at the root of the app:
+Modals, notifications and tooltips render into containers mounted once at the root of the app. `WShineEffect` is optional: it drives the moving shine on action buttons.
 
 ```vue
 <template>
@@ -68,11 +68,13 @@ Modals, notifications and tooltips render into containers mounted once at the ro
   <WTooltipContainer />
   <WNotify />
   <WModal />
+  <WShineEffect />
 </template>
 
 <script setup lang="ts">
 import WModal from 'eco-vue-js/dist/components/Modal/WModal.vue'
 import WNotify from 'eco-vue-js/dist/components/Notify/WNotify.vue'
+import WShineEffect from 'eco-vue-js/dist/components/Shine/WShineEffect.vue'
 import WTooltipContainer from 'eco-vue-js/dist/components/Tooltip/WTooltipContainer.vue'
 </script>
 ```
