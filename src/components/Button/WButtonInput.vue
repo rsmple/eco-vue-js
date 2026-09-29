@@ -18,6 +18,7 @@
       'cursor-progress': loading,
     }"
     :disabled="disabled"
+    :aria-label="tooltipText"
     @click.stop.prevent="!disabled && !loading && $emit('click', $event)"
     @mousedown.stop.prevent
   >
@@ -49,15 +50,22 @@ import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 defineProps<{
+  /** Icon of the button. */
   icon: SVGComponent
+  /** Router location — renders a router link. Needs vue-router installed in the app. */
   to?: LinkProps['to']
+  /** Tooltip text, which also names the button. */
   tooltipText?: string
+  /** Shows a spinner instead of the icon and ignores clicks. */
   loading?: boolean
+  /** Shows a placeholder instead of the button. */
   skeleton?: boolean
+  /** Grays the button out and ignores clicks. */
   disabled?: boolean
 }>()
 
 defineEmits<{
+  /** The button was clicked, unless it is disabled or loading. */
   (e: 'click', value: MouseEvent): void
 }>()
 </script>

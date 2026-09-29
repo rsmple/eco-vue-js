@@ -166,6 +166,8 @@ const visible = ref(['Title', 'Author', 'Year'])
 
 `WDropdownAdaptive` takes the same props and slots but opens a bottom sheet on phones instead. It emits `close` when the sheet is dismissed, and with `closeOnClickOutside` also on a click outside the dropdown.
 
+`WMenuItem` is a row for the content of a custom menu — the row that `WButtonMoreItem` and the list menus are built from. It is a button, a router link with `to`, or a plain link with `href` (and `download` for a file). `active` marks the picked option with a check; `false` keeps room for the check, so that the rows of a picker line up. `loading` shows a spinner over it while its action runs.
+
 ## API
 
 <!-- @api WDropdownMenu -->
@@ -311,6 +313,40 @@ import WButtonDropdown from 'eco-vue-js/dist/components/Button/WButtonDropdown.v
 | --- | --- | --- |
 | `button` | — | Buttons joined to the arrow button. They keep their own click handlers. |
 | `content` | `{ close: () => void; }` | Menu content, usually WButtonMoreItem. A click inside closes the menu, and so does `close`. |
+
+<!-- @api-end -->
+
+<!-- @api WMenuItem -->
+
+### WMenuItem
+
+```ts
+import WMenuItem from 'eco-vue-js/dist/components/MenuItem/WMenuItem.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | — | Grays the item out and ignores clicks. |
+| `href` | `string` | — | URL of a plain link, when there is no `to`. |
+| `download` | `string` | — | `download` attribute of the `href` link — the file name to save it as. |
+| `active` | `boolean` | — | Marks the item as picked, with primary text and a check. `false` leaves room for the check, to line up with picked items. |
+| `tooltipText` | `string` | — | Tooltip text on the left of the item. |
+| `loading` | `boolean` | — | Shows a spinner over the item and ignores clicks. |
+| `to` | `RouteLocationRaw` | — | Router location — renders a router link. Needs vue-router installed in the app. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `click` | `(value: MouseEvent)` | The item was clicked, unless it is disabled or loading. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `default` | — | Content of the item, laid out in a row. |
 
 <!-- @api-end -->
 

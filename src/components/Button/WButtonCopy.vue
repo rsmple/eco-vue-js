@@ -27,6 +27,7 @@ import WTooltip from '@/components/Tooltip/WTooltip.vue'
 import {useCopy} from '@/utils/useCopy'
 
 const props = defineProps<{
+  /** Text copied to the clipboard on click. */
   value: string
 }>()
 

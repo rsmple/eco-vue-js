@@ -68,11 +68,17 @@ import IconCheck from '@/assets/icons/IconCheck.svg?component'
 import WSpinner from '../Spinner/WSpinner.vue'
 
 interface Props extends Partial<LinkProps> {
+  /** Grays the item out and ignores clicks. */
   disabled?: boolean
+  /** URL of a plain link, when there is no `to`. */
   href?: string
+  /** `download` attribute of the `href` link — the file name to save it as. */
   download?: string
+  /** Marks the item as picked, with primary text and a check. `false` leaves room for the check, to line up with picked items. */
   active?: boolean
+  /** Tooltip text on the left of the item. */
   tooltipText?: string
+  /** Shows a spinner over the item and ignores clicks. */
   loading?: boolean
 }
 
@@ -87,6 +93,12 @@ withDefaults(
 )
 
 defineEmits<{
+  /** The item was clicked, unless it is disabled or loading. */
   (e: 'click', value: MouseEvent): void
+}>()
+
+defineSlots<{
+  /** Content of the item, laid out in a row. */
+  default?: () => void
 }>()
 </script>

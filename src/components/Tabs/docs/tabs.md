@@ -194,6 +194,8 @@ import IconUser from 'eco-vue-js/dist/assets/icons/IconUser'
 
 <!-- @example-end -->
 
+`WButtonTab` is the tab button on its own, for a button among the tab buttons that isn't a tab — such as "New chat" at the top of a side column of chats. With `side` it lines up with the side column's buttons; `title`, `icon` and `count` show as on a tab, and it emits `click`.
+
 ## Tabs in forms
 
 An item's `hasError`, `hasChanges` and `hasValue` mark its button — `statusIcon` shows them as icons, `showHasValue` marks tabs with a value. When a tab gets an error while another is open, the tabs switch to it; `noSwitchOnInvalid` turns that off. Inside a Uniform form the tab items pick these states up from their fields on their own.
@@ -291,5 +293,46 @@ import WTabsItem from 'eco-vue-js/dist/components/Tabs/WTabsItem.vue'
 | `title` | `StateScope` | Replaces the content of the tab button. |
 | `suffix` | `StateScope` | Content after the title, inside the tab button. |
 | `right` | `StateScope` | Content after the tab button. |
+
+<!-- @api-end -->
+
+<!-- @api WButtonTab -->
+
+### WButtonTab
+
+```ts
+import WButtonTab from 'eco-vue-js/dist/components/Button/WButtonTab.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `active` | `boolean` | — | Marks the button as the open tab: primary text and an underline. |
+| `hasError` | `boolean` | — | Colors the button red, over the other states. |
+| `hasValue` | `boolean` | — | Marks the tab as filled in, for `showHasValue`, `statusIcon` and `indicator`. |
+| `hasChanges` | `boolean` | — | Shows the unsaved changes dot. |
+| `disabled` | `boolean` | — | Grays the button out and ignores clicks. |
+| `icon` | `SVGComponent` | — | Icon before the title. |
+| `title` | `string` | — | Text of the button. The `title` slot replaces it. |
+| `indicator` | `boolean` | — | Shows a large status circle — error, has value or empty — before the title. |
+| `side` | `boolean` | — | Aligns the title to the start, for a column of tab buttons. |
+| `statusIcon` | `boolean` | — | Shows a value and error status icon after the title. |
+| `showHasValue` | `boolean` | — | Colors the title green when `hasValue` is set and the tab isn't open. |
+| `enableOverflow` | `boolean` | — | Scrolls a title that doesn't fit into view on hover. |
+| `count` | `number` | — | Number shown in brackets after the title. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `click` | `(value: MouseEvent)` | The button was clicked, unless it is disabled. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `title` | `{ hasChanges?: boolean \| undefined; hasError?: boolean \| undefined; hasValue?: boolean \| undefined; }` | Content of the button, replacing the title, icon, count and status icon. |
+| `suffix` | `{ hasChanges?: boolean \| undefined; hasError?: boolean \| undefined; hasValue?: boolean \| undefined; }` | Content after the title, such as a close button. |
 
 <!-- @api-end -->

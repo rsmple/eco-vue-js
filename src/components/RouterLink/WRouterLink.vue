@@ -1,7 +1,7 @@
 <template>
   <component
-    :is="RouterLinkComponent ?? 'a'"
-    v-bind="to ? { to } : { href }"
+    :is="to && RouterLinkComponent ? RouterLinkComponent : 'a'"
+    v-bind="to && RouterLinkComponent ? { to } : { href }"
   >
     <slot />
   </component>
@@ -11,18 +11,20 @@
 import type {LinkProps} from '@/types/types'
 import type {RouterLink} from 'vue-router'
 
-import {resolveComponent} from 'vue'
+import {getCurrentInstance} from 'vue'
 
 interface Props extends LinkProps {
+  /** URL of a plain link, used when `to` is empty. */
   href?: string
 }
 
 defineProps<Props>()
 
-let RouterLinkComponent: typeof RouterLink | null = null
-try {
-  RouterLinkComponent = resolveComponent('RouterLink') as unknown as typeof RouterLink
-} catch {
-  RouterLinkComponent = null
-}
+defineSlots<{
+  /** Content of the link. */
+  default?: () => void
+}>()
+
+// Registered by vue-router's plugin. Without it, links render as plain `a` elements.
+const RouterLinkComponent = getCurrentInstance()?.appContext.components.RouterLink as typeof RouterLink | undefined
 </script>

@@ -21,8 +21,14 @@ import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 import IconBack from '@/assets/icons/IconBack.svg?component'
 
 interface Props extends LinkProps {
+  /** Text of the link. The default slot replaces it. */
   text?: string
 }
 
 defineProps<Props>()
+
+defineSlots<{
+  /** Text of the link, replacing `text`. */
+  default?: () => void
+}>()
 </script>

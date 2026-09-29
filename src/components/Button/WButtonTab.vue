@@ -147,22 +147,43 @@ import WStatusIcon from '../Status/WStatusIcon.vue'
 import WTextOverflow from '../TextOverflow/WTextOverflow.vue'
 
 defineProps<{
+  /** Marks the button as the open tab: primary text and an underline. */
   active?: boolean
+  /** Colors the button red, over the other states. */
   hasError?: boolean
+  /** Marks the tab as filled in, for `showHasValue`, `statusIcon` and `indicator`. */
   hasValue?: boolean
+  /** Shows the unsaved changes dot. */
   hasChanges?: boolean
+  /** Grays the button out and ignores clicks. */
   disabled?: boolean
+  /** Icon before the title. */
   icon?: SVGComponent
+  /** Text of the button. The `title` slot replaces it. */
   title?: string
+  /** Shows a large status circle — error, has value or empty — before the title. */
   indicator?: boolean
+  /** Aligns the title to the start, for a column of tab buttons. */
   side?: boolean
+  /** Shows a value and error status icon after the title. */
   statusIcon?: boolean
+  /** Colors the title green when `hasValue` is set and the tab isn't open. */
   showHasValue?: boolean
+  /** Scrolls a title that doesn't fit into view on hover. */
   enableOverflow?: boolean
+  /** Number shown in brackets after the title. */
   count?: number
 }>()
 
 defineEmits<{
+  /** The button was clicked, unless it is disabled. */
   (e: 'click', value: MouseEvent): void
+}>()
+
+defineSlots<{
+  /** Content of the button, replacing the title, icon, count and status icon. */
+  title?: (props: {hasChanges?: boolean, hasError?: boolean, hasValue?: boolean}) => void
+  /** Content after the title, such as a close button. */
+  suffix?: (props: {hasChanges?: boolean, hasError?: boolean, hasValue?: boolean}) => void
 }>()
 </script>

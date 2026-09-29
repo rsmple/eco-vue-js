@@ -23,11 +23,17 @@ import IconLink from '@/assets/icons/IconLink.svg?component'
 import {SemanticType, useSemanticTypeChipMap, useSemanticTypeTextMap} from '@/utils/SemanticType'
 
 interface Props extends Partial<LinkProps> {
+  /** URL of the link, when there is no `to`. */
   href?: string
+  /** `target` attribute of the link. */
   target?: '_self' | '_blank' | '_parent' | '_top'
+  /** `rel` attribute of the link. */
   rel?: string
+  /** Text of the link. The default slot replaces it. */
   text?: string
+  /** Color of the text and the icon's chip. */
   semanticType?: SemanticType
+  /** Icon before the text, in a chip. Defaults to a link icon. */
   icon?: SVGComponent
 }
 
@@ -43,6 +49,11 @@ withDefaults(
     icon: undefined,
   },
 )
+
+defineSlots<{
+  /** Text of the link, replacing `text`. */
+  default?: () => void
+}>()
 
 const semanticTypeChipMap = useSemanticTypeChipMap()
 const semanticTypeTextMap = useSemanticTypeTextMap()
