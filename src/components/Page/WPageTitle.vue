@@ -13,7 +13,9 @@
 
 <script lang="ts" setup>
 defineProps<{
+  /** Text of the heading, after its section number. */
   title: string
+  /** A large heading, with the number in two digits, e.g. for a cover. */
   big?: boolean
 }>()
 </script>

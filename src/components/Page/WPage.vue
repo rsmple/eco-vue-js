@@ -91,7 +91,7 @@
       v-if="title && topTitle"
       class="
         text-2xs before:text-primary absolute inset-x-[1.3cm] top-[0.9cm] font-semibold uppercase tracking-[0.16em]
-        text-gray-400 [counter-increment:section] before:mr-1 before:[--tw-content:counters(section,'.',decimal-leading-zero)]
+        text-gray-400 before:mr-1 before:[--tw-content:counters(section,'.',decimal-leading-zero)]
       "
     >{{ title }}</div>
 
@@ -145,16 +145,39 @@ import {usePageBreadcrumb} from './use/usePageBreadcrumbs'
 const INNER_CLASS = 'w-page-inner'
 
 const props = defineProps<{
+  /** Title of the section the page starts, numbered and listed in WPageBreadcrumbs. Continuation pages repeat it small at the top. */
   title?: string
+  /** Caption after the section number above the title. */
   eyebrow?: string
+  /** Leaves the page out of the page count and hides its number, e.g. for a cover. */
   empty?: boolean
+  /** Centers the logo in the footer, in place of the date. */
   centerLogo?: boolean
+  /** Logo in the footer. The `logo` slot replaces it. */
   logoComponent?: Component
+  /** Shows `title` small at the top instead of as a heading. Set on continuation pages. */
   topTitle?: boolean
+  /** Date in the middle of the footer, such as the date of the report. */
   date?: Date
+  /** Elements moved from the previous page because they didn't fit. Set on continuation pages. */
   prerendered?: HTMLElement[]
+  /** While `true`, content that doesn't fit stays on the page. It is split into continuation pages once loading ends. */
   skeleton?: boolean
-  watermark: string | undefined
+  /** Large faint text across the page, such as "Draft". */
+  watermark?: string
+}>()
+
+defineSlots<{
+  /** Content of the page. Blocks that don't fit move to a continuation page. Children of an element with the `INNER_CLASS` class (`w-page-inner`) move one by one, so a long list or table continues on the next page. Call `updateOverflow` when the content changes size after loading. */
+  default?: (props: {updateOverflow: () => void, INNER_CLASS: string}) => void
+  /** Content above the page's content, repeated on continuation pages, such as a table header. */
+  header?: () => void
+  /** Content under the title, on the first page only. */
+  intro?: () => void
+  /** Content to the right of the title, such as the report's details. */
+  meta?: () => void
+  /** Logo in the footer, replacing `logoComponent`. */
+  logo?: () => void
 }>()
 
 const elementRef = useTemplateRef('element')
@@ -193,7 +216,7 @@ const updateOverflow = (): void => {
 }
 
 const isSimilar = (current: HTMLElement | null, element: HTMLElement | null): boolean => {
-  return current?.tagName === element?.tagName && current?.className === current?.className
+  return current?.tagName === element?.tagName && current?.className === element?.className
 }
 
 const moveElements = (value: HTMLElement[]) => {
