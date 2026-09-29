@@ -73,9 +73,13 @@ import WClickOutside from '../ClickOutside/WClickOutside.vue'
 
 const props = withDefaults(
   defineProps<{
+    /** Singular noun in the "Selected N items" counter. An "s" is added for more than one. */
     title?: string
+    /** Tooltip of the actions while nothing is selected, which also disables them. */
     disableMessage?: string
+    /** Number of selected items. While it is above 0, the counter with a clear button replaces the `settings` slot. */
     selectedCount?: number
+    /** Class of the More menu's toggle, e.g. to hide it while all actions fit. */
     moreToggleClass?: string
   }>(),
   {
@@ -87,6 +91,7 @@ const props = withDefaults(
 )
 
 defineEmits<{
+  /** The clear button of the counter was clicked. */
   (e: 'clear:selection'): void
 }>()
 
@@ -99,8 +104,11 @@ const isOpen = ref(false)
 const disableMessageValue = computed<string | undefined>(() => props.selectedCount === 0 ? props.disableMessage : undefined)
 
 defineSlots<{
+  /** WButtonSelectionAction buttons. Pass them `disableMessage`, and `cssClass` for the dividers between them. */
   default?: (props: {disableMessage: string | undefined, cssClass: string}) => VNode[]
+  /** Actions in the More menu at the end of the row. */
   more?: (props: {disableMessage: string | undefined, cssClass: string}) => VNode[]
+  /** Content at the end of the bar while nothing is selected, such as list settings. */
   settings?: () => VNode[]
 }>()
 </script>

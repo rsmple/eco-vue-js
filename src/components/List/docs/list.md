@@ -21,6 +21,52 @@ The [List with fields](/recipes/list-with-fields) recipe builds this step by ste
 
 The sticky header, the checkbox column and full-width rows position themselves from the app's layout variables — `--header-height`, `--nav-bar-width`, `--actions-bar-width` and `--inner-margin` — so the app has to set them (see [App shell](/guide/app-shell)). Inside a modal, the modal sets its own.
 
+## Bulk actions
+
+Above the table is the selection bar, `WButtonSelection`. While nothing is selected it shows the `action` components and the list settings; while items are selected, the `bulk` components and a "Selected N items" counter with a clear button. Actions that don't fit move into a More menu.
+
+Each action is a component that renders a `WButtonSelectionAction` — an icon with a title, hidden on phones. A bulk action gets `BulkProps`: `selectionCount`, `queryParamsGetter()` for the query params narrowed to the selection, `readonly`, and `disableMessage`, which disables the button with that text as its tooltip while nothing is selected. It emits `clear:selected` to reset the selection when it is done.
+
+```vue
+<template>
+  <WButtonSelectionAction
+    title="Archive"
+    :icon="markRaw(IconArchiveBook)"
+    :disable-message="disableMessage"
+    :disabled="readonly"
+    @click="archive"
+  />
+</template>
+
+<script lang="ts" setup>
+import {markRaw} from 'vue'
+
+import type {BulkProps} from 'eco-vue-js/dist/components/List/types'
+
+import WButtonSelectionAction from 'eco-vue-js/dist/components/Button/WButtonSelectionAction.vue'
+
+import IconArchiveBook from 'eco-vue-js/dist/assets/icons/IconArchiveBook'
+
+const props = defineProps<BulkProps<BookQueryParams>>()
+
+const emit = defineEmits<{
+  (e: 'clear:selected'): void
+}>()
+
+const archive = () => bookApi.archive(props.queryParamsGetter()).then(() => emit('clear:selected'))
+</script>
+```
+
+`WButtonUnselect` is the small round clear button of the select chips.
+
+## Filters
+
+`WListFilter` renders filter components for query params held in a Uniform form's `scope` — usually a form over the route query. Each filter is a component with a `meta` export (its `title`, `icon` and the `fields` it sets) that gets `scope`, `global` and `readonly`. `search` adds a text search for the `search` param, or `filterSearch` for your own.
+
+In place, the filters are chips in a row: the set ones are shown, and a button adds another. With `global` they go into the app shell instead — the filters into the actions bar's panel and the search into the header bar — with a button that resets them. `disabledFilterFields` leaves out filters for params the page fixes.
+
+`WListHeader` and `WListHeaderItem` are the table header row of the list, with the select-all checkbox and sortable, resizable column titles. `WList` renders them from `fields`.
+
 ## API
 
 <!-- @api WList -->
@@ -125,5 +171,224 @@ import WListCardField from 'eco-vue-js/dist/components/List/WListCardField.vue'
 | --- | --- | --- |
 | `default` | — | Replaces the whole content, including the truncating wrapper. |
 | `inner` | — | Replaces `modelValue` inside the truncating wrapper. |
+
+<!-- @api-end -->
+
+<!-- @api WButtonSelection -->
+
+### WButtonSelection
+
+```ts
+import WButtonSelection from 'eco-vue-js/dist/components/Button/WButtonSelection.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `string` | `"item"` | Singular noun in the "Selected N items" counter. An "s" is added for more than one. |
+| `disableMessage` | `string` | `"No selected items"` | Tooltip of the actions while nothing is selected, which also disables them. |
+| `selectedCount` | `number` | — | Number of selected items. While it is above 0, the counter with a clear button replaces the `settings` slot. |
+| `moreToggleClass` | `string` | — | Class of the More menu's toggle, e.g. to hide it while all actions fit. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `clear:selection` | — | The clear button of the counter was clicked. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `default` | `{ disableMessage: string \| undefined; cssClass: string; }` | WButtonSelectionAction buttons. Pass them `disableMessage`, and `cssClass` for the dividers between them. |
+| `more` | `{ disableMessage: string \| undefined; cssClass: string; }` | Actions in the More menu at the end of the row. |
+| `settings` | — | Content at the end of the bar while nothing is selected, such as list settings. |
+
+<!-- @api-end -->
+
+<!-- @api WButtonSelectionAction -->
+
+### WButtonSelectionAction
+
+```ts
+import WButtonSelectionAction from 'eco-vue-js/dist/components/Button/WButtonSelectionAction.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `string` | — | Text after the icon. Hidden on phones, except in the More menu. |
+| `label` | `string` | — | Name for screen readers. Defaults to `tooltipText`, then `title`. |
+| `icon` | `SVGComponent` | **required** | Icon of the action. |
+| `disableMessage` | `string` | — | Disables the action and shows this text in its tooltip, e.g. "No selected items". |
+| `disabled` | `boolean` | — | Disables the action. |
+| `active` | `boolean` | — | Marks the action as on, e.g. a filter that is applied. |
+| `loading` | `boolean` | — | Shows a spinner over the action and ignores clicks. |
+| `tooltipText` | `string` | — | Tooltip text. |
+| `to` | `RouteLocationRaw` | — | Router location — renders a router link. Needs vue-router installed in the app. |
+| `tag` | `keyof HTMLElementTagNameMap` | — | Element rendered without `to`, e.g. `a` for a link with `href`. Defaults to `button`. |
+| `href` | `string` | — | Link URL when `tag` is `a`. |
+| `target` | `"_self" \| "_blank" \| "_parent" \| "_top"` | — | `target` attribute of the link. |
+| `replace` | `boolean` | — | Replaces the current history entry instead of adding one, with `to`. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `click` | `(value: MouseEvent)` | The action was clicked, unless it is disabled or loading. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `tooltip` | — | Rich content of the tooltip, replacing `disableMessage` or `tooltipText`. |
+
+<!-- @api-end -->
+
+<!-- @api WButtonSelectionState -->
+
+### WButtonSelectionState
+
+```ts
+import WButtonSelectionState from 'eco-vue-js/dist/components/Button/WButtonSelectionState.vue'
+```
+
+#### Props
+
+_No props._
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `click` | `(value: MouseEvent)` | The clear button was clicked. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `default` | — | The selection count, such as "Selected 3 items". |
+
+<!-- @api-end -->
+
+<!-- @api WButtonUnselect -->
+
+### WButtonUnselect
+
+```ts
+import WButtonUnselect from 'eco-vue-js/dist/components/Button/WButtonUnselect.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | — | Disables the button. |
+| `loading` | `boolean` | — | Ignores clicks, e.g. while the value is saving. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `click` | `(value: MouseEvent)` | The button was clicked, unless it is disabled or loading. |
+| `mousedown` | `(value: MouseEvent)` | A mouse button was pressed on it, unless it is disabled or loading. |
+
+<!-- @api-end -->
+
+<!-- @api WListFilter -->
+
+### WListFilter
+
+```ts
+import WListFilter from 'eco-vue-js/dist/components/List/WListFilter.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `scope` | `UniformScope<QueryParams>` | **required** | Scope of the Uniform form that holds the query params, usually synced with the route query. |
+| `filter` | `FilterComponent<QueryParams>[]` | — | Filter components, one per filter, each with a `meta` export. A tuple adds props for it. |
+| `filterSearch` | `FilterComponent<QueryParams>` | — | Component for the search field, instead of the default text search on `search`. |
+| `disabledFilterFields` | `(keyof QueryParams)[]` | — | Query params that can't be changed, e.g. fixed by the page. Their filters are left out. |
+| `search` | `boolean` | — | Adds a search field for the `search` query param. |
+| `global` | `boolean` | — | Puts the filters in the actions bar's filter panel and the search in the header bar, instead of in a row in place. |
+| `readonly` | `boolean` | — | Shows the filters without changing them. |
+| `searchVisible` | `boolean` | — | **Deprecated**: No effect: the search field is always shown in place, and behind the header's search button with `global`. |
+
+<!-- @api-end -->
+
+<!-- @api WListHeader -->
+
+### WListHeader
+
+```ts
+import WListHeader from 'eco-vue-js/dist/components/List/WListHeader.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `allowSelect` | `boolean` | — | Shows the select-all checkbox. |
+| `selectOnly` | `boolean` | — | Keeps the checkbox column's space without the checkbox, for lists without select-all. |
+| `hideMore` | `boolean` | — | Narrows the end cap when the rows have no menu. |
+| `disabled` | `boolean` | — | Disables the checkbox. |
+| `count` | `number` | — | Total number of items. The checkbox is disabled while it is 0 or unknown. |
+| `selection` | `boolean \| null` | — | State of the select-all checkbox: `true` for all, `null` for some, `false` for none. |
+| `tooltipText` | `string` | **required** | Tooltip of the select-all checkbox. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `update:header` | — | The header was mounted or unmounted, for the sticky header to measure it. |
+| `toggle:selection` | `(value: boolean)` | The select-all checkbox was toggled. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `default` | — | WListHeaderItem cells, one per column. |
+| `settings` | — | Content of the end cap, such as the column settings button. |
+
+<!-- @api-end -->
+
+<!-- @api WListHeaderItem -->
+
+### WListHeaderItem
+
+```ts
+import WListHeaderItem from 'eco-vue-js/dist/components/List/WListHeaderItem.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `string` | — | Title of the column. The default slot replaces it. |
+| `field` | `Field` | **required** | Ordering field of the column. Without it, the title isn't a sort button. |
+| `ordering` | `OrderItem<Field>[]` | **required** | Current ordering, to show the column's direction and position in it. |
+| `disabled` | `boolean` | — | Turns sorting off. |
+| `allowResize` | `boolean` | — | Adds a handle to resize the column. |
+| `itemClass` | `string` | — | Class of the title, replacing the default bold one-line style. |
+| `styleValue` | `Record<string, string \| undefined>` | **required** | Style of the column, such as its width. |
+| `hasWidth` | `boolean` | **required** | Whether the column has a width set, for the resize handle. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `update:width` | `(number)` | The column is being resized to this width. |
+| `save:width` | — | Resizing ended, to save the width. |
+| `update:ordering` | `(OrderItem<Field>[])` | The title was clicked: descending, then ascending, then off. Other columns stay in the ordering after it. |
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `default` | — | Title of the column, replacing `title`. |
 
 <!-- @api-end -->

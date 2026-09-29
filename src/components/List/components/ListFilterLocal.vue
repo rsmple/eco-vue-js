@@ -61,9 +61,7 @@ const props = defineProps<{
   filterSearch: FilterComponent<QueryParams> | undefined
   search: boolean
   disabledFilterFields: Array<keyof QueryParams>
-  title: ((count: number) => string) | undefined
   readonly: boolean
-  searchVisible: boolean
 }>()
 
 const searchComponent: FilterComponent<QueryParams> | undefined = props.search ? props.filterSearch ?? ListFilterSearch : undefined

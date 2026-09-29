@@ -65,20 +65,36 @@ import HeaderItem from './components/HeaderItem.vue'
 import HeaderItemResizer from './components/HeaderItemResizer.vue'
 
 const props = defineProps<{
+  /** Title of the column. The default slot replaces it. */
   title?: string
+  /** Ordering field of the column. Without it, the title isn't a sort button. */
   field: Field
+  /** Current ordering, to show the column's direction and position in it. */
   ordering: OrderItem<Field>[]
+  /** Turns sorting off. */
   disabled?: boolean
+  /** Adds a handle to resize the column. */
   allowResize?: boolean
+  /** Class of the title, replacing the default bold one-line style. */
   itemClass?: string
+  /** Style of the column, such as its width. */
   styleValue: Record<string, string | undefined>
+  /** Whether the column has a width set, for the resize handle. */
   hasWidth: boolean
 }>()
 
 const emit = defineEmits<{
+  /** The column is being resized to this width. */
   (e: 'update:width', value: number): void
+  /** Resizing ended, to save the width. */
   (e: 'save:width'): void
+  /** The title was clicked: descending, then ascending, then off. Other columns stay in the ordering after it. */
   (e: 'update:ordering', value: OrderItem<Field>[]): void
+}>()
+
+defineSlots<{
+  /** Title of the column, replacing `title`. */
+  default?: () => void
 }>()
 
 const allowSort = computed(() => !props.disabled && !!props.field)

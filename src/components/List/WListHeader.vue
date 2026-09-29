@@ -52,18 +52,34 @@ import {onMounted, onUnmounted} from 'vue'
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 
 defineProps<{
+  /** Shows the select-all checkbox. */
   allowSelect?: boolean
+  /** Keeps the checkbox column's space without the checkbox, for lists without select-all. */
   selectOnly?: boolean
+  /** Narrows the end cap when the rows have no menu. */
   hideMore?: boolean
+  /** Disables the checkbox. */
   disabled?: boolean
+  /** Total number of items. The checkbox is disabled while it is 0 or unknown. */
   count?: number
+  /** State of the select-all checkbox: `true` for all, `null` for some, `false` for none. */
   selection?: boolean | null
+  /** Tooltip of the select-all checkbox. */
   tooltipText: string
 }>()
 
 const emit = defineEmits<{
+  /** The select-all checkbox was toggled. */
   (e: 'toggle:selection', value: boolean): void
+  /** The header was mounted or unmounted, for the sticky header to measure it. */
   (e: 'update:header'): void
+}>()
+
+defineSlots<{
+  /** WListHeaderItem cells, one per column. */
+  default?: () => void
+  /** Content of the end cap, such as the column settings button. */
+  settings?: () => void
 }>()
 
 onMounted(() => {

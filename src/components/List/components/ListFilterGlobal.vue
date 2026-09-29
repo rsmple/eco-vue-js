@@ -73,9 +73,7 @@ const props = defineProps<{
   filterSearch: FilterComponent<QueryParams> | undefined
   search: boolean
   disabledFilterFields: Array<keyof QueryParams>
-  title: ((count: number) => string) | undefined
   readonly: boolean
-  searchVisible: boolean
 }>()
 
 const open = ref<number | null>(null)

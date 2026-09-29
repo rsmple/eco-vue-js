@@ -20,12 +20,16 @@
 import IconCancel from '@/assets/icons/IconCancel.svg?component'
 
 defineProps<{
+  /** Disables the button. */
   disabled?: boolean
+  /** Ignores clicks, e.g. while the value is saving. */
   loading?: boolean
 }>()
 
 defineEmits<{
+  /** The button was clicked, unless it is disabled or loading. */
   (e: 'click', value: MouseEvent): void
+  /** A mouse button was pressed on it, unless it is disabled or loading. */
   (e: 'mousedown', value: MouseEvent): void
 }>()
 </script>

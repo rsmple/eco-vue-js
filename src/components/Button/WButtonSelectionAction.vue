@@ -80,22 +80,41 @@ import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 defineProps<{
+  /** Text after the icon. Hidden on phones, except in the More menu. */
   title?: string
+  /** Name for screen readers. Defaults to `tooltipText`, then `title`. */
   label?: string
+  /** Icon of the action. */
   icon: SVGComponent
+  /** Disables the action and shows this text in its tooltip, e.g. "No selected items". */
   disableMessage?: string
+  /** Disables the action. */
   disabled?: boolean
+  /** Marks the action as on, e.g. a filter that is applied. */
   active?: boolean
+  /** Shows a spinner over the action and ignores clicks. */
   loading?: boolean
+  /** Tooltip text. */
   tooltipText?: string
+  /** Router location — renders a router link. Needs vue-router installed in the app. */
   to?: LinkProps['to']
+  /** Element rendered without `to`, e.g. `a` for a link with `href`. Defaults to `button`. */
   tag?: keyof HTMLElementTagNameMap
+  /** Link URL when `tag` is `a`. */
   href?: string
+  /** `target` attribute of the link. */
   target?: '_self' | '_blank' | '_parent' | '_top'
+  /** Replaces the current history entry instead of adding one, with `to`. */
   replace?: boolean
 }>()
 
 defineEmits<{
+  /** The action was clicked, unless it is disabled or loading. */
   (e: 'click', value: MouseEvent): void
+}>()
+
+defineSlots<{
+  /** Rich content of the tooltip, replacing `disableMessage` or `tooltipText`. */
+  tooltip?: () => void
 }>()
 </script>

@@ -18,6 +18,12 @@
 import IconCancel from '@/assets/icons/IconCancel.svg?component'
 
 defineEmits<{
+  /** The clear button was clicked. */
   (e: 'click', value: MouseEvent): void
+}>()
+
+defineSlots<{
+  /** The selection count, such as "Selected 3 items". */
+  default?: () => void
 }>()
 </script>
