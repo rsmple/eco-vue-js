@@ -24,6 +24,7 @@
 import type {ValidateResponse} from './types'
 
 defineProps<{
+  /** Validation result of a form: a message, or the messages of its fields by title, nested for nested forms. */
   message: ValidateResponse | string
 }>()
 </script>

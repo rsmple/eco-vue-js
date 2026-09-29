@@ -207,7 +207,9 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
+  /** The field was clicked. */
   (e: 'click', value: MouseEvent): void
+  /** Items were dropped onto the field, with `allowDropFile`. */
   (e: 'drop', value: DataTransferItemList): void
 }>()
 
@@ -292,11 +294,17 @@ defineExpose({
 })
 
 defineSlots<{
+  /** Replaces the `title` text. */
   title?: () => VNode[]
+  /** Content between the title and the field. */
   subtitle: () => VNode[]
+  /** Content to the right of the field. */
   right?: () => VNode[]
+  /** Content between the field and the description. */
   bottom: () => VNode[]
+  /** The whole field, replacing the value row — for a control of your own. `id` labels it, and `setFocused` shows the length counter while it is focused. */
   field: (props: {id: string, focused: boolean, setFocused: (value: boolean) => void, isDragover: boolean}) => VNode[]
+  /** Content of the value row, replacing the formatted `modelValue`. The copy button stays after it. */
   default: (props: {id: string, focused: boolean, setFocused: (value: boolean) => void, isDragover: boolean}) => VNode[]
 }>()
 </script>

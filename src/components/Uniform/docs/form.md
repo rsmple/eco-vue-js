@@ -17,7 +17,7 @@ The kit's controls — WInput, WSelect, WCheckbox, WToggle, WButtonGroup and the
 
 With `initData`, the form keeps its own copy of the model, built from the given or loaded value. `submit` from the scope, or from the form's template ref, validates the fields and calls `apiMethod`:
 
-- If a field is invalid, nothing is sent: the errors show on the fields, a warning lists them, and the page scrolls to the first one.
+- If a field is invalid, nothing is sent: the errors show on the fields, a warning lists them, and the page scrolls to the first one. The list in the warning is a `WUniformErrorMessage`, which can also show a validation result elsewhere.
 - Only the changed fields are sent. `fullPayload` sends the whole model.
 - The result of `apiMethod` becomes the new initial model, so `hasChanges` resets, and is emitted with `success`.
 - When `apiMethod` rejects with an `ApiError`, the field errors in its response show on the matching fields. Try `taken@example.com` below.
@@ -406,5 +406,21 @@ import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 | --- | --- | --- |
 | `field` | `UniformScopeField<ResultModel>` | Renders the control of a field. Spread the scope onto it with `v-bind`: it carries the model, title, error message and states. |
 | `default` | `UniformScope<ResultModel, InnerModel>` | Renders the fields of a form. Spread the scope onto each nested WUniform with `v-bind`; it also has `submit`, `submitting` and `hasChanges`. |
+
+<!-- @api-end -->
+
+<!-- @api WUniformErrorMessage -->
+
+### WUniformErrorMessage
+
+```ts
+import WUniformErrorMessage from 'eco-vue-js/dist/components/Uniform/WUniformErrorMessage.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `message` | `string \| ValidateResponse` | **required** | Validation result of a form: a message, or the messages of its fields by title, nested for nested forms. |
 
 <!-- @api-end -->

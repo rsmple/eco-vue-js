@@ -5,7 +5,7 @@ description: WDatePicker and WDatePickerSingle calendars for a date range or a d
 
 # Pickers
 
-Controls that pick a value by pointing at it rather than typing it. Unlike the inputs, they have no title or form-field frame of their own, except `WFilePicker` — put them in a `WFieldWrapper` or next to your own label.
+Controls that pick a value by pointing at it rather than typing it. Unlike the inputs, they have no title or form-field frame of their own, except `WFilePicker` — put them in the `field` slot of a [`WFieldWrapper`](/components/field-wrapper) or next to your own label.
 
 ## Dates
 

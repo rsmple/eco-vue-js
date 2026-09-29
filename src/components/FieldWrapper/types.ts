@@ -1,5 +1,5 @@
 export interface FieldWrapperProps {
-  /** Field value. */
+  /** Value shown in the field — numbers with thousands separators and `null` as "N / A". Also what `allowCopy` copies. */
   modelValue?: string | number | boolean | null
   /** Label above the field; the `title` slot replaces it. */
   title?: string
