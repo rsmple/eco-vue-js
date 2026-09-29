@@ -241,6 +241,10 @@ const date = ref<Date>()
 
 <!-- @example-end -->
 
+## Toolbar
+
+A textarea with `rich` gets a toolbar of formatting buttons; `toolbarActions` adds your own. Each action wraps the selected text: `value` is a `WrapSelection`, such as a start and end marker to toggle, and a list of them makes a group that opens on hover. `WInputToolbarButton` is the button itself, for the `toolbar` slot of `WInputSuggest` when a button needs more than a formatting — call the slot's `wrapSelection` from its `click`.
+
 ## API
 
 <!-- @api WInput -->
@@ -761,5 +765,32 @@ import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
 | `title` | — | Replaces the `title` text. |
 | `subtitle` | — | Content between the title and the field. |
 | `right` | `{ unclickable?: boolean \| null \| undefined; }` | Content to the right of the field. On mobile, `unclickable` is `true` for the field on the page and `false` for its copy in the bottom sheet. |
+
+<!-- @api-end -->
+
+<!-- @api WInputToolbarButton -->
+
+### WInputToolbarButton
+
+```ts
+import WInputToolbarButton from 'eco-vue-js/dist/components/Input/WInputToolbarButton.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `string` | — | Text of the button, e.g. "H1". |
+| `icon` | `SVGComponent` | — | Icon of the button. |
+| `value` | `WrapSelection \| { title?: string \| undefined; icon?: SVGComponent \| undefined; value?: WrapSelection \| undefined; label?: string \| undefined; }[]` | — | Formatting applied to the selected text on click. A list turns the button into a group that opens its items on hover. |
+| `tooltip` | `string` | — | Tooltip text. |
+| `disabled` | `boolean` | — | Disables the button. |
+| `label` | `string` | — | Name for screen readers. Defaults to `tooltip`, then `title`. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `click` | `(index: number \| undefined)` | The button was clicked — with the item's index for a group, and `undefined` otherwise. |
 
 <!-- @api-end -->

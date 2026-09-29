@@ -67,6 +67,7 @@ import InputToolbarButton from './components/InputToolbarButton.vue'
 defineProps<ToolbarAction>()
 
 defineEmits<{
+  /** The button was clicked — with the item's index for a group, and `undefined` otherwise. */
   (e: 'click', index: number | undefined): void
 }>()
 

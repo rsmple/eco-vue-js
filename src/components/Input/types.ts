@@ -146,11 +146,17 @@ export type WrapSelection = {
 }
 
 export type ToolbarAction = {
+  /** Text of the button, e.g. "H1". */
   title?: string
+  /** Icon of the button. */
   icon?: SVGComponent
+  /** Formatting applied to the selected text on click. A list turns the button into a group that opens its items on hover. */
   value?: WrapSelection | {title?: string, icon?: SVGComponent, value?: WrapSelection, label?: string}[]
+  /** Tooltip text. */
   tooltip?: string
+  /** Disables the button. */
   disabled?: boolean
+  /** Name for screen readers. Defaults to `tooltip`, then `title`. */
   label?: string
 }
 

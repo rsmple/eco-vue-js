@@ -67,19 +67,33 @@ import SelectAsyncList from './components/SelectAsyncList.vue'
 
 const props = withDefaults(
   defineProps<{
+    /** Label above the list. */
     title?: string
+    /** Text shown when the query returns no options. */
     emptyStub?: string
+    /** Picked values. */
     modelValue: Model[]
+    /** Paginated query of the options, loaded page by page as the list scrolls. */
     useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
+    /** Params of the query, such as a search. */
     queryParams: QueryParams
+    /** Shows placeholders instead of the list. When unset, inherits the skeleton state provided by a parent. */
     skeleton?: boolean
+    /** Params whose change refetches the loaded pages instead of starting from the first one. */
     excludeParams?: (keyof QueryParams)[]
+    /** Only allows picking options, not unpicking them. */
     selectOnly?: boolean
+    /** Only allows unpicking options, not picking them. */
     unselectOnly?: boolean
+    /** Hides the check icon of the options. */
     hideOptionIcon?: boolean
+    /** Value of an option. Defaults to its `id`. */
     valueGetter?: (data: Data) => Model
+    /** Options for every page query. */
     queryOptions?: Partial<Parameters<UseQueryDefault<PaginatedResponse<Data>, QueryParams>>[1]>
+    /** Stops picking. When unset, inherits the disabled state provided by a parent. */
     disabled?: boolean
+    /** Stops picking. When unset, inherits the readonly state provided by a parent. */
     readonly?: boolean
   }>(),
   {
@@ -95,14 +109,18 @@ const props = withDefaults(
 )
 
 defineEmits<{
+  /** An option was picked. */
   (e: 'select', value: Model): void
+  /** An option was unpicked. */
   (e: 'unselect', value: Model): void
+  /** Total number of options, from the query's `count`. */
   (e: 'update:count', value: number): void
 }>()
 
 const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 defineSlots<{
+  /** Content of an option, with `skeleton` while its page loads. */
   default?: (props: PartialNot<SelectOptionProps<Data>>) => void
 }>()
 </script>

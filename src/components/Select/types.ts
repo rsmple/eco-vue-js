@@ -106,7 +106,9 @@ export interface SelectSingleProps<Model extends number | string, Data extends D
 
 export interface SelectStringifiedProps<Model extends string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
   extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue'> {
+  /** Picked values in one string, joined by `divider`. */
   modelValue: Model | null | undefined
+  /** Separator between the values, e.g. `,`, or `json` for a JSON array of strings. */
   divider: string | 'json'
 }
 

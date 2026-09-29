@@ -72,8 +72,11 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
+  /** The picked values, joined into one string. */
   (e: 'update:model-value', value: Model): void
+  /** Error message of the options query, or `undefined` once it loads. */
   (e: 'update:query-options-error', value: string | undefined): void
+  /** The options loaded. */
   (e: 'init-model'): void
 }>()
 
@@ -129,10 +132,15 @@ defineExpose({
 })
 
 defineSlots<{
+  /** Replaces the `title` text. */
   title?: () => VNode[]
+  /** Content between the title and the field. */
   subtitle?: () => VNode[]
+  /** Content to the right of the field. */
   right?: () => VNode[]
+  /** Content of an option, in the menu and in the chips. */
   option?: (props: PartialNot<SelectOptionProps<Data>>) => VNode[]
+  /** Content at the top of the menu. */
   content?: () => VNode[]
 }>()
 </script>

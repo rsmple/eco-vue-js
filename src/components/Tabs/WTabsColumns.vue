@@ -25,6 +25,7 @@ import {useIsMobile} from '@/utils/mobile'
 const {isMobile} = useIsMobile()
 
 defineSlots<{
+  /** WTabsItem items: tabs on phones, and columns side by side from `sm` up. */
   default: () => []
 }>()
 </script>

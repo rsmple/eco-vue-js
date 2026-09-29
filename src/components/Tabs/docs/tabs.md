@@ -196,6 +196,8 @@ import IconUser from 'eco-vue-js/dist/assets/icons/IconUser'
 
 `WButtonTab` is the tab button on its own, for a button among the tab buttons that isn't a tab — such as "New chat" at the top of a side column of chats. With `side` it lines up with the side column's buttons; `title`, `icon` and `count` show as on a tab, and it emits `click`.
 
+`WTabsColumns` shows its `WTabsItem` items as tabs on phones and as columns side by side from `sm` up, e.g. for the two halves of a form in a modal.
+
 ## Tabs in forms
 
 An item's `hasError`, `hasChanges` and `hasValue` mark its button — `statusIcon` shows them as icons, `showHasValue` marks tabs with a value. When a tab gets an error while another is open, the tabs switch to it; `noSwitchOnInvalid` turns that off. Inside a Uniform form the tab items pick these states up from their fields on their own.
@@ -334,5 +336,25 @@ import WButtonTab from 'eco-vue-js/dist/components/Button/WButtonTab.vue'
 | --- | --- | --- |
 | `title` | `{ hasChanges?: boolean \| undefined; hasError?: boolean \| undefined; hasValue?: boolean \| undefined; }` | Content of the button, replacing the title, icon, count and status icon. |
 | `suffix` | `{ hasChanges?: boolean \| undefined; hasError?: boolean \| undefined; hasValue?: boolean \| undefined; }` | Content after the title, such as a close button. |
+
+<!-- @api-end -->
+
+<!-- @api WTabsColumns -->
+
+### WTabsColumns
+
+```ts
+import WTabsColumns from 'eco-vue-js/dist/components/Tabs/WTabsColumns.vue'
+```
+
+#### Props
+
+_No props._
+
+#### Slots
+
+| Slot | Props | Description |
+| --- | --- | --- |
+| `default` | — | WTabsItem items: tabs on phones, and columns side by side from `sm` up. |
 
 <!-- @api-end -->
