@@ -17,7 +17,7 @@
         <div
           class="flex h-full items-center justify-end rounded-inherit"
           :class="{
-            [!errorMessage ? semanticType : SemanticType.NEGATIVE]: !disabled,
+            [semanticTypeBackgroundMap[errorMessage ? SemanticType.NEGATIVE : semanticType]]: !disabled,
             'bg-gray-400 dark:bg-gray-500': disabled,
           }"
           :style="{width: percentCompactFormatter.format(rangeScale(cursor ?? modelValue))}"
@@ -54,20 +54,28 @@
 import {computed, onBeforeUnmount, ref, useTemplateRef, watch} from 'vue'
 
 import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
-import {SemanticType} from '@/utils/SemanticType'
+import {SemanticType, useSemanticTypeBackgroundMap} from '@/utils/SemanticType'
 import {percentCompactFormatter} from '@/utils/utils'
 
 const POINTER_EVENTS_NONE_CLASS = 'pointer-events-none'
 
 const props = withDefaults(
   defineProps<{
+    /** Picked value, from `min` to `max`. */
     modelValue: number
+    /** Value at the left end. */
     min?: number
+    /** Value at the right end. */
     max?: number
+    /** Values snap to steps of this size from `min`. */
     step?: number
+    /** Color of the filled part. */
     semanticType?: SemanticType
+    /** Grays the slider out and stops dragging. */
     disabled?: boolean
+    /** Stops dragging. */
     readonly?: boolean
+    /** Error shown under the slider. The filled part turns red. */
     errorMessage?: string
   }>(),
   {
@@ -80,9 +88,18 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: number): void
-  (e: 'update-eager:modelValue', value: number): void
+  /** The value where dragging ended. */
+  (e: 'update:model-value', value: number): void
+  /** The value under the pointer while dragging, for showing it before it is picked. */
+  (e: 'update-eager:model-value', value: number): void
 }>()
+
+defineSlots<{
+  /** Content to the right of the slider, such as the value. */
+  right?: () => void
+}>()
+
+const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()
 
 const cursor = ref<number | undefined>()
 
@@ -93,11 +110,10 @@ const rect = ref<DOMRect | undefined>()
 
 const range = computed(() => props.max - props.min)
 
-const rectMin = computed(() => props.min + props.step / 2)
 const rangeToRect = computed<number | undefined>(() => rect.value && rect.value.width !== 0 ? range.value / rect.value.width : undefined)
 
 const rangeScale = (value: number): number => {
-  return (props.min + value) / range.value
+  return (value - props.min) / range.value
 }
 
 const handleMove = (event: MouseEvent | TouchEvent): void => {
@@ -125,9 +141,9 @@ const handleMove = (event: MouseEvent | TouchEvent): void => {
     return
   }
 
-  const value = rectMin.value + rangeToRect.value * start
+  const value = props.min + rangeToRect.value * start
 
-  cursor.value = value - value % props.step
+  cursor.value = Math.min(props.max, props.min + Math.round((value - props.min) / props.step) * props.step)
 }
 
 const startMove = (event: MouseEvent | TouchEvent): void => {
@@ -151,7 +167,7 @@ const startMove = (event: MouseEvent | TouchEvent): void => {
 const endMove = (): void => {
   if (props.readonly || props.disabled) return
 
-  if (cursor.value !== undefined) emit('update:modelValue', cursor.value)
+  if (cursor.value !== undefined) emit('update:model-value', cursor.value)
 
   isMoveStarted.value = false
   rect.value = undefined
@@ -167,7 +183,7 @@ watch(cursor, value => {
   if (props.readonly || props.disabled) return
   if (value === undefined) return
 
-  emit('update-eager:modelValue', value)
+  emit('update-eager:model-value', value)
 })
 
 onBeforeUnmount(() => {

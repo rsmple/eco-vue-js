@@ -59,16 +59,20 @@ import {useCalendarNavigation} from './use/useCalendarNavigation'
 
 const props = withDefaults(
   defineProps<{
+    /** Picked day. The calendar opens at its month. */
     modelValue: Date | undefined
-    title?: string
+    /** First day that can be picked. The calendar doesn't go to earlier months. */
     minDate?: Date
+    /** Last day that can be picked. The calendar doesn't go to later months. */
     maxDate?: Date
+    /** Shows the calendar without picking a day. When unset, inherits the readonly state provided by a parent. */
     readonly?: boolean
+    /** Shows the calendar without picking a day. When unset, inherits the disabled state provided by a parent. */
     disabled?: boolean
+    /** Shows the calendar without picking a day. When unset, inherits the skeleton state provided by a parent. */
     skeleton?: boolean
   }>(),
   {
-    title: undefined,
     minDate: undefined,
     maxDate: undefined,
     readonly: undefined,
@@ -80,6 +84,7 @@ const props = withDefaults(
 const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 
 const emit = defineEmits<{
+  /** The clicked day, at the start of the day. */
   (e: 'update:model-value', value: Date | undefined): void
 }>()
 

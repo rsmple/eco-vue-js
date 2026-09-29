@@ -156,15 +156,25 @@ import FilePickerSvg from './components/FilePickerSvg.vue'
 
 const props = withDefaults(
   defineProps<{
+    /** Picked files. */
     modelValue: File[]
+    /** Name of a file that is already saved, such as the current avatar, shown while no file is picked. Removing it emits `clear:placeholder`. */
     placeholder?: string
+    /** Lets several files be picked at once. */
     multiple?: boolean
+    /** File types the browse dialog offers, as in the input's `accept` attribute, e.g. `image/*,.pdf`. */
     accept?: string
+    /** Error shown under the drop zone. The files get a cross instead of a check. */
     errorMessage?: string
+    /** Label above the drop zone. */
     title?: string
+    /** Shows a placeholder for the title and stops picking. When unset, inherits the skeleton state provided by a parent. */
     skeleton?: boolean
+    /** Stops picking. When unset, inherits the readonly state provided by a parent. */
     readonly?: boolean
+    /** Stops picking. When unset, inherits the disabled state provided by a parent. */
     disabled?: boolean
+    /** Marks the title with a red asterisk. */
     required?: boolean
   }>(),
   {
@@ -179,8 +189,19 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
+  /** Files picked with the dialog or dropped, replacing the previous ones, or the files left after one is removed. */
   (e: 'update:model-value', value: File[]): void
+  /** The `placeholder` file was removed. */
   (e: 'clear:placeholder'): void
+}>()
+
+defineSlots<{
+  /** Replaces the `title` text. */
+  title?: () => void
+  /** Icon of a file, replacing the check. `file` is unset for the `placeholder`. */
+  positive?: (props: {file?: File}) => void
+  /** Icon of a file while there is an error, replacing the cross. `file` is unset for the `placeholder`. */
+  negative?: (props: {file?: File}) => void
 }>()
 
 const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
@@ -199,7 +220,13 @@ const setIsActive = (value: boolean): void => {
 const onDrop = (event: DragEvent): void => {
   setIsActive(false)
 
-  emit('update:model-value', event.dataTransfer?.files?.length ? Array.from(event.dataTransfer.files) : [])
+  if (isReadonly.value || isDisabled.value || isSkeleton.value) return
+
+  const files = Array.from(event.dataTransfer?.files ?? [])
+
+  if (!files.length) return
+
+  emit('update:model-value', props.multiple ? files : files.slice(0, 1))
 }
 
 const unselectFile = (index: number): void => {

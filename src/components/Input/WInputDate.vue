@@ -41,7 +41,6 @@
       >
         <WDatePickerSingle
           :model-value="modelValue"
-          :title="title"
           :min-date="minDate"
           :max-date="maxDate"
           @update:model-value="$emit('update:model-value', $event); formatModelValue($event)"

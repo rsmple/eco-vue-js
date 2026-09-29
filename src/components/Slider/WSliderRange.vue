@@ -15,7 +15,7 @@
         class="relative h-1 w-full rounded-sm bg-gray-200 dark:bg-gray-600"
       >
         <div
-          class="absolute flex h-full items-center rounded-inherit bg-linear-to-r from-(--w-slider-from) from-50% to-(--w-slider-to) to-50%"
+          class="absolute flex h-full items-center rounded-inherit bg-linear-to-r from-(--w-slider-from,var(--color-primary)) from-50% to-(--w-slider-to,var(--color-primary)) to-50%"
           :class="{
             'bg-gray-400 dark:bg-gray-500': disabled,
           }"
@@ -25,7 +25,7 @@
           }"
         >
           <div
-            class="square-4 absolute left-0 -ml-2 rounded-full bg-(--w-slider-from) transition-transform"
+            class="square-4 absolute left-0 -ml-2 rounded-full bg-(--w-slider-from,var(--color-primary)) transition-transform"
             :class="{
               'scale-180': isCursorFrom === true,
               'hover:scale-200': !readonly && isCursorFrom === null,
@@ -33,7 +33,7 @@
           />
 
           <div
-            class="square-4 absolute right-0 -mr-2 rounded-full bg-(--w-slider-to) transition-transform"
+            class="square-4 absolute right-0 -mr-2 rounded-full bg-(--w-slider-to,var(--color-primary)) transition-transform"
             :class="{
               'scale-180': isCursorFrom === false,
               'hover:scale-200': !readonly && isCursorFrom === null,
@@ -65,7 +65,6 @@
 import {computed, onBeforeUnmount, ref, useTemplateRef, watch} from 'vue'
 
 import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
-import {SemanticType} from '@/utils/SemanticType'
 import {percentCompactFormatter} from '@/utils/utils'
 
 type Range = {from: number, to: number}
@@ -74,28 +73,39 @@ const POINTER_EVENTS_NONE_CLASS = 'pointer-events-none'
 
 const props = withDefaults(
   defineProps<{
+    /** Picked range, with `from` no greater than `to`. */
     modelValue: Range
+    /** Value at the left end. */
     min?: number
+    /** Value at the right end. */
     max?: number
+    /** Values snap to steps of this size from `min`. */
     step?: number
-    semanticType?: SemanticType
+    /** Grays the slider out and stops dragging. */
     disabled?: boolean
+    /** Stops dragging. */
     readonly?: boolean
+    /** Error shown under the slider. */
     errorMessage?: string
-    noBg?: boolean
   }>(),
   {
     min: 1,
     max: 10,
     step: 1,
-    semanticType: SemanticType.PRIMARY,
     errorMessage: undefined,
   },
 )
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Range): void
-  (e: 'update-eager:modelValue', value: Range): void
+  /** The range where dragging ended. */
+  (e: 'update:model-value', value: Range): void
+  /** The range under the pointer while dragging, for showing it before it is picked. */
+  (e: 'update-eager:model-value', value: Range): void
+}>()
+
+defineSlots<{
+  /** Content to the right of the slider, such as the range. */
+  right?: () => void
 }>()
 
 const cursor = ref<number | null>(null)
@@ -163,7 +173,7 @@ const handleMove = (event: MouseEvent | TouchEvent): void => {
     else isCursorFrom.value = (value - props.modelValue.from) <= (props.modelValue.to - value)
   }
 
-  cursor.value = Math.round(value / props.step) * props.step
+  cursor.value = Math.min(props.max, props.min + Math.round((value - props.min) / props.step) * props.step)
 }
 
 const startMove = (event: MouseEvent | TouchEvent): void => {
@@ -187,7 +197,7 @@ const startMove = (event: MouseEvent | TouchEvent): void => {
 const endMove = (): void => {
   if (props.readonly || props.disabled) return
 
-  if (cursorRange.value && cursorRange.value !== props.modelValue) emit('update:modelValue', cursorRange.value)
+  if (cursorRange.value && cursorRange.value !== props.modelValue) emit('update:model-value', cursorRange.value)
 
   isMoveStarted.value = false
   rect.value = null
@@ -204,7 +214,7 @@ watch(cursorRange, value => {
   if (props.readonly || props.disabled) return
   if (value === props.modelValue || !value) return
 
-  emit('update-eager:modelValue', value)
+  emit('update-eager:model-value', value)
 })
 
 onBeforeUnmount(() => {
