@@ -36,9 +36,22 @@ import {SemanticType} from '@/utils/SemanticType'
 import {infoCardIconSemanticTypeMap, infoCardSemanticTypeMap} from './models/utils'
 
 defineProps<{
+  /** Drops the colored background, leaving the icon and text. */
   noBg?: boolean
+  /** Hides the icon. */
   noIcon?: boolean
+  /** Icon before the text. Defaults to an info icon, or an exclamation mark for `WARNING` and `NEGATIVE`. */
   icon?: SVGComponent
+  /** Color scheme of the background and icon. Defaults to `SECONDARY`. */
   semanticType?: SemanticType
+}>()
+
+defineSlots<{
+  /** Text of the card, next to the icon. */
+  default?: () => void
+  /** Content above the icon and text. */
+  top?: () => void
+  /** Content under the icon and text, such as actions. */
+  bottom?: () => void
 }>()
 </script>

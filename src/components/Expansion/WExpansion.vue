@@ -26,7 +26,9 @@
 <script lang="ts" setup>
 withDefaults(
   defineProps<{
+    /** Expands the content, animating its height. Collapsed content stays alive, keeping its state. */
     isOpen?: boolean
+    /** Shows the content. `false` hides it at once, without the animation. */
     isShown?: boolean
   }>(),
   {
@@ -36,6 +38,12 @@ withDefaults(
 )
 
 defineEmits<{
+  /** `true` as the content starts to expand, `false` once it has collapsed. */
   (e: 'update:visible', value: boolean): void
+}>()
+
+defineSlots<{
+  /** Content that expands and collapses. */
+  default?: () => void
 }>()
 </script>

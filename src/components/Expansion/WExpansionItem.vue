@@ -4,6 +4,7 @@
     ref="button"
     role="button"
     tabindex="0"
+    :aria-expanded="isOpen"
     class="w-ripple w-ripple-hover px---inner-margin relative grid cursor-pointer select-none grid-cols-[1fr_auto] items-center gap-2 py-3 text-start"
     :class="toggleClass"
     @click="toggle"
@@ -59,20 +60,29 @@ import IconArrow from '@/assets/icons/IconArrow.svg?component'
 import WExpansion from './WExpansion.vue'
 
 defineProps<{
+  /** Expands the content. The item doesn't toggle itself: set it on `toggle`. */
   isOpen?: boolean
+  /** Text of the toggle row. */
   title?: string
+  /** Icon before the title. */
   icon?: SVGComponent
+  /** Shows a dot after the title, e.g. for new content inside. */
   hasFlag?: boolean
+  /** Smaller title text. */
   minTitle?: boolean
+  /** Class of the toggle row. */
   toggleClass?: string
 }>()
 
 const emit = defineEmits<{
+  /** The toggle row was clicked, or Enter or Space was pressed on it. */
   (e: 'toggle'): void
 }>()
 
 defineSlots<{
+  /** Content that expands under the toggle row. The component's class goes on it. */
   default?: () => VNode[]
+  /** An empty element that the toggle row renders as instead of a `div`, e.g. `<h3 />` for a heading. */
   title?: () => VNode[]
 }>()
 

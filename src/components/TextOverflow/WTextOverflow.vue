@@ -23,6 +23,11 @@
 <script setup lang="ts">
 import {onBeforeUnmount, onMounted, ref, useTemplateRef} from 'vue'
 
+defineSlots<{
+  /** One line of text. When it is wider than the component, hovering scrolls it to its end. */
+  default?: () => void
+}>()
+
 // Use group/overflow to trigger from outside elements hover
 
 const overflow = ref(0)

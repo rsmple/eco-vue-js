@@ -28,7 +28,14 @@ const stylesMap: Record<SemanticType, string> = {
 }
 
 defineProps<{
+  /** Heading of the card, after a warning icon. */
   title: string
+  /** Color of the icon. Defaults to `NEGATIVE`. */
   semanticType?: SemanticType
+}>()
+
+defineSlots<{
+  /** Description under the title. */
+  default?: () => void
 }>()
 </script>
