@@ -161,19 +161,38 @@ import WTooltip from '@/components/Tooltip/WTooltip.vue'
 type DataPrepared = {x: number, y: number, yMin: number, yMax: number, d: Data, imagine: boolean}
 
 const props = defineProps<{
+  /** Points of the line, newest first. The line runs on flat to both edges of the chart. */
   data: Data[]
+  /** Key of the timestamp of a point, in ms. */
   xKey: keyof Data
+  /** Key of the value of a point. */
   yKey: keyof Data
+  /** Key of the lower bound of a point, for a band around the line with `yKeyMax`. */
   yKeyMin?: keyof Data
+  /** Key of the upper bound of a point, for a band around the line with `yKeyMin`. */
   yKeyMax?: keyof Data
+  /** Style of the line. */
   strokeStyle?: 'solid' | 'dashed' | 'dashed-small' | 'dotted'
+  /** Width of the line in px. Defaults to 2. */
   strokeWidth?: number
+  /** Fills the area under the line with a fading color. */
   hasArea?: boolean
-  showPoints?: boolean
+  /** Radius in px of the point marked under the tooltip. Defaults to 3. */
   pointRadius?: number
+  /** Text shown when there are no points in range. The `empty` slot replaces it. */
   emptyStub?: string
+  /** Lets the y axis start above 0, at the lowest value. By default it includes 0. */
   calcMin?: boolean
 } & ChartContext>()
+
+defineSlots<{
+  /** Content of the tooltip for the point nearest the pointer, with its data, the older point's data as `prev` and the newer one's as `next`, and its position. The line only has a tooltip with this slot. */
+  tooltip?: (props: {d: Data, x: number, y: number, index: number | null, prev: Data | undefined, next: Data | undefined}) => void
+  /** `stop` elements of a vertical gradient for the line's color, e.g. green below a threshold and red above it. `scaleYPercent` places a value on it. By default the line is the current text color. */
+  gradient?: (props: {scaleY: (value: number) => number, scaleYPercent: (value: number) => number, topPercent: number, bottomPercent: number}) => void
+  /** Content shown when there are no points in range, replacing `emptyStub`. */
+  empty?: () => void
+}>()
 
 const gradientId = useId()
 const gradientAreaId = useId()

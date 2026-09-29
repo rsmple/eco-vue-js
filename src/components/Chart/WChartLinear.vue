@@ -67,17 +67,29 @@ import ChartAxis from './components/ChartAxis.vue'
 
 const props = withDefaults(
   defineProps<{
+    /** Time range of the x axis, as `[from, to]` timestamps in ms. The axis labels are dates, and "Today". */
     xDomain: [number, number]
+    /** Range of the y axis from the range of all the lines' values. By default it is rounded out to tens or hundreds and starts at 0 or below. */
     yDomainGetter?: (extent: [number, number]) => [number, number]
+    /** Height of the chart in px. By default it fills the height of its parent. */
     height?: number
+    /** Hides the x axis. */
     xHidden?: boolean
+    /** Hides the y axis. */
     yHidden?: boolean
+    /** Puts the y axis on the right. */
     yRight?: boolean
+    /** Labels of the y axis. */
     yFormat?: (value: number) => string
+    /** Space above the plot in px, for the axis labels. */
     top?: number
+    /** Space under the plot in px. */
     bottom?: number
+    /** Space left of the plot in px. */
     left?: number
+    /** Space right of the plot in px. */
     right?: number
+    /** Shows a placeholder instead of the chart. When unset, inherits the skeleton state provided by a parent. */
     skeleton?: boolean
   }>(),
   {
@@ -171,6 +183,7 @@ defineExpose({
 })
 
 defineSlots<{
+  /** SVG content of the chart, such as WChartLine lines — bind the scope to each one. Gets the scales and sizes for drawing your own marks. */
   default: (props: ChartContext) => VNode[]
 }>()
 </script>

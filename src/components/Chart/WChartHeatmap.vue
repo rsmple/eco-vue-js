@@ -94,10 +94,15 @@ type DataEntry = {
 
 const props = withDefaults(
   defineProps<{
+    /** Values by day, over the last year. */
     data: Data[]
+    /** Key of the timestamp of a day, in ms. */
     xKey: keyof PickByType<Required<Data>, number>
+    /** Key of the day's value, which sets its shade. */
     yKey: keyof PickByType<Required<Data>, number>
+    /** Heading above the grid, next to the legend. */
     title?: string
+    /** Shows a placeholder instead of the chart. When unset, inherits the skeleton state provided by a parent. */
     skeleton?: boolean
   }>(),
   {
@@ -170,6 +175,7 @@ const dataMap = computed(() => {
 })
 
 defineSlots<{
+  /** Tooltip of a day with data, with the day's data and its index in `data`. */
   tooltip?: (props: {d: Data, index: number}) => unknown
 }>()
 </script>
