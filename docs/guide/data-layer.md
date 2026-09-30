@@ -1,7 +1,7 @@
 ---
 group: Guide
 order: 4
-description: Fetch data for the kit's lists and selects — ApiClientInstance for requests and auth, createRestModelApi for a model's queries and actions that keep every cached copy in sync, query params kept in the URL, and handleApiError for failed requests.
+description: Fetch data for the kit's lists and selects — ApiClientInstance for requests and auth, createRestModelApi for a model's queries and actions that keep every cached copy in sync, list filters kept in the URL, and handleApiError for failed requests.
 ---
 
 # Data layer
@@ -10,7 +10,7 @@ Lists, infinite lists and async selects don't fetch anything themselves. They ta
 
 - `ApiClientInstance` sends the requests and handles auth.
 - `createRestModelApi` declares a model's queries and the actions that change it, keeping every cached copy of an item in sync.
-- `createUseQueryParams` keeps a list's filters, ordering and page in the URL.
+- `createUseQueryParams` keeps the filters a user sets on a list in the URL.
 - `handleApiError` reports a failed request in a notification and in the form that sent it.
 
 The [query client](/guide/getting-started#query-client) has to be installed first.
@@ -318,27 +318,27 @@ export const taskModelApi = createRestModelApi({
 
 <!-- @source-end -->
 
-## Query params in the URL
+## Filters in the URL
 
-`createUseQueryParams` declares a list's params with a parser for each, which turns the value from the URL back into its type:
+The filters a user sets on a list — a search, a type, a sort order — can be kept in the URL, so a reload or a shared link opens the list as it was. `createUseQueryParams` declares them with a parser for each, which turns the value from the URL back into its type:
 
 ```ts
 import {createUseQueryParams} from 'eco-vue-js/dist/utils/api'
-import {useQueryParamsList} from 'eco-vue-js/dist/utils/queryParams'
 import {parseBoolean, parseIdList, parseString} from 'eco-vue-js/dist/utils/utils'
 
 export const useQueryParamsProducts = createUseQueryParams({
   search: parseString,
   product_type__in: parseIdList,
   is_default: parseBoolean,
-
-  ...useQueryParamsList.config,
+  ordering: parseString,
 })
 
 export type QueryParamsProducts = typeof useQueryParamsProducts['QueryParams']
 ```
 
-On a page, it reads the params from the route and writes changes back to it:
+Leave `page` and `size` out: the list adds them to each page's query itself.
+
+On a page, the declaration reads the filters from the route and writes changes back to it:
 
 ```ts
 const route = useRoute()
@@ -346,19 +346,10 @@ const {queryParams, updateQueryParams} = useQueryParamsProducts(route)
 ```
 
 - `queryParams` is a reactive object parsed from the route's query. It goes to the list as `query-params`. The object is created once per declaration, so the pages that use one declaration share it.
-- `updateQueryParams(value)` merges `value` into the URL with `router.replace`. An empty value removes its param. Bind it to the list's `update:query-params` and to the filters.
-- `useQueryParamsProducts.useQueryParamsLocal(initial?)` gives the same pair without the URL, e.g. for a list in a modal.
+- `updateQueryParams(value)` merges `value` into the URL with `router.replace`. An empty value removes its param. Bind it to the filters and to the list's `update:query-params`, which sets `ordering` when a column is sorted.
+- `useQueryParamsProducts.useQueryParamsLocal(initial?)` gives the same pair without the URL, for filters that don't need to survive a reload, e.g. in a modal.
 
-The parsers in `eco-vue-js/dist/utils/utils` are `parseString`, `parseBoolean`, `parseInteger`, `parseId`, `parseIdList`, `parseIntegerList`, `parseStringList`, `parseSliceIndexes` and `parseJson(guard)`. `eco-vue-js/dist/utils/queryParams` has ready declarations to spread from:
-
-| Declaration | Params |
-| --- | --- |
-| `useQueryParamsPage` | `page`, `size`, `slice_indexes` |
-| `useQueryParamsList` | `ordering` and the page params |
-| `useQueryParamsId` | `id__in`, `id__not_in` — the bulk selection of a list |
-| `useQueryParamsListBulk` | the id and list params together |
-
-The `…String` variants take string ids.
+The parsers in `eco-vue-js/dist/utils/utils` are `parseString`, `parseBoolean`, `parseInteger`, `parseId`, `parseIdList`, `parseIntegerList`, `parseStringList` and `parseJson(guard)`. A declaration's `config` can be spread into another, to share filters between lists.
 
 ## Errors
 
