@@ -7,22 +7,26 @@ const isSelectedRange = (value: unknown): value is [number, number] => {
   return Array.isArray(value) && value.length === 2 && value.every(isIndex) && value[0]! <= value[1]!
 }
 
+const isSelectionIdArray = (value: unknown): value is number[] => {
+  return isIdArray(value) || (Array.isArray(value) && value.every(item => typeof item === 'string' && item.length > 0))
+}
+
 const keysLengthSelection: ObjectKeys<Selection<number>>['length'] = 3
 
 const isSelection = (value: unknown): value is Selection<number> => {
   return value instanceof Object && Object.keys(value).length <= keysLengthSelection
     && (
       ('range' in value && isSelectedRange(value.range))
-      || ('id__in' in value && isIdArray(value.id__in))
-      || ('id__not_in' in value && isIdArray(value.id__not_in))
+      || ('id__in' in value && isSelectionIdArray(value.id__in))
+      || ('id__not_in' in value && isSelectionIdArray(value.id__not_in))
     )
 }
 
 const parseSelection = (value: Partial<Selection<number>>): Selection<number> => {
   return {
     range: isSelectedRange(value.range) ? value.range : undefined,
-    id__in: isIdArray(value.id__in) ? value.id__in : undefined,
-    id__not_in: isIdArray(value.id__not_in) ? value.id__not_in : undefined,
+    id__in: isSelectionIdArray(value.id__in) ? value.id__in : undefined,
+    id__not_in: isSelectionIdArray(value.id__not_in) ? value.id__not_in : undefined,
   }
 }
 
