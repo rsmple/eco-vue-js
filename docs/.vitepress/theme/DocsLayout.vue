@@ -1,11 +1,12 @@
 <template>
-  <div class="docs-shell">
-    <DocsNav
-      v-if="!isHome || isTablet"
-      @update:is-open="isNavOpen = $event"
-    />
+  <!-- The home page has no nav on wide screens and doesn't keep its space, so the page is centred in the frame. -->
+  <div
+    class="docs-shell"
+    :class="{'[--nav-bar-width:0px]': isHome}"
+  >
+    <DocsNav v-if="!isHome || isTablet" />
 
-    <WHeaderBar class="pl-[calc(var(--left-margin)+var(--nav-bar-width))] pr-[calc(var(--right-margin)+var(--actions-bar-width))]">
+    <WHeaderBar class="pl-[calc(var(--left-margin)+var(--nav-bar-width))] pr-(--right-margin)">
       <template #title>
         <a
           :href="withBase('/')"
@@ -20,7 +21,7 @@
 
           <span class="leading-none">
             <span class="text-accent text-xl font-semibold tracking-tight sm:text-2xl leading-none">EcoVue</span>
-            <span class="text-description text-base font-medium tracking-[0.2em] uppercase mx-4">UI Library</span>
+            <span class="text-description mx-4 hidden text-base font-medium tracking-[0.2em] uppercase lg:inline">UI Library</span>
           </span>
         </a>
       </template>
@@ -39,52 +40,65 @@
             {{ item.text }}
           </a>
         </nav>
-      </template>
-    </WHeaderBar>
 
-    <div class="pl-[calc(var(--left-margin)+var(--nav-bar-width))] pr-[calc(var(--right-margin)+var(--actions-bar-width))]">
-      <VPContent />
-    </div>
-
-    <Transition
-      enter-active-class="transition-[translate]"
-      leave-active-class="transition-[translate]"
-      enter-from-class="translate-x-full"
-      leave-to-class="translate-x-full"
-    >
-      <WActionsBar v-if="!isMobile || isNavOpen">
-        <template #top>
-          <WButtonAction
-            title="Search"
-            :icon="markRaw(IconSearch)"
+        <div class="flex items-center gap-1 pl-4 sm:gap-2 md:pl-6">
+          <button
+            class="
+              text-description hover:text-accent flex items-center gap-2 rounded-lg p-2 transition-colors
+              sm:border sm:border-gray-200 sm:py-1.5 sm:pr-2 sm:pl-3 sm:dark:border-gray-800
+            "
+            aria-label="Search"
+            aria-keyshortcuts="Meta+K /"
             @click="isSearchOpen = true"
-          />
+          >
+            <IconSearch class="square-4.5" />
 
-          <WButtonAction
+            <span class="hidden text-sm sm:inline">Search</span>
+
+            <kbd class="hidden rounded-md bg-gray-100 px-1.5 font-sans text-xs sm:inline dark:bg-gray-800">⌘K</kbd>
+          </button>
+
+          <a
             v-for="link in SOCIAL_LINKS"
             :key="link.href"
-            :title="link.title"
-            :icon="link.icon"
             :href="link.href"
-            tag="a"
+            :aria-label="link.title"
             target="_blank"
             rel="noopener"
-          />
-        </template>
+            class="text-description hover:text-accent hidden p-2 transition-colors sm:block"
+          >
+            <component
+              :is="link.icon"
+              class="square-5"
+            />
+          </a>
 
-        <template #footer>
           <!-- The theme is only known in the browser, so the server can't render the right icon. -->
           <ClientOnly>
             <WToggleTheme
               :model-value="isDark ? Theme.DARK : Theme.LIGHT"
-              center
-              class="mb-4"
+              no-margin
+              class="ml-1"
               @update:model-value="isDark = $event === Theme.DARK"
             />
           </ClientOnly>
+        </div>
+      </template>
+    </WHeaderBar>
+
+    <div class="pl-[calc(var(--left-margin)+var(--nav-bar-width))] pr-(--right-margin)">
+      <VPContent>
+        <template #home-hero-before>
+          <DocsHomeHero />
         </template>
-      </WActionsBar>
-    </Transition>
+
+        <template #home-hero-after>
+          <DocsHomeFeatures />
+        </template>
+      </VPContent>
+
+      <DocsHomeFooter v-if="isHome" />
+    </div>
 
     <VPLocalSearchBox
       v-if="isSearchOpen"
@@ -104,13 +118,14 @@ import {computed, defineAsyncComponent, markRaw, onBeforeUnmount, onMounted, pro
 import {useIsMobile} from 'eco-vue-js/dist/utils/mobile'
 import {Theme} from 'eco-vue-js/dist/utils/utils'
 
-import WActionsBar from 'eco-vue-js/dist/components/ActionsBar/WActionsBar.vue'
-import WButtonAction from 'eco-vue-js/dist/components/Button/WButtonAction.vue'
 import WHeaderBar from 'eco-vue-js/dist/components/HeaderBar/WHeaderBar.vue'
 import WToggleTheme from 'eco-vue-js/dist/components/Toggle/WToggleTheme.vue'
 
 import IconSearch from 'eco-vue-js/dist/assets/icons/IconSearch'
 
+import DocsHomeFeatures from './components/DocsHomeFeatures.vue'
+import DocsHomeFooter from './components/DocsHomeFooter.vue'
+import DocsHomeHero from './components/DocsHomeHero.vue'
 import DocsNav from './components/DocsNav.vue'
 import KitContainers from './components/KitContainers.vue'
 import IconGithub from './icons/IconGithub.svg?component'
@@ -143,10 +158,9 @@ const navItems = computed(() => ((theme.value.nav ?? []) as DefaultTheme.NavItem
 registerWatchers({closeSidebar: () => undefined})
 provide(layoutInfoInjectionKey, {heroImageSlotExists: computed(() => false)})
 
-// The home page hides the nav on wide screens but keeps its space; below xl the nav is an overlay behind the menu button anyway.
-const {isMobile, isTablet} = useIsMobile()
+// The home page hides the nav on wide screens; below xl the nav is an overlay behind the menu button anyway.
+const {isTablet} = useIsMobile()
 
-const isNavOpen = ref(false)
 const isSearchOpen = ref(false)
 
 const onKeydown = (event: KeyboardEvent) => {

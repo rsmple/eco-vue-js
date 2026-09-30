@@ -25,7 +25,6 @@
 
 @theme {
   --spacing-nav-bar-width: 15rem;
-  --spacing-actions-bar-width: 3.5rem;
   --spacing-docs-max-width: 92rem;
   --spacing-docs-content-width: 56rem;
   --spacing-docs-aside-width: 16rem;
@@ -35,10 +34,10 @@
 body {
   --header-height: 3.5rem;
   --nav-bar-width: 0px;
+  /* The site has no actions bar: search, links and the theme toggle are in the header. */
   --actions-bar-width: 0px;
   --inner-margin: 1rem;
   --inner-width-diff: calc(var(--nav-bar-width) + var(--actions-bar-width) + (var(--inner-margin) * 2));
-  --w-actions-bar-width: var(--spacing-actions-bar-width);
 
   /* On wide screens the whole shell is centred; the bars are offset by the same margins. */
   --left-margin: max(0px, (100vw - var(--spacing-docs-max-width)) / 2);
@@ -52,16 +51,11 @@ body {
     w-list-header-h-9 w-list-header-rounded-xl w-list-padding-3
     w-list-header-bg-primary-light dark:w-list-header-bg-primary-darkest
     sm:[--inner-margin:1.5rem]
-    sm:[--actions-bar-width:var(--spacing-actions-bar-width)]
     xl:[--nav-bar-width:var(--spacing-nav-bar-width)];
 }
 
 .w-nav-bar {
   @apply bg-default dark:bg-default-dark shadow-md xl:shadow-none;
-}
-
-.w-actions-bar {
-  @apply bg-default dark:bg-default-dark shadow-md sm:shadow-none;
 }
 
 /* VitePress styles, driven by the kit's tokens. Colors go on :root, where VitePress derives its own variables from
@@ -100,17 +94,15 @@ body {
   padding: var(--header-height) 0 0;
 }
 
-/* The home page keeps the frame of a doc page: the nav bar's space stays empty, and the hero and features take the
-   text and outline width, from the same left edge. */
-#VPContent .VPHero,
-#VPContent .VPFeatures {
-  padding-inline: var(--inner-margin);
+/* The home hero's backdrop runs to the viewport's edges, past VPHome's box: the shell clips it instead of VPHome. */
+.docs-shell {
+  overflow-x: clip;
 }
 
-#VPContent .VPHero .container,
-#VPContent .VPFeatures .container {
-  max-width: var(--spacing-docs-content-width);
-  margin-inline: 0;
+/* The home footer follows VPHome directly, without VitePress's bottom margin. */
+#VPContent .VPHome {
+  overflow-x: visible;
+  margin-bottom: 0;
 }
 
 /* Content starts at the app's inner margin, like a page in a kit app, so it lines up with the header title. */
