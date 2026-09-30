@@ -49,6 +49,7 @@ body {
     w-modal-wrapper-p---inner-margin
     w-button-h-9
     w-input-h-9 w-input-rounded-lg w-button-rounded-xl
+    w-input-gap-0.5
     w-list-header-h-9 w-list-header-rounded-xl w-list-padding-3
     w-list-header-bg-primary-light dark:w-list-header-bg-primary-darkest
     sm:[--inner-margin:1.5rem]
