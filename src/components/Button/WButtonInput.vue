@@ -24,7 +24,7 @@
   >
     <WSpinner
       v-if="loading"
-      class="w-spinner-size-[1.125em]"
+      class="square-[1.125em]"
     />
 
     <component

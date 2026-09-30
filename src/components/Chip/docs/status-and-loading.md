@@ -92,7 +92,7 @@ const count = ref(3)
 
 Controls, chips and list fields have a `skeleton` prop that renders their own skeleton. A form or an area can set it for everything inside at once — see [Conventions](/guide/conventions).
 
-`WSpinner` is an indeterminate spinner in the current text color. `w-spinner-size-*` sets its size, 2rem by default.
+`WSpinner` is an indeterminate spinner in the current text color. `square-*` sets its size, 20px by default.
 
 <!-- @example Skeleton/Basic -->
 
@@ -147,7 +147,7 @@ Controls, chips and list fields have a `skeleton` prop that renders their own sk
 
     <div class="flex items-center gap-4">
       <WSpinner />
-      <WSpinner class="w-spinner-size-5 text-primary dark:text-primary-dark" />
+      <WSpinner class="square-5 text-primary dark:text-primary-dark" />
     </div>
   </div>
 </template>

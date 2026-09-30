@@ -58,7 +58,7 @@
 
       <WSpinner
         v-if="loading"
-        class="w-spinner-size-[1em] text-primary dark:text-primary-dark"
+        class="square-[1em] text-primary dark:text-primary-dark"
       />
 
       <template v-else-if="icon">

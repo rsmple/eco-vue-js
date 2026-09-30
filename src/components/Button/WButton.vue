@@ -62,7 +62,7 @@
     >
       <WSpinner
         v-if="loading"
-        class="absolute z-10 w-spinner-size-(--w-button-spinner-size,1.25em)"
+        class="absolute z-10 square-(--w-button-spinner-size,1.25em)"
       />
     </Transition>
 

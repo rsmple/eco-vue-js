@@ -60,7 +60,7 @@
             >
               <WSpinner
                 v-if="loading"
-                class="text-description w-spinner-size-5"
+                class="text-description square-5"
               />
 
               <component

@@ -35,7 +35,7 @@
     >
       <div
         v-if="!hideOptionIcon && (selectedVisible || loading)"
-        class="text-primary dark:text-primary-dark w-spinner-size-[1.25em] col-start-3 flex items-center justify-self-end"
+        class="text-primary dark:text-primary-dark square-[1.25em] col-start-3 flex items-center justify-self-end"
       >
         <IconCheck
           v-if="selectedVisible && !loading"

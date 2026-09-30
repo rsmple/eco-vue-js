@@ -46,7 +46,7 @@
 
     <div class="flex items-center gap-4">
       <WSpinner />
-      <WSpinner class="w-spinner-size-5 text-primary dark:text-primary-dark" />
+      <WSpinner class="square-5 text-primary dark:text-primary-dark" />
     </div>
   </div>
 </template>

@@ -23,7 +23,7 @@
 
     <template v-else>
       <div class="text-accent w-progress-striped before:animate-move-horizontal relative flex h-full items-center justify-center gap-2">
-        <span>In progress</span> <WSpinner class="w-spinner-size-6" />
+        <span>In progress</span> <WSpinner class="square-6" />
       </div>
     </template>
   </div>

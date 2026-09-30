@@ -8,7 +8,6 @@
   --animate-spinner-dash: spinner-dash 1.6s linear infinite;
   --animate-ping-fast: ping-big .5s cubic-bezier(0, 0, 0.2, 1);
   --animate-ping-opacity: ping-opacity 1.2s linear infinite alternate-reverse;
-  --animate-spinner-dash-small: spinner-dash-small 1.6s linear infinite;
 
   @keyframes ticker {
     from {
@@ -75,31 +74,16 @@
 
   @keyframes spinner-dash {
     0% {
-      stroke-dasharray: 1, 200;
+      stroke-dasharray: 1, 57;
       stroke-dashoffset: 0;
     }
     50% {
-      stroke-dasharray: 89, 200;
-      stroke-dashoffset: -35px;
+      stroke-dasharray: 40, 57;
+      stroke-dashoffset: -16px;
     }
     100% {
-      stroke-dasharray: 89, 200;
-      stroke-dashoffset: -124px;
-    }
-  }
-
-  @keyframes spinner-dash-small {
-    0% {
-      stroke-dasharray: 1, 69;
-      stroke-dashoffset: 0;
-    }
-    50% {
-      stroke-dasharray: 30, 69;
-      stroke-dashoffset: -20px;
-    }
-    100% {
-      stroke-dasharray: 30, 69;
-      stroke-dashoffset: -69px;
+      stroke-dasharray: 40, 57;
+      stroke-dashoffset: -56px;
     }
   }
 

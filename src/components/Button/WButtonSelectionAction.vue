@@ -48,9 +48,9 @@
 
     <div
       v-if="loading" 
-      class="w-spinner-size-5 text-description absolute inset-0 z-10 flex items-center justify-center"
+      class="text-description absolute inset-0 z-10 flex items-center justify-center"
     >
-      <WSpinner />
+      <WSpinner class="square-5" />
     </div>
 
     <WTooltip

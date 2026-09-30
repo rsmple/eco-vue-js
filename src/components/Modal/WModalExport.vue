@@ -23,7 +23,7 @@
       class="mb-4 text-center"
     >
       <div v-if="loading || loadingExportValue">
-        <WSpinner class="w-spinner-size-[1.25em] inline" /> Loading
+        <WSpinner class="square-[1.25em] inline" /> Loading
       </div>
 
       <div v-else>

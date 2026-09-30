@@ -116,11 +116,6 @@
   --w-input-gap: --value(--spacing-*, --w-size-*, [*]);
 }
 
-@utility w-spinner-size-* {
-  --w-spinner-size: --spacing(--value(number));
-  --w-spinner-size: --value(--spacing-*, --w-size-*, [*]);
-}
-
 @utility w-button-spinner-size-* {
   --w-button-spinner-size: --spacing(--value(number));
   --w-button-spinner-size: --value(--spacing-*, --w-size-*, [*]);

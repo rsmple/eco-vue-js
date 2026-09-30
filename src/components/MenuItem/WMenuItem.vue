@@ -45,7 +45,7 @@
         v-if="loading"
         class="absolute inset-0 flex items-center justify-center"
       >
-        <WSpinner class="w-spinner-size-[1.25em]" />
+        <WSpinner class="square-[1.25em]" />
       </div>
     </Transition>
 
