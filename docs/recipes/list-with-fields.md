@@ -61,7 +61,7 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
     card-class="list:h-11 card:gap-2 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-gray-100 dark:border-gray-800"
     card-wrapper-class="card:self-start"
     min-height
-    class="sm:w-list-gap-3"
+    class="card:w-list-gap-3"
     @update:query-params="updateQueryParams"
   />
 </template>
@@ -167,6 +167,56 @@ const SOURCE: [string, string, Genre, number][] = [
   ['Opticks', 'Isaac Newton', Genre.SCIENCE, 1704],
   ['Sonnets', 'William Shakespeare', Genre.POETRY, 1609],
   ['The Gallic War', 'Julius Caesar', Genre.HISTORY, -50],
+  ['War and Peace', 'Leo Tolstoy', Genre.NOVEL, 1869],
+  ['The Brothers Karamazov', 'Fyodor Dostoevsky', Genre.NOVEL, 1880],
+  ['Les Misérables', 'Victor Hugo', Genre.NOVEL, 1862],
+  ['The Count of Monte Cristo', 'Alexandre Dumas', Genre.NOVEL, 1844],
+  ['Emma', 'Jane Austen', Genre.NOVEL, 1815],
+  ['Bleak House', 'Charles Dickens', Genre.NOVEL, 1853],
+  ['Vanity Fair', 'William Makepeace Thackeray', Genre.NOVEL, 1848],
+  ['The Scarlet Letter', 'Nathaniel Hawthorne', Genre.NOVEL, 1850],
+  ['Dracula', 'Bram Stoker', Genre.NOVEL, 1897],
+  ['Fathers and Sons', 'Ivan Turgenev', Genre.NOVEL, 1862],
+  ['The Mill on the Floss', 'George Eliot', Genre.NOVEL, 1860],
+  ['Robinson Crusoe', 'Daniel Defoe', Genre.NOVEL, 1719],
+  ['Gulliver\'s Travels', 'Jonathan Swift', Genre.NOVEL, 1726],
+  ['Tess of the d\'Urbervilles', 'Thomas Hardy', Genre.NOVEL, 1891],
+  ['The Portrait of a Lady', 'Henry James', Genre.NOVEL, 1881],
+  ['Treasure Island', 'Robert Louis Stevenson', Genre.NOVEL, 1883],
+  ['Elements', 'Euclid', Genre.SCIENCE, -300],
+  ['On the Revolutions of the Heavenly Spheres', 'Nicolaus Copernicus', Genre.SCIENCE, 1543],
+  ['Astronomia Nova', 'Johannes Kepler', Genre.SCIENCE, 1609],
+  ['Two New Sciences', 'Galileo Galilei', Genre.SCIENCE, 1638],
+  ['Elements of Chemistry', 'Antoine Lavoisier', Genre.SCIENCE, 1789],
+  ['Principles of Geology', 'Charles Lyell', Genre.SCIENCE, 1830],
+  ['Experiments on Plant Hybridization', 'Gregor Mendel', Genre.SCIENCE, 1866],
+  ['A Treatise on Electricity and Magnetism', 'James Clerk Maxwell', Genre.SCIENCE, 1873],
+  ['The Interpretation of Dreams', 'Sigmund Freud', Genre.SCIENCE, 1899],
+  ['Relativity: The Special and General Theory', 'Albert Einstein', Genre.SCIENCE, 1916],
+  ['De Humani Corporis Fabrica', 'Andreas Vesalius', Genre.SCIENCE, 1543],
+  ['The Voyage of the Beagle', 'Charles Darwin', Genre.SCIENCE, 1839],
+  ['The Iliad', 'Homer', Genre.POETRY, -750],
+  ['The Odyssey', 'Homer', Genre.POETRY, -725],
+  ['The Aeneid', 'Virgil', Genre.POETRY, -19],
+  ['Metamorphoses', 'Ovid', Genre.POETRY, 8],
+  ['The Divine Comedy', 'Dante Alighieri', Genre.POETRY, 1320],
+  ['The Canterbury Tales', 'Geoffrey Chaucer', Genre.POETRY, 1400],
+  ['The Faerie Queene', 'Edmund Spenser', Genre.POETRY, 1590],
+  ['Lyrical Ballads', 'William Wordsworth', Genre.POETRY, 1798],
+  ['Don Juan', 'Lord Byron', Genre.POETRY, 1819],
+  ['Eugene Onegin', 'Alexander Pushkin', Genre.POETRY, 1833],
+  ['Les Fleurs du mal', 'Charles Baudelaire', Genre.POETRY, 1857],
+  ['Poems', 'Emily Dickinson', Genre.POETRY, 1890],
+  ['Gitanjali', 'Rabindranath Tagore', Genre.POETRY, 1910],
+  ['The Twelve Caesars', 'Suetonius', Genre.HISTORY, 121],
+  ['Parallel Lives', 'Plutarch', Genre.HISTORY, 100],
+  ['The Anabasis', 'Xenophon', Genre.HISTORY, -370],
+  ['The History of Rome', 'Livy', Genre.HISTORY, -27],
+  ['The Ecclesiastical History of the English People', 'Bede', Genre.HISTORY, 731],
+  ['The Muqaddimah', 'Ibn Khaldun', Genre.HISTORY, 1377],
+  ['The History of England', 'Thomas Babington Macaulay', Genre.HISTORY, 1848],
+  ['Democracy in America', 'Alexis de Tocqueville', Genre.HISTORY, 1835],
+  ['The French Revolution', 'Thomas Carlyle', Genre.HISTORY, 1837],
 ]
 
 /** In-memory stand-in for a REST collection. */
