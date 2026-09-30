@@ -6,11 +6,7 @@
           :href="withBase('/')"
           class="inline-flex items-center gap-2.5"
         >
-          <img
-            :src="withBase('/logo.svg')"
-            alt=""
-            class="size-7"
-          >
+          <IconLogo class="size-7 *:nth-[1]:fill-primary *:nth-[2]:fill-primary-dark *:nth-[3]:fill-primary-dark" />
 
           <span class="text-accent text-lg font-semibold tracking-tight">EcoVue</span>
         </a>
@@ -59,6 +55,8 @@
 
 <script lang="ts" setup>
 import {withBase} from 'vitepress'
+
+import IconLogo from '../../../public/logo.svg?component'
 
 const isExternal = (href: string) => /^https?:/.test(href)
 

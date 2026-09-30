@@ -27,7 +27,7 @@
     class="
       relative isolate flex min-h---button-height
       items-center justify-center rounded-(--w-button-rounded,1rem)
-      [border-width:var(--w-button-border,1px)] px-(--w-button-rounded,1rem) font-medium
+      [border-width:var(--w-button-border,1px)] px-(--w-button-padding) font-medium
       whitespace-nowrap outline-none select-none w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-var(--w-button-border,1px))]
     "
     :class="{

@@ -13,11 +13,7 @@
           :aria-label="site.title"
           class="inline-flex items-center gap-2.5 no-underline"
         >
-          <img
-            :src="withBase('/logo.svg')"
-            alt=""
-            class="size-8"
-          >
+          <IconLogo class="size-8 *:nth-[1]:fill-primary *:nth-[2]:fill-primary-dark *:nth-[3]:fill-primary-dark" />
 
           <span class="leading-none">
             <span class="text-accent text-xl font-semibold tracking-tight sm:text-2xl leading-none">EcoVue</span>
@@ -73,8 +69,10 @@
             />
           </a>
 
-          <!-- The theme is only known in the browser, so the server can't render the right icon. -->
+          <!-- The theme is only known in the browser, so the server can't render the right icon or the chosen preset. -->
           <ClientOnly>
+            <ThemeMenu />
+
             <WToggleTheme
               :model-value="isDark ? Theme.DARK : Theme.LIGHT"
               no-margin
@@ -131,8 +129,12 @@ import DocsHomeGallery from './components/DocsHomeGallery.vue'
 import DocsHomeHero from './components/DocsHomeHero.vue'
 import DocsNav from './components/DocsNav.vue'
 import KitContainers from './components/KitContainers.vue'
+import ThemeMenu from './components/ThemeMenu.vue'
+import {installDocsTheme} from './docsTheme'
 import IconGithub from './icons/IconGithub.svg?component'
 import IconNpm from './icons/IconNpm.svg?component'
+
+import IconLogo from '../../public/logo.svg?component'
 
 // Loaded on first open, like VitePress does: the search index and its deps stay out of the page bundle.
 const VPLocalSearchBox = defineAsyncComponent(() => import('vitepress/dist/client/theme-default/components/VPLocalSearchBox.vue'))
@@ -175,6 +177,9 @@ const onKeydown = (event: KeyboardEvent) => {
   }
 }
 
-onMounted(() => window.addEventListener('keydown', onKeydown))
+onMounted(() => {
+  window.addEventListener('keydown', onKeydown)
+  installDocsTheme()
+})
 onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 </script>

@@ -23,7 +23,7 @@ The kit ships Tailwind v4 classes, not compiled CSS. Import its Tailwind base ri
 @import "eco-vue-js/tailwind-base/base.css";
 ```
 
-Dark mode follows a `dark` class on an ancestor (usually `<html>`).
+Dark mode follows a `dark` class on an ancestor (usually `<html>`). Colors, fonts and field sizes are CSS variables — see [Theming](./theming) to change them.
 
 ## Query client
 

@@ -6,6 +6,7 @@ import {existsSync, readFileSync} from 'node:fs'
 import {URL, fileURLToPath} from 'node:url'
 
 import {buildSidebar, rewrite} from './sidebar.ts'
+import {THEME_HEAD_SCRIPT} from './theme/docsTheme.ts'
 
 import {svgComponent} from '../../build/svg-component.ts'
 
@@ -33,6 +34,8 @@ export default defineConfig({
     ['meta', {property: 'og:image:width', content: '1200'}],
     ['meta', {property: 'og:image:height', content: '630'}],
     ['meta', {name: 'twitter:card', content: 'summary_large_image'}],
+    // The theme picked in the header, applied before the first paint.
+    ['script', {}, THEME_HEAD_SCRIPT],
   ],
 
   transformHead({pageData, title, description}) {

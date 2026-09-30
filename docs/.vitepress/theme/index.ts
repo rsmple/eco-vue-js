@@ -8,6 +8,7 @@ import {setQueryClient} from '@/utils/queryClient'
 import DocsLayout from './DocsLayout.vue'
 import DocsDemo from './components/DocsDemo.vue'
 import IconGallery from './components/IconGallery.vue'
+import ThemePlayground from './components/ThemePlayground.vue'
 import {installKitRouter} from './router'
 
 import './style.css'
@@ -32,5 +33,6 @@ export default {
     app.component('CopyOrDownloadAsMarkdownButtons', CopyOrDownloadAsMarkdownButtons)
     app.component('DocsDemo', DocsDemo)
     app.component('IconGallery', IconGallery)
+    app.component('ThemePlayground', ThemePlayground)
   },
 } satisfies Theme

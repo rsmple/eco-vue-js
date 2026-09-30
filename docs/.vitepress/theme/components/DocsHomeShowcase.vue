@@ -31,7 +31,7 @@
         @unselect="tags = tags.filter(item => item !== $event)"
       >
         <template #option="{option}">
-          <div class="w-option">
+          <div class="w-option flex items-center">
             {{ option?.name }}
           </div>
         </template>
