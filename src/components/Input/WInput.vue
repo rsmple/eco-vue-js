@@ -29,8 +29,9 @@
       #default
     >
       <div
-        class="flex max-w-full gap-1"
+        class="flex max-w-full gap-(--w-input-gap,0.25rem)"
         :class="{
+          'py-(--w-input-gap,0.25rem)': !textarea,
           'flex-wrap': !seamless,
           'overflow-hidden': seamless,
           'w-full': textarea,
@@ -49,8 +50,10 @@
             'w-textarea relative h-(--w-textarea-height,10rem) min-h-(--w-textarea-height,10rem) w-full overflow-auto overscroll-contain whitespace-pre bg-(--w-input-bg,inherit)': textarea,
             'resize-y': resize && textarea,
             'resize-none': !resize && textarea,
+            'py---w-option-padding': textarea,
+            'w-option w-option-padding-y': !textarea,
           }"
-          class="scrollbar-width-thin group/field py---w-option-padding overflow-x-auto overscroll-x-contain"
+          class="scrollbar-width-thin group/field overflow-x-auto overscroll-x-contain"
         ><slot
            name="before"
            v-bind="{modelValue, focused: false}"

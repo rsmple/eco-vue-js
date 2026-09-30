@@ -11,9 +11,11 @@
     class="max-w-md"
   >
     <template #option="{option}">
-      <span v-if="option">
-        {{ option.title }} <span class="text-description">— {{ option.author }}</span>
-      </span>
+      <div class="w-option flex items-center">
+        <span v-if="option">
+          {{ option.title }} <span class="text-description">— {{ option.author }}</span>
+        </span>
+      </div>
     </template>
   </WSelectAsyncSingle>
 

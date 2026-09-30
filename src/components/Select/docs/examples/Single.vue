@@ -11,7 +11,9 @@
     class="max-w-md"
   >
     <template #option="{option}">
-      {{ option?.name }}
+      <div class="w-option flex items-center">
+        {{ option?.name }}
+      </div>
     </template>
   </WSelectSingle>
 

@@ -18,7 +18,7 @@ Selects pick values out of a list of objects. The model holds only the values �
 Every select needs:
 
 - `valueGetter` — picks the model value out of an option.
-- An `option` slot or an `optionComponent` to render an option. There is no default label; the slot receives `option`, `selected` and `model` (`true` when rendering the chosen value in the field rather than in the dropdown).
+- An `option` slot or an `optionComponent` to render an option. There is no default label; the slot receives `option`, `selected` and `model` (`true` when rendering the chosen value in the field rather than in the dropdown). Put a `w-option` class on the option's root, so it takes the height and rounding of a line in the field; add `w-option-has-bg` when the option has a background of its own, like a tag, so the background covers the field's left padding instead of sitting inside it. Such options are best made an `optionComponent`, which can hold the unselect button inside the background — see [Multiple](#multiple).
 - `searchFn` for the static selects — the async ones send the search text to the query instead.
 
 ## Single
@@ -41,7 +41,9 @@ Every select needs:
     class="max-w-md"
   >
     <template #option="{option}">
-      {{ option?.name }}
+      <div class="w-option flex items-center">
+        {{ option?.name }}
+      </div>
     </template>
   </WSelectSingle>
 
@@ -87,14 +89,11 @@ With `allowClear` the value can be cleared. `clearValue` sets what clearing emit
     :search-fn="(item, search) => item.name.toLowerCase().includes(search.toLowerCase())"
     title="Tags"
     placeholder="Add a tag"
+    :option-component="OptionTag"
     class="max-w-md"
     @select="tags = [...tags, $event]"
     @unselect="tags = tags.filter(item => item !== $event)"
-  >
-    <template #option="{option}">
-      {{ option?.name }}
-    </template>
-  </WSelect>
+  />
 
   <p class="text-sm text-gray-500">
     Model: {{ tags }}
@@ -105,6 +104,8 @@ With `allowClear` the value can be cleared. `clearValue` sets what clearing emit
 import {ref} from 'vue'
 
 import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
+
+import OptionTag from './parts/OptionTag.vue'
 
 const options = [
   {id: 1, name: 'urgent'},
@@ -119,6 +120,41 @@ const tags = ref<number[]>([2, 3])
 ```
 
 <!-- @example-end -->
+
+The tags are drawn by an `optionComponent` rather than the `option` slot. The select passes its unselect button to the component's default slot, so the component can put it inside the tag's background; with the slot, the button sits next to the tag. The same component renders the tags in the dropdown, without a button.
+
+<!-- @source src/components/Select/docs/examples/parts/OptionTag.vue -->
+
+```vue [OptionTag.vue]
+<template>
+  <WSkeleton
+    v-if="skeleton"
+    class="w-option"
+  />
+
+  <div
+    v-else
+    class="w-option w-option-has-bg bg-primary/10 dark:bg-primary-dark/10 text-primary dark:text-primary-dark grid max-w-max grid-cols-[1fr_auto] items-center gap-1 font-semibold"
+  >
+    <div class="truncate">
+      {{ option?.name ?? search }}
+    </div>
+
+    <!-- The select puts its unselect button here, for a chosen tag in the field. -->
+    <slot />
+  </div>
+</template>
+
+<script lang="ts" setup>
+import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
+
+import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
+
+defineProps<SelectOptionProps<{id: number, name: string}>>()
+</script>
+```
+
+<!-- @source-end -->
 
 ## Async
 
@@ -144,9 +180,11 @@ To show the chosen value before the user opens the dropdown, the select requests
     class="max-w-md"
   >
     <template #option="{option}">
-      <span v-if="option">
-        {{ option.title }} <span class="text-description">— {{ option.author }}</span>
-      </span>
+      <div class="w-option flex items-center">
+        <span v-if="option">
+          {{ option.title }} <span class="text-description">— {{ option.author }}</span>
+        </span>
+      </div>
     </template>
   </WSelectAsyncSingle>
 

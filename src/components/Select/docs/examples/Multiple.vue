@@ -6,14 +6,11 @@
     :search-fn="(item, search) => item.name.toLowerCase().includes(search.toLowerCase())"
     title="Tags"
     placeholder="Add a tag"
+    :option-component="OptionTag"
     class="max-w-md"
     @select="tags = [...tags, $event]"
     @unselect="tags = tags.filter(item => item !== $event)"
-  >
-    <template #option="{option}">
-      {{ option?.name }}
-    </template>
-  </WSelect>
+  />
 
   <p class="text-sm text-gray-500">
     Model: {{ tags }}
@@ -24,6 +21,8 @@
 import {ref} from 'vue'
 
 import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
+
+import OptionTag from './parts/OptionTag.vue'
 
 const options = [
   {id: 1, name: 'urgent'},

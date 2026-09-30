@@ -177,7 +177,9 @@ const isEmail: ValidateFn = value => typeof value === 'string' && value.includes
     class="max-w-md"
   >
     <template #option="{option}">
-      {{ option.flag }} {{ option.name }}
+      <div class="w-option flex items-center">
+        {{ option.flag }} {{ option.name }}
+      </div>
     </template>
   </WInputOptions>
 
