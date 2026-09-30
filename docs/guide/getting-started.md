@@ -40,6 +40,8 @@ setQueryClient(queryClient)
 app.use(VueQueryPlugin, {queryClient})
 ```
 
+The queries themselves are declared per model — see [Data layer](/guide/data-layer).
+
 ## App layout
 
 Sticky list headers and columns, full-width rows, dropdowns and modals position themselves from a few CSS variables that describe the app's frame. Set them on `body`, with the values your header and side bars actually take at each breakpoint — all default to `0px`:
