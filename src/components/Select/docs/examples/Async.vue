@@ -1,7 +1,7 @@
 <template>
   <WSelectAsyncSingle
     v-model="bookId"
-    :use-query-fn-options="useQueryBooks"
+    :use-query-fn-options="bookModelApi.paginated.use"
     :query-params-options="{}"
     :value-getter="item => item.id"
     title="Book"
@@ -27,8 +27,8 @@ import {ref} from 'vue'
 
 import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSingle.vue'
 
-// Any paginated query made with the kit's query helpers — here the stand-in API from the list recipe.
-import {useQueryBooks} from '../../../../../docs/examples/recipes/book-list/api/Book'
+// The `use` of any paginated query — here the book model from the list recipe.
+import {bookModelApi} from '../../../../../docs/examples/recipes/book-list/api/Book'
 
 const bookId = ref<number | null>(3)
 </script>

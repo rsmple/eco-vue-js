@@ -1,7 +1,8 @@
 <template>
   <WListCardField
-    :model-value="item.author"
+    :model-value="`${ item.pages } pages`"
     :skeleton="skeleton"
+    class="tabular-nums"
   />
 </template>
 
@@ -22,10 +23,11 @@ defineEmits<{
 
 <script lang="ts">
 export const meta = {
-  label: 'author',
-  cssClass: 'basis-[10rem]',
-  title: 'Author',
-  field: 'author',
-  allowResize: true,
+  label: 'pages',
+  cssClass: 'basis-[7rem]',
+  title: 'Length',
+  field: 'pages',
+  // The number alone in CSV export, without the unit.
+  textFormat: item => item.pages.toString(),
 } as const satisfies ListField<Book>
 </script>

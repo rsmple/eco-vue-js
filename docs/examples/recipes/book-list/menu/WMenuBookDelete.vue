@@ -15,10 +15,13 @@ import {markRaw} from 'vue'
 import type {MenuEmits, MenuProps} from 'eco-vue-js/dist/components/List/types'
 import {Modal} from 'eco-vue-js/dist/utils/Modal'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
+import {handleApiError} from 'eco-vue-js/dist/utils/api'
 
 import WButtonMoreItem from 'eco-vue-js/dist/components/Button/WButtonMoreItem.vue'
 
 import IconTrash from 'eco-vue-js/dist/assets/icons/IconTrash'
+
+import {bookModelApi} from '../api/Book'
 
 const props = defineProps<MenuProps<Book>>()
 
@@ -30,8 +33,8 @@ const remove = () => {
     description: `"${ props.item.title }" will be removed from the catalogue.`,
     acceptText: 'Remove',
     acceptSemanticType: SemanticType.NEGATIVE,
-    // In an app, await the DELETE request here — the modal shows a loading state until it resolves.
-    onAccept: () => props.deleteItem(),
+    // The modal shows a loading state until the action resolves, which also drops the book from every cached page.
+    onAccept: () => bookModelApi.item.actions.delete(props.item.id).catch(handleApiError),
   })
 }
 </script>

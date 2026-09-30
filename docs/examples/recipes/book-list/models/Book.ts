@@ -1,3 +1,5 @@
+import {addDay, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
+
 export enum Genre {
   NOVEL = 'novel',
   SCIENCE = 'science',
@@ -12,15 +14,14 @@ export type Book = {
   genre: Genre
   year: number
   available: boolean
+  /** Average reader rating, from 1 to 5. */
+  rating: number
+  /** How many times the book has been borrowed. */
+  loans: number
+  pages: number
+  /** When a borrowed book is due back; `null` while it is available. */
+  dueAt: Date | null
   description: string
-}
-
-export type QueryParamsBooks = {
-  page?: number
-  ordering?: string
-  search?: string
-  /** Comma-separated ids — how async selects look up the items behind their model value. */
-  id__in?: string
 }
 
 const SOURCE: [string, string, Genre, number][] = [
@@ -64,5 +65,10 @@ export const books: Book[] = SOURCE.map(([title, author, genre, year], index) =>
   genre,
   year,
   available: index % 3 !== 0,
+  rating: 3 + (index * 13 % 21) / 10,
+  loans: 40 + index * 7919 % 4800,
+  pages: 120 + index * 97 % 900,
+  // Some borrowed books are overdue.
+  dueAt: index % 3 === 0 ? addDay(getStartOfDay(), index * 5 % 30 - 7) : null,
   description: `${ title } by ${ author }, first published ${ year < 0 ? `around ${ -year } BC` : `in ${ year }` }.`,
 }))

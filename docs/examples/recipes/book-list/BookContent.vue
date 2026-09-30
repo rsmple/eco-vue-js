@@ -12,7 +12,8 @@
 </template>
 
 <script lang="ts" setup>
-import type {Book, QueryParamsBooks} from './models/Book'
+import type {QueryParamsBooks} from './api/Book'
+import type {Book} from './models/Book'
 
 import type {FieldProps} from 'eco-vue-js/dist/components/List/types'
 

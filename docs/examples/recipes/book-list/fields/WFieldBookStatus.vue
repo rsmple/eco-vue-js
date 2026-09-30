@@ -28,7 +28,7 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'available',
-  cssClass: 'basis-[8rem]',
+  cssClass: 'basis-[7rem]',
   title: 'Status',
   field: 'available',
   textFormat: item => item.available ? 'Available' : 'Borrowed',

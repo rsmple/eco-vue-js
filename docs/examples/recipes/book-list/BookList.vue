@@ -1,16 +1,17 @@
 <template>
   <WInput
-    v-model="search"
+    :model-value="queryParams.search"
     type="search"
     placeholder="Search by title or author"
     :icon="markRaw(IconSearch)"
     allow-clear
     no-margin
     class="sticky left---left-inner mb-4 w---width-inner"
+    @update:model-value="updateQueryParams({search: $event || undefined})"
   />
 
   <WList
-    :use-query-fn="useQueryBooks"
+    :use-query-fn="bookModelApi.paginated.use"
     :query-params="queryParams"
     :fields="listFieldsBook"
     :default-config-map="defaultFieldConfigMapBook"
@@ -26,21 +27,21 @@
     :card-areas="[
       ['title', 'title', 'area_select'],
       ['author','author', 'area_more'],
-      ['year', 'available', 'available'],
+      ['year', 'rating', 'rating'],
+      ['available', 'due', 'due'],
+      ['pages', 'loans', 'loans'],
       ['genre', 'genre', 'genre'],
     ]"
     card-class="list:h-11 card:gap-2 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-gray-100 dark:border-gray-800"
     card-wrapper-class="card:self-start"
     min-height
-    class="sm:w-list-gap-3"
-    @update:query-params="ordering = $event.ordering"
+    class="card:w-list-gap-3"
+    @update:query-params="updateQueryParams"
   />
 </template>
 
 <script lang="ts" setup>
-import type {QueryParamsBooks} from './models/Book'
-
-import {computed, markRaw, ref} from 'vue'
+import {markRaw} from 'vue'
 
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WList from 'eco-vue-js/dist/components/List/WList.vue'
@@ -48,19 +49,13 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 import IconSearch from 'eco-vue-js/dist/assets/icons/IconSearch'
 
 import BookContent from './BookContent.vue'
-import {useQueryBooks} from './api/Book'
+import {bookModelApi, useQueryParamsBooks} from './api/Book'
 import {defaultFieldConfigMapBook, listFieldsBook} from './fields'
 import WMenuBookDelete from './menu/WMenuBookDelete.vue'
 import WMenuBookToggle from './menu/WMenuBookToggle.vue'
 
-// In an app these usually live in the route query, so the list state survives reloads and can be shared.
-const search = ref<string | undefined | null>()
-const ordering = ref<string>()
-
-const queryParams = computed<QueryParamsBooks>(() => ({
-  search: search.value || undefined,
-  ordering: ordering.value,
-}))
+// The docs have no router, so the filters stay in the page. In an app, keep them in the URL: `useQueryParamsBooks(useRoute())`.
+const {queryParams, updateQueryParams} = useQueryParamsBooks.useQueryParamsLocal()
 
 const selectAllTextGetter = (isUnselect: boolean, count: number) => `${ isUnselect ? 'Unselect' : 'Select' } all ${ count } books`
 </script>

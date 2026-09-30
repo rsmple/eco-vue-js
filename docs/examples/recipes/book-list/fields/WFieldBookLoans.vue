@@ -1,9 +1,15 @@
 <template>
-  <WListCardField
-    :model-value="item.year < 0 ? `${ -item.year } BC` : item.year"
-    :skeleton="skeleton"
-    class="tabular-nums"
-  />
+  <WListCardField :skeleton="skeleton">
+    <template #inner>
+      <!-- Compact, 1.2K for 1234, with the full number in a tooltip. -->
+      <WNumberFormatter
+        :model-value="item.loans"
+        compact
+        tag="span"
+        class="tabular-nums"
+      />
+    </template>
+  </WListCardField>
 </template>
 
 <script lang="ts" setup>
@@ -12,6 +18,7 @@ import type {Book} from '../models/Book'
 import type {FieldProps, ListField} from 'eco-vue-js/dist/components/List/types'
 
 import WListCardField from 'eco-vue-js/dist/components/List/WListCardField.vue'
+import WNumberFormatter from 'eco-vue-js/dist/components/NumberFormatter/WNumberFormatter.vue'
 
 defineProps<FieldProps<Book>>()
 
@@ -23,9 +30,9 @@ defineEmits<{
 
 <script lang="ts">
 export const meta = {
-  label: 'year',
+  label: 'loans',
   cssClass: 'basis-[6rem]',
-  title: 'Year',
-  field: 'year',
+  title: 'Loans',
+  field: 'loans',
 } as const satisfies ListField<Book>
 </script>
