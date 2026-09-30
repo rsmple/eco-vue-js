@@ -10,15 +10,20 @@
  *   <!-- @icons --> … <!-- @icons-end -->                        every icon name
  *
  * Run with `--check` to fail instead of writing when a region is stale.
+ *
+ * `@api` tables are rendered in a pool of worker threads (this same file), each with its own type checker.
  */
 import {type ComponentMeta, type PropertyMeta, createChecker} from 'vue-component-meta'
 
 import {existsSync, readFileSync} from 'node:fs'
 import {glob, readFile, readdir, writeFile} from 'node:fs/promises'
+import {availableParallelism} from 'node:os'
 import path from 'node:path'
+import {Worker, isMainThread, parentPort} from 'node:worker_threads'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const CHECK = process.argv.includes('--check')
+const WORKERS = Math.max(1, Math.min(availableParallelism() - 1, 6))
 
 const MARKDOWN_GLOBS = ['docs/**/*.md', 'src/components/*/docs/*.md']
 const INHERITED_COLLAPSE_MIN = 4
@@ -181,16 +186,69 @@ const fence = (file: string, title?: string) => async () => {
   return `${ ticks }${ lang }${ title ? ` [${ title }]` : '' }\n${ source }\n${ ticks }`
 }
 
+const renderComponentApi = async (name: string) => {
+  const file = await findComponent(name)
+  const checker = getChecker()
+
+  // A fresh type checker per component: TypeScript orders union members and inherited props by the order it first
+  // saw the types, so a shared checker would reshuffle one page's tables whenever another page is added.
+  checker.reload()
+
+  return renderApi(name, file, checker.getComponentMeta(file))
+}
+
+const renderApiInWorker = (worker: Worker, name: string) => new Promise<string>((resolve, reject) => {
+  const onError = (error: Error) => reject(error)
+
+  worker.once('error', onError)
+  worker.once('message', (message: {result?: string, error?: string}) => {
+    worker.off('error', onError)
+    if (message.error !== undefined) reject(new Error(message.error))
+    else resolve(message.result!)
+  })
+  worker.postMessage(name)
+})
+
+const showProgress = (text: string) => {
+  if (process.stdout.isTTY) process.stdout.write(`\r\x1b[K${ text }`)
+}
+
+const renderAllApis = async (names: string[]): Promise<Map<string, string>> => {
+  const results = new Map<string, string>()
+  const queue = [...names]
+  let done = 0
+
+  const runWorker = async () => {
+    const worker = new Worker(new URL(import.meta.url))
+
+    try {
+      while (queue.length) {
+        const name = queue.shift()!
+        results.set(name, await renderApiInWorker(worker, name))
+        showProgress(`API tables ${ ++done }/${ names.length } — ${ name }`)
+      }
+    } finally {
+      await worker.terminate()
+    }
+  }
+
+  showProgress(`API tables 0/${ names.length }`)
+  try {
+    await Promise.all(Array.from({length: Math.min(WORKERS, names.length)}, runWorker))
+  } finally {
+    showProgress('')
+  }
+
+  return results
+}
+
+let apiResults = new Map<string, string>()
+
 const renderers: Record<string, (arg: string) => Promise<string>> = {
   async api(name) {
-    const file = await findComponent(name)
-    const checker = getChecker()
-
-    // A fresh type checker per component: TypeScript orders union members and inherited props by the order it first
-    // saw the types, so a shared checker would reshuffle one page's tables whenever another page is added.
-    checker.reload()
-
-    return renderApi(name, file, checker.getComponentMeta(file))
+    const result = apiResults.get(name)
+    if (result === undefined) throw new Error(`API table for ${ name } was not rendered`)
+    return result
   },
 
   async example(arg) {
@@ -262,25 +320,53 @@ const processFile = async (file: string): Promise<string[]> => {
   return stale.map(region => `@${ region.kind }${ region.arg ? ` ${ region.arg }` : '' } — ${ describeStale(content, region.offset, region.body, region.expected) }`)
 }
 
-const start = performance.now()
-const changed: string[] = []
-const details: string[] = []
+const main = async () => {
+  const start = performance.now()
+  const files: string[] = []
 
-for (const pattern of MARKDOWN_GLOBS) {
-  for await (const file of glob(pattern, {cwd: ROOT})) {
+  for (const pattern of MARKDOWN_GLOBS) {
+    for await (const file of glob(pattern, {cwd: ROOT})) files.push(file)
+  }
+
+  const apiNames = new Set<string>()
+
+  for (const file of files) {
+    for (const [, , kind, arg] of (await readFile(path.join(ROOT, file), 'utf8')).matchAll(REGION)) {
+      if (kind === 'api') apiNames.add(arg.trim())
+    }
+  }
+
+  apiResults = await renderAllApis([...apiNames])
+
+  const changed: string[] = []
+  const details: string[] = []
+
+  for (const file of files) {
     const stale = await processFile(path.join(ROOT, file))
     if (!stale.length) continue
 
     changed.push(file)
     details.push(`  ${ file }`, ...stale.map(item => `    ${ item }`))
   }
+
+  const seconds = ((performance.now() - start) / 1000).toFixed(1)
+
+  if (CHECK && changed.length) {
+    console.error(`Generated docs are stale — run \`npm run docs:generate\`:\n${ details.join('\n') }`)
+    process.exit(1)
+  }
+
+  console.log(changed.length ? `Updated ${ changed.length } file(s) in ${ seconds }s:\n${ changed.map(file => `  ${ file }`).join('\n') }` : `Docs are up to date (${ seconds }s)`)
 }
 
-const seconds = ((performance.now() - start) / 1000).toFixed(1)
-
-if (CHECK && changed.length) {
-  console.error(`Generated docs are stale — run \`npm run docs:generate\`:\n${ details.join('\n') }`)
-  process.exit(1)
+if (isMainThread) {
+  await main()
+} else {
+  parentPort!.on('message', async (name: string) => {
+    try {
+      parentPort!.postMessage({result: await renderComponentApi(name)})
+    } catch (error) {
+      parentPort!.postMessage({error: error instanceof Error ? error.stack ?? error.message : String(error)})
+    }
+  })
 }
-
-console.log(changed.length ? `Updated ${ changed.length } file(s) in ${ seconds }s:\n${ changed.map(file => `  ${ file }`).join('\n') }` : `Docs are up to date (${ seconds }s)`)
