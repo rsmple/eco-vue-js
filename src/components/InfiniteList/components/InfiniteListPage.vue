@@ -4,7 +4,10 @@
     class="relative"
   >
     <template v-if="page && slotList.length !== 0">
-      <div :class="[pageClass, page !== 1 ? 'pt-(--w-list-gap)' : undefined]">
+      <div
+        ref="items"
+        :class="[pageClass, page !== 1 ? 'pt-(--w-list-gap)' : undefined]"
+      >
         <component
           :is="transition ? TransitionGroup : WEmptyComponent"
           v-bind="transition ? {
@@ -114,7 +117,7 @@ const emit = defineEmits<{
 }>()
 
 const elementRef = useTemplateRef('element')
-const resultElement = ref<HTMLDivElement[]>([])
+const itemsRef = useTemplateRef('items')
 const isIntersecting = ref(false)
 
 const scrollingElement = inject(wScrollingElement, null)
@@ -236,16 +239,27 @@ const getLast = () => {
   return data.value.results[data.value.results.length - 1]
 }
 
-const scrollTo = (index?: number) => {
-  if (index) {
-    if (index !== -1 && resultElement.value[index]) {
-      resultElement.value[index].scrollIntoView({block: 'center', behavior: 'smooth'})
-      return
-    }
-  }
+/** Item to scroll to again once the page's data replaces the skeletons, which can change the item's position. */
+let pendingIndex: number | undefined
 
-  elementRef.value?.scrollIntoView({block: 'center', behavior: 'smooth'})
+const scrollToItem = (index: number | undefined, behavior: ScrollBehavior) => {
+  const item = index === undefined ? undefined : itemsRef.value?.children[index]
+
+  ;(item ?? elementRef.value)?.scrollIntoView({block: 'center', behavior})
 }
+
+const scrollTo = (index?: number, behavior: ScrollBehavior = 'smooth') => {
+  scrollToItem(index, behavior)
+
+  pendingIndex = data.value ? undefined : index
+}
+
+watch(data, value => {
+  if (!value || pendingIndex === undefined) return
+
+  scrollToItem(pendingIndex, 'instant')
+  pendingIndex = undefined
+}, {flush: 'post'})
 
 watch(data, value => {
   if (props.firstPage && value?.previous !== undefined) emit('update:previous-page', value.previous)

@@ -387,15 +387,34 @@ const removePage = (page: number): void => {
   emit('update:page', pages.value[pages.value.length - 1])
 }
 
+const getPageComponent = (page: number) => pageComponentRef.value?.find(component => component?.pageNumber === page)
+
 const goto = async (page = 1, itemIndex?: number) => {
-  const index = pages.value.indexOf(page)
-  if (index !== -1) {
-    pageComponentRef.value?.[index]?.scrollTo(itemIndex)
+  if (pages.value.includes(page)) {
+    getPageComponent(page)?.scrollTo(itemIndex)
 
     return
   }
 
-  resetPage(page)
+  // Before any page has a height, or past the known pages, there is no place for the page yet, so the list starts over from it.
+  if (!avgPageHeight.value || page > pagesCount.value) {
+    resetPage(page)
+
+    return
+  }
+
+  // Scrolls to where the page will be first, so the sentinels are out of view when the pages change,
+  // as they are when the list is scrolled far. Otherwise a sentinel still reported in view adds a page and drops the target.
+  scrollToOffset((page - 1) * avgPageHeight.value)
+
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+
+  jumpToPage(page)
+
+  await nextTick()
+
+  // Far away: a smooth scroll would pass through the spacers and load the pages on the way.
+  getPageComponent(page)?.scrollTo(itemIndex, 'instant')
 }
 
 const scrollTop = () => {
@@ -493,21 +512,39 @@ const anyPageInViewport = (): boolean => {
   return false
 }
 
+const getScrollPosition = () => {
+  const scrollEl = scrollingElement?.value ?? document.scrollingElement
+  const containerEl = infiniteScrollRef.value?.$el as HTMLElement | null | undefined
+  if (!scrollEl || !containerEl) return null
+
+  const isDocumentScroll = scrollEl === document.scrollingElement || scrollEl === document.body || scrollEl === document.documentElement
+  const scrollTop = isDocumentScroll ? window.scrollY : scrollEl.scrollTop
+  const containerTop = isDocumentScroll ? containerEl.getBoundingClientRect().top + scrollTop : containerEl.offsetTop
+
+  return {scrollEl, isDocumentScroll, scrollTop, containerTop}
+}
+
+/** Scrolls to `y` px from the top of the list. */
+const scrollToOffset = (y: number) => {
+  const position = getScrollPosition()
+  if (!position) return
+
+  const top = position.containerTop + y
+
+  if (position.isDocumentScroll) window.scrollTo({top, behavior: 'instant'})
+  else position.scrollEl.scrollTop = top
+}
+
 const checkScrollJump = debounce(() => {
   if (isResettingPage.value) return
   if (topSentinelIntersecting.value || bottomSentinelIntersecting.value) return
   if (!avgPageHeight.value) return
   if (anyPageInViewport()) return
 
-  const scrollEl = scrollingElement?.value ?? document.scrollingElement
-  const containerEl = infiniteScrollRef.value?.$el as HTMLElement | null | undefined
-  if (!scrollEl || !containerEl) return
+  const position = getScrollPosition()
+  if (!position) return
 
-  const isDocumentScroll = scrollEl === document.scrollingElement || scrollEl === document.body || scrollEl === document.documentElement
-  const scrollTop = isDocumentScroll ? window.scrollY : scrollEl.scrollTop
-  const containerTop = isDocumentScroll ? containerEl.getBoundingClientRect().top + scrollTop : containerEl.offsetTop
-
-  const y = Math.max(0, scrollTop - containerTop)
+  const y = Math.max(0, position.scrollTop - position.containerTop)
 
   const target = Math.max(1, Math.min(Math.ceil(y / avgPageHeight.value) + 1, pagesCount.value))
   if (pages.value.includes(target)) return
