@@ -1,28 +1,38 @@
 <template>
   <div
-    class="relative w-full select-none overflow-clip rounded-full"
-    :class="{
-      'bg-primary dark:bg-primary-dark': modelValue > 0,
-      'bg-gray-200 dark:bg-gray-800': modelValue <= 0,
-      'w-progress-striped before:animate-move-horizontal cursor-progress': modelValue > 0 && modelValue < 100,
-      'before:absolute before:inset-0': modelValue >= 100 || modelValue <= 0,
-      'before:animate-ticker before:via-default/50 before:bg-linear-to-r before:from-transparent before:to-transparent': modelValue <= 0,
-      'before:bg-default/50 before:animate-pulse': modelValue >= 100,
-    }"
+    class="relative w-full overflow-hidden rounded-full bg-gray-200 select-none dark:bg-gray-800"
+    :class="{'cursor-progress': modelValue < 100}"
+    role="progressbar"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    :aria-valuenow="modelValue > 0 ? Math.min(modelValue, 100) : undefined"
+    :aria-busy="modelValue < 100"
   >
+    <!-- Waiting to start: a band sweeps the empty track. -->
     <div
-      v-if="modelValue < 100 && modelValue > 0"
-      class="absolute right-0 h-full bg-gray-200 transition-[width] dark:bg-gray-800"
-      :style="{
-        width: (100 - modelValue) + '%',
-      }"
+      v-if="modelValue <= 0"
+      class="animate-ticker via-primary/60 dark:via-primary-dark/70 absolute inset-0 bg-linear-to-r from-transparent to-transparent [--tiker-duration:1.4s]"
     />
+
+    <div
+      v-else
+      class="from-primary-dark to-primary relative h-full overflow-hidden rounded-full bg-linear-to-r transition-[width] duration-500 ease-out"
+      :style="{width: Math.min(modelValue, 100) + '%'}"
+    >
+      <!-- Running: a light sweeps the fill. Done: the full bar pulses. -->
+      <div
+        class="absolute inset-0"
+        :class="modelValue < 100
+          ? 'animate-ticker bg-linear-to-r from-transparent via-white/40 to-transparent [--tiker-duration:1.6s]'
+          : 'bg-default/30 animate-pulse'"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 defineProps<{
-  /** Filled part, from 0 to 100. At 0 a shimmer runs over the empty track, while waiting to start; at 100 the full bar pulses. */
+  /** Filled part, from 0 to 100. At 0 a band sweeps the empty track, while waiting to start; at 100 the full bar pulses. */
   modelValue: number
 }>()
 </script>

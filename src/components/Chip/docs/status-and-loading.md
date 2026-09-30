@@ -171,8 +171,8 @@ const loading = ref(true)
 Three bars for the progress of a task:
 
 - `WProgress` — a thin line, from 0 to 100, e.g. under a modal's title for the steps of a stepper.
-- `WProgressStriped` — a rounded bar, from 0 to 100, with moving stripes while in progress. A shimmer runs over the empty bar at 0, and the full bar pulses at 100. It has no height of its own, so give it one, e.g. `h-1.5`.
-- `WProgressBar` — a large bar with the percentage in it, from 0 to 1. `null` shows it striped with a spinner, for a task that hasn't reported its progress yet.
+- `WProgressStriped` — a slim rounded bar, from 0 to 100, with a light sweeping the fill while in progress. A band sweeps the empty track at 0, and the full bar pulses at 100. It has no height of its own, so give it one, e.g. `h-1.5`.
+- `WProgressBar` — a large bar with the percentage in it, from 0 to 1; the label changes color where the fill passes under it. `null` sweeps the empty bar and shows a spinner, for a task that hasn't reported its progress yet.
 
 <!-- @example Progress/Basic -->
 
@@ -378,7 +378,7 @@ import WProgressStriped from 'eco-vue-js/dist/components/Progress/WProgressStrip
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `modelValue` | `number` | **required** | Filled part, from 0 to 100. At 0 a shimmer runs over the empty track, while waiting to start; at 100 the full bar pulses. |
+| `modelValue` | `number` | **required** | Filled part, from 0 to 100. At 0 a band sweeps the empty track, while waiting to start; at 100 the full bar pulses. |
 
 <!-- @api-end -->
 
@@ -394,7 +394,7 @@ import WProgressBar from 'eco-vue-js/dist/components/Progress/WProgressBar.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `modelValue` | `number \| null` | **required** | Filled part, from 0 to 1, shown as a percentage. `null` shows the whole bar striped with a spinner, for progress not known yet. |
-| `semanticType` | `SemanticType` | `SemanticType.INFO` | Color scheme of the fill and the border. |
+| `modelValue` | `number \| null` | **required** | Filled part, from 0 to 1, shown as a percentage. `null` sweeps the empty bar and shows a spinner, for progress not known yet. |
+| `semanticType` | `SemanticType` | `SemanticType.INFO` | Color scheme of the fill. |
 
 <!-- @api-end -->

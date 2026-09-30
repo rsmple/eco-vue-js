@@ -71,6 +71,12 @@
   --w-drag-item-overlay: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
 }
 
+@utility w-chart-heatmap-bg-* {
+  --w-chart-heatmap-bg: --value(--color-*, [color]);
+  --w-chart-heatmap-bg: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
+  --w-chart-heatmap-bg: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
+}
+
 /* Opacity */
 
 @utility w-ripple-opacity-* {

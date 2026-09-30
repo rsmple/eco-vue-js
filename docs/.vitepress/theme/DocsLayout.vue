@@ -94,6 +94,8 @@
 
         <template #home-hero-after>
           <DocsHomeFeatures />
+
+          <DocsHomeGallery />
         </template>
       </VPContent>
 
@@ -125,6 +127,7 @@ import IconSearch from 'eco-vue-js/dist/assets/icons/IconSearch'
 
 import DocsHomeFeatures from './components/DocsHomeFeatures.vue'
 import DocsHomeFooter from './components/DocsHomeFooter.vue'
+import DocsHomeGallery from './components/DocsHomeGallery.vue'
 import DocsHomeHero from './components/DocsHomeHero.vue'
 import DocsNav from './components/DocsNav.vue'
 import KitContainers from './components/KitContainers.vue'
