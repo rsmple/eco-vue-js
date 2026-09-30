@@ -23,9 +23,10 @@
           :style="{width: percentCompactFormatter.format(rangeScale(cursor ?? modelValue))}"
         >
           <div
-            class="square-4 tw-hover-circle tw-hover-circle-inherit relative -mr-2 rounded-full bg-inherit"
-            :style="{
-              '--hover-circle-opacity': isMoveStarted ? 1 : 0.35,
+            class="square-4 relative right-0 -mr-2 rounded-full bg-inherit transition-transform"
+            :class="{
+              'scale-180': isMoveStarted,
+              'hover:scale-200': !readonly && !isMoveStarted,
             }"
           />
         </div>
