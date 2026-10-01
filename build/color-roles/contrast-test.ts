@@ -5,10 +5,11 @@
  * Colors are resolved by the browser from the real `roles.css`, so overrides and derived values are measured as
  * rendered; translucent colors are composited over their background first.
  *
- *   node build/color-roles/contrast-test.ts [--report] [--presets]
+ *   node build/color-roles/contrast-test.ts [--report] [--presets] [--random]
  *
  * Fails when a pair is under its minimum; `--report` prints every pair without failing. `--presets` also checks every
- * docs theme preset, with the `@theme` CSS the playground gives an app.
+ * docs theme preset, with the `@theme` CSS the playground gives an app. `--random` checks 24 themes of the playground's
+ * Random button, from a fixed seed so a failure repeats.
  *
  * The DOM lib reference is for the `page.evaluate` callback, which runs in the browser.
  */
@@ -18,7 +19,7 @@ import {chromium} from 'playwright-core'
 import {readFileSync} from 'node:fs'
 import {fileURLToPath} from 'node:url'
 
-import {PRESETS, getThemeBlock} from '../../docs/.vitepress/themePresets.ts'
+import {PRESETS, getRandomTokens, getThemeBlock} from '../../docs/.vitepress/themePresets.ts'
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url))
 const CSS_DIR = ROOT + 'package/tailwind-base/css/'
@@ -63,11 +64,31 @@ const html = PAIRS.map((pair, index) => `
     <div id="bg${ index }" class="${ pair.bg }"><div id="fg${ index }" class="${ pair.fg } border">x</div></div>
   </div>`).join('')
 
+/** Mulberry32: a small seeded generator, so the random themes are the same on every run. */
+const seeded = (seed: number) => () => {
+  seed = (seed + 0x6D2B79F5) | 0
+  let value = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+  value = (value + Math.imul(value ^ (value >>> 7), 61 | value)) ^ value
+
+  return ((value ^ (value >>> 14)) >>> 0) / 4294967296
+}
+
+const getSeededThemes = (count: number) => {
+  const random = seeded(1)
+
+  return Array.from({length: count}, () => {
+    const tokens = getRandomTokens(random)
+
+    return {name: `random ${ tokens['color-primary'] } / ${ tokens['color-primary-dark'] ?? 'same' } ${ tokens.neutral }`, css: getThemeBlock(tokens)}
+  })
+}
+
 const kitCss = '@import "tailwindcss";\n' + ['theme.css', 'roles.css', 'default.css'].map(file => readFileSync(CSS_DIR + file, 'utf8')).join('\n')
 const candidates = [...new Set(html.match(/[\w:/.#[\]-]+/g))]
 const themes = [
   {name: 'default', css: ''},
   ...process.argv.includes('--presets') ? PRESETS.filter(preset => preset.id !== 'default').map(preset => ({name: preset.id, css: getThemeBlock(preset.tokens)})) : [],
+  ...process.argv.includes('--random') ? getSeededThemes(24) : [],
 ]
 
 const browser = await chromium.launch()

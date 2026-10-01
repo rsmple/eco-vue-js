@@ -100,3 +100,105 @@ export const getThemeBlock = (tokens: PresetTokens) => {
 
   return entries.length ? ['@theme {', ...entries.map(([key, value]) => `  --${ key }: ${ value };`), '}'].join('\n') : ''
 }
+
+/** A neutral scale whose tint suits a hue: slate for blues, zinc for violets, stone for warm hues. */
+const neutralForHue = (hue: number, random: () => number): NeutralScale => {
+  if (hue >= 200 && hue < 275) return 'slate'
+  if (hue >= 275 && hue < 330) return 'zinc'
+  if (hue >= 20 && hue < 120) return 'stone'
+
+  return (['zinc', 'gray', 'neutral'] as const)[Math.floor(random() * 3)]
+}
+
+const SIZES = [
+  {height: 2, header: 2, gap: 0.125},
+  {height: 2.25, header: 2.25, gap: 0.125},
+  {height: 2.5, header: 2.25, gap: 0.25},
+] as const
+
+/** Input radii; the last one is a pill. Buttons and list headers take half as much again, up to a pill. */
+const RADII = [0.25, 0.5, 0.75, Infinity] as const
+
+const pick = <T>(list: readonly T[], random: () => number): T => list[Math.floor(random() * list.length)]
+
+const rem = (value: number) => `${ +value.toFixed(4) }rem`
+
+/** Linear sRGB of an OKLCH color, or null outside the sRGB gamut. */
+const toLinearRgb = (l: number, c: number, h: number): [number, number, number] | null => {
+  const a = c * Math.cos(h * Math.PI / 180)
+  const b = c * Math.sin(h * Math.PI / 180)
+  const [lms1, lms2, lms3] = [l + 0.3963377774 * a + 0.2158037573 * b, l - 0.1055613458 * a - 0.0638541728 * b, l - 0.0894841775 * a - 1.2914855480 * b].map(value => value ** 3)
+  const rgb: [number, number, number] = [
+    4.0767416621 * lms1 - 3.3077115913 * lms2 + 0.2309699292 * lms3,
+    -1.2684380046 * lms1 + 2.6097574011 * lms2 - 0.3413193965 * lms3,
+    -0.0041960863 * lms1 - 0.7034186147 * lms2 + 1.7076147010 * lms3,
+  ]
+
+  return rgb.every(value => value >= -0.0001 && value <= 1.0001) ? rgb : null
+}
+
+const luminance = ([r, g, b]: [number, number, number]) => 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+const contrast = (first: number, second: number) => (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05)
+
+/** Lightness of `oklch(L% C H)` strings: the scales and the kit's default. */
+const parseLightness = (color: string) => Number.parseFloat(color) / 100
+
+/**
+ * Lightnesses at which a fill of this hue and chroma passes the kit's contrast checks on a page of `pageLuminance`:
+ * 3:1 against the page, and 4.5:1 for the black or white text `text-tone-on` puts on it (white below L 0.58).
+ */
+const passingLightness = (chroma: number, hue: number, pageLuminance: number) => {
+  const result: number[] = []
+
+  for (let l = 0.4; l <= 0.8; l += 0.005) {
+    const rgb = toLinearRgb(l, chroma, hue)
+    if (!rgb) continue
+
+    const fill = luminance(rgb)
+    const text = l < 0.58 ? 1 : 0
+
+    if (contrast(fill, pageLuminance) >= 3.1 && contrast(fill, text) >= 4.6) result.push(l)
+  }
+
+  return result
+}
+
+/**
+ * A theme from one random primary, the neutral scale that suits its hue, and a size with a radius. The lightness is
+ * picked where the fill passes the contrast checks on a white page; when that lightness fails on the dark page, the
+ * nearest one that passes there becomes `color-primary-dark`.
+ */
+export const getRandomTokens = (random: () => number = Math.random): PresetTokens => {
+  for (;;) {
+    const hue = Math.round(random() * 360)
+    const chroma = 0.1 + random() * 0.08
+    const neutral = neutralForHue(hue, random)
+    const darkPage = toLinearRgb(parseLightness(NEUTRAL_SCALES[neutral][9]), 0, 0) as [number, number, number]
+    const light = passingLightness(chroma, hue, 1)
+    const dark = passingLightness(chroma, hue, luminance(darkPage))
+
+    if (!light.length || !dark.length) continue
+
+    // White text on the primary looks more like a brand than black does, so its range is preferred.
+    const withWhiteText = light.filter(l => l < 0.58)
+    const lightness = pick(withWhiteText.length && random() < 0.75 ? withWhiteText : light, random)
+    const darkLightness = dark.includes(lightness) ? null : dark.reduce((best, value) => Math.abs(value - lightness) < Math.abs(best - lightness) ? value : best)
+    const color = (l: number) => `oklch(${ (l * 100).toFixed(1) }% ${ chroma.toFixed(3) } ${ hue })`
+    const size = pick(SIZES, random)
+    const radius = pick(RADII, random)
+
+    return {
+      neutral,
+      'color-primary': color(lightness),
+      ...darkLightness === null ? {} : {'color-primary-dark': color(darkLightness)},
+      'w-input-height': rem(size.height),
+      'w-input-rounded': rem(Math.min(radius, size.height / 2)),
+      'w-input-gap': rem(size.gap),
+      'w-button-height': rem(size.height),
+      'w-button-rounded': rem(Math.min(radius * 1.5, size.height / 2)),
+      'w-list-header-height': rem(size.header),
+      'w-list-header-rounded': rem(Math.min(radius * 1.5, size.header / 2)),
+    }
+  }
+}

@@ -12,7 +12,7 @@ The kit's look comes from three kinds of CSS variables:
 - **Color roles** — what components actually paint with, named by purpose: main and muted text, surfaces, lines, focus. Each reads the palette by default, and an app can set any of them in `@theme` too.
 - **`w-*` variables** — sizes and radii of fields, buttons and list headers. An app sets them on `body`, directly or with the matching utilities (`w-input-h-9`, `w-button-rounded-xl`).
 
-All are plain CSS variables at runtime, so this site can swap them live. Pick a preset or change a value below: the whole site follows, including the header and every component page. The theme is kept in this browser until you reset it — the palette button in the header switches presets and resets from any page.
+All are plain CSS variables at runtime, so this site can swap them live. Pick a preset, roll a random one or change a value below: the whole site follows, including the header and every component page. A random theme is one primary color with the neutral scale, size and radius that suit it, at a lightness that passes the kit's contrast checks in both modes. To describe a look in words instead, **Ask an AI assistant** opens Claude or ChatGPT with a prompt that explains the tokens, or copies it for another assistant. The reply gives the theme as JSON and as a link that opens this page with it; paste either one, or the whole reply, into the field below the buttons and apply it. The theme is kept in this browser until you reset it — the palette button in the header switches presets and resets from any page.
 
 <ClientOnly>
   <ThemePlayground />
@@ -28,7 +28,7 @@ All are plain CSS variables at runtime, so this site can swap them live. Pick a 
 
 <DocsDemo name="Checkbox/Basic" />
 
-<DocsDemo name="Tabs/Basic" />
+<DocsDemo name="Tabs/Basic" overflowHidden />
 
 <DocsDemo name="Progress/Basic" />
 
