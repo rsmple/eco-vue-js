@@ -41,22 +41,10 @@
   --w-toggle-caret: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
 }
 
-@utility w-checkbox-color-* {
-  --w-checkbox-color: --value(--color-*, [color]);
-  --w-checkbox-color: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
-  --w-checkbox-color: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
-}
-
 @utility w-nav-item-dot-color-* {
   --w-nav-item-dot-color: --value(--color-*, [color]);
   --w-nav-item-dot-color: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
   --w-nav-item-dot-color: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
-}
-
-@utility w-date-picker-day-* {
-  --w-date-picker-day: --value(--color-*, [color]);
-  --w-date-picker-day: --alpha(--value(--color-*, [color]) / calc(--modifier(number) * 1%));
-  --w-date-picker-day: --alpha(--value(--color-*, [color]) / --modifier([percentage], [*]));
 }
 
 @utility w-list-header-bg-* {
