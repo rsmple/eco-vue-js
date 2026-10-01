@@ -175,17 +175,101 @@ export const themeTokens = computed(() => getTokens(themeConfig.value))
 
 export const hasCustomTokens = computed(() => Object.keys(themeConfig.value).some(key => key !== 'preset'))
 
+/** A theme's primary in the current mode, for the dot next to its name: its dark primary in dark mode when it has one. */
+export const getThemeSwatch = (config: ThemeConfig) => {
+  const tokens = getTokens(config)
+  const light = tokens['color-primary'] ?? DEFAULT_TOKENS['color-primary']
+  const dark = tokens['color-primary-dark'] ?? light
+
+  return light === dark ? light : `light-dark(${ light }, ${ dark })`
+}
+
+/** A theme saved under a name in this browser. */
+export type SavedTheme = {id: string, name: string, config: ThemeConfig}
+
+const THEMES_STORAGE_KEY = 'eco-vue-docs-themes'
+
+const NAME_MAX_LENGTH = 60
+
+export const savedThemes = ref<SavedTheme[]>([])
+
+/** The saved theme being edited: changes to the theme are saved into it as they are made. Null while unsaved. */
+export const activeThemeId = ref<string | null>(null)
+
+export const activeTheme = computed(() => savedThemes.value.find(theme => theme.id === activeThemeId.value))
+
+const sameConfig = (first: ThemeConfig, second: ThemeConfig) => JSON.stringify(Object.entries(first).sort()) === JSON.stringify(Object.entries(second).sort())
+
+/** Opens a theme that isn't saved — a preset, a random one, a pasted reply — leaving the saved ones as they are. */
+export const loadTheme = (config: ThemeConfig) => {
+  activeThemeId.value = null
+  themeConfig.value = config
+}
+
 export const setPreset = (id: PresetId) => {
-  themeConfig.value = id === 'default' ? {} : {preset: id}
+  loadTheme(id === 'default' ? {} : {preset: id})
 }
 
 /** A random primary with the neutral scale, size and radius that go with it; see `getRandomTokens`. */
 export const setRandomTheme = () => {
-  themeConfig.value = normalizeConfig(getRandomTokens())
+  loadTheme(normalizeConfig(getRandomTokens()))
 }
 
 export const resetTheme = () => {
-  themeConfig.value = {}
+  loadTheme({})
+}
+
+export const isThemeNameTaken = (name: string, exceptId?: string) => savedThemes.value.some(theme => theme.id !== exceptId && theme.name === name.trim())
+
+/** `name`, or `name 2`, `name 3`… when it is taken. */
+export const getUniqueThemeName = (name: string) => {
+  if (!isThemeNameTaken(name)) return name
+
+  for (let index = 2; ; index++) if (!isThemeNameTaken(`${ name } ${ index }`)) return `${ name } ${ index }`
+}
+
+const addTheme = (name: string, config: ThemeConfig, index = savedThemes.value.length) => {
+  const theme: SavedTheme = {id: crypto.randomUUID(), name: name.slice(0, NAME_MAX_LENGTH), config: {...config}}
+
+  savedThemes.value = savedThemes.value.toSpliced(index, 0, theme)
+  activeThemeId.value = theme.id
+  themeConfig.value = theme.config
+}
+
+/** Saves the theme in use under a new name and keeps editing it there. */
+export const saveThemeAs = (name: string) => addTheme(name, themeConfig.value)
+
+export const selectTheme = (id: string) => {
+  const theme = savedThemes.value.find(item => item.id === id)
+
+  if (!theme) return
+
+  activeThemeId.value = theme.id
+  themeConfig.value = theme.config
+}
+
+export const renameTheme = (id: string, name: string) => {
+  savedThemes.value = savedThemes.value.map(theme => theme.id === id ? {...theme, name: name.slice(0, NAME_MAX_LENGTH)} : theme)
+}
+
+/** Copies a saved theme next to it and switches to the copy. */
+export const duplicateTheme = (id: string) => {
+  const index = savedThemes.value.findIndex(theme => theme.id === id)
+
+  if (index !== -1) addTheme(getUniqueThemeName(`${ savedThemes.value[index].name } copy`), savedThemes.value[index].config, index + 1)
+}
+
+/** Removes a saved theme. When it is the one in use, the site keeps showing it, unsaved. */
+export const deleteTheme = (id: string) => {
+  savedThemes.value = savedThemes.value.filter(theme => theme.id !== id)
+
+  if (activeThemeId.value === id) activeThemeId.value = null
+}
+
+/** Drops every saved theme. The site keeps the theme in use until another is picked. */
+export const deleteAllThemes = () => {
+  savedThemes.value = []
+  activeThemeId.value = null
 }
 
 /** Sets one token; an empty value, or the one the preset already gives, removes the override. */
@@ -200,11 +284,11 @@ export const setToken = (key: TokenKey, value: string) => {
   themeConfig.value = trimmed && isSafeValue(trimmed) && trimmed !== (base?.[key] ?? DEFAULT_TOKENS[key]) ? {...config, [key]: trimmed} : config
 }
 
-/** A link that opens `path` with the theme applied. */
-export const getThemeLink = (config: ThemeConfig, path = 'guide/theming') => {
+/** A link that opens `path` with the theme applied. With a name, opening it adds the theme to the saved ones. */
+export const getThemeLink = (config: ThemeConfig, path = 'guide/theming', name?: string) => {
   const url = new URL(path, window.location.origin + import.meta.env.BASE_URL)
 
-  if (Object.keys(config).length) url.searchParams.set(THEME_QUERY_PARAM, JSON.stringify(config))
+  if (Object.keys(config).length || name) url.searchParams.set(THEME_QUERY_PARAM, JSON.stringify(name ? {...config, name} : config))
 
   return url.toString()
 }
@@ -306,6 +390,56 @@ const store = (config: ThemeConfig, css: string) => {
   }
 }
 
+/** The `name` a theme link carries, if any. */
+const parseThemeName = (value: string): string | undefined => {
+  try {
+    const {name} = JSON.parse(value) as {name?: unknown}
+
+    return typeof name === 'string' && name.trim() ? name.trim().slice(0, NAME_MAX_LENGTH) : undefined
+  } catch {
+    return undefined
+  }
+}
+
+const readStoredThemes = (): {themes: SavedTheme[], activeId: string | null} => {
+  try {
+    const value = JSON.parse(localStorage.getItem(THEMES_STORAGE_KEY) ?? 'null') as {themes?: unknown, activeId?: unknown} | null
+    const themes = (Array.isArray(value?.themes) ? value.themes as Record<string, unknown>[] : [])
+      .filter(theme => theme instanceof Object && typeof theme.id === 'string' && typeof theme.name === 'string' && theme.name.trim())
+      .map(theme => ({id: theme.id as string, name: (theme.name as string).slice(0, NAME_MAX_LENGTH), config: normalizeConfig(theme.config)}))
+    const activeId = themes.find(theme => theme.id === value?.activeId)?.id ?? null
+
+    return {themes, activeId}
+  } catch {
+    return {themes: [], activeId: null}
+  }
+}
+
+const storeThemes = (themes: SavedTheme[], activeId: string | null) => {
+  try {
+    if (themes.length) localStorage.setItem(THEMES_STORAGE_KEY, JSON.stringify({themes, activeId}))
+    else localStorage.removeItem(THEMES_STORAGE_KEY)
+  } catch {
+    // Storage is blocked: the themes last until the page is closed.
+  }
+}
+
+/** Opens a theme from a link: a named one joins the saved themes, unless the same one is saved already. */
+const openThemeParam = (param: string) => {
+  const config = parseThemeParam(param)
+
+  if (!config) return
+
+  const name = parseThemeName(param)
+
+  if (!name) return loadTheme(config)
+
+  const saved = savedThemes.value.find(theme => sameConfig(theme.config, config))
+
+  if (saved) selectTheme(saved.id)
+  else addTheme(getUniqueThemeName(name), config)
+}
+
 const readStored = (): ThemeConfig => {
   try {
     return normalizeConfig(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null')?.config)
@@ -323,13 +457,19 @@ export const installDocsTheme = () => {
 
   themeConfig.value = readStored()
 
+  const stored = readStoredThemes()
+
+  savedThemes.value = stored.themes
+  activeThemeId.value = stored.activeId
+
+  // The saved theme is the truth: another tab may have edited it since the working copy was stored.
+  if (activeTheme.value) themeConfig.value = activeTheme.value.config
+
   const url = new URL(window.location.href)
   const param = url.searchParams.get(THEME_QUERY_PARAM)
 
   if (param !== null) {
-    const config = parseThemeParam(param)
-
-    if (config) themeConfig.value = config
+    openThemeParam(param)
 
     // The theme is stored from here on; the link stays clean for copying and reloads.
     url.searchParams.delete(THEME_QUERY_PARAM)
@@ -341,5 +481,13 @@ export const installDocsTheme = () => {
 
     applyCss(css)
     store(config, css)
+
+    // Edits go into the saved theme in use. Opening another theme clears `activeThemeId` first, so it is never overwritten.
+    const theme = activeTheme.value
+
+    if (theme && !sameConfig(theme.config, config)) savedThemes.value = savedThemes.value.map(item => item.id === theme.id ? {...item, config} : item)
   }, {immediate: true})
+
+  // Immediate, so a theme added from a link on load is stored too.
+  watch([savedThemes, activeThemeId], ([themes, activeId]) => storeThemes(themes, activeId), {immediate: true})
 }
