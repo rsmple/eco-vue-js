@@ -23,7 +23,7 @@
     <div
       class="square-[1.5em] bg-surface relative isolate flex items-center justify-center border border-solid [font-size:var(--w-checkbox-size)]"
       :class="{
-        'text-(--w-checkbox-color,#ffffff)': modelValue && !isDisabled && !isSkeleton,
+        'text-tone-on': modelValue && !isDisabled && !isSkeleton,
         'tone-primary text-tone': !modelValue && !isDisabled && !isSkeleton,
         'text-subtle': !modelValue && isDisabled && !isSkeleton,
         'w-ripple w-hover-circle before:text-accent after:text-accent': !isDisabled && !isReadonly && !isSkeleton,
