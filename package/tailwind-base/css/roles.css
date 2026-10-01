@@ -1,0 +1,31 @@
+/*
+ * Color roles: what components paint with, named by purpose. Each role is a `--w-*` variable holding both modes in
+ * `light-dark()`; the utilities (`text-accent`, …) read the variable, so a theme or a scope can redefine it.
+ *
+ * Values are declared on every mode boundary, not only on `:root`: a build that lowers `light-dark()` (Vite's
+ * lightningcss with older targets) resolves it where the variable is declared, and this keeps `.light` and `.dark`
+ * islands right either way.
+ */
+
+@theme inline {
+  --color-accent: var(--w-text-accent);
+  --color-description: var(--w-text-description);
+}
+
+@layer base {
+  :root,
+  .light {
+    color-scheme: light;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
+  :root,
+  .light,
+  .dark {
+    --w-text-accent: light-dark(var(--color-black-default), var(--color-default));
+    --w-text-description: light-dark(var(--color-gray-400), var(--color-gray-500));
+  }
+}
