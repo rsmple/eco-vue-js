@@ -1,7 +1,19 @@
+import {defineAsyncComponent, markRaw} from 'vue'
+
 import {Modal} from 'eco-vue-js/dist/utils/Modal'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
-import {deleteAllThemes, savedThemes} from './docsTheme'
+import {deleteAllThemes, findPreset, getUniqueThemeName, hasCustomTokens, saveThemeAs, savedThemes, themeConfig} from './docsTheme'
+
+const ThemeNameModal = defineAsyncComponent(() => import('./components/ThemeNameModal.vue'))
+
+export const openSaveTheme = () => {
+  Modal.add(markRaw(ThemeNameModal), {
+    title: 'Save theme',
+    name: getUniqueThemeName(hasCustomTokens.value ? 'My theme' : findPreset(themeConfig.value.preset ?? 'default')?.name ?? 'My theme'),
+    onSave: saveThemeAs,
+  })
+}
 
 export const confirmDeleteAllThemes = () => {
   Modal.addConfirm({

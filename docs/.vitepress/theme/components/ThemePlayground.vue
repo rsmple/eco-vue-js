@@ -117,7 +117,7 @@
           <WButton
             v-else
             :semantic-type="SemanticType.SECONDARY"
-            @click="openSaveAs"
+            @click="openSaveTheme"
           >
             Save as…
           </WButton>
@@ -290,7 +290,6 @@ import {
   getThemeCss,
   getThemeLink,
   getThemePrompt,
-  getUniqueThemeName,
   hasCustomTokens,
   isRandomTheme,
   loadTheme,
@@ -298,7 +297,6 @@ import {
   randomStyle,
   renameTheme,
   resetTheme,
-  saveThemeAs,
   savedThemes,
   selectTheme,
   setPreset,
@@ -306,7 +304,7 @@ import {
   themeConfig,
   themeTokens,
 } from '../docsTheme'
-import {confirmDeleteAllThemes} from '../themeConfirm'
+import {confirmDeleteAllThemes, openSaveTheme} from '../themeConfirm'
 
 const ThemeNameModal = defineAsyncComponent(() => import('./ThemeNameModal.vue'))
 
@@ -351,14 +349,6 @@ const applyReply = () => {
   loadTheme(config)
   reply.value = ''
   replyError.value = undefined
-}
-
-const openSaveAs = () => {
-  Modal.add(markRaw(ThemeNameModal), {
-    title: 'Save theme',
-    name: getUniqueThemeName(hasCustomTokens.value ? 'My theme' : findPreset(activePreset.value)?.name ?? 'My theme'),
-    onSave: saveThemeAs,
-  })
 }
 
 const openRename = (theme: SavedTheme) => {
