@@ -44,12 +44,12 @@
     >
       <WSkeleton
         v-if="isSkeleton"
-        class="w-skeleton-h---w-button-height w-skeleton-rounded-[0.625rem]"
+        class="w-skeleton-h---w-button-height w-skeleton-rounded-(--w-button-rounded,1rem)"
       />
       <div
         v-else
         role="group"
-        class="flex max-w-full gap-0.5 rounded-[0.625rem] p-0.75 bg-surface-muted"
+        class="flex max-w-full gap-0.5 rounded-(--w-button-rounded,1rem) p-0.75 bg-surface-muted"
         :class="{
           'flex-wrap': wrap,
           'flex-col': col,
@@ -64,7 +64,7 @@
           class="
             relative isolate flex h-[calc(var(--w-button-height,2.75rem)-0.375rem)]
             bg-size-[200%] bg-position-[100%] items-center justify-center gap-2
-            rounded-lg px-3 font-medium whitespace-nowrap outline-none select-none
+            rounded-[max(0px,calc(var(--w-button-rounded,1rem)-0.1875rem))] px-(--w-button-padding) font-medium whitespace-nowrap outline-none select-none
           "
           :class="{
             [semanticTypeButtonBackgroundMap[semanticType] ?? semanticTypeBackgroundMap[semanticType]]: getValue(item as Model | Entity) === modelValue,

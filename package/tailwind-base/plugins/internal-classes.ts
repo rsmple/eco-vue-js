@@ -113,10 +113,10 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
     '*': {
       '--w-option-height': 'calc(var(--w-input-height,2.75rem) - (var(--w-input-gap,0.25rem) * 2) - 2px)',
       '--w-option-rounded': 'calc(var(--w-input-rounded,0.75rem) - var(--w-input-gap,0.25rem) - 1px)',
-      '--w-option-padding': 'clamp(0.5rem, var(--w-input-rounded, 0.75rem), calc(var(--w-input-height, 2.75rem) / 2 - var(--w-input-gap, 0.25rem) - 2px))',
+      '--w-option-padding': 'min(max(0.5rem, var(--w-input-rounded, 0.75rem)), calc(var(--w-input-height, 2.75rem) / 2 - var(--w-input-gap, 0.25rem) - 2px))',
       '--w-option-padding-y': 'calc((var(--w-option-height) - 1.5em) / 2)',
       '--w-select-option-padding': 'calc(var(--w-option-padding) + var(--w-input-gap,0.25rem) + 1px)',
-      '--w-button-padding': 'clamp(0.5rem, var(--w-button-rounded, 1rem), calc(var(--w-button-height, 2.75rem) / 2 - 2px))',
+      '--w-button-padding': 'min(max(0.5rem, var(--w-button-rounded, 1rem)), calc(var(--w-button-height, 2.75rem) / 2 - 2px))',
     },
     '.w-option-padding-y': {
       'padding-top': 'var(--w-option-padding-y)',
