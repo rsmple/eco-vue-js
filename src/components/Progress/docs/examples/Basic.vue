@@ -27,7 +27,7 @@
 
     <WProgressBar
       :model-value="waiting ? null : percent / 100"
-      :semantic-type="SemanticType.POSITIVE"
+      :semantic-type="SemanticType.PRIMARY"
     />
   </div>
 </template>
