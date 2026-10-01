@@ -2,6 +2,38 @@
   <div class="vp-raw grid gap-8">
     <div class="grid gap-3">
       <div class="text-description text-sm font-semibold">
+        Presets
+      </div>
+
+      <div class="flex flex-wrap gap-2 mb-2">
+        <WButton
+          :semantic-type="isRandomTheme ? SemanticType.PRIMARY : SemanticType.SECONDARY"
+          @click="setRandomTheme"
+        >
+          Random
+        </WButton>
+
+        <WButton
+          v-for="preset in PRESETS"
+          :key="preset.id"
+          :semantic-type="!activeTheme && !hasCustomTokens && activePreset === preset.id ? SemanticType.PRIMARY : SemanticType.SECONDARY"
+          @click="setPreset(preset.id)"
+        >
+          <ThemeSwatch :config="{preset: preset.id}" />
+          {{ preset.name }}
+        </WButton>
+      </div>
+
+      <p
+        v-if="hasCustomTokens && !activeTheme"
+        class="text-description text-sm"
+      >
+        Custom values over {{ findPreset(activePreset)?.name }}. Picking a preset drops them.
+      </p>
+    </div>
+
+    <div class="grid gap-3">
+      <div class="text-description text-sm font-semibold">
         My themes
       </div>
 
@@ -79,38 +111,6 @@
           </WButton>
         </div>
       </div>
-    </div>
-
-    <div class="grid gap-3">
-      <div class="text-description text-sm font-semibold">
-        Presets
-      </div>
-
-      <div class="flex flex-wrap gap-2">
-        <WButton
-          v-for="preset in PRESETS"
-          :key="preset.id"
-          :semantic-type="!activeTheme && activePreset === preset.id ? SemanticType.PRIMARY : SemanticType.SECONDARY"
-          @click="setPreset(preset.id)"
-        >
-          <ThemeSwatch :config="{preset: preset.id}" />
-          {{ preset.name }}
-        </WButton>
-
-        <WButton
-          :semantic-type="SemanticType.SECONDARY"
-          @click="setRandomTheme"
-        >
-          Random
-        </WButton>
-      </div>
-
-      <p
-        v-if="hasCustomTokens && !activeTheme"
-        class="text-description text-sm"
-      >
-        Custom values over {{ findPreset(activePreset)?.name }}. Picking a preset drops them.
-      </p>
     </div>
 
     <div class="grid gap-3">
@@ -270,6 +270,7 @@ import {
   getThemePrompt,
   getUniqueThemeName,
   hasCustomTokens,
+  isRandomTheme,
   loadTheme,
   parseThemeReply,
   renameTheme,
