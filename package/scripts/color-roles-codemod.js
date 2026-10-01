@@ -173,14 +173,19 @@ const transformClasses = (value, exact, table) => {
     replaced.push(`${ light.raw } ${ dark.raw } → ${ next }`)
     words[index] = next
     words[darkIndex] = ''
+    // The removed class takes one separator with it: the one before, unless it starts the string or a line. Lines and
+    // their indentation stay as they were.
+    const before = words[darkIndex - 1]
+    const dropAfter = darkIndex === 0 || (before?.includes('\n') && darkIndex + 1 < words.length)
+
+    words[dropAfter ? darkIndex + 1 : darkIndex - 1] = ''
     tokens[index] = null
     tokens[darkIndex] = null
   })
 
-  // Removed classes leave gaps: collapse them, drop spaces left before line breaks, keep the string's own edges.
-  const lead = value.match(/^\s*/)?.[0] ?? ''
-  const trail = value.match(/\s*$/)?.[0] ?? ''
-  let text = lead + words.join('').trim().replace(/[ \t]{2,}/g, ' ').replace(/[ \t]+\n/g, '\n') + trail
+  if (!replaced.length) return {text: value, replaced, unmapped, left: tokens.filter(token => token !== null).map(token => token.raw)}
+
+  let text = words.join('')
 
   if (addTone && !text.split(/\s+/).includes(addTone)) text = text.replace(/^(\s*)/, `$1${ addTone } `)
 
