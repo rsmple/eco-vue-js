@@ -25,7 +25,7 @@
       <WButtonMoreItem
         text="Delete"
         :icon="markRaw(IconTrash)"
-        class="tone-negative text-tone"
+        :semantic-type="SemanticType.NEGATIVE"
         @click="action = 'Delete'"
       />
     </WButtonMore>
@@ -58,6 +58,8 @@
 
 <script lang="ts" setup>
 import {markRaw, ref} from 'vue'
+
+import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WButtonDropdown from 'eco-vue-js/dist/components/Button/WButtonDropdown.vue'

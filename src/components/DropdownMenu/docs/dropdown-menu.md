@@ -13,7 +13,7 @@ For a menu of actions, use a ready-made button. For anything else anchored to an
 - `WButtonMore` is the "⋯" button: its default slot is the menu, and any click closes it. Only one `WButtonMore` is open at a time across the page.
 - `WButtonDropdown` is a button with an arrow next to it: the `button` slot holds the main action and the `content` slot the others. The `content` slot gets `close`.
 
-Menu items are `WButtonMoreItem`s: a `text` (or the default slot), an `icon`, and `to` or `href` to make the item a link. A disabled item can explain itself with `tooltipText`.
+Menu items are `WButtonMoreItem`s: a `text` (or the default slot), an `icon`, and `to` or `href` to make the item a link. A disabled item can explain itself with `tooltipText`. `semanticType` colors an item, like the red Delete below.
 
 <!-- @example DropdownMenu/ButtonMore -->
 
@@ -47,7 +47,7 @@ Menu items are `WButtonMoreItem`s: a `text` (or the default slot), an `icon`, an
       <WButtonMoreItem
         text="Delete"
         :icon="markRaw(IconTrash)"
-        class="tone-negative text-tone"
+        :semantic-type="SemanticType.NEGATIVE"
         @click="action = 'Delete'"
       />
     </WButtonMore>
@@ -80,6 +80,8 @@ Menu items are `WButtonMoreItem`s: a `text` (or the default slot), an `icon`, an
 
 <script lang="ts" setup>
 import {markRaw, ref} from 'vue'
+
+import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WButtonDropdown from 'eco-vue-js/dist/components/Button/WButtonDropdown.vue'
@@ -343,6 +345,7 @@ import WMenuItem from 'eco-vue-js/dist/components/MenuItem/WMenuItem.vue'
 | `active` | `boolean` | — | Marks the item as picked, with primary text and a check. `false` leaves room for the check, to line up with picked items. |
 | `tooltipText` | `string` | — | Tooltip text on the left of the item. |
 | `loading` | `boolean` | — | Shows a spinner over the item and ignores clicks. |
+| `semanticType` | `SemanticType` | `SemanticType.PRIMARY` | Color of the item. Types other than `primary` and `secondary` color the text at rest — a red "Delete". |
 | `to` | `RouteLocationRaw` | — | Router location — renders a router link. Needs vue-router installed in the app. |
 
 #### Events
@@ -377,6 +380,7 @@ import WButtonMoreItem from 'eco-vue-js/dist/components/Button/WButtonMoreItem.v
 | `href` | `string` | — | Renders the item as a link to this URL. |
 | `download` | `string` | — | Native `download` attribute, with `href`. |
 | `tooltipText` | `string` | — | Tooltip over the item. |
+| `semanticType` | `SemanticType` | — | Color of the item. Types other than `primary` and `secondary` color the text at rest — a red "Delete". |
 | `to` | `RouteLocationRaw` | — | Router location — renders a router link. Needs vue-router installed in the app. |
 
 #### Events
