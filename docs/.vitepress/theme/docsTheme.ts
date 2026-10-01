@@ -1,4 +1,4 @@
-import {computed, ref, watch} from 'vue'
+import {computed, ref, shallowRef, toRaw, watch} from 'vue'
 
 import rolesCss from '../../../package/tailwind-base/css/roles.css?raw'
 import themeCss from '../../../package/tailwind-base/css/theme.css?raw'
@@ -210,9 +210,15 @@ export const setPreset = (id: PresetId) => {
   loadTheme(id === 'default' ? {} : {preset: id})
 }
 
+const randomConfig = shallowRef<ThemeConfig | null>(null)
+
+/** Whether the theme in use is a random one, not yet edited or saved: edits and saves make a new config. */
+export const isRandomTheme = computed(() => !activeThemeId.value && toRaw(themeConfig.value) === randomConfig.value)
+
 /** A random primary with the neutral scale, size and radius that go with it; see `getRandomTokens`. */
 export const setRandomTheme = () => {
-  loadTheme(normalizeConfig(getRandomTokens()))
+  randomConfig.value = normalizeConfig(getRandomTokens())
+  loadTheme(randomConfig.value)
 }
 
 export const resetTheme = () => {
