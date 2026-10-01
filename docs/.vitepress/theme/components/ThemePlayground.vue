@@ -2,16 +2,98 @@
   <div class="vp-raw grid gap-8">
     <div class="grid gap-3">
       <div class="text-description text-sm font-semibold">
-        Preset
+        My themes
+      </div>
+
+      <div
+        v-if="savedThemes.length"
+        class="flex flex-wrap gap-2"
+      >
+        <WButton
+          v-for="theme in savedThemes"
+          :key="theme.id"
+          :semantic-type="activeThemeId === theme.id ? SemanticType.PRIMARY : SemanticType.SECONDARY"
+          class="max-w-full grid grid-cols-1"
+          @click="selectTheme(theme.id)"
+        >
+          <ThemeSwatch :config="theme.config" />
+          <div class="truncate">
+            {{ theme.name }}
+          </div>
+        </WButton>
+      </div>
+
+      <div>
+        <p class="text-description text-sm mb-2">
+          <template v-if="activeTheme">
+            Changes are saved into “{{ activeTheme.name }}” as you make them.
+          </template>
+
+          <template v-else-if="savedThemes.length">
+            The theme in use isn't saved.
+          </template>
+
+          <template v-else>
+            Save a theme to keep it under a name and come back to it from the palette menu.
+          </template>
+        </p>
+
+        <div class="flex flex-wrap gap-2">
+          <template v-if="activeTheme">
+            <WButton
+              :semantic-type="SemanticType.SECONDARY"
+              @click="openRename(activeTheme)"
+            >
+              Rename
+            </WButton>
+
+            <WButton
+              :semantic-type="SemanticType.SECONDARY"
+              @click="duplicateTheme(activeTheme.id)"
+            >
+              Duplicate
+            </WButton>
+
+            <WButton
+              :semantic-type="SemanticType.SECONDARY"
+              @click="confirmDelete(activeTheme)"
+            >
+              Delete
+            </WButton>
+          </template>
+
+          <WButton
+            v-else
+            :semantic-type="SemanticType.SECONDARY"
+            @click="openSaveAs"
+          >
+            Save as…
+          </WButton>
+
+          <WButton
+            v-if="savedThemes.length"
+            :semantic-type="SemanticType.SECONDARY"
+            @click="confirmDeleteAllThemes"
+          >
+            Delete all
+          </WButton>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid gap-3">
+      <div class="text-description text-sm font-semibold">
+        Presets
       </div>
 
       <div class="flex flex-wrap gap-2">
         <WButton
           v-for="preset in PRESETS"
           :key="preset.id"
-          :semantic-type="activePreset === preset.id ? SemanticType.PRIMARY : SemanticType.SECONDARY"
+          :semantic-type="!activeTheme && activePreset === preset.id ? SemanticType.PRIMARY : SemanticType.SECONDARY"
           @click="setPreset(preset.id)"
         >
+          <ThemeSwatch :config="{preset: preset.id}" />
           {{ preset.name }}
         </WButton>
 
@@ -24,7 +106,7 @@
       </div>
 
       <p
-        v-if="hasCustomTokens"
+        v-if="hasCustomTokens && !activeTheme"
         class="text-description text-sm"
       >
         Custom values over {{ findPreset(activePreset)?.name }}. Picking a preset drops them.
@@ -159,8 +241,9 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {computed, defineAsyncComponent, markRaw, ref} from 'vue'
 
+import {Modal} from 'eco-vue-js/dist/utils/Modal'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 import {useCopy} from 'eco-vue-js/dist/utils/useCopy'
 
@@ -168,25 +251,40 @@ import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 
 import ThemePlaygroundFields from './ThemePlaygroundFields.vue'
+import ThemeSwatch from './ThemeSwatch.vue'
 
 import {
   ADVANCED_GROUPS,
   DEFAULT_TOKENS,
   PRESETS,
+  type SavedTheme,
   TOKENS,
   type ThemeTokens,
+  activeTheme,
+  activeThemeId,
+  deleteTheme,
+  duplicateTheme,
   findPreset,
   getThemeCss,
   getThemeLink,
   getThemePrompt,
+  getUniqueThemeName,
   hasCustomTokens,
+  loadTheme,
   parseThemeReply,
+  renameTheme,
   resetTheme,
+  saveThemeAs,
+  savedThemes,
+  selectTheme,
   setPreset,
   setRandomTheme,
   themeConfig,
   themeTokens,
 } from '../docsTheme'
+import {confirmDeleteAllThemes} from '../themeConfirm'
+
+const ThemeNameModal = defineAsyncComponent(() => import('./ThemeNameModal.vue'))
 
 const allGroups = [...new Set(TOKENS.map(token => token.group))].map(name => ({name, description: ADVANCED_GROUPS[name], tokens: TOKENS.filter(token => token.group === name)}))
 
@@ -201,7 +299,7 @@ const baseTokens = computed(() => ({...DEFAULT_TOKENS, ...findPreset(activePrese
 
 const css = computed(() => getThemeCss(themeTokens.value))
 
-const copyLink = useCopy(() => getThemeLink(themeConfig.value))
+const copyLink = useCopy(() => getThemeLink(themeConfig.value, undefined, activeTheme.value?.name))
 const copyCss = useCopy(css)
 
 const description = ref('')
@@ -226,8 +324,35 @@ const applyReply = () => {
     return
   }
 
-  themeConfig.value = config
+  loadTheme(config)
   reply.value = ''
   replyError.value = undefined
+}
+
+const openSaveAs = () => {
+  Modal.add(markRaw(ThemeNameModal), {
+    title: 'Save theme',
+    name: getUniqueThemeName(hasCustomTokens.value ? 'My theme' : findPreset(activePreset.value)?.name ?? 'My theme'),
+    onSave: saveThemeAs,
+  })
+}
+
+const openRename = (theme: SavedTheme) => {
+  Modal.add(markRaw(ThemeNameModal), {
+    title: 'Rename theme',
+    name: theme.name,
+    themeId: theme.id,
+    onSave: (name: string) => renameTheme(theme.id, name),
+  })
+}
+
+const confirmDelete = (theme: SavedTheme) => {
+  Modal.addConfirm({
+    title: `Delete “${ theme.name }”?`,
+    description: 'The site keeps showing it until you pick another theme, but it is no longer saved.',
+    acceptText: 'Delete',
+    acceptSemanticType: SemanticType.NEGATIVE,
+    onAccept: () => deleteTheme(theme.id),
+  })
 }
 </script>
