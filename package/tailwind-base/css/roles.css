@@ -21,6 +21,8 @@
 
   --role-surface: var(--color-default);
   --role-surface-dark: var(--color-default-dark);
+  --role-surface-subtle: var(--color-gray-50);
+  --role-surface-subtle-dark: var(--color-gray-850);
   --role-surface-muted: var(--color-gray-100);
   --role-surface-muted-dark: var(--color-gray-800);
   --role-surface-inset: var(--color-gray-200);
@@ -59,6 +61,7 @@
   --color-subtle: var(--w-text-subtle);
 
   --color-surface: var(--w-surface);
+  --color-surface-subtle: var(--w-surface-subtle);
   --color-surface-muted: var(--w-surface-muted);
   --color-surface-inset: var(--w-surface-inset);
   --color-overlay: var(--w-overlay);
@@ -112,6 +115,7 @@
     --w-text-subtle: light-dark(var(--role-text-subtle), var(--role-text-subtle-dark));
 
     --w-surface: light-dark(var(--role-surface), var(--role-surface-dark));
+    --w-surface-subtle: light-dark(var(--role-surface-subtle), var(--role-surface-subtle-dark));
     --w-surface-muted: light-dark(var(--role-surface-muted), var(--role-surface-muted-dark));
     --w-surface-inset: light-dark(var(--role-surface-inset), var(--role-surface-inset-dark));
     --w-overlay: light-dark(var(--role-overlay), var(--role-overlay-dark));

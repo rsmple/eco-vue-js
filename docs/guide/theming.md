@@ -83,7 +83,8 @@ So a light brand color still gives readable links on white, and a yellow fill ge
 | `text-description` | `text-description` | `gray-500` / `gray-400` | Muted text |
 | `text-subtle` | `text-subtle` | `gray-400` / `gray-600` | Placeholders, disabled text, chart axes |
 | `surface` | `bg-surface` | `default` / `default-dark` | Page, cards, dropdowns |
-| `surface-muted` | `bg-surface-muted` | `gray-100` / `gray-800` | Secondary fills, striped rows, tooltips |
+| `surface-subtle` | `bg-surface-subtle` | `gray-50` / `gray-850` | Barely raised areas: striped rows, empty chart cells, panels inside a card |
+| `surface-muted` | `bg-surface-muted` | `gray-100` / `gray-800` | Secondary fills, hovered rows, tooltips |
 | `surface-inset` | `bg-surface-inset` | `gray-200` / `gray-700` | Fills inside controls, chips |
 | `overlay` | `bg-overlay` | `default` 40% / `default-dark` 60% | Translucent bars over scrolling content |
 | `backdrop` | `bg-backdrop` | `primary-light` 40% / `primary-darkest` 40% | Behind modals, bottom sheets and the mobile nav |

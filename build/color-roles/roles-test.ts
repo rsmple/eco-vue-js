@@ -32,6 +32,7 @@ const EQUIVALENT: [string, string][] = [
   ['text-subtle', 'text-gray-400 dark:text-gray-600'],
   ['text-surface', 'text-default dark:text-default-dark'],
   ['bg-surface', 'bg-default dark:bg-default-dark'],
+  ['bg-surface-subtle', 'bg-gray-50 dark:bg-gray-850'],
   ['bg-surface-muted', 'bg-gray-100 dark:bg-gray-800'],
   ['bg-surface-inset', 'bg-gray-200 dark:bg-gray-700'],
   ['bg-overlay', 'bg-default/40 dark:bg-default-dark/60'],
