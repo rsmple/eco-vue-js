@@ -14,8 +14,8 @@
    */
   --color-primary: oklch(55% 0.17 286.8);
   --color-primary-dark: var(--color-primary);
-  --color-primary-light: color-mix(in oklab, var(--color-primary) 10%, var(--color-default));
-  --color-primary-darkest: color-mix(in oklab, var(--color-primary-dark) 20%, var(--color-default-dark));
+  --color-primary-light: color-mix(in oklab, var(--color-primary) 7%, var(--color-default));
+  --color-primary-darkest: color-mix(in oklab, var(--color-primary-dark) 10%, var(--color-default-dark));
 
   --color-black-default: #333333;
   --color-black-light: #4f4f4f;
