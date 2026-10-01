@@ -84,7 +84,7 @@
     "LICENSE"
   ],
   "bin": {
-    "eco-vue-color-roles": "./scripts/color-roles-codemod.js"
+    "eco-vue-color-roles": "scripts/color-roles-codemod.js"
   },
   "license": "MIT",
   "main": "./dist/main.js",
