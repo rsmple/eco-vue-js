@@ -22,7 +22,7 @@ export const rewrite = (file: string) => file
 
 type Page = {group: string, order: number, title: string, link: string}
 
-const readFrontmatter = (content: string): Record<string, string> => {
+export const readFrontmatter =(content: string): Record<string, string> => {
   const block = /^---\n([\s\S]*?)\n---/.exec(content)?.[1] ?? ''
 
   // Only flat `key: value` lines are needed here.

@@ -1,5 +1,12 @@
 # eco-vue-js
 
+Docs, with live demos and a theme playground: https://rsmple.github.io/eco-vue-js/
+
+For AI coding assistants, the docs of the installed version are in the package as Markdown: start at
+`node_modules/eco-vue-js/docs/llms.txt`. The latest version's docs are also online as
+[llms.txt](https://rsmple.github.io/eco-vue-js/llms.txt) and
+[llms-full.txt](https://rsmple.github.io/eco-vue-js/llms-full.txt).
+
 ## Usage
 
 ### Installation

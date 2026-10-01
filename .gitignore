@@ -13,6 +13,7 @@ dist
 package/dist
 package/dist-temp
 package/package.json
+package/docs
 dist-ssr
 coverage
 *.local

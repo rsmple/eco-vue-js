@@ -105,6 +105,16 @@ import IconAdd from 'eco-vue-js/dist/assets/icons/IconAdd'
 
 See [Conventions](./conventions) for the patterns the rest of the docs assume.
 
+## AI assistants
+
+The package carries these docs as Markdown, for the version it is: point an assistant at `node_modules/eco-vue-js/docs/llms.txt`, for example with a line in the app's `CLAUDE.md` or `AGENTS.md`:
+
+```md
+UI kit docs: node_modules/eco-vue-js/docs/llms.txt — read the page for a component before using it.
+```
+
+This site also serves them for the latest version: [llms.txt](https://rsmple.github.io/eco-vue-js/llms.txt) indexes every page, and [llms-full.txt](https://rsmple.github.io/eco-vue-js/llms-full.txt) has all of them in one file.
+
 ## Eslint config
 
 The package also ships the shared eslint config used by its consumers:

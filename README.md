@@ -4,6 +4,8 @@
 [![npm downloads](https://img.shields.io/npm/dm/eco-vue-js.svg)](https://www.npmjs.com/package/eco-vue-js)
 [![Build Status](https://github.com/rsmple/eco-vue-js/workflows/CI/badge.svg)](https://github.com/rsmple/eco-vue-js/actions)
 
+Vue 3 UI kit with Tailwind v4. Docs: https://rsmple.github.io/eco-vue-js/ ([llms.txt](https://rsmple.github.io/eco-vue-js/llms.txt) for AI assistants).
+
 ## Development
 
 ### Local testing
