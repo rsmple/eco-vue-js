@@ -56,6 +56,19 @@ body {
     xl:[--nav-bar-width:var(--spacing-nav-bar-width)];
 }
 
+/*
+ * The logo's two leaf shades, from the primary of the current theme and mode: the front leaf lighter, the back leaf
+ * and the grass darker, as in the drawn logo. The fourth shape darkens the grass further.
+ */
+.docs-logo > :nth-child(1) {
+  fill: oklch(from var(--w-primary) min(l + 0.12, 0.95) c h);
+}
+
+.docs-logo > :nth-child(2),
+.docs-logo > :nth-child(3) {
+  fill: oklch(from var(--w-primary) max(l - 0.05, 0.1) c h);
+}
+
 .w-nav-bar {
   @apply bg-surface shadow-md xl:shadow-none;
 }

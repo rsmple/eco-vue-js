@@ -6,7 +6,7 @@
           :href="withBase('/')"
           class="inline-flex items-center gap-2.5"
         >
-          <IconLogo class="size-7 *:nth-[1]:fill-primary *:nth-[2]:fill-primary-dark *:nth-[3]:fill-primary-dark" />
+          <IconLogo class="size-7 docs-logo" />
 
           <span class="text-accent text-lg font-semibold tracking-tight">EcoVue</span>
         </a>
