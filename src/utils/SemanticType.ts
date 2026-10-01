@@ -40,12 +40,12 @@ export const setSemanticTypeChipMap = (value: Partial<Record<SemanticType, strin
 }
 
 const semanticTypeBorderMap = reactive<Record<SemanticType, string>>({
-  [SemanticType.PRIMARY]: 'tone-primary border-solid border-tone',
+  [SemanticType.PRIMARY]: 'tone-primary border-solid border-tone-fill',
   [SemanticType.SECONDARY]: 'border-solid border-line',
-  [SemanticType.NEGATIVE]: 'tone-negative border-solid border-tone',
-  [SemanticType.POSITIVE]: 'tone-positive border-solid border-tone',
-  [SemanticType.WARNING]: 'tone-warning border-solid border-tone',
-  [SemanticType.INFO]: 'tone-info border-solid border-tone',
+  [SemanticType.NEGATIVE]: 'tone-negative border-solid border-tone-fill',
+  [SemanticType.POSITIVE]: 'tone-positive border-solid border-tone-fill',
+  [SemanticType.WARNING]: 'tone-warning border-solid border-tone-fill',
+  [SemanticType.INFO]: 'tone-info border-solid border-tone-fill',
 })
 
 export const useSemanticTypeBorderMap = () => {

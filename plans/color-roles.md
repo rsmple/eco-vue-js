@@ -7,7 +7,7 @@ Living plan for moving the kit from palette classes (`bg-gray-100 dark:bg-gray-8
 | 0. Spike | done |
 | 1. Foundation in `tailwind-base` | done — on branch `color-roles` |
 | 2. Codemod the kit | done |
-| 3. Re-tune default colors | — |
+| 3. Re-tune default colors | candidate on the branch, uncommitted — awaiting visual sign-off |
 | 4. Playground and presets on roles | — |
 | 5. Consumers | — |
 
@@ -293,10 +293,38 @@ Run `node build/color-roles/codemod.ts` for the current list. By kind:
 
 Separate minor, deliberate visual change.
 
-- [ ] One neutral tint across `gray-*` and `default-dark` (zinc vs bluish gray today).
-- [ ] Tone colors and text shades chosen for contrast, not taken from the Tailwind palette.
-- [ ] Derived on-colors on by default.
-- [ ] Contrast check in tests for every tone and surface pair.
+- [x] Contrast check: `build/color-roles/contrast-test.ts` resolves every role in the browser, composites translucent colors, and checks WCAG ratios in light and dark (`--report` prints all). Baseline before retuning: 23 pairs under their minimum; after: 0.
+- [x] One neutral tint: `gray-*` is Tailwind's zinc, the scale `default-dark` (zinc-900) came from; `gray-850` interpolated.
+- [x] Tone fills chosen for contrast: each keeps its hue, lightness set so white text reads (≥ 4.5) and the fill stands out on the dark surface (≥ 3), so one value serves both modes and `X-dark` defaults to `X`. Warning is a deeper amber, still with black text.
+- [x] Derived sub-roles on by default; the kit's explicit on/soft values are gone.
+- [ ] Visual sign-off (screenshots: button, status, info cards, input, tabs, checkbox pages, before/after, light/dark).
+- [ ] Soft backgrounds read duller than before (12% of a darker fill): keep, raise the mix, or mix from a lighter shade.
+
+#### Palette
+
+| Token | Was | Now |
+| --- | --- | --- |
+| `primary` / `-dark` | `#9087e2` / `#5b4fc4` | `oklch(55% 0.17 286.8)` (#6e5bce) / same |
+| `primary-light` / `-darkest` | `#f4f3fc` / `#23222e` | `color-mix` of `primary` 10% over `default` / 20% over `default-dark` — follow a theme's primary |
+| `negative` / `-dark` | `#f35555` / `#cc3636` | `oklch(57% 0.2 24.1)` (#d42f37) / same |
+| `positive` / `-dark` | `#77d460` / `#5bb245` | `oklch(54% 0.148 150)` (#02853c) / same |
+| `warning` / `-dark` | `#ffda56` / `#e6b919` | `oklch(82% 0.16 85)` (#f3ba25) / same |
+| `info` / `-dark` | `#82adff` / `#407ae5` | `oklch(55% 0.16 262.6)` (#3c6cce) / same |
+| `gray-50`…`950` | Tailwind gray (bluish) | Tailwind zinc |
+
+#### Derivation
+
+`X` and `X-dark` keep meaning "the value for light mode" and "for dark mode" — aspm's `primary-dark` is lighter than its `primary`, traio's is white — so roles never treat `-dark` as a darker shade. Instead `tone-*` derives from the fill of the current mode:
+
+- text and borders (`--w-tone`): lightness clamped to ≤ 0.53 in light, ≥ 0.72 in dark;
+- on-fill (`--w-tone-on`): black or white, switching at L 0.58 — where the two have equal WCAG contrast for every hue;
+- soft (`--w-tone-soft`): 12% of the fill over the surface.
+
+Pins per tone: `--tone-text-*`, `--tone-on-*`, `--tone-soft-*` in a theme's `@theme inline`. The semantic border map uses `border-tone-fill`, so a filled button's border stays its fill and an outlined one keeps today's look.
+
+Other changes: `text-description` light gray-400 → 500 and dark 500 → 400 (4.8 and 6.8 instead of 2.6 and 3.7); docs VitePress link text (`--vp-c-brand-1`) uses the same clamped shade; docs body uses `bg-surface text-accent`.
+
+Effects on consumers worth noting in the release: traio's dark primary fill (white) now gets black text; whitespots, which sets only `primary`, gets its own color in dark mode instead of the kit's old `primary-dark`.
 
 ### 4. Playground and presets
 
@@ -372,3 +400,4 @@ Without a scope, every role has its default — today's colors.
 - 2026-10-01 — Phase 2 started: harness and role test moved to `build/color-roles/`, codemod written; automatic pass replaced 93 pairs in 45 files; color diff shows only the agreed input text unification; cascade review clean. 166 classes left for the manual pass.
 - 2026-10-01 — Codemod scanner fixed (46 more pairs). Manual pass done: fills, soft, raised lines (now both modes), islands for tooltip and toast, `backdrop` and `focus` roles. Visible changes listed in the manual pass table. Color diff, screenshots of transient UI, role test and build: clean.
 - 2026-10-01 — Docs examples and docs site components migrated. Phase 2 done.
+- 2026-10-01 — Phase 3 candidate: contrast test (23 → 0 failing pairs), zinc neutral, tone fills for contrast, derived tone text / on / soft. Awaiting visual sign-off.
