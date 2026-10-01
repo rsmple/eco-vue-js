@@ -353,10 +353,11 @@ Kit side:
 - [x] Data palette `--color-data-{red,orange,amber,green,teal,cyan,blue,violet,fuchsia,pink,gray}`: Tailwind hues, lightness set per hue so white text reads (orange and amber are light hues, black text) and fills stand out on the dark surface. Checked by the contrast test as tones.
 - [x] Gradient roles `gradient-start/middle/end` (`from-gradient-start via-gradient-middle to-gradient-end`), default primary turned 0°, 30°, 60° in hue, per mode.
 - [x] Playground: Data and Roles groups, collapsed; theming page: data palette, gradient roles, migrating `dark:` pairs; preview of data tones and the gradient.
-- [ ] Kit `severity-*` and `score-*`: unused by the kit's components; deprecate for a release, then drop. aspm and traio override `score-*`.
+- [x] Kit `severity-*` and `score-*` removed: they belong to consumers. aspm, traio and auditor define all 26 themselves; whitespots uses the 12 `severity-*` from the kit and has to define them when it bumps.
 
 Consumer side, after a release:
 
+- [ ] whitespots: copy the kit's 12 `severity-*` values into its theme (removed from the kit in 0.20.0).
 - [ ] whitespots: run the codemod (with `--role-surface-dark` and a muted-surface role in its theme), then the manual pass.
 - [ ] Alias `scanner-*`, `json-*`, `score-*` to the data palette and drop their `-dark` pairs; `gwrt` to the gradient roles where it's the brand gradient (`pwrt` stays app-specific).
 - [ ] aspm and traio: drop palette overrides that equal the new defaults; traio's `gray-50…200` still default to the kit's (now zinc).
