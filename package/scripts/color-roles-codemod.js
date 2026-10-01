@@ -7,6 +7,7 @@
  *   'border-gray-300 dark:border-gray-700'           → 'border-line'
  *   'text-negative dark:text-negative-dark'          → 'tone-negative text-tone'
  *   'bg-primary/10 dark:bg-primary-dark/10'          → 'tone-primary bg-tone-fill/10'
+ *   'bg-primary-light dark:bg-primary-darkest'       → 'tone-primary bg-tone-soft'
  *
  *   npx eco-vue-color-roles [--write] [--exact] [--theme <css>] [paths…]     default: src
  *
@@ -37,6 +38,7 @@ const ROLES = [
   {role: 'text-description', color: 'description', props: TEXT_PROPS, light: 'gray-500', dark: 'gray-400'},
   {role: 'text-subtle', color: 'subtle', props: TEXT_PROPS, light: 'gray-400', dark: 'gray-600'},
   {role: 'surface', color: 'surface', props: [...SURFACE_PROPS, 'text'], light: 'default', dark: 'default-dark'},
+  {role: 'surface-subtle', color: 'surface-subtle', props: SURFACE_PROPS, light: 'gray-50', dark: 'gray-850'},
   {role: 'surface-muted', color: 'surface-muted', props: SURFACE_PROPS, light: 'gray-100', dark: 'gray-800'},
   {role: 'surface-inset', color: 'surface-inset', props: SURFACE_PROPS, light: 'gray-200', dark: 'gray-700'},
   {role: 'track', color: 'track', props: ['bg', 'fill', 'stroke'], light: 'gray-300', dark: 'gray-700'},
@@ -59,6 +61,11 @@ const NEUTRAL_UNIFIED = {
   'border:gray-200|gray-800': 'border-line-subtle', // dark 800 → 700
   // Exactly `line-raised`, but in app code these are card borders, not the edge of a popup.
   'border:gray-100|gray-800': 'border-line-subtle', // light 100 → 200, dark 800 → 700
+  // Half of `surface-muted` over the surface, which is what `gray-850` is in dark mode.
+  'bg:gray-50|gray-800/50': 'bg-surface-subtle',
+  'bg:gray-50|gray-800/40': 'bg-surface-subtle', // dark a bit stronger
+  'bg:gray-100/50|gray-800/50': 'bg-surface-subtle',
+  'bg:gray-50|gray-800': 'bg-surface-muted', // light 50 → 100
 }
 
 /**
@@ -157,11 +164,16 @@ const transformClasses = (value, exact, table) => {
     } else {
       const tone = TONES.find(item => lightColor === item && darkColor === item + '-dark' && lightAlpha === darkAlpha)
       const toneProp = TONE_PROPS[/** @type {keyof typeof TONE_PROPS} */ (light.prop)]
+      // `bg-primary-light dark:bg-primary-darkest` is the soft background, which the tone mixes from its fill.
+      const soft = light.prop === 'bg' && TONES.find(item => lightColor === item + '-light' && darkColor === item + '-darkest' && lightAlpha === darkAlpha)
 
       // A tone is set on the whole string, so only strings with one tone and no state variant on it qualify.
       if (tone && toneProp && (toneProp.exact || !exact) && !light.variants && tonesInString.size === 1) {
         next = toneProp.utility + alpha
         addTone = 'tone-' + tone
+      } else if (soft && !exact && !light.variants && tonesInString.size === 1) {
+        next = 'bg-tone-soft' + alpha
+        addTone = 'tone-' + soft
       }
     }
 

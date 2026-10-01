@@ -15,7 +15,7 @@
         :class="{
           [cardWrapperClass ?? '']: true,
           'w-ripple-trigger-list': isActionShown,
-          'sm-not:even:bg-surface-muted/50 grid grid-cols-1': card,
+          'sm-not:even:bg-surface-subtle grid grid-cols-1': card,
           'flex': !card,
           '-mb-px': !card && isOpen,
           'w-hover-checked': allowSelectHover,
