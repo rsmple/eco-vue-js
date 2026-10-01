@@ -1,0 +1,8 @@
+/*
+ * Styles for rendered markdown in `.w-markdown`. Import after `base.css`:
+ *
+ *   @import "eco-vue-js/tailwind-base/markdown.css";
+ *   @import "eco-vue-js/tailwind-base/css/markdown/blocks.css";  // GitBook blocks: hints, colored text, details…
+ */
+@import "./css/markdown/prose.css";
+@import "./css/markdown/code.css";

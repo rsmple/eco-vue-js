@@ -1,6 +1,10 @@
-/* Multiline WInput (`textarea`): one `.line` per line, with a sticky line number and the active line highlighted. */
+/*
+ * Numbered lines: one `.line` per line, wrapping its text in a `div`, with a sticky line number. Used by the multiline
+ * WInput (`w-textarea`) and by markdown code blocks. The active line (`line-active`) is highlighted, and so is the
+ * hovered one in a read-only textarea (`group/field`) or a markdown code block.
+ */
 @layer components {
-  .w-textarea {
+  :is(.w-textarea, .w-markdown pre code) {
     counter-reset: w-textarea-lines;
     display: grid;
     grid-template-columns: auto 1fr;
@@ -8,7 +12,7 @@
     background: inherit;
   }
 
-  .w-textarea .line {
+  :is(.w-textarea, .w-markdown pre code) .line {
     counter-increment: w-textarea-lines;
     display: grid;
     grid-template-columns: subgrid;
@@ -16,7 +20,7 @@
     background: inherit;
   }
 
-  .w-textarea .line::before {
+  :is(.w-textarea, .w-markdown pre code) .line::before {
     content: counter(w-textarea-lines);
     position: sticky;
     left: 0;
@@ -25,41 +29,25 @@
     padding-right: --spacing(2);
     text-align: end;
     font-weight: 300;
-    color: var(--color-gray-400);
+    color: light-dark(var(--color-gray-400), var(--color-gray-500));
     background-color: inherit;
     text-security: none;
     -webkit-text-security: none;
   }
 
-  .w-textarea .line > div {
+  :is(.w-textarea, .w-markdown pre code) .line > div {
     padding-right: var(--w-option-padding);
   }
 
-  .w-textarea .line > div > * {
+  :is(.w-textarea, .w-markdown pre code) .line > div > * {
     vertical-align: top;
   }
 
-  .w-textarea .line.line-active > div,
-  .w-textarea.group\/field .line:hover > div {
-    background-color: color-mix(in oklab, var(--color-primary) 10%, transparent);
+  :is(.w-textarea .line.line-active, .w-textarea.group\/field .line:hover, .w-markdown:not(.w-report) pre code .line:hover) > div {
+    background-color: color-mix(in oklab, var(--w-primary) 10%, transparent);
   }
 
-  .w-textarea .line.line-active::before,
-  .w-textarea.group\/field .line:hover::before {
-    color: var(--color-black-default);
-  }
-
-  .dark .w-textarea:not(:is(.light *)) .line::before {
-    color: var(--color-gray-500);
-  }
-
-  .dark .w-textarea:not(:is(.light *)) .line.line-active > div,
-  .dark .w-textarea.group\/field:not(:is(.light *)) .line:hover > div {
-    background-color: color-mix(in oklab, var(--color-primary-dark) 10%, transparent);
-  }
-
-  .dark .w-textarea:not(:is(.light *)) .line.line-active::before,
-  .dark .w-textarea.group\/field:not(:is(.light *)) .line:hover::before {
-    color: var(--color-default);
+  :is(.w-textarea .line.line-active, .w-textarea.group\/field .line:hover, .w-markdown:not(.w-report) pre code .line:hover)::before {
+    color: var(--w-text-accent);
   }
 }

@@ -25,6 +25,18 @@ The kit ships Tailwind v4 classes, not compiled CSS. Import its Tailwind base ri
 
 Dark mode follows a `dark` class on an ancestor (usually `<html>`). Colors, fonts and field sizes are CSS variables — see [Theming](./theming) to change them.
 
+### Markdown
+
+Rendered markdown is styled inside a `.w-markdown` container: headings, lists, tables, inline code, and code blocks with numbered `.line`s. Sizes are in `em`, so the content follows the container's font size, and colors come from the color roles. Import it after the base:
+
+```css
+@import "eco-vue-js/tailwind-base/markdown.css";
+/* Optional: GitBook blocks — hints, colored text, expandable sections, embedded videos */
+@import "eco-vue-js/tailwind-base/css/markdown/blocks.css";
+```
+
+Add `enable-mobile` to the container to keep text on the page's inner margin below `sm` while code blocks and tables reach the screen edges, or `w-report` for print: code wraps and lines don't highlight on hover.
+
 ## Query client
 
 List, select and async components fetch through `@tanstack/vue-query`. Install the plugin and hand the same client to the kit, so model actions running outside `setup` can reach it:

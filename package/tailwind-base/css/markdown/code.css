@@ -1,0 +1,49 @@
+/*
+ * Markdown code blocks: `pre > code`, one `.line` per line (numbered by the kit's textarea styles). An optional header
+ * before the `code` — `pre > div:first-child`, holding the language and a `.button-copy-code` — sits over its top
+ * padding.
+ */
+@layer components {
+  .w-markdown pre {
+    position: relative;
+    display: grid;
+    white-space: pre;
+    word-break: break-word;
+    background-color: var(--w-input-bg, inherit);
+    @apply mb-3 overflow-x-auto overscroll-x-contain rounded-xl border border-solid border-line-subtle
+      print:whitespace-pre-wrap print:break-all;
+  }
+
+  .w-markdown pre code {
+    font-size: inherit;
+    color: inherit;
+    @apply px-3 py-3 first-not:pt-8 rounded-inherit overscroll-x-contain
+      not-print:max-h-[calc(100vh-6rem)] not-print:overflow-auto;
+  }
+
+  .w-markdown pre code .line {
+    @apply -mx-3;
+  }
+
+  .w-markdown pre code .line::before {
+    @apply pl-3 -left-3;
+  }
+
+  .w-markdown pre > div:first-child {
+    background: inherit;
+    @apply text-description absolute inset-x-0 top-0 flex items-end justify-between gap-2 pt-2 pb-1 pl-3 text-xs;
+  }
+
+  .w-markdown .button-copy-code {
+    @apply hover:text-accent -mt-2 -mb-1 flex items-center gap-2 px-3 pt-2 pb-1 print:hidden;
+  }
+
+  .w-markdown.w-report pre {
+    overflow-x: unset;
+    @apply bg-surface-subtle text-accent whitespace-pre-wrap break-all;
+  }
+
+  .w-markdown.enable-mobile pre {
+    @apply sm-not:px---inner-margin sm-not:border-x-0 sm-not:rounded-none;
+  }
+}

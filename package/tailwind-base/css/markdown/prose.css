@@ -1,0 +1,156 @@
+/*
+ * Markdown text: what any renderer outputs inside `.w-markdown` — headings, paragraphs, lists, quotes, links, inline
+ * code, tables and images. Sizes are in `em`, so the content follows the container's font size.
+ *
+ * Modifiers on `.w-markdown`:
+ * - `enable-mobile`: below `sm`, text keeps the page's inner margin while code blocks and tables reach the screen edges.
+ * - `w-report`: for print — code wraps and its lines don't highlight on hover.
+ */
+@layer components {
+  .w-markdown {
+    isolation: isolate;
+  }
+
+  .w-markdown :is(h1, h2, h3, h4, h5, h6) {
+    margin-block: 0.75em 0.5em;
+    @apply font-medium;
+  }
+
+  .w-markdown h1 {
+    font-size: 1.875em;
+    line-height: 2.25em;
+  }
+
+  .w-markdown h2 {
+    font-size: 1.5em;
+    line-height: 2em;
+  }
+
+  .w-markdown h3 {
+    font-size: 1.25em;
+    line-height: 1.75em;
+  }
+
+  .w-markdown h4 {
+    font-size: 1.125em;
+    line-height: 1.75em;
+    margin-block: 0.5em;
+  }
+
+  .w-markdown h5 {
+    font-size: 1em;
+    line-height: 1.5em;
+    margin-block: 0.5em;
+  }
+
+  .w-markdown h6 {
+    font-size: 0.75em;
+    line-height: 1em;
+    margin-block: 0.5em;
+    @apply font-semibold;
+  }
+
+  .w-markdown p {
+    word-break: break-word;
+    @apply last-not:mb-[0.75em];
+  }
+
+  .w-markdown a {
+    @apply tone-primary text-tone underline;
+  }
+
+  .w-markdown hr {
+    margin-block: 1.25em;
+    @apply border-line;
+  }
+
+  .w-markdown :is(ul, ol) {
+    padding-inline-start: 2.5em;
+    margin-bottom: 0.75em;
+  }
+
+  .w-markdown :is(ul, ol) :is(ul, ol) {
+    margin-inline: 0;
+  }
+
+  .w-markdown ul {
+    list-style-type: disc;
+  }
+
+  .w-markdown ul ul {
+    list-style-type: circle;
+  }
+
+  .w-markdown ul ul ul {
+    list-style-type: square;
+  }
+
+  .w-markdown ol {
+    list-style-type: decimal;
+  }
+
+  .w-markdown blockquote {
+    margin-bottom: 0.75em;
+    padding: 0.5em 1.25em;
+    @apply border-l-4 border-solid border-line-subtle italic;
+  }
+
+  .w-markdown :not(pre) > code {
+    font-size: 90%;
+    @apply tone-primary bg-tone-soft text-tone px-1 rounded-sm;
+  }
+
+  .w-markdown mark {
+    font-size: 90%;
+    @apply tone-warning bg-tone-fill/50 text-accent font-mono px-1 py-0.5 rounded-sm;
+  }
+
+  .w-markdown mark code {
+    background: unset;
+    color: unset;
+    padding: unset;
+  }
+
+  .w-markdown table {
+    margin-bottom: 1.25em;
+    @apply w-full;
+  }
+
+  .w-markdown :is(th, td) {
+    padding: 0.5em;
+  }
+
+  .w-markdown th {
+    @apply text-description font-semibold text-left;
+  }
+
+  .w-markdown tbody tr {
+    @apply border-t border-solid border-line-subtle;
+  }
+
+  .w-markdown tbody tr:nth-child(odd) {
+    @apply bg-surface-subtle;
+  }
+
+  .w-markdown img {
+    display: block;
+    object-fit: contain;
+    margin-bottom: 1em;
+  }
+
+  .w-markdown :is(p, figure) > img {
+    @apply sm-not:-mx-4 sm-not:w-screen sm-not:max-w-screen;
+  }
+
+  .w-markdown.enable-mobile > :is(h1, h2, h3, h4, h5, h6) {
+    @apply sm-not:px---inner-margin;
+  }
+
+  .w-markdown.enable-mobile > :is(p, ul, ol, blockquote) {
+    @apply sm-not:mx---inner-margin;
+  }
+
+  .w-markdown.enable-mobile :is(th, td) {
+    @apply sm-not:first:pl---inner-margin sm-not:last:pr---inner-margin;
+  }
+}

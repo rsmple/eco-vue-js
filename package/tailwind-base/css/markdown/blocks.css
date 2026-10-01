@@ -1,0 +1,127 @@
+/*
+ * Markdown blocks beyond plain markdown, as GitBook writes them: hints, colored text, expandable sections, embedded
+ * videos and quotes with an avatar. A renderer outputs this markup itself:
+ *
+ * - `.hint-{info|success|warning|danger|note}`: a callout box.
+ * - `mark.mark-{blue|green|red|danger|orange|purple}`: colored text; `mark.mark-{blue|green|red}-bg`: a colored
+ *   highlight.
+ * - `details > summary > div`: an expandable section; consecutive sections join into one bordered group.
+ * - `.markdown-embed-video > iframe`, `.markdown-table > div > table` (scrolls sideways), `cite > img + …`,
+ *   `img[data-size="line"]` (an inline image as tall as the text).
+ */
+@layer components {
+  .w-markdown :is(.hint-info, .mark-blue, .mark-blue-bg) {
+    @apply tone-info;
+  }
+
+  .w-markdown :is(.hint-success, .mark-green, .mark-green-bg) {
+    @apply tone-positive;
+  }
+
+  .w-markdown :is(.hint-warning, .mark-orange) {
+    @apply tone-warning;
+  }
+
+  .w-markdown :is(.hint-danger, .mark-red, .mark-danger, .mark-red-bg) {
+    @apply tone-negative;
+  }
+
+  .w-markdown .mark-purple {
+    @apply tone-primary;
+  }
+
+  .w-markdown :is(.hint-info, .hint-success, .hint-warning, .hint-danger, .mark-blue, .mark-green, .mark-orange, .mark-red, .mark-danger, .mark-purple) {
+    @apply bg-tone-soft text-tone;
+  }
+
+  .w-markdown :is(.mark-blue-bg, .mark-green-bg, .mark-red-bg) {
+    @apply bg-tone-fill/40;
+  }
+
+  .w-markdown .hint-note {
+    @apply bg-surface-muted text-description;
+  }
+
+  .w-markdown details {
+    @apply bg-surface border-line relative border-x border-t border-solid p-4;
+  }
+
+  .w-markdown details:first-of-type {
+    @apply rounded-t-lg;
+  }
+
+  .w-markdown details:last-of-type {
+    @apply mb-4 rounded-b-lg border-b;
+  }
+
+  .w-markdown details > div {
+    display: grid;
+  }
+
+  .w-markdown details > :nth-child(2) {
+    margin-top: 2rem;
+  }
+
+  /* Sticks to the top of the scroll container while its section scrolls, covering the content above it. */
+  .w-markdown summary {
+    z-index: 3;
+    margin: -10rem -1rem -1rem;
+    @apply text-description hover:text-accent sticky -top-20 cursor-pointer list-none pt-36 select-none;
+  }
+
+  .w-markdown summary > div {
+    grid-template-columns: auto 1fr auto;
+    @apply bg-surface relative grid gap-4 rounded-md p-4;
+  }
+
+  .w-markdown summary svg {
+    @apply transition-transform self-center;
+  }
+
+  .w-markdown details:open summary svg {
+    @apply rotate-0;
+  }
+
+  .w-markdown .markdown-embed-video {
+    margin-block: 1em;
+    @apply aspect-video w-full;
+  }
+
+  .w-markdown .markdown-embed-video iframe {
+    @apply size-full;
+  }
+
+  .w-markdown .markdown-table,
+  .w-markdown .markdown-table > div {
+    display: grid;
+  }
+
+  .w-markdown .markdown-table > div {
+    @apply not-print:overflow-x-auto;
+  }
+
+  .w-markdown cite {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: 1rem;
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+
+  .w-markdown cite :not(img) {
+    width: 100%;
+  }
+
+  .w-markdown cite img {
+    grid-row: 1 / 4;
+    height: 4.5rem;
+    margin-bottom: 0;
+  }
+
+  .w-markdown img[data-size="line"] {
+    display: inline;
+    height: 1.75em;
+    margin-bottom: 0;
+  }
+}
