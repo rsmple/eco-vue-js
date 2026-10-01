@@ -73,7 +73,9 @@ const current = ref('security')
 
 <!-- @example-end -->
 
-Switching slides the content in from the side of the new tab, and the content area keeps the height of the tallest tab opened so far, so what's below it doesn't jump — `disableMinHeight` turns that off, `lessTransitions` fades instead of sliding. A header wider than its space scrolls sideways and keeps the active tab in view.
+Switching slides the content in from the side of the new tab, and the content area keeps the height of the tallest tab opened so far, so what's below it doesn't jump — `disableMinHeight` turns that off, `lessTransitions` fades instead of sliding.
+
+The slide moves content its full width plus `--inner-margin` past the edge of the tabs, and WTabs doesn't clip it: the container decides where it shows. Spanning the page, the content slides in from the screen edge. Inside a card, a modal or a column, give the container `overflow-x-clip` — unlike `overflow-hidden`, it keeps sticky elements inside working. A header wider than its space scrolls sideways and keeps the active tab in view.
 
 `update:current` and `update:current-index` emit the active tab, and `update:current-title` its title — for putting it in a page header when the tabs' own header is hidden with `noHeader`. To switch from code, call `updateCurrent(name)` or `updateIndex(index)` on a template ref. The first `update:current` comes during setup, so when the parent shows the current tab, seed it and pass it as `initTab`, as the demo does — otherwise a server-rendered page shows a different value than the first client render.
 
