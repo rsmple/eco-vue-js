@@ -88,10 +88,10 @@ const getPackageExports = (list: ComponentPath[]) => {
       import: './tailwind-base/index.ts',
       require: './tailwind-base/index.ts',
     },
-    './tailwind-base/base.css': {
-      style: './tailwind-base/base.css',
-      import: './tailwind-base/base.css',
-      require: './tailwind-base/base.css',
+    './tailwind-base/*.css': {
+      style: './tailwind-base/*.css',
+      import: './tailwind-base/*.css',
+      require: './tailwind-base/*.css',
     },
     './tailwind-base/*.js': {
       import: './tailwind-base/*.ts',
