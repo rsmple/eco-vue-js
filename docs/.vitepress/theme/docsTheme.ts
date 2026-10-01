@@ -3,9 +3,9 @@ import {computed, ref, shallowRef, toRaw, watch} from 'vue'
 import rolesCss from '../../../package/tailwind-base/css/roles.css?raw'
 import themeCss from '../../../package/tailwind-base/css/theme.css?raw'
 import {THEME_STORAGE_KEY as STORAGE_KEY, THEME_STYLE_ID as STYLE_ID} from '../themeHeadScript'
-import {NEUTRAL_SCALES, PRESETS, type PresetId, expandNeutral, getRandomTokens, getThemeBlock, isNeutralScale} from '../themePresets'
+import {NEUTRAL_SCALES, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, expandNeutral, getRandomTokens, getThemeBlock, isNeutralScale, isRandomStyleId} from '../themePresets'
 
-export {NEUTRAL_SCALES, PRESETS, type PresetId}
+export {NEUTRAL_SCALES, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId}
 
 type PaletteKey =
   | 'color-primary' | 'color-primary-dark' | 'color-primary-light' | 'color-primary-darkest'
@@ -215,9 +215,14 @@ const randomConfig = shallowRef<ThemeConfig | null>(null)
 /** Whether the theme in use is a random one, not yet edited or saved: edits and saves make a new config. */
 export const isRandomTheme = computed(() => !activeThemeId.value && toRaw(themeConfig.value) === randomConfig.value)
 
-/** A random primary with the neutral scale, size and radius that go with it; see `getRandomTokens`. */
+const RANDOM_STYLE_STORAGE_KEY = 'eco-vue-docs-random-style'
+
+/** The style the Random buttons generate in, from `RANDOM_STYLES`. Remembered in this browser. */
+export const randomStyle = ref<RandomStyleId>('vivid')
+
+/** A random primary in `randomStyle` with the neutral scale, size and radius that go with it; see `getRandomTokens`. */
 export const setRandomTheme = () => {
-  randomConfig.value = normalizeConfig(getRandomTokens())
+  randomConfig.value = normalizeConfig(getRandomTokens(randomStyle.value))
   loadTheme(randomConfig.value)
 }
 
@@ -454,6 +459,24 @@ const readStored = (): ThemeConfig => {
   }
 }
 
+const readStoredRandomStyle = (): RandomStyleId => {
+  try {
+    const value = localStorage.getItem(RANDOM_STYLE_STORAGE_KEY)
+
+    return isRandomStyleId(value) ? value : 'vivid'
+  } catch {
+    return 'vivid'
+  }
+}
+
+const storeRandomStyle = (value: RandomStyleId) => {
+  try {
+    localStorage.setItem(RANDOM_STYLE_STORAGE_KEY, value)
+  } catch {
+    // Storage is blocked: the style lasts until the page is closed.
+  }
+}
+
 let isInstalled = false
 
 /** Restores the stored theme, takes the one from `?theme=` over it, and keeps the page and storage in sync. */
@@ -493,6 +516,9 @@ export const installDocsTheme = () => {
 
     if (theme && !sameConfig(theme.config, config)) savedThemes.value = savedThemes.value.map(item => item.id === theme.id ? {...item, config} : item)
   }, {immediate: true})
+
+  randomStyle.value = readStoredRandomStyle()
+  watch(randomStyle, storeRandomStyle)
 
   // Immediate, so a theme added from a link on load is stored too.
   watch([savedThemes, activeThemeId], ([themes, activeId]) => storeThemes(themes, activeId), {immediate: true})
