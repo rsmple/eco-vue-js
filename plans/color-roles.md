@@ -5,7 +5,7 @@ Living plan for moving the kit from palette classes (`bg-gray-100 dark:bg-gray-8
 | Phase | Status |
 | --- | --- |
 | 0. Spike | done |
-| 1. Foundation in `tailwind-base` | roles, tones and scopes defined, unused; consumer `color-scheme` check left |
+| 1. Foundation in `tailwind-base` | done — on branch `color-roles` |
 | 2. Codemod the kit | — |
 | 3. Re-tune default colors | — |
 | 4. Playground and presets on roles | — |
@@ -208,7 +208,16 @@ Plan for extra colors, by kind:
 - [x] Remaining roles, `tone-*` and `surface-*` in `css/roles.css`, defaulting to today's palette. Nothing in `src/` uses them yet.
 - [x] On-colors explicit for kit tones, matching today (white; `black-default` / `default-dark` on warning).
 - [x] Role equivalence test (below): passes.
-- [ ] Check `color-scheme` side effects in a consumer app (scrollbars, native controls, page canvas).
+- [x] Consumer check in auditor (below).
+
+#### Consumer check
+
+auditor (`front`, Vite 8) built against a local pack of `main` and of `color-roles`, then dependencies restored.
+
+- **Compiled CSS:** the role variables, `color-scheme` rules and the variable-based `text-accent` / `text-description` / plugin colors, lowered by lightningcss as expected. Nothing else changed.
+- **Cascade:** the old JS-plugin `text-accent` / `text-description` had a dark rule with higher specificity (`.dark .text-accent:not(:is(.light *))`), so in dark mode they beat any plain `text-*` on the same element; now they are single-class utilities. Scanned the kit and all consumers for `text-accent` / `text-description` combined with another plain text color: one hit, appsec `TaskTrackerConnectionForm.vue` (`text-description … text-primary dark:text-primary-dark`), which resolves the same in both modes. `@apply text-accent` in the shared `markdown.css` is unaffected — the `mark-*` / `hint-*` rules carry their own `dark:` variants.
+- **Rendered app** (login page; no backend): computed colors of every element identical in light and dark; only `color-scheme` differs (`normal` → `light` / `dark`).
+- **Native controls** in dark mode (full Chromium, app CSS): the date input icon, checkbox and range slider switch to the browser's dark rendering — before, the calendar icon was black on the dark background. Native popups (select, date picker) and classic scrollbars follow the mode too. Kit components are unaffected. This is the only visible change of phase 1, and it goes in the release notes.
 
 #### Role equivalence test
 
@@ -309,3 +318,4 @@ Without a scope, every role has its default — today's colors.
 - 2026-10-01 — Plan written; spike done in Chromium and Firefox; inventory of the kit and five consumer repos.
 - 2026-10-01 — Spike done in WebKit. Found lightningcss lowering of `light-dark()` in the docs build; roles moved to `css/roles.css` declared per mode boundary. `text-accent`, `text-description`, autofill, resizer and `code-inline` colors read variables. Color diff: 0 changes. `plans/` excluded from the docs build.
 - 2026-10-01 — Names agreed. All roles, kit tones, `tone-*` and `surface-*` added to `css/roles.css` with today's values; role equivalence test passes in three engines; docs color diff 0.
+- 2026-10-01 — Consumer check in auditor: CSS and rendered colors unchanged apart from `color-scheme`; native controls now follow dark mode. Phase 1 done.
