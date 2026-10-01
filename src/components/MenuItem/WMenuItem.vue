@@ -4,7 +4,7 @@
     v-bind="disabled || loading ? undefined : to ? {to} : href ? {href, download} : undefined"
     class="w-ripple-trigger relative block w-full select-none items-center justify-start px-2 text-start outline-none first:pt-2 last:pb-2"
     :class="{
-      'hover:text-primary dark:hover:text-primary-dark cursor-pointer': !disabled && !loading,
+      'tone-primary hover:text-tone cursor-pointer': !disabled && !loading,
       'cursor-not-allowed opacity-50': disabled,
       'tone-primary text-tone': active && !disabled,
       'text-description': !active || disabled,

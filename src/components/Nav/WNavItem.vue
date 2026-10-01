@@ -17,7 +17,7 @@
     >
       <div
         v-if="!indent && (isActive || hasActive)"
-        class="bg-primary dark:bg-primary-dark absolute left-0 top-0 h-full w-1"
+        class="tone-primary bg-tone-fill absolute left-0 top-0 h-full w-1"
       />
     </Transition>
 

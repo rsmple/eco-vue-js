@@ -27,7 +27,7 @@
       <div
         class="grid grid-cols-1 overflow-hidden"
         :class="{
-          'bg-surface my-2 rounded-xl shadow-md dark:outline-1 dark:outline-gray-800': !isMobile,
+          'bg-surface my-2 rounded-xl shadow-md outline-1 outline-line-raised': !isMobile,
         }"
       >
         <div class="p-4">
@@ -51,7 +51,7 @@
 
             <div
               v-if="!mobile && !noMode"
-              class="mx-4 h-full border-r border-solid border-gray-200 dark:border-gray-700"
+              class="mx-4 h-full border-r border-solid border-line-subtle"
             />
 
             <HeaderSettingsList
@@ -64,11 +64,11 @@
             />
           </div>
 
-          <div class="my-4 border-b border-solid border-gray-200 dark:border-gray-700" />
+          <div class="my-4 border-b border-solid border-line-subtle" />
       
           <div class="flex justify-end">
             <button
-              class="relative rounded-lg bg-gray-100 px-2 py-1 dark:bg-gray-800"
+              class="relative rounded-lg bg-surface-muted px-2 py-1"
               :class="{
                 'w-ripple w-ripple-hover': hasSaved,
                 'cursor-not-allowed opacity-50': !hasSaved,

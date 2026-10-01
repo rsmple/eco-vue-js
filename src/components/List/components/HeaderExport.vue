@@ -15,7 +15,7 @@
 
     <template #content>
       <WClickOutside
-        class="bg-surface my-2 grid grid-cols-1 overflow-hidden rounded-xl shadow-md dark:outline-1 dark:outline-gray-800"
+        class="bg-surface my-2 grid grid-cols-1 overflow-hidden rounded-xl shadow-md outline-1 outline-line-raised"
         @click="isOpen = false"
       >
         <WMenuItem @click="exportAs('csv')">

@@ -9,7 +9,7 @@
       v-if="isOpen && isTablet"
       title="Click to close"
       class="
-        bg-primary-light/40 dark:bg-primary-darkest/40 no-scrollbar fixed left-0 top-0 size-full
+        bg-backdrop no-scrollbar fixed left-0 top-0 size-full
         overflow-y-auto overflow-x-hidden overscroll-contain backdrop-blur print:hidden
       "
       :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
@@ -37,7 +37,7 @@
 
   <div
     class="square---header-height w-ripple fixed left-(--left-margin,0px) top-0 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
-    :class="{'text-primary': isOpen}"
+    :class="{'tone-primary text-tone': isOpen}"
     :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
     @click.stop="toggle"
   >

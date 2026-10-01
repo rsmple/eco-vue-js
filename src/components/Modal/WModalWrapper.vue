@@ -22,7 +22,7 @@
   >
     <div
       ref="header"
-      class="bg-default dark:bg-default-dark sticky left-0 top-0 z-1 w-(--w-width-inner-out)"
+      class="bg-surface sticky left-0 top-0 z-1 w-(--w-width-inner-out)"
       :class="{
         'sm-not:w-full': !maximized,
         'sm-not:w-screen': maximized,
@@ -45,7 +45,7 @@
     <div
       ref="footer"
       class="
-        bg-default dark:bg-default-dark gap---inner-margin p---w-modal-wrapper-padding
+        bg-surface gap---inner-margin p---w-modal-wrapper-padding
         md-not:pb-8 sticky bottom-0 left-0 flex w-(--w-width-inner-out) justify-center
       "
       :class="{

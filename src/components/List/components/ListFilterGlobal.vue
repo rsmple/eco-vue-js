@@ -32,7 +32,7 @@
       @toggle="open = open === index ? null : index"
     />
 
-    <div class="mx---inner-margin my-8 h-0.5 rounded bg-gray-400" />
+    <div class="mx---inner-margin my-8 h-0.5 rounded bg-line" />
 
     <div class="px---inner-margin grid grid-cols-2 gap-4">
       <slot name="bottom" />

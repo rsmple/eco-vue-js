@@ -2,7 +2,7 @@
   <div
     class="
       bg-surface no-scrollbar sticky top-0 z-2 col-span-full flex
-      overflow-x-auto overscroll-x-contain border-b border-solid border-gray-50 text-xs dark:border-gray-800/50
+      overflow-x-auto overscroll-x-contain border-b border-solid border-line-raised/50 text-xs
     "
     @mousedown.prevent=""
   >

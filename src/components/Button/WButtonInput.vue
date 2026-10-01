@@ -9,8 +9,8 @@
     v-else
     v-bind="to ? {to} : undefined"
     class="
-      square---w-input-height bg-default dark:bg-default-dark relative flex select-none items-center
-      justify-center rounded-(--w-input-rounded,0.75rem) border border-solid border-gray-200 dark:border-gray-800
+      square---w-input-height bg-surface relative flex select-none items-center
+      justify-center rounded-(--w-input-rounded,0.75rem) border border-solid border-line-subtle
     "
     :class="{
       'cursor-not-allowed opacity-50': disabled,

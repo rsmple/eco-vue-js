@@ -6,7 +6,7 @@ Living plan for moving the kit from palette classes (`bg-gray-100 dark:bg-gray-8
 | --- | --- |
 | 0. Spike | done |
 | 1. Foundation in `tailwind-base` | done — on branch `color-roles` |
-| 2. Codemod the kit | in progress — automatic pass done, manual pass next |
+| 2. Codemod the kit | components done; docs examples left |
 | 3. Re-tune default colors | — |
 | 4. Playground and presets on roles | — |
 | 5. Consumers | — |
@@ -239,9 +239,38 @@ Now `build/color-roles/color-diff.ts` (`dump` / `diff`). It sees what the docs d
 - [x] `build/color-roles/codemod.ts`: replaces light/dark pairs inside one class string — neutral pairs only where the role default is exactly the pair (plus the `text-black-default dark:text-gray-200` → `text-accent` unification), equal-opacity pairs to the role with that opacity, and tone text/border pairs to `tone-X text-tone` / `border-tone` when the string has one tone and no state variant. Reports everything it leaves.
 - [x] Automatic pass on `src/components` and `src/utils` (docs examples excluded): 93 pairs in 45 files. Docs color diff: only the listed unification (input text in dark mode, enabled and disabled, gray-200 → white). Role test: passes.
 - [x] Cascade review of the automatic pass (below).
-- [ ] Manual pass: 166 palette classes left in 39 files (below).
+- [x] Codemod fix: it paired quotes from the start of the file, so a stray apostrophe skipped strings; it now takes every run between two consecutive quote characters. Second automatic pass: 46 more pairs.
+- [x] Manual pass (below). 27 palette classes remain in 8 files, all kept on purpose.
 - [ ] Docs examples (`src/components/*/docs`) — they teach consumers, so they move to roles too.
-- [ ] Color diff: zero except listed fixes.
+- [x] Color diff: only the listed changes. Transient UI (tooltip, dropdown, toast) compared in screenshots, light and dark.
+
+#### Manual pass
+
+Approach agreed 2026-10-01: keep the result where a role reproduces it; where a value was a near-duplicate or a dark-only tweak, move it to the nearest role and list the change.
+
+New roles: `backdrop` (was `bg-primary-light/40 dark:bg-primary-darkest/40` — a tone scope on a backdrop would leak into the modal content it wraps), `focus` (WInput's field takes `tone-negative` on error, so its focus colors can't come from the tone). `line-raised` gets a light value.
+
+| Where | Was | Now | Visible change |
+| --- | --- | --- | --- |
+| `SemanticType.ts` background map | `bg-X dark:bg-X-dark text-default` | `tone-X surface-fill` | none |
+| `SemanticType.ts` chip map, secondary | `bg-gray-200 dark:bg-gray-800` | `bg-surface-inset` | dark gray-800 → 700 |
+| InfoCard | `bg-X/10 dark:bg-X-dark/10` | `tone-X surface-soft` | primary: `primary/10` → `primary-light`, the same over white; dark slightly different |
+| Progress bar | three maps of fills, labels, shine | `tone-X bg-tone-fill`, `text-tone-on`, `via-tone/40`; secondary `track-strong` | secondary bar gray-300/600 → 400/500 (stays visible on its track); shine opacity 40/50 → 40 |
+| Striped progress | `bg-gray-200 dark:bg-gray-800`, `via-primary/60 dark:via-primary-dark/70` | `bg-surface-inset`, `via-tone/60` | dark track 800 → 700; dark shine 70 → 60 |
+| Dropdowns, popovers (10 components) | `dark:border dark:border-gray-800`, `dark:outline-1 dark:outline-gray-800` | `border-line-raised` / `outline-line-raised` in both modes | light: a gray-100 edge appears |
+| WNavItemExpand, ImageViewer, InputToolbar | gray-200/100/50 \| gray-800 borders | `border-line-raised` (`/50` for the toolbar) | nav popup light 200 → 100 |
+| Tooltip, NotifyCard | `bg-black-default dark:bg-gray-800 text-default` | `.dark` island, `bg-surface-muted text-accent`; tooltip border `border-subtle` | light: #333 → gray-800; content inside renders in dark-mode colors |
+| WButtonTab indicator | `bg-gray-400 dark:bg-gray-600` lost to `bg-inherit` in light (source order) | `bg-track-strong` | light: neutral indicator now gray, as in dark |
+| Sliders, bottom sheet handle | `bg-gray-300\|600`, `bg-gray-200\|600`, `bg-gray-300` | `bg-track` | dark 600 → 700; range light 200 → 300; handle dark 300 → 700 |
+| WButtonInput, InputToolbarButton | `border-gray-200\|800`, `border-gray-300\|600` | `border-line-subtle`, `border-line` | dark 800 → 700, 600 → 700 |
+| List card stripes, heatmap empty cells, filter row hover | `gray-50 \| primary-darkest/25`, `gray-50 \| gray-800/20`, `gray-50 \| gray-800` | `bg-surface-muted/50`, `group-hover:bg-surface-muted` | dark stripe loses its purple tint; dark heatmap cells a bit stronger; hover light 50 → 100 |
+| Checkbox disabled glyph, filter divider, file-picker remove hover | `text-gray-300\|700`, `bg-gray-400`, `hover:bg-black-default/5` | `text-subtle`, `bg-line`, `hover:bg-accent/5` | small; hover is now white/5 in dark |
+| WNavBar open item | `text-primary` (light only) | `tone-primary text-tone` | dark: primary → primary-dark |
+| Everything else migrated here | fills, hover fills, soft primary, tone text with `hover:`/`before:`, selected-day text | `surface-fill`, `hover:surface-fill`, `bg-tone-soft`, `hover:text-tone`, `text-surface` | none |
+
+Also: `dark:border-b-transparent` in ListItem removed — it only existed to out-rank the old `dark:border-gray-700`. DragItem and WChartHeatmap fallbacks `var(--color-default)` / `var(--color-default-dark)` → `var(--w-surface)`.
+
+Kept on purpose: WPage / WPageTitle (print, light only), white sheens (`via-white/*`, `bg-default/30`), black ripples (`before:text-black-default`), the image overlay in WImageViewer, the brand gradient in WProgressStriped, WShine (`primary-light` in both modes), WButtonAction's loading stripes, ImageModal's dark shadow.
 
 #### Cascade review
 
@@ -295,7 +324,9 @@ Agreed 2026-10-01. Keep the names consumers already use — `text-accent` (about
 | `bg-track`, `bg-track-strong` | `--w-track`, `--w-track-strong` | Inactive parts of controls |
 | `bg-overlay` | `--w-overlay` | Backdrops |
 | `border-line`, `border-line-subtle` | `--w-line`, `--w-line-subtle` | Borders, dividers |
-| `outline-line-raised` | `--w-line-raised` | Outline of floating surfaces |
+| `border-line-raised`, `outline-line-raised` | `--w-line-raised` | Edge of floating surfaces: dropdowns, popovers |
+| `bg-backdrop` | `--w-backdrop` | Behind modals, bottom sheets, the mobile nav |
+| `border-focus`, `outline-focus` | `--w-focus` | Focus border and ring of fields |
 
 Tones and scopes — see [Tones](#3-tones--a-color-with-everything-that-sits-on-it) and [Scopes](#scopes--context-aware-areas):
 
@@ -338,3 +369,4 @@ Without a scope, every role has its default — today's colors.
 - 2026-10-01 — Names agreed. All roles, kit tones, `tone-*` and `surface-*` added to `css/roles.css` with today's values; role equivalence test passes in three engines; docs color diff 0.
 - 2026-10-01 — Consumer check in auditor: CSS and rendered colors unchanged apart from `color-scheme`; native controls now follow dark mode. Phase 1 done.
 - 2026-10-01 — Phase 2 started: harness and role test moved to `build/color-roles/`, codemod written; automatic pass replaced 93 pairs in 45 files; color diff shows only the agreed input text unification; cascade review clean. 166 classes left for the manual pass.
+- 2026-10-01 — Codemod scanner fixed (46 more pairs). Manual pass done: fills, soft, raised lines (now both modes), islands for tooltip and toast, `backdrop` and `focus` roles. Visible changes listed in the manual pass table. Color diff, screenshots of transient UI, role test and build: clean.

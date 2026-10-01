@@ -2,7 +2,7 @@
   <button
     class="w-ripple w-ripple-hover relative flex justify-center rounded-2xl p-4"
     :class="{
-      'tone-primary text-tone bg-primary/10 dark:bg-primary-dark/10': active,
+      'tone-primary text-tone bg-tone/10': active,
       'text-description': !active,
     }"
     :aria-pressed="active"

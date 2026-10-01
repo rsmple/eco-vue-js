@@ -97,7 +97,7 @@
           :y2="svgHeight - bottom"
           stroke="currentColor"
           stroke-width="1"
-          class="pointer-events-none text-gray-400 dark:text-gray-600"
+          class="pointer-events-none text-subtle"
         />
 
         <foreignObject

@@ -20,14 +20,14 @@
             :icon="markRaw(IconMore)"
             :aria-expanded="isOpen"
             :disable-message="disableMessageValue"
-            class="border-l border-solid border-gray-300 dark:border-gray-700"
+            class="border-l border-solid border-line"
             @click="isOpen = !isOpen"
           />
         </template>
 
         <template #content>
           <WClickOutside
-            class="bg-default dark:bg-default-dark dropdown w-shine-hidden my-2 grid grid-cols-1 overflow-hidden rounded-xl shadow-md dark:outline-1 dark:outline-gray-800"
+            class="bg-surface dropdown w-shine-hidden my-2 grid grid-cols-1 overflow-hidden rounded-xl shadow-md outline-1 outline-line-raised"
             @click="isOpen = false"
           >
             <slot
@@ -46,7 +46,7 @@
       v-if="selectedCount"
       @click="$emit('clear:selection')"
     >
-      <span class="sm-not:hidden">Selected&nbsp;</span><span class="text-primary dark:text-primary-dark font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedCount === 1 ? '' : 's' }}</span>
+      <span class="sm-not:hidden">Selected&nbsp;</span><span class="tone-primary text-tone font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedCount === 1 ? '' : 's' }}</span>
     </WButtonSelectionState>
 
     <slot

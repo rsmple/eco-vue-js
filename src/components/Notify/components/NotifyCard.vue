@@ -1,5 +1,6 @@
 <template>
-  <div class="bg-black-default relative my-2 mr-4 grid min-h-18 max-w-[calc(100vw-2rem)] grid-cols-[auto_1fr_auto] rounded-xl shadow-md sm:max-w-lg dark:bg-gray-800">
+  <!-- A dark island in either mode: everything inside resolves its colors for dark mode. -->
+  <div class="dark bg-surface-muted relative my-2 mr-4 grid min-h-18 max-w-[calc(100vw-2rem)] grid-cols-[auto_1fr_auto] rounded-xl shadow-md sm:max-w-lg">
     <WCounter
       v-show="count > 1"
       class="absolute left-[-0.625em] top-[-0.625em] text-xs shadow-md"
@@ -24,7 +25,7 @@
     </div>
 
     <div class="grid items-center py-4">
-      <div class="text-default font-semibold">
+      <div class="text-accent font-semibold">
         <template v-if="typeof title === 'string'">
           {{ title }}
         </template>
@@ -36,7 +37,7 @@
 
       <div
         v-if="caption || userInput"
-        class="text-default whitespace-pre-wrap wrap-break-word font-normal [word-break:break-word]"
+        class="text-accent whitespace-pre-wrap wrap-break-word font-normal [word-break:break-word]"
       >
         <template v-if="typeof caption === 'string'">
           {{ caption }}

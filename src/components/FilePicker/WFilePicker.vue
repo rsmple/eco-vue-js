@@ -26,8 +26,8 @@
     <label
       class="height-64 relative mb-1 block w-full min-w-60 rounded-xl"
       :class="{
-        'bg-primary/10 dark:bg-primary-dark/10': !isActive,
-        'bg-primary/20 dark:bg-primary-dark/20': isActive,
+        'tone-primary bg-tone/10': !isActive,
+        'tone-primary bg-tone/20': isActive,
       }"
       @dragenter.prevent="setIsActive(true)"
       @dragover.prevent="setIsActive(true)"
@@ -133,7 +133,7 @@
     >
       <div
         v-if="errorMessage"
-        class="text-negative dark:text-negative-dark absolute right-0 text-xs font-normal"
+        class="tone-negative text-tone absolute right-0 text-xs font-normal"
       >
         {{ errorMessage }}
       </div>

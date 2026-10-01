@@ -12,7 +12,7 @@
     >
       <div
         ref="wrapper"
-        class="relative h-1 w-full rounded-sm bg-gray-200 dark:bg-gray-600"
+        class="relative h-1 w-full rounded-sm bg-track"
       >
         <div
           class="absolute flex h-full items-center rounded-inherit bg-linear-to-r from-(--w-slider-from,var(--color-primary)) from-50% to-(--w-slider-to,var(--color-primary)) to-50%"
@@ -50,7 +50,7 @@
       >
         <div
           v-if="errorMessage"
-          class="text-negative dark:text-negative-dark absolute -bottom-4 right-0 pt-0.5 text-xs font-normal"
+          class="tone-negative text-tone absolute -bottom-4 right-0 pt-0.5 text-xs font-normal"
         >
           {{ errorMessage }}
         </div>

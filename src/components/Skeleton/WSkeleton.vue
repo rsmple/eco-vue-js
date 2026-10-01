@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-primary-light dark:bg-primary-darkest w-skeleton w-skeleton-opacity-50 dark:w-skeleton-opacity-5 before:animate-ticker w-option-has-bg"
+    class="tone-primary bg-tone-soft w-skeleton w-skeleton-opacity-50 dark:w-skeleton-opacity-5 before:animate-ticker w-option-has-bg"
     :style="{'--skeleton-width-internal': skeletonWidth + '%'}"
   >
     <slot />

@@ -2,7 +2,7 @@
   <WRouterLink
     :to="to"
     class="
-      text-description hover:text-primary dark:hover:text-primary-dark flex cursor-pointer select-none
+      text-description tone-primary hover:text-tone flex cursor-pointer select-none
       items-center gap-2 self-end py-2 font-normal no-underline
     "
   >

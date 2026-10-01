@@ -10,12 +10,12 @@ export enum SemanticType {
 }
 
 const semanticTypeConfig = reactive<Record<SemanticType, string>>({
-  [SemanticType.PRIMARY]: 'bg-primary dark:bg-primary-dark text-default',
+  [SemanticType.PRIMARY]: 'tone-primary surface-fill',
   [SemanticType.SECONDARY]: 'bg-surface text-accent',
-  [SemanticType.NEGATIVE]: 'bg-negative dark:bg-negative-dark text-default',
-  [SemanticType.POSITIVE]: 'bg-positive dark:bg-positive-dark text-default',
-  [SemanticType.WARNING]: 'bg-warning dark:bg-warning-dark text-black-default dark:text-default-dark',
-  [SemanticType.INFO]: 'bg-info dark:bg-info-dark text-default',
+  [SemanticType.NEGATIVE]: 'tone-negative surface-fill',
+  [SemanticType.POSITIVE]: 'tone-positive surface-fill',
+  [SemanticType.WARNING]: 'tone-warning surface-fill',
+  [SemanticType.INFO]: 'tone-info surface-fill',
 })
 
 export const useSemanticTypeBackgroundMap = () => {
@@ -28,7 +28,7 @@ export const setSemanticTypeBackgroundMap = (value: Partial<Record<SemanticType,
 
 const semanticTypeChipMap = reactive<Record<SemanticType, string>>({
   ...semanticTypeConfig,
-  [SemanticType.SECONDARY]: 'bg-gray-200 dark:bg-gray-800 text-accent',
+  [SemanticType.SECONDARY]: 'bg-surface-inset text-accent',
 })
 
 export const useSemanticTypeChipMap = () => {

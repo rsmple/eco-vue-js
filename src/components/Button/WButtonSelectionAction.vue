@@ -19,7 +19,7 @@
       no-underline outline-none disabled:cursor-not-allowed
     "
     :class="{
-      'w-ripple w-ripple-hover before:text-primary dark:before:text-primary-dark hover:text-primary dark:hover:text-primary-dark cursor-pointer': !disabled && !disableMessage && !loading,
+      'w-ripple w-ripple-hover tone-primary before:text-tone hover:text-tone cursor-pointer': !disabled && !disableMessage && !loading,
       'tone-primary text-tone w-ripple-active': active,
       'text-accent': !active,
       'cursor-not-allowed': disabled || disableMessage,

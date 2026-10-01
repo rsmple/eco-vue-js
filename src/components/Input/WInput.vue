@@ -100,7 +100,7 @@
           grid-cols-[auto_1fr_auto] overflow-hidden rounded-(--w-input-rounded,0.75rem) border border-solid
         "
         :class="{
-          'focus-within:border-primary dark:focus-within:border-primary-dark focus-within:outline-primary/20 dark:focus-within:outline-primary-dark/20 focus-within:outline-2': !isDisabled && !isReadonly && !unclickable,
+          'focus-within:border-focus focus-within:outline-focus/20 focus-within:outline-2': !isDisabled && !isReadonly && !unclickable,
           'cursor-text': !isDisabled,
           'tone-negative border-tone': errorMessage,
           [borderClass ?? 'border-line']: !isDisabled,
@@ -154,7 +154,7 @@
         >
           <div
             v-if="allowDropFile && isDragging"
-            class="text-primary dark:text-primary-dark bg-primary/10 dark:bg-primary-dark/10 pointer-events-none absolute inset-0.5 rounded-(--w-option-rounded)"
+            class="tone-primary text-tone bg-tone/10 pointer-events-none absolute inset-0.5 rounded-(--w-option-rounded)"
           >
             <FilePickerSvg
               :animate="isDragover"
@@ -177,10 +177,10 @@
 
             <div
               v-if="!errorMessage && ((placeholderSecure && !modelValue) || (textSecure && modelValue as string | true === true)) && (!asyncState.isAsync.value || !asyncState.value.value) && !focused"
-              class="bg-info/10 dark:bg-info-dark/10 pointer-events-none absolute inset-0.5 flex items-center justify-center rounded-(--w-option-rounded)"
+              class="tone-info bg-tone/10 pointer-events-none absolute inset-0.5 flex items-center justify-center rounded-(--w-option-rounded)"
             >
               <IconCheckSecret
-                class="text-info dark:text-info-dark"
+                class="tone-info text-tone"
                 :class="{
                   'square-6': !textarea,
                   'square-7': textarea,
@@ -225,7 +225,7 @@
                   :aria-labelledby="textarea ? `${id}-label` : undefined"
                   class="
                     w-input min-h-full flex-1 basis-auto appearance-none border-none bg-inherit
-                    outline-0 placeholder:text-gray-400 disabled:cursor-not-allowed dark:placeholder:text-gray-500
+                    outline-0 placeholder:text-description disabled:cursor-not-allowed
                   "
                   :class="{
                     'w-0 max-w-0': hideInput,
@@ -331,7 +331,7 @@
           >
             <div
               v-if="asyncState.timeout.value"
-              class="absolute inset-0 -z-10 bg-gray-200 dark:bg-gray-700"
+              class="absolute inset-0 -z-10 bg-surface-inset"
             />
           </Transition>
 
@@ -344,7 +344,7 @@
             <div
               v-if="asyncState.timeout.value"
               :key="asyncState.timeout.value.toString()"
-              class="bg-primary dark:bg-primary-dark relative h-full rounded-sm"
+              class="tone-primary bg-tone-fill relative h-full rounded-sm"
               :style="{'--debounce-duration': debounce + 'ms'}"
             />
           </Transition>

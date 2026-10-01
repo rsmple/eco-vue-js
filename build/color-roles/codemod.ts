@@ -99,7 +99,9 @@ const transformClasses = (value: string): Result => {
     tokens[darkIndex] = null
   })
 
-  let text = words.join('').replace(/\s{2,}(?=\S)/g, match => match.includes('\n') ? match : ' ').replace(/^\s+|\s+$/g, match => match.includes('\n') ? match : '')
+  // Removed classes leave gaps: collapse them, drop spaces left before line breaks, keep the string's own edges.
+  const [lead, trail] = [value.match(/^\s*/)?.[0] ?? '', value.match(/\s*$/)?.[0] ?? '']
+  let text = lead + words.join('').trim().replace(/[ \t]{2,}/g, ' ').replace(/[ \t]+\n/g, '\n') + trail
 
   if (addTone && !text.split(/\s+/).includes(addTone)) text = addTone + ' ' + text
 
@@ -119,9 +121,11 @@ for (const file of files) {
   const source = readFileSync(file, 'utf8')
   const left: string[] = []
 
-  // Quoted strings without other quote characters inside: class attributes, class-binding keys and values, class maps.
-  const output = source.replace(/(["'`])([^"'`]*?)\1/g, (match, quote: string, value: string) => {
-    if (!/(?:^|\s|:)(?:bg|text|border|outline|ring|fill|stroke|divide|from|via|to|shadow)-/.test(value)) return match
+  // Every run of text between two consecutive quote characters. Class strings never contain quotes, so this finds each
+  // one whatever the quoting around it — pairing quotes from the start of the file goes wrong on a stray apostrophe.
+  // Runs between strings (`: isOpen,`) hold no palette pairs and come back unchanged.
+  const output = source.replace(/(?<=["'`])[^"'`]+(?=["'`])/g, value => {
+    if (!/(?:^|\s|:)(?:bg|text|border|outline|ring|fill|stroke|divide|from|via|to|shadow)-/.test(value)) return value
 
     const result = transformClasses(value)
 
@@ -129,7 +133,7 @@ for (const file of files) {
     left.push(...result.left)
     if (result.replaced.length && !write) console.log(`${ file }:`, result.replaced.join('; '))
 
-    return quote + result.text + quote
+    return result.text
   })
 
   if (left.length) leftByFile.set(file, left)
