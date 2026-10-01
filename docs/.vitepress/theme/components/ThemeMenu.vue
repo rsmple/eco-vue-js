@@ -38,11 +38,22 @@
           :active="isRandomTheme"
           @click="setRandomTheme"
         >
-          Random
-          <span class="text-description ml-auto">
-            {{ RANDOM_STYLES.find(style => style.id === randomStyle)?.name }}
-          </span>
+          Randomize Theme
         </WMenuItem>
+
+        <WButtonGroup
+          :model-value="randomStyle"
+          :list="RANDOM_STYLES.map(style => style.id)"
+          :semantic-type="SemanticType.SECONDARY"
+          no-margin
+          stretch
+          class="w-button-h-8 w-button-rounded-lg mx-2 mt-1"
+          @update:model-value="randomStyle = $event"
+        >
+          <template #option="{option}">
+            {{ RANDOM_STYLES.find(style => style.id === option)?.name }}
+          </template>
+        </WButtonGroup>
 
         <div class="my-1 border-t border-line-subtle" />
 
@@ -112,6 +123,7 @@ import {computed, ref} from 'vue'
 import {HorizontalAlign} from 'eco-vue-js/dist/utils/HorizontalAlign'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
+import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
 import WDropdownAdaptive from 'eco-vue-js/dist/components/DropdownMenu/WDropdownAdaptive.vue'
 import WMenuItem from 'eco-vue-js/dist/components/MenuItem/WMenuItem.vue'
 
