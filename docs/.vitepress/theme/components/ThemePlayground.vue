@@ -10,7 +10,7 @@
           :semantic-type="isRandomTheme ? SemanticType.PRIMARY : SemanticType.SECONDARY"
           @click="setRandomTheme"
         >
-          Apply Random
+          Randomize Theme
         </WButton>
 
         <WButtonGroup
