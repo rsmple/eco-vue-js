@@ -79,6 +79,7 @@
   "files": [
     "eslint",
     "dist",
+    "docs",
     "scripts",
     "tailwind-base",
     "LICENSE"
