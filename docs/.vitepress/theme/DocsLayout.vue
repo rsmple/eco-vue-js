@@ -13,7 +13,7 @@
           :aria-label="site.title"
           class="inline-flex items-center gap-2.5 no-underline"
         >
-          <IconLogo class="size-8 docs-logo" />
+          <IconLogo class="size-8 tone-primary text-tone-fill" />
 
           <span class="leading-none">
             <span class="text-accent text-xl font-semibold tracking-tight sm:text-2xl leading-none">EcoVue</span>
