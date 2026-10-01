@@ -91,7 +91,7 @@ With `initData`, the form keeps its own copy of the model, built from the given 
     </template>
   </WUniform>
 
-  <p class="mt-4 text-sm text-gray-500">
+  <p class="mt-4 text-sm text-description">
     Last payload: {{ sent ? JSON.stringify(sent) : '—' }}
   </p>
 </template>

@@ -11,11 +11,11 @@
           v-if="release"
           :href="withBase('/releases')"
           class="
-            border-primary/40 text-description hover:text-accent hover:border-primary mb-6 inline-flex items-center gap-2
-            rounded-full border px-3 py-1 text-sm font-medium transition-colors
+            tone-primary border-tone/40 text-description hover:text-accent hover:border-tone mb-6 inline-flex items-center gap-2
+ rounded-full border px-3 py-1 text-sm font-medium transition-colors
           "
         >
-          <span class="bg-positive dark:bg-positive-dark size-2 rounded-full" />
+          <span class="tone-positive bg-tone-fill size-2 rounded-full" />
           {{ release.text }} — release notes
         </a>
 
@@ -57,8 +57,8 @@
 
         <div
           class="
-            bg-gray-100 dark:bg-gray-850 mt-6 inline-flex items-center gap-3 rounded-xl border border-gray-200
-            py-2 pr-3 pl-4 font-mono text-sm dark:border-gray-800
+            bg-gray-100 dark:bg-gray-850 mt-6 inline-flex items-center gap-3 rounded-xl border border-line-subtle
+ py-2 pr-3 pl-4 font-mono text-sm
           "
         >
           <span

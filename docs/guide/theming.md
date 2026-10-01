@@ -53,7 +53,7 @@ body {
 
 Only changed colors are listed, but every `w-*` variable is: this site sets its own sizes, and an app without them gets the kit's defaults instead (in the table below).
 
-Each color has a dark mode counterpart with a `-dark` suffix — components use `bg-primary dark:bg-primary-dark`, not one variable that changes with the mode. Set both.
+Each color has a dark mode counterpart with a `-dark` suffix. Components don't read them directly: they use color roles (`bg-surface`, `text-description`, `tone-primary`, …) that take the light or the dark value depending on the mode. Set both.
 
 ## Theme links
 

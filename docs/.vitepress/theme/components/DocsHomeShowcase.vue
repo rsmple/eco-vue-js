@@ -85,7 +85,7 @@
 
           <span
             class="text-sm font-medium tabular-nums"
-            :class="change <= 0 ? 'text-positive dark:text-positive-dark' : 'text-negative dark:text-negative-dark'"
+            :class="change <= 0 ? 'tone-positive text-tone' : 'tone-negative text-tone'"
           >{{ change > 0 ? '+' : '−' }}{{ Math.abs(change) }}%</span>
         </div>
 
@@ -108,7 +108,7 @@
                 x-key="date"
                 y-key="value"
                 has-area
-                class="text-primary dark:text-primary-dark"
+                class="tone-primary text-tone"
               >
                 <template #tooltip="{d}">
                   <div class="grid text-sm">

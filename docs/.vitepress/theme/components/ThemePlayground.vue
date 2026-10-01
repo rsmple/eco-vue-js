@@ -50,8 +50,8 @@
           >
             <label
               class="
-                relative mr-2 block size-5 shrink-0 self-center overflow-hidden rounded-full border border-gray-300 dark:border-gray-700
-                ml-[calc(var(--w-option-padding)*-0.5+var(--w-input-gap))]
+                relative mr-2 block size-5 shrink-0 self-center overflow-hidden rounded-full border border-line
+ ml-[calc(var(--w-option-padding)*-0.5+var(--w-input-gap))]
               "
               :style="{background: themeTokens[token.key] ?? DEFAULT_TOKENS[token.key]}"
             >

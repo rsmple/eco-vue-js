@@ -31,7 +31,7 @@
       </span>
     </div>
 
-    <WInfiniteListScrollingElement class="h-96 overflow-y-auto overscroll-contain rounded-xl border border-solid border-gray-200 dark:border-gray-800">
+    <WInfiniteListScrollingElement class="h-96 overflow-y-auto overscroll-contain rounded-xl border border-solid border-line-subtle">
       <WInfiniteList
         ref="list"
         :use-query-fn="eventModelApi.paginated.use"
@@ -43,7 +43,7 @@
       >
         <template #default="{item, skeleton, position}">
           <div
-            class="event-row flex h-9 items-center gap-3 border-b border-solid border-gray-100 px-4 text-sm dark:border-gray-800"
+            class="event-row flex h-9 items-center gap-3 border-b border-solid border-line-subtle px-4 text-sm"
           >
             <span class="text-description w-12 text-right tabular-nums">
               {{ position + 1 }}
@@ -88,9 +88,9 @@ import {EVENT_COUNT, EventLevel, eventModelApi} from './api/Event'
 const PAGE_LENGTH = 50
 
 const levelClass: Record<EventLevel, string> = {
-  [EventLevel.INFO]: 'text-info dark:text-info-dark',
-  [EventLevel.WARNING]: 'text-warning dark:text-warning-dark',
-  [EventLevel.ERROR]: 'text-negative dark:text-negative-dark',
+  [EventLevel.INFO]: 'tone-info text-tone',
+  [EventLevel.WARNING]: 'tone-warning text-tone',
+  [EventLevel.ERROR]: 'tone-negative text-tone',
 }
 
 const timeFormatter = Intl.DateTimeFormat('en', {hour: '2-digit', minute: '2-digit', hourCycle: 'h23'})

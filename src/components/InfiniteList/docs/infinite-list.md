@@ -19,7 +19,7 @@ A change of `queryParams`, such as a new search, resets the list to the first pa
 
 ```vue
 <template>
-  <WInfiniteListScrollingElement class="h-96 overflow-y-auto overscroll-contain rounded-xl border border-solid border-gray-200 dark:border-gray-800">
+  <WInfiniteListScrollingElement class="h-96 overflow-y-auto overscroll-contain rounded-xl border border-solid border-line-subtle">
     <WInfiniteList
       :use-query-fn="bookModelApi.paginated.use"
       :query-params="{search}"
@@ -45,7 +45,7 @@ A change of `queryParams`, such as a new search, resets the list to the first pa
       </template>
 
       <template #default="{item, skeleton, position}">
-        <div class="flex items-baseline gap-3 border-t border-solid border-gray-100 px-4 py-2 dark:border-gray-800">
+        <div class="flex items-baseline gap-3 border-t border-solid border-line-subtle px-4 py-2">
           <span class="text-description w-6 text-right text-sm">
             {{ position + 1 }}
           </span>
@@ -158,7 +158,7 @@ The demo below pages through 10,000 events, 50 at a time. The counter shows how 
       </span>
     </div>
 
-    <WInfiniteListScrollingElement class="h-96 overflow-y-auto overscroll-contain rounded-xl border border-solid border-gray-200 dark:border-gray-800">
+    <WInfiniteListScrollingElement class="h-96 overflow-y-auto overscroll-contain rounded-xl border border-solid border-line-subtle">
       <WInfiniteList
         ref="list"
         :use-query-fn="eventModelApi.paginated.use"
@@ -170,7 +170,7 @@ The demo below pages through 10,000 events, 50 at a time. The counter shows how 
       >
         <template #default="{item, skeleton, position}">
           <div
-            class="event-row flex h-9 items-center gap-3 border-b border-solid border-gray-100 px-4 text-sm dark:border-gray-800"
+            class="event-row flex h-9 items-center gap-3 border-b border-solid border-line-subtle px-4 text-sm"
           >
             <span class="text-description w-12 text-right tabular-nums">
               {{ position + 1 }}
@@ -215,9 +215,9 @@ import {EVENT_COUNT, EventLevel, eventModelApi} from './api/Event'
 const PAGE_LENGTH = 50
 
 const levelClass: Record<EventLevel, string> = {
-  [EventLevel.INFO]: 'text-info dark:text-info-dark',
-  [EventLevel.WARNING]: 'text-warning dark:text-warning-dark',
-  [EventLevel.ERROR]: 'text-negative dark:text-negative-dark',
+  [EventLevel.INFO]: 'tone-info text-tone',
+  [EventLevel.WARNING]: 'tone-warning text-tone',
+  [EventLevel.ERROR]: 'tone-negative text-tone',
 }
 
 const timeFormatter = Intl.DateTimeFormat('en', {hour: '2-digit', minute: '2-digit', hourCycle: 'h23'})

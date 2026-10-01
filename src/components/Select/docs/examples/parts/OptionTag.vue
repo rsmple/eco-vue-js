@@ -6,7 +6,7 @@
 
   <div
     v-else
-    class="w-option w-option-has-bg bg-primary/10 dark:bg-primary-dark/10 text-primary dark:text-primary-dark grid max-w-max grid-cols-[1fr_auto] items-center gap-1 font-semibold"
+    class="tone-primary w-option w-option-has-bg tone-primary bg-tone/10 text-tone grid max-w-max grid-cols-[1fr_auto] items-center gap-1 font-semibold"
   >
     <div class="truncate">
       {{ option?.name ?? search }}

@@ -6,7 +6,7 @@ Living plan for moving the kit from palette classes (`bg-gray-100 dark:bg-gray-8
 | --- | --- |
 | 0. Spike | done |
 | 1. Foundation in `tailwind-base` | done — on branch `color-roles` |
-| 2. Codemod the kit | components done; docs examples left |
+| 2. Codemod the kit | done |
 | 3. Re-tune default colors | — |
 | 4. Playground and presets on roles | — |
 | 5. Consumers | — |
@@ -241,7 +241,8 @@ Now `build/color-roles/color-diff.ts` (`dump` / `diff`). It sees what the docs d
 - [x] Cascade review of the automatic pass (below).
 - [x] Codemod fix: it paired quotes from the start of the file, so a stray apostrophe skipped strings; it now takes every run between two consecutive quote characters. Second automatic pass: 46 more pairs.
 - [x] Manual pass (below). 27 palette classes remain in 8 files, all kept on purpose.
-- [ ] Docs examples (`src/components/*/docs`) — they teach consumers, so they move to roles too.
+- [x] Docs examples and the docs site's components: 31 pairs by the codemod (two border unifications added to its table: `gray-200|800` and `gray-100|800` → `line-subtle`), the rest by hand — example captions `text-gray-500` → `text-description`, fills and soft backgrounds to tones. Kept: the WPage example (print), logo fills, the docs home's `gray-850` alternate backgrounds (VitePress `--vp-c-bg-alt`). Color diff: example borders dark 800 → 700, light separators 100 → 200, captions light 500 → 400.
+- [ ] Theming guide still describes palette pairs; rewrite with phase 4.
 - [x] Color diff: only the listed changes. Transient UI (tooltip, dropdown, toast) compared in screenshots, light and dark.
 
 #### Manual pass
@@ -370,3 +371,4 @@ Without a scope, every role has its default — today's colors.
 - 2026-10-01 — Consumer check in auditor: CSS and rendered colors unchanged apart from `color-scheme`; native controls now follow dark mode. Phase 1 done.
 - 2026-10-01 — Phase 2 started: harness and role test moved to `build/color-roles/`, codemod written; automatic pass replaced 93 pairs in 45 files; color diff shows only the agreed input text unification; cascade review clean. 166 classes left for the manual pass.
 - 2026-10-01 — Codemod scanner fixed (46 more pairs). Manual pass done: fills, soft, raised lines (now both modes), islands for tooltip and toast, `backdrop` and `focus` roles. Visible changes listed in the manual pass table. Color diff, screenshots of transient UI, role test and build: clean.
+- 2026-10-01 — Docs examples and docs site components migrated. Phase 2 done.

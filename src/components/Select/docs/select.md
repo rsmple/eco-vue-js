@@ -47,7 +47,7 @@ Every select needs:
     </template>
   </WSelectSingle>
 
-  <p class="text-sm text-gray-500">
+  <p class="text-sm text-description">
     Model: {{ country ?? 'null' }}
   </p>
 </template>
@@ -95,7 +95,7 @@ With `allowClear` the value can be cleared. `clearValue` sets what clearing emit
     @unselect="tags = tags.filter(item => item !== $event)"
   />
 
-  <p class="text-sm text-gray-500">
+  <p class="text-sm text-description">
     Model: {{ tags }}
   </p>
 </template>
@@ -134,7 +134,7 @@ The tags are drawn by an `optionComponent` rather than the `option` slot. The se
 
   <div
     v-else
-    class="w-option w-option-has-bg bg-primary/10 dark:bg-primary-dark/10 text-primary dark:text-primary-dark grid max-w-max grid-cols-[1fr_auto] items-center gap-1 font-semibold"
+    class="tone-primary w-option w-option-has-bg tone-primary bg-tone/10 text-tone grid max-w-max grid-cols-[1fr_auto] items-center gap-1 font-semibold"
   >
     <div class="truncate">
       {{ option?.name ?? search }}
@@ -188,7 +188,7 @@ To show the chosen value before the user opens the dropdown, the select requests
     </template>
   </WSelectAsyncSingle>
 
-  <p class="text-sm text-gray-500">
+  <p class="text-sm text-description">
     Model: {{ bookId ?? 'null' }}
   </p>
 </template>

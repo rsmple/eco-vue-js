@@ -48,7 +48,7 @@ description: WLink and WLinkArrow text links, WRouterLink that works with or wit
     </p>
 
     <div class="flex items-center gap-2">
-      <code class="rounded-lg bg-gray-100 px-2 py-1 dark:bg-gray-800">{{ token }}</code>
+      <code class="rounded-lg bg-surface-muted px-2 py-1">{{ token }}</code>
 
       <WButtonCopy :value="token" />
     </div>

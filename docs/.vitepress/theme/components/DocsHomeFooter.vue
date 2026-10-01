@@ -1,5 +1,5 @@
 <template>
-  <footer class="mx-(--inner-margin) border-t border-gray-200 py-12 text-sm dark:border-gray-800">
+  <footer class="mx-(--inner-margin) border-t border-line-subtle py-12 text-sm">
     <div class="grid grid-cols-3 gap-10 md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
       <div class="col-span-3 grid content-start gap-3 md:col-span-1">
         <a
@@ -37,7 +37,7 @@
       </nav>
     </div>
 
-    <div class="text-description mt-12 flex flex-wrap justify-between gap-x-6 gap-y-2 border-t border-gray-200 pt-6 dark:border-gray-800">
+    <div class="text-description mt-12 flex flex-wrap justify-between gap-x-6 gap-y-2 border-t border-line-subtle pt-6">
       <span>Released under the MIT License.</span>
 
       <span>

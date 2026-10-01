@@ -6,7 +6,7 @@
  *   'border-gray-300 dark:border-gray-700'           → 'border-line'
  *   'text-negative dark:text-negative-dark'          → 'tone-negative text-tone'
  *
- *   node build/color-roles/codemod.ts [--write] [paths…]     default path: src/components, src/utils
+ *   node build/color-roles/codemod.ts [--write] [paths…]     default: src/components, src/utils without their docs/
  *
  * Without `--write` it only reports. Either way it lists every palette color class it left, for review by hand:
  * one-sided classes, near-duplicate pairs, state variants on tones, and strings with more than one tone.
@@ -27,6 +27,8 @@ const NEUTRAL: Record<string, string> = {
   'bg:gray-400|gray-500': 'bg-track-strong',
   'border:gray-300|gray-700': 'border-line',
   'border:gray-200|gray-700': 'border-line-subtle',
+  'border:gray-200|gray-800': 'border-line-subtle', // unification: dark 800 → 700
+  'border:gray-100|gray-800': 'border-line-subtle', // unification: light 100 → 200, dark 800 → 700
 }
 
 const TONES = ['primary', 'negative', 'positive', 'warning', 'info']
@@ -112,7 +114,7 @@ const args = process.argv.slice(2)
 const write = args.includes('--write')
 const roots = args.filter(arg => arg !== '--write')
 const files = (roots.length ? roots : ['src/components', 'src/utils'])
-  .flatMap(root => statSync(root).isDirectory() ? globSync(`${ root }/**/*.{vue,ts}`, {exclude: path => path.includes('/docs/')}) : [root])
+  .flatMap(root => statSync(root).isDirectory() ? globSync(`${ root }/**/*.{vue,ts}`, {exclude: path => !roots.length && path.includes('/docs/')}) : [root])
 
 let replacedCount = 0
 const leftByFile = new Map<string, string[]>()

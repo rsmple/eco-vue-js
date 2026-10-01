@@ -135,7 +135,7 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
     class="max-w-md"
   />
 
-  <p class="text-sm text-gray-500">
+  <p class="text-sm text-description">
     Saved value: {{ email || '—' }}
   </p>
 </template>
@@ -183,7 +183,7 @@ const isEmail: ValidateFn = value => typeof value === 'string' && value.includes
     </template>
   </WInputOptions>
 
-  <p class="text-sm text-gray-500">
+  <p class="text-sm text-description">
     Model: {{ country || '—' }}
   </p>
 </template>
@@ -227,7 +227,7 @@ const filtered = computed(() => countries.filter(item => item.name.toLowerCase()
     class="max-w-md"
   />
 
-  <p class="text-sm text-gray-500">
+  <p class="text-sm text-description">
     Model: {{ date?.toDateString() ?? '—' }}
   </p>
 </template>

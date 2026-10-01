@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-default dark:bg-gray-850 dark:w-chart-heatmap-bg-gray-850 border-gray-200 dark:border-gray-800 grid content-start gap-4 rounded-2xl p-5">
+  <div class="bg-default dark:bg-gray-850 dark:w-chart-heatmap-bg-gray-850 border-line-subtle grid content-start gap-4 rounded-2xl p-5">
     <div class="flex items-center justify-between gap-2">
       <span class="font-semibold">{{ title }}</span>
 

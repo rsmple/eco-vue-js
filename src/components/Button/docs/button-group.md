@@ -27,7 +27,7 @@ Options have no default label: render each one through the `option` slot, or pas
     </template>
   </WButtonGroup>
 
-  <p class="mt-2 text-sm text-gray-500">
+  <p class="mt-2 text-sm text-description">
     Selected: {{ period }}
   </p>
 </template>
