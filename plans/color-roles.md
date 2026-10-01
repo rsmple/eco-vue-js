@@ -8,8 +8,8 @@ Living plan for moving the kit from palette classes (`bg-gray-100 dark:bg-gray-8
 | 1. Foundation in `tailwind-base` | done — on branch `color-roles` |
 | 2. Codemod the kit | done |
 | 3. Re-tune default colors | done |
-| 4. Playground and presets on roles | candidate on the branch, uncommitted |
-| 5. Consumers | — |
+| 4. Playground and presets on roles | done |
+| 5. Consumers | kit side on the branch, uncommitted; consumer side waits for a release |
 
 ## Goals
 
@@ -341,9 +341,26 @@ Color diff against phase 3: only the edited pages, and gray-850 rounding below o
 
 ### 5. Consumers
 
-- [ ] Ship the codemod as a script consumers can run on their own `dark:` pairs.
-- [ ] Move `json-*`, `scanner-*`, `score-*` to data palette aliases; gradients to the kit trio.
-- [ ] aspm and traio: drop palette overrides that equal the new defaults.
+Kit side:
+
+- [x] Codemod shipped as `npx eco-vue-color-roles` (`package/scripts/color-roles-codemod.js`, plain JS: Node won't strip types under `node_modules`); `build/color-roles/codemod.ts` removed.
+  - Maps a pair on any property its role suits (`stroke-gray-200 dark:stroke-gray-700` → `stroke-line-subtle`); tone pairs with equal opacity, and tone backgrounds (`bg-tone-fill/10`).
+  - `--exact`: only replacements that render the same colors (exact role pairs, tone fills); skips unifications and derived tone text.
+  - `--theme <css>`: reads the app's `--role-*: var(--color-*)` overrides, so the app's own surface and line pairs map.
+  - Reports the pairs without a role, most frequent first; scans `.vue .ts .tsx .js .jsx .astro .html .svelte`.
+  - `gray-100|gray-800` borders map to `line-subtle` (a unification), not to `line-raised`, which matches exactly but means popup edges.
+  - Dry run in whitespots: 574 pairs (was 115), 601 with `--role-surface-dark: var(--color-gray-900)` (×46 `bg-default dark:bg-gray-900`); 167 with `--exact`. aspm and traio fronts: almost no pairs (their app code lives in appsec-portal-app).
+- [x] Data palette `--color-data-{red,orange,amber,green,teal,cyan,blue,violet,fuchsia,pink,gray}`: Tailwind hues, lightness set per hue so white text reads (orange and amber are light hues, black text) and fills stand out on the dark surface. Checked by the contrast test as tones.
+- [x] Gradient roles `gradient-start/middle/end` (`from-gradient-start via-gradient-middle to-gradient-end`), default primary turned 0°, 30°, 60° in hue, per mode.
+- [x] Playground: Data and Roles groups, collapsed; theming page: data palette, gradient roles, migrating `dark:` pairs; preview of data tones and the gradient.
+- [ ] Kit `severity-*` and `score-*`: unused by the kit's components; deprecate for a release, then drop. aspm and traio override `score-*`.
+
+Consumer side, after a release:
+
+- [ ] whitespots: run the codemod (with `--role-surface-dark` and a muted-surface role in its theme), then the manual pass.
+- [ ] Alias `scanner-*`, `json-*`, `score-*` to the data palette and drop their `-dark` pairs; `gwrt` to the gradient roles where it's the brand gradient (`pwrt` stays app-specific).
+- [ ] aspm and traio: drop palette overrides that equal the new defaults; traio's `gray-50…200` still default to the kit's (now zinc).
+- [ ] appsec-portal-app: not touched from here (it has uncommitted work on a feature branch).
 
 ## Names
 
@@ -412,3 +429,4 @@ Without a scope, every role has its default — today's colors.
 - 2026-10-01 — Docs examples and docs site components migrated. Phase 2 done.
 - 2026-10-01 — Phase 3 candidate: contrast test (23 → 0 failing pairs), zinc neutral, tone fills for contrast, derived tone text / on / soft. Awaiting visual sign-off.
 - 2026-10-01 — Phase 3 committed after sign-off (soft backgrounds kept). Phase 4: `--role-*` theme tokens, playground with neutral scale and roles, presets with neutrals and tones checked by the contrast test, theming guide rewritten.
+- 2026-10-01 — Phase 4 committed. Phase 5 kit side: codemod shipped as `eco-vue-color-roles` with `--exact`, `--theme` and the unmapped-pair report; data palette and gradient roles; contrast test covers data tones.

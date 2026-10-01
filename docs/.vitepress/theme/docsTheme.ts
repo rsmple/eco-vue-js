@@ -12,6 +12,11 @@ type PaletteKey =
   | 'color-default' | 'color-default-dark' | 'color-black-default'
   | 'color-negative' | 'color-negative-dark' | 'color-positive' | 'color-positive-dark'
   | 'color-warning' | 'color-warning-dark' | 'color-info' | 'color-info-dark'
+  | `color-data-${ DataHue }`
+
+export const DATA_HUES = ['red', 'orange', 'amber', 'green', 'teal', 'cyan', 'blue', 'violet', 'fuchsia', 'pink', 'gray'] as const
+
+type DataHue = typeof DATA_HUES[number]
 
 /** Color roles a theme can set per mode (`css/roles.css`), with what they paint. */
 const ROLES = {
@@ -43,8 +48,15 @@ const SAME_IN_DARK = 'Empty: same as in light mode'
 
 /**
  * What the playground edits. `color-*` and `role-*` are Tailwind theme tokens, `neutral` picks the `gray-*` scale and
- * `w-*` are set on `body`. Roles default to palette colors, so they sit in an advanced group.
+ * `w-*` are set on `body`. Data colors and roles sit in advanced groups: most themes leave them.
  */
+
+/** Groups the playground shows collapsed, with what they are for. */
+export const ADVANCED_GROUPS: Record<string, string> = {
+  Data: 'Distinct hues for categories: chart series, scanners, syntax. Each works as a tone, in both modes.',
+  Roles: 'What components paint with, by purpose. Each takes a palette color by default, so a theme sets them only to break from the palette: a darker line, a tinted surface. A role is set per mode.',
+}
+
 export const TOKENS: Token[] = [
   {key: 'color-primary', group: 'Brand', label: 'Primary', description: 'Fills, links, focus and selection', kind: 'color'},
   {key: 'color-primary-dark', group: 'Brand', label: 'Primary, dark mode', description: SAME_IN_DARK, kind: 'color'},
@@ -62,6 +74,7 @@ export const TOKENS: Token[] = [
   {key: 'color-warning-dark', group: 'Status', label: 'Warning, dark mode', description: SAME_IN_DARK, kind: 'color'},
   {key: 'color-info', group: 'Status', label: 'Info', kind: 'color'},
   {key: 'color-info-dark', group: 'Status', label: 'Info, dark mode', description: SAME_IN_DARK, kind: 'color'},
+  ...DATA_HUES.map((hue): Token => ({key: `color-data-${ hue }`, group: 'Data', label: hue, kind: 'color'})),
   ...(Object.entries(ROLES) as [RoleName, string][]).flatMap(([name, description]): Token[] => [
     {key: `role-${ name }`, group: 'Roles', label: name, description, kind: 'color'},
     {key: `role-${ name }-dark`, group: 'Roles', label: `${ name }, dark mode`, kind: 'color'},

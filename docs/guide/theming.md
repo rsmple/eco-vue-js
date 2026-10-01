@@ -32,6 +32,10 @@ All are plain CSS variables at runtime, so this site can swap them live. Pick a 
 
 <DocsDemo name="Progress/Basic" />
 
+<ClientOnly>
+  <ThemeDataPreview />
+</ClientOnly>
+
 ## In an app
 
 **Copy CSS** gives what goes in the app's stylesheet, after the kit's base:
@@ -89,6 +93,7 @@ So a light brand color still gives readable links on white, and a yellow fill ge
 | `line-subtle` | `border-line-subtle` | `gray-200` / `gray-700` | Card and section borders |
 | `line-raised` | `border-line-raised`, `outline-line-raised` | `gray-100` / `gray-800` | Edge of dropdowns and popovers |
 | `focus` | `border-focus`, `outline-focus` | `primary` / `primary-dark` | Focused field border and ring |
+| `gradient-start`, `gradient-middle`, `gradient-end` | `from-gradient-start via-gradient-middle to-gradient-end` | `primary`, turned 30° and 60° towards pink / the same from `primary-dark` | The brand gradient |
 
 A theme sets a role with `--role-{name}` and `--role-{name}-dark` in `@theme`:
 
@@ -97,6 +102,24 @@ A theme sets a role with `--role-{name}` and `--role-{name}-dark` in `@theme`:
   --role-line: var(--color-gray-400);
   --role-surface-muted-dark: oklch(25% 0.02 250);
 }
+```
+
+### Data palette
+
+Categories — chart series, scanner types, syntax colors — take the kit's data hues: `data-red`, `data-orange`, `data-amber`, `data-green`, `data-teal`, `data-cyan`, `data-blue`, `data-violet`, `data-fuchsia`, `data-pink` and `data-gray`. They are mid-tones like the status colors, so each works as a tone in both modes without `-dark` values (the Preview above shows them as fills and as soft chips).
+
+An app names its categories after them, so a theme that retunes the palette retunes the categories too:
+
+```css
+@theme {
+  --color-scanner-sast: var(--color-data-cyan);
+  --color-scanner-sca: var(--color-data-fuchsia);
+}
+```
+
+```html
+<span class="tone-scanner-sast text-tone">SAST</span>
+<span class="tone-scanner-sca surface-soft text-tone">SCA</span>
 ```
 
 ### In app code
@@ -135,6 +158,28 @@ Components use the same classes, and app code should too: a color written as a r
 | `light`, `dark` | Forces a mode for the element and its children, as tooltips do with `dark` |
 
 Roles take opacity like any color: `bg-surface-muted/50`, `outline-focus/20`.
+
+### Migrating `dark:` pairs
+
+The kit ships a codemod that rewrites light/dark palette pairs in an app's class strings to roles and tones:
+
+```sh
+npx eco-vue-color-roles                      # report what it would change in src/
+npx eco-vue-color-roles --write src          # apply
+npx eco-vue-color-roles --exact --write src  # only replacements that render the same colors
+```
+
+Without `--exact` it also moves near-duplicate grays to the role the kit uses and tone text to the readable shade derived from the fill. It ends with the pairs it found no role for, most frequent first. A frequent one usually means the app's surface or line differs from the kit's default. Set it as a role in the app's theme, then run again with `--theme`, so those pairs map too:
+
+```css
+@theme {
+  --role-surface-dark: var(--color-gray-900);
+}
+```
+
+```sh
+npx eco-vue-color-roles --theme src/assets/styles/index.css --write src
+```
 
 ## Theme links
 
@@ -178,6 +223,7 @@ To make a theme from a description — "a warm, rounded theme for a finance dash
 | `color-warning` | `oklch(82% 0.16 85)` | Warnings; black text on the fill |
 | `color-info` | `oklch(55% 0.16 262.6)` | Information |
 | `color-*-dark` | the light value | Each status color in dark mode |
+| `color-data-*` | Tailwind's hues at mid lightness: white text on all but orange and amber; gray is the scale's 500 | [Data palette](#data-palette) |
 | `role-*`, `role-*-dark` | see [Roles](#roles) | One role, per mode |
 | `font-sans` | `MontSerrat, system-ui, sans-serif` | Text font. Only MontSerrat is loaded on this site; other families must be installed on the viewer's machine |
 

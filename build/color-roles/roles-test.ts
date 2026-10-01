@@ -7,7 +7,7 @@
  *
  *   node build/color-roles/roles-test.ts
  *
- * Add a row to `EQUIVALENT` for every role the codemod maps to.
+ * Add a row to `EQUIVALENT` for every exact mapping of the codemod (`package/scripts/color-roles-codemod.js`).
  *
  * The DOM lib reference is for the `page.evaluate` callbacks, which run in the browser.
  */
@@ -46,6 +46,7 @@ const EQUIVALENT: [string, string][] = [
   ['tone-primary bg-tone-fill text-tone-on', 'bg-primary dark:bg-primary-dark text-white'],
   ['tone-primary surface-fill', 'bg-primary dark:bg-primary-dark text-white'],
   ['tone-primary border border-tone-fill', 'border border-primary dark:border-primary-dark'],
+  ['tone-positive bg-tone-fill/10', 'bg-positive/10 dark:bg-positive-dark/10'],
   ['tone-negative surface-fill', 'bg-negative dark:bg-negative-dark text-white'],
   ['tone-positive surface-fill', 'bg-positive dark:bg-positive-dark text-white'],
   ['tone-info surface-fill', 'bg-info dark:bg-info-dark text-white'],

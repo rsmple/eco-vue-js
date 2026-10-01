@@ -43,6 +43,14 @@
   --role-line-raised-dark: var(--color-gray-800);
   --role-focus: var(--color-primary);
   --role-focus-dark: var(--color-primary-dark);
+
+  /* The brand gradient: primary, turned towards pink. */
+  --role-gradient-start: var(--color-primary);
+  --role-gradient-start-dark: var(--color-primary-dark);
+  --role-gradient-middle: oklch(from var(--color-primary) l c calc(h + 30));
+  --role-gradient-middle-dark: oklch(from var(--color-primary-dark) l c calc(h + 30));
+  --role-gradient-end: oklch(from var(--color-primary) l c calc(h + 60));
+  --role-gradient-end-dark: oklch(from var(--color-primary-dark) l c calc(h + 60));
 }
 
 @theme inline {
@@ -63,6 +71,10 @@
   --color-line-subtle: var(--w-line-subtle);
   --color-line-raised: var(--w-line-raised);
   --color-focus: var(--w-focus);
+
+  --color-gradient-start: var(--w-gradient-start);
+  --color-gradient-middle: var(--w-gradient-middle);
+  --color-gradient-end: var(--w-gradient-end);
 
   /* The current tone, set by `tone-*`. */
   --color-tone: var(--w-tone);
@@ -123,6 +135,10 @@
 
     --w-focus: light-dark(var(--role-focus), var(--role-focus-dark));
     --w-backdrop: light-dark(var(--role-backdrop), var(--role-backdrop-dark));
+
+    --w-gradient-start: light-dark(var(--role-gradient-start), var(--role-gradient-start-dark));
+    --w-gradient-middle: light-dark(var(--role-gradient-middle), var(--role-gradient-middle-dark));
+    --w-gradient-end: light-dark(var(--role-gradient-end), var(--role-gradient-end-dark));
   }
 }
 

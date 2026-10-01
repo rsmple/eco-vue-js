@@ -55,6 +55,24 @@
   --color-info: oklch(55% 0.16 262.6);
   --color-info-dark: var(--color-info);
 
+  /*
+   * Data palette: distinct mid-tone hues for categories — chart series, scanner and syntax colors. Each works as a
+   * tone (`tone-data-cyan text-tone`), so its text and soft shades are derived per mode. An app names its categories
+   * after them: `--color-scanner-sast: var(--color-data-cyan)`. Lightness is set per hue so white text reads on the
+   * fill and the fill stands out on the dark surface; orange and amber are light hues and take black text.
+   */
+  --color-data-red: oklch(57.7% 0.245 27.325);
+  --color-data-orange: oklch(64.6% 0.222 41.116);
+  --color-data-amber: oklch(76.9% 0.188 70.08);
+  --color-data-green: oklch(53% 0.16 150);
+  --color-data-teal: oklch(54% 0.1 185);
+  --color-data-cyan: oklch(54% 0.11 222);
+  --color-data-blue: oklch(54.6% 0.245 262.881);
+  --color-data-violet: oklch(56% 0.27 293);
+  --color-data-fuchsia: oklch(56% 0.27 323);
+  --color-data-pink: oklch(56% 0.22 1);
+  --color-data-gray: var(--color-gray-500);
+
   --color-severity-critical-bg: #ff757520;
   --color-severity-critical-text: #FF7171;
   --color-severity-high-bg: #ffbc7035;

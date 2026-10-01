@@ -31,6 +31,9 @@ type Pair = {name: string, fg: string, bg: string, min: number, scope?: string}
 
 const TONES = ['primary', 'negative', 'positive', 'warning', 'info']
 
+/** Data tones: categories, not status, so only what makes them usable — readable text and a visible fill. */
+const DATA_TONES = ['red', 'orange', 'amber', 'green', 'teal', 'cyan', 'blue', 'violet', 'fuchsia', 'pink', 'gray'].map(hue => 'data-' + hue)
+
 const PAIRS: Pair[] = [
   {name: 'text-accent on surface', fg: 'text-accent', bg: 'bg-surface', min: 7},
   {name: 'text-accent on surface-muted', fg: 'text-accent', bg: 'bg-surface-muted', min: TEXT},
@@ -47,6 +50,11 @@ const PAIRS: Pair[] = [
     {name: `${ tone }: text-tone-on on fill`, fg: 'text-tone-on', bg: 'bg-tone-fill', min: TEXT, scope: 'tone-' + tone},
     {name: `${ tone }: fill on surface`, fg: 'bg-tone-fill', bg: 'bg-surface', min: tone === 'warning' ? 1.5 : UI, scope: 'tone-' + tone},
     {name: `${ tone }: text-accent on soft`, fg: 'text-accent', bg: 'bg-tone-soft', min: 7, scope: 'tone-' + tone},
+  ]),
+  ...DATA_TONES.flatMap(tone => [
+    {name: `${ tone }: text-tone on surface`, fg: 'text-tone', bg: 'bg-surface', min: TEXT, scope: 'tone-' + tone},
+    {name: `${ tone }: text-tone-on on fill`, fg: 'text-tone-on', bg: 'bg-tone-fill', min: TEXT, scope: 'tone-' + tone},
+    {name: `${ tone }: fill on surface`, fg: 'bg-tone-fill', bg: 'bg-surface', min: tone === 'data-amber' ? 1.5 : UI, scope: 'tone-' + tone},
   ]),
 ]
 

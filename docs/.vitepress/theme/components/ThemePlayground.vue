@@ -39,18 +39,21 @@
       />
     </div>
 
-    <details class="grid gap-3">
+    <details
+      v-for="group in advancedGroups"
+      :key="group.name"
+      class="grid gap-3"
+    >
       <summary class="text-description cursor-pointer text-sm font-semibold">
-        Roles
+        {{ group.name }}
       </summary>
 
       <p class="text-description my-3 text-sm">
-        What components paint with, by purpose. Each takes a palette color by default, so a theme sets them only to
-        break from the palette: a darker line, a tinted surface. A role is set per mode.
+        {{ group.description }}
       </p>
 
       <ThemePlaygroundFields
-        :tokens="roleTokens"
+        :tokens="group.tokens"
         :base-tokens="baseTokens"
       />
     </details>
@@ -96,6 +99,7 @@ import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import ThemePlaygroundFields from './ThemePlaygroundFields.vue'
 
 import {
+  ADVANCED_GROUPS,
   DEFAULT_TOKENS,
   PRESETS,
   TOKENS,
@@ -110,9 +114,11 @@ import {
   themeTokens,
 } from '../docsTheme'
 
-const groups = [...new Set(TOKENS.map(token => token.group))].filter(name => name !== 'Roles').map(name => ({name, tokens: TOKENS.filter(token => token.group === name)}))
+const allGroups = [...new Set(TOKENS.map(token => token.group))].map(name => ({name, description: ADVANCED_GROUPS[name], tokens: TOKENS.filter(token => token.group === name)}))
 
-const roleTokens = TOKENS.filter(token => token.group === 'Roles')
+const groups = allGroups.filter(group => !group.description)
+
+const advancedGroups = allGroups.filter(group => group.description)
 
 const activePreset = computed(() => themeConfig.value.preset ?? 'default')
 

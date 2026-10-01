@@ -79,9 +79,13 @@
   "files": [
     "eslint",
     "dist",
+    "scripts",
     "tailwind-base",
     "LICENSE"
   ],
+  "bin": {
+    "eco-vue-color-roles": "./scripts/color-roles-codemod.js"
+  },
   "license": "MIT",
   "main": "./dist/main.js",
   "module": "./dist/main.js",
