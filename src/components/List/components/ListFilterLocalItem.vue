@@ -51,7 +51,7 @@
         class="text-start font-normal"
         :class="{
           'p-4': !meta.embedded,
-          'bg-default dark:bg-default-dark my-1 rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
+          'bg-surface my-1 rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
           'w-96': !isMobile && !meta.embedded,
           'max-w-96': !isMobile && meta.embedded,
           'w-screen': isMobile && meta.embedded,

@@ -44,7 +44,7 @@
         <div
           class="width-[calc(var(--w-input-height)+0.5rem)] p-0.75 h-full rounded-full bg-size-[200%_auto] bg-right"
           :class="{
-            'bg-gray-300 dark:bg-gray-700': !value || loading,
+            'bg-track': !value || loading,
             [semanticTypeBackgroundMap[SemanticType.PRIMARY]]: value && !loading,
           }"
         >

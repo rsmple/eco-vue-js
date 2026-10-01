@@ -5,7 +5,7 @@
     aria-modal="true"
     :aria-labelledby="$slots.title ? titleId : undefined"
     class="
-      bg-default dark:bg-default-dark w-modal-wrapper
+      bg-surface w-modal-wrapper
       scrollbar-width-thin grid
       max-h-[calc(100%-var(--inner-margin,2rem)*2)]
       w-(--w-modal-wrapper-width,35rem) max-w-[calc(100%-var(--inner-margin,2rem)*2)] grid-cols-[1fr] grid-rows-[auto_1fr_auto]

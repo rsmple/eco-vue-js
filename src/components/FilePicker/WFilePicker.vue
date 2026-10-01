@@ -11,7 +11,7 @@
 
         <span
           v-if="required"
-          class="text-negative dark:text-negative-dark"
+          class="tone-negative text-tone"
         >
           *
         </span>
@@ -49,8 +49,8 @@
         :animate="isDragging"
         class="w-border-svg-rounded-xl absolute left-0 top-0"
         :class="{
-          'text-negative dark:text-negative-dark': !!errorMessage,
-          'text-primary dark:text-primary-dark': !errorMessage,
+          'tone-negative text-tone': !!errorMessage,
+          'tone-primary text-tone': !errorMessage,
         }"
       />
 

@@ -5,14 +5,14 @@
         v-if="!hasError"
         name="positive"
       >
-        <IconCheckCircle class="square-36 text-positive dark:text-positive-dark" />
+        <IconCheckCircle class="tone-positive square-36 text-tone" />
       </slot>
   
       <slot
         v-else
         name="negative"
       >
-        <IconCloseCircle class="square-36 text-negative dark:text-negative-dark" />
+        <IconCloseCircle class="tone-negative square-36 text-tone" />
       </slot>
 
       <button

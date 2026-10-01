@@ -6,9 +6,9 @@
   >
     <div
       :key="headerPadding"
-      class="bg-default dark:bg-default-dark supports-backdrop:backdrop-blur fixed inset-x-0 top-0 h-[calc(var(--header-height)+var(--header-height-padding))] print:hidden"
+      class="bg-surface supports-backdrop:backdrop-blur fixed inset-x-0 top-0 h-[calc(var(--header-height)+var(--header-height-padding))] print:hidden"
       :class="{
-        'supports-backdrop:bg-default/40 supports-backdrop:dark:bg-default-dark/60': isTransparent,
+        'supports-backdrop:bg-overlay': isTransparent,
       }"
       :style="{'--header-height-padding': headerPadding + 'px'}"
     />

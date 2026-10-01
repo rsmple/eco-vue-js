@@ -21,7 +21,7 @@
     <template #content>
       <div
         class="
-          bg-default dark:bg-default-dark flex overflow-y-auto overscroll-y-contain rounded-md
+          bg-surface flex overflow-y-auto overscroll-y-contain rounded-md
           text-xs shadow-md dark:border dark:border-solid dark:border-gray-800
         "
         @mouseenter="enter"

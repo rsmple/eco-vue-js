@@ -1,11 +1,11 @@
 <template>
   <IconNegativeInfo
     v-if="hasError"
-    class="text-negative dark:text-negative-dark"
+    class="tone-negative text-tone"
   />
   <IconCheckCircle
     v-else-if="hasValue"
-    class="text-positive dark:text-positive-dark"
+    class="tone-positive text-tone"
   />
   <IconSlash
     v-else

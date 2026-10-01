@@ -4,7 +4,7 @@
       <slot
         v-bind="{
           disableMessage: disableMessageValue,
-          cssClass: 'border-l border-solid border-gray-300 first:border-l-0 dark:border-gray-700'
+          cssClass: 'border-l border-solid border-line first:border-l-0'
         }"
       />
 

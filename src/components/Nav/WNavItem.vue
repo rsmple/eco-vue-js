@@ -3,7 +3,7 @@
     :to="to"
     class="w-ripple-trigger relative block py-1 no-underline"
     :class="{
-      'text-primary dark:text-primary-dark': isTextColor,
+      'tone-primary text-tone': isTextColor,
       'text-accent': !isTextColor,
       'px-1': even,
       'xl-not:pr-1 pl-2': !even,

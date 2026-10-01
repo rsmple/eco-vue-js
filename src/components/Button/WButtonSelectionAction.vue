@@ -20,7 +20,7 @@
     "
     :class="{
       'w-ripple w-ripple-hover before:text-primary dark:before:text-primary-dark hover:text-primary dark:hover:text-primary-dark cursor-pointer': !disabled && !disableMessage && !loading,
-      'text-primary dark:text-primary-dark w-ripple-active': active,
+      'tone-primary text-tone w-ripple-active': active,
       'text-accent': !active,
       'cursor-not-allowed': disabled || disableMessage,
       'cursor-progress': loading,

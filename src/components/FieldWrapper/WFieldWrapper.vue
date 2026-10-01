@@ -83,7 +83,7 @@
             class="flex min-h-(--w-input-height,2.75rem) items-center font-normal"
             :class="{
               'font-mono': mono,
-              'border-t border-solid border-gray-300 dark:border-gray-700': title || $slots.title,
+              'border-t border-solid border-line': title || $slots.title,
             }"
           >
             <slot v-bind="{id, setFocused, focused, isDragover}">

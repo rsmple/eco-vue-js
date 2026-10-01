@@ -18,7 +18,7 @@
       :class="{
         'border-primary border-y border-solid': isHoverEnabled && !isDisabled,
         'bg-primary dark:bg-primary-dark': !isHoverEnabled && !isDisabled,
-        'bg-gray-200 dark:bg-gray-700': isDisabled,
+        'bg-surface-inset': isDisabled,
         'w-full': isBetweenRange || isDisabled,
         'left-1/2 w-1/2': isFrom && !isTo,
         'right-1/2 w-1/2': !isFrom && isTo,

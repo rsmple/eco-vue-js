@@ -24,7 +24,7 @@
           :class="{
             'w-hover-circle': !disabled,
             'text-description': !isOpen || anchor,
-            'text-primary dark:text-primary-dark': isOpen && !anchor,
+            'tone-primary text-tone': isOpen && !anchor,
           }"
         >
           <component

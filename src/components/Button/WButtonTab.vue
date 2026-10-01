@@ -3,9 +3,9 @@
     :disabled="disabled"
     class="w-ripple-trigger grid select-none grid-cols-[auto_1fr] font-semibold outline-none transition-colors duration-500"
     :class="{
-      'text-primary dark:text-primary-dark': !hasError && active,
-      'text-negative dark:text-negative-dark': hasError,
-      'text-positive dark:text-positive-dark': !active && !hasError && hasValue && showHasValue,
+      'tone-primary text-tone': !hasError && active,
+      'tone-negative text-tone': hasError,
+      'tone-positive text-tone': !active && !hasError && hasValue && showHasValue,
       'text-description': !active && !hasError && (!showHasValue || !hasValue),
       'cursor-not-allowed opacity-50': disabled,
       'cursor-pointer': !disabled,

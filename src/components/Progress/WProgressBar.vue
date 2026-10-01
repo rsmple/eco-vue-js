@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative isolate h-8 w-full overflow-hidden rounded-xl bg-gray-100 text-sm font-semibold tabular-nums select-none dark:bg-gray-800"
+    class="relative isolate h-8 w-full overflow-hidden rounded-xl bg-surface-muted text-sm font-semibold tabular-nums select-none"
     role="progressbar"
     aria-valuemin="0"
     aria-valuemax="100"

@@ -1,5 +1,5 @@
 <template>
-  <div class="h-1 w-full bg-gray-200 dark:bg-gray-700">
+  <div class="h-1 w-full bg-surface-inset">
     <div
       class="bg-primary dark:bg-primary-dark h-full transition-[width]"
       :style="{

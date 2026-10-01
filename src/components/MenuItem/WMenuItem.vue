@@ -6,7 +6,7 @@
     :class="{
       'hover:text-primary dark:hover:text-primary-dark cursor-pointer': !disabled && !loading,
       'cursor-not-allowed opacity-50': disabled,
-      'text-primary dark:text-primary-dark': active && !disabled,
+      'tone-primary text-tone': active && !disabled,
       'text-description': !active || disabled,
       'cursor-progress': loading,
     }"

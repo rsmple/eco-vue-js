@@ -18,7 +18,7 @@
           class="flex h-full items-center justify-end rounded-inherit"
           :class="{
             [semanticTypeBackgroundMap[errorMessage ? SemanticType.NEGATIVE : semanticType]]: !disabled,
-            'bg-gray-400 dark:bg-gray-500': disabled,
+            'bg-track-strong': disabled,
           }"
           :style="{width: percentCompactFormatter.format(rangeScale(cursor ?? modelValue))}"
         >

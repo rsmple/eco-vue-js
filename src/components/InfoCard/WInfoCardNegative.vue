@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-2 rounded-2xl bg-gray-100 p-4 dark:bg-gray-800">
+  <div class="mt-2 rounded-2xl bg-surface-muted p-4">
     <div class="text-accent mb-2 text-balance font-normal">
       <IconDanger
         class="-mt-1 mr-2 inline"
@@ -19,12 +19,12 @@ import IconDanger from '@/assets/icons/IconDanger.svg?component'
 import {SemanticType} from '@/utils/SemanticType'
 
 const stylesMap: Record<SemanticType, string> = {
-  [SemanticType.PRIMARY]: 'text-primary dark:text-primary-dark',
+  [SemanticType.PRIMARY]: 'tone-primary text-tone',
   [SemanticType.SECONDARY]: 'text-description',
-  [SemanticType.NEGATIVE]: 'text-negative dark:text-negative-dark',
-  [SemanticType.POSITIVE]: 'text-positive dark:text-positive-dark',
-  [SemanticType.WARNING]: 'text-warning dark:text-warning-dark',
-  [SemanticType.INFO]: 'text-info dark:text-info-dark',
+  [SemanticType.NEGATIVE]: 'tone-negative text-tone',
+  [SemanticType.POSITIVE]: 'tone-positive text-tone',
+  [SemanticType.WARNING]: 'tone-warning text-tone',
+  [SemanticType.INFO]: 'tone-info text-tone',
 }
 
 defineProps<{

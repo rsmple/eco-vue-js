@@ -9,17 +9,17 @@
     <div class="m-7">
       <IconDanger
         v-if="type === NotifyType.DANGER"
-        class="square-6 text-negative dark:text-negative-dark"
+        class="tone-negative square-6 text-tone"
       />
 
       <IconWarn
         v-else-if="type === NotifyType.WARN"
-        class="square-6 text-warning dark:text-warning-dark"
+        class="tone-warning square-6 text-tone"
       />
 
       <IconSuccess
         v-else-if="type === NotifyType.SUCCESS"
-        class="square-6 text-positive dark:text-positive-dark"
+        class="tone-positive square-6 text-tone"
       />
     </div>
 

@@ -27,7 +27,7 @@
       <div
         class="text-start font-normal"
         :class="{
-          'bg-default dark:bg-default-dark max-h-80 overflow-y-auto overscroll-y-contain rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
+          'bg-surface max-h-80 overflow-y-auto overscroll-y-contain rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
         }"
       >
         <WMenuItem

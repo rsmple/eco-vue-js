@@ -11,7 +11,7 @@
       'top---header-height': !isContained,
       'top-0 not-empty:pt-3': isContained && !isModal,
       'top---modal-header-height': isModal,
-      'bg-default dark:bg-default-dark': noHeaderUpdate || isContained,
+      'bg-surface': noHeaderUpdate || isContained,
     }"
     :style="{zIndex: isIntersecting ? BASE_ZINDEX_DROPDOWN : BASE_ZINDEX_LIST_HEADER}"
   >

@@ -102,9 +102,9 @@
         :class="{
           'focus-within:border-primary dark:focus-within:border-primary-dark focus-within:outline-primary/20 dark:focus-within:outline-primary-dark/20 focus-within:outline-2': !isDisabled && !isReadonly && !unclickable,
           'cursor-text': !isDisabled,
-          'border-negative dark:border-negative-dark': errorMessage,
-          [borderClass ?? 'border-gray-300 dark:border-gray-700']: !isDisabled,
-          'border-gray-300/50 dark:border-gray-700/50': isDisabled,
+          'tone-negative border-tone': errorMessage,
+          [borderClass ?? 'border-line']: !isDisabled,
+          'border-line/50': isDisabled,
           'not-group-hover/seamless:border-transparent!': seamless && !focused,
           'bg-(--w-input-bg,inherit)': !seamless || focused,
         }"
@@ -134,7 +134,7 @@
           class="flex h-full w-(--w-input-height,2.75rem) select-none items-center justify-center"
           :class="{
             'text-description': !focused,
-            'text-primary dark:text-primary-dark': focused,
+            'tone-primary text-tone': focused,
           }"
         >
           <component
@@ -197,8 +197,8 @@
                 'resize-none': !resize && textarea,
                 'w-option': !textarea && $slots.prefix && !hideInput,
                 'font-mono': mono,
-                'text-black-default dark:text-gray-200': !isDisabled,
-                'text-black-default/50 dark:text-gray-200/50': isDisabled,
+                'text-accent': !isDisabled,
+                'text-accent/50': isDisabled,
                 'scrollbar-width-thin min-h-(--w-textarea-height,10rem) w-full overflow-auto overscroll-contain': textarea,
                 'h-(--w-textarea-height,10rem)': textarea && resize,
                 'absolute': hideInput,

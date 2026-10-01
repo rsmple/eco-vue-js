@@ -11,10 +11,10 @@ export enum SemanticType {
 
 const semanticTypeConfig = reactive<Record<SemanticType, string>>({
   [SemanticType.PRIMARY]: 'bg-primary dark:bg-primary-dark text-default',
-  [SemanticType.SECONDARY]: 'bg-default dark:bg-default-dark text-accent',
+  [SemanticType.SECONDARY]: 'bg-surface text-accent',
   [SemanticType.NEGATIVE]: 'bg-negative dark:bg-negative-dark text-default',
   [SemanticType.POSITIVE]: 'bg-positive dark:bg-positive-dark text-default',
-  [SemanticType.WARNING]: 'bg-warning dark:bg-warning-dark text-black-default dark:text-default-dark ',
+  [SemanticType.WARNING]: 'bg-warning dark:bg-warning-dark text-black-default dark:text-default-dark',
   [SemanticType.INFO]: 'bg-info dark:bg-info-dark text-default',
 })
 
@@ -40,12 +40,12 @@ export const setSemanticTypeChipMap = (value: Partial<Record<SemanticType, strin
 }
 
 const semanticTypeBorderMap = reactive<Record<SemanticType, string>>({
-  [SemanticType.PRIMARY]: 'border-solid border-primary dark:border-primary-dark',
-  [SemanticType.SECONDARY]: 'border-solid border-gray-300 dark:border-gray-700',
-  [SemanticType.NEGATIVE]: 'border-solid border-negative dark:border-negative-dark',
-  [SemanticType.POSITIVE]: 'border-solid border-positive dark:border-positive-dark',
-  [SemanticType.WARNING]: 'border-solid border-warning dark:border-warning-dark',
-  [SemanticType.INFO]: 'border-solid border-info dark:border-info-dark',
+  [SemanticType.PRIMARY]: 'tone-primary border-solid border-tone',
+  [SemanticType.SECONDARY]: 'border-solid border-line',
+  [SemanticType.NEGATIVE]: 'tone-negative border-solid border-tone',
+  [SemanticType.POSITIVE]: 'tone-positive border-solid border-tone',
+  [SemanticType.WARNING]: 'tone-warning border-solid border-tone',
+  [SemanticType.INFO]: 'tone-info border-solid border-tone',
 })
 
 export const useSemanticTypeBorderMap = () => {
@@ -57,12 +57,12 @@ export const setSemanticTypeBorderMap = (value: Partial<Record<SemanticType, str
 }
 
 const semanticTypeTextStylesMap = reactive<Record<SemanticType, string>>({
-  [SemanticType.PRIMARY]: 'text-primary dark:text-primary-dark',
+  [SemanticType.PRIMARY]: 'tone-primary text-tone',
   [SemanticType.SECONDARY]: 'text-description',
-  [SemanticType.NEGATIVE]: 'text-negative dark:text-negative-dark',
-  [SemanticType.POSITIVE]: 'text-positive dark:text-positive-dark',
-  [SemanticType.WARNING]: 'text-warning dark:text-warning-dark',
-  [SemanticType.INFO]: 'text-info dark:text-info-dark',
+  [SemanticType.NEGATIVE]: 'tone-negative text-tone',
+  [SemanticType.POSITIVE]: 'tone-positive text-tone',
+  [SemanticType.WARNING]: 'tone-warning text-tone',
+  [SemanticType.INFO]: 'tone-info text-tone',
 })
 
 export const useSemanticTypeTextMap = () => {

@@ -1,10 +1,10 @@
 <template>
   <div class="flex h-(--w-list-header-height,2rem)">
-    <div class="left---left-inner bg-default dark:bg-default-dark sticky z-1">
-      <div class="bg-default dark:bg-default-dark w---left-inner absolute right-full top-0 -z-1 h-full" />
+    <div class="left---left-inner bg-surface sticky z-1">
+      <div class="bg-surface w---left-inner absolute right-full top-0 -z-1 h-full" />
 
       <div
-        class="h-full rounded-l-(--w-list-header-rounded,0.75rem) border-y border-l border-solid border-gray-300 bg-(--w-list-header-bg,inherit) dark:border-gray-700"
+        class="h-full rounded-l-(--w-list-header-rounded,0.75rem) border-y border-l border-solid border-line bg-(--w-list-header-bg,inherit)"
         :class="{
           'width-(--w-list-header-rounded,1rem)': !allowSelect,
         }"

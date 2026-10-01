@@ -6,7 +6,7 @@ Living plan for moving the kit from palette classes (`bg-gray-100 dark:bg-gray-8
 | --- | --- |
 | 0. Spike | done |
 | 1. Foundation in `tailwind-base` | done — on branch `color-roles` |
-| 2. Codemod the kit | — |
+| 2. Codemod the kit | in progress — automatic pass done, manual pass next |
 | 3. Re-tune default colors | — |
 | 4. Playground and presets on roles | — |
 | 5. Consumers | — |
@@ -221,7 +221,7 @@ auditor (`front`, Vite 8) built against a local pack of `main` and of `color-rol
 
 #### Role equivalence test
 
-`roles-test.mjs` compiles `theme.css` + `roles.css` + `default.css` with Tailwind, also lowers the output with lightningcss at Vite 8's default targets, and renders each new class next to the old pair it replaces — e.g. `tone-negative surface-soft` next to `bg-negative/10 dark:bg-negative-dark/10` — asserting equal computed colors. 27 pairs, plus checks for text inside `surface-fill`, the `surface` reset, derived on-colors (white on teal, black on yellow), a derived `surface-soft` that doesn't loop, and a `.light` island. Run in Chromium, Firefox and WebKit × native and lowered CSS × light and dark: all pass.
+`build/color-roles/roles-test.ts` compiles `theme.css` + `roles.css` + `default.css` with Tailwind, also lowers the output with lightningcss at Vite 8's default targets, and renders each new class next to the old pair it replaces — e.g. `tone-negative surface-soft` next to `bg-negative/10 dark:bg-negative-dark/10` — asserting equal computed colors. 27 pairs, plus checks for text inside `surface-fill`, the `surface` reset, derived on-colors (white on teal, black on yellow), a derived `surface-soft` that doesn't loop, and a `.light` island. Run in Chromium, Firefox and WebKit × native and lowered CSS × light and dark: all pass.
 
 #### Color diff harness
 
@@ -231,14 +231,32 @@ Compares computed colors (`color`, backgrounds, borders, outline, shadow, fill, 
 2. `node dump.mjs <dir> <out.json>` for each — serves the build under `/eco-vue-js/`, visits every page with Playwright.
 3. `node diff.mjs base.json new.json` — changes grouped by `property: before → after`, with example elements.
 
-The scripts (this and the role equivalence test) live in the session scratchpad for now; move them to `build/color-roles/` once phase 2 starts relying on them.
+Now `build/color-roles/color-diff.ts` (`dump` / `diff`). It sees what the docs demos render statically — hover, focus, error and open states mostly aren't covered, which is why the codemod also gets a static cascade scan (phase 2).
 
 ### 2. Codemod the kit
 
-- [ ] Script applying the mapping table to complete pairs within one class string (about 70% of uses).
-- [ ] Review the one-sided and split uses by hand (about 20%) — most missing dark variants are bugs, fixed here.
-- [ ] Gradients and `SemanticType.ts` maps by hand (about 10%); the maps become tones.
-- [ ] Screenshot diff: zero except listed fixes.
+- [x] Move the color diff and role test to `build/color-roles/`; `playwright-core` added as a devDependency (browsers come from the Playwright cache: `npx playwright-core install chromium firefox webkit`).
+- [x] `build/color-roles/codemod.ts`: replaces light/dark pairs inside one class string — neutral pairs only where the role default is exactly the pair (plus the `text-black-default dark:text-gray-200` → `text-accent` unification), equal-opacity pairs to the role with that opacity, and tone text/border pairs to `tone-X text-tone` / `border-tone` when the string has one tone and no state variant. Reports everything it leaves.
+- [x] Automatic pass on `src/components` and `src/utils` (docs examples excluded): 93 pairs in 45 files. Docs color diff: only the listed unification (input text in dark mode, enabled and disabled, gray-200 → white). Role test: passes.
+- [x] Cascade review of the automatic pass (below).
+- [ ] Manual pass: 166 palette classes left in 39 files (below).
+- [ ] Docs examples (`src/components/*/docs`) — they teach consumers, so they move to roles too.
+- [ ] Color diff: zero except listed fixes.
+
+#### Cascade review
+
+The old pairs had a `dark:` class with higher specificity (`.dark .dark\:bg-x:not(:is(.light *))`), so in dark mode it beat any plain class of the same property on the element; roles are single classes and fall back to source order. Scanned every migrated template element for a role plus another plain color class of the same property: all hits are mutually exclusive conditions, other attributes (`content-class`), or width/gradient utilities, except WInput's field — `tone-negative border-tone` (error) and `border-line` (enabled) both apply, and `border-tone` sorts after `border-line`, so the error border wins as `border-negative` did over `border-gray-300`. Elements with several `tone-*` classes: all on mutually exclusive conditions or separate elements. WButton combines the background and border maps of `SemanticType.ts` for the same type, so they share a tone. Consumers override only the background and chip maps (appsec, auditor, traio), which the automatic pass left alone.
+
+#### Left for the manual pass
+
+Run `node build/color-roles/codemod.ts` for the current list. By kind:
+
+- **Fills** (`bg-primary dark:bg-primary-dark` with `text-default`, same for the status colors; about 60 classes) — `tone-X surface-fill`, which also covers the text on them. Mostly `SemanticType.ts` background/chip maps, `progressBarClass.ts`, WButtonTab, CalendarDay, WCheckbox. The maps are overridable by consumers, so their keys stay and only the values change.
+- **Soft primary** (`bg-primary-light dark:bg-primary-darkest`, often with opacity; about 14) — `tone-primary bg-tone-soft`, or `surface-soft`.
+- **Dark-only lines** (`dark:border-gray-800`, `dark:outline-gray-800`; 8) — `line-raised`.
+- **Near-duplicates** (`bg-gray-200 dark:bg-gray-800`, `bg-gray-300 dark:bg-gray-600`, `text-gray-300 dark:text-gray-700`, …) — pick the nearest role and list the change.
+- **Gradients** (`via-*`; about 15) — tone colors in the progress bar shine; need `via-tone`.
+- **Tones with state variants** (`hover:text-primary dark:hover:text-primary-dark`) — `tone-X hover:text-tone`.
 - Phases 1–2 ship as one minor. Nothing breaks for consumers: palette names still work as inputs.
 
 ### 3. Re-tune defaults
@@ -319,3 +337,4 @@ Without a scope, every role has its default — today's colors.
 - 2026-10-01 — Spike done in WebKit. Found lightningcss lowering of `light-dark()` in the docs build; roles moved to `css/roles.css` declared per mode boundary. `text-accent`, `text-description`, autofill, resizer and `code-inline` colors read variables. Color diff: 0 changes. `plans/` excluded from the docs build.
 - 2026-10-01 — Names agreed. All roles, kit tones, `tone-*` and `surface-*` added to `css/roles.css` with today's values; role equivalence test passes in three engines; docs color diff 0.
 - 2026-10-01 — Consumer check in auditor: CSS and rendered colors unchanged apart from `color-scheme`; native controls now follow dark mode. Phase 1 done.
+- 2026-10-01 — Phase 2 started: harness and role test moved to `build/color-roles/`, codemod written; automatic pass replaced 93 pairs in 45 files; color diff shows only the agreed input text unification; cascade review clean. 166 classes left for the manual pass.
