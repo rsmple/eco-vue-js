@@ -3,7 +3,7 @@ import {computed, ref, watch} from 'vue'
 import rolesCss from '../../../package/tailwind-base/css/roles.css?raw'
 import themeCss from '../../../package/tailwind-base/css/theme.css?raw'
 import {THEME_STORAGE_KEY as STORAGE_KEY, THEME_STYLE_ID as STYLE_ID} from '../themeHeadScript'
-import {NEUTRAL_SCALES, PRESETS, type PresetId, expandNeutral, getThemeBlock, isNeutralScale} from '../themePresets'
+import {NEUTRAL_SCALES, PRESETS, type PresetId, expandNeutral, getRandomTokens, getThemeBlock, isNeutralScale} from '../themePresets'
 
 export {NEUTRAL_SCALES, PRESETS, type PresetId}
 
@@ -179,6 +179,11 @@ export const setPreset = (id: PresetId) => {
   themeConfig.value = id === 'default' ? {} : {preset: id}
 }
 
+/** A random primary with the neutral scale, size and radius that go with it; see `getRandomTokens`. */
+export const setRandomTheme = () => {
+  themeConfig.value = normalizeConfig(getRandomTokens())
+}
+
 export const resetTheme = () => {
   themeConfig.value = {}
 }
@@ -202,6 +207,64 @@ export const getThemeLink = (config: ThemeConfig, path = 'guide/theming') => {
   if (Object.keys(config).length) url.searchParams.set(THEME_QUERY_PARAM, JSON.stringify(config))
 
   return url.toString()
+}
+
+/**
+ * A prompt for an AI assistant to make a theme from a description. It lists the tokens with their defaults and the
+ * limits the kit's contrast checks hold them to, and asks for a link to this page with the theme applied, so the
+ * result is tried here and Copy CSS gives the app's stylesheet.
+ */
+export const getThemePrompt = (description: string, config: ThemeConfig) => {
+  const listed = TOKENS.filter(token => !ADVANCED_GROUPS[token.group])
+  const line = (token: Token) => `- ${ token.key }: ${ token.label.toLowerCase() }${ token.description ? ` (${ token.description.replace(/^Empty: /, 'empty: ') })` : '' }, default ${ DEFAULT_TOKENS[token.key].replace(/var\(--color-([\w-]+)\)/g, '$1') }`
+  const advanced = Object.keys(ADVANCED_GROUPS).map(group => `${ group }: ${ TOKENS.filter(token => token.group === group && !token.key.endsWith('-dark')).map(token => token.key).join(', ') }`)
+
+  return [
+    'Make a theme for eco-vue-js, a Vue 3 UI kit on Tailwind v4.',
+    `The look: ${ description.trim() || 'surprise me, but keep it usable for a dense business app' }`,
+    '',
+    'A theme is a JSON object of tokens. Set only what the look needs: every token left out keeps its default.',
+    ...listed.map(line),
+    `Also available, usually left out: ${ advanced.join('; ') }. Roles take a -dark variant too.`,
+    '',
+    'Rules:',
+    '- Colors as oklch(L% C H). "neutral" is one of: ' + Object.keys(NEUTRAL_SCALES).join(', ') + '.',
+    '- Primary and the status colors are fills under black or white text, which the kit picks by lightness (white below L 58%). A fill needs 3:1 contrast with the page and 4.5:1 with its text, in light mode against the background and in dark mode against the dark background. When one value cannot pass both, set its -dark variant.',
+    '- Readable text, focus rings and soft backgrounds are derived from these fills, so don\'t ask for more colors to get them.',
+    '- Radii at most half the matching height. Sizes in rem.',
+    ...Object.keys(config).length ? ['', `The theme I have now, to adjust or replace as the look asks: ${ JSON.stringify(getTokens(config)) }`] : [],
+    '',
+    'Reply with:',
+    '1. The theme as one JSON object in a ```json code block.',
+    `2. In a second code block, a link that opens the docs with it applied: ${ getThemeLink({}) }?theme= followed by the JSON, URL-encoded. Keep it in a code block: chat apps may strip links from plain text.`,
+    '3. One short line per token you set, saying why.',
+    '',
+    'I will paste the JSON or the link into the theming page, which previews the components and gives the CSS for the app, so no CSS is needed.',
+  ].join('\n')
+}
+
+/**
+ * Reads a theme pasted back from an assistant: its JSON, a theme link, or a whole reply holding either. Returns
+ * undefined when nothing in it is a theme.
+ */
+export const parseThemeReply = (text: string): ThemeConfig | undefined => {
+  const param = /[?&]theme=([^\s`'"<>]+)/.exec(text)?.[1]
+
+  // `)` stays unencoded inside `oklch()`, so a link closing a Markdown `(…)` is tried without its last `)` too.
+  for (const candidate of param ? [param, param.replace(/\)$/, '')] : []) {
+    try {
+      const config = parseThemeParam(decodeURIComponent(candidate))
+
+      if (config && Object.keys(config).length) return config
+    } catch {
+      // Not URL-encoded as asked: try the next candidate, then the JSON.
+    }
+  }
+
+  const json = /\{[\s\S]*\}/.exec(text)?.[0]
+  const config = json ? parseThemeParam(json) : undefined
+
+  return config && Object.keys(config).length ? config : undefined
 }
 
 /**
