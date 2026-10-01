@@ -4,10 +4,12 @@
     v-bind="disabled || loading ? undefined : to ? {to} : href ? {href, download} : undefined"
     class="w-ripple-trigger relative block w-full select-none items-center justify-start px-2 text-start outline-none first:pt-2 last:pb-2"
     :class="{
-      'tone-primary hover:text-tone cursor-pointer': !disabled && !loading,
+      [semanticTypeTextMap[semanticType]]: toned && !disabled,
+      'tone-primary': !toned,
+      'hover:text-tone cursor-pointer': !disabled && !loading,
       'cursor-not-allowed opacity-50': disabled,
-      'tone-primary text-tone': active && !disabled,
-      'text-description': !active || disabled,
+      'text-tone': active && !disabled,
+      'text-description': (!active && !toned) || disabled,
       'cursor-progress': loading,
     }"
     :disabled="disabled"
@@ -60,10 +62,14 @@
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
 
+import {computed} from 'vue'
+
 import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 import IconCheck from '@/assets/icons/IconCheck.svg?component'
+
+import {SemanticType, useSemanticTypeTextMap} from '@/utils/SemanticType'
 
 import WSpinner from '../Spinner/WSpinner.vue'
 
@@ -80,12 +86,15 @@ interface Props extends Partial<LinkProps> {
   tooltipText?: string
   /** Shows a spinner over the item and ignores clicks. */
   loading?: boolean
+  /** Color of the item. Types other than `primary` and `secondary` color the text at rest — a red "Delete". */
+  semanticType?: SemanticType
 }
 
-withDefaults(
+const props = withDefaults(
   defineProps<Props>(),
   {
     active: undefined,
+    semanticType: SemanticType.PRIMARY,
     download: undefined,
     href: undefined,
     tooltipText: undefined,
@@ -101,4 +110,8 @@ defineSlots<{
   /** Content of the item, laid out in a row. */
   default?: () => void
 }>()
+
+const semanticTypeTextMap = useSemanticTypeTextMap()
+
+const toned = computed(() => props.semanticType !== SemanticType.PRIMARY && props.semanticType !== SemanticType.SECONDARY)
 </script>

@@ -5,6 +5,7 @@
     :download="download"
     :disabled="disabled"
     :tooltip-text="tooltipText"
+    :semantic-type="semanticType"
     @click="$emit('click', $event)"
   >
     <div class="min-w-20 flex-1 text-start">
@@ -26,6 +27,7 @@
 
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
+import type {SemanticType} from '@/utils/SemanticType'
 
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
@@ -42,6 +44,8 @@ interface Props extends Partial<LinkProps> {
   download?: string
   /** Tooltip over the item. */
   tooltipText?: string
+  /** Color of the item. Types other than `primary` and `secondary` color the text at rest — a red "Delete". */
+  semanticType?: SemanticType
 }
 
 defineProps<Props>()
