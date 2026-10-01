@@ -1,67 +1,93 @@
 <template>
   <div class="grid grid-cols-1 items-start h-full gap-4 text-left sm:grid-cols-[minmax(0,7fr)_minmax(0,6fr)]">
-    <form
+    <WUniform
+      :model-value="project"
+      :init-data="initData"
+      :api-method="create"
+      tag="div"
       class="docs-home-card grid content-start gap-3"
-      @submit.prevent="create"
+      full-payload
+      @success="isCreated = true"
     >
-      <div class="flex items-center justify-between">
-        <span class="font-semibold">New project</span>
+      <template #default="scope">
+        <div class="flex items-center justify-between">
+          <span class="font-semibold">New project</span>
 
-        <WChip
-          :text="isCreated ? 'active' : 'draft'"
-          :semantic-type="isCreated ? SemanticType.POSITIVE : SemanticType.WARNING"
-        />
-      </div>
+          <WChip
+            :text="isCreated ? 'active' : 'draft'"
+            :semantic-type="isCreated ? SemanticType.POSITIVE : SemanticType.WARNING"
+          />
+        </div>
 
-      <WInput
-        v-model="name"
-        title="Name"
-        placeholder="Payments API"
-        allow-clear
-      />
-
-      <WSelect
-        :model-value="tags"
-        :options="TAG_OPTIONS"
-        :value-getter="item => item.id"
-        :search-fn="(item, search) => item.name.includes(search.toLowerCase())"
-        title="Tags"
-        placeholder="Add a tag"
-        @select="tags = [...tags, $event]"
-        @unselect="tags = tags.filter(item => item !== $event)"
-      >
-        <template #option="{option}">
-          <div class="w-option flex items-center">
-            {{ option?.name }}
-          </div>
-        </template>
-      </WSelect>
-
-      <WToggle
-        v-model="notify"
-        title="Notify the team"
-        description="A digest once a day."
-      />
-
-      <div class="mt-1 flex justify-end gap-2">
-        <WButton
-          :semantic-type="SemanticType.SECONDARY"
-          :disabled="isCreating"
-          @click="reset"
+        <WUniform
+          v-bind="scope"
+          field="name"
+          title="Name"
+          required
         >
-          Reset
-        </WButton>
+          <template #field="scopeField">
+            <WInput
+              v-bind="scopeField"
+              placeholder="Payments API"
+              allow-clear
+            />
+          </template>
+        </WUniform>
 
-        <WButton
-          :semantic-type="SemanticType.PRIMARY"
-          :loading="isCreating"
-          :disabled="!name"
-          type="submit"
+        <WUniform
+          v-bind="scope"
+          field="tags"
+          title="Tags"
         >
-          Create
-        </WButton>
-      </div>
-    </form>
+          <template #field="scopeField">
+            <WSelect
+              v-bind="scopeField"
+              :options="TAG_OPTIONS"
+              :value-getter="item => item.id"
+              :search-fn="(item, search) => item.name.includes(search.toLowerCase())"
+              placeholder="Add a tag"
+            >
+              <template #option="{option}">
+                <div class="w-option flex items-center">
+                  {{ option?.name }}
+                </div>
+              </template>
+            </WSelect>
+          </template>
+        </WUniform>
+
+        <WUniform
+          v-bind="scope"
+          field="notify"
+          title="Notify the team"
+        >
+          <template #field="scopeField">
+            <WToggle
+              v-bind="scopeField"
+              description="A digest once a day."
+            />
+          </template>
+        </WUniform>
+
+        <div class="mt-1 flex justify-end gap-2">
+          <WButton
+            :semantic-type="SemanticType.SECONDARY"
+            :disabled="scope.submitting"
+            @click="reset"
+          >
+            Reset
+          </WButton>
+
+          <WButton
+            :semantic-type="SemanticType.PRIMARY"
+            :loading="scope.submitting"
+            @click="scope.submit?.()"
+          >
+            Create
+          </WButton>
+        </div>
+      </template>
+    </WUniform>
 
     <div class="grid gap-4 sm:translate-y-6">
       <div class="docs-home-card grid gap-2 grid-cols-1">
@@ -176,6 +202,7 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WProgressBar from 'eco-vue-js/dist/components/Progress/WProgressBar.vue'
 import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 import WToggle from 'eco-vue-js/dist/components/Toggle/WToggle.vue'
+import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 const TAG_OPTIONS = [
   {id: 1, name: 'api'},
@@ -183,6 +210,8 @@ const TAG_OPTIONS = [
   {id: 3, name: 'payments'},
   {id: 4, name: 'urgent'},
 ]
+
+type Project = {name: string | undefined, tags: number[], notify: boolean}
 
 const RANGES = [7, 30, 90] as const
 
@@ -202,30 +231,26 @@ const EXPORT_STATUS_TYPE = {
   done: SemanticType.POSITIVE,
 } as const satisfies Record<string, SemanticType>
 
-const name = ref<string | undefined>('Payments API')
-const tags = ref([1, 3])
-const notify = ref(true)
-const isCreating = ref(false)
+const getDefaultProject = (): Project => ({name: 'Payments API', tags: [1, 3], notify: true})
+
+const project = ref(getDefaultProject())
 const isCreated = ref(false)
+
+const initData = (value: Project): Project => ({...value, tags: [...value.tags]})
 
 let createTimer: ReturnType<typeof setTimeout> | undefined
 
-const create = () => {
-  if (!name.value || isCreating.value) return
-
-  isCreating.value = true
-
+// Stands in for an API call: returns the saved project, which becomes the form's new initial model.
+const create = (payload: Partial<Project>) => new Promise<Project>(resolve => {
   createTimer = setTimeout(() => {
-    isCreating.value = false
-    isCreated.value = true
-    Notify.success({title: 'Project created', caption: `${ name.value } is ready${ notify.value ? ' and the team is notified' : '' }.`})
+    Notify.success({title: 'Project created', caption: `${ payload.name } is ready${ payload.notify ? ' and the team is notified' : '' }.`})
+    resolve(payload as Project)
   }, 900)
-}
+})
 
+// A new model object makes the form drop its edits and start over from it.
 const reset = () => {
-  name.value = 'Payments API'
-  tags.value = [1, 3]
-  notify.value = true
+  project.value = getDefaultProject()
   isCreated.value = false
 }
 
