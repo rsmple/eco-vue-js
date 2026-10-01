@@ -6,7 +6,7 @@ import {existsSync, readFileSync} from 'node:fs'
 import {URL, fileURLToPath} from 'node:url'
 
 import {buildSidebar, rewrite} from './sidebar.ts'
-import {THEME_HEAD_SCRIPT} from './theme/docsTheme.ts'
+import {THEME_HEAD_SCRIPT} from './themeHeadScript.ts'
 
 import {svgComponent} from '../../build/svg-component.ts'
 
@@ -52,7 +52,7 @@ export default defineConfig({
 
   // Component pages live next to their component; guides and recipes live in docs/.
   srcDir: '..',
-  srcExclude: ['node_modules/**', 'package/**', '*.md', 'docs/.vitepress/**'],
+  srcExclude: ['node_modules/**', 'package/**', 'plans/**', '*.md', 'docs/.vitepress/**'],
   rewrites: rewrite,
   lastUpdated: true,
 

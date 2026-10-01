@@ -1,5 +1,7 @@
 import {computed, ref, watch} from 'vue'
 
+import {THEME_STORAGE_KEY as STORAGE_KEY, THEME_STYLE_ID as STYLE_ID} from '../themeHeadScript'
+
 /** The kit's theme variables the playground edits: `color-*` and `font-*` are Tailwind theme tokens, `w-*` are set on `body`. */
 export const TOKENS = [
   {key: 'color-primary', group: 'Brand', label: 'Primary', description: 'Fills and accents in light mode'},
@@ -119,8 +121,6 @@ export type PresetId = typeof PRESETS[number]['id']
 /** A theme as it is stored and shared in links: an optional preset, and tokens that override it. */
 export type ThemeConfig = ThemeTokens & {preset?: PresetId}
 
-const STORAGE_KEY = 'eco-vue-docs-theme'
-const STYLE_ID = 'docs-theme'
 export const THEME_QUERY_PARAM = 'theme'
 
 const TOKEN_KEYS = new Set<string>(TOKENS.map(token => token.key))
@@ -227,12 +227,6 @@ export const getThemeCss = (tokens: ThemeTokens) => {
     '}',
   ].join('\n')
 }
-
-/**
- * Inlined in the page head: applies the stored theme before the first paint, so a customized site doesn't flash the
- * default one while the app loads.
- */
-export const THEME_HEAD_SCRIPT = `try{var t=JSON.parse(localStorage.getItem('${ STORAGE_KEY }')||'null');if(t&&t.css){var s=document.createElement('style');s.id='${ STYLE_ID }';s.textContent=t.css;document.head.appendChild(s)}}catch(e){}`
 
 const applyCss = (css: string) => {
   let style = document.getElementById(STYLE_ID)
