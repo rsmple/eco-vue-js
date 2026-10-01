@@ -30,9 +30,16 @@
     text-align: end;
     font-weight: 300;
     color: light-dark(var(--color-gray-400), var(--color-gray-500));
-    background-color: inherit;
     text-security: none;
     -webkit-text-security: none;
+  }
+
+  .w-textarea .line::before {
+    background-color: var(--w-input-bg, inherit);
+  }
+
+  .w-markdown pre code .line::before {
+    background-color: inherit;
   }
 
   :is(.w-textarea, .w-markdown pre code) .line > div {
