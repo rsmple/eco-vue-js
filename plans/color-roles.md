@@ -5,7 +5,7 @@ Living plan for moving the kit from palette classes (`bg-gray-100 dark:bg-gray-8
 | Phase | Status |
 | --- | --- |
 | 0. Spike | done |
-| 1. Foundation in `tailwind-base` | in progress — `text-accent`, `text-description` and plugin colors done |
+| 1. Foundation in `tailwind-base` | roles, tones and scopes defined, unused; consumer `color-scheme` check left |
 | 2. Codemod the kit | — |
 | 3. Re-tune default colors | — |
 | 4. Playground and presets on roles | — |
@@ -49,45 +49,42 @@ Why every boundary: Vite 8 minifies CSS with lightningcss, and with its default 
 
 ### 2. Roles — what neutral UI uses
 
-| Role | Used for |
-| --- | --- |
-| `surface` | Page, cards, dropdowns, modals |
-| `surface-muted` | Secondary fills: button groups, secondary info cards, hovered rows |
-| `surface-inset` | Fills inside a control: input backgrounds, calendar days |
-| `track` | Inactive part of a control: unchecked checkbox, toggle off, slider and progress tracks |
-| `track-strong` | Slider rail, the stronger half of a range |
-| `overlay` | Backdrops behind modals and drawers |
-| `border` | Default borders of fields, cards, dividers |
-| `border-subtle` | Light separators inside a component |
-| `border-raised` | Outline of floating surfaces (dropdowns) — transparent in light mode today |
-| `text` | Main text |
-| `text-muted` | Descriptions, captions (today `text-description`) |
-| `text-subtle` | Placeholders, disabled text, chart axes |
-| `focus-ring` | Focus outlines |
+Text (`text-accent`, `text-description`, `text-subtle`), surfaces (`bg-surface`, `-muted`, `-inset`, `bg-overlay`), control tracks (`bg-track`, `-strong`) and lines (`border-line`, `-subtle`, `outline-line-raised`). Full table with variables in [Names](#names). A focus-ring role is left for phase 2, when the focus styles get mapped.
 
-### 3. Tones — fills with everything that sits on them
+### 3. Tones — a color with everything that sits on it
 
-A tone is one input color plus derived sub-roles. A `tone-*` utility sets the tone for an element and its children, and generic classes read it:
+`tone-{name}` sets the current tone for an element and its children; generic classes read it:
 
-| Sub-role | Class | Default |
-| --- | --- | --- |
-| fill | `bg-tone` | the tone's color |
-| on-fill | `text-tone-on` | black or white, picked from the fill's lightness |
-| soft | `bg-tone-soft` | 15% of the tone over `surface` |
-| text | `text-tone-text` | the tone, but readable on `surface` (see [contrast](#contrast-today)) |
-| border | `border-tone` | the tone |
+| Sub-role | Class | Variable | Default for a derived tone |
+| --- | --- | --- | --- |
+| color | `text-tone`, `border-tone`, `bg-tone/10` | `--w-tone` | the tone's color |
+| fill | `bg-tone-fill` | `--w-tone-fill` | the color |
+| on-fill | `text-tone-on` | `--w-tone-on` | black or white by the fill's lightness: `oklch(from var(--w-tone-fill) clamp(0, (0.72 - l) * 1000, 1) 0 0)` |
+| soft | `bg-tone-soft` | `--w-tone-soft` | 15% of the fill over `--w-surface` |
 
-Tones: `primary`, `negative`, `positive`, `warning`, `info`, the data hues (see [Consumers](#consumers)), and any tone a consumer adds. WButton, WInfoCard and the maps in `src/utils/SemanticType.ts` become `tone-{type}` plus generic classes.
+`tone` is the color as seen on a surface (text, icons, borders) and `tone-fill` the background, so the two can diverge in phase 3 for contrast. Today they are equal. A custom `text-tone` utility can't read a different variable than the `bg-tone` one generated from the same theme color — Tailwind merges both and the theme one wins — hence two names.
 
-`on-fill` is derived in CSS, so it follows runtime overrides:
+What `tone-*` accepts, resolved by `--value()`:
 
-```css
---tone-on: oklch(from var(--tone) clamp(0, (0.72 - l) * 1000, 1) 0 0);
-```
+1. A kit tone (`primary`, `negative`, `positive`, `warning`, `info`) — explicit values from `--w-{name}`, `--w-{name}-on`, `--w-{name}-soft`, registered as `--tone-color-*`, `--tone-on-*`, `--tone-soft-*` in `@theme inline`.
+2. Any theme color (`tone-scanner-sast` from `--color-scanner-sast`) or an arbitrary one (`tone-[#0f766e]`) — sub-roles derived.
+
+An explicit value overrides the derived one because the utility writes both declarations and Tailwind drops a `--value()` declaration that doesn't resolve. A consumer tone can be made explicit the same way: `@theme inline { --tone-on-scanner-sast: …; }`.
+
+WButton, WInfoCard and the maps in `src/utils/SemanticType.ts` become `tone-{type}` plus scopes.
 
 ### Scopes — context-aware areas
 
-Because roles are variables, a container can re-map them for its subtree: an inverted sidebar, a brand-colored banner, a dark island in a light page. A `surface-*` utility (shape to be decided in phase 1) sets `surface`, `text`, `text-muted` and `border` for everything inside, the way `tone-*` does for fills.
+Scopes paint a background and re-map roles for their subtree:
+
+| Class | Background | Re-maps |
+| --- | --- | --- |
+| `surface` | `--w-surface` | Resets every role to its default — `.surface` is a mode boundary in `roles.css` |
+| `surface-muted` | `--w-surface-muted` | `--w-surface`, so soft tones inside mix over it |
+| `surface-soft` | `--w-tone-soft` | nothing — re-mapping `--w-surface` would loop for derived tones, whose soft color is mixed over it |
+| `surface-fill` | `--w-tone-fill` | `--w-text-accent` → on-fill, `--w-text-description` → on-fill 70%, `--w-text-subtle` → 50%, `--w-line` → 30%, `--w-line-subtle` → 15%, `--w-surface` → fill |
+
+Inside `surface-fill`, `text-tone` matches the background; use `text-accent` / `text-description` there.
 
 ## Inventory
 
@@ -108,23 +105,23 @@ Current combination → role, with the number of uses inside single class string
 | Current (light \| dark) | Uses | Role |
 | --- | --- | --- |
 | `bg-default` \| `bg-default-dark` | 30 | `bg-surface` |
-| `text-primary` \| `text-primary-dark` | 19+3+2 | `tone-primary text-tone-text`, or `text-primary-text` outside a tone |
-| `border-gray-300` \| `border-gray-700` | 19 | `border-border` |
-| `text-negative` \| `text-negative-dark` | 14 | `text-negative-text` |
-| `text-default` on a fill | 13 | `text-tone-on` |
-| `bg-primary` \| `bg-primary-dark` | 10+2 | `bg-tone` in `tone-primary` |
-| `text-positive` \| `text-positive-dark` | 7 | `text-positive-text` |
+| `text-primary` \| `text-primary-dark` | 19+3+2 | `tone-primary text-tone` |
+| `border-gray-300` \| `border-gray-700` | 19 | `border-line` |
+| `text-negative` \| `text-negative-dark` | 14 | `tone-negative text-tone` |
+| `text-default` on a fill | 13 | `text-tone-on`, or nothing inside `surface-fill` |
+| `bg-primary` \| `bg-primary-dark` | 10+2 | `tone-primary surface-fill` |
+| `text-positive` \| `text-positive-dark` | 7 | `tone-positive text-tone` |
 | `border-primary` \| `border-primary-dark` | 6+1 | `border-tone` |
 | `bg-gray-100` \| `bg-gray-800` | 5 | `bg-surface-muted` |
-| `bg-negative` \| `bg-negative-dark` | 5 | `bg-tone` in `tone-negative` |
+| `bg-negative` \| `bg-negative-dark` | 5 | `tone-negative surface-fill` |
 | `bg-gray-200` \| `bg-gray-700` | 4 | `bg-surface-inset` |
-| `—` \| `outline-gray-800` | 4 | `outline-border-raised` |
-| `bg-{status}/10` \| `bg-{status}-dark/10`, `bg-primary-light` \| `bg-primary-darkest` | ~14 | `bg-tone-soft` |
-| `text-black-default` \| `text-gray-200` | 3 | `text-text` |
+| `—` \| `outline-gray-800` | 4 | `outline-line-raised` |
+| `bg-{status}/10` \| `bg-{status}-dark/10`, `bg-primary-light` \| `bg-primary-darkest` | ~14 | `bg-tone-soft` / `surface-soft` |
+| `text-black-default` \| `text-gray-200` | 3 | `text-accent` (dark changes from gray-200 to white) |
 | `bg-gray-300` \| `bg-gray-700`, `bg-gray-300` \| `bg-gray-600` | 4 | `bg-track` |
 | `bg-gray-400` \| `bg-gray-500` | 2 | `bg-track-strong` |
-| `text-gray-400` \| `text-gray-600` | 2 | `text-text-subtle` |
-| `border-gray-200` \| `border-gray-700` | 2 | `border-border-subtle` |
+| `text-gray-400` \| `text-gray-600` | 2 | `text-subtle` |
+| `border-gray-200` \| `border-gray-700` | 2 | `border-line-subtle` |
 | `bg-gray-200` \| `bg-gray-800` | 2 | `bg-surface-muted` (SemanticType secondary) |
 | `bg-default/40` \| `bg-default-dark/60` | 1 | `bg-overlay` |
 | one-sided `text-gray-400` in WPage | 5 | stays: print layout, light only |
@@ -207,9 +204,15 @@ Plan for extra colors, by kind:
 - [x] `text-accent` and `text-description` are theme colors reading `--w-text-accent` / `--w-text-description` instead of literals from the JS plugin — runtime overrides reach them, and opacity modifiers (`text-description/50`) now work.
 - [x] Autofill and resizer colors in `internal-classes.ts`, and `code-inline` tints in `text.ts`, read variables through `light-dark()`; the hex-append trick is gone. Remaining `DARK_SELECTOR`: the striped progress overlay.
 - [x] Color diff harness (below). Result for the above: 0 changes over 31 pages × 2 modes; islands checked in all three engines against the lowered production CSS.
-- [ ] Settle naming ([proposal](#naming-proposal)).
-- [ ] Remaining roles and `tone-*` / `surface-*` utilities, defaulting to today's palette.
-- [ ] On-colors explicit, matching today (white; `black-default` / `default-dark` on warning).
+- [x] Settle naming ([names](#names)).
+- [x] Remaining roles, `tone-*` and `surface-*` in `css/roles.css`, defaulting to today's palette. Nothing in `src/` uses them yet.
+- [x] On-colors explicit for kit tones, matching today (white; `black-default` / `default-dark` on warning).
+- [x] Role equivalence test (below): passes.
+- [ ] Check `color-scheme` side effects in a consumer app (scrollbars, native controls, page canvas).
+
+#### Role equivalence test
+
+`roles-test.mjs` compiles `theme.css` + `roles.css` + `default.css` with Tailwind, also lowers the output with lightningcss at Vite 8's default targets, and renders each new class next to the old pair it replaces — e.g. `tone-negative surface-soft` next to `bg-negative/10 dark:bg-negative-dark/10` — asserting equal computed colors. 27 pairs, plus checks for text inside `surface-fill`, the `surface` reset, derived on-colors (white on teal, black on yellow), a derived `surface-soft` that doesn't loop, and a `.light` island. Run in Chromium, Firefox and WebKit × native and lowered CSS × light and dark: all pass.
 
 #### Color diff harness
 
@@ -219,7 +222,7 @@ Compares computed colors (`color`, backgrounds, borders, outline, shadow, fill, 
 2. `node dump.mjs <dir> <out.json>` for each — serves the build under `/eco-vue-js/`, visits every page with Playwright.
 3. `node diff.mjs base.json new.json` — changes grouped by `property: before → after`, with example elements.
 
-The scripts live in the session scratchpad for now; move them to `build/color-diff/` once phase 2 starts relying on them.
+The scripts (this and the role equivalence test) live in the session scratchpad for now; move them to `build/color-roles/` once phase 2 starts relying on them.
 
 ### 2. Codemod the kit
 
@@ -250,9 +253,9 @@ Separate minor, deliberate visual change.
 - [ ] Move `json-*`, `scanner-*`, `score-*` to data palette aliases; gradients to the kit trio.
 - [ ] aspm and traio: drop palette overrides that equal the new defaults.
 
-## Naming proposal
+## Names
 
-Keep the names consumers already use — `text-accent` (about 320 uses across consumers) and `text-description` (about 760) — and add the rest in the same style. Every role is a `--w-*` variable, like the kit's size variables, and a utility in the usual Tailwind namespaces.
+Agreed 2026-10-01. Keep the names consumers already use — `text-accent` (about 320 uses across consumers) and `text-description` (about 760) — and add the rest in the same style. Every role is a `--w-*` variable, like the kit's size variables, and a utility in the usual Tailwind namespaces.
 
 | Class | Variable | Role |
 | --- | --- | --- |
@@ -267,10 +270,7 @@ Keep the names consumers already use — `text-accent` (about 320 uses across co
 | `border-line`, `border-line-subtle` | `--w-line`, `--w-line-subtle` | Borders, dividers |
 | `outline-line-raised` | `--w-line-raised` | Outline of floating surfaces |
 
-Tones and scopes:
-
-- `tone-{name}` picks the tone for an element and its children: `bg-tone`, `text-tone`, `border-tone`, `bg-tone-soft`, `text-tone-on` read it. It does not change other text, so a red border on an input doesn't recolor the label.
-- `surface-fill`, `surface-soft`, `surface-muted`, `surface` paint the background and re-map the text and line roles for everything inside. `surface-fill` in a tone sets `--w-text-accent` to the on-fill color and `--w-text-description` to a translucent on-fill; `surface` resets to the defaults.
+Tones and scopes — see [Tones](#3-tones--a-color-with-everything-that-sits-on-it) and [Scopes](#scopes--context-aware-areas):
 
 ```html
 <!-- filled button: plain text and descriptions inside become readable on the fill -->
@@ -296,15 +296,16 @@ Without a scope, every role has its default — today's colors.
 - 2026-10-01 — Mode switching for colors through `light-dark()` and `color-scheme`, not `dark:` pairs. Spike showed it survives the Tailwind build and resolves per element.
 - 2026-10-01 — Phase 1 reproduces today's colors exactly; every visual change waits for phase 3.
 - 2026-10-01 — Role values are `--w-*` variables declared on `:root, .light, .dark`; utilities read them through `@theme inline`. Keeps islands right under lightningcss lowering.
-- 2026-10-01 — `text-accent` and `text-description` keep their names.
+- 2026-10-01 — `text-accent` and `text-description` keep their names; the [names](#names) table is agreed.
+- 2026-10-01 — `text-tone` is the tone's color on a surface and `bg-tone-fill` the fill, instead of `bg-tone` + `text-tone-text`: Tailwind can't give `text-tone` and `bg-tone` different variables.
 
 ## Open questions
 
 - Nesting semantics differ slightly: the `dark:` variant is `.dark &:not(:is(.light *))`, so `.dark > .light > .dark` content counts as light, while `color-scheme` takes the nearest class (dark). `color-scheme` is arguably right; check no consumer relies on the old behaviour.
-- Naming — see [proposal](#naming-proposal).
 - Main text in dark mode: `text-accent` (white) is the standard; the `dark:text-gray-200` / `dark:text-gray-100` spots are inconsistencies and move to `text-accent` in phase 2, listed in its diff.
 
 ## Log
 
 - 2026-10-01 — Plan written; spike done in Chromium and Firefox; inventory of the kit and five consumer repos.
 - 2026-10-01 — Spike done in WebKit. Found lightningcss lowering of `light-dark()` in the docs build; roles moved to `css/roles.css` declared per mode boundary. `text-accent`, `text-description`, autofill, resizer and `code-inline` colors read variables. Color diff: 0 changes. `plans/` excluded from the docs build.
+- 2026-10-01 — Names agreed. All roles, kit tones, `tone-*` and `surface-*` added to `css/roles.css` with today's values; role equivalence test passes in three engines; docs color diff 0.

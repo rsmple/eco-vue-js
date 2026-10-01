@@ -1,15 +1,54 @@
 /*
  * Color roles: what components paint with, named by purpose. Each role is a `--w-*` variable holding both modes in
- * `light-dark()`; the utilities (`text-accent`, …) read the variable, so a theme or a scope can redefine it.
+ * `light-dark()`; the utilities (`text-accent`, `bg-surface`, `border-line`, …) read the variable, so a theme or a
+ * scope can redefine it.
  *
  * Values are declared on every mode boundary, not only on `:root`: a build that lowers `light-dark()` (Vite's
  * lightningcss with older targets) resolves it where the variable is declared, and this keeps `.light` and `.dark`
- * islands right either way.
+ * islands right either way. `.surface` is a boundary too, so it resets roles that an outer scope re-mapped.
  */
 
 @theme inline {
   --color-accent: var(--w-text-accent);
   --color-description: var(--w-text-description);
+  --color-subtle: var(--w-text-subtle);
+
+  --color-surface: var(--w-surface);
+  --color-surface-muted: var(--w-surface-muted);
+  --color-surface-inset: var(--w-surface-inset);
+  --color-overlay: var(--w-overlay);
+
+  --color-track: var(--w-track);
+  --color-track-strong: var(--w-track-strong);
+
+  --color-line: var(--w-line);
+  --color-line-subtle: var(--w-line-subtle);
+  --color-line-raised: var(--w-line-raised);
+
+  /* The current tone, set by `tone-*`. */
+  --color-tone: var(--w-tone);
+  --color-tone-fill: var(--w-tone-fill);
+  --color-tone-on: var(--w-tone-on);
+  --color-tone-soft: var(--w-tone-soft);
+
+  /* Explicit values for the kit's tones; a tone without them derives its own from its color. */
+  --tone-color-primary: var(--w-primary);
+  --tone-color-negative: var(--w-negative);
+  --tone-color-positive: var(--w-positive);
+  --tone-color-warning: var(--w-warning);
+  --tone-color-info: var(--w-info);
+
+  --tone-on-primary: var(--w-primary-on);
+  --tone-on-negative: var(--w-negative-on);
+  --tone-on-positive: var(--w-positive-on);
+  --tone-on-warning: var(--w-warning-on);
+  --tone-on-info: var(--w-info-on);
+
+  --tone-soft-primary: var(--w-primary-soft);
+  --tone-soft-negative: var(--w-negative-soft);
+  --tone-soft-positive: var(--w-positive-soft);
+  --tone-soft-warning: var(--w-warning-soft);
+  --tone-soft-info: var(--w-info-soft);
 }
 
 @layer base {
@@ -24,8 +63,89 @@
 
   :root,
   .light,
-  .dark {
+  .dark,
+  .surface {
     --w-text-accent: light-dark(var(--color-black-default), var(--color-default));
     --w-text-description: light-dark(var(--color-gray-400), var(--color-gray-500));
+    --w-text-subtle: light-dark(var(--color-gray-400), var(--color-gray-600));
+
+    --w-surface: light-dark(var(--color-default), var(--color-default-dark));
+    --w-surface-muted: light-dark(var(--color-gray-100), var(--color-gray-800));
+    --w-surface-inset: light-dark(var(--color-gray-200), var(--color-gray-700));
+    --w-overlay: light-dark(color-mix(in oklab, var(--color-default) 40%, transparent), color-mix(in oklab, var(--color-default-dark) 60%, transparent));
+
+    --w-track: light-dark(var(--color-gray-300), var(--color-gray-700));
+    --w-track-strong: light-dark(var(--color-gray-400), var(--color-gray-500));
+
+    --w-line: light-dark(var(--color-gray-300), var(--color-gray-700));
+    --w-line-subtle: light-dark(var(--color-gray-200), var(--color-gray-700));
+    --w-line-raised: light-dark(transparent, var(--color-gray-800));
   }
+
+  :root,
+  .light,
+  .dark {
+    --w-primary: light-dark(var(--color-primary), var(--color-primary-dark));
+    --w-primary-on: var(--color-default);
+    --w-primary-soft: light-dark(var(--color-primary-light), var(--color-primary-darkest));
+
+    --w-negative: light-dark(var(--color-negative), var(--color-negative-dark));
+    --w-negative-on: var(--color-default);
+    --w-negative-soft: color-mix(in oklab, var(--w-negative) 10%, transparent);
+
+    --w-positive: light-dark(var(--color-positive), var(--color-positive-dark));
+    --w-positive-on: var(--color-default);
+    --w-positive-soft: color-mix(in oklab, var(--w-positive) 10%, transparent);
+
+    --w-warning: light-dark(var(--color-warning), var(--color-warning-dark));
+    --w-warning-on: light-dark(var(--color-black-default), var(--color-default-dark));
+    --w-warning-soft: light-dark(color-mix(in oklab, var(--color-warning) 20%, transparent), color-mix(in oklab, var(--color-warning-dark) 10%, transparent));
+
+    --w-info: light-dark(var(--color-info), var(--color-info-dark));
+    --w-info-on: var(--color-default);
+    --w-info-soft: color-mix(in oklab, var(--w-info) 10%, transparent);
+  }
+}
+
+/*
+ * Sets the tone for an element and its children: `text-tone`, `border-tone`, `bg-tone-fill`, `text-tone-on`,
+ * `bg-tone-soft` read it. Takes the kit's tones, any theme color (`tone-scanner-sast`) or an arbitrary one; what a
+ * tone doesn't define explicitly is derived from its color.
+ */
+@utility tone-* {
+  --w-tone: --value(--tone-color-*, --color-*, [color]);
+  --w-tone-fill: var(--w-tone);
+  --w-tone-on: oklch(from var(--w-tone-fill) clamp(0, (0.72 - l) * 1000, 1) 0 0);
+  --w-tone-on: --value(--tone-on-*);
+  --w-tone-soft: color-mix(in oklab, var(--w-tone-fill) 15%, var(--w-surface));
+  --w-tone-soft: --value(--tone-soft-*);
+}
+
+/* Scopes: paint a background and re-map the roles for everything inside, so plain text stays readable on it. */
+
+@utility surface {
+  background-color: var(--w-surface);
+  color: var(--w-text-accent);
+}
+
+@utility surface-muted {
+  background-color: var(--w-surface-muted);
+  --w-surface: var(--w-surface-muted);
+}
+
+/* Doesn't re-map `--w-surface`: a derived soft tone is mixed over it, which would loop. */
+@utility surface-soft {
+  background-color: var(--w-tone-soft);
+}
+
+/* Inside a fill, `text-tone` would match the background: use `text-accent` and `text-description` there. */
+@utility surface-fill {
+  background-color: var(--w-tone-fill);
+  color: var(--w-tone-on);
+  --w-surface: var(--w-tone-fill);
+  --w-text-accent: var(--w-tone-on);
+  --w-text-description: color-mix(in oklab, var(--w-tone-on) 70%, transparent);
+  --w-text-subtle: color-mix(in oklab, var(--w-tone-on) 50%, transparent);
+  --w-line: color-mix(in oklab, var(--w-tone-on) 30%, transparent);
+  --w-line-subtle: color-mix(in oklab, var(--w-tone-on) 15%, transparent);
 }
