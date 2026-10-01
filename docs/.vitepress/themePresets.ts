@@ -159,11 +159,22 @@ const maxChroma = (l: number, hue: number) => {
   return low
 }
 
-/** Below this chroma a fill reads as a tinted gray rather than a color. */
-const MIN_CHROMA = 0.08
+/**
+ * How saturated a random primary is: the share of the most chroma its lightness allows, the chroma it stays within,
+ * and how often it is a bright fill with black text rather than a deep one with white. Neon also takes the most
+ * saturated fill that passes on the dark page for `color-primary-dark`.
+ */
+export const RANDOM_STYLES = [
+  {id: 'soft', name: 'Soft', saturation: [0.45, 0.65], minChroma: 0.05, maxChroma: 0.16, blackText: 0.3},
+  {id: 'vivid', name: 'Vivid', saturation: [0.85, 1], minChroma: 0.08, maxChroma: 0.26, blackText: 0.5},
+  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.12, maxChroma: 0.4, blackText: 0.8},
+] as const
 
-/** Past this chroma violets and pinks turn neon. */
-const MAX_CHROMA = 0.26
+export type RandomStyle = typeof RANDOM_STYLES[number]
+
+export type RandomStyleId = RandomStyle['id']
+
+export const isRandomStyleId = (value: unknown): value is RandomStyleId => RANDOM_STYLES.some(style => style.id === value)
 
 /**
  * Fills that are brown or olive at any chroma: ambers, yellows and yellow-greens dark enough for 3:1 on a white page,
@@ -174,16 +185,16 @@ const isMuddy = (l: number, hue: number) => (hue >= 55 && hue < 140) || (hue >= 
 type Fill = {l: number, c: number}
 
 /**
- * Fills of this hue, at `saturation` of the most chroma each lightness allows, that pass the kit's contrast checks on
- * a page of `pageLuminance`: 3:1 against the page, and 4.5:1 for the black or white text `text-tone-on` puts on it
- * (white below L 0.58).
+ * Fills of this hue, at `saturation` of the most chroma each lightness allows within the style's limits, that pass
+ * the kit's contrast checks on a page of `pageLuminance`: 3:1 against the page, and 4.5:1 for the black or white text
+ * `text-tone-on` puts on it (white below L 0.58).
  */
-const passingFills = (hue: number, saturation: number, pageLuminance: number) => {
+const passingFills = (hue: number, saturation: number, style: RandomStyle, pageLuminance: number) => {
   const result: Fill[] = []
 
   for (let l = 0.4; l <= 0.8; l += 0.005) {
-    const c = Math.min(maxChroma(l, hue) * saturation, MAX_CHROMA)
-    if (c < MIN_CHROMA || isMuddy(l, hue)) continue
+    const c = Math.min(maxChroma(l, hue) * saturation, style.maxChroma)
+    if (c < style.minChroma || isMuddy(l, hue)) continue
 
     const fill = luminance(toLinearRgb(l, c, hue) as [number, number, number])
     const text = l < 0.58 ? 1 : 0
@@ -195,27 +206,30 @@ const passingFills = (hue: number, saturation: number, pageLuminance: number) =>
 }
 
 /**
- * A theme from one random primary, the neutral scale that suits its hue, and a size with a radius. The primary is
- * close to the most saturated its lightness allows, and that lightness is picked where the fill passes the contrast
- * checks on a white page; when it fails on the dark page, the nearest fill that passes there becomes
- * `color-primary-dark`.
+ * A theme from one random primary in a style from `RANDOM_STYLES`, the neutral scale that suits its hue, and a size
+ * with a radius. The primary's lightness is picked where the fill passes the contrast checks on a white page; when it
+ * fails on the dark page, the nearest fill that passes there becomes `color-primary-dark`.
  */
-export const getRandomTokens = (random: () => number = Math.random): PresetTokens => {
+export const getRandomTokens = (styleId: RandomStyleId = 'vivid', random: () => number = Math.random): PresetTokens => {
+  const style = RANDOM_STYLES.find(item => item.id === styleId) ?? RANDOM_STYLES[1]
+
   for (;;) {
     const hue = Math.round(random() * 360)
-    const saturation = 0.85 + random() * 0.15
+    const saturation = style.saturation[0] + random() * (style.saturation[1] - style.saturation[0])
     const neutral = neutralForHue(hue, random)
     const darkPage = toLinearRgb(parseLightness(NEUTRAL_SCALES[neutral][9]), 0, 0) as [number, number, number]
-    const light = passingFills(hue, saturation, 1)
-    const dark = passingFills(hue, saturation, luminance(darkPage))
+    const light = passingFills(hue, saturation, style, 1)
+    const dark = passingFills(hue, saturation, style, luminance(darkPage))
 
     if (!light.length || !dark.length) continue
 
-    // Deep fills with white text and bright ones with black text, equally often: the bright range is narrower.
     const withWhiteText = light.filter(fill => fill.l < 0.58)
     const withBlackText = light.filter(fill => fill.l >= 0.58)
-    const primary = pick(withWhiteText.length && (!withBlackText.length || random() < 0.5) ? withWhiteText : withBlackText, random)
-    const primaryDark = dark.some(fill => fill.l === primary.l) ? null : dark.reduce((best, fill) => Math.abs(fill.l - primary.l) < Math.abs(best.l - primary.l) ? fill : best)
+    const primary = pick(withBlackText.length && (!withWhiteText.length || random() < style.blackText) ? withBlackText : withWhiteText, random)
+    const passesDark = dark.some(fill => fill.l === primary.l)
+    const mostSaturatedDark = dark.reduce((best, fill) => fill.c > best.c ? fill : best)
+    const nearestDark = dark.reduce((best, fill) => Math.abs(fill.l - primary.l) < Math.abs(best.l - primary.l) ? fill : best)
+    const primaryDark = style.id === 'neon' && mostSaturatedDark.c > primary.c ? mostSaturatedDark : passesDark ? null : nearestDark
     const color = (fill: Fill) => `oklch(${ (fill.l * 100).toFixed(1) }% ${ fill.c.toFixed(3) } ${ hue })`
     const size = pick(SIZES, random)
     const radius = pick(RADII, random)

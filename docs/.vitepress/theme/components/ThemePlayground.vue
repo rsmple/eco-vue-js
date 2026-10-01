@@ -2,17 +2,37 @@
   <div class="vp-raw grid gap-8">
     <div class="grid gap-3">
       <div class="text-description text-sm font-semibold">
-        Presets
+        Randomize theme
       </div>
 
-      <div class="flex flex-wrap gap-2 mb-2">
+      <div class="flex flex-wrap gap-y-2 gap-x-8">
         <WButton
           :semantic-type="isRandomTheme ? SemanticType.PRIMARY : SemanticType.SECONDARY"
           @click="setRandomTheme"
         >
-          Random
+          Apply Random
         </WButton>
 
+        <WButtonGroup
+          :model-value="randomStyle"
+          :list="RANDOM_STYLES.map(style => style.id)"
+          :semantic-type="SemanticType.SECONDARY"
+          no-margin
+          @update:model-value="randomStyle = $event"
+        >
+          <template #option="{option}">
+            {{ RANDOM_STYLES.find(style => style.id === option)?.name }}
+          </template>
+        </WButtonGroup>
+      </div>
+    </div>
+
+    <div class="grid gap-3">
+      <div class="text-description text-sm font-semibold">
+        Presets
+      </div>
+
+      <div class="flex flex-wrap gap-2 mb-2">
         <WButton
           v-for="preset in PRESETS"
           :key="preset.id"
@@ -248,6 +268,7 @@ import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 import {useCopy} from 'eco-vue-js/dist/utils/useCopy'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
+import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 
 import ThemePlaygroundFields from './ThemePlaygroundFields.vue'
@@ -257,6 +278,7 @@ import {
   ADVANCED_GROUPS,
   DEFAULT_TOKENS,
   PRESETS,
+  RANDOM_STYLES,
   type SavedTheme,
   TOKENS,
   type ThemeTokens,
@@ -273,6 +295,7 @@ import {
   isRandomTheme,
   loadTheme,
   parseThemeReply,
+  randomStyle,
   renameTheme,
   resetTheme,
   saveThemeAs,

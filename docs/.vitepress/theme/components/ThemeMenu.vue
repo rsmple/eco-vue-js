@@ -35,6 +35,16 @@
         }"
       >
         <WMenuItem
+          :active="isRandomTheme"
+          @click="setRandomTheme"
+        >
+          Random
+          <span class="text-description ml-auto">
+            {{ RANDOM_STYLES.find(style => style.id === randomStyle)?.name }}
+          </span>
+        </WMenuItem>
+
+        <WMenuItem
           v-for="preset in PRESETS"
           :key="preset.id"
           :active="!activeThemeId && !hasCustomTokens && activePreset === preset.id"
@@ -45,7 +55,7 @@
         </WMenuItem>
 
         <WMenuItem
-          v-if="hasCustomTokens && !activeThemeId"
+          v-if="hasCustomTokens && !activeThemeId && !isRandomTheme"
           active
           :href="withBase('/guide/theming')"
         >
@@ -105,7 +115,7 @@ import WMenuItem from 'eco-vue-js/dist/components/MenuItem/WMenuItem.vue'
 
 import ThemeSwatch from './ThemeSwatch.vue'
 
-import {PRESETS, activeThemeId, hasCustomTokens, resetTheme, savedThemes, selectTheme, setPreset, themeConfig} from '../docsTheme'
+import {PRESETS, RANDOM_STYLES, activeThemeId, hasCustomTokens, isRandomTheme, randomStyle, resetTheme, savedThemes, selectTheme, setPreset, setRandomTheme, themeConfig} from '../docsTheme'
 import IconPalette from '../icons/IconPalette.svg?component'
 import {confirmDeleteAllThemes} from '../themeConfirm'
 
