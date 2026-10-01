@@ -62,6 +62,7 @@ ${ EQUIVALENT.map(([next, prev], index) => `<div id="n${ index }" class="${ next
 <div id="on-yellow" class="tone-[#ffda56] surface-fill">y</div>
 <div id="derived-soft" class="tone-[#0f766e] surface-soft">s</div>
 <div class="light"><div id="island-surface" class="bg-surface">i</div><div id="island-tone" class="tone-negative text-tone">n</div></div>
+<div class="light" style="--role-line: #f00"><div id="role-override" class="border border-line">o</div></div>
 <div id="root-surface" class="bg-surface">i</div><div id="root-tone" class="tone-negative text-tone">n</div>
 <span id="ref-white" class="text-white">w</span>`
 
@@ -100,6 +101,7 @@ const check = (colors: Colors, dark: boolean, light?: Colors) => {
   if (colors['on-teal'].color !== '255,255,255,255') errors.push(`derived on-color on teal: ${ colors['on-teal'].color }`)
   if (colors['on-yellow'].color !== '0,0,0,255') errors.push(`derived on-color on yellow: ${ colors['on-yellow'].color }`)
   if (colors['derived-soft'].background === '0,0,0,0') errors.push('derived surface-soft is empty')
+  if (colors['role-override'].border !== '255,0,0,255') errors.push(`--role-line override: ${ colors['role-override'].border }`)
   if (dark && light && colors['island-surface'].background !== light['root-surface'].background) errors.push(`.light island surface: ${ colors['island-surface'].background }`)
   if (dark && light && colors['island-tone'].color !== light['root-tone'].color) errors.push(`.light island tone: ${ colors['island-tone'].color }`)
 

@@ -1,12 +1,49 @@
 /*
  * Color roles: what components paint with, named by purpose. Each role is a `--w-*` variable holding both modes in
- * `light-dark()`; the utilities (`text-accent`, `bg-surface`, `border-line`, …) read the variable, so a theme or a
- * scope can redefine it.
+ * `light-dark()`; the utilities (`text-accent`, `bg-surface`, `border-line`, …) read the variable, so a scope can
+ * redefine it.
+ *
+ * A theme sets a role like a palette color, in its own `@theme`: `--role-line` for light mode and `--role-line-dark`
+ * for dark. The defaults below read the palette, so most themes only change the palette.
  *
  * Values are declared on every mode boundary, not only on `:root`: a build that lowers `light-dark()` (Vite's
  * lightningcss with older targets) resolves it where the variable is declared, and this keeps `.light` and `.dark`
  * islands right either way. `.surface` is a boundary too, so it resets roles that an outer scope re-mapped.
  */
+
+@theme {
+  --role-text-accent: var(--color-black-default);
+  --role-text-accent-dark: var(--color-default);
+  --role-text-description: var(--color-gray-500);
+  --role-text-description-dark: var(--color-gray-400);
+  --role-text-subtle: var(--color-gray-400);
+  --role-text-subtle-dark: var(--color-gray-600);
+
+  --role-surface: var(--color-default);
+  --role-surface-dark: var(--color-default-dark);
+  --role-surface-muted: var(--color-gray-100);
+  --role-surface-muted-dark: var(--color-gray-800);
+  --role-surface-inset: var(--color-gray-200);
+  --role-surface-inset-dark: var(--color-gray-700);
+  --role-overlay: color-mix(in oklab, var(--color-default) 40%, transparent);
+  --role-overlay-dark: color-mix(in oklab, var(--color-default-dark) 60%, transparent);
+  --role-backdrop: color-mix(in oklab, var(--color-primary-light) 40%, transparent);
+  --role-backdrop-dark: color-mix(in oklab, var(--color-primary-darkest) 40%, transparent);
+
+  --role-track: var(--color-gray-300);
+  --role-track-dark: var(--color-gray-700);
+  --role-track-strong: var(--color-gray-400);
+  --role-track-strong-dark: var(--color-gray-500);
+
+  --role-line: var(--color-gray-300);
+  --role-line-dark: var(--color-gray-700);
+  --role-line-subtle: var(--color-gray-200);
+  --role-line-subtle-dark: var(--color-gray-700);
+  --role-line-raised: var(--color-gray-100);
+  --role-line-raised-dark: var(--color-gray-800);
+  --role-focus: var(--color-primary);
+  --role-focus-dark: var(--color-primary-dark);
+}
 
 @theme inline {
   --color-accent: var(--w-text-accent);
@@ -58,21 +95,21 @@
   .light,
   .dark,
   .surface {
-    --w-text-accent: light-dark(var(--color-black-default), var(--color-default));
-    --w-text-description: light-dark(var(--color-gray-500), var(--color-gray-400));
-    --w-text-subtle: light-dark(var(--color-gray-400), var(--color-gray-600));
+    --w-text-accent: light-dark(var(--role-text-accent), var(--role-text-accent-dark));
+    --w-text-description: light-dark(var(--role-text-description), var(--role-text-description-dark));
+    --w-text-subtle: light-dark(var(--role-text-subtle), var(--role-text-subtle-dark));
 
-    --w-surface: light-dark(var(--color-default), var(--color-default-dark));
-    --w-surface-muted: light-dark(var(--color-gray-100), var(--color-gray-800));
-    --w-surface-inset: light-dark(var(--color-gray-200), var(--color-gray-700));
-    --w-overlay: light-dark(color-mix(in oklab, var(--color-default) 40%, transparent), color-mix(in oklab, var(--color-default-dark) 60%, transparent));
+    --w-surface: light-dark(var(--role-surface), var(--role-surface-dark));
+    --w-surface-muted: light-dark(var(--role-surface-muted), var(--role-surface-muted-dark));
+    --w-surface-inset: light-dark(var(--role-surface-inset), var(--role-surface-inset-dark));
+    --w-overlay: light-dark(var(--role-overlay), var(--role-overlay-dark));
 
-    --w-track: light-dark(var(--color-gray-300), var(--color-gray-700));
-    --w-track-strong: light-dark(var(--color-gray-400), var(--color-gray-500));
+    --w-track: light-dark(var(--role-track), var(--role-track-dark));
+    --w-track-strong: light-dark(var(--role-track-strong), var(--role-track-strong-dark));
 
-    --w-line: light-dark(var(--color-gray-300), var(--color-gray-700));
-    --w-line-subtle: light-dark(var(--color-gray-200), var(--color-gray-700));
-    --w-line-raised: light-dark(var(--color-gray-100), var(--color-gray-800));
+    --w-line: light-dark(var(--role-line), var(--role-line-dark));
+    --w-line-subtle: light-dark(var(--role-line-subtle), var(--role-line-subtle-dark));
+    --w-line-raised: light-dark(var(--role-line-raised), var(--role-line-raised-dark));
   }
 
   :root,
@@ -84,8 +121,8 @@
     --w-warning: light-dark(var(--color-warning), var(--color-warning-dark));
     --w-info: light-dark(var(--color-info), var(--color-info-dark));
 
-    --w-focus: var(--w-primary);
-    --w-backdrop: light-dark(color-mix(in oklab, var(--color-primary-light) 40%, transparent), color-mix(in oklab, var(--color-primary-darkest) 40%, transparent));
+    --w-focus: light-dark(var(--role-focus), var(--role-focus-dark));
+    --w-backdrop: light-dark(var(--role-backdrop), var(--role-backdrop-dark));
   }
 }
 

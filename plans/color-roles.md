@@ -7,8 +7,8 @@ Living plan for moving the kit from palette classes (`bg-gray-100 dark:bg-gray-8
 | 0. Spike | done |
 | 1. Foundation in `tailwind-base` | done — on branch `color-roles` |
 | 2. Codemod the kit | done |
-| 3. Re-tune default colors | candidate on the branch, uncommitted — awaiting visual sign-off |
-| 4. Playground and presets on roles | — |
+| 3. Re-tune default colors | done |
+| 4. Playground and presets on roles | candidate on the branch, uncommitted |
 | 5. Consumers | — |
 
 ## Goals
@@ -297,8 +297,8 @@ Separate minor, deliberate visual change.
 - [x] One neutral tint: `gray-*` is Tailwind's zinc, the scale `default-dark` (zinc-900) came from; `gray-850` interpolated.
 - [x] Tone fills chosen for contrast: each keeps its hue, lightness set so white text reads (≥ 4.5) and the fill stands out on the dark surface (≥ 3), so one value serves both modes and `X-dark` defaults to `X`. Warning is a deeper amber, still with black text.
 - [x] Derived sub-roles on by default; the kit's explicit on/soft values are gone.
-- [ ] Visual sign-off (screenshots: button, status, info cards, input, tabs, checkbox pages, before/after, light/dark).
-- [ ] Soft backgrounds read duller than before (12% of a darker fill): keep, raise the mix, or mix from a lighter shade.
+- [x] Visual sign-off (screenshots: button, status, info cards, input, tabs, checkbox pages, before/after, light/dark).
+- [x] Soft backgrounds read duller than before (12% of a darker fill): kept; fine-tune later with the rest of the kit's look.
 
 #### Palette
 
@@ -328,9 +328,16 @@ Effects on consumers worth noting in the release: traio's dark primary fill (whi
 
 ### 4. Playground and presets
 
-- [ ] Docs playground edits palette inputs, with roles in an advanced section.
-- [ ] Presets set a neutral scale and tones, not just primary.
-- [ ] Theme link schema and the theming page updated.
+- [x] Roles are theme tokens: `--role-{name}` and `--role-{name}-dark` in `@theme` (`css/roles.css`), defaulting to the palette; `--w-*` reads them on every mode boundary. An app sets a role like a palette color. Role test checks an override reaches a `.light` island.
+- [x] Docs playground edits palette inputs — `-dark` fields empty by default ("same as light"), tints shown as their `color-mix` — with a neutral scale picker and a collapsed Roles section. Defaults are read from `theme.css` and `roles.css` (`?raw`), so they can't drift. Swatches render `var(--key)`; the picker resolves it through a probe element.
+- [x] Presets (`docs/.vitepress/themePresets.ts`, no browser code) set a neutral scale and tones: ocean slate + cyan info, forest stone + lime positive, sunset stone + rose negative + amber, compact neutral + near-black primary with a light `primary-dark`.
+- [x] `contrast-test.ts --presets` checks every preset with the `@theme` CSS the playground gives an app: 0 pairs under minimum.
+- [x] Theme link schema: `neutral` (scale name) and `role-*` keys. Theming page rewritten: palette, light/dark contract, tones and derivation, roles table, classes for app code, presets, palette and shape tables.
+- [x] Leftover `dark:` pairs in `docs/examples` (guide and recipe demos) and the app-shell guide moved to roles.
+
+`default-dark` stays a fixed value in the kit: whitespots sets its own `gray-900` (#1c1f22) and uses `default-dark` (zinc-900) as a separate, darker surface in 31 places. The playground's neutral swap sets `default-dark` to the scale's 900 instead. `gray-850` is mixed from 800 and 900, so it follows a consumer's scale (traio scrollbar gutter, five spots in whitespots; aspm sets its own).
+
+Color diff against phase 3: only the edited pages, and gray-850 rounding below one unit.
 
 ### 5. Consumers
 
@@ -386,6 +393,9 @@ Without a scope, every role has its default — today's colors.
 - 2026-10-01 — `text-accent` and `text-description` keep their names; the [names](#names) table is agreed.
 - 2026-10-01 — `text-tone` is the tone's color on a surface and `bg-tone-fill` the fill, instead of `bg-tone` + `text-tone-text`: Tailwind can't give `text-tone` and `bg-tone` different variables.
 
+- 2026-10-01 — Roles are configurable as `--role-*` / `--role-*-dark` theme tokens, the same light/dark contract as the palette, rather than by redeclaring `--w-*` on the mode boundaries.
+- 2026-10-01 — The kit's `default-dark` stays fixed rather than following `gray-900`; neutral presets set it.
+
 ## Open questions
 
 - Nesting semantics differ slightly: the `dark:` variant is `.dark &:not(:is(.light *))`, so `.dark > .light > .dark` content counts as light, while `color-scheme` takes the nearest class (dark). `color-scheme` is arguably right; check no consumer relies on the old behaviour.
@@ -401,3 +411,4 @@ Without a scope, every role has its default — today's colors.
 - 2026-10-01 — Codemod scanner fixed (46 more pairs). Manual pass done: fills, soft, raised lines (now both modes), islands for tooltip and toast, `backdrop` and `focus` roles. Visible changes listed in the manual pass table. Color diff, screenshots of transient UI, role test and build: clean.
 - 2026-10-01 — Docs examples and docs site components migrated. Phase 2 done.
 - 2026-10-01 — Phase 3 candidate: contrast test (23 → 0 failing pairs), zinc neutral, tone fills for contrast, derived tone text / on / soft. Awaiting visual sign-off.
+- 2026-10-01 — Phase 3 committed after sign-off (soft backgrounds kept). Phase 4: `--role-*` theme tokens, playground with neutral scale and roles, presets with neutrals and tones checked by the contrast test, theming guide rewritten.

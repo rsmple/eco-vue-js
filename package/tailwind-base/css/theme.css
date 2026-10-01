@@ -20,7 +20,7 @@
   --color-black-default: #333333;
   --color-black-light: #4f4f4f;
 
-  /* Neutral scale: zinc, the tint of `default-dark`. */
+  /* Neutral scale: Tailwind's zinc, the tint of `default-dark`. `gray-850` follows a theme's own scale. */
   --color-gray-50: oklch(98.5% 0 0);
   --color-gray-100: oklch(96.7% 0.001 286.375);
   --color-gray-200: oklch(92% 0.004 286.32);
@@ -30,7 +30,7 @@
   --color-gray-600: oklch(44.2% 0.017 285.786);
   --color-gray-700: oklch(37% 0.013 285.805);
   --color-gray-800: oklch(27.4% 0.006 286.033);
-  --color-gray-850: oklch(24.2% 0.006 286);
+  --color-gray-850: color-mix(in oklab, var(--color-gray-800), var(--color-gray-900));
   --color-gray-900: oklch(21% 0.006 285.885);
   --color-gray-950: oklch(14.1% 0.005 285.823);
 

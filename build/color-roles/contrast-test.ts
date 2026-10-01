@@ -5,9 +5,10 @@
  * Colors are resolved by the browser from the real `roles.css`, so overrides and derived values are measured as
  * rendered; translucent colors are composited over their background first.
  *
- *   node build/color-roles/contrast-test.ts [--report]
+ *   node build/color-roles/contrast-test.ts [--report] [--presets]
  *
- * Fails when a pair is under its minimum; `--report` prints every pair without failing.
+ * Fails when a pair is under its minimum; `--report` prints every pair without failing. `--presets` also checks every
+ * docs theme preset, with the `@theme` CSS the playground gives an app.
  *
  * The DOM lib reference is for the `page.evaluate` callback, which runs in the browser.
  */
@@ -16,6 +17,8 @@ import {chromium} from 'playwright-core'
 
 import {readFileSync} from 'node:fs'
 import {fileURLToPath} from 'node:url'
+
+import {PRESETS, getThemeBlock} from '../../docs/.vitepress/themePresets.ts'
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url))
 const CSS_DIR = ROOT + 'package/tailwind-base/css/'
@@ -52,16 +55,22 @@ const html = PAIRS.map((pair, index) => `
     <div id="bg${ index }" class="${ pair.bg }"><div id="fg${ index }" class="${ pair.fg } border">x</div></div>
   </div>`).join('')
 
-const source = '@import "tailwindcss";\n' + ['theme.css', 'roles.css', 'default.css'].map(file => readFileSync(CSS_DIR + file, 'utf8')).join('\n')
-const compiler = await compile(source, {base: ROOT, onDependency: () => {}})
-const css = compiler.build([...new Set(html.match(/[\w:/.#[\]-]+/g))])
+const kitCss = '@import "tailwindcss";\n' + ['theme.css', 'roles.css', 'default.css'].map(file => readFileSync(CSS_DIR + file, 'utf8')).join('\n')
+const candidates = [...new Set(html.match(/[\w:/.#[\]-]+/g))]
+const themes = [
+  {name: 'default', css: ''},
+  ...process.argv.includes('--presets') ? PRESETS.filter(preset => preset.id !== 'default').map(preset => ({name: preset.id, css: getThemeBlock(preset.tokens)})) : [],
+]
 
 const browser = await chromium.launch()
 const page = await browser.newPage()
 const report = process.argv.includes('--report')
 let failures = 0
 
-for (const mode of ['light', 'dark']) {
+for (const theme of themes) for (const mode of ['light', 'dark']) {
+  const compiler = await compile(kitCss + '\n' + theme.css, {base: ROOT, onDependency: () => {}})
+  const css = compiler.build(candidates)
+
   await page.setContent(`<html class="${ mode === 'dark' ? 'dark' : '' }"><style>${ css }</style><body class="bg-surface">${ html }</body></html>`)
 
   const ratios: {name: string, ratio: number, min: number}[] = await page.evaluate(pairs => {
@@ -101,7 +110,7 @@ for (const mode of ['light', 'dark']) {
     })
   }, PAIRS)
 
-  console.log(`\n${ mode }`)
+  console.log(`\n${ theme.name } ${ mode }`)
 
   for (const {name, ratio, min} of ratios) {
     const ok = ratio >= min
