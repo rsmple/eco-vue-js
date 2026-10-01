@@ -8,6 +8,7 @@
 @import "./css/textarea.css";
 
 @source "../dist/components";
+@source "../dist/utils";
 
 @plugin "./plugins/internal-classes.ts";
 @plugin "./plugins/text.ts";
