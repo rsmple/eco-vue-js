@@ -27,8 +27,8 @@
     <div class="relative isolate grid justify-end">
       <div
         class="
-          from-(--w-chart-heatmap-bg,var(--color-default)) dark:from-(--w-chart-heatmap-bg,var(--color-default-dark))
-          via-(--w-chart-heatmap-bg,var(--color-default)) dark:via-(--w-chart-heatmap-bg,var(--color-default-dark))
+          from-(--w-chart-heatmap-bg,var(--w-surface))
+          via-(--w-chart-heatmap-bg,var(--w-surface))
           text-2xs text-description absolute inset-y-0 left-0 z-1 flex w-5 flex-col bg-linear-to-r to-transparent pt-4
         "
       >

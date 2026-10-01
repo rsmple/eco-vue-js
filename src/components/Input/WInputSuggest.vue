@@ -7,7 +7,7 @@
       horizontalAlign,
       updateAlign: true,
       parentElement: parentEl,
-      dropdownClass: `bg-default rounded-xl dark:bg-default-dark ${dropdownClass ?? ''}`,
+      dropdownClass: `bg-surface rounded-xl ${dropdownClass ??''}`,
       onClose: close,
     }"
   >
@@ -143,10 +143,10 @@
     >
       <WInfiniteListScrollingElement
         :parent="isMobile"
-        class="bg-default dark:bg-default-dark w-full"
+        class="bg-surface w-full"
         :class="{
           'pb-[50vh]': isMobile,
-          'max-h-[inherit] overflow-auto overscroll-contain rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
+          'max-h-[inherit] overflow-auto overscroll-contain rounded-xl shadow-md border border-solid border-line-raised': !isMobile,
         }"
       >
         <template v-if="$slots.content">

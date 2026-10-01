@@ -8,7 +8,7 @@
           v-for="task in queryTasks.data.value?.results"
           :key="task.id"
           class="flex items-center gap-2 rounded-lg px-2 py-1 text-left [&_svg]:square-4"
-          :class="{'bg-gray-100 dark:bg-gray-800': task.id === selected}"
+          :class="{'bg-surface-muted': task.id === selected}"
           @click="selected = task.id"
         >
           <WStatusIcon :has-value="task.done" />
@@ -49,7 +49,7 @@
 
       <span
         v-if="error"
-        class="text-negative dark:text-negative-dark text-sm"
+        class="tone-negative text-tone text-sm"
       >
         {{ error }}
       </span>

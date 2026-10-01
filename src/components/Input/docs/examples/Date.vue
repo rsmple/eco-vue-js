@@ -6,7 +6,7 @@
     class="max-w-md"
   />
 
-  <p class="text-sm text-gray-500">
+  <p class="text-sm text-description">
     Model: {{ date?.toDateString() ?? '—' }}
   </p>
 </template>

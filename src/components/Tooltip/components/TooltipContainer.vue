@@ -1,6 +1,7 @@
 <template>
+  <!-- A dark island in either mode: everything inside resolves its colors for dark mode. -->
   <div
-    class="pointer-events-none flex items-center"
+    class="dark pointer-events-none flex items-center"
     :class="{
       'flex-col': !isLeft && !isRight,
       'justify-end': isLeft,
@@ -33,14 +34,14 @@
         <path
           d="M7.04 5.87C5.79 2.95 4.88.81 0 0h16c-4.88.81-5.8 2.95-7.04 5.87l-.13.31a.9.9 0 0 1-1.66 0z"
           fill="currentColor"
-          class="text-black-default dark:text-gray-800"
+          class="text-surface-muted"
         />
         <path
           d="M0 .5c5.05.84 5.85 3.1 7.17 6.18a.9.9 0 0 0 1.66 0C10.15 3.6 10.95 1.34 16 .5"
           stroke="currentColor"
           stroke-width="1"
           fill="none"
-          class="text-gray-400 dark:text-gray-600"
+          class="text-subtle"
         />
       </g>
     </svg>
@@ -48,10 +49,10 @@
     <div
       ref="container"
       class="
-        bg-black-default text-default pointer-events-auto max-w-[calc(100vw-1.5rem)]
+        bg-surface-muted text-accent pointer-events-auto max-w-[calc(100vw-1.5rem)]
         rounded-lg border border-solid
-        border-gray-400 px-3 py-2 text-center text-xs
-        font-medium shadow-md will-change-transform dark:border-gray-600 dark:bg-gray-800
+        border-subtle px-3 py-2 text-center text-xs
+        font-medium shadow-md will-change-transform
       "
       :class="isLeft || isRight ? undefined : 'w-tooltip-center-x'"
       @mouseover="$emit('over')"

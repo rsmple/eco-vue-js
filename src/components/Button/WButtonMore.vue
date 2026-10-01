@@ -24,7 +24,7 @@
           :class="{
             'w-hover-circle': !disabled,
             'text-description': !isOpen || anchor,
-            'text-primary dark:text-primary-dark': isOpen && !anchor,
+            'tone-primary text-tone': isOpen && !anchor,
           }"
         >
           <component
@@ -38,8 +38,8 @@
         <WClickOutside
           no-filter
           class="
-            bg-default dark:bg-default-dark overflow-hidden
-            rounded-xl text-start font-normal shadow-md dark:border dark:border-solid dark:border-gray-800
+            bg-surface overflow-hidden
+            rounded-xl text-start font-normal shadow-md border border-solid border-line-raised
           "
           :class="{
             'sm-not:-mr-4 my-4 -mr-5': !anchor,

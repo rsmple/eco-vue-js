@@ -5,7 +5,7 @@
   >
     <template #inner>
       <span class="flex items-center gap-1">
-        <IconStar class="text-warning dark:text-warning-dark square-4 fill-current" />
+        <IconStar class="tone-warning text-tone-fill square-4 fill-current" />
         {{ item.rating.toFixed(1) }}
       </span>
     </template>

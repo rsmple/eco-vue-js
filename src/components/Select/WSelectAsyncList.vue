@@ -18,7 +18,7 @@
 
     <WInfiniteListScrollingElement
       v-else
-      class="sm-not:border-y h-96 overflow-y-auto border-solid border-gray-300 sm:rounded-2xl sm:border dark:border-gray-700"
+      class="sm-not:border-y h-96 overflow-y-auto border-solid border-line sm:rounded-2xl sm:border"
     >
       <SelectAsyncList
         :model-value="modelValue"

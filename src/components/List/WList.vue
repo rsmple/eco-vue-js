@@ -394,7 +394,7 @@ const columnDataMap = computed<Record<string, ColumnData>>(() => {
       baseClass: {
         'items-center': !at,
         'items-start': at,
-        'bg-default dark:bg-default-dark sticky z-[1]': stickyInTable,
+        'bg-surface sticky z-[1]': stickyInTable,
       },
       sticky: stickyInTable,
     }

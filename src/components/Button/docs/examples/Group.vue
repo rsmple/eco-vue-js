@@ -9,7 +9,7 @@
     </template>
   </WButtonGroup>
 
-  <p class="mt-2 text-sm text-gray-500">
+  <p class="mt-2 text-sm text-description">
     Selected: {{ period }}
   </p>
 </template>

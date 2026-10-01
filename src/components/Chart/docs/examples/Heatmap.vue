@@ -4,7 +4,7 @@
     x-key="date"
     y-key="count"
     title="Scans in the last year"
-    class="text-primary dark:text-primary-dark"
+    class="tone-primary text-tone"
   >
     <template #tooltip="{d}">
       {{ d.count }} scans on {{ dateFormat(new Date(d.date)) }}

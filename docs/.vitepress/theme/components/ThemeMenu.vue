@@ -18,7 +18,7 @@
       :href="withBase('/guide/theming')"
     />
 
-    <div class="my-1 border-t border-gray-200 dark:border-gray-800" />
+    <div class="my-1 border-t border-line-subtle" />
 
     <WButtonMoreItem
       text="Customize…"

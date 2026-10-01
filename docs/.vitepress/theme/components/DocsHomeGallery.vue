@@ -121,7 +121,7 @@
             x-key="date"
             y-key="count"
             title="Scans in the last year"
-            class="text-primary dark:text-primary-dark"
+            class="tone-primary text-tone"
           >
             <template #tooltip="{d}">
               {{ d.count }} scans on {{ dateFormat(new Date(d.date)) }}
@@ -217,7 +217,7 @@
 
           <div
             v-else
-            class="bg-primary dark:bg-primary-dark text-default flex size-10 shrink-0 items-center justify-center rounded-full font-semibold"
+            class="tone-primary surface-fill flex size-10 shrink-0 items-center justify-center rounded-full font-semibold"
           >
             JA
           </div>

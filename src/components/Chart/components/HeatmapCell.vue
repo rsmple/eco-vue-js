@@ -5,7 +5,7 @@
   >
     <div
       class="size-(--w-chart-heatmap-size,1rem) rounded-sm"
-      :class="empty ? undefined : opacity !== null ? 'bg-current' : 'bg-gray-50 dark:bg-gray-800/20'"
+      :class="empty ? undefined : opacity !== null ? 'bg-current' : 'bg-surface-muted/50'"
       :style="opacity !== null && !empty ? {opacity} : undefined"
     />
 

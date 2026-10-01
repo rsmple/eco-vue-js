@@ -58,7 +58,7 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
       ['pages', 'loans', 'loans'],
       ['genre', 'genre', 'genre'],
     ]"
-    card-class="list:h-11 card:gap-2 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-gray-100 dark:border-gray-800"
+    card-class="list:h-11 card:gap-2 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-line-subtle"
     card-wrapper-class="card:self-start"
     min-height
     class="card:w-list-gap-3"
@@ -449,7 +449,7 @@ export const meta = {
     :skeleton="skeleton"
     :class="{
       'text-description': !item.dueAt,
-      'text-negative dark:text-negative-dark': item.dueAt && item.dueAt < today,
+      'tone-negative text-tone': item.dueAt && item.dueAt < today,
     }"
   />
 </template>

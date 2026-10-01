@@ -23,7 +23,7 @@ description: WDragContainer to reorder a list by dragging, WShine and WShineEffe
       <template #default="{item, index, container, initDrag}">
         <div
           v-bind="container"
-          class="bg-default dark:bg-default-dark mb-2 flex items-center gap-3 rounded-xl border border-solid border-gray-200 p-3 dark:border-gray-800"
+          class="bg-surface mb-2 flex items-center gap-3 rounded-xl border border-solid border-line-subtle p-3"
         >
           <IconDrag
             class="text-description square-5 cursor-grab"

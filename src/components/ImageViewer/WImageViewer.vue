@@ -16,7 +16,7 @@
       class="
       w-ripple w-ripple-hover text-black-default w-ripple-opacity-20 dark:w-ripple-opacity-30 group/image-button relative isolate h-28
       w-40 cursor-pointer overflow-hidden rounded-lg border border-solid
-      border-gray-100 bg-cover bg-center outline-none dark:border-gray-800
+      border-line-raised bg-cover bg-center outline-none
     "
       :style="{backgroundImage: `url(${modelValue})`}"
       aria-label="View image"

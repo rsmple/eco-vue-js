@@ -44,7 +44,7 @@ body {
   --actions-bar-filter-width: 24rem;
 
   @apply
-    bg-default dark:bg-default-dark text-black-default dark:text-gray-100
+    bg-surface text-accent
     sm:[--inner-margin:1.5rem]
     sm:[--actions-bar-width:var(--spacing-actions-bar-width)]
     xl:[--nav-bar-width:var(--spacing-nav-bar-width)];
@@ -52,11 +52,11 @@ body {
 
 /* The bars have no background of their own: the class is a hook for the app's surface. */
 .w-nav-bar {
-  @apply bg-default dark:bg-default-dark shadow-md xl:shadow-none;
+  @apply bg-surface shadow-md xl:shadow-none;
 }
 
 .w-actions-bar {
-  @apply bg-default dark:bg-default-dark shadow-md sm:shadow-none;
+  @apply bg-surface shadow-md sm:shadow-none;
 }
 ```
 

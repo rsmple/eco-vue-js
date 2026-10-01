@@ -30,7 +30,7 @@
         >
           <div
             v-if="hasFlag"
-            class="square-2 bg-info dark:bg-info-dark absolute right-0 top-0 rounded-full"
+            class="square-2 tone-info bg-tone-fill absolute right-0 top-0 rounded-full"
           />
         </Transition>
       </span>

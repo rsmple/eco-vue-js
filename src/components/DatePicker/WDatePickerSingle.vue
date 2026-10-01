@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-default dark:bg-default-dark overflow-hidden rounded-xl border border-solid border-gray-300 py-3 dark:border-gray-700"
+    class="bg-surface overflow-hidden rounded-xl border border-solid border-line py-3"
     :style="{'--direction-factor': isDirect ? '1' : '-1'}"
   >
     <div class="grid grid-cols-2 gap-8 px-3 pb-4">

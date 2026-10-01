@@ -10,7 +10,7 @@
       class="mb-4"
     />
 
-    <p class="mb-4 text-sm text-gray-500">
+    <p class="mb-4 text-sm text-description">
       {{ filtered.length }} of {{ icons.length }} icons — click to copy the import
     </p>
 
@@ -21,7 +21,7 @@
       >
         <button
           type="button"
-          class="flex w-full cursor-pointer flex-col items-center gap-2 rounded-lg border border-transparent p-3 hover:border-gray-300 dark:hover:border-gray-700"
+          class="flex w-full cursor-pointer flex-col items-center gap-2 rounded-lg border border-transparent p-3 hover:border-line"
           :title="importLine(icon.name)"
           @click="doCopy(importLine(icon.name))"
         >
@@ -29,7 +29,7 @@
             :is="icon.component"
             class="square-6"
           />
-          <span class="max-w-full truncate text-xs text-gray-500">{{ icon.name }}</span>
+          <span class="max-w-full truncate text-xs text-description">{{ icon.name }}</span>
         </button>
       </li>
     </ul>

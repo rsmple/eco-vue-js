@@ -47,7 +47,7 @@ Menu items are `WButtonMoreItem`s: a `text` (or the default slot), an `icon`, an
       <WButtonMoreItem
         text="Delete"
         :icon="markRaw(IconTrash)"
-        class="text-negative dark:text-negative-dark"
+        class="tone-negative text-tone"
         @click="action = 'Delete'"
       />
     </WButtonMore>
@@ -123,7 +123,7 @@ const action = ref<string>()
 
     <template #content>
       <WClickOutside
-        class="bg-default dark:bg-default-dark my-2 grid w-64 gap-1 rounded-xl p-3 shadow-md dark:border dark:border-gray-800"
+        class="bg-surface my-2 grid w-64 gap-1 rounded-xl p-3 shadow-md border border-line-raised"
         @click="isOpen = false"
       >
         <WCheckbox

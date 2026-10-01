@@ -8,26 +8,31 @@
   --color-default: #ffffff;
   --color-default-dark: oklch(21% 0.006 285.885); /* zinc-900 */
 
-  --color-primary-darkest: #23222e;
-  --color-primary-dark: #5b4fc4;
-  --color-primary: #9087e2;
-  --color-primary-light: #f4f3fc;
+  /*
+   * Fills are dark enough for white text and light enough to stand out on the dark surface, so one value serves both
+   * modes; text shades and the text on fills are derived from them (roles.css).
+   */
+  --color-primary: oklch(55% 0.17 286.8);
+  --color-primary-dark: var(--color-primary);
+  --color-primary-light: color-mix(in oklab, var(--color-primary) 10%, var(--color-default));
+  --color-primary-darkest: color-mix(in oklab, var(--color-primary-dark) 20%, var(--color-default-dark));
 
   --color-black-default: #333333;
   --color-black-light: #4f4f4f;
 
-  --color-gray-50: oklch(98.5% 0.002 247.839);
-  --color-gray-100: oklch(96.7% 0.003 264.542);
-  --color-gray-200: oklch(92.8% 0.006 264.531);
-  --color-gray-300: oklch(87.2% 0.01 258.338);
-  --color-gray-400: oklch(70.7% 0.022 261.325);
-  --color-gray-500: oklch(55.1% 0.027 264.364);
-  --color-gray-600: oklch(44.6% 0.03 256.802);
-  --color-gray-700: oklch(37.3% 0.034 259.733);
-  --color-gray-800: oklch(27.8% 0.033 256.848);
-  --color-gray-850: #1c1e26;
-  --color-gray-900: oklch(21% 0.034 264.665);
-  --color-gray-950: oklch(13% 0.028 261.692);
+  /* Neutral scale: Tailwind's zinc, the tint of `default-dark`. `gray-850` follows a theme's own scale. */
+  --color-gray-50: oklch(98.5% 0 0);
+  --color-gray-100: oklch(96.7% 0.001 286.375);
+  --color-gray-200: oklch(92% 0.004 286.32);
+  --color-gray-300: oklch(87.1% 0.006 286.286);
+  --color-gray-400: oklch(70.5% 0.015 286.067);
+  --color-gray-500: oklch(55.2% 0.016 285.938);
+  --color-gray-600: oklch(44.2% 0.017 285.786);
+  --color-gray-700: oklch(37% 0.013 285.805);
+  --color-gray-800: oklch(27.4% 0.006 286.033);
+  --color-gray-850: color-mix(in oklab, var(--color-gray-800), var(--color-gray-900));
+  --color-gray-900: oklch(21% 0.006 285.885);
+  --color-gray-950: oklch(14.1% 0.005 285.823);
 
   --color-slate-50: oklch(98.4% 0.003 247.858);
   --color-slate-100: oklch(96.8% 0.007 247.896);
@@ -41,14 +46,32 @@
   --color-slate-900: oklch(20.8% 0.042 265.755);
   --color-slate-950: oklch(12.9% 0.042 264.695);
 
-  --color-negative: #f35555;
-  --color-negative-dark: #cc3636;
-  --color-positive: #77d460;
-  --color-positive-dark: #5bb245;
-  --color-warning: #ffda56;
-  --color-warning-dark: #e6b919;
-  --color-info: #82adff;
-  --color-info-dark: #407ae5;
+  --color-negative: oklch(57% 0.2 24.1);
+  --color-negative-dark: var(--color-negative);
+  --color-positive: oklch(54% 0.148 150);
+  --color-positive-dark: var(--color-positive);
+  --color-warning: oklch(82% 0.16 85);
+  --color-warning-dark: var(--color-warning);
+  --color-info: oklch(55% 0.16 262.6);
+  --color-info-dark: var(--color-info);
+
+  /*
+   * Data palette: distinct mid-tone hues for categories — chart series, scanner and syntax colors. Each works as a
+   * tone (`tone-data-cyan text-tone`), so its text and soft shades are derived per mode. An app names its categories
+   * after them: `--color-scanner-sast: var(--color-data-cyan)`. Lightness is set per hue so white text reads on the
+   * fill and the fill stands out on the dark surface; orange and amber are light hues and take black text.
+   */
+  --color-data-red: oklch(57.7% 0.245 27.325);
+  --color-data-orange: oklch(64.6% 0.222 41.116);
+  --color-data-amber: oklch(76.9% 0.188 70.08);
+  --color-data-green: oklch(53% 0.16 150);
+  --color-data-teal: oklch(54% 0.1 185);
+  --color-data-cyan: oklch(54% 0.11 222);
+  --color-data-blue: oklch(54.6% 0.245 262.881);
+  --color-data-violet: oklch(56% 0.27 293);
+  --color-data-fuchsia: oklch(56% 0.27 323);
+  --color-data-pink: oklch(56% 0.22 1);
+  --color-data-gray: var(--color-gray-500);
 
   --color-severity-critical-bg: #ff757520;
   --color-severity-critical-text: #FF7171;

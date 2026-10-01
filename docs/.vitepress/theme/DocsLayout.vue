@@ -13,7 +13,7 @@
           :aria-label="site.title"
           class="inline-flex items-center gap-2.5 no-underline"
         >
-          <IconLogo class="size-8 *:nth-[1]:fill-primary *:nth-[2]:fill-primary-dark *:nth-[3]:fill-primary-dark" />
+          <IconLogo class="size-8 tone-primary text-tone-fill" />
 
           <span class="leading-none">
             <span class="text-accent text-xl font-semibold tracking-tight sm:text-2xl leading-none">EcoVue</span>
@@ -41,7 +41,7 @@
           <button
             class="
               text-description hover:text-accent flex items-center gap-2 rounded-lg p-2 transition-colors
-              sm:border sm:border-gray-200 sm:py-1.5 sm:pr-2 sm:pl-3 sm:dark:border-gray-800
+ sm:border sm:border-line-subtle sm:py-1.5 sm:pr-2 sm:pl-3
             "
             aria-label="Search"
             aria-keyshortcuts="Meta+K /"
@@ -51,7 +51,7 @@
 
             <span class="hidden text-sm sm:inline">Search</span>
 
-            <kbd class="hidden rounded-md bg-gray-100 px-1.5 font-sans text-xs sm:inline dark:bg-gray-800">⌘K</kbd>
+            <kbd class="hidden rounded-md bg-surface-muted px-1.5 font-sans text-xs sm:inline">⌘K</kbd>
           </button>
 
           <a

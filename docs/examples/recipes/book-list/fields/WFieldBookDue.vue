@@ -4,7 +4,7 @@
     :skeleton="skeleton"
     :class="{
       'text-description': !item.dueAt,
-      'text-negative dark:text-negative-dark': item.dueAt && item.dueAt < today,
+      'tone-negative text-tone': item.dueAt && item.dueAt < today,
     }"
   />
 </template>

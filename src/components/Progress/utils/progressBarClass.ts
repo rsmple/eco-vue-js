@@ -1,30 +1,30 @@
 import {SemanticType} from '@/utils/SemanticType'
 
 export const progressBarClass: Record<SemanticType, string> = {
-  [SemanticType.PRIMARY]: 'bg-primary dark:bg-primary-dark',
-  [SemanticType.SECONDARY]: 'bg-gray-300 dark:bg-gray-600',
-  [SemanticType.POSITIVE]: 'bg-positive dark:bg-positive-dark',
-  [SemanticType.WARNING]: 'bg-warning dark:bg-warning-dark',
-  [SemanticType.NEGATIVE]: 'bg-negative dark:bg-negative-dark',
-  [SemanticType.INFO]: 'bg-info dark:bg-info-dark',
+  [SemanticType.PRIMARY]: 'tone-primary bg-tone-fill',
+  [SemanticType.SECONDARY]: 'bg-track-strong',
+  [SemanticType.POSITIVE]: 'tone-positive bg-tone-fill',
+  [SemanticType.WARNING]: 'tone-warning bg-tone-fill',
+  [SemanticType.NEGATIVE]: 'tone-negative bg-tone-fill',
+  [SemanticType.INFO]: 'tone-info bg-tone-fill',
 }
 
 /** Label color over the fill. */
 export const progressBarTextClass: Record<SemanticType, string> = {
-  [SemanticType.PRIMARY]: 'text-default',
+  [SemanticType.PRIMARY]: 'tone-primary text-tone-on',
   [SemanticType.SECONDARY]: 'text-accent',
-  [SemanticType.POSITIVE]: 'text-default',
-  [SemanticType.WARNING]: 'text-black-default dark:text-default-dark',
-  [SemanticType.NEGATIVE]: 'text-default',
-  [SemanticType.INFO]: 'text-default',
+  [SemanticType.POSITIVE]: 'tone-positive text-tone-on',
+  [SemanticType.WARNING]: 'tone-warning text-tone-on',
+  [SemanticType.NEGATIVE]: 'tone-negative text-tone-on',
+  [SemanticType.INFO]: 'tone-info text-tone-on',
 }
 
 /** The band that sweeps the track while progress is not known yet. */
 export const progressBarIndeterminateClass: Record<SemanticType, string> = {
-  [SemanticType.PRIMARY]: 'via-primary/40 dark:via-primary-dark/50',
-  [SemanticType.SECONDARY]: 'via-gray-300 dark:via-gray-600',
-  [SemanticType.POSITIVE]: 'via-positive/40 dark:via-positive-dark/50',
-  [SemanticType.WARNING]: 'via-warning/50 dark:via-warning-dark/50',
-  [SemanticType.NEGATIVE]: 'via-negative/40 dark:via-negative-dark/50',
-  [SemanticType.INFO]: 'via-info/40 dark:via-info-dark/50',
+  [SemanticType.PRIMARY]: 'tone-primary via-tone/40',
+  [SemanticType.SECONDARY]: 'via-track-strong',
+  [SemanticType.POSITIVE]: 'tone-positive via-tone/40',
+  [SemanticType.WARNING]: 'tone-warning via-tone/40',
+  [SemanticType.NEGATIVE]: 'tone-negative via-tone/40',
+  [SemanticType.INFO]: 'tone-info via-tone/40',
 }

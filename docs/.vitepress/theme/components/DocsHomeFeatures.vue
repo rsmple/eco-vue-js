@@ -17,7 +17,7 @@
         :rel="feature.external ? 'noopener' : undefined"
         class="docs-home-feature group flex flex-col gap-3 rounded-2xl p-6 transition-[border-color,box-shadow,translate] hover:-translate-y-0.5"
       >
-        <span class="bg-primary-light dark:bg-primary-darkest text-accent grid size-10 place-items-center rounded-xl">
+        <span class="tone-primary bg-tone-soft text-accent grid size-10 place-items-center rounded-xl">
           <component
             :is="feature.icon"
             class="square-5"

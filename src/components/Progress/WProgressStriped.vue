@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative w-full overflow-hidden rounded-full bg-gray-200 select-none dark:bg-gray-800"
+    class="relative w-full overflow-hidden rounded-full bg-surface-inset select-none"
     :class="{'cursor-progress': modelValue < 100}"
     role="progressbar"
     aria-valuemin="0"
@@ -11,7 +11,7 @@
     <!-- Waiting to start: a band sweeps the empty track. -->
     <div
       v-if="modelValue <= 0"
-      class="animate-ticker via-primary/60 dark:via-primary-dark/70 absolute inset-0 bg-linear-to-r from-transparent to-transparent [--tiker-duration:1.4s]"
+      class="animate-ticker tone-primary via-tone/60 absolute inset-0 bg-linear-to-r from-transparent to-transparent [--tiker-duration:1.4s]"
     />
 
     <div

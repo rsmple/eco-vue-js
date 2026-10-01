@@ -21,7 +21,7 @@
       class="relative mx-1 grid aspect-square select-none gap-1 rounded-(--w-button-action-rounded,9999px) bg-size-[200%_auto] bg-right"
       :class="{
         'w-ripple w-ripple-hover cursor-pointer': !disabled && !skeleton,
-        'text-primary dark:text-primary-dark': active && semanticType === SemanticType.SECONDARY,
+        'tone-primary text-tone': active && semanticType === SemanticType.SECONDARY,
         [semanticTypeBackgroundMap[semanticType]]: true,
       }"
     >

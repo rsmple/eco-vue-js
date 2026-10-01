@@ -5,7 +5,7 @@
       title="Loading"
     />
 
-    <div class="flex items-center gap-4 rounded-xl border border-solid border-gray-200 p-4 dark:border-gray-800">
+    <div class="flex items-center gap-4 rounded-xl border border-solid border-line-subtle p-4">
       <WSkeleton
         v-if="loading"
         class="w-skeleton-w-12 w-skeleton-h-12 w-skeleton-rounded-full shrink-0"
@@ -13,7 +13,7 @@
 
       <div
         v-else
-        class="bg-primary dark:bg-primary-dark text-default flex square-12 shrink-0 items-center justify-center rounded-full text-lg font-semibold"
+        class="tone-primary surface-fill flex square-12 shrink-0 items-center justify-center rounded-full text-lg font-semibold"
       >
         JA
       </div>
@@ -46,7 +46,7 @@
 
     <div class="flex items-center gap-4">
       <WSpinner />
-      <WSpinner class="square-5 text-primary dark:text-primary-dark" />
+      <WSpinner class="tone-primary square-5 text-tone" />
     </div>
   </div>
 </template>

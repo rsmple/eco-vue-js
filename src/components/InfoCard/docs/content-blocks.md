@@ -89,7 +89,7 @@ import IconCheckCircle from 'eco-vue-js/dist/assets/icons/IconCheckCircle'
 ```vue
 <template>
   <div class="grid gap-8">
-    <div class="rounded-xl border border-solid border-gray-200 dark:border-gray-800 [--inner-margin:1rem]">
+    <div class="rounded-xl border border-solid border-line-subtle [--inner-margin:1rem]">
       <WExpansionItem
         v-for="(item, index) in sections"
         :key="item.title"
@@ -111,7 +111,7 @@ import IconCheckCircle from 'eco-vue-js/dist/assets/icons/IconCheckCircle'
       />
 
       <WExpansion :is-open="details">
-        <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 rounded-xl bg-gray-100 p-4 dark:bg-gray-800">
+        <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 rounded-xl bg-surface-muted p-4">
           <span class="text-description">Findings</span>
           <WNumberFormatter
             :model-value="12840"

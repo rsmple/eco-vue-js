@@ -62,7 +62,7 @@
           <div
             class="
               w-nav-bar w-nav-bar-width overflow-hidden rounded-xl border
-              border-solid border-gray-200 text-start font-normal shadow dark:border-gray-800
+              border-solid border-line-raised text-start font-normal shadow
             "
           >
             <template

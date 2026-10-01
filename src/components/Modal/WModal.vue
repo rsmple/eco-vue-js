@@ -9,7 +9,7 @@
       <div
         v-if="isBackdrop"
         :style="{zIndex: 99 + modalMetaList.length * 2}"
-        class="bg-primary-light/40 dark:bg-primary-darkest/40 fixed inset-0 backdrop-blur"
+        class="bg-backdrop fixed inset-0 backdrop-blur"
       />
     </Transition>
 

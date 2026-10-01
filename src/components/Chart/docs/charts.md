@@ -25,8 +25,8 @@ Small SVG charts of values over time. They are drawn in the current text color, 
 <template>
   <div class="grid gap-2">
     <div class="flex gap-4 text-sm">
-      <span class="text-primary dark:text-primary-dark">— Open findings</span>
-      <span class="text-positive dark:text-positive-dark">- - Fixed</span>
+      <span class="tone-primary text-tone">— Open findings</span>
+      <span class="tone-positive text-tone">- - Fixed</span>
     </div>
 
     <WChartLinear
@@ -43,7 +43,7 @@ Small SVG charts of values over time. They are drawn in the current text color, 
           y-key="value"
           y-key-min="min"
           y-key-max="max"
-          class="text-primary dark:text-primary-dark"
+          class="tone-primary text-tone"
         >
           <template #tooltip="{d, prev}">
             <div class="grid text-sm">
@@ -64,7 +64,7 @@ Small SVG charts of values over time. They are drawn in the current text color, 
           y-key="value"
           stroke-style="dashed-small"
           has-area
-          class="text-positive dark:text-positive-dark"
+          class="tone-positive text-tone"
         />
       </template>
     </WChartLinear>
@@ -108,7 +108,7 @@ const fixed = Array.from({length: 30}, (_, index) => ({date: +addDay(getStartOfD
     x-key="date"
     y-key="count"
     title="Scans in the last year"
-    class="text-primary dark:text-primary-dark"
+    class="tone-primary text-tone"
   >
     <template #tooltip="{d}">
       {{ d.count }} scans on {{ dateFormat(new Date(d.date)) }}

@@ -1,5 +1,5 @@
 <template>
-  <WInfiniteListScrollingElement class="h-96 overflow-y-auto overscroll-contain rounded-xl border border-solid border-gray-200 dark:border-gray-800">
+  <WInfiniteListScrollingElement class="h-96 overflow-y-auto overscroll-contain rounded-xl border border-solid border-line-subtle">
     <WInfiniteList
       :use-query-fn="bookModelApi.paginated.use"
       :query-params="{search}"
@@ -25,7 +25,7 @@
       </template>
 
       <template #default="{item, skeleton, position}">
-        <div class="flex items-baseline gap-3 border-t border-solid border-gray-100 px-4 py-2 dark:border-gray-800">
+        <div class="flex items-baseline gap-3 border-t border-solid border-line-subtle px-4 py-2">
           <span class="text-description w-6 text-right text-sm">
             {{ position + 1 }}
           </span>

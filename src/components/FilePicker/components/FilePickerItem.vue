@@ -5,18 +5,18 @@
         v-if="!hasError"
         name="positive"
       >
-        <IconCheckCircle class="square-36 text-positive dark:text-positive-dark" />
+        <IconCheckCircle class="tone-positive square-36 text-tone" />
       </slot>
   
       <slot
         v-else
         name="negative"
       >
-        <IconCloseCircle class="square-36 text-negative dark:text-negative-dark" />
+        <IconCloseCircle class="tone-negative square-36 text-tone" />
       </slot>
 
       <button
-        class="w-ripple square-5 hover:bg-black-default/5 absolute right-0 top-0 flex items-center justify-center rounded-full outline-none"
+        class="w-ripple square-5 hover:bg-accent/5 absolute right-0 top-0 flex items-center justify-center rounded-full outline-none"
         aria-label="Remove file"
         @click.stop.prevent="$emit('click:cancel')"
       >

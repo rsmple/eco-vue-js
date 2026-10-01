@@ -9,7 +9,7 @@
     class="w-ripple w-ripple-hover rounded p-[0.125em]"
     :class="{
       'text-description': $route.query[filterField] !== encodedQueryParam,
-      'bg-primary dark:bg-primary-dark text-default': $route.query[filterField] === encodedQueryParam,
+      'tone-primary surface-fill': $route.query[filterField] === encodedQueryParam,
     }"
     :aria-pressed="$route.query[filterField] === encodedQueryParam"
     aria-label="Toggle filter"

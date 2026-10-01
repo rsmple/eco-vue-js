@@ -2,7 +2,7 @@
   <div class="grid gap-4">
     <WPageBreadcrumbs />
 
-    <div class="h-[40rem] overflow-auto rounded-xl bg-gray-100 p-4 dark:bg-gray-800">
+    <div class="h-[40rem] overflow-auto rounded-xl bg-surface-muted p-4">
       <WPageNumerator class="grid justify-center gap-4 [zoom:0.5]">
         <WPage
           :date="date"

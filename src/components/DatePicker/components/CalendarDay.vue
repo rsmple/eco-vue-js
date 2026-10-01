@@ -4,7 +4,7 @@
     :class="{
       'text-accent': !isSelected && !isOutOfMonth,
       'text-description': !isSelected && isOutOfMonth,
-      'text-default dark:text-default-dark selected': isSelected,
+      'text-surface selected': isSelected,
       'cursor-not-allowed': isDisabled,
       'cursor-pointer': !isDisabled && !readonly,
       'hover-enabled': isHoverEnabled,
@@ -16,9 +16,9 @@
       v-show="isBetweenRange || (isFrom || isTo && !(isFrom && isTo)) || isDisabled"
       class="absolute h-9 opacity-50"
       :class="{
-        'border-primary border-y border-solid': isHoverEnabled && !isDisabled,
-        'bg-primary dark:bg-primary-dark': !isHoverEnabled && !isDisabled,
-        'bg-gray-200 dark:bg-gray-700': isDisabled,
+        'tone-primary border-tone border-y border-solid': isHoverEnabled && !isDisabled,
+        'tone-primary bg-tone-fill': !isHoverEnabled && !isDisabled,
+        'bg-surface-inset': isDisabled,
         'w-full': isBetweenRange || isDisabled,
         'left-1/2 w-1/2': isFrom && !isTo,
         'right-1/2 w-1/2': !isFrom && isTo,
@@ -30,8 +30,8 @@
       :class="{
         'w-ripple w-ripple-hover': !isDisabled && !readonly,
         'opacity-50': isDisabled,
-        'bg-primary dark:bg-primary-dark font-semibold text-(--w-date-picker-day,#ffffff)': isSelected,
-        'bg-negative dark:bg-negative-dark font-semibold text-(--w-date-picker-day,#ffffff)': !isSelected && isToday,
+        'tone-primary bg-tone-fill font-semibold text-(--w-date-picker-day,#ffffff)': isSelected,
+        'tone-negative bg-tone-fill font-semibold text-(--w-date-picker-day,#ffffff)': !isSelected && isToday,
       }"
     >
       <div class="font-normal">

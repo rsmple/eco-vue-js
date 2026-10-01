@@ -4,7 +4,7 @@
       class="square-8 text-description relative mr-auto flex select-none items-center justify-center rounded-xl"
       :class="disabledPrevious
         ? 'cursor-not-allowed opacity-50'
-        : 'w-ripple hover:bg-primary hover:dark:bg-primary-dark hover:text-default dark:hover:text-default cursor-pointer'"
+        : 'w-ripple tone-primary hover:surface-fill cursor-pointer'"
       @click="!disabledPrevious && $emit('click:previous')"
     >
       <IconArrow class="-ml-1 rotate-90" />
@@ -30,7 +30,7 @@
       class="square-8 text-description relative ml-auto flex select-none items-center justify-center rounded-xl"
       :class="disabledNext
         ? 'cursor-not-allowed opacity-50'
-        : 'w-ripple hover:bg-primary hover:dark:bg-primary-dark hover:text-default dark:hover:text-default cursor-pointer'"
+        : 'w-ripple tone-primary hover:surface-fill cursor-pointer'"
       @click="!disabledNext && $emit('click:next')"
     >
       <IconArrow class="-mr-1 -rotate-90" />

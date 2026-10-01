@@ -98,7 +98,7 @@
           :active="isShift"
           :aria-pressed="isShift"
           tooltip-text="Select range"
-          class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
+          class="last-not:border-r border-solid border-line"
           @click.stop="$emit('set:is-selecting')"
         >
           <template #tooltip>
@@ -120,7 +120,7 @@
           :loading="isRefetchingAll"
           :active="isRefetchingAll"
           tooltip-text="Refetch"
-          class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
+          class="last-not:border-r border-solid border-line"
           @click="refetchAll"
         />
 
@@ -129,7 +129,7 @@
           :ordering="ordering"
           :fields="fieldsFiltered"
           :query-params="queryParams"
-          class="last-not:border-r border-solid border-gray-300 dark:border-gray-700"
+          class="last-not:border-r border-solid border-line"
           @update:ordering="$emit('update:ordering', $event)"
         />
 

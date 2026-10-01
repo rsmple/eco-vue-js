@@ -25,7 +25,7 @@
       <WButtonMoreItem
         text="Delete"
         :icon="markRaw(IconTrash)"
-        class="text-negative dark:text-negative-dark"
+        class="tone-negative text-tone"
         @click="action = 'Delete'"
       />
     </WButtonMore>
