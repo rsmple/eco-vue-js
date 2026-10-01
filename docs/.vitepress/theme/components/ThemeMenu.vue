@@ -93,6 +93,13 @@
 
         <div class="my-1 border-t border-line-subtle" />
 
+        <WMenuItem
+          v-if="!activeThemeId"
+          @click="saveTheme"
+        >
+          Save theme…
+        </WMenuItem>
+
         <WMenuItem :href="withBase('/guide/theming')">
           Customize…
         </WMenuItem>
@@ -131,11 +138,16 @@ import ThemeSwatch from './ThemeSwatch.vue'
 
 import {PRESETS, RANDOM_STYLES, activeThemeId, hasCustomTokens, isRandomTheme, randomStyle, resetTheme, savedThemes, selectTheme, setPreset, setRandomTheme, themeConfig} from '../docsTheme'
 import IconPalette from '../icons/IconPalette.svg?component'
-import {confirmDeleteAllThemes} from '../themeConfirm'
+import {confirmDeleteAllThemes, openSaveTheme} from '../themeConfirm'
 
 const isOpen = ref(false)
 
 const activePreset = computed(() => themeConfig.value.preset ?? 'default')
+
+const saveTheme = () => {
+  isOpen.value = false
+  openSaveTheme()
+}
 
 const confirmDeleteAll = () => {
   isOpen.value = false
