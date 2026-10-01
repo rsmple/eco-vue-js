@@ -15,7 +15,7 @@
         :class="{
           [cardWrapperClass ?? '']: true,
           'w-ripple-trigger-list': isActionShown,
-          'sm-not:dark:even:bg-primary-darkest/25 sm-not:even:bg-gray-50 grid grid-cols-1': card,
+          'sm-not:even:bg-surface-muted/50 grid grid-cols-1': card,
           'flex': !card,
           '-mb-px': !card && isOpen,
           'w-hover-checked': allowSelectHover,
@@ -30,27 +30,27 @@
         >
           <div
             v-if="mobile && selected"
-            class="bg-primary dark:bg-primary-dark @sm:hidden absolute left-0 top-0 h-full w-2"
+            class="tone-primary bg-tone-fill @sm:hidden absolute left-0 top-0 h-full w-2"
           />
         </Transition>
 
         <div
           v-if="!card"
-          class="left---left-inner bg-default dark:bg-default-dark @max-lg:hidden sticky z-1"
+          class="left---left-inner bg-surface @max-lg:hidden sticky z-1"
           :class="{
             'width-(--w-list-header-rounded,1rem)': !allowSelect,
           }"
         >
-          <div class="bg-default dark:bg-default-dark w---left-inner absolute right-full top-0 -z-1 h-full" />
+          <div class="bg-surface w---left-inner absolute right-full top-0 -z-1 h-full" />
 
           <div
             class="h-full rounded-l-(--w-list-rounded,unset)"
             :class="{
               'border border-r-0': hasBorder,
-              'border-gray-300 dark:border-gray-700': hasBorder && !selected,
-              'border-primary dark:border-primary-dark': hasBorder && selected,
+              'border-line': hasBorder && !selected,
+              'tone-primary border-tone': hasBorder && selected,
               'rounded-bl-[unset]!': isOpen,
-              'border-b-transparent dark:border-b-transparent': hasBorder && isOpen,
+              'border-b-transparent': hasBorder && isOpen,
               'pl-px': !hasBorder,
               ...beforeClass,
             }"
@@ -81,10 +81,10 @@
             'flex flex-1': !card,
             'grid grid-cols-(--w-list-grid-cols) [grid-template-areas:var(--w-list-grid-areas)] sm:rounded-(--w-list-rounded,unset)': card,
             'sm:border-y': hasBorder,
-            'border-gray-300 dark:border-gray-700': hasBorder && !selected,
-            'border-primary dark:border-primary-dark': hasBorder && selected,
+            'border-line': hasBorder && !selected,
+            'tone-primary border-tone': hasBorder && selected,
             'sm:border': card && hasBorder,
-            'border-b-transparent dark:border-b-transparent': !card && hasBorder && isOpen,
+            'border-b-transparent': !card && hasBorder && isOpen,
           }"
         >
           <WCheckbox
@@ -141,7 +141,7 @@
             v-bind="getActionProps(uniformField !== undefined ? innerScope : undefined)"
             :class="{
               'z-[-1]': action !== 'select',
-              'before:text-primary dark:before:text-primary-dark': isHighlighted,
+              'tone-primary before:text-tone': isHighlighted,
               'before:opacity-10': isAccented,
             }"
             :opacity-class="isHighlighted ? 'w-ripple-opacity-15' : undefined"
@@ -192,22 +192,22 @@
 
         <div
           v-if="!card"
-          class="right---right-inner bg-default dark:bg-default-dark sticky z-1"
+          class="right---right-inner bg-surface sticky z-1"
           :class="{
             'width-[calc(var(--w-list-padding,1rem)*2+1.25em)]': hasMenu,
             'width-(--w-list-header-rounded,1rem)': !hasMenu,
           }"
         >
-          <div class="bg-default dark:bg-default-dark w---right-inner absolute left-full top-0 -z-1 h-full" />
+          <div class="bg-surface w---right-inner absolute left-full top-0 -z-1 h-full" />
 
           <div
             class="h-full rounded-r-(--w-list-rounded,unset)"
             :class="{
               'rounded-tr-(--w-list-rounded,unset) border border-l-0': hasBorder,
-              'border-gray-300 dark:border-gray-700': hasBorder && !selected,
-              'border-primary dark:border-primary-dark': hasBorder && selected,
+              'border-line': hasBorder && !selected,
+              'tone-primary border-tone': hasBorder && selected,
               'rounded-br-[unset]!': isOpen,
-              'border-b-transparent dark:border-b-transparent': hasBorder && isOpen,
+              'border-b-transparent': hasBorder && isOpen,
               ...beforeClass,
             }"
           >
@@ -270,8 +270,8 @@
         v-if="expansion && isOpen"
         class="list:w---width-inner list:left---left-inner list:sticky col-span-full"
         :class="{
-          'border-gray-300 dark:border-gray-700': hasBorder && !selected,
-          'border-primary dark:border-primary-dark': hasBorder && selected,
+          'border-line': hasBorder && !selected,
+          'tone-primary border-tone': hasBorder && selected,
           '-mt-(--w-list-gap,1rem) border border-t-0 px-5': !card && hasBorder,
           'rounded-b-(--w-list-rounded,unset)': !card,
         }"
@@ -414,7 +414,7 @@ const beforeClass = computed<Record<string, boolean | undefined>>(() => {
   return {
     'w-ripple-list w-ripple-hover-list': true,
     'w-ripple-opacity-5': !isHighlighted.value,
-    'before:text-primary dark:before:text-primary-dark w-ripple-opacity-15': isHighlighted.value,
+    'tone-primary before:text-tone w-ripple-opacity-15': isHighlighted.value,
     'before:opacity-10': isAccented.value,
   }
 })

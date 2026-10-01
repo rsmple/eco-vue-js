@@ -12,13 +12,13 @@
     >
       <div
         ref="wrapper"
-        class="h-1 w-full rounded-sm bg-gray-300 dark:bg-gray-600"
+        class="h-1 w-full rounded-sm bg-track"
       >
         <div
           class="flex h-full items-center justify-end rounded-inherit"
           :class="{
             [semanticTypeBackgroundMap[errorMessage ? SemanticType.NEGATIVE : semanticType]]: !disabled,
-            'bg-gray-400 dark:bg-gray-500': disabled,
+            'bg-track-strong': disabled,
           }"
           :style="{width: percentCompactFormatter.format(rangeScale(cursor ?? modelValue))}"
         >
@@ -40,7 +40,7 @@
       >
         <div
           v-if="errorMessage"
-          class="text-negative dark:text-negative-dark absolute -bottom-4 right-0 pt-0.5 text-xs font-normal"
+          class="tone-negative text-tone absolute -bottom-4 right-0 pt-0.5 text-xs font-normal"
         >
           {{ errorMessage }}
         </div>

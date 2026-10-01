@@ -3,9 +3,9 @@
     :disabled="disabled"
     class="w-ripple-trigger grid select-none grid-cols-[auto_1fr] font-semibold outline-none transition-colors duration-500"
     :class="{
-      'text-primary dark:text-primary-dark': !hasError && active,
-      'text-negative dark:text-negative-dark': hasError,
-      'text-positive dark:text-positive-dark': !active && !hasError && hasValue && showHasValue,
+      'tone-primary text-tone': !hasError && active,
+      'tone-negative text-tone': hasError,
+      'tone-positive text-tone': !active && !hasError && hasValue && showHasValue,
       'text-description': !active && !hasError && (!showHasValue || !hasValue),
       'cursor-not-allowed opacity-50': disabled,
       'cursor-pointer': !disabled,
@@ -17,11 +17,11 @@
       class="p-8"
     >
       <div
-        class="text-default dark:text-default-dark rounded-full bg-inherit p-1 outline transition-[outline-width] duration-500" 
+        class="text-surface rounded-full bg-inherit p-1 outline transition-[outline-width] duration-500" 
         :class="{
-          'bg-negative dark:bg-negative-dark outline-negative/10 dark:outline-negative-dark/10': hasError,
-          'bg-positive dark:bg-positive-dark outline-positive/10 dark:outline-positive-dark/10': !hasError && hasValue && showHasValue,
-          'bg-gray-400 outline-gray-400/10 dark:bg-gray-600 dark:outline-gray-600/10': !hasError && (!showHasValue || !hasValue),
+          'tone-negative bg-tone-fill outline-tone/10': hasError,
+          'tone-positive bg-tone-fill outline-tone/10': !hasError && hasValue && showHasValue,
+          'bg-track-strong outline-track-strong/10': !hasError && (!showHasValue || !hasValue),
           'outline-[1.5rem]': active,
         }"
       >
@@ -110,8 +110,8 @@
           v-if="hasChanges"
           class="square-2 absolute right-1 top-1 rounded-full transition-colors duration-200"
           :class="{
-            'bg-info dark:bg-info-dark': !hasError,
-            'bg-negative dark:bg-negative-dark': hasError,
+            'tone-info bg-tone-fill': !hasError,
+            'tone-negative bg-tone-fill': hasError,
           }"
         />
       </Transition>

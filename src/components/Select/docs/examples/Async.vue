@@ -19,7 +19,7 @@
     </template>
   </WSelectAsyncSingle>
 
-  <p class="text-sm text-gray-500">
+  <p class="text-sm text-description">
     Model: {{ bookId ?? 'null' }}
   </p>
 </template>

@@ -7,7 +7,7 @@
       :is="iconCopy"
       class="square-[1.25em] mt-[-0.125em]"
       :class="{
-        'text-primary dark:text-primary-dark': copied
+        'tone-primary text-tone': copied
       }"
     />
 

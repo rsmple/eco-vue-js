@@ -1,5 +1,6 @@
 <template>
-  <div class="bg-black-default relative my-2 mr-4 grid min-h-18 max-w-[calc(100vw-2rem)] grid-cols-[auto_1fr_auto] rounded-xl shadow-md sm:max-w-lg dark:bg-gray-800">
+  <!-- A dark island in either mode: everything inside resolves its colors for dark mode. -->
+  <div class="dark bg-surface-muted relative my-2 mr-4 grid min-h-18 max-w-[calc(100vw-2rem)] grid-cols-[auto_1fr_auto] rounded-xl shadow-md sm:max-w-lg">
     <WCounter
       v-show="count > 1"
       class="absolute left-[-0.625em] top-[-0.625em] text-xs shadow-md"
@@ -9,22 +10,22 @@
     <div class="m-7">
       <IconDanger
         v-if="type === NotifyType.DANGER"
-        class="square-6 text-negative dark:text-negative-dark"
+        class="tone-negative square-6 text-tone"
       />
 
       <IconWarn
         v-else-if="type === NotifyType.WARN"
-        class="square-6 text-warning dark:text-warning-dark"
+        class="tone-warning square-6 text-tone"
       />
 
       <IconSuccess
         v-else-if="type === NotifyType.SUCCESS"
-        class="square-6 text-positive dark:text-positive-dark"
+        class="tone-positive square-6 text-tone"
       />
     </div>
 
     <div class="grid items-center py-4">
-      <div class="text-default font-semibold">
+      <div class="text-accent font-semibold">
         <template v-if="typeof title === 'string'">
           {{ title }}
         </template>
@@ -36,7 +37,7 @@
 
       <div
         v-if="caption || userInput"
-        class="text-default whitespace-pre-wrap wrap-break-word font-normal [word-break:break-word]"
+        class="text-accent whitespace-pre-wrap wrap-break-word font-normal [word-break:break-word]"
       >
         <template v-if="typeof caption === 'string'">
           {{ caption }}

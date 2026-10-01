@@ -52,7 +52,7 @@
 
           <div
             v-if="$slots.top && (hasFilter || $slots.bottom)"
-            class="mx-1 my-2 h-0.5 rounded bg-gray-200 md:my-4 dark:bg-gray-700"
+            class="mx-1 my-2 h-0.5 rounded bg-surface-inset md:my-4"
           />
 
           <WButtonAction

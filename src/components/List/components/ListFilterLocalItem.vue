@@ -27,7 +27,7 @@
           class="group p-1"
           @click.stop="$emit('remove')"
         >
-          <div class="square-4 relative flex items-center justify-center rounded-full group-hover:bg-gray-50 dark:group-hover:bg-gray-800">
+          <div class="square-4 relative flex items-center justify-center rounded-full group-hover:bg-surface-muted">
             <IconClose class="square-[1em]" />
           </div>
         </div>
@@ -51,7 +51,7 @@
         class="text-start font-normal"
         :class="{
           'p-4': !meta.embedded,
-          'bg-default dark:bg-default-dark my-1 rounded-xl shadow-md dark:border dark:border-solid dark:border-gray-800': !isMobile,
+          'bg-surface my-1 rounded-xl shadow-md border border-solid border-line-raised': !isMobile,
           'w-96': !isMobile && !meta.embedded,
           'max-w-96': !isMobile && meta.embedded,
           'w-screen': isMobile && meta.embedded,

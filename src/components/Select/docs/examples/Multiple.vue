@@ -12,7 +12,7 @@
     @unselect="tags = tags.filter(item => item !== $event)"
   />
 
-  <p class="text-sm text-gray-500">
+  <p class="text-sm text-description">
     Model: {{ tags }}
   </p>
 </template>

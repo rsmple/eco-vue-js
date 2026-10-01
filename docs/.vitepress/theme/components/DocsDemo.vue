@@ -14,7 +14,7 @@
       />
       <p
         v-else
-        class="text-negative"
+        class="tone-negative text-tone"
       >
         Example not found: {{ name }}
       </p>

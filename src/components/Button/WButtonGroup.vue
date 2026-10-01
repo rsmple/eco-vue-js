@@ -49,7 +49,7 @@
       <div
         v-else
         role="group"
-        class="flex max-w-full gap-0.5 rounded-[0.625rem] p-0.75 bg-gray-100 dark:bg-gray-800"
+        class="flex max-w-full gap-0.5 rounded-[0.625rem] p-0.75 bg-surface-muted"
         :class="{
           'flex-wrap': wrap,
           'flex-col': col,
@@ -69,7 +69,7 @@
           :class="{
             [semanticTypeButtonBackgroundMap[semanticType] ?? semanticTypeBackgroundMap[semanticType]]: getValue(item as Model | Entity) === modelValue,
             'shadow-sm': getValue(item as Model | Entity) === modelValue,
-            'text-black-default dark:text-gray-200 bg-transparent': getValue(item as Model | Entity) !== modelValue,
+            'text-accent bg-transparent': getValue(item as Model | Entity) !== modelValue,
             'w-ripple cursor-pointer w-ripple-hover': !loading && !isItemDisabled(item),
             'cursor-progress': loading && getValue(item as Model | Entity) === loadingItem,
             'cursor-not-allowed opacity-70': isItemDisabled(item),

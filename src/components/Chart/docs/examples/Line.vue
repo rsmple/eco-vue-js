@@ -1,8 +1,8 @@
 <template>
   <div class="grid gap-2">
     <div class="flex gap-4 text-sm">
-      <span class="text-primary dark:text-primary-dark">— Open findings</span>
-      <span class="text-positive dark:text-positive-dark">- - Fixed</span>
+      <span class="tone-primary text-tone">— Open findings</span>
+      <span class="tone-positive text-tone">- - Fixed</span>
     </div>
 
     <WChartLinear
@@ -19,7 +19,7 @@
           y-key="value"
           y-key-min="min"
           y-key-max="max"
-          class="text-primary dark:text-primary-dark"
+          class="tone-primary text-tone"
         >
           <template #tooltip="{d, prev}">
             <div class="grid text-sm">
@@ -40,7 +40,7 @@
           y-key="value"
           stroke-style="dashed-small"
           has-area
-          class="text-positive dark:text-positive-dark"
+          class="tone-positive text-tone"
         />
       </template>
     </WChartLinear>

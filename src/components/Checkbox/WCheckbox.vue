@@ -21,16 +21,16 @@
     @mousedown="$emit('mousedown', $event)"
   >
     <div
-      class="square-[1.5em] bg-default dark:bg-default-dark relative isolate flex items-center justify-center border border-solid [font-size:var(--w-checkbox-size)]"
+      class="square-[1.5em] bg-surface relative isolate flex items-center justify-center border border-solid [font-size:var(--w-checkbox-size)]"
       :class="{
         'text-(--w-checkbox-color,#ffffff)': modelValue && !isDisabled && !isSkeleton,
-        'text-primary dark:text-primary-dark': !modelValue && !isDisabled && !isSkeleton,
-        'text-gray-300 dark:text-gray-700': !modelValue && isDisabled && !isSkeleton,
+        'tone-primary text-tone': !modelValue && !isDisabled && !isSkeleton,
+        'text-subtle': !modelValue && isDisabled && !isSkeleton,
         'w-ripple w-hover-circle before:text-accent after:text-accent': !isDisabled && !isReadonly && !isSkeleton,
         'rounded-full': radio,
         'rounded-md': !radio,
-        'border-gray-300 dark:border-gray-700': isDisabled || isSkeleton,
-        'border-primary dark:border-primary-dark [.w-hover-checked:hover_&]:text-default': !isDisabled && !isSkeleton,
+        'border-line': isDisabled || isSkeleton,
+        'tone-primary border-tone [.w-hover-checked:hover_&]:text-tone-on': !isDisabled && !isSkeleton,
       }"
       @keypress.enter.stop.prevent="toggle"
     >
@@ -49,8 +49,8 @@
             'scale-66 rounded': !radio && intermediate && modelValue === null,
             'scale-66 rounded-full': radio && !(intermediate && modelValue === null),
             'rounded': !radio && !(intermediate && modelValue === null),
-            'bg-primary dark:bg-primary-dark [.w-hover-checked:hover_&]:block!': !isDisabled && !isSkeleton,
-            'bg-gray-300 dark:bg-gray-700': isDisabled || isSkeleton,
+            'tone-primary bg-tone-fill [.w-hover-checked:hover_&]:block!': !isDisabled && !isSkeleton,
+            'bg-track': isDisabled || isSkeleton,
             'transition-[scale,opacity]': !lessTransitions,
           }"
         />
@@ -58,7 +58,7 @@
 
       <WSpinner
         v-if="loading"
-        class="square-[1em] text-primary dark:text-primary-dark"
+        class="tone-primary square-[1em] text-tone"
       />
 
       <template v-else-if="icon">

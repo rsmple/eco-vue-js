@@ -24,7 +24,7 @@ Modals are not placed in templates. They are opened from code, rendered by the s
     Delete project
   </WButton>
 
-  <p class="mt-2 text-sm text-gray-500">
+  <p class="mt-2 text-sm text-description">
     {{ status }}
   </p>
 </template>

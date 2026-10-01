@@ -61,6 +61,7 @@
     "jsdom": "30.0.1",
     "npm-run-all2": "9.0.3",
     "path": "0.12.7",
+    "playwright-core": "1.63.0",
     "postcss": "8.5.26",
     "postcss-import": "17.0.0",
     "rollup-plugin-watch": "1.0.5",
@@ -78,9 +79,13 @@
   "files": [
     "eslint",
     "dist",
+    "scripts",
     "tailwind-base",
     "LICENSE"
   ],
+  "bin": {
+    "eco-vue-color-roles": "./scripts/color-roles-codemod.js"
+  },
   "license": "MIT",
   "main": "./dist/main.js",
   "module": "./dist/main.js",

@@ -6,7 +6,7 @@
     :aria-disabled="disabled || undefined"
     class="w-select-option relative grid w-full grid-cols-[auto_1fr_1.25em]"
     :class="{
-      'bg-primary-light/30 dark:bg-primary-darkest/30': selectedVisible,
+      'tone-primary bg-tone-soft/30': selectedVisible,
       'before:opacity-5': !loading && isCursor && !skeleton && !disabled,
       'cursor-progress': loading || skeleton,
       'w-ripple': !loading && !skeleton && !disabled,
@@ -35,7 +35,7 @@
     >
       <div
         v-if="!hideOptionIcon && (selectedVisible || loading)"
-        class="text-primary dark:text-primary-dark square-[1.25em] col-start-3 flex items-center justify-self-end"
+        class="tone-primary text-tone square-[1.25em] col-start-3 flex items-center justify-self-end"
       >
         <IconCheck
           v-if="selectedVisible && !loading"

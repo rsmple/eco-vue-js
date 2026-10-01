@@ -29,12 +29,8 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
     '.w-input': {
       outline: 'none',
 
-      '--input-autofill-bg': theme('colors.default'),
-      '--input-autofull-text': theme('colors.black-default'),
-      [DARK_SELECTOR]: {
-        '--input-autofill-bg': theme('colors.default-dark'),
-        '--input-autofull-text': theme('colors.gray-100'),
-      },
+      '--input-autofill-bg': 'light-dark(var(--color-default), var(--color-default-dark))',
+      '--input-autofull-text': 'light-dark(var(--color-black-default), var(--color-gray-100))',
 
       '&:focus-visible': {
         outline: 'none',
@@ -82,13 +78,9 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
       'transform-origin': 'top left',
       'background-size': '7px 7px',
       'background-position': 'top',
-      color: theme('colors.gray-300'),
-      '--resizer-bg': theme('colors.default'),
+      color: 'light-dark(var(--color-gray-300), var(--color-gray-700))',
+      '--resizer-bg': 'light-dark(var(--color-default), var(--color-default-dark))',
       'background-image': 'linear-gradient(135deg, currentColor 10%, var(--resizer-bg) 10%, var(--resizer-bg) 50%, currentColor 50%, currentColor 60%, var(--resizer-bg) 60%, var(--resizer-bg) 100%)',
-    },
-    '.dark *:not(:is(.light *))::-webkit-resizer': {
-      color: theme('colors.gray-700'),
-      '--resizer-bg': theme('colors.default-dark'),
     },
     '*:focus-visible': {
       outline: 'none',

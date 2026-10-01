@@ -1,0 +1,194 @@
+/*
+ * Color roles: what components paint with, named by purpose. Each role is a `--w-*` variable holding both modes in
+ * `light-dark()`; the utilities (`text-accent`, `bg-surface`, `border-line`, …) read the variable, so a scope can
+ * redefine it.
+ *
+ * A theme sets a role like a palette color, in its own `@theme`: `--role-line` for light mode and `--role-line-dark`
+ * for dark. The defaults below read the palette, so most themes only change the palette.
+ *
+ * Values are declared on every mode boundary, not only on `:root`: a build that lowers `light-dark()` (Vite's
+ * lightningcss with older targets) resolves it where the variable is declared, and this keeps `.light` and `.dark`
+ * islands right either way. `.surface` is a boundary too, so it resets roles that an outer scope re-mapped.
+ */
+
+@theme {
+  --role-text-accent: var(--color-black-default);
+  --role-text-accent-dark: var(--color-default);
+  --role-text-description: var(--color-gray-500);
+  --role-text-description-dark: var(--color-gray-400);
+  --role-text-subtle: var(--color-gray-400);
+  --role-text-subtle-dark: var(--color-gray-600);
+
+  --role-surface: var(--color-default);
+  --role-surface-dark: var(--color-default-dark);
+  --role-surface-muted: var(--color-gray-100);
+  --role-surface-muted-dark: var(--color-gray-800);
+  --role-surface-inset: var(--color-gray-200);
+  --role-surface-inset-dark: var(--color-gray-700);
+  --role-overlay: color-mix(in oklab, var(--color-default) 40%, transparent);
+  --role-overlay-dark: color-mix(in oklab, var(--color-default-dark) 60%, transparent);
+  --role-backdrop: color-mix(in oklab, var(--color-primary-light) 40%, transparent);
+  --role-backdrop-dark: color-mix(in oklab, var(--color-primary-darkest) 40%, transparent);
+
+  --role-track: var(--color-gray-300);
+  --role-track-dark: var(--color-gray-700);
+  --role-track-strong: var(--color-gray-400);
+  --role-track-strong-dark: var(--color-gray-500);
+
+  --role-line: var(--color-gray-300);
+  --role-line-dark: var(--color-gray-700);
+  --role-line-subtle: var(--color-gray-200);
+  --role-line-subtle-dark: var(--color-gray-700);
+  --role-line-raised: var(--color-gray-100);
+  --role-line-raised-dark: var(--color-gray-800);
+  --role-focus: var(--color-primary);
+  --role-focus-dark: var(--color-primary-dark);
+
+  /* The brand gradient: primary, turned towards pink. */
+  --role-gradient-start: var(--color-primary);
+  --role-gradient-start-dark: var(--color-primary-dark);
+  --role-gradient-middle: oklch(from var(--color-primary) l c calc(h + 30));
+  --role-gradient-middle-dark: oklch(from var(--color-primary-dark) l c calc(h + 30));
+  --role-gradient-end: oklch(from var(--color-primary) l c calc(h + 60));
+  --role-gradient-end-dark: oklch(from var(--color-primary-dark) l c calc(h + 60));
+}
+
+@theme inline {
+  --color-accent: var(--w-text-accent);
+  --color-description: var(--w-text-description);
+  --color-subtle: var(--w-text-subtle);
+
+  --color-surface: var(--w-surface);
+  --color-surface-muted: var(--w-surface-muted);
+  --color-surface-inset: var(--w-surface-inset);
+  --color-overlay: var(--w-overlay);
+  --color-backdrop: var(--w-backdrop);
+
+  --color-track: var(--w-track);
+  --color-track-strong: var(--w-track-strong);
+
+  --color-line: var(--w-line);
+  --color-line-subtle: var(--w-line-subtle);
+  --color-line-raised: var(--w-line-raised);
+  --color-focus: var(--w-focus);
+
+  --color-gradient-start: var(--w-gradient-start);
+  --color-gradient-middle: var(--w-gradient-middle);
+  --color-gradient-end: var(--w-gradient-end);
+
+  /* The current tone, set by `tone-*`. */
+  --color-tone: var(--w-tone);
+  --color-tone-fill: var(--w-tone-fill);
+  --color-tone-on: var(--w-tone-on);
+  --color-tone-soft: var(--w-tone-soft);
+
+  /*
+   * The kit's tones: their fills, per mode. Everything else is derived in `tone-*`; a theme can pin a sub-role with
+   * `--tone-text-{name}`, `--tone-on-{name}` or `--tone-soft-{name}` here.
+   */
+  --tone-fill-primary: var(--w-primary);
+  --tone-fill-negative: var(--w-negative);
+  --tone-fill-positive: var(--w-positive);
+  --tone-fill-warning: var(--w-warning);
+  --tone-fill-info: var(--w-info);
+}
+
+@layer base {
+  :root,
+  .light {
+    color-scheme: light;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
+  :root,
+  .light,
+  .dark,
+  .surface {
+    --w-text-accent: light-dark(var(--role-text-accent), var(--role-text-accent-dark));
+    --w-text-description: light-dark(var(--role-text-description), var(--role-text-description-dark));
+    --w-text-subtle: light-dark(var(--role-text-subtle), var(--role-text-subtle-dark));
+
+    --w-surface: light-dark(var(--role-surface), var(--role-surface-dark));
+    --w-surface-muted: light-dark(var(--role-surface-muted), var(--role-surface-muted-dark));
+    --w-surface-inset: light-dark(var(--role-surface-inset), var(--role-surface-inset-dark));
+    --w-overlay: light-dark(var(--role-overlay), var(--role-overlay-dark));
+
+    --w-track: light-dark(var(--role-track), var(--role-track-dark));
+    --w-track-strong: light-dark(var(--role-track-strong), var(--role-track-strong-dark));
+
+    --w-line: light-dark(var(--role-line), var(--role-line-dark));
+    --w-line-subtle: light-dark(var(--role-line-subtle), var(--role-line-subtle-dark));
+    --w-line-raised: light-dark(var(--role-line-raised), var(--role-line-raised-dark));
+  }
+
+  :root,
+  .light,
+  .dark {
+    --w-primary: light-dark(var(--color-primary), var(--color-primary-dark));
+    --w-negative: light-dark(var(--color-negative), var(--color-negative-dark));
+    --w-positive: light-dark(var(--color-positive), var(--color-positive-dark));
+    --w-warning: light-dark(var(--color-warning), var(--color-warning-dark));
+    --w-info: light-dark(var(--color-info), var(--color-info-dark));
+
+    --w-focus: light-dark(var(--role-focus), var(--role-focus-dark));
+    --w-backdrop: light-dark(var(--role-backdrop), var(--role-backdrop-dark));
+
+    --w-gradient-start: light-dark(var(--role-gradient-start), var(--role-gradient-start-dark));
+    --w-gradient-middle: light-dark(var(--role-gradient-middle), var(--role-gradient-middle-dark));
+    --w-gradient-end: light-dark(var(--role-gradient-end), var(--role-gradient-end-dark));
+  }
+}
+
+/*
+ * Sets the tone for an element and its children. Takes the kit's tones, any theme color (`tone-scanner-sast`) or an
+ * arbitrary one, and derives from its fill:
+ *
+ * - `--w-tone` (`text-tone`, `border-tone`): the fill's lightness clamped to stay readable on the surface — at most
+ *   0.53 in light mode, at least 0.72 in dark — so a light brand color still gives legible text on white.
+ * - `--w-tone-on` (`text-tone-on`): black or white, whichever contrasts more with the fill (they cross at L ≈ 0.58).
+ * - `--w-tone-soft` (`bg-tone-soft`): 12% of the fill over the surface.
+ *
+ * A theme pins any of them per tone through `--tone-text-*`, `--tone-on-*` and `--tone-soft-*`: an explicit value is
+ * written after the derived one, and Tailwind drops it when the tone has none.
+ */
+@utility tone-* {
+  --w-tone-fill: --value(--tone-fill-*, --color-*, [color]);
+  --w-tone: light-dark(oklch(from var(--w-tone-fill) min(l, 0.53) c h), oklch(from var(--w-tone-fill) max(l, 0.72) c h));
+  --w-tone: --value(--tone-text-*);
+  --w-tone-on: oklch(from var(--w-tone-fill) clamp(0, (0.58 - l) * 1000, 1) 0 0);
+  --w-tone-on: --value(--tone-on-*);
+  --w-tone-soft: color-mix(in oklab, var(--w-tone-fill) 12%, var(--w-surface));
+  --w-tone-soft: --value(--tone-soft-*);
+}
+
+/* Scopes: paint a background and re-map the roles for everything inside, so plain text stays readable on it. */
+
+@utility surface {
+  background-color: var(--w-surface);
+  color: var(--w-text-accent);
+}
+
+@utility surface-muted {
+  background-color: var(--w-surface-muted);
+  --w-surface: var(--w-surface-muted);
+}
+
+/* Doesn't re-map `--w-surface`: a derived soft tone is mixed over it, which would loop. */
+@utility surface-soft {
+  background-color: var(--w-tone-soft);
+}
+
+/* Inside a fill, `text-tone` would match the background: use `text-accent` and `text-description` there. */
+@utility surface-fill {
+  background-color: var(--w-tone-fill);
+  color: var(--w-tone-on);
+  --w-surface: var(--w-tone-fill);
+  --w-text-accent: var(--w-tone-on);
+  --w-text-description: color-mix(in oklab, var(--w-tone-on) 70%, transparent);
+  --w-text-subtle: color-mix(in oklab, var(--w-tone-on) 50%, transparent);
+  --w-line: color-mix(in oklab, var(--w-tone-on) 30%, transparent);
+  --w-line-subtle: color-mix(in oklab, var(--w-tone-on) 15%, transparent);
+}

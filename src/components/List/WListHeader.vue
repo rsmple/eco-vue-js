@@ -1,10 +1,10 @@
 <template>
   <div class="flex h-(--w-list-header-height,2rem)">
-    <div class="left---left-inner bg-default dark:bg-default-dark sticky z-1">
-      <div class="bg-default dark:bg-default-dark w---left-inner absolute right-full top-0 -z-1 h-full" />
+    <div class="left---left-inner bg-surface sticky z-1">
+      <div class="bg-surface w---left-inner absolute right-full top-0 -z-1 h-full" />
 
       <div
-        class="h-full rounded-l-(--w-list-header-rounded,0.75rem) border-y border-l border-solid border-gray-300 bg-(--w-list-header-bg,inherit) dark:border-gray-700"
+        class="h-full rounded-l-(--w-list-header-rounded,0.75rem) border-y border-l border-solid border-line bg-(--w-list-header-bg,inherit)"
         :class="{
           'width-(--w-list-header-rounded,1rem)': !allowSelect,
         }"
@@ -26,15 +26,15 @@
       </div>
     </div>
 
-    <div class="flex min-w-(--list-header-width) flex-1 border-y border-solid border-gray-300 bg-(--w-list-header-bg,inherit) dark:border-gray-700">
+    <div class="flex min-w-(--list-header-width) flex-1 border-y border-solid border-line bg-(--w-list-header-bg,inherit)">
       <slot />
     </div>
 
-    <div class="right---right-inner bg-default dark:bg-default-dark sticky z-1">
-      <div class="bg-default dark:bg-default-dark w---right-inner absolute left-full top-0 -z-1 h-full" />
+    <div class="right---right-inner bg-surface sticky z-1">
+      <div class="bg-surface w---right-inner absolute left-full top-0 -z-1 h-full" />
 
       <div
-        class="h-full rounded-r-(--w-list-header-rounded,0.75rem) border-y border-r border-solid border-gray-300 bg-(--w-list-header-bg,inherit) dark:border-gray-700"
+        class="h-full rounded-r-(--w-list-header-rounded,0.75rem) border-y border-r border-solid border-line bg-(--w-list-header-bg,inherit)"
         :class="{
           'width-[calc(var(--w-list-padding,1rem)*2+1.25em)]': !hideMore,
           'width-(--w-list-header-rounded,1rem)': hideMore,
