@@ -44,6 +44,8 @@
           </span>
         </WMenuItem>
 
+        <div class="my-1 border-t border-line-subtle" />
+
         <WMenuItem
           v-for="preset in PRESETS"
           :key="preset.id"
