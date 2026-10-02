@@ -310,7 +310,7 @@ const FILL_LIMITS = {
  * The contrast a fill needs against the page: 3:1 under white text, and only 1.5:1 under black, as the kit checks,
  * since the text on it and `text-tone` carry the contrast there. That lets bright fills glare on a white page.
  */
-const MIN_PAGE = {white: 3.1, black: 1.6}
+const MIN_PAGE = {white: 3.02, black: 1.52}
 
 /**
  * Fills of this hue, at `saturation` of the most chroma each lightness allows within the style's limits, that pass
@@ -336,9 +336,9 @@ const passingFills = (hue: number, saturation: number, style: RandomStyle, pageL
 
     if (
       contrast(fill, pageLuminance) >= (text ? MIN_PAGE.white : MIN_PAGE.black)
-      && contrast(fill, text) >= 4.6
-      && contrast(toneText, pageLuminance) >= 4.6
-      && contrast(toneLine, pageLuminance) >= 3.1
+      && contrast(fill, text) >= 4.52
+      && contrast(toneText, pageLuminance) >= 4.52
+      && contrast(toneLine, pageLuminance) >= 3.02
     ) result.push({l, c})
   }
 
