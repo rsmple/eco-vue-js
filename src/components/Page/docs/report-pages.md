@@ -33,7 +33,7 @@ A page with a `title` starts a numbered section: the number and an `eyebrow` cap
               big
             />
 
-            <span class="text-2xl text-gray-400">Acme web app</span>
+            <span class="text-2xl text-subtle">Acme web app</span>
           </div>
         </WPage>
 
@@ -65,7 +65,7 @@ A page with a `title` starts a numbered section: the number and an `eyebrow` cap
           watermark="Draft"
         >
           <template #header>
-            <div class="grid grid-cols-[4rem_1fr_6rem] border-b border-solid border-gray-200 py-2 font-semibold">
+            <div class="grid grid-cols-[4rem_1fr_6rem] border-b border-solid border-line-subtle py-2 font-semibold">
               <span>#</span><span>Finding</span><span>Severity</span>
             </div>
           </template>
@@ -75,11 +75,11 @@ A page with a `title` starts a numbered section: the number and an `eyebrow` cap
             <div
               v-for="(item, index) in findings"
               :key="index"
-              class="border-b border-solid border-gray-100 py-3 text-lg"
+              class="border-b border-solid border-line-raised py-3 text-lg"
             >
               <!-- One element inside, so the row moves whole. -->
               <div class="grid grid-cols-[4rem_1fr_6rem]">
-                <span class="text-gray-400">{{ index + 1 }}</span>
+                <span class="text-subtle">{{ index + 1 }}</span>
                 <span>{{ item.title }}</span>
                 <span>{{ item.severity }}</span>
               </div>

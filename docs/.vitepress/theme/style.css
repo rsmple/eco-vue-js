@@ -63,7 +63,7 @@ body {
 /* VitePress styles, driven by the kit's tokens. Colors go on :root, where VitePress derives its own variables from
    them (hero, buttons); the header height lives on body with the rest of the shell variables. */
 :root {
-  /* The kit's surface roles, which switch with the mode themselves, so a theme's dark surfaces reach VitePress too. */
+  /* The kit's roles, which switch with the mode themselves, so a theme's dark colors reach VitePress too. */
   --vp-c-bg: var(--w-surface);
   --vp-c-bg-alt: var(--w-surface-subtle);
   --vp-c-bg-soft: var(--w-surface-muted);
@@ -72,7 +72,7 @@ body {
   --vp-c-brand-2: var(--color-primary);
   --vp-c-brand-3: var(--color-primary);
   --vp-c-brand-soft: color-mix(in oklab, var(--color-primary) 16%, transparent);
-  --vp-c-text-1: var(--color-black-default);
+  --vp-c-text-1: var(--w-text-accent);
   --vp-code-color: var(--vp-c-brand-1);
   --vp-font-family-base: var(--font-sans);
   --vp-font-family-mono: var(--font-mono);
@@ -83,7 +83,6 @@ body {
   --vp-c-brand-1: oklch(from var(--color-primary-dark) max(l, 0.72) c h);
   --vp-c-brand-2: var(--color-primary-dark);
   --vp-c-brand-3: var(--color-primary-dark);
-  --vp-c-text-1: var(--color-gray-100);
 }
 
 body {

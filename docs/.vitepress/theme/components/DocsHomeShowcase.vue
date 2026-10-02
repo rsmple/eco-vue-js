@@ -5,7 +5,8 @@
       :init-data="initData"
       :api-method="create"
       tag="div"
-      class="docs-home-card grid content-start gap-3"
+      class="grid content-start gap-3"
+      :class="CARD_CLASS"
       full-payload
       @success="isCreated = true"
     >
@@ -90,7 +91,10 @@
     </WUniform>
 
     <div class="grid gap-4 sm:translate-y-6">
-      <div class="docs-home-card grid gap-2 grid-cols-1">
+      <div
+        class="grid grid-cols-1 gap-2"
+        :class="CARD_CLASS"
+      >
         <div class="flex items-center justify-between gap-2">
           <span class="text-description text-sm">Open findings</span>
 
@@ -152,7 +156,10 @@
         </ClientOnly>
       </div>
 
-      <div class="docs-home-card grid gap-3">
+      <div
+        class="grid gap-3"
+        :class="CARD_CLASS"
+      >
         <div class="flex items-center justify-between">
           <span class="font-semibold">Export report</span>
 
@@ -203,6 +210,8 @@ import WProgressBar from 'eco-vue-js/dist/components/Progress/WProgressBar.vue'
 import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 import WToggle from 'eco-vue-js/dist/components/Toggle/WToggle.vue'
 import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
+
+const CARD_CLASS = 'border-line-subtle bg-surface-subtle/80 shadow-primary-dark/35 rounded-2xl border p-5 shadow-[0_1.5rem_3rem_-1.5rem] backdrop-blur-md'
 
 const TAG_OPTIONS = [
   {id: 1, name: 'api'},
@@ -292,20 +301,3 @@ onBeforeUnmount(() => {
   clearTimeout(exportTimer)
 })
 </script>
-
-<style scoped>
-.docs-home-card {
-  padding: 1.25rem;
-  border: 1px solid var(--color-gray-200);
-  border-radius: 1rem;
-  background: color-mix(in oklab, var(--color-default) 85%, transparent);
-  box-shadow: 0 1.5rem 3rem -1.5rem color-mix(in oklab, var(--color-primary-dark) 35%, transparent);
-  backdrop-filter: blur(12px);
-}
-
-.dark .docs-home-card {
-  border-color: var(--role-line-raised-dark);
-  background: color-mix(in oklab, var(--role-surface-subtle-dark) 80%, transparent);
-  box-shadow: 0 1.5rem 3rem -1.5rem black;
-}
-</style>
