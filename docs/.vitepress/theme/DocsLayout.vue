@@ -70,16 +70,18 @@
           </a>
 
           <!-- The theme is only known in the browser, so the server can't render the right icon or the chosen preset. -->
-          <ClientOnly>
-            <ThemeMenu />
+          <div class="flex gap-1 sm:gap-2 items-center min-w-22">
+            <ClientOnly>
+              <ThemeMenu />
 
-            <WToggleTheme
-              :model-value="isDark ? Theme.DARK : Theme.LIGHT"
-              no-margin
-              class="ml-1"
-              @update:model-value="isDark = $event === Theme.DARK"
-            />
-          </ClientOnly>
+              <WToggleTheme
+                :model-value="isDark ? Theme.DARK : Theme.LIGHT"
+                no-margin
+                class="w-input-h-8"
+                @update:model-value="isDark = $event === Theme.DARK"
+              />
+            </ClientOnly>
+          </div>
         </div>
       </template>
     </WHeaderBar>

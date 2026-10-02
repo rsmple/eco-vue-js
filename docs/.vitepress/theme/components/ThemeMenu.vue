@@ -16,7 +16,7 @@
           class="w-hover-circle relative"
           :class="isOpen ? 'tone-primary text-tone' : 'text-description'"
         >
-          <IconPalette class="square-[1.125em]" />
+          <IconPalette class="square-6" />
         </div>
       </button>
     </template>
@@ -153,12 +153,12 @@ import WMenuItem from 'eco-vue-js/dist/components/MenuItem/WMenuItem.vue'
 
 import IconCodeInline from 'eco-vue-js/dist/assets/icons/IconCodeInline'
 import IconLink from 'eco-vue-js/dist/assets/icons/IconLink'
+import IconPalette from 'eco-vue-js/dist/assets/icons/IconPalette'
 import IconRefresh from 'eco-vue-js/dist/assets/icons/IconRefresh'
 
 import ThemeSwatch from './ThemeSwatch.vue'
 
 import {PRESETS, RANDOM_STYLES, activeTheme, activeThemeId, getThemeCss, getThemeLink, hasCustomTokens, isRandomTheme, randomStyle, resetTheme, savedThemes, selectTheme, setPreset, setRandomTheme, themeConfig, themeTokens} from '../docsTheme'
-import IconPalette from '../icons/IconPalette.svg?component'
 import {confirmDeleteAllThemes, openSaveTheme} from '../themeConfirm'
 
 const isOpen = ref(false)
