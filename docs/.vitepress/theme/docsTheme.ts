@@ -220,7 +220,7 @@ const RANDOM_STYLE_STORAGE_KEY = 'eco-vue-docs-random-style'
 /** The style the Random buttons generate in, from `RANDOM_STYLES`. Remembered in this browser. */
 export const randomStyle = ref<RandomStyleId>('vivid')
 
-/** A random primary in `randomStyle` with the neutral scale, size and radius that go with it; see `getRandomTokens`. */
+/** A random primary and status tones in `randomStyle` with the neutral scale, size and radius that go with them; see `getRandomTokens`. */
 export const setRandomTheme = () => {
   randomConfig.value = normalizeConfig(getRandomTokens(randomStyle.value))
   loadTheme(randomConfig.value)

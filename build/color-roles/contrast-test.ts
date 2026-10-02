@@ -79,7 +79,7 @@ const getSeededThemes = (count: number) => {
   return RANDOM_STYLES.flatMap(style => Array.from({length: count}, () => {
     const tokens = getRandomTokens(style.id, random)
 
-    return {name: `random ${ style.id } ${ tokens['color-primary'] } / ${ tokens['color-primary-dark'] ?? 'same' } ${ tokens.neutral }`, css: getThemeBlock(tokens)}
+    return {name: `random ${ style.id } ${ getThemeBlock(tokens).split('\n').filter(line => !line.includes('gray-')).join(' ') }`, css: getThemeBlock(tokens)}
   }))
 }
 
