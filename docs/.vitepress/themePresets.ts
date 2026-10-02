@@ -166,18 +166,19 @@ const maxChroma = (l: number, hue: number) => {
 /**
  * How saturated a random primary is: the share of the most chroma its lightness allows, the chroma it stays within,
  * the share of the hue's most saturated passing fill its lightness keeps to (`peak`, so it doesn't sink into the dull
- * dark fills), and how often it is a bright fill with black text rather than a deep one with white. Neon also takes
- * the most saturated fill that passes on the dark page for `color-primary-dark`.
- */
-/**
+ * dark fills), how often it is a bright fill with black text rather than a deep one with white, and how light a fill
+ * with black text goes (`lightest`): Soft keeps to pastels, Neon goes up to the glaring greens and cyans near white.
+ * Neon also takes the most saturated fill that passes on the dark page for `color-primary-dark`.
+ *
+
  * `dark` is the lightness of the dark mode background and the surfaces on it (`surface-subtle`, `surface-muted` with
  * `line-raised`, and `surface-inset`): Soft lifts them off black, Neon takes them to almost black so its colors glow,
  * and Vivid keeps the neutral scale's 900, 850, 800 and 700.
  */
 export const RANDOM_STYLES = [
-  {id: 'soft', name: 'Soft', saturation: [0.45, 0.65], minChroma: 0.05, maxChroma: 0.16, peak: 0.85, blackText: 0.3, dark: [0.245, 0.275, 0.31, 0.39]},
-  {id: 'vivid', name: 'Vivid', saturation: [0.85, 1], minChroma: 0.08, maxChroma: 0.26, peak: 0.92, blackText: 0.5, dark: null},
-  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.12, maxChroma: 0.4, peak: 0.97, blackText: 0.8, dark: [0.09, 0.14, 0.18, 0.22]},
+  {id: 'soft', name: 'Soft', saturation: [0.5, 0.7], minChroma: 0.06, maxChroma: 0.19, peak: 0.85, blackText: 0.35, lightest: 0.82, dark: [0.245, 0.275, 0.31, 0.39]},
+  {id: 'vivid', name: 'Vivid', saturation: [0.75, 0.85], minChroma: 0.1, maxChroma: 0.3, peak: 0.92, blackText: 0.55, lightest: 0.87, dark: null},
+  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.14, maxChroma: 0.4, peak: 0.97, blackText: 0.85, lightest: 0.93, dark: [0.09, 0.14, 0.18, 0.22]},
 ] as const
 
 export type RandomStyle = typeof RANDOM_STYLES[number]
@@ -289,36 +290,49 @@ const statusHues = (tone: typeof STATUS_TONES[number], taken: number[], random: 
 }
 
 /**
- * The fills `passingFills` looks through: their lightness, how much contrast against the page they need, and whether
- * muddy ones are left out. A `light` fill, warning's and a yellow or lime primary's, takes black text and needs only
- * 1.5:1, as the kit checks for those tones, and its yellows are muddy only below its lightness.
+ * The fills `passingFills` looks through: the lightness they start from, up to the style's `lightest`, and whether
+ * muddy ones are left out. A `light` fill, warning's and a yellow or lime primary's, always takes black text, and its
+ * yellows are muddy only below its lightness.
  */
 const FILL_LIMITS = {
-  fill: {from: 0.4, to: 0.8, minPage: 3.1, muddy: true},
-  light: {from: 0.72, to: 0.9, minPage: 1.6, muddy: false},
+  fill: {from: 0.4, muddy: true},
+  light: {from: 0.72, muddy: false},
 } as const
 
 /**
+ * The contrast a fill needs against the page: 3:1 under white text, and only 1.5:1 under black, as the kit checks,
+ * since the text on it and `text-tone` carry the contrast there. That lets bright fills glare on a white page.
+ */
+const MIN_PAGE = {white: 3.1, black: 1.6}
+
+/**
  * Fills of this hue, at `saturation` of the most chroma each lightness allows within the style's limits, that pass
- * the kit's contrast checks on a page of `pageLuminance`: `minPage` against the page, 4.5:1 for the black or white
- * text `text-tone-on` puts on it (white below L 0.58), and 4.5:1 for `text-tone`, the fill's chroma at a lightness of
- * at most 0.53 on a light page and at least 0.72 on a dark one, which the browser clips when it leaves sRGB. Fills
- * under `minChroma`, the style's by default, are left out.
+ * the kit's contrast checks on a page of `pageLuminance`: `MIN_PAGE` against the page, 4.5:1 for the black or white
+ * text `text-tone-on` puts on it (white below L 0.58), 4.5:1 for `text-tone`, the fill's chroma at a lightness of at
+ * most 0.53 on a light page and at least 0.72 on a dark one, and 3:1 for `border-tone-line`, the same at most 0.62 on a
+ * light page; the browser clips both when they leave sRGB. Fills under `minChroma`, the style's by default, are left out.
  */
 const passingFills = (hue: number, saturation: number, style: RandomStyle, pageLuminance: number, limits: typeof FILL_LIMITS[keyof typeof FILL_LIMITS] = FILL_LIMITS.fill, minChroma: number = style.minChroma) => {
   const result: Fill[] = []
-  const {from, to, minPage, muddy} = limits
+  const {from, muddy} = limits
+  const lightPage = pageLuminance > 0.5
 
-  for (let l = from; l <= to; l += 0.005) {
+  for (let l = from; l <= style.lightest; l += 0.005) {
     const c = Math.min(maxChroma(l, hue) * saturation, style.maxChroma)
     if (c < minChroma || (muddy && isMuddy(l, hue))) continue
 
     const fill = luminance(toLinearRgb(l, c, hue) as [number, number, number])
     const text = l < 0.58 ? 1 : 0
 
-    const toneText = luminance(toLinearRgb(pageLuminance > 0.5 ? Math.min(l, 0.53) : Math.max(l, 0.72), c, hue, true))
+    const toneText = luminance(toLinearRgb(lightPage ? Math.min(l, 0.53) : Math.max(l, 0.72), c, hue, true))
+    const toneLine = luminance(toLinearRgb(lightPage ? Math.min(l, 0.62) : Math.max(l, 0.72), c, hue, true))
 
-    if (contrast(fill, pageLuminance) >= minPage && contrast(fill, text) >= 4.6 && contrast(toneText, pageLuminance) >= 4.6) result.push({l, c})
+    if (
+      contrast(fill, pageLuminance) >= (text ? MIN_PAGE.white : MIN_PAGE.black)
+      && contrast(fill, text) >= 4.6
+      && contrast(toneText, pageLuminance) >= 4.6
+      && contrast(toneLine, pageLuminance) >= 3.1
+    ) result.push({l, c})
   }
 
   return result
