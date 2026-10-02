@@ -16,7 +16,7 @@
       v-show="isBetweenRange || (isFrom || isTo && !(isFrom && isTo)) || isDisabled"
       class="absolute h-9 opacity-50"
       :class="{
-        'tone-primary border-tone border-y border-solid': isHoverEnabled && !isDisabled,
+        'tone-primary border-tone-line border-y border-solid': isHoverEnabled && !isDisabled,
         'tone-primary bg-tone-fill': !isHoverEnabled && !isDisabled,
         'bg-surface-inset': isDisabled,
         'w-full': isBetweenRange || isDisabled,

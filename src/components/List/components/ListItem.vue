@@ -48,7 +48,7 @@
             :class="{
               'border border-r-0': hasBorder,
               'border-line': hasBorder && !selected,
-              'tone-primary border-tone': hasBorder && selected,
+              'tone-primary border-tone-line': hasBorder && selected,
               'rounded-bl-[unset]!': isOpen,
               'border-b-transparent': hasBorder && isOpen,
               'pl-px': !hasBorder,
@@ -82,7 +82,7 @@
             'grid grid-cols-(--w-list-grid-cols) [grid-template-areas:var(--w-list-grid-areas)] sm:rounded-(--w-list-rounded,unset)': card,
             'sm:border-y': hasBorder,
             'border-line': hasBorder && !selected,
-            'tone-primary border-tone': hasBorder && selected,
+            'tone-primary border-tone-line': hasBorder && selected,
             'sm:border': card && hasBorder,
             'border-b-transparent': !card && hasBorder && isOpen,
           }"
@@ -205,7 +205,7 @@
             :class="{
               'rounded-tr-(--w-list-rounded,unset) border border-l-0': hasBorder,
               'border-line': hasBorder && !selected,
-              'tone-primary border-tone': hasBorder && selected,
+              'tone-primary border-tone-line': hasBorder && selected,
               'rounded-br-[unset]!': isOpen,
               'border-b-transparent': hasBorder && isOpen,
               ...beforeClass,
@@ -271,7 +271,7 @@
         class="list:w---width-inner list:left---left-inner list:sticky col-span-full"
         :class="{
           'border-line': hasBorder && !selected,
-          'tone-primary border-tone': hasBorder && selected,
+          'tone-primary border-tone-line': hasBorder && selected,
           '-mt-(--w-list-gap,1rem) border border-t-0 px-5': !card && hasBorder,
           'rounded-b-(--w-list-rounded,unset)': !card,
         }"

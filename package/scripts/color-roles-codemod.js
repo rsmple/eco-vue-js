@@ -96,7 +96,7 @@ const TONE_PROPS = {
   bg: {utility: 'bg-tone-fill', exact: true},
   fill: {utility: 'fill-tone-fill', exact: true},
   text: {utility: 'text-tone', exact: false},
-  border: {utility: 'border-tone', exact: false},
+  border: {utility: 'border-tone-line', exact: false},
   outline: {utility: 'outline-tone', exact: false},
   stroke: {utility: 'stroke-tone', exact: false},
 }

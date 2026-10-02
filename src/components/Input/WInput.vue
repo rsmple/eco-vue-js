@@ -102,7 +102,7 @@
         :class="{
           'focus-within:border-focus focus-within:outline-focus/20 focus-within:outline-2': !isDisabled && !isReadonly && !unclickable,
           'cursor-text': !isDisabled,
-          'tone-negative border-tone': errorMessage,
+          'tone-negative border-tone-line': errorMessage,
           [borderClass ?? 'border-line']: !isDisabled,
           'border-line/50': isDisabled,
           'not-group-hover/seamless:border-transparent!': seamless && !focused,

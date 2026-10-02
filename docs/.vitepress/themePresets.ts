@@ -123,8 +123,10 @@ const pick = <T>(list: readonly T[], random: () => number): T => list[Math.floor
 
 const rem = (value: number) => `${ +value.toFixed(4) }rem`
 
-/** Linear sRGB of an OKLCH color, or null outside the sRGB gamut. */
-const toLinearRgb = (l: number, c: number, h: number): [number, number, number] | null => {
+/** Linear sRGB of an OKLCH color, or null outside the sRGB gamut; with `clip`, clipped into it as the browser does. */
+function toLinearRgb(l: number, c: number, h: number): [number, number, number] | null
+function toLinearRgb(l: number, c: number, h: number, clip: true): [number, number, number]
+function toLinearRgb(l: number, c: number, h: number, clip = false): [number, number, number] | null {
   const a = c * Math.cos(h * Math.PI / 180)
   const b = c * Math.sin(h * Math.PI / 180)
   const [lms1, lms2, lms3] = [l + 0.3963377774 * a + 0.2158037573 * b, l - 0.1055613458 * a - 0.0638541728 * b, l - 0.0894841775 * a - 1.2914855480 * b].map(value => value ** 3)
@@ -133,6 +135,8 @@ const toLinearRgb = (l: number, c: number, h: number): [number, number, number] 
     -1.2684380046 * lms1 + 2.6097574011 * lms2 - 0.3413193965 * lms3,
     -0.0041960863 * lms1 - 0.7034186147 * lms2 + 1.7076147010 * lms3,
   ]
+
+  if (clip) return rgb.map(value => Math.min(Math.max(value, 0), 1)) as [number, number, number]
 
   return rgb.every(value => value >= -0.0001 && value <= 1.0001) ? rgb : null
 }
@@ -210,27 +214,20 @@ const hueRange = ([from, to]: readonly [number, number]) => Array.from({length: 
 
 /**
  * The hues a status tone tries, in order: its own hues away from the `taken` ones (the primary's and the tones' before
- * it), from a random one; when those take them all, the hues of its wider range away from them, nearest its own first,
- * at each of `STATUS_HUE_DISTANCES` in turn; when even those are taken, its own hues farthest from the nearest taken
- * one first.
+ * it), from a random one; then the hues of its wider range away from them, nearest its own first, at each of
+ * `STATUS_HUE_DISTANCES` in turn; then its own hues farthest from the nearest taken one first.
  */
 const statusHues = (tone: typeof STATUS_TONES[number], taken: number[], random: () => number) => {
   const own = hueRange(tone.hues)
   const distanceFromTaken = (hue: number) => Math.min(...taken.map(item => hueDistance(hue, item)))
   const apart = own.filter(hue => distanceFromTaken(hue) >= STATUS_HUE_DISTANCES[0])
-
-  if (apart.length) {
-    const start = Math.floor(random() * apart.length)
-
-    return [...apart.slice(start), ...apart.slice(0, start)]
-  }
-
+  const start = Math.floor(random() * apart.length)
   const distanceFromOwn = (hue: number) => Math.min(...own.map(item => hueDistance(hue, item)))
   const shifted = STATUS_HUE_DISTANCES.flatMap(distance => hueRange(tone.shifted)
     .filter(hue => distanceFromTaken(hue) >= distance)
     .sort((first, second) => distanceFromOwn(first) - distanceFromOwn(second)))
 
-  return [...shifted, ...own.sort((first, second) => distanceFromTaken(second) - distanceFromTaken(first))]
+  return [...apart.slice(start), ...apart.slice(0, start), ...shifted, ...own.sort((first, second) => distanceFromTaken(second) - distanceFromTaken(first))]
 }
 
 /**
@@ -245,8 +242,9 @@ const FILL_LIMITS = {
 
 /**
  * Fills of this hue, at `saturation` of the most chroma each lightness allows within the style's limits, that pass
- * the kit's contrast checks on a page of `pageLuminance`: `minPage` against the page, and 4.5:1 for the black or white
- * text `text-tone-on` puts on it (white below L 0.58).
+ * the kit's contrast checks on a page of `pageLuminance`: `minPage` against the page, 4.5:1 for the black or white
+ * text `text-tone-on` puts on it (white below L 0.58), and 4.5:1 for `text-tone`, the fill's chroma at a lightness of
+ * at most 0.53 on a light page and at least 0.72 on a dark one, which the browser clips when it leaves sRGB.
  */
 const passingFills = (hue: number, saturation: number, style: RandomStyle, pageLuminance: number, limits: typeof FILL_LIMITS[keyof typeof FILL_LIMITS] = FILL_LIMITS.fill) => {
   const result: Fill[] = []
@@ -259,7 +257,9 @@ const passingFills = (hue: number, saturation: number, style: RandomStyle, pageL
     const fill = luminance(toLinearRgb(l, c, hue) as [number, number, number])
     const text = l < 0.58 ? 1 : 0
 
-    if (contrast(fill, pageLuminance) >= minPage && contrast(fill, text) >= 4.6) result.push({l, c})
+    const toneText = luminance(toLinearRgb(pageLuminance > 0.5 ? Math.min(l, 0.53) : Math.max(l, 0.72), c, hue, true))
+
+    if (contrast(fill, pageLuminance) >= minPage && contrast(fill, text) >= 4.6 && contrast(toneText, pageLuminance) >= 4.6) result.push({l, c})
   }
 
   return result
@@ -290,12 +290,13 @@ const toColor = (fill: Fill, hue: number) => `oklch(${ (fill.l * 100).toFixed(1)
 /**
  * A status tone in the theme's style and saturation, with the hue it took: a hue away from the `taken` ones from
  * `statusHues`, and among the fills near its peak chroma, the one nearest the primary's lightness with the same black
- * or white text, so the tones carry the same weight. Warning is always a bright fill with black text, the most
- * saturated one that passes.
+ * or white text, so the tones carry the same weight. Warning is always a light fill with black text, the most
+ * saturated one that passes, and so is every tone when the primary is a light fill.
  */
 const getStatusTokens = (
   tone: typeof STATUS_TONES[number],
   primary: Fill,
+  lightPrimary: boolean,
   taken: number[],
   saturation: number,
   style: RandomStyle,
@@ -303,14 +304,15 @@ const getStatusTokens = (
   random: () => number,
 ): {hue: number, tokens: PresetTokens} | null => {
   for (const hue of statusHues(tone, taken, random)) {
-    const limits = tone.warning ? FILL_LIMITS.light : FILL_LIMITS.fill
+    const lightFill = tone.warning || lightPrimary
+    const limits = lightFill ? FILL_LIMITS.light : FILL_LIMITS.fill
     const passing = passingFills(hue, saturation, style, 1, limits)
     const dark = passingFills(hue, saturation, style, darkPageLuminance, limits)
     if (!passing.length || !dark.length) continue
 
     const light = nearPeak(passing, style)
     const sameText = light.filter(fill => (fill.l < 0.58) === (primary.l < 0.58))
-    const fill = tone.warning
+    const fill = lightFill
       ? light.reduce((best, item) => item.c > best.c ? item : best)
       : (sameText.length ? sameText : light).reduce((best, item) => Math.abs(item.l - primary.l) < Math.abs(best.l - primary.l) ? item : best)
     const darkFill = getDarkFill(fill, dark, style)
@@ -332,7 +334,7 @@ const getStatusTokens = (
  * the neutral scale that suits its hue, and a size with a radius. The primary's lightness is picked where the fill
  * passes the contrast checks on a white page and stays near the hue's peak chroma; when it fails on the dark page, the
  * nearest fill that passes there becomes `color-primary-dark`. A yellow or lime primary is a light fill with black text,
- * as warning is. The status tones follow with
+ * as warning is, and the status tones turn light with it. They follow with
  * `getStatusTokens`, each keeping away from the primary's hues and the ones before it.
  */
 export const getRandomTokens = (styleId: RandomStyleId = 'vivid', random: () => number = Math.random): PresetTokens => {
@@ -358,7 +360,7 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', random: () => 
     const status: PresetTokens = {}
 
     for (const tone of STATUS_TONES) {
-      const result = getStatusTokens(tone, primary, taken, saturation, style, luminance(darkPage), random)
+      const result = getStatusTokens(tone, primary, limits === FILL_LIMITS.light, taken, saturation, style, luminance(darkPage), random)
       if (!result) continue
 
       taken.push(result.hue)

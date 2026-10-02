@@ -15,7 +15,7 @@ The kit's look comes from three kinds of CSS variables:
 All are plain CSS variables at runtime, so this site can swap them live: the whole site follows the playground below, including the header and every component page.
 
 - **The theme in use** is at the top, with what to do with it. **Save as…** keeps it under a name in this browser; changes to a saved theme are saved into it as you make them, and the palette button in the header switches to it from any page. **Copy link** shares it: the link opens this page with the theme applied, and adds it to the other person's themes when it is a saved one. **Copy CSS** gives the stylesheet for an app.
-- **Presets** are starting points, and **My themes** lists the saved ones. **Random** picks a primary color, status colors (negative, positive, warning, info) in the same style and weight, and the neutral scale, size and radius that suit them, each at a lightness that passes the kit's contrast checks in both modes. A yellow or lime primary is a bright fill with black text, like warning: it stands out from a white page less than the other colors do, and its text and focus ring are darkened to stay readable.
+- **Presets** are starting points, and **My themes** lists the saved ones. **Random** picks a primary color, status colors (negative, positive, warning, info) in the same style and weight, and the neutral scale, size and radius that suit them, each at a lightness that passes the kit's contrast checks in both modes. A yellow or lime primary is a bright fill with black text, like warning, and the status colors turn bright with it: they stand out from a white page less than darker fills do, and their text and the focus ring are darkened to stay readable.
 - **Ask an AI assistant** describes a look in words: it opens Claude or ChatGPT with a prompt that explains the tokens, or copies it for another assistant. The reply gives the theme as JSON and as a link; paste either one, or the whole reply, into the field below the buttons.
 - **The fields below** adjust each token of the theme in use.
 
@@ -78,7 +78,7 @@ The palette gives one color per tone, the fill. Everything else a tone needs is 
 - **Text on the fill** — black or white, whichever contrasts more.
 - **Soft background** — 12% of the fill over the surface, as in info cards.
 
-So a light brand color still gives readable links on white, and a yellow fill gets black text, without extra tokens. To pin one of them, set `--tone-text-{name}`, `--tone-on-{name}` or `--tone-soft-{name}` in an `@theme inline` block — for example `--tone-on-warning: var(--color-black-default)`.
+So a light brand color still gives readable links on white, and a yellow fill gets black text, without extra tokens. To pin one of them, set `--tone-text-{name}`, `--tone-line-{name}`, `--tone-on-{name}` or `--tone-soft-{name}` in an `@theme inline` block — for example `--tone-on-warning: var(--color-black-default)`.
 
 ### Roles
 
@@ -154,7 +154,8 @@ Components use the same classes, and app code should too: a color written as a r
 | Class | Effect |
 | --- | --- |
 | `tone-{name}` | Sets the tone for the element and its children: `primary`, `negative`, `positive`, `warning`, `info`, any theme color (`tone-scanner-sast`) or an arbitrary one (`tone-[#0f766e]`) |
-| `text-tone`, `border-tone` | The tone's readable shade, for text, icons and outlines on the page |
+| `text-tone` | The tone's readable shade, for text and icons on the page |
+| `border-tone-line` | The tone's shade for borders and outlines on the page — nearer the fill than `text-tone`, as lines need less contrast than text |
 | `bg-tone-fill`, `border-tone-fill`, `text-tone-on` | The fill, and the text that goes on it |
 | `bg-tone-soft` | The tone's soft background |
 | `surface-fill` | Fill background; `text-accent`, `text-description`, `text-subtle` and lines inside switch to the text-on-fill color |
