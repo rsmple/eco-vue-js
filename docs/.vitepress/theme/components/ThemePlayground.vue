@@ -172,6 +172,32 @@
           </template>
         </WButtonGroup>
       </div>
+
+      <div class="grid max-w-md gap-1">
+        <div class="text-sm font-semibold">
+          Primary hue
+        </div>
+
+        <WSliderRange
+          :model-value="randomHues"
+          :min="FULL_HUE_RANGE.from"
+          :max="FULL_HUE_RANGE.to"
+          :step="5"
+          :style="hueSliderStyle"
+          @update-eager:model-value="randomHuesEager = $event"
+          @update:model-value="randomHues = $event"
+        >
+          <template #right>
+            <span class="text-description w-20 self-center text-right text-sm tabular-nums">
+              {{ hueRangeText }}
+            </span>
+          </template>
+        </WSliderRange>
+
+        <div class="text-description text-xs">
+          Randomize takes the primary from these hues; status tones keep away from it.
+        </div>
+      </div>
     </div>
 
     <div class="grid gap-3">
@@ -274,7 +300,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, defineAsyncComponent, markRaw, ref} from 'vue'
+import {computed, defineAsyncComponent, markRaw, ref, watch} from 'vue'
 
 import {Modal} from 'eco-vue-js/dist/utils/Modal'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
@@ -283,6 +309,7 @@ import {useCopy} from 'eco-vue-js/dist/utils/useCopy'
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
+import WSliderRange from 'eco-vue-js/dist/components/Slider/WSliderRange.vue'
 
 import IconCancel from 'eco-vue-js/dist/assets/icons/IconCancel'
 import IconCodeInline from 'eco-vue-js/dist/assets/icons/IconCodeInline'
@@ -300,6 +327,8 @@ import ThemeSwatch from './ThemeSwatch.vue'
 import {
   ADVANCED_GROUPS,
   DEFAULT_TOKENS,
+  FULL_HUE_RANGE,
+  type HueRange,
   PRESETS,
   RANDOM_STYLES,
   type SavedTheme,
@@ -310,13 +339,17 @@ import {
   deleteTheme,
   duplicateTheme,
   findPreset,
+  getHueGradient,
+  getHueSwatch,
   getThemeCss,
   getThemeLink,
   getThemePrompt,
   hasCustomTokens,
+  isFullHueRange,
   isRandomTheme,
   loadTheme,
   parseThemeReply,
+  randomHues,
   randomStyle,
   renameTheme,
   resetTheme,
@@ -355,6 +388,23 @@ const css = computed(() => getThemeCss(themeTokens.value))
 
 const copyLink = useCopy(() => getThemeLink(themeConfig.value, undefined, activeTheme.value?.name))
 const copyCss = useCopy(css)
+
+// The range under the pointer while dragging; the picked one takes over once it ends.
+const randomHuesEager = ref<HueRange>()
+
+watch(randomHues, () => randomHuesEager.value = undefined)
+
+const shownHues = computed(() => randomHuesEager.value ?? randomHues.value)
+
+// The track shows every hue faded and the picked ones in full, in the colors the style makes.
+const hueSliderStyle = computed(() => ({
+  '--w-slider-track': getHueGradient(randomStyle.value, FULL_HUE_RANGE, 0.15),
+  '--w-slider-fill': getHueGradient(randomStyle.value, shownHues.value),
+  '--w-slider-from': getHueSwatch(randomStyle.value, shownHues.value.from),
+  '--w-slider-to': getHueSwatch(randomStyle.value, shownHues.value.to),
+}))
+
+const hueRangeText = computed(() => isFullHueRange(shownHues.value) ? 'Any' : `${ shownHues.value.from % 360 }°–${ shownHues.value.to % 360 }°`)
 
 const description = ref('')
 

@@ -12,7 +12,7 @@
     >
       <div
         ref="wrapper"
-        class="relative h-1 w-full rounded-sm bg-track"
+        class="relative h-1 w-full rounded-sm bg-track bg-(image:--w-slider-track)"
       >
         <div
           class="absolute flex h-full items-center rounded-inherit bg-linear-to-r from-(--w-slider-from,var(--color-primary)) from-50% to-(--w-slider-to,var(--color-primary)) to-50%"
@@ -24,6 +24,11 @@
             right: percentCompactFormatter.format(1 - rangeScale(cursorRange.to)),
           }"
         >
+          <div
+            v-if="!disabled"
+            class="absolute inset-0 rounded-inherit bg-(image:--w-slider-fill)"
+          />
+
           <div
             class="square-4 absolute left-0 -ml-2 rounded-full bg-(--w-slider-from,var(--color-primary)) transition-transform"
             :class="{

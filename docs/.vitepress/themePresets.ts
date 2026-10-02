@@ -186,6 +186,59 @@ export type RandomStyleId = RandomStyle['id']
 
 export const isRandomStyleId = (value: unknown): value is RandomStyleId => RANDOM_STYLES.some(style => style.id === value)
 
+/** A range of hues from `from` to `to`, clockwise: `to` runs past 360 when the range wraps through red. */
+export type HueRange = {from: number, to: number}
+
+/**
+ * Every hue range a slider offers: from red around the circle and on through red again to blue, so any range up to
+ * 240° wide runs unbroken, those through red included, in the second lap. A range of 360° or more is every hue.
+ */
+export const FULL_HUE_RANGE: HueRange = {from: 20, to: 620}
+
+export const isFullHueRange = (range: HueRange) => range.to - range.from >= 360
+
+export const isHueRange = (value: unknown): value is HueRange => value instanceof Object
+  && typeof (value as HueRange).from === 'number' && typeof (value as HueRange).to === 'number'
+  && (value as HueRange).from >= FULL_HUE_RANGE.from && (value as HueRange).from <= (value as HueRange).to && (value as HueRange).to <= FULL_HUE_RANGE.to
+
+const cusps = new Map<number, {l: number, c: number}>()
+
+/** The lightness where `hue` holds the most chroma in sRGB, and that chroma: yellow's is near white, blue's deep. */
+const getCusp = (hue: number) => {
+  const key = Math.round(hue) % 360
+  let cusp = cusps.get(key)
+
+  if (!cusp) {
+    cusp = {l: 0, c: 0}
+
+    for (let l = 0.3; l <= 0.99; l += 0.005) {
+      const c = maxChroma(l, key)
+      if (c > cusp.c) cusp = {l, c}
+    }
+
+    cusps.set(key, cusp)
+  }
+
+  return cusp
+}
+
+/** A color of `hue` at its most saturated, in the style's usual share of that chroma, so the track reads as its hues do. */
+export const getHueSwatch = (styleId: RandomStyleId, hue: number, alpha = 1) => {
+  const style = RANDOM_STYLES.find(item => item.id === styleId) ?? RANDOM_STYLES[1]
+  const saturation = (style.saturation[0] + style.saturation[1]) / 2
+  const {l, c} = getCusp(hue)
+
+  return `oklch(${ (l * 100).toFixed(1) }% ${ (c * saturation).toFixed(3) } ${ Math.round(hue) % 360 }${ alpha < 1 ? ` / ${ alpha }` : '' })`
+}
+
+/** A left to right gradient through the hues of `range` in `getHueSwatch` colors, a stop every 15°. */
+export const getHueGradient = (styleId: RandomStyleId, range: HueRange, alpha = 1) => {
+  const steps = Math.max(1, Math.ceil((range.to - range.from) / 15))
+  const stops = Array.from({length: steps + 1}, (_, index) => getHueSwatch(styleId, range.from + (range.to - range.from) * index / steps, alpha))
+
+  return `linear-gradient(to right, ${ stops.join(', ') })`
+}
+
 /**
  * Fills that are brown or olive at any chroma: ambers, yellows and yellow-greens dark enough for 3:1 on a white page,
  * and dark oranges. Yellows and limes are muddy at any lightness that passes 3:1 there, so they come up only as light
@@ -249,15 +302,16 @@ const FILL_LIMITS = {
  * Fills of this hue, at `saturation` of the most chroma each lightness allows within the style's limits, that pass
  * the kit's contrast checks on a page of `pageLuminance`: `minPage` against the page, 4.5:1 for the black or white
  * text `text-tone-on` puts on it (white below L 0.58), and 4.5:1 for `text-tone`, the fill's chroma at a lightness of
- * at most 0.53 on a light page and at least 0.72 on a dark one, which the browser clips when it leaves sRGB.
+ * at most 0.53 on a light page and at least 0.72 on a dark one, which the browser clips when it leaves sRGB. Fills
+ * under `minChroma`, the style's by default, are left out.
  */
-const passingFills = (hue: number, saturation: number, style: RandomStyle, pageLuminance: number, limits: typeof FILL_LIMITS[keyof typeof FILL_LIMITS] = FILL_LIMITS.fill) => {
+const passingFills = (hue: number, saturation: number, style: RandomStyle, pageLuminance: number, limits: typeof FILL_LIMITS[keyof typeof FILL_LIMITS] = FILL_LIMITS.fill, minChroma: number = style.minChroma) => {
   const result: Fill[] = []
   const {from, to, minPage, muddy} = limits
 
   for (let l = from; l <= to; l += 0.005) {
     const c = Math.min(maxChroma(l, hue) * saturation, style.maxChroma)
-    if (c < style.minChroma || (muddy && isMuddy(l, hue))) continue
+    if (c < minChroma || (muddy && isMuddy(l, hue))) continue
 
     const fill = luminance(toLinearRgb(l, c, hue) as [number, number, number])
     const text = l < 0.58 ? 1 : 0
@@ -346,24 +400,29 @@ const getStatusTokens = (
 
 /**
  * A theme from one random primary in a style from `RANDOM_STYLES`, the status tones that go with it in the same style,
- * the neutral scale that suits its hue, and a size with a radius. The primary's lightness is picked where the fill
+ * the neutral scale that suits its hue, and a size with a radius. The primary's hue is taken from `hues`. The primary's lightness is picked where the fill
  * passes the contrast checks on a white page and stays near the hue's peak chroma; when it fails on the dark page, the
  * nearest fill that passes there becomes `color-primary-dark`. A yellow or lime primary is a light fill with black text,
- * as warning is, and the status tones turn light with it. They follow with
+ * as warning is, and the status tones turn light with it. A hue that holds less chroma on a white page than the style
+ * asks takes the most it has there. They follow with
  * `getStatusTokens`, each keeping away from the primary's hues and the ones before it.
  */
-export const getRandomTokens = (styleId: RandomStyleId = 'vivid', random: () => number = Math.random): PresetTokens => {
+export const getRandomTokens = (styleId: RandomStyleId = 'vivid', hues: HueRange = FULL_HUE_RANGE, random: () => number = Math.random): PresetTokens => {
   const style = RANDOM_STYLES.find(item => item.id === styleId) ?? RANDOM_STYLES[1]
 
   for (;;) {
-    const hue = Math.round(random() * 360)
+    // Capped at a full turn: past it, the hues the range covers twice would come up twice as often.
+    const hue = Math.round(hues.from + random() * Math.min(hues.to - hues.from, 360)) % 360
     const limits = isMuddy(1, hue) ? FILL_LIMITS.light : FILL_LIMITS.fill
     const saturation = style.saturation[0] + random() * (style.saturation[1] - style.saturation[0])
     const neutral = neutralForHue(hue, random)
     const darkSurfaces = getDarkSurfaces(neutral, style)
     const darkPage = toLinearRgb(style.dark?.[0] ?? parseLightness(NEUTRAL_SCALES[neutral][9]), 0, 0) as [number, number, number]
-    const passing = passingFills(hue, saturation, style, 1, limits)
     const dark = passingFills(hue, saturation, style, luminance(darkPage), limits)
+    const vivid = passingFills(hue, saturation, style, 1, limits)
+    // Teals and cyans pass on a white page only where sRGB holds less chroma than Neon asks: the light fill takes what
+    // there is, and dark mode, where they pass light and saturated, keeps the style's chroma.
+    const passing = vivid.length || !dark.length ? vivid : passingFills(hue, saturation, style, 1, limits, 0)
 
     if (!passing.length || !dark.length) continue
 
