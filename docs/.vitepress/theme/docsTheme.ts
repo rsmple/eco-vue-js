@@ -24,6 +24,7 @@ const ROLES = {
   'text-description': 'Muted text: descriptions, captions, secondary values',
   'text-subtle': 'Placeholders, disabled text, chart axes',
   surface: 'Page, cards, dropdowns',
+  'surface-subtle': 'Panels and cards set off from the page, such as the docs sidebar',
   'surface-muted': 'Secondary fills, striped rows, tooltips',
   'surface-inset': 'Fills inside controls, chips',
   overlay: 'Translucent bars over scrolling content, such as the header',
