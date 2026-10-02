@@ -11,6 +11,7 @@ export const openSaveTheme = () => {
   Modal.add(markRaw(ThemeNameModal), {
     title: 'Save theme',
     name: getUniqueThemeName(hasCustomTokens.value ? 'My theme' : findPreset(themeConfig.value.preset ?? 'default')?.name ?? 'My theme'),
+    share: true,
     onSave: saveThemeAs,
   })
 }
