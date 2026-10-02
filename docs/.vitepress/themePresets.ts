@@ -251,21 +251,24 @@ type Fill = {l: number, c: number}
 
 /**
  * The status tones: the hues each one keeps to, the wider range it shifts into when the primary takes those (a red
- * primary turns negative to rose or red-orange, a yellow one turns warning to orange), and for warning the bright fill
- * with black text it always is. Ranges run clockwise from the first hue to the second, past 360 when it's lower.
+ * primary turns negative to pink-red or orange-red, a yellow one turns warning to orange), and the fill it takes:
+ * `light` with black text always, as warning; `deep` never light, as negative; or light only with a light `primary`.
+ * Ranges run clockwise from the first hue to the second, past 360 when it's lower.
+ * `distance` is how far it keeps from the primary's and the other tones' hues, so no two read as one color: negative
+ * keeps nearer, since around red a few degrees already turn pink to red to orange.
  */
 const STATUS_TONES = [
-  {key: 'negative', hues: [5, 32], shifted: [345, 45], warning: false},
-  {key: 'positive', hues: [140, 175], shifted: [128, 200], warning: false},
-  {key: 'warning', hues: [65, 95], shifted: [50, 105], warning: true},
-  {key: 'info', hues: [205, 265], shifted: [190, 280], warning: false},
+  {key: 'negative', hues: [15, 35], shifted: [0, 50], distance: 20, fill: 'deep'},
+  {key: 'positive', hues: [140, 175], shifted: [128, 200], distance: 30, fill: 'primary'},
+  {key: 'warning', hues: [65, 95], shifted: [50, 105], distance: 30, fill: 'light'},
+  {key: 'info', hues: [205, 265], shifted: [190, 280], distance: 30, fill: 'primary'},
 ] as const
 
-/**
- * How far a status hue keeps from the primary's and the other tones', so no two read as one color; the second is what
- * it settles for when nothing in its wider range is that far, as warning beside a yellow primary.
- */
-const STATUS_HUE_DISTANCES = [30, 20]
+/** What a status hue settles for when nothing in its wider range is its `distance` away, as warning beside a yellow primary. */
+const STATUS_HUE_FALLBACK_DISTANCE = 20
+
+/** How many of its own hues a tone needs away from the taken ones before it stops reaching into its wider range. */
+const STATUS_HUE_MIN_SPAN = 12
 
 const hueDistance = (first: number, second: number) => Math.min(Math.abs(first - second), 360 - Math.abs(first - second))
 
@@ -273,16 +276,20 @@ const hueRange = ([from, to]: readonly [number, number]) => Array.from({length: 
 
 /**
  * The hues a status tone tries, in order: its own hues away from the `taken` ones (the primary's and the tones' before
- * it), from a random one; then the hues of its wider range away from them, nearest its own first, at each of
- * `STATUS_HUE_DISTANCES` in turn; then its own hues farthest from the nearest taken one first.
+ * it), from a random one, joined by those of its wider range on their side when fewer than `STATUS_HUE_MIN_SPAN` of its
+ * own are, so a pink primary's negative still ranges from red to orange; then the hues of its wider range away from them, nearest
+ * its own first, at its `distance` and the fallback in turn; then its own hues farthest from the nearest taken one first.
  */
 const statusHues = (tone: typeof STATUS_TONES[number], taken: number[], random: () => number) => {
   const own = hueRange(tone.hues)
   const distanceFromTaken = (hue: number) => Math.min(...taken.map(item => hueDistance(hue, item)))
-  const apart = own.filter(hue => distanceFromTaken(hue) >= STATUS_HUE_DISTANCES[0])
+  const ownApart = own.filter(hue => distanceFromTaken(hue) >= tone.distance)
+  const nearestOwnApart = (hue: number) => Math.min(...ownApart.map(item => hueDistance(hue, item)))
+  const apart = ownApart.length >= STATUS_HUE_MIN_SPAN ? ownApart : hueRange(tone.shifted)
+    .filter(hue => distanceFromTaken(hue) >= tone.distance && (!ownApart.length || nearestOwnApart(hue) < distanceFromTaken(hue)))
   const start = Math.floor(random() * apart.length)
   const distanceFromOwn = (hue: number) => Math.min(...own.map(item => hueDistance(hue, item)))
-  const shifted = STATUS_HUE_DISTANCES.flatMap(distance => hueRange(tone.shifted)
+  const shifted = [tone.distance, STATUS_HUE_FALLBACK_DISTANCE].flatMap(distance => hueRange(tone.shifted)
     .filter(hue => distanceFromTaken(hue) >= distance)
     .sort((first, second) => distanceFromOwn(first) - distanceFromOwn(second)))
 
@@ -374,7 +381,8 @@ const toColor = (fill: Fill, hue: number) => `oklch(${ (fill.l * 100).toFixed(1)
  * A status tone in the theme's style and saturation, with the hue it took: a hue away from the `taken` ones from
  * `statusHues`, and among the fills near its peak chroma, the one nearest the primary's lightness with the same black
  * or white text, so the tones carry the same weight. Warning is always a light fill with black text, the most
- * saturated one that passes, and so is every tone when the primary is a light fill.
+ * saturated one that passes, and so is every tone but negative when the primary is a light fill: negative stays deep,
+ * since a light red is pink or salmon, and takes its most saturated fill.
  */
 const getStatusTokens = (
   tone: typeof STATUS_TONES[number],
@@ -387,7 +395,7 @@ const getStatusTokens = (
   random: () => number,
 ): {hue: number, tokens: PresetTokens} | null => {
   for (const hue of statusHues(tone, taken, random)) {
-    const lightFill = tone.warning || lightPrimary
+    const lightFill = tone.fill === 'light' || (tone.fill === 'primary' && lightPrimary)
     const limits = lightFill ? FILL_LIMITS.light : FILL_LIMITS.fill
     const passing = passingFills(hue, saturation, style, 1, limits)
     const dark = passingFills(hue, saturation, style, darkPageLuminance, limits)
@@ -395,7 +403,7 @@ const getStatusTokens = (
 
     const light = nearPeak(passing, style)
     const sameText = light.filter(fill => (fill.l < 0.58) === (primary.l < 0.58))
-    const fill = lightFill
+    const fill = lightFill || lightPrimary
       ? light.reduce((best, item) => item.c > best.c ? item : best)
       : (sameText.length ? sameText : light).reduce((best, item) => Math.abs(item.l - primary.l) < Math.abs(best.l - primary.l) ? item : best)
     const darkFill = getDarkFill(fill, dark, style)
