@@ -119,41 +119,39 @@
           >{{ change > 0 ? '+' : '−' }}{{ Math.abs(change) }}%</span>
         </div>
 
-        <ClientOnly>
-          <WChartLinear
-            :x-domain="[+addDay(TODAY, 1 - range), +TODAY]"
-            :height="90"
-            :y-domain-getter="([min, max]) => [min - 10, max + 5]"
-            :top="4"
-            :bottom="0"
-            :left="0"
-            :right="0"
-            x-hidden
-            y-hidden
-          >
-            <template #default="scope">
-              <WChartLine
-                v-bind="scope"
-                :data="points"
-                x-key="date"
-                y-key="value"
-                has-area
-                class="tone-primary text-tone"
-              >
-                <template #tooltip="{d}">
-                  <div class="grid text-sm">
-                    <span class="text-description">{{ dateFormat(new Date(d.date)) }}</span>
-                    <span class="font-semibold">{{ d.value }} open</span>
-                  </div>
-                </template>
-              </WChartLine>
-            </template>
-          </WChartLinear>
-
-          <template #fallback>
-            <div class="h-22.5" />
-          </template>
-        </ClientOnly>
+        <div class="min-h-22.5">
+          <ClientOnly>
+            <WChartLinear
+              :x-domain="[+addDay(TODAY, 1 - range), +TODAY]"
+              :height="90"
+              :y-domain-getter="([min, max]) => [min - 10, max + 5]"
+              :top="4"
+              :bottom="0"
+              :left="0"
+              :right="0"
+              x-hidden
+              y-hidden
+            >
+              <template #default="scope">
+                <WChartLine
+                  v-bind="scope"
+                  :data="points"
+                  x-key="date"
+                  y-key="value"
+                  has-area
+                  class="tone-primary text-tone"
+                >
+                  <template #tooltip="{d}">
+                    <div class="grid text-sm">
+                      <span class="text-description">{{ dateFormat(new Date(d.date)) }}</span>
+                      <span class="font-semibold">{{ d.value }} open</span>
+                    </div>
+                  </template>
+                </WChartLine>
+              </template>
+            </WChartLinear>
+          </ClientOnly>
+        </div>
       </div>
 
       <div
