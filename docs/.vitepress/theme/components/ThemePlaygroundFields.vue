@@ -65,6 +65,25 @@
             >
           </label>
         </template>
+
+        <template
+          v-if="token.range"
+          #bottom
+        >
+          <WSlider
+            :model-value="sliders[token.key].value"
+            :min="sliders[token.key].min"
+            :max="sliders[token.key].max"
+            @update-eager:model-value="setPx(token.key, $event)"
+            @update:model-value="setPx(token.key, $event)"
+          >
+            <template #right>
+              <span class="text-description w-10 self-center text-right text-sm tabular-nums">
+                {{ sliders[token.key].value }}px
+              </span>
+            </template>
+          </WSlider>
+        </template>
       </WInput>
     </template>
   </div>
@@ -77,6 +96,7 @@ import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
+import WSlider from 'eco-vue-js/dist/components/Slider/WSlider.vue'
 
 import {DEFAULT_TOKENS, NEUTRAL_SCALES, type TOKENS, type TokenKey, setToken, themeConfig, themeTokens} from '../docsTheme'
 
@@ -86,6 +106,33 @@ const props = defineProps<{
 }>()
 
 const scales = Object.keys(NEUTRAL_SCALES) as (keyof typeof NEUTRAL_SCALES)[]
+
+const ROOT_FONT_SIZE = 16
+
+/** Px of a `rem` or `px` value; undefined for anything else, such as `calc()`. */
+const parsePx = (value: string | undefined) => {
+  const match = /^(-?\d*\.?\d+)(rem|px)$/.exec(value?.trim() ?? '')
+
+  if (!match) return undefined
+
+  return match[2] === 'rem' ? Number(match[1]) * ROOT_FONT_SIZE : Number(match[1])
+}
+
+const getPx = (key: TokenKey) => parsePx(themeConfig.value[key]) ?? parsePx(props.baseTokens[key])
+
+/** Sliders work in whole px; the field gets rem, as the kit's sizes are. */
+const setPx = (key: TokenKey, px: number) => setToken(key, `${ +(px / ROOT_FONT_SIZE).toFixed(4) }rem`)
+
+/** Where each size slider stands, held within its range: a value set past it shows at the end. Only tokens with a `range` have one. */
+const sliders = computed(() => Object.fromEntries(props.tokens.flatMap(token => {
+  if (!token.range) return []
+
+  const {min} = token.range
+  const max = 'max' in token.range ? token.range.max : Math.floor((getPx(token.range.pillOf) ?? 0) / 2)
+  const value = Math.min(Math.max(Math.round(getPx(token.key) ?? min), min), max)
+
+  return [[token.key, {min, max, value}]]
+})) as Record<TokenKey, {min: number, max: number, value: number}>)
 
 /** Placeholders name palette colors the way classes do: `gray-300`, not `var(--color-gray-300)`. */
 const shorten = (value: string) => value.replace(/var\(--color-([\w-]+)\)/g, '$1')

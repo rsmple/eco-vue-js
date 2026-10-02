@@ -85,7 +85,7 @@ const getSeededThemes = (count: number) => {
   const random = seeded(1)
 
   return RANDOM_STYLES.flatMap(style => Array.from({length: count}, () => {
-    const tokens = getRandomTokens(style.id, random)
+    const tokens = getRandomTokens(style.id, undefined, random)
 
     return {name: `random ${ style.id } ${ getThemeBlock(tokens).split('\n').filter(line => !line.includes('gray-')).join(' ') }`, css: getThemeBlock(tokens)}
   }))

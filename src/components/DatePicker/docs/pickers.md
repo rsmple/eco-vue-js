@@ -70,6 +70,8 @@ const day = ref<Date>()
 
 `WSlider` is colored by `semanticType`. `WSliderRange` fades from one end's color to the other's, set with the `w-slider-from-*` and `w-slider-to-*` utilities from the kit's Tailwind base, e.g. `w-slider-from-positive w-slider-to-negative`. Both ends are primary by default.
 
+For a scale the colors run along, such as hues, set `--w-slider-track` and `--w-slider-fill` to background images: the first paints the whole track, the second the picked part over the end colors.
+
 <!-- @example Slider/Basic -->
 
 <DocsDemo name="Slider/Basic" />

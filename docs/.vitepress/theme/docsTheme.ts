@@ -3,9 +3,9 @@ import {computed, ref, shallowRef, toRaw, watch} from 'vue'
 import rolesCss from '../../../package/tailwind-base/css/roles.css?raw'
 import themeCss from '../../../package/tailwind-base/css/theme.css?raw'
 import {THEME_STORAGE_KEY as STORAGE_KEY, THEME_STYLE_ID as STYLE_ID} from '../themeHeadScript'
-import {NEUTRAL_SCALES, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, expandNeutral, getRandomTokens, getThemeBlock, isNeutralScale, isRandomStyleId} from '../themePresets'
+import {FULL_HUE_RANGE, type HueRange, NEUTRAL_SCALES, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, expandNeutral, getHueGradient, getHueSwatch, getRandomTokens, getThemeBlock, isFullHueRange, isHueRange, isNeutralScale, isRandomStyleId} from '../themePresets'
 
-export {NEUTRAL_SCALES, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId}
+export {FULL_HUE_RANGE, type HueRange, NEUTRAL_SCALES, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, getHueGradient, getHueSwatch, isFullHueRange}
 
 type PaletteKey =
   | 'color-primary' | 'color-primary-dark' | 'color-primary-light' | 'color-primary-darkest'
@@ -43,7 +43,15 @@ type ShapeKey = 'w-input-height' | 'w-input-rounded' | 'w-input-gap' | 'w-button
 
 export type TokenKey = PaletteKey | 'neutral' | `role-${ RoleName }` | `role-${ RoleName }-dark` | ShapeKey | 'font-sans'
 
-type Token = {key: TokenKey, group: string, label: string, description?: string, kind: 'color' | 'neutral' | 'size' | 'font'}
+/**
+ * The px a size slider runs through: from `min` to `max`, or for a radius to half of the `pillOf` height, where it
+ * turns into a pill.
+ */
+type SizeRange = {min: number, max: number} | {min: number, pillOf: ShapeKey}
+
+type Token = {key: TokenKey, group: string, label: string, description?: string, kind: 'color' | 'neutral' | 'size' | 'font', range?: SizeRange}
+
+const HEIGHT_RANGE: SizeRange = {min: 24, max: 56}
 
 const SAME_IN_DARK = 'Empty: same as in light mode'
 
@@ -80,14 +88,14 @@ export const TOKENS: Token[] = [
     {key: `role-${ name }`, group: 'Roles', label: name, description, kind: 'color'},
     {key: `role-${ name }-dark`, group: 'Roles', label: `${ name }, dark mode`, kind: 'color'},
   ]),
-  {key: 'w-input-height', group: 'Shape', label: 'Input height', description: 'Inputs and selects; options inside them follow', kind: 'size'},
-  {key: 'w-input-rounded', group: 'Shape', label: 'Input radius', description: 'Also the side padding of options; half the height at most', kind: 'size'},
-  {key: 'w-input-gap', group: 'Shape', label: 'Input gap', description: 'Between the field border and the options in it', kind: 'size'},
-  {key: 'w-button-height', group: 'Shape', label: 'Button height', kind: 'size'},
-  {key: 'w-button-rounded', group: 'Shape', label: 'Button radius', description: 'Also the side padding; half the height at most', kind: 'size'},
-  {key: 'w-list-header-height', group: 'Shape', label: 'List header height', kind: 'size'},
-  {key: 'w-list-header-rounded', group: 'Shape', label: 'List header radius', kind: 'size'},
-  {key: 'w-checkbox-size', group: 'Shape', label: 'Checkbox size', kind: 'size'},
+  {key: 'w-input-height', group: 'Shape', label: 'Input height', description: 'Inputs and selects; options inside them follow', kind: 'size', range: HEIGHT_RANGE},
+  {key: 'w-input-rounded', group: 'Shape', label: 'Input radius', description: 'Also the side padding of options; half the height at most', kind: 'size', range: {min: 0, pillOf: 'w-input-height'}},
+  {key: 'w-input-gap', group: 'Shape', label: 'Input gap', description: 'Between the field border and the options in it', kind: 'size', range: {min: 0, max: 8}},
+  {key: 'w-button-height', group: 'Shape', label: 'Button height', kind: 'size', range: HEIGHT_RANGE},
+  {key: 'w-button-rounded', group: 'Shape', label: 'Button radius', description: 'Also the side padding; half the height at most', kind: 'size', range: {min: 0, pillOf: 'w-button-height'}},
+  {key: 'w-list-header-height', group: 'Shape', label: 'List header height', kind: 'size', range: HEIGHT_RANGE},
+  {key: 'w-list-header-rounded', group: 'Shape', label: 'List header radius', kind: 'size', range: {min: 0, pillOf: 'w-list-header-height'}},
+  {key: 'w-checkbox-size', group: 'Shape', label: 'Checkbox size', kind: 'size', range: {min: 10, max: 24}},
   {key: 'font-sans', group: 'Font', label: 'Font family', description: 'Only MontSerrat is loaded on this site; other families must be installed locally', kind: 'font'},
 ]
 
@@ -221,9 +229,14 @@ const RANDOM_STYLE_STORAGE_KEY = 'eco-vue-docs-random-style'
 /** The style the Random buttons generate in, from `RANDOM_STYLES`. Remembered in this browser. */
 export const randomStyle = ref<RandomStyleId>('vivid')
 
+const RANDOM_HUES_STORAGE_KEY = 'eco-vue-docs-random-hues'
+
+/** The hues a random primary is taken from. Remembered in this browser. */
+export const randomHues = ref<HueRange>(FULL_HUE_RANGE)
+
 /** A random primary and status tones in `randomStyle` with the neutral scale, size and radius that go with them; see `getRandomTokens`. */
 export const setRandomTheme = () => {
-  randomConfig.value = normalizeConfig(getRandomTokens(randomStyle.value))
+  randomConfig.value = normalizeConfig(getRandomTokens(randomStyle.value, randomHues.value))
   loadTheme(randomConfig.value)
 }
 
@@ -478,6 +491,24 @@ const storeRandomStyle = (value: RandomStyleId) => {
   }
 }
 
+const readStoredRandomHues = (): HueRange => {
+  try {
+    const value = JSON.parse(localStorage.getItem(RANDOM_HUES_STORAGE_KEY) ?? 'null') as unknown
+
+    return isHueRange(value) ? value : FULL_HUE_RANGE
+  } catch {
+    return FULL_HUE_RANGE
+  }
+}
+
+const storeRandomHues = (value: HueRange) => {
+  try {
+    localStorage.setItem(RANDOM_HUES_STORAGE_KEY, JSON.stringify(value))
+  } catch {
+    // Storage is blocked: the range lasts until the page is closed.
+  }
+}
+
 let isInstalled = false
 
 /** Restores the stored theme, takes the one from `?theme=` over it, and keeps the page and storage in sync. */
@@ -520,6 +551,9 @@ export const installDocsTheme = () => {
 
   randomStyle.value = readStoredRandomStyle()
   watch(randomStyle, storeRandomStyle)
+
+  randomHues.value = readStoredRandomHues()
+  watch(randomHues, storeRandomHues)
 
   // Immediate, so a theme added from a link on load is stored too.
   watch([savedThemes, activeThemeId], ([themes, activeId]) => storeThemes(themes, activeId), {immediate: true})
