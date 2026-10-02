@@ -177,7 +177,7 @@ const maxChroma = (l: number, hue: number) => {
 export const RANDOM_STYLES = [
   {id: 'soft', name: 'Soft', saturation: [0.45, 0.65], minChroma: 0.05, maxChroma: 0.16, peak: 0.85, blackText: 0.3, dark: [0.245, 0.275, 0.31, 0.39]},
   {id: 'vivid', name: 'Vivid', saturation: [0.85, 1], minChroma: 0.08, maxChroma: 0.26, peak: 0.92, blackText: 0.5, dark: null},
-  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.12, maxChroma: 0.4, peak: 0.97, blackText: 0.8, dark: [0.09, 0.16, 0.2, 0.28]},
+  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.12, maxChroma: 0.4, peak: 0.97, blackText: 0.8, dark: [0.09, 0.14, 0.18, 0.22]},
 ] as const
 
 export type RandomStyle = typeof RANDOM_STYLES[number]
