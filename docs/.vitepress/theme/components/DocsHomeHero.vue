@@ -1,8 +1,13 @@
 <template>
-  <section class="docs-home-hero vp-raw relative isolate px-(--inner-margin) pt-12 pb-16 sm:pt-20 lg:pb-24">
+  <section class="vp-raw relative isolate px-(--inner-margin) pt-12 pb-16 sm:pt-20 lg:pb-24">
     <div
       aria-hidden="true"
-      class="docs-home-backdrop pointer-events-none absolute -top-(--header-height) bottom-0 -z-10 w-screen"
+      class="
+        pointer-events-none absolute -top-(--header-height) bottom-0 left-[calc((var(--left-margin)+var(--nav-bar-width))*-1)] -z-10 w-screen
+        bg-[radial-gradient(40rem_28rem_at_70%_35%,color-mix(in_oklab,var(--color-primary)_22%,transparent),transparent_70%),radial-gradient(32rem_24rem_at_15%_10%,color-mix(in_oklab,var(--color-info)_10%,transparent),transparent_70%)]
+        before:absolute before:inset-0 before:bg-[radial-gradient(color-mix(in_oklab,var(--color-track-strong)_35%,transparent)_1px,transparent_1px)] before:bg-size-[24px_24px]
+        before:mask-radial-[60%_70%] before:mask-radial-at-[60%_40%] before:mask-radial-from-0% before:mask-radial-to-100%
+      "
     />
 
     <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,42rem)] xl:gap-16">
@@ -20,7 +25,7 @@
         </a>
 
         <h1 class="text-4xl leading-tight font-bold tracking-tight text-balance sm:text-5xl lg:text-[3.5rem] lg:leading-[1.1]">
-          <span class="docs-home-name block">EcoVue UI Library</span>
+          <span class="from-primary-dark via-primary to-info dark:from-primary block bg-linear-120 via-60% bg-clip-text text-transparent dark:via-0%">EcoVue UI Library</span>
           <span class="block">Vue 3 UI kit on Tailwind v4</span>
         </h1>
 
@@ -57,7 +62,7 @@
 
         <div
           class="
-            bg-gray-100 dark:bg-surface-subtle mt-6 inline-flex items-center gap-3 rounded-xl border border-line-subtle
+            bg-surface-subtle mt-6 inline-flex items-center gap-3 rounded-xl border border-line-subtle
  py-2 pr-3 pl-4 font-mono text-sm
           "
         >
@@ -94,31 +99,3 @@ const {theme} = useData()
 
 const release = computed(() => ((theme.value.nav ?? []) as DefaultTheme.NavItemWithLink[]).find(item => item.link === '/releases'))
 </script>
-
-<style scoped>
-.docs-home-backdrop {
-  left: calc((var(--left-margin) + var(--nav-bar-width)) * -1);
-  background:
-    radial-gradient(40rem 28rem at 70% 35%, color-mix(in oklab, var(--color-primary) 22%, transparent), transparent 70%),
-    radial-gradient(32rem 24rem at 15% 10%, color-mix(in oklab, var(--color-info) 10%, transparent), transparent 70%);
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(color-mix(in oklab, var(--color-gray-400) 35%, transparent) 1px, transparent 1px);
-    background-size: 24px 24px;
-    mask-image: radial-gradient(ellipse 60% 70% at 60% 40%, black, transparent);
-  }
-}
-
-.docs-home-name {
-  background: linear-gradient(120deg, var(--color-primary-dark), var(--color-primary) 60%, var(--color-info));
-  background-clip: text;
-  color: transparent;
-}
-
-.dark .docs-home-name {
-  background-image: linear-gradient(120deg, var(--color-primary), var(--color-info));
-}
-</style>

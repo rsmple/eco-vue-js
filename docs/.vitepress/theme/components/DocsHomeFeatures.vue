@@ -15,7 +15,11 @@
         :href="withBase(feature.link)"
         :target="feature.external ? '_blank' : undefined"
         :rel="feature.external ? 'noopener' : undefined"
-        class="docs-home-feature group flex flex-col gap-3 rounded-2xl p-6 transition-[border-color,box-shadow,translate] hover:-translate-y-0.5"
+        class="
+          group border-line-subtle bg-surface-subtle shadow-primary-dark/35 hover:border-primary/60 focus-visible:border-primary/60 flex flex-col gap-3
+          rounded-2xl border p-6 transition-[border-color,box-shadow,translate] hover:-translate-y-0.5
+          hover:shadow-[0_1rem_2rem_-1rem] focus-visible:shadow-[0_1rem_2rem_-1rem]
+        "
       >
         <span class="tone-primary bg-tone-soft text-accent grid size-10 place-items-center rounded-xl">
           <component
@@ -93,21 +97,3 @@ const FEATURES = [
   },
 ]
 </script>
-
-<style scoped>
-.docs-home-feature {
-  border: 1px solid var(--color-gray-200);
-  background: var(--color-gray-50);
-
-  &:hover,
-  &:focus-visible {
-    border-color: color-mix(in oklab, var(--color-primary) 60%, transparent);
-    box-shadow: 0 1rem 2rem -1rem color-mix(in oklab, var(--color-primary-dark) 35%, transparent);
-  }
-}
-
-.dark .docs-home-feature {
-  border-color: var(--role-line-raised-dark);
-  background: var(--role-surface-subtle-dark);
-}
-</style>
