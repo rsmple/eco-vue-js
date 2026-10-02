@@ -43,7 +43,8 @@
   --role-line-subtle-dark: var(--color-gray-700);
   --role-line-raised: var(--color-gray-100);
   --role-line-raised-dark: var(--color-gray-800);
-  --role-focus: var(--color-primary);
+  /* Darkened when the primary is a light fill, as a yellow with black text is, to keep 3:1 on the page. */
+  --role-focus: oklch(from var(--color-primary) min(l, 0.62) c h);
   --role-focus-dark: var(--color-primary-dark);
 
   /* The brand gradient: primary, turned towards pink. */

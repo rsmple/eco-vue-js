@@ -179,16 +179,10 @@ export const isRandomStyleId = (value: unknown): value is RandomStyleId => RANDO
 
 /**
  * Fills that are brown or olive at any chroma: ambers, yellows and yellow-greens dark enough for 3:1 on a white page,
- * and dark oranges. Bright yellows only pass on the dark page, so they never come up as a light primary.
+ * and dark oranges. Yellows and limes are muddy at any lightness that passes 3:1 there, so they come up only as light
+ * fills with black text, the way warning does.
  */
 const isMuddy = (l: number, hue: number) => (hue >= 55 && hue < 128) || (hue >= 35 && hue < 55 && l < 0.55)
-
-/**
- * The hue a primary fills the white page with. Yellows and limes are muddy at any lightness that passes there, so they
- * are a primary of the dark page only, where even the limes read as acid yellow, and the white one takes red-orange,
- * kept clear of warning's ambers.
- */
-const lightHueFor = (hue: number) => isMuddy(1, hue) ? 40 : hue
 
 type Fill = {l: number, c: number}
 
@@ -206,7 +200,7 @@ const STATUS_TONES = [
 
 /**
  * How far a status hue keeps from the primary's and the other tones', so no two read as one color; the second is what
- * it settles for when nothing in its wider range is that far, as warning between a yellow primary and its red-orange.
+ * it settles for when nothing in its wider range is that far, as warning beside a yellow primary.
  */
 const STATUS_HUE_DISTANCES = [30, 20]
 
@@ -240,14 +234,13 @@ const statusHues = (tone: typeof STATUS_TONES[number], taken: number[], random: 
 }
 
 /**
- * The fills `passingFills` looks through: their lightness, how much contrast against the page they need (3:1, or for
- * warning 1.5:1), and whether muddy ones are left out. Warning's yellows are muddy only below its lightness, and a
- * dark-only primary's only on the white page it never fills.
+ * The fills `passingFills` looks through: their lightness, how much contrast against the page they need, and whether
+ * muddy ones are left out. A `light` fill, warning's and a yellow or lime primary's, takes black text and needs only
+ * 1.5:1, as the kit checks for those tones, and its yellows are muddy only below its lightness.
  */
 const FILL_LIMITS = {
   fill: {from: 0.4, to: 0.8, minPage: 3.1, muddy: true},
-  warning: {from: 0.72, to: 0.9, minPage: 1.6, muddy: false},
-  darkOnly: {from: 0.4, to: 0.95, minPage: 3.1, muddy: false},
+  light: {from: 0.72, to: 0.9, minPage: 1.6, muddy: false},
 } as const
 
 /**
@@ -310,7 +303,7 @@ const getStatusTokens = (
   random: () => number,
 ): {hue: number, tokens: PresetTokens} | null => {
   for (const hue of statusHues(tone, taken, random)) {
-    const limits = tone.warning ? FILL_LIMITS.warning : FILL_LIMITS.fill
+    const limits = tone.warning ? FILL_LIMITS.light : FILL_LIMITS.fill
     const passing = passingFills(hue, saturation, style, 1, limits)
     const dark = passingFills(hue, saturation, style, darkPageLuminance, limits)
     if (!passing.length || !dark.length) continue
@@ -338,8 +331,8 @@ const getStatusTokens = (
  * A theme from one random primary in a style from `RANDOM_STYLES`, the status tones that go with it in the same style,
  * the neutral scale that suits its hue, and a size with a radius. The primary's lightness is picked where the fill
  * passes the contrast checks on a white page and stays near the hue's peak chroma; when it fails on the dark page, the
- * nearest fill that passes there becomes `color-primary-dark`. A yellow or lime primary is the most saturated fill of
- * its hue on the dark page only, and `lightHueFor` gives the white page's. The status tones follow with
+ * nearest fill that passes there becomes `color-primary-dark`. A yellow or lime primary is a light fill with black text,
+ * as warning is. The status tones follow with
  * `getStatusTokens`, each keeping away from the primary's hues and the ones before it.
  */
 export const getRandomTokens = (styleId: RandomStyleId = 'vivid', random: () => number = Math.random): PresetTokens => {
@@ -347,13 +340,12 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', random: () => 
 
   for (;;) {
     const hue = Math.round(random() * 360)
-    const lightHue = lightHueFor(hue)
-    const darkOnly = lightHue !== hue
+    const limits = isMuddy(1, hue) ? FILL_LIMITS.light : FILL_LIMITS.fill
     const saturation = style.saturation[0] + random() * (style.saturation[1] - style.saturation[0])
     const neutral = neutralForHue(hue, random)
     const darkPage = toLinearRgb(parseLightness(NEUTRAL_SCALES[neutral][9]), 0, 0) as [number, number, number]
-    const passing = passingFills(lightHue, saturation, style, 1)
-    const dark = passingFills(hue, saturation, style, luminance(darkPage), darkOnly ? FILL_LIMITS.darkOnly : FILL_LIMITS.fill)
+    const passing = passingFills(hue, saturation, style, 1, limits)
+    const dark = passingFills(hue, saturation, style, luminance(darkPage), limits)
 
     if (!passing.length || !dark.length) continue
 
@@ -361,8 +353,8 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', random: () => 
     const withWhiteText = light.filter(fill => fill.l < 0.58)
     const withBlackText = light.filter(fill => fill.l >= 0.58)
     const primary = pick(withBlackText.length && (!withWhiteText.length || random() < style.blackText) ? withBlackText : withWhiteText, random)
-    const primaryDark = darkOnly ? dark.reduce((best, fill) => fill.c > best.c ? fill : best) : getDarkFill(primary, dark, style)
-    const taken = darkOnly ? [hue, lightHue] : [hue]
+    const primaryDark = getDarkFill(primary, dark, style)
+    const taken = [hue]
     const status: PresetTokens = {}
 
     for (const tone of STATUS_TONES) {
@@ -378,7 +370,7 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', random: () => 
 
     return {
       neutral,
-      'color-primary': toColor(primary, lightHue),
+      'color-primary': toColor(primary, hue),
       ...primaryDark === null ? {} : {'color-primary-dark': toColor(primaryDark, hue)},
       ...status,
       'w-input-height': rem(size.height),

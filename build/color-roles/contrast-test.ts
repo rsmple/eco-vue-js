@@ -32,6 +32,12 @@ type Pair = {name: string, fg: string, bg: string, min: number, scope?: string}
 
 const TONES = ['primary', 'negative', 'positive', 'warning', 'info']
 
+/**
+ * Tones whose fill may be light, with black text, as a yellow is: the text on it and `text-tone` carry the contrast, and
+ * the fill only needs to be told apart from the page.
+ */
+const LIGHT_FILL_TONES = ['primary', 'warning']
+
 /** Data tones: categories, not status, so only what makes them usable — readable text and a visible fill. */
 const DATA_TONES = ['red', 'orange', 'amber', 'green', 'teal', 'cyan', 'blue', 'violet', 'fuchsia', 'pink', 'gray'].map(hue => 'data-' + hue)
 
@@ -49,7 +55,7 @@ const PAIRS: Pair[] = [
   ...TONES.flatMap(tone => [
     {name: `${ tone }: text-tone on surface`, fg: 'text-tone', bg: 'bg-surface', min: tone === 'warning' ? UI : TEXT, scope: 'tone-' + tone},
     {name: `${ tone }: text-tone-on on fill`, fg: 'text-tone-on', bg: 'bg-tone-fill', min: TEXT, scope: 'tone-' + tone},
-    {name: `${ tone }: fill on surface`, fg: 'bg-tone-fill', bg: 'bg-surface', min: tone === 'warning' ? 1.5 : UI, scope: 'tone-' + tone},
+    {name: `${ tone }: fill on surface`, fg: 'bg-tone-fill', bg: 'bg-surface', min: LIGHT_FILL_TONES.includes(tone) ? 1.5 : UI, scope: 'tone-' + tone},
     {name: `${ tone }: text-accent on soft`, fg: 'text-accent', bg: 'bg-tone-soft', min: 7, scope: 'tone-' + tone},
   ]),
   ...DATA_TONES.flatMap(tone => [

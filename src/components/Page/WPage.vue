@@ -21,7 +21,7 @@
         <div class="min-w-0">
           <div
             class="
-              text-primary text-2xs mb-1.5 font-semibold uppercase tracking-[0.16em]
+              tone-primary text-tone text-2xs mb-1.5 font-semibold uppercase tracking-[0.16em]
               [counter-increment:section] before:mr-1 before:[--tw-content:counters(section,'.',decimal-leading-zero)]
             "
           >
@@ -90,7 +90,7 @@
     <div
       v-if="title && topTitle"
       class="
-        text-2xs before:text-primary absolute inset-x-[1.3cm] top-[0.9cm] font-semibold uppercase tracking-[0.16em]
+        tone-primary text-2xs before:text-tone absolute inset-x-[1.3cm] top-[0.9cm] font-semibold uppercase tracking-[0.16em]
         text-gray-400 before:mr-1 before:[--tw-content:counters(section,'.',decimal-leading-zero)]
       "
     >{{ title }}</div>
