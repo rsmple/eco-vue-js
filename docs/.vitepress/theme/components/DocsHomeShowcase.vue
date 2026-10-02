@@ -304,8 +304,8 @@ onBeforeUnmount(() => {
 }
 
 .dark .docs-home-card {
-  border-color: var(--color-gray-800);
-  background: color-mix(in oklab, var(--color-gray-850) 80%, transparent);
+  border-color: var(--role-line-raised-dark);
+  background: color-mix(in oklab, var(--role-surface-subtle-dark) 80%, transparent);
   box-shadow: 0 1.5rem 3rem -1.5rem black;
 }
 </style>

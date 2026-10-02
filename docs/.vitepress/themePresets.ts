@@ -169,10 +169,15 @@ const maxChroma = (l: number, hue: number) => {
  * dark fills), and how often it is a bright fill with black text rather than a deep one with white. Neon also takes
  * the most saturated fill that passes on the dark page for `color-primary-dark`.
  */
+/**
+ * `dark` is the lightness of the dark mode background and the surfaces raised on it (`surface-subtle`, and
+ * `surface-muted` with `line-raised`): Soft lifts them off black, Neon takes them to almost black so its colors glow,
+ * and Vivid keeps the neutral scale's 900, 850 and 800.
+ */
 export const RANDOM_STYLES = [
-  {id: 'soft', name: 'Soft', saturation: [0.45, 0.65], minChroma: 0.05, maxChroma: 0.16, peak: 0.85, blackText: 0.3},
-  {id: 'vivid', name: 'Vivid', saturation: [0.85, 1], minChroma: 0.08, maxChroma: 0.26, peak: 0.92, blackText: 0.5},
-  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.12, maxChroma: 0.4, peak: 0.97, blackText: 0.8},
+  {id: 'soft', name: 'Soft', saturation: [0.45, 0.65], minChroma: 0.05, maxChroma: 0.16, peak: 0.85, blackText: 0.3, dark: [0.245, 0.275, 0.31]},
+  {id: 'vivid', name: 'Vivid', saturation: [0.85, 1], minChroma: 0.08, maxChroma: 0.26, peak: 0.92, blackText: 0.5, dark: null},
+  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.12, maxChroma: 0.4, peak: 0.97, blackText: 0.8, dark: [0.09, 0.13, 0.17]},
 ] as const
 
 export type RandomStyle = typeof RANDOM_STYLES[number]
@@ -285,6 +290,16 @@ const getDarkFill = (fill: Fill, dark: Fill[], style: RandomStyle): Fill | null 
   return dark.some(item => item.l === fill.l) ? null : nearest
 }
 
+/** The style's dark background and raised surfaces, in the tint of the neutral scale's 900; none for Vivid. */
+const getDarkSurfaces = (neutral: NeutralScale, style: RandomStyle): PresetTokens => {
+  if (!style.dark) return {}
+
+  const [, chroma, hue] = NEUTRAL_SCALES[neutral][9].split(' ')
+  const [surface, subtle, muted] = style.dark.map(l => `oklch(${ +(l * 100).toFixed(1) }% ${ chroma } ${ hue })`)
+
+  return {'color-default-dark': surface, 'role-surface-subtle-dark': subtle, 'role-surface-muted-dark': muted, 'role-line-raised-dark': muted}
+}
+
 const toColor = (fill: Fill, hue: number) => `oklch(${ (fill.l * 100).toFixed(1) }% ${ fill.c.toFixed(3) } ${ hue })`
 
 /**
@@ -345,7 +360,8 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', random: () => 
     const limits = isMuddy(1, hue) ? FILL_LIMITS.light : FILL_LIMITS.fill
     const saturation = style.saturation[0] + random() * (style.saturation[1] - style.saturation[0])
     const neutral = neutralForHue(hue, random)
-    const darkPage = toLinearRgb(parseLightness(NEUTRAL_SCALES[neutral][9]), 0, 0) as [number, number, number]
+    const darkSurfaces = getDarkSurfaces(neutral, style)
+    const darkPage = toLinearRgb(style.dark?.[0] ?? parseLightness(NEUTRAL_SCALES[neutral][9]), 0, 0) as [number, number, number]
     const passing = passingFills(hue, saturation, style, 1, limits)
     const dark = passingFills(hue, saturation, style, luminance(darkPage), limits)
 
@@ -372,6 +388,7 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', random: () => 
 
     return {
       neutral,
+      ...darkSurfaces,
       'color-primary': toColor(primary, hue),
       ...primaryDark === null ? {} : {'color-primary-dark': toColor(primaryDark, hue)},
       ...status,

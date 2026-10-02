@@ -107,7 +107,7 @@ const FEATURES = [
 }
 
 .dark .docs-home-feature {
-  border-color: var(--color-gray-800);
-  background: var(--color-gray-850);
+  border-color: var(--role-line-raised-dark);
+  background: var(--role-surface-subtle-dark);
 }
 </style>
