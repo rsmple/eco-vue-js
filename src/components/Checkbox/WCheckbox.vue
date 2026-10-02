@@ -30,7 +30,7 @@
         'rounded-full': radio,
         'rounded-md': !radio,
         'border-line': isDisabled || isSkeleton,
-        'tone-primary border-tone [.w-hover-checked:hover_&]:text-tone-on': !isDisabled && !isSkeleton,
+        'tone-primary border-tone-fill [.w-hover-checked:hover_&]:text-tone-on': !isDisabled && !isSkeleton,
       }"
       @keypress.enter.stop.prevent="toggle"
     >
@@ -46,9 +46,9 @@
           class="square-full absolute -z-10"
           :class="{
             'scale-33 rounded-full': radio && intermediate && modelValue === null,
-            'scale-66 rounded': !radio && intermediate && modelValue === null,
+            'scale-66 rounded-[calc(0.25rem+1px)]': !radio && intermediate && modelValue === null,
             'scale-66 rounded-full': radio && !(intermediate && modelValue === null),
-            'rounded': !radio && !(intermediate && modelValue === null),
+            'rounded-[calc(0.25rem+1px)]': !radio && !(intermediate && modelValue === null),
             'tone-primary bg-tone-fill [.w-hover-checked:hover_&]:block!': !isDisabled && !isSkeleton,
             'bg-track': isDisabled || isSkeleton,
             'transition-[scale,opacity]': !lessTransitions,

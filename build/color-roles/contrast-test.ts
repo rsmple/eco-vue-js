@@ -28,15 +28,16 @@ const CSS_DIR = ROOT + 'package/tailwind-base/css/'
 const TEXT = 4.5
 const UI = 3
 
-type Pair = {name: string, fg: string, bg: string, min: number, scope?: string}
+/** `lightMin` replaces `min` when the fill takes black text. */
+type Pair = {name: string, fg: string, bg: string, min: number, lightMin?: number, scope?: string}
 
 const TONES = ['primary', 'negative', 'positive', 'warning', 'info']
 
 /**
- * Tones whose fill may be light, with black text, as a yellow is: the text on it and `text-tone` carry the contrast, and
- * the fill only needs to be told apart from the page.
+ * A light fill with black text, as warning's and a yellow primary's are, needs only to be told apart from the page:
+ * the text on it and `text-tone` carry the contrast.
  */
-const LIGHT_FILL_TONES = ['primary', 'warning']
+const LIGHT_FILL = 1.5
 
 /** Data tones: categories, not status, so only what makes them usable — readable text and a visible fill. */
 const DATA_TONES = ['red', 'orange', 'amber', 'green', 'teal', 'cyan', 'blue', 'violet', 'fuchsia', 'pink', 'gray'].map(hue => 'data-' + hue)
@@ -54,8 +55,9 @@ const PAIRS: Pair[] = [
   {name: 'track on surface', fg: 'bg-track', bg: 'bg-surface', min: 1.3},
   ...TONES.flatMap(tone => [
     {name: `${ tone }: text-tone on surface`, fg: 'text-tone', bg: 'bg-surface', min: tone === 'warning' ? UI : TEXT, scope: 'tone-' + tone},
+    {name: `${ tone }: border-tone-line on surface`, fg: 'border-tone-line', bg: 'bg-surface', min: UI, scope: 'tone-' + tone},
     {name: `${ tone }: text-tone-on on fill`, fg: 'text-tone-on', bg: 'bg-tone-fill', min: TEXT, scope: 'tone-' + tone},
-    {name: `${ tone }: fill on surface`, fg: 'bg-tone-fill', bg: 'bg-surface', min: LIGHT_FILL_TONES.includes(tone) ? 1.5 : UI, scope: 'tone-' + tone},
+    {name: `${ tone }: fill on surface`, fg: 'bg-tone-fill', bg: 'bg-surface', min: UI, lightMin: LIGHT_FILL, scope: 'tone-' + tone},
     {name: `${ tone }: text-accent on soft`, fg: 'text-accent', bg: 'bg-tone-soft', min: 7, scope: 'tone-' + tone},
   ]),
   ...DATA_TONES.flatMap(tone => [
@@ -67,7 +69,7 @@ const PAIRS: Pair[] = [
 
 const html = PAIRS.map((pair, index) => `
   <div class="${ pair.scope ?? '' }">
-    <div id="bg${ index }" class="${ pair.bg }"><div id="fg${ index }" class="${ pair.fg } border">x</div></div>
+    <div id="bg${ index }" class="${ pair.bg }"><div id="fg${ index }" class="${ pair.fg } ${ pair.lightMin ? 'text-tone-on' : '' } border">x</div></div>
   </div>`).join('')
 
 /** Mulberry32: a small seeded generator, so the random themes are the same on every run. */
@@ -140,8 +142,9 @@ for (const theme of themes) for (const mode of ['light', 'dark']) {
       const property = pair.fg.startsWith('border') ? fgStyle.borderTopColor : pair.fg.startsWith('bg') ? fgStyle.backgroundColor : fgStyle.color
       const fg = over(property, bg)
       const [light, dark] = [luminance(fg), luminance(bg)].sort((a, b) => b - a)
+      const blackText = pair.lightMin !== undefined && luminance(toRgba(fgStyle.color).rgb) < 0.5
 
-      return {name: pair.name, ratio: (light + 0.05) / (dark + 0.05), min: pair.min}
+      return {name: pair.name, ratio: (light + 0.05) / (dark + 0.05), min: blackText ? pair.lightMin as number : pair.min}
     })
   }, PAIRS)
 

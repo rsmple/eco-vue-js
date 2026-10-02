@@ -95,7 +95,7 @@ const fixed = Array.from({length: 30}, (_, index) => ({date: +addDay(getStartOfD
 
 ## Heatmap
 
-`WChartHeatmap` shows a value per day over the last year as a grid of weeks, in five shades of the current color. The legend's steps are round numbers up to the highest value. The grid scrolls to today; the `tooltip` slot describes a day.
+`WChartHeatmap` shows a value per day over the last year as a grid of weeks, in five shades of the current color: `text-tone-fill` gives it a tone's fill color, as bright as its buttons. The legend's steps are round numbers up to the highest value. The grid scrolls to today; the `tooltip` slot describes a day.
 
 <!-- @example Chart/Heatmap client -->
 
@@ -108,7 +108,7 @@ const fixed = Array.from({length: 30}, (_, index) => ({date: +addDay(getStartOfD
     x-key="date"
     y-key="count"
     title="Scans in the last year"
-    class="tone-primary text-tone"
+    class="tone-primary text-tone-fill"
   >
     <template #tooltip="{d}">
       {{ d.count }} scans on {{ dateFormat(new Date(d.date)) }}

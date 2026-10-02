@@ -82,6 +82,7 @@
 
   /* The current tone, set by `tone-*`. */
   --color-tone: var(--w-tone);
+  --color-tone-line: var(--w-tone-line);
   --color-tone-fill: var(--w-tone-fill);
   --color-tone-on: var(--w-tone-on);
   --color-tone-soft: var(--w-tone-soft);
@@ -151,18 +152,22 @@
  * Sets the tone for an element and its children. Takes the kit's tones, any theme color (`tone-scanner-sast`) or an
  * arbitrary one, and derives from its fill:
  *
- * - `--w-tone` (`text-tone`, `border-tone`): the fill's lightness clamped to stay readable on the surface — at most
+ * - `--w-tone` (`text-tone`): the fill's lightness clamped to stay readable on the surface — at most
  *   0.53 in light mode, at least 0.72 in dark — so a light brand color still gives legible text on white.
+ * - `--w-tone-line` (`border-tone-line`): the same for outlines and borders, which need 3:1 rather than text's 4.5:1, so
+ *   a light fill stays nearer its own color — at most 0.62 in light mode.
  * - `--w-tone-on` (`text-tone-on`): black or white, whichever contrasts more with the fill (they cross at L ≈ 0.58).
  * - `--w-tone-soft` (`bg-tone-soft`): 12% of the fill over the surface.
  *
- * A theme pins any of them per tone through `--tone-text-*`, `--tone-on-*` and `--tone-soft-*`: an explicit value is
+ * A theme pins any of them per tone through `--tone-text-*`, `--tone-line-*`, `--tone-on-*` and `--tone-soft-*`: an explicit value is
  * written after the derived one, and Tailwind drops it when the tone has none.
  */
 @utility tone-* {
   --w-tone-fill: --value(--tone-fill-*, --color-*, [color]);
   --w-tone: light-dark(oklch(from var(--w-tone-fill) min(l, 0.53) c h), oklch(from var(--w-tone-fill) max(l, 0.72) c h));
   --w-tone: --value(--tone-text-*);
+  --w-tone-line: light-dark(oklch(from var(--w-tone-fill) min(l, 0.62) c h), oklch(from var(--w-tone-fill) max(l, 0.72) c h));
+  --w-tone-line: --value(--tone-line-*);
   --w-tone-on: oklch(from var(--w-tone-fill) clamp(0, (0.58 - l) * 1000, 1) 0 0);
   --w-tone-on: --value(--tone-on-*);
   --w-tone-soft: color-mix(in oklab, var(--w-tone-fill) 12%, var(--w-surface));

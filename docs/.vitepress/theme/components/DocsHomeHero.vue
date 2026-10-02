@@ -11,7 +11,7 @@
           v-if="release"
           :href="withBase('/releases')"
           class="
-            tone-primary border-tone/40 text-description hover:text-accent hover:border-tone mb-6 inline-flex items-center gap-2
+            tone-primary border-tone-line/40 text-description hover:text-accent hover:border-tone-line mb-6 inline-flex items-center gap-2
  rounded-full border px-3 py-1 text-sm font-medium transition-colors
           "
         >
