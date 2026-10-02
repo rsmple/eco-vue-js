@@ -57,7 +57,7 @@
 
         <div
           class="
-            bg-gray-100 dark:bg-gray-850 mt-6 inline-flex items-center gap-3 rounded-xl border border-line-subtle
+            bg-gray-100 dark:bg-surface-subtle mt-6 inline-flex items-center gap-3 rounded-xl border border-line-subtle
  py-2 pr-3 pl-4 font-mono text-sm
           "
         >
