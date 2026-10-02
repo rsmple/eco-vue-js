@@ -161,13 +161,14 @@ const maxChroma = (l: number, hue: number) => {
 
 /**
  * How saturated a random primary is: the share of the most chroma its lightness allows, the chroma it stays within,
- * and how often it is a bright fill with black text rather than a deep one with white. Neon also takes the most
- * saturated fill that passes on the dark page for `color-primary-dark`.
+ * the share of the hue's most saturated passing fill its lightness keeps to (`peak`, so it doesn't sink into the dull
+ * dark fills), and how often it is a bright fill with black text rather than a deep one with white. Neon also takes
+ * the most saturated fill that passes on the dark page for `color-primary-dark`.
  */
 export const RANDOM_STYLES = [
-  {id: 'soft', name: 'Soft', saturation: [0.45, 0.65], minChroma: 0.05, maxChroma: 0.16, blackText: 0.3},
-  {id: 'vivid', name: 'Vivid', saturation: [0.85, 1], minChroma: 0.08, maxChroma: 0.26, blackText: 0.5},
-  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.12, maxChroma: 0.4, blackText: 0.8},
+  {id: 'soft', name: 'Soft', saturation: [0.45, 0.65], minChroma: 0.05, maxChroma: 0.16, peak: 0.85, blackText: 0.3},
+  {id: 'vivid', name: 'Vivid', saturation: [0.85, 1], minChroma: 0.08, maxChroma: 0.26, peak: 0.92, blackText: 0.5},
+  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.12, maxChroma: 0.4, peak: 0.97, blackText: 0.8},
 ] as const
 
 export type RandomStyle = typeof RANDOM_STYLES[number]
@@ -185,30 +186,112 @@ const isMuddy = (l: number, hue: number) => (hue >= 55 && hue < 140) || (hue >= 
 type Fill = {l: number, c: number}
 
 /**
- * Fills of this hue, at `saturation` of the most chroma each lightness allows within the style's limits, that pass
- * the kit's contrast checks on a page of `pageLuminance`: 3:1 against the page, and 4.5:1 for the black or white text
- * `text-tone-on` puts on it (white below L 0.58).
+ * The status tones: the hues each one keeps to, and for warning the bright fill with black text it always is and the
+ * 1.5:1 against the page the kit asks of its fill instead of 3:1. Warning's yellows are muddy only below its lightness.
  */
-const passingFills = (hue: number, saturation: number, style: RandomStyle, pageLuminance: number) => {
-  const result: Fill[] = []
+const STATUS_TONES = [
+  {key: 'negative', hues: [5, 32], warning: false},
+  {key: 'positive', hues: [140, 175], warning: false},
+  {key: 'warning', hues: [65, 95], warning: true},
+  {key: 'info', hues: [205, 265], warning: false},
+] as const
 
-  for (let l = 0.4; l <= 0.8; l += 0.005) {
+/** How far a status hue keeps from the primary's, when its range allows, so the two don't read as one color. */
+const STATUS_HUE_DISTANCE = 30
+
+const hueDistance = (first: number, second: number) => Math.min(Math.abs(first - second), 360 - Math.abs(first - second))
+
+/**
+ * Fills of this hue, at `saturation` of the most chroma each lightness allows within the style's limits, that pass
+ * the kit's contrast checks on a page of `pageLuminance`: `minPage` against the page (3:1, or 1.5:1 for warning), and
+ * 4.5:1 for the black or white text `text-tone-on` puts on it (white below L 0.58).
+ */
+const passingFills = (hue: number, saturation: number, style: RandomStyle, pageLuminance: number, warning = false) => {
+  const result: Fill[] = []
+  const minPage = warning ? 1.6 : 3.1
+
+  for (let l = warning ? 0.72 : 0.4; l <= (warning ? 0.9 : 0.8); l += 0.005) {
     const c = Math.min(maxChroma(l, hue) * saturation, style.maxChroma)
-    if (c < style.minChroma || isMuddy(l, hue)) continue
+    if (c < style.minChroma || (!warning && isMuddy(l, hue))) continue
 
     const fill = luminance(toLinearRgb(l, c, hue) as [number, number, number])
     const text = l < 0.58 ? 1 : 0
 
-    if (contrast(fill, pageLuminance) >= 3.1 && contrast(fill, text) >= 4.6) result.push({l, c})
+    if (contrast(fill, pageLuminance) >= minPage && contrast(fill, text) >= 4.6) result.push({l, c})
   }
 
   return result
 }
 
+/** The fills within the style's `peak` share of the most saturated one: on a white page, the brightest that pass. */
+const nearPeak = (fills: Fill[], style: RandomStyle) => {
+  const most = Math.max(...fills.map(fill => fill.c))
+
+  return fills.filter(fill => fill.c >= most * style.peak)
+}
+
 /**
- * A theme from one random primary in a style from `RANDOM_STYLES`, the neutral scale that suits its hue, and a size
- * with a radius. The primary's lightness is picked where the fill passes the contrast checks on a white page; when it
- * fails on the dark page, the nearest fill that passes there becomes `color-primary-dark`.
+ * The fill for dark mode when `fill` doesn't pass on the dark page: the nearest one that does. Neon takes the most
+ * saturated one instead, when it has more chroma. Null when `fill` stays.
+ */
+const getDarkFill = (fill: Fill, dark: Fill[], style: RandomStyle): Fill | null => {
+  const mostSaturated = dark.reduce((best, item) => item.c > best.c ? item : best)
+  const nearest = dark.reduce((best, item) => Math.abs(item.l - fill.l) < Math.abs(best.l - fill.l) ? item : best)
+
+  if (style.id === 'neon' && mostSaturated.c > fill.c) return mostSaturated
+
+  return dark.some(item => item.l === fill.l) ? null : nearest
+}
+
+const toColor = (fill: Fill, hue: number) => `oklch(${ (fill.l * 100).toFixed(1) }% ${ fill.c.toFixed(3) } ${ hue })`
+
+/**
+ * A status tone in the theme's style and saturation: a hue from its range away from the primary's, and among the fills
+ * near its peak chroma, the one nearest the primary's lightness with the same black or white text, so the tones carry
+ * the same weight. Warning is
+ * always a bright fill with black text, the most saturated one that passes.
+ */
+const getStatusTokens = (
+  tone: typeof STATUS_TONES[number],
+  primary: {hue: number, fill: Fill},
+  saturation: number,
+  style: RandomStyle,
+  darkPageLuminance: number,
+  random: () => number,
+): PresetTokens => {
+  const [from, to] = tone.hues
+  const hues = Array.from({length: to - from + 1}, (_, index) => from + index)
+  const apart = hues.filter(hue => hueDistance(hue, primary.hue) >= STATUS_HUE_DISTANCE)
+  const candidates = apart.length ? apart : hues
+  const start = Math.floor(random() * candidates.length)
+  const order = [...candidates.slice(start), ...candidates.slice(0, start)]
+
+  for (const hue of order) {
+    const passing = passingFills(hue, saturation, style, 1, tone.warning)
+    const dark = passingFills(hue, saturation, style, darkPageLuminance, tone.warning)
+    if (!passing.length || !dark.length) continue
+
+    const light = nearPeak(passing, style)
+    const sameText = light.filter(fill => (fill.l < 0.58) === (primary.fill.l < 0.58))
+    const fill = tone.warning
+      ? light.reduce((best, item) => item.c > best.c ? item : best)
+      : (sameText.length ? sameText : light).reduce((best, item) => Math.abs(item.l - primary.fill.l) < Math.abs(best.l - primary.fill.l) ? item : best)
+    const darkFill = getDarkFill(fill, dark, style)
+
+    return {
+      [`color-${ tone.key }`]: toColor(fill, hue),
+      ...darkFill === null ? {} : {[`color-${ tone.key }-dark`]: toColor(darkFill, hue)},
+    }
+  }
+
+  return {}
+}
+
+/**
+ * A theme from one random primary in a style from `RANDOM_STYLES`, the status tones that go with it in the same style,
+ * the neutral scale that suits its hue, and a size with a radius. The primary's lightness is picked where the fill
+ * passes the contrast checks on a white page and stays near the hue's peak chroma; when it fails on the dark page, the nearest fill that passes there
+ * becomes `color-primary-dark`. The status tones follow with `getStatusTokens`.
  */
 export const getRandomTokens = (styleId: RandomStyleId = 'vivid', random: () => number = Math.random): PresetTokens => {
   const style = RANDOM_STYLES.find(item => item.id === styleId) ?? RANDOM_STYLES[1]
@@ -218,26 +301,25 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', random: () => 
     const saturation = style.saturation[0] + random() * (style.saturation[1] - style.saturation[0])
     const neutral = neutralForHue(hue, random)
     const darkPage = toLinearRgb(parseLightness(NEUTRAL_SCALES[neutral][9]), 0, 0) as [number, number, number]
-    const light = passingFills(hue, saturation, style, 1)
+    const passing = passingFills(hue, saturation, style, 1)
     const dark = passingFills(hue, saturation, style, luminance(darkPage))
 
-    if (!light.length || !dark.length) continue
+    if (!passing.length || !dark.length) continue
 
+    const light = nearPeak(passing, style)
     const withWhiteText = light.filter(fill => fill.l < 0.58)
     const withBlackText = light.filter(fill => fill.l >= 0.58)
     const primary = pick(withBlackText.length && (!withWhiteText.length || random() < style.blackText) ? withBlackText : withWhiteText, random)
-    const passesDark = dark.some(fill => fill.l === primary.l)
-    const mostSaturatedDark = dark.reduce((best, fill) => fill.c > best.c ? fill : best)
-    const nearestDark = dark.reduce((best, fill) => Math.abs(fill.l - primary.l) < Math.abs(best.l - primary.l) ? fill : best)
-    const primaryDark = style.id === 'neon' && mostSaturatedDark.c > primary.c ? mostSaturatedDark : passesDark ? null : nearestDark
-    const color = (fill: Fill) => `oklch(${ (fill.l * 100).toFixed(1) }% ${ fill.c.toFixed(3) } ${ hue })`
+    const primaryDark = getDarkFill(primary, dark, style)
+    const status = STATUS_TONES.map(tone => getStatusTokens(tone, {hue, fill: primary}, saturation, style, luminance(darkPage), random))
     const size = pick(SIZES, random)
     const radius = pick(RADII, random)
 
     return {
       neutral,
-      'color-primary': color(primary),
-      ...primaryDark === null ? {} : {'color-primary-dark': color(primaryDark)},
+      'color-primary': toColor(primary, hue),
+      ...primaryDark === null ? {} : {'color-primary-dark': toColor(primaryDark, hue)},
+      ...Object.assign({}, ...status) as PresetTokens,
       'w-input-height': rem(size.height),
       'w-input-rounded': rem(Math.min(radius, size.height / 2)),
       'w-input-gap': rem(size.gap),
