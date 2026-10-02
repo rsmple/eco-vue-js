@@ -14,10 +14,10 @@ The kit's look comes from three kinds of CSS variables:
 
 All are plain CSS variables at runtime, so this site can swap them live: the whole site follows the playground below, including the header and every component page.
 
-- **Presets** are starting points. **Random** picks one primary color with the neutral scale, size and radius that suit it, at a lightness that passes the kit's contrast checks in both modes.
+- **The theme in use** is at the top, with what to do with it. **Save as…** keeps it under a name in this browser; changes to a saved theme are saved into it as you make them, and the palette button in the header switches to it from any page. **Copy link** shares it: the link opens this page with the theme applied, and adds it to the other person's themes when it is a saved one. **Copy CSS** gives the stylesheet for an app.
+- **Presets** are starting points, and **My themes** lists the saved ones. **Random** picks one primary color with the neutral scale, size and radius that suit it, at a lightness that passes the kit's contrast checks in both modes.
 - **Ask an AI assistant** describes a look in words: it opens Claude or ChatGPT with a prompt that explains the tokens, or copies it for another assistant. The reply gives the theme as JSON and as a link; paste either one, or the whole reply, into the field below the buttons.
-- **My themes** keeps themes under a name in this browser. Changes to a saved theme are saved into it as you make them; a preset, a random or a pasted theme stays unsaved until **Save as…**. The palette button in the header switches between presets and saved themes from any page, and **Delete all** clears the saved ones.
-- **Copy link** shares the theme: the link opens this page with it applied, and adds it to the other person's themes when it is a saved one.
+- **The fields below** adjust each token of the theme in use.
 
 <ClientOnly>
   <ThemePlayground />
