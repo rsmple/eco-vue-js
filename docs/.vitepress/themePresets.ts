@@ -170,14 +170,14 @@ const maxChroma = (l: number, hue: number) => {
  * the most saturated fill that passes on the dark page for `color-primary-dark`.
  */
 /**
- * `dark` is the lightness of the dark mode background and the surfaces raised on it (`surface-subtle`, and
- * `surface-muted` with `line-raised`): Soft lifts them off black, Neon takes them to almost black so its colors glow,
- * and Vivid keeps the neutral scale's 900, 850 and 800.
+ * `dark` is the lightness of the dark mode background and the surfaces on it (`surface-subtle`, `surface-muted` with
+ * `line-raised`, and `surface-inset`): Soft lifts them off black, Neon takes them to almost black so its colors glow,
+ * and Vivid keeps the neutral scale's 900, 850, 800 and 700.
  */
 export const RANDOM_STYLES = [
-  {id: 'soft', name: 'Soft', saturation: [0.45, 0.65], minChroma: 0.05, maxChroma: 0.16, peak: 0.85, blackText: 0.3, dark: [0.245, 0.275, 0.31]},
+  {id: 'soft', name: 'Soft', saturation: [0.45, 0.65], minChroma: 0.05, maxChroma: 0.16, peak: 0.85, blackText: 0.3, dark: [0.245, 0.275, 0.31, 0.39]},
   {id: 'vivid', name: 'Vivid', saturation: [0.85, 1], minChroma: 0.08, maxChroma: 0.26, peak: 0.92, blackText: 0.5, dark: null},
-  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.12, maxChroma: 0.4, peak: 0.97, blackText: 0.8, dark: [0.09, 0.13, 0.17]},
+  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.12, maxChroma: 0.4, peak: 0.97, blackText: 0.8, dark: [0.09, 0.16, 0.2, 0.28]},
 ] as const
 
 export type RandomStyle = typeof RANDOM_STYLES[number]
@@ -290,14 +290,14 @@ const getDarkFill = (fill: Fill, dark: Fill[], style: RandomStyle): Fill | null 
   return dark.some(item => item.l === fill.l) ? null : nearest
 }
 
-/** The style's dark background and raised surfaces, in the tint of the neutral scale's 900; none for Vivid. */
+/** The style's dark background and the surfaces on it, in the tint of the neutral scale's 900; none for Vivid. */
 const getDarkSurfaces = (neutral: NeutralScale, style: RandomStyle): PresetTokens => {
   if (!style.dark) return {}
 
   const [, chroma, hue] = NEUTRAL_SCALES[neutral][9].split(' ')
-  const [surface, subtle, muted] = style.dark.map(l => `oklch(${ +(l * 100).toFixed(1) }% ${ chroma } ${ hue })`)
+  const [surface, subtle, muted, inset] = style.dark.map(l => `oklch(${ +(l * 100).toFixed(1) }% ${ chroma } ${ hue })`)
 
-  return {'color-default-dark': surface, 'role-surface-subtle-dark': subtle, 'role-surface-muted-dark': muted, 'role-line-raised-dark': muted}
+  return {'color-default-dark': surface, 'role-surface-subtle-dark': subtle, 'role-surface-muted-dark': muted, 'role-line-raised-dark': muted, 'role-surface-inset-dark': inset}
 }
 
 const toColor = (fill: Fill, hue: number) => `oklch(${ (fill.l * 100).toFixed(1) }% ${ fill.c.toFixed(3) } ${ hue })`
