@@ -1,12 +1,18 @@
 <template>
   <WListCardField
-    :model-value="item.waterBy ? dateFormatShort(item.waterBy) : '—'"
     :skeleton="skeleton"
+    allow-open
     :class="{
       'text-description': !item.waterBy,
       'tone-negative text-tone': item.waterBy && item.waterBy < today,
     }"
-  />
+    class="card:text-xs"
+  >
+    <template #inner>
+      <span class="list:hidden">{{ meta.title }}: </span>
+      {{ item.waterBy ? dateFormatShort(item.waterBy) : '-' }}
+    </template>
+  </WListCardField>
 </template>
 
 <script lang="ts" setup>

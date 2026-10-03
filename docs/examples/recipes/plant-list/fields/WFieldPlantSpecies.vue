@@ -2,6 +2,7 @@
   <WListCardField
     :model-value="item.species"
     :skeleton="skeleton"
+    allow-open
     class="italic"
   />
 </template>
