@@ -32,12 +32,14 @@ export const useUniformForm = (
 
   const isValid = computed<boolean>(() => mapValues.value.every(item => item.isValid))
 
-  const validate: UniformValidate = (silent?: boolean, includeMessage?: boolean) => {
+  const validate: UniformValidate = (silent?: boolean, includeMessage?: boolean, onlyChanged?: boolean) => {
+    const items = onlyChanged ? mapValues.value.filter(item => item.hasChanges) : mapValues.value
+
     if (includeMessage) {
       const result = []
 
-      for (const item of mapValues.value) {
-        const message = item.validate(silent, includeMessage)
+      for (const item of items) {
+        const message = item.validate(silent, includeMessage, onlyChanged)
         if (message) result.push(message)
       }
 
@@ -46,8 +48,8 @@ export const useUniformForm = (
       return {title: titleGetter(), message: result}
     }
 
-    for (const item of mapValues.value) {
-      item.validate(silent, includeMessage)
+    for (const item of items) {
+      item.validate(silent, includeMessage, onlyChanged)
     }
 
     return undefined
@@ -88,8 +90,10 @@ export const useUniformForm = (
     return merged
   }
 
-  const showMessage = (message: string, onlyChanged?: boolean): void => {
+  const showMessage = (message: string, onlyChanged?: boolean, fields?: string[]): void => {
     for (const item of mapValues.value) {
+      if (fields && !fields.includes(String(item.field))) continue
+
       item.showMessage(message, onlyChanged)
     }
   }

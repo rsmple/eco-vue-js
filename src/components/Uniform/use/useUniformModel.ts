@@ -94,6 +94,24 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
     }
   }
   
+  /**
+   * Takes the saved `payload` as the initial value of its fields, leaving the rest of the model as it is: other fields
+   * may hold changes that were not sent. With the saved `value`, its fields are taken from it, in the model too.
+   */
+  const initFields = (value: InnerModel | undefined, payload: Partial<ResultModel>) => {
+    if (!data || !modelValueInitRef || !(data.value instanceof Object) || !(modelValueInitRef.value instanceof Object)) return initModel(value)
+
+    if (query && value) query.setData(value)
+
+    const source = (value !== undefined ? (initFn ?? copyItem)(value) : payload) as Partial<ResultModel>
+
+    for (const key of Object.keys(payload) as (keyof ResultModel)[]) {
+      modelValueInitRef.value[key] = copyItem(source[key]) as ResultModel[keyof ResultModel]
+
+      if (value !== undefined) data.value[key] = copyItem(source[key]) as ResultModel[keyof ResultModel]
+    }
+  }
+
   const emitValue = (value: ResultModel) => {
     validateOnUpdate?.(value)
 
@@ -175,6 +193,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
     innerModel,
     skeleton,
     initModel,
+    initFields,
     select,
     unselect,
     updateModelValue,

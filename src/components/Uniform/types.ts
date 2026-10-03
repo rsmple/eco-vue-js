@@ -5,7 +5,8 @@ export type ValidateResponse = {
   message: (string | ValidateResponse)[]
 } | undefined
 
-export type UniformValidate = (silent?: boolean, includeMessage?: boolean) => ValidateResponse | undefined
+/** Validates the fields; with `onlyChanged`, only those with unsaved changes, leaving the errors of the rest as they are. */
+export type UniformValidate = (silent?: boolean, includeMessage?: boolean, onlyChanged?: boolean) => ValidateResponse | undefined
 
 export type UniformInstance = {
   id: string
@@ -18,7 +19,7 @@ export type UniformInstance = {
   validate: UniformValidate
   invalidate: (payload: InvalidatePayload) => void
   getInvalidatePayload: () => InvalidatePayload | undefined
-  showMessage: (message: string, onlyChanged?: boolean) => void
+  showMessage: (message: string, onlyChanged?: boolean, fields?: string[]) => void
   getFieldChanged: (field: string) => boolean
 }
 

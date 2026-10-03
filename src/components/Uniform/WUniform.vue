@@ -105,9 +105,9 @@ type PropsBase = {
   mandatory?: boolean
   /** Passed to the slots, and with the scope to every field of the form. Set on its own while `useQueryFn` loads. */
   skeleton?: boolean
-  /** Saves every change right away. The changed field shows a spinner instead of the whole form being disabled. */
+  /** Saves every change right away. The changed field shows a spinner instead of the whole form being disabled. Only changed fields are checked and sent: an invalid one shows its error and waits until it is fixed, while the rest are saved. A change made while saving is sent once the save ends. */
   async?: boolean
-  /** Functions returning an error message for an invalid value. Errors show after a submit attempt and clear as soon as the value is valid. */
+  /** Functions returning an error message for an invalid value. Errors show after a submit attempt, or on each change with `async`, and clear as soon as the value is valid. */
   validate?: ValidateFn | ValidateFn[]
   /** Submitting state of a parent form, received with the scope. */
   submitting?: boolean
@@ -195,16 +195,30 @@ const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
 
     if (!scopeForm || !(value instanceof Object) || props.fullPayload) return value
 
-    return getChangedPayload<ResultModel>(value, scopeModel.modelValueInit.value, Object.values(scopeForm.map.value))
+    const instances = Object.values(scopeForm.map.value)
+    const payload = getChangedPayload<ResultModel>(value, scopeModel.modelValueInit.value, instances)
+
+    // Saving each change on its own: an invalid field waits until it is fixed.
+    if (props.async) {
+      for (const item of instances) {
+        if (!item.isValid && item.field !== undefined) delete payload[item.field as keyof ResultModel]
+      }
+    }
+
+    return payload
   },
   props.apiMethod,
-  (silent?: boolean | undefined, includeMessage?: boolean | undefined) => scope?.validate(silent, includeMessage),
+  (silent, includeMessage, onlyChanged) => scope?.validate(silent, includeMessage, onlyChanged),
   payload => scope?.invalidate(payload),
   result => emit('success', result),
-  result => scopeModel.initModel(result),
-  (message, onlyChanged) => scope?.showMessage(message, onlyChanged),
+  (result, payload, partial) => {
+    if (partial) scopeModel.initFields(result, payload)
+    else scopeModel.initModel(result ?? payload as unknown as InnerModel)
+  },
+  (message, onlyChanged, fields) => scope?.showMessage(message, onlyChanged, fields),
   () => props.noInit,
   () => props.async,
+  () => props.fullPayload,
 ) : undefined
 
 const scopeModel = useUniformModel(

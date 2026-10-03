@@ -13,19 +13,30 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
   validate: UniformValidate,
   invalidate: (payload: InvalidatePayload) => void,
   onSuccess: (value: OriginalModel) => void,
-  initModel: (value: OriginalModel) => void,
-  showMessage: (message: string, onlyChanged?: boolean) => void,
+  initModel: (value: OriginalModel | undefined, payload: ModelValue, partial: boolean) => void,
+  showMessage: (message: string, onlyChanged?: boolean, fields?: string[]) => void,
   noInitGetter: () => boolean,
   asyncGetter: () => boolean,
+  fullPayloadGetter: () => boolean | undefined,
 ) => {
   const submitting = ref(false)
 
+  // A change made while saving is sent once the save ends.
+  let resubmit = false
+
   const submit = (): Promise<boolean> => {
-    if (submitting.value) return Promise.resolve(false)
+    if (submitting.value) {
+      if (asyncGetter()) resubmit = true
 
-    const message = validate(false, true)
+      return Promise.resolve(false)
+    }
 
-    if (message) {
+    // Saving each change on its own: only the changed fields are checked, and the invalid ones wait without holding back the rest.
+    const partial = asyncGetter() && !fullPayloadGetter()
+
+    const message = validate(false, true, partial)
+
+    if (message && !partial) {
       if (!asyncGetter()) Notify.warn({
         title: 'Form contains invalid data',
         caption: h(WUniformErrorMessage, {message}),
@@ -36,6 +47,10 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
 
     const payload = payloadGetter()
 
+    if (partial && payload instanceof Object && !Object.keys(payload).length) return Promise.resolve(false)
+
+    const fields = partial && payload instanceof Object ? Object.keys(payload) : undefined
+
     submitting.value = true
 
     const promise = apiMethod(payload!)
@@ -45,9 +60,9 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
         const isResponse = isRequestResponse<OriginalModel>(response)
         const responseData = isResponse ? response.data : response
 
-        showMessage('Saved', true)
+        showMessage('Saved', true, fields)
 
-        if (!noInitGetter()) initModel(responseData ?? payload as unknown as OriginalModel)
+        if (!noInitGetter()) initModel(responseData, payload, partial)
         onSuccess(responseData ?? payload as unknown as OriginalModel)
 
         return true
@@ -76,6 +91,11 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
       })
       .finally(() => {
         submitting.value = false
+
+        if (resubmit) {
+          resubmit = false
+          submit()
+        }
       })
   }
 
