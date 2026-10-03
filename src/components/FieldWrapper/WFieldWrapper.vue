@@ -19,14 +19,14 @@
     <label
       v-if="!hideTitle && !embedded && !seamless && (title || $slots.title)"
       :id="`${id}-label`"
-      :for="id"
+      :for="noLabelFor ? undefined : id"
       class="text-accent relative block text-xs font-semibold leading-loose"
       :class="{
         'cursor-not-allowed opacity-50': isDisabled && !isReadonly && !isSkeleton,
         'col-start-1': subgrid,
       }"
       @mousedown="focused ? downed = true : undefined"
-      @click="downed && $event.preventDefault(); downed = false"
+      @click="downed ? $event.preventDefault() : noLabelFor && focusById(); downed = false"
     >
       <template v-if="!isSkeleton">
         <slot name="title">
@@ -198,7 +198,10 @@ import {wFieldSetShowMessage} from './use/useFieldSaved'
 defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
-  defineProps<FieldWrapperProps>(),
+  defineProps<FieldWrapperProps & {
+    /** Renders the title without `for`, for a field that is not a form control, such as a contenteditable — clicking the title still focuses the field. */
+    noLabelFor?: boolean
+  }>(),
   {
     readonly: undefined,
     disabled: undefined,
@@ -218,6 +221,8 @@ const {isReadonly, isDisabled, isSkeleton} = useComponentStates(props)
 const id = useId()
 
 const downed = ref(false)
+
+const focusById = (): void => document.getElementById(id)?.focus()
 
 const fieldRef = useTemplateRef<HTMLDivElement>('field')
 

@@ -3,6 +3,7 @@
     ref="fieldWrapper"
     v-bind="props"
     :has-changes="asyncState.hasChanges.value || hasChanges"
+    :no-label-for="textarea"
     :allow-clear="asyncState.isAsync.value ? (!textarea || allowClear) && asyncState.focused.value : allowClear"
     :class="[$attrs.class, {
       'group/seamless': seamless,

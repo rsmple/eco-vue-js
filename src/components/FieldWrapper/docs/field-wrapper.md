@@ -128,6 +128,7 @@ import WFieldWrapper from 'eco-vue-js/dist/components/FieldWrapper/WFieldWrapper
 | `allowDropFile` | `boolean` | — | Accepts files dropped onto the field. |
 | `hideTitle` | `boolean` | — | Hides the title while keeping the rest of the layout. |
 | `embedded` | `boolean` | — | For a field placed inside another component, such as a dropdown: no title, no margin, and horizontal padding. |
+| `noLabelFor` | `boolean` | — | Renders the title without `for`, for a field that is not a form control, such as a contenteditable — clicking the title still focuses the field. |
 
 #### Events
 
