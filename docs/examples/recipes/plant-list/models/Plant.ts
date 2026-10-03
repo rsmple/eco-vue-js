@@ -55,7 +55,7 @@ export type Plant = {
   description: string
 }
 
-const CARETAKERS: Caretaker[] = [
+export const caretakers: Caretaker[] = [
   {name: 'Ivy Moss', tone: 'tone-data-green'},
   {name: 'Rowan Oak', tone: 'tone-data-amber'},
   {name: 'Fern Ash', tone: 'tone-data-violet'},
@@ -177,7 +177,7 @@ export const plants: Plant[] = SOURCE.map(([name, species, kind, height], index)
     waterings: Array.from({length: 28}, (_, day) => addDay(today, -day))
       .filter((_, day) => day >= lastWatered && (day - lastWatered) % INTERVAL[kind] === 0),
     temperature: TEMPERATURE[kind],
-    caretaker: CARETAKERS[index % CARETAKERS.length]!,
+    caretaker: caretakers[index % caretakers.length]!,
     tasks: [
       {title: 'Fertilize', due: addDay(today, index * 3 % 14 - 2)},
       {title: 'Prune', due: addDay(today, 7 + index * 5 % 30)},

@@ -2,14 +2,23 @@ import {createUseQueryParams} from 'eco-vue-js/dist/utils/api'
 import {Order, parseOrdering} from 'eco-vue-js/dist/utils/order'
 import {createRestModelApi} from 'eco-vue-js/dist/utils/restModelApi'
 import {paginateList} from 'eco-vue-js/dist/utils/useDefaultQuery'
-import {isId, parseString} from 'eco-vue-js/dist/utils/utils'
+import {isId, parseBoolean, parseString, parseStringList} from 'eco-vue-js/dist/utils/utils'
 
-import {type Plant, plants} from '../models/Plant'
+import {Kind, Light, type Plant, plants} from '../models/Plant'
+
+/** Parses a comma-separated list, dropping values that are not in `values`, such as ones edited into the URL by hand. */
+const parseEnumList = <Value extends string>(values: Value[]): ParseFn<Value[]> => value => {
+  return parseStringList(value)?.filter((item): item is Value => (values as string[]).includes(item))
+}
 
 /** The filters a user sets on the list. In an app they are kept in the URL. */
 export const useQueryParamsPlants = createUseQueryParams({
   search: parseString,
   ordering: parseString,
+  kind__in: parseEnumList(Object.values(Kind)),
+  light__in: parseEnumList(Object.values(Light)),
+  watered: parseBoolean,
+  caretaker: parseString,
 })
 
 export type QueryParamsPlants = typeof useQueryParamsPlants['QueryParams'] & {
@@ -39,6 +48,7 @@ const compare = (a: Plant, b: Plant, field: keyof Plant, direction: 1 | -1) => {
 
 /** Filters and sorts by the same query params a backend would receive. */
 const filterPlants = (queryParams: QueryParamsPlants | undefined) => {
+  const {kind__in, light__in, watered, caretaker} = queryParams ?? {}
   const search = queryParams?.search?.trim().toLowerCase()
   const ids = queryParams?.id__in?.split(',').map(Number)
   let result = search
@@ -46,6 +56,10 @@ const filterPlants = (queryParams: QueryParamsPlants | undefined) => {
     : source
 
   if (ids) result = result.filter(plant => ids.includes(plant.id))
+  if (kind__in) result = result.filter(plant => kind__in.includes(plant.kind))
+  if (light__in) result = result.filter(plant => light__in.includes(plant.light))
+  if (watered !== undefined) result = result.filter(plant => plant.watered === watered)
+  if (caretaker) result = result.filter(plant => plant.caretaker.name === caretaker)
 
   if (queryParams?.ordering) {
     const ordering = parseOrdering<keyof Plant>(queryParams.ordering)

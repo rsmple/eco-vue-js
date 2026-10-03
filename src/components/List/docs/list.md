@@ -63,7 +63,7 @@ const archive = () => plantApi.archive(props.queryParamsGetter()).then(() => emi
 
 `WListFilter` renders filter components for query params held in a Uniform form's `scope` — usually a form over the route query. Each filter is a component with a `meta` export (its `title`, `icon` and the `fields` it sets) that gets `scope`, `global` and `readonly`. `search` adds a text search for the `search` param, or `filterSearch` for your own.
 
-In place, the filters are chips in a row: the set ones are shown, and a button adds another. With `global` they go into the app shell instead — the filters into the actions bar's panel and the search into the header bar — with a button that resets them. `disabledFilterFields` leaves out filters for params the page fixes.
+In place, the filters are chips in a row: the set ones are shown, and a button adds another. With `global` they go into the app shell instead — the filters into the actions bar's panel and the search into the header bar — with a button that resets them. `disabledFilterFields` leaves out filters for params the page fixes. The [List with fields](/recipes/list-with-fields#filters) recipe builds a set of filters for its list.
 
 `WListHeader` and `WListHeaderItem` are the table header row of the list, with the select-all checkbox and sortable, resizable column titles. `WList` renders them from `fields`.
 
