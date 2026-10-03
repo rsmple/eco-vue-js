@@ -4,6 +4,8 @@
       v-if="modelValue.length <= prefixMax"
       :use-query-fn="useQueryFn"
       :query-params="({page: 1, size: prefixMax, [valueQueryKey]: valueInString} as QueryParams)"
+      :values="modelValue.slice(0, prefixMax)"
+      :known-data="knownData"
       :option-component="(optionComponent as SelectOptionComponent<Data>)"
       :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
       :disable-clear="disableClear"

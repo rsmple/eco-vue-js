@@ -57,6 +57,7 @@
           :readonly="isReadonly"
           :prefix-text="prefixText"
           :prefix-max="prefixMax"
+          :known-data="knownData"
           @unselect="unselect"
           @update:fetching="!$event && updateDropdown(); isFetchingPrefix = $event"
           @update:model-value="updateSelected"
@@ -196,6 +197,7 @@ const focused = ref(false)
 const isFetchingPrefix = ref(false)
 const search = ref('')
 const loadingCreate = ref(false)
+const knownData = new Map<string, Data>()
 
 const isDisabledComputed = computed(() => props.loading || isReadonly.value || isDisabled.value)
 const isModelValueSearch = computed(() => !!search.value && props.modelValue?.includes(search.value as Model))
@@ -249,6 +251,8 @@ const captureDoubleDelete = () => {
 
 const select = (item: Model, data: Data): void => {
   if (isDisabledComputed.value) return
+
+  knownData.set(String(item), data)
 
   emit('select', item, data)
 

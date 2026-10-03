@@ -149,12 +149,15 @@ export interface SelectAsyncPrefixProps<Model extends number | string, Data exte
   readonly: boolean | undefined
   prefixText: string | undefined
   prefixMax: number
+  knownData: Map<string, Data>
 }
 
 export interface SelectAsyncPrefixPageProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
   extends SelectOptionComponentProps<Data, OptionComponent> {
   useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
   queryParams: QueryParams
+  values: Model[]
+  knownData: Map<string, Data>
   disabled?: boolean
   loading?: boolean
   disableClear?: boolean
