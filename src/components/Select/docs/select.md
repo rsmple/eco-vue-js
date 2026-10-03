@@ -134,7 +134,7 @@ The tags are drawn by an `optionComponent` rather than the `option` slot. The se
 
   <div
     v-else
-    class="tone-primary w-option w-option-has-bg tone-primary bg-tone/10 text-tone grid max-w-max grid-cols-[1fr_auto] items-center gap-1 font-semibold"
+    class="tone-primary w-option w-option-has-bg bg-tone/10 text-tone grid max-w-max grid-cols-[1fr_auto] items-center gap-1 font-semibold"
   >
     <div class="truncate">
       {{ option?.name ?? search }}
@@ -175,18 +175,11 @@ To show the chosen value before the user opens the dropdown, the select requests
     :value-getter="item => item.id"
     title="Plant"
     placeholder="Search by name or species"
+    :option-component="OptionPlant"
     allow-clear
     :clear-value="null"
     class="max-w-md"
-  >
-    <template #option="{option}">
-      <div class="w-option flex items-center">
-        <span v-if="option">
-          {{ option.name }} <span class="text-description italic">— {{ option.species }}</span>
-        </span>
-      </div>
-    </template>
-  </WSelectAsyncSingle>
+  />
 
   <p class="text-sm text-description">
     Model: {{ plantId ?? 'null' }}
@@ -198,6 +191,8 @@ import {ref} from 'vue'
 
 import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSingle.vue'
 
+import OptionPlant from './parts/OptionPlant.vue'
+
 // The `use` of any paginated query — here the plant model from the list recipe.
 import {plantModelApi} from '../../../../../docs/examples/recipes/plant-list/api/Plant'
 
@@ -206,6 +201,913 @@ const plantId = ref<number | null>(3)
 ```
 
 <!-- @example-end -->
+
+Until the selected plant loads by id, the select renders its option with `skeleton` — give the option a `WSkeleton` branch, or the field stays blank for that moment. Options on menu pages that are still loading get it too.
+
+<!-- @source src/components/Select/docs/examples/parts/OptionPlant.vue OptionPlant.vue -->
+
+```vue [OptionPlant.vue]
+<template>
+  <!-- Shown while the selected plant loads by id, and for options on pages still loading. -->
+  <WSkeleton
+    v-if="skeleton"
+    class="w-option w-skeleton-w-48"
+  />
+
+  <div
+    v-else
+    class="w-option grid grid-cols-[auto_1fr_auto] items-center gap-2"
+  >
+    <span
+      class="bg-tone-fill size-2.5 rounded-full"
+      :class="option ? kindToneMap[option.kind] : 'tone-data-gray'"
+    />
+
+    <span class="truncate">
+      {{ option?.name ?? search }} <span
+        v-if="option"
+        class="text-description italic"
+      >{{ option.species }}</span>
+    </span>
+
+    <slot />
+  </div>
+</template>
+
+<script lang="ts" setup>
+import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
+
+import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
+
+import {Kind, type Plant} from '../../../../../../docs/examples/recipes/plant-list/models/Plant'
+
+defineProps<SelectOptionProps<Plant>>()
+
+const kindToneMap: Record<Kind, string> = {
+  [Kind.TROPICAL]: 'tone-data-green',
+  [Kind.SUCCULENT]: 'tone-data-orange',
+  [Kind.FERN]: 'tone-data-teal',
+  [Kind.HERB]: 'tone-data-violet',
+}
+</script>
+```
+
+<!-- @source-end -->
+
+## Option layouts
+
+An option is any markup, so it can carry as much as a card. The same component draws an option in three places, and its props tell them apart:
+
+- **In the field** — `model` is `true`. Keep it to one line of `w-option` height, so the input does not grow. In a multiple select, the default slot holds the unselect button: place it inside the option's background.
+- **In the menu** — `model` is falsy and there is room: add more rows, and a `py-1` to space them. `selected` is set for picked options.
+- **While loading** — `skeleton` is `true` and `option` may be `undefined`. Draw a `WSkeleton` the size of what it stands for.
+- **The "New:" row** of `createOption` — `option` is empty and `search` holds the typed text, which the option shows instead.
+
+Extra props of an option component, like a display variant, are passed with `optionComponentProps`.
+
+### Tags with their own color
+
+Each option carries its tone, and the tag paints a soft background with it — `w-option-has-bg` stretches it to the field's edge. A typed light level is created with the tag icon and a gray tone.
+
+<!-- @example Select/Light -->
+
+<DocsDemo name="Select/Light" />
+
+```vue
+<template>
+  <WSelect
+    :model-value="light"
+    :options="options"
+    :value-getter="item => item.id"
+    :search-fn="(item, search) => item.name.toLowerCase().includes(search)"
+    :create-option="createLight"
+    title="Light it tolerates"
+    placeholder="Add a light level"
+    :option-component="OptionLight"
+    class="max-w-md"
+    @select="light = [...light, $event]"
+    @unselect="light = light.filter(item => item !== $event)"
+  />
+
+  <p class="text-sm text-description">
+    Model: {{ light }}
+  </p>
+</template>
+
+<script lang="ts" setup>
+import {markRaw, reactive, ref} from 'vue'
+
+import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
+
+import IconCloud from 'eco-vue-js/dist/assets/icons/IconCloud'
+import IconCloudSun from 'eco-vue-js/dist/assets/icons/IconCloudSun'
+import IconCloudSunPartial from 'eco-vue-js/dist/assets/icons/IconCloudSunPartial'
+import IconMoon from 'eco-vue-js/dist/assets/icons/IconMoon'
+import IconSun from 'eco-vue-js/dist/assets/icons/IconSun'
+
+import OptionLight, {type Light} from './parts/OptionLight.vue'
+
+const options = reactive<Light[]>([
+  {id: 'full-sun', name: 'Full sun', tone: 'tone-data-amber', icon: markRaw(IconSun)},
+  {id: 'bright-indirect', name: 'Bright indirect', tone: 'tone-data-orange', icon: markRaw(IconCloudSun)},
+  {id: 'part-shade', name: 'Part shade', tone: 'tone-data-teal', icon: markRaw(IconCloudSunPartial)},
+  {id: 'shade', name: 'Shade', tone: 'tone-data-cyan', icon: markRaw(IconCloud)},
+  {id: 'low-light', name: 'Low light', tone: 'tone-data-violet', icon: markRaw(IconMoon)},
+])
+
+const light = ref<string[]>(['bright-indirect', 'part-shade'])
+
+// In an app, a POST that answers with the saved option. Without an icon, the option shows a tag.
+const createLight = (search: string): Light => {
+  const option = {id: search.toLowerCase().replaceAll(' ', '-'), name: search, tone: 'tone-data-gray'}
+
+  options.push(option)
+
+  return option
+}
+</script>
+```
+
+<!-- @example-end -->
+
+<!-- @source src/components/Select/docs/examples/parts/OptionLight.vue OptionLight.vue -->
+
+```vue [OptionLight.vue]
+<template>
+  <WSkeleton
+    v-if="skeleton"
+    class="w-option"
+  />
+
+  <!-- Each option brings its own tone; a typed one, not created yet, has no option and falls back to the search text. -->
+  <div
+    v-else
+    class="w-option w-option-has-bg bg-tone-soft text-tone grid max-w-max grid-cols-[auto_1fr_auto] items-center gap-1.5 font-semibold"
+    :class="option?.tone ?? 'tone-data-gray'"
+  >
+    <component
+      :is="option?.icon ?? IconTag"
+      class="square-[1.25em] shrink-0"
+    />
+
+    <span class="truncate">{{ option?.name ?? search }}</span>
+
+    <!-- The select puts its unselect button here, for a chosen tag in the field. -->
+    <slot />
+  </div>
+</template>
+
+<script lang="ts" setup>
+import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
+
+import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
+
+import IconTag from 'eco-vue-js/dist/assets/icons/IconTag'
+
+export type Light = {
+  id: string
+  name: string
+  tone: string
+  icon?: SVGComponent
+}
+
+defineProps<SelectOptionProps<Light>>()
+</script>
+```
+
+<!-- @source-end -->
+
+### Avatar and details
+
+One line in the field; in the menu, the option fills the row with a larger avatar, a second line and a count pushed to the right. The avatar color is picked from the name, so a person keeps it everywhere.
+
+<!-- @example Select/Gardener -->
+
+<DocsDemo name="Select/Gardener" />
+
+```vue
+<template>
+  <WSelectSingle
+    v-model="gardenerId"
+    :options="gardeners"
+    :value-getter="item => item.id"
+    :search-fn="(item, search) => item.name.toLowerCase().includes(search) || item.role.toLowerCase().includes(search)"
+    title="On watering duty"
+    placeholder="Pick a gardener"
+    :option-component="OptionGardener"
+    allow-clear
+    :clear-value="null"
+    class="max-w-md"
+  />
+
+  <p class="text-sm text-description">
+    Model: {{ gardenerId ?? 'null' }}
+  </p>
+</template>
+
+<script lang="ts" setup>
+import {ref} from 'vue'
+
+import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
+
+import OptionGardener, {type Gardener} from './parts/OptionGardener.vue'
+
+const gardeners: Gardener[] = [
+  {id: 1, name: 'Mira Kovač', role: 'Head gardener', beds: 12},
+  {id: 2, name: 'Tomás Reyes', role: 'Greenhouse', beds: 4},
+  {id: 3, name: 'Aiko Tanaka', role: 'Seedlings', beds: 7},
+  {id: 4, name: 'Jonas Berg', role: 'Herb garden', beds: 3},
+  {id: 5, name: 'Priya Nair', role: 'Orchard', beds: 9},
+]
+
+const gardenerId = ref<number | null>(1)
+</script>
+```
+
+<!-- @example-end -->
+
+<!-- @source src/components/Select/docs/examples/parts/OptionGardener.vue OptionGardener.vue -->
+
+```vue [OptionGardener.vue]
+<template>
+  <WSkeleton
+    v-if="skeleton || !option"
+    class="w-option w-option-has-bg"
+  />
+
+  <!-- One line in the field, so it keeps the input's height; the menu adds the role and fills the row, pushing the count right. -->
+  <div
+    v-else
+    class="w-option w-option-has-bg grid grid-cols-[auto_1fr_auto] items-center gap-2"
+    :class="model ? 'w-option-has-bg' : undefined"
+  >
+    <span
+      class="surface-fill flex shrink-0 items-center justify-center rounded-full font-semibold -ml-2"
+      :class="[toneOf(option.name), model ? 'size-5 text-[0.625rem]' : 'size-8 text-xs']"
+    >
+      {{ option.name.split(' ').map(part => part[0]).join('') }}
+    </span>
+
+    <span
+      v-if="model"
+      class="truncate"
+    >{{ option.name }}</span>
+
+    <span
+      v-else
+      class="grid min-w-0"
+    >
+      <span class="text-accent truncate">{{ option.name }}</span>
+      <span class="text-description truncate text-xs">{{ option.role }}</span>
+    </span>
+
+    <span
+      v-if="!model"
+      class="text-description bg-surface-muted rounded-full px-2 text-xs whitespace-nowrap"
+    >
+      {{ option.beds }} beds
+    </span>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
+
+import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
+
+export type Gardener = {
+  id: number
+  name: string
+  role: string
+  beds: number
+}
+
+defineProps<SelectOptionProps<Gardener>>()
+
+const TONES = ['tone-data-green', 'tone-data-teal', 'tone-data-amber', 'tone-data-violet', 'tone-data-pink', 'tone-data-cyan']
+
+/** The same name always gets the same color. */
+const toneOf = (name: string) => TONES[[...name].reduce((hash, char) => hash + char.charCodeAt(0), 0) % TONES.length]
+</script>
+```
+
+<!-- @source-end -->
+
+### Joined segments
+
+Three segments, each a `w-option-has-bg` with its own background: the name, the humidity colored by range, and the kind on a gradient that holds the unselect button. The option's own `textOnly` prop, passed through `optionComponentProps`, drops the backgrounds and keeps the colored text — for a plain list or a table cell.
+
+<!-- @example Select/Passport -->
+
+<DocsDemo name="Select/Passport" />
+
+```vue
+<template>
+  <WSelectAsync
+    :model-value="plantIds"
+    :use-query-fn-options="plantModelApi.paginated.use"
+    :query-params-options="{}"
+    :value-getter="item => item.id"
+    title="Shelf by the window"
+    placeholder="Add a plant"
+    :option-component="OptionPassport"
+    :option-component-props="{textOnly}"
+    class="max-w-xl"
+    @select="plantIds = [...plantIds, $event]"
+    @unselect="plantIds = plantIds.filter(item => item !== $event)"
+    @update:model-value="plantIds = $event"
+  />
+
+  <WCheckbox
+    v-model="textOnly"
+    title="Text only"
+  />
+
+  <p class="text-sm text-description">
+    Model: {{ plantIds }}
+  </p>
+</template>
+
+<script lang="ts" setup>
+import {ref} from 'vue'
+
+import WCheckbox from 'eco-vue-js/dist/components/Checkbox/WCheckbox.vue'
+import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
+
+import OptionPassport from './parts/OptionPassport.vue'
+
+import {plantModelApi} from '../../../../../docs/examples/recipes/plant-list/api/Plant'
+
+const plantIds = ref<number[]>([1, 2, 3, 4])
+
+const textOnly = ref(false)
+</script>
+```
+
+<!-- @example-end -->
+
+<!-- @source src/components/Select/docs/examples/parts/OptionPassport.vue OptionPassport.vue -->
+
+```vue [OptionPassport.vue]
+<template>
+  <WSkeleton
+    v-if="skeleton"
+    class="w-option w-skeleton-w-48"
+  />
+
+  <!-- Three joined segments, each with its own background, so each is a `w-option-has-bg`. -->
+  <div
+    v-else
+    class="w-option flex w-max max-w-full overflow-hidden"
+  >
+    <div
+      class="w-option-has-bg text-accent flex min-w-0 items-center rounded-l-[inherit]"
+      :class="{'bg-surface border-line-subtle border-y border-l': !textOnly}"
+    >
+      <span class="truncate">{{ option?.name ?? search }}</span>
+    </div>
+
+    <div
+      v-if="option"
+      class="w-option-has-bg text-tone flex items-center font-semibold tabular-nums"
+      :class="[humidityTone, {'surface-soft border-y border-line-subtle': !textOnly}]"
+      :title="`Prefers ${ option.humidity }% air humidity`"
+    >
+      <IconDrop class="square-[1em] mr-1" />
+      {{ option.humidity }}%
+    </div>
+
+    <div
+      class="w-option-has-bg grid grid-cols-[1fr_auto] items-center gap-1 rounded-r-[inherit] font-semibold capitalize"
+      :class="textOnly ? ['text-tone', kindStyle.tone] : ['surface-fill bg-linear-to-r', kindStyle.tone, kindStyle.gradient]"
+    >
+      <span class="truncate">{{ option?.kind ?? 'new' }}</span>
+
+      <!-- The unselect button lands in the last segment, on the gradient. -->
+      <slot />
+    </div>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import {computed} from 'vue'
+
+import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
+
+import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
+
+import IconDrop from 'eco-vue-js/dist/assets/icons/IconDrop'
+
+import {Kind, type Plant} from '../../../../../../docs/examples/recipes/plant-list/models/Plant'
+
+const props = defineProps<SelectOptionProps<Plant> & {
+  /** Colors the text only, without backgrounds — for a plain list or a table cell. */
+  textOnly?: boolean
+}>()
+
+/** `surface-fill` takes the tone for the text and the unselect button; the gradient paints over its flat fill. */
+const kindStyleMap: Record<Kind, {tone: string, gradient: string}> = {
+  [Kind.TROPICAL]: {tone: 'tone-data-green', gradient: 'from-data-green to-data-teal'},
+  [Kind.SUCCULENT]: {tone: 'tone-data-orange', gradient: 'from-data-orange to-data-pink'},
+  [Kind.FERN]: {tone: 'tone-data-teal', gradient: 'from-data-teal to-data-cyan'},
+  [Kind.HERB]: {tone: 'tone-data-violet', gradient: 'from-data-violet to-data-fuchsia'},
+}
+
+const kindStyle = computed(() => props.option ? kindStyleMap[props.option.kind] : {tone: 'tone-data-gray', gradient: 'from-data-gray to-data-gray'})
+
+const humidityTone = computed(() => {
+  if (!props.option || props.option.humidity < 50) return 'tone-data-amber'
+  if (props.option.humidity <= 65) return 'tone-data-green'
+  return 'tone-data-cyan'
+})
+</script>
+```
+
+<!-- @source-end -->
+
+### Compact in the field, a card in the menu
+
+The first line is the whole option in the field: the bed, the date and how many seedlings sprouted and were lost. The menu adds the crops and a bar of how the tray is doing. The skeleton follows the same split.
+
+<!-- @example Select/Batch -->
+
+<DocsDemo name="Select/Batch" />
+
+```vue
+<template>
+  <WSelectAsyncSingle
+    v-model="batchId"
+    :use-query-fn-options="batchModelApi.paginated.use"
+    :query-params-options="{}"
+    :value-getter="item => item.id"
+    title="Seed tray"
+    placeholder="Search by bed or crop"
+    :option-component="OptionBatch"
+    allow-clear
+    :clear-value="null"
+    class="max-w-md"
+  />
+
+  <p class="text-sm text-description">
+    Model: {{ batchId ?? 'null' }}
+  </p>
+</template>
+
+<script lang="ts" setup>
+import {ref} from 'vue'
+
+import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSingle.vue'
+
+import {batchModelApi} from './api/garden'
+import OptionBatch from './parts/OptionBatch.vue'
+
+const batchId = ref<number | null>(3)
+</script>
+```
+
+<!-- @example-end -->
+
+<!-- @source src/components/Select/docs/examples/parts/OptionBatch.vue OptionBatch.vue -->
+
+```vue [OptionBatch.vue]
+<template>
+  <!-- The placeholder takes the shape of what it stands for: one line in the field, a card in the menu. -->
+  <WSkeleton
+    v-if="skeleton && model"
+    class="w-option w-skeleton-w-56"
+  />
+
+  <div
+    v-else-if="skeleton"
+    class="grid gap-1.5 py-1"
+  >
+    <WSkeleton class="w-skeleton-h-5" />
+    <WSkeleton class="w-skeleton-h-5 w-skeleton-w-32" />
+    <WSkeleton class="w-skeleton-h-1.5 w-skeleton-w-full" />
+  </div>
+
+  <div
+    v-else-if="option"
+    class="w-option grid content-center gap-1.5"
+  >
+    <!-- The first line is the whole option in the field. -->
+    <div class="grid grid-cols-[1fr_auto_auto_auto] items-center gap-2">
+      <span class="text-accent truncate">
+        <span class="font-semibold">{{ option.bed }}</span> · sown {{ dateFormatter.format(option.sownAt) }}
+      </span>
+
+      <span class="tone-data-green text-tone text-xs font-semibold tabular-nums">+{{ option.sprouted }}</span>
+      <span
+        class="text-xs font-semibold tabular-nums"
+        :class="option.lost ? 'tone-data-red text-tone' : 'text-subtle'"
+      >−{{ option.lost }}</span>
+
+      <slot />
+    </div>
+
+    <template v-if="!model">
+      <div class="flex flex-wrap gap-1">
+        <span
+          v-for="crop in option.crops"
+          :key="crop"
+          class="bg-tone-soft text-tone rounded-full px-2 text-xs font-semibold"
+          :class="cropToneMap[crop]"
+        >
+          {{ crop }}
+        </span>
+      </div>
+
+      <!-- How the tray is doing: sprouted, still waiting, lost. -->
+      <div class="flex h-1.5 overflow-hidden rounded-full bg-surface-muted">
+        <div
+          v-for="part in parts"
+          :key="part.label"
+          :class="part.class"
+          :style="{width: `${ part.value / total * 100 }%`}"
+        />
+      </div>
+
+      <div class="text-description flex gap-3 text-xs">
+        <span
+          v-for="part in parts"
+          :key="part.label"
+          class="flex items-center gap-1"
+        >
+          <span
+            class="size-2 rounded-full"
+            :class="part.class"
+          />
+          {{ part.value }} {{ part.label }}
+        </span>
+      </div>
+    </template>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import {computed} from 'vue'
+
+import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
+
+import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
+
+import {type Batch, cropToneMap} from '../api/garden'
+
+const props = defineProps<SelectOptionProps<Batch>>()
+
+const dateFormatter = Intl.DateTimeFormat('en', {day: 'numeric', month: 'short'})
+
+const parts = computed(() => props.option
+  ? [
+    {label: 'sprouted', value: props.option.sprouted, class: 'bg-data-green'},
+    {label: 'waiting', value: props.option.waiting, class: 'bg-data-amber'},
+    {label: 'lost', value: props.option.lost, class: 'bg-data-red'},
+  ]
+  : [])
+
+const total = computed(() => parts.value.reduce((sum, part) => sum + part.value, 0) || 1)
+</script>
+```
+
+<!-- @source-end -->
+
+### A dense card
+
+A seed variety with its crop, flags drawn as icons and a sowing calendar — twelve cells colored for sowing, harvest, or both. The legend sits above the options in the `content` slot. In the field it collapses to a colored tag.
+
+<!-- @example Select/Variety -->
+
+<DocsDemo name="Select/Variety" />
+
+```vue
+<template>
+  <WSelectAsync
+    :model-value="varietyIds"
+    :use-query-fn-options="varietyModelApi.paginated.use"
+    :query-params-options="{}"
+    :value-getter="item => item.id"
+    title="Seeds to order"
+    placeholder="Search by variety or crop"
+    :option-component="OptionVariety"
+    class="max-w-xl"
+    @select="varietyIds = [...varietyIds, $event]"
+    @unselect="varietyIds = varietyIds.filter(item => item !== $event)"
+  >
+    <!-- A legend for the calendar strip, above the options. -->
+    <template #content>
+      <div class="text-description flex gap-3 px---w-select-option-padding pt-2 text-xs">
+        <span class="flex items-center gap-1"><span class="bg-data-teal size-2 rounded-full" /> Sow</span>
+        <span class="flex items-center gap-1"><span class="bg-data-amber size-2 rounded-full" /> Harvest</span>
+      </div>
+    </template>
+  </WSelectAsync>
+
+  <p class="text-sm text-description">
+    Model: {{ varietyIds }}
+  </p>
+</template>
+
+<script lang="ts" setup>
+import {ref} from 'vue'
+
+import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
+
+import {varietyModelApi} from './api/garden'
+import OptionVariety from './parts/OptionVariety.vue'
+
+const varietyIds = ref<number[]>([1, 9])
+</script>
+```
+
+<!-- @example-end -->
+
+<!-- @source src/components/Select/docs/examples/parts/OptionVariety.vue OptionVariety.vue -->
+
+```vue [OptionVariety.vue]
+<template>
+  <WSkeleton
+    v-if="skeleton && model"
+    class="w-option"
+  />
+
+  <div
+    v-else-if="skeleton"
+    class="grid gap-1.5 py-1"
+  >
+    <WSkeleton class="w-skeleton-h-5" />
+    <WSkeleton class="w-skeleton-h-4 w-skeleton-w-48" />
+    <WSkeleton class="w-skeleton-h-4 w-skeleton-w-full" />
+  </div>
+
+  <!-- In the field: the name with a crop tag, and the unselect button inside it. -->
+  <div
+    v-else-if="model"
+    class="w-option w-option-has-bg bg-tone-soft text-tone grid max-w-max grid-cols-[auto_1fr_auto] items-center gap-1.5"
+    :class="option ? cropToneMap[option.crop] : 'tone-data-gray'"
+  >
+    <span class="bg-tone-fill size-2 rounded-full" />
+    <span class="truncate font-semibold">{{ option?.name ?? search }}</span>
+
+    <slot />
+  </div>
+
+  <div
+    v-else-if="option"
+    class="grid max-w-full gap-1 py-1"
+  >
+    <div class="flex min-w-0 items-center gap-2">
+      <span class="text-accent truncate font-semibold">{{ option.name }}</span>
+
+      <span
+        class="bg-tone-soft text-tone shrink-0 rounded-full px-2 text-xs font-semibold"
+        :class="cropToneMap[option.crop]"
+      >{{ option.crop }}</span>
+
+      <span
+        v-if="option.heirloom"
+        class="tone-data-amber text-tone ml-auto flex shrink-0 items-center gap-1 text-xs font-semibold"
+      >
+        <IconStar class="square-[1.25em]" />
+        Heirloom
+      </span>
+    </div>
+
+    <div class="text-description text-xs">
+      Germinates in {{ option.germination[0] }}–{{ option.germination[1] }} days · first harvest at {{ option.harvest }} days
+    </div>
+
+    <div class="flex gap-3 text-xs">
+      <span
+        class="flex items-center gap-1"
+        :class="option.organic ? 'tone-data-green text-tone' : 'text-description'"
+      >
+        <IconPlant class="square-[1.25em]" />
+        {{ option.organic ? 'Organic' : 'Conventional' }}
+      </span>
+
+      <span
+        class="flex items-center gap-1"
+        :class="option.frostHardy ? 'tone-data-cyan text-tone' : 'text-description'"
+      >
+        <IconSnowflake class="square-[1.25em]" />
+        {{ option.frostHardy ? 'Frost-hardy' : 'Frost-tender' }}
+      </span>
+    </div>
+
+    <!-- The year at a glance: when to sow, when to harvest, and months that are both. -->
+    <div class="mt-0.5 flex gap-0.5">
+      <span
+        v-for="(month, monthIndex) in MONTHS"
+        :key="monthIndex"
+        class="flex h-4 items-center justify-center rounded-sm text-[0.5625rem] font-semibold px-2"
+        :class="monthClass(monthIndex)"
+      >
+        {{ month }}
+      </span>
+    </div>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
+
+import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
+
+import IconPlant from 'eco-vue-js/dist/assets/icons/IconPlant'
+import IconSnowflake from 'eco-vue-js/dist/assets/icons/IconSnowflake'
+import IconStar from 'eco-vue-js/dist/assets/icons/IconStar'
+
+import {type Variety, cropToneMap} from '../api/garden'
+
+const props = defineProps<SelectOptionProps<Variety>>()
+
+const MONTHS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
+
+const monthClass = (month: number) => {
+  const sow = props.option?.sowMonths.includes(month)
+  const harvest = props.option?.harvestMonths.includes(month)
+
+  // `surface-fill` picks a readable text color for the tone; the split gradient paints over its fill.
+  if (sow && harvest) return 'tone-data-teal surface-fill bg-linear-to-br from-data-teal from-50% to-data-amber to-50%'
+  if (sow) return 'tone-data-teal surface-fill'
+  if (harvest) return 'tone-data-amber surface-fill'
+  return 'bg-surface-muted text-subtle'
+}
+</script>
+```
+
+<!-- @source-end -->
+
+The batches and varieties come from a mock API, built the same way as the plants:
+
+<!-- @source src/components/Select/docs/examples/api/garden.ts api/garden.ts -->
+
+```ts [api/garden.ts]
+import {createRestModelApi} from 'eco-vue-js/dist/utils/restModelApi'
+import {paginateList} from 'eco-vue-js/dist/utils/useDefaultQuery'
+
+export enum Crop {
+  TOMATO = 'Tomato',
+  PEPPER = 'Pepper',
+  SQUASH = 'Squash',
+  BEAN = 'Bean',
+  KALE = 'Kale',
+  CUCUMBER = 'Cucumber',
+  EGGPLANT = 'Eggplant',
+  BEET = 'Beet',
+  RADISH = 'Radish',
+  CARROT = 'Carrot',
+}
+
+/** Each crop gets one of the theme's data colors, used as a tone: `text-tone`, `bg-tone-soft`, `surface-fill`. */
+export const cropToneMap: Record<Crop, string> = {
+  [Crop.TOMATO]: 'tone-data-red',
+  [Crop.PEPPER]: 'tone-data-orange',
+  [Crop.SQUASH]: 'tone-data-amber',
+  [Crop.BEAN]: 'tone-data-green',
+  [Crop.KALE]: 'tone-data-teal',
+  [Crop.CUCUMBER]: 'tone-data-cyan',
+  [Crop.EGGPLANT]: 'tone-data-violet',
+  [Crop.BEET]: 'tone-data-fuchsia',
+  [Crop.RADISH]: 'tone-data-pink',
+  [Crop.CARROT]: 'tone-data-orange',
+}
+
+/** A tray of seeds sown into a bed on one day. */
+export type Batch = {
+  id: number
+  bed: string
+  sownAt: Date
+  crops: Crop[]
+  sprouted: number
+  waiting: number
+  lost: number
+}
+
+/** A seed variety from the catalogue. Months are 0-based. */
+export type Variety = {
+  id: number
+  name: string
+  crop: Crop
+  heirloom: boolean
+  organic: boolean
+  frostHardy: boolean
+  /** Days to germinate, from and to. */
+  germination: [number, number]
+  /** Days from sowing to the first harvest. */
+  harvest: number
+  sowMonths: number[]
+  harvestMonths: number[]
+}
+
+type QueryParams = {
+  page?: number
+  search?: string
+  /** Comma-separated ids — how async selects look up the items behind their model value. */
+  id__in?: string
+}
+
+const batches: Batch[] = ([
+  ['Bed 1', [2, 3], [Crop.TOMATO, Crop.PEPPER], 18, 4, 2],
+  ['Bed 2', [2, 9], [Crop.KALE], 22, 0, 1],
+  ['Bed 3', [2, 17], [Crop.BEET, Crop.RADISH, Crop.CARROT], 31, 12, 5],
+  ['Bed 4', [2, 24], [Crop.BEAN], 9, 14, 0],
+  ['Bed 5', [3, 1], [Crop.SQUASH, Crop.CUCUMBER], 6, 8, 4],
+  ['Greenhouse A', [3, 6], [Crop.EGGPLANT, Crop.PEPPER], 12, 2, 0],
+  ['Greenhouse B', [3, 14], [Crop.TOMATO], 24, 6, 3],
+  ['Bed 6', [3, 21], [Crop.RADISH], 40, 0, 2],
+  ['Bed 7', [4, 2], [Crop.BEAN, Crop.SQUASH], 3, 20, 1],
+  ['Cold frame', [4, 11], [Crop.KALE, Crop.BEET], 0, 16, 0],
+] as const).map(([bed, [month, day], crops, sprouted, waiting, lost], index) => ({
+  id: index + 1,
+  bed,
+  sownAt: new Date(2026, month, day),
+  crops: [...crops],
+  sprouted,
+  waiting,
+  lost,
+}))
+
+const months = (from: number, to: number) => Array.from({length: to - from + 1}, (_, index) => from + index)
+
+const varieties: Variety[] = ([
+  ['Cherokee Purple', Crop.TOMATO, true, true, false, [6, 14], 80, months(2, 3), months(6, 8)],
+  ['Sungold', Crop.TOMATO, false, false, false, [5, 10], 65, months(2, 3), months(6, 9)],
+  ['Brandywine', Crop.TOMATO, true, true, false, [6, 14], 90, months(2, 3), months(7, 8)],
+  ['California Wonder', Crop.PEPPER, true, false, false, [8, 21], 75, months(1, 2), months(7, 9)],
+  ['Early Jalapeño', Crop.PEPPER, false, true, false, [8, 16], 65, months(1, 2), months(6, 9)],
+  ['Waltham Butternut', Crop.SQUASH, true, true, false, [5, 10], 100, months(4, 5), months(8, 9)],
+  ['Blue Lake', Crop.BEAN, true, false, false, [6, 10], 58, months(4, 6), months(6, 8)],
+  ['Kentucky Wonder', Crop.BEAN, true, true, false, [6, 12], 65, months(4, 6), months(7, 9)],
+  ['Lacinato', Crop.KALE, true, true, true, [5, 8], 60, [2, 3, 6, 7], [5, 6, 9, 10, 11]],
+  ['Red Russian', Crop.KALE, true, false, true, [5, 8], 50, [2, 3, 7], [4, 5, 9, 10, 11]],
+  ['Marketmore 76', Crop.CUCUMBER, false, true, false, [4, 10], 68, months(4, 5), months(6, 8)],
+  ['Listada de Gandia', Crop.EGGPLANT, true, true, false, [7, 14], 85, months(1, 2), months(7, 8)],
+  ['Detroit Dark Red', Crop.BEET, true, false, true, [5, 12], 60, months(2, 6), months(5, 9)],
+  ['Chioggia', Crop.BEET, true, true, true, [5, 12], 55, months(2, 6), months(5, 9)],
+  ['French Breakfast', Crop.RADISH, true, true, true, [3, 7], 25, [2, 3, 4, 7, 8], [3, 4, 5, 8, 9]],
+  ['Cherry Belle', Crop.RADISH, false, false, true, [3, 7], 24, [2, 3, 4, 7, 8], [3, 4, 5, 8, 9]],
+  ['Danvers', Crop.CARROT, true, true, true, [10, 21], 75, months(2, 5), months(6, 10)],
+] as const).map(([name, crop, heirloom, organic, frostHardy, germination, harvest, sowMonths, harvestMonths], index) => ({
+  id: index + 1,
+  name,
+  crop,
+  heirloom,
+  organic,
+  frostHardy,
+  germination: [...germination],
+  harvest,
+  sowMonths: [...sowMonths],
+  harvestMonths: [...harvestMonths],
+}))
+
+/** Stands in for a request to the API: answers after a moment with a copy of the data. */
+const respond = <Data>(handler: () => Data) => new Promise<Data>(resolve => {
+  setTimeout(() => resolve(structuredClone(handler())), 600)
+})
+
+/** Searches the given fields and filters by `id__in`, as a backend would. */
+const filterList = <Item extends {id: number}>(list: Item[], queryParams: QueryParams | undefined, fields: (item: Item) => string[]) => {
+  const search = queryParams?.search?.trim().toLowerCase()
+  const ids = queryParams?.id__in?.split(',').map(Number)
+
+  return list
+    .filter(item => !search || fields(item).some(field => field.toLowerCase().includes(search)))
+    .filter(item => !ids || ids.includes(item.id))
+}
+
+const isQueryParams = (value: unknown): value is QueryParams | undefined => value === undefined || value instanceof Object
+
+export const batchModelApi = createRestModelApi({
+  modelKey: 'Batch',
+  model: {} as Batch,
+  queries: {
+    paginated: {
+      scope: 'paginated',
+      dataType: {} as PaginatedResponse<Batch>,
+      isQueryParams,
+      // In an app, a GET to `/batches/` with the query params.
+      queryFn: ({queryKey}) => respond(() => paginateList(filterList(batches, queryKey[2], item => [item.bed, ...item.crops]), queryKey[2]?.page, 6)),
+    },
+  },
+})
+
+export const varietyModelApi = createRestModelApi({
+  modelKey: 'Variety',
+  model: {} as Variety,
+  queries: {
+    paginated: {
+      scope: 'paginated',
+      dataType: {} as PaginatedResponse<Variety>,
+      isQueryParams,
+      // In an app, a GET to `/varieties/` with the query params.
+      queryFn: ({queryKey}) => respond(() => paginateList(filterList(varieties, queryKey[2], item => [item.name, item.crop]), queryKey[2]?.page, 6)),
+    },
+  },
+})
+```
+
+<!-- @source-end -->
 
 ## Other forms
 
