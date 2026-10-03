@@ -11,7 +11,7 @@
         :is="lightDisplay[item.light].icon"
         class="text-tone square-4.5 shrink-0"
       />
-      <span class="truncate">{{ lightDisplay[item.light].label }}</span>
+      <span class="truncate">{{ lightDisplay[item.light].name }}</span>
     </span>
   </WListCardField>
 </template>
@@ -39,6 +39,6 @@ export const meta = {
   cssClass: 'basis-[7rem]',
   title: 'Light',
   field: 'light',
-  textFormat: item => lightDisplay[item.light].label,
+  textFormat: item => lightDisplay[item.light].name,
 } as const satisfies ListField<Plant>
 </script>

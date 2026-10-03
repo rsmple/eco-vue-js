@@ -283,7 +283,7 @@ Each option carries its tone, and the tag paints a soft background with it — `
     :create-option="createLight"
     title="Light it tolerates"
     placeholder="Add a light level"
-    :option-component="OptionLight"
+    :option-component="OptionToneTag"
     class="max-w-md"
     @select="light = [...light, $event]"
     @unselect="light = light.filter(item => item !== $event)"
@@ -305,9 +305,9 @@ import IconCloudSunPartial from 'eco-vue-js/dist/assets/icons/IconCloudSunPartia
 import IconMoon from 'eco-vue-js/dist/assets/icons/IconMoon'
 import IconSun from 'eco-vue-js/dist/assets/icons/IconSun'
 
-import OptionLight, {type Light} from './parts/OptionLight.vue'
+import OptionToneTag, {type ToneTag} from '../../../../../docs/examples/shared/OptionToneTag.vue'
 
-const options = reactive<Light[]>([
+const options = reactive<ToneTag[]>([
   {id: 'full-sun', name: 'Full sun', tone: 'tone-data-amber', icon: markRaw(IconSun)},
   {id: 'bright-indirect', name: 'Bright indirect', tone: 'tone-data-orange', icon: markRaw(IconCloudSun)},
   {id: 'part-shade', name: 'Part shade', tone: 'tone-data-teal', icon: markRaw(IconCloudSunPartial)},
@@ -318,7 +318,7 @@ const options = reactive<Light[]>([
 const light = ref<string[]>(['bright-indirect', 'part-shade'])
 
 // In an app, a POST that answers with the saved option. Without an icon, the option shows a tag.
-const createLight = (search: string): Light => {
+const createLight = (search: string): ToneTag => {
   const option = {id: search.toLowerCase().replaceAll(' ', '-'), name: search, tone: 'tone-data-gray'}
 
   options.push(option)
@@ -330,9 +330,9 @@ const createLight = (search: string): Light => {
 
 <!-- @example-end -->
 
-<!-- @source src/components/Select/docs/examples/parts/OptionLight.vue OptionLight.vue -->
+<!-- @source docs/examples/shared/OptionToneTag.vue OptionToneTag.vue -->
 
-```vue [OptionLight.vue]
+```vue [OptionToneTag.vue]
 <template>
   <WSkeleton
     v-if="skeleton"
@@ -357,21 +357,22 @@ const createLight = (search: string): Light => {
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Id extends string">
 import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
 
 import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
 
 import IconTag from 'eco-vue-js/dist/assets/icons/IconTag'
 
-export type Light = {
-  id: string
+export type ToneTag<Id extends string = string> = {
+  id: Id
   name: string
   tone: string
+  /** Without one, the tag icon is shown. */
   icon?: SVGComponent
 }
 
-defineProps<SelectOptionProps<Light>>()
+defineProps<SelectOptionProps<ToneTag<Id>>>()
 </script>
 ```
 
@@ -379,7 +380,7 @@ defineProps<SelectOptionProps<Light>>()
 
 ### Avatar and details
 
-One line in the field; in the menu, the option fills the row with a larger avatar, a second line and a count pushed to the right. The avatar color is picked from the name, so a person keeps it everywhere.
+One line in the field; in the menu, the option fills the row with a larger avatar, the role on a second line and the last week of watering pushed to the right, one bar a day. Each person carries their avatar tone, so they look the same everywhere — the home page and the [List with fields](/recipes/list-with-fields) recipe use the same people and option.
 
 <!-- @example Select/Gardener -->
 
@@ -410,15 +411,8 @@ import {ref} from 'vue'
 
 import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 
-import OptionGardener, {type Gardener} from './parts/OptionGardener.vue'
-
-const gardeners: Gardener[] = [
-  {id: 1, name: 'Mira Kovač', role: 'Head gardener', beds: 12},
-  {id: 2, name: 'Tomás Reyes', role: 'Greenhouse', beds: 4},
-  {id: 3, name: 'Aiko Tanaka', role: 'Seedlings', beds: 7},
-  {id: 4, name: 'Jonas Berg', role: 'Herb garden', beds: 3},
-  {id: 5, name: 'Priya Nair', role: 'Orchard', beds: 9},
-]
+import {gardeners} from '../../../../../docs/examples/shared/Gardener'
+import OptionGardener from '../../../../../docs/examples/shared/OptionGardener.vue'
 
 const gardenerId = ref<number | null>(1)
 </script>
@@ -426,7 +420,7 @@ const gardenerId = ref<number | null>(1)
 
 <!-- @example-end -->
 
-<!-- @source src/components/Select/docs/examples/parts/OptionGardener.vue OptionGardener.vue -->
+<!-- @source docs/examples/shared/OptionGardener.vue OptionGardener.vue -->
 
 ```vue [OptionGardener.vue]
 <template>
@@ -435,17 +429,17 @@ const gardenerId = ref<number | null>(1)
     class="w-option w-option-has-bg"
   />
 
-  <!-- One line in the field, so it keeps the input's height; the menu adds the role and fills the row, pushing the count right. -->
+  <!-- In the field it is one line, so the input keeps its height; the menu adds the role and the last week of watering. -->
   <div
     v-else
-    class="w-option w-option-has-bg grid grid-cols-[auto_1fr_auto] items-center gap-2"
+    class="w-option grid grid-cols-[auto_1fr_auto] items-center gap-2"
     :class="model ? 'w-option-has-bg' : undefined"
   >
     <span
       class="surface-fill flex shrink-0 items-center justify-center rounded-full font-semibold option-shift"
-      :class="[toneOf(option.name), model ? 'size-5 text-[0.625rem]' : 'size-8 text-xs']"
+      :class="[option.tone, model ? 'size-5 text-[0.625rem]' : 'size-8 text-xs']"
     >
-      {{ option.name.split(' ').map(part => part[0]).join('') }}
+      {{ initials(option.name) }}
     </span>
 
     <span
@@ -453,41 +447,41 @@ const gardenerId = ref<number | null>(1)
       class="truncate"
     >{{ option.name }}</span>
 
-    <span
-      v-else
-      class="grid min-w-0"
-    >
-      <span class="text-accent truncate">{{ option.name }}</span>
-      <span class="text-description truncate text-xs">{{ option.role }}</span>
-    </span>
+    <template v-else>
+      <span class="grid min-w-0">
+        <span class="truncate">{{ option.name }}</span>
+        <span class="text-description truncate text-xs">{{ option.role }}</span>
+      </span>
 
-    <span
-      v-if="!model"
-      class="text-description bg-surface-muted rounded-full px-2 text-xs whitespace-nowrap"
-    >
-      {{ option.beds }} beds
-    </span>
+      <!-- One bar a day, filled on the days they watered. -->
+      <span
+        class="flex items-end gap-0.5"
+        :class="option.tone"
+        :title="`Watered ${ option.week.filter(Boolean).length } of the last 7 days`"
+      >
+        <span
+          v-for="(watered, day) in option.week"
+          :key="day"
+          class="w-1 rounded-full"
+          :class="watered ? 'bg-tone-fill h-4' : 'bg-line h-1.5'"
+        />
+      </span>
+    </template>
+
+    <slot />
   </div>
 </template>
 
 <script lang="ts" setup>
+import type {Gardener} from './Gardener'
+
 import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
 
 import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
 
-export type Gardener = {
-  id: number
-  name: string
-  role: string
-  beds: number
-}
+import {initials} from './Gardener'
 
 defineProps<SelectOptionProps<Gardener>>()
-
-const TONES = ['tone-data-green', 'tone-data-teal', 'tone-data-amber', 'tone-data-violet', 'tone-data-pink', 'tone-data-cyan']
-
-/** The same name always gets the same color. */
-const toneOf = (name: string) => TONES[[...name].reduce((hash, char) => hash + char.charCodeAt(0), 0) % TONES.length]
 </script>
 
 <style>
@@ -495,6 +489,39 @@ const toneOf = (name: string) => TONES[[...name].reduce((hash, char) => hash + c
   margin-left: max(-0.5rem, calc(var(--w-option-padding) / -2));
 }
 </style>
+```
+
+<!-- @source-end -->
+
+<!-- @source docs/examples/shared/Gardener.ts Gardener.ts -->
+
+```ts [Gardener.ts]
+/** A person who looks after the plants. Shared by the docs examples, so the same people show up everywhere. */
+export type Gardener = {
+  id: number
+  name: string
+  role: string
+  /** Tone class of the avatar. */
+  tone: string
+  /** The last seven days, oldest first: whether they watered that day. */
+  week: boolean[]
+}
+
+export const gardeners: Gardener[] = [
+  {id: 1, name: 'Carl Linnaeus', role: 'Head gardener', tone: 'tone-data-green', week: [true, true, false, true, true, true, true]},
+  {id: 2, name: 'Gregor Mendel', role: 'Gardener', tone: 'tone-data-violet', week: [true, false, true, true, false, true, true]},
+  {id: 3, name: 'Barbara McClintock', role: 'Gardener', tone: 'tone-data-pink', week: [false, true, true, true, true, false, true]},
+  {id: 4, name: 'Luther Burbank', role: 'Volunteer', tone: 'tone-data-amber', week: [false, false, true, false, false, true, false]},
+  {id: 5, name: 'Beatrix Potter', role: 'Greenhouse', tone: 'tone-data-teal', week: [true, true, true, false, true, true, false]},
+  {id: 6, name: 'George Washington Carver', role: 'Seedlings', tone: 'tone-data-cyan', week: [false, true, false, true, true, true, true]},
+]
+
+/** First and last initials, which fit the round avatar. */
+export const initials = (name: string) => {
+  const parts = name.split(' ')
+
+  return parts.length > 1 ? parts[0]![0]! + parts.at(-1)![0]! : name.slice(0, 2)
+}
 ```
 
 <!-- @source-end -->

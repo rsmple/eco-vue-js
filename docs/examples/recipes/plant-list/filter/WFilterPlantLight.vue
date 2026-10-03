@@ -21,7 +21,7 @@
               :is="lightDisplay[option].icon"
               class="text-tone square-4.5 shrink-0"
             />
-            {{ lightDisplay[option].label }}
+            {{ lightDisplay[option].name }}
           </span>
         </template>
       </WCheckboxGroupMultiple>

@@ -2,7 +2,7 @@ import {createUseQueryParams} from 'eco-vue-js/dist/utils/api'
 import {Order, parseOrdering} from 'eco-vue-js/dist/utils/order'
 import {createRestModelApi} from 'eco-vue-js/dist/utils/restModelApi'
 import {paginateList} from 'eco-vue-js/dist/utils/useDefaultQuery'
-import {isId, parseBoolean, parseString, parseStringList} from 'eco-vue-js/dist/utils/utils'
+import {isId, parseBoolean, parseId, parseString, parseStringList} from 'eco-vue-js/dist/utils/utils'
 
 import {Kind, Light, type Plant, plants} from '../models/Plant'
 
@@ -18,7 +18,7 @@ export const useQueryParamsPlants = createUseQueryParams({
   kind__in: parseEnumList(Object.values(Kind)),
   light__in: parseEnumList(Object.values(Light)),
   watered: parseBoolean,
-  caretaker: parseString,
+  caretaker: parseId,
 })
 
 export type QueryParamsPlants = typeof useQueryParamsPlants['QueryParams'] & {
@@ -59,7 +59,7 @@ const filterPlants = (queryParams: QueryParamsPlants | undefined) => {
   if (kind__in) result = result.filter(plant => kind__in.includes(plant.kind))
   if (light__in) result = result.filter(plant => light__in.includes(plant.light))
   if (watered !== undefined) result = result.filter(plant => plant.watered === watered)
-  if (caretaker) result = result.filter(plant => plant.caretaker.name === caretaker)
+  if (caretaker) result = result.filter(plant => plant.caretaker.id === caretaker)
 
   if (queryParams?.ordering) {
     const ordering = parseOrdering<keyof Plant>(queryParams.ordering)

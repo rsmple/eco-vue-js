@@ -7,10 +7,10 @@
     <template #field="scopeField">
       <WSelectSingle
         v-bind="scopeField"
-        :options="caretakers"
-        :value-getter="item => item.name"
-        :search-fn="(item, search) => item.name.toLowerCase().includes(search)"
-        :option-component="markRaw(WOptionPlantCaretaker)"
+        :options="gardeners"
+        :value-getter="item => item.id"
+        :search-fn="(item, search) => item.name.toLowerCase().includes(search) || item.role.toLowerCase().includes(search)"
+        :option-component="markRaw(OptionGardener)"
         :readonly="readonly"
         placeholder="Search caretakers"
         :embedded="!global"
@@ -34,8 +34,8 @@ import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 import IconUser from 'eco-vue-js/dist/assets/icons/IconUser'
 
-import {caretakers} from '../models/Plant'
-import WOptionPlantCaretaker from '../options/WOptionPlantCaretaker.vue'
+import {gardeners} from '../../../shared/Gardener'
+import OptionGardener from '../../../shared/OptionGardener.vue'
 
 defineProps<FilterProps<QueryParamsPlants>>()
 defineEmits<FilterEmits>()

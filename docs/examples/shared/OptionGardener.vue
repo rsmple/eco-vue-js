@@ -14,7 +14,7 @@
       class="surface-fill flex shrink-0 items-center justify-center rounded-full font-semibold option-shift"
       :class="[option.tone, model ? 'size-5 text-[0.625rem]' : 'size-8 text-xs']"
     >
-      {{ option.name.split(' ').map(part => part[0]).join('') }}
+      {{ initials(option.name) }}
     </span>
 
     <span
@@ -48,11 +48,13 @@
 </template>
 
 <script lang="ts" setup>
-import type {Gardener} from './DocsHomeGallery.vue'
+import type {Gardener} from './Gardener'
 
 import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
 
 import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
+
+import {initials} from './Gardener'
 
 defineProps<SelectOptionProps<Gardener>>()
 </script>

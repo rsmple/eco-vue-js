@@ -1,5 +1,7 @@
 import {addDay, addMonth, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 
+import {type Gardener, gardeners} from '../../../shared/Gardener'
+
 export enum Kind {
   TROPICAL = 'tropical',
   SUCCULENT = 'succulent',
@@ -12,12 +14,6 @@ export enum Light {
   BRIGHT = 'bright',
   PARTIAL = 'partial',
   SHADE = 'shade',
-}
-
-export type Caretaker = {
-  name: string
-  /** Tone class of the avatar. */
-  tone: string
 }
 
 export type Task = {
@@ -50,17 +46,10 @@ export type Plant = {
   waterings: Date[]
   /** Temperature range it is happy in, in °C. */
   temperature: [number, number]
-  caretaker: Caretaker
+  caretaker: Gardener
   tasks: Task[]
   description: string
 }
-
-export const caretakers: Caretaker[] = [
-  {name: 'Ivy Moss', tone: 'tone-data-green'},
-  {name: 'Rowan Oak', tone: 'tone-data-amber'},
-  {name: 'Fern Ash', tone: 'tone-data-violet'},
-  {name: 'Hazel Reed', tone: 'tone-data-pink'},
-]
 
 const LIGHTS = [Light.BRIGHT, Light.FULL_SUN, Light.PARTIAL, Light.SHADE] as const
 
@@ -144,11 +133,29 @@ const SOURCE: [string, string, Kind, number][] = [
   ['Century plant', 'Agave americana', Kind.SUCCULENT, 180],
   ['Hart\'s tongue fern', 'Asplenium scolopendrium', Kind.FERN, 60],
   ['Bay laurel', 'Laurus nobilis', Kind.HERB, 300],
+  ['Swiss cheese vine', 'Monstera adansonii', Kind.TROPICAL, 90],
+  ['Paddle plant', 'Kalanchoe luciae', Kind.SUCCULENT, 45],
+  ['Cinnamon fern', 'Osmundastrum cinnamomeum', Kind.FERN, 120],
+  ['Fennel', 'Foeniculum vulgare', Kind.HERB, 150],
+  ['Dragon tree', 'Dracaena marginata', Kind.TROPICAL, 200],
+  ['Ghost plant', 'Graptopetalum paraguayense', Kind.SUCCULENT, 20],
+  ['Lady fern', 'Athyrium filix-femina', Kind.FERN, 90],
+  ['Marjoram', 'Origanum majorana', Kind.HERB, 45],
+  ['Cast iron plant', 'Aspidistra elatior', Kind.TROPICAL, 60],
+  ['String of hearts', 'Ceropegia woodii', Kind.SUCCULENT, 120],
+  ['Royal fern', 'Osmunda regalis', Kind.FERN, 150],
+  ['Catnip', 'Nepeta cataria', Kind.HERB, 90],
+  ['Banana plant', 'Musa acuminata', Kind.TROPICAL, 300],
+  ['Moon cactus', 'Gymnocalycium mihanovichii', Kind.SUCCULENT, 10],
+  ['Bracken', 'Pteridium aquilinum', Kind.FERN, 120],
+  ['Sorrel', 'Rumex acetosa', Kind.HERB, 60],
 ]
 
 /** In-memory stand-in for a REST collection. */
 export const plants: Plant[] = SOURCE.map(([name, species, kind, height], index) => {
   const today = getStartOfDay()
+  // The kinds repeat every four rows, so `round` steps each kind through every light level and caretaker in turn.
+  const round = index + Math.floor(index / 4)
   const watered = index % 3 !== 0
   // Some thirsty plants are overdue.
   const waterBy = watered ? null : addDay(today, index * 5 % 10 - 4)
@@ -168,7 +175,7 @@ export const plants: Plant[] = SOURCE.map(([name, species, kind, height], index)
     seeds: 40 + index * 7919 % 4800,
     water: 50 * (1 + index * 7 % 16),
     waterBy,
-    light: LIGHTS[index * 3 % LIGHTS.length]!,
+    light: LIGHTS[round % LIGHTS.length]!,
     health: Math.max(12, 60 + index * 17 % 41 - (waterBy && waterBy < today ? 35 : 0)),
     growth: Array.from({length: 6}, (_, month) => ({
       date: +addMonth(today, month - 5),
@@ -177,7 +184,7 @@ export const plants: Plant[] = SOURCE.map(([name, species, kind, height], index)
     waterings: Array.from({length: 28}, (_, day) => addDay(today, -day))
       .filter((_, day) => day >= lastWatered && (day - lastWatered) % INTERVAL[kind] === 0),
     temperature: TEMPERATURE[kind],
-    caretaker: caretakers[index % caretakers.length]!,
+    caretaker: gardeners[round % gardeners.length]!,
     tasks: [
       {title: 'Fertilize', due: addDay(today, index * 3 % 14 - 2)},
       {title: 'Prune', due: addDay(today, 7 + index * 5 % 30)},

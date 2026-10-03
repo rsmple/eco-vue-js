@@ -119,6 +119,8 @@ const {queryParams, updateQueryParams} = useQueryParamsPlants(useRoute())
 ```ts [models/Plant.ts]
 import {addDay, addMonth, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 
+import {type Gardener, gardeners} from '../../../shared/Gardener'
+
 export enum Kind {
   TROPICAL = 'tropical',
   SUCCULENT = 'succulent',
@@ -131,12 +133,6 @@ export enum Light {
   BRIGHT = 'bright',
   PARTIAL = 'partial',
   SHADE = 'shade',
-}
-
-export type Caretaker = {
-  name: string
-  /** Tone class of the avatar. */
-  tone: string
 }
 
 export type Task = {
@@ -169,17 +165,10 @@ export type Plant = {
   waterings: Date[]
   /** Temperature range it is happy in, in °C. */
   temperature: [number, number]
-  caretaker: Caretaker
+  caretaker: Gardener
   tasks: Task[]
   description: string
 }
-
-export const caretakers: Caretaker[] = [
-  {name: 'Ivy Moss', tone: 'tone-data-green'},
-  {name: 'Rowan Oak', tone: 'tone-data-amber'},
-  {name: 'Fern Ash', tone: 'tone-data-violet'},
-  {name: 'Hazel Reed', tone: 'tone-data-pink'},
-]
 
 const LIGHTS = [Light.BRIGHT, Light.FULL_SUN, Light.PARTIAL, Light.SHADE] as const
 
@@ -263,11 +252,29 @@ const SOURCE: [string, string, Kind, number][] = [
   ['Century plant', 'Agave americana', Kind.SUCCULENT, 180],
   ['Hart\'s tongue fern', 'Asplenium scolopendrium', Kind.FERN, 60],
   ['Bay laurel', 'Laurus nobilis', Kind.HERB, 300],
+  ['Swiss cheese vine', 'Monstera adansonii', Kind.TROPICAL, 90],
+  ['Paddle plant', 'Kalanchoe luciae', Kind.SUCCULENT, 45],
+  ['Cinnamon fern', 'Osmundastrum cinnamomeum', Kind.FERN, 120],
+  ['Fennel', 'Foeniculum vulgare', Kind.HERB, 150],
+  ['Dragon tree', 'Dracaena marginata', Kind.TROPICAL, 200],
+  ['Ghost plant', 'Graptopetalum paraguayense', Kind.SUCCULENT, 20],
+  ['Lady fern', 'Athyrium filix-femina', Kind.FERN, 90],
+  ['Marjoram', 'Origanum majorana', Kind.HERB, 45],
+  ['Cast iron plant', 'Aspidistra elatior', Kind.TROPICAL, 60],
+  ['String of hearts', 'Ceropegia woodii', Kind.SUCCULENT, 120],
+  ['Royal fern', 'Osmunda regalis', Kind.FERN, 150],
+  ['Catnip', 'Nepeta cataria', Kind.HERB, 90],
+  ['Banana plant', 'Musa acuminata', Kind.TROPICAL, 300],
+  ['Moon cactus', 'Gymnocalycium mihanovichii', Kind.SUCCULENT, 10],
+  ['Bracken', 'Pteridium aquilinum', Kind.FERN, 120],
+  ['Sorrel', 'Rumex acetosa', Kind.HERB, 60],
 ]
 
 /** In-memory stand-in for a REST collection. */
 export const plants: Plant[] = SOURCE.map(([name, species, kind, height], index) => {
   const today = getStartOfDay()
+  // The kinds repeat every four rows, so `round` steps each kind through every light level and caretaker in turn.
+  const round = index + Math.floor(index / 4)
   const watered = index % 3 !== 0
   // Some thirsty plants are overdue.
   const waterBy = watered ? null : addDay(today, index * 5 % 10 - 4)
@@ -287,7 +294,7 @@ export const plants: Plant[] = SOURCE.map(([name, species, kind, height], index)
     seeds: 40 + index * 7919 % 4800,
     water: 50 * (1 + index * 7 % 16),
     waterBy,
-    light: LIGHTS[index * 3 % LIGHTS.length]!,
+    light: LIGHTS[round % LIGHTS.length]!,
     health: Math.max(12, 60 + index * 17 % 41 - (waterBy && waterBy < today ? 35 : 0)),
     growth: Array.from({length: 6}, (_, month) => ({
       date: +addMonth(today, month - 5),
@@ -296,7 +303,7 @@ export const plants: Plant[] = SOURCE.map(([name, species, kind, height], index)
     waterings: Array.from({length: 28}, (_, day) => addDay(today, -day))
       .filter((_, day) => day >= lastWatered && (day - lastWatered) % INTERVAL[kind] === 0),
     temperature: TEMPERATURE[kind],
-    caretaker: caretakers[index % caretakers.length]!,
+    caretaker: gardeners[round % gardeners.length]!,
     tasks: [
       {title: 'Fertilize', due: addDay(today, index * 3 % 14 - 2)},
       {title: 'Prune', due: addDay(today, 7 + index * 5 % 30)},
@@ -316,7 +323,7 @@ import {createUseQueryParams} from 'eco-vue-js/dist/utils/api'
 import {Order, parseOrdering} from 'eco-vue-js/dist/utils/order'
 import {createRestModelApi} from 'eco-vue-js/dist/utils/restModelApi'
 import {paginateList} from 'eco-vue-js/dist/utils/useDefaultQuery'
-import {isId, parseBoolean, parseString, parseStringList} from 'eco-vue-js/dist/utils/utils'
+import {isId, parseBoolean, parseId, parseString, parseStringList} from 'eco-vue-js/dist/utils/utils'
 
 import {Kind, Light, type Plant, plants} from '../models/Plant'
 
@@ -332,7 +339,7 @@ export const useQueryParamsPlants = createUseQueryParams({
   kind__in: parseEnumList(Object.values(Kind)),
   light__in: parseEnumList(Object.values(Light)),
   watered: parseBoolean,
-  caretaker: parseString,
+  caretaker: parseId,
 })
 
 export type QueryParamsPlants = typeof useQueryParamsPlants['QueryParams'] & {
@@ -373,7 +380,7 @@ const filterPlants = (queryParams: QueryParamsPlants | undefined) => {
   if (kind__in) result = result.filter(plant => kind__in.includes(plant.kind))
   if (light__in) result = result.filter(plant => light__in.includes(plant.light))
   if (watered !== undefined) result = result.filter(plant => plant.watered === watered)
-  if (caretaker) result = result.filter(plant => plant.caretaker.name === caretaker)
+  if (caretaker) result = result.filter(plant => plant.caretaker.id === caretaker)
 
   if (queryParams?.ordering) {
     const ordering = parseOrdering<keyof Plant>(queryParams.ordering)
@@ -730,7 +737,7 @@ export const defaultFieldConfigMapPlant = getDefaultFieldConfigMap(listFieldsPla
 
 `WListFilter` edits the same query params the list reads. Wrap it in a `WUniform` over `queryParams` and pass the `scope` down; `search` adds the search field. Without `global`, the filters sit above the list as chips: the add button offers the rest, and each chip opens its control in a dropdown and shows how many values are set.
 
-Each filter is a module like a field: the component renders the control inside a `WUniform` bound to its param, and `meta` gives the chip's `title`, `icon` and the `fields` it sets — removing the chip clears them. The control is the same one a form would use: a `WSelect` with a custom option for kinds, a `WCheckboxGroupMultiple` for light, a radio `WCheckboxGroup` for watered, where `undefined` means "Any", and a `WSelectSingle` for the caretaker.
+Each filter is a module like a field: the component renders the control inside a `WUniform` bound to its param, and `meta` gives the chip's `title`, `icon` and the `fields` it sets — removing the chip clears them. The control is the same one a form would use: a `WSelect` for kinds, a `WCheckboxGroupMultiple` for light, a radio `WCheckboxGroup` for watered, where `undefined` means "Any", and a `WSelectSingle` for the caretaker. The two selects reuse option components from the [Select](/components/select) examples — the tone tag and the gardener with their week of watering — so a kind looks the same in the filter as in its column.
 
 `embedded: true` in `meta` drops the dropdown's padding, and `:embedded="!global"` drops the control's title and margin, so the control fills the dropdown edge to edge — the chip already names it. With `global` the filters go into the app shell's filter panel instead, where each control keeps its title.
 
@@ -748,10 +755,10 @@ Each filter is a module like a field: the component renders the control inside a
     <template #field="scopeField">
       <WSelect
         v-bind="scopeField"
-        :options="Object.values(Kind)"
-        :value-getter="item => item"
-        :search-fn="(item, search) => kindDisplay[item].label.toLowerCase().includes(search)"
-        :option-component="markRaw(WOptionPlantKind)"
+        :options="options"
+        :value-getter="item => item.id"
+        :search-fn="(item, search) => item.name.toLowerCase().includes(search)"
+        :option-component="markRaw(OptionToneTag)"
         :readonly="readonly"
         placeholder="Search kinds"
         :embedded="!global"
@@ -773,12 +780,15 @@ import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 import IconPlant from 'eco-vue-js/dist/assets/icons/IconPlant'
 
+import OptionToneTag, {type ToneTag} from '../../../shared/OptionToneTag.vue'
 import {Kind} from '../models/Plant'
 import {kindDisplay} from '../models/PlantDisplay'
-import WOptionPlantKind from '../options/WOptionPlantKind.vue'
 
 defineProps<FilterProps<QueryParamsPlants>>()
 defineEmits<FilterEmits>()
+
+// The same tags as the kind column, in the shape the shared tag option takes.
+const options: ToneTag<Kind>[] = Object.values(Kind).map(id => ({id, ...kindDisplay[id]}))
 </script>
 
 <script lang="ts">
@@ -846,43 +856,6 @@ export const meta = {
   fields: ['watered'],
   embedded: true,
 } as const satisfies FilterMeta<QueryParamsPlants>
-</script>
-```
-
-<!-- @source-end -->
-
-<!-- @source docs/examples/recipes/plant-list/options/WOptionPlantKind.vue WOptionPlantKind.vue -->
-
-```vue [WOptionPlantKind.vue]
-<template>
-  <div class="w-option grid grid-cols-[1fr_auto] items-center gap-2">
-    <!-- The same tag as the kind column. -->
-    <span
-      v-if="option"
-      class="bg-tone-soft text-tone flex w-max items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-semibold"
-      :class="kindDisplay[option].tone"
-    >
-      <component
-        :is="kindDisplay[option].icon"
-        class="square-3.5"
-      />
-      {{ kindDisplay[option].label }}
-    </span>
-
-    <span v-else>{{ search }}</span>
-
-    <slot />
-  </div>
-</template>
-
-<script lang="ts" setup>
-import type {Kind} from '../models/Plant'
-
-import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
-
-import {kindDisplay} from '../models/PlantDisplay'
-
-defineProps<SelectOptionProps<Kind>>()
 </script>
 ```
 
@@ -1200,7 +1173,7 @@ const xDomain: [number, number] = [+addMonth(today, -5), +today]
 const days = Array.from({length: 28}, (_, index) => addDay(today, index - 27))
 
 const getFacts = (item: Plant) => [
-  {title: 'Light', value: lightDisplay[item.light].label, tone: lightDisplay[item.light].tone, icon: lightDisplay[item.light].icon},
+  {title: 'Light', value: lightDisplay[item.light].name, tone: lightDisplay[item.light].tone, icon: lightDisplay[item.light].icon},
   {title: 'Water', value: `${ item.water } ml`, tone: 'tone-data-blue', icon: markRaw(IconDrop)},
   {title: 'Humidity', value: `${ item.humidity }%`, tone: 'tone-data-cyan', icon: markRaw(IconWind)},
   {title: 'Temperature', value: `${ item.temperature[0] }–${ item.temperature[1] } °C`, tone: 'tone-data-red', icon: markRaw(IconThermometer)},

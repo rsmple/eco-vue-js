@@ -22,19 +22,20 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Id extends string">
 import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
 
 import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
 
 import IconTag from 'eco-vue-js/dist/assets/icons/IconTag'
 
-export type Light = {
-  id: string
+export type ToneTag<Id extends string = string> = {
+  id: Id
   name: string
   tone: string
+  /** Without one, the tag icon is shown. */
   icon?: SVGComponent
 }
 
-defineProps<SelectOptionProps<Light>>()
+defineProps<SelectOptionProps<ToneTag<Id>>>()
 </script>
