@@ -1,33 +1,33 @@
 <template>
   <WListCardField
-    :model-value="`${ item.pages } pages`"
+    :model-value="`${ item.water } ml`"
     :skeleton="skeleton"
     class="tabular-nums"
   />
 </template>
 
 <script lang="ts" setup>
-import type {Book} from '../models/Book'
+import type {Plant} from '../models/Plant'
 
 import type {FieldProps, ListField} from 'eco-vue-js/dist/components/List/types'
 
 import WListCardField from 'eco-vue-js/dist/components/List/WListCardField.vue'
 
-defineProps<FieldProps<Book>>()
+defineProps<FieldProps<Plant>>()
 
 defineEmits<{
-  (e: 'update:item', value: Book): void
+  (e: 'update:item', value: Plant): void
   (e: 'delete:item'): void
 }>()
 </script>
 
 <script lang="ts">
 export const meta = {
-  label: 'pages',
+  label: 'water',
   cssClass: 'basis-[7rem]',
-  title: 'Length',
-  field: 'pages',
+  title: 'Water',
+  field: 'water',
   // The number alone in CSV export, without the unit.
-  textFormat: item => item.pages.toString(),
-} as const satisfies ListField<Book>
+  textFormat: item => item.water.toString(),
+} as const satisfies ListField<Plant>
 </script>

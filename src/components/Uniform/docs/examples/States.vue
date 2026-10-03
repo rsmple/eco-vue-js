@@ -57,5 +57,5 @@ import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 const state = ref('editable')
 
-const initData = () => ({title: 'Quarterly report', priority: 'medium'})
+const initData = () => ({title: 'Repot the monstera', priority: 'medium'})
 </script>

@@ -116,7 +116,7 @@ Controls, chips and list fields have a `skeleton` prop that renders their own sk
         v-else
         class="tone-primary surface-fill flex square-12 shrink-0 items-center justify-center rounded-full text-lg font-semibold"
       >
-        JA
+        CL
       </div>
 
       <div class="grid flex-1">
@@ -126,7 +126,7 @@ Controls, chips and list fields have a `skeleton` prop that renders their own sk
           v-else
           class="font-semibold"
         >
-          Jane Austen
+          Carl Linnaeus
         </span>
 
         <WSkeleton v-if="loading" />
@@ -135,12 +135,12 @@ Controls, chips and list fields have a `skeleton` prop that renders their own sk
           v-else
           class="text-description"
         >
-          Pride and Prejudice, Emma, Persuasion
+          Herb bed, greenhouse, orchard
         </span>
       </div>
 
       <WChip
-        text="Author"
+        text="Gardener"
         :skeleton="loading"
       />
     </div>

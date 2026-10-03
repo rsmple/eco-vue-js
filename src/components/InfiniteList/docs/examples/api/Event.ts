@@ -22,16 +22,16 @@ export type QueryParamsEvents = {
 export const EVENT_COUNT = 10_000
 
 const MESSAGES: [EventLevel, string][] = [
-  [EventLevel.INFO, 'Scan finished for'],
-  [EventLevel.INFO, 'New commit pushed to'],
-  [EventLevel.WARNING, 'Outdated dependency found in'],
-  [EventLevel.INFO, 'Pipeline started for'],
-  [EventLevel.ERROR, 'Build failed for'],
-  [EventLevel.WARNING, 'Secret detected in'],
-  [EventLevel.INFO, 'Report exported for'],
+  [EventLevel.INFO, 'Watering finished in'],
+  [EventLevel.INFO, 'Moisture reading from'],
+  [EventLevel.WARNING, 'Soil drying out in'],
+  [EventLevel.INFO, 'Sprinklers started in'],
+  [EventLevel.ERROR, 'Sensor offline in'],
+  [EventLevel.WARNING, 'Frost expected in'],
+  [EventLevel.INFO, 'Harvest logged in'],
 ]
 
-const REPOSITORIES = ['api-gateway', 'billing', 'web-app', 'auth-service', 'mobile', 'infra', 'search']
+const BEDS = ['the greenhouse', 'the herb bed', 'the orchard', 'the seed trays', 'the balcony', 'the tomato row', 'the rose bed']
 
 const start = Date.now()
 
@@ -42,7 +42,7 @@ const events: Event[] = Array.from({length: EVENT_COUNT}, (_, index) => {
   return {
     id: index + 1,
     level,
-    message: `${ message } ${ REPOSITORIES[index * 3 % REPOSITORIES.length] }`,
+    message: `${ message } ${ BEDS[index * 3 % BEDS.length] }`,
     at: new Date(start - index * 60_000),
   }
 })

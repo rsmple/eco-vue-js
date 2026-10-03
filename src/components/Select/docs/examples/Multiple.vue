@@ -25,11 +25,11 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 import OptionTag from './parts/OptionTag.vue'
 
 const options = [
-  {id: 1, name: 'urgent'},
-  {id: 2, name: 'backend'},
-  {id: 3, name: 'frontend'},
-  {id: 4, name: 'design'},
-  {id: 5, name: 'docs'},
+  {id: 1, name: 'indoor'},
+  {id: 2, name: 'edible'},
+  {id: 3, name: 'pet-safe'},
+  {id: 4, name: 'fragrant'},
+  {id: 5, name: 'evergreen'},
 ]
 
 const tags = ref<number[]>([2, 3])

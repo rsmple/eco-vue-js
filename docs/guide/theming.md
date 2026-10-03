@@ -112,20 +112,20 @@ A theme sets a role with `--role-{name}` and `--role-{name}-dark` in `@theme`:
 
 ### Data palette
 
-Categories — chart series, scanner types, syntax colors — take the kit's data hues: `data-red`, `data-orange`, `data-amber`, `data-green`, `data-teal`, `data-cyan`, `data-blue`, `data-violet`, `data-fuchsia`, `data-pink` and `data-gray`. They are mid-tones like the status colors, so each works as a tone in both modes without `-dark` values (the Preview above shows them as fills and as soft chips).
+Categories — chart series, plant kinds, syntax colors — take the kit's data hues: `data-red`, `data-orange`, `data-amber`, `data-green`, `data-teal`, `data-cyan`, `data-blue`, `data-violet`, `data-fuchsia`, `data-pink` and `data-gray`. They are mid-tones like the status colors, so each works as a tone in both modes without `-dark` values (the Preview above shows them as fills and as soft chips).
 
 An app names its categories after them, so a theme that retunes the palette retunes the categories too:
 
 ```css
 @theme {
-  --color-scanner-sast: var(--color-data-cyan);
-  --color-scanner-sca: var(--color-data-fuchsia);
+  --color-kind-fern: var(--color-data-green);
+  --color-kind-succulent: var(--color-data-teal);
 }
 ```
 
 ```html
-<span class="tone-scanner-sast text-tone">SAST</span>
-<span class="tone-scanner-sca surface-soft text-tone">SCA</span>
+<span class="tone-kind-fern text-tone">Fern</span>
+<span class="tone-kind-succulent surface-soft text-tone">Succulent</span>
 ```
 
 ### In app code
@@ -153,7 +153,7 @@ Components use the same classes, and app code should too: a color written as a r
 
 | Class | Effect |
 | --- | --- |
-| `tone-{name}` | Sets the tone for the element and its children: `primary`, `negative`, `positive`, `warning`, `info`, any theme color (`tone-scanner-sast`) or an arbitrary one (`tone-[#0f766e]`) |
+| `tone-{name}` | Sets the tone for the element and its children: `primary`, `negative`, `positive`, `warning`, `info`, any theme color (`tone-kind-fern`) or an arbitrary one (`tone-[#0f766e]`) |
 | `text-tone` | The tone's readable shade, for text and icons on the page |
 | `border-tone-line` | The tone's shade for borders and outlines on the page — nearer the fill than `text-tone`, as lines need less contrast than text |
 | `bg-tone-fill`, `border-tone-fill`, `text-tone-on` | The fill, and the text that goes on it |

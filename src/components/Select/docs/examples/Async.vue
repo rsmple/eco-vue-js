@@ -1,11 +1,11 @@
 <template>
   <WSelectAsyncSingle
-    v-model="bookId"
-    :use-query-fn-options="bookModelApi.paginated.use"
+    v-model="plantId"
+    :use-query-fn-options="plantModelApi.paginated.use"
     :query-params-options="{}"
     :value-getter="item => item.id"
-    title="Book"
-    placeholder="Search by title or author"
+    title="Plant"
+    placeholder="Search by name or species"
     allow-clear
     :clear-value="null"
     class="max-w-md"
@@ -13,14 +13,14 @@
     <template #option="{option}">
       <div class="w-option flex items-center">
         <span v-if="option">
-          {{ option.title }} <span class="text-description">— {{ option.author }}</span>
+          {{ option.name }} <span class="text-description italic">— {{ option.species }}</span>
         </span>
       </div>
     </template>
   </WSelectAsyncSingle>
 
   <p class="text-sm text-description">
-    Model: {{ bookId ?? 'null' }}
+    Model: {{ plantId ?? 'null' }}
   </p>
 </template>
 
@@ -29,8 +29,8 @@ import {ref} from 'vue'
 
 import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSingle.vue'
 
-// The `use` of any paginated query — here the book model from the list recipe.
-import {bookModelApi} from '../../../../../docs/examples/recipes/book-list/api/Book'
+// The `use` of any paginated query — here the plant model from the list recipe.
+import {plantModelApi} from '../../../../../docs/examples/recipes/plant-list/api/Plant'
 
-const bookId = ref<number | null>(3)
+const plantId = ref<number | null>(3)
 </script>

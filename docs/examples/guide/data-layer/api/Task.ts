@@ -15,10 +15,10 @@ export type QueryParamsTasks = {
 }
 
 let tasks: Task[] = [
-  {id: 1, title: 'Rotate the API keys', done: false},
-  {id: 2, title: 'Review the new scanner rules', done: true},
-  {id: 3, title: 'Update the base images', done: false},
-  {id: 4, title: 'Close the stale findings', done: false},
+  {id: 1, title: 'Repot the monstera', done: false},
+  {id: 2, title: 'Prune the roses', done: true},
+  {id: 3, title: 'Sow the tomato seeds', done: false},
+  {id: 4, title: 'Clean the greenhouse gutters', done: false},
 ]
 
 /** Lets the demo make every request fail, to show the rollback. */

@@ -2,29 +2,29 @@
   <div class="grid gap-8 md:grid-cols-2">
     <div>
       <WFieldWrapper
-        title="Repository"
-        model-value="acme/payments-gateway"
+        title="Sensor"
+        model-value="greenhouse-2/moisture-07"
         mono
         allow-copy
       />
 
       <WFieldWrapper
-        title="Open findings"
+        title="Seeds sown"
         :model-value="12840"
-        description="Across all branches."
+        description="Across all beds."
       />
 
       <WFieldWrapper
-        title="Owner"
+        title="Caretaker"
         :model-value="null"
       />
     </div>
 
     <div>
       <WFieldWrapper
-        title="Severity threshold"
+        title="Moisture threshold"
         :has-changes="threshold !== 7"
-        description="Findings at or above it fail the build."
+        description="The sprinklers start below it."
         required
       >
         <template #field>
@@ -42,7 +42,7 @@
 
       <WFieldWrapper title="Status">
         <WChip
-          text="Active"
+          text="Thriving"
           :semantic-type="SemanticType.POSITIVE"
         />
       </WFieldWrapper>

@@ -1,18 +1,18 @@
 <template>
   <div class="grid gap-4">
     <WInfoCard>
-      Findings are grouped by the rule that found them. Open a group to see its findings.
+      Plants are grouped by the bed they grow in. Open a bed to see its plants.
     </WInfoCard>
 
     <WInfoCard :semantic-type="SemanticType.WARNING">
-      The scanner hasn't run for 30 days — results may be out of date.
+      The moisture sensors haven't reported for 3 days — readings may be out of date.
 
       <template #bottom>
         <WButton
           :semantic-type="SemanticType.SECONDARY"
           class="mt-4"
         >
-          Run now
+          Check now
         </WButton>
       </template>
     </WInfoCard>
@@ -21,7 +21,7 @@
       :semantic-type="SemanticType.POSITIVE"
       :icon="markRaw(IconCheckCircle)"
     >
-      All checks passed.
+      All plants are watered.
     </WInfoCard>
 
     <WInfoCard
@@ -31,8 +31,8 @@
       Without a background, for a note inside other content.
     </WInfoCard>
 
-    <WInfoCardNegative title="The repository can't be reached">
-      Check that the access token is still valid and has read access to the repository.
+    <WInfoCardNegative title="The greenhouse sensor can't be reached">
+      Check its battery and that it is still in range of the Wi-Fi.
     </WInfoCardNegative>
   </div>
 </template>

@@ -14,7 +14,7 @@ import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 // Loaded on first open, so the modal's code stays out of the page bundle.
 const RenameModal = defineAsyncComponent(() => import('./parts/RenameModal.vue'))
 
-const name = ref('Roadmap')
+const name = ref('Herb bed')
 
 const rename = () => {
   Modal.add(markRaw(RenameModal), {

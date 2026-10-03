@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-wrap items-center gap-6">
     <span class="cursor-help underline decoration-dotted">
-      SLA
-      <WTooltip text="Service level agreement: fix critical issues within 24 hours." />
+      Hardy
+      <WTooltip text="Survives winters outdoors down to −15 °C." />
     </span>
 
     <span class="cursor-help underline decoration-dotted">
@@ -17,8 +17,8 @@
       Rich content
       <WTooltip>
         <div class="grid gap-1">
-          <b>Last scan</b>
-          <span>12 findings · 3 critical</span>
+          <b>Last watered</b>
+          <span>2 days ago · 250 ml</span>
         </div>
       </WTooltip>
     </span>
@@ -31,9 +31,9 @@
     </WButton>
 
     <span class="w-40 truncate">
-      A title too long to fit in its column
+      Monstera deliciosa 'Thai Constellation'
       <WTooltip
-        text="A title too long to fit in its column"
+        text="Monstera deliciosa 'Thai Constellation'"
         overflow-only
       />
     </span>

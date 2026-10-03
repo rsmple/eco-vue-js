@@ -20,29 +20,29 @@ The `field` slot replaces the whole field, to give a control of your own — her
   <div class="grid gap-8 md:grid-cols-2">
     <div>
       <WFieldWrapper
-        title="Repository"
-        model-value="acme/payments-gateway"
+        title="Sensor"
+        model-value="greenhouse-2/moisture-07"
         mono
         allow-copy
       />
 
       <WFieldWrapper
-        title="Open findings"
+        title="Seeds sown"
         :model-value="12840"
-        description="Across all branches."
+        description="Across all beds."
       />
 
       <WFieldWrapper
-        title="Owner"
+        title="Caretaker"
         :model-value="null"
       />
     </div>
 
     <div>
       <WFieldWrapper
-        title="Severity threshold"
+        title="Moisture threshold"
         :has-changes="threshold !== 7"
-        description="Findings at or above it fail the build."
+        description="The sprinklers start below it."
         required
       >
         <template #field>
@@ -60,7 +60,7 @@ The `field` slot replaces the whole field, to give a control of your own — her
 
       <WFieldWrapper title="Status">
         <WChip
-          text="Active"
+          text="Thriving"
           :semantic-type="SemanticType.POSITIVE"
         />
       </WFieldWrapper>
@@ -87,7 +87,7 @@ const threshold = ref(7)
 
 - `subgrid` puts the title and the field on the parent grid's columns, so that the titles of a column of fields line up — the parent needs a grid with those columns.
 - `seamless` hides the title and the field's frame until it is hovered or focused, for editing in place, such as in a table cell. `embedded` fits a field inside another component, without title or margin.
-- `filterField` adds a filter button to the title, which toggles the value as a query param — e.g. from a finding's product to the list of that product's findings.
+- `filterField` adds a filter button to the title, which toggles the value as a query param — e.g. from a plant's bed to the list of that bed's plants.
 - `noMargin` drops the space under the field, `topText` moves the messages above it and `leftError` aligns the error to the left.
 
 ## API

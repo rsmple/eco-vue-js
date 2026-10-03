@@ -1,30 +1,30 @@
 <template>
   <WListCardField
-    :model-value="item.dueAt ? dateFormatShort(item.dueAt) : '—'"
+    :model-value="item.waterBy ? dateFormatShort(item.waterBy) : '—'"
     :skeleton="skeleton"
     :class="{
-      'text-description': !item.dueAt,
-      'tone-negative text-tone': item.dueAt && item.dueAt < today,
+      'text-description': !item.waterBy,
+      'tone-negative text-tone': item.waterBy && item.waterBy < today,
     }"
   />
 </template>
 
 <script lang="ts" setup>
-import type {Book} from '../models/Book'
+import type {Plant} from '../models/Plant'
 
 import type {FieldProps, ListField} from 'eco-vue-js/dist/components/List/types'
 import {dateFormat, dateFormatShort, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 
 import WListCardField from 'eco-vue-js/dist/components/List/WListCardField.vue'
 
-defineProps<FieldProps<Book>>()
+defineProps<FieldProps<Plant>>()
 
 defineEmits<{
-  (e: 'update:item', value: Book): void
+  (e: 'update:item', value: Plant): void
   (e: 'delete:item'): void
 }>()
 
-// Overdue books are shown in red.
+// Overdue plants are shown in red.
 const today = getStartOfDay()
 </script>
 
@@ -32,8 +32,8 @@ const today = getStartOfDay()
 export const meta = {
   label: 'due',
   cssClass: 'basis-[6rem]',
-  title: 'Due',
-  field: 'dueAt',
-  textFormat: item => item.dueAt ? dateFormat(item.dueAt) : undefined,
-} as const satisfies ListField<Book>
+  title: 'Water by',
+  field: 'waterBy',
+  textFormat: item => item.waterBy ? dateFormat(item.waterBy) : undefined,
+} as const satisfies ListField<Plant>
 </script>

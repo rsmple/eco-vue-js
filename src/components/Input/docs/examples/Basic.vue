@@ -3,7 +3,7 @@
     <WInput
       v-model="name"
       title="Name"
-      placeholder="Jane Austen"
+      placeholder="Monstera"
       allow-clear
     />
 

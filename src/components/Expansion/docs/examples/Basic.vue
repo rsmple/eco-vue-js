@@ -23,14 +23,14 @@
 
       <WExpansion :is-open="details">
         <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 rounded-xl bg-surface-muted p-4">
-          <span class="text-description">Findings</span>
+          <span class="text-description">Seeds sown</span>
           <WNumberFormatter
             :model-value="12840"
             tag="span"
             compact
           />
 
-          <span class="text-description">Fixed</span>
+          <span class="text-description">Sprouted</span>
           <WNumberFormatter
             :model-value="0.4375"
             tag="span"
@@ -44,7 +44,7 @@
       <span class="text-description text-sm">Hover the name:</span>
 
       <WTextOverflow>
-        <span class="whitespace-nowrap font-semibold">platform/services/payments-gateway/src/main.ts</span>
+        <span class="whitespace-nowrap font-semibold">Monstera deliciosa 'Thai Constellation', half-moon variegation</span>
       </WTextOverflow>
     </div>
   </div>
@@ -60,9 +60,9 @@ import WTextOverflow from 'eco-vue-js/dist/components/TextOverflow/WTextOverflow
 import WToggle from 'eco-vue-js/dist/components/Toggle/WToggle.vue'
 
 const sections = [
-  {title: 'What is scanned?', text: 'Every repository of the project, on each push to the default branch.'},
-  {title: 'How long are results kept?', text: 'For a year after the scan, or until the project is deleted.'},
-  {title: 'What changed this month?', text: 'Scans now include the container images built from the repository.', flag: true},
+  {title: 'When should I repot?', text: 'When roots grow out of the drainage holes — usually every year or two, in spring.'},
+  {title: 'Which soil is best?', text: 'A light, well-draining mix: add bark for aroids and grit for succulents.'},
+  {title: 'What changed this month?', text: 'The days are getting shorter, so move sun lovers closer to the window.', flag: true},
 ]
 
 const open = ref<number | null>(0)

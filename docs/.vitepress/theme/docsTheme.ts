@@ -62,7 +62,7 @@ const SAME_IN_DARK = 'Empty: same as in light mode'
 
 /** Groups the playground shows collapsed, with what they are for. */
 export const ADVANCED_GROUPS: Record<string, string> = {
-  Data: 'Distinct hues for categories: chart series, scanners, syntax. Each works as a tone, in both modes.',
+  Data: 'Distinct hues for categories: chart series, plant kinds, syntax. Each works as a tone, in both modes.',
   Roles: 'What components paint with, by purpose. Each takes a palette color by default, so a theme sets them only to break from the palette: a darker line, a tinted surface. A role is set per mode.',
 }
 

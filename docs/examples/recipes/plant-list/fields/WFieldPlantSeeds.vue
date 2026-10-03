@@ -3,7 +3,7 @@
     <template #inner>
       <!-- Compact, 1.2K for 1234, with the full number in a tooltip. -->
       <WNumberFormatter
-        :model-value="item.loans"
+        :model-value="item.seeds"
         compact
         tag="span"
         class="tabular-nums"
@@ -13,26 +13,26 @@
 </template>
 
 <script lang="ts" setup>
-import type {Book} from '../models/Book'
+import type {Plant} from '../models/Plant'
 
 import type {FieldProps, ListField} from 'eco-vue-js/dist/components/List/types'
 
 import WListCardField from 'eco-vue-js/dist/components/List/WListCardField.vue'
 import WNumberFormatter from 'eco-vue-js/dist/components/NumberFormatter/WNumberFormatter.vue'
 
-defineProps<FieldProps<Book>>()
+defineProps<FieldProps<Plant>>()
 
 defineEmits<{
-  (e: 'update:item', value: Book): void
+  (e: 'update:item', value: Plant): void
   (e: 'delete:item'): void
 }>()
 </script>
 
 <script lang="ts">
 export const meta = {
-  label: 'loans',
+  label: 'seeds',
   cssClass: 'basis-[6rem]',
-  title: 'Loans',
-  field: 'loans',
-} as const satisfies ListField<Book>
+  title: 'Seeds',
+  field: 'seeds',
+} as const satisfies ListField<Plant>
 </script>

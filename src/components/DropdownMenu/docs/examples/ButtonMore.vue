@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center gap-6">
-    <span>Project Atlas</span>
+    <span>Herb bed</span>
 
     <WButtonMore>
       <WButtonMoreItem
@@ -19,7 +19,7 @@
         text="Archive"
         :icon="markRaw(IconArchiveBook)"
         disabled
-        tooltip-text="Only owners can archive a project"
+        tooltip-text="Only the head gardener can archive a bed"
       />
 
       <WButtonMoreItem

@@ -1,24 +1,24 @@
 <template>
   <div class="grid gap-6">
     <p class="max-w-xl leading-relaxed">
-      The scanner reports each finding with a
+      Each plant links to its
       <WLink
-        href="https://cwe.mitre.org/data/definitions/79.html"
-        text="CWE-79"
+        href="https://en.wikipedia.org/wiki/Monstera_deliciosa"
+        text="Monstera deliciosa"
         target="_blank"
         rel="noopener"
       />
-      reference. The
+      article. The
       <WLink
-        href="https://owasp.org/www-project-top-ten/"
+        href="https://www.rhs.org.uk/plants"
         target="_blank"
         rel="noopener"
         :semantic-type="SemanticType.INFO"
         :icon="markRaw(IconArchiveBook)"
       >
-        OWASP guide
+        RHS plant guide
       </WLink>
-      explains how to fix it.
+      explains how to care for it.
     </p>
 
     <div class="flex items-center gap-2">
@@ -30,14 +30,14 @@
     <div class="flex max-w-md items-center gap-2">
       <WInput
         v-model="search"
-        placeholder="Repository"
+        placeholder="Sensor"
         class="flex-1"
         no-margin
       />
 
       <WButtonInput
         :icon="markRaw(IconRefresh)"
-        tooltip-text="Sync repositories"
+        tooltip-text="Sync sensors"
         :loading="syncing"
         @click="sync"
       />
@@ -58,7 +58,7 @@ import WLink from 'eco-vue-js/dist/components/Link/WLink.vue'
 import IconArchiveBook from 'eco-vue-js/dist/assets/icons/IconArchiveBook'
 import IconRefresh from 'eco-vue-js/dist/assets/icons/IconRefresh'
 
-const token = 'wsp_4f9c2e1a7b'
+const token = 'gh2_4f9c2e1a7b'
 const search = ref<string>()
 const syncing = ref(false)
 

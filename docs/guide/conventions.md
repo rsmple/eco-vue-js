@@ -45,8 +45,8 @@ Components plugged into `WList` — fields, menus, bulk actions, filters — mus
 ```ts
 import type {MenuEmits, MenuProps} from 'eco-vue-js/dist/components/List/types'
 
-defineProps<MenuProps<Book>>()
-defineEmits<MenuEmits<Book>>()
+defineProps<MenuProps<Plant>>()
+defineEmits<MenuEmits<Plant>>()
 ```
 
 See the [List with fields](../recipes/list-with-fields) recipe for the full pattern.

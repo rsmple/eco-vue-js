@@ -196,19 +196,19 @@ What each part does:
   />
 
   <WNavItemExpand
-    title="Findings"
-    :icon="markRaw(IconBug)"
-    :count="findingCount"
+    title="Plants"
+    :icon="markRaw(IconPlant)"
+    :count="plantCount"
   >
     <WNavItem
-      :to="{name: RouteName.FINDINGS, query: {status: 'open'}}"
-      title="Open"
+      :to="{name: RouteName.PLANTS, query: {status: 'thirsty'}}"
+      title="Thirsty"
       :query-fields="['status']"
     />
 
     <WNavItem
-      :to="{name: RouteName.FINDINGS, query: {status: 'closed'}}"
-      title="Closed"
+      :to="{name: RouteName.PLANTS, query: {status: 'watered'}}"
+      title="Watered"
       :query-fields="['status']"
     />
   </WNavItemExpand>
