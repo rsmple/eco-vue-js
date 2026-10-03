@@ -22,7 +22,7 @@ With `initData`, the form keeps its own copy of the model, built from the given 
 - The result of `apiMethod` becomes the new initial model, so `hasChanges` resets, and is emitted with `success`.
 - When `apiMethod` rejects with an `ApiError`, the field errors in its response show on the matching fields. Try `taken@example.com` below.
 
-`validate` takes one function or a list, each returning an error message or `undefined`. Errors appear after a submit attempt and clear as soon as the value is valid. `required` is checked first.
+`validate` takes one function or a list, each returning an error message or `undefined`. Errors appear after a submit attempt — on each change with `async` — and clear as soon as the value is valid. `required` is checked first.
 
 <!-- @example Uniform/Basic -->
 
@@ -143,6 +143,8 @@ A form in a modal usually has its buttons in the modal's `actions` slot, outside
 ## Auto-save
 
 `async` saves every change right away, one field at a time. The changed field shows a spinner while it is saved, and the rest of the form stays editable. `confimGetter` asks before a change is applied — the change is dropped on cancel.
+
+Only the changed fields are validated and sent. An invalid one shows its error at once and keeps its value without being saved, and changes to other fields are still saved. The value is sent once it is fixed. A change made while a save is in progress is sent when that save ends. When `apiMethod` returns nothing, the sent values become the initial ones for their fields. Fields that weren't sent keep their unsaved changes. `fullPayload` sends the whole model instead and waits until every field is valid.
 
 <!-- @example Uniform/Async -->
 

@@ -182,7 +182,7 @@
 <script lang="ts" setup>
 import type {FieldWrapperProps} from './types'
 
-import {type StyleValue, type VNode, computed, inject, onBeforeUnmount, ref, useId, useTemplateRef} from 'vue'
+import {type StyleValue, type VNode, computed, inject, onBeforeUnmount, ref, useId, useTemplateRef, watch} from 'vue'
 
 import WButtonCopy from '@/components/Button/WButtonCopy.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
@@ -262,6 +262,10 @@ const showMessage = (value: string, durationMs: number = 2000) => {
     timeout = setTimeout(resetMessage, durationMs)
   }
 }
+
+watch(() => props.errorMessage, value => {
+  if (value) resetMessage()
+})
 
 const setShowMessageInjected = inject(wFieldSetShowMessage, null)
 
