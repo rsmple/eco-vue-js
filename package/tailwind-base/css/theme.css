@@ -91,12 +91,21 @@
   --radius-2\.75xl: 1.375rem;
   --radius-3\.5xl: 1.75rem;
   --radius-4xl: 2rem;
-
-  --shadow-md: 0px 0px 8px rgba(0, 0, 0, 0.15);
-  --drop-shadow-md: 0px 0px 8px rgba(0, 0, 0, 0.15);
 }
 
 @theme inline {
+  /*
+   * Layered: a hairline, a short contact shadow, the main one and a wide soft one, in shares of the `shadow` role's
+   * alpha. `--w-shadow-lift` is how far the main one falls, the others in proportion; at 0 they center into a glow.
+   * Inline, so the color is read where the shadow is: a `.dark` island takes the dark one.
+   */
+  --shadow-md:
+    0 0 0 0.5px oklch(from var(--w-shadow) l c h / calc(alpha * 0.3)),
+    0 calc(var(--w-shadow-lift, 0.5rem) * 0.25) 4px -1px oklch(from var(--w-shadow) l c h / calc(alpha * 0.5)),
+    0 var(--w-shadow-lift, 0.5rem) 20px -4px oklch(from var(--w-shadow) l c h / calc(alpha * 0.8)),
+    0 calc(var(--w-shadow-lift, 0.5rem) * 2.5) 44px -12px oklch(from var(--w-shadow) l c h / calc(alpha * 0.6));
+  --drop-shadow-md: 0 calc(var(--w-shadow-lift, 0.5rem) * 0.5) 8px var(--w-shadow);
+
   --spacing-8xl: 88rem;
   --spacing-9xl: 96rem;
   --spacing-10xl: 104rem;

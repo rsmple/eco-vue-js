@@ -42,7 +42,7 @@ const EQUIVALENT: [string, string][] = [
   ['border border-line', 'border border-gray-300 dark:border-gray-700'],
   ['border border-line/50', 'border border-gray-300/50 dark:border-gray-700/50'],
   ['border border-line-subtle', 'border border-gray-200 dark:border-gray-700'],
-  ['outline outline-line-raised', 'outline outline-gray-100 dark:outline-gray-800'],
+  ['outline outline-line-raised', 'outline outline-gray-300 dark:outline-gray-700'],
   ['border border-focus outline outline-focus/20', 'border border-primary dark:border-primary-dark outline outline-primary/20 dark:outline-primary-dark/20'],
   ['tone-primary bg-tone-fill text-tone-on', 'bg-primary dark:bg-primary-dark text-white'],
   ['tone-primary surface-fill', 'bg-primary dark:bg-primary-dark text-white'],

@@ -27,7 +27,7 @@
       <div
         class="grid grid-cols-1 overflow-hidden"
         :class="{
-          'bg-surface my-2 rounded-xl shadow-md outline-1 outline-line-raised': !isMobile,
+          'surface-raised my-2 rounded-xl shadow-md outline-1 outline-line-raised': !isMobile,
         }"
       >
         <div class="p-4">

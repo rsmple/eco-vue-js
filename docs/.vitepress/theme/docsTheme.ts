@@ -23,23 +23,25 @@ const ROLES = {
   'text-accent': 'Main text',
   'text-description': 'Muted text: descriptions, captions, secondary values',
   'text-subtle': 'Placeholders, disabled text, chart axes',
-  surface: 'Page, cards, dropdowns',
+  surface: 'Page and cards',
   'surface-subtle': 'Panels and cards set off from the page, such as the docs sidebar',
   'surface-muted': 'Secondary fills, striped rows, tooltips',
   'surface-inset': 'Fills inside controls, chips',
+  'surface-raised': 'Dropdowns and popovers: lighter than the page in dark mode, where a shadow hardly shows',
   overlay: 'Translucent bars over scrolling content, such as the header',
   backdrop: 'Behind modals, bottom sheets and the mobile nav',
   track: 'Inactive parts of controls: slider and progress tracks',
   'track-strong': 'The stronger track: neutral progress bars, slider and tab indicator parts',
   line: 'Field borders and dividers',
   'line-subtle': 'Card and section borders',
-  'line-raised': 'Edge of dropdowns and popovers',
+  'line-raised': 'Edge of dropdowns, popovers and tooltips',
+  shadow: 'Color of the shadow under dropdowns, modals and tooltips: black, or a glow',
   focus: 'Focused field border and ring',
 } as const
 
 type RoleName = keyof typeof ROLES
 
-type ShapeKey = 'w-input-height' | 'w-input-rounded' | 'w-input-gap' | 'w-button-height' | 'w-button-rounded' | 'w-list-header-height' | 'w-list-header-rounded' | 'w-checkbox-size'
+type ShapeKey = 'w-input-height' | 'w-input-rounded' | 'w-input-gap' | 'w-button-height' | 'w-button-rounded' | 'w-list-header-height' | 'w-list-header-rounded' | 'w-checkbox-size' | 'w-shadow-lift'
 
 export type TokenKey = PaletteKey | 'neutral' | `role-${ RoleName }` | `role-${ RoleName }-dark` | ShapeKey | 'font-sans'
 
@@ -96,6 +98,7 @@ export const TOKENS: Token[] = [
   {key: 'w-list-header-height', group: 'Shape', label: 'List header height', kind: 'size', range: HEIGHT_RANGE},
   {key: 'w-list-header-rounded', group: 'Shape', label: 'List header radius', kind: 'size', range: {min: 0, pillOf: 'w-list-header-height'}},
   {key: 'w-checkbox-size', group: 'Shape', label: 'Checkbox size', kind: 'size', range: {min: 10, max: 24}},
+  {key: 'w-shadow-lift', group: 'Shape', label: 'Shadow lift', description: 'How far shadows fall under dropdowns, modals and tooltips; 0 centers them into a glow', kind: 'size', range: {min: 0, max: 16}},
   {key: 'font-sans', group: 'Font', label: 'Font family', description: 'Only MontSerrat is loaded on this site; other families must be installed locally', kind: 'font'},
 ]
 
@@ -116,6 +119,7 @@ export const DEFAULT_TOKENS: Record<TokenKey, string> = {
   'w-list-header-height': '2.25rem',
   'w-list-header-rounded': '0.75rem',
   'w-checkbox-size': '0.75rem',
+  'w-shadow-lift': '0.5rem',
 }
 
 /** A theme as it is stored and shared in links: an optional preset, and tokens that override it. */

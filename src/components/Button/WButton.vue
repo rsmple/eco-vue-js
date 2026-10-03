@@ -28,12 +28,13 @@
       relative isolate flex min-h---button-height
       items-center justify-center rounded-(--w-button-rounded,1rem)
       [border-width:var(--w-button-border,1px)] px-(--w-button-padding) font-medium
-      whitespace-nowrap outline-none select-none w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-var(--w-button-border,1px))]
+      whitespace-nowrap select-none w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-var(--w-button-border,1px))]
     "
     :class="{
       [semanticTypeButtonBackgroundMap[semanticType] ?? semanticTypeBackgroundMap[semanticType]]: !outline,
+      'before:text-tone-fill': outline,
       [semanticTypeBorderMap[semanticType]]: true,
-      'w-ripple cursor-pointer w-ripple-hover w-ripple-opacity-20 before:text-black-default dark:w-ripple-opacity-30': !loading && !isDisabled,
+      'w-ripple cursor-pointer w-ripple-hover before:text-black-default w-ripple-opacity-15': !loading && !isDisabled,
       'cursor-progress': loading,
       'cursor-not-allowed opacity-70': isDisabled,
       'last-not:rounded-r-none last-not:border-r-0 last-not:before:rounded-r-none first-not:rounded-l-none first-not:border-l-0 first-not:before:rounded-l-none': join

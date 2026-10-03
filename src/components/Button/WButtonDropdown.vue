@@ -52,7 +52,7 @@
     <template #content>
       <WClickOutside
         class="
-          bg-surface my-1 max-h-[inherit] w-full overflow-y-auto
+          surface-raised my-1 max-h-[inherit] w-full overflow-y-auto
           overflow-x-hidden overscroll-contain rounded-xl shadow-md border border-solid border-line-raised
         "
         @click="close"

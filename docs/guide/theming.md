@@ -15,7 +15,7 @@ The kit's look comes from three kinds of CSS variables:
 All are plain CSS variables at runtime, so this site can swap them live: the whole site follows the playground below, including the header and every component page.
 
 - **The theme in use** is at the top, with what to do with it. **Save as…** keeps it under a name in this browser; changes to a saved theme are saved into it as you make them, and the palette button in the header switches to it from any page. **Copy link** shares it: the link opens this page with the theme applied, and adds it to the other person's themes when it is a saved one. **Copy CSS** gives the stylesheet for an app.
-- **Presets** are starting points, and **My themes** lists the saved ones. **Random** picks a primary color, status colors (negative, positive, warning, info) in the same style and weight, the neutral scale, size and radius that suit them, and a dark mode background that fits the style — lifted for Soft, almost black for Neon — each at a lightness that passes the kit's contrast checks in both modes. A fill with black text can be bright, like warning, and goes brightest in Neon. A yellow or lime primary always is one, and the status colors turn bright with it. Bright fills stand out from a white page less than darker fills do, so their text and the focus ring are darkened to stay readable.
+- **Presets** are starting points, and **My themes** lists the saved ones. **Random** picks a primary color, status colors (negative, positive, warning, info) in the same style and weight, the neutral scale, size and radius that suit them, and a dark mode background that fits the style — lifted for Soft, almost black for Neon, whose shadows also glow in its primary — each at a lightness that passes the kit's contrast checks in both modes. A fill with black text can be bright, like warning, and goes brightest in Neon. A yellow or lime primary always is one, and the status colors turn bright with it. Bright fills stand out from a white page less than darker fills do, so their text and the focus ring are darkened to stay readable.
 - **Ask an AI assistant** describes a look in words: it opens Claude or ChatGPT with a prompt that explains the tokens, or copies it for another assistant. The reply gives the theme as JSON and as a link; paste either one, or the whole reply, into the field below the buttons.
 - **The fields below** adjust each token of the theme in use.
 
@@ -87,17 +87,19 @@ So a light brand color still gives readable links on white, and a yellow fill ge
 | `text-accent` | `text-accent` | `black-default` / `default` | Main text |
 | `text-description` | `text-description` | `gray-500` / `gray-400` | Muted text |
 | `text-subtle` | `text-subtle` | `gray-400` / `gray-600` | Placeholders, disabled text, chart axes |
-| `surface` | `bg-surface` | `default` / `default-dark` | Page, cards, dropdowns |
+| `surface` | `bg-surface` | `default` / `default-dark` | Page and cards |
 | `surface-subtle` | `bg-surface-subtle` | `gray-50` / `gray-850` | Barely raised areas: striped rows, empty chart cells, panels inside a card |
 | `surface-muted` | `bg-surface-muted` | `gray-100` / `gray-800` | Secondary fills, hovered rows, tooltips |
 | `surface-inset` | `bg-surface-inset` | `gray-200` / `gray-700` | Fills inside controls, chips |
+| `surface-raised` | `bg-surface-raised`, `surface-raised` | `default` / `default-dark` lightened by 4% | Dropdowns and popovers — in dark mode a shadow hardly shows, so they are lighter than the page instead |
 | `overlay` | `bg-overlay` | `default` 40% / `default-dark` 60% | Translucent bars over scrolling content |
 | `backdrop` | `bg-backdrop` | `primary-light` 40% / `primary-darkest` 40% | Behind modals, bottom sheets and the mobile nav |
 | `track` | `bg-track` | `gray-300` / `gray-700` | Unfilled tracks of sliders and progress bars, toggles and checkboxes when off |
 | `track-strong` | `bg-track-strong` | `gray-400` / `gray-500` | The stronger track: neutral progress bars, slider and tab indicator parts |
 | `line` | `border-line` | `gray-300` / `gray-700` | Field borders and dividers |
 | `line-subtle` | `border-line-subtle` | `gray-200` / `gray-700` | Card and section borders |
-| `line-raised` | `border-line-raised`, `outline-line-raised` | `gray-100` / `gray-800` | Edge of dropdowns and popovers |
+| `line-raised` | `border-line-raised`, `outline-line-raised` | `gray-300` / `gray-700` | Edge of dropdowns, popovers and tooltips |
+| `shadow` | `shadow-md`, `drop-shadow-md` | black 15% / black 50% | Shadow under dropdowns, modals, tooltips and toasts — a primary mix makes it a glow |
 | `focus` | `border-focus`, `outline-focus` | `primary` / `primary-dark` | Focused field border and ring |
 | `gradient-start`, `gradient-middle`, `gradient-end` | `from-gradient-start via-gradient-middle to-gradient-end` | `primary`, turned 30° and 60° towards pink / the same from `primary-dark` | The brand gradient |
 
@@ -107,6 +109,18 @@ A theme sets a role with `--role-{name}` and `--role-{name}-dark` in `@theme`:
 @theme {
   --role-line: var(--color-gray-400);
   --role-surface-muted-dark: oklch(25% 0.02 250);
+}
+```
+
+The shadow's color is a role too, and `--w-shadow-lift` sets how far it falls: `0` centers it, so a theme can turn every `shadow-md` into a glow:
+
+```css
+@theme {
+  --role-shadow-dark: color-mix(in oklab, var(--color-primary-dark) 45%, transparent);
+}
+
+body {
+  --w-shadow-lift: 0rem;
 }
 ```
 
@@ -161,6 +175,7 @@ Components use the same classes, and app code should too: a color written as a r
 | `surface-fill` | Fill background; `text-accent`, `text-description`, `text-subtle` and lines inside switch to the text-on-fill color |
 | `surface-soft` | Soft background; roles inside stay as they are |
 | `surface-muted` | Muted background; a soft tone set inside it mixes over it |
+| `surface-raised` | Dropdown or popover background; a soft tone and `bg-surface` inside it follow it |
 | `surface` | Page background and text, and resets roles a scope outside changed |
 | `light`, `dark` | Forces a mode for the element and its children, as tooltips do with `dark` |
 
@@ -246,5 +261,6 @@ To make a theme from a description — "a warm, rounded theme for a finance dash
 | `w-list-header-height` | `2.25rem` | `2rem` | List headers |
 | `w-list-header-rounded` | `0.75rem` | `1rem` | Radius of list headers |
 | `w-checkbox-size` | `0.75rem` | `1rem` | Checkboxes and radios |
+| `w-shadow-lift` | `0.5rem` | `0.5rem` | How far `shadow-md` falls under dropdowns, modals and tooltips; `0rem` centers it into a glow |
 
 The kit has more `w-*` variables for single components, such as `w-list-padding` and `w-modal-wrapper-rounded`; the playground covers the ones that shape the whole app.

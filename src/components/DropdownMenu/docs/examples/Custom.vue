@@ -15,7 +15,7 @@
 
     <template #content>
       <WClickOutside
-        class="bg-surface my-2 grid w-64 gap-1 rounded-xl p-3 shadow-md border border-line-raised"
+        class="surface-raised my-2 grid w-64 gap-1 rounded-xl p-3 shadow-md border border-line-raised"
         @click="isOpen = false"
       >
         <WCheckbox

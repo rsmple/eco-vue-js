@@ -31,7 +31,7 @@
       <div
         class="text-start font-normal"
         :class="{
-          'bg-surface my-2 max-h-[calc(100vh-6rem)] min-w-56 overflow-y-auto overscroll-contain rounded-xl shadow-md border border-solid border-line-raised': !isMobile,
+          'surface-raised my-2 max-h-[calc(100vh-6rem)] min-w-56 overflow-y-auto overscroll-contain rounded-xl shadow-md border border-solid border-line-raised': !isMobile,
         }"
       >
         <WMenuItem

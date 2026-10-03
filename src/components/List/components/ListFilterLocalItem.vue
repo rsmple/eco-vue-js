@@ -9,6 +9,7 @@
     <template #toggle>
       <WButton
         :semantic-type="isOpen ? SemanticType.PRIMARY : SemanticType.SECONDARY"
+        :class="isOpen ? 'outline-solid outline-2 outline-focus/20 before:opacity-15' : undefined"
         outline
         @click="$emit('toggle')"
       >
@@ -46,33 +47,40 @@
       </div>
     </template>
 
-    <template #content="{isMobile}">
-      <div
-        class="text-start font-normal"
-        :class="{
-          'p-4': !meta.embedded,
-          'bg-surface my-1 rounded-xl shadow-md border border-solid border-line-raised': !isMobile,
-          'w-96': !isMobile && !meta.embedded,
-          'max-w-96': !isMobile && meta.embedded,
-          'w-screen': isMobile && meta.embedded,
-        }"
-      >
-        <component
-          :is="item[0].default"
-          v-if="Array.isArray(item)"
-          v-bind="item[1]"
-          :scope="scope"
-          :readonly="readonly"
-          :global="false"
+    <template #content="{isMobile, isTop}">
+      <div class="flex-col flex items-center tone-surface-raised">
+        <WDropdownTip
+          v-if="!isMobile"
+          :top="isTop"
         />
 
-        <component
-          :is="item.default"
-          v-else
-          :scope="scope"
-          :readonly="readonly"
-          :global="false"
-        />
+        <div
+          class="text-start font-normal"
+          :class="{
+            'p-4': !meta.embedded,
+            'surface-raised rounded-xl shadow-md border border-solid border-line-raised': !isMobile,
+            'w-96': !isMobile && !meta.embedded,
+            'max-w-96': !isMobile && meta.embedded,
+            'w-screen': isMobile && meta.embedded,
+          }"
+        >
+          <component
+            :is="item[0].default"
+            v-if="Array.isArray(item)"
+            v-bind="item[1]"
+            :scope="scope"
+            :readonly="readonly"
+            :global="false"
+          />
+
+          <component
+            :is="item.default"
+            v-else
+            :scope="scope"
+            :readonly="readonly"
+            :global="false"
+          />
+        </div>
       </div>
     </template>
   </WDropdownAdaptive>
@@ -85,6 +93,7 @@ import type {UniformScope} from '@/components/Uniform/types'
 import {computed} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
+import WDropdownTip from '@/components/Dropdown/WDropdownTip.vue'
 import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconClose from '@/assets/icons/IconClose.svg?component'
