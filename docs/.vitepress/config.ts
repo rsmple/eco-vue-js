@@ -19,7 +19,7 @@ const siteUrl = `https://rsmple.github.io${ base }`
 
 export default defineConfig({
   title: 'EcoVue UI Library',
-  description: 'Vue 3 UI kit with Tailwind v4 — components, utilities, icons and recipes.',
+  description: 'One Vue 3 UI kit for your entire ecosystem — lists, forms and a data layer for complex data, live theming, icons and a ready project setup on Tailwind v4.',
   base,
   cleanUrls: true,
 
