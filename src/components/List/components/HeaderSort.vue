@@ -30,6 +30,24 @@
           :disabled="disabled"
           @update:ordering="$emit('update:ordering', $event)"
         />
+
+        <div class="mx-4 mt-2 border-b border-solid border-line-subtle" />
+
+        <div class="flex justify-end p-2">
+          <button
+            class="relative rounded-lg bg-surface-muted px-2 py-1 text-sm"
+            :class="{
+              'w-ripple w-ripple-hover': canClear,
+              'cursor-not-allowed opacity-50': !canClear,
+            }"
+            :disabled="!canClear"
+            :aria-disabled="!canClear"
+            aria-label="Clear sorting"
+            @click="canClear && $emit('update:ordering', [])"
+          >
+            Clear
+          </button>
+        </div>
       </WClickOutside>
     </template>
   </WDropdownMenu>
@@ -73,6 +91,8 @@ defineEmits<{
 }>()
 
 const isOpen = ref(false)
+
+const canClear = computed(() => !props.disabled && props.ordering.length !== 0)
 
 const isFieldRequired = (field: ListFields<Data, QueryParams>[number]): field is RequiredField => {
   return 'field' in field.meta && field.meta.field !== undefined
