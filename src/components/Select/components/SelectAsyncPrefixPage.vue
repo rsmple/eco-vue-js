@@ -48,8 +48,19 @@ const emit = defineEmits<{
 
 const queryEnabled = computed<boolean>(() => !props.previewData)
 
+// Built from options already seen, so selecting or unselecting does not refetch the chips.
+const getInitialData = (): PaginatedResponse<Data> | undefined => {
+  const results = props.values.map(value => props.knownData.get(String(value)))
+
+  if (results.some(item => item === undefined)) return undefined
+
+  return {count: results.length, pages_count: 1, current: 1, next: null, previous: null, results: results as Data[]}
+}
+
 const {data, isFetching} = props.useQueryFn(toRef(() => props.queryParams), {
   enabled: queryEnabled,
+  initialData: getInitialData,
+  staleTime: Infinity,
   refetchInterval: false,
   refetchOnMount: false,
   refetchOnReconnect: false,
@@ -67,6 +78,10 @@ const options = computed<Data[]>(() => {
     ...(props.previewData ?? data.value?.results ?? []),
   ].filter((option, index, array) => array.findIndex(item => props.valueGetter(item) === props.valueGetter(option)) === index)
 })
+
+watch(() => data.value?.results, value => {
+  value?.forEach(item => props.knownData.set(String(props.valueGetter(item)), item))
+}, {immediate: true})
 
 watch(pagesCount, value => {
   if (value === undefined) return
