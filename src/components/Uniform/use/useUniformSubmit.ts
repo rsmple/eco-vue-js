@@ -16,6 +16,7 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
   initModel: (value: OriginalModel) => void,
   showMessage: (message: string, onlyChanged?: boolean) => void,
   noInitGetter: () => boolean,
+  asyncGetter: () => boolean,
 ) => {
   const submitting = ref(false)
 
@@ -25,7 +26,7 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
     const message = validate(false, true)
 
     if (message) {
-      Notify.warn({
+      if (!asyncGetter()) Notify.warn({
         title: 'Form contains invalid data',
         caption: h(WUniformErrorMessage, {message}),
       })

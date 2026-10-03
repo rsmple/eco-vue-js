@@ -204,6 +204,7 @@ const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
   result => scopeModel.initModel(result),
   (message, onlyChanged) => scope?.showMessage(message, onlyChanged),
   () => props.noInit,
+  () => props.async,
 ) : undefined
 
 const scopeModel = useUniformModel(
