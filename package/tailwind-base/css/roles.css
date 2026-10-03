@@ -156,7 +156,9 @@
  *   0.53 in light mode, at least 0.72 in dark — so a light brand color still gives legible text on white.
  * - `--w-tone-line` (`border-tone-line`): the same for outlines and borders, which need 3:1 rather than text's 4.5:1, so
  *   a light fill stays nearer its own color — at most 0.62 in light mode.
- * - `--w-tone-on` (`text-tone-on`): black or white, whichever contrasts more with the fill (they cross at L ≈ 0.58).
+ * - `--w-tone-on` (`text-tone-on`): black or white, whichever reads better on the fill by APCA. They cross at a
+ *   luminance of about 0.36, a gray's L 0.71, so the fill is first turned into the gray of the same luminance: a
+ *   saturated purple or blue at L 0.65 still takes white, where WCAG 2 would pick black.
  * - `--w-tone-soft` (`bg-tone-soft`): 12% of the fill over the surface.
  *
  * A theme pins any of them per tone through `--tone-text-*`, `--tone-line-*`, `--tone-on-*` and `--tone-soft-*`: an explicit value is
@@ -168,7 +170,7 @@
   --w-tone: --value(--tone-text-*);
   --w-tone-line: light-dark(oklch(from var(--w-tone-fill) min(l, 0.62) c h), oklch(from var(--w-tone-fill) max(l, 0.72) c h));
   --w-tone-line: --value(--tone-line-*);
-  --w-tone-on: oklch(from var(--w-tone-fill) clamp(0, (0.58 - l) * 1000, 1) 0 0);
+  --w-tone-on: oklch(from color(from var(--w-tone-fill) xyz-d65 calc(y * 0.9505) y calc(y * 1.089)) clamp(0, (0.71 - l) * 1000, 1) 0 0);
   --w-tone-on: --value(--tone-on-*);
   --w-tone-soft: color-mix(in oklab, var(--w-tone-fill) 12%, var(--w-surface));
   --w-tone-soft: --value(--tone-soft-*);

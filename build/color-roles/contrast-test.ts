@@ -1,7 +1,8 @@
 /// <reference lib="dom" />
 /* eslint-disable no-console */
 /**
- * WCAG contrast of every color role against what it sits on, in light and dark (plans/color-roles.md, phase 3).
+ * WCAG contrast of every color role against what it sits on, in light and dark (plans/color-roles.md, phase 3), and
+ * APCA for the black or white text on tone fills, which is what `text-tone-on` picks it by.
  * Colors are resolved by the browser from the real `roles.css`, so overrides and derived values are measured as
  * rendered; translucent colors are composited over their background first.
  *
@@ -28,8 +29,11 @@ const CSS_DIR = ROOT + 'package/tailwind-base/css/'
 const TEXT = 4.5
 const UI = 3
 
-/** `lightMin` replaces `min` when the fill takes black text. */
-type Pair = {name: string, fg: string, bg: string, min: number, lightMin?: number, scope?: string}
+/** APCA Lc for the text on a fill: badges and button labels, so the minimum for body text rather than for headings. */
+const ON_FILL = 60
+
+/** `lightMin` replaces `min` when the fill takes black text; `apca` measures the pair by APCA Lc instead of WCAG. */
+type Pair = {name: string, fg: string, bg: string, min: number, lightMin?: number, apca?: boolean, scope?: string}
 
 const TONES = ['primary', 'negative', 'positive', 'warning', 'info']
 
@@ -56,13 +60,13 @@ const PAIRS: Pair[] = [
   ...TONES.flatMap(tone => [
     {name: `${ tone }: text-tone on surface`, fg: 'text-tone', bg: 'bg-surface', min: tone === 'warning' ? UI : TEXT, scope: 'tone-' + tone},
     {name: `${ tone }: border-tone-line on surface`, fg: 'border-tone-line', bg: 'bg-surface', min: UI, scope: 'tone-' + tone},
-    {name: `${ tone }: text-tone-on on fill`, fg: 'text-tone-on', bg: 'bg-tone-fill', min: TEXT, scope: 'tone-' + tone},
+    {name: `${ tone }: text-tone-on on fill`, fg: 'text-tone-on', bg: 'bg-tone-fill', min: ON_FILL, apca: true, scope: 'tone-' + tone},
     {name: `${ tone }: fill on surface`, fg: 'bg-tone-fill', bg: 'bg-surface', min: UI, lightMin: LIGHT_FILL, scope: 'tone-' + tone},
     {name: `${ tone }: text-accent on soft`, fg: 'text-accent', bg: 'bg-tone-soft', min: 7, scope: 'tone-' + tone},
   ]),
   ...DATA_TONES.flatMap(tone => [
     {name: `${ tone }: text-tone on surface`, fg: 'text-tone', bg: 'bg-surface', min: TEXT, scope: 'tone-' + tone},
-    {name: `${ tone }: text-tone-on on fill`, fg: 'text-tone-on', bg: 'bg-tone-fill', min: TEXT, scope: 'tone-' + tone},
+    {name: `${ tone }: text-tone-on on fill`, fg: 'text-tone-on', bg: 'bg-tone-fill', min: ON_FILL, apca: true, scope: 'tone-' + tone},
     {name: `${ tone }: fill on surface`, fg: 'bg-tone-fill', bg: 'bg-surface', min: tone === 'data-amber' ? 1.5 : UI, scope: 'tone-' + tone},
   ]),
 ]
@@ -132,6 +136,18 @@ for (const theme of themes) for (const mode of ['light', 'dark']) {
 
       return 0.2126 * r + 0.7152 * g + 0.0722 * b
     }
+    /** APCA Lc of text on a background, as a positive number either way round. */
+    const apca = (text: number[], background: number[]) => {
+      const [t, bg] = [text, background].map(rgb => {
+        const [r, g, b] = rgb.map(value => (value / 255) ** 2.4)
+        const y = 0.2126729 * r + 0.7151522 * g + 0.0721750 * b
+
+        return y > 0.022 ? y : y + (0.022 - y) ** 1.414
+      })
+      const lc = bg > t ? (bg ** 0.56 - t ** 0.57) * 1.14 : (t ** 0.62 - bg ** 0.65) * 1.14
+
+      return lc < 0.001 ? 0 : (lc - 0.027) * 100
+    }
     const bodyRgb = toRgba(getComputedStyle(document.body).backgroundColor).rgb
 
     return pairs.map((pair, index) => {
@@ -141,6 +157,8 @@ for (const theme of themes) for (const mode of ['light', 'dark']) {
       const bg = over(bgStyle.backgroundColor, bodyRgb)
       const property = pair.fg.startsWith('border') ? fgStyle.borderTopColor : pair.fg.startsWith('bg') ? fgStyle.backgroundColor : fgStyle.color
       const fg = over(property, bg)
+      if (pair.apca) return {name: pair.name, ratio: apca(fg, bg), min: pair.min}
+
       const [light, dark] = [luminance(fg), luminance(bg)].sort((a, b) => b - a)
       const blackText = pair.lightMin !== undefined && luminance(toRgba(fgStyle.color).rgb) < 0.5
 

@@ -413,7 +413,7 @@ export const getThemePrompt = (description: string, config: ThemeConfig) => {
     '',
     'Rules:',
     '- Colors as oklch(L% C H). "neutral" is one of: ' + Object.keys(NEUTRAL_SCALES).join(', ') + '.',
-    '- Primary and the status colors are fills under black or white text, which the kit picks by lightness (white below L 58%). A fill needs 3:1 contrast with the page and 4.5:1 with its text, in light mode against the background and in dark mode against the dark background. When one value cannot pass both, set its -dark variant.',
+    '- Primary and the status colors are fills under black or white text, whichever reads better by APCA: white on fills with less luminance than a gray of L 71%, so a saturated purple or blue at L 65% still takes white. A fill with white text needs 3:1 contrast with the page, in light mode against the background and in dark mode against the dark background, and its text APCA Lc 60. Avoid fills right at the switch, where neither text reaches it. When one value cannot pass in both modes, set its -dark variant.',
     '- Readable text, focus rings and soft backgrounds are derived from these fills, so don\'t ask for more colors to get them.',
     '- Radii at most half the matching height. Sizes in rem.',
     ...Object.keys(config).length ? ['', `The theme I have now, to adjust or replace as the look asks: ${ JSON.stringify(getTokens(config)) }`] : [],

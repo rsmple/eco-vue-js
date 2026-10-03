@@ -317,7 +317,7 @@ Separate minor, deliberate visual change.
 `X` and `X-dark` keep meaning "the value for light mode" and "for dark mode" — aspm's `primary-dark` is lighter than its `primary`, traio's is white — so roles never treat `-dark` as a darker shade. Instead `tone-*` derives from the fill of the current mode:
 
 - text and borders (`--w-tone`): lightness clamped to ≤ 0.53 in light, ≥ 0.72 in dark;
-- on-fill (`--w-tone-on`): black or white, switching at L 0.58 — where the two have equal WCAG contrast for every hue;
+- on-fill (`--w-tone-on`): black or white, switching where APCA rates them the same — at the luminance of a gray of L 0.71, so the switch follows each hue's luminance rather than its lightness;
 - soft (`--w-tone-soft`): 12% of the fill over the surface.
 
 Pins per tone: `--tone-text-*`, `--tone-on-*`, `--tone-soft-*` in a theme's `@theme inline`. The semantic border map uses `border-tone-fill`, so a filled button's border stays its fill and an outlined one keeps today's look.

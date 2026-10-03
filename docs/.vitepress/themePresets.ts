@@ -145,6 +145,33 @@ const luminance = ([r, g, b]: [number, number, number]) => 0.2126 * r + 0.7152 *
 
 const contrast = (first: number, second: number) => (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05)
 
+/** Luminance as APCA takes it: from the sRGB channels with a plain 2.4 gamma, rather than WCAG's linearization. */
+const apcaLuminance = (rgb: [number, number, number]) => {
+  const [r, g, b] = rgb.map(value => (value <= 0.0031308 ? value * 12.92 : 1.055 * value ** (1 / 2.4) - 0.055) ** 2.4)
+
+  return 0.2126729 * r + 0.7151522 * g + 0.0721750 * b
+}
+
+/** APCA lightness contrast (Lc) of text on a background, as a positive number either way round. */
+const apca = (text: number, background: number) => {
+  const [t, bg] = [text, background].map(value => value > 0.022 ? value : value + (0.022 - value) ** 1.414)
+  const lc = bg > t ? (bg ** 0.56 - t ** 0.57) * 1.14 : (t ** 0.62 - bg ** 0.65) * 1.14
+
+  return lc < 0.001 ? 0 : (lc - 0.027) * 100
+}
+
+/**
+ * `text-tone-on` takes white on a fill whose luminance is under that of a gray of this lightness, where APCA rates
+ * black and white the same, and black above it.
+ */
+const ON_FILL_LIGHTNESS = 0.71
+
+/**
+ * The APCA contrast `text-tone-on` needs on a fill: readable at a badge's or a button's size and weight. A little
+ * over the 60 the contrast test asks, as the other minimums are, for the rounding of the color the theme writes.
+ */
+const MIN_ON_FILL = 60.5
+
 /** Lightness of `oklch(L% C H)` strings: the scales and the kit's default. */
 const parseLightness = (color: string) => Number.parseFloat(color) / 100
 
@@ -247,7 +274,8 @@ export const getHueGradient = (styleId: RandomStyleId, range: HueRange, alpha = 
  */
 const isMuddy = (l: number, hue: number) => (hue >= 55 && hue < 128) || (hue >= 35 && hue < 55 && l < 0.55)
 
-type Fill = {l: number, c: number}
+/** A fill's lightness and chroma, and whether `text-tone-on` puts white text on it. */
+type Fill = {l: number, c: number, white: boolean}
 
 /**
  * The status tones: the hues each one keeps to, the wider range it shifts into when the primary takes those (a red
@@ -314,8 +342,8 @@ const MIN_PAGE = {white: 3.02, black: 1.52}
 
 /**
  * Fills of this hue, at `saturation` of the most chroma each lightness allows within the style's limits, that pass
- * the kit's contrast checks on a page of `pageLuminance`: `MIN_PAGE` against the page, 4.5:1 for the black or white
- * text `text-tone-on` puts on it (white below L 0.58), 4.5:1 for `text-tone`, the fill's chroma at a lightness of at
+ * the kit's contrast checks on a page of `pageLuminance`: `MIN_PAGE` against the page, `MIN_ON_FILL` for the black or
+ * white text `text-tone-on` puts on it, 4.5:1 for `text-tone`, the fill's chroma at a lightness of at
  * most 0.53 on a light page and at least 0.72 on a dark one, and 3:1 for `border-tone-line`, the same at most 0.62 on a
  * light page; the browser clips both when they leave sRGB. Fills under `minChroma`, the style's by default, are left out.
  */
@@ -328,18 +356,19 @@ const passingFills = (hue: number, saturation: number, style: RandomStyle, pageL
     const c = Math.min(maxChroma(l, hue) * saturation, style.maxChroma)
     if (c < minChroma || (muddy && isMuddy(l, hue))) continue
 
-    const fill = luminance(toLinearRgb(l, c, hue) as [number, number, number])
-    const text = l < 0.58 ? 1 : 0
+    const rgb = toLinearRgb(l, c, hue) as [number, number, number]
+    const fill = luminance(rgb)
+    const white = fill < ON_FILL_LIGHTNESS ** 3
 
     const toneText = luminance(toLinearRgb(lightPage ? Math.min(l, 0.53) : Math.max(l, 0.72), c, hue, true))
     const toneLine = luminance(toLinearRgb(lightPage ? Math.min(l, 0.62) : Math.max(l, 0.72), c, hue, true))
 
     if (
-      contrast(fill, pageLuminance) >= (text ? MIN_PAGE.white : MIN_PAGE.black)
-      && contrast(fill, text) >= 4.52
+      contrast(fill, pageLuminance) >= (white ? MIN_PAGE.white : MIN_PAGE.black)
+      && apca(white ? 1 : 0, apcaLuminance(rgb)) >= MIN_ON_FILL
       && contrast(toneText, pageLuminance) >= 4.52
       && contrast(toneLine, pageLuminance) >= 3.02
-    ) result.push({l, c})
+    ) result.push({l, c, white})
   }
 
   return result
@@ -402,7 +431,7 @@ const getStatusTokens = (
     if (!passing.length || !dark.length) continue
 
     const light = nearPeak(passing, style)
-    const sameText = light.filter(fill => (fill.l < 0.58) === (primary.l < 0.58))
+    const sameText = light.filter(fill => fill.white === primary.white)
     const fill = lightFill || lightPrimary
       ? light.reduce((best, item) => item.c > best.c ? item : best)
       : (sameText.length ? sameText : light).reduce((best, item) => Math.abs(item.l - primary.l) < Math.abs(best.l - primary.l) ? item : best)
@@ -449,8 +478,8 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', hues: HueRange
     if (!passing.length || !dark.length) continue
 
     const light = nearPeak(passing, style)
-    const withWhiteText = light.filter(fill => fill.l < 0.58)
-    const withBlackText = light.filter(fill => fill.l >= 0.58)
+    const withWhiteText = light.filter(fill => fill.white)
+    const withBlackText = light.filter(fill => !fill.white)
     const primary = pick(withBlackText.length && (!withWhiteText.length || random() < style.blackText) ? withBlackText : withWhiteText, random)
     const primaryDark = getDarkFill(primary, dark, style)
     const taken = [hue]
