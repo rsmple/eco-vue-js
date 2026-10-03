@@ -7,10 +7,10 @@
     <template #field="scopeField">
       <WSelect
         v-bind="scopeField"
-        :options="Object.values(Kind)"
-        :value-getter="item => item"
-        :search-fn="(item, search) => kindDisplay[item].label.toLowerCase().includes(search)"
-        :option-component="markRaw(WOptionPlantKind)"
+        :options="options"
+        :value-getter="item => item.id"
+        :search-fn="(item, search) => item.name.toLowerCase().includes(search)"
+        :option-component="markRaw(OptionToneTag)"
         :readonly="readonly"
         placeholder="Search kinds"
         :embedded="!global"
@@ -32,12 +32,15 @@ import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 import IconPlant from 'eco-vue-js/dist/assets/icons/IconPlant'
 
+import OptionToneTag, {type ToneTag} from '../../../shared/OptionToneTag.vue'
 import {Kind} from '../models/Plant'
 import {kindDisplay} from '../models/PlantDisplay'
-import WOptionPlantKind from '../options/WOptionPlantKind.vue'
 
 defineProps<FilterProps<QueryParamsPlants>>()
 defineEmits<FilterEmits>()
+
+// The same tags as the kind column, in the shape the shared tag option takes.
+const options: ToneTag<Kind>[] = Object.values(Kind).map(id => ({id, ...kindDisplay[id]}))
 </script>
 
 <script lang="ts">

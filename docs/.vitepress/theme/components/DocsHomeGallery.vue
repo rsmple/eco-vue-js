@@ -634,10 +634,10 @@
       >
         <WSelectSingle
           v-model="caretaker"
-          :options="GARDENERS"
+          :options="gardeners"
           :value-getter="item => item.id"
           :search-fn="(item, search) => item.name.toLowerCase().includes(search.toLowerCase())"
-          :option-component="DocsHomeOptionUser"
+          :option-component="OptionGardener"
           title="Caretaker"
           placeholder="Pick a person"
           allow-clear
@@ -794,8 +794,10 @@ import IconWind from 'eco-vue-js/dist/assets/icons/IconWind'
 
 import DocsHomeOptionCompanion, {type Companion} from './DocsHomeOptionCompanion.vue'
 import DocsHomeOptionHealth, {type Health} from './DocsHomeOptionHealth.vue'
-import DocsHomeOptionUser from './DocsHomeOptionUser.vue'
 import DocsHomeTile from './DocsHomeTile.vue'
+
+import {gardeners} from '../../../examples/shared/Gardener'
+import OptionGardener from '../../../examples/shared/OptionGardener.vue'
 
 const TODAY = getStartOfDay()
 
@@ -918,22 +920,6 @@ const water = () => {
     isWatered.value = true
   }, 1200)
 }
-export type Gardener = {
-  id: number
-  name: string
-  role: string
-  tone: string
-  week: boolean[]
-}
-
-// `week` is the last seven days, oldest first: whether they watered that day.
-const GARDENERS: Gardener[] = [
-  {id: 1, name: 'Carl Linnaeus', role: 'Head gardener', tone: 'tone-data-green', week: [true, true, false, true, true, true, true]},
-  {id: 2, name: 'Gregor Mendel', role: 'Gardener', tone: 'tone-data-violet', week: [true, false, true, true, false, true, true]},
-  {id: 3, name: 'Barbara McClintock', role: 'Gardener', tone: 'tone-data-pink', week: [false, true, true, true, true, false, true]},
-  {id: 4, name: 'Luther Burbank', role: 'Volunteer', tone: 'tone-data-amber', week: [false, false, true, false, false, true, false]},
-]
-
 const caretaker = ref<number | null>(2)
 
 const HEALTH: Health[] = [

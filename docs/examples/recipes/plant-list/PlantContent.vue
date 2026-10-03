@@ -172,7 +172,7 @@ const xDomain: [number, number] = [+addMonth(today, -5), +today]
 const days = Array.from({length: 28}, (_, index) => addDay(today, index - 27))
 
 const getFacts = (item: Plant) => [
-  {title: 'Light', value: lightDisplay[item.light].label, tone: lightDisplay[item.light].tone, icon: lightDisplay[item.light].icon},
+  {title: 'Light', value: lightDisplay[item.light].name, tone: lightDisplay[item.light].tone, icon: lightDisplay[item.light].icon},
   {title: 'Water', value: `${ item.water } ml`, tone: 'tone-data-blue', icon: markRaw(IconDrop)},
   {title: 'Humidity', value: `${ item.humidity }%`, tone: 'tone-data-cyan', icon: markRaw(IconWind)},
   {title: 'Temperature', value: `${ item.temperature[0] }–${ item.temperature[1] } °C`, tone: 'tone-data-red', icon: markRaw(IconThermometer)},

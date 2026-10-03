@@ -7,7 +7,7 @@
     :create-option="createLight"
     title="Light it tolerates"
     placeholder="Add a light level"
-    :option-component="OptionLight"
+    :option-component="OptionToneTag"
     class="max-w-md"
     @select="light = [...light, $event]"
     @unselect="light = light.filter(item => item !== $event)"
@@ -29,9 +29,9 @@ import IconCloudSunPartial from 'eco-vue-js/dist/assets/icons/IconCloudSunPartia
 import IconMoon from 'eco-vue-js/dist/assets/icons/IconMoon'
 import IconSun from 'eco-vue-js/dist/assets/icons/IconSun'
 
-import OptionLight, {type Light} from './parts/OptionLight.vue'
+import OptionToneTag, {type ToneTag} from '../../../../../docs/examples/shared/OptionToneTag.vue'
 
-const options = reactive<Light[]>([
+const options = reactive<ToneTag[]>([
   {id: 'full-sun', name: 'Full sun', tone: 'tone-data-amber', icon: markRaw(IconSun)},
   {id: 'bright-indirect', name: 'Bright indirect', tone: 'tone-data-orange', icon: markRaw(IconCloudSun)},
   {id: 'part-shade', name: 'Part shade', tone: 'tone-data-teal', icon: markRaw(IconCloudSunPartial)},
@@ -42,7 +42,7 @@ const options = reactive<Light[]>([
 const light = ref<string[]>(['bright-indirect', 'part-shade'])
 
 // In an app, a POST that answers with the saved option. Without an icon, the option shows a tag.
-const createLight = (search: string): Light => {
+const createLight = (search: string): ToneTag => {
   const option = {id: search.toLowerCase().replaceAll(' ', '-'), name: search, tone: 'tone-data-gray'}
 
   options.push(option)

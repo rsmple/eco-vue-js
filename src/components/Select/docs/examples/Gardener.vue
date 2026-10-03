@@ -22,15 +22,8 @@ import {ref} from 'vue'
 
 import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 
-import OptionGardener, {type Gardener} from './parts/OptionGardener.vue'
-
-const gardeners: Gardener[] = [
-  {id: 1, name: 'Mira Kovač', role: 'Head gardener', beds: 12},
-  {id: 2, name: 'Tomás Reyes', role: 'Greenhouse', beds: 4},
-  {id: 3, name: 'Aiko Tanaka', role: 'Seedlings', beds: 7},
-  {id: 4, name: 'Jonas Berg', role: 'Herb garden', beds: 3},
-  {id: 5, name: 'Priya Nair', role: 'Orchard', beds: 9},
-]
+import {gardeners} from '../../../../../docs/examples/shared/Gardener'
+import OptionGardener from '../../../../../docs/examples/shared/OptionGardener.vue'
 
 const gardenerId = ref<number | null>(1)
 </script>

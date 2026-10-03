@@ -8,7 +8,7 @@
         class="surface-fill flex size-6 shrink-0 items-center justify-center rounded-full text-[0.625rem] font-semibold"
         :class="item.caretaker.tone"
       >
-        {{ item.caretaker.name.split(' ').map(part => part[0]).join('') }}
+        {{ initials(item.caretaker.name) }}
       </span>
 
       <span class="truncate">{{ item.caretaker.name }}</span>
@@ -22,6 +22,8 @@ import type {Plant} from '../models/Plant'
 import type {FieldProps, ListField} from 'eco-vue-js/dist/components/List/types'
 
 import WListCardField from 'eco-vue-js/dist/components/List/WListCardField.vue'
+
+import {initials} from '../../../shared/Gardener'
 
 defineProps<FieldProps<Plant>>()
 

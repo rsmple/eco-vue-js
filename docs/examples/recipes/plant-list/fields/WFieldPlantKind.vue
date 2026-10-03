@@ -12,7 +12,7 @@
         :is="kindDisplay[item.kind].icon"
         class="square-3.5"
       />
-      {{ kindDisplay[item.kind].label }}
+      {{ kindDisplay[item.kind].name }}
     </span>
   </WListCardField>
 </template>
