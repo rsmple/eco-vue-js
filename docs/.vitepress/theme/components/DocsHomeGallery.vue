@@ -562,6 +562,24 @@
         link="/components/content-blocks#info-cards"
       >
         <WInfoCard
+          :icon="markRaw(IconDanger)"
+          :semantic-type="SemanticType.NEGATIVE"
+        >
+          The repository can't be reached
+
+          <template #bottom>
+            Check that the access token is still valid.
+          </template>
+        </WInfoCard>
+
+        <WInfoCard
+          :semantic-type="SemanticType.INFO"
+          no-bg
+        >
+          Without a background, for a note inside other content.
+        </WInfoCard>
+
+        <WInfoCard
           v-if="!isScanned"
           :semantic-type="SemanticType.WARNING"
         >
@@ -595,17 +613,6 @@
               Start over
             </WButton>
           </template>
-        </WInfoCard>
-
-        <WInfoCardNegative title="The repository can't be reached">
-          Check that the access token is still valid.
-        </WInfoCardNegative>
-
-        <WInfoCard
-          :semantic-type="SemanticType.INFO"
-          no-bg
-        >
-          Without a background, for a note inside other content.
         </WInfoCard>
       </DocsHomeTile>
 
@@ -649,7 +656,6 @@ import WDragContainer from 'eco-vue-js/dist/components/DragContainer/WDragContai
 import WExpansionItem from 'eco-vue-js/dist/components/Expansion/WExpansionItem.vue'
 import WFilePicker from 'eco-vue-js/dist/components/FilePicker/WFilePicker.vue'
 import WInfoCard from 'eco-vue-js/dist/components/InfoCard/WInfoCard.vue'
-import WInfoCardNegative from 'eco-vue-js/dist/components/InfoCard/WInfoCardNegative.vue'
 import WInputOptions from 'eco-vue-js/dist/components/Input/WInputOptions.vue'
 import WNumberFormatter from 'eco-vue-js/dist/components/NumberFormatter/WNumberFormatter.vue'
 import WProgressStriped from 'eco-vue-js/dist/components/Progress/WProgressStriped.vue'
@@ -665,6 +671,7 @@ import WToggle from 'eco-vue-js/dist/components/Toggle/WToggle.vue'
 import WTooltip from 'eco-vue-js/dist/components/Tooltip/WTooltip.vue'
 
 import IconCheckCircle from 'eco-vue-js/dist/assets/icons/IconCheckCircle'
+import IconDanger from 'eco-vue-js/dist/assets/icons/IconDanger'
 import IconDrag from 'eco-vue-js/dist/assets/icons/IconDrag'
 import IconSettings from 'eco-vue-js/dist/assets/icons/IconSettings'
 import IconSummary from 'eco-vue-js/dist/assets/icons/IconSummary'
