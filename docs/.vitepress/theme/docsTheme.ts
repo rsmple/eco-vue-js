@@ -357,6 +357,33 @@ export const setToken = (key: TokenKey, value: string) => {
   themeConfig.value = trimmed && !getTokenError(key, trimmed) && trimmed !== (base?.[key] ?? DEFAULT_TOKENS[key]) ? {...config, [key]: trimmed} : config
 }
 
+/** The playground form's model: every token as typed, empty when unset. */
+export type ThemeFormModel = Record<TokenKey, string>
+
+export const toFormModel = (config: ThemeConfig): ThemeFormModel => Object.fromEntries(TOKENS.map(token => [token.key, config[token.key] ?? ''])) as ThemeFormModel
+
+/**
+ * Sets every token from the playground form as `setToken` does, except that an invalid value keeps the token's last
+ * valid one: the field shows what is wrong while the theme stays as it was. Returns the new config.
+ */
+export const setTokens = (model: ThemeFormModel): ThemeConfig => {
+  const config = {...themeConfig.value}
+  const base = findPreset(config.preset)?.tokens as ThemeTokens | undefined
+
+  for (const token of TOKENS) {
+    const value = model[token.key].trim()
+
+    if (value && getTokenError(token.key, value)) continue
+
+    if (value && value !== (base?.[token.key] ?? DEFAULT_TOKENS[token.key])) config[token.key] = value
+    else delete config[token.key]
+  }
+
+  themeConfig.value = config
+
+  return config
+}
+
 /** A link that opens `path` with the theme applied. With a name, opening it adds the theme to the saved ones. */
 export const getThemeLink = (config: ThemeConfig, path = 'guide/theming', name?: string) => {
   const url = new URL(path, window.location.origin + import.meta.env.BASE_URL)

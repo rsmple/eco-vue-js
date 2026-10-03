@@ -1,137 +1,123 @@
 <template>
   <div class="grid gap-x-4 gap-y-2 sm:grid-cols-2">
-    <template
+    <WUniform
       v-for="token in tokens"
       :key="token.key"
+      v-bind="scope"
+      :field="token.key"
+      :title="token.label"
+      :validate="validators[token.key]"
     >
-      <div
-        v-if="token.kind === 'neutral'"
-        class="grid content-start gap-2 sm:col-span-2"
-      >
-        <div class="text-sm font-semibold">
-          {{ token.label }}
-        </div>
-
-        <div class="flex flex-wrap gap-2">
-          <WButton
-            v-for="scale in scales"
-            :key="scale"
-            :semantic-type="(themeTokens.neutral ?? DEFAULT_TOKENS.neutral) === scale ? SemanticType.PRIMARY : SemanticType.SECONDARY"
-            @click="setToken(token.key, scale)"
-          >
-            <span class="mr-2 flex">
-              <span
-                v-for="step in [2, 5, 8]"
-                :key="step"
-                class="size-3 first:rounded-l-full last:rounded-r-full"
-                :style="{background: `oklch(${ NEUTRAL_SCALES[scale][step] })`}"
-              />
-            </span>
-            {{ scale }}
-          </WButton>
-        </div>
-
-        <div class="text-description text-xs">
-          {{ token.description }}
-        </div>
-      </div>
-
-      <WInput
-        v-else
-        :model-value="rejected[token.key]?.value ?? themeConfig[token.key] ?? ''"
-        :title="token.label"
-        :description="token.description"
-        :error-message="rejected[token.key]?.error"
-        :placeholder="shorten(baseTokens[token.key])"
-        allow-clear
-        @update:model-value="set(token.key, $event ?? '')"
-      >
-        <template
-          v-if="token.kind === 'color'"
-          #before
+      <template #field="scopeField">
+        <div
+          v-if="token.kind === 'neutral'"
+          class="grid content-start gap-2 sm:col-span-2"
         >
-          <label
-            class="
-              relative mr-2 block size-5 shrink-0 self-center overflow-hidden rounded-full border border-line
-              ml-[calc(var(--w-option-padding)*-0.5+var(--w-input-gap))]
-            "
-            :style="{background: `var(--${ token.key })`}"
-          >
-            <input
-              type="color"
-              :value="pickerValues[token.key]"
-              :aria-label="`Pick ${ token.label.toLowerCase() }`"
-              class="absolute inset-0 cursor-pointer opacity-0"
-              @input="set(token.key, ($event.target as HTMLInputElement).value)"
+          <div class="text-sm font-semibold">
+            {{ token.label }}
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <WButton
+              v-for="scale in scales"
+              :key="scale"
+              :semantic-type="(themeTokens.neutral ?? DEFAULT_TOKENS.neutral) === scale ? SemanticType.PRIMARY : SemanticType.SECONDARY"
+              @click="scopeField.updateModelValue(scale)"
             >
-          </label>
-        </template>
-
-        <template
-          v-if="token.range"
-          #bottom
-        >
-          <WSlider
-            :model-value="sliders[token.key].value"
-            :min="sliders[token.key].min"
-            :max="sliders[token.key].max"
-            class="mt-4"
-            @update-eager:model-value="setPx(token.key, $event)"
-            @update:model-value="setPx(token.key, $event)"
-          >
-            <template #right>
-              <span class="text-description w-10 self-center text-right text-sm tabular-nums">
-                {{ sliders[token.key].value }}px
+              <span class="mr-2 flex">
+                <span
+                  v-for="step in [2, 5, 8]"
+                  :key="step"
+                  class="size-3 first:rounded-l-full last:rounded-r-full"
+                  :style="{background: `oklch(${ NEUTRAL_SCALES[scale][step] })`}"
+                />
               </span>
-            </template>
-          </WSlider>
-        </template>
-      </WInput>
-    </template>
+              {{ scale }}
+            </WButton>
+          </div>
+
+          <div class="text-description text-xs">
+            {{ token.description }}
+          </div>
+        </div>
+
+        <WInput
+          v-else
+          v-bind="scopeField"
+          :description="token.description"
+          :placeholder="shorten(baseTokens[token.key])"
+          allow-clear
+        >
+          <template
+            v-if="token.kind === 'color'"
+            #before
+          >
+            <label
+              class="
+                relative mr-2 block size-5 shrink-0 self-center overflow-hidden rounded-full border border-line
+                ml-[calc(var(--w-option-padding)*-0.5+var(--w-input-gap))]
+              "
+              :style="{background: `var(--${ token.key })`}"
+            >
+              <input
+                type="color"
+                :value="pickerValues[token.key]"
+                :aria-label="`Pick ${ token.label.toLowerCase() }`"
+                class="absolute inset-0 cursor-pointer opacity-0"
+                @input="scopeField.updateModelValue(($event.target as HTMLInputElement).value)"
+              >
+            </label>
+          </template>
+
+          <template
+            v-if="token.range"
+            #bottom
+          >
+            <WSlider
+              :model-value="sliders[token.key].value"
+              :min="sliders[token.key].min"
+              :max="sliders[token.key].max"
+              class="mt-4"
+              @update-eager:model-value="scopeField.updateModelValue(toRem($event))"
+              @update:model-value="scopeField.updateModelValue(toRem($event))"
+            >
+              <template #right>
+                <span class="text-description w-10 self-center text-right text-sm tabular-nums">
+                  {{ sliders[token.key].value }}px
+                </span>
+              </template>
+            </WSlider>
+          </template>
+        </WInput>
+      </template>
+    </WUniform>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue'
+import {computed} from 'vue'
 
+import type {UniformScope} from 'eco-vue-js/dist/components/Uniform/types'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WSlider from 'eco-vue-js/dist/components/Slider/WSlider.vue'
+import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
-import {DEFAULT_TOKENS, NEUTRAL_SCALES, type TOKENS, type ThemeConfig, type TokenKey, getTokenError, setToken, themeConfig, themeTokens} from '../docsTheme'
+import {DEFAULT_TOKENS, NEUTRAL_SCALES, type TOKENS, type ThemeFormModel, type TokenKey, getTokenError, themeTokens} from '../docsTheme'
 
 const props = defineProps<{
   tokens: typeof TOKENS
   baseTokens: Record<TokenKey, string>
+  scope: UniformScope<ThemeFormModel>
 }>()
 
-/** Typed values the theme refused, kept in their fields with why, so the field doesn't snap back without a word. */
-const rejected = ref<Partial<Record<TokenKey, {value: string, error: string}>>>({})
-
-let ownConfig: ThemeConfig | undefined
-
-const set = (key: TokenKey, value: string) => {
-  const error = value.trim() ? getTokenError(key, value.trim()) : undefined
-
-  if (error) {
-    rejected.value = {...rejected.value, [key]: {value, error}}
-    return
-  }
-
-  const rest = {...rejected.value}
-
-  delete rest[key]
-  rejected.value = rest
-  setToken(key, value)
-  ownConfig = themeConfig.value
-}
-
-// Another theme opened, or set from elsewhere: the refused values were for the one before.
-watch(themeConfig, config => {
-  if (config !== ownConfig) rejected.value = {}
-})
+/** An empty field is valid: it falls back to the preset's value. */
+const validators = Object.fromEntries(props.tokens.map(token => [
+  token.key,
+  (value: unknown) => typeof value === 'string' && value.trim() ? getTokenError(token.key, value.trim()) : undefined,
+])) as Record<TokenKey, (value: unknown) => string | undefined>
 
 const scales = Object.keys(NEUTRAL_SCALES) as (keyof typeof NEUTRAL_SCALES)[]
 
@@ -146,10 +132,10 @@ const parsePx = (value: string | undefined) => {
   return match[2] === 'rem' ? Number(match[1]) * ROOT_FONT_SIZE : Number(match[1])
 }
 
-const getPx = (key: TokenKey) => parsePx(themeConfig.value[key]) ?? parsePx(props.baseTokens[key])
+const getPx = (key: TokenKey) => parsePx(props.scope.modelValue[key]) ?? parsePx(props.baseTokens[key])
 
 /** Sliders work in whole px; the field gets rem, as the kit's sizes are. */
-const setPx = (key: TokenKey, px: number) => set(key, `${ +(px / ROOT_FONT_SIZE).toFixed(4) }rem`)
+const toRem = (px: number) => `${ +(px / ROOT_FONT_SIZE).toFixed(4) }rem`
 
 /** Where each size slider stands, held within its range: a value set past it shows at the end. Only tokens with a `range` have one. */
 const sliders = computed(() => Object.fromEntries(props.tokens.flatMap(token => {
