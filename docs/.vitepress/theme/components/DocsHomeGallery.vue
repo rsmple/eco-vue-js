@@ -159,6 +159,116 @@
       </DocsHomeTile>
 
       <DocsHomeTile
+        title="Status"
+        link="/components/status-and-loading#chips-counters-and-status-icons"
+      >
+        <div class="flex flex-wrap items-center gap-2">
+          <WChip
+            v-for="type in Object.values(SemanticType)"
+            :key="type"
+            :text="type"
+            :semantic-type="type"
+          />
+        </div>
+
+        <div class="flex items-center gap-6">
+          <span class="relative">
+            Inbox
+
+            <WCounter
+              :count="messages"
+              :trigger="1"
+              class="absolute -top-2 left-full text-xs"
+            />
+          </span>
+
+          <WButton
+            :semantic-type="SemanticType.SECONDARY"
+            @click="messages++"
+          >
+            New message
+          </WButton>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4 text-sm [&_svg]:square-5">
+          <span class="flex items-center gap-2"><WStatusIcon /> Not set</span>
+          <span class="flex items-center gap-2"><WStatusIcon has-value /> Done</span>
+          <span class="flex items-center gap-2"><WStatusIcon has-error /> Failed</span>
+        </div>
+      </DocsHomeTile>
+
+      <DocsHomeTile
+        title="Line chart"
+        link="/components/charts#lines"
+        class="lg:col-span-2"
+      >
+        <div class="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+          <button
+            v-for="series in TREND_SERIES"
+            :key="series.key"
+            class="flex items-center gap-2 transition-opacity"
+            :class="[series.tone, {'opacity-40': !visibleSeries[series.key]}]"
+            @click="visibleSeries[series.key] = !visibleSeries[series.key]"
+          >
+            <span
+              class="border-tone w-4 border-t-2"
+              :class="{'border-dashed': series.key === 'fixed'}"
+            />
+            {{ series.title }}
+          </button>
+        </div>
+
+        <div class="h-30 -mt-4">
+          <ClientOnly>
+            <WChartLinear
+              :x-domain="[+addDay(TODAY, -29), +TODAY]"
+              :height="120"
+              :y-format="value => numberCompactFormatter.format(value)"
+              y-right
+            >
+              <template #default="scope">
+                <WChartLine
+                  v-if="visibleSeries.open"
+                  v-bind="scope"
+                  :data="OPEN_TREND"
+                  x-key="date"
+                  y-key="value"
+                  y-key-min="min"
+                  y-key-max="max"
+                  class="tone-primary text-tone"
+                >
+                  <template #tooltip="{d}">
+                    <div class="grid text-sm">
+                      <span class="text-description">{{ dateFormat(new Date(d.date)) }}</span>
+                      <span class="font-semibold">{{ d.value }} open</span>
+                    </div>
+                  </template>
+                </WChartLine>
+
+                <WChartLine
+                  v-if="visibleSeries.fixed"
+                  v-bind="scope"
+                  :data="FIXED_TREND"
+                  x-key="date"
+                  y-key="value"
+                  stroke-style="dashed-small"
+                  has-area
+                  class="tone-positive text-tone"
+                >
+                  <template #tooltip="{d}">
+                    <div class="grid text-sm">
+                      <span class="text-description">{{ dateFormat(new Date(d.date)) }}</span>
+                      <span class="font-semibold">{{ d.value }} fixed</span>
+                    </div>
+                  </template>
+                </WChartLine>
+              </template>
+            </WChartLinear>
+          </ClientOnly>
+        </div>
+      </DocsHomeTile>
+
+      <DocsHomeTile
         title="Buttons"
         link="/components/button"
         class="lg:col-span-2"
@@ -272,6 +382,7 @@
       <DocsHomeTile
         title="Sliders"
         link="/components/pickers#sliders"
+        class="lg:col-span-2"
       >
         <WSlider
           v-model="threshold"
@@ -296,6 +407,27 @@
             <span class="w-14 text-right text-sm font-semibold tabular-nums">{{ (scoreEager ?? score).from }}–{{ (scoreEager ?? score).to }}</span>
           </template>
         </WSliderRange>
+      </DocsHomeTile>
+
+      <DocsHomeTile
+        title="Expansion"
+        link="/components/content-blocks#expansion"
+        class="lg:row-span-2"
+      >
+        <div class="border-line-subtle rounded-xl border [--inner-margin:1rem]">
+          <WExpansionItem
+            v-for="(item, index) in FAQ"
+            :key="item.title"
+            :title="item.title"
+            :is-open="openFaq === index"
+            :has-flag="item.flag"
+            @toggle="openFaq = openFaq === index ? null : index"
+          >
+            <p class="text-description px-4 pb-4 text-sm">
+              {{ item.text }}
+            </p>
+          </WExpansionItem>
+        </div>
       </DocsHomeTile>
 
       <DocsHomeTile
@@ -336,23 +468,52 @@
       </DocsHomeTile>
 
       <DocsHomeTile
-        title="Expansion"
-        link="/components/content-blocks#expansion"
-        class="lg:col-span-2"
+        title="Suggestions"
+        link="/components/input#suggestions"
       >
-        <div class="border-line-subtle rounded-xl border [--inner-margin:1rem]">
-          <WExpansionItem
-            v-for="(item, index) in FAQ"
-            :key="item.title"
-            :title="item.title"
-            :is-open="openFaq === index"
-            :has-flag="item.flag"
-            @toggle="openFaq = openFaq === index ? null : index"
-          >
-            <p class="text-description px-4 pb-4 text-sm">
-              {{ item.text }}
-            </p>
-          </WExpansionItem>
+        <WInputOptions
+          v-model="country"
+          title="Country"
+          placeholder="Start typing"
+          :options="countries"
+          :value-getter="option => option.name"
+          empty-stub="No such country"
+          allow-clear
+        >
+          <template #option="{option}">
+            <div class="w-option flex items-center">
+              {{ option.flag }} {{ option.name }}
+            </div>
+          </template>
+        </WInputOptions>
+      </DocsHomeTile>
+
+      <DocsHomeTile
+        title="Numbers"
+        link="/components/content-blocks#wnumberformatter"
+      >
+        <div class="grid grid-cols-2 gap-4">
+          <div class="grid">
+            <div>
+              <WNumberFormatter
+                :model-value="12840"
+                tag="span"
+                class="text-2xl font-bold tabular-nums"
+                compact
+              />
+            </div>
+            <span class="text-description text-sm">findings</span>
+          </div>
+
+          <div class="grid">
+            <WNumberFormatter
+              :model-value="0.4375"
+              tag="span"
+              class="tone-positive text-tone text-2xl font-bold tabular-nums"
+              percent
+            />
+            <span class="text-description text-sm">fixed</span>
+          </div>
         </div>
       </DocsHomeTile>
 
@@ -360,7 +521,6 @@
       <DocsHomeTile
         title="Select"
         link="/components/select"
-        class="lg:row-span-2"
       >
         <WSelectSingle
           v-model="assignee"
@@ -400,7 +560,6 @@
       <DocsHomeTile
         title="Info cards"
         link="/components/content-blocks#info-cards"
-        class="lg:row-span-2"
       >
         <WInfoCard
           v-if="!isScanned"
@@ -451,27 +610,6 @@
       </DocsHomeTile>
 
       <DocsHomeTile
-        title="Suggestions"
-        link="/components/input#suggestions"
-      >
-        <WInputOptions
-          v-model="country"
-          title="Country"
-          placeholder="Start typing"
-          :options="countries"
-          :value-getter="option => option.name"
-          empty-stub="No such country"
-          allow-clear
-        >
-          <template #option="{option}">
-            <div class="w-option flex items-center">
-              {{ option.flag }} {{ option.name }}
-            </div>
-          </template>
-        </WInputOptions>
-      </DocsHomeTile>
-
-      <DocsHomeTile
         title="File picker"
         link="/components/pickers#files"
       >
@@ -481,6 +619,10 @@
           accept="image/*,.pdf"
           multiple
         />
+
+        <span class="text-description -mt-6 text-sm">
+          Images and PDFs — drop several at once or browse for them. Each picked file shows as a card you can remove before saving.
+        </span>
       </DocsHomeTile>
     </div>
   </section>
@@ -492,11 +634,16 @@ import {computed, markRaw, onBeforeUnmount, onMounted, ref, watch} from 'vue'
 import {Notify} from 'eco-vue-js/dist/utils/Notify'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 import {addDay, dateFormat, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
+import {numberCompactFormatter} from 'eco-vue-js/dist/utils/utils'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WChartHeatmap from 'eco-vue-js/dist/components/Chart/WChartHeatmap.vue'
+import WChartLine from 'eco-vue-js/dist/components/Chart/WChartLine.vue'
+import WChartLinear from 'eco-vue-js/dist/components/Chart/WChartLinear.vue'
 import WCheckbox from 'eco-vue-js/dist/components/Checkbox/WCheckbox.vue'
 import WCheckboxGroup from 'eco-vue-js/dist/components/Checkbox/WCheckboxGroup.vue'
+import WChip from 'eco-vue-js/dist/components/Chip/WChip.vue'
+import WCounter from 'eco-vue-js/dist/components/Counter/WCounter.vue'
 import WDatePickerSingle from 'eco-vue-js/dist/components/DatePicker/WDatePickerSingle.vue'
 import WDragContainer from 'eco-vue-js/dist/components/DragContainer/WDragContainer.vue'
 import WExpansionItem from 'eco-vue-js/dist/components/Expansion/WExpansionItem.vue'
@@ -504,12 +651,14 @@ import WFilePicker from 'eco-vue-js/dist/components/FilePicker/WFilePicker.vue'
 import WInfoCard from 'eco-vue-js/dist/components/InfoCard/WInfoCard.vue'
 import WInfoCardNegative from 'eco-vue-js/dist/components/InfoCard/WInfoCardNegative.vue'
 import WInputOptions from 'eco-vue-js/dist/components/Input/WInputOptions.vue'
+import WNumberFormatter from 'eco-vue-js/dist/components/NumberFormatter/WNumberFormatter.vue'
 import WProgressStriped from 'eco-vue-js/dist/components/Progress/WProgressStriped.vue'
 import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
 import WSlider from 'eco-vue-js/dist/components/Slider/WSlider.vue'
 import WSliderRange from 'eco-vue-js/dist/components/Slider/WSliderRange.vue'
+import WStatusIcon from 'eco-vue-js/dist/components/Status/WStatusIcon.vue'
 import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 import WTabsItem from 'eco-vue-js/dist/components/Tabs/WTabsItem.vue'
 import WToggle from 'eco-vue-js/dist/components/Toggle/WToggle.vue'
@@ -539,6 +688,24 @@ const SCANS = Array.from({length: 365}, (_, index) => {
 
   return {date: +date, count: isWeekday ? (index * 7) % 23 + (Math.floor(index / 30) % 3) * 5 : 0}
 }).filter(item => item.count > 0)
+
+// Points go newest first, one a day for the last 30 days.
+const OPEN_TREND = Array.from({length: 30}, (_, index) => {
+  const value = Math.round(120 + 30 * Math.sin(index / 4) - index)
+
+  return {date: +addDay(TODAY, -index), value, min: value - 12, max: value + 12}
+})
+
+const FIXED_TREND = Array.from({length: 30}, (_, index) => ({date: +addDay(TODAY, -index), value: Math.max(0, 60 - 2 * index + (index % 5) * 3)}))
+
+const TREND_SERIES = [
+  {key: 'open', title: 'Open findings', tone: 'tone-primary text-tone'},
+  {key: 'fixed', title: 'Fixed', tone: 'tone-positive text-tone'},
+] as const
+
+const visibleSeries = ref<Record<typeof TREND_SERIES[number]['key'], boolean>>({open: true, fixed: true})
+
+const messages = ref(3)
 
 const day = ref<Date>()
 const plan = ref<typeof PLANS[number]>('team')
