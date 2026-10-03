@@ -24,13 +24,13 @@
           {{ release.text }} — release notes
         </a>
 
-        <h1 class="text-4xl leading-tight font-bold tracking-tight text-balance sm:text-5xl lg:text-[3.5rem] lg:leading-[1.1]">
-          <span class="from-primary-dark via-primary to-info dark:from-primary block bg-linear-120 via-60% bg-clip-text text-transparent dark:via-0%">EcoVue UI Library</span>
-          <span class="block">Vue 3 UI kit on Tailwind v4</span>
+        <h1 class="text-4xl leading-tight font-bold tracking-tight text-balance sm:text-5xl lg:text-[4.5rem] lg:leading-none">
+          <span class="from-primary-dark via-primary to-info dark:from-primary block bg-linear-120 via-0% bg-clip-text text-transparent">A single UI kit</span>
+          <span class="block">for your entire ecosystem</span>
         </h1>
 
         <p class="text-description mx-auto mt-5 max-w-xl text-lg text-pretty sm:text-xl lg:mx-0">
-          Components, list and form building blocks, query utilities, icons — plus a shared eslint config.
+          Lists, forms and queries that tame complex data. Themes you shape in minutes. A project setup that's ready on day one — so every Vue 3 app you ship feels like part of one family.
         </p>
 
         <div class="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
