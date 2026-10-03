@@ -7,12 +7,12 @@
   <!-- In the field it is one line, so the input keeps its height; the menu shows the email and role as well. -->
   <div
     v-else
-    class="w-option w-option-has-bg pl-1 grid grid-cols-[auto_1fr_auto] items-center gap-2"
-    :class="{'w-full py-1': !model}"
+    class="w-option grid grid-cols-[auto_1fr_auto] items-center gap-2"
+    :class="model ? 'w-option-has-bg' : undefined"
   >
     <span
       class="tone-primary surface-fill flex shrink-0 items-center justify-center rounded-full font-semibold"
-      :class="model ? 'size-5 text-[0.625rem]' : 'size-8 text-xs'"
+      :class="model ? 'size-5 text-[0.625rem] -ml-2' : 'size-8 text-xs'"
     >
       {{ option.name.split(' ').map(part => part[0]).join('') }}
     </span>
