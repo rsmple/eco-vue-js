@@ -24,7 +24,7 @@
     </div>
 
     <label
-      class="height-64 relative mb-1 block w-full min-w-60 rounded-xl"
+      class="height-64 relative isolate mb-1 block w-full min-w-60 rounded-xl"
       :class="{
         'tone-primary bg-tone/10': !isActive,
         'tone-primary bg-tone/20': isActive,

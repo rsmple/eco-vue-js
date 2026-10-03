@@ -239,12 +239,255 @@
           </div>
         </div>
       </DocsHomeTile>
+
+      <DocsHomeTile
+        title="Reorder"
+        link="/components/utilities#reorder-by-dragging"
+        class="lg:row-span-2"
+      >
+        <WDragContainer
+          :list="steps"
+          @update:list="steps = $event"
+        >
+          <template #default="{item, index, container, initDrag}">
+            <div
+              v-bind="container"
+              class="bg-surface border-line-subtle mb-2 flex items-center gap-3 rounded-xl border p-2.5 text-sm"
+            >
+              <IconDrag
+                class="text-description square-5 cursor-grab"
+                @mousedown="initDrag"
+              />
+
+              <span class="text-description w-3 tabular-nums">{{ index + 1 }}</span>
+
+              <span>{{ item }}</span>
+            </div>
+          </template>
+        </WDragContainer>
+
+        <span class="text-description text-sm">Drag by the handle to change the pipeline order.</span>
+      </DocsHomeTile>
+
+      <DocsHomeTile
+        title="Sliders"
+        link="/components/pickers#sliders"
+      >
+        <WSlider
+          v-model="threshold"
+          :min="1"
+          :max="10"
+          @update-eager:model-value="thresholdEager = $event"
+        >
+          <template #right>
+            <span class="w-6 text-right text-sm font-semibold tabular-nums">{{ thresholdEager ?? threshold }}</span>
+          </template>
+        </WSlider>
+
+        <WSliderRange
+          v-model="score"
+          :min="0"
+          :max="100"
+          :step="10"
+          class="w-slider-from-positive w-slider-to-negative"
+          @update-eager:model-value="scoreEager = $event"
+        >
+          <template #right>
+            <span class="w-14 text-right text-sm font-semibold tabular-nums">{{ (scoreEager ?? score).from }}–{{ (scoreEager ?? score).to }}</span>
+          </template>
+        </WSliderRange>
+      </DocsHomeTile>
+
+      <DocsHomeTile
+        title="Tooltips"
+        link="/components/tooltip"
+      >
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
+          <span class="cursor-help underline decoration-dotted">
+            SLA
+            <WTooltip text="Fix critical issues within 24 hours." />
+          </span>
+
+          <span class="cursor-help underline decoration-dotted">
+            Last scan
+            <WTooltip>
+              <div class="grid gap-1">
+                <b>2 hours ago</b>
+                <span>12 findings · 3 critical</span>
+              </div>
+            </WTooltip>
+          </span>
+
+          <WButton
+            :semantic-type="SemanticType.SECONDARY"
+            tooltip-text="Buttons take the text as a prop."
+          >
+            Hover me
+          </WButton>
+        </div>
+
+        <span class="text-description w-40 truncate text-sm">
+          A title too long to fit in its column
+          <WTooltip
+            text="A title too long to fit in its column"
+            overflow-only
+          />
+        </span>
+      </DocsHomeTile>
+
+      <DocsHomeTile
+        title="Expansion"
+        link="/components/content-blocks#expansion"
+        class="lg:col-span-2"
+      >
+        <div class="border-line-subtle rounded-xl border [--inner-margin:1rem]">
+          <WExpansionItem
+            v-for="(item, index) in FAQ"
+            :key="item.title"
+            :title="item.title"
+            :is-open="openFaq === index"
+            :has-flag="item.flag"
+            @toggle="openFaq = openFaq === index ? null : index"
+          >
+            <p class="text-description px-4 pb-4 text-sm">
+              {{ item.text }}
+            </p>
+          </WExpansionItem>
+        </div>
+      </DocsHomeTile>
+
+      <!-- Spans the height of the two tiles on the right, so the multiple select has room to grow into without moving the page. -->
+      <DocsHomeTile
+        title="Select"
+        link="/components/select"
+        class="lg:row-span-2"
+      >
+        <WSelectSingle
+          v-model="assignee"
+          :options="USERS"
+          :value-getter="item => item.id"
+          :search-fn="(item, search) => item.name.toLowerCase().includes(search.toLowerCase())"
+          :option-component="DocsHomeOptionUser"
+          title="Assignee"
+          placeholder="Pick a person"
+          allow-clear
+          :clear-value="null"
+        />
+
+        <WSelectSingle
+          v-model="severity"
+          :options="SEVERITIES"
+          :value-getter="item => item.id"
+          :search-fn="(item, search) => item.name.toLowerCase().includes(search.toLowerCase())"
+          :option-component="DocsHomeOptionSeverity"
+          title="Severity"
+          placeholder="Pick a severity"
+        />
+
+        <WSelect
+          :model-value="scanners"
+          :options="SCANNERS"
+          :value-getter="item => item.id"
+          :search-fn="(item, search) => item.name.toLowerCase().includes(search.toLowerCase())"
+          :option-component="DocsHomeOptionScanner"
+          title="Scanners"
+          placeholder="Add a scanner"
+          @select="scanners = [...scanners, $event]"
+          @unselect="scanners = scanners.filter(item => item !== $event)"
+        />
+      </DocsHomeTile>
+
+      <DocsHomeTile
+        title="Info cards"
+        link="/components/content-blocks#info-cards"
+        class="lg:row-span-2"
+      >
+        <WInfoCard
+          v-if="!isScanned"
+          :semantic-type="SemanticType.WARNING"
+        >
+          The scanner hasn't run for 30 days — results may be out of date.
+
+          <template #bottom>
+            <WButton
+              :semantic-type="SemanticType.SECONDARY"
+              :loading="isScanning"
+              class="mt-3"
+              @click="scan"
+            >
+              Run now
+            </WButton>
+          </template>
+        </WInfoCard>
+
+        <WInfoCard
+          v-else
+          :semantic-type="SemanticType.POSITIVE"
+          :icon="markRaw(IconCheckCircle)"
+        >
+          All checks passed.
+
+          <template #bottom>
+            <WButton
+              :semantic-type="SemanticType.SECONDARY"
+              class="mt-3"
+              @click="isScanned = false"
+            >
+              Start over
+            </WButton>
+          </template>
+        </WInfoCard>
+
+        <WInfoCardNegative title="The repository can't be reached">
+          Check that the access token is still valid.
+        </WInfoCardNegative>
+
+        <WInfoCard
+          :semantic-type="SemanticType.INFO"
+          no-bg
+        >
+          Without a background, for a note inside other content.
+        </WInfoCard>
+      </DocsHomeTile>
+
+      <DocsHomeTile
+        title="Suggestions"
+        link="/components/input#suggestions"
+      >
+        <WInputOptions
+          v-model="country"
+          title="Country"
+          placeholder="Start typing"
+          :options="countries"
+          :value-getter="option => option.name"
+          empty-stub="No such country"
+          allow-clear
+        >
+          <template #option="{option}">
+            <div class="w-option flex items-center">
+              {{ option.flag }} {{ option.name }}
+            </div>
+          </template>
+        </WInputOptions>
+      </DocsHomeTile>
+
+      <DocsHomeTile
+        title="File picker"
+        link="/components/pickers#files"
+      >
+        <WFilePicker
+          v-model="files"
+          title="Attachments"
+          accept="image/*,.pdf"
+          multiple
+        />
+      </DocsHomeTile>
     </div>
   </section>
 </template>
 
 <script lang="ts" setup>
-import {markRaw, onBeforeUnmount, onMounted, ref} from 'vue'
+import {computed, markRaw, onBeforeUnmount, onMounted, ref, watch} from 'vue'
 
 import {Notify} from 'eco-vue-js/dist/utils/Notify'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
@@ -255,16 +498,32 @@ import WChartHeatmap from 'eco-vue-js/dist/components/Chart/WChartHeatmap.vue'
 import WCheckbox from 'eco-vue-js/dist/components/Checkbox/WCheckbox.vue'
 import WCheckboxGroup from 'eco-vue-js/dist/components/Checkbox/WCheckboxGroup.vue'
 import WDatePickerSingle from 'eco-vue-js/dist/components/DatePicker/WDatePickerSingle.vue'
+import WDragContainer from 'eco-vue-js/dist/components/DragContainer/WDragContainer.vue'
+import WExpansionItem from 'eco-vue-js/dist/components/Expansion/WExpansionItem.vue'
+import WFilePicker from 'eco-vue-js/dist/components/FilePicker/WFilePicker.vue'
+import WInfoCard from 'eco-vue-js/dist/components/InfoCard/WInfoCard.vue'
+import WInfoCardNegative from 'eco-vue-js/dist/components/InfoCard/WInfoCardNegative.vue'
+import WInputOptions from 'eco-vue-js/dist/components/Input/WInputOptions.vue'
 import WProgressStriped from 'eco-vue-js/dist/components/Progress/WProgressStriped.vue'
+import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
+import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
+import WSlider from 'eco-vue-js/dist/components/Slider/WSlider.vue'
+import WSliderRange from 'eco-vue-js/dist/components/Slider/WSliderRange.vue'
 import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 import WTabsItem from 'eco-vue-js/dist/components/Tabs/WTabsItem.vue'
 import WToggle from 'eco-vue-js/dist/components/Toggle/WToggle.vue'
+import WTooltip from 'eco-vue-js/dist/components/Tooltip/WTooltip.vue'
 
+import IconCheckCircle from 'eco-vue-js/dist/assets/icons/IconCheckCircle'
+import IconDrag from 'eco-vue-js/dist/assets/icons/IconDrag'
 import IconSettings from 'eco-vue-js/dist/assets/icons/IconSettings'
 import IconSummary from 'eco-vue-js/dist/assets/icons/IconSummary'
 import IconTime from 'eco-vue-js/dist/assets/icons/IconTime'
 
+import DocsHomeOptionScanner from './DocsHomeOptionScanner.vue'
+import DocsHomeOptionSeverity from './DocsHomeOptionSeverity.vue'
+import DocsHomeOptionUser from './DocsHomeOptionUser.vue'
 import DocsHomeTile from './DocsHomeTile.vue'
 
 const TODAY = getStartOfDay()
@@ -303,6 +562,81 @@ const uploads = ref([
 
 let uploadTimer: ReturnType<typeof setInterval> | undefined
 
+const steps = ref(['Clone', 'Build', 'Scan dependencies', 'Scan code', 'Report'])
+
+const threshold = ref(7)
+const thresholdEager = ref<number>()
+
+const score = ref({from: 30, to: 70})
+const scoreEager = ref<{from: number, to: number}>()
+
+// The eager value is only for showing the drag; the picked value takes over once it ends.
+watch(threshold, () => thresholdEager.value = undefined)
+watch(score, () => scoreEager.value = undefined)
+
+const FAQ = [
+  {title: 'What is scanned?', text: 'Every repository of the project, on each push to the default branch.'},
+  {title: 'How long are results kept?', text: 'For a year after the scan, or until the project is deleted.'},
+  {title: 'What changed this month?', text: 'Scans now include the container images built from the repository.', flag: true},
+]
+
+const openFaq = ref<number | null>(0)
+
+const isScanned = ref(false)
+const isScanning = ref(false)
+
+let scanTimer: ReturnType<typeof setTimeout> | undefined
+
+const scan = () => {
+  isScanning.value = true
+  scanTimer = setTimeout(() => {
+    isScanning.value = false
+    isScanned.value = true
+  }, 1200)
+}
+
+const USERS = [
+  {id: 1, name: 'Ada Lovelace', email: 'ada@example.com', role: 'Owner'},
+  {id: 2, name: 'Alan Turing', email: 'alan@example.com', role: 'Developer'},
+  {id: 3, name: 'Grace Hopper', email: 'grace@example.com', role: 'Developer'},
+  {id: 4, name: 'Linus Torvalds', email: 'linus@example.com', role: 'Reviewer'},
+]
+
+const assignee = ref<number | null>(2)
+
+const SEVERITIES = [
+  {id: 'critical', name: 'Critical', sla: 'Fix within 24 hours', tone: 'tone-negative'},
+  {id: 'high', name: 'High', sla: 'Fix within a week', tone: 'tone-warning'},
+  {id: 'medium', name: 'Medium', sla: 'Fix within a month', tone: 'tone-info'},
+  {id: 'low', name: 'Low', sla: 'Fix when convenient', tone: 'tone-positive'},
+]
+
+const severity = ref<string | null>('high')
+
+const SCANNERS = [
+  {id: 1, name: 'Semgrep', description: 'Static analysis of the source code'},
+  {id: 2, name: 'Gitleaks', description: 'Secrets in the code and its history'},
+  {id: 3, name: 'Trivy', description: 'Container images and dependencies'},
+  {id: 4, name: 'Checkov', description: 'Infrastructure as code'},
+]
+
+const scanners = ref<number[]>([1, 3])
+
+const COUNTRIES = [
+  {id: 1, name: 'Austria', flag: '🇦🇹'},
+  {id: 2, name: 'Belgium', flag: '🇧🇪'},
+  {id: 3, name: 'Denmark', flag: '🇩🇰'},
+  {id: 4, name: 'France', flag: '🇫🇷'},
+  {id: 5, name: 'Germany', flag: '🇩🇪'},
+  {id: 6, name: 'Norway', flag: '🇳🇴'},
+]
+
+const country = ref<string | null>()
+
+const countries = computed(() => COUNTRIES.filter(item => item.name.toLowerCase().includes(country.value?.toLowerCase() ?? '')))
+
+const files = ref<File[]>([])
+
 onMounted(() => {
   uploadTimer = setInterval(() => {
     const upload = uploads.value[1]
@@ -313,6 +647,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   clearTimeout(saveTimer)
+  clearTimeout(scanTimer)
   clearInterval(uploadTimer)
 })
 </script>
