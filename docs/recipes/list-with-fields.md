@@ -357,9 +357,18 @@ const filterPlants = (queryParams: QueryParamsPlants | undefined) => {
   if (ids) result = result.filter(plant => ids.includes(plant.id))
 
   if (queryParams?.ordering) {
-    const [{field, order}] = parseOrdering<keyof Plant>(queryParams.ordering)
+    const ordering = parseOrdering<keyof Plant>(queryParams.ordering)
 
-    result = result.toSorted((a, b) => compare(a, b, field, order === Order.DESC ? -1 : 1))
+    // Each next field breaks the ties of the ones before it.
+    result = result.toSorted((a, b) => {
+      for (const {field, order} of ordering) {
+        const difference = compare(a, b, field, order === Order.DESC ? -1 : 1)
+
+        if (difference !== 0) return difference
+      }
+
+      return 0
+    })
   }
 
   return result
