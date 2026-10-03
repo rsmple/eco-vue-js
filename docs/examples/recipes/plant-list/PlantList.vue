@@ -1,14 +1,18 @@
 <template>
-  <WInput
-    :model-value="queryParams.search"
-    type="search"
-    placeholder="Search by name or species"
-    :icon="markRaw(IconSearch)"
-    allow-clear
-    no-margin
-    class="sticky left---left-inner mb-4 w---width-inner"
-    @update:model-value="updateQueryParams({search: $event || undefined})"
-  />
+  <!-- The filters edit the same query params the list reads. -->
+  <WUniform
+    :model-value="queryParams"
+    @update:model-value="updateQueryParams"
+  >
+    <template #default="scope">
+      <WListFilter
+        :scope="scope"
+        :filter="listFilterPlant"
+        search
+        class="sticky left---left-inner mb-2 w---width-inner"
+      />
+    </template>
+  </WUniform>
 
   <WList
     :use-query-fn="plantModelApi.paginated.use"
@@ -45,14 +49,14 @@
 <script lang="ts" setup>
 import {markRaw} from 'vue'
 
-import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WList from 'eco-vue-js/dist/components/List/WList.vue'
-
-import IconSearch from 'eco-vue-js/dist/assets/icons/IconSearch'
+import WListFilter from 'eco-vue-js/dist/components/List/WListFilter.vue'
+import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 import PlantContent from './PlantContent.vue'
 import {plantModelApi, useQueryParamsPlants} from './api/Plant'
 import {defaultFieldConfigMapPlant, listFieldsPlant} from './fields'
+import {listFilterPlant} from './filter'
 import WMenuPlantDelete from './menu/WMenuPlantDelete.vue'
 import WMenuPlantToggle from './menu/WMenuPlantToggle.vue'
 

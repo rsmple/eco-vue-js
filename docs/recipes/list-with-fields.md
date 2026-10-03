@@ -6,14 +6,15 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
 
 # List with fields
 
-**Problem:** a paginated collection needs a table on desktop and cards on mobile, sortable and resizable columns the user can show, hide and reorder, per-row actions, and an expandable detail row — without each list re-implementing any of that.
+**Problem:** a paginated collection needs a table on desktop and cards on mobile, sortable and resizable columns the user can show, hide and reorder, filters, per-row actions, and an expandable detail row — without each list re-implementing any of that.
 
 **Pattern:** `WList` owns layout, pagination, selection, column settings and ordering. You supply:
 
 | Piece | What it is |
 | --- | --- |
 | A model | `createRestModelApi` with a paginated query, whose `use` is the list's `useQueryFn`, and the actions that change an item. |
-| Filters | `createUseQueryParams`, which keeps the user's search and ordering in the URL. |
+| Query params | `createUseQueryParams`, which keeps the user's search, filters and ordering in the URL. |
+| Filter components | One `.vue` per filter for `WListFilter`. The component renders the control; its exported `meta` declares the title, icon and the params it sets. |
 | Field components | One `.vue` per column. The component renders the cell; its exported `meta` declares the label, width, title and sort field. |
 | A fields index | The ordered tuple of field modules plus the default column config. |
 | Menu components | Row actions, typed with `MenuProps<T>` / `MenuEmits<T>`. |
@@ -25,16 +26,20 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
 
 ```vue
 <template>
-  <WInput
-    :model-value="queryParams.search"
-    type="search"
-    placeholder="Search by name or species"
-    :icon="markRaw(IconSearch)"
-    allow-clear
-    no-margin
-    class="sticky left---left-inner mb-4 w---width-inner"
-    @update:model-value="updateQueryParams({search: $event || undefined})"
-  />
+  <!-- The filters edit the same query params the list reads. -->
+  <WUniform
+    :model-value="queryParams"
+    @update:model-value="updateQueryParams"
+  >
+    <template #default="scope">
+      <WListFilter
+        :scope="scope"
+        :filter="listFilterPlant"
+        search
+        class="sticky left---left-inner mb-2 w---width-inner"
+      />
+    </template>
+  </WUniform>
 
   <WList
     :use-query-fn="plantModelApi.paginated.use"
@@ -71,14 +76,14 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
 <script lang="ts" setup>
 import {markRaw} from 'vue'
 
-import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WList from 'eco-vue-js/dist/components/List/WList.vue'
-
-import IconSearch from 'eco-vue-js/dist/assets/icons/IconSearch'
+import WListFilter from 'eco-vue-js/dist/components/List/WListFilter.vue'
+import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 import PlantContent from './PlantContent.vue'
 import {plantModelApi, useQueryParamsPlants} from './api/Plant'
 import {defaultFieldConfigMapPlant, listFieldsPlant} from './fields'
+import {listFilterPlant} from './filter'
 import WMenuPlantDelete from './menu/WMenuPlantDelete.vue'
 import WMenuPlantToggle from './menu/WMenuPlantToggle.vue'
 
@@ -91,7 +96,7 @@ const selectAllTextGetter = (isUnselect: boolean, count: number) => `${ isUnsele
 
 <!-- @example-end -->
 
-Try sorting by a column header, resizing Name, hiding columns from the header settings, switching to cards, expanding a row and using the `⋯` menu. The data is in memory here, behind the same model API a real endpoint would use.
+Try adding a filter, sorting by a few columns from the sort menu, resizing Name, hiding columns from the header settings, switching to cards, expanding a row and using the `⋯` menu. The data is in memory here, behind the same model API a real endpoint would use.
 
 ## The code
 
@@ -101,7 +106,7 @@ The model is the only piece that knows where data comes from — see [Data layer
 
 The item query holds the actions the menu calls. `update` puts the saved plant into every cached page that holds it, and `delete` returns `() => null` to drop the plant from them.
 
-`useQueryParamsPlants` declares the filters the user sets: `search` and `ordering`. Leave `page` out — the list adds it to each page's query. The docs have no router, so the demo keeps the filters in the page with `useQueryParamsLocal()`. In an app, pass the route, and the filters live in the URL:
+`useQueryParamsPlants` declares the params the user sets: `search`, `ordering` and one per filter — `kind__in`, `light__in`, `watered` and `caretaker`. Each gets a parse function that reads it back from the URL and drops what does not parse, so a hand-edited link cannot put an unknown kind into the query. Leave `page` out — the list adds it to each page's query. The docs have no router, so the demo keeps the filters in the page with `useQueryParamsLocal()`. In an app, pass the route, and the filters live in the URL:
 
 ```ts
 const {queryParams, updateQueryParams} = useQueryParamsPlants(useRoute())
@@ -169,7 +174,7 @@ export type Plant = {
   description: string
 }
 
-const CARETAKERS: Caretaker[] = [
+export const caretakers: Caretaker[] = [
   {name: 'Ivy Moss', tone: 'tone-data-green'},
   {name: 'Rowan Oak', tone: 'tone-data-amber'},
   {name: 'Fern Ash', tone: 'tone-data-violet'},
@@ -291,7 +296,7 @@ export const plants: Plant[] = SOURCE.map(([name, species, kind, height], index)
     waterings: Array.from({length: 28}, (_, day) => addDay(today, -day))
       .filter((_, day) => day >= lastWatered && (day - lastWatered) % INTERVAL[kind] === 0),
     temperature: TEMPERATURE[kind],
-    caretaker: CARETAKERS[index % CARETAKERS.length]!,
+    caretaker: caretakers[index % caretakers.length]!,
     tasks: [
       {title: 'Fertilize', due: addDay(today, index * 3 % 14 - 2)},
       {title: 'Prune', due: addDay(today, 7 + index * 5 % 30)},
@@ -311,14 +316,23 @@ import {createUseQueryParams} from 'eco-vue-js/dist/utils/api'
 import {Order, parseOrdering} from 'eco-vue-js/dist/utils/order'
 import {createRestModelApi} from 'eco-vue-js/dist/utils/restModelApi'
 import {paginateList} from 'eco-vue-js/dist/utils/useDefaultQuery'
-import {isId, parseString} from 'eco-vue-js/dist/utils/utils'
+import {isId, parseBoolean, parseString, parseStringList} from 'eco-vue-js/dist/utils/utils'
 
-import {type Plant, plants} from '../models/Plant'
+import {Kind, Light, type Plant, plants} from '../models/Plant'
+
+/** Parses a comma-separated list, dropping values that are not in `values`, such as ones edited into the URL by hand. */
+const parseEnumList = <Value extends string>(values: Value[]): ParseFn<Value[]> => value => {
+  return parseStringList(value)?.filter((item): item is Value => (values as string[]).includes(item))
+}
 
 /** The filters a user sets on the list. In an app they are kept in the URL. */
 export const useQueryParamsPlants = createUseQueryParams({
   search: parseString,
   ordering: parseString,
+  kind__in: parseEnumList(Object.values(Kind)),
+  light__in: parseEnumList(Object.values(Light)),
+  watered: parseBoolean,
+  caretaker: parseString,
 })
 
 export type QueryParamsPlants = typeof useQueryParamsPlants['QueryParams'] & {
@@ -348,6 +362,7 @@ const compare = (a: Plant, b: Plant, field: keyof Plant, direction: 1 | -1) => {
 
 /** Filters and sorts by the same query params a backend would receive. */
 const filterPlants = (queryParams: QueryParamsPlants | undefined) => {
+  const {kind__in, light__in, watered, caretaker} = queryParams ?? {}
   const search = queryParams?.search?.trim().toLowerCase()
   const ids = queryParams?.id__in?.split(',').map(Number)
   let result = search
@@ -355,6 +370,10 @@ const filterPlants = (queryParams: QueryParamsPlants | undefined) => {
     : source
 
   if (ids) result = result.filter(plant => ids.includes(plant.id))
+  if (kind__in) result = result.filter(plant => kind__in.includes(plant.kind))
+  if (light__in) result = result.filter(plant => light__in.includes(plant.light))
+  if (watered !== undefined) result = result.filter(plant => plant.watered === watered)
+  if (caretaker) result = result.filter(plant => plant.caretaker.name === caretaker)
 
   if (queryParams?.ordering) {
     const ordering = parseOrdering<keyof Plant>(queryParams.ordering)
@@ -707,6 +726,193 @@ export const defaultFieldConfigMapPlant = getDefaultFieldConfigMap(listFieldsPla
 
 `as const satisfies ListFields<…>` keeps the tuple literal, which is what lets TypeScript check the labels in `getDefaultFieldConfigMap` and `cardAreas` — a typo in either is a type error.
 
+### Filters
+
+`WListFilter` edits the same query params the list reads. Wrap it in a `WUniform` over `queryParams` and pass the `scope` down; `search` adds the search field. Without `global`, the filters sit above the list as chips: the add button offers the rest, and each chip opens its control in a dropdown and shows how many values are set.
+
+Each filter is a module like a field: the component renders the control inside a `WUniform` bound to its param, and `meta` gives the chip's `title`, `icon` and the `fields` it sets — removing the chip clears them. The control is the same one a form would use: a `WSelect` with a custom option for kinds, a `WCheckboxGroupMultiple` for light, a radio `WCheckboxGroup` for watered, where `undefined` means "Any", and a `WSelectSingle` for the caretaker.
+
+`embedded: true` in `meta` drops the dropdown's padding, and `:embedded="!global"` drops the control's title and margin, so the control fills the dropdown edge to edge — the chip already names it. With `global` the filters go into the app shell's filter panel instead, where each control keeps its title.
+
+::: code-group
+
+<!-- @source docs/examples/recipes/plant-list/filter/WFilterPlantKind.vue WFilterPlantKind.vue -->
+
+```vue [WFilterPlantKind.vue]
+<template>
+  <WUniform
+    v-bind="scope"
+    field="kind__in"
+    title="Kind"
+  >
+    <template #field="scopeField">
+      <WSelect
+        v-bind="scopeField"
+        :options="Object.values(Kind)"
+        :value-getter="item => item"
+        :search-fn="(item, search) => kindDisplay[item].label.toLowerCase().includes(search)"
+        :option-component="markRaw(WOptionPlantKind)"
+        :readonly="readonly"
+        placeholder="Search kinds"
+        :embedded="!global"
+        class="min-w-60"
+      />
+    </template>
+  </WUniform>
+</template>
+
+<script lang="ts" setup>
+import type {QueryParamsPlants} from '../api/Plant'
+
+import {markRaw} from 'vue'
+
+import type {FilterEmits, FilterMeta, FilterProps} from 'eco-vue-js/dist/components/List/types'
+
+import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
+import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
+
+import IconPlant from 'eco-vue-js/dist/assets/icons/IconPlant'
+
+import {Kind} from '../models/Plant'
+import {kindDisplay} from '../models/PlantDisplay'
+import WOptionPlantKind from '../options/WOptionPlantKind.vue'
+
+defineProps<FilterProps<QueryParamsPlants>>()
+defineEmits<FilterEmits>()
+</script>
+
+<script lang="ts">
+export const meta = {
+  title: 'Kind',
+  icon: markRaw(IconPlant),
+  fields: ['kind__in'],
+  // The control fills the filter's dropdown edge to edge, so the dropdown drops its padding.
+  embedded: true,
+} as const satisfies FilterMeta<QueryParamsPlants>
+</script>
+```
+
+<!-- @source-end -->
+
+<!-- @source docs/examples/recipes/plant-list/filter/WFilterPlantWatered.vue WFilterPlantWatered.vue -->
+
+```vue [WFilterPlantWatered.vue]
+<template>
+  <WUniform
+    v-bind="scope"
+    field="watered"
+  >
+    <template #field="scopeField">
+      <!-- `undefined` is "Any": it drops the param, so the filter shows every plant. -->
+      <WCheckboxGroup
+        v-bind="scopeField"
+        :list="[undefined, true, false]"
+        radio
+        :readonly="readonly"
+        :embedded="!global"
+        class="w-full"
+        option-class="w-full"
+      >
+        <template #option="{option}">
+          <div class="flex h-8 items-center">
+            {{ option === true ? 'Watered' : option === false ? 'Thirsty' : 'Any' }}
+          </div>
+        </template>
+      </WCheckboxGroup>
+    </template>
+  </WUniform>
+</template>
+
+<script lang="ts" setup>
+import type {QueryParamsPlants} from '../api/Plant'
+
+import {markRaw} from 'vue'
+
+import type {FilterEmits, FilterMeta, FilterProps} from 'eco-vue-js/dist/components/List/types'
+
+import WCheckboxGroup from 'eco-vue-js/dist/components/Checkbox/WCheckboxGroup.vue'
+import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
+
+import IconDrop from 'eco-vue-js/dist/assets/icons/IconDrop'
+
+defineProps<FilterProps<QueryParamsPlants>>()
+defineEmits<FilterEmits>()
+</script>
+
+<script lang="ts">
+export const meta = {
+  title: 'Watered',
+  icon: markRaw(IconDrop),
+  fields: ['watered'],
+  embedded: true,
+} as const satisfies FilterMeta<QueryParamsPlants>
+</script>
+```
+
+<!-- @source-end -->
+
+<!-- @source docs/examples/recipes/plant-list/options/WOptionPlantKind.vue WOptionPlantKind.vue -->
+
+```vue [WOptionPlantKind.vue]
+<template>
+  <div class="w-option grid grid-cols-[1fr_auto] items-center gap-2">
+    <!-- The same tag as the kind column. -->
+    <span
+      v-if="option"
+      class="bg-tone-soft text-tone flex w-max items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-semibold"
+      :class="kindDisplay[option].tone"
+    >
+      <component
+        :is="kindDisplay[option].icon"
+        class="square-3.5"
+      />
+      {{ kindDisplay[option].label }}
+    </span>
+
+    <span v-else>{{ search }}</span>
+
+    <slot />
+  </div>
+</template>
+
+<script lang="ts" setup>
+import type {Kind} from '../models/Plant'
+
+import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
+
+import {kindDisplay} from '../models/PlantDisplay'
+
+defineProps<SelectOptionProps<Kind>>()
+</script>
+```
+
+<!-- @source-end -->
+
+<!-- @source docs/examples/recipes/plant-list/filter/index.ts filter/index.ts -->
+
+```ts [filter/index.ts]
+import type {QueryParamsPlants} from '../api/Plant'
+
+import type {FilterComponent} from 'eco-vue-js/dist/components/List/types'
+
+import * as FilterPlantCaretaker from './WFilterPlantCaretaker.vue'
+import * as FilterPlantKind from './WFilterPlantKind.vue'
+import * as FilterPlantLight from './WFilterPlantLight.vue'
+import * as FilterPlantWatered from './WFilterPlantWatered.vue'
+
+// In the order they are offered by the add-filter button.
+export const listFilterPlant = [
+  FilterPlantKind,
+  FilterPlantLight,
+  FilterPlantWatered,
+  FilterPlantCaretaker,
+] satisfies FilterComponent<QueryParamsPlants>[]
+```
+
+<!-- @source-end -->
+
+:::
+
 ### Row menu
 
 Menu items receive the row and call the model's actions. The actions update the cached pages themselves, so the list changes without a refetch. The menu also gets `updateItem` and `deleteItem`, which write the row to the cache or remove it without a request — e.g. to drop a row that was never saved.
@@ -1021,6 +1227,7 @@ const getDueText = (due: Date) => {
 
 ## Variations
 
+- **Filters in the app shell**: pass `global` to `WListFilter` to put the filters into the actions bar's panel and the search into the header bar, with a button that resets them. `disabledFilterFields` leaves out filters for params the page fixes, e.g. `caretaker` on a caretaker's own page.
 - **Bulk actions**: pass `bulk` with components typed by `BulkProps<QueryParams>`; they get a `queryParamsGetter` that describes the current selection.
 - **Toolbar actions** (e.g. "Create"): pass `action` with components typed by `ActionProps<QueryParams>`.
 - **Nested columns**: a field's `meta` can be `{keyEntity, fields}` or `{keyArray, fields}` to render columns of a related object or of every item in an array.
