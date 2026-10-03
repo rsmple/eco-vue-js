@@ -18,32 +18,144 @@
           <WTabsItem
             name="overview"
             title="Overview"
-            :icon="markRaw(IconSummary)"
+            :icon="markRaw(IconPlant)"
           >
-            <p class="text-description py-2 text-sm">
-              Tabs keep the height of the tallest one opened so far, so the page below doesn't jump.
-            </p>
+            <div class="grid gap-4 py-3">
+              <div class="flex items-center gap-3">
+                <span class="tone-positive bg-tone/15 text-tone-fill flex size-12 shrink-0 items-center justify-center rounded-xl"><IconPlant class="square-8" /></span>
+
+                <div class="grid min-w-0 flex-1">
+                  <span class="truncate font-semibold">Monstera deliciosa</span>
+                  <span class="text-description truncate text-sm">Swiss cheese plant · Araceae</span>
+                </div>
+
+                <div class="hidden flex-wrap justify-end gap-1.5 sm:flex">
+                  <WChip
+                    text="tropical"
+                    :semantic-type="SemanticType.POSITIVE"
+                  />
+
+                  <WChip
+                    text="pet-toxic"
+                    :semantic-type="SemanticType.NEGATIVE"
+                  />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <div
+                  v-for="stat in PLANT_STATS"
+                  :key="stat.title"
+                  class="bg-tone/10 grid gap-1 rounded-xl p-4"
+                  :class="stat.tone"
+                >
+                  <component
+                    :is="stat.icon"
+                    class="square-[1.25em] text-tone-fill"
+                  />
+                  <span class="text-tone text-sm font-semibold">{{ stat.value }}</span>
+                  <span class="text-description text-xs">{{ stat.title }}</span>
+                </div>
+              </div>
+            </div>
           </WTabsItem>
 
           <WTabsItem
-            name="activity"
-            title="Activity"
-            :icon="markRaw(IconTime)"
-            :count="3"
+            name="care"
+            title="Care"
+            :icon="markRaw(IconSun)"
           >
-            <p class="text-description py-2 text-sm">
-              Three new events since your last visit.
-            </p>
+            <div class="grid gap-5 py-3 sm:grid-cols-2">
+              <div class="grid content-start gap-3">
+                <div
+                  v-for="level in PLANT_LEVELS"
+                  :key="level.title"
+                  class="grid gap-1.5"
+                  :class="level.tone"
+                >
+                  <div class="flex justify-between text-sm">
+                    <span>{{ level.title }}</span>
+                    <span class="text-tone font-semibold tabular-nums">{{ level.value }}%</span>
+                  </div>
+
+                  <div class="bg-surface-muted h-2 overflow-hidden rounded-full">
+                    <div
+                      class="bg-tone-fill h-full rounded-full"
+                      :style="{width: `${ level.value }%`}"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid content-start gap-2">
+                <span class="text-description text-sm">This week</span>
+
+                <div class="grid grid-cols-7 gap-1.5">
+                  <div
+                    v-for="item in CARE_WEEK"
+                    :key="item.day"
+                    class="grid justify-items-center gap-1"
+                  >
+                    <span class="text-description text-xs">{{ item.day }}</span>
+
+                    <span
+                      class="flex aspect-square w-full items-center justify-center rounded-lg text-sm"
+                      :class="item.task ? `${ CARE_TASKS[item.task].tone } bg-tone/15` : 'bg-surface-muted'"
+                    ><component
+                      :is="CARE_TASKS[item.task].icon"
+                      v-if="item.task"
+                      class="square-[1.25em]"
+                    /></span>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap gap-x-3 gap-y-1 text-xs">
+                  <span
+                    v-for="task in Object.values(CARE_TASKS)"
+                    :key="task.title"
+                    class="flex items-center gap-1.5"
+                    :class="task.tone"
+                  >
+                    <span class="bg-tone-fill size-2 rounded-full" />
+                    {{ task.title }}
+                  </span>
+                </div>
+              </div>
+            </div>
           </WTabsItem>
 
           <WTabsItem
-            name="settings"
-            title="Settings"
-            :icon="markRaw(IconSettings)"
+            name="journal"
+            title="Journal"
+            :icon="markRaw(IconNote)"
+            :count="JOURNAL.length"
           >
-            <p class="text-description py-2 text-sm">
-              Counts, icons and disabled tabs come built in.
-            </p>
+            <div class="grid py-3">
+              <div
+                v-for="(entry, index) in JOURNAL"
+                :key="entry.title"
+                class="grid grid-cols-[auto_1fr] gap-x-3"
+                :class="entry.tone"
+              >
+                <div class="flex flex-col items-center">
+                  <span class="bg-tone-fill ring-tone/20 mt-1.5 size-2.5 rounded-full ring-4" />
+
+                  <span
+                    v-if="index < JOURNAL.length - 1"
+                    class="bg-line-subtle w-px flex-1"
+                  />
+                </div>
+
+                <div class="grid pb-3 text-sm">
+                  <div class="flex justify-between gap-2">
+                    <span class="text-tone font-semibold">{{ entry.title }}</span>
+                    <span class="text-description shrink-0 text-xs">{{ entry.when }}</span>
+                  </div>
+
+                  <span class="text-description">{{ entry.text }}</span>
+                </div>
+              </div>
+            </div>
           </WTabsItem>
         </WTabs>
       </DocsHomeTile>
@@ -59,7 +171,7 @@
         />
 
         <span class="text-description text-sm">
-          {{ day ? `Due ${ dateFormat(day) }` : 'Pick a due date' }}
+          {{ day ? `Repot on ${ dateFormat(day) }` : 'Pick a repotting date' }}
         </span>
       </DocsHomeTile>
 
@@ -70,21 +182,21 @@
         <div class="flex flex-wrap gap-2">
           <WButton
             :semantic-type="SemanticType.POSITIVE"
-            @click="Notify.success({title: 'Changes saved'})"
+            @click="Notify.success({title: 'Watered', caption: 'Next watering in 7 days.'})"
           >
             Success
           </WButton>
 
           <WButton
             :semantic-type="SemanticType.WARNING"
-            @click="Notify.warn({title: 'Check the form', caption: 'Name is required.'})"
+            @click="Notify.warn({title: 'Check the leaves', caption: 'Yellow tips can mean too much water.'})"
           >
             Warning
           </WButton>
 
           <WButton
             :semantic-type="SemanticType.NEGATIVE"
-            @click="Notify.error({title: 'Upload failed', caption: 'The file is larger than 10 MB.'})"
+            @click="Notify.error({title: 'Sensor offline', caption: 'The greenhouse probe stopped reporting.'})"
           >
             Error
           </WButton>
@@ -96,17 +208,17 @@
         link="/components/checkbox"
       >
         <WCheckboxGroup
-          v-model="plan"
-          :list="PLANS"
-          :title-map="PLAN_TITLES"
+          v-model="light"
+          :list="LIGHTS"
+          :title-map="LIGHT_TITLES"
           radio
           wrap
           no-margin
         />
 
         <WCheckbox
-          v-model="isYearly"
-          title="Bill yearly — two months free"
+          v-model="isPetSafe"
+          title="Pet-safe plants only"
         />
       </DocsHomeTile>
 
@@ -117,14 +229,14 @@
       >
         <ClientOnly>
           <WChartHeatmap
-            :data="SCANS"
+            :data="WATERINGS"
             x-key="date"
             y-key="count"
-            title="Scans in the last year"
+            title="Waterings in the last year"
             class="tone-primary text-tone-fill"
           >
             <template #tooltip="{d}">
-              {{ d.count }} scans on {{ dateFormat(new Date(d.date)) }}
+              {{ d.count }} waterings on {{ dateFormatShort(new Date(d.date)) }}
             </template>
           </WChartHeatmap>
 
@@ -139,20 +251,20 @@
         link="/components/status-and-loading#progress"
       >
         <div
-          v-for="upload in uploads"
-          :key="upload.name"
+          v-for="tray in trays"
+          :key="tray.name"
           class="grid gap-1.5"
         >
           <div class="flex justify-between text-sm">
-            <span class="truncate">{{ upload.name }}</span>
+            <span class="truncate">{{ tray.name }}</span>
 
             <span class="text-description tabular-nums">
-              {{ upload.progress <= 0 ? 'Waiting' : upload.progress >= 100 ? 'Done' : `${ Math.round(upload.progress) }%` }}
+              {{ tray.progress <= 0 ? 'Just sown' : tray.progress >= 100 ? 'Sprouted' : `${ Math.round(tray.progress) }%` }}
             </span>
           </div>
 
           <WProgressStriped
-            :model-value="upload.progress"
+            :model-value="tray.progress"
             class="h-1.5"
           />
         </div>
@@ -173,10 +285,10 @@
 
         <div class="flex items-center gap-6">
           <span class="relative">
-            Inbox
+            Buds
 
             <WCounter
-              :count="messages"
+              :count="buds"
               :trigger="1"
               class="absolute -top-2 left-full text-xs"
             />
@@ -184,16 +296,16 @@
 
           <WButton
             :semantic-type="SemanticType.SECONDARY"
-            @click="messages++"
+            @click="buds++"
           >
-            New message
+            New bud
           </WButton>
         </div>
 
         <div class="flex flex-wrap items-center gap-4 text-sm [&_svg]:square-5">
-          <span class="flex items-center gap-2"><WStatusIcon /> Not set</span>
-          <span class="flex items-center gap-2"><WStatusIcon has-value /> Done</span>
-          <span class="flex items-center gap-2"><WStatusIcon has-error /> Failed</span>
+          <span class="flex items-center gap-2"><WStatusIcon /> Not checked</span>
+          <span class="flex items-center gap-2"><WStatusIcon has-value /> Watered</span>
+          <span class="flex items-center gap-2"><WStatusIcon has-error /> Wilted</span>
         </div>
       </DocsHomeTile>
 
@@ -212,7 +324,7 @@
           >
             <span
               class="border-tone w-4 border-t-2"
-              :class="{'border-dashed': series.key === 'fixed'}"
+              :class="{'border-dashed': series.key === 'humidity'}"
             />
             {{ series.title }}
           </button>
@@ -223,42 +335,36 @@
             <WChartLinear
               :x-domain="[+addDay(TODAY, -29), +TODAY]"
               :height="120"
-              :y-format="value => numberCompactFormatter.format(value)"
+              :y-format="value => `${ numberCompactFormatter.format(value) }%`"
               y-right
             >
               <template #default="scope">
                 <WChartLine
-                  v-if="visibleSeries.open"
+                  v-if="visibleSeries.humidity"
                   v-bind="scope"
-                  :data="OPEN_TREND"
-                  x-key="date"
-                  y-key="value"
-                  y-key-min="min"
-                  y-key-max="max"
-                  class="tone-primary text-tone"
-                >
-                  <template #tooltip="{d}">
-                    <div class="grid text-sm">
-                      <span class="text-description">{{ dateFormat(new Date(d.date)) }}</span>
-                      <span class="font-semibold">{{ d.value }} open</span>
-                    </div>
-                  </template>
-                </WChartLine>
-
-                <WChartLine
-                  v-if="visibleSeries.fixed"
-                  v-bind="scope"
-                  :data="FIXED_TREND"
+                  :data="HUMIDITY_TREND"
                   x-key="date"
                   y-key="value"
                   stroke-style="dashed-small"
                   has-area
                   class="tone-positive text-tone"
+                />
+
+                <WChartLine
+                  v-if="visibleSeries.moisture"
+                  v-bind="scope"
+                  :data="MOISTURE_TREND"
+                  x-key="date"
+                  y-key="value"
+                  y-key-min="min"
+                  y-key-max="max"
+                  class="tone-info text-tone"
                 >
-                  <template #tooltip="{d}">
-                    <div class="grid text-sm">
-                      <span class="text-description">{{ dateFormat(new Date(d.date)) }}</span>
-                      <span class="font-semibold">{{ d.value }} fixed</span>
+                  <template #tooltip="{d, index}">
+                    <div class="grid text-sm text-start">
+                      <span class="text-description text-xs">{{ dateFormatShort(new Date(d.date)) }}</span>
+                      <span class="font-semibold">{{ d.value }}% soil moisture <span class="text-description">±{{ d.max - d.value }}%</span></span>
+                      <span class="font-semibold">{{ HUMIDITY_TREND[index!].value }}% air humidity</span>
                     </div>
                   </template>
                 </WChartLine>
@@ -327,9 +433,9 @@
 
           <div
             v-else
-            class="tone-primary surface-fill flex size-10 shrink-0 items-center justify-center rounded-full font-semibold"
+            class="tone-positive bg-tone/15 flex size-10 shrink-0 items-center justify-center rounded-full text-xl"
           >
-            JA
+            🌵
           </div>
 
           <div class="grid min-w-0 flex-1 text-sm">
@@ -338,14 +444,14 @@
             <span
               v-else
               class="font-semibold"
-            >Jane Austen</span>
+            >Golden barrel cactus</span>
 
             <WSkeleton v-if="isLoading" />
 
             <span
               v-else
               class="text-description truncate"
-            >Pride and Prejudice, Emma</span>
+            >Echinocactus grusonii · water monthly</span>
           </div>
         </div>
       </DocsHomeTile>
@@ -376,7 +482,7 @@
           </template>
         </WDragContainer>
 
-        <span class="text-description text-sm">Drag by the handle to change the pipeline order.</span>
+        <span class="text-description text-sm">Drag by the handle to change the planting order.</span>
       </DocsHomeTile>
 
       <DocsHomeTile
@@ -436,16 +542,16 @@
       >
         <div class="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
           <span class="cursor-help underline decoration-dotted">
-            SLA
-            <WTooltip text="Fix critical issues within 24 hours." />
+            Zone 10
+            <WTooltip text="Survives frost down to −1 °C." />
           </span>
 
           <span class="cursor-help underline decoration-dotted">
-            Last scan
+            Last watered
             <WTooltip>
               <div class="grid gap-1">
-                <b>2 hours ago</b>
-                <span>12 findings · 3 critical</span>
+                <b>2 days ago</b>
+                <span>250 ml · the soil was dry</span>
               </div>
             </WTooltip>
           </span>
@@ -459,9 +565,9 @@
         </div>
 
         <span class="text-description w-40 truncate text-sm">
-          A title too long to fit in its column
+          Monstera deliciosa 'Thai Constellation'
           <WTooltip
-            text="A title too long to fit in its column"
+            text="Monstera deliciosa 'Thai Constellation'"
             overflow-only
           />
         </span>
@@ -472,17 +578,17 @@
         link="/components/input#suggestions"
       >
         <WInputOptions
-          v-model="country"
-          title="Country"
+          v-model="plantName"
+          title="Plant"
           placeholder="Start typing"
-          :options="countries"
+          :options="plantNames"
           :value-getter="option => option.name"
-          empty-stub="No such country"
+          empty-stub="No such plant"
           allow-clear
         >
           <template #option="{option}">
             <div class="w-option flex items-center">
-              {{ option.flag }} {{ option.name }}
+              {{ option.emoji }} {{ option.name }}
             </div>
           </template>
         </WInputOptions>
@@ -502,7 +608,7 @@
                 compact
               />
             </div>
-            <span class="text-description text-sm">findings</span>
+            <span class="text-description text-sm">seeds sown</span>
           </div>
 
           <div class="grid">
@@ -512,7 +618,7 @@
               class="tone-positive text-tone text-2xl font-bold tabular-nums"
               percent
             />
-            <span class="text-description text-sm">fixed</span>
+            <span class="text-description text-sm">sprouted</span>
           </div>
         </div>
       </DocsHomeTile>
@@ -523,37 +629,37 @@
         link="/components/select"
       >
         <WSelectSingle
-          v-model="assignee"
-          :options="USERS"
+          v-model="caretaker"
+          :options="GARDENERS"
           :value-getter="item => item.id"
           :search-fn="(item, search) => item.name.toLowerCase().includes(search.toLowerCase())"
           :option-component="DocsHomeOptionUser"
-          title="Assignee"
+          title="Caretaker"
           placeholder="Pick a person"
           allow-clear
           :clear-value="null"
         />
 
         <WSelectSingle
-          v-model="severity"
-          :options="SEVERITIES"
+          v-model="health"
+          :options="HEALTH"
           :value-getter="item => item.id"
           :search-fn="(item, search) => item.name.toLowerCase().includes(search.toLowerCase())"
-          :option-component="DocsHomeOptionSeverity"
-          title="Severity"
-          placeholder="Pick a severity"
+          :option-component="DocsHomeOptionHealth"
+          title="Health"
+          placeholder="Pick a state"
         />
 
         <WSelect
-          :model-value="scanners"
-          :options="SCANNERS"
+          :model-value="companions"
+          :options="COMPANIONS"
           :value-getter="item => item.id"
           :search-fn="(item, search) => item.name.toLowerCase().includes(search.toLowerCase())"
-          :option-component="DocsHomeOptionScanner"
-          title="Scanners"
-          placeholder="Add a scanner"
-          @select="scanners = [...scanners, $event]"
-          @unselect="scanners = scanners.filter(item => item !== $event)"
+          :option-component="DocsHomeOptionCompanion"
+          title="Companion plants"
+          placeholder="Add a companion"
+          @select="companions = [...companions, $event]"
+          @unselect="companions = companions.filter(item => item !== $event)"
         />
       </DocsHomeTile>
 
@@ -565,10 +671,10 @@
           :icon="markRaw(IconDanger)"
           :semantic-type="SemanticType.NEGATIVE"
         >
-          The repository can't be reached
+          The greenhouse sensor is offline
 
           <template #bottom>
-            Check that the access token is still valid.
+            Check its battery and the Wi-Fi signal.
           </template>
         </WInfoCard>
 
@@ -580,19 +686,19 @@
         </WInfoCard>
 
         <WInfoCard
-          v-if="!isScanned"
+          v-if="!isWatered"
           :semantic-type="SemanticType.WARNING"
         >
-          The scanner hasn't run for 30 days — results may be out of date.
+          The fern hasn't been watered for 9 days — the soil is getting dry.
 
           <template #bottom>
             <WButton
               :semantic-type="SemanticType.SECONDARY"
-              :loading="isScanning"
+              :loading="isWatering"
               class="mt-3"
-              @click="scan"
+              @click="water"
             >
-              Run now
+              Water now
             </WButton>
           </template>
         </WInfoCard>
@@ -602,13 +708,13 @@
           :semantic-type="SemanticType.POSITIVE"
           :icon="markRaw(IconCheckCircle)"
         >
-          All checks passed.
+          Watered — the soil is moist again.
 
           <template #bottom>
             <WButton
               :semantic-type="SemanticType.SECONDARY"
               class="mt-3"
-              @click="isScanned = false"
+              @click="isWatered = false"
             >
               Start over
             </WButton>
@@ -622,13 +728,13 @@
       >
         <WFilePicker
           v-model="files"
-          title="Attachments"
-          accept="image/*,.pdf"
+          title="Plant photos"
+          accept="image/*"
           multiple
         />
 
         <span class="text-description -mt-6 text-sm">
-          Images and PDFs — drop several at once or browse for them. Each picked file shows as a card you can remove before saving.
+          Photos of the leaves and roots — drop several at once or browse for them. Each picked file shows as a card you can remove before saving.
         </span>
       </DocsHomeTile>
     </div>
@@ -640,7 +746,7 @@ import {computed, markRaw, onBeforeUnmount, onMounted, ref, watch} from 'vue'
 
 import {Notify} from 'eco-vue-js/dist/utils/Notify'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
-import {addDay, dateFormat, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
+import {addDay, dateFormat, dateFormatShort, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 import {numberCompactFormatter} from 'eco-vue-js/dist/utils/utils'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
@@ -673,50 +779,88 @@ import WTooltip from 'eco-vue-js/dist/components/Tooltip/WTooltip.vue'
 import IconCheckCircle from 'eco-vue-js/dist/assets/icons/IconCheckCircle'
 import IconDanger from 'eco-vue-js/dist/assets/icons/IconDanger'
 import IconDrag from 'eco-vue-js/dist/assets/icons/IconDrag'
-import IconSettings from 'eco-vue-js/dist/assets/icons/IconSettings'
-import IconSummary from 'eco-vue-js/dist/assets/icons/IconSummary'
-import IconTime from 'eco-vue-js/dist/assets/icons/IconTime'
+import IconDrop from 'eco-vue-js/dist/assets/icons/IconDrop'
+import IconNote from 'eco-vue-js/dist/assets/icons/IconNote'
+import IconPlant from 'eco-vue-js/dist/assets/icons/IconPlant'
+import IconRuler from 'eco-vue-js/dist/assets/icons/IconRuler'
+import IconSun from 'eco-vue-js/dist/assets/icons/IconSun'
+import IconWind from 'eco-vue-js/dist/assets/icons/IconWind'
 
-import DocsHomeOptionScanner from './DocsHomeOptionScanner.vue'
-import DocsHomeOptionSeverity from './DocsHomeOptionSeverity.vue'
+import DocsHomeOptionCompanion from './DocsHomeOptionCompanion.vue'
+import DocsHomeOptionHealth from './DocsHomeOptionHealth.vue'
 import DocsHomeOptionUser from './DocsHomeOptionUser.vue'
 import DocsHomeTile from './DocsHomeTile.vue'
 
 const TODAY = getStartOfDay()
 
-const PLANS = ['free', 'team', 'business'] as const
+const PLANT_STATS = [
+  {title: 'Water every', value: '7 days', icon: markRaw(IconDrop), tone: 'tone-info'},
+  {title: 'Light', value: 'Bright, indirect', icon: markRaw(IconSun), tone: 'tone-warning'},
+  {title: 'Humidity', value: '60–80%', icon: markRaw(IconWind), tone: 'tone-primary'},
+  {title: 'Height', value: '1.2 m', icon: markRaw(IconRuler), tone: 'tone-positive'},
+]
 
-const PLAN_TITLES: Record<typeof PLANS[number], string> = {free: 'Free', team: 'Team', business: 'Business'}
+const PLANT_LEVELS = [
+  {title: 'Soil moisture', value: 62, tone: 'tone-info'},
+  {title: 'Light today', value: 81, tone: 'tone-warning'},
+  {title: 'Nutrients', value: 34, tone: 'tone-positive'},
+]
 
-// A made-up count for every weekday of the last year, more on some weeks than others.
-const SCANS = Array.from({length: 365}, (_, index) => {
+const CARE_TASKS = {
+  water: {title: 'Water', icon: markRaw(IconDrop), tone: 'tone-info'},
+  feed: {title: 'Feed', icon: markRaw(IconPlant), tone: 'tone-positive'},
+  mist: {title: 'Mist', icon: markRaw(IconWind), tone: 'tone-primary'},
+} as const
+
+const CARE_WEEK: {day: string, task?: keyof typeof CARE_TASKS}[] = [
+  {day: 'Mo', task: 'water'},
+  {day: 'Tu'},
+  {day: 'We', task: 'mist'},
+  {day: 'Th', task: 'feed'},
+  {day: 'Fr', task: 'water'},
+  {day: 'Sa', task: 'mist'},
+  {day: 'Su'},
+]
+
+const JOURNAL = [
+  {title: 'New leaf unfurled', when: 'Today', text: 'The fifth one this year, with its first split.', tone: 'tone-positive'},
+  {title: 'Repotted', when: '2 weeks ago', text: 'Moved into a 25 cm pot with an orchid bark mix.', tone: 'tone-primary'},
+  {title: 'Spider mites', when: 'Last month', text: 'Wiped the leaves and treated them with neem oil.', tone: 'tone-negative'},
+]
+
+const LIGHTS = ['shade', 'partial', 'sun'] as const
+
+const LIGHT_TITLES: Record<typeof LIGHTS[number], string> = {shade: 'Shade', partial: 'Partial sun', sun: 'Full sun'}
+
+// A made-up count for every day of the last year, more often in the summer months.
+const WATERINGS = Array.from({length: 365}, (_, index) => {
   const date = addDay(TODAY, -index)
-  const isWeekday = date.getDay() !== 0 && date.getDay() !== 6
+  const summer = Math.max(0, Math.cos((date.getMonth() - 6) / 6 * Math.PI))
 
-  return {date: +date, count: isWeekday ? (index * 7) % 23 + (Math.floor(index / 30) % 3) * 5 : 0}
+  return {date: +date, count: (index * 7) % 5 < 2 + Math.round(summer * 2) ? 1 + Math.round(summer * 3) + (index % 3) : 0}
 }).filter(item => item.count > 0)
 
-// Points go newest first, one a day for the last 30 days.
-const OPEN_TREND = Array.from({length: 30}, (_, index) => {
-  const value = Math.round(120 + 30 * Math.sin(index / 4) - index)
+// Points go newest first, one a day for the last 30 days; the soil dries out between waterings every 7 days.
+const MOISTURE_TREND = Array.from({length: 30}, (_, index) => {
+  const value = Math.round(75 - (index % 7) * 6 + 4 * Math.sin(index / 5))
 
-  return {date: +addDay(TODAY, -index), value, min: value - 12, max: value + 12}
+  return {date: +addDay(TODAY, -index), value, min: value - 15, max: value + 15}
 })
 
-const FIXED_TREND = Array.from({length: 30}, (_, index) => ({date: +addDay(TODAY, -index), value: Math.max(0, 60 - 2 * index + (index % 5) * 3)}))
+const HUMIDITY_TREND = Array.from({length: 30}, (_, index) => ({date: +addDay(TODAY, -index), value: Math.round(30 + 10 * Math.sin(index / 3) + (index % 4) * 2)}))
 
 const TREND_SERIES = [
-  {key: 'open', title: 'Open findings', tone: 'tone-primary text-tone'},
-  {key: 'fixed', title: 'Fixed', tone: 'tone-positive text-tone'},
+  {key: 'moisture', title: 'Soil moisture', tone: 'tone-info text-tone'},
+  {key: 'humidity', title: 'Air humidity', tone: 'tone-positive text-tone'},
 ] as const
 
-const visibleSeries = ref<Record<typeof TREND_SERIES[number]['key'], boolean>>({open: true, fixed: true})
+const visibleSeries = ref<Record<typeof TREND_SERIES[number]['key'], boolean>>({moisture: true, humidity: true})
 
-const messages = ref(3)
+const buds = ref(3)
 
 const day = ref<Date>()
-const plan = ref<typeof PLANS[number]>('team')
-const isYearly = ref(true)
+const light = ref<typeof LIGHTS[number]>('partial')
+const isPetSafe = ref(true)
 const isLoading = ref(true)
 const isSaving = ref(false)
 
@@ -727,16 +871,16 @@ const save = () => {
   saveTimer = setTimeout(() => isSaving.value = false, 1200)
 }
 
-// Three uploads, one queued, one running and one finished; the running one starts over when it is done.
-const uploads = ref([
-  {name: 'annual-report.pdf', progress: 100},
-  {name: 'screenshots.zip', progress: 35},
-  {name: 'raw-export.csv', progress: 0},
+// Three seed trays, one just sown, one sprouting and one done; the sprouting one starts over when it is done.
+const trays = ref([
+  {name: 'Basil', progress: 100},
+  {name: 'Cherry tomatoes', progress: 35},
+  {name: 'Lavender', progress: 0},
 ])
 
-let uploadTimer: ReturnType<typeof setInterval> | undefined
+let trayTimer: ReturnType<typeof setInterval> | undefined
 
-const steps = ref(['Clone', 'Build', 'Scan dependencies', 'Scan code', 'Report'])
+const steps = ref(['Add drainage', 'Fill with soil', 'Plant the seedling', 'Water', 'Mulch'])
 
 const threshold = ref(7)
 const thresholdEager = ref<number>()
@@ -749,79 +893,79 @@ watch(threshold, () => thresholdEager.value = undefined)
 watch(score, () => scoreEager.value = undefined)
 
 const FAQ = [
-  {title: 'What is scanned?', text: 'Every repository of the project, on each push to the default branch.'},
-  {title: 'How long are results kept?', text: 'For a year after the scan, or until the project is deleted.'},
-  {title: 'What changed this month?', text: 'Scans now include the container images built from the repository.', flag: true},
+  {title: 'How often should I water?', text: 'When the top 2 cm of soil is dry — about once a week for most houseplants.'},
+  {title: 'Does it need direct sun?', text: 'Bright indirect light is best; direct afternoon sun scorches the leaves.'},
+  {title: 'What changes in autumn?', text: 'Growth slows down, so feed once a month instead of every two weeks.', flag: true},
 ]
 
 const openFaq = ref<number | null>(0)
 
-const isScanned = ref(false)
-const isScanning = ref(false)
+const isWatered = ref(false)
+const isWatering = ref(false)
 
-let scanTimer: ReturnType<typeof setTimeout> | undefined
+let waterTimer: ReturnType<typeof setTimeout> | undefined
 
-const scan = () => {
-  isScanning.value = true
-  scanTimer = setTimeout(() => {
-    isScanning.value = false
-    isScanned.value = true
+const water = () => {
+  isWatering.value = true
+  waterTimer = setTimeout(() => {
+    isWatering.value = false
+    isWatered.value = true
   }, 1200)
 }
 
-const USERS = [
-  {id: 1, name: 'Ada Lovelace', email: 'ada@example.com', role: 'Owner'},
-  {id: 2, name: 'Alan Turing', email: 'alan@example.com', role: 'Developer'},
-  {id: 3, name: 'Grace Hopper', email: 'grace@example.com', role: 'Developer'},
-  {id: 4, name: 'Linus Torvalds', email: 'linus@example.com', role: 'Reviewer'},
+const GARDENERS = [
+  {id: 1, name: 'Carl Linnaeus', email: 'carl@example.com', role: 'Head gardener'},
+  {id: 2, name: 'Gregor Mendel', email: 'gregor@example.com', role: 'Gardener'},
+  {id: 3, name: 'Barbara McClintock', email: 'barbara@example.com', role: 'Gardener'},
+  {id: 4, name: 'Luther Burbank', email: 'luther@example.com', role: 'Volunteer'},
 ]
 
-const assignee = ref<number | null>(2)
+const caretaker = ref<number | null>(2)
 
-const SEVERITIES = [
-  {id: 'critical', name: 'Critical', sla: 'Fix within 24 hours', tone: 'tone-negative'},
-  {id: 'high', name: 'High', sla: 'Fix within a week', tone: 'tone-warning'},
-  {id: 'medium', name: 'Medium', sla: 'Fix within a month', tone: 'tone-info'},
-  {id: 'low', name: 'Low', sla: 'Fix when convenient', tone: 'tone-positive'},
+const HEALTH = [
+  {id: 'thriving', name: 'Thriving', description: 'New growth every week', tone: 'tone-positive'},
+  {id: 'thirsty', name: 'Thirsty', description: 'Drooping leaves, dry soil', tone: 'tone-info'},
+  {id: 'stressed', name: 'Stressed', description: 'Yellow or brown leaf tips', tone: 'tone-warning'},
+  {id: 'pests', name: 'Pests', description: 'Webs or spots under the leaves', tone: 'tone-negative'},
 ]
 
-const severity = ref<string | null>('high')
+const health = ref<string | null>('thirsty')
 
-const SCANNERS = [
-  {id: 1, name: 'Semgrep', description: 'Static analysis of the source code'},
-  {id: 2, name: 'Gitleaks', description: 'Secrets in the code and its history'},
-  {id: 3, name: 'Trivy', description: 'Container images and dependencies'},
-  {id: 4, name: 'Checkov', description: 'Infrastructure as code'},
+const COMPANIONS = [
+  {id: 1, name: 'Basil', description: 'Repels aphids and whiteflies'},
+  {id: 2, name: 'Marigold', description: 'Keeps nematodes away from the roots'},
+  {id: 3, name: 'Nasturtium', description: 'Draws pests away as a trap crop'},
+  {id: 4, name: 'Borage', description: 'Brings in bees and other pollinators'},
 ]
 
-const scanners = ref<number[]>([1, 3])
+const companions = ref<number[]>([1, 3])
 
-const COUNTRIES = [
-  {id: 1, name: 'Austria', flag: '🇦🇹'},
-  {id: 2, name: 'Belgium', flag: '🇧🇪'},
-  {id: 3, name: 'Denmark', flag: '🇩🇰'},
-  {id: 4, name: 'France', flag: '🇫🇷'},
-  {id: 5, name: 'Germany', flag: '🇩🇪'},
-  {id: 6, name: 'Norway', flag: '🇳🇴'},
+const PLANTS = [
+  {id: 1, name: 'Cactus', emoji: '🌵'},
+  {id: 2, name: 'Cherry blossom', emoji: '🌸'},
+  {id: 3, name: 'Rose', emoji: '🌹'},
+  {id: 4, name: 'Sunflower', emoji: '🌻'},
+  {id: 5, name: 'Tulip', emoji: '🌷'},
+  {id: 6, name: 'Hibiscus', emoji: '🌺'},
 ]
 
-const country = ref<string | null>()
+const plantName = ref<string | null>()
 
-const countries = computed(() => COUNTRIES.filter(item => item.name.toLowerCase().includes(country.value?.toLowerCase() ?? '')))
+const plantNames = computed(() => PLANTS.filter(item => item.name.toLowerCase().includes(plantName.value?.toLowerCase() ?? '')))
 
 const files = ref<File[]>([])
 
 onMounted(() => {
-  uploadTimer = setInterval(() => {
-    const upload = uploads.value[1]
+  trayTimer = setInterval(() => {
+    const tray = trays.value[1]
 
-    upload.progress = upload.progress >= 100 ? 0 : Math.min(100, upload.progress + 7)
+    tray.progress = tray.progress >= 100 ? 0 : Math.min(100, tray.progress + 7)
   }, 400)
 })
 
 onBeforeUnmount(() => {
   clearTimeout(saveTimer)
-  clearTimeout(scanTimer)
-  clearInterval(uploadTimer)
+  clearTimeout(waterTimer)
+  clearInterval(trayTimer)
 })
 </script>

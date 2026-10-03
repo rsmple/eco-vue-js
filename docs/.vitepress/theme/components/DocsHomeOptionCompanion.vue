@@ -4,7 +4,7 @@
     class="w-option w-option-has-bg"
   />
 
-  <!-- A tag in the field, with the unselect button inside its background; the menu adds what the scanner checks. -->
+  <!-- A tag in the field, with the unselect button inside its background; the menu adds what the companion does for the plant. -->
   <div
     v-else-if="model"
     class="tone-primary bg-tone/10 text-tone w-option w-option-has-bg grid max-w-max grid-cols-[1fr_auto] items-center gap-1 font-semibold"

@@ -13,10 +13,10 @@
       >
         <template #default="scope">
           <div class="flex items-center justify-between">
-            <span class="font-semibold">New project</span>
+            <span class="font-semibold">New plant</span>
 
             <WChip
-              :text="isCreated ? 'active' : 'draft'"
+              :text="isCreated ? 'planted' : 'draft'"
               :semantic-type="isCreated ? SemanticType.POSITIVE : SemanticType.WARNING"
             />
           </div>
@@ -30,7 +30,7 @@
             <template #field="scopeField">
               <WInput
                 v-bind="scopeField"
-                placeholder="Payments API"
+                placeholder="Monstera"
                 allow-clear
               />
             </template>
@@ -61,12 +61,12 @@
           <WUniform
             v-bind="scope"
             field="notify"
-            title="Notify the team"
+            title="Watering reminders"
           >
             <template #field="scopeField">
               <WToggle
                 v-bind="scopeField"
-                description="A digest once a day."
+                description="A note on the days it needs water."
               />
             </template>
           </WUniform>
@@ -85,7 +85,7 @@
               :loading="scope.submitting"
               @click="scope.submit?.()"
             >
-              Create
+              Add
             </WButton>
           </div>
         </template>
@@ -98,7 +98,7 @@
         :class="CARD_CLASS"
       >
         <div class="flex items-center justify-between gap-2">
-          <span class="text-description text-sm">Open findings</span>
+          <span class="text-description text-sm">Height</span>
 
           <WButtonGroup
             v-model="range"
@@ -113,11 +113,11 @@
         </div>
 
         <div class="flex items-baseline gap-2">
-          <span class="text-3xl font-bold tabular-nums">{{ points[0].value }}</span>
+          <span class="text-3xl font-bold tabular-nums">{{ points[0].value }} cm</span>
 
           <span
             class="text-sm font-medium tabular-nums"
-            :class="change <= 0 ? 'tone-positive text-tone' : 'tone-negative text-tone'"
+            :class="change >= 0 ? 'tone-positive text-tone' : 'tone-negative text-tone'"
           >{{ change > 0 ? '+' : '−' }}{{ Math.abs(change) }}%</span>
         </div>
 
@@ -141,12 +141,12 @@
                   x-key="date"
                   y-key="value"
                   has-area
-                  class="tone-primary text-tone"
+                  class="tone-positive text-tone"
                 >
                   <template #tooltip="{d}">
                     <div class="grid text-sm">
                       <span class="text-description">{{ dateFormat(new Date(d.date)) }}</span>
-                      <span class="font-semibold">{{ d.value }} open</span>
+                      <span class="font-semibold">{{ d.value }} cm</span>
                     </div>
                   </template>
                 </WChartLine>
@@ -161,9 +161,9 @@
         :class="CARD_CLASS"
       >
         <div class="flex items-center justify-between">
-          <span class="font-semibold">Members</span>
+          <span class="font-semibold">Gardeners</span>
 
-          <span class="text-description text-xs tabular-nums">{{ members.length }} of {{ SEATS }} seats</span>
+          <span class="text-description text-xs tabular-nums">{{ members.length }} of {{ SEATS }} spots</span>
         </div>
 
         <!-- Keeps the height of all three rows, so removing members doesn't resize the hero. -->
@@ -218,7 +218,7 @@
         :class="CARD_CLASS"
       >
         <div class="flex items-center justify-between">
-          <span class="font-semibold">Export report</span>
+          <span class="font-semibold">Export care journal</span>
 
           <WChip
             :text="exportStatus"
@@ -278,10 +278,10 @@ import IconTrash from 'eco-vue-js/dist/assets/icons/IconTrash'
 const CARD_CLASS = 'border-line-subtle bg-surface-subtle/80 shadow-primary-dark/35 rounded-xl border p-4 shadow-[0_1.5rem_3rem_-1.5rem] backdrop-blur-md'
 
 const TAG_OPTIONS = [
-  {id: 1, name: 'api'},
-  {id: 2, name: 'backend'},
-  {id: 3, name: 'payments'},
-  {id: 4, name: 'urgent'},
+  {id: 1, name: 'tropical'},
+  {id: 2, name: 'indoor'},
+  {id: 3, name: 'climber'},
+  {id: 4, name: 'pet-toxic'},
 ]
 
 type Project = {name: string | undefined, tags: number[], notify: boolean}
@@ -290,10 +290,10 @@ const RANGES = [7, 30, 90] as const
 
 const TODAY = getStartOfDay()
 
-// One point a day for the last 90 days, newest first, trending down.
+// One point a day for the last 90 days, newest first, growing in spurts.
 const HISTORY = Array.from({length: 90}, (_, index) => ({
   date: +addDay(TODAY, -index),
-  value: Math.round(92 + 12 * Math.sin(index / 3) + index * 0.7),
+  value: Math.round(64 - index * 0.4 + 2 * Math.sin(index / 3)),
 }))
 
 const EXPORT_PAGES = 12
@@ -308,12 +308,12 @@ const SEATS = 5
 
 type Member = {name: string, email: string, role: 'owner' | 'member'}
 
-const getDefaultProject = (): Project => ({name: 'Payments API', tags: [1, 3], notify: true})
+const getDefaultProject = (): Project => ({name: 'Monstera', tags: [1, 3], notify: true})
 
 const getDefaultMembers = (): Member[] => [
-  {name: 'Ada Lovelace', email: 'ada@example.com', role: 'owner'},
-  {name: 'Alan Turing', email: 'alan@example.com', role: 'member'},
-  {name: 'Grace Hopper', email: 'grace@example.com', role: 'member'},
+  {name: 'Carl Linnaeus', email: 'carl@example.com', role: 'owner'},
+  {name: 'Gregor Mendel', email: 'gregor@example.com', role: 'member'},
+  {name: 'Barbara McClintock', email: 'barbara@example.com', role: 'member'},
 ]
 
 const project = ref(getDefaultProject())
@@ -323,10 +323,10 @@ const initData = (value: Project): Project => ({...value, tags: [...value.tags]}
 
 let createTimer: ReturnType<typeof setTimeout> | undefined
 
-// Stands in for an API call: returns the saved project, which becomes the form's new initial model.
+// Stands in for an API call: returns the saved plant, which becomes the form's new initial model.
 const create = (payload: Partial<Project>) => new Promise<Project>(resolve => {
   createTimer = setTimeout(() => {
-    Notify.success({title: 'Project created', caption: `${ payload.name } is ready${ payload.notify ? ' and the team is notified' : '' }.`})
+    Notify.success({title: 'Plant added', caption: `${ payload.name } is in the collection${ payload.notify ? ' and reminders are on' : '' }.`})
     resolve(payload as Project)
   }, 900)
 })
@@ -373,7 +373,7 @@ const members = ref(getDefaultMembers())
 const confirmRemove = (member: Member) => {
   Modal.addConfirm({
     title: `Remove ${ member.name }?`,
-    description: 'They lose access to the project right away.',
+    description: 'They stop getting care reminders for this garden.',
     acceptText: 'Remove',
     acceptSemanticType: SemanticType.NEGATIVE,
     onAccept: () => {
