@@ -4,22 +4,37 @@
     class="w-option w-option-has-bg"
   />
 
-  <!-- A tag in the field, with the unselect button inside its background; the menu adds what the companion does for the plant. -->
-  <div
-    v-else-if="model"
-    class="tone-primary bg-tone/10 text-tone w-option w-option-has-bg grid max-w-max grid-cols-[1fr_auto] items-center gap-1 font-semibold"
-  >
-    <span class="truncate">{{ option.name }}</span>
-
-    <slot />
-  </div>
-
+  <!-- Two joined segments: the plant, and what it does on a colored fill that holds the unselect button. -->
   <div
     v-else
-    class="w-option w-option-has-bg grid w-full py-1"
+    class="w-option flex max-w-full"
+    :class="model ? 'w-max overflow-hidden' : 'w-full flex-col gap-0.5 py-1'"
   >
-    <span class="tone-primary text-tone font-semibold">{{ option.name }}</span>
-    <span class="text-description text-xs">{{ option.description }}</span>
+    <div class="flex w-max max-w-full overflow-hidden rounded-[inherit]">
+      <span
+        class="w-option-has-bg bg-surface border-line-subtle text-accent flex min-w-0 items-center rounded-l-[inherit] border-y border-l"
+      >
+        <span class="truncate">{{ option.name }}</span>
+      </span>
+
+      <span
+        class="w-option-has-bg surface-fill flex items-center gap-1 rounded-r-[inherit] text-sm font-semibold whitespace-nowrap"
+        :class="option.tone"
+      >
+        <component
+          :is="option.icon"
+          class="square-[1.25em] shrink-0"
+        />
+        {{ option.role }}
+
+        <slot />
+      </span>
+    </div>
+
+    <span
+      v-if="!model"
+      class="text-description text-xs mt-1"
+    >{{ option.description }}</span>
   </div>
 </template>
 
@@ -28,5 +43,7 @@ import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
 
 import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
 
-defineProps<SelectOptionProps<{id: number, name: string, description: string}>>()
+export type Companion = {id: number, name: string, role: string, description: string, tone: string, icon: SVGComponent}
+
+defineProps<SelectOptionProps<Companion>>()
 </script>

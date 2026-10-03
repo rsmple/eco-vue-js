@@ -587,8 +587,12 @@
           allow-clear
         >
           <template #option="{option}">
-            <div class="w-option flex items-center">
-              {{ option.emoji }} {{ option.name }}
+            <div
+              class="w-option flex items-center gap-2"
+              :class="option.tone"
+            >
+              <IconPlant class="text-tone square-[1.25em] shrink-0" />
+              <span class="truncate">{{ option.name }} <span class="text-description italic">{{ option.species }}</span></span>
             </div>
           </template>
         </WInputOptions>
@@ -780,14 +784,16 @@ import IconCheckCircle from 'eco-vue-js/dist/assets/icons/IconCheckCircle'
 import IconDanger from 'eco-vue-js/dist/assets/icons/IconDanger'
 import IconDrag from 'eco-vue-js/dist/assets/icons/IconDrag'
 import IconDrop from 'eco-vue-js/dist/assets/icons/IconDrop'
+import IconFilter from 'eco-vue-js/dist/assets/icons/IconFilter'
+import IconNegativeInfo from 'eco-vue-js/dist/assets/icons/IconNegativeInfo'
 import IconNote from 'eco-vue-js/dist/assets/icons/IconNote'
 import IconPlant from 'eco-vue-js/dist/assets/icons/IconPlant'
 import IconRuler from 'eco-vue-js/dist/assets/icons/IconRuler'
 import IconSun from 'eco-vue-js/dist/assets/icons/IconSun'
 import IconWind from 'eco-vue-js/dist/assets/icons/IconWind'
 
-import DocsHomeOptionCompanion from './DocsHomeOptionCompanion.vue'
-import DocsHomeOptionHealth from './DocsHomeOptionHealth.vue'
+import DocsHomeOptionCompanion, {type Companion} from './DocsHomeOptionCompanion.vue'
+import DocsHomeOptionHealth, {type Health} from './DocsHomeOptionHealth.vue'
 import DocsHomeOptionUser from './DocsHomeOptionUser.vue'
 import DocsHomeTile from './DocsHomeTile.vue'
 
@@ -913,40 +919,41 @@ const water = () => {
   }, 1200)
 }
 
+// `week` is the last seven days, oldest first: whether they watered that day.
 const GARDENERS = [
-  {id: 1, name: 'Carl Linnaeus', email: 'carl@example.com', role: 'Head gardener'},
-  {id: 2, name: 'Gregor Mendel', email: 'gregor@example.com', role: 'Gardener'},
-  {id: 3, name: 'Barbara McClintock', email: 'barbara@example.com', role: 'Gardener'},
-  {id: 4, name: 'Luther Burbank', email: 'luther@example.com', role: 'Volunteer'},
+  {id: 1, name: 'Carl Linnaeus', role: 'Head gardener', tone: 'tone-data-green', week: [true, true, false, true, true, true, true]},
+  {id: 2, name: 'Gregor Mendel', role: 'Gardener', tone: 'tone-data-violet', week: [true, false, true, true, false, true, true]},
+  {id: 3, name: 'Barbara McClintock', role: 'Gardener', tone: 'tone-data-pink', week: [false, true, true, true, true, false, true]},
+  {id: 4, name: 'Luther Burbank', role: 'Volunteer', tone: 'tone-data-amber', week: [false, false, true, false, false, true, false]},
 ]
 
 const caretaker = ref<number | null>(2)
 
-const HEALTH = [
-  {id: 'thriving', name: 'Thriving', description: 'New growth every week', tone: 'tone-positive'},
-  {id: 'thirsty', name: 'Thirsty', description: 'Drooping leaves, dry soil', tone: 'tone-info'},
-  {id: 'stressed', name: 'Stressed', description: 'Yellow or brown leaf tips', tone: 'tone-warning'},
-  {id: 'pests', name: 'Pests', description: 'Webs or spots under the leaves', tone: 'tone-negative'},
+const HEALTH: Health[] = [
+  {id: 'thriving', name: 'Thriving', description: 'New growth every week', tone: 'tone-positive', icon: markRaw(IconPlant)},
+  {id: 'thirsty', name: 'Thirsty', description: 'Drooping leaves, dry soil', tone: 'tone-info', icon: markRaw(IconDrop)},
+  {id: 'stressed', name: 'Stressed', description: 'Yellow or brown leaf tips', tone: 'tone-warning', icon: markRaw(IconSun)},
+  {id: 'pests', name: 'Pests', description: 'Webs or spots under the leaves', tone: 'tone-negative', icon: markRaw(IconNegativeInfo)},
 ]
 
 const health = ref<string | null>('thirsty')
 
-const COMPANIONS = [
-  {id: 1, name: 'Basil', description: 'Repels aphids and whiteflies'},
-  {id: 2, name: 'Marigold', description: 'Keeps nematodes away from the roots'},
-  {id: 3, name: 'Nasturtium', description: 'Draws pests away as a trap crop'},
-  {id: 4, name: 'Borage', description: 'Brings in bees and other pollinators'},
+const COMPANIONS: Companion[] = [
+  {id: 1, name: 'Basil', role: 'Repels', description: 'Keeps aphids and whiteflies off', tone: 'tone-data-teal', icon: markRaw(IconWind)},
+  {id: 2, name: 'Marigold', role: 'Roots', description: 'Keeps nematodes away from the roots', tone: 'tone-data-amber', icon: markRaw(IconPlant)},
+  {id: 3, name: 'Nasturtium', role: 'Trap crop', description: 'Draws pests away to itself', tone: 'tone-data-orange', icon: markRaw(IconFilter)},
+  {id: 4, name: 'Borage', role: 'Bees', description: 'Brings in bees and other pollinators', tone: 'tone-data-violet', icon: markRaw(IconSun)},
 ]
 
 const companions = ref<number[]>([1, 3])
 
 const PLANTS = [
-  {id: 1, name: 'Cactus', emoji: '🌵'},
-  {id: 2, name: 'Cherry blossom', emoji: '🌸'},
-  {id: 3, name: 'Rose', emoji: '🌹'},
-  {id: 4, name: 'Sunflower', emoji: '🌻'},
-  {id: 5, name: 'Tulip', emoji: '🌷'},
-  {id: 6, name: 'Hibiscus', emoji: '🌺'},
+  {id: 1, name: 'Cactus', species: 'Cactaceae', tone: 'tone-data-green'},
+  {id: 2, name: 'Cherry blossom', species: 'Prunus serrulata', tone: 'tone-data-pink'},
+  {id: 3, name: 'Rose', species: 'Rosa', tone: 'tone-data-red'},
+  {id: 4, name: 'Sunflower', species: 'Helianthus annuus', tone: 'tone-data-amber'},
+  {id: 5, name: 'Tulip', species: 'Tulipa', tone: 'tone-data-fuchsia'},
+  {id: 6, name: 'Hibiscus', species: 'Hibiscus rosa-sinensis', tone: 'tone-data-orange'},
 ]
 
 const plantName = ref<string | null>()

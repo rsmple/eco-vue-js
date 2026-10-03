@@ -47,14 +47,9 @@
                 :options="TAG_OPTIONS"
                 :value-getter="item => item.id"
                 :search-fn="(item, search) => item.name.includes(search.toLowerCase())"
+                :option-component="DocsHomeOptionTag"
                 placeholder="Add a tag"
-              >
-                <template #option="{option}">
-                  <div class="w-option flex items-center">
-                    {{ option?.name }}
-                  </div>
-                </template>
-              </WSelect>
+              />
             </template>
           </WUniform>
 
@@ -272,16 +267,22 @@ import WToggle from 'eco-vue-js/dist/components/Toggle/WToggle.vue'
 import WTooltip from 'eco-vue-js/dist/components/Tooltip/WTooltip.vue'
 import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
+import IconCloudSunPartial from 'eco-vue-js/dist/assets/icons/IconCloudSunPartial'
 import IconEdit from 'eco-vue-js/dist/assets/icons/IconEdit'
+import IconNegativeInfo from 'eco-vue-js/dist/assets/icons/IconNegativeInfo'
+import IconPlant from 'eco-vue-js/dist/assets/icons/IconPlant'
+import IconRuler from 'eco-vue-js/dist/assets/icons/IconRuler'
 import IconTrash from 'eco-vue-js/dist/assets/icons/IconTrash'
+
+import DocsHomeOptionTag, {type Tag} from './DocsHomeOptionTag.vue'
 
 const CARD_CLASS = 'border-line-subtle bg-surface-subtle/80 shadow-primary-dark/35 rounded-xl border p-4 shadow-[0_1.5rem_3rem_-1.5rem] backdrop-blur-md'
 
-const TAG_OPTIONS = [
-  {id: 1, name: 'tropical'},
-  {id: 2, name: 'indoor'},
-  {id: 3, name: 'climber'},
-  {id: 4, name: 'pet-toxic'},
+const TAG_OPTIONS: Tag[] = [
+  {id: 1, name: 'tropical', tone: 'tone-data-green', icon: markRaw(IconPlant)},
+  {id: 2, name: 'indoor', tone: 'tone-data-amber', icon: markRaw(IconCloudSunPartial)},
+  {id: 3, name: 'climber', tone: 'tone-data-teal', icon: markRaw(IconRuler)},
+  {id: 4, name: 'pet-toxic', tone: 'tone-data-red', icon: markRaw(IconNegativeInfo)},
 ]
 
 type Project = {name: string | undefined, tags: number[], notify: boolean}
