@@ -1,98 +1,100 @@
 <template>
-  <div class="grid grid-cols-1 items-start h-full gap-4 text-left sm:grid-cols-[minmax(0,7fr)_minmax(0,6fr)]">
-    <WUniform
-      :model-value="project"
-      :init-data="initData"
-      :api-method="create"
-      tag="div"
-      class="grid content-start gap-3"
-      :class="CARD_CLASS"
-      full-payload
-      @success="isCreated = true"
-    >
-      <template #default="scope">
-        <div class="flex items-center justify-between">
-          <span class="font-semibold">New project</span>
+  <div class="grid grid-cols-1 items-start h-full gap-3 text-left sm:grid-cols-[minmax(0,7fr)_minmax(0,6fr)]">
+    <div class="grid gap-3 sm:translate-y-10">
+      <WUniform
+        :model-value="project"
+        :init-data="initData"
+        :api-method="create"
+        tag="div"
+        class="grid content-start gap-2.5"
+        :class="CARD_CLASS"
+        full-payload
+        @success="isCreated = true"
+      >
+        <template #default="scope">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold">New project</span>
 
-          <WChip
-            :text="isCreated ? 'active' : 'draft'"
-            :semantic-type="isCreated ? SemanticType.POSITIVE : SemanticType.WARNING"
-          />
-        </div>
-
-        <WUniform
-          v-bind="scope"
-          field="name"
-          title="Name"
-          required
-        >
-          <template #field="scopeField">
-            <WInput
-              v-bind="scopeField"
-              placeholder="Payments API"
-              allow-clear
+            <WChip
+              :text="isCreated ? 'active' : 'draft'"
+              :semantic-type="isCreated ? SemanticType.POSITIVE : SemanticType.WARNING"
             />
-          </template>
-        </WUniform>
+          </div>
 
-        <WUniform
-          v-bind="scope"
-          field="tags"
-          title="Tags"
-        >
-          <template #field="scopeField">
-            <WSelect
-              v-bind="scopeField"
-              :options="TAG_OPTIONS"
-              :value-getter="item => item.id"
-              :search-fn="(item, search) => item.name.includes(search.toLowerCase())"
-              placeholder="Add a tag"
+          <WUniform
+            v-bind="scope"
+            field="name"
+            title="Name"
+            required
+          >
+            <template #field="scopeField">
+              <WInput
+                v-bind="scopeField"
+                placeholder="Payments API"
+                allow-clear
+              />
+            </template>
+          </WUniform>
+
+          <WUniform
+            v-bind="scope"
+            field="tags"
+            title="Tags"
+          >
+            <template #field="scopeField">
+              <WSelect
+                v-bind="scopeField"
+                :options="TAG_OPTIONS"
+                :value-getter="item => item.id"
+                :search-fn="(item, search) => item.name.includes(search.toLowerCase())"
+                placeholder="Add a tag"
+              >
+                <template #option="{option}">
+                  <div class="w-option flex items-center">
+                    {{ option?.name }}
+                  </div>
+                </template>
+              </WSelect>
+            </template>
+          </WUniform>
+
+          <WUniform
+            v-bind="scope"
+            field="notify"
+            title="Notify the team"
+          >
+            <template #field="scopeField">
+              <WToggle
+                v-bind="scopeField"
+                description="A digest once a day."
+              />
+            </template>
+          </WUniform>
+
+          <div class="flex justify-end gap-2">
+            <WButton
+              :semantic-type="SemanticType.SECONDARY"
+              :disabled="scope.submitting"
+              @click="reset"
             >
-              <template #option="{option}">
-                <div class="w-option flex items-center">
-                  {{ option?.name }}
-                </div>
-              </template>
-            </WSelect>
-          </template>
-        </WUniform>
+              Reset
+            </WButton>
 
-        <WUniform
-          v-bind="scope"
-          field="notify"
-          title="Notify the team"
-        >
-          <template #field="scopeField">
-            <WToggle
-              v-bind="scopeField"
-              description="A digest once a day."
-            />
-          </template>
-        </WUniform>
+            <WButton
+              :semantic-type="SemanticType.PRIMARY"
+              :loading="scope.submitting"
+              @click="scope.submit?.()"
+            >
+              Create
+            </WButton>
+          </div>
+        </template>
+      </WUniform>
+    </div>
 
-        <div class="mt-1 flex justify-end gap-2">
-          <WButton
-            :semantic-type="SemanticType.SECONDARY"
-            :disabled="scope.submitting"
-            @click="reset"
-          >
-            Reset
-          </WButton>
-
-          <WButton
-            :semantic-type="SemanticType.PRIMARY"
-            :loading="scope.submitting"
-            @click="scope.submit?.()"
-          >
-            Create
-          </WButton>
-        </div>
-      </template>
-    </WUniform>
-
-    <div class="grid gap-4 sm:translate-y-6">
+    <div class="grid gap-3">
       <div
-        class="grid grid-cols-1 gap-2"
+        class="grid grid-cols-1 gap-1.5"
         :class="CARD_CLASS"
       >
         <div class="flex items-center justify-between gap-2">
@@ -119,11 +121,11 @@
           >{{ change > 0 ? '+' : '−' }}{{ Math.abs(change) }}%</span>
         </div>
 
-        <div class="min-h-22.5">
+        <div class="min-h-18">
           <ClientOnly>
             <WChartLinear
               :x-domain="[+addDay(TODAY, 1 - range), +TODAY]"
-              :height="90"
+              :height="72"
               :y-domain-getter="([min, max]) => [min - 10, max + 5]"
               :top="4"
               :bottom="0"
@@ -155,7 +157,64 @@
       </div>
 
       <div
-        class="grid gap-3"
+        class="grid gap-2.5"
+        :class="CARD_CLASS"
+      >
+        <div class="flex items-center justify-between">
+          <span class="font-semibold">Members</span>
+
+          <span class="text-description text-xs tabular-nums">{{ members.length }} of {{ SEATS }} seats</span>
+        </div>
+
+        <!-- Keeps the height of all three rows, so removing members doesn't resize the hero. -->
+        <div class="grid min-h-26 content-start gap-2.5">
+          <div
+            v-for="member in members"
+            :key="member.email"
+            class="flex items-center gap-2.5"
+          >
+            <span class="tone-primary surface-fill flex size-7 shrink-0 cursor-default items-center justify-center rounded-full text-xs font-semibold">
+              {{ member.name.split(' ').map(part => part[0]).join('') }}
+
+              <WTooltip :text="member.email" />
+            </span>
+
+            <span class="min-w-0 flex-1 truncate text-sm">{{ member.name }}</span>
+
+            <WChip
+              :text="member.role"
+              :semantic-type="member.role === 'owner' ? SemanticType.PRIMARY : SemanticType.SECONDARY"
+            />
+
+            <WButtonMore>
+              <WButtonMoreItem
+                :text="member.role === 'owner' ? 'Make member' : 'Make owner'"
+                :icon="markRaw(IconEdit)"
+                @click="member.role = member.role === 'owner' ? 'member' : 'owner'"
+              />
+
+              <WButtonMoreItem
+                text="Remove"
+                :icon="markRaw(IconTrash)"
+                :semantic-type="SemanticType.NEGATIVE"
+                @click="confirmRemove(member)"
+              />
+            </WButtonMore>
+          </div>
+
+          <WButton
+            v-if="!members.length"
+            :semantic-type="SemanticType.SECONDARY"
+            class="w-button-h-7 w-button-rounded-lg justify-self-start text-xs"
+            @click="members = getDefaultMembers()"
+          >
+            Invite them back
+          </WButton>
+        </div>
+      </div>
+
+      <div
+        class="grid gap-2.5"
         :class="CARD_CLASS"
       >
         <div class="flex items-center justify-between">
@@ -192,14 +251,17 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onBeforeUnmount, onMounted, ref} from 'vue'
+import {computed, markRaw, onBeforeUnmount, onMounted, ref} from 'vue'
 
+import {Modal} from 'eco-vue-js/dist/utils/Modal'
 import {Notify} from 'eco-vue-js/dist/utils/Notify'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 import {addDay, dateFormat, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
+import WButtonMore from 'eco-vue-js/dist/components/Button/WButtonMore.vue'
+import WButtonMoreItem from 'eco-vue-js/dist/components/Button/WButtonMoreItem.vue'
 import WChartLine from 'eco-vue-js/dist/components/Chart/WChartLine.vue'
 import WChartLinear from 'eco-vue-js/dist/components/Chart/WChartLinear.vue'
 import WChip from 'eco-vue-js/dist/components/Chip/WChip.vue'
@@ -207,9 +269,13 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WProgressBar from 'eco-vue-js/dist/components/Progress/WProgressBar.vue'
 import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 import WToggle from 'eco-vue-js/dist/components/Toggle/WToggle.vue'
+import WTooltip from 'eco-vue-js/dist/components/Tooltip/WTooltip.vue'
 import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
-const CARD_CLASS = 'border-line-subtle bg-surface-subtle/80 shadow-primary-dark/35 rounded-2xl border p-5 shadow-[0_1.5rem_3rem_-1.5rem] backdrop-blur-md'
+import IconEdit from 'eco-vue-js/dist/assets/icons/IconEdit'
+import IconTrash from 'eco-vue-js/dist/assets/icons/IconTrash'
+
+const CARD_CLASS = 'border-line-subtle bg-surface-subtle/80 shadow-primary-dark/35 rounded-xl border p-4 shadow-[0_1.5rem_3rem_-1.5rem] backdrop-blur-md'
 
 const TAG_OPTIONS = [
   {id: 1, name: 'api'},
@@ -238,7 +304,17 @@ const EXPORT_STATUS_TYPE = {
   done: SemanticType.POSITIVE,
 } as const satisfies Record<string, SemanticType>
 
+const SEATS = 5
+
+type Member = {name: string, email: string, role: 'owner' | 'member'}
+
 const getDefaultProject = (): Project => ({name: 'Payments API', tags: [1, 3], notify: true})
+
+const getDefaultMembers = (): Member[] => [
+  {name: 'Ada Lovelace', email: 'ada@example.com', role: 'owner'},
+  {name: 'Alan Turing', email: 'alan@example.com', role: 'member'},
+  {name: 'Grace Hopper', email: 'grace@example.com', role: 'member'},
+]
 
 const project = ref(getDefaultProject())
 const isCreated = ref(false)
@@ -290,6 +366,21 @@ const runExport = () => {
   }
 
   exportTimer = setTimeout(() => step(0), 1200)
+}
+
+const members = ref(getDefaultMembers())
+
+const confirmRemove = (member: Member) => {
+  Modal.addConfirm({
+    title: `Remove ${ member.name }?`,
+    description: 'They lose access to the project right away.',
+    acceptText: 'Remove',
+    acceptSemanticType: SemanticType.NEGATIVE,
+    onAccept: () => {
+      members.value = members.value.filter(item => item.email !== member.email)
+      Notify.success({title: `${ member.name } removed`})
+    },
+  })
 }
 
 onMounted(runExport)
