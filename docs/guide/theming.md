@@ -75,7 +75,7 @@ Swapping the neutral scale in the playground also sets the dark page background,
 The palette gives one color per tone, the fill. Everything else a tone needs is derived from it in the current mode:
 
 - **Text and borders** on the page — the fill's lightness clamped to stay readable: at most 53% in light mode, at least 72% in dark.
-- **Text on the fill** — black or white, whichever contrasts more.
+- **Text on the fill** — black or white, whichever reads better by APCA, so a saturated purple or blue keeps white text where WCAG 2 would pick black.
 - **Soft background** — 12% of the fill over the surface, as in info cards.
 
 So a light brand color still gives readable links on white, and a yellow fill gets black text, without extra tokens. To pin one of them, set `--tone-text-{name}`, `--tone-line-{name}`, `--tone-on-{name}` or `--tone-soft-{name}` in an `@theme inline` block — for example `--tone-on-warning: var(--color-black-default)`.
