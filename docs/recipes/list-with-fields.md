@@ -629,7 +629,7 @@ const today = getStartOfDay()
 <script lang="ts">
 export const meta = {
   label: 'due',
-  cssClass: 'basis-[6rem]',
+  cssClass: 'basis-[8rem]',
   title: 'Water by',
   field: 'waterBy',
   textFormat: item => item.waterBy ? dateFormat(item.waterBy) : undefined,

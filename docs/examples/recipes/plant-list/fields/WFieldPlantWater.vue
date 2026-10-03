@@ -29,7 +29,7 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'water',
-  cssClass: 'basis-[6rem]',
+  cssClass: 'basis-[7rem]',
   title: 'Water',
   field: 'water',
   // The number alone in CSV export, without the unit.

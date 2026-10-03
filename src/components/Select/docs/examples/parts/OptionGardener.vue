@@ -11,7 +11,7 @@
     :class="model ? 'w-option-has-bg' : undefined"
   >
     <span
-      class="surface-fill flex shrink-0 items-center justify-center rounded-full font-semibold -ml-2"
+      class="surface-fill flex shrink-0 items-center justify-center rounded-full font-semibold option-shift"
       :class="[toneOf(option.name), model ? 'size-5 text-[0.625rem]' : 'size-8 text-xs']"
     >
       {{ option.name.split(' ').map(part => part[0]).join('') }}
@@ -58,3 +58,9 @@ const TONES = ['tone-data-green', 'tone-data-teal', 'tone-data-amber', 'tone-dat
 /** The same name always gets the same color. */
 const toneOf = (name: string) => TONES[[...name].reduce((hash, char) => hash + char.charCodeAt(0), 0) % TONES.length]
 </script>
+
+<style>
+.option-shift {
+  margin-left: max(-0.5rem, calc(var(--w-option-padding) / -2));
+}
+</style>

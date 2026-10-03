@@ -7,11 +7,11 @@
   <!-- In the field it is one line, so the input keeps its height; the menu adds the role and the last week of watering. -->
   <div
     v-else
-    class="w-option w-option-has-bg grid grid-cols-[auto_1fr_auto] items-center gap-2 pl-1"
-    :class="{'w-full py-1': !model}"
+    class="w-option grid grid-cols-[auto_1fr_auto] items-center gap-2"
+    :class="model ? 'w-option-has-bg' : undefined"
   >
     <span
-      class="surface-fill flex shrink-0 items-center justify-center rounded-full font-semibold"
+      class="surface-fill flex shrink-0 items-center justify-center rounded-full font-semibold option-shift"
       :class="[option.tone, model ? 'size-5 text-[0.625rem]' : 'size-8 text-xs']"
     >
       {{ option.name.split(' ').map(part => part[0]).join('') }}
@@ -48,9 +48,17 @@
 </template>
 
 <script lang="ts" setup>
+import type {Gardener} from './DocsHomeGallery.vue'
+
 import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
 
 import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
 
-defineProps<SelectOptionProps<{id: number, name: string, role: string, tone: string, week: boolean[]}>>()
+defineProps<SelectOptionProps<Gardener>>()
 </script>
+
+<style>
+.option-shift {
+  margin-left: max(-0.5rem, calc(var(--w-option-padding) / -2));
+}
+</style>

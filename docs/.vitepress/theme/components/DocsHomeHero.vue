@@ -3,7 +3,7 @@
     <div
       aria-hidden="true"
       class="
-        pointer-events-none absolute -top-(--header-height) bottom-0 left-[calc((var(--left-margin)+var(--nav-bar-width))*-1)] -z-10 w-screen
+        pointer-events-none absolute -top-(--header-height) bottom-0 -left-[(var(--left-margin)+var(--nav-bar-width))] -z-10 w-screen
         bg-[radial-gradient(40rem_28rem_at_70%_35%,color-mix(in_oklab,var(--color-primary)_22%,transparent),transparent_70%),radial-gradient(32rem_24rem_at_15%_10%,color-mix(in_oklab,var(--color-info)_10%,transparent),transparent_70%)]
         before:absolute before:inset-0 before:bg-[radial-gradient(color-mix(in_oklab,var(--color-track-strong)_35%,transparent)_1px,transparent_1px)] before:bg-size-[24px_24px]
         before:mask-radial-[60%_70%] before:mask-radial-at-[60%_40%] before:mask-radial-from-0% before:mask-radial-to-100%
@@ -16,8 +16,9 @@
           v-if="release"
           :href="withBase('/releases')"
           class="
-            tone-primary border-tone-line/40 text-description hover:text-accent hover:border-tone-line mb-6 inline-flex items-center gap-2
- rounded-full border px-3 py-1 text-sm font-medium transition-colors
+            tone-primary border-tone-line/40 text-description hover:text-accent
+            hover:border-tone-line mb-6 inline-flex items-center gap-2
+            rounded-full border px-3 py-1 text-sm font-medium transition-colors
           "
         >
           <span class="tone-positive bg-tone-fill size-2 rounded-full" />
