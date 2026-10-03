@@ -10,7 +10,7 @@
     class="w-option flex max-w-full"
     :class="model ? 'w-max overflow-hidden' : 'w-full flex-col gap-0.5 py-1'"
   >
-    <div class="flex w-max max-w-full overflow-hidden rounded-[inherit]">
+    <div class="flex w-max max-w-full overflow-hidden rounded-inherit">
       <span
         class="w-option-has-bg bg-surface border-line-subtle text-accent flex min-w-0 items-center rounded-l-[inherit] border-y border-l"
       >
