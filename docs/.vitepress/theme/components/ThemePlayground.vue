@@ -268,7 +268,6 @@
       :model-value="formSource"
       :init-data="toFormModel"
       :api-method="applyForm"
-      full-payload
       async
     >
       <template #default="scope">
@@ -406,8 +405,8 @@ const formSource = shallowRef<ThemeConfig>(toRaw(themeConfig.value))
 
 let appliedConfig: ThemeConfig | undefined
 
-const applyForm = (model: Partial<ThemeFormModel>) => {
-  appliedConfig = setTokens(model as ThemeFormModel)
+const applyForm = (tokens: Partial<ThemeFormModel>) => {
+  appliedConfig = setTokens(tokens)
 }
 
 // Another theme opened: the form starts over from it, and the errors of the one before are cleared.

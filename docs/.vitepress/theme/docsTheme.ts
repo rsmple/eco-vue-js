@@ -363,20 +363,20 @@ export type ThemeFormModel = Record<TokenKey, string>
 export const toFormModel = (config: ThemeConfig): ThemeFormModel => Object.fromEntries(TOKENS.map(token => [token.key, config[token.key] ?? ''])) as ThemeFormModel
 
 /**
- * Sets every token from the playground form as `setToken` does, except that an invalid value keeps the token's last
- * valid one: the field shows what is wrong while the theme stays as it was. Returns the new config.
+ * Sets the tokens the playground form saved, as `setToken` does. The form sends only valid values; an invalid one
+ * that gets here anyway is skipped and the token keeps its value. Returns the new config.
  */
-export const setTokens = (model: ThemeFormModel): ThemeConfig => {
+export const setTokens = (tokens: Partial<ThemeFormModel>): ThemeConfig => {
   const config = {...themeConfig.value}
   const base = findPreset(config.preset)?.tokens as ThemeTokens | undefined
 
-  for (const token of TOKENS) {
-    const value = model[token.key].trim()
+  for (const [key, item] of Object.entries(tokens) as [TokenKey, string][]) {
+    const value = item.trim()
 
-    if (value && getTokenError(token.key, value)) continue
+    if (value && getTokenError(key, value)) continue
 
-    if (value && value !== (base?.[token.key] ?? DEFAULT_TOKENS[token.key])) config[token.key] = value
-    else delete config[token.key]
+    if (value && value !== (base?.[key] ?? DEFAULT_TOKENS[key])) config[key] = value
+    else delete config[key]
   }
 
   themeConfig.value = config
