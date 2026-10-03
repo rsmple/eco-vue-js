@@ -1,8 +1,25 @@
 import type {UniformInstance} from '../types'
 
-import {isEqualArrObj, throttle} from '@/utils/utils'
+import {getAllScrollParents, isEqualArrObj, throttle} from '@/utils/utils'
+
+const isInRect = (rect: DOMRect, top: number, bottom: number, left: number, right: number): boolean =>
+  rect.top >= top && rect.bottom <= bottom && rect.left >= left && rect.right <= right
+
+const isFullyVisible = (element: HTMLElement): boolean => {
+  const rect = element.getBoundingClientRect()
+
+  if (!isInRect(rect, 0, window.innerHeight, 0, window.innerWidth)) return false
+
+  return getAllScrollParents(element).every(parent => {
+    const parentRect = parent.getBoundingClientRect()
+
+    return isInRect(rect, parentRect.top, parentRect.bottom, parentRect.left, parentRect.right)
+  })
+}
 
 export const scrollToValidator = throttle((element: HTMLElement): void => {
+  if (isFullyVisible(element)) return
+
   element.scrollIntoView({
     behavior: 'smooth',
     block: 'center',
