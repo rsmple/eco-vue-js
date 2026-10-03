@@ -918,9 +918,16 @@ const water = () => {
     isWatered.value = true
   }, 1200)
 }
+export type Gardener = {
+  id: number
+  name: string
+  role: string
+  tone: string
+  week: boolean[]
+}
 
 // `week` is the last seven days, oldest first: whether they watered that day.
-const GARDENERS = [
+const GARDENERS: Gardener[] = [
   {id: 1, name: 'Carl Linnaeus', role: 'Head gardener', tone: 'tone-data-green', week: [true, true, false, true, true, true, true]},
   {id: 2, name: 'Gregor Mendel', role: 'Gardener', tone: 'tone-data-violet', week: [true, false, true, true, false, true, true]},
   {id: 3, name: 'Barbara McClintock', role: 'Gardener', tone: 'tone-data-pink', week: [false, true, true, true, true, false, true]},
