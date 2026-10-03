@@ -143,10 +143,11 @@
     >
       <WInfiniteListScrollingElement
         :parent="isMobile"
-        class="bg-surface w-full"
+        class="w-full"
         :class="{
+          'bg-surface': isMobile,
           'pb-[50vh]': isMobile,
-          'max-h-[inherit] overflow-auto overscroll-contain rounded-xl shadow-md border border-solid border-line-raised': !isMobile,
+          'surface-raised max-h-[inherit] overflow-auto overscroll-contain rounded-xl shadow-md border border-solid border-line-raised': !isMobile,
         }"
       >
         <template v-if="$slots.content">

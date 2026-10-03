@@ -47,7 +47,9 @@
 import type {FilterComponent} from '../types'
 import type {UniformScope} from '@/components/Uniform/types'
 
-import {computed, ref, useId} from 'vue'
+import {computed, inject, provide, ref, useId} from 'vue'
+
+import {BASE_ZINDEX_ACTIONS_BAR, wBaseZIndex} from '@/utils/utils.ts'
 
 import ListFilterLocalItem from './ListFilterLocalItem.vue'
 import * as ListFilterSearch from './ListFilterSearch.vue'
@@ -63,6 +65,8 @@ const props = defineProps<{
   disabledFilterFields: Array<keyof QueryParams>
   readonly: boolean
 }>()
+
+provide(wBaseZIndex, inject(wBaseZIndex, 0) + BASE_ZINDEX_ACTIONS_BAR)
 
 const searchComponent: FilterComponent<QueryParams> | undefined = props.search ? props.filterSearch ?? ListFilterSearch : undefined
 

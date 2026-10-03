@@ -59,7 +59,7 @@ const NEUTRAL_UNIFIED = {
   'text:black-default|gray-100': 'text-accent',
   'text:gray-400|gray-500': 'text-description', // muted text was too faint in light mode
   'border:gray-200|gray-800': 'border-line-subtle', // dark 800 → 700
-  // Exactly `line-raised`, but in app code these are card borders, not the edge of a popup.
+  // In app code these are card borders, not the edge of a popup (`line-raised`).
   'border:gray-100|gray-800': 'border-line-subtle', // light 100 → 200, dark 800 → 700
   // Half of `surface-muted` over the surface, which is what `gray-850` is in dark mode.
   'bg:gray-50|gray-800/50': 'bg-surface-subtle',

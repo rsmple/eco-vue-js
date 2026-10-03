@@ -27,6 +27,12 @@
   --role-surface-muted-dark: var(--color-gray-800);
   --role-surface-inset: var(--color-gray-200);
   --role-surface-inset-dark: var(--color-gray-700);
+  /*
+   * Floating surfaces: dropdowns, popovers. A shadow sets them off a light page; on a dark one it hardly shows, so
+   * they are lighter than the page there instead.
+   */
+  --role-surface-raised: var(--color-default);
+  --role-surface-raised-dark: oklch(from var(--color-default-dark) calc(l + 0.04) c h);
   --role-overlay: color-mix(in oklab, var(--color-default) 40%, transparent);
   --role-overlay-dark: color-mix(in oklab, var(--color-default-dark) 60%, transparent);
   --role-backdrop: color-mix(in oklab, var(--color-primary-light) 40%, transparent);
@@ -41,11 +47,15 @@
   --role-line-dark: var(--color-gray-700);
   --role-line-subtle: var(--color-gray-200);
   --role-line-subtle-dark: var(--color-gray-700);
-  --role-line-raised: var(--color-gray-100);
-  --role-line-raised-dark: var(--color-gray-800);
+  --role-line-raised: var(--color-gray-300);
+  --role-line-raised-dark: var(--color-gray-700);
   /* Darkened when the primary is a light fill, as a yellow with black text is, to keep 3:1 on the page. */
   --role-focus: oklch(from var(--color-primary) min(l, 0.62) c h);
   --role-focus-dark: var(--color-primary-dark);
+
+  /* The color of `shadow-md` and `drop-shadow-md`: a theme can make it a glow. */
+  --role-shadow: rgb(0 0 0 / 15%);
+  --role-shadow-dark: rgb(0 0 0 / 50%);
 
   /* The brand gradient: primary, turned towards pink. */
   --role-gradient-start: var(--color-primary);
@@ -65,6 +75,7 @@
   --color-surface-subtle: var(--w-surface-subtle);
   --color-surface-muted: var(--w-surface-muted);
   --color-surface-inset: var(--w-surface-inset);
+  --color-surface-raised: var(--w-surface-raised);
   --color-overlay: var(--w-overlay);
   --color-backdrop: var(--w-backdrop);
 
@@ -120,6 +131,7 @@
     --w-surface-subtle: light-dark(var(--role-surface-subtle), var(--role-surface-subtle-dark));
     --w-surface-muted: light-dark(var(--role-surface-muted), var(--role-surface-muted-dark));
     --w-surface-inset: light-dark(var(--role-surface-inset), var(--role-surface-inset-dark));
+    --w-surface-raised: light-dark(var(--role-surface-raised), var(--role-surface-raised-dark));
     --w-overlay: light-dark(var(--role-overlay), var(--role-overlay-dark));
 
     --w-track: light-dark(var(--role-track), var(--role-track-dark));
@@ -138,6 +150,8 @@
     --w-positive: light-dark(var(--color-positive), var(--color-positive-dark));
     --w-warning: light-dark(var(--color-warning), var(--color-warning-dark));
     --w-info: light-dark(var(--color-info), var(--color-info-dark));
+
+    --w-shadow: light-dark(var(--role-shadow), var(--role-shadow-dark));
 
     --w-focus: light-dark(var(--role-focus), var(--role-focus-dark));
     --w-backdrop: light-dark(var(--role-backdrop), var(--role-backdrop-dark));
@@ -186,6 +200,12 @@
 @utility surface-muted {
   background-color: var(--w-surface-muted);
   --w-surface: var(--w-surface-muted);
+}
+
+/* A dropdown or popover: tones and `bg-surface` inside mix over it, not the page. */
+@utility surface-raised {
+  background-color: var(--w-surface-raised);
+  --w-surface: var(--w-surface-raised);
 }
 
 /* Doesn't re-map `--w-surface`: a derived soft tone is mixed over it, which would loop. */

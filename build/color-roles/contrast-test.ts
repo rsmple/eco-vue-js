@@ -52,9 +52,13 @@ const PAIRS: Pair[] = [
   {name: 'text-description on surface', fg: 'text-description', bg: 'bg-surface', min: TEXT},
   {name: 'text-description on surface-muted', fg: 'text-description', bg: 'bg-surface-muted', min: UI},
   {name: 'text-subtle on surface', fg: 'text-subtle', bg: 'bg-surface', min: 2},
+  {name: 'text-accent on surface-raised', fg: 'text-accent', bg: 'bg-surface-raised', min: 7},
+  {name: 'text-description on surface-raised', fg: 'text-description', bg: 'bg-surface-raised', min: TEXT},
   // Separators and field borders: visible, not WCAG 1.4.11's 3:1 — that would take gray-500 borders everywhere.
   {name: 'line on surface', fg: 'border-line', bg: 'bg-surface', min: 1.4},
   {name: 'line-subtle on surface', fg: 'border-line-subtle', bg: 'bg-surface', min: 1.2},
+  // The edge of a dropdown against the page around it.
+  {name: 'line-raised on surface', fg: 'border-line-raised', bg: 'bg-surface', min: 1.4},
   {name: 'focus on surface', fg: 'border-focus', bg: 'bg-surface', min: UI},
   {name: 'track on surface', fg: 'bg-track', bg: 'bg-surface', min: 1.3},
   ...TONES.flatMap(tone => [

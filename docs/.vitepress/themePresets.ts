@@ -202,14 +202,17 @@ const maxChroma = (l: number, hue: number) => {
  * Neon also takes the most saturated fill that passes on the dark page for `color-primary-dark`.
  *
 
- * `dark` is the lightness of the dark mode background and the surfaces on it (`surface-subtle`, `surface-muted` with
- * `line-raised`, and `surface-inset`): Soft lifts them off black, Neon takes them to almost black so its colors glow,
+ * `dark` is the lightness of the dark mode background and the surfaces on it (`surface-subtle`, `surface-muted` and
+ * `surface-inset`): Soft lifts them off black, Neon takes them to almost black so its colors glow,
  * and Vivid keeps the neutral scale's 900, 850, 800 and 700.
+ *
+ * `glow` is how much of the primary the `shadow` role takes, light and dark, in place of a black shadow: Neon's
+ * dropdowns, modals and tooltips glow in its color.
  */
 export const RANDOM_STYLES = [
-  {id: 'soft', name: 'Soft', saturation: [0.5, 0.7], minChroma: 0.06, maxChroma: 0.19, peak: 0.85, blackText: 0.35, lightest: 0.82, dark: [0.245, 0.275, 0.31, 0.39]},
-  {id: 'vivid', name: 'Vivid', saturation: [0.75, 0.85], minChroma: 0.1, maxChroma: 0.3, peak: 0.92, blackText: 0.55, lightest: 0.87, dark: null},
-  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.14, maxChroma: 0.4, peak: 0.97, blackText: 0.85, lightest: 0.93, dark: [0.09, 0.14, 0.18, 0.22]},
+  {id: 'soft', name: 'Soft', saturation: [0.5, 0.7], minChroma: 0.06, maxChroma: 0.19, peak: 0.85, blackText: 0.35, lightest: 0.82, dark: [0.245, 0.275, 0.31, 0.39], glow: null},
+  {id: 'vivid', name: 'Vivid', saturation: [0.75, 0.85], minChroma: 0.1, maxChroma: 0.3, peak: 0.92, blackText: 0.55, lightest: 0.87, dark: null, glow: null},
+  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.14, maxChroma: 0.4, peak: 0.97, blackText: 0.85, lightest: 0.93, dark: [0.09, 0.14, 0.18, 0.22], glow: [0.25, 0.45]},
 ] as const
 
 export type RandomStyle = typeof RANDOM_STYLES[number]
@@ -398,6 +401,19 @@ const getDarkFill = (fill: Fill, dark: Fill[], style: RandomStyle): Fill | null 
   return dark.some(item => item.l === fill.l) ? null : nearest
 }
 
+/** The style's glow: the `shadow` role, centered with no lift; none for Soft and Vivid, which keep the black shadow. */
+const getShadow = (style: RandomStyle): PresetTokens => {
+  if (!style.glow) return {}
+
+  const [light, dark] = style.glow.map(share => +(share * 100).toFixed(0))
+
+  return {
+    'role-shadow': `color-mix(in oklab, var(--color-primary) ${ light }%, transparent)`,
+    'role-shadow-dark': `color-mix(in oklab, var(--color-primary-dark) ${ dark }%, transparent)`,
+    'w-shadow-lift': '0.5rem',
+  }
+}
+
 /** The style's dark background and the surfaces on it, in the tint of the neutral scale's 900; none for Vivid. */
 const getDarkSurfaces = (neutral: NeutralScale, style: RandomStyle): PresetTokens => {
   if (!style.dark) return {}
@@ -405,7 +421,7 @@ const getDarkSurfaces = (neutral: NeutralScale, style: RandomStyle): PresetToken
   const [, chroma, hue] = NEUTRAL_SCALES[neutral][9].split(' ')
   const [surface, subtle, muted, inset] = style.dark.map(l => `oklch(${ +(l * 100).toFixed(1) }% ${ chroma } ${ hue })`)
 
-  return {'color-default-dark': surface, 'role-surface-subtle-dark': subtle, 'role-surface-muted-dark': muted, 'role-line-raised-dark': muted, 'role-surface-inset-dark': inset}
+  return {'color-default-dark': surface, 'role-surface-subtle-dark': subtle, 'role-surface-muted-dark': muted, 'role-surface-inset-dark': inset}
 }
 
 const toColor = (fill: Fill, hue: number) => `oklch(${ (fill.l * 100).toFixed(1) }% ${ fill.c.toFixed(3) } ${ hue })`
@@ -503,6 +519,7 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', hues: HueRange
     return {
       neutral,
       ...darkSurfaces,
+      ...getShadow(style),
       'color-primary': toColor(primary, hue),
       ...primaryDark === null ? {} : {'color-primary-dark': toColor(primaryDark, hue)},
       ...status,
