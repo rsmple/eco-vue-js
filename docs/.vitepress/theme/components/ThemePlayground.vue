@@ -263,44 +263,57 @@
       </div>
     </div>
 
-    <div
-      v-for="group in groups"
-      :key="group.name"
-      class="grid gap-3"
+    <WUniform
+      ref="form"
+      :model-value="formSource"
+      :init-data="toFormModel"
+      :api-method="applyForm"
+      full-payload
+      async
     >
-      <div class="text-description text-sm font-semibold">
-        {{ group.name }}
-      </div>
+      <template #default="scope">
+        <div
+          v-for="group in groups"
+          :key="group.name"
+          class="grid gap-3"
+        >
+          <div class="text-description text-sm font-semibold">
+            {{ group.name }}
+          </div>
 
-      <ThemePlaygroundFields
-        :tokens="group.tokens"
-        :base-tokens="baseTokens"
-      />
-    </div>
+          <ThemePlaygroundFields
+            :tokens="group.tokens"
+            :base-tokens="baseTokens"
+            :scope="scope"
+          />
+        </div>
 
-    <details
-      v-for="group in advancedGroups"
-      :key="group.name"
-      class="grid gap-3"
-    >
-      <summary class="text-description cursor-pointer text-sm font-semibold">
-        {{ group.name }}
-      </summary>
+        <details
+          v-for="group in advancedGroups"
+          :key="group.name"
+          class="grid gap-3"
+        >
+          <summary class="text-description cursor-pointer text-sm font-semibold">
+            {{ group.name }}
+          </summary>
 
-      <p class="text-description my-3 text-sm">
-        {{ group.description }}
-      </p>
+          <p class="text-description my-3 text-sm">
+            {{ group.description }}
+          </p>
 
-      <ThemePlaygroundFields
-        :tokens="group.tokens"
-        :base-tokens="baseTokens"
-      />
-    </details>
+          <ThemePlaygroundFields
+            :tokens="group.tokens"
+            :base-tokens="baseTokens"
+            :scope="scope"
+          />
+        </details>
+      </template>
+    </WUniform>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {computed, defineAsyncComponent, markRaw, ref, watch} from 'vue'
+import {computed, defineAsyncComponent, markRaw, nextTick, ref, shallowRef, toRaw, useTemplateRef, watch} from 'vue'
 
 import {Modal} from 'eco-vue-js/dist/utils/Modal'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
@@ -310,6 +323,7 @@ import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WSliderRange from 'eco-vue-js/dist/components/Slider/WSliderRange.vue'
+import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 import IconCancel from 'eco-vue-js/dist/assets/icons/IconCancel'
 import IconCodeInline from 'eco-vue-js/dist/assets/icons/IconCodeInline'
@@ -333,6 +347,8 @@ import {
   RANDOM_STYLES,
   type SavedTheme,
   TOKENS,
+  type ThemeConfig,
+  type ThemeFormModel,
   type ThemeTokens,
   activeTheme,
   activeThemeId,
@@ -357,8 +373,10 @@ import {
   selectTheme,
   setPreset,
   setRandomTheme,
+  setTokens,
   themeConfig,
   themeTokens,
+  toFormModel,
 } from '../docsTheme'
 import {confirmDeleteAllThemes, openSaveTheme} from '../themeConfirm'
 
@@ -379,6 +397,25 @@ const currentName = computed(() => {
   const preset = findPreset(activePreset.value)?.name
 
   return hasCustomTokens.value ? `Custom over ${ preset }` : preset
+})
+
+const form = useTemplateRef('form')
+
+/** The theme the form starts from. It keeps what is typed, invalid values too; only the valid ones reach the theme. */
+const formSource = shallowRef<ThemeConfig>(toRaw(themeConfig.value))
+
+let appliedConfig: ThemeConfig | undefined
+
+const applyForm = (model: Partial<ThemeFormModel>) => {
+  appliedConfig = setTokens(model as ThemeFormModel)
+}
+
+// Another theme opened: the form starts over from it, and the errors of the one before are cleared.
+watch(themeConfig, config => {
+  if (toRaw(config) === appliedConfig) return
+
+  formSource.value = toRaw(config)
+  nextTick(() => form.value?.validate(true))
 })
 
 // What an empty field falls back to: the preset's value, or the site's.
