@@ -124,6 +124,14 @@ body {
 }
 ```
 
+On a dark page a glow shows about as bright as its alpha times its color's lightness, so a yellow or cyan glows much brighter than a purple at the same share. Dividing the alpha by the lightness evens that out — this matches 45% at lightness 0.6 for every hue:
+
+```css
+@theme {
+  --role-shadow-dark: oklch(from var(--color-primary-dark) l c h / min(0.675, calc(0.27 / l)));
+}
+```
+
 ### Data palette
 
 Categories — chart series, plant kinds, syntax colors — take the kit's data hues: `data-red`, `data-orange`, `data-amber`, `data-green`, `data-teal`, `data-cyan`, `data-blue`, `data-violet`, `data-fuchsia`, `data-pink` and `data-gray`. They are mid-tones like the status colors, so each works as a tone in both modes without `-dark` values (the Preview above shows them as fills and as soft chips).

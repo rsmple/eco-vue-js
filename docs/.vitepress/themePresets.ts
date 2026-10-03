@@ -207,12 +207,13 @@ const maxChroma = (l: number, hue: number) => {
  * and Vivid keeps the neutral scale's 900, 850, 800 and 700.
  *
  * `glow` is how much of the primary the `shadow` role takes, light and dark, in place of a black shadow: Neon's
- * dropdowns, modals and tooltips glow in its color.
+ * dropdowns, modals and tooltips glow in its color. In dark mode the share is scaled by the primary's lightness, so
+ * every hue glows about as bright.
  */
 export const RANDOM_STYLES = [
   {id: 'soft', name: 'Soft', saturation: [0.5, 0.7], minChroma: 0.06, maxChroma: 0.19, peak: 0.85, blackText: 0.35, lightest: 0.82, dark: [0.245, 0.275, 0.31, 0.39], glow: null},
   {id: 'vivid', name: 'Vivid', saturation: [0.75, 0.85], minChroma: 0.1, maxChroma: 0.3, peak: 0.92, blackText: 0.55, lightest: 0.87, dark: null, glow: null},
-  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.14, maxChroma: 0.4, peak: 0.97, blackText: 0.85, lightest: 0.93, dark: [0.09, 0.14, 0.18, 0.22], glow: [0.25, 0.45]},
+  {id: 'neon', name: 'Neon', saturation: [1, 1], minChroma: 0.14, maxChroma: 0.4, peak: 0.97, blackText: 0.85, lightest: 0.93, dark: [0.09, 0.14, 0.18, 0.22], glow: [0.15, 0.20]},
 ] as const
 
 export type RandomStyle = typeof RANDOM_STYLES[number]
@@ -401,15 +402,21 @@ const getDarkFill = (fill: Fill, dark: Fill[], style: RandomStyle): Fill | null 
   return dark.some(item => item.l === fill.l) ? null : nearest
 }
 
-/** The style's glow: the `shadow` role, centered with no lift; none for Soft and Vivid, which keep the black shadow. */
+/**
+ * The lightness at which the dark glow takes the style's share. On a near-black page a glow shows about as bright as
+ * its share times its lightness, so a lighter primary takes less: a yellow or cyan glows no brighter than a purple.
+ */
+const GLOW_LIGHTNESS = 0.6
+
+/** The style's glow: the `shadow` role; none for Soft and Vivid, which keep the black shadow. */
 const getShadow = (style: RandomStyle): PresetTokens => {
   if (!style.glow) return {}
 
-  const [light, dark] = style.glow.map(share => +(share * 100).toFixed(0))
+  const [light, dark] = style.glow
 
   return {
-    'role-shadow': `color-mix(in oklab, var(--color-primary) ${ light }%, transparent)`,
-    'role-shadow-dark': `color-mix(in oklab, var(--color-primary-dark) ${ dark }%, transparent)`,
+    'role-shadow': `color-mix(in oklab, var(--color-primary) ${ +(light * 100).toFixed(0) }%, transparent)`,
+    'role-shadow-dark': `oklch(from var(--color-primary-dark) l c h / min(${ +(dark * 1.5).toFixed(3) }, calc(${ +(dark * GLOW_LIGHTNESS).toFixed(3) } / l)))`,
     'w-shadow-lift': '0.5rem',
   }
 }
