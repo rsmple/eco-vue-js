@@ -23,16 +23,18 @@
     ]"
     selection-title="plant"
     :select-all-text-getter="selectAllTextGetter"
-    :card-columns="(['minmax(0rem, 1fr)', 'auto', 'auto'] as const)"
+    :card-columns="(['2fr', '1fr', 'auto'] as const)"
     :card-areas="[
       ['name', 'name', 'area_select'],
       ['species','species', 'area_more'],
-      ['height', 'humidity', 'humidity'],
+      ['kind', 'light', 'light'],
+      ['health', 'growth', 'growth'],
       ['watered', 'due', 'due'],
+      ['height', 'humidity', 'humidity'],
       ['water', 'seeds', 'seeds'],
-      ['kind', 'kind', 'kind'],
+      ['caretaker', 'caretaker', 'caretaker'],
     ]"
-    card-class="list:h-11 card:gap-2 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-line-subtle"
+    card-class="list:h-11 card:gap-1 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-line-subtle"
     card-wrapper-class="card:self-start"
     min-height
     class="card:w-list-gap-3"

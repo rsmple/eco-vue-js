@@ -1,5 +1,8 @@
 <template>
-  <WListCardField :skeleton="skeleton">
+  <WListCardField
+    :skeleton="skeleton"
+    allow-open
+  >
     <WChip
       :text="item.watered ? 'Watered' : 'Thirsty'"
       :semantic-type="item.watered ? SemanticType.POSITIVE : SemanticType.WARNING"

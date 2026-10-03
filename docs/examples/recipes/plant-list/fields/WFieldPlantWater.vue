@@ -1,9 +1,14 @@
 <template>
   <WListCardField
-    :model-value="`${ item.water } ml`"
     :skeleton="skeleton"
-    class="tabular-nums"
-  />
+    allow-open
+    class="tabular-nums card:text-xs"
+  >
+    <template #inner>
+      <span class="list:hidden">{{ meta.title }}: </span>
+      {{ `${ item.water } ml` }}
+    </template>
+  </WListCardField>
 </template>
 
 <script lang="ts" setup>

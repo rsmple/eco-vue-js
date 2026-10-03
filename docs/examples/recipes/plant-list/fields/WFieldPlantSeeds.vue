@@ -1,6 +1,11 @@
 <template>
-  <WListCardField :skeleton="skeleton">
+  <WListCardField
+    :skeleton="skeleton"
+    allow-open
+    class="card:text-xs"
+  >
     <template #inner>
+      <span class="list:hidden">{{ meta.title }}: </span>
       <!-- Compact, 1.2K for 1234, with the full number in a tooltip. -->
       <WNumberFormatter
         :model-value="item.seeds"

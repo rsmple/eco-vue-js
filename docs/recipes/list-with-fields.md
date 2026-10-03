@@ -49,16 +49,18 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
     ]"
     selection-title="plant"
     :select-all-text-getter="selectAllTextGetter"
-    :card-columns="(['minmax(0rem, 1fr)', 'auto', 'auto'] as const)"
+    :card-columns="(['2fr', '1fr', 'auto'] as const)"
     :card-areas="[
       ['name', 'name', 'area_select'],
       ['species','species', 'area_more'],
-      ['height', 'humidity', 'humidity'],
+      ['kind', 'light', 'light'],
+      ['health', 'growth', 'growth'],
       ['watered', 'due', 'due'],
+      ['height', 'humidity', 'humidity'],
       ['water', 'seeds', 'seeds'],
-      ['kind', 'kind', 'kind'],
+      ['caretaker', 'caretaker', 'caretaker'],
     ]"
-    card-class="list:h-11 card:gap-2 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-line-subtle"
+    card-class="list:h-11 card:gap-1 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-line-subtle"
     card-wrapper-class="card:self-start"
     min-height
     class="card:w-list-gap-3"
@@ -110,13 +112,31 @@ const {queryParams, updateQueryParams} = useQueryParamsPlants(useRoute())
 <!-- @source docs/examples/recipes/plant-list/models/Plant.ts models/Plant.ts -->
 
 ```ts [models/Plant.ts]
-import {addDay, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
+import {addDay, addMonth, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 
 export enum Kind {
   TROPICAL = 'tropical',
   SUCCULENT = 'succulent',
   FERN = 'fern',
   HERB = 'herb',
+}
+
+export enum Light {
+  FULL_SUN = 'full_sun',
+  BRIGHT = 'bright',
+  PARTIAL = 'partial',
+  SHADE = 'shade',
+}
+
+export type Caretaker = {
+  name: string
+  /** Tone class of the avatar. */
+  tone: string
+}
+
+export type Task = {
+  title: string
+  due: Date
 }
 
 export type Plant = {
@@ -135,7 +155,42 @@ export type Plant = {
   water: number
   /** When a thirsty plant needs water by; `null` while it is watered. */
   waterBy: Date | null
+  light: Light
+  /** Health score, from 0 to 100. */
+  health: number
+  /** Height a month apart over the last six months, oldest first; the last is today's. */
+  growth: {date: number, height: number}[]
+  /** Days it was watered over the last four weeks, newest first. */
+  waterings: Date[]
+  /** Temperature range it is happy in, in °C. */
+  temperature: [number, number]
+  caretaker: Caretaker
+  tasks: Task[]
   description: string
+}
+
+const CARETAKERS: Caretaker[] = [
+  {name: 'Ivy Moss', tone: 'tone-data-green'},
+  {name: 'Rowan Oak', tone: 'tone-data-amber'},
+  {name: 'Fern Ash', tone: 'tone-data-violet'},
+  {name: 'Hazel Reed', tone: 'tone-data-pink'},
+]
+
+const LIGHTS = [Light.BRIGHT, Light.FULL_SUN, Light.PARTIAL, Light.SHADE] as const
+
+/** Days between waterings. */
+const INTERVAL: Record<Kind, number> = {
+  [Kind.TROPICAL]: 5,
+  [Kind.SUCCULENT]: 10,
+  [Kind.FERN]: 3,
+  [Kind.HERB]: 2,
+}
+
+const TEMPERATURE: Record<Kind, [number, number]> = {
+  [Kind.TROPICAL]: [18, 29],
+  [Kind.SUCCULENT]: [10, 32],
+  [Kind.FERN]: [16, 24],
+  [Kind.HERB]: [12, 26],
 }
 
 const SOURCE: [string, string, Kind, number][] = [
@@ -206,20 +261,45 @@ const SOURCE: [string, string, Kind, number][] = [
 ]
 
 /** In-memory stand-in for a REST collection. */
-export const plants: Plant[] = SOURCE.map(([name, species, kind, height], index) => ({
-  id: index + 1,
-  name,
-  species,
-  kind,
-  height,
-  watered: index % 3 !== 0,
-  humidity: 40 + index * 13 % 41,
-  seeds: 40 + index * 7919 % 4800,
-  water: 50 * (1 + index * 7 % 16),
+export const plants: Plant[] = SOURCE.map(([name, species, kind, height], index) => {
+  const today = getStartOfDay()
+  const watered = index % 3 !== 0
   // Some thirsty plants are overdue.
-  waterBy: index % 3 === 0 ? addDay(getStartOfDay(), index * 5 % 10 - 4) : null,
-  description: `${ name } (${ species }), a ${ kind } plant that grows to about ${ height } cm.`,
-}))
+  const waterBy = watered ? null : addDay(today, index * 5 % 10 - 4)
+  // Plants that grow fast gained up to a third of their height in six months.
+  const gain = 0.08 + index * 7 % 25 / 100
+  // The last watering was a while ago for thirsty plants.
+  const lastWatered = (watered ? index % INTERVAL[kind] : INTERVAL[kind] + 1 + index % 3)
+
+  return {
+    id: index + 1,
+    name,
+    species,
+    kind,
+    height,
+    watered,
+    humidity: 40 + index * 13 % 41,
+    seeds: 40 + index * 7919 % 4800,
+    water: 50 * (1 + index * 7 % 16),
+    waterBy,
+    light: LIGHTS[index * 3 % LIGHTS.length]!,
+    health: Math.max(12, 60 + index * 17 % 41 - (waterBy && waterBy < today ? 35 : 0)),
+    growth: Array.from({length: 6}, (_, month) => ({
+      date: +addMonth(today, month - 5),
+      height: month === 5 ? height : Math.round(height * (1 - gain * (5 - month) / 5) * (1 + (month * index % 3 - 1) / 100)),
+    })),
+    waterings: Array.from({length: 28}, (_, day) => addDay(today, -day))
+      .filter((_, day) => day >= lastWatered && (day - lastWatered) % INTERVAL[kind] === 0),
+    temperature: TEMPERATURE[kind],
+    caretaker: CARETAKERS[index % CARETAKERS.length]!,
+    tasks: [
+      {title: 'Fertilize', due: addDay(today, index * 3 % 14 - 2)},
+      {title: 'Prune', due: addDay(today, 7 + index * 5 % 30)},
+      {title: 'Repot', due: addDay(today, 20 + index * 11 % 90)},
+    ],
+    description: `${ name } (${ species }), a ${ kind } plant that grows to about ${ height } cm.`,
+  }
+})
 ```
 
 <!-- @source-end -->
@@ -340,6 +420,7 @@ Each field is a module with two exports: the component (default) renders the cel
 - `field` makes the column sortable — its value is sent as `ordering` (`height`, `-height`).
 - `textFormat` gives a plain-text value for CSV export and "copy as Markdown", for cells that render components or format the value for display — like the water-by date, which is shown short and exported in full.
 - `allow-open` on `WListCardField` makes that cell toggle the expansion row.
+- A cell can render anything inside `WListCardField` — a tag in the kind's tone, a sparkline, a meter. Keep it one line high so the row height stays the same, and give it a `textFormat` for export.
 
 ::: code-group
 
@@ -383,11 +464,91 @@ export const meta = {
 
 <!-- @source-end -->
 
+<!-- @source docs/examples/recipes/plant-list/fields/WFieldPlantGrowth.vue WFieldPlantGrowth.vue -->
+
+```vue [WFieldPlantGrowth.vue]
+<template>
+  <WListCardField
+    :skeleton="skeleton"
+    allow-open
+  >
+    <span class="tone-data-green flex items-center gap-2">
+      <!-- A sparkline of the last six months, scaled to the plant's own range. -->
+      <svg
+        viewBox="0 0 50 16"
+        class="text-tone h-4 w-12 shrink-0 overflow-visible"
+        fill="none"
+      >
+        <polyline
+          :points="points"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <circle
+          v-bind="last"
+          r="2"
+          fill="currentColor"
+        />
+      </svg>
+
+      <span class="text-tone text-xs font-semibold tabular-nums">+{{ gain }} cm</span>
+    </span>
+  </WListCardField>
+</template>
+
+<script lang="ts" setup>
+import type {Plant} from '../models/Plant'
+
+import {computed} from 'vue'
+
+import type {FieldProps, ListField} from 'eco-vue-js/dist/components/List/types'
+
+import WListCardField from 'eco-vue-js/dist/components/List/WListCardField.vue'
+
+const props = defineProps<FieldProps<Plant>>()
+
+defineEmits<{
+  (e: 'update:item', value: Plant): void
+  (e: 'delete:item'): void
+}>()
+
+const coordinates = computed(() => {
+  const heights = props.item.growth.map(point => point.height)
+  const min = Math.min(...heights)
+  const range = Math.max(...heights) - min || 1
+
+  return heights.map((height, index) => ({cx: index * 10, cy: 15 - (height - min) / range * 14}))
+})
+
+const points = computed(() => coordinates.value.map(({cx, cy}) => `${ cx },${ cy }`).join(' '))
+const last = computed(() => coordinates.value[coordinates.value.length - 1])
+const gain = computed(() => getGain(props.item))
+</script>
+
+<script lang="ts">
+const getGain = (item: Plant) => item.height - item.growth[0]!.height
+
+export const meta = {
+  label: 'growth',
+  cssClass: 'basis-[8rem]',
+  title: 'Growth',
+  textFormat: item => `+${ getGain(item) } cm`,
+} as const satisfies ListField<Plant>
+</script>
+```
+
+<!-- @source-end -->
+
 <!-- @source docs/examples/recipes/plant-list/fields/WFieldPlantStatus.vue WFieldPlantStatus.vue -->
 
 ```vue [WFieldPlantStatus.vue]
 <template>
-  <WListCardField :skeleton="skeleton">
+  <WListCardField
+    :skeleton="skeleton"
+    allow-open
+  >
     <WChip
       :text="item.watered ? 'Watered' : 'Thirsty'"
       :semantic-type="item.watered ? SemanticType.POSITIVE : SemanticType.WARNING"
@@ -431,13 +592,19 @@ export const meta = {
 ```vue [WFieldPlantWaterBy.vue]
 <template>
   <WListCardField
-    :model-value="item.waterBy ? dateFormatShort(item.waterBy) : '—'"
     :skeleton="skeleton"
+    allow-open
     :class="{
       'text-description': !item.waterBy,
       'tone-negative text-tone': item.waterBy && item.waterBy < today,
     }"
-  />
+    class="card:text-xs"
+  >
+    <template #inner>
+      <span class="list:hidden">{{ meta.title }}: </span>
+      {{ item.waterBy ? dateFormatShort(item.waterBy) : '-' }}
+    </template>
+  </WListCardField>
 </template>
 
 <script lang="ts" setup>
@@ -481,9 +648,13 @@ import type {Plant} from '../models/Plant'
 import type {ListFields} from 'eco-vue-js/dist/components/List/types'
 import {getDefaultFieldConfigMap} from 'eco-vue-js/dist/utils/utils'
 
+import * as FieldPlantCaretaker from './WFieldPlantCaretaker.vue'
+import * as FieldPlantGrowth from './WFieldPlantGrowth.vue'
+import * as FieldPlantHealth from './WFieldPlantHealth.vue'
 import * as FieldPlantHeight from './WFieldPlantHeight.vue'
 import * as FieldPlantHumidity from './WFieldPlantHumidity.vue'
 import * as FieldPlantKind from './WFieldPlantKind.vue'
+import * as FieldPlantLight from './WFieldPlantLight.vue'
 import * as FieldPlantName from './WFieldPlantName.vue'
 import * as FieldPlantSeeds from './WFieldPlantSeeds.vue'
 import * as FieldPlantSpecies from './WFieldPlantSpecies.vue'
@@ -495,20 +666,27 @@ export const listFieldsPlant = [
   FieldPlantName,
   FieldPlantSpecies,
   FieldPlantKind,
+  FieldPlantLight,
   FieldPlantHeight,
+  FieldPlantGrowth,
+  FieldPlantHealth,
   FieldPlantWater,
   FieldPlantHumidity,
   FieldPlantSeeds,
+  FieldPlantCaretaker,
   FieldPlantStatus,
   FieldPlantWaterBy,
 ] as const satisfies ListFields<Plant, QueryParamsPlants>
 
-// Columns shown until the user changes them in the header settings. `kind`, `water` and `seeds` start hidden.
+// Columns shown until the user changes them in the header settings. `species`, `height`, `water` and `seeds` start hidden.
 export const defaultFieldConfigMapPlant = getDefaultFieldConfigMap(listFieldsPlant, [
   'name',
-  'species',
-  'height',
+  'kind',
+  'light',
+  'growth',
+  'health',
   'humidity',
+  'caretaker',
   'watered',
   'due',
 ])
@@ -628,19 +806,151 @@ const remove = () => {
 
 ### Expansion
 
+The expansion gets the row's `item` and has the full width of the list, so it can hold what does not fit in a cell: here the care facts, a growth chart with a tooltip per month, a four-week watering calendar and the next tasks. While the row loads, `skeleton` is set and `item` may be `undefined` — each section shows its own placeholder.
+
 <!-- @source docs/examples/recipes/plant-list/PlantContent.vue PlantContent.vue -->
 
 ```vue [PlantContent.vue]
 <template>
-  <div class="py-4">
-    <WSkeleton v-if="skeleton || !item" />
+  <div class="grid gap-4 py-2 md:grid-cols-3">
+    <!-- Care: what the plant needs, each fact in its own tone. -->
+    <section class="grid content-start gap-3 p-4 rounded-2xl bg-surface-subtle">
+      <WSkeleton
+        v-if="skeleton || !item"
+        class="w-skeleton-h-20"
+      />
 
-    <p
-      v-else
-      class="text-description"
-    >
-      {{ item.description }}
-    </p>
+      <template v-else>
+        <p class="text-description text-sm">
+          {{ item.description }}
+        </p>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div
+            v-for="fact in getFacts(item)"
+            :key="fact.title"
+            class="flex items-center gap-2"
+            :class="fact.tone"
+          >
+            <span class="surface-soft text-tone flex size-8 shrink-0 items-center justify-center rounded-full">
+              <component
+                :is="fact.icon"
+                class="square-4"
+              />
+            </span>
+
+            <span class="grid min-w-0">
+              <span class="text-description truncate text-xs">{{ fact.title }}</span>
+              <span class="truncate text-sm font-semibold tabular-nums">{{ fact.value }}</span>
+            </span>
+          </div>
+        </div>
+      </template>
+    </section>
+
+    <!-- Growth: the six-month height as a chart, with a tooltip per month. -->
+    <section class="grid content-start gap-1 p-4 rounded-2xl bg-surface-subtle">
+      <h4 class="flex items-baseline justify-between text-sm font-semibold">
+        Growth
+        <span
+          v-if="item && !skeleton"
+          class="tone-data-green text-tone text-xs tabular-nums"
+        >+{{ item.height - item.growth[0]!.height }} cm in 6 months</span>
+      </h4>
+
+      <WChartLinear
+        :x-domain="xDomain"
+        :height="176"
+        :skeleton="skeleton || !item"
+        y-hidden
+      >
+        <template #default="scope">
+          <WChartLine
+            v-if="item"
+            v-bind="scope"
+            :data="item.growth.toReversed()"
+            x-key="date"
+            y-key="height"
+            has-area
+            calc-min
+            class="tone-data-green text-tone"
+          >
+            <template #tooltip="{d, prev}">
+              <div class="grid text-sm text-start">
+                <span class="text-description">{{ dateFormatShort(new Date(d.date)) }}</span>
+                <span>
+                  <span class="font-semibold">{{ d.height }} cm</span> <span
+                    v-if="prev"
+                    class="text-description"
+                  >+{{ d.height - prev.height }} cm that month</span>
+                </span>
+              </div>
+            </template>
+          </WChartLine>
+        </template>
+      </WChartLinear>
+    </section>
+
+    <!-- Schedule: a four-week watering calendar and the next tasks. -->
+    <section class="grid content-start gap-4 p-4 rounded-2xl bg-surface-subtle">
+      <div class="grid gap-2">
+        <h4 class="flex items-baseline justify-between gap-4 text-sm font-semibold">
+          Watering
+          <span
+            v-if="item && !skeleton"
+            class="text-description text-xs font-normal"
+          >{{ item.waterings.length }} times in 4 weeks</span>
+        </h4>
+
+        <WSkeleton
+          v-if="skeleton || !item"
+          class="w-skeleton-h-16"
+        />
+
+        <!-- One square a day, oldest first, filled on the days it was watered. -->
+        <div
+          v-else
+          class="tone-data-blue grid grid-cols-7 gap-1"
+        >
+          <span
+            v-for="day in days"
+            :key="+day"
+            class="h-3.5 rounded-sm"
+            :class="item.waterings.some(watering => isSameDate(watering, day)) ? 'bg-tone-fill' : 'bg-tone-soft'"
+            :title="dateFormat(day)"
+          />
+        </div>
+      </div>
+
+      <div class="grid gap-1.5">
+        <h4 class="text-sm font-semibold">
+          Next up
+        </h4>
+
+        <WSkeleton
+          v-if="skeleton || !item"
+          class="w-skeleton-h-16"
+        />
+
+        <ul
+          v-else
+          class="grid gap-1"
+        >
+          <li
+            v-for="task in item.tasks"
+            :key="task.title"
+            class="flex items-center justify-between gap-2 text-sm"
+          >
+            {{ task.title }}
+
+            <WChip
+              :text="getDueText(task.due)"
+              :semantic-type="task.due < today ? SemanticType.NEGATIVE : task.due <= soon ? SemanticType.WARNING : SemanticType.SECONDARY"
+            />
+          </li>
+        </ul>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -648,11 +958,46 @@ const remove = () => {
 import type {QueryParamsPlants} from './api/Plant'
 import type {Plant} from './models/Plant'
 
-import type {FieldProps} from 'eco-vue-js/dist/components/List/types'
+import {markRaw} from 'vue'
 
+import type {FieldProps} from 'eco-vue-js/dist/components/List/types'
+import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
+import {addDay, addMonth, dateFormat, dateFormatShort, getStartOfDay, isSameDate} from 'eco-vue-js/dist/utils/dateTime'
+
+import WChartLine from 'eco-vue-js/dist/components/Chart/WChartLine.vue'
+import WChartLinear from 'eco-vue-js/dist/components/Chart/WChartLinear.vue'
+import WChip from 'eco-vue-js/dist/components/Chip/WChip.vue'
 import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
 
+import IconDrop from 'eco-vue-js/dist/assets/icons/IconDrop'
+import IconThermometer from 'eco-vue-js/dist/assets/icons/IconThermometer'
+import IconWind from 'eco-vue-js/dist/assets/icons/IconWind'
+
+import {lightDisplay} from './models/PlantDisplay'
+
 defineProps<Omit<FieldProps<Plant | undefined, QueryParamsPlants>, 'config'>>()
+
+const today = getStartOfDay()
+const soon = addDay(today, 3)
+const xDomain: [number, number] = [+addMonth(today, -5), +today]
+
+// The last four weeks, oldest first.
+const days = Array.from({length: 28}, (_, index) => addDay(today, index - 27))
+
+const getFacts = (item: Plant) => [
+  {title: 'Light', value: lightDisplay[item.light].label, tone: lightDisplay[item.light].tone, icon: lightDisplay[item.light].icon},
+  {title: 'Water', value: `${ item.water } ml`, tone: 'tone-data-blue', icon: markRaw(IconDrop)},
+  {title: 'Humidity', value: `${ item.humidity }%`, tone: 'tone-data-cyan', icon: markRaw(IconWind)},
+  {title: 'Temperature', value: `${ item.temperature[0] }–${ item.temperature[1] } °C`, tone: 'tone-data-red', icon: markRaw(IconThermometer)},
+]
+
+const getDueText = (due: Date) => {
+  const left = Math.round((+due - +today) / 86_400_000)
+
+  if (left < 0) return `${ -left } d overdue`
+  if (left === 0) return 'Today'
+  return `In ${ left } d`
+}
 </script>
 ```
 

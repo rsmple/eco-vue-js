@@ -1,11 +1,13 @@
 <template>
   <WListCardField
     :skeleton="skeleton"
-    class="tabular-nums"
+    allow-open
+    class="tabular-nums card:text-xs"
   >
     <template #inner>
-      <span class="flex items-center gap-1">
-        <IconDrop class="tone-info text-tone-fill square-4" />
+      <span class="list:hidden">{{ meta.title }}: </span>
+      <span>
+        <IconDrop class="tone-info text-tone-fill square-[1.25em] inline mt-[-0.25em]" />
         {{ item.humidity }}%
       </span>
     </template>

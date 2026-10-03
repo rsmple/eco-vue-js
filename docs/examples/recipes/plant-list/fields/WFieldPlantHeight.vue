@@ -1,9 +1,14 @@
 <template>
   <WListCardField
-    :model-value="item.height < 100 ? `${ item.height } cm` : `${ item.height / 100 } m`"
     :skeleton="skeleton"
-    class="tabular-nums"
-  />
+    allow-open
+    class="tabular-nums card:text-xs"
+  >
+    <template #inner>
+      <span class="list:hidden">{{ meta.title }}: </span>
+      {{ item.height < 100 ? `${ item.height } cm` : `${ item.height / 100 } m` }}
+    </template>
+  </WListCardField>
 </template>
 
 <script lang="ts" setup>
