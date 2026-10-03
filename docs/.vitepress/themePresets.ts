@@ -145,9 +145,13 @@ const luminance = ([r, g, b]: [number, number, number]) => 0.2126 * r + 0.7152 *
 
 const contrast = (first: number, second: number) => (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05)
 
-/** Luminance as APCA takes it: from the sRGB channels with a plain 2.4 gamma, rather than WCAG's linearization. */
+/**
+ * Luminance as APCA takes it: from the sRGB channels with a plain 2.4 gamma, rather than WCAG's linearization. The
+ * channels are clamped first: a fill at the edge of sRGB, as Neon's are, can be a hair below 0, and a negative to the
+ * power of 2.4 is NaN.
+ */
 const apcaLuminance = (rgb: [number, number, number]) => {
-  const [r, g, b] = rgb.map(value => (value <= 0.0031308 ? value * 12.92 : 1.055 * value ** (1 / 2.4) - 0.055) ** 2.4)
+  const [r, g, b] = rgb.map(value => Math.min(Math.max(value, 0), 1)).map(value => (value <= 0.0031308 ? value * 12.92 : 1.055 * value ** (1 / 2.4) - 0.055) ** 2.4)
 
   return 0.2126729 * r + 0.7151522 * g + 0.0721750 * b
 }
