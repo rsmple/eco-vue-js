@@ -123,16 +123,64 @@ export type ThemeConfig = ThemeTokens & {preset?: PresetId}
 
 export const THEME_QUERY_PARAM = 'theme'
 
-const TOKEN_KEYS = new Set<string>(TOKENS.map(token => token.key))
+const TOKEN_KINDS = new Map<string, Token['kind']>(TOKENS.map(token => [token.key, token.kind]))
 
-// A value ends up inside a style rule, so anything that could close it or load a resource is refused.
-const isSafeValue = (value: unknown): value is string => typeof value === 'string' && value.length <= 120 && !/[;{}<>\\]|url\(|@import/i.test(value)
+const VALUE_MAX_LENGTH = 120
 
-export const isTokenKey = (key: string): key is TokenKey => TOKEN_KEYS.has(key)
+const MATH_FUNCTIONS = ['calc', 'min', 'max', 'clamp', 'var']
+
+/**
+ * What a value of each kind may hold. A value ends up in a style rule and in inline styles, so it is allowed in rather
+ * than filtered out: no quotes outside font names, so no strings for `image-set()` and the like to load, only the listed
+ * functions, and no comments, which could swallow the end of the rule.
+ */
+const VALUE_RULES: Record<Exclude<Token['kind'], 'neutral'>, {pattern: RegExp, functions: string[], property: string, error: string}> = {
+  color: {
+    pattern: /^[\w #%.,+*/()-]+$/,
+    functions: ['rgb', 'rgba', 'hsl', 'hsla', 'hwb', 'lab', 'lch', 'oklab', 'oklch', 'color', 'color-mix', 'light-dark', ...MATH_FUNCTIONS],
+    property: 'color',
+    error: 'Not a color: use hex, a name, a function such as oklch(55% 0.17 286.8), or var(--color-…)',
+  },
+  size: {
+    pattern: /^[\w .%+*/()-]+$/,
+    functions: MATH_FUNCTIONS,
+    property: 'width',
+    error: 'Not a length, such as 2.25rem',
+  },
+  font: {
+    pattern: /^ *(?:"[\w ,-]*"|'[\w ,-]*'|[\w-]+(?: +[\w-]+)*) *(?:, *(?:"[\w ,-]*"|'[\w ,-]*'|[\w-]+(?: +[\w-]+)*) *)*$/,
+    functions: [],
+    property: 'font-family',
+    error: 'Not a list of font families, such as Inter, sans-serif',
+  },
+}
+
+/** Why `value` can't be set to `key`, or undefined when it can. Checked by the browser too where `CSS` is available. */
+export const getTokenError = (key: TokenKey, value: string): string | undefined => {
+  const kind = TOKEN_KINDS.get(key)
+
+  if (kind === 'neutral') return isNeutralScale(value) ? undefined : `Not a neutral scale: one of ${ Object.keys(NEUTRAL_SCALES).join(', ') }`
+  if (!kind) return 'Unknown token'
+  if (value.length > VALUE_MAX_LENGTH) return `At most ${ VALUE_MAX_LENGTH } characters`
+
+  const rule = VALUE_RULES[kind]
+  const functions = [...value.matchAll(/([\w-]+) *\(/g)].map(([, name]) => name.toLowerCase())
+
+  if (
+    !rule.pattern.test(value)
+    || /\/\*|\*\//.test(value)
+    || functions.some(name => !rule.functions.includes(name))
+    || (typeof CSS !== 'undefined' && !CSS.supports(rule.property, value))
+  ) return rule.error
+
+  return undefined
+}
+
+export const isTokenKey = (key: string): key is TokenKey => TOKEN_KINDS.has(key)
 
 export const findPreset = (id: string | undefined) => PRESETS.find(preset => preset.id === id)
 
-/** Keeps the known preset and tokens with safe values; drops everything else. */
+/** Keeps the known preset and tokens with valid values; drops everything else. */
 export const normalizeConfig = (value: unknown): ThemeConfig => {
   if (!(value instanceof Object)) return {}
 
@@ -145,7 +193,7 @@ export const normalizeConfig = (value: unknown): ThemeConfig => {
       if (preset && preset.id !== 'default') config.preset = preset.id
     } else if (key === 'neutral') {
       if (isNeutralScale(item)) config.neutral = item
-    } else if (isTokenKey(key) && isSafeValue(item) && item.trim()) {
+    } else if (isTokenKey(key) && typeof item === 'string' && item.trim() && !getTokenError(key, item.trim())) {
       config[key] = item.trim()
     }
   }
@@ -297,7 +345,7 @@ export const deleteAllThemes = () => {
   activeThemeId.value = null
 }
 
-/** Sets one token; an empty value, or the one the preset already gives, removes the override. */
+/** Sets one token; an empty or invalid value, or the one the preset already gives, removes the override. */
 export const setToken = (key: TokenKey, value: string) => {
   const config = {...themeConfig.value}
 
@@ -306,7 +354,7 @@ export const setToken = (key: TokenKey, value: string) => {
   const base = findPreset(config.preset)?.tokens as ThemeTokens | undefined
   const trimmed = value.trim()
 
-  themeConfig.value = trimmed && isSafeValue(trimmed) && trimmed !== (base?.[key] ?? DEFAULT_TOKENS[key]) ? {...config, [key]: trimmed} : config
+  themeConfig.value = trimmed && !getTokenError(key, trimmed) && trimmed !== (base?.[key] ?? DEFAULT_TOKENS[key]) ? {...config, [key]: trimmed} : config
 }
 
 /** A link that opens `path` with the theme applied. With a name, opening it adds the theme to the saved ones. */

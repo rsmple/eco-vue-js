@@ -16,7 +16,7 @@ export type NeutralScale = keyof typeof NEUTRAL_SCALES
 
 export const NEUTRAL_STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const
 
-export const isNeutralScale = (value: unknown): value is NeutralScale => typeof value === 'string' && value in NEUTRAL_SCALES
+export const isNeutralScale = (value: unknown): value is NeutralScale => typeof value === 'string' && Object.hasOwn(NEUTRAL_SCALES, value)
 
 /**
  * Keys are CSS variable names without `--`: `color-*` and `role-*` go in the app's `@theme`, `w-*` on `body`.
