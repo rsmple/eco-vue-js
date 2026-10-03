@@ -15,7 +15,7 @@ description: WList — paginated, sortable collections shown as a table on deskt
 
 The [List with fields](/recipes/list-with-fields) recipe builds this step by step; the list below is its result.
 
-<DocsDemo name="recipes/book-list/BookList" overflow />
+<DocsDemo name="recipes/plant-list/PlantList" overflow />
 
 ## Layout variables
 
@@ -47,13 +47,13 @@ import WButtonSelectionAction from 'eco-vue-js/dist/components/Button/WButtonSel
 
 import IconArchiveBook from 'eco-vue-js/dist/assets/icons/IconArchiveBook'
 
-const props = defineProps<BulkProps<BookQueryParams>>()
+const props = defineProps<BulkProps<QueryParamsPlants>>()
 
 const emit = defineEmits<{
   (e: 'clear:selected'): void
 }>()
 
-const archive = () => bookApi.archive(props.queryParamsGetter()).then(() => emit('clear:selected'))
+const archive = () => plantApi.archive(props.queryParamsGetter()).then(() => emit('clear:selected'))
 </script>
 ```
 

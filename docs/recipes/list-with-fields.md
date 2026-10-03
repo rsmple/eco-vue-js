@@ -19,16 +19,16 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
 | Menu components | Row actions, typed with `MenuProps<T>` / `MenuEmits<T>`. |
 | An expansion component | Optional detail row, opened from the field marked `allow-open`. |
 
-<!-- @example recipes/book-list/BookList overflow -->
+<!-- @example recipes/plant-list/PlantList overflow -->
 
-<DocsDemo name="recipes/book-list/BookList" overflow />
+<DocsDemo name="recipes/plant-list/PlantList" overflow />
 
 ```vue
 <template>
   <WInput
     :model-value="queryParams.search"
     type="search"
-    placeholder="Search by title or author"
+    placeholder="Search by name or species"
     :icon="markRaw(IconSearch)"
     allow-clear
     no-margin
@@ -37,26 +37,26 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
   />
 
   <WList
-    :use-query-fn="bookModelApi.paginated.use"
+    :use-query-fn="plantModelApi.paginated.use"
     :query-params="queryParams"
-    :fields="listFieldsBook"
-    :default-config-map="defaultFieldConfigMapBook"
-    config-key="w-list-docs-book"
-    :expansion="markRaw(BookContent)"
+    :fields="listFieldsPlant"
+    :default-config-map="defaultFieldConfigMapPlant"
+    config-key="w-list-docs-plant"
+    :expansion="markRaw(PlantContent)"
     :menu="[
-      markRaw(WMenuBookToggle),
-      markRaw(WMenuBookDelete),
+      markRaw(WMenuPlantToggle),
+      markRaw(WMenuPlantDelete),
     ]"
-    selection-title="book"
+    selection-title="plant"
     :select-all-text-getter="selectAllTextGetter"
     :card-columns="(['minmax(0rem, 1fr)', 'auto', 'auto'] as const)"
     :card-areas="[
-      ['title', 'title', 'area_select'],
-      ['author','author', 'area_more'],
-      ['year', 'rating', 'rating'],
-      ['available', 'due', 'due'],
-      ['pages', 'loans', 'loans'],
-      ['genre', 'genre', 'genre'],
+      ['name', 'name', 'area_select'],
+      ['species','species', 'area_more'],
+      ['height', 'humidity', 'humidity'],
+      ['watered', 'due', 'due'],
+      ['water', 'seeds', 'seeds'],
+      ['kind', 'kind', 'kind'],
     ]"
     card-class="list:h-11 card:gap-2 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-line-subtle"
     card-wrapper-class="card:self-start"
@@ -74,204 +74,190 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 
 import IconSearch from 'eco-vue-js/dist/assets/icons/IconSearch'
 
-import BookContent from './BookContent.vue'
-import {bookModelApi, useQueryParamsBooks} from './api/Book'
-import {defaultFieldConfigMapBook, listFieldsBook} from './fields'
-import WMenuBookDelete from './menu/WMenuBookDelete.vue'
-import WMenuBookToggle from './menu/WMenuBookToggle.vue'
+import PlantContent from './PlantContent.vue'
+import {plantModelApi, useQueryParamsPlants} from './api/Plant'
+import {defaultFieldConfigMapPlant, listFieldsPlant} from './fields'
+import WMenuPlantDelete from './menu/WMenuPlantDelete.vue'
+import WMenuPlantToggle from './menu/WMenuPlantToggle.vue'
 
-// The docs have no router, so the filters stay in the page. In an app, keep them in the URL: `useQueryParamsBooks(useRoute())`.
-const {queryParams, updateQueryParams} = useQueryParamsBooks.useQueryParamsLocal()
+// The docs have no router, so the filters stay in the page. In an app, keep them in the URL: `useQueryParamsPlants(useRoute())`.
+const {queryParams, updateQueryParams} = useQueryParamsPlants.useQueryParamsLocal()
 
-const selectAllTextGetter = (isUnselect: boolean, count: number) => `${ isUnselect ? 'Unselect' : 'Select' } all ${ count } books`
+const selectAllTextGetter = (isUnselect: boolean, count: number) => `${ isUnselect ? 'Unselect' : 'Select' } all ${ count } plants`
 </script>
 ```
 
 <!-- @example-end -->
 
-Try sorting by a column header, resizing Title, hiding columns from the header settings, switching to cards, expanding a row and using the `⋯` menu. The data is in memory here, behind the same model API a real endpoint would use.
+Try sorting by a column header, resizing Name, hiding columns from the header settings, switching to cards, expanding a row and using the `⋯` menu. The data is in memory here, behind the same model API a real endpoint would use.
 
 ## The code
 
 ### Model and filters
 
-The model is the only piece that knows where data comes from — see [Data layer](/guide/data-layer) for the whole API. `WList` calls `bookModelApi.paginated.use` with `{...queryParams, page}` for each page and expects a `PaginatedResponse<T>`. Here each request is answered from an array in memory; in an app it goes through your `apiClient`.
+The model is the only piece that knows where data comes from — see [Data layer](/guide/data-layer) for the whole API. `WList` calls `plantModelApi.paginated.use` with `{...queryParams, page}` for each page and expects a `PaginatedResponse<T>`. Here each request is answered from an array in memory; in an app it goes through your `apiClient`.
 
-The item query holds the actions the menu calls. `update` puts the saved book into every cached page that holds it, and `delete` returns `() => null` to drop the book from them.
+The item query holds the actions the menu calls. `update` puts the saved plant into every cached page that holds it, and `delete` returns `() => null` to drop the plant from them.
 
-`useQueryParamsBooks` declares the filters the user sets: `search` and `ordering`. Leave `page` out — the list adds it to each page's query. The docs have no router, so the demo keeps the filters in the page with `useQueryParamsLocal()`. In an app, pass the route, and the filters live in the URL:
+`useQueryParamsPlants` declares the filters the user sets: `search` and `ordering`. Leave `page` out — the list adds it to each page's query. The docs have no router, so the demo keeps the filters in the page with `useQueryParamsLocal()`. In an app, pass the route, and the filters live in the URL:
 
 ```ts
-const {queryParams, updateQueryParams} = useQueryParamsBooks(useRoute())
+const {queryParams, updateQueryParams} = useQueryParamsPlants(useRoute())
 ```
 
 ::: code-group
 
-<!-- @source docs/examples/recipes/book-list/models/Book.ts models/Book.ts -->
+<!-- @source docs/examples/recipes/plant-list/models/Plant.ts models/Plant.ts -->
 
-```ts [models/Book.ts]
+```ts [models/Plant.ts]
 import {addDay, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 
-export enum Genre {
-  NOVEL = 'novel',
-  SCIENCE = 'science',
-  HISTORY = 'history',
-  POETRY = 'poetry',
+export enum Kind {
+  TROPICAL = 'tropical',
+  SUCCULENT = 'succulent',
+  FERN = 'fern',
+  HERB = 'herb',
 }
 
-export type Book = {
+export type Plant = {
   id: number
-  title: string
-  author: string
-  genre: Genre
-  year: number
-  available: boolean
-  /** Average reader rating, from 1 to 5. */
-  rating: number
-  /** How many times the book has been borrowed. */
-  loans: number
-  pages: number
-  /** When a borrowed book is due back; `null` while it is available. */
-  dueAt: Date | null
+  name: string
+  species: string
+  kind: Kind
+  /** Grown height, in centimetres. */
+  height: number
+  watered: boolean
+  /** Air humidity the plant prefers, in percent. */
+  humidity: number
+  /** How many seeds are in stock. */
+  seeds: number
+  /** Water per watering, in millilitres. */
+  water: number
+  /** When a thirsty plant needs water by; `null` while it is watered. */
+  waterBy: Date | null
   description: string
 }
 
-const SOURCE: [string, string, Genre, number][] = [
-  ['Moby-Dick', 'Herman Melville', Genre.NOVEL, 1851],
-  ['Pride and Prejudice', 'Jane Austen', Genre.NOVEL, 1813],
-  ['On the Origin of Species', 'Charles Darwin', Genre.SCIENCE, 1859],
-  ['Leaves of Grass', 'Walt Whitman', Genre.POETRY, 1855],
-  ['The History of the Decline and Fall of the Roman Empire', 'Edward Gibbon', Genre.HISTORY, 1776],
-  ['Frankenstein', 'Mary Shelley', Genre.NOVEL, 1818],
-  ['Middlemarch', 'George Eliot', Genre.NOVEL, 1871],
-  ['Principia', 'Isaac Newton', Genre.SCIENCE, 1687],
-  ['The Waste Land', 'T. S. Eliot', Genre.POETRY, 1922],
-  ['The Histories', 'Herodotus', Genre.HISTORY, -430],
-  ['Jane Eyre', 'Charlotte Brontë', Genre.NOVEL, 1847],
-  ['Wuthering Heights', 'Emily Brontë', Genre.NOVEL, 1847],
-  ['Dialogue Concerning the Two Chief World Systems', 'Galileo Galilei', Genre.SCIENCE, 1632],
-  ['Songs of Innocence and of Experience', 'William Blake', Genre.POETRY, 1789],
-  ['The Prince', 'Niccolò Machiavelli', Genre.HISTORY, 1532],
-  ['Great Expectations', 'Charles Dickens', Genre.NOVEL, 1861],
-  ['Anna Karenina', 'Leo Tolstoy', Genre.NOVEL, 1878],
-  ['Micrographia', 'Robert Hooke', Genre.SCIENCE, 1665],
-  ['The Raven', 'Edgar Allan Poe', Genre.POETRY, 1845],
-  ['History of the Peloponnesian War', 'Thucydides', Genre.HISTORY, -400],
-  ['Don Quixote', 'Miguel de Cervantes', Genre.NOVEL, 1605],
-  ['Crime and Punishment', 'Fyodor Dostoevsky', Genre.NOVEL, 1866],
-  ['The Descent of Man', 'Charles Darwin', Genre.SCIENCE, 1871],
-  ['Paradise Lost', 'John Milton', Genre.POETRY, 1667],
-  ['The Annals', 'Tacitus', Genre.HISTORY, 109],
-  ['Madame Bovary', 'Gustave Flaubert', Genre.NOVEL, 1857],
-  ['The Picture of Dorian Gray', 'Oscar Wilde', Genre.NOVEL, 1890],
-  ['Opticks', 'Isaac Newton', Genre.SCIENCE, 1704],
-  ['Sonnets', 'William Shakespeare', Genre.POETRY, 1609],
-  ['The Gallic War', 'Julius Caesar', Genre.HISTORY, -50],
-  ['War and Peace', 'Leo Tolstoy', Genre.NOVEL, 1869],
-  ['The Brothers Karamazov', 'Fyodor Dostoevsky', Genre.NOVEL, 1880],
-  ['Les Misérables', 'Victor Hugo', Genre.NOVEL, 1862],
-  ['The Count of Monte Cristo', 'Alexandre Dumas', Genre.NOVEL, 1844],
-  ['Emma', 'Jane Austen', Genre.NOVEL, 1815],
-  ['Bleak House', 'Charles Dickens', Genre.NOVEL, 1853],
-  ['Vanity Fair', 'William Makepeace Thackeray', Genre.NOVEL, 1848],
-  ['The Scarlet Letter', 'Nathaniel Hawthorne', Genre.NOVEL, 1850],
-  ['Dracula', 'Bram Stoker', Genre.NOVEL, 1897],
-  ['Fathers and Sons', 'Ivan Turgenev', Genre.NOVEL, 1862],
-  ['The Mill on the Floss', 'George Eliot', Genre.NOVEL, 1860],
-  ['Robinson Crusoe', 'Daniel Defoe', Genre.NOVEL, 1719],
-  ['Gulliver\'s Travels', 'Jonathan Swift', Genre.NOVEL, 1726],
-  ['Tess of the d\'Urbervilles', 'Thomas Hardy', Genre.NOVEL, 1891],
-  ['The Portrait of a Lady', 'Henry James', Genre.NOVEL, 1881],
-  ['Treasure Island', 'Robert Louis Stevenson', Genre.NOVEL, 1883],
-  ['Elements', 'Euclid', Genre.SCIENCE, -300],
-  ['On the Revolutions of the Heavenly Spheres', 'Nicolaus Copernicus', Genre.SCIENCE, 1543],
-  ['Astronomia Nova', 'Johannes Kepler', Genre.SCIENCE, 1609],
-  ['Two New Sciences', 'Galileo Galilei', Genre.SCIENCE, 1638],
-  ['Elements of Chemistry', 'Antoine Lavoisier', Genre.SCIENCE, 1789],
-  ['Principles of Geology', 'Charles Lyell', Genre.SCIENCE, 1830],
-  ['Experiments on Plant Hybridization', 'Gregor Mendel', Genre.SCIENCE, 1866],
-  ['A Treatise on Electricity and Magnetism', 'James Clerk Maxwell', Genre.SCIENCE, 1873],
-  ['The Interpretation of Dreams', 'Sigmund Freud', Genre.SCIENCE, 1899],
-  ['Relativity: The Special and General Theory', 'Albert Einstein', Genre.SCIENCE, 1916],
-  ['De Humani Corporis Fabrica', 'Andreas Vesalius', Genre.SCIENCE, 1543],
-  ['The Voyage of the Beagle', 'Charles Darwin', Genre.SCIENCE, 1839],
-  ['The Iliad', 'Homer', Genre.POETRY, -750],
-  ['The Odyssey', 'Homer', Genre.POETRY, -725],
-  ['The Aeneid', 'Virgil', Genre.POETRY, -19],
-  ['Metamorphoses', 'Ovid', Genre.POETRY, 8],
-  ['The Divine Comedy', 'Dante Alighieri', Genre.POETRY, 1320],
-  ['The Canterbury Tales', 'Geoffrey Chaucer', Genre.POETRY, 1400],
-  ['The Faerie Queene', 'Edmund Spenser', Genre.POETRY, 1590],
-  ['Lyrical Ballads', 'William Wordsworth', Genre.POETRY, 1798],
-  ['Don Juan', 'Lord Byron', Genre.POETRY, 1819],
-  ['Eugene Onegin', 'Alexander Pushkin', Genre.POETRY, 1833],
-  ['Les Fleurs du mal', 'Charles Baudelaire', Genre.POETRY, 1857],
-  ['Poems', 'Emily Dickinson', Genre.POETRY, 1890],
-  ['Gitanjali', 'Rabindranath Tagore', Genre.POETRY, 1910],
-  ['The Twelve Caesars', 'Suetonius', Genre.HISTORY, 121],
-  ['Parallel Lives', 'Plutarch', Genre.HISTORY, 100],
-  ['The Anabasis', 'Xenophon', Genre.HISTORY, -370],
-  ['The History of Rome', 'Livy', Genre.HISTORY, -27],
-  ['The Ecclesiastical History of the English People', 'Bede', Genre.HISTORY, 731],
-  ['The Muqaddimah', 'Ibn Khaldun', Genre.HISTORY, 1377],
-  ['The History of England', 'Thomas Babington Macaulay', Genre.HISTORY, 1848],
-  ['Democracy in America', 'Alexis de Tocqueville', Genre.HISTORY, 1835],
-  ['The French Revolution', 'Thomas Carlyle', Genre.HISTORY, 1837],
+const SOURCE: [string, string, Kind, number][] = [
+  ['Monstera', 'Monstera deliciosa', Kind.TROPICAL, 300],
+  ['Aloe vera', 'Aloe barbadensis', Kind.SUCCULENT, 60],
+  ['Boston fern', 'Nephrolepis exaltata', Kind.FERN, 90],
+  ['Basil', 'Ocimum basilicum', Kind.HERB, 60],
+  ['Fiddle-leaf fig', 'Ficus lyrata', Kind.TROPICAL, 300],
+  ['Jade plant', 'Crassula ovata', Kind.SUCCULENT, 90],
+  ['Maidenhair fern', 'Adiantum raddianum', Kind.FERN, 45],
+  ['Rosemary', 'Salvia rosmarinus', Kind.HERB, 150],
+  ['Rubber plant', 'Ficus elastica', Kind.TROPICAL, 250],
+  ['Snake plant', 'Dracaena trifasciata', Kind.SUCCULENT, 90],
+  ['Bird\'s nest fern', 'Asplenium nidus', Kind.FERN, 90],
+  ['Thyme', 'Thymus vulgaris', Kind.HERB, 30],
+  ['Golden pothos', 'Epipremnum aureum', Kind.TROPICAL, 200],
+  ['Zebra haworthia', 'Haworthiopsis attenuata', Kind.SUCCULENT, 15],
+  ['Staghorn fern', 'Platycerium bifurcatum', Kind.FERN, 90],
+  ['Mint', 'Mentha spicata', Kind.HERB, 60],
+  ['Heartleaf philodendron', 'Philodendron hederaceum', Kind.TROPICAL, 120],
+  ['Echeveria', 'Echeveria elegans', Kind.SUCCULENT, 15],
+  ['Rabbit\'s foot fern', 'Davallia fejeensis', Kind.FERN, 45],
+  ['Lavender', 'Lavandula angustifolia', Kind.HERB, 60],
+  ['Peace lily', 'Spathiphyllum wallisii', Kind.TROPICAL, 60],
+  ['String of pearls', 'Curio rowleyanus', Kind.SUCCULENT, 90],
+  ['Blue star fern', 'Phlebodium aureum', Kind.FERN, 60],
+  ['Sage', 'Salvia officinalis', Kind.HERB, 60],
+  ['Calathea', 'Goeppertia orbifolia', Kind.TROPICAL, 90],
+  ['Panda plant', 'Kalanchoe tomentosa', Kind.SUCCULENT, 45],
+  ['Kangaroo fern', 'Microsorum diversifolium', Kind.FERN, 45],
+  ['Oregano', 'Origanum vulgare', Kind.HERB, 45],
+  ['Prayer plant', 'Maranta leuconeura', Kind.TROPICAL, 30],
+  ['Burro\'s tail', 'Sedum morganianum', Kind.SUCCULENT, 60],
+  ['Holly fern', 'Cyrtomium falcatum', Kind.FERN, 60],
+  ['Parsley', 'Petroselinum crispum', Kind.HERB, 30],
+  ['Bird of paradise', 'Strelitzia reginae', Kind.TROPICAL, 180],
+  ['Golden barrel cactus', 'Echinocactus grusonii', Kind.SUCCULENT, 60],
+  ['Button fern', 'Pellaea rotundifolia', Kind.FERN, 30],
+  ['Chives', 'Allium schoenoprasum', Kind.HERB, 30],
+  ['Areca palm', 'Dypsis lutescens', Kind.TROPICAL, 250],
+  ['Christmas cactus', 'Schlumbergera bridgesii', Kind.SUCCULENT, 30],
+  ['Lemon button fern', 'Nephrolepis cordifolia', Kind.FERN, 30],
+  ['Coriander', 'Coriandrum sativum', Kind.HERB, 50],
+  ['Parlour palm', 'Chamaedorea elegans', Kind.TROPICAL, 120],
+  ['Bunny ear cactus', 'Opuntia microdasys', Kind.SUCCULENT, 60],
+  ['Silver lace fern', 'Pteris ensiformis', Kind.FERN, 45],
+  ['Dill', 'Anethum graveolens', Kind.HERB, 90],
+  ['Chinese evergreen', 'Aglaonema commutatum', Kind.TROPICAL, 90],
+  ['Ponytail palm', 'Beaucarnea recurvata', Kind.SUCCULENT, 180],
+  ['Asparagus fern', 'Asparagus setaceus', Kind.FERN, 90],
+  ['Lemon balm', 'Melissa officinalis', Kind.HERB, 60],
+  ['Anthurium', 'Anthurium andraeanum', Kind.TROPICAL, 60],
+  ['ZZ plant', 'Zamioculcas zamiifolia', Kind.SUCCULENT, 90],
+  ['Japanese painted fern', 'Athyrium niponicum', Kind.FERN, 45],
+  ['Tarragon', 'Artemisia dracunculus', Kind.HERB, 90],
+  ['Elephant ear', 'Alocasia amazonica', Kind.TROPICAL, 120],
+  ['Living stones', 'Lithops lesliei', Kind.SUCCULENT, 5],
+  ['Ostrich fern', 'Matteuccia struthiopteris', Kind.FERN, 150],
+  ['Chamomile', 'Matricaria chamomilla', Kind.HERB, 60],
+  ['Croton', 'Codiaeum variegatum', Kind.TROPICAL, 150],
+  ['Hens and chicks', 'Sempervivum tectorum', Kind.SUCCULENT, 15],
+  ['Tree fern', 'Dicksonia antarctica', Kind.FERN, 450],
+  ['Lemongrass', 'Cymbopogon citratus', Kind.HERB, 150],
+  ['Moth orchid', 'Phalaenopsis amabilis', Kind.TROPICAL, 60],
+  ['Century plant', 'Agave americana', Kind.SUCCULENT, 180],
+  ['Hart\'s tongue fern', 'Asplenium scolopendrium', Kind.FERN, 60],
+  ['Bay laurel', 'Laurus nobilis', Kind.HERB, 300],
 ]
 
 /** In-memory stand-in for a REST collection. */
-export const books: Book[] = SOURCE.map(([title, author, genre, year], index) => ({
+export const plants: Plant[] = SOURCE.map(([name, species, kind, height], index) => ({
   id: index + 1,
-  title,
-  author,
-  genre,
-  year,
-  available: index % 3 !== 0,
-  rating: 3 + (index * 13 % 21) / 10,
-  loans: 40 + index * 7919 % 4800,
-  pages: 120 + index * 97 % 900,
-  // Some borrowed books are overdue.
-  dueAt: index % 3 === 0 ? addDay(getStartOfDay(), index * 5 % 30 - 7) : null,
-  description: `${ title } by ${ author }, first published ${ year < 0 ? `around ${ -year } BC` : `in ${ year }` }.`,
+  name,
+  species,
+  kind,
+  height,
+  watered: index % 3 !== 0,
+  humidity: 40 + index * 13 % 41,
+  seeds: 40 + index * 7919 % 4800,
+  water: 50 * (1 + index * 7 % 16),
+  // Some thirsty plants are overdue.
+  waterBy: index % 3 === 0 ? addDay(getStartOfDay(), index * 5 % 10 - 4) : null,
+  description: `${ name } (${ species }), a ${ kind } plant that grows to about ${ height } cm.`,
 }))
 ```
 
 <!-- @source-end -->
 
-<!-- @source docs/examples/recipes/book-list/api/Book.ts api/Book.ts -->
+<!-- @source docs/examples/recipes/plant-list/api/Plant.ts api/Plant.ts -->
 
-```ts [api/Book.ts]
+```ts [api/Plant.ts]
 import {createUseQueryParams} from 'eco-vue-js/dist/utils/api'
 import {Order, parseOrdering} from 'eco-vue-js/dist/utils/order'
 import {createRestModelApi} from 'eco-vue-js/dist/utils/restModelApi'
 import {paginateList} from 'eco-vue-js/dist/utils/useDefaultQuery'
 import {isId, parseString} from 'eco-vue-js/dist/utils/utils'
 
-import {type Book, books} from '../models/Book'
+import {type Plant, plants} from '../models/Plant'
 
 /** The filters a user sets on the list. In an app they are kept in the URL. */
-export const useQueryParamsBooks = createUseQueryParams({
+export const useQueryParamsPlants = createUseQueryParams({
   search: parseString,
   ordering: parseString,
 })
 
-export type QueryParamsBooks = typeof useQueryParamsBooks['QueryParams'] & {
+export type QueryParamsPlants = typeof useQueryParamsPlants['QueryParams'] & {
   page?: number
   /** Comma-separated ids — how async selects look up the items behind their model value. */
   id__in?: string
 }
 
-let source = books
+let source = plants
 
 /** Stands in for a request to the API: answers after a moment with a copy of the data. */
 const respond = <Data>(handler: () => Data) => new Promise<Data>(resolve => {
   setTimeout(() => resolve(structuredClone(handler())), 300)
 })
 
-const toSortable = (value: Book[keyof Book]) => value instanceof Date ? value.getTime() : value
+const toSortable = (value: Plant[keyof Plant]) => value instanceof Date ? value.getTime() : value
 
 /** Sorts in `direction`, with empty values last either way. */
-const compare = (a: Book, b: Book, field: keyof Book, direction: 1 | -1) => {
+const compare = (a: Plant, b: Plant, field: keyof Plant, direction: 1 | -1) => {
   const left = toSortable(a[field])
   const right = toSortable(b[field])
 
@@ -281,17 +267,17 @@ const compare = (a: Book, b: Book, field: keyof Book, direction: 1 | -1) => {
 }
 
 /** Filters and sorts by the same query params a backend would receive. */
-const filterBooks = (queryParams: QueryParamsBooks | undefined) => {
+const filterPlants = (queryParams: QueryParamsPlants | undefined) => {
   const search = queryParams?.search?.trim().toLowerCase()
   const ids = queryParams?.id__in?.split(',').map(Number)
   let result = search
-    ? source.filter(book => book.title.toLowerCase().includes(search) || book.author.toLowerCase().includes(search))
+    ? source.filter(plant => plant.name.toLowerCase().includes(search) || plant.species.toLowerCase().includes(search))
     : source
 
-  if (ids) result = result.filter(book => ids.includes(book.id))
+  if (ids) result = result.filter(plant => ids.includes(plant.id))
 
   if (queryParams?.ordering) {
-    const [{field, order}] = parseOrdering<keyof Book>(queryParams.ordering)
+    const [{field, order}] = parseOrdering<keyof Plant>(queryParams.ordering)
 
     result = result.toSorted((a, b) => compare(a, b, field, order === Order.DESC ? -1 : 1))
   }
@@ -299,44 +285,44 @@ const filterBooks = (queryParams: QueryParamsBooks | undefined) => {
   return result
 }
 
-export const bookModelApi = createRestModelApi({
-  modelKey: 'Book',
-  model: {} as Book,
+export const plantModelApi = createRestModelApi({
+  modelKey: 'Plant',
+  model: {} as Plant,
   queries: {
     item: {
       scope: 'item',
-      dataType: {} as Book,
+      dataType: {} as Plant,
       isQueryParams: isId,
-      queryFn: ({queryKey}) => respond(() => source.find(book => book.id === queryKey[2])!),
+      queryFn: ({queryKey}) => respond(() => source.find(plant => plant.id === queryKey[2])!),
       actions: {
-        // In an app, a PATCH to `/books/<id>/`.
-        update: ({set}, id, payload: Partial<Book>) => respond(() => {
-          source = source.map(book => book.id === id ? {...book, ...payload} : book)
+        // In an app, a PATCH to `/plants/<id>/`.
+        update: ({set}, id, payload: Partial<Plant>) => respond(() => {
+          source = source.map(plant => plant.id === id ? {...plant, ...payload} : plant)
 
-          return source.find(book => book.id === id)!
+          return source.find(plant => plant.id === id)!
         })
-          .then(book => {
-            // Puts the saved book into every cached page that holds it.
-            set(book)
+          .then(plant => {
+            // Puts the saved plant into every cached page that holds it.
+            set(plant)
 
-            return book
+            return plant
           }),
 
-        // In an app, a DELETE to `/books/<id>/`.
+        // In an app, a DELETE to `/plants/<id>/`.
         delete: (context, id) => respond(() => {
-          source = source.filter(book => book.id !== id)
+          source = source.filter(plant => plant.id !== id)
         })
-          // Drops the book from every cached page.
+          // Drops the plant from every cached page.
           .then(() => () => null),
       },
     },
 
     paginated: {
       scope: 'paginated',
-      dataType: {} as PaginatedResponse<Book>,
-      isQueryParams: (value: unknown): value is QueryParamsBooks | undefined => value === undefined || value instanceof Object,
-      // In an app, a GET to `/books/` with the query params.
-      queryFn: ({queryKey}) => respond(() => paginateList(filterBooks(queryKey[2]), queryKey[2]?.page, 10)),
+      dataType: {} as PaginatedResponse<Plant>,
+      isQueryParams: (value: unknown): value is QueryParamsPlants | undefined => value === undefined || value instanceof Object,
+      // In an app, a GET to `/plants/` with the query params.
+      queryFn: ({queryKey}) => respond(() => paginateList(filterPlants(queryKey[2]), queryKey[2]?.page, 10)),
     },
   },
 })
@@ -351,18 +337,18 @@ export const bookModelApi = createRestModelApi({
 Each field is a module with two exports: the component (default) renders the cell, and `meta` describes the column. Keep both in one file — the column cannot drift from what it renders.
 
 - `label` is the column's stable id: it keys the saved column config and names the area in `cardAreas`.
-- `field` makes the column sortable — its value is sent as `ordering` (`year`, `-year`).
-- `textFormat` gives a plain-text value for CSV export and "copy as Markdown", for cells that render components or format the value for display — like the due date, which is shown short and exported in full.
+- `field` makes the column sortable — its value is sent as `ordering` (`height`, `-height`).
+- `textFormat` gives a plain-text value for CSV export and "copy as Markdown", for cells that render components or format the value for display — like the water-by date, which is shown short and exported in full.
 - `allow-open` on `WListCardField` makes that cell toggle the expansion row.
 
 ::: code-group
 
-<!-- @source docs/examples/recipes/book-list/fields/WFieldBookTitle.vue WFieldBookTitle.vue -->
+<!-- @source docs/examples/recipes/plant-list/fields/WFieldPlantName.vue WFieldPlantName.vue -->
 
-```vue [WFieldBookTitle.vue]
+```vue [WFieldPlantName.vue]
 <template>
   <WListCardField
-    :model-value="item.title"
+    :model-value="item.name"
     :skeleton="skeleton"
     allow-open
     class="font-semibold"
@@ -370,48 +356,48 @@ Each field is a module with two exports: the component (default) renders the cel
 </template>
 
 <script lang="ts" setup>
-import type {Book} from '../models/Book'
+import type {Plant} from '../models/Plant'
 
 import type {FieldProps, ListField} from 'eco-vue-js/dist/components/List/types'
 
 import WListCardField from 'eco-vue-js/dist/components/List/WListCardField.vue'
 
-defineProps<FieldProps<Book>>()
+defineProps<FieldProps<Plant>>()
 
 defineEmits<{
-  (e: 'update:item', value: Book): void
+  (e: 'update:item', value: Plant): void
   (e: 'delete:item'): void
 }>()
 </script>
 
 <script lang="ts">
 export const meta = {
-  label: 'title',
+  label: 'name',
   cssClass: 'flex-1 basis-[12rem]',
-  title: 'Title',
-  field: 'title',
+  title: 'Name',
+  field: 'name',
   allowResize: true,
-} as const satisfies ListField<Book>
+} as const satisfies ListField<Plant>
 </script>
 ```
 
 <!-- @source-end -->
 
-<!-- @source docs/examples/recipes/book-list/fields/WFieldBookStatus.vue WFieldBookStatus.vue -->
+<!-- @source docs/examples/recipes/plant-list/fields/WFieldPlantStatus.vue WFieldPlantStatus.vue -->
 
-```vue [WFieldBookStatus.vue]
+```vue [WFieldPlantStatus.vue]
 <template>
   <WListCardField :skeleton="skeleton">
     <WChip
-      :text="item.available ? 'Available' : 'Borrowed'"
-      :semantic-type="item.available ? SemanticType.POSITIVE : SemanticType.WARNING"
+      :text="item.watered ? 'Watered' : 'Thirsty'"
+      :semantic-type="item.watered ? SemanticType.POSITIVE : SemanticType.WARNING"
       :skeleton="skeleton"
     />
   </WListCardField>
 </template>
 
 <script lang="ts" setup>
-import type {Book} from '../models/Book'
+import type {Plant} from '../models/Plant'
 
 import type {FieldProps, ListField} from 'eco-vue-js/dist/components/List/types'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
@@ -419,57 +405,57 @@ import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 import WChip from 'eco-vue-js/dist/components/Chip/WChip.vue'
 import WListCardField from 'eco-vue-js/dist/components/List/WListCardField.vue'
 
-defineProps<FieldProps<Book>>()
+defineProps<FieldProps<Plant>>()
 
 defineEmits<{
-  (e: 'update:item', value: Book): void
+  (e: 'update:item', value: Plant): void
   (e: 'delete:item'): void
 }>()
 </script>
 
 <script lang="ts">
 export const meta = {
-  label: 'available',
+  label: 'watered',
   cssClass: 'basis-[7rem]',
   title: 'Status',
-  field: 'available',
-  textFormat: item => item.available ? 'Available' : 'Borrowed',
-} as const satisfies ListField<Book>
+  field: 'watered',
+  textFormat: item => item.watered ? 'Watered' : 'Thirsty',
+} as const satisfies ListField<Plant>
 </script>
 ```
 
 <!-- @source-end -->
 
-<!-- @source docs/examples/recipes/book-list/fields/WFieldBookDue.vue WFieldBookDue.vue -->
+<!-- @source docs/examples/recipes/plant-list/fields/WFieldPlantWaterBy.vue WFieldPlantWaterBy.vue -->
 
-```vue [WFieldBookDue.vue]
+```vue [WFieldPlantWaterBy.vue]
 <template>
   <WListCardField
-    :model-value="item.dueAt ? dateFormatShort(item.dueAt) : '—'"
+    :model-value="item.waterBy ? dateFormatShort(item.waterBy) : '—'"
     :skeleton="skeleton"
     :class="{
-      'text-description': !item.dueAt,
-      'tone-negative text-tone': item.dueAt && item.dueAt < today,
+      'text-description': !item.waterBy,
+      'tone-negative text-tone': item.waterBy && item.waterBy < today,
     }"
   />
 </template>
 
 <script lang="ts" setup>
-import type {Book} from '../models/Book'
+import type {Plant} from '../models/Plant'
 
 import type {FieldProps, ListField} from 'eco-vue-js/dist/components/List/types'
 import {dateFormat, dateFormatShort, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 
 import WListCardField from 'eco-vue-js/dist/components/List/WListCardField.vue'
 
-defineProps<FieldProps<Book>>()
+defineProps<FieldProps<Plant>>()
 
 defineEmits<{
-  (e: 'update:item', value: Book): void
+  (e: 'update:item', value: Plant): void
   (e: 'delete:item'): void
 }>()
 
-// Overdue books are shown in red.
+// Overdue plants are shown in red.
 const today = getStartOfDay()
 </script>
 
@@ -477,53 +463,53 @@ const today = getStartOfDay()
 export const meta = {
   label: 'due',
   cssClass: 'basis-[6rem]',
-  title: 'Due',
-  field: 'dueAt',
-  textFormat: item => item.dueAt ? dateFormat(item.dueAt) : undefined,
-} as const satisfies ListField<Book>
+  title: 'Water by',
+  field: 'waterBy',
+  textFormat: item => item.waterBy ? dateFormat(item.waterBy) : undefined,
+} as const satisfies ListField<Plant>
 </script>
 ```
 
 <!-- @source-end -->
 
-<!-- @source docs/examples/recipes/book-list/fields/index.ts fields/index.ts -->
+<!-- @source docs/examples/recipes/plant-list/fields/index.ts fields/index.ts -->
 
 ```ts [fields/index.ts]
-import type {QueryParamsBooks} from '../api/Book'
-import type {Book} from '../models/Book'
+import type {QueryParamsPlants} from '../api/Plant'
+import type {Plant} from '../models/Plant'
 
 import type {ListFields} from 'eco-vue-js/dist/components/List/types'
 import {getDefaultFieldConfigMap} from 'eco-vue-js/dist/utils/utils'
 
-import * as FieldBookAuthor from './WFieldBookAuthor.vue'
-import * as FieldBookDue from './WFieldBookDue.vue'
-import * as FieldBookGenre from './WFieldBookGenre.vue'
-import * as FieldBookLoans from './WFieldBookLoans.vue'
-import * as FieldBookPages from './WFieldBookPages.vue'
-import * as FieldBookRating from './WFieldBookRating.vue'
-import * as FieldBookStatus from './WFieldBookStatus.vue'
-import * as FieldBookTitle from './WFieldBookTitle.vue'
-import * as FieldBookYear from './WFieldBookYear.vue'
+import * as FieldPlantHeight from './WFieldPlantHeight.vue'
+import * as FieldPlantHumidity from './WFieldPlantHumidity.vue'
+import * as FieldPlantKind from './WFieldPlantKind.vue'
+import * as FieldPlantName from './WFieldPlantName.vue'
+import * as FieldPlantSeeds from './WFieldPlantSeeds.vue'
+import * as FieldPlantSpecies from './WFieldPlantSpecies.vue'
+import * as FieldPlantStatus from './WFieldPlantStatus.vue'
+import * as FieldPlantWater from './WFieldPlantWater.vue'
+import * as FieldPlantWaterBy from './WFieldPlantWaterBy.vue'
 
-export const listFieldsBook = [
-  FieldBookTitle,
-  FieldBookAuthor,
-  FieldBookGenre,
-  FieldBookYear,
-  FieldBookPages,
-  FieldBookRating,
-  FieldBookLoans,
-  FieldBookStatus,
-  FieldBookDue,
-] as const satisfies ListFields<Book, QueryParamsBooks>
+export const listFieldsPlant = [
+  FieldPlantName,
+  FieldPlantSpecies,
+  FieldPlantKind,
+  FieldPlantHeight,
+  FieldPlantWater,
+  FieldPlantHumidity,
+  FieldPlantSeeds,
+  FieldPlantStatus,
+  FieldPlantWaterBy,
+] as const satisfies ListFields<Plant, QueryParamsPlants>
 
-// Columns shown until the user changes them in the header settings. `genre`, `pages` and `loans` start hidden.
-export const defaultFieldConfigMapBook = getDefaultFieldConfigMap(listFieldsBook, [
-  'title',
-  'author',
-  'year',
-  'rating',
-  'available',
+// Columns shown until the user changes them in the header settings. `kind`, `water` and `seeds` start hidden.
+export const defaultFieldConfigMapPlant = getDefaultFieldConfigMap(listFieldsPlant, [
+  'name',
+  'species',
+  'height',
+  'humidity',
+  'watered',
   'due',
 ])
 ```
@@ -542,20 +528,20 @@ Always type menu components with `MenuProps<T>` and `MenuEmits<T>` from the kit 
 
 ::: code-group
 
-<!-- @source docs/examples/recipes/book-list/menu/WMenuBookToggle.vue WMenuBookToggle.vue -->
+<!-- @source docs/examples/recipes/plant-list/menu/WMenuPlantToggle.vue WMenuPlantToggle.vue -->
 
-```vue [WMenuBookToggle.vue]
+```vue [WMenuPlantToggle.vue]
 <template>
   <WButtonMoreItem
-    :text="item.available ? 'Mark as borrowed' : 'Mark as returned'"
-    :icon="markRaw(item.available ? IconArchiveBook : IconCheckCircle)"
+    :text="item.watered ? 'Mark as dry' : 'Mark as watered'"
+    :icon="markRaw(item.watered ? IconSun : IconDrop)"
     :disabled="readonly"
     @click="toggle"
   />
 </template>
 
 <script lang="ts" setup>
-import type {Book} from '../models/Book'
+import type {Plant} from '../models/Plant'
 
 import {markRaw} from 'vue'
 
@@ -566,32 +552,32 @@ import {addDay, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 
 import WButtonMoreItem from 'eco-vue-js/dist/components/Button/WButtonMoreItem.vue'
 
-import IconArchiveBook from 'eco-vue-js/dist/assets/icons/IconArchiveBook'
-import IconCheckCircle from 'eco-vue-js/dist/assets/icons/IconCheckCircle'
+import IconDrop from 'eco-vue-js/dist/assets/icons/IconDrop'
+import IconSun from 'eco-vue-js/dist/assets/icons/IconSun'
 
-import {bookModelApi} from '../api/Book'
+import {plantModelApi} from '../api/Plant'
 
-const props = defineProps<MenuProps<Book>>()
+const props = defineProps<MenuProps<Plant>>()
 
-defineEmits<MenuEmits<Book>>()
+defineEmits<MenuEmits<Plant>>()
 
-const toggle = () => bookModelApi.item.actions
-  // The action puts the saved book into every cached page that holds it, so the row updates without a refetch.
+const toggle = () => plantModelApi.item.actions
+  // The action puts the saved plant into every cached page that holds it, so the row updates without a refetch.
   .update(props.item.id, {
-    available: !props.item.available,
-    // Borrowed for two weeks.
-    dueAt: props.item.available ? addDay(getStartOfDay(), 14) : null,
+    watered: !props.item.watered,
+    // Dry soil needs water within three days.
+    waterBy: props.item.watered ? addDay(getStartOfDay(), 3) : null,
   })
-  .then(book => Notify.success({title: book.available ? 'Marked as returned' : 'Marked as borrowed'}))
+  .then(plant => Notify.success({title: plant.watered ? 'Marked as watered' : 'Marked as dry'}))
   .catch(handleApiError)
 </script>
 ```
 
 <!-- @source-end -->
 
-<!-- @source docs/examples/recipes/book-list/menu/WMenuBookDelete.vue WMenuBookDelete.vue -->
+<!-- @source docs/examples/recipes/plant-list/menu/WMenuPlantDelete.vue WMenuPlantDelete.vue -->
 
-```vue [WMenuBookDelete.vue]
+```vue [WMenuPlantDelete.vue]
 <template>
   <WButtonMoreItem
     text="Remove"
@@ -602,7 +588,7 @@ const toggle = () => bookModelApi.item.actions
 </template>
 
 <script lang="ts" setup>
-import type {Book} from '../models/Book'
+import type {Plant} from '../models/Plant'
 
 import {markRaw} from 'vue'
 
@@ -615,20 +601,20 @@ import WButtonMoreItem from 'eco-vue-js/dist/components/Button/WButtonMoreItem.v
 
 import IconTrash from 'eco-vue-js/dist/assets/icons/IconTrash'
 
-import {bookModelApi} from '../api/Book'
+import {plantModelApi} from '../api/Plant'
 
-const props = defineProps<MenuProps<Book>>()
+const props = defineProps<MenuProps<Plant>>()
 
-defineEmits<MenuEmits<Book>>()
+defineEmits<MenuEmits<Plant>>()
 
 const remove = () => {
   Modal.addConfirm({
-    title: 'Remove book',
-    description: `"${ props.item.title }" will be removed from the catalogue.`,
+    title: 'Remove plant',
+    description: `"${ props.item.name }" will be removed from the collection.`,
     acceptText: 'Remove',
     acceptSemanticType: SemanticType.NEGATIVE,
-    // The modal shows a loading state until the action resolves, which also drops the book from every cached page.
-    onAccept: () => bookModelApi.item.actions.delete(props.item.id).catch(handleApiError),
+    // The modal shows a loading state until the action resolves, which also drops the plant from every cached page.
+    onAccept: () => plantModelApi.item.actions.delete(props.item.id).catch(handleApiError),
   })
 }
 </script>
@@ -642,9 +628,9 @@ const remove = () => {
 
 ### Expansion
 
-<!-- @source docs/examples/recipes/book-list/BookContent.vue BookContent.vue -->
+<!-- @source docs/examples/recipes/plant-list/PlantContent.vue PlantContent.vue -->
 
-```vue [BookContent.vue]
+```vue [PlantContent.vue]
 <template>
   <div class="py-4">
     <WSkeleton v-if="skeleton || !item" />
@@ -659,14 +645,14 @@ const remove = () => {
 </template>
 
 <script lang="ts" setup>
-import type {QueryParamsBooks} from './api/Book'
-import type {Book} from './models/Book'
+import type {QueryParamsPlants} from './api/Plant'
+import type {Plant} from './models/Plant'
 
 import type {FieldProps} from 'eco-vue-js/dist/components/List/types'
 
 import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
 
-defineProps<Omit<FieldProps<Book | undefined, QueryParamsBooks>, 'config'>>()
+defineProps<Omit<FieldProps<Plant | undefined, QueryParamsPlants>, 'config'>>()
 </script>
 ```
 
@@ -676,7 +662,7 @@ defineProps<Omit<FieldProps<Book | undefined, QueryParamsBooks>, 'config'>>()
 
 - **One component per column** makes columns reusable across lists of the same model, lets each cell own its formatting and loading state, and keeps the column list declarative, so `WList` can reorder, hide and resize columns without knowing what they render.
 - **Query params are the whole state.** Search, filters and ordering go into `queryParams`; `WList` adds `page` and emits `update:query-params` when the user sorts. With `createUseQueryParams` they live in the route query, so the list is linkable and survives reloads.
-- **Card layout is data, not markup.** `cardColumns` and `cardAreas` place the same field components into a CSS grid for the mobile card view, using the field labels as area names. `area_select` and `area_more` place the checkbox and the menu. Name every field, including ones hidden by default: a field left out still renders in card mode, in an extra column the grid adds for it. A row whose fields are all hidden drops out, so the `pages`/`loans` and `genre` rows cost nothing until the user shows those columns.
+- **Card layout is data, not markup.** `cardColumns` and `cardAreas` place the same field components into a CSS grid for the mobile card view, using the field labels as area names. `area_select` and `area_more` place the checkbox and the menu. Name every field, including ones hidden by default: a field left out still renders in card mode, in an extra column the grid adds for it. A row whose fields are all hidden drops out, so the `water`/`seeds` and `kind` rows cost nothing until the user shows those columns.
 - **Cache updates instead of refetching.** The model's actions update the item in every cached page, so the user keeps their scroll position and loaded pages.
 
 ## Variations

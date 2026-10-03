@@ -3,7 +3,7 @@
     :semantic-type="SemanticType.NEGATIVE"
     @click="confirmDelete"
   >
-    Delete project
+    Delete bed
   </WButton>
 
   <p class="mt-2 text-sm text-description">
@@ -23,8 +23,8 @@ const status = ref('Nothing happened yet.')
 
 const confirmDelete = () => {
   Modal.addConfirm({
-    title: 'Delete project?',
-    description: 'The project and its history are removed for everyone.',
+    title: 'Delete bed?',
+    description: 'The bed and its planting history are removed for everyone.',
     acceptText: 'Delete',
     acceptSemanticType: SemanticType.NEGATIVE,
     onAccept: () => {

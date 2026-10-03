@@ -12,12 +12,12 @@
 </template>
 
 <script lang="ts" setup>
-import type {QueryParamsBooks} from './api/Book'
-import type {Book} from './models/Book'
+import type {QueryParamsPlants} from './api/Plant'
+import type {Plant} from './models/Plant'
 
 import type {FieldProps} from 'eco-vue-js/dist/components/List/types'
 
 import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
 
-defineProps<Omit<FieldProps<Book | undefined, QueryParamsBooks>, 'config'>>()
+defineProps<Omit<FieldProps<Plant | undefined, QueryParamsPlants>, 'config'>>()
 </script>

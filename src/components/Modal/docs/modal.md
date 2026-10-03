@@ -21,7 +21,7 @@ Modals are not placed in templates. They are opened from code, rendered by the s
     :semantic-type="SemanticType.NEGATIVE"
     @click="confirmDelete"
   >
-    Delete project
+    Delete bed
   </WButton>
 
   <p class="mt-2 text-sm text-description">
@@ -41,8 +41,8 @@ const status = ref('Nothing happened yet.')
 
 const confirmDelete = () => {
   Modal.addConfirm({
-    title: 'Delete project?',
-    description: 'The project and its history are removed for everyone.',
+    title: 'Delete bed?',
+    description: 'The bed and its planting history are removed for everyone.',
     acceptText: 'Delete',
     acceptSemanticType: SemanticType.NEGATIVE,
     onAccept: () => {
@@ -85,7 +85,7 @@ import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 // Loaded on first open, so the modal's code stays out of the page bundle.
 const RenameModal = defineAsyncComponent(() => import('./parts/RenameModal.vue'))
 
-const name = ref('Roadmap')
+const name = ref('Herb bed')
 
 const rename = () => {
   Modal.add(markRaw(RenameModal), {

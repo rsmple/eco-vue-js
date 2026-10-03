@@ -30,12 +30,12 @@ Every select needs:
 ```vue
 <template>
   <WSelectSingle
-    v-model="country"
-    :options="countries"
+    v-model="soil"
+    :options="soils"
     :value-getter="item => item.code"
     :search-fn="(item, search) => item.name.toLowerCase().includes(search.toLowerCase())"
-    title="Country"
-    placeholder="Pick a country"
+    title="Soil"
+    placeholder="Pick a soil"
     allow-clear
     :clear-value="null"
     class="max-w-md"
@@ -48,7 +48,7 @@ Every select needs:
   </WSelectSingle>
 
   <p class="text-sm text-description">
-    Model: {{ country ?? 'null' }}
+    Model: {{ soil ?? 'null' }}
   </p>
 </template>
 
@@ -57,14 +57,14 @@ import {ref} from 'vue'
 
 import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 
-const countries = [
-  {id: 1, code: 'de', name: 'Germany'},
-  {id: 2, code: 'fr', name: 'France'},
-  {id: 3, code: 'it', name: 'Italy'},
-  {id: 4, code: 'es', name: 'Spain'},
+const soils = [
+  {id: 1, code: 'loam', name: 'Loam'},
+  {id: 2, code: 'sand', name: 'Sandy'},
+  {id: 3, code: 'clay', name: 'Clay'},
+  {id: 4, code: 'peat', name: 'Peat'},
 ]
 
-const country = ref<string | null>('fr')
+const soil = ref<string | null>('loam')
 </script>
 ```
 
@@ -108,11 +108,11 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 import OptionTag from './parts/OptionTag.vue'
 
 const options = [
-  {id: 1, name: 'urgent'},
-  {id: 2, name: 'backend'},
-  {id: 3, name: 'frontend'},
-  {id: 4, name: 'design'},
-  {id: 5, name: 'docs'},
+  {id: 1, name: 'indoor'},
+  {id: 2, name: 'edible'},
+  {id: 3, name: 'pet-safe'},
+  {id: 4, name: 'fragrant'},
+  {id: 5, name: 'evergreen'},
 ]
 
 const tags = ref<number[]>([2, 3])
@@ -169,12 +169,12 @@ To show the chosen value before the user opens the dropdown, the select requests
 ```vue
 <template>
   <WSelectAsyncSingle
-    v-model="bookId"
-    :use-query-fn-options="bookModelApi.paginated.use"
+    v-model="plantId"
+    :use-query-fn-options="plantModelApi.paginated.use"
     :query-params-options="{}"
     :value-getter="item => item.id"
-    title="Book"
-    placeholder="Search by title or author"
+    title="Plant"
+    placeholder="Search by name or species"
     allow-clear
     :clear-value="null"
     class="max-w-md"
@@ -182,14 +182,14 @@ To show the chosen value before the user opens the dropdown, the select requests
     <template #option="{option}">
       <div class="w-option flex items-center">
         <span v-if="option">
-          {{ option.title }} <span class="text-description">— {{ option.author }}</span>
+          {{ option.name }} <span class="text-description italic">— {{ option.species }}</span>
         </span>
       </div>
     </template>
   </WSelectAsyncSingle>
 
   <p class="text-sm text-description">
-    Model: {{ bookId ?? 'null' }}
+    Model: {{ plantId ?? 'null' }}
   </p>
 </template>
 
@@ -198,10 +198,10 @@ import {ref} from 'vue'
 
 import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSingle.vue'
 
-// The `use` of any paginated query — here the book model from the list recipe.
-import {bookModelApi} from '../../../../../docs/examples/recipes/book-list/api/Book'
+// The `use` of any paginated query — here the plant model from the list recipe.
+import {plantModelApi} from '../../../../../docs/examples/recipes/plant-list/api/Plant'
 
-const bookId = ref<number | null>(3)
+const plantId = ref<number | null>(3)
 </script>
 ```
 

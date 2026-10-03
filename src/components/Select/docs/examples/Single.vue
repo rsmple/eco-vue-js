@@ -1,11 +1,11 @@
 <template>
   <WSelectSingle
-    v-model="country"
-    :options="countries"
+    v-model="soil"
+    :options="soils"
     :value-getter="item => item.code"
     :search-fn="(item, search) => item.name.toLowerCase().includes(search.toLowerCase())"
-    title="Country"
-    placeholder="Pick a country"
+    title="Soil"
+    placeholder="Pick a soil"
     allow-clear
     :clear-value="null"
     class="max-w-md"
@@ -18,7 +18,7 @@
   </WSelectSingle>
 
   <p class="text-sm text-description">
-    Model: {{ country ?? 'null' }}
+    Model: {{ soil ?? 'null' }}
   </p>
 </template>
 
@@ -27,12 +27,12 @@ import {ref} from 'vue'
 
 import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 
-const countries = [
-  {id: 1, code: 'de', name: 'Germany'},
-  {id: 2, code: 'fr', name: 'France'},
-  {id: 3, code: 'it', name: 'Italy'},
-  {id: 4, code: 'es', name: 'Spain'},
+const soils = [
+  {id: 1, code: 'loam', name: 'Loam'},
+  {id: 2, code: 'sand', name: 'Sandy'},
+  {id: 3, code: 'clay', name: 'Clay'},
+  {id: 4, code: 'peat', name: 'Peat'},
 ]
 
-const country = ref<string | null>('fr')
+const soil = ref<string | null>('loam')
 </script>

@@ -21,11 +21,11 @@ A change of `queryParams`, such as a new search, resets the list to the first pa
 <template>
   <WInfiniteListScrollingElement class="h-96 overflow-y-auto overscroll-contain rounded-xl border border-solid border-line-subtle">
     <WInfiniteList
-      :use-query-fn="bookModelApi.paginated.use"
+      :use-query-fn="plantModelApi.paginated.use"
       :query-params="{search}"
       :page-length="10"
       page-class="grid"
-      empty-stub="No books found"
+      empty-stub="No plants found"
       min-height-only
       @update:count="count = $event"
     >
@@ -33,13 +33,13 @@ A change of `queryParams`, such as a new search, resets the list to the first pa
         <div class="flex items-center gap-4 px-4 pb-3">
           <WInput
             v-model="search"
-            placeholder="Search by title or author"
+            placeholder="Search by name or species"
             class="flex-1"
             no-margin
           />
 
           <span class="text-description text-sm whitespace-nowrap">
-            {{ count }} books
+            {{ count }} plants
           </span>
         </div>
       </template>
@@ -53,7 +53,7 @@ A change of `queryParams`, such as a new search, resets the list to the first pa
           <WSkeleton v-if="skeleton" />
 
           <span v-else>
-            {{ item.title }} <span class="text-description">— {{ item.author }}</span>
+            {{ item.name }} <span class="text-description italic">— {{ item.species }}</span>
           </span>
         </div>
       </template>
@@ -69,8 +69,8 @@ import WInfiniteListScrollingElement from 'eco-vue-js/dist/components/InfiniteLi
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
 
-// The `use` of any paginated query — here the book model from the list recipe, 10 books a page.
-import {bookModelApi} from '../../../../../docs/examples/recipes/book-list/api/Book'
+// The `use` of any paginated query — here the plant model from the list recipe, 10 plants a page.
+import {plantModelApi} from '../../../../../docs/examples/recipes/plant-list/api/Plant'
 
 const search = ref<string>()
 const count = ref(0)

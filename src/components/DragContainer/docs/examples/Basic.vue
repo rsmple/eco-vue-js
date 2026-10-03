@@ -32,5 +32,5 @@ import WDragContainer from 'eco-vue-js/dist/components/DragContainer/WDragContai
 
 import IconDrag from 'eco-vue-js/dist/assets/icons/IconDrag'
 
-const steps = ref(['Clone', 'Build', 'Scan dependencies', 'Scan code', 'Report'])
+const steps = ref(['Sow', 'Prick out', 'Pot on', 'Harden off', 'Plant out'])
 </script>

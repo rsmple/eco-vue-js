@@ -15,7 +15,7 @@
         v-else
         class="tone-primary surface-fill flex square-12 shrink-0 items-center justify-center rounded-full text-lg font-semibold"
       >
-        JA
+        CL
       </div>
 
       <div class="grid flex-1">
@@ -25,7 +25,7 @@
           v-else
           class="font-semibold"
         >
-          Jane Austen
+          Carl Linnaeus
         </span>
 
         <WSkeleton v-if="loading" />
@@ -34,12 +34,12 @@
           v-else
           class="text-description"
         >
-          Pride and Prejudice, Emma, Persuasion
+          Herb bed, greenhouse, orchard
         </span>
       </div>
 
       <WChip
-        text="Author"
+        text="Gardener"
         :skeleton="loading"
       />
     </div>

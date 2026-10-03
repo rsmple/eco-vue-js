@@ -25,8 +25,8 @@ Small SVG charts of values over time. They are drawn in the current text color, 
 <template>
   <div class="grid gap-2">
     <div class="flex gap-4 text-sm">
-      <span class="tone-primary text-tone">— Open findings</span>
-      <span class="tone-positive text-tone">- - Fixed</span>
+      <span class="tone-primary text-tone">— Seedlings</span>
+      <span class="tone-positive text-tone">- - Planted out</span>
     </div>
 
     <WChartLinear
@@ -38,7 +38,7 @@ Small SVG charts of values over time. They are drawn in the current text color, 
       <template #default="scope">
         <WChartLine
           v-bind="scope"
-          :data="open"
+          :data="seedlings"
           x-key="date"
           y-key="value"
           y-key-min="min"
@@ -48,7 +48,7 @@ Small SVG charts of values over time. They are drawn in the current text color, 
           <template #tooltip="{d, prev}">
             <div class="grid text-sm">
               <span class="text-description">{{ dateFormat(new Date(d.date)) }}</span>
-              <span class="font-semibold">{{ d.value }} open</span>
+              <span class="font-semibold">{{ d.value }} seedlings</span>
               <span
                 v-if="prev"
                 class="text-description"
@@ -59,7 +59,7 @@ Small SVG charts of values over time. They are drawn in the current text color, 
 
         <WChartLine
           v-bind="scope"
-          :data="fixed"
+          :data="plantedOut"
           x-key="date"
           y-key="value"
           stroke-style="dashed-small"
@@ -82,12 +82,12 @@ const today = +getStartOfDay()
 const from = +addDay(getStartOfDay(), -29)
 
 // Points go newest first, one a day for the last 30 days.
-const open = Array.from({length: 30}, (_, index) => {
+const seedlings = Array.from({length: 30}, (_, index) => {
   const value = Math.round(120 + 30 * Math.sin(index / 4) - index)
   return {date: +addDay(getStartOfDay(), -index), value, min: value - 12, max: value + 12}
 })
 
-const fixed = Array.from({length: 30}, (_, index) => ({date: +addDay(getStartOfDay(), -index), value: Math.max(0, 60 - 2 * index + (index % 5) * 3)}))
+const plantedOut = Array.from({length: 30}, (_, index) => ({date: +addDay(getStartOfDay(), -index), value: Math.max(0, 60 - 2 * index + (index % 5) * 3)}))
 </script>
 ```
 
@@ -104,14 +104,14 @@ const fixed = Array.from({length: 30}, (_, index) => ({date: +addDay(getStartOfD
 ```vue
 <template>
   <WChartHeatmap
-    :data="scans"
+    :data="waterings"
     x-key="date"
     y-key="count"
-    title="Scans in the last year"
+    title="Waterings in the last year"
     class="tone-primary text-tone-fill"
   >
     <template #tooltip="{d}">
-      {{ d.count }} scans on {{ dateFormat(new Date(d.date)) }}
+      {{ d.count }} waterings on {{ dateFormat(new Date(d.date)) }}
     </template>
   </WChartHeatmap>
 </template>
@@ -122,7 +122,7 @@ import {addDay, dateFormat, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 import WChartHeatmap from 'eco-vue-js/dist/components/Chart/WChartHeatmap.vue'
 
 // A made-up count for every weekday of the last year, more on some weeks than others.
-const scans = Array.from({length: 365}, (_, index) => {
+const waterings = Array.from({length: 365}, (_, index) => {
   const date = addDay(getStartOfDay(), -index)
   const weekday = date.getDay() !== 0 && date.getDay() !== 6
 

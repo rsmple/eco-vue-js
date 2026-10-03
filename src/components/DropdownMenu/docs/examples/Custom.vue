@@ -42,8 +42,8 @@ import WCheckbox from 'eco-vue-js/dist/components/Checkbox/WCheckbox.vue'
 import WClickOutside from 'eco-vue-js/dist/components/ClickOutside/WClickOutside.vue'
 import WDropdownMenu from 'eco-vue-js/dist/components/DropdownMenu/WDropdownMenu.vue'
 
-const COLUMNS = ['Title', 'Author', 'Year', 'Genre', 'Available']
+const COLUMNS = ['Name', 'Species', 'Height', 'Kind', 'Watered']
 
 const isOpen = ref(false)
-const visible = ref(['Title', 'Author', 'Year'])
+const visible = ref(['Name', 'Species', 'Height'])
 </script>

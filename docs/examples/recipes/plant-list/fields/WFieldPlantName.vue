@@ -1,31 +1,33 @@
 <template>
   <WListCardField
-    :model-value="item.year < 0 ? `${ -item.year } BC` : item.year"
+    :model-value="item.name"
     :skeleton="skeleton"
-    class="tabular-nums"
+    allow-open
+    class="font-semibold"
   />
 </template>
 
 <script lang="ts" setup>
-import type {Book} from '../models/Book'
+import type {Plant} from '../models/Plant'
 
 import type {FieldProps, ListField} from 'eco-vue-js/dist/components/List/types'
 
 import WListCardField from 'eco-vue-js/dist/components/List/WListCardField.vue'
 
-defineProps<FieldProps<Book>>()
+defineProps<FieldProps<Plant>>()
 
 defineEmits<{
-  (e: 'update:item', value: Book): void
+  (e: 'update:item', value: Plant): void
   (e: 'delete:item'): void
 }>()
 </script>
 
 <script lang="ts">
 export const meta = {
-  label: 'year',
-  cssClass: 'basis-[6rem]',
-  title: 'Year',
-  field: 'year',
-} as const satisfies ListField<Book>
+  label: 'name',
+  cssClass: 'flex-1 basis-[12rem]',
+  title: 'Name',
+  field: 'name',
+  allowResize: true,
+} as const satisfies ListField<Plant>
 </script>

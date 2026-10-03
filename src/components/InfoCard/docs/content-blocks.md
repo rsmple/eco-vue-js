@@ -21,18 +21,18 @@ Small blocks for the content of a page, around the controls and lists.
 <template>
   <div class="grid gap-4">
     <WInfoCard>
-      Findings are grouped by the rule that found them. Open a group to see its findings.
+      Plants are grouped by the bed they grow in. Open a bed to see its plants.
     </WInfoCard>
 
     <WInfoCard :semantic-type="SemanticType.WARNING">
-      The scanner hasn't run for 30 days — results may be out of date.
+      The moisture sensors haven't reported for 3 days — readings may be out of date.
 
       <template #bottom>
         <WButton
           :semantic-type="SemanticType.SECONDARY"
           class="mt-4"
         >
-          Run now
+          Check now
         </WButton>
       </template>
     </WInfoCard>
@@ -41,7 +41,7 @@ Small blocks for the content of a page, around the controls and lists.
       :semantic-type="SemanticType.POSITIVE"
       :icon="markRaw(IconCheckCircle)"
     >
-      All checks passed.
+      All plants are watered.
     </WInfoCard>
 
     <WInfoCard
@@ -51,8 +51,8 @@ Small blocks for the content of a page, around the controls and lists.
       Without a background, for a note inside other content.
     </WInfoCard>
 
-    <WInfoCardNegative title="The repository can't be reached">
-      Check that the access token is still valid and has read access to the repository.
+    <WInfoCardNegative title="The greenhouse sensor can't be reached">
+      Check its battery and that it is still in range of the Wi-Fi.
     </WInfoCardNegative>
   </div>
 </template>
@@ -112,14 +112,14 @@ import IconCheckCircle from 'eco-vue-js/dist/assets/icons/IconCheckCircle'
 
       <WExpansion :is-open="details">
         <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 rounded-xl bg-surface-muted p-4">
-          <span class="text-description">Findings</span>
+          <span class="text-description">Seeds sown</span>
           <WNumberFormatter
             :model-value="12840"
             tag="span"
             compact
           />
 
-          <span class="text-description">Fixed</span>
+          <span class="text-description">Sprouted</span>
           <WNumberFormatter
             :model-value="0.4375"
             tag="span"
@@ -133,7 +133,7 @@ import IconCheckCircle from 'eco-vue-js/dist/assets/icons/IconCheckCircle'
       <span class="text-description text-sm">Hover the name:</span>
 
       <WTextOverflow>
-        <span class="whitespace-nowrap font-semibold">platform/services/payments-gateway/src/main.ts</span>
+        <span class="whitespace-nowrap font-semibold">Monstera deliciosa 'Thai Constellation', half-moon variegation</span>
       </WTextOverflow>
     </div>
   </div>
@@ -149,9 +149,9 @@ import WTextOverflow from 'eco-vue-js/dist/components/TextOverflow/WTextOverflow
 import WToggle from 'eco-vue-js/dist/components/Toggle/WToggle.vue'
 
 const sections = [
-  {title: 'What is scanned?', text: 'Every repository of the project, on each push to the default branch.'},
-  {title: 'How long are results kept?', text: 'For a year after the scan, or until the project is deleted.'},
-  {title: 'What changed this month?', text: 'Scans now include the container images built from the repository.', flag: true},
+  {title: 'When should I repot?', text: 'When roots grow out of the drainage holes — usually every year or two, in spring.'},
+  {title: 'Which soil is best?', text: 'A light, well-draining mix: add bark for aroids and grit for succulents.'},
+  {title: 'What changed this month?', text: 'The days are getting shorter, so move sun lovers closer to the window.', flag: true},
 ]
 
 const open = ref<number | null>(0)
