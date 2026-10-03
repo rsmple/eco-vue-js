@@ -38,12 +38,13 @@
 
       <WInput
         v-else
-        :model-value="themeConfig[token.key] ?? ''"
+        :model-value="rejected[token.key]?.value ?? themeConfig[token.key] ?? ''"
         :title="token.label"
         :description="token.description"
+        :error-message="rejected[token.key]?.error"
         :placeholder="shorten(baseTokens[token.key])"
         allow-clear
-        @update:model-value="setToken(token.key, $event ?? '')"
+        @update:model-value="set(token.key, $event ?? '')"
       >
         <template
           v-if="token.kind === 'color'"
@@ -61,7 +62,7 @@
               :value="pickerValues[token.key]"
               :aria-label="`Pick ${ token.label.toLowerCase() }`"
               class="absolute inset-0 cursor-pointer opacity-0"
-              @input="setToken(token.key, ($event.target as HTMLInputElement).value)"
+              @input="set(token.key, ($event.target as HTMLInputElement).value)"
             >
           </label>
         </template>
@@ -74,6 +75,7 @@
             :model-value="sliders[token.key].value"
             :min="sliders[token.key].min"
             :max="sliders[token.key].max"
+            class="mt-4"
             @update-eager:model-value="setPx(token.key, $event)"
             @update:model-value="setPx(token.key, $event)"
           >
@@ -90,7 +92,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue'
+import {computed, ref, watch} from 'vue'
 
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
@@ -98,12 +100,38 @@ import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WSlider from 'eco-vue-js/dist/components/Slider/WSlider.vue'
 
-import {DEFAULT_TOKENS, NEUTRAL_SCALES, type TOKENS, type TokenKey, setToken, themeConfig, themeTokens} from '../docsTheme'
+import {DEFAULT_TOKENS, NEUTRAL_SCALES, type TOKENS, type ThemeConfig, type TokenKey, getTokenError, setToken, themeConfig, themeTokens} from '../docsTheme'
 
 const props = defineProps<{
   tokens: typeof TOKENS
   baseTokens: Record<TokenKey, string>
 }>()
+
+/** Typed values the theme refused, kept in their fields with why, so the field doesn't snap back without a word. */
+const rejected = ref<Partial<Record<TokenKey, {value: string, error: string}>>>({})
+
+let ownConfig: ThemeConfig | undefined
+
+const set = (key: TokenKey, value: string) => {
+  const error = value.trim() ? getTokenError(key, value.trim()) : undefined
+
+  if (error) {
+    rejected.value = {...rejected.value, [key]: {value, error}}
+    return
+  }
+
+  const rest = {...rejected.value}
+
+  delete rest[key]
+  rejected.value = rest
+  setToken(key, value)
+  ownConfig = themeConfig.value
+}
+
+// Another theme opened, or set from elsewhere: the refused values were for the one before.
+watch(themeConfig, config => {
+  if (config !== ownConfig) rejected.value = {}
+})
 
 const scales = Object.keys(NEUTRAL_SCALES) as (keyof typeof NEUTRAL_SCALES)[]
 
@@ -121,7 +149,7 @@ const parsePx = (value: string | undefined) => {
 const getPx = (key: TokenKey) => parsePx(themeConfig.value[key]) ?? parsePx(props.baseTokens[key])
 
 /** Sliders work in whole px; the field gets rem, as the kit's sizes are. */
-const setPx = (key: TokenKey, px: number) => setToken(key, `${ +(px / ROOT_FONT_SIZE).toFixed(4) }rem`)
+const setPx = (key: TokenKey, px: number) => set(key, `${ +(px / ROOT_FONT_SIZE).toFixed(4) }rem`)
 
 /** Where each size slider stands, held within its range: a value set past it shows at the end. Only tokens with a `range` have one. */
 const sliders = computed(() => Object.fromEntries(props.tokens.flatMap(token => {
