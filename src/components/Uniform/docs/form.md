@@ -380,8 +380,8 @@ import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 | `required` | `boolean` | — | The field must have a value. Checked before `validate` and passed to the `field` slot. |
 | `mandatory` | `boolean` | — | Counts the field in the form's `hasValue`, which tabs show with `showHasValue`, without making it required. |
 | `skeleton` | `boolean` | — | Passed to the slots, and with the scope to every field of the form. Set on its own while `useQueryFn` loads. |
-| `async` | `boolean` | — | Saves every change right away. The changed field shows a spinner instead of the whole form being disabled. |
-| `validate` | `ValidateFn \| ValidateFn[]` | — | Functions returning an error message for an invalid value. Errors show after a submit attempt and clear as soon as the value is valid. |
+| `async` | `boolean` | — | Saves every change right away. The changed field shows a spinner instead of the whole form being disabled. Only changed fields are checked and sent: an invalid one shows its error and waits until it is fixed, while the rest are saved. A change made while saving is sent once the save ends. |
+| `validate` | `ValidateFn \| ValidateFn[]` | — | Functions returning an error message for an invalid value. Errors show after a submit attempt, or on each change with `async`, and clear as soon as the value is valid. |
 | `submitting` | `boolean` | — | Submitting state of a parent form, received with the scope. |
 | `noInit` | `boolean` | — | Keeps the current model after a successful submit instead of taking the result as the new initial model. |
 | `fullPayload` | `boolean` | — | Submits the whole model instead of only the changed fields. On a field, sends its whole object when anything in it changed. |

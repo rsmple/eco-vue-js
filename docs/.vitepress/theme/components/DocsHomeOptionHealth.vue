@@ -4,7 +4,7 @@
     class="w-option w-option-has-bg"
   />
 
-  <!-- A coloured tag in the field; the menu adds how soon it has to be fixed. -->
+  <!-- A coloured tag in the field; the menu adds what it looks like. -->
   <div
     v-else-if="model"
     class="w-option w-option-has-bg bg-tone/10 text-tone grid max-w-max grid-cols-[1fr_auto] items-center gap-1 font-semibold"
@@ -22,7 +22,7 @@
   >
     <span class="bg-tone-fill row-span-2 size-2.5 rounded-full" />
     <span class="text-tone font-semibold">{{ option.name }}</span>
-    <span class="text-description text-xs">{{ option.sla }}</span>
+    <span class="text-description text-xs">{{ option.description }}</span>
   </div>
 </template>
 
@@ -31,5 +31,5 @@ import type {SelectOptionProps} from 'eco-vue-js/dist/components/Select/types'
 
 import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
 
-defineProps<SelectOptionProps<{id: string, name: string, sla: string, tone: string}>>()
+defineProps<SelectOptionProps<{id: string, name: string, description: string, tone: string}>>()
 </script>
