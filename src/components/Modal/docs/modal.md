@@ -181,7 +181,7 @@ const confirmClear = () => {
 `useOverlay()`, called in setup, opens any component and lets WModal frame it. Say how with `present`:
 
 - `modal` — centered over the backdrop, stacked over other modals. The component brings its own frame, such as `WModalWrapper`.
-- `dropdown` — at `anchor`, one at a time, and a bottom sheet on phones. `dropdown` options set its alignment, an arrow pointing at the anchor (`tip`), its box (`frameClass`, `sheetClass`), and whether a click inside closes it (`closeOnClick`).
+- `dropdown` — at `anchor`, one at a time, and a bottom sheet on phones. It is centered on the anchor with a tip pointing at it, and near the edge of the screen the box shifts aside while the tip stays. `dropdown` options open it at a point instead (`cornered`), set its box (`frameClass`, `sheetClass`), and whether a click inside closes it (`closeOnClick`).
 
 `open` returns a function that closes the layer, or `null` if nothing opened. The component closes the layer by emitting `close:modal`. Inside it:
 
@@ -202,7 +202,6 @@ const openNotes = (event: MouseEvent) => {
     anchor: event.currentTarget as Element,
     content: markRaw(WPlantNotes),
     props: {plantId: 42},
-    dropdown: {tip: true},
   })
 }
 ```

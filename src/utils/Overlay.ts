@@ -1,4 +1,3 @@
-import type {HorizontalAlign} from './HorizontalAlign'
 import type {ModalComponent} from './Modal'
 import type {DropdownProps} from '@/components/Dropdown/types'
 import type {ConfirmModalProps} from '@/components/Modal/types'
@@ -35,11 +34,10 @@ export type OverlayFrame = 'modal' | 'dropdown' | 'sheet'
 
 /** How a `dropdown` layer is framed. */
 export type OverlayDropdownOptions = {
-  /** Side of the anchor the dropdown lines up with. Defaults to its left edge. */
-  align?: HorizontalAlign
-  /** Centers the dropdown on the anchor with an arrow pointing at it, like a popover. */
-  tip?: boolean
-  /** Squares off the corner that touches the anchor, for a dropdown opened at a point. Otherwise it is offset to clear a `⋯` button. */
+  /**
+   * Opens at the anchor as at a point, such as where a row was right-clicked, squaring off the corner that touches it.
+   * Otherwise the dropdown is centered on the anchor with a tip pointing at it, and shifts aside near the edge of the screen while the tip stays.
+   */
   cornered?: boolean
   /** Classes of the dropdown's box, replacing the default frame. */
   frameClass?: string

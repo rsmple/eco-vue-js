@@ -6,7 +6,6 @@ import type {OverlayAnchor, OverlayDropdownOptions, OverlayFrame, OverlayOpenOpt
 
 import {type Component, type ComponentInternalInstance, type InjectionKey, type Ref, defineAsyncComponent, markRaw, nextTick, shallowRef} from 'vue'
 
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {isAnchorConnected} from '@/utils/utils'
 
 const ConfirmModal = defineAsyncComponent(() => import('../modals/Confirm/ConfirmModal.vue'))
@@ -235,7 +234,6 @@ export const openConfirm = (props: ConfirmModalProps, cb: (() => void) | undefin
       anchor,
       content: ConfirmAnchored,
       props: {...props, anchor},
-      dropdown: {tip: true, align: HorizontalAlign.CENTER},
       autoclose: true,
       // Opening it again from the same anchor closes it, like a second click on a toggle.
       toggle: true,

@@ -40,7 +40,6 @@ import {type VNode, computed, inject, markRaw, provide, ref, useSlots, useTempla
 
 import IconMore from '@/assets/icons/IconMore.svg?component'
 
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {useOverlay} from '@/utils/Overlay'
 import {BASE_ZINDEX_LIST_HEADER, numberFormatter, wBaseZIndex} from '@/utils/utils'
 
@@ -109,9 +108,8 @@ const toggleMore = () => {
     anchor,
     content: renderMore,
     dropdown: {
-      align: HorizontalAlign.RIGHT_INNER,
       closeOnClick: true,
-      frameClass: 'surface-raised dropdown w-shine-hidden my-2 grid grid-cols-1 overflow-hidden rounded-xl shadow-md outline-1 outline-line-raised',
+      frameClass: 'surface-raised dropdown w-shine-hidden grid grid-cols-1 overflow-hidden rounded-xl shadow-md outline-1 outline-line-raised',
       // `dropdown` shows the actions' titles, which the bar hides on phones.
       sheetClass: 'dropdown grid grid-cols-1',
     },
