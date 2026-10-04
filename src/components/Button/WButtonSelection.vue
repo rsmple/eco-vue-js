@@ -8,38 +8,17 @@
         }"
       />
 
-      <WDropdownMenu
+      <WButtonSelectionAction
         v-if="$slots.more"
-        :is-open="isOpen"
-        :horizontal-align="HorizontalAlign.RIGHT_INNER"
+        ref="moreToggle"
+        title="More"
+        :icon="markRaw(IconMore)"
+        :aria-expanded="isOpen"
+        :disable-message="disableMessageValue"
+        class="border-l border-solid border-line"
         :class="moreToggleClass"
-      >
-        <template #toggle>
-          <WButtonSelectionAction
-            title="More"
-            :icon="markRaw(IconMore)"
-            :aria-expanded="isOpen"
-            :disable-message="disableMessageValue"
-            class="border-l border-solid border-line"
-            @click="isOpen = !isOpen"
-          />
-        </template>
-
-        <template #content>
-          <WClickOutside
-            class="surface-raised dropdown w-shine-hidden my-2 grid grid-cols-1 overflow-hidden rounded-xl shadow-md outline-1 outline-line-raised"
-            @click="isOpen = false"
-          >
-            <slot
-              name="more"
-              v-bind="{
-                disableMessage: disableMessageValue,
-                cssClass: 'first:pt-2 last:pb-2'
-              }"
-            />
-          </WClickOutside>
-        </template>
-      </WDropdownMenu>
+        @click="toggleMore"
+      />
     </div>
 
     <WButtonSelectionState
@@ -57,19 +36,16 @@
 </template>
 
 <script lang="ts" setup>
-import {type VNode, computed, inject, markRaw, provide, ref} from 'vue'
-
-import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+import {type VNode, computed, inject, markRaw, provide, ref, useSlots, useTemplateRef} from 'vue'
 
 import IconMore from '@/assets/icons/IconMore.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
+import {useOverlay} from '@/utils/Overlay'
 import {BASE_ZINDEX_LIST_HEADER, numberFormatter, wBaseZIndex} from '@/utils/utils'
 
 import WButtonSelectionAction from './WButtonSelectionAction.vue'
 import WButtonSelectionState from './WButtonSelectionState.vue'
-
-import WClickOutside from '../ClickOutside/WClickOutside.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -99,9 +75,57 @@ const baseZIndex = inject(wBaseZIndex, null)
 
 provide(wBaseZIndex, baseZIndex ?? BASE_ZINDEX_LIST_HEADER)
 
+const disableMessageValue = computed<string | undefined>(() => props.selectedCount === 0 ? props.disableMessage : undefined)
+
+const slots = useSlots()
+
+// The overlay host renders the menu, as a component so the slot keeps this component's context.
+const renderMore = markRaw(() => slots.more?.({
+  disableMessage: disableMessageValue.value,
+  cssClass: 'first:pt-2 last:pb-2',
+}))
+
+const moreToggleRef = useTemplateRef<ComponentInstance<typeof WButtonSelectionAction>>('moreToggle')
+
+const overlay = useOverlay()
+
+let closeMore: (() => void) | null = null
 const isOpen = ref(false)
 
-const disableMessageValue = computed<string | undefined>(() => props.selectedCount === 0 ? props.disableMessage : undefined)
+const toggleMore = () => {
+  if (closeMore) {
+    closeMore()
+
+    return
+  }
+
+  const anchor = moreToggleRef.value?.$el as Element | undefined
+
+  if (!anchor) return
+
+  // An action opened from the menu with `useOverlay` takes its place, and a confirm sticks to the More button.
+  const value: (() => void) | null = overlay.open({
+    present: 'dropdown',
+    anchor,
+    content: renderMore,
+    dropdown: {
+      align: HorizontalAlign.RIGHT_INNER,
+      closeOnClick: true,
+      frameClass: 'surface-raised dropdown w-shine-hidden my-2 grid grid-cols-1 overflow-hidden rounded-xl shadow-md outline-1 outline-line-raised',
+      // `dropdown` shows the actions' titles, which the bar hides on phones.
+      sheetClass: 'dropdown grid grid-cols-1',
+    },
+    onClose: () => {
+      if (closeMore !== value) return
+
+      closeMore = null
+      isOpen.value = false
+    },
+  })
+
+  closeMore = value
+  isOpen.value = value !== null
+}
 
 defineSlots<{
   /** WButtonSelectionAction buttons. Pass them `disableMessage`, and `cssClass` for the dividers between them. */

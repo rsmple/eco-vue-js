@@ -47,19 +47,52 @@ const emit = defineEmits<{
 
 defineSlots<{
   /** Content that slides up from the bottom. `hide` slides it out, which then emits `close`. */
-  default?: (props: {hide: () => void}) => void
+  default?: (props: {hide: () => Promise<void>}) => void
 }>()
 
 const containerRef = useTemplateRef('container')
 const contentRef = useTemplateRef('content')
 
-const hide = () => {
-  containerRef.value?.scrollTo({top: 0, behavior: 'smooth'})
-}
+// Whether the content was slid into view and not yet out, to keep it in view as it grows.
+let isShown = false
+
+/** Slides the content out. Resolves once it is out of view. */
+const hide = (): Promise<void> => new Promise(resolve => {
+  isShown = false
+
+  const container = containerRef.value
+
+  if (!container || container.scrollTop <= 0) {
+    resolve()
+
+    return
+  }
+
+  const finish = () => {
+    clearTimeout(timeout)
+    container.removeEventListener('scrollend', finish)
+
+    resolve()
+  }
+
+  // Falls back to a timeout where `scrollend` is not supported.
+  const timeout = setTimeout(finish, 600)
+
+  container.addEventListener('scrollend', finish)
+
+  container.scrollTo({top: 0, behavior: 'smooth'})
+})
 
 const show = () => {
+  isShown = true
+
   containerRef.value?.scrollTo({top: contentRef.value?.offsetTop, behavior: 'smooth'})
 }
+
+// Content that grows once open, such as one still loading, would stay partly below the screen — and be taken as swiped out.
+const resizeObserver = new ResizeObserver(() => {
+  if (isShown) show()
+})
 
 const observerCb = (entries: IntersectionObserverEntry[]) => {
   entries.forEach(entry => {
@@ -77,9 +110,14 @@ const observer = new IntersectionObserver(observerCb, {
 let timeout: ReturnType<typeof setTimeout>
 
 watch(contentRef, (value, oldValue) => {
-  if (oldValue) observer.unobserve(oldValue)
+  if (oldValue) {
+    observer.unobserve(oldValue)
+    resizeObserver.unobserve(oldValue)
+  }
 
   if (value) {
+    resizeObserver.observe(value)
+
     if (timeout) clearTimeout(timeout)
 
     timeout = setTimeout(() => {
@@ -94,5 +132,10 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   observer.disconnect()
+  resizeObserver.disconnect()
+})
+
+defineExpose({
+  hide,
 })
 </script>

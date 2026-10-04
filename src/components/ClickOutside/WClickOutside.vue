@@ -37,12 +37,23 @@ defineSlots<{
 
 const elementRef = useTemplateRef('element')
 
-const clickListener = (event: MouseEvent) => {
+const isOnDisabled = (event: Event): boolean => event.target instanceof Element && event.target.closest(':disabled') !== null
+
+const emitOutside = (event: Event) => {
   if (!props.noFilter) {
     if (!elementRef.value || !(event.target instanceof Element) || hasParent(elementRef.value, event.target)) return
   }
 
   emit('click')
+}
+
+const clickListener = (event: MouseEvent) => {
+  if (!isOnDisabled(event)) emitOutside(event)
+}
+
+// A disabled control, such as a disabled button, gets no click at all — only pointer events — though it may lie outside.
+const pointerListener = (event: PointerEvent) => {
+  if (isOnDisabled(event)) emitOutside(event)
 }
 
 onMounted(() => {
@@ -51,6 +62,7 @@ onMounted(() => {
   setTimeout(() => {
     document.addEventListener('click', clickListener)
     document.addEventListener('contextmenu', clickListener)
+    document.addEventListener('pointerup', pointerListener)
   })
 })
 
@@ -59,5 +71,6 @@ onBeforeUnmount(() => {
 
   document.removeEventListener('click', clickListener)
   document.removeEventListener('contextmenu', clickListener)
+  document.removeEventListener('pointerup', pointerListener)
 })
 </script>

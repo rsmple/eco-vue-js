@@ -21,6 +21,11 @@
     :default-config-map="defaultFieldConfigMapPlant"
     config-key="w-list-docs-plant"
     :expansion="markRaw(PlantContent)"
+    :bulk="[
+      markRaw(WBulkPlantWatered),
+      markRaw(WBulkPlantDry),
+      markRaw(WBulkPlantRemove),
+    ]"
     :menu="[
       markRaw(WMenuPlantToggle),
       markRaw(WMenuPlantDelete),
@@ -55,6 +60,9 @@ import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 import PlantContent from './PlantContent.vue'
 import {plantModelApi, useQueryParamsPlants} from './api/Plant'
+import WBulkPlantDry from './bulk/WBulkPlantDry.vue'
+import WBulkPlantRemove from './bulk/WBulkPlantRemove.vue'
+import WBulkPlantWatered from './bulk/WBulkPlantWatered.vue'
 import {defaultFieldConfigMapPlant, listFieldsPlant} from './fields'
 import {listFilterPlant} from './filter'
 import WMenuPlantDelete from './menu/WMenuPlantDelete.vue'

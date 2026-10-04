@@ -1,3 +1,4 @@
+import type {DropdownProps} from '@/components/Dropdown/types'
 import type {LinkProps} from '@/types/types'
 import type {SemanticType} from '@/utils/SemanticType'
 import type {Component, VNode} from 'vue'
@@ -24,6 +25,9 @@ export interface ConfirmModalProps {
   actionsCol?: boolean
   wrapperClass?: string
   maximized?: boolean
+
+  /** Element the confirm sticks to, opening as a dropdown — a bottom sheet on phones — instead of a modal, so the page stays in view. Falls back to the modal when the element is no longer on the page. Opened with `useOverlay` from a menu, the confirm sticks to the menu's anchor instead. */
+  anchor?: DropdownProps['parentElement']
 }
 
 export type ModalExportProps<Model, QueryParams> = {

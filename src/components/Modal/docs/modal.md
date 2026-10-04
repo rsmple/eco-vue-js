@@ -1,11 +1,11 @@
 ---
 group: Overlays
-description: Opening modals with Modal.add and Modal.addConfirm, building a modal body with WModalWrapper, steps with WModalStepper, and closing it with close:modal.
+description: Opening modals with Modal.add and Modal.addConfirm, or useOverlay from a component — which also opens any component in a dropdown — anchoring a confirm to the element it is about, building a modal body with WModalWrapper, steps with WModalStepper, and closing it with close:modal.
 ---
 
 # Modal
 
-Modals are not placed in templates. They are opened from code, rendered by the single `WModal` container mounted at the app root (see [Getting started](/guide/getting-started#global-containers)), and stacked when several are open.
+Modals are not placed in templates. They are opened from code, rendered by the single `WModal` container mounted at the app root (see [Getting started](/guide/getting-started#global-containers)), and stacked when several are open. The same container renders the menus of WButtonMore, so a confirm can take a menu's place.
 
 ## Confirm
 
@@ -57,6 +57,155 @@ const confirmDelete = () => {
 ```
 
 <!-- @example-end -->
+
+## Anchored confirm
+
+A modal covers the page, so the user loses sight of the row or selection they are confirming for. Pass `anchor` and the same confirm opens as a dropdown under that element instead — a bottom sheet without the backdrop on phones. Use it for short yes-or-no questions; keep the modal for long descriptions and forms.
+
+Open it with `useOverlay()`, called in setup, whose `add`, `addAutoclosable` and `addConfirm` work like `Modal` for the overlay the component is in:
+
+- Opened from a menu — WButtonMore, or the More menu of a list's selection bar — the confirm takes the menu's place at the menu's anchor, without `anchor`: the `⋯` button, or the point where a row was right-clicked. The row stays highlighted until the confirm closes.
+- Opened from a modal, it closes together with the modal, and a click beside the modal closes the confirm first.
+
+- A click outside, Escape or a swipe down closes it and calls `onCancel`. Opening it again from the same anchor closes it too.
+- While the `onAccept` promise is pending, clicks on the page are blocked, so the selection or filters it was confirmed for cannot change under it.
+- When the anchor is no longer on the page, `addConfirm` opens the modal instead.
+
+<!-- @example Modal/ConfirmAnchored -->
+
+<DocsDemo name="Modal/ConfirmAnchored" />
+
+```vue
+<template>
+  <div class="flex flex-wrap items-center gap-2">
+    <WButton
+      :semantic-type="SemanticType.NEGATIVE"
+      @click="confirmClear"
+    >
+      Clear bed
+    </WButton>
+
+    <WButtonMore>
+      <WMenuClearBed @status="status = $event" />
+    </WButtonMore>
+  </div>
+
+  <p class="mt-2 text-sm text-description">
+    {{ status }}
+  </p>
+</template>
+
+<script lang="ts" setup>
+import {ref} from 'vue'
+
+import {useOverlay} from 'eco-vue-js/dist/utils/Overlay'
+import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
+
+import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
+import WButtonMore from 'eco-vue-js/dist/components/Button/WButtonMore.vue'
+
+import WMenuClearBed from './parts/WMenuClearBed.vue'
+
+const status = ref('Nothing happened yet.')
+
+const overlay = useOverlay()
+
+const confirmClear = (event: Event) => {
+  overlay.addConfirm({
+    title: 'Clear the bed?',
+    description: 'Every plant in it is moved to the compost.',
+    acceptText: 'Clear',
+    acceptSemanticType: SemanticType.NEGATIVE,
+    // The clicked button.
+    anchor: event.currentTarget as Element,
+    // The page is held still while the promise is pending.
+    onAccept: () => new Promise<void>(resolve => setTimeout(resolve, 1000)).then(() => {
+      status.value = 'Cleared.'
+    }),
+    onCancel: () => {
+      status.value = 'Cancelled.'
+    },
+  })
+}
+</script>
+```
+
+<!-- @example-end -->
+
+<!-- @source src/components/Modal/docs/examples/parts/WMenuClearBed.vue -->
+
+```vue [WMenuClearBed.vue]
+<template>
+  <WButtonMoreItem
+    text="Clear bed"
+    :icon="markRaw(IconTrash)"
+    :semantic-type="SemanticType.NEGATIVE"
+    @click="confirmClear"
+  />
+</template>
+
+<script lang="ts" setup>
+import {markRaw} from 'vue'
+
+import {useOverlay} from 'eco-vue-js/dist/utils/Overlay'
+import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
+
+import WButtonMoreItem from 'eco-vue-js/dist/components/Button/WButtonMoreItem.vue'
+
+import IconTrash from 'eco-vue-js/dist/assets/icons/IconTrash'
+
+const emit = defineEmits<{
+  (e: 'status', value: string): void
+}>()
+
+// Opened from a menu, the confirm takes its place at the menu's anchor — the `⋯` button, or the point a row was right-clicked.
+const overlay = useOverlay()
+
+const confirmClear = () => {
+  overlay.addConfirm({
+    title: 'Clear the bed?',
+    description: 'Every plant in it is moved to the compost.',
+    acceptText: 'Clear',
+    acceptSemanticType: SemanticType.NEGATIVE,
+    onAccept: () => emit('status', 'Cleared from the menu.'),
+    onCancel: () => emit('status', 'Cancelled.'),
+  })
+}
+</script>
+```
+
+<!-- @source-end -->
+
+## Dropdown or modal
+
+`useOverlay()`, called in setup, opens any component and lets WModal frame it. Say how with `present`:
+
+- `modal` — centered over the backdrop, stacked over other modals. The component brings its own frame, such as `WModalWrapper`.
+- `dropdown` — at `anchor`, one at a time, and a bottom sheet on phones. `dropdown` options set its alignment, an arrow pointing at the anchor (`tip`), its box (`frameClass`, `sheetClass`), and whether a click inside closes it (`closeOnClick`).
+
+`open` returns a function that closes the layer, or `null` if nothing opened. The component closes the layer by emitting `close:modal`. Inside it:
+
+- It sees the opener's injections, and its own `useOverlay()` opens what belongs to the same layer.
+- `useOverlayFrame()` tells whether it is shown in a `modal`, a `dropdown` or a `sheet`, to adjust its layout.
+- `useLayerBusy(() => loading.value)` keeps the layer open on Escape, outside clicks, swipes and a removed anchor while something runs.
+
+A dropdown closes when the opener unmounts, unless it took a menu's place; a modal stays.
+
+```ts
+import {useOverlay} from 'eco-vue-js/dist/utils/Overlay'
+
+const overlay = useOverlay()
+
+const openNotes = (event: MouseEvent) => {
+  overlay.open({
+    present: 'dropdown',
+    anchor: event.currentTarget as Element,
+    content: markRaw(WPlantNotes),
+    props: {plantId: 42},
+    dropdown: {tip: true},
+  })
+}
+```
 
 ## Custom modal
 
