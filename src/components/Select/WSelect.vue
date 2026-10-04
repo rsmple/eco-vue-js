@@ -86,7 +86,7 @@
     <template #content>
       <div
         role="listbox"
-        :class="embedded ? undefined : 'max-h-80'"
+        class="max-h-80"
       >
         <slot name="content" />
 
