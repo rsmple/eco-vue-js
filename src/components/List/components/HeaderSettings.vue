@@ -1,8 +1,6 @@
 <template>
-  <WDropdownAdaptive
+  <DropdownOverlay
     :is-open="isOpen"
-    :horizontal-align="HorizontalAlign.RIGHT_INNER"
-    close-on-click-outside
     @close="isOpen = false"
   >
     <template #toggle>
@@ -23,13 +21,8 @@
       </div>
     </template>
 
-    <template #content="{isMobile}">
-      <div
-        class="grid grid-cols-1 overflow-hidden"
-        :class="{
-          'surface-raised my-2 rounded-xl shadow-md outline-1 outline-line-raised': !isMobile,
-        }"
-      >
+    <template #content>
+      <div class="grid grid-cols-1 overflow-hidden">
         <div class="p-4">
           <div
             class="grid items-start"
@@ -84,7 +77,7 @@
         </div>
       </div>
     </template>
-  </WDropdownAdaptive>
+  </DropdownOverlay>
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
@@ -93,11 +86,10 @@ import type {FieldConfig, ListFields} from '../types'
 import {markRaw, ref} from 'vue'
 
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
-import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconListSettings from '@/assets/icons/IconListSettings.svg?component'
 
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
+import DropdownOverlay from '@/components/DropdownMenu/components/DropdownOverlay.vue'
 import {type ListMode} from '@/utils/utils'
 
 import HeaderSettingsList from './HeaderSettingsList.vue'

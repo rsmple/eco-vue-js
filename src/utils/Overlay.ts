@@ -41,6 +41,8 @@ export type OverlayDropdownOptions = {
   cornered?: boolean
   /** Classes of the dropdown's box, replacing the default frame. */
   frameClass?: string
+  /** Heading at the top of the bottom sheet on phones, such as the name of the button that opened it. */
+  title?: string | Component
   /** Classes added to the content's box in the bottom sheet on phones. */
   sheetClass?: string
   /** A click on the content closes the layer, as in a menu. */

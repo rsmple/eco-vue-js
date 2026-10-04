@@ -1,8 +1,10 @@
 <template>
-  <WDropdownMenu
+  <DropdownOverlay
     v-if="fieldsFiltered.length"
     :is-open="isOpen"
-    :horizontal-align="HorizontalAlign.LEFT_INNER"
+    frame-class="surface-raised grid grid-cols-1 overflow-hidden rounded-xl shadow-md border border-solid border-line-raised"
+    sheet-class="grid grid-cols-1"
+    @close="isOpen = false"
   >
     <template #toggle>
       <WButtonSelectionAction
@@ -16,41 +18,40 @@
       />
     </template>
 
-    <template #content>
-      <WClickOutside
-        class="surface-raised my-2 grid grid-cols-1 overflow-hidden rounded-xl shadow-md outline-1 outline-line-raised"
-        @click="isOpen = false"
-      >
-        <HeaderSortItem
-          v-for="field in fieldsFiltered"
-          :key="field.meta.label"
-          :title="typeof field.meta.title === 'string' ? field.meta.title : field.meta.title(queryParams)"
-          :field="typeof field.meta.field === 'string' ? field.meta.field : field.meta.field(queryParams)!"
-          :ordering="ordering"
-          :disabled="disabled"
-          @update:ordering="$emit('update:ordering', $event)"
-        />
-
-        <div class="mx-4 mt-2 border-b border-solid border-line-subtle" />
-
-        <div class="flex justify-end p-2">
-          <button
-            class="relative rounded-lg bg-surface-muted px-2 py-1 text-sm"
-            :class="{
-              'w-ripple w-ripple-hover': canClear,
-              'cursor-not-allowed opacity-50': !canClear,
-            }"
-            :disabled="!canClear"
-            :aria-disabled="!canClear"
-            aria-label="Clear sorting"
-            @click="canClear && $emit('update:ordering', [])"
-          >
-            Clear
-          </button>
-        </div>
-      </WClickOutside>
+    <template #header>
+      Sort
     </template>
-  </WDropdownMenu>
+
+    <template #content>
+      <HeaderSortItem
+        v-for="field in fieldsFiltered"
+        :key="field.meta.label"
+        :title="typeof field.meta.title === 'string' ? field.meta.title : field.meta.title(queryParams)"
+        :field="typeof field.meta.field === 'string' ? field.meta.field : field.meta.field(queryParams)!"
+        :ordering="ordering"
+        :disabled="disabled"
+        @update:ordering="$emit('update:ordering', $event)"
+      />
+
+      <div class="mx-4 mt-2 border-b border-solid border-line-subtle" />
+
+      <div class="flex justify-end p-2">
+        <button
+          class="relative rounded-lg bg-surface-muted px-2 py-1 text-sm"
+          :class="{
+            'w-ripple w-ripple-hover': canClear,
+            'cursor-not-allowed opacity-50': !canClear,
+          }"
+          :disabled="!canClear"
+          :aria-disabled="!canClear"
+          aria-label="Clear sorting"
+          @click="canClear && $emit('update:ordering', [])"
+        >
+          Clear
+        </button>
+      </div>
+    </template>
+  </DropdownOverlay>
   <div
     v-else-if="fieldsFlat.length"
     class="h-8"
@@ -64,12 +65,10 @@ import type {OrderItem} from '@/utils/order'
 import {computed, markRaw, ref} from 'vue'
 
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
-import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
-import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
 
 import IconSort from '@/assets/icons/IconSort.svg?component'
 
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
+import DropdownOverlay from '@/components/DropdownMenu/components/DropdownOverlay.vue'
 import {type ListMode} from '@/utils/utils'
 
 import HeaderSortItem from './HeaderSortItem.vue'
