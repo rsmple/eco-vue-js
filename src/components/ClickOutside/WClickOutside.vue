@@ -12,7 +12,7 @@
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, useTemplateRef} from 'vue'
 
-import {getIsClientSide, hasParent} from '@/utils/utils'
+import {getIsClientSide} from '@/utils/utils'
 
 const props = defineProps<{
   /** Emits `click` on clicks inside the element too. */
@@ -21,7 +21,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   /** A click or right-click outside the element. Clicks in the same tick as mounting, such as the one that opened it, are ignored. */
-  (e: 'click'): void
+  (e: 'click', event: Event): void
   /** The pointer entered the element. */
   (e: 'mouseenter', value: MouseEvent): void
   /** The pointer left the element. */
@@ -41,10 +41,11 @@ const isOnDisabled = (event: Event): boolean => event.target instanceof Element 
 
 const emitOutside = (event: Event) => {
   if (!props.noFilter) {
-    if (!elementRef.value || !(event.target instanceof Element) || hasParent(elementRef.value, event.target)) return
+    // The path is taken as the click starts, so it still holds an element that the click took off the page.
+    if (!elementRef.value || event.composedPath().includes(elementRef.value)) return
   }
 
-  emit('click')
+  emit('click', event)
 }
 
 const clickListener = (event: MouseEvent) => {

@@ -56,7 +56,7 @@ const dropdownRef = useTemplateRef<ComponentInstance<typeof WDropdown>>('dropdow
 
 const element = computed(() => getIsClientSide() ? containerRef.value instanceof HTMLElement ? containerRef.value : containerRef.value?.$el : undefined)
 
-const isTop = computed(() => dropdownRef.value?.top ?? false)
+const isTop = computed(() => dropdownRef.value?.isTop ?? false)
 
 defineSlots<{
   /** Element that opens the menu, and that it is positioned against. `isTop` is true while the menu is open above it. */

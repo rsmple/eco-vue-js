@@ -60,6 +60,9 @@ export const setInstanceProvides = (instance: ComponentInternalInstance | null, 
 /** Getter of the layer the content belongs to, `null` on the page. */
 export const wOverlayLayer = Symbol('wOverlayLayer') as InjectionKey<() => number | null>
 
+/** Whether the dropdown the content is in opened above its anchor. */
+export const wOverlayIsTop = Symbol('wOverlayIsTop') as InjectionKey<Readonly<Ref<boolean>>>
+
 /** Frame of the layer the content belongs to, `null` on the page. */
 export const wOverlayFrame = Symbol('wOverlayFrame') as InjectionKey<OverlayFrame | null>
 
@@ -103,6 +106,26 @@ export const closeLayer = (id: number): void => {
   entry.onClose?.()
 }
 
+/** Whether the layer was opened from `ancestor`, or from a layer opened from it. */
+export const isLayerWithin = (id: number, ancestor: number): boolean => {
+  const parent = findLayer(id)?.parent ?? null
+
+  return parent !== null && (parent === ancestor || isLayerWithin(parent, ancestor))
+}
+
+const layerElements = new Map<number, Element>()
+
+/** Called by a dropdown layer's frame with its element on the page, `null` once it is gone. */
+export const setLayerElement = (id: number, element: Element | null): void => {
+  if (element) layerElements.set(id, element)
+  else layerElements.delete(id)
+}
+
+/** Whether an event's path goes through a layer opened from `ancestor`, such as a click in a select's menu inside a filter. */
+export const isInLayerWithin = (path: EventTarget[], ancestor: number): boolean => {
+  return [...layerElements].some(([id, element]) => path.includes(element) && isLayerWithin(id, ancestor))
+}
+
 /** Whether opening from `parent` hands off: a menu closes on the click that opens something from it, taking the clicked item with it. */
 export const isHandoff = (parent: number | null): boolean => findLayer(parent)?.policy === 'replace'
 
@@ -114,7 +137,7 @@ export const getHandoffAnchor = (parent: number | null): OverlayAnchor | undefin
 /**
  * Opens a layer. Opened from a `replace` layer — a menu — it takes the menu's place: the menu closes,
  * and the new layer belongs to the menu's parent. A `replace` layer also inherits the menu's anchor and owner,
- * so it stays where the menu was and keeps its row marked.
+ * so it stays where the menu was and keeps its row marked. A `nested` layer stays over the menu instead.
  *
  * Returns `null` when nothing opened: without the host, or when `toggle` closed a layer instead.
  */
@@ -129,7 +152,7 @@ export const openLayer = (options: OverlayOptions): OverlayLayer | null => {
 
   const parentEntry = findLayer(parent)
 
-  if (parentEntry?.policy === 'replace') {
+  if (parentEntry?.policy === 'replace' && !options.nested) {
     parent = parentEntry.parent
 
     if (policy === 'replace') {

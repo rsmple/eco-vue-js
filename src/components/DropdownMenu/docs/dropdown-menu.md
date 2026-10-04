@@ -453,7 +453,7 @@ import WClickOutside from 'eco-vue-js/dist/components/ClickOutside/WClickOutside
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `click` | — | A click or right-click outside the element. Clicks in the same tick as mounting, such as the one that opened it, are ignored. |
+| `click` | `(event: Event)` | A click or right-click outside the element. Clicks in the same tick as mounting, such as the one that opened it, are ignored. |
 | `mouseenter` | `(value: MouseEvent)` | The pointer entered the element. |
 | `mouseleave` | `(value: MouseEvent)` | The pointer left the element. |
 | `mousedown` | `(value: MouseEvent)` | A mouse button was pressed on the element. |

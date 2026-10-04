@@ -73,7 +73,7 @@ const setParentRect = (updateAlign = false): void => {
 
   const newRect = props.parentElement.getBoundingClientRect()
 
-  const isLeftChanged = newRect.left !== parentRect.value?.left
+  const isLeftChanged = newRect.left !== parentRect.value?.left || newRect.right !== parentRect.value?.right
   const isTopChanged = newRect.top !== parentRect.value?.top || newRect.bottom !== parentRect.value?.bottom
 
   if (!horizontalGetter.value || (isLeftChanged && (props.updateAlign || updateAlign))) {
@@ -99,6 +99,7 @@ onBeforeMount(() => {
 })
 
 let domListenerContainer: DOMListenerContainer
+let resizeObserver: ResizeObserver | undefined
 let requestAnimationFrameId: number | null = null
 
 onMounted(() => {
@@ -130,10 +131,17 @@ onMounted(() => {
     },
     {passive: true},
   )
+
+  // A parent that changes size, such as a field as its chips wrap, moves the edges the dropdown sits at.
+  if (props.parentElement instanceof Element && !props.emitUpdate) {
+    resizeObserver = new ResizeObserver(() => setParentRect())
+    resizeObserver.observe(props.parentElement)
+  }
 })
 
 onUnmounted(() => {
   domListenerContainer?.destroy()
+  resizeObserver?.disconnect()
 })
 
 watch(toRef(props, 'parentElement'), () => {
@@ -146,6 +154,8 @@ defineSlots<{
 }>()
 
 defineExpose({
+  /** Whether it opened above the parent. */
+  isTop,
   update: () => {
     setParentRect()
   },

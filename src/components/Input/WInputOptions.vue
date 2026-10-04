@@ -82,7 +82,7 @@
 <script lang="ts" setup generic="Type extends InputType = 'text', Option extends Record<string, any> & {id: number} = Record<string, any> & {id: number}">
 import type {InputOptionsProps} from './types'
 
-import {computed, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
+import {computed, ref, useTemplateRef} from 'vue'
 
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
@@ -207,12 +207,6 @@ const focus = () => {
 const blur = () => {
   inputRef.value?.blur()
 }
-
-watch(toRef(props, 'modelValue'), async () => {
-  await nextTick()
-
-  inputRef.value?.updateDropdown()
-})
 
 defineExpose({
   focus,
