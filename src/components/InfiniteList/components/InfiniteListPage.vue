@@ -243,9 +243,9 @@ const getLast = () => {
 let pendingIndex: number | undefined
 
 const scrollToItem = (index: number | undefined, behavior: ScrollBehavior) => {
-  const item = index === undefined ? undefined : itemsRef.value?.children[index]
+  const item = (index === undefined ? undefined : itemsRef.value?.children[index]) ?? elementRef.value
 
-  ;(item ?? elementRef.value)?.scrollIntoView({block: 'center', behavior})
+  item?.scrollIntoView({block: 'center', behavior, container: 'nearest'})
 }
 
 const scrollTo = (index?: number, behavior: ScrollBehavior = 'smooth') => {

@@ -4,6 +4,10 @@ declare interface ObjectConstructor extends ObjectConstructor {
   entries<T extends NonNullable<unknown>>(value: T): [`${ keyof T }`, T[keyof T]][]
 }
 
+declare interface ScrollIntoViewOptions {
+  container?: 'all' | 'nearest'
+}
+
 declare type SVGComponent = import('vue').Raw<import('vue').FunctionalComponent<import('vue').SVGAttributes>> | keyof import('vue').GlobalComponents
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
