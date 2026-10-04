@@ -76,7 +76,7 @@
           :is-no-cursor="cursor === undefined"
           :hide-option-icon="hideOptionIcon"
           :reverse="reverse"
-          :scroll-selected="scrollSelected"
+          :scroll-selected="isScrollSelected"
           :class="{
             'pt---w-select-option-padding': !noPadding && first && !allowCreate,
             'pb---w-select-option-padding': !noPadding && last,
@@ -125,13 +125,15 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import type {SelectOptionProps} from '../types'
 
-import {type UnwrapRef, computed, ref, useTemplateRef, watch} from 'vue'
+import {type UnwrapRef, computed, ref, useTemplateRef} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
 import {debounce} from '@/utils/utils'
 
 import SelectOption from './SelectOption.vue'
+
+import {useScrollSelected} from '../models/useScrollSelected'
 
 const props = defineProps<{
   modelValue: Model[]
@@ -152,7 +154,9 @@ const props = defineProps<{
   loadingCreate?: boolean
   search?: string
   reverse?: boolean
+  /** Scrolls to the first selected option once it shows, after it turns on without a search — set while the menu is open. */
   scrollSelected?: boolean
+  /** Also puts the cursor on that option. */
   cursorSelected?: boolean
 }>()
 
@@ -161,7 +165,6 @@ const emit = defineEmits<{
   (e: 'unselect', value: Model, data: Data): void
   (e: 'update:count', value: number): void
   (e: 'create:option'): void
-  (e: 'scroll:selected'): void
 }>()
 
 const optionRef = useTemplateRef<ComponentInstance<typeof SelectOption>[]>('option')
@@ -232,28 +235,17 @@ const selectCursor = () => {
   if (cursor.value) optionRef.value?.forEach(item => item.toggleCursor())
 }
 
-/** Options mounted in the same render all report before `scrollSelected` turns off, so only the first one is taken. */
-let isScrolledToSelected = false
-
-watch(() => props.scrollSelected, value => {
-  if (value) isScrolledToSelected = false
-})
+const {isScrollSelected, takeSelected} = useScrollSelected(() => props.scrollSelected, () => props.search)
 
 const scrollToSelected = (value: Model, scroll: () => void) => {
-  if (isScrolledToSelected) return
-
-  isScrolledToSelected = true
-
-  if (props.cursorSelected) cursor.value = value as UnwrapRef<Model>
-
-  scroll()
-
-  emit('scroll:selected')
+  if (takeSelected(scroll) && props.cursorSelected) cursor.value = value as UnwrapRef<Model>
 }
 
 const emitSelect = (value: Model, data: Data): void => {
   if (props.disabled || props.loading) return
   if (props.unselectOnly) return
+
+  isScrollSelected.value = false
 
   emit('select', value, data)
   setLoadingOption(value)
@@ -262,6 +254,8 @@ const emitSelect = (value: Model, data: Data): void => {
 const emitUnselect = (value: Model, data: Data): void => {
   if (props.disabled || props.loading) return
   if (props.selectOnly) return
+
+  isScrollSelected.value = false
 
   emit('unselect', value, data)
   setLoadingOption(value)

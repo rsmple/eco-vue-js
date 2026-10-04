@@ -1,4 +1,6 @@
 import type {DropdownProps} from '../Dropdown/types'
+import type {HorizontalAlign} from '@/utils/HorizontalAlign'
+import type {OverlayAnchor, OverlayDropdownOptions} from '@/utils/Overlay'
 
 export interface DropdownMenuProps extends Omit<DropdownProps, 'parentElement' | 'innerClass'> {
   /** Shows the menu. */
@@ -9,7 +11,13 @@ export interface DropdownMenuProps extends Omit<DropdownProps, 'parentElement' |
   dropdownClass?: string
 }
 
-export interface DropdownAdaptiveProps extends DropdownMenuProps {
-  /** Emits `close` on a click outside the menu. On mobile the bottom sheet emits `close` on its own. */
-  closeOnClickOutside?: boolean
+export interface DropdownAdaptiveProps extends Pick<OverlayDropdownOptions, 'frameClass' | 'sheetClass' | 'closeOnClick'> {
+  /** Shows the dropdown. */
+  isOpen: boolean
+  /** Element the dropdown opens at. Defaults to the element rendered by the `toggle` slot. */
+  parentElement?: OverlayAnchor | null
+  /** Aligns the dropdown to the parent without a tip, such as a field's menu with `HorizontalAlign.FILL`. Otherwise it is centered on the parent with a tip pointing at it. */
+  horizontalAlign?: HorizontalAlign
+  /** Opens over the dropdown this one is inside of, instead of taking its place. */
+  nested?: boolean
 }

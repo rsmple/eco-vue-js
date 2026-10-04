@@ -1,93 +1,105 @@
 <template>
   <component
-    :is="isMobile ? WBottomSheet : WDropdownMenu"
-    ref="dropdown"
-    v-bind="isMobile ? {
-      isOpen,
-      onClose: () => $emit('close'),
-    } : {
-      isOpen,
-      horizontalAlign,
-      updateAlign,
-      emitUpdate,
-      top,
-      bottom,
-      parentElement,
-      dropdownClass,
-      'onUpdate:rect': () => $emit('update:rect'),
-    }"
-  >
-    <template #toggle="toggleScope">
-      <slot
-        v-if="$slots.header && toggleScope?.unclickable === false"
-        name="header"
-      />
-
-      <slot
-        v-else
-        name="toggle"
-        v-bind="{...toggleScope, isMobile}"
-      />
-    </template>
-
-    <template #content="contentScope">
-      <WClickOutside
-        v-if="closeOnClickOutside && !isMobile"
-        @click="$emit('close')"
-      >
-        <slot
-          name="content"
-          v-bind="{...contentScope, isMobile}"
-        />
-      </WClickOutside>
-
-      <slot
-        v-else
-        name="content"
-        v-bind="{...contentScope, isMobile}"
-      />
-    </template>
-  </component>
+    :is="$slots.toggle?.({isTop, unclickable: isMobile ? true : undefined})[0]"
+    ref="toggle"
+    v-bind="$attrs"
+  />
 </template>
 
 <script lang="ts" setup>
 import type {DropdownAdaptiveProps} from './types'
-import type {DropdownDefaultSlotScope} from '@/components/Dropdown/types'
 
-import {type VNode, useTemplateRef} from 'vue'
+import {type VNode, computed, defineComponent, markRaw, onMounted, ref, useSlots, useTemplateRef, watch} from 'vue'
 
-import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
-import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
-import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
-
+import {useOverlay} from '@/utils/Overlay'
 import {useIsMobile} from '@/utils/mobile'
+
+// Opens the `content` slot with the overlay manager while `isOpen` is true — a dropdown at the `toggle` element, or a bottom sheet on phones.
+const props = defineProps<DropdownAdaptiveProps>()
+
+const emit = defineEmits<{
+  /** The dropdown closed without `isOpen` turning false — a click outside, Escape, a swipe, or another dropdown taking its place. */
+  (e: 'close'): void
+}>()
 
 defineOptions({inheritAttrs: false})
 
-defineProps<DropdownAdaptiveProps>()
-
-defineEmits<{
-  /** The bottom sheet was dismissed on mobile, or a click landed outside the menu with `closeOnClickOutside`. */
-  (e: 'close'): void
-  /** The parent moved on scroll or resize, with `emitUpdate` set. Desktop only. */
-  (e: 'update:rect'): void
+defineSlots<{
+  /**
+   * Element that opens the dropdown, which it points at. `isTop` is true while the dropdown is open above it.
+   * On phones it is repeated at the top of the bottom sheet, unless there is a `header` — `unclickable` is true for the one on the page and false for the copy in the sheet.
+   */
+  toggle?: (props: {isTop: boolean, unclickable: boolean | undefined}) => VNode[]
+  /** Heading of the bottom sheet on phones, instead of the copy of `toggle`. */
+  header?: () => VNode[]
+  /** Content of the dropdown, which brings its own padding. A click inside closes it with `closeOnClick`. */
+  content?: () => VNode[]
 }>()
 
-const dropdownRef = useTemplateRef('dropdown')
+const slots = useSlots()
+
 const {isMobile} = useIsMobile()
 
-defineSlots<{
-  /** Element that opens the menu. On mobile it is also repeated at the top of the bottom sheet — `unclickable` is true for the one on the page and false for the copy in the sheet. */
-  toggle?: (props: {isTop?: boolean, unclickable?: boolean, isMobile: boolean}) => VNode[]
-  /** Replaces the copy of `toggle` at the top of the bottom sheet on mobile. */
-  header?: () => void
-  /** Menu content, rendered in a dropdown on desktop and in a bottom sheet on mobile. The placement props of WDropdownMenu are passed on desktop only. */
-  content?: (props: Partial<DropdownDefaultSlotScope> & {isMobile: boolean}) => VNode[]
-}>()
+const toggleRef = useTemplateRef<ComponentInstance<unknown> | HTMLElement>('toggle')
 
-defineExpose({
-  updateDropdown: () => {
-    if (dropdownRef.value && 'updateDropdown' in dropdownRef.value) dropdownRef.value.updateDropdown()
-  },
+const element = computed(() => props.parentElement ?? (toggleRef.value instanceof HTMLElement ? toggleRef.value : toggleRef.value?.$el as HTMLElement | undefined))
+
+const isTop = ref(false)
+
+// The overlay host renders the slots, as components so they keep this component's context.
+// The content declares `close:modal`, which the host listens to on every content, as the slot may render several nodes for the listener to fall through to.
+const renderContent = markRaw(defineComponent({emits: ['close:modal'], setup: () => () => slots.content?.()}))
+const renderHeader = markRaw(() => slots.header?.())
+const renderToggle = markRaw(() => slots.toggle?.({isTop: false, unclickable: false}))
+
+const overlay = useOverlay()
+
+let closeDropdown: (() => void) | null = null
+
+const open = () => {
+  if (!element.value) return
+
+  const value: (() => void) | null = overlay.open({
+    present: 'dropdown',
+    anchor: element.value,
+    content: renderContent,
+    nested: props.nested,
+    dropdown: {
+      align: props.horizontalAlign,
+      frameClass: props.frameClass,
+      sheetClass: props.sheetClass,
+      closeOnClick: props.closeOnClick,
+      title: slots.header ? renderHeader : undefined,
+      header: slots.header ? undefined : renderToggle,
+      onTop: value => isTop.value = value,
+    },
+    onClose: () => {
+      if (closeDropdown !== value) return
+
+      closeDropdown = null
+      isTop.value = false
+
+      if (props.isOpen) emit('close')
+    },
+  })
+
+  closeDropdown = value
+
+  if (!value) emit('close')
+}
+
+const close = () => {
+  const value = closeDropdown
+
+  closeDropdown = null
+  isTop.value = false
+  value?.()
+}
+
+onMounted(() => {
+  watch(() => props.isOpen, value => {
+    if (value) open()
+    else close()
+  }, {immediate: true})
 })
 </script>

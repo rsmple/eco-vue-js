@@ -166,7 +166,7 @@ const visible = ref(['Name', 'Species', 'Height'])
 - **`parentElement`** anchors the content to another element than the toggle. `updateAlign` picks the sides again when the toggle moves while the dropdown is open.
 - **`dropdownClass`** goes on the positioned box, for its width or max height.
 
-`WDropdownAdaptive` takes the same props and slots but opens a bottom sheet on phones instead. It emits `close` when the sheet is dismissed, and with `closeOnClickOutside` also on a click outside the dropdown.
+`WDropdownAdaptive` opens its `content` with the overlay manager, like the list's sort and filter menus: a dropdown in the standard `w-dropdown-frame`, or a bottom sheet on phones. Only one is open at a time, and it emits `close` when it closes on its own — a click outside, Escape, a swipe, or another dropdown taking its place. Without `horizontalAlign` it is centered on the toggle with a tip. The sheet starts with the `header` slot, or else a copy of the toggle with `unclickable` false. `nested` opens it over the dropdown it is inside of, instead of taking its place.
 
 `WMenuItem` is a row for the content of a custom menu — the row that `WButtonMoreItem` and the list menus are built from. It is a button, a router link with `to`, or a plain link with `href` (and `download` for a file). `active` marks the picked option with a check; `false` keeps room for the check, so that the rows of a picker line up. `loading` shows a spinner over it while its action runs.
 
@@ -237,38 +237,27 @@ import WDropdownAdaptive from 'eco-vue-js/dist/components/DropdownMenu/WDropdown
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `closeOnClickOutside` | `boolean` | — | Emits `close` on a click outside the menu. On mobile the bottom sheet emits `close` on its own. |
-| `isOpen` | `boolean` | **required** | Shows the menu. |
-| `parentElement` | `(Pick<Element, "getBoundingClientRect"> & { contextElement?: Element \| undefined; })` | — | Element the menu is positioned against. Defaults to the element rendered by the `toggle` slot. |
-| `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
-
-::: details Inherited from `src/components/Dropdown/types.ts` (6)
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `horizontalAlign` | `HorizontalAlign` | **required** | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
-| `top` | `boolean` | — | Prefers opening above the parent. |
-| `bottom` | `boolean` | — | Always opens below the parent. |
-| `updateAlign` | `boolean` | — | Picks the placement again as the parent moves, instead of keeping the first one. |
-| `emitUpdate` | `boolean` | — | Emits `update:rect` on scroll and resize instead of following the parent. |
-| `freeze` | `boolean` | — | Stops following the parent and keeps the current position, e.g. once the parent is leaving the page. |
-
-:::
+| `isOpen` | `boolean` | **required** | Shows the dropdown. |
+| `parentElement` | `(Pick<Element, "getBoundingClientRect"> & { contextElement?: Element \| undefined; }) \| null` | — | Element the dropdown opens at. Defaults to the element rendered by the `toggle` slot. |
+| `horizontalAlign` | `HorizontalAlign` | — | Aligns the dropdown to the parent without a tip, such as a field's menu with `HorizontalAlign.FILL`. Otherwise it is centered on the parent with a tip pointing at it. |
+| `nested` | `boolean` | — | Opens over the dropdown this one is inside of, instead of taking its place. |
+| `frameClass` | `string` | — | Classes of the dropdown's box, replacing the default frame. |
+| `sheetClass` | `string` | — | Classes added to the content's box in the bottom sheet on phones. |
+| `closeOnClick` | `boolean` | — | A click on the content closes the layer, as in a menu. |
 
 #### Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `close` | — | The bottom sheet was dismissed on mobile, or a click landed outside the menu with `closeOnClickOutside`. |
-| `update:rect` | — | The parent moved on scroll or resize, with `emitUpdate` set. Desktop only. |
+| `close` | — | The dropdown closed without `isOpen` turning false — a click outside, Escape, a swipe, or another dropdown taking its place. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `toggle` | `{ isTop?: boolean \| undefined; unclickable?: boolean \| undefined; isMobile: boolean; }` | Element that opens the menu. On mobile it is also repeated at the top of the bottom sheet — `unclickable` is true for the one on the page and false for the copy in the sheet. |
-| `header` | — | Replaces the copy of `toggle` at the top of the bottom sheet on mobile. |
-| `content` | `Partial<DropdownDefaultSlotScope> & { isMobile: boolean; }` | Menu content, rendered in a dropdown on desktop and in a bottom sheet on mobile. The placement props of WDropdownMenu are passed on desktop only. |
+| `toggle` | `{ isTop: boolean; unclickable: boolean \| undefined; }` | Element that opens the dropdown, which it points at. `isTop` is true while the dropdown is open above it. On phones it is repeated at the top of the bottom sheet, unless there is a `header` — `unclickable` is true for the one on the page and false for the copy in the sheet. |
+| `header` | — | Heading of the bottom sheet on phones, instead of the copy of `toggle`. |
+| `content` | — | Content of the dropdown, which brings its own padding. A click inside closes it with `closeOnClick`. |
 
 <!-- @api-end -->
 

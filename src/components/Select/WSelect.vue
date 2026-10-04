@@ -17,7 +17,7 @@
     @keypress:down.prevent="cursorDown"
     @keypress:delete="captureDoubleDelete"
 
-    @open="isOpen = true; isScrollSelected = !search"
+    @open="isOpen = true"
     @close="close"
     @focus="focused = true; $emit('focus', $event)"
     @blur="focused = false; $emit('blur', $event)"
@@ -202,6 +202,7 @@ import {debounce} from '@/utils/utils'
 
 import SelectOption from './components/SelectOption.vue'
 import SelectOptionPrefix from './components/SelectOptionPrefix.vue'
+import {useScrollSelected} from './models/useScrollSelected'
 
 defineOptions({inheritAttrs: false})
 
@@ -238,9 +239,8 @@ const optionRef = useTemplateRef('option')
 const inputRef = useTemplateRef('input')
 const cursor = ref<number>(0)
 const isCursorLocked = ref(false)
-/** Set when the menu opens, until the first selected option scrolls into view or a search is typed. */
-const isScrollSelected = ref(false)
 const search = ref('')
+const {isScrollSelected, takeSelected} = useScrollSelected(() => isOpen.value, () => search.value)
 const isModelValueSearch = computed(() => !!search.value && props.modelValue?.includes(search.value as Model))
 const searchPrepared = computed(() => isModelValueSearch.value ? '' : search.value.trim().toLocaleLowerCase())
 const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
@@ -294,7 +294,6 @@ const close = () => {
   }
 
   isOpen.value = false
-  isScrollSelected.value = false
   focused.value = false
   search.value = ''
 }
@@ -366,13 +365,7 @@ const selectCursor = () => {
 }
 
 const scrollToSelected = (index: number, scroll: () => void) => {
-  if (!isScrollSelected.value) return
-
-  isScrollSelected.value = false
-
-  if (props.cursorSelected) cursor.value = index
-
-  scroll()
+  if (takeSelected(scroll) && props.cursorSelected) cursor.value = index
 }
 
 let deletePressTimeout: ReturnType<typeof setTimeout> | null = null
@@ -449,10 +442,6 @@ const blur = () => {
 const setSearch = (value: string): void => {
   search.value = value
 }
-
-watch(search, value => {
-  if (value) isScrollSelected.value = false
-})
 
 watch(isModelValueSearch, async value => {
   if (!value) return

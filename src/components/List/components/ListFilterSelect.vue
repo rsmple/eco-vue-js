@@ -1,5 +1,5 @@
 <template>
-  <DropdownOverlay
+  <WDropdownAdaptive
     :is-open="isOpen"
     @close="isOpen = false"
   >
@@ -38,7 +38,7 @@
         </WMenuItem>
       </div>
     </template>
-  </DropdownOverlay>
+  </WDropdownAdaptive>
 </template>
 
 <script setup lang="ts" generic="QueryParams">
@@ -47,11 +47,11 @@ import type {FilterComponent} from '../types'
 import {ref} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
+import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
 import IconAdd from '@/assets/icons/IconAdd.svg?component'
 
-import DropdownOverlay from '@/components/DropdownMenu/components/DropdownOverlay.vue'
 import {SemanticType} from '@/utils/SemanticType'
 
 import {getMetaValue} from '../models/utils'

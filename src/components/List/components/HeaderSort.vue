@@ -1,9 +1,7 @@
 <template>
-  <DropdownOverlay
+  <WDropdownAdaptive
     v-if="fieldsFiltered.length"
     :is-open="isOpen"
-    frame-class="surface-raised grid grid-cols-1 overflow-hidden rounded-xl shadow-md border border-solid border-line-raised"
-    sheet-class="grid grid-cols-1"
     @close="isOpen = false"
   >
     <template #toggle>
@@ -51,7 +49,7 @@
         </button>
       </div>
     </template>
-  </DropdownOverlay>
+  </WDropdownAdaptive>
   <div
     v-else-if="fieldsFlat.length"
     class="h-8"
@@ -65,10 +63,10 @@ import type {OrderItem} from '@/utils/order'
 import {computed, markRaw, ref} from 'vue'
 
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
+import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconSort from '@/assets/icons/IconSort.svg?component'
 
-import DropdownOverlay from '@/components/DropdownMenu/components/DropdownOverlay.vue'
 import {type ListMode} from '@/utils/utils'
 
 import HeaderSortItem from './HeaderSortItem.vue'

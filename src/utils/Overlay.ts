@@ -52,6 +52,8 @@ export type OverlayDropdownOptions = {
   sheetClass?: string
   /** A click on the content closes the layer, as in a menu. */
   closeOnClick?: boolean
+  /** Called with whether the dropdown opened above its anchor, as it is placed. Not called in a bottom sheet. */
+  onTop?: (value: boolean) => void
 }
 
 type OverlayContentOptions = {

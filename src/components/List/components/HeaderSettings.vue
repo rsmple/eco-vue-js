@@ -1,5 +1,5 @@
 <template>
-  <DropdownOverlay
+  <WDropdownAdaptive
     :is-open="isOpen"
     @close="isOpen = false"
   >
@@ -16,9 +16,7 @@
     </template>
 
     <template #header>
-      <div class="py-2 text-base font-semibold">
-        Table settings
-      </div>
+      Table settings
     </template>
 
     <template #content>
@@ -77,7 +75,7 @@
         </div>
       </div>
     </template>
-  </DropdownOverlay>
+  </WDropdownAdaptive>
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
@@ -86,10 +84,10 @@ import type {FieldConfig, ListFields} from '../types'
 import {markRaw, ref} from 'vue'
 
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
+import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconListSettings from '@/assets/icons/IconListSettings.svg?component'
 
-import DropdownOverlay from '@/components/DropdownMenu/components/DropdownOverlay.vue'
 import {type ListMode} from '@/utils/utils'
 
 import HeaderSettingsList from './HeaderSettingsList.vue'
