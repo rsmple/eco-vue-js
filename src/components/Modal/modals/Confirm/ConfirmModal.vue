@@ -30,7 +30,13 @@
 
     <template #actions>
       <ConfirmActions
-        v-bind="props"
+        :accept-text="acceptText"
+        :accept-semantic-type="acceptSemanticType"
+        :accept-to="acceptTo"
+        :intermediate-text="intermediateText"
+        :intermediate-semantic-type="intermediateSemanticType"
+        :intermediate-to="intermediateTo"
+        :cancel-text="cancelText"
         :loading-accept="loadingAccept"
         :loading-intermediate="loadingIntermediate"
         :disabled="disabledInner"
