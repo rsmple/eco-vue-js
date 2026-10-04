@@ -83,7 +83,7 @@ import ModalCloseButton from './components/ModalCloseButton.vue'
 import OverlayDropdown from './components/OverlayDropdown.vue'
 import OverlayLayerProvider from './components/OverlayLayerProvider.vue'
 import {wIsModal} from './models/injection'
-import {type OverlayLayer, closeChildLayers, closeLayer, isLayerBusy, isTopLayer, openConfirm, setOverlayHost, toClose, useOverlayLayers} from './models/overlayRegistry'
+import {type OverlayLayer, closeChildLayers, closeLayer, isLayerBusy, openConfirm, setOverlayHost, toClose, useOverlayLayers} from './models/overlayRegistry'
 import {useIsBackdrop} from './use/useIsBackdrop'
 
 // Renders every overlay layer in the frame it asks for: modals, and dropdowns such as menus and confirms.
@@ -201,7 +201,7 @@ const onKeydown = (event: KeyboardEvent) => {
 
   const top = layers.value[layers.value.length - 1]
 
-  if (top?.escape && isTopLayer(top.id) && !isLayerBusy(top.id)) closeLayer(top.id)
+  if (top?.escape && !isLayerBusy(top.id)) closeLayer(top.id)
 }
 
 let timeout: ReturnType<typeof setTimeout> | undefined

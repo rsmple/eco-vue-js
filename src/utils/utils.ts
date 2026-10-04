@@ -50,7 +50,7 @@ export const scrollInParent = (
   parent.scrollTo({top: parent.scrollTop + delta, behavior})
 }
 
-export const getAllScrollParents =(node?: Node, max = 10): Array<Element> => {
+export const getAllScrollParents = (node?: Node, max = 10): Array<Element> => {
   const arr: Array<Element> = []
 
   let parent = node && getScrollParent(node)
@@ -63,12 +63,6 @@ export const getAllScrollParents =(node?: Node, max = 10): Array<Element> => {
   }
 
   return arr
-}
-
-export const hasParent = (parent: Element, current: Element): boolean => {
-  if (current === parent) return true
-  else if (!current.parentElement) return false
-  else return hasParent(parent, current.parentElement)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
