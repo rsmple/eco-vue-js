@@ -59,7 +59,7 @@
           :prefix-max="prefixMax"
           :known-data="knownData"
           @unselect="unselect"
-          @update:fetching="!$event && updateDropdown(); isFetchingPrefix = $event"
+          @update:fetching="isFetchingPrefix = $event"
           @update:model-value="updateSelected"
         >
           <template
@@ -310,12 +310,6 @@ const blur = () => {
   inputRef.value?.blur()
 }
 
-const updateDropdown = async () => {
-  await nextTick()
-
-  inputRef.value?.updateDropdown()
-}
-
 const setSearch = (value: string): void => {
   search.value = value
 }
@@ -337,8 +331,6 @@ watch(search, value => {
 
 watch(() => props.modelValue, async () => {
   await nextTick()
-
-  inputRef.value?.updateDropdown()
 
   if (props.seamless) inputRef.value?.scrollToInput()
 })

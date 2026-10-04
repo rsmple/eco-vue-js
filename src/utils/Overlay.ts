@@ -1,6 +1,7 @@
 import type {ModalComponent} from './Modal'
 import type {DropdownProps} from '@/components/Dropdown/types'
 import type {ConfirmModalProps} from '@/components/Modal/types'
+import type {HorizontalAlign} from '@/utils/HorizontalAlign'
 
 import {type Component, type ComputedRef, computed, getCurrentInstance, inject, onScopeDispose, watch} from 'vue'
 
@@ -39,10 +40,14 @@ export type OverlayDropdownOptions = {
    * Otherwise the dropdown is centered on the anchor with a tip pointing at it, and shifts aside near the edge of the screen while the tip stays.
    */
   cornered?: boolean
+  /** Aligns the dropdown to the anchor without a tip, such as a field's menu with `HorizontalAlign.FILL`. */
+  align?: HorizontalAlign
   /** Classes of the dropdown's box, replacing the default frame. */
   frameClass?: string
   /** Heading at the top of the bottom sheet on phones, such as the name of the button that opened it. */
   title?: string | Component
+  /** Replaces the heading at the top of the bottom sheet on phones, such as an editable copy of the field that opened it. */
+  header?: Component
   /** Classes added to the content's box in the bottom sheet on phones. */
   sheetClass?: string
   /** A click on the content closes the layer, as in a menu. */
@@ -61,6 +66,8 @@ type OverlayContentOptions = {
   escape?: boolean
   /** Closes a dropdown with the same anchor instead of opening, like a second click on a toggle. */
   toggle?: boolean
+  /** Opens over the dropdown it is opened from instead of taking its place, such as the menu of a select inside a filter. */
+  nested?: boolean
   /** Runs once the layer is closed — by its close function, its content, the user, a sibling taking its place, or the layer it was opened from closing. */
   onClose?: () => void
 }
@@ -110,7 +117,7 @@ export const useOverlay = () => {
     /** Opens `content` the way `present` says. WModal picks the frame, such as a dropdown that is a bottom sheet on phones. */
     open(options: OverlayOpenOptions): (() => void) | null {
       const context = getContext()
-      const handoff = isHandoff(context.parent)
+      const handoff = !options.nested && isHandoff(context.parent)
 
       const layer: OverlayLayer | null = openWithCallback(options, untrack(() => layer), context)
 

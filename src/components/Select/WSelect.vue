@@ -490,8 +490,6 @@ if (props.useFirstDefault) {
 watch(() => props.modelValue, async (value, oldValue) => {
   await nextTick()
 
-  inputRef.value?.updateDropdown()
-
   if (props.seamless) inputRef.value?.scrollToInput()
 
   if (!createdOptions.value.length || !oldValue || !value) return

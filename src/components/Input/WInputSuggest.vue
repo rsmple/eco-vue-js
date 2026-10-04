@@ -1,19 +1,20 @@
 <template>
   <component
-    :is="isStatic ? InputSuggestStatic : WDropdownAdaptive"
-    ref="dropdownMenu"
+    :is="isStatic ? InputSuggestStatic : DropdownOverlay"
     v-bind="isStatic ? undefined : {
       isOpen,
-      horizontalAlign,
-      updateAlign: true,
-      parentElement: parentEl,
-      dropdownClass: `bg-surface rounded-xl ${dropdownClass ??''}`,
-      onClose: close,
+      anchor: parentEl,
+      align: horizontalAlign,
+      frameClass: `${FRAME_CLASS} ${dropdownClass ?? ''}`,
+      repeatToggle: true,
+      nested: true,
+      onClose: dismiss,
     }"
   >
     <template #toggle="toggleScope">
+      <!-- On phones it is repeated in the bottom sheet as the field to type in, with `unclickable` false. -->
       <WInput
-        ref="input"
+        :ref="toggleScope?.unclickable === false ? 'inputCopy' : 'input'"
         v-bind="{
           ...props,
           ...$attrs,
@@ -40,7 +41,7 @@
         @focus="open(); !toggleScope?.unclickable && $emit('focus', $event); focused = true"
         @blur="!isMobile && !persist && close(); !toggleScope?.unclickable && $emit('blur', $event); focused = false"
 
-        @click="isMobile && toggleScope?.unclickable && open()"
+        @click="(!isMobile || toggleScope?.unclickable) && open()"
         @click:clear="$emit('click:clear'); closeOnClear && close()"
       >
         <template
@@ -141,21 +142,25 @@
       v-if="!isStatic"
       #content
     >
-      <WInfiniteListScrollingElement
-        :parent="isMobile"
-        class="w-full"
-        :class="{
-          'bg-surface': isMobile,
-          'pb-[50vh]': isMobile,
-          'surface-raised max-h-[inherit] overflow-auto overscroll-contain rounded-xl shadow-md border border-solid border-line-raised': !isMobile,
-        }"
+      <!-- The bottom sheet scrolls on its own, with room under the content for the keyboard. -->
+      <div
+        v-if="isMobile"
+        class="w-full pb-[50vh]"
       >
-        <template v-if="$slots.content">
-          <slot
-            name="content"
-            v-bind="{focused, focus, blur}"
-          />
-        </template>
+        <slot
+          name="content"
+          v-bind="{focused, focus, blur}"
+        />
+      </div>
+
+      <WInfiniteListScrollingElement
+        v-else
+        class="w-full overflow-auto overscroll-contain"
+      >
+        <slot
+          name="content"
+          v-bind="{focused, focus, blur}"
+        />
       </WInfiniteListScrollingElement>
     </template>
   </component>
@@ -166,12 +171,12 @@ import type {InputSuggestProps, WrapSelection} from './types'
 
 import {type VNode, computed, ref, shallowRef, useTemplateRef} from 'vue'
 
-import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
 import WInput from '@/components/Input/WInput.vue'
 
 import IconArrow from '@/assets/icons/IconArrow.svg?component'
 
+import DropdownOverlay from '@/components/DropdownMenu/components/DropdownOverlay.vue'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {useIsMobile} from '@/utils/mobile'
 import {useComponentStates} from '@/utils/useComponentStates'
@@ -218,10 +223,12 @@ const emit = defineEmits<{
 
 const {isReadonly, isDisabled} = useComponentStates(props)
 
+const FRAME_CLASS = 'surface-raised overflow-hidden rounded-xl text-start font-normal shadow-md border border-solid border-line-raised'
+
 const isOpen = ref(false)
 const focused = ref(false)
-const dropdownMenuRef = useTemplateRef('dropdownMenu')
 const inputRef = useTemplateRef('input')
+const inputCopyRef = useTemplateRef('inputCopy')
 const parentEl = shallowRef<Element | null>(null)
 const {isMobile} = useIsMobile()
 
@@ -229,8 +236,11 @@ const isDisabledComputed = computed(() => isReadonly.value || isDisabled.value)
 
 const isStatic = computed(() => props.static || props.embedded)
 
+// The field typed in — on phones, its copy in the bottom sheet while that is open.
+const getInput = () => inputCopyRef.value ?? inputRef.value
+
 const open = () => {
-  if (isDisabledComputed.value) return
+  if (isDisabledComputed.value || isOpen.value) return
 
   parentEl.value = inputRef.value?.getFieldEl() ?? null
   isOpen.value = true
@@ -239,6 +249,8 @@ const open = () => {
 }
 
 const close = () => {
+  if (!isOpen.value) return
+
   isOpen.value = false
   parentEl.value = null
 
@@ -246,18 +258,27 @@ const close = () => {
 }
 
 const focus = () => {
-  if (isMobile.value) open()
+  open()
 
-  inputRef.value?.focus()
+  getInput()?.focus()
 }
 
-const blur = () => inputRef.value?.blur()
-const scrollToInput = () => inputRef.value?.scrollToInput()
-const wrapSelection = (value: WrapSelection) => inputRef.value?.wrapSelection(value)
-const setCaret = (indexStart: number, indexEnd?: number) => inputRef.value?.setCaret(indexStart, indexEnd)
-const getCaret = () => inputRef.value?.getCaret()
+const blur = () => getInput()?.blur()
 
-const updateDropdown = () => dropdownMenuRef.value && 'updateDropdown' in dropdownMenuRef.value ? dropdownMenuRef.value.updateDropdown() : void 0
+// Closed by the overlay — Escape, a swipe, or another dropdown taking its place. On desktop the menu is open while the input has focus, so it lets go of it too.
+const dismiss = () => {
+  if (!isMobile.value) blur()
+
+  close()
+}
+
+const scrollToInput = () => inputRef.value?.scrollToInput()
+const wrapSelection = (value: WrapSelection) => getInput()?.wrapSelection(value)
+const setCaret = (indexStart: number, indexEnd?: number) => getInput()?.setCaret(indexStart, indexEnd)
+const getCaret = () => getInput()?.getCaret()
+
+/** @deprecated The menu follows the field as it changes size on its own. */
+const updateDropdown = () => {}
 
 defineExpose({
   focus,
