@@ -18,7 +18,7 @@ import {
   toClose,
   wOverlayFrame,
   wOverlayLayer,
-} from './OverlayRegistry'
+} from '@/components/Modal/models/overlayRegistry'
 
 /** Element, range or virtual element — such as one made with `createPointAnchor` — a dropdown opens at. */
 export type OverlayAnchor = DropdownProps['parentElement']

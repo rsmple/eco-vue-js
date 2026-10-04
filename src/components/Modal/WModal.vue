@@ -76,14 +76,14 @@
 <script lang="ts" setup>
 import {computed, onBeforeMount, onBeforeUnmount, onMounted, provide, shallowRef, watch} from 'vue'
 
-import {type OverlayLayer, closeChildLayers, closeLayer, isAnchorConnected, isLayerBusy, isTopLayer, openConfirm, setOverlayHost, toClose, useOverlayLayers} from '@/utils/OverlayRegistry'
 import {SemanticType} from '@/utils/SemanticType'
-import {BASE_ZINDEX_MODAL, getIsClientSide, wBaseZIndex} from '@/utils/utils'
+import {BASE_ZINDEX_MODAL, getIsClientSide, isAnchorConnected, wBaseZIndex} from '@/utils/utils'
 
 import ModalCloseButton from './components/ModalCloseButton.vue'
 import OverlayDropdown from './components/OverlayDropdown.vue'
 import OverlayLayerProvider from './components/OverlayLayerProvider.vue'
 import {wIsModal} from './models/injection'
+import {type OverlayLayer, closeChildLayers, closeLayer, isLayerBusy, isTopLayer, openConfirm, setOverlayHost, toClose, useOverlayLayers} from './models/overlayRegistry'
 import {useIsBackdrop} from './use/useIsBackdrop'
 
 // Renders every overlay layer in the frame it asks for: modals, and dropdowns such as menus and confirms.

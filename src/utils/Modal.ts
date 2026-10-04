@@ -2,7 +2,7 @@ import type {ConfirmModalProps} from '@/components/Modal/types'
 
 import {type Component, type ComponentOptions, type MethodOptions} from 'vue'
 
-import {openConfirm, openModal, toClose} from './OverlayRegistry'
+import {openConfirm, openModal, toClose} from '@/components/Modal/models/overlayRegistry'
 
 export type ModalComponent<Props> = Component<
   Props,

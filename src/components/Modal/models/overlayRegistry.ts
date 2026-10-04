@@ -1,15 +1,16 @@
 /**
  * Internal to the ui-kit: the list of open overlay layers that WModal renders. Open layers with `useOverlay` or `Modal` instead.
  */
-import type {OverlayAnchor, OverlayDropdownOptions, OverlayFrame, OverlayOpenOptions, OverlayPresentation} from './Overlay'
-import type {ConfirmModalProps} from '@/components/Modal/types'
+import type {ConfirmModalProps} from '../types'
+import type {OverlayAnchor, OverlayDropdownOptions, OverlayFrame, OverlayOpenOptions, OverlayPresentation} from '@/utils/Overlay'
 
 import {type Component, type ComponentInternalInstance, type InjectionKey, type Ref, defineAsyncComponent, markRaw, nextTick, shallowRef} from 'vue'
 
-import {HorizontalAlign} from './HorizontalAlign'
+import {HorizontalAlign} from '@/utils/HorizontalAlign'
+import {isAnchorConnected} from '@/utils/utils'
 
-const ConfirmModal = defineAsyncComponent(() => import('@/components/Modal/modals/Confirm/ConfirmModal.vue'))
-const ConfirmAnchored = defineAsyncComponent(() => import('@/components/Modal/modals/Confirm/ConfirmAnchored.vue'))
+const ConfirmModal = defineAsyncComponent(() => import('../modals/Confirm/ConfirmModal.vue'))
+const ConfirmAnchored = defineAsyncComponent(() => import('../modals/Confirm/ConfirmAnchored.vue'))
 
 /**
  * How a layer shares its parent with other layers:
@@ -201,17 +202,6 @@ export const setLayerBusy = (id: number, value: boolean): void => {
 }
 
 export const isLayerBusy = (id: number): boolean => busyLayers.value.has(id)
-
-/** Whether the anchor is still on the page. A detached anchor has nothing to stick to. */
-export const isAnchorConnected = (anchor: OverlayAnchor): boolean => {
-  const element = anchor instanceof Element
-    ? anchor
-    : anchor instanceof Range
-      ? anchor.commonAncestorContainer
-      : anchor.contextElement
-
-  return !element || element.isConnected
-}
 
 type OpenContext = {
   parent: number | null

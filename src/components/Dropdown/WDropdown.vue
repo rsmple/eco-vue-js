@@ -39,8 +39,7 @@ import type {DropdownDefaultSlotScope, DropdownProps} from './types'
 import {type VNode, computed, onBeforeMount, onMounted, onUnmounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
-import {isAnchorConnected} from '@/utils/OverlayRegistry'
-import {getAllScrollParents, getIsClientSide} from '@/utils/utils'
+import {getAllScrollParents, getIsClientSide, isAnchorConnected} from '@/utils/utils'
 
 import {type HorizontalGetter, OriginX, type VerticalGetter, horizontalGetterOrderMap, searchStyleGetter} from './utils/DropdownStyle'
 
