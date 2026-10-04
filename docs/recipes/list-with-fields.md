@@ -1,12 +1,12 @@
 ---
 group: Recipes
 aside: false
-description: Build a paginated, sortable, searchable WList on a createRestModelApi model, with one component per column, filters kept in the URL, an expansion row and a row menu that calls the model's actions — the pattern used for every data table in eco-vue-js apps.
+description: Build a paginated, sortable, searchable WList on a createRestModelApi model, with one component per column, filters kept in the URL, an expansion row, a row menu and bulk actions that call the model's actions — the pattern used for every data table in eco-vue-js apps.
 ---
 
 # List with fields
 
-**Problem:** a paginated collection needs a table on desktop and cards on mobile, sortable and resizable columns the user can show, hide and reorder, filters, per-row actions, and an expandable detail row — without each list re-implementing any of that.
+**Problem:** a paginated collection needs a table on desktop and cards on mobile, sortable and resizable columns the user can show, hide and reorder, filters, per-row and bulk actions, and an expandable detail row — without each list re-implementing any of that.
 
 **Pattern:** `WList` owns layout, pagination, selection, column settings and ordering. You supply:
 
@@ -18,6 +18,7 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
 | Field components | One `.vue` per column. The component renders the cell; its exported `meta` declares the label, width, title and sort field. |
 | A fields index | The ordered tuple of field modules plus the default column config. |
 | Menu components | Row actions, typed with `MenuProps<T>` / `MenuEmits<T>`. |
+| Bulk components | Actions on the selected rows, typed with `BulkProps<QueryParams>`. |
 | An expansion component | Optional detail row, opened from the field marked `allow-open`. |
 
 <!-- @example recipes/plant-list/PlantList overflow -->
@@ -48,6 +49,11 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
     :default-config-map="defaultFieldConfigMapPlant"
     config-key="w-list-docs-plant"
     :expansion="markRaw(PlantContent)"
+    :bulk="[
+      markRaw(WBulkPlantWatered),
+      markRaw(WBulkPlantDry),
+      markRaw(WBulkPlantRemove),
+    ]"
     :menu="[
       markRaw(WMenuPlantToggle),
       markRaw(WMenuPlantDelete),
@@ -82,6 +88,9 @@ import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 import PlantContent from './PlantContent.vue'
 import {plantModelApi, useQueryParamsPlants} from './api/Plant'
+import WBulkPlantDry from './bulk/WBulkPlantDry.vue'
+import WBulkPlantRemove from './bulk/WBulkPlantRemove.vue'
+import WBulkPlantWatered from './bulk/WBulkPlantWatered.vue'
 import {defaultFieldConfigMapPlant, listFieldsPlant} from './fields'
 import {listFilterPlant} from './filter'
 import WMenuPlantDelete from './menu/WMenuPlantDelete.vue'
@@ -96,7 +105,7 @@ const selectAllTextGetter = (isUnselect: boolean, count: number) => `${ isUnsele
 
 <!-- @example-end -->
 
-Try adding a filter, sorting by a few columns from the sort menu, resizing Name, hiding columns from the header settings, switching to cards, expanding a row and using the `⋯` menu. The data is in memory here, behind the same model API a real endpoint would use.
+Try adding a filter, sorting by a few columns from the sort menu, resizing Name, hiding columns from the header settings, switching to cards, expanding a row, using the `⋯` menu, and selecting a few rows for the bulk actions above the list. The data is in memory here, behind the same model API a real endpoint would use.
 
 ## The code
 
@@ -104,7 +113,7 @@ Try adding a filter, sorting by a few columns from the sort menu, resizing Name,
 
 The model is the only piece that knows where data comes from — see [Data layer](/guide/data-layer) for the whole API. `WList` calls `plantModelApi.paginated.use` with `{...queryParams, page}` for each page and expects a `PaginatedResponse<T>`. Here each request is answered from an array in memory; in an app it goes through your `apiClient`.
 
-The item query holds the actions the menu calls. `update` puts the saved plant into every cached page that holds it, and `delete` returns `() => null` to drop the plant from them.
+The item query holds the actions the menu calls. `update` puts the saved plant into every cached page that holds it, and `delete` returns `() => null` to drop the plant from them. The paginated query holds the bulk actions, `updateMany` and `deleteMany`. They take the list's query params narrowed to the selection — `id__in`, `id__not_in` or `slice_indexes` — and invalidate the model, since a bulk change can move plants in and out of the filters.
 
 `useQueryParamsPlants` declares the params the user sets: `search`, `ordering` and one per filter — `kind__in`, `light__in`, `watered` and `caretaker`. Each gets a parse function that reads it back from the URL and drops what does not parse, so a hand-edited link cannot put an unknown kind into the query. Leave `page` out — the list adds it to each page's query. The docs have no router, so the demo keeps the filters in the page with `useQueryParamsLocal()`. In an app, pass the route, and the filters live in the URL:
 
@@ -323,6 +332,7 @@ import {createUseQueryParams} from 'eco-vue-js/dist/utils/api'
 import {Order, parseOrdering} from 'eco-vue-js/dist/utils/order'
 import {createRestModelApi} from 'eco-vue-js/dist/utils/restModelApi'
 import {paginateList} from 'eco-vue-js/dist/utils/useDefaultQuery'
+import type {QueryParamsSelection} from 'eco-vue-js/dist/utils/useSelected'
 import {isId, parseBoolean, parseId, parseString, parseStringList} from 'eco-vue-js/dist/utils/utils'
 
 import {Kind, Light, type Plant, plants} from '../models/Plant'
@@ -342,10 +352,11 @@ export const useQueryParamsPlants = createUseQueryParams({
   caretaker: parseId,
 })
 
-export type QueryParamsPlants = typeof useQueryParamsPlants['QueryParams'] & {
+/** The filters, plus the selection a bulk action narrows them to. */
+export type QueryParamsPlants = typeof useQueryParamsPlants['QueryParams'] & Omit<QueryParamsSelection, 'id__in'> & {
   page?: number
-  /** Comma-separated ids — how async selects look up the items behind their model value. */
-  id__in?: string
+  /** Ids — comma-separated when async selects look up the items behind their model value, an array for the rows picked in the list. */
+  id__in?: string | number[]
 }
 
 let source = plants
@@ -367,16 +378,17 @@ const compare = (a: Plant, b: Plant, field: keyof Plant, direction: 1 | -1) => {
   return direction * (typeof left === 'number' && typeof right === 'number' ? left - right : String(left).localeCompare(String(right)))
 }
 
-/** Filters and sorts by the same query params a backend would receive. */
+/** Filters and sorts by the same query params a backend would receive, then narrows to the selection. */
 const filterPlants = (queryParams: QueryParamsPlants | undefined) => {
-  const {kind__in, light__in, watered, caretaker} = queryParams ?? {}
+  const {kind__in, light__in, watered, caretaker, id__not_in, slice_indexes} = queryParams ?? {}
   const search = queryParams?.search?.trim().toLowerCase()
-  const ids = queryParams?.id__in?.split(',').map(Number)
+  const ids = typeof queryParams?.id__in === 'string' ? queryParams.id__in.split(',').map(Number) : queryParams?.id__in
   let result = search
     ? source.filter(plant => plant.name.toLowerCase().includes(search) || plant.species.toLowerCase().includes(search))
     : source
 
   if (ids) result = result.filter(plant => ids.includes(plant.id))
+  if (id__not_in) result = result.filter(plant => !id__not_in.includes(plant.id))
   if (kind__in) result = result.filter(plant => kind__in.includes(plant.kind))
   if (light__in) result = result.filter(plant => light__in.includes(plant.light))
   if (watered !== undefined) result = result.filter(plant => plant.watered === watered)
@@ -396,6 +408,9 @@ const filterPlants = (queryParams: QueryParamsPlants | undefined) => {
       return 0
     })
   }
+
+  // A range picked with Shift is the positions in the sorted list, both ends included.
+  if (slice_indexes) result = result.slice(slice_indexes[0], slice_indexes[1] + 1)
 
   return result
 }
@@ -438,6 +453,24 @@ export const plantModelApi = createRestModelApi({
       isQueryParams: (value: unknown): value is QueryParamsPlants | undefined => value === undefined || value instanceof Object,
       // In an app, a GET to `/plants/` with the query params.
       queryFn: ({queryKey}) => respond(() => paginateList(filterPlants(queryKey[2]), queryKey[2]?.page, 10)),
+      actions: {
+        // In an app, a PATCH to `/plants/bulk/` with the filters and the selection as query params.
+        updateMany: ({invalidate}, queryParams, payload: Partial<Plant>) => respond(() => {
+          const ids = new Set(filterPlants(queryParams).map(plant => plant.id))
+
+          source = source.map(plant => ids.has(plant.id) ? {...plant, ...payload} : plant)
+        })
+          // Refetches every cached page, since the change can move plants in and out of the filters.
+          .then(() => invalidate()),
+
+        // In an app, a DELETE to `/plants/bulk/` with the filters and the selection as query params.
+        deleteMany: ({invalidate}, queryParams) => respond(() => {
+          const ids = new Set(filterPlants(queryParams).map(plant => plant.id))
+
+          source = source.filter(plant => !ids.has(plant.id))
+        })
+          .then(() => invalidate()),
+      },
     },
   },
 })
@@ -959,7 +992,7 @@ import type {Plant} from '../models/Plant'
 import {markRaw} from 'vue'
 
 import type {MenuEmits, MenuProps} from 'eco-vue-js/dist/components/List/types'
-import {Modal} from 'eco-vue-js/dist/utils/Modal'
+import {useOverlay} from 'eco-vue-js/dist/utils/Overlay'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 import {handleApiError} from 'eco-vue-js/dist/utils/api'
 
@@ -973,13 +1006,16 @@ const props = defineProps<MenuProps<Plant>>()
 
 defineEmits<MenuEmits<Plant>>()
 
+// Opened from the row menu, the confirm takes its place — under the `⋯` button, or where the row was right-clicked — and keeps the row highlighted.
+const overlay = useOverlay()
+
 const remove = () => {
-  Modal.addConfirm({
+  overlay.addConfirm({
     title: 'Remove plant',
     description: `"${ props.item.name }" will be removed from the collection.`,
     acceptText: 'Remove',
     acceptSemanticType: SemanticType.NEGATIVE,
-    // The modal shows a loading state until the action resolves, which also drops the plant from every cached page.
+    // The confirm shows a loading state until the action resolves, which also drops the plant from every cached page.
     onAccept: () => plantModelApi.item.actions.delete(props.item.id).catch(handleApiError),
   })
 }
@@ -990,7 +1026,142 @@ const remove = () => {
 
 :::
 
-`Modal.addConfirm` keeps the dialog open with a spinner while `onAccept`'s promise is pending, closes it when the promise resolves, and leaves it open if it rejects — so return the action's promise.
+`Modal.addConfirm` keeps the confirm open with a spinner while `onAccept`'s promise is pending, closes it when the promise resolves, and leaves it open if it rejects — so return the action's promise.
+
+Opened with `useOverlay()` from the menu, the confirm takes the menu's place as a dropdown — a bottom sheet on phones — instead of a modal, so the list stays in view. It opens under the row's `⋯` button, or where the row was right-clicked, and the row stays highlighted until it closes.
+
+### Bulk actions
+
+Bulk components sit in the bar above the list and act on the selected rows. They get the `selectionCount` and a `queryParamsGetter` that returns the list's query params narrowed to the selection, which the model's bulk actions send as they are. Emit `clear:selected` to reset the selection once the action is done.
+
+Each confirm opens under its button, like a filter's dropdown, so the selected rows stay in view. Actions that do not fit the bar — on phones, all but the first two buttons — move into a More menu, and there the confirm opens under the More button instead. A click outside closes the confirm, so changing the selection cancels it. Once accepted, the page is held still until the request settles, so the selection and filters cannot change under it.
+
+::: code-group
+
+<!-- @source docs/examples/recipes/plant-list/bulk/WBulkPlantRemove.vue WBulkPlantRemove.vue -->
+
+```vue [WBulkPlantRemove.vue]
+<template>
+  <WButtonSelectionAction
+    title="Remove"
+    :icon="markRaw(IconTrash)"
+    :disable-message="disableMessage"
+    :disabled="readonly"
+    :active="isOpen"
+    @click="remove"
+  />
+</template>
+
+<script lang="ts" setup>
+import {markRaw, ref} from 'vue'
+
+import type {BulkProps} from 'eco-vue-js/dist/components/List/types'
+import {Notify} from 'eco-vue-js/dist/utils/Notify'
+import {useOverlay} from 'eco-vue-js/dist/utils/Overlay'
+import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
+import {handleApiError} from 'eco-vue-js/dist/utils/api'
+
+import WButtonSelectionAction from 'eco-vue-js/dist/components/Button/WButtonSelectionAction.vue'
+
+import IconTrash from 'eco-vue-js/dist/assets/icons/IconTrash'
+
+import {type QueryParamsPlants, plantModelApi} from '../api/Plant'
+
+const props = defineProps<BulkProps<QueryParamsPlants>>()
+
+const emit = defineEmits<{
+  (e: 'clear:selected'): void
+}>()
+
+const overlay = useOverlay()
+
+const isOpen = ref(false)
+
+const remove = (event: MouseEvent) => {
+  isOpen.value = true
+
+  overlay.addConfirm({
+    title: `Remove ${ props.selectionCount } plant${ props.selectionCount === 1 ? '' : 's' }?`,
+    description: 'They will be removed from the collection.',
+    acceptText: 'Remove',
+    acceptSemanticType: SemanticType.NEGATIVE,
+    // Opens under the button, or under More when the action sits in that menu, so the selected rows stay in view.
+    anchor: event.currentTarget as Element,
+    // The page is held still until the request settles, so the selection cannot change under it.
+    onAccept: () => plantModelApi.paginated.actions.deleteMany(props.queryParamsGetter())
+      .then(() => {
+        Notify.success({title: 'Plants removed'})
+        emit('clear:selected')
+      })
+      .catch(handleApiError),
+  }, () => isOpen.value = false)
+}
+</script>
+```
+
+<!-- @source-end -->
+
+<!-- @source docs/examples/recipes/plant-list/bulk/WBulkPlantDry.vue WBulkPlantDry.vue -->
+
+```vue [WBulkPlantDry.vue]
+<template>
+  <WButtonSelectionAction
+    title="Mark as dry"
+    :icon="markRaw(IconSun)"
+    :disable-message="disableMessage"
+    :disabled="readonly"
+    :active="isOpen"
+    @click="markDry"
+  />
+</template>
+
+<script lang="ts" setup>
+import {markRaw, ref} from 'vue'
+
+import type {BulkProps} from 'eco-vue-js/dist/components/List/types'
+import {Notify} from 'eco-vue-js/dist/utils/Notify'
+import {useOverlay} from 'eco-vue-js/dist/utils/Overlay'
+import {handleApiError} from 'eco-vue-js/dist/utils/api'
+import {addDay, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
+
+import WButtonSelectionAction from 'eco-vue-js/dist/components/Button/WButtonSelectionAction.vue'
+
+import IconSun from 'eco-vue-js/dist/assets/icons/IconSun'
+
+import {type QueryParamsPlants, plantModelApi} from '../api/Plant'
+
+const props = defineProps<BulkProps<QueryParamsPlants>>()
+
+defineEmits<{
+  (e: 'clear:selected'): void
+}>()
+
+const overlay = useOverlay()
+
+const isOpen = ref(false)
+
+const markDry = (event: MouseEvent) => {
+  isOpen.value = true
+
+  overlay.addConfirm({
+    title: `Mark ${ props.selectionCount } plant${ props.selectionCount === 1 ? '' : 's' } as dry?`,
+    description: 'They will need water within three days.',
+    acceptText: 'Mark as dry',
+    anchor: event.currentTarget as Element,
+    // Dry soil needs water within three days.
+    onAccept: () => plantModelApi.paginated.actions.updateMany(props.queryParamsGetter(), {watered: false, waterBy: addDay(getStartOfDay(), 3)})
+      .then(() => {
+        Notify.success({title: 'Marked as dry'})
+      })
+      .catch(handleApiError),
+  }, () => isOpen.value = false)
+}
+</script>
+```
+
+<!-- @source-end -->
+
+:::
 
 ### Expansion
 
@@ -1201,7 +1372,6 @@ const getDueText = (due: Date) => {
 ## Variations
 
 - **Filters in the app shell**: pass `global` to `WListFilter` to put the filters into the actions bar's panel and the search into the header bar, with a button that resets them. `disabledFilterFields` leaves out filters for params the page fixes, e.g. `caretaker` on a caretaker's own page.
-- **Bulk actions**: pass `bulk` with components typed by `BulkProps<QueryParams>`; they get a `queryParamsGetter` that describes the current selection.
 - **Toolbar actions** (e.g. "Create"): pass `action` with components typed by `ActionProps<QueryParams>`.
 - **Nested columns**: a field's `meta` can be `{keyEntity, fields}` or `{keyArray, fields}` to render columns of a related object or of every item in an array.
 - **Embedded lists**: a list is sized as a page by default — it reserves the viewport height. Inside a card, tab or docs page like this one, pass `min-height` to drop that.

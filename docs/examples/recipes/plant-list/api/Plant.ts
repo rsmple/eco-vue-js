@@ -2,6 +2,7 @@ import {createUseQueryParams} from 'eco-vue-js/dist/utils/api'
 import {Order, parseOrdering} from 'eco-vue-js/dist/utils/order'
 import {createRestModelApi} from 'eco-vue-js/dist/utils/restModelApi'
 import {paginateList} from 'eco-vue-js/dist/utils/useDefaultQuery'
+import type {QueryParamsSelection} from 'eco-vue-js/dist/utils/useSelected'
 import {isId, parseBoolean, parseId, parseString, parseStringList} from 'eco-vue-js/dist/utils/utils'
 
 import {Kind, Light, type Plant, plants} from '../models/Plant'
@@ -21,10 +22,11 @@ export const useQueryParamsPlants = createUseQueryParams({
   caretaker: parseId,
 })
 
-export type QueryParamsPlants = typeof useQueryParamsPlants['QueryParams'] & {
+/** The filters, plus the selection a bulk action narrows them to. */
+export type QueryParamsPlants = typeof useQueryParamsPlants['QueryParams'] & Omit<QueryParamsSelection, 'id__in'> & {
   page?: number
-  /** Comma-separated ids — how async selects look up the items behind their model value. */
-  id__in?: string
+  /** Ids — comma-separated when async selects look up the items behind their model value, an array for the rows picked in the list. */
+  id__in?: string | number[]
 }
 
 let source = plants
@@ -46,16 +48,17 @@ const compare = (a: Plant, b: Plant, field: keyof Plant, direction: 1 | -1) => {
   return direction * (typeof left === 'number' && typeof right === 'number' ? left - right : String(left).localeCompare(String(right)))
 }
 
-/** Filters and sorts by the same query params a backend would receive. */
+/** Filters and sorts by the same query params a backend would receive, then narrows to the selection. */
 const filterPlants = (queryParams: QueryParamsPlants | undefined) => {
-  const {kind__in, light__in, watered, caretaker} = queryParams ?? {}
+  const {kind__in, light__in, watered, caretaker, id__not_in, slice_indexes} = queryParams ?? {}
   const search = queryParams?.search?.trim().toLowerCase()
-  const ids = queryParams?.id__in?.split(',').map(Number)
+  const ids = typeof queryParams?.id__in === 'string' ? queryParams.id__in.split(',').map(Number) : queryParams?.id__in
   let result = search
     ? source.filter(plant => plant.name.toLowerCase().includes(search) || plant.species.toLowerCase().includes(search))
     : source
 
   if (ids) result = result.filter(plant => ids.includes(plant.id))
+  if (id__not_in) result = result.filter(plant => !id__not_in.includes(plant.id))
   if (kind__in) result = result.filter(plant => kind__in.includes(plant.kind))
   if (light__in) result = result.filter(plant => light__in.includes(plant.light))
   if (watered !== undefined) result = result.filter(plant => plant.watered === watered)
@@ -75,6 +78,9 @@ const filterPlants = (queryParams: QueryParamsPlants | undefined) => {
       return 0
     })
   }
+
+  // A range picked with Shift is the positions in the sorted list, both ends included.
+  if (slice_indexes) result = result.slice(slice_indexes[0], slice_indexes[1] + 1)
 
   return result
 }
@@ -117,6 +123,24 @@ export const plantModelApi = createRestModelApi({
       isQueryParams: (value: unknown): value is QueryParamsPlants | undefined => value === undefined || value instanceof Object,
       // In an app, a GET to `/plants/` with the query params.
       queryFn: ({queryKey}) => respond(() => paginateList(filterPlants(queryKey[2]), queryKey[2]?.page, 10)),
+      actions: {
+        // In an app, a PATCH to `/plants/bulk/` with the filters and the selection as query params.
+        updateMany: ({invalidate}, queryParams, payload: Partial<Plant>) => respond(() => {
+          const ids = new Set(filterPlants(queryParams).map(plant => plant.id))
+
+          source = source.map(plant => ids.has(plant.id) ? {...plant, ...payload} : plant)
+        })
+          // Refetches every cached page, since the change can move plants in and out of the filters.
+          .then(() => invalidate()),
+
+        // In an app, a DELETE to `/plants/bulk/` with the filters and the selection as query params.
+        deleteMany: ({invalidate}, queryParams) => respond(() => {
+          const ids = new Set(filterPlants(queryParams).map(plant => plant.id))
+
+          source = source.filter(plant => !ids.has(plant.id))
+        })
+          .then(() => invalidate()),
+      },
     },
   },
 })

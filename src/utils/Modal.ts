@@ -1,8 +1,8 @@
 import type {ConfirmModalProps} from '@/components/Modal/types'
 
-import {type Component, type ComponentOptions, type MethodOptions, defineAsyncComponent, markRaw} from 'vue'
+import {type Component, type ComponentOptions, type MethodOptions} from 'vue'
 
-const ConfirmModal = defineAsyncComponent(() => import('@/components/Modal/modals/Confirm/ConfirmModal.vue'))
+import {openConfirm, openModal, toClose} from './OverlayRegistry'
 
 export type ModalComponent<Props> = Component<
   Props,
@@ -16,30 +16,20 @@ export type ModalComponent<Props> = Component<
   }
 >
 
-export type AddModal<Props> = (component: ModalComponent<Props>, props?: Props, cb?: () => void, autoclose?: boolean) => (() => void)
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let addModal: AddModal<any> | undefined
-
-export const initModal = <Props>(value: AddModal<Props> | undefined) => {
-  addModal = value
-}
-
+/**
+ * Opens modals on the page, from anywhere. In a component, `useOverlay` does the same for the overlay it is in —
+ * a modal opened from a modal closes with it, and a confirm opened from a menu sticks to the menu's anchor.
+ */
 export const Modal = {
   add<Props>(component: ModalComponent<Props>, props?: Props, cb?: () => void): (() => void) | null {
-    return addModal?.(component, props, cb, false) ?? null
+    return toClose(openModal(component, props, cb, false, {parent: null}))
   },
 
   addAutoclosable<Props>(component: ModalComponent<Props>, props?: Props, cb?: () => void): (() => void) | null {
-    return addModal?.(component, props, cb, true) ?? null
+    return toClose(openModal(component, props, cb, true, {parent: null}))
   },
 
   addConfirm(props: ConfirmModalProps, cb?: () => void): (() => void) | null {
-    return addModal?.(
-      markRaw(ConfirmModal),
-      props,
-      cb,
-      true,
-    ) ?? null
+    return toClose(openConfirm(props, cb, {parent: null}))
   },
 }

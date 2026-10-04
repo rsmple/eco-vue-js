@@ -26,7 +26,10 @@
     </template>
 
     <template #content="{isMobile, isTop}">
-      <div class="flex-col flex items-center tone-surface-raised">
+      <div
+        class="tone-surface-raised"
+        :class="isMobile ? undefined : 'flex-col flex items-center'"
+      >
         <WDropdownTip
           v-if="!isMobile"
           :top="isTop"

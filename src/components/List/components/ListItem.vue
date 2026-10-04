@@ -153,8 +153,6 @@
             class="p---inner-margin -my---inner-margin -mr---inner-margin flex items-center"
             :disabled="skeleton || disableMore"
             :style="{gridArea: AREA_MORE}"
-            :anchor="anchorRef ?? undefined"
-            @close="positionMenu = null"
           >
             <WButtonMoreItem
               v-if="alwaysSelect && allowSelect && to"
@@ -220,8 +218,6 @@
                 'items-center': !alignTop,
               }"
               :disabled="skeleton || disableMore"
-              :anchor="anchorRef ?? undefined"
-              @close="positionMenu = null"
             >
               <WButtonMoreItem
                 v-if="alwaysSelect && allowSelect && to"
@@ -257,13 +253,6 @@
             </WButtonMore>
           </div>
         </div>
-
-        <div
-          v-if="positionMenu"
-          ref="anchor"
-          class="absolute"
-          :style="positionMenu"
-        />
       </div>
 
       <div
@@ -309,6 +298,8 @@ import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 import WUniform from '@/components/Uniform/WUniform.vue'
 
 import IconTo from '@/assets/icons/IconTo.svg?component'
+
+import {createPointAnchor} from '@/utils/Overlay'
 
 import ListCardAction from './ListCardAction.vue'
 import ListCardFieldItem from './ListCardFieldItem.vue'
@@ -371,8 +362,6 @@ const containerRef = useTemplateRef('container')
 const moreRef = useTemplateRef<ComponentInstance<typeof WButtonMore>>('more')
 
 const isOpen = ref(false)
-const positionMenu = ref<{left: string, top: string} | null>(null)
-const anchorRef = useTemplateRef<HTMLDivElement>('anchor')
 
 const toggle = () => {
   isOpen.value = !isOpen.value
@@ -386,7 +375,8 @@ const to = computed(() => props.skeleton ? undefined : props.cardTo?.(props.item
 
 const hasMenu = computed(() => props.menu !== undefined || props.toMarkdown !== undefined)
 
-const isAccented = computed(() => props.selected || moreRef.value?.isOpen === true)
+// Stays on while the menu, or a confirm opened from it, is open.
+const isAccented = computed(() => props.selected || moreRef.value?.isActive === true)
 
 const isHighlighted = computed(() => props.allowSelectHover || isAccented.value)
 
@@ -422,18 +412,13 @@ const beforeClass = computed<Record<string, boolean | undefined>>(() => {
 const toggleMenu = (event: MouseEvent) => {
   if (props.skeleton || props.disableMore || !containerRef.value || !moreRef.value || event.ctrlKey) return
 
-  const containerRect = containerRef.value.getBoundingClientRect()
-
-  positionMenu.value = {left: event.clientX - containerRect.x + 'px', top: event.clientY - containerRect.y + 'px'}
-
-  moreRef.value.open()
+  moreRef.value.open(createPointAnchor(containerRef.value, event.clientX, event.clientY))
 
   event.preventDefault()
 }
 
 watch(() => props.position, () => {
   isOpen.value = false
-  positionMenu.value = null
   moreRef.value?.close()
 })
 </script>

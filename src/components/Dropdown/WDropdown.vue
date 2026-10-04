@@ -39,6 +39,7 @@ import type {DropdownDefaultSlotScope, DropdownProps} from './types'
 import {type VNode, computed, onBeforeMount, onMounted, onUnmounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
+import {isAnchorConnected} from '@/utils/OverlayRegistry'
 import {getAllScrollParents, getIsClientSide} from '@/utils/utils'
 
 import {type HorizontalGetter, OriginX, type VerticalGetter, horizontalGetterOrderMap, searchStyleGetter} from './utils/DropdownStyle'
@@ -68,6 +69,9 @@ const atBottom = computed(() => y.value > window.innerHeight / 2)
 const order = computed(() => horizontalGetterOrderMap[props.horizontalAlign])
 
 const setParentRect = (updateAlign = false): void => {
+  // A parent taken off the page reads as an empty rect in the corner, so the dropdown stays where it was.
+  if (parentRect.value && (props.freeze || !isAnchorConnected(props.parentElement))) return
+
   const newRect = props.parentElement.getBoundingClientRect()
 
   const isLeftChanged = newRect.left !== parentRect.value?.left
@@ -105,7 +109,7 @@ onMounted(() => {
     ? props.parentElement
     : props.parentElement instanceof Range
       ? props.parentElement.commonAncestorContainer
-      : undefined
+      : props.parentElement.contextElement
 
   domListenerContainer = new DOMListenerContainer(
     parent
