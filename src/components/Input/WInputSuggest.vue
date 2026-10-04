@@ -1,18 +1,16 @@
 <template>
   <component
-    :is="isStatic ? InputSuggestStatic : DropdownOverlay"
+    :is="isStatic ? InputSuggestStatic : WDropdownAdaptive"
     v-bind="isStatic ? undefined : {
       isOpen,
-      anchor: parentEl,
-      align: horizontalAlign,
-      frameClass: `${FRAME_CLASS} ${dropdownClass ?? ''}`,
-      repeatToggle: true,
+      parentElement: parentEl,
+      horizontalAlign,
+      frameClass: dropdownClass ? `w-dropdown-frame ${dropdownClass}` : undefined,
       nested: true,
       onClose: dismiss,
     }"
   >
     <template #toggle="toggleScope">
-      <!-- On phones it is repeated in the bottom sheet as the field to type in, with `unclickable` false. -->
       <WInput
         :ref="toggleScope?.unclickable === false ? 'inputCopy' : 'input'"
         v-bind="{
@@ -171,12 +169,12 @@ import type {InputSuggestProps, WrapSelection} from './types'
 
 import {type VNode, computed, ref, shallowRef, useTemplateRef} from 'vue'
 
+import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
 import WInput from '@/components/Input/WInput.vue'
 
 import IconArrow from '@/assets/icons/IconArrow.svg?component'
 
-import DropdownOverlay from '@/components/DropdownMenu/components/DropdownOverlay.vue'
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {useIsMobile} from '@/utils/mobile'
 import {useComponentStates} from '@/utils/useComponentStates'
@@ -223,8 +221,6 @@ const emit = defineEmits<{
 
 const {isReadonly, isDisabled} = useComponentStates(props)
 
-const FRAME_CLASS = 'surface-raised overflow-hidden rounded-xl text-start font-normal shadow-md border border-solid border-line-raised'
-
 const isOpen = ref(false)
 const focused = ref(false)
 const inputRef = useTemplateRef('input')
@@ -236,7 +232,7 @@ const isDisabledComputed = computed(() => isReadonly.value || isDisabled.value)
 
 const isStatic = computed(() => props.static || props.embedded)
 
-// The field typed in — on phones, its copy in the bottom sheet while that is open.
+// The field typed in — on phones, its copy in the bottom sheet while that is open: the `toggle` slot is repeated there with `unclickable` false.
 const getInput = () => inputCopyRef.value ?? inputRef.value
 
 const open = () => {

@@ -2,7 +2,6 @@
   <WDropdownAdaptive
     :is-open="isOpen"
     :horizontal-align="HorizontalAlign.RIGHT_INNER"
-    close-on-click-outside
     @close="isOpen = false"
   >
     <template #toggle>
@@ -22,18 +21,11 @@
     </template>
 
     <template #header>
-      <div class="py-2 text-base font-semibold">
-        Theme
-      </div>
+      Theme
     </template>
 
-    <template #content="{isMobile}">
-      <div
-        class="text-start font-normal"
-        :class="{
-          'surface-raised my-2 max-h-[calc(100vh-6rem)] min-w-56 overflow-y-auto overscroll-contain rounded-xl shadow-md border border-solid border-line-raised': !isMobile,
-        }"
-      >
+    <template #content>
+      <div class="max-h-[calc(100vh-6rem)] min-w-56 overflow-y-auto overscroll-contain">
         <WMenuItem
           v-for="preset in PRESETS"
           :key="preset.id"

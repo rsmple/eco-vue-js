@@ -86,6 +86,6 @@ defineExpose({
 const contentClass = computed(() => [
   'bg-surface grid-cols-[1fr] grid-rows-[auto_1fr] rounded-t-3xl shadow-md relative grid',
   props.compact ? 'max-h-[90%]' : 'height-[90%]',
-  props.noOverlay ? 'pointer-events-auto border border-b-0 border-solid border-line-raised' : '',
+  props.noOverlay ? 'pointer-events-auto border-t border-solid border-line-raised' : '',
 ].join(' '))
 </script>

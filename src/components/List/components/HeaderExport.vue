@@ -1,8 +1,6 @@
 <template>
-  <DropdownOverlay
+  <WDropdownAdaptive
     :is-open="isOpen"
-    frame-class="surface-raised grid grid-cols-1 overflow-hidden rounded-xl shadow-md border border-solid border-line-raised"
-    sheet-class="grid grid-cols-1"
     close-on-click
     @close="isOpen = false"
   >
@@ -36,7 +34,7 @@
         Export as Markdown
       </WMenuItem>
     </template>
-  </DropdownOverlay>
+  </WDropdownAdaptive>
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
@@ -46,11 +44,11 @@ import type {ModalExportProps} from '@/components/Modal/types'
 import {defineAsyncComponent, markRaw, ref} from 'vue'
 
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
+import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
 import IconExport from '@/assets/icons/IconExport.svg?component'
 
-import DropdownOverlay from '@/components/DropdownMenu/components/DropdownOverlay.vue'
 import {Modal} from '@/utils/Modal'
 
 import {buildExportColumns} from '../use/useExportColumns'

@@ -1,5 +1,5 @@
 <template>
-  <DropdownOverlay
+  <WDropdownAdaptive
     :is-open="isOpen"
     @close="$emit('close')"
   >
@@ -65,7 +65,7 @@
         />
       </div>
     </template>
-  </DropdownOverlay>
+  </WDropdownAdaptive>
 </template>
 
 <script setup lang="ts" generic="QueryParams">
@@ -75,10 +75,10 @@ import type {UniformScope} from '@/components/Uniform/types'
 import {computed} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
+import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconClose from '@/assets/icons/IconClose.svg?component'
 
-import DropdownOverlay from '@/components/DropdownMenu/components/DropdownOverlay.vue'
 import {SemanticType} from '@/utils/SemanticType'
 
 import {getMetaValue} from '../models/utils'

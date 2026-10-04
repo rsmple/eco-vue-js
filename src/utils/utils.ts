@@ -322,13 +322,15 @@ export const getOffsetTop = (element: HTMLElement): number => element.offsetPare
 export const toKebabCase = (value: string): string => value.replace(/\B([A-Z])/g, '-$1').toLowerCase()
 
 export const getPropValue = <Props extends VNodeProps, Key extends keyof Props & string>(props: Props, key: Key): Props[Key] => key in props ? props[key] : props[toKebabCase(key) as Key]
-/** Whether the anchor is still on the page. A detached anchor has nothing to stick to. */
-export const isAnchorConnected = (anchor: OverlayAnchor): boolean => {
-  const element = anchor instanceof Element
+
+/** Node the anchor sits in — the element itself, a range's container, or a virtual anchor's `contextElement`. */
+export const getAnchorNode = (anchor: OverlayAnchor): Node | undefined => {
+  return anchor instanceof Element
     ? anchor
     : anchor instanceof Range
       ? anchor.commonAncestorContainer
       : anchor.contextElement
-
-  return !element || element.isConnected
 }
+
+/** Whether the anchor is still on the page. A detached anchor has nothing to stick to. */
+export const isAnchorConnected = (anchor: OverlayAnchor): boolean => getAnchorNode(anchor)?.isConnected ?? true

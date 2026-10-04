@@ -60,9 +60,6 @@ export const setInstanceProvides = (instance: ComponentInternalInstance | null, 
 /** Getter of the layer the content belongs to, `null` on the page. */
 export const wOverlayLayer = Symbol('wOverlayLayer') as InjectionKey<() => number | null>
 
-/** Whether the dropdown the content is in opened above its anchor. */
-export const wOverlayIsTop = Symbol('wOverlayIsTop') as InjectionKey<Readonly<Ref<boolean>>>
-
 /** Frame of the layer the content belongs to, `null` on the page. */
 export const wOverlayFrame = Symbol('wOverlayFrame') as InjectionKey<OverlayFrame | null>
 

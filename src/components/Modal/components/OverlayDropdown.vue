@@ -18,7 +18,7 @@
 
       <div
         v-else-if="!unclickable"
-        class="flex items-center gap-2 py-2 text-base font-semibold"
+        class="flex items-center gap-2 py-2 text-base text-center font-semibold"
       >
         <template v-if="typeof title === 'string'">
           {{ title }}
@@ -60,49 +60,30 @@
         :horizontal-align="cornered ? HorizontalAlign.RIGHT_INNER : align ?? HorizontalAlign.CENTER"
         :update-align="!cornered"
         :freeze="detached"
+        :inner-class="hasTip ? 'w-max tone-surface-raised flex flex-col items-center' : undefined"
         :style="{zIndex}"
       >
         <template #default="{isTop, isLeft, isRight}">
-          <!-- Aligned to the anchor, such as a field's menu, it sizes to the space left on screen for the content to scroll in. -->
-          <WClickOutside
-            v-if="align !== undefined && !cornered"
-            :no-filter="closeOnClick"
-            class="flex max-h-[inherit] flex-col"
-            :class="frameClass ?? FRAME_CLASS"
-            @click="dismissOutside"
-          >
-            <slot />
-          </WClickOutside>
-
           <!-- Centered on the anchor with the tip pointing at it. Near the edge of the screen only the box shifts, like a tooltip's, so the tip stays on the anchor. -->
-          <div
-            v-else-if="!cornered"
-            class="tone-surface-raised flex flex-col items-center"
-          >
-            <WDropdownTip :top="isTop" />
+          <WDropdownTip
+            v-if="hasTip"
+            :top="isTop"
+          />
 
-            <WClickOutside
-              :no-filter="closeOnClick"
-              class="w-tooltip-center-x max-w-[calc(100vw-1.5rem)]"
-              :class="frameClass ?? FRAME_CLASS"
-              @click="dismissOutside"
-            >
-              <slot />
-            </WClickOutside>
-          </div>
-
-          <!-- At a point, such as where a row was right-clicked, the corner at the point is squared off instead of a tip. -->
+          <!--
+            Aligned to the anchor, such as a field's menu, it sizes to the space left on screen for the content to scroll in.
+            At a point, such as where a row was right-clicked, the corner at the point is squared off instead of a tip.
+          -->
           <WClickOutside
-            v-else
             :no-filter="closeOnClick"
-            :class="frameClass ?? [
-              FRAME_CLASS,
-              {
+            :class="[
+              frameClass ?? 'w-dropdown-frame',
+              hasTip ? 'w-tooltip-center-x max-w-[calc(100vw-1.5rem)]' : cornered ? frameClass === undefined && {
                 'rounded-bl-none': isRight && isTop,
                 'rounded-tl-none': isRight && !isTop,
                 'rounded-br-none': isLeft && isTop,
                 'rounded-tr-none': isLeft && !isTop,
-              },
+              } : 'flex max-h-[inherit] flex-col',
             ]"
             @click="dismissOutside"
           >
@@ -115,9 +96,9 @@
 </template>
 
 <script lang="ts" setup>
-import type {OverlayAnchor} from '@/utils/Overlay'
+import type {OverlayAnchor, OverlayDropdownOptions} from '@/utils/Overlay'
 
-import {type Component, computed, inject, onBeforeUnmount, provide, useTemplateRef, watch} from 'vue'
+import {computed, inject, onBeforeUnmount, provide, useTemplateRef, watch} from 'vue'
 
 import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
@@ -129,19 +110,12 @@ import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {getIsMobile} from '@/utils/mobile'
 import {BASE_ZINDEX_DROPDOWN, wBaseZIndex} from '@/utils/utils'
 
-import {isInLayerWithin, setLayerElement, wOverlayFrame, wOverlayIsTop, wOverlayLayer} from '../models/overlayRegistry'
+import {isInLayerWithin, setLayerElement, wOverlayFrame, wOverlayLayer} from '../models/overlayRegistry'
 
-// Frame of a `dropdown` layer — a dropdown at the anchor, or a bottom sheet on phones. Options match OverlayDropdownOptions.
+// Frame of a `dropdown` layer — a dropdown at the anchor, or a bottom sheet on phones.
 const props = withDefaults(
-  defineProps<{
+  defineProps<OverlayDropdownOptions & {
     anchor: OverlayAnchor
-    cornered?: boolean
-    align?: HorizontalAlign
-    title?: string | Component
-    header?: Component
-    frameClass?: string
-    sheetClass?: string
-    closeOnClick?: boolean
     /** The layer is closed; the sheet slides down, then `closed` is emitted. */
     closing?: boolean
     /** The anchor left the page, which closes a dropdown; a sheet stays. */
@@ -155,10 +129,9 @@ const props = withDefaults(
     sheetClass: undefined,
     title: undefined,
     header: undefined,
+    onTop: undefined,
   },
 )
-
-const FRAME_CLASS = 'surface-raised overflow-hidden rounded-xl text-start font-normal shadow-md border border-solid border-line-raised'
 
 const emit = defineEmits<{
   (e: 'close'): void
@@ -174,7 +147,9 @@ provide(wOverlayFrame, isMobile ? 'sheet' : 'dropdown')
 
 const dropdownRef = useTemplateRef('dropdown')
 
-provide(wOverlayIsTop, computed(() => dropdownRef.value?.isTop ?? false))
+if (props.onTop && !isMobile) watch(() => dropdownRef.value?.isTop ?? false, props.onTop, {immediate: true})
+
+const hasTip = computed(() => props.align === undefined && !props.cornered)
 
 const zIndex = inject(wBaseZIndex, 0) + BASE_ZINDEX_DROPDOWN
 

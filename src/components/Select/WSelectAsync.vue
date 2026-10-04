@@ -17,7 +17,7 @@
     @keypress:down.prevent="listRef?.cursorDown()"
     @keypress:delete="captureDoubleDelete"
 
-    @open="isOpen = true; isScrollSelected = !search"
+    @open="isOpen = true"
     @close="close"
     @focus="focused = true; $emit('focus', $event)"
     @blur="focused = false; $emit('blur', $event)"
@@ -103,10 +103,9 @@
         :query-options="{placeholderData: keepPreviousData}"
         :search="search"
         :reverse="reverse"
-        :scroll-selected="isScrollSelected"
+        :scroll-selected="isOpen"
         :cursor-selected="cursorSelected"
         class="max-h-80"
-        @scroll:selected="isScrollSelected = false"
         @select="select"
         @unselect="unselect"
         @create:option="create(search)"
@@ -198,8 +197,6 @@ const inputRef = useTemplateRef('input')
 const listRef = useTemplateRef('list')
 const focused = ref(false)
 const isFetchingPrefix = ref(false)
-/** Set when the menu opens, until the first selected option scrolls into view or a search is typed. */
-const isScrollSelected = ref(false)
 const search = ref('')
 const loadingCreate = ref(false)
 const knownData = new Map<string, Data>()
@@ -220,7 +217,6 @@ const hasSearchOption = computed(() => {
 
 const close = () => {
   isOpen.value = false
-  isScrollSelected.value = false
   focused.value = false
 
   if (props.searchModel && search.value && !isModelValueSearch.value) {
@@ -258,8 +254,6 @@ const captureDoubleDelete = () => {
 const select = (item: Model, data: Data): void => {
   if (isDisabledComputed.value) return
 
-  isScrollSelected.value = false
-
   knownData.set(String(item), data)
 
   emit('select', item, data)
@@ -269,8 +263,6 @@ const select = (item: Model, data: Data): void => {
 
 const unselect = (item: Model, data: Data | undefined): void => {
   if (isDisabledComputed.value) return
-
-  isScrollSelected.value = false
 
   emit('unselect', item, data)
 
@@ -324,10 +316,6 @@ if (props.useQueryFnDefault) {
     }
   }, {immediate: true})
 }
-
-watch(search, value => {
-  if (value) isScrollSelected.value = false
-})
 
 watch(() => props.modelValue, async () => {
   await nextTick()
