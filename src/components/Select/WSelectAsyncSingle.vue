@@ -8,6 +8,7 @@
       previewData: previewData ? [previewData] as Data[] : undefined,
       createdData: createdData ? [createdData] as Data[] : undefined,
       hidePrefix: true,
+      cursorSelected: true,
       filterValue: filterValue === undefined ? modelValue : filterValue,
     }"
     :class="$attrs.class"

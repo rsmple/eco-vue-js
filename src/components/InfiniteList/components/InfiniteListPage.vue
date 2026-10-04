@@ -72,6 +72,7 @@ import {type Ref, TransitionGroup, computed, inject, onBeforeUnmount, onMounted,
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
 import {ApiError} from '@/utils/api'
+import {scrollInParent} from '@/utils/utils'
 
 import {wScrollingElement} from '../models/injection'
 
@@ -245,7 +246,7 @@ let pendingIndex: number | undefined
 const scrollToItem = (index: number | undefined, behavior: ScrollBehavior) => {
   const item = (index === undefined ? undefined : itemsRef.value?.children[index]) ?? elementRef.value
 
-  item?.scrollIntoView({block: 'center', behavior, container: 'nearest'})
+  if (item) scrollInParent(item, {block: 'center', behavior})
 }
 
 const scrollTo = (index?: number, behavior: ScrollBehavior = 'smooth') => {
