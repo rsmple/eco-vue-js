@@ -25,37 +25,46 @@
   >
     <WDropdown
       :parent-element="anchor"
-      :horizontal-align="tip ? HorizontalAlign.CENTER : align"
-      :update-align="tip"
+      :horizontal-align="cornered ? HorizontalAlign.RIGHT_INNER : HorizontalAlign.CENTER"
+      :update-align="!cornered"
       :freeze="detached"
       :style="{zIndex}"
     >
       <template #default="{isTop, isLeft, isRight}">
+        <!-- Centered on the anchor with the tip pointing at it. Near the edge of the screen only the box shifts, like a tooltip's, so the tip stays on the anchor. -->
         <div
-          :class="{'tone-surface-raised flex flex-col items-center': tip}"
+          v-if="!cornered"
+          class="tone-surface-raised flex flex-col items-center"
         >
-          <WDropdownTip
-            v-if="tip"
-            :top="isTop"
-          />
+          <WDropdownTip :top="isTop" />
 
           <WClickOutside
             :no-filter="closeOnClick"
-            :class="frameClass ?? [
-              'surface-raised overflow-hidden rounded-xl text-start font-normal shadow-md border border-solid border-line-raised',
-              {
-                'sm-not:-mr-4 my-4 -mr-5': !cornered && !tip,
-                'rounded-bl-none': cornered && isRight && isTop,
-                'rounded-tl-none': cornered && isRight && !isTop,
-                'rounded-br-none': cornered && isLeft && isTop,
-                'rounded-tr-none': cornered && isLeft && !isTop,
-              },
-            ]"
+            class="w-tooltip-center-x max-w-[calc(100vw-1.5rem)]"
+            :class="frameClass ?? FRAME_CLASS"
             @click="dismiss"
           >
             <slot />
           </WClickOutside>
         </div>
+
+        <!-- At a point, such as where a row was right-clicked, the corner at the point is squared off instead of a tip. -->
+        <WClickOutside
+          v-else
+          :no-filter="closeOnClick"
+          :class="frameClass ?? [
+            FRAME_CLASS,
+            {
+              'rounded-bl-none': isRight && isTop,
+              'rounded-tl-none': isRight && !isTop,
+              'rounded-br-none': isLeft && isTop,
+              'rounded-tr-none': isLeft && !isTop,
+            },
+          ]"
+          @click="dismiss"
+        >
+          <slot />
+        </WClickOutside>
       </template>
     </WDropdown>
   </Teleport>
@@ -81,8 +90,6 @@ import {wOverlayFrame} from '../models/overlayRegistry'
 const props = withDefaults(
   defineProps<{
     anchor: OverlayAnchor
-    align?: HorizontalAlign
-    tip?: boolean
     cornered?: boolean
     frameClass?: string
     sheetClass?: string
@@ -95,11 +102,12 @@ const props = withDefaults(
     busy?: boolean
   }>(),
   {
-    align: HorizontalAlign.LEFT_INNER,
     frameClass: undefined,
     sheetClass: undefined,
   },
 )
+
+const FRAME_CLASS = 'surface-raised overflow-hidden rounded-xl text-start font-normal shadow-md border border-solid border-line-raised'
 
 const emit = defineEmits<{
   (e: 'close'): void

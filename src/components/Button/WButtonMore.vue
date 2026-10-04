@@ -34,7 +34,6 @@ import {markRaw, ref, useSlots, useTemplateRef} from 'vue'
 
 import IconMore from '@/assets/icons/IconMore.svg?component'
 
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {type OverlayAnchor, useOverlay, useOwnerActive} from '@/utils/Overlay'
 
 const props = defineProps<{
@@ -90,7 +89,6 @@ const open = (anchor?: OverlayAnchor): void => {
     anchor: target ?? buttonRef.value!,
     content: renderSlot,
     dropdown: {
-      align: target ? HorizontalAlign.RIGHT_INNER : HorizontalAlign.LEFT_INNER,
       cornered: target !== undefined,
       closeOnClick: true,
     },
