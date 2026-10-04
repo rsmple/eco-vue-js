@@ -72,9 +72,10 @@ import WDropdown from '@/components/Dropdown/WDropdown.vue'
 import WDropdownTip from '@/components/Dropdown/WDropdownTip.vue'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
-import {wOverlayFrame} from '@/utils/OverlayRegistry'
 import {getIsMobile} from '@/utils/mobile'
 import {BASE_ZINDEX_DROPDOWN, wBaseZIndex} from '@/utils/utils'
+
+import {wOverlayFrame} from '../models/overlayRegistry'
 
 // Frame of a `dropdown` layer — a dropdown at the anchor, or a bottom sheet on phones. Options match OverlayDropdownOptions.
 const props = withDefaults(

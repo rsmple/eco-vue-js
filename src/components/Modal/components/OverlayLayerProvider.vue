@@ -5,10 +5,10 @@
 <script lang="ts" setup>
 import {getCurrentInstance, provide} from 'vue'
 
-import {setInstanceProvides, wOverlayFrame, wOverlayLayer} from '@/utils/OverlayRegistry'
 import {BASE_ZINDEX_MODAL, wBaseZIndex} from '@/utils/utils'
 
 import {wIsModal} from '../models/injection'
+import {setInstanceProvides, wOverlayFrame, wOverlayLayer} from '../models/overlayRegistry'
 
 const props = defineProps<{
   /** Overlay layer the content belongs to. */
