@@ -1,9 +1,6 @@
 <template>
-  <WDropdownAdaptive
+  <DropdownOverlay
     :is-open="isOpen"
-    :horizontal-align="HorizontalAlign.CENTER"
-    update-align
-    close-on-click-outside
     @close="isOpen = false"
   >
     <template #toggle>
@@ -25,38 +22,23 @@
       </div>
     </template>
 
-    <template #content="{isMobile, isTop}">
-      <div
-        class="tone-surface-raised"
-        :class="isMobile ? undefined : 'flex-col flex items-center'"
-      >
-        <WDropdownTip
-          v-if="!isMobile"
-          :top="isTop"
-        />
-
-        <div
-          class="text-start font-normal"
-          :class="{
-            'surface-raised max-h-80 overflow-y-auto overscroll-y-contain rounded-xl shadow-md border border-solid border-line-raised': !isMobile,
-          }"
+    <template #content>
+      <div class="text-start font-normal sm:max-h-80 sm:overflow-y-auto sm:overscroll-y-contain">
+        <WMenuItem
+          v-for="item in filter"
+          :key="item.id"
+          @click="$emit('select', item.id); isOpen = false"
         >
-          <WMenuItem
-            v-for="item in filter"
-            :key="item.id"
-            @click="$emit('select', item.id); isOpen = false"
-          >
-            <div>
-              <component
-                :is="getMetaValue((Array.isArray(item.item) ? item.item[0].meta : item.item.meta).icon, queryParams)"
-                class="square-[1.25em] -mt-1 inline"
-              /> {{ getMetaValue((Array.isArray(item.item) ? item.item[0].meta : item.item.meta).title, queryParams) ?? '' }}
-            </div>
-          </WMenuItem>
-        </div>
+          <div>
+            <component
+              :is="getMetaValue((Array.isArray(item.item) ? item.item[0].meta : item.item.meta).icon, queryParams)"
+              class="square-[1.25em] -mt-1 inline"
+            /> {{ getMetaValue((Array.isArray(item.item) ? item.item[0].meta : item.item.meta).title, queryParams) ?? '' }}
+          </div>
+        </WMenuItem>
       </div>
     </template>
-  </WDropdownAdaptive>
+  </DropdownOverlay>
 </template>
 
 <script setup lang="ts" generic="QueryParams">
@@ -65,13 +47,11 @@ import type {FilterComponent} from '../types'
 import {ref} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
-import WDropdownTip from '@/components/Dropdown/WDropdownTip.vue'
-import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
 import IconAdd from '@/assets/icons/IconAdd.svg?component'
 
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
+import DropdownOverlay from '@/components/DropdownMenu/components/DropdownOverlay.vue'
 import {SemanticType} from '@/utils/SemanticType'
 
 import {getMetaValue} from '../models/utils'

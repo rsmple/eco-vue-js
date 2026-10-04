@@ -7,6 +7,25 @@
     no-overlay
     @close="dismiss"
   >
+    <template
+      v-if="title"
+      #toggle="{unclickable}"
+    >
+      <div
+        v-if="!unclickable"
+        class="flex items-center gap-2 py-2 text-base font-semibold"
+      >
+        <template v-if="typeof title === 'string'">
+          {{ title }}
+        </template>
+
+        <component
+          :is="title"
+          v-else
+        />
+      </div>
+    </template>
+
     <template #content>
       <!-- Clicks inside the sheet stop at its content, so `closeOnClick` closes it here. -->
       <div
@@ -73,7 +92,7 @@
 <script lang="ts" setup>
 import type {OverlayAnchor} from '@/utils/Overlay'
 
-import {inject, provide, useTemplateRef, watch} from 'vue'
+import {type Component, inject, provide, useTemplateRef, watch} from 'vue'
 
 import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
@@ -91,6 +110,7 @@ const props = withDefaults(
   defineProps<{
     anchor: OverlayAnchor
     cornered?: boolean
+    title?: string | Component
     frameClass?: string
     sheetClass?: string
     closeOnClick?: boolean
@@ -104,6 +124,7 @@ const props = withDefaults(
   {
     frameClass: undefined,
     sheetClass: undefined,
+    title: undefined,
   },
 )
 
