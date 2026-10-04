@@ -84,8 +84,6 @@ const findLayer = (id: number | null): LayerEntry | undefined => {
   return id === null ? undefined : layers.value.find(item => item.id === id)
 }
 
-export const getLayer = (id: number | null): OverlayLayer | undefined => findLayer(id)
-
 /**
  * Closes the layer and everything opened from it, the top-most first.
  */
@@ -190,11 +188,6 @@ export const openLayer = (options: OverlayOptions): OverlayLayer | null => {
   layers.value = [...layers.value, entry]
 
   return entry
-}
-
-/** Whether the layer is the top-most, the one Escape and outside clicks belong to. */
-export const isTopLayer = (id: number | null): boolean => {
-  return id !== null && layers.value[layers.value.length - 1]?.id === id
 }
 
 /** Closes the layers opened from the given one. Returns whether there were any. */
