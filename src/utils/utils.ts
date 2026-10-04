@@ -21,7 +21,36 @@ export const getScrollParent = (node: Node): Element | null =>
       : getScrollParent(node.parentElement)
     : null
 
-export const getAllScrollParents = (node?: Node, max = 10): Array<Element> => {
+/**
+ * Scrolls only the nearest scrolling ancestor, or the page when there is none, to bring the element into view —
+ * `scrollIntoView` scrolls every ancestor, and its `container: 'nearest'` option is not supported in Firefox and Safari yet.
+ * With `ifNeeded`, an element that is already fully in view is left alone.
+ */
+export const scrollInParent = (
+  element: Element,
+  {block = 'nearest', behavior, ifNeeded = false}: {block?: 'start' | 'center' | 'nearest', behavior?: ScrollBehavior, ifNeeded?: boolean} = {},
+): void => {
+  const parent = getScrollParent(element) ?? document.scrollingElement
+
+  if (!parent) return
+
+  const isPage = parent === document.scrollingElement
+  const height = element.getBoundingClientRect().height
+  const top = element.getBoundingClientRect().top - (isPage ? 0 : parent.getBoundingClientRect().top + parent.clientTop)
+  const isVisible = top >= 0 && top + height <= parent.clientHeight
+
+  if (isVisible && (ifNeeded || block === 'nearest')) return
+
+  const delta = block === 'start'
+    ? top
+    : block === 'center'
+      ? top - (parent.clientHeight - height) / 2
+      : top < 0 ? top : top + height - parent.clientHeight
+
+  parent.scrollTo({top: parent.scrollTop + delta, behavior})
+}
+
+export const getAllScrollParents =(node?: Node, max = 10): Array<Element> => {
   const arr: Array<Element> = []
 
   let parent = node && getScrollParent(node)

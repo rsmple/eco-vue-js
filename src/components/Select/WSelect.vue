@@ -17,7 +17,7 @@
     @keypress:down.prevent="cursorDown"
     @keypress:delete="captureDoubleDelete"
 
-    @open="isOpen = true"
+    @open="isOpen = true; isScrollSelected = !search"
     @close="close"
     @focus="focused = true; $emit('focus', $event)"
     @blur="focused = false; $emit('blur', $event)"
@@ -155,11 +155,13 @@
           :is-cursor="index === cursor"
           :loading="loadingOptionIndex === index && loading"
           :scroll="isCursorLocked"
+          :scroll-selected="isScrollSelected"
           :hide-option-icon="hideOptionIcon"
           class="first:pt---w-select-option-padding last:pb---w-select-option-padding"
           @select="select(valueGetter(option), option); setLoadingOptionIndex(index)"
           @unselect="unselect(valueGetter(option), option); setLoadingOptionIndex(index)"
           @mouseenter="setCursor(index)"
+          @scroll:selected="scrollToSelected(index, $event)"
         >
           <template #default="{selected}">
             <slot
@@ -236,6 +238,8 @@ const optionRef = useTemplateRef('option')
 const inputRef = useTemplateRef('input')
 const cursor = ref<number>(0)
 const isCursorLocked = ref(false)
+/** Set when the menu opens, until the first selected option scrolls into view or a search is typed. */
+const isScrollSelected = ref(false)
 const search = ref('')
 const isModelValueSearch = computed(() => !!search.value && props.modelValue?.includes(search.value as Model))
 const searchPrepared = computed(() => isModelValueSearch.value ? '' : search.value.trim().toLocaleLowerCase())
@@ -290,6 +294,7 @@ const close = () => {
   }
 
   isOpen.value = false
+  isScrollSelected.value = false
   focused.value = false
   search.value = ''
 }
@@ -360,6 +365,16 @@ const selectCursor = () => {
   optionRef.value?.forEach(item => item?.toggleCursor())
 }
 
+const scrollToSelected = (index: number, scroll: () => void) => {
+  if (!isScrollSelected.value) return
+
+  isScrollSelected.value = false
+
+  if (props.cursorSelected) cursor.value = index
+
+  scroll()
+}
+
 let deletePressTimeout: ReturnType<typeof setTimeout> | null = null
 
 const captureDoubleDelete = () => {
@@ -381,6 +396,8 @@ const captureDoubleDelete = () => {
 const select = (item: Model, data: Data): void => {
   if (isDisabledComputed.value) return
 
+  isScrollSelected.value = false
+
   emit('select', item, data)
 
   search.value = ''
@@ -388,6 +405,8 @@ const select = (item: Model, data: Data): void => {
 
 const unselect = (item: Model, data: Data | undefined): void => {
   if (isDisabledComputed.value) return
+
+  isScrollSelected.value = false
 
   emit('unselect', item, data)
 
@@ -430,6 +449,10 @@ const blur = () => {
 const setSearch = (value: string): void => {
   search.value = value
 }
+
+watch(search, value => {
+  if (value) isScrollSelected.value = false
+})
 
 watch(isModelValueSearch, async value => {
   if (!value) return

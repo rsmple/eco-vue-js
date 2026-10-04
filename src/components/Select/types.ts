@@ -77,6 +77,8 @@ export interface SelectProps<Model extends number | string, Data extends Default
   lazy?: boolean
   /** Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. */
   placeholderEmpty?: string
+  /** Puts the cursor on the first selected option when the menu opens, so Enter toggles it — by default the menu only scrolls to it. Always set in the single selects. */
+  cursorSelected?: boolean
 }
 
 export interface SelectPrefixProps<Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>>
@@ -93,7 +95,7 @@ export interface SelectPrefixProps<Data extends DefaultData, OptionComponent ext
 export type SelectClearValue = null | undefined | ''
 
 export interface SelectSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean, ClearValue extends SelectClearValue = null>
-  extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'createdData'> {
+  extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'createdData' | 'cursorSelected'> {
   /** Selected value. */
   modelValue: Model | ClearValue | null | undefined
   /** Adds a button that clears the value, emitting `clearValue`. */
@@ -168,7 +170,7 @@ export interface SelectAsyncPrefixPageProps<Model extends number | string, Data 
 }
 
 export interface SelectAsyncSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean, ClearValue extends SelectClearValue = null>
-  extends Omit<SelectAsyncProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'previewData' | 'createdData'> {
+  extends Omit<SelectAsyncProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'previewData' | 'createdData' | 'cursorSelected'> {
   /** Selected value. */
   modelValue: Model | ClearValue | null
   /** Adds a button that clears the value, emitting `clearValue`. */

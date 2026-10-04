@@ -76,6 +76,7 @@
           :is-no-cursor="cursor === undefined"
           :hide-option-icon="hideOptionIcon"
           :reverse="reverse"
+          :scroll-selected="scrollSelected"
           :class="{
             'pt---w-select-option-padding': !noPadding && first && !allowCreate,
             'pb---w-select-option-padding': !noPadding && last,
@@ -90,6 +91,7 @@
           @unmounted="updateCursor(next ? valueGetter(next) : undefined)"
           @update:first="firstItem = valueGetter(item)"
           @update:last="lastItem = valueGetter(item)"
+          @scroll:selected="scrollToSelected(valueGetter(item), $event)"
         >
           <template #default="{selected}">
             <slot
@@ -123,7 +125,7 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import type {SelectOptionProps} from '../types'
 
-import {type UnwrapRef, computed, ref, useTemplateRef} from 'vue'
+import {type UnwrapRef, computed, ref, useTemplateRef, watch} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
@@ -150,6 +152,8 @@ const props = defineProps<{
   loadingCreate?: boolean
   search?: string
   reverse?: boolean
+  scrollSelected?: boolean
+  cursorSelected?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -157,6 +161,7 @@ const emit = defineEmits<{
   (e: 'unselect', value: Model, data: Data): void
   (e: 'update:count', value: number): void
   (e: 'create:option'): void
+  (e: 'scroll:selected'): void
 }>()
 
 const optionRef = useTemplateRef<ComponentInstance<typeof SelectOption>[]>('option')
@@ -225,6 +230,25 @@ const selectCursor = () => {
   }
 
   if (cursor.value) optionRef.value?.forEach(item => item.toggleCursor())
+}
+
+/** Options mounted in the same render all report before `scrollSelected` turns off, so only the first one is taken. */
+let isScrolledToSelected = false
+
+watch(() => props.scrollSelected, value => {
+  if (value) isScrolledToSelected = false
+})
+
+const scrollToSelected = (value: Model, scroll: () => void) => {
+  if (isScrolledToSelected) return
+
+  isScrolledToSelected = true
+
+  if (props.cursorSelected) cursor.value = value as UnwrapRef<Model>
+
+  scroll()
+
+  emit('scroll:selected')
 }
 
 const emitSelect = (value: Model, data: Data): void => {
