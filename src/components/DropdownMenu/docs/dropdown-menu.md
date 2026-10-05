@@ -242,7 +242,6 @@ import WDropdownAdaptive from 'eco-vue-js/dist/components/DropdownMenu/WDropdown
 | `horizontalAlign` | `HorizontalAlign` | — | Aligns the dropdown to the parent without a tip, such as a field's menu with `HorizontalAlign.FILL`. Otherwise it is centered on the parent with a tip pointing at it. |
 | `nested` | `boolean` | — | Opens over the dropdown this one is inside of, instead of taking its place. |
 | `frameClass` | `string` | — | Classes of the dropdown's box, replacing the default frame. |
-| `sheetClass` | `string` | — | Classes added to the content's box in the bottom sheet on phones. |
 | `closeOnClick` | `boolean` | — | A click on the content closes the layer, as in a menu. |
 
 #### Events

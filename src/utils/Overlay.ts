@@ -6,6 +6,7 @@ import type {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {type Component, type ComputedRef, computed, getCurrentInstance, inject, onScopeDispose, watch} from 'vue'
 
 import {
+  type OpenContext,
   type OverlayLayer,
   closeLayer,
   getInstanceProvides,
@@ -46,8 +47,6 @@ export type OverlayDropdownOptions = {
   frameClass?: string
   /** Heading at the top of the bottom sheet on phones, such as the name of the button that opened it. The content can pin more under it with OverlayHeader, such as a field. */
   title?: string | Component
-  /** Classes added to the content's box in the bottom sheet on phones. */
-  sheetClass?: string
   /** A click on the content closes the layer, as in a menu. */
   closeOnClick?: boolean
   /** Called with whether the dropdown opened above its anchor, as it is placed. Not called in a bottom sheet. */
@@ -60,12 +59,6 @@ type OverlayContentOptions = {
   props?: object
   /** What the layer is for, such as a list row, to mark it with `useOwnerActive` while the layer — or one it hands off to — is open. */
   owner?: unknown
-  /** Closed with the modal's close button without asking about unsaved changes. */
-  autoclose?: boolean
-  /** Closes on Escape while top-most. Defaults to `true` for a dropdown. */
-  escape?: boolean
-  /** Closes a dropdown with the same anchor instead of opening, like a second click on a toggle. */
-  toggle?: boolean
   /** Opens over the dropdown it is opened from instead of taking its place, such as the menu of a select inside a filter. */
   nested?: boolean
   /** Runs once the layer is closed — by its close function, its content, the user, a sibling taking its place, or the layer it was opened from closing. */
@@ -73,8 +66,14 @@ type OverlayContentOptions = {
 }
 
 export type OverlayOpenOptions = OverlayContentOptions & (
-  | {present: 'modal', anchor?: undefined, dropdown?: undefined}
-  | {present: 'dropdown', anchor: OverlayAnchor, dropdown?: OverlayDropdownOptions}
+  | {
+    present: 'modal'
+    anchor?: undefined
+    dropdown?: undefined
+    /** Closed with the modal's close button without asking about unsaved changes. */
+    autoclose?: boolean
+  }
+  | {present: 'dropdown', anchor: OverlayAnchor, dropdown?: OverlayDropdownOptions, autoclose?: undefined}
 )
 
 /**
@@ -92,36 +91,33 @@ export const useOverlay = () => {
   const instance = getCurrentInstance()
   const getParent = inject(wOverlayLayer, () => null)
 
-  // Dropdowns stick to the component's elements, so they go with it.
-  const dropdowns = new Set<OverlayLayer>()
+  // Dropdowns stick to the component's elements, so they go with it — unless they took a menu's place.
+  const dropdowns = new Set<number>()
 
   onScopeDispose(() => {
-    dropdowns.forEach(layer => closeLayer(layer.id))
+    dropdowns.forEach(closeLayer)
   })
 
-  const getContext = () => ({parent: getParent(), provides: getInstanceProvides(instance)})
+  const getContext = (): OpenContext => ({parent: getParent(), provides: getInstanceProvides(instance)})
 
-  const track = (layer: OverlayLayer | null, handoff: boolean) => {
-    if (layer?.present === 'dropdown' && !handoff) dropdowns.add(layer)
+  // `open` gets a callback to run once the layer closes, which forgets it.
+  const track = (nested: boolean | undefined, open: (context: OpenContext, untrack: () => void) => OverlayLayer | null) => {
+    const context = getContext()
+    const handoff = !nested && isHandoff(context.parent)
+
+    const layer: OverlayLayer | null = open(context, () => {
+      if (layer) dropdowns.delete(layer.id)
+    })
+
+    if (layer?.present === 'dropdown' && !handoff) dropdowns.add(layer.id)
 
     return toClose(layer)
-  }
-
-  const untrack = (getLayer: () => OverlayLayer | null) => () => {
-    const layer = getLayer()
-
-    if (layer) dropdowns.delete(layer)
   }
 
   return {
     /** Opens `content` the way `present` says. WModal picks the frame, such as a dropdown that is a bottom sheet on phones. */
     open(options: OverlayOpenOptions): (() => void) | null {
-      const context = getContext()
-      const handoff = !options.nested && isHandoff(context.parent)
-
-      const layer: OverlayLayer | null = openWithCallback(options, untrack(() => layer), context)
-
-      return track(layer, handoff)
+      return track(options.nested, (context, untrack) => openWithCallback(options, untrack, context))
     },
 
     /** Opens a modal. `cb` runs after it closes. */
@@ -136,15 +132,10 @@ export const useOverlay = () => {
 
     /** Opens a confirm at `anchor`, or at the anchor of the menu it is opened from, as a dropdown — a bottom sheet on phones. Without one, a modal. */
     addConfirm(props: ConfirmModalProps, cb?: () => void): (() => void) | null {
-      const context = getContext()
-      const handoff = isHandoff(context.parent)
-
-      const layer: OverlayLayer | null = openConfirm(props, () => {
-        untrack(() => layer)()
+      return track(false, (context, untrack) => openConfirm(props, () => {
+        untrack()
         cb?.()
-      }, context)
-
-      return track(layer, handoff)
+      }, context))
     },
   }
 }

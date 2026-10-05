@@ -39,7 +39,7 @@
       <WInfiniteListScrollingElement parent>
         <div
           class="pb-4 text-start font-normal"
-          :class="[sheetClass, {'pointer-events-none': closing}]"
+          :class="{'pointer-events-none': closing}"
           @click="closeOnClick && dismiss()"
         >
           <slot />
@@ -54,7 +54,7 @@
   >
     <!-- The layer's element, where a click counts as inside the dropdown it was opened from too. -->
     <div
-      ref="element"
+      v-bind="{[LAYER_ATTRIBUTE]: layer ?? undefined}"
       class="contents"
     >
       <WDropdown
@@ -118,7 +118,7 @@
 <script lang="ts" setup>
 import type {OverlayAnchor, OverlayDropdownOptions} from '@/utils/Overlay'
 
-import {type Component, computed, inject, onBeforeUnmount, provide, shallowRef, useTemplateRef, watch} from 'vue'
+import {type Component, computed, inject, provide, shallowRef, useTemplateRef, watch} from 'vue'
 
 import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
@@ -130,7 +130,7 @@ import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {getIsMobile} from '@/utils/mobile'
 import {BASE_ZINDEX_DROPDOWN, wBaseZIndex} from '@/utils/utils'
 
-import {isInLayerWithin, setLayerElement, wOverlayFrame, wOverlayHeader, wOverlayLayer} from '../models/overlayRegistry'
+import {LAYER_ATTRIBUTE, isInLayerWithin, wOverlayFrame, wOverlayHeader, wOverlayLayer} from '../models/overlayRegistry'
 
 // Frame of a `dropdown` layer — a dropdown at the anchor, or a bottom sheet on phones.
 const props = withDefaults(
@@ -146,7 +146,6 @@ const props = withDefaults(
   {
     align: undefined,
     frameClass: undefined,
-    sheetClass: undefined,
     title: undefined,
     onTop: undefined,
   },
@@ -188,13 +187,6 @@ const dismiss = () => {
 }
 
 const layer = inject(wOverlayLayer, () => null)()
-
-const elementRef = useTemplateRef('element')
-
-if (layer !== null) {
-  watch(elementRef, value => setLayerElement(layer, value))
-  onBeforeUnmount(() => setLayerElement(layer, null))
-}
 
 // A click on the anchor is its own — a field keeps its menu, a toggle closes it itself — and one in a dropdown opened from this one, such as a select's menu, is inside.
 const dismissOutside = (event: Event) => {

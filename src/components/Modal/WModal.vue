@@ -99,12 +99,7 @@ const leavingLayers = shallowRef<OverlayLayer[]>([])
 
 const renderedDropdownLayers = computed(() => [...dropdownLayers.value, ...leavingLayers.value])
 
-const leavingTimeouts = new Map<OverlayLayer, ReturnType<typeof setTimeout>>()
-
 const removeLeaving = (layer: OverlayLayer) => {
-  clearTimeout(leavingTimeouts.get(layer))
-  leavingTimeouts.delete(layer)
-
   leavingLayers.value = leavingLayers.value.filter(item => item !== layer)
 }
 
@@ -156,12 +151,7 @@ watch(() => dropdownLayers.value.length > 0, value => {
 watch(dropdownLayers, (value, oldValue) => {
   const closed = oldValue.filter(layer => !value.includes(layer))
 
-  if (!closed.length) return
-
-  leavingLayers.value = [...leavingLayers.value, ...closed]
-
-  // Drops a layer that never emits `closed`, such as a component without an exit.
-  closed.forEach(layer => leavingTimeouts.set(layer, setTimeout(() => removeLeaving(layer), 1000)))
+  if (closed.length) leavingLayers.value = [...leavingLayers.value, ...closed]
 })
 
 const isBackdrop = useIsBackdrop()
@@ -201,7 +191,7 @@ const onKeydown = (event: KeyboardEvent) => {
 
   const top = layers.value[layers.value.length - 1]
 
-  if (top?.escape && !isLayerBusy(top.id)) closeLayer(top.id)
+  if (top?.present === 'dropdown' && !isLayerBusy(top.id)) closeLayer(top.id)
 }
 
 let timeout: ReturnType<typeof setTimeout> | undefined

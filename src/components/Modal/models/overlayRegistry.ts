@@ -4,7 +4,7 @@
 import type {ConfirmModalProps} from '../types'
 import type {OverlayAnchor, OverlayDropdownOptions, OverlayFrame, OverlayOpenOptions, OverlayPresentation} from '@/utils/Overlay'
 
-import {type Component, type ComponentInternalInstance, type InjectionKey, type Ref, defineAsyncComponent, markRaw, nextTick, shallowRef} from 'vue'
+import {type Component, type ComponentInternalInstance, type InjectionKey, type Ref, defineAsyncComponent, markRaw, nextTick, shallowReactive, shallowRef} from 'vue'
 
 import {isAnchorConnected} from '@/utils/utils'
 
@@ -12,16 +12,13 @@ const ConfirmModal = defineAsyncComponent(() => import('../modals/Confirm/Confir
 const ConfirmAnchored = defineAsyncComponent(() => import('../modals/Confirm/ConfirmAnchored.vue'))
 
 /**
- * How a layer shares its parent with other layers:
- * - `replace` — one at a time per parent, like a menu or an anchored confirm. Opening one closes the other.
- * - `push` — stacks over the others, like a modal.
+ * A layer is presented as:
+ * - `dropdown` — one at a time per parent, like a menu or an anchored confirm. Opening one closes the other. Closes on Escape while top-most.
+ * - `modal` — stacks over the others.
  */
-export type OverlayPolicy = 'push' | 'replace'
-
 export type OverlayLayer = {
   readonly id: number
   readonly present: OverlayPresentation
-  readonly policy: OverlayPolicy
   /** Layer it was opened from, closed together with it. `null` for the page. */
   readonly parent: number | null
   /** What the layer is for, such as a list row, to mark it while the layer is open. */
@@ -33,10 +30,8 @@ export type OverlayLayer = {
   readonly dropdown: OverlayDropdownOptions
   /** Injections of the component that opened the layer, which the content sees instead of the host's. */
   readonly provides: Record<string | symbol, unknown> | undefined
-  /** Closed with the modal's close button without asking about unsaved changes. */
+  /** Modal closed with its close button without asking about unsaved changes. */
   readonly autoclose: boolean
-  /** Closes on Escape while top-most. */
-  readonly escape: boolean
 }
 
 export type OverlayOptions = OverlayOpenOptions & {
@@ -44,6 +39,8 @@ export type OverlayOptions = OverlayOpenOptions & {
   parent?: number | null
   /** Injections the content sees. */
   provides?: Record<string | symbol, unknown>
+  /** Closes a dropdown with the same anchor instead of opening, like a second click on a toggle. */
+  toggle?: boolean
 }
 
 type LayerEntry = OverlayLayer & {onClose: (() => void) | undefined}
@@ -114,21 +111,20 @@ export const isLayerWithin = (id: number, ancestor: number): boolean => {
   return parent !== null && (parent === ancestor || isLayerWithin(parent, ancestor))
 }
 
-const layerElements = new Map<number, Element>()
-
-/** Called by a dropdown layer's frame with its element on the page, `null` once it is gone. */
-export const setLayerElement = (id: number, element: Element | null): void => {
-  if (element) layerElements.set(id, element)
-  else layerElements.delete(id)
-}
+/** Attribute a dropdown layer's frame marks its element on the page with, holding the layer's id. */
+export const LAYER_ATTRIBUTE = 'data-w-layer'
 
 /** Whether an event's path goes through a layer opened from `ancestor`, such as a click in a select's menu inside a filter. */
 export const isInLayerWithin = (path: EventTarget[], ancestor: number): boolean => {
-  return [...layerElements].some(([id, element]) => path.includes(element) && isLayerWithin(id, ancestor))
+  return path.some(target => {
+    const id = target instanceof Element ? target.getAttribute(LAYER_ATTRIBUTE) : null
+
+    return id !== null && isLayerWithin(Number(id), ancestor)
+  })
 }
 
 /** Whether opening from `parent` hands off: a menu closes on the click that opens something from it, taking the clicked item with it. */
-export const isHandoff = (parent: number | null): boolean => findLayer(parent)?.policy === 'replace'
+export const isHandoff = (parent: number | null): boolean => findLayer(parent)?.present === 'dropdown'
 
 /** The anchor a layer opened from `parent` takes over, so a layer opened from a menu sticks to the menu's anchor. */
 export const getHandoffAnchor = (parent: number | null): OverlayAnchor | undefined => {
@@ -145,7 +141,7 @@ export const getHandoffAnchor = (parent: number | null): OverlayAnchor | undefin
 export const openLayer = (options: OverlayOptions): OverlayLayer | null => {
   if (!isHosted) return null
 
-  const policy: OverlayPolicy = options.present === 'dropdown' ? 'replace' : 'push'
+  const isDropdown = options.present === 'dropdown'
 
   let parent = findLayer(options.parent ?? null) ? options.parent ?? null : null
   let owner = options.owner
@@ -153,10 +149,10 @@ export const openLayer = (options: OverlayOptions): OverlayLayer | null => {
 
   const parentEntry = findLayer(parent)
 
-  if (parentEntry?.policy === 'replace' && !options.nested) {
+  if (parentEntry?.present === 'dropdown' && !options.nested) {
     parent = parentEntry.parent
 
-    if (policy === 'replace') {
+    if (isDropdown) {
       owner ??= parentEntry.owner
       anchor = parentEntry.anchor ?? anchor
     }
@@ -164,8 +160,8 @@ export const openLayer = (options: OverlayOptions): OverlayLayer | null => {
     closeLayer(parentEntry.id)
   }
 
-  if (policy === 'replace') {
-    const siblings = layers.value.filter(item => item.policy === 'replace' && item.parent === parent)
+  if (isDropdown) {
+    const siblings = layers.value.filter(item => item.present === 'dropdown' && item.parent === parent)
 
     siblings.reverse().forEach(item => closeLayer(item.id))
 
@@ -175,7 +171,6 @@ export const openLayer = (options: OverlayOptions): OverlayLayer | null => {
   const entry: LayerEntry = {
     id: nextId++,
     present: options.present,
-    policy,
     parent,
     owner,
     anchor,
@@ -184,7 +179,6 @@ export const openLayer = (options: OverlayOptions): OverlayLayer | null => {
     dropdown: options.dropdown ?? {},
     provides: options.provides,
     autoclose: options.autoclose ?? false,
-    escape: options.escape ?? options.present === 'dropdown',
     onClose: options.onClose,
   }
 
@@ -205,29 +199,23 @@ export const closeChildLayers = (id: number): boolean => {
 /** Whether a layer is open for the owner. */
 export const hasOwnerLayer = (owner: unknown): boolean => layers.value.some(item => item.owner === owner)
 
-const busyLayers = shallowRef<ReadonlySet<number>>(new Set())
+const busyLayers = shallowReactive(new Set<number>())
 
 /** Marks a layer busy, such as a confirm running its action. A busy layer stays open on Escape, outside clicks, swipes and a detached anchor. */
 export const setLayerBusy = (id: number, value: boolean): void => {
-  if (value === busyLayers.value.has(id) || (value && !findLayer(id))) return
-
-  const next = new Set(busyLayers.value)
-
-  if (value) next.add(id)
-  else next.delete(id)
-
-  busyLayers.value = next
+  if (!value) busyLayers.delete(id)
+  else if (findLayer(id)) busyLayers.add(id)
 }
 
-export const isLayerBusy = (id: number): boolean => busyLayers.value.has(id)
+export const isLayerBusy = (id: number): boolean => busyLayers.has(id)
 
-type OpenContext = {
+export type OpenContext = {
   parent: number | null
   provides?: Record<string | symbol, unknown>
 }
 
 /** Opens a layer for `Modal` and `useOverlay`, returning its close function. `cb` runs after it closes. */
-export const openWithCallback = (options: OverlayOpenOptions, cb: (() => void) | undefined, context: OpenContext): OverlayLayer | null => {
+export const openWithCallback = (options: OverlayOpenOptions & Pick<OverlayOptions, 'toggle'>, cb: (() => void) | undefined, context: OpenContext): OverlayLayer | null => {
   return openLayer({
     ...options,
     ...context,
@@ -253,7 +241,6 @@ export const openConfirm = (props: ConfirmModalProps, cb: (() => void) | undefin
       anchor,
       content: ConfirmAnchored,
       props: {...props, anchor},
-      autoclose: true,
       // Opening it again from the same anchor closes it, like a second click on a toggle.
       toggle: true,
     }, cb, context)
