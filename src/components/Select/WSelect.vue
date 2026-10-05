@@ -86,7 +86,6 @@
     <template #content>
       <div
         role="listbox"
-        :class="embedded ? undefined : 'max-h-80'"
       >
         <slot name="content" />
 
@@ -155,11 +154,13 @@
           :is-cursor="index === cursor"
           :loading="loadingOptionIndex === index && loading"
           :scroll="isCursorLocked"
+          :scroll-selected="isScrollSelected"
           :hide-option-icon="hideOptionIcon"
           class="first:pt---w-select-option-padding last:pb---w-select-option-padding"
           @select="select(valueGetter(option), option); setLoadingOptionIndex(index)"
           @unselect="unselect(valueGetter(option), option); setLoadingOptionIndex(index)"
           @mouseenter="setCursor(index)"
+          @scroll:selected="scrollToSelected(index, $event)"
         >
           <template #default="{selected}">
             <slot
@@ -200,6 +201,7 @@ import {debounce} from '@/utils/utils'
 
 import SelectOption from './components/SelectOption.vue'
 import SelectOptionPrefix from './components/SelectOptionPrefix.vue'
+import {useScrollSelected} from './models/useScrollSelected'
 
 defineOptions({inheritAttrs: false})
 
@@ -237,6 +239,7 @@ const inputRef = useTemplateRef('input')
 const cursor = ref<number>(0)
 const isCursorLocked = ref(false)
 const search = ref('')
+const {isScrollSelected, takeSelected} = useScrollSelected(() => isOpen.value, () => search.value)
 const isModelValueSearch = computed(() => !!search.value && props.modelValue?.includes(search.value as Model))
 const searchPrepared = computed(() => isModelValueSearch.value ? '' : search.value.trim().toLocaleLowerCase())
 const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
@@ -360,6 +363,10 @@ const selectCursor = () => {
   optionRef.value?.forEach(item => item?.toggleCursor())
 }
 
+const scrollToSelected = (index: number, scroll: () => void) => {
+  if (takeSelected(scroll) && props.cursorSelected) cursor.value = index
+}
+
 let deletePressTimeout: ReturnType<typeof setTimeout> | null = null
 
 const captureDoubleDelete = () => {
@@ -381,6 +388,8 @@ const captureDoubleDelete = () => {
 const select = (item: Model, data: Data): void => {
   if (isDisabledComputed.value) return
 
+  isScrollSelected.value = false
+
   emit('select', item, data)
 
   search.value = ''
@@ -388,6 +397,8 @@ const select = (item: Model, data: Data): void => {
 
 const unselect = (item: Model, data: Data | undefined): void => {
   if (isDisabledComputed.value) return
+
+  isScrollSelected.value = false
 
   emit('unselect', item, data)
 
@@ -466,8 +477,6 @@ if (props.useFirstDefault) {
 
 watch(() => props.modelValue, async (value, oldValue) => {
   await nextTick()
-
-  inputRef.value?.updateDropdown()
 
   if (props.seamless) inputRef.value?.scrollToInput()
 

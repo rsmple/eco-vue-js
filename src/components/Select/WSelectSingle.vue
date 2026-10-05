@@ -7,6 +7,7 @@
       disableClear: !allowClear,
       createdData: createdData ? [createdData] as Data[] : undefined,
       hidePrefix: true,
+      cursorSelected: true,
       filterValue: filterValue === undefined ? modelValue : filterValue,
     }"
     :class="$attrs.class"

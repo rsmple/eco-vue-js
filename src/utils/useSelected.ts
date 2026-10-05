@@ -288,7 +288,11 @@ export const useSelected = <Value extends number>(
 
     isShift.value = true
 
-    window.addEventListener('click', applySelect)
+    // Added after the current event, so the click on a "Select range" button does not select right away
+    // and still reaches other listeners, such as an open menu closing on a click outside.
+    setTimeout(() => {
+      if (isShift.value && !unmounted.value) window.addEventListener('click', applySelect)
+    })
   }
 
   const resetIsSelecting = () => {

@@ -59,7 +59,7 @@
           :prefix-max="prefixMax"
           :known-data="knownData"
           @unselect="unselect"
-          @update:fetching="!$event && updateDropdown(); isFetchingPrefix = $event"
+          @update:fetching="isFetchingPrefix = $event"
           @update:model-value="updateSelected"
         >
           <template
@@ -103,7 +103,8 @@
         :query-options="{placeholderData: keepPreviousData}"
         :search="search"
         :reverse="reverse"
-        :class="embedded ? undefined : 'max-h-80'"
+        :scroll-selected="isOpen"
+        :cursor-selected="cursorSelected"
         @select="select"
         @unselect="unselect"
         @create:option="create(search)"
@@ -300,12 +301,6 @@ const blur = () => {
   inputRef.value?.blur()
 }
 
-const updateDropdown = async () => {
-  await nextTick()
-
-  inputRef.value?.updateDropdown()
-}
-
 const setSearch = (value: string): void => {
   search.value = value
 }
@@ -323,8 +318,6 @@ if (props.useQueryFnDefault) {
 
 watch(() => props.modelValue, async () => {
   await nextTick()
-
-  inputRef.value?.updateDropdown()
 
   if (props.seamless) inputRef.value?.scrollToInput()
 })

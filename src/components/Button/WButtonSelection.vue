@@ -8,11 +8,11 @@
         }"
       />
 
-      <WDropdownMenu
+      <WDropdownAdaptive
         v-if="$slots.more"
         :is-open="isOpen"
-        :horizontal-align="HorizontalAlign.RIGHT_INNER"
-        :class="moreToggleClass"
+        close-on-click
+        @close="isOpen = false"
       >
         <template #toggle>
           <WButtonSelectionAction
@@ -21,25 +21,25 @@
             :aria-expanded="isOpen"
             :disable-message="disableMessageValue"
             class="border-l border-solid border-line"
+            :class="moreToggleClass"
             @click="isOpen = !isOpen"
           />
         </template>
 
-        <template #content>
-          <WClickOutside
-            class="surface-raised dropdown w-shine-hidden my-2 grid grid-cols-1 overflow-hidden rounded-xl shadow-md outline-1 outline-line-raised"
-            @click="isOpen = false"
-          >
-            <slot
-              name="more"
-              v-bind="{
-                disableMessage: disableMessageValue,
-                cssClass: 'first:pt-2 last:pb-2'
-              }"
-            />
-          </WClickOutside>
+        <template #header>
+          More
         </template>
-      </WDropdownMenu>
+
+        <template #content>
+          <slot
+            name="more"
+            v-bind="{
+              disableMessage: disableMessageValue,
+              cssClass: 'first:pt-2 last:pb-2',
+            }"
+          />
+        </template>
+      </WDropdownAdaptive>
     </div>
 
     <WButtonSelectionState
@@ -59,17 +59,14 @@
 <script lang="ts" setup>
 import {type VNode, computed, inject, markRaw, provide, ref} from 'vue'
 
-import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconMore from '@/assets/icons/IconMore.svg?component'
 
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {BASE_ZINDEX_LIST_HEADER, numberFormatter, wBaseZIndex} from '@/utils/utils'
 
 import WButtonSelectionAction from './WButtonSelectionAction.vue'
 import WButtonSelectionState from './WButtonSelectionState.vue'
-
-import WClickOutside from '../ClickOutside/WClickOutside.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -99,9 +96,9 @@ const baseZIndex = inject(wBaseZIndex, null)
 
 provide(wBaseZIndex, baseZIndex ?? BASE_ZINDEX_LIST_HEADER)
 
-const isOpen = ref(false)
-
 const disableMessageValue = computed<string | undefined>(() => props.selectedCount === 0 ? props.disableMessage : undefined)
+
+const isOpen = ref(false)
 
 defineSlots<{
   /** WButtonSelectionAction buttons. Pass them `disableMessage`, and `cssClass` for the dividers between them. */

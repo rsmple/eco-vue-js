@@ -1,3 +1,4 @@
+import type {OverlayAnchor} from './Overlay'
 import type {FieldConfig, FieldConfigMap, GetFieldLabels, ListFields} from '@/components/List/types'
 import type {InjectionKey, VNode, VNodeProps} from 'vue'
 
@@ -20,6 +21,35 @@ export const getScrollParent = (node: Node): Element | null =>
       : getScrollParent(node.parentElement)
     : null
 
+/**
+ * Scrolls only the nearest scrolling ancestor, or the page when there is none, to bring the element into view —
+ * `scrollIntoView` scrolls every ancestor, and its `container: 'nearest'` option is not supported in Firefox and Safari yet.
+ * With `ifNeeded`, an element that is already fully in view is left alone.
+ */
+export const scrollInParent = (
+  element: Element,
+  {block = 'nearest', behavior, ifNeeded = false}: {block?: 'start' | 'center' | 'nearest', behavior?: ScrollBehavior, ifNeeded?: boolean} = {},
+): void => {
+  const parent = getScrollParent(element) ?? document.scrollingElement
+
+  if (!parent) return
+
+  const isPage = parent === document.scrollingElement
+  const height = element.getBoundingClientRect().height
+  const top = element.getBoundingClientRect().top - (isPage ? 0 : parent.getBoundingClientRect().top + parent.clientTop)
+  const isVisible = top >= 0 && top + height <= parent.clientHeight
+
+  if (isVisible && (ifNeeded || block === 'nearest')) return
+
+  const delta = block === 'start'
+    ? top
+    : block === 'center'
+      ? top - (parent.clientHeight - height) / 2
+      : top < 0 ? top : top + height - parent.clientHeight
+
+  parent.scrollTo({top: parent.scrollTop + delta, behavior})
+}
+
 export const getAllScrollParents = (node?: Node, max = 10): Array<Element> => {
   const arr: Array<Element> = []
 
@@ -33,12 +63,6 @@ export const getAllScrollParents = (node?: Node, max = 10): Array<Element> => {
   }
 
   return arr
-}
-
-export const hasParent = (parent: Element, current: Element): boolean => {
-  if (current === parent) return true
-  else if (!current.parentElement) return false
-  else return hasParent(parent, current.parentElement)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -298,3 +322,15 @@ export const getOffsetTop = (element: HTMLElement): number => element.offsetPare
 export const toKebabCase = (value: string): string => value.replace(/\B([A-Z])/g, '-$1').toLowerCase()
 
 export const getPropValue = <Props extends VNodeProps, Key extends keyof Props & string>(props: Props, key: Key): Props[Key] => key in props ? props[key] : props[toKebabCase(key) as Key]
+
+/** Node the anchor sits in — the element itself, a range's container, or a virtual anchor's `contextElement`. */
+export const getAnchorNode = (anchor: OverlayAnchor): Node | undefined => {
+  return anchor instanceof Element
+    ? anchor
+    : anchor instanceof Range
+      ? anchor.commonAncestorContainer
+      : anchor.contextElement
+}
+
+/** Whether the anchor is still on the page. A detached anchor has nothing to stick to. */
+export const isAnchorConnected = (anchor: OverlayAnchor): boolean => getAnchorNode(anchor)?.isConnected ?? true

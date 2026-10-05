@@ -1,7 +1,8 @@
 <template>
-  <WDropdownMenu
+  <WDropdownAdaptive
     :is-open="isOpen"
-    :horizontal-align="HorizontalAlign.RIGHT_INNER"
+    close-on-click
+    @close="isOpen = false"
   >
     <template #toggle>
       <WButtonSelectionAction
@@ -13,28 +14,27 @@
       />
     </template>
 
-    <template #content>
-      <WClickOutside
-        class="surface-raised my-2 grid grid-cols-1 overflow-hidden rounded-xl shadow-md outline-1 outline-line-raised"
-        @click="isOpen = false"
-      >
-        <WMenuItem @click="exportAs('csv')">
-          Export as CSV
-        </WMenuItem>
-
-        <WMenuItem @click="exportAs('json')">
-          Export as JSON
-        </WMenuItem>
-
-        <WMenuItem
-          v-if="toMarkdown"
-          @click="exportAs('md')"
-        >
-          Export as Markdown
-        </WMenuItem>
-      </WClickOutside>
+    <template #header>
+      Export
     </template>
-  </WDropdownMenu>
+
+    <template #content>
+      <WMenuItem @click="exportAs('csv')">
+        Export as CSV
+      </WMenuItem>
+
+      <WMenuItem @click="exportAs('json')">
+        Export as JSON
+      </WMenuItem>
+
+      <WMenuItem
+        v-if="toMarkdown"
+        @click="exportAs('md')"
+      >
+        Export as Markdown
+      </WMenuItem>
+    </template>
+  </WDropdownAdaptive>
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
@@ -44,13 +44,11 @@ import type {ModalExportProps} from '@/components/Modal/types'
 import {defineAsyncComponent, markRaw, ref} from 'vue'
 
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
-import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
-import WDropdownMenu from '@/components/DropdownMenu/WDropdownMenu.vue'
+import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 
 import IconExport from '@/assets/icons/IconExport.svg?component'
 
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {Modal} from '@/utils/Modal'
 
 import {buildExportColumns} from '../use/useExportColumns'

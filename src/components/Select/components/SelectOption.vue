@@ -48,13 +48,13 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string">
-import {computed, onUnmounted, toRef, useTemplateRef, watch, watchEffect} from 'vue'
+import {computed, nextTick, onUnmounted, toRef, useTemplateRef, watch, watchEffect} from 'vue'
 
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 
 import IconCheck from '@/assets/icons/IconCheck.svg?component'
 
-import {getScrollParent} from '@/utils/utils'
+import {scrollInParent} from '@/utils/utils'
 
 const props = defineProps<{
   isSelected: boolean
@@ -71,6 +71,8 @@ const props = defineProps<{
   disabled?: boolean
   index: number
   reverse?: boolean
+  /** Emits `scroll:selected` once the option shows as selected — set while the menu opens. */
+  scrollSelected?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -84,6 +86,7 @@ const emit = defineEmits<{
   (e: 'update:first'): void
   (e: 'update:last'): void
   (e: 'mouseenter', value: MouseEvent): void
+  (e: 'scroll:selected', scroll: () => void): void
 }>()
 
 const elementRef = useTemplateRef('element')
@@ -104,14 +107,17 @@ const toggleCursor = (): void => {
 }
 
 const scrollIntoView = () => {
-  if (!elementRef.value) return
-
-  const parent = getScrollParent(elementRef.value)
-
-  if (!parent) return
-
-  parent.scrollTo({top: elementRef.value.getBoundingClientRect().top - parent.getBoundingClientRect().top})
+  if (elementRef.value) scrollInParent(elementRef.value)
 }
+
+// The immediate run happens during setup, before the element is mounted.
+const scrollToSelected = () => nextTick(() => {
+  if (elementRef.value) scrollInParent(elementRef.value, {block: 'center', ifNeeded: true})
+})
+
+watch(() => props.scrollSelected && selectedVisible.value && !props.skeleton, value => {
+  if (value) emit('scroll:selected', scrollToSelected)
+}, {immediate: true})
 
 watch(() => props.isCursor, value => {
   if (!value) return

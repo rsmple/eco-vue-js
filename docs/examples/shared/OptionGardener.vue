@@ -11,8 +11,8 @@
     :class="model ? 'w-option-has-bg' : undefined"
   >
     <span
-      class="surface-fill flex shrink-0 items-center justify-center rounded-full font-semibold option-shift"
-      :class="[option.tone, model ? 'size-5 text-[0.625rem]' : 'size-8 text-xs']"
+      class="surface-fill flex shrink-0 items-center justify-center rounded-full font-semibold"
+      :class="[option.tone, model ? 'size-5 text-[0.625rem] option-shift' : 'size-8 text-xs']"
     >
       {{ initials(option.name) }}
     </span>

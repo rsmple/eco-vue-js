@@ -73,7 +73,7 @@ body {
 
 ## Global containers
 
-Modals, notifications and tooltips render into containers mounted once at the root of the app. `WShineEffect` is optional: it drives the moving shine on action buttons.
+Modals, menus, notifications and tooltips render into containers mounted once at the root of the app — `WModal` renders the modals and every `WButtonMore` menu. `WShineEffect` is optional: it drives the moving shine on action buttons.
 
 ```vue
 <template>

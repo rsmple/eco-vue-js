@@ -29,58 +29,21 @@
     </div>
 
     <template #actions>
-      <WButton
-        :semantic-type="SemanticType.SECONDARY"
-        :disabled="loadingAccept"
-        class="w-full"
-        @click.stop.prevent="cancel"
-      >
-        <template v-if="typeof cancelText === 'string'">
-          {{ cancelText }}
-        </template>
-
-        <component
-          :is="cancelText"
-          v-else
-        />
-      </WButton>
-
-      <WButton
-        v-if="intermediateText"
-        :to="intermediateTo"
-        :semantic-type="intermediateSemanticType"
-        :loading="loadingIntermediate"
-        :disabled="loadingAccept || disabledInner"
-        class="w-full"
-        @click.stop.prevent="intermediate"
-      >
-        <template v-if="typeof intermediateText === 'string'">
-          {{ intermediateText }}
-        </template>
-
-        <component
-          :is="intermediateText"
-          v-else
-        />
-      </WButton>
-
-      <WButton
-        :to="acceptTo"
-        :semantic-type="acceptSemanticType"
-        :loading="loadingAccept"
-        :disabled="loadingIntermediate || disabledInner"
-        class="w-full"
-        @click.stop.prevent="accept"
-      >
-        <template v-if="typeof acceptText === 'string'">
-          {{ acceptText }}
-        </template>
-
-        <component
-          :is="acceptText"
-          v-else
-        />
-      </WButton>
+      <ConfirmActions
+        :accept-text="acceptText"
+        :accept-semantic-type="acceptSemanticType"
+        :accept-to="acceptTo"
+        :intermediate-text="intermediateText"
+        :intermediate-semantic-type="intermediateSemanticType"
+        :intermediate-to="intermediateTo"
+        :cancel-text="cancelText"
+        :loading-accept="loadingAccept"
+        :loading-intermediate="loadingIntermediate"
+        :disabled="disabledInner"
+        @accept="accept"
+        @intermediate="intermediate"
+        @cancel="cancel"
+      />
     </template>
   </WModalWrapper>
 </template>
@@ -88,75 +51,17 @@
 <script lang="ts" setup>
 import type {ConfirmModalProps} from '../../types'
 
-import {ref} from 'vue'
-
-import WButton from '@/components/Button/WButton.vue'
 import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
 
-import {SemanticType} from '@/utils/SemanticType'
+import ConfirmActions from './ConfirmActions.vue'
 
-const props = withDefaults(
-  defineProps<ConfirmModalProps>(),
-  {
-    cancelText: 'Cancel',
-    acceptText: 'Accept',
-    acceptSemanticType: SemanticType.PRIMARY,
-    intermediateSemanticType: SemanticType.SECONDARY,
-  },
-)
+import {useConfirm} from '../../use/useConfirm'
 
-const disabledInner = ref(false)
-
-const loadingAccept = ref(false)
-const loadingIntermediate = ref(false)
+const props = defineProps<ConfirmModalProps>()
 
 const emit = defineEmits<{
   (e: 'close:modal'): void
 }>()
 
-const intermediate = () => {
-  if (loadingIntermediate.value || loadingAccept.value) return
-
-  const promise = props.onIntermediate?.()
-
-  if (promise) {
-    loadingIntermediate.value = true
-
-    promise
-      .then(() => {
-        emit('close:modal')
-      })
-      .finally(() => {
-        loadingIntermediate.value = false
-      })
-  } else {
-    emit('close:modal')
-  }
-}
-
-const accept = () => {
-  if (loadingIntermediate.value || loadingAccept.value) return
-
-  const promise = props.onAccept?.()
-
-  if (promise) {
-    loadingAccept.value = true
-
-    promise
-      .then(() => {
-        emit('close:modal')
-      })
-      .finally(() => {
-        loadingAccept.value = false
-      })
-  } else {
-    emit('close:modal')
-  }
-}
-
-const cancel = () => {
-  props.onCancel?.()
-
-  emit('close:modal')
-}
+const {disabledInner, loadingAccept, loadingIntermediate, accept, intermediate, cancel} = useConfirm(props, () => emit('close:modal'))
 </script>

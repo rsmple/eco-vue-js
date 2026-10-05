@@ -8,7 +8,7 @@
     >
       <div
         v-if="isBackdrop"
-        :style="{zIndex: 99 + modalMetaList.length * 2}"
+        :style="{zIndex: 99 + modalLayers.length * 2}"
         class="bg-backdrop fixed inset-0 backdrop-blur"
       />
     </Transition>
@@ -20,116 +20,186 @@
       leave-to-class="-translate-y-5 opacity-0"
     >
       <div
-        v-for="(modalMeta, index) in modalMetaList"
-        :key="modalMeta.key"
+        v-for="(layer, index) in modalLayers"
+        :key="layer.id"
         :style="{zIndex: 102 + index * 2}"
         class="no-scrollbar w-modal fixed inset-0 isolate flex items-center justify-center overflow-y-auto overscroll-none"
       >
         <div class="h-[calc(100%+1px)]" />
 
-        <ModalCloseButton @click.stop.prevent="closeModalWithConfirm(modalMeta, index)" />
+        <ModalCloseButton @click.stop.prevent="closeModalWithConfirm(layer)" />
 
-        <component
-          :is="modalMeta.component"
-          ref="modalComponent"
-          v-bind="modalMeta.props"
-          @close:modal="closeModal(modalMeta)"
-        />
+        <OverlayLayerProvider
+          :layer="layer.id"
+          :provides="layer.provides"
+          modal
+        >
+          <component
+            :is="layer.content"
+            :ref="(value: unknown) => setModalComponent(layer.id, value)"
+            v-bind="layer.props"
+            @close:modal="closeLayer(layer.id)"
+          />
+        </OverlayLayerProvider>
       </div>
     </TransitionGroup>
+
+    <!--
+      Dropdown layers, such as menus and confirms, sit beside the page without the backdrop — or in a bottom sheet on phones.
+      A closed one stays with `closing` until it emits `closed`, so a bottom sheet can slide down first.
+    -->
+    <OverlayLayerProvider
+      v-for="layer in renderedDropdownLayers"
+      :key="layer.id"
+      :layer="layer.id"
+      :provides="layer.provides"
+    >
+      <OverlayDropdown
+        v-bind="layer.dropdown"
+        :anchor="layer.anchor!"
+        :closing="leavingLayers.includes(layer)"
+        :detached="detachedLayers.includes(layer)"
+        :busy="isLayerBusy(layer.id)"
+        @close="closeLayer(layer.id)"
+        @closed="removeLeaving(layer)"
+      >
+        <component
+          :is="layer.content"
+          v-bind="layer.props"
+          @close:modal="closeLayer(layer.id)"
+        />
+      </OverlayDropdown>
+    </OverlayLayerProvider>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {nextTick, onBeforeMount, onBeforeUnmount, provide, reactive, ref, useTemplateRef, watch} from 'vue'
+import {computed, onBeforeMount, onBeforeUnmount, onMounted, provide, shallowRef, watch} from 'vue'
 
-import {Modal, type ModalComponent, initModal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
-import {BASE_ZINDEX_MODAL, wBaseZIndex} from '@/utils/utils'
+import {BASE_ZINDEX_MODAL, getIsClientSide, isAnchorConnected, wBaseZIndex} from '@/utils/utils'
 
 import ModalCloseButton from './components/ModalCloseButton.vue'
+import OverlayDropdown from './components/OverlayDropdown.vue'
+import OverlayLayerProvider from './components/OverlayLayerProvider.vue'
 import {wIsModal} from './models/injection'
+import {type OverlayLayer, closeChildLayers, closeLayer, isLayerBusy, openConfirm, setOverlayHost, toClose, useOverlayLayers} from './models/overlayRegistry'
 import {useIsBackdrop} from './use/useIsBackdrop'
 
-type ModalMeta<ModalProps> = {
-  key: string
-  component: ModalComponent<unknown>
-  props?: ModalProps
-  cb?: () => void
-  autoclose: boolean
-}
-
+// Renders every overlay layer in the frame it asks for: modals, and dropdowns such as menus and confirms.
 provide(wBaseZIndex, BASE_ZINDEX_MODAL)
 provide(wIsModal, true)
- 
-let key = 0
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const modalMetaList = ref<ModalMeta<any>[]>([])
-const isBackdrop = useIsBackdrop()
-const modalComponentRef = useTemplateRef<ComponentInstance<ModalComponent<unknown>>[]>('modalComponent')
-const hasChangesMap = reactive<Record<string, boolean>>({})
 
-type Cb = () => void
-type CloseModal = () => ReturnType<typeof closeModal>
+const layers = useOverlayLayers()
 
-const addModal = (component: ModalComponent<unknown>, props?: unknown, cb?: Cb, autoclose = false): CloseModal => {
-  const modalMeta = {
-    component,
-    key: `w-modal-${ key++ }`,
-    props,
-    cb,
-    autoclose,
-  }
+const modalLayers = computed(() => layers.value.filter(layer => layer.present === 'modal'))
+const dropdownLayers = computed(() => layers.value.filter(layer => layer.present === 'dropdown'))
 
-  modalMetaList.value = [...modalMetaList.value, modalMeta]
+const leavingLayers = shallowRef<OverlayLayer[]>([])
 
-  return () => closeModal(modalMeta)
+const renderedDropdownLayers = computed(() => [...dropdownLayers.value, ...leavingLayers.value])
+
+const removeLeaving = (layer: OverlayLayer) => {
+  leavingLayers.value = leavingLayers.value.filter(item => item !== layer)
 }
 
-const closeModal = (modalMeta: ModalMeta<unknown>): void => {
-  const index = modalMetaList.value.indexOf(modalMeta)
+// Anchors taken off the page — the row removed, or the page left, e.g. by a swipe back — leave nothing to stick to.
+// The layer gets `detached` and dismisses itself, unless it is busy, such as a confirm with a pending action. A layer stays detached once it is.
+const detachedLayers = shallowRef<OverlayLayer[]>([])
 
-  if (index === -1) return
+const addDetached = (layers: OverlayLayer[]) => {
+  const added = layers.filter(layer => !detachedLayers.value.includes(layer))
 
-  const modalMetaListNew = modalMetaList.value.slice()
+  if (added.length) detachedLayers.value = [...detachedLayers.value.filter(layer => dropdownLayers.value.includes(layer)), ...added]
+}
 
-  modalMetaListNew.splice(index, 1)
+// Going back or forward restores the scroll before the old page is gone, which would carry a dropdown along with its anchor,
+// so every dropdown layer counts as detached as soon as the history entry changes.
+const onPopstate = () => {
+  addDetached(dropdownLayers.value)
+}
 
-  modalMetaList.value = modalMetaListNew
-  delete hasChangesMap[modalMeta.key]
+let mutationObserver: MutationObserver | null = null
+let mutationFrame: number | null = null
 
-  if (modalMetaListNew.length === 0) key = 0
+const checkAnchors = () => {
+  mutationFrame = null
 
-  if (modalMeta.cb) nextTick(modalMeta.cb)
+  addDetached(dropdownLayers.value.filter(layer => layer.anchor && !isAnchorConnected(layer.anchor)))
+}
+
+watch(() => dropdownLayers.value.length > 0, value => {
+  if (!getIsClientSide()) return
+
+  if (value && !mutationObserver) {
+    mutationObserver = new MutationObserver(() => {
+      if (mutationFrame === null) mutationFrame = requestAnimationFrame(checkAnchors)
+    })
+
+    mutationObserver.observe(document.body, {childList: true, subtree: true})
+  } else if (!value && mutationObserver) {
+    mutationObserver.disconnect()
+    mutationObserver = null
+
+    if (mutationFrame !== null) cancelAnimationFrame(mutationFrame)
+    mutationFrame = null
+
+    detachedLayers.value = []
+  }
+})
+
+watch(dropdownLayers, (value, oldValue) => {
+  const closed = oldValue.filter(layer => !value.includes(layer))
+
+  if (closed.length) leavingLayers.value = [...leavingLayers.value, ...closed]
+})
+
+const isBackdrop = useIsBackdrop()
+const modalComponentMap: Record<number, {formRef?: {hasChanges?: boolean}} | undefined> = {}
+
+const setModalComponent = (id: number, value: unknown) => {
+  if (value) modalComponentMap[id] = value as {formRef?: {hasChanges?: boolean}}
+  else delete modalComponentMap[id]
 }
 
 let closeConfirm: (() => void) | null = null
 
-const closeModalWithConfirm = (modalMeta: ModalMeta<unknown>, index: number): void => {
-  if (modalMeta.autoclose || (!hasChangesMap[modalMeta.key] && !modalComponentRef.value?.[index]?.formRef?.hasChanges)) {
-    closeModal(modalMeta)
+const closeModalWithConfirm = (layer: OverlayLayer): void => {
+  // A click beside the modal closes what was opened from it first, such as a menu or a confirm.
+  if (closeChildLayers(layer.id)) return
+
+  if (layer.autoclose || !modalComponentMap[layer.id]?.formRef?.hasChanges) {
+    closeLayer(layer.id)
     return
   }
 
   closeConfirm?.()
 
-  closeConfirm = Modal.addConfirm({
+  closeConfirm = toClose(openConfirm({
     title: 'Are you sure want to close modal?',
     description: 'Closing the modal will undo any changes',
     acceptSemanticType: SemanticType.WARNING,
     acceptText: 'Close',
     onAccept() {
-      closeModal(modalMeta)
+      closeLayer(layer.id)
     },
-  }, () => closeConfirm = null)
+  }, () => closeConfirm = null, {parent: layer.id}))
+}
+
+const onKeydown = (event: KeyboardEvent) => {
+  if (event.key !== 'Escape') return
+
+  const top = layers.value[layers.value.length - 1]
+
+  if (top?.present === 'dropdown' && !isLayerBusy(top.id)) closeLayer(top.id)
 }
 
 let timeout: ReturnType<typeof setTimeout> | undefined
 
-watch(modalMetaList, value => {
+watch(() => modalLayers.value.length, value => {
   if (timeout) clearTimeout(timeout)
 
-  if (value.length) {
+  if (value) {
     isBackdrop.value = true
   } else {
     timeout = setTimeout(() => {
@@ -140,10 +210,25 @@ watch(modalMetaList, value => {
 })
 
 onBeforeMount(() => {
-  initModal(addModal)
+  setOverlayHost(true)
+})
+
+onMounted(() => {
+  if (!getIsClientSide()) return
+
+  document.addEventListener('keydown', onKeydown)
+  // Capture, to run before the router's own listener.
+  window.addEventListener('popstate', onPopstate, true)
 })
 
 onBeforeUnmount(() => {
-  initModal(undefined)
+  setOverlayHost(false)
+
+  mutationObserver?.disconnect()
+
+  if (!getIsClientSide()) return
+
+  document.removeEventListener('keydown', onKeydown)
+  window.removeEventListener('popstate', onPopstate, true)
 })
 </script>

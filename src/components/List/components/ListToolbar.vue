@@ -99,7 +99,7 @@
           :aria-pressed="isShift"
           tooltip-text="Select range"
           class="last-not:border-r border-solid border-line"
-          @click.stop="$emit('set:is-selecting')"
+          @click="$emit('set:is-selecting')"
         >
           <template #tooltip>
             <div class="grid grid-cols-[1fr_auto] gap-4">

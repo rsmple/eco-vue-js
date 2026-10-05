@@ -562,7 +562,7 @@ import WInputSuggest from 'eco-vue-js/dist/components/Input/WInputSuggest.vue'
 | `prefix` | `{ unclickable?: boolean \| null \| undefined; }` | Content before the text inside the field, such as chips. `unclickable` is `true` for the field that opens the mobile bottom sheet. |
 | `before` | `{ modelValue: (Type extends "number" ? number : string) \| null \| undefined; focused: boolean; }` | Content right before the text, in the same box as the input. |
 | `right` | `{ unclickable?: boolean \| null \| undefined; }` | Content to the right of the field. `unclickable` is `true` for the field that opens the mobile bottom sheet. |
-| `bottom` | — | Content under the field, after a `static` or `embedded` menu. |
+| `bottom` | — | Content under the field, after a `static` menu. |
 | `content` | `{ focused: boolean; blur: () => void; focus: () => void; }` | Menu content. `focus` and `blur` move focus to and from the input, which opens and closes the menu. |
 
 <!-- @api-end -->

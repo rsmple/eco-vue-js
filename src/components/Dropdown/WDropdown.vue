@@ -39,7 +39,7 @@ import type {DropdownDefaultSlotScope, DropdownProps} from './types'
 import {type VNode, computed, onBeforeMount, onMounted, onUnmounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
-import {getAllScrollParents, getIsClientSide} from '@/utils/utils'
+import {getAllScrollParents, getAnchorNode, getIsClientSide, isAnchorConnected} from '@/utils/utils'
 
 import {type HorizontalGetter, OriginX, type VerticalGetter, horizontalGetterOrderMap, searchStyleGetter} from './utils/DropdownStyle'
 
@@ -68,9 +68,12 @@ const atBottom = computed(() => y.value > window.innerHeight / 2)
 const order = computed(() => horizontalGetterOrderMap[props.horizontalAlign])
 
 const setParentRect = (updateAlign = false): void => {
+  // A parent taken off the page reads as an empty rect in the corner, so the dropdown stays where it was.
+  if (parentRect.value && (props.freeze || !isAnchorConnected(props.parentElement))) return
+
   const newRect = props.parentElement.getBoundingClientRect()
 
-  const isLeftChanged = newRect.left !== parentRect.value?.left
+  const isLeftChanged = newRect.left !== parentRect.value?.left || newRect.right !== parentRect.value?.right
   const isTopChanged = newRect.top !== parentRect.value?.top || newRect.bottom !== parentRect.value?.bottom
 
   if (!horizontalGetter.value || (isLeftChanged && (props.updateAlign || updateAlign))) {
@@ -96,16 +99,13 @@ onBeforeMount(() => {
 })
 
 let domListenerContainer: DOMListenerContainer
+let resizeObserver: ResizeObserver | undefined
 let requestAnimationFrameId: number | null = null
 
 onMounted(() => {
   if (!getIsClientSide() || !dropdownRef.value) return
 
-  const parent = props.parentElement instanceof Element
-    ? props.parentElement
-    : props.parentElement instanceof Range
-      ? props.parentElement.commonAncestorContainer
-      : undefined
+  const parent = getAnchorNode(props.parentElement)
 
   domListenerContainer = new DOMListenerContainer(
     parent
@@ -127,10 +127,17 @@ onMounted(() => {
     },
     {passive: true},
   )
+
+  // A parent that changes size, such as a field as its chips wrap, moves the edges the dropdown sits at.
+  if (props.parentElement instanceof Element && !props.emitUpdate) {
+    resizeObserver = new ResizeObserver(() => setParentRect())
+    resizeObserver.observe(props.parentElement)
+  }
 })
 
 onUnmounted(() => {
   domListenerContainer?.destroy()
+  resizeObserver?.disconnect()
 })
 
 watch(toRef(props, 'parentElement'), () => {
@@ -143,6 +150,8 @@ defineSlots<{
 }>()
 
 defineExpose({
+  /** Whether it opened above the parent. */
+  isTop,
   update: () => {
     setParentRect()
   },
