@@ -12,7 +12,7 @@
       <div
         class="flex items-center justify-between gap-4"
         :class="{
-          'border-line-subtle border-b border-solid px-5 py-3': frame === null,
+          'border-line-subtle border-b border-solid px-4 py-3': frame === null,
           'pb-4': frame === 'sheet',
         }"
       >
@@ -33,7 +33,7 @@
 
     <div
       class="grid content-start gap-2"
-      :class="frame === null ? 'overflow-y-auto overscroll-contain' : frame === 'sheet' ? 'px-3' : 'p-2'"
+      :class="frame === null ? 'overflow-y-auto overscroll-contain p-4' : frame === 'sheet' ? 'px-3' : 'p-2'"
     >
       <div
         v-if="!notifyCenterItems.length"

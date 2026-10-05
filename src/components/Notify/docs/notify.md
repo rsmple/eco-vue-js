@@ -64,6 +64,10 @@ Each call takes:
 
 A toast closes after 5 seconds. The same notification shown again within those 5 seconds doesn't stack: the one on screen stays, gets a counter, and its 5 seconds start over. Clicking the same failing button five times shows one error with a 5 on it.
 
+Toasts show in the top right corner, under the header. `position` on `WNotify` moves them to `top-center`, `bottom-right` or `bottom-center`; at the bottom the newest toast is closest to the edge.
+
+<NotifyPositionPlayground />
+
 The kit shows notifications itself in a few places: copying and pasting, invalid form values when leaving a tab or submitting a form, a `validate` error in `WToggle`, and failed requests made through its API helpers.
 
 ## Progress
@@ -251,6 +255,22 @@ const repot = () => {
 <!-- @example-end -->
 
 ## API
+
+<!-- @api WNotify -->
+
+### WNotify
+
+```ts
+import WNotify from 'eco-vue-js/dist/components/Notify/WNotify.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `position` | `NotifyPosition` | `"top-right"` | Corner or edge of the screen the toasts show in. On top they sit under the header (`--header-height`); new toasts stack away from the edge. |
+
+<!-- @api-end -->
 
 <!-- @api WNotifyCenter -->
 

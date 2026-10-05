@@ -8,6 +8,7 @@ import {setQueryClient} from '@/utils/queryClient'
 import DocsLayout from './DocsLayout.vue'
 import DocsDemo from './components/DocsDemo.vue'
 import IconGallery from './components/IconGallery.vue'
+import NotifyPositionPlayground from './components/NotifyPositionPlayground.vue'
 import ThemeDataPreview from './components/ThemeDataPreview.vue'
 import ThemePlayground from './components/ThemePlayground.vue'
 import {installKitRouter} from './router'
@@ -34,6 +35,7 @@ export default {
     app.component('CopyOrDownloadAsMarkdownButtons', CopyOrDownloadAsMarkdownButtons)
     app.component('DocsDemo', DocsDemo)
     app.component('IconGallery', IconGallery)
+    app.component('NotifyPositionPlayground', NotifyPositionPlayground)
     app.component('ThemePlayground', ThemePlayground)
     app.component('ThemeDataPreview', ThemeDataPreview)
   },

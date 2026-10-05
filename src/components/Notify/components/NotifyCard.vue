@@ -3,7 +3,7 @@
     class="text-accent relative grid grid-cols-[auto_1fr] gap-x-4 rounded-xl border border-l-4 border-solid border-line-subtle border-l-tone-fill pl-4 text-sm"
     :class="[
       notifyTypeToneMap[item.type],
-      history ? 'bg-surface-subtle w-full' : 'bg-surface-raised my-1.5 mr-4 w-[min(24rem,calc(100vw-2rem))] shadow-lg',
+      history ? 'bg-surface-subtle w-full' : 'bg-surface-raised my-1.5 w-[min(24rem,calc(100vw-2rem))] shadow-lg',
     ]"
   >
     <WCounter

@@ -1,3 +1,10 @@
+export type NotifyPosition = 'top-right' | 'top-center' | 'bottom-right' | 'bottom-center'
+
+export interface NotifyProps {
+  /** Corner or edge of the screen the toasts show in. On top they sit under the header (`--header-height`); new toasts stack away from the edge. */
+  position?: NotifyPosition
+}
+
 export interface NotifyCenterProps {
   /** Heading of the notify center. Defaults to `Notifications`. */
   title?: string
