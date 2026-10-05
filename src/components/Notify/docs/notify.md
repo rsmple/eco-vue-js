@@ -206,7 +206,7 @@ const checkSoil = () => {
 
 ### Groups
 
-Notifications with the same `group.key` show as one entry while there are two or more of them — in a toast and in the center — with the group's `title` and `caption`, the most severe type of its members, and a list of them to expand. Closing the entry closes each member, or calls the group's `onRemoveItems` with all of them at once. A group's `component` gets its `items` along with `componentProps`.
+Notifications with the same `group.key` show as one entry while there are two or more of them — in a toast and in the center — with the group's `title` and `caption`, the most severe type of its members, and a list of them to expand, newest first. A member is never merged into a repeat of itself — every one adds to the list, and the group's toast stays up for 5 seconds after its latest member. Closing the entry closes each member, or calls the group's `onRemoveItems` with all of them at once. A group's `component` gets its `items` along with `componentProps`.
 
 ## Custom content
 

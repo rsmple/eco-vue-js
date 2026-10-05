@@ -51,16 +51,21 @@ export const notifyCenterActivityItems: ComputedRef<NotifyItem[]> = computed(() 
 
 export const getNotifyItemKey = (item: NotifyItem): string => item.items ? `group:${ item.key }` : `item:${ item.id }`
 
-const toGroupItem = (group: NotifyGroup, items: [NotifyItem, ...NotifyItem[]]): NotifyItem => ({
-  ...group,
-  componentProps: {...group.componentProps, items},
-  id: items[0].id,
-  type: notifyTypeSeverityList.find(type => items.some(item => item.type === type)) ?? NotifyType.SUCCESS,
-  count: items.length,
-  date: new Date(Math.max(...items.map(item => item.date.getTime()))),
-  channel: items[0].channel,
-  items,
-})
+const toGroupItem = (group: NotifyGroup, members: [NotifyItem, ...NotifyItem[]]): NotifyItem => {
+  // Newest first, the same in a toast and in the center.
+  const items = [...members].sort((a, b) => b.date.getTime() - a.date.getTime()) as [NotifyItem, ...NotifyItem[]]
+
+  return {
+    ...group,
+    componentProps: {...group.componentProps, items},
+    id: items[0].id,
+    type: notifyTypeSeverityList.find(type => items.some(item => item.type === type)) ?? NotifyType.SUCCESS,
+    count: items.length,
+    date: new Date(Math.max(...items.map(item => item.date.getTime()))),
+    channel: items[0].channel,
+    items,
+  }
+}
 
 const groupItems = (list: NotifyItem[]): NotifyItem[] => {
   const groupMembers = new Map<string, [NotifyItem, ...NotifyItem[]]>()
@@ -136,6 +141,15 @@ const scheduleToastHide = (id: number): void => {
 const showToast = (id: number): void => {
   if (isNotifyCenterOpen.value) return
 
+  const groupKey = findItem(id)?.group?.key
+
+  // A group's toast stays up for the full delay after its latest member, instead of shrinking member by member.
+  if (groupKey !== undefined) {
+    toastIds.value.forEach(value => {
+      if (findItem(value)?.group?.key === groupKey) scheduleToastHide(value)
+    })
+  }
+
   scheduleToastHide(id)
 
   if (!toastIds.value.includes(id)) toastIds.value = [...toastIds.value, id]
@@ -156,8 +170,9 @@ const markGroupRaw = (group: NotifyGroup | undefined): NotifyGroup | undefined =
 }
 
 // The same notification added again while its toast would still be up is counted instead of added.
+// A group member is always added, so the group grows the same way in a toast and in the center.
 const findMergeable = (config: NotifyConfig) => {
-  if (config.component) return undefined
+  if (config.component || config.group) return undefined
 
   const channel = config.channel ?? NotifyChannel.ACTIVITY
 
