@@ -178,30 +178,41 @@
       </DocsHomeTile>
 
       <DocsHomeTile
-        title="Notifications"
-        link="/components/notify"
+        title="Status"
+        link="/components/status-and-loading#chips-counters-and-status-icons"
       >
-        <div class="flex flex-wrap gap-2">
-          <WButton
-            :semantic-type="SemanticType.POSITIVE"
-            @click="Notify.success({title: 'Watered', caption: 'Next watering in 7 days.'})"
-          >
-            Success
-          </WButton>
+        <div class="flex flex-wrap items-center gap-2">
+          <WChip
+            v-for="type in Object.values(SemanticType)"
+            :key="type"
+            :text="type"
+            :semantic-type="type"
+          />
+        </div>
+
+        <div class="flex items-center gap-6">
+          <span class="relative">
+            Buds
+
+            <WCounter
+              :count="buds"
+              :trigger="1"
+              class="absolute -top-2 left-full text-xs"
+            />
+          </span>
 
           <WButton
-            :semantic-type="SemanticType.WARNING"
-            @click="Notify.warn({title: 'Check the leaves', caption: 'Yellow tips can mean too much water.'})"
+            :semantic-type="SemanticType.SECONDARY"
+            @click="buds++"
           >
-            Warning
+            New bud
           </WButton>
+        </div>
 
-          <WButton
-            :semantic-type="SemanticType.NEGATIVE"
-            @click="Notify.error({title: 'Sensor offline', caption: 'The greenhouse probe stopped reporting.'})"
-          >
-            Error
-          </WButton>
+        <div class="flex flex-wrap items-center gap-4 text-sm [&_svg]:square-5">
+          <span class="flex items-center gap-2"><WStatusIcon /> Not checked</span>
+          <span class="flex items-center gap-2"><WStatusIcon has-value /> Watered</span>
+          <span class="flex items-center gap-2"><WStatusIcon has-error /> Wilted</span>
         </div>
       </DocsHomeTile>
 
@@ -273,41 +284,76 @@
       </DocsHomeTile>
 
       <DocsHomeTile
-        title="Status"
-        link="/components/status-and-loading#chips-counters-and-status-icons"
+        title="Notifications"
+        link="/components/notify"
       >
-        <div class="flex flex-wrap items-center gap-2">
-          <WChip
-            v-for="type in Object.values(SemanticType)"
-            :key="type"
-            :text="type"
-            :semantic-type="type"
-          />
-        </div>
-
-        <div class="flex items-center gap-6">
-          <span class="relative">
-            Buds
-
-            <WCounter
-              :count="buds"
-              :trigger="1"
-              class="absolute -top-2 left-full text-xs"
-            />
-          </span>
+        <div class="flex flex-wrap gap-2">
+          <WButton
+            :semantic-type="SemanticType.POSITIVE"
+            @click="Notify.success({title: 'Watered', caption: 'Next watering in 7 days.'})"
+          >
+            Success
+          </WButton>
 
           <WButton
-            :semantic-type="SemanticType.SECONDARY"
-            @click="buds++"
+            :semantic-type="SemanticType.WARNING"
+            @click="Notify.warn({title: 'Check the leaves', caption: 'Yellow tips can mean too much water.'})"
           >
-            New bud
+            Warning
+          </WButton>
+
+          <WButton
+            :semantic-type="SemanticType.NEGATIVE"
+            @click="Notify.error({title: 'Sensor offline', caption: 'The greenhouse probe stopped reporting.'})"
+          >
+            Error
           </WButton>
         </div>
 
-        <div class="flex flex-wrap items-center gap-4 text-sm [&_svg]:square-5">
-          <span class="flex items-center gap-2"><WStatusIcon /> Not checked</span>
-          <span class="flex items-center gap-2"><WStatusIcon has-value /> Watered</span>
-          <span class="flex items-center gap-2"><WStatusIcon has-error /> Wilted</span>
+        <div class="flex flex-wrap gap-2">
+          <WButton
+            :semantic-type="SemanticType.PRIMARY"
+            @click="repot"
+          >
+            In progress
+          </WButton>
+
+          <WButton
+            :semantic-type="SemanticType.SECONDARY"
+            @click="Notify.error({title: 'Sensor offline', caption: 'The greenhouse probe stopped reporting.', channel: NotifyChannel.ACTION})"
+          >
+            Needs action
+          </WButton>
+
+          <WButton
+            :semantic-type="SemanticType.SECONDARY"
+            @click="checkSoil"
+          >
+            Group
+          </WButton>
+        </div>
+
+        <span class="text-description text-sm">
+          Ones that need action stay until closed and count on the bell in the header, where the history is kept.
+        </span>
+
+        <div class="flex items-center gap-3">
+          <div class="border-line-subtle bg-surface grid aspect-16/10 w-24 shrink-0 grid-cols-3 grid-rows-[1fr_auto] gap-1.5 rounded-md border p-1.5">
+            <button
+              v-for="option in NOTIFY_POSITIONS"
+              :key="option.value"
+              class="tone-primary h-2.5 cursor-pointer rounded-sm border transition-colors"
+              :class="[
+                option.class,
+                notifyPosition === option.value ? 'bg-tone-fill border-tone-fill' : 'border-line-subtle bg-surface-raised hover:border-tone-line',
+              ]"
+              :aria-label="option.label"
+              :aria-pressed="notifyPosition === option.value"
+              @click="moveToasts(option)"
+            />
+          </div>
+
+          <span class="text-description text-sm">Click a spot to move the toasts.</span>
         </div>
       </DocsHomeTile>
 
@@ -332,11 +378,11 @@
           </button>
         </div>
 
-        <div class="h-30 -mt-4">
+        <div class="h-50 -mt-4">
           <ClientOnly>
             <WChartLinear
               :x-domain="[+addDay(TODAY, -29), +TODAY]"
-              :height="120"
+              :height="200"
               :y-format="value => `${ numberCompactFormatter.format(value) }%`"
               y-right
             >
@@ -748,8 +794,10 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, markRaw, onBeforeUnmount, onMounted, ref, watch} from 'vue'
+import {computed, markRaw, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue'
 
+import {NotifyChannel} from 'eco-vue-js/dist/components/Notify/models/NotifyType'
+import type {NotifyPosition} from 'eco-vue-js/dist/components/Notify/types'
 import {Notify} from 'eco-vue-js/dist/utils/Notify'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 import {addDay, dateFormat, dateFormatShort, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
@@ -794,12 +842,15 @@ import IconRuler from 'eco-vue-js/dist/assets/icons/IconRuler'
 import IconSun from 'eco-vue-js/dist/assets/icons/IconSun'
 import IconWind from 'eco-vue-js/dist/assets/icons/IconWind'
 
+import NotifyRepotProgress from '@/components/Notify/docs/examples/parts/NotifyRepotProgress.vue'
+
 import DocsHomeOptionCompanion, {type Companion} from './DocsHomeOptionCompanion.vue'
 import DocsHomeOptionHealth, {type Health} from './DocsHomeOptionHealth.vue'
 import DocsHomeTile from './DocsHomeTile.vue'
 
 import {gardeners} from '../../../examples/shared/Gardener'
 import OptionGardener from '../../../examples/shared/OptionGardener.vue'
+import {notifyPosition} from '../notifyPosition'
 
 const TODAY = getStartOfDay()
 
@@ -852,9 +903,9 @@ const WATERINGS = Array.from({length: 365}, (_, index) => {
 
 // Points go newest first, one a day for the last 30 days; the soil dries out between waterings every 7 days.
 const MOISTURE_TREND = Array.from({length: 30}, (_, index) => {
-  const value = Math.round(75 - (index % 7) * 6 + 4 * Math.sin(index / 5))
+  const value = Math.round(75 - (index % 7) * 3 + 4 * Math.sin(index / 5))
 
-  return {date: +addDay(TODAY, -index), value, min: value - 15, max: value + 15}
+  return {date: +addDay(TODAY, -index), value, min: value - 10, max: value + 10}
 })
 
 const HUMIDITY_TREND = Array.from({length: 30}, (_, index) => ({date: +addDay(TODAY, -index), value: Math.round(30 + 10 * Math.sin(index / 3) + (index % 4) * 2)}))
@@ -865,6 +916,50 @@ const TREND_SERIES = [
 ] as const
 
 const visibleSeries = ref<Record<typeof TREND_SERIES[number]['key'], boolean>>({moisture: true, humidity: true})
+
+const repotTimers = new Set<ReturnType<typeof setInterval>>()
+
+// The progress lives in a reactive object outside the content, since the toast and the notify center each render a copy of it.
+const repot = () => {
+  const task = reactive({done: 0, total: 8})
+
+  Notify.process({title: 'Repotting seedlings', component: markRaw(NotifyRepotProgress), componentProps: {task}})
+
+  const timer = setInterval(() => {
+    task.done++
+
+    if (task.done !== task.total) return
+
+    clearInterval(timer)
+    repotTimers.delete(timer)
+  }, 500)
+
+  repotTimers.add(timer)
+}
+
+const DRY_SOIL_GROUP = {key: 'dry-soil', title: 'Soil is dry', caption: 'These beds need water.'}
+
+const checkSoil = () => {
+  ['Bed 1', 'Bed 4', 'Bed 7'].forEach(bed => Notify.warn({title: 'Soil is dry', caption: bed, group: DRY_SOIL_GROUP}))
+}
+
+type NotifyPositionOption = {value: NotifyPosition, label: string, class: string}
+
+const NOTIFY_POSITIONS: NotifyPositionOption[] = [
+  {value: 'top-center', label: 'Top center', class: 'col-start-2 row-start-1'},
+  {value: 'top-right', label: 'Top right', class: 'col-start-3 row-start-1'},
+  {value: 'bottom-center', label: 'Bottom center', class: 'col-start-2 row-start-2'},
+  {value: 'bottom-right', label: 'Bottom right', class: 'col-start-3 row-start-2'},
+]
+
+// The site's position, put back when leaving the home page.
+const initialNotifyPosition = notifyPosition.value
+
+const moveToasts = (option: NotifyPositionOption) => {
+  notifyPosition.value = option.value
+
+  Notify.success({title: `Toasts at ${ option.label.toLowerCase() }`, caption: `position="${ option.value }"`})
+}
 
 const buds = ref(3)
 
@@ -969,5 +1064,7 @@ onBeforeUnmount(() => {
   clearTimeout(saveTimer)
   clearTimeout(waterTimer)
   clearInterval(trayTimer)
+  repotTimers.forEach(timer => clearInterval(timer))
+  notifyPosition.value = initialNotifyPosition
 })
 </script>
