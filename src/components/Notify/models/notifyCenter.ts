@@ -53,7 +53,7 @@ export const getNotifyItemKey = (item: NotifyItem): string => item.items ? `grou
 
 const toGroupItem = (group: NotifyGroup, members: [NotifyItem, ...NotifyItem[]]): NotifyItem => {
   // Newest first, the same in a toast and in the center.
-  const items = [...members].sort((a, b) => b.date.getTime() - a.date.getTime()) as [NotifyItem, ...NotifyItem[]]
+  const items = [...members].sort((a, b) => b.date.getTime() - a.date.getTime() || b.id - a.id) as [NotifyItem, ...NotifyItem[]]
 
   return {
     ...group,
@@ -127,6 +127,31 @@ watch(isNotifyCenterOpen, isOpen => {
   if (isOpen) hideAllToasts()
 })
 
+// Members of a group on screen share one toast: they are kept up and hidden together.
+const getToastGroupIds = (id: number): number[] => {
+  const groupKey = findItem(id)?.group?.key
+
+  if (groupKey === undefined) return [id]
+
+  return toastIds.value.filter(value => findItem(value)?.group?.key === groupKey)
+}
+
+// Hidden in one update, so a group's toast leaves as it is instead of shrinking member by member first.
+const hideToastGroup = (id: number): void => {
+  const ids = getToastGroupIds(id).filter(value => {
+    const item = findItem(value)
+
+    return value === id || !item || !isActionRequired(item)
+  })
+
+  ids.forEach(value => {
+    clearTimeout(toastTimeouts.get(value))
+    toastTimeouts.delete(value)
+  })
+
+  toastIds.value = toastIds.value.filter(value => !ids.includes(value))
+}
+
 const scheduleToastHide = (id: number): void => {
   clearTimeout(toastTimeouts.get(id))
   toastTimeouts.delete(id)
@@ -135,24 +160,16 @@ const scheduleToastHide = (id: number): void => {
 
   if (item && isActionRequired(item)) return
 
-  toastTimeouts.set(id, setTimeout(() => hideToast(id), TOAST_DELAY))
+  toastTimeouts.set(id, setTimeout(() => hideToastGroup(id), TOAST_DELAY))
 }
 
 const showToast = (id: number): void => {
   if (isNotifyCenterOpen.value) return
 
-  const groupKey = findItem(id)?.group?.key
-
-  // A group's toast stays up for the full delay after its latest member, instead of shrinking member by member.
-  if (groupKey !== undefined) {
-    toastIds.value.forEach(value => {
-      if (findItem(value)?.group?.key === groupKey) scheduleToastHide(value)
-    })
-  }
-
-  scheduleToastHide(id)
-
   if (!toastIds.value.includes(id)) toastIds.value = [...toastIds.value, id]
+
+  // A group's toast stays up for the full delay after its latest member.
+  getToastGroupIds(id).forEach(scheduleToastHide)
 }
 
 const trimHistory = (): void => {
