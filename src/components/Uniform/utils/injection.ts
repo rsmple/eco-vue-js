@@ -1,10 +1,13 @@
-import {type InjectionKey, type Reactive, computed, provide, ref} from 'vue'
+import {type InjectionKey, type Reactive, type Ref, computed, provide, ref} from 'vue'
 
 type UniformState = {hasChanges: boolean, fullPayload: boolean, hasValue: boolean | null, hasError: boolean}
 
 export const wUniformUpdater = Symbol('wUniformUpdater') as InjectionKey<(value: Reactive<UniformState>, key: string) => void>
 
 export const wUniformUnlistener = Symbol('wUniformUnlistener') as InjectionKey<(key: string) => void>
+
+/** How many times the nearest form with its own model replaced it with a new one, dropping the changes. */
+export const wUniformReset = Symbol('wUniformReset') as InjectionKey<Ref<number>>
 
 export type WUniformStepperController = {
   submitting: () => boolean

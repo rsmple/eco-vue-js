@@ -1,6 +1,8 @@
-import {type Ref, computed, nextTick, ref, useId, watch} from 'vue'
+import {type Ref, computed, inject, nextTick, provide, ref, useId, watch} from 'vue'
 
 import {Modal} from '@/utils/Modal'
+
+import {wUniformReset} from '../utils/injection'
 
 const copyItem = <Value>(value: Value): Value => Array.isArray(value)
   ? value.map(copyItem) as Value
@@ -12,6 +14,40 @@ const copyItem = <Value>(value: Value): Value => Array.isArray(value)
         return result
       }, {} as Value)
       : value
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> => value instanceof Object && !Array.isArray(value) && !(value instanceof Date)
+
+const isSame = (value: unknown, other: unknown): boolean => {
+  if (value instanceof Date && other instanceof Date) return value.getTime() === other.getTime()
+  if (Array.isArray(value) && Array.isArray(other)) return value.length === other.length && value.every((item, index) => isSame(item, other[index]))
+  if (isPlainObject(value) && isPlainObject(other)) {
+    const keys = Object.keys(value)
+
+    return keys.length === Object.keys(other).length && keys.every(key => isSame(value[key], other[key]))
+  }
+
+  return value === other
+}
+
+/**
+ * Takes `next` as the new model, keeping the parts of `current` that differ from `init` — the changes not saved yet.
+ * Objects are merged key by key; a changed array or value is kept whole.
+ */
+const keepChanges = <Value>(next: Value, current: Value, init: Value): Value => {
+  if (isSame(current, init)) return next
+
+  if (isPlainObject(next) && isPlainObject(current) && isPlainObject(init)) {
+    const result: Record<string, unknown> = {...next}
+
+    for (const key of Object.keys(current)) {
+      result[key] = keepChanges(next[key], current[key], init[key])
+    }
+
+    return result as Value
+  }
+
+  return current
+}
 
 export const useUniformModel = <ParentModel, Field extends keyof NonNullable<ParentModel>, InnerModel, QueryParams, ResultModel>(
   parentModel: Ref<ParentModel>,
@@ -43,10 +79,23 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   const modelValueInit = modelValueInitRef ?? (field.value !== undefined ? computed(() => parentModelInit.value?.[field.value as keyof ParentModel]) : parentModelInit)
   const modelValue: Ref<ResultModel> = data ?? innerModel as unknown as Ref<ResultModel>
 
+  // Counts the times this form dropped its changes for a new model, so the forms inside it with their own copy drop theirs too.
+  const parentReset = inject(wUniformReset, undefined)
+  const reset = ref(0)
+
   if (data && modelValueInitRef) {
-    watch(innerModel, value => {
-      data.value = (initFn ?? copyItem)(value ?? {} as InnerModel)
+    provide(wUniformReset, reset)
+
+    // A new value from the parent or the query — e.g. a save that updated the cache — keeps the changes not saved yet,
+    // unless the query now loads another item or the parent form was reset.
+    watch([innerModel, () => queryParams?.value, () => parentReset?.value], ([value, params, parentResetValue], [, paramsOld, parentResetOld]) => {
+      const next = (initFn ?? copyItem)(value ?? {} as InnerModel)
+      const isReset = !isSame(params, paramsOld) || parentResetValue !== parentResetOld
+
+      data.value = isReset ? next : keepChanges(next, data.value, modelValueInitRef.value)
       modelValueInitRef.value = (initFn ?? copyItem)(value ?? {} as InnerModel)
+
+      if (isReset) reset.value++
     })
   }
 
@@ -88,6 +137,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
       if (value) {
         data.value = (initFn ?? copyItem)(value)
         modelValueInitRef.value = (initFn ?? copyItem)(value)
+        reset.value++
       } else {
         modelValueInitRef.value = copyItem(data.value)
       }
