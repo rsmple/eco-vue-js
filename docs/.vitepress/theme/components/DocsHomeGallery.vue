@@ -24,7 +24,7 @@
           >
             <div class="grid gap-4 py-3">
               <div class="flex items-center gap-3">
-                <span class="tone-positive bg-tone/15 text-tone-fill flex size-12 shrink-0 items-center justify-center rounded-xl"><IconPlant class="square-8" /></span>
+                <span class="tone-positive bg-tone/15 text-tone-fill flex size-12 shrink-0 items-center justify-center rounded-xl"><IconMonstera class="square-8" /></span>
 
                 <div class="grid min-w-0 flex-1">
                   <span class="truncate font-semibold">Monstera deliciosa</span>
@@ -849,6 +849,7 @@ import IconDanger from 'eco-vue-js/dist/assets/icons/IconDanger'
 import IconDrag from 'eco-vue-js/dist/assets/icons/IconDrag'
 import IconDrop from 'eco-vue-js/dist/assets/icons/IconDrop'
 import IconFilter from 'eco-vue-js/dist/assets/icons/IconFilter'
+import IconMonstera from 'eco-vue-js/dist/assets/icons/IconMonstera'
 import IconNegativeInfo from 'eco-vue-js/dist/assets/icons/IconNegativeInfo'
 import IconNote from 'eco-vue-js/dist/assets/icons/IconNote'
 import IconPlant from 'eco-vue-js/dist/assets/icons/IconPlant'
