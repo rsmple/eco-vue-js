@@ -17,8 +17,8 @@
       <template #toggle>
         <WNavItem
           v-bind="isMobile || hasActive || even ? undefined : {
-            onmouseenter: showDropdown,
-            onmouseleave: hideDropdown,
+            onMouseenter: showDropdown,
+            onMouseleave: hideDropdown,
           }"
           ref="component"
           :to="to ?? slotsDefault?.[0]?.props?.to"
