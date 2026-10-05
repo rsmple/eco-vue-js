@@ -191,7 +191,6 @@ body {
 .demo-content {
   width: fit-content;
   min-width: 100%;
-  padding: var(--inner-margin);
 }
 
 /* The kit derives these from 100vw and 100vh on every element; in a demo the box is the viewport. */
