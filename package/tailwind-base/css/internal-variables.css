@@ -251,7 +251,8 @@
 }
 
 @utility w-border-svg-stroke-* {
-  --w-border-svg-stroke-width: --value(number, [*]);
+  --w-border-svg-stroke-width: calc(--value(number) * 1px);
+  --w-border-svg-stroke-width: --value([length], [*]);
 }
 
 @utility w-button-border-* {

@@ -128,7 +128,7 @@ export const isEqualObj = (obj1: NonNullable<unknown>, obj2: NonNullable<unknown
 
 const getFormatter = (formatter: Intl.NumberFormat): Pick<Intl.NumberFormat, 'format'> => {
   return {
-    format: (value: number) => formatter.format(value).replace(',', ' '),
+    format: (value: number) => formatter.format(value).replaceAll(',', ' '),
   }
 }
 
@@ -242,16 +242,14 @@ export const get = <FieldType, Data>(data: Data, path: keyof ObjectPaths<Data, F
 
 export const set = <FieldType, Data>(data: Data, path: keyof ObjectPaths<Data, FieldType>, value: FieldType): Data => {
   (path as string).split('.').reduce<Data>((acc, current, index, array) => {
-    if (index !== array.length - 1) {
-      if (!(acc as Record<string, unknown>)[current]) {
-        (acc as Record<string, object>)[current] = {}
-        return (acc as Record<string, unknown>)[current] as Data
-      }
-    } else {
+    if (index === array.length - 1) {
       (acc as Record<string, FieldType>)[current] = value
+      return acc
     }
 
-    return acc
+    if (!(acc as Record<string, unknown>)[current]) (acc as Record<string, object>)[current] = {}
+
+    return (acc as Record<string, unknown>)[current] as Data
   }, data)
 
   return data
