@@ -40,7 +40,10 @@ export type OverlayDropdownOptions = {
    * Otherwise the dropdown is centered on the anchor with a tip pointing at it, and shifts aside near the edge of the screen while the tip stays.
    */
   cornered?: boolean
-  /** Aligns the dropdown to the anchor without a tip, such as a field's menu with `HorizontalAlign.FILL`. */
+  /**
+   * Aligns the dropdown to the anchor without a tip, such as a field's menu with `HorizontalAlign.FILL`.
+   * `LEFT_CENTER` and `RIGHT_CENTER` open it beside the anchor with a tip pointing at it, such as from a button in a side rail; near the top or bottom of the screen the box shifts while the tip stays.
+   */
   align?: HorizontalAlign
   /** Classes of the dropdown's box, replacing the default frame. */
   frameClass?: string

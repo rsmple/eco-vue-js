@@ -49,14 +49,19 @@
         :horizontal-align="cornered ? HorizontalAlign.RIGHT_INNER : align ?? HorizontalAlign.CENTER"
         :update-align="!cornered"
         :freeze="detached"
-        :inner-class="hasTip ? 'w-max tone-surface-raised flex flex-col items-center' : undefined"
+        :inner-class="hasTip ? isBeside ? 'w-max tone-surface-raised flex items-center' : 'w-max tone-surface-raised flex flex-col items-center' : undefined"
         :style="{zIndex}"
       >
         <template #default="{isTop, isLeft, isRight}">
-          <!-- Centered on the anchor with the tip pointing at it. Near the edge of the screen only the box shifts, like a tooltip's, so the tip stays on the anchor. -->
+          <!--
+            Centered on the anchor with the tip pointing at it, under or over it — or beside it with `LEFT_CENTER` and `RIGHT_CENTER`.
+            Near the edge of the screen only the box shifts, like a tooltip's, so the tip stays on the anchor.
+          -->
           <WDropdownTip
             v-if="hasTip"
-            :top="isTop"
+            :top="!isBeside && isTop"
+            :left="isBeside && isLeft"
+            :right="isBeside && isRight"
           />
 
           <!--
@@ -67,7 +72,7 @@
             :no-filter="closeOnClick"
             :class="[
               frameClass ?? 'w-dropdown-frame',
-              hasTip ? 'w-tooltip-center-x' : undefined,
+              hasTip ? isBeside ? 'w-tooltip-center-y' : 'w-tooltip-center-x' : undefined,
               cornered && frameClass === undefined && {
                 'rounded-bl-none': isRight && isTop,
                 'rounded-tl-none': isRight && !isTop,
@@ -75,13 +80,13 @@
                 'rounded-tr-none': isLeft && !isTop,
               },
             ]"
-            class="flex flex-col"
+            class="grid grid-rows-[auto_1fr]"
             @click="dismissOutside"
           >
             <!-- The content's pinned header, such as the field of an embedded select. It is inset like the sheet's, so the content brings no padding of its own. -->
             <div
               v-if="headers.length"
-              class="shrink-0 px-3 pb-4 pt-3"
+              class="px-3 pb-4 pt-3"
             >
               <component
                 :is="render"
@@ -160,7 +165,9 @@ const dropdownRef = useTemplateRef('dropdown')
 
 if (props.onTop && !isMobile) watch(() => dropdownRef.value?.isTop ?? false, props.onTop, {immediate: true})
 
-const hasTip = computed(() => props.align === undefined && !props.cornered)
+const isBeside = computed(() => props.align === HorizontalAlign.LEFT_CENTER || props.align === HorizontalAlign.RIGHT_CENTER)
+
+const hasTip = computed(() => (props.align === undefined || isBeside.value) && !props.cornered)
 
 const zIndex = inject(wBaseZIndex, 0) + BASE_ZINDEX_DROPDOWN
 

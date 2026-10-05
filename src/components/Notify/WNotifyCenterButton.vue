@@ -13,6 +13,7 @@
 
 <script lang="ts" setup>
 import type {NotifyCenterProps} from './types'
+import type {HorizontalAlign} from '@/utils/HorizontalAlign'
 
 import {type VNode, useTemplateRef} from 'vue'
 
@@ -28,6 +29,8 @@ interface Props extends NotifyCenterProps {
   title?: string
   /** Icon of the button. Defaults to a bell. */
   icon?: SVGComponent
+  /** Aligns the notify center to the button — such as `HorizontalAlign.LEFT_INNER` to grow left from its right edge, without a tip, or `HorizontalAlign.LEFT_CENTER` beside it with a tip, for a button in a side rail. Defaults to centered under the button with a tip. */
+  horizontalAlign?: HorizontalAlign
 }
 
 const props = defineProps<Props>()
@@ -48,5 +51,6 @@ const {isOpen, toggle} = useNotifyCenter({
     activityText: props.activityText,
   }),
   footer: slots.footer ? () => slots.footer?.() : undefined,
+  horizontalAlign: () => props.horizontalAlign,
 })
 </script>

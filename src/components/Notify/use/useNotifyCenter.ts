@@ -1,4 +1,5 @@
 import type {NotifyCenterProps} from '../types'
+import type {HorizontalAlign} from '@/utils/HorizontalAlign'
 
 import {type VNode, h, markRaw, readonly} from 'vue'
 
@@ -12,6 +13,11 @@ type NotifyCenterOptions = {
   props?: () => NotifyCenterProps
   /** Footer of WNotifyCenter, such as a component's slot. */
   footer?: () => VNode[] | undefined
+  /**
+   * Aligns the center to the anchor, read as it opens — such as `HorizontalAlign.LEFT_INNER` to grow left from its right edge, without a tip.
+   * `LEFT_CENTER` and `RIGHT_CENTER` open it beside the anchor with a tip, kept on screen — for a button in a side rail. Defaults to centered under the anchor with a tip.
+   */
+  horizontalAlign?: () => HorizontalAlign | undefined
 }
 
 /**
@@ -31,7 +37,11 @@ export const useNotifyCenter = (options: NotifyCenterOptions = {}) => {
       present: 'dropdown',
       anchor,
       content,
-      dropdown: {frameClass: 'w-dropdown-frame min-h-0 max-h-160 w-[min(28rem,calc(100vw-1rem))]'},
+      dropdown: {
+        // Fits the screen with the margins kept beside the anchor too, where no space is left to size it.
+        frameClass: 'w-dropdown-frame min-h-80 max-h-[min(40rem,calc(100vh-1.5rem))] w-[min(28rem,calc(100vw-1rem))]',
+        align: options.horizontalAlign?.(),
+      },
       onClose: () => {
         if (closeCenter !== value) return
 
