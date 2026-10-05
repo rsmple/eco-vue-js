@@ -16,7 +16,7 @@
     <div class="py-2.5">
       <component
         :is="notifyTypeIconMap[item.type]"
-        class="text-tone square-5"
+        class="text-tone-fill square-5"
       />
     </div>
 
