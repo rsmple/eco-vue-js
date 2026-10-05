@@ -84,7 +84,7 @@
 
         <div
           v-show="isExpanded"
-          class="grid text-xs"
+          class="grid max-h-60 overflow-y-auto overscroll-y-contain text-xs"
         >
           <div
             v-for="child in item.items"
