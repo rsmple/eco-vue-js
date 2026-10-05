@@ -76,6 +76,7 @@
           :is-no-cursor="cursor === undefined"
           :hide-option-icon="hideOptionIcon"
           :reverse="reverse"
+          :scroll-selected="isScrollSelected"
           :class="{
             'pt---w-select-option-padding': !noPadding && first && !allowCreate,
             'pb---w-select-option-padding': !noPadding && last,
@@ -90,6 +91,7 @@
           @unmounted="updateCursor(next ? valueGetter(next) : undefined)"
           @update:first="firstItem = valueGetter(item)"
           @update:last="lastItem = valueGetter(item)"
+          @scroll:selected="scrollToSelected(valueGetter(item), $event)"
         >
           <template #default="{selected}">
             <slot
@@ -131,6 +133,8 @@ import {debounce} from '@/utils/utils'
 
 import SelectOption from './SelectOption.vue'
 
+import {useScrollSelected} from '../models/useScrollSelected'
+
 const props = defineProps<{
   modelValue: Model[]
   useQueryFn: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
@@ -150,6 +154,10 @@ const props = defineProps<{
   loadingCreate?: boolean
   search?: string
   reverse?: boolean
+  /** Scrolls to the first selected option once it shows, after it turns on without a search — set while the menu is open. */
+  scrollSelected?: boolean
+  /** Also puts the cursor on that option. */
+  cursorSelected?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -227,9 +235,17 @@ const selectCursor = () => {
   if (cursor.value) optionRef.value?.forEach(item => item.toggleCursor())
 }
 
+const {isScrollSelected, takeSelected} = useScrollSelected(() => props.scrollSelected, () => props.search)
+
+const scrollToSelected = (value: Model, scroll: () => void) => {
+  if (takeSelected(scroll) && props.cursorSelected) cursor.value = value as UnwrapRef<Model>
+}
+
 const emitSelect = (value: Model, data: Data): void => {
   if (props.disabled || props.loading) return
   if (props.unselectOnly) return
+
+  isScrollSelected.value = false
 
   emit('select', value, data)
   setLoadingOption(value)
@@ -238,6 +254,8 @@ const emitSelect = (value: Model, data: Data): void => {
 const emitUnselect = (value: Model, data: Data): void => {
   if (props.disabled || props.loading) return
   if (props.selectOnly) return
+
+  isScrollSelected.value = false
 
   emit('unselect', value, data)
   setLoadingOption(value)

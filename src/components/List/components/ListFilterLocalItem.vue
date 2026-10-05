@@ -1,9 +1,7 @@
 <template>
   <WDropdownAdaptive
     :is-open="isOpen"
-    :horizontal-align="HorizontalAlign.CENTER"
-    update-align
-    close-on-click-outside
+    frame-class="max-w-96 max-h-80 w-dropdown-frame"
     @close="$emit('close')"
   >
     <template #toggle>
@@ -36,51 +34,36 @@
     </template>
 
     <template #header>
-      <div class="flex items-center gap-2 py-2 text-base font-semibold">
-        <component
-          :is="icon"
-          v-if="icon"
-          class="square-[1.25em]"
-        />
+      <component
+        :is="icon"
+        v-if="icon"
+        class="square-[1.25em]"
+      />
 
-        <span>{{ title }}</span>
-      </div>
+      <span>{{ title }}</span>
     </template>
 
-    <template #content="{isMobile, isTop}">
-      <div class="flex-col flex items-center tone-surface-raised">
-        <WDropdownTip
-          v-if="!isMobile"
-          :top="isTop"
+    <template #content>
+      <div
+        class="text-start font-normal"
+        :class="meta.embedded ? undefined : 'p-4 sm:w-96'"
+      >
+        <component
+          :is="item[0].default"
+          v-if="Array.isArray(item)"
+          v-bind="item[1]"
+          :scope="scope"
+          :readonly="readonly"
+          :global="false"
         />
 
-        <div
-          class="text-start font-normal"
-          :class="{
-            'p-4': !meta.embedded,
-            'surface-raised rounded-xl shadow-md border border-solid border-line-raised': !isMobile,
-            'w-96': !isMobile && !meta.embedded,
-            'max-w-96': !isMobile && meta.embedded,
-            'w-screen': isMobile && meta.embedded,
-          }"
-        >
-          <component
-            :is="item[0].default"
-            v-if="Array.isArray(item)"
-            v-bind="item[1]"
-            :scope="scope"
-            :readonly="readonly"
-            :global="false"
-          />
-
-          <component
-            :is="item.default"
-            v-else
-            :scope="scope"
-            :readonly="readonly"
-            :global="false"
-          />
-        </div>
+        <component
+          :is="item.default"
+          v-else
+          :scope="scope"
+          :readonly="readonly"
+          :global="false"
+        />
       </div>
     </template>
   </WDropdownAdaptive>
@@ -93,12 +76,10 @@ import type {UniformScope} from '@/components/Uniform/types'
 import {computed} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
-import WDropdownTip from '@/components/Dropdown/WDropdownTip.vue'
 import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconClose from '@/assets/icons/IconClose.svg?component'
 
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {SemanticType} from '@/utils/SemanticType'
 
 import {getMetaValue} from '../models/utils'

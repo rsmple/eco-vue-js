@@ -40,7 +40,8 @@
 
       <div
         v-if="title"
-        class="sm-not:hidden sm-not:in-[.dropdown]:block whitespace-nowrap font-normal"
+        class="whitespace-nowrap font-normal"
+        :class="!overlay ? 'sm-not:hidden' : undefined"
       >
         {{ title }}
       </div>
@@ -67,7 +68,7 @@
       </template>
     </WTooltip>
 
-    <WShine v-if="!disabled && !disableMessage && !loading" />
+    <WShine v-if="!disabled && !disableMessage && !loading && !overlay" />
   </component>
 </template>
 
@@ -78,6 +79,8 @@ import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 import WShine from '@/components/Shine/WShine.vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
+
+import {useOverlayFrame} from '@/utils/Overlay'
 
 defineProps<{
   /** Text after the icon. Hidden on phones, except in the More menu. */
@@ -117,4 +120,6 @@ defineSlots<{
   /** Rich content of the tooltip, replacing `disableMessage` or `tooltipText`. */
   tooltip?: () => void
 }>()
+
+const overlay = useOverlayFrame()
 </script>

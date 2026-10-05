@@ -10,7 +10,7 @@ For a menu of actions, use a ready-made button. For anything else anchored to an
 
 ## Action menus
 
-- `WButtonMore` is the "⋯" button: its default slot is the menu, and any click closes it. Only one `WButtonMore` is open at a time across the page.
+- `WButtonMore` is the "⋯" button: its default slot is the menu, and any click closes it. Only one menu is open at a time, and on phones it opens as a bottom sheet. The menu is rendered by `WModal` at the app root, with the slot keeping its context, and a confirm opened from an item with `useOverlay` takes its place — see [Anchored confirm](/components/modal#anchored-confirm).
 - `WButtonDropdown` is a button with an arrow next to it: the `button` slot holds the main action and the `content` slot the others. The `content` slot gets `close`.
 
 Menu items are `WButtonMoreItem`s: a `text` (or the default slot), an `icon`, and `to` or `href` to make the item a link. A disabled item can explain itself with `tooltipText`. `semanticType` colors an item, like the red Delete below.
@@ -166,7 +166,7 @@ const visible = ref(['Name', 'Species', 'Height'])
 - **`parentElement`** anchors the content to another element than the toggle. `updateAlign` picks the sides again when the toggle moves while the dropdown is open.
 - **`dropdownClass`** goes on the positioned box, for its width or max height.
 
-`WDropdownAdaptive` takes the same props and slots but opens a bottom sheet on phones instead. It emits `close` when the sheet is dismissed, and with `closeOnClickOutside` also on a click outside the dropdown.
+`WDropdownAdaptive` opens its `content` with the overlay manager, like the list's sort and filter menus: a dropdown in the standard `w-dropdown-frame`, or a bottom sheet on phones. Only one is open at a time, and it emits `close` when it closes on its own — a click outside, Escape, a swipe, or another dropdown taking its place. Without `horizontalAlign` it is centered on the toggle with a tip. The sheet starts with the `header` slot, or else a copy of the toggle with `unclickable` false. Opened from inside a dropdown with `closeOnClick` it takes that one's place; from any other, such as a filter, it opens over it.
 
 `WMenuItem` is a row for the content of a custom menu — the row that `WButtonMoreItem` and the list menus are built from. It is a button, a router link with `to`, or a plain link with `href` (and `download` for a file). `active` marks the picked option with a check; `false` keeps room for the check, so that the rows of a picker line up. `loading` shows a spinner over it while its action runs.
 
@@ -176,7 +176,7 @@ The menus are made of smaller parts, which also work on their own:
 
 - **`WDropdown`** places its content in a fixed layer against `parentElement` — an element or a text selection `Range` — and follows it as the page scrolls. `WDropdownMenu` adds the toggle and the teleport to `<body>`; the tooltips use it as well.
 - **`WClickOutside`** emits `click` on a click or right-click anywhere outside it. The click that mounted it doesn't count, so it can wrap content opened by a click.
-- **`WBottomSheet`** is the phone version of a dropdown: a sheet that slides up from the bottom with the toggle repeated at its top, and emits `close` when swiped down or when the backdrop is clicked.
+- **`WBottomSheet`** is the phone version of a dropdown: a sheet that slides up from the bottom with the toggle repeated at its top, and emits `close` when swiped down or when the backdrop is clicked. `compact` sizes it to its content, and `noOverlay` leaves the page in view without the backdrop — a tap on the page then closes it.
 - **`WDismissable`** is the swipe under the sheet: a full-screen layer whose content scrolls up into view when `isOpen` turns on, and emits `close` when it is scrolled mostly out of view.
 
 ## API
@@ -194,10 +194,10 @@ import WDropdownMenu from 'eco-vue-js/dist/components/DropdownMenu/WDropdownMenu
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `isOpen` | `boolean` | **required** | Shows the menu. |
-| `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | Element the menu is positioned against. Defaults to the element rendered by the `toggle` slot. |
+| `parentElement` | `(Pick<Element, "getBoundingClientRect"> & { contextElement?: Element \| undefined; })` | — | Element the menu is positioned against. Defaults to the element rendered by the `toggle` slot. |
 | `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
 
-::: details Inherited from `src/components/Dropdown/types.ts` (5)
+::: details Inherited from `src/components/Dropdown/types.ts` (6)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -206,6 +206,7 @@ import WDropdownMenu from 'eco-vue-js/dist/components/DropdownMenu/WDropdownMenu
 | `bottom` | `boolean` | — | Always opens below the parent. |
 | `updateAlign` | `boolean` | — | Picks the placement again as the parent moves, instead of keeping the first one. |
 | `emitUpdate` | `boolean` | — | Emits `update:rect` on scroll and resize instead of following the parent. |
+| `freeze` | `boolean` | — | Stops following the parent and keeps the current position, e.g. once the parent is leaving the page. |
 
 :::
 
@@ -236,37 +237,25 @@ import WDropdownAdaptive from 'eco-vue-js/dist/components/DropdownMenu/WDropdown
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `closeOnClickOutside` | `boolean` | — | Emits `close` on a click outside the menu. On mobile the bottom sheet emits `close` on its own. |
-| `isOpen` | `boolean` | **required** | Shows the menu. |
-| `parentElement` | `Pick<Element, "getBoundingClientRect">` | — | Element the menu is positioned against. Defaults to the element rendered by the `toggle` slot. |
-| `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
-
-::: details Inherited from `src/components/Dropdown/types.ts` (5)
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `horizontalAlign` | `HorizontalAlign` | **required** | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
-| `top` | `boolean` | — | Prefers opening above the parent. |
-| `bottom` | `boolean` | — | Always opens below the parent. |
-| `updateAlign` | `boolean` | — | Picks the placement again as the parent moves, instead of keeping the first one. |
-| `emitUpdate` | `boolean` | — | Emits `update:rect` on scroll and resize instead of following the parent. |
-
-:::
+| `isOpen` | `boolean` | **required** | Shows the dropdown. |
+| `parentElement` | `(Pick<Element, "getBoundingClientRect"> & { contextElement?: Element \| undefined; }) \| null` | — | Element the dropdown opens at. Defaults to the element rendered by the `toggle` slot. |
+| `horizontalAlign` | `HorizontalAlign` | — | Aligns the dropdown to the parent without a tip, such as a field's menu with `HorizontalAlign.FILL`. Otherwise it is centered on the parent with a tip pointing at it. |
+| `frameClass` | `string` | — | Classes of the dropdown's box, replacing the default frame. |
+| `closeOnClick` | `boolean` | — | A click on the content closes the layer, as in a menu. What is opened from it takes its place; from a dropdown without it, such as a filter, it stays over it. |
 
 #### Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `close` | — | The bottom sheet was dismissed on mobile, or a click landed outside the menu with `closeOnClickOutside`. |
-| `update:rect` | — | The parent moved on scroll or resize, with `emitUpdate` set. Desktop only. |
+| `close` | — | The dropdown closed without `isOpen` turning false — a click outside, Escape, a swipe, or another dropdown taking its place. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `toggle` | `{ isTop?: boolean \| undefined; unclickable?: boolean \| undefined; isMobile: boolean; }` | Element that opens the menu. On mobile it is also repeated at the top of the bottom sheet — `unclickable` is true for the one on the page and false for the copy in the sheet. |
-| `header` | — | Replaces the copy of `toggle` at the top of the bottom sheet on mobile. |
-| `content` | `Partial<DropdownDefaultSlotScope> & { isMobile: boolean; }` | Menu content, rendered in a dropdown on desktop and in a bottom sheet on mobile. The placement props of WDropdownMenu are passed on desktop only. |
+| `toggle` | `{ isTop: boolean; unclickable: boolean \| undefined; }` | Element that opens the dropdown, which it points at. `isTop` is true while the dropdown is open above it. On phones it is repeated at the top of the bottom sheet, unless there is a `header` — `unclickable` is true for the one on the page and false for the copy in the sheet. |
+| `header` | — | Heading of the bottom sheet on phones, instead of the copy of `toggle`. |
+| `content` | — | Content of the dropdown, which brings its own padding. A click inside closes it with `closeOnClick`. |
 
 <!-- @api-end -->
 
@@ -284,19 +273,19 @@ import WButtonMore from 'eco-vue-js/dist/components/Button/WButtonMore.vue'
 | --- | --- | --- | --- |
 | `icon` | `SVGComponent` | — | Icon of the button. Defaults to three dots. |
 | `disabled` | `boolean` | — | Blocks opening and dims the button. |
-| `anchor` | `Pick<Element, "getBoundingClientRect">` | — | Element the menu is positioned against instead of the button, aligned to its right edge — for a menu opened at a cursor or row. |
+| `anchor` | `(Pick<Element, "getBoundingClientRect"> & { contextElement?: Element \| undefined; })` | — | Element the menu is positioned against instead of the button, aligned to its right edge — for a menu opened at a cursor or row. |
 
 #### Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `close` | — | The menu closed — by a click on the button or inside the menu. |
+| `close` | — | The menu closed — by a click on the button or inside the menu, or by something opened from it taking its place. |
 
 #### Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `default` | — | Menu items, usually WButtonMoreItem. A click inside closes the menu. Only one WButtonMore menu is open at a time. |
+| `default` | — | Menu items, usually WButtonMoreItem. A click inside closes the menu. Only one menu is open at a time, and on phones it is a bottom sheet. A confirm opened from an item with `useOverlay` takes the menu's place at the same anchor. |
 
 <!-- @api-end -->
 
@@ -413,9 +402,10 @@ import WDropdown from 'eco-vue-js/dist/components/Dropdown/WDropdown.vue'
 | `horizontalAlign` | `HorizontalAlign` | **required** | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
 | `top` | `boolean` | — | Prefers opening above the parent. |
 | `bottom` | `boolean` | — | Always opens below the parent. |
-| `parentElement` | `Pick<Element, "getBoundingClientRect">` | **required** | Element (or range) the dropdown is positioned against. |
+| `parentElement` | `Pick<Element, "getBoundingClientRect"> & { contextElement?: Element \| undefined; }` | **required** | Element (or range) the dropdown is positioned against. A virtual one names the element it sits in with `contextElement`, so the dropdown follows its scrolling. |
 | `updateAlign` | `boolean` | — | Picks the placement again as the parent moves, instead of keeping the first one. |
 | `emitUpdate` | `boolean` | — | Emits `update:rect` on scroll and resize instead of following the parent. |
+| `freeze` | `boolean` | — | Stops following the parent and keeps the current position, e.g. once the parent is leaving the page. |
 | `innerClass` | `string` | — | Classes for the dropdown's content box. Defaults to `w-max`. |
 
 #### Events
@@ -450,7 +440,7 @@ import WClickOutside from 'eco-vue-js/dist/components/ClickOutside/WClickOutside
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `click` | — | A click or right-click outside the element. Clicks in the same tick as mounting, such as the one that opened it, are ignored. |
+| `click` | `(event: Event)` | A click or right-click outside the element. Clicks in the same tick as mounting, such as the one that opened it, are ignored. |
 | `mouseenter` | `(value: MouseEvent)` | The pointer entered the element. |
 | `mouseleave` | `(value: MouseEvent)` | The pointer left the element. |
 | `mousedown` | `(value: MouseEvent)` | A mouse button was pressed on the element. |
@@ -476,12 +466,14 @@ import WBottomSheet from 'eco-vue-js/dist/components/BottomSheet/WBottomSheet.vu
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `isOpen` | `boolean` | **required** | Opens the sheet. |
+| `compact` | `boolean` | — | Sizes the sheet to its content, up to 90% of the screen, instead of always taking 90%. |
+| `noOverlay` | `boolean` | — | Leaves the page in view without the dimmed backdrop. A tap outside the sheet still closes it, and also reaches the page. |
 
 #### Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `close` | — | The sheet was swiped down or the backdrop was clicked. Set `isOpen` to `false` on it. |
+| `close` | — | The sheet was swiped down, or the backdrop — with `noOverlay`, the page — was tapped. Set `isOpen` to `false` on it. |
 
 #### Slots
 
@@ -517,6 +509,6 @@ import WDismissable from 'eco-vue-js/dist/components/Dismissable/WDismissable.vu
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `default` | `{ hide: () => void; }` | Content that slides up from the bottom. `hide` slides it out, which then emits `close`. |
+| `default` | `{ hide: () => Promise<void>; }` | Content that slides up from the bottom. `hide` slides it out, which then emits `close`. |
 
 <!-- @api-end -->

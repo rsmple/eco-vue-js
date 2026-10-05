@@ -1,8 +1,6 @@
 <template>
   <WDropdownAdaptive
     :is-open="isOpen"
-    :horizontal-align="HorizontalAlign.RIGHT_INNER"
-    close-on-click-outside
     @close="isOpen = false"
   >
     <template #toggle>
@@ -18,18 +16,11 @@
     </template>
 
     <template #header>
-      <div class="py-2 text-base font-semibold">
-        Table settings
-      </div>
+      Table settings
     </template>
 
-    <template #content="{isMobile}">
-      <div
-        class="grid grid-cols-1 overflow-hidden"
-        :class="{
-          'surface-raised my-2 rounded-xl shadow-md outline-1 outline-line-raised': !isMobile,
-        }"
-      >
+    <template #content>
+      <div class="grid grid-cols-1 overflow-hidden">
         <div class="p-4">
           <div
             class="grid items-start"
@@ -97,7 +88,6 @@ import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconListSettings from '@/assets/icons/IconListSettings.svg?component'
 
-import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {type ListMode} from '@/utils/utils'
 
 import HeaderSettingsList from './HeaderSettingsList.vue'
