@@ -167,13 +167,13 @@
         link="/components/pickers"
         class="lg:row-span-2"
       >
-        <WDatePickerSingle
-          v-model="day"
+        <WDatePicker
+          v-model="vacation"
           :min-date="TODAY"
         />
 
         <span class="text-description text-sm">
-          {{ day ? `Repot on ${ dateFormat(day) }` : 'Pick a repotting date' }}
+          {{ vacation ? `Plant-sitter needed ${ dateFormatShort(vacation.from) } – ${ dateFormatShort(vacation.to) }` : 'Pick your vacation dates' }}
         </span>
       </DocsHomeTile>
 
@@ -229,9 +229,21 @@
           no-margin
         />
 
+        <WCheckboxGroupMultiple
+          :model-value="reminders"
+          :list="REMINDERS"
+          :title-map="REMINDER_TITLES"
+          title="Remind me to"
+          wrap
+          no-margin
+          @select="reminders = [...reminders, $event]"
+          @unselect="reminders = reminders.filter(item => item !== $event)"
+        />
+
         <WCheckbox
           v-model="isPetSafe"
           title="Pet-safe plants only"
+          no-margin
         />
       </DocsHomeTile>
 
@@ -796,11 +808,12 @@
 <script lang="ts" setup>
 import {computed, markRaw, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue'
 
+import type {DateRange} from 'eco-vue-js/dist/components/DatePicker/models/types'
 import {NotifyChannel} from 'eco-vue-js/dist/components/Notify/models/NotifyType'
 import type {NotifyPosition} from 'eco-vue-js/dist/components/Notify/types'
 import {Notify} from 'eco-vue-js/dist/utils/Notify'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
-import {addDay, dateFormat, dateFormatShort, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
+import {addDay, dateFormatShort, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 import {numberCompactFormatter} from 'eco-vue-js/dist/utils/utils'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
@@ -809,9 +822,10 @@ import WChartLine from 'eco-vue-js/dist/components/Chart/WChartLine.vue'
 import WChartLinear from 'eco-vue-js/dist/components/Chart/WChartLinear.vue'
 import WCheckbox from 'eco-vue-js/dist/components/Checkbox/WCheckbox.vue'
 import WCheckboxGroup from 'eco-vue-js/dist/components/Checkbox/WCheckboxGroup.vue'
+import WCheckboxGroupMultiple from 'eco-vue-js/dist/components/Checkbox/WCheckboxGroupMultiple.vue'
 import WChip from 'eco-vue-js/dist/components/Chip/WChip.vue'
 import WCounter from 'eco-vue-js/dist/components/Counter/WCounter.vue'
-import WDatePickerSingle from 'eco-vue-js/dist/components/DatePicker/WDatePickerSingle.vue'
+import WDatePicker from 'eco-vue-js/dist/components/DatePicker/WDatePicker.vue'
 import WDragContainer from 'eco-vue-js/dist/components/DragContainer/WDragContainer.vue'
 import WExpansionItem from 'eco-vue-js/dist/components/Expansion/WExpansionItem.vue'
 import WFilePicker from 'eco-vue-js/dist/components/FilePicker/WFilePicker.vue'
@@ -893,6 +907,10 @@ const LIGHTS = ['shade', 'partial', 'sun'] as const
 
 const LIGHT_TITLES: Record<typeof LIGHTS[number], string> = {shade: 'Shade', partial: 'Partial sun', sun: 'Full sun'}
 
+const REMINDERS = ['water', 'mist', 'feed', 'repot'] as const
+
+const REMINDER_TITLES: Record<typeof REMINDERS[number], string> = {water: 'Water', mist: 'Mist', feed: 'Feed', repot: 'Repot'}
+
 // A made-up count for every day of the last year, more often in the summer months.
 const WATERINGS = Array.from({length: 365}, (_, index) => {
   const date = addDay(TODAY, -index)
@@ -963,7 +981,8 @@ const moveToasts = (option: NotifyPositionOption) => {
 
 const buds = ref(3)
 
-const day = ref<Date>()
+const vacation = ref<DateRange | undefined>({from: addDay(TODAY, 9), to: addDay(TODAY, 16)})
+const reminders = ref<typeof REMINDERS[number][]>(['water', 'mist'])
 const light = ref<typeof LIGHTS[number]>('partial')
 const isPetSafe = ref(true)
 const isLoading = ref(true)
@@ -976,10 +995,11 @@ const save = () => {
   saveTimer = setTimeout(() => isSaving.value = false, 1200)
 }
 
-// Three seed trays, one just sown, one sprouting and one done; the sprouting one starts over when it is done.
+// Four seed trays, one just sown, two sprouting and one done; the first sprouting one starts over when it is done.
 const trays = ref([
   {name: 'Basil', progress: 100},
   {name: 'Cherry tomatoes', progress: 35},
+  {name: 'Mint', progress: 82},
   {name: 'Lavender', progress: 0},
 ])
 
