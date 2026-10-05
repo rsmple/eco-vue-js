@@ -50,7 +50,9 @@ export const useUniformField = <Model>(
     const oldValue = modelValueInit.value
     const newValue = modelValue.value
 
-    if (Array.isArray(newValue) && Array.isArray(oldValue)) {
+    if (newValue instanceof Date && oldValue instanceof Date) {
+      return newValue.getTime() !== oldValue.getTime()
+    } else if (Array.isArray(newValue) && Array.isArray(oldValue)) {
       return newValue.length !== oldValue.length || !isEqualArrObj(newValue, oldValue)
     } else if (newValue instanceof Object && oldValue instanceof Object) {
       const keys = Object.keys(newValue)
