@@ -23,29 +23,13 @@
 
       <WExpansion :is-open="details">
         <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 rounded-xl bg-surface-muted p-4">
-          <span class="text-description">Seeds sown</span>
-          <WNumberFormatter
-            :model-value="12840"
-            tag="span"
-            compact
-          />
+          <span class="text-description">Sown</span>
+          <span>March 12</span>
 
           <span class="text-description">Sprouted</span>
-          <WNumberFormatter
-            :model-value="0.4375"
-            tag="span"
-            percent
-          />
+          <span>March 20</span>
         </div>
       </WExpansion>
-    </div>
-
-    <div class="grid max-w-60 gap-1">
-      <span class="text-description text-sm">Hover the name:</span>
-
-      <WTextOverflow>
-        <span class="whitespace-nowrap font-semibold">Monstera deliciosa 'Thai Constellation', half-moon variegation</span>
-      </WTextOverflow>
     </div>
   </div>
 </template>
@@ -55,8 +39,6 @@ import {ref} from 'vue'
 
 import WExpansion from 'eco-vue-js/dist/components/Expansion/WExpansion.vue'
 import WExpansionItem from 'eco-vue-js/dist/components/Expansion/WExpansionItem.vue'
-import WNumberFormatter from 'eco-vue-js/dist/components/NumberFormatter/WNumberFormatter.vue'
-import WTextOverflow from 'eco-vue-js/dist/components/TextOverflow/WTextOverflow.vue'
 import WToggle from 'eco-vue-js/dist/components/Toggle/WToggle.vue'
 
 const sections = [
