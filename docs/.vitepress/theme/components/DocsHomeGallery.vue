@@ -1,12 +1,14 @@
 <template>
-  <section class="px-(--inner-margin) pb-20 sm:pb-28">
-    <p class="text-accent text-sm font-semibold tracking-[0.2em] uppercase">
-      Try them
-    </p>
+  <section class="sm:px-(--inner-margin) pb-20 sm:pb-28">
+    <div class="sm-not:px-(--inner-margin)">
+      <p class="text-accent text-sm font-semibold tracking-[0.2em] uppercase">
+        Try them
+      </p>
 
-    <h2 class="mt-2 max-w-2xl text-3xl font-bold tracking-tight text-balance sm:text-4xl">
-      Every tile is the real component
-    </h2>
+      <h2 class="mt-2 max-w-2xl text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+        Every tile is the real component
+      </h2>
+    </div>
 
     <div class="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       <DocsHomeTile
