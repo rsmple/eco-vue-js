@@ -28,10 +28,6 @@ import {type QueryParamsPlants, plantModelApi} from '../api/Plant'
 
 const props = defineProps<BulkProps<QueryParamsPlants>>()
 
-const emit = defineEmits<{
-  (e: 'clear:selected'): void
-}>()
-
 const overlay = useOverlay()
 
 const isOpen = ref(false)
@@ -52,7 +48,8 @@ const remove = (event: MouseEvent) => {
     onAccept: () => plantModelApi.paginated.actions.deleteMany(props.queryParamsGetter())
       .then(() => {
         Notify.success({title: `${ countText } removed`})
-        emit('clear:selected')
+        // A function, not an emit: in the More menu this component is gone by now, as the confirm took the menu's place.
+        props.clearSelection()
       })
       .catch(handleApiError),
   }, () => isOpen.value = false)
