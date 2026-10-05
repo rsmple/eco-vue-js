@@ -9,7 +9,7 @@
     :class="{
       'top-[calc(var(--header-height,0px)+0.5rem)]': isTop,
       'bottom-[calc(env(safe-area-inset-bottom,0px)+0.5rem)]': !isTop,
-      'right-0': !isCenter,
+      'right-(--w-right-inner)': !isCenter,
       'left-1/2 -translate-x-1/2': isCenter,
     }"
   >
@@ -22,7 +22,6 @@
       <div class="min-h-0">
         <NotifyCard
           :item="item"
-          :class="{'mr-4': !isCenter}"
           @click:close="entry => (entry.items ?? [entry]).forEach(value => hideToast(value.id))"
         />
       </div>

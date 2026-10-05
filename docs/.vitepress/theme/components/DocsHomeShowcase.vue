@@ -314,7 +314,7 @@ const getDefaultProject = (): Project => ({name: 'Monstera', tags: [1, 3], notif
 const getDefaultMembers = (): Member[] => [
   {name: 'Carl Linnaeus', email: 'carl@example.com', role: 'owner'},
   {name: 'Gregor Mendel', email: 'gregor@example.com', role: 'member'},
-  {name: 'Barbara McClintock', email: 'barbara@example.com', role: 'member'},
+  {name: 'Ernest Wilson', email: 'barbara@example.com', role: 'member'},
 ]
 
 const project = ref(getDefaultProject())

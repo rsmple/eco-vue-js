@@ -10,7 +10,7 @@
       "
     />
 
-    <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,42rem)] xl:gap-16">
+    <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)] xl:grid-cols-[minmax(0,1fr)_minmax(0,42rem)]">
       <div class="text-center lg:text-left">
         <a
           v-if="release"
