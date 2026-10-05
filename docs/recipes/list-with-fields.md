@@ -1039,7 +1039,7 @@ Opened with `useOverlay()` from the menu, the confirm takes the menu's place as 
 
 ### Bulk actions
 
-Bulk components sit in the bar above the list and act on the selected rows. They get the `selectionCount` and a `queryParamsGetter` that returns the list's query params narrowed to the selection, which the model's bulk actions send as they are. Emit `clear:selected` to reset the selection once the action is done.
+Bulk components sit in the bar above the list and act on the selected rows. They get the `selectionCount` and a `queryParamsGetter` that returns the list's query params narrowed to the selection, which the model's bulk actions send as they are. Call `clearSelection()` to reset the selection once the action is done.
 
 Each confirm opens under its button, like a filter's dropdown, so the selected rows stay in view. Actions that do not fit the bar — on phones, all but the first two buttons — move into a More menu, and there the confirm opens under the More button instead. A click outside closes the confirm, so changing the selection cancels it. Once accepted, the page is held still until the request settles, so the selection and filters cannot change under it.
 
@@ -1078,10 +1078,6 @@ import {type QueryParamsPlants, plantModelApi} from '../api/Plant'
 
 const props = defineProps<BulkProps<QueryParamsPlants>>()
 
-const emit = defineEmits<{
-  (e: 'clear:selected'): void
-}>()
-
 const overlay = useOverlay()
 
 const isOpen = ref(false)
@@ -1102,7 +1098,8 @@ const remove = (event: MouseEvent) => {
     onAccept: () => plantModelApi.paginated.actions.deleteMany(props.queryParamsGetter())
       .then(() => {
         Notify.success({title: `${ countText } removed`})
-        emit('clear:selected')
+        // A function, not an emit: in the More menu this component is gone by now, as the confirm took the menu's place.
+        props.clearSelection()
       })
       .catch(handleApiError),
   }, () => isOpen.value = false)
@@ -1144,10 +1141,6 @@ import {numberFormatter} from '@/utils/utils'
 import {type QueryParamsPlants, plantModelApi} from '../api/Plant'
 
 const props = defineProps<BulkProps<QueryParamsPlants>>()
-
-defineEmits<{
-  (e: 'clear:selected'): void
-}>()
 
 const overlay = useOverlay()
 

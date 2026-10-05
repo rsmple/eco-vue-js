@@ -125,6 +125,8 @@ export type BulkProps<QueryParams> = {
   selectionCount: number
   disableMessage: string | undefined
   readonly: boolean
+  /** Resets the selection. Unlike the `clear:selected` emit, it works after the action unmounts, such as when its confirm took the More menu's place. */
+  clearSelection: () => void
 }
 
 export type BulkComponent<QueryParams> = Component<BulkProps<QueryParams>>

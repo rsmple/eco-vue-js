@@ -25,7 +25,9 @@ The sticky header, the checkbox column and full-width rows position themselves f
 
 Above the table is the selection bar, `WButtonSelection`. While nothing is selected it shows the `action` components and the list settings; while items are selected, the `bulk` components and a "Selected N items" counter with a clear button. Actions that don't fit move into a More menu.
 
-Each action is a component that renders a `WButtonSelectionAction` — an icon with a title, hidden on phones. A bulk action gets `BulkProps`: `selectionCount`, `queryParamsGetter()` for the query params narrowed to the selection, `readonly`, and `disableMessage`, which disables the button with that text as its tooltip while nothing is selected. It emits `clear:selected` to reset the selection when it is done.
+Each action is a component that renders a `WButtonSelectionAction` — an icon with a title, hidden on phones. A bulk action gets `BulkProps`: `selectionCount`, `queryParamsGetter()` for the query params narrowed to the selection, `readonly`, `disableMessage`, which disables the button with that text as its tooltip while nothing is selected, and `clearSelection()` to reset the selection when it is done.
+
+Call `clearSelection` rather than emitting `clear:selected`, which still works but is deprecated. An action that doesn't fit the bar renders in the More menu, and a confirm opened from there takes the menu's place, unmounting the action — an emit after the confirm is accepted never arrives.
 
 ```vue
 <template>
@@ -49,11 +51,7 @@ import IconArchiveBook from 'eco-vue-js/dist/assets/icons/IconArchiveBook'
 
 const props = defineProps<BulkProps<QueryParamsPlants>>()
 
-const emit = defineEmits<{
-  (e: 'clear:selected'): void
-}>()
-
-const archive = () => plantApi.archive(props.queryParamsGetter()).then(() => emit('clear:selected'))
+const archive = () => plantApi.archive(props.queryParamsGetter()).then(() => props.clearSelection())
 </script>
 ```
 

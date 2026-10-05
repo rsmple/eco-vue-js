@@ -52,6 +52,7 @@
             :query-params-getter="getQueryParamsBulk"
             :disable-message="disableMessage"
             :readonly="readonly"
+            :clear-selection="resetSelection"
             :class="[
               cssClass,
               'sm-not:nth-[n+3]:hidden nth-[n+5]:hidden',
@@ -76,6 +77,7 @@
           :query-params-getter="getQueryParamsBulk"
           :disable-message="scope?.disableMessage"
           :readonly="readonly"
+          :clear-selection="resetSelection"
           class="last:pb-2 nth-[-n+1]:hidden sm:nth-[-n+3]:hidden nth-2:pt-2 sm:nth-4:pt-2"
           @clear:selected="$emit('reset:selection')"
         />
@@ -271,7 +273,7 @@ defineProps<{
   updateHeader: (() => void) | undefined
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'reset:selection'): void
   (e: 'toggle:selection', value: boolean): void
   (e: 'set:is-selecting'): void
@@ -282,6 +284,9 @@ defineEmits<{
   (e: 'save:width'): void
   (e: 'click:reset'): void
 }>()
+
+// A bulk action in the More menu unmounts once its confirm takes the menu's place, so its own emits no longer arrive.
+const resetSelection = () => emit('reset:selection')
 
 defineSlots<{
   header?: (props: {count: number | undefined}) => void

@@ -27,10 +27,6 @@ import {type QueryParamsPlants, plantModelApi} from '../api/Plant'
 
 const props = defineProps<BulkProps<QueryParamsPlants>>()
 
-defineEmits<{
-  (e: 'clear:selected'): void
-}>()
-
 const overlay = useOverlay()
 
 const isOpen = ref(false)
