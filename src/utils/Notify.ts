@@ -3,6 +3,9 @@ import type {AddNotify, NotifyConfig, NotifyPatch} from '@/components/Notify/mod
 import {NotifyType} from '@/components/Notify/models/NotifyType'
 import {discardNotify, updateNotify} from '@/components/Notify/models/notifyCenter'
 
+export {NotifyChannel, NotifyType} from '@/components/Notify/models/NotifyType'
+export type {NotifyConfig, NotifyContentEmits, NotifyGroup, NotifyItem, NotifyPatch} from '@/components/Notify/models/types'
+
 let addNotify: AddNotify | undefined
 
 /** Sets what `Notify` calls add to. `WNotify` sets it while it is mounted. */

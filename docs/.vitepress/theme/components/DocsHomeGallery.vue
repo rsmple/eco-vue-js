@@ -809,9 +809,8 @@
 import {computed, markRaw, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue'
 
 import type {DateRange} from 'eco-vue-js/dist/components/DatePicker/models/types'
-import {NotifyChannel} from 'eco-vue-js/dist/components/Notify/models/NotifyType'
 import type {NotifyPosition} from 'eco-vue-js/dist/components/Notify/types'
-import {Notify} from 'eco-vue-js/dist/utils/Notify'
+import {Notify, NotifyChannel} from 'eco-vue-js/dist/utils/Notify'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 import {addDay, dateFormatShort, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 import {numberCompactFormatter} from 'eco-vue-js/dist/utils/utils'

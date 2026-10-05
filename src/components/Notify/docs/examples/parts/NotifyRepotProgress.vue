@@ -25,8 +25,8 @@
 <script lang="ts" setup>
 import {computed, watch} from 'vue'
 
-import {NotifyType} from 'eco-vue-js/dist/components/Notify/models/NotifyType'
-import type {NotifyContentEmits} from 'eco-vue-js/dist/components/Notify/models/types'
+import {NotifyType} from 'eco-vue-js/dist/utils/Notify'
+import type {NotifyContentEmits} from 'eco-vue-js/dist/utils/Notify'
 
 import WProgress from 'eco-vue-js/dist/components/Progress/WProgress.vue'
 
