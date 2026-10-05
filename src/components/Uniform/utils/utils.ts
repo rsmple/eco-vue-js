@@ -33,7 +33,9 @@ export const getChangedPayload = <Result>(newValueObj: NonNullable<unknown>, old
   for (const key of Object.keys(newValueObj)) {
     const newValue = newValueObj[key as keyof typeof newValueObj] as unknown
     const oldValue = oldValueObj[key as keyof typeof oldValueObj] as unknown
-    if (Array.isArray(newValue) && Array.isArray(oldValue)) {
+    if (newValue instanceof Date && oldValue instanceof Date) {
+      if (newValue.getTime() !== oldValue.getTime()) result[key as keyof Result] = newValueObj[key as keyof typeof newValueObj]
+    } else if (Array.isArray(newValue) && Array.isArray(oldValue)) {
       if (!isEqualArrObj(newValue, oldValue)) result[key as keyof Result] = newValueObj[key as keyof typeof newValueObj]
     } else if (newValue instanceof Object && oldValue instanceof Object) {
       const changed = getChangedPayload<NonNullable<unknown> & Result[keyof Result]>(newValue, oldValue, undefined)

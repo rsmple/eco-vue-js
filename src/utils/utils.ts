@@ -103,9 +103,11 @@ export const isEqualArrObj = (arr1: unknown[], arr2: unknown[]): boolean => {
   return arr1.length === arr2.length && arr1.every((item, index) =>
     Array.isArray(item) && Array.isArray(arr2[index])
       ? isEqualArrObj(item, arr2[index])
-      : item instanceof Object && arr2[index] instanceof Object 
-        ? isEqualObj(item as NonNullable<unknown>, arr2[index] as NonNullable<unknown>, undefined, undefined, true)
-        : item === arr2[index],
+      : item instanceof Date && arr2[index] instanceof Date
+        ? item.getTime() === arr2[index].getTime()
+        : item instanceof Object && arr2[index] instanceof Object 
+          ? isEqualObj(item as NonNullable<unknown>, arr2[index] as NonNullable<unknown>, undefined, undefined, true)
+          : item === arr2[index],
   )
 }
 
@@ -119,6 +121,11 @@ export const isEqualObj = (obj1: NonNullable<unknown>, obj2: NonNullable<unknown
       if (Array.isArray(obj1[key]) && !Array.isArray(obj2[key])) return (obj1[key] as unknown[]).length === 0 && !obj2[key]
       else if (!Array.isArray(obj1[key]) && Array.isArray(obj2[key])) return (obj2[key] as unknown[]).length === 0 && !obj1[key]
       else if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) return (strictArray ? isEqualArrObj : isEqualArr)(obj1[key] as unknown[], obj2[key] as unknown[])
+
+      const value1 = obj1[key as keyof typeof obj1] as unknown
+      const value2 = obj2[key as keyof typeof obj2] as unknown
+
+      if (value1 instanceof Date && value2 instanceof Date) return value1.getTime() === value2.getTime()
 
       if ((obj1[key] as NonNullable<unknown>) instanceof Object && (obj2[key] as NonNullable<unknown>) instanceof Object) return isEqualObj(obj1[key] as NonNullable<unknown>, obj2[key] as NonNullable<unknown>)
 

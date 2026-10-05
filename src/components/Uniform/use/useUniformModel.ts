@@ -4,12 +4,14 @@ import {Modal} from '@/utils/Modal'
 
 const copyItem = <Value>(value: Value): Value => Array.isArray(value)
   ? value.map(copyItem) as Value
-  : value instanceof Object
-    ? Object.keys(value).reduce<Value>((result, key) => {
-      result[key as keyof Value] = copyItem(value[key as keyof Value])
-      return result
-    }, {} as Value)
-    : value
+  : value instanceof Date
+    ? new Date(value) as Value
+    : value instanceof Object
+      ? Object.keys(value).reduce<Value>((result, key) => {
+        result[key as keyof Value] = copyItem(value[key as keyof Value])
+        return result
+      }, {} as Value)
+      : value
 
 export const useUniformModel = <ParentModel, Field extends keyof NonNullable<ParentModel>, InnerModel, QueryParams, ResultModel>(
   parentModel: Ref<ParentModel>,
