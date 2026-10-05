@@ -62,7 +62,7 @@ Each call takes:
 | `component`, `componentProps` | Content under the caption — see [Custom content](#custom-content). |
 | `onRemove` | Called when the user closes it. |
 
-A toast closes after 5 seconds. The same notification shown again within those 5 seconds doesn't stack: the one on screen stays, gets a counter, and its 5 seconds start over. Clicking the same failing button five times shows one error with a 5 on it.
+A toast closes after 5 seconds. While the pointer is over the toasts, none of them close: their time stops and goes on from where it was once the pointer leaves. The same notification shown again within those 5 seconds doesn't stack: the one on screen stays, gets a counter, and its 5 seconds start over. Clicking the same failing button five times shows one error with a 5 on it.
 
 Toasts show in the top right corner, under the header. `position` on `WNotify` moves them to `top-center`, `bottom-right` or `bottom-center`; at the bottom the newest toast is closest to the edge.
 
