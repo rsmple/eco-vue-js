@@ -1,10 +1,5 @@
 <template>
-  <TransitionGroup
-    enter-from-class="opacity-0 translate-y-2 grid-rows-[0fr]"
-    enter-to-class="opacity-1 grid-rows-[1fr]"
-    leave-from-class="opacity-1 grid-rows-[1fr]"
-    leave-to-class="opacity-0 grid-rows-[0fr]"
-    tag="div"
+  <div
     class="fixed isolate z-10000"
     :class="{
       'top-(--w-top-inner,0.5rem)': isTop,
@@ -12,21 +7,31 @@
       'right-(--w-right-inner,0.5rem)': !isCenter,
       'left-1/2 -translate-x-1/2': isCenter,
     }"
+    @pointerenter="setToastsPaused(true)"
+    @pointerleave="setToastsPaused(false)"
   >
-    <div
-      v-for="item in notifyCenterToastEntries"
-      :key="getNotifyItemKey(item)"
-      class="grid transition-[translate,opacity,grid-template-rows] duration-500"
-      :class="isCenter ? 'justify-center' : 'justify-end'"
+    <TransitionGroup
+      enter-from-class="opacity-0 translate-y-2 grid-rows-[0fr]"
+      enter-to-class="opacity-1 grid-rows-[1fr]"
+      leave-from-class="opacity-1 grid-rows-[1fr]"
+      leave-to-class="opacity-0 grid-rows-[0fr]"
+      tag="div"
     >
-      <div class="min-h-0">
-        <NotifyCard
-          :item="item"
-          @click:close="entry => (entry.items ?? [entry]).forEach(value => hideToast(value.id))"
-        />
+      <div
+        v-for="item in notifyCenterToastEntries"
+        :key="getNotifyItemKey(item)"
+        class="grid transition-[translate,opacity,grid-template-rows] duration-500"
+        :class="isCenter ? 'justify-center' : 'justify-end'"
+      >
+        <div class="min-h-0">
+          <NotifyCard
+            :item="item"
+            @click:close="entry => (entry.items ?? [entry]).forEach(value => hideToast(value.id))"
+          />
+        </div>
       </div>
-    </div>
-  </TransitionGroup>
+    </TransitionGroup>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -37,7 +42,7 @@ import {computed, onBeforeMount, onBeforeUnmount} from 'vue'
 import {initNotify} from '@/utils/Notify'
 
 import NotifyCard from './components/NotifyCard.vue'
-import {addNotify, getNotifyItemKey, hideToast, notifyCenterToastEntries} from './models/notifyCenter'
+import {addNotify, getNotifyItemKey, hideToast, notifyCenterToastEntries, setToastsPaused} from './models/notifyCenter'
 
 const props = withDefaults(defineProps<NotifyProps>(), {position: 'top-right'})
 

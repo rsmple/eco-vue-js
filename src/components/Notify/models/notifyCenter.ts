@@ -33,7 +33,10 @@ const HISTORY_LIMIT = 50
 
 const items = ref([]) as Ref<NotifyItem[]>
 const toastIds = ref<number[]>([])
-const toastTimeouts = new Map<number, ReturnType<typeof setTimeout>>()
+type ToastTimer = {remaining: number, startedAt: number, timeout?: ReturnType<typeof setTimeout>}
+
+const toastTimers = new Map<number, ToastTimer>()
+let isToastsPaused = false
 const dismissedKeys = new Set<string>()
 
 /** The notify center is open: toasts are hidden while it is. */
@@ -109,16 +112,19 @@ const getId = () => ++i
 
 const findItem = (id: number) => items.value.find(item => item.id === id)
 
+const clearToastTimer = (id: number): void => {
+  clearTimeout(toastTimers.get(id)?.timeout)
+  toastTimers.delete(id)
+}
+
 export const hideToast = (id: number): void => {
-  clearTimeout(toastTimeouts.get(id))
-  toastTimeouts.delete(id)
+  clearToastTimer(id)
 
   toastIds.value = toastIds.value.filter(item => item !== id)
 }
 
 const hideAllToasts = (): void => {
-  toastIds.value.forEach(id => clearTimeout(toastTimeouts.get(id)))
-  toastTimeouts.clear()
+  toastIds.value.forEach(clearToastTimer)
 
   toastIds.value = []
 }
@@ -144,24 +150,48 @@ const hideToastGroup = (id: number): void => {
     return value === id || !item || !isActionRequired(item)
   })
 
-  ids.forEach(value => {
-    clearTimeout(toastTimeouts.get(value))
-    toastTimeouts.delete(value)
-  })
+  ids.forEach(clearToastTimer)
 
   toastIds.value = toastIds.value.filter(value => !ids.includes(value))
 }
 
+const startToastTimer = (timer: ToastTimer, id: number): void => {
+  timer.startedAt = Date.now()
+  timer.timeout = setTimeout(() => hideToastGroup(id), timer.remaining)
+}
+
 const scheduleToastHide = (id: number): void => {
-  clearTimeout(toastTimeouts.get(id))
-  toastTimeouts.delete(id)
+  clearToastTimer(id)
 
   const item = findItem(id)
 
   if (item && isActionRequired(item)) return
 
-  toastTimeouts.set(id, setTimeout(() => hideToastGroup(id), TOAST_DELAY))
+  const timer: ToastTimer = {remaining: TOAST_DELAY, startedAt: 0}
+
+  toastTimers.set(id, timer)
+
+  if (!isToastsPaused) startToastTimer(timer, id)
 }
+
+/** Holds the toasts on screen while the user is over them: their timers stop and go on with the time they had left. */
+export const setToastsPaused = (value: boolean): void => {
+  if (value === isToastsPaused) return
+
+  isToastsPaused = value
+
+  toastTimers.forEach((timer, id) => {
+    if (!value) return startToastTimer(timer, id)
+
+    clearTimeout(timer.timeout)
+    timer.remaining -= Date.now() - timer.startedAt
+  })
+}
+
+// With no toasts left there is nothing under the pointer, though it may never get to leave them.
+watch(() => toastIds.value.length, length => {
+  if (!length) setToastsPaused(false)
+})
 
 const showToast = (id: number): void => {
   if (isNotifyCenterOpen.value) return
