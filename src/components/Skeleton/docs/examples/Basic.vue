@@ -43,11 +43,6 @@
         :skeleton="loading"
       />
     </div>
-
-    <div class="flex items-center gap-4">
-      <WSpinner />
-      <WSpinner class="tone-primary square-5 text-tone" />
-    </div>
   </div>
 </template>
 
@@ -56,7 +51,6 @@ import {ref} from 'vue'
 
 import WChip from 'eco-vue-js/dist/components/Chip/WChip.vue'
 import WSkeleton from 'eco-vue-js/dist/components/Skeleton/WSkeleton.vue'
-import WSpinner from 'eco-vue-js/dist/components/Spinner/WSpinner.vue'
 import WToggle from 'eco-vue-js/dist/components/Toggle/WToggle.vue'
 
 const loading = ref(true)

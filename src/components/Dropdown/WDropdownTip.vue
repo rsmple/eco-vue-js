@@ -41,13 +41,18 @@
 
 <script setup lang="ts">
 defineProps<{
+  /** Points down, placed after the content — for a dropdown above its parent. Without a side, it points up. */
   top?: boolean
+  /** Points right, placed after the content — for a dropdown to the left of its parent. */
   left?: boolean
+  /** Points left, placed before the content — for a dropdown to the right of its parent. */
   right?: boolean
 }>()
 
 defineEmits<{
+  /** The pointer entered the tip, e.g. to keep a tooltip open while it moves onto the content. */
   (e: 'mouseover', value: MouseEvent): void
+  /** The pointer left the tip. */
   (e: 'mouseleave', value: MouseEvent): void
 }>()
 </script>

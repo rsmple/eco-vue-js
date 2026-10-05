@@ -35,9 +35,12 @@ import WNavItem from 'eco-vue-js/dist/components/Nav/WNavItem.vue'
 import WNavItemExpand from 'eco-vue-js/dist/components/Nav/WNavItemExpand.vue'
 import WNavItemTransition from 'eco-vue-js/dist/components/Nav/WNavItemTransition.vue'
 
+import IconCodeBlock from 'eco-vue-js/dist/assets/icons/IconCodeBlock'
 import IconElement from 'eco-vue-js/dist/assets/icons/IconElement'
+import IconEye from 'eco-vue-js/dist/assets/icons/IconEye'
 import IconGrid from 'eco-vue-js/dist/assets/icons/IconGrid'
 import IconLayer from 'eco-vue-js/dist/assets/icons/IconLayer'
+import IconMenu from 'eco-vue-js/dist/assets/icons/IconMenu'
 import IconNote from 'eco-vue-js/dist/assets/icons/IconNote'
 import IconSettings from 'eco-vue-js/dist/assets/icons/IconSettings'
 import IconTable from 'eco-vue-js/dist/assets/icons/IconTable'
@@ -45,10 +48,13 @@ import IconTask from 'eco-vue-js/dist/assets/icons/IconTask'
 
 const ICONS: Record<Group, SVGComponent> = {
   Guide: markRaw(IconNote),
+  Layout: markRaw(IconMenu),
   Actions: markRaw(IconElement),
   Controls: markRaw(IconSettings),
+  Display: markRaw(IconEye),
   Data: markRaw(IconTable),
   Overlays: markRaw(IconLayer),
+  Utilities: markRaw(IconCodeBlock),
   Assets: markRaw(IconGrid),
   Recipes: markRaw(IconTask),
 }

@@ -9,35 +9,22 @@
       />
     </div>
 
-    <div class="flex flex-wrap items-center gap-6">
-      <span class="relative">
-        Inbox
+    <div class="flex flex-wrap items-center gap-2">
+      <WChip :semantic-type="SemanticType.POSITIVE">
+        <IconCheck class="square-3.5" />
+        Watered
+      </WChip>
 
-        <WCounter
-          :count="count"
-          :trigger="1"
-          class="absolute -top-2 left-full text-xs"
-        />
-      </span>
-
-      <WCounter
-        :count="1234"
-        :semantic-type="SemanticType.INFO"
-        class="text-sm"
+      <WChip
+        text="Gardener"
+        :skeleton="loading"
       />
 
-      <WButton
-        :semantic-type="SemanticType.SECONDARY"
-        @click="count++"
-      >
-        New message
-      </WButton>
-    </div>
-
-    <div class="flex flex-wrap items-center gap-4 [&_svg]:square-5">
-      <span class="flex items-center gap-2"><WStatusIcon /> Not set</span>
-      <span class="flex items-center gap-2"><WStatusIcon has-value /> Done</span>
-      <span class="flex items-center gap-2"><WStatusIcon has-error /> Failed</span>
+      <WToggle
+        v-model="loading"
+        title="Loading"
+        class="ml-4"
+      />
     </div>
   </div>
 </template>
@@ -47,12 +34,12 @@ import {ref} from 'vue'
 
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
-import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WChip from 'eco-vue-js/dist/components/Chip/WChip.vue'
-import WCounter from 'eco-vue-js/dist/components/Counter/WCounter.vue'
-import WStatusIcon from 'eco-vue-js/dist/components/Status/WStatusIcon.vue'
+import WToggle from 'eco-vue-js/dist/components/Toggle/WToggle.vue'
+
+import IconCheck from 'eco-vue-js/dist/assets/icons/IconCheck'
 
 const semanticTypes = Object.values(SemanticType)
 
-const count = ref(3)
+const loading = ref(false)
 </script>

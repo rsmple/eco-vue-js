@@ -3,6 +3,7 @@ import {type Theme, inBrowser} from 'vitepress'
 import DefaultTheme from 'vitepress/theme-without-fonts'
 import CopyOrDownloadAsMarkdownButtons from 'vitepress-plugin-llms/vitepress-components/CopyOrDownloadAsMarkdownButtons.vue'
 
+import {preventDragFile} from '@/utils/preventDragFile'
 import {setQueryClient} from '@/utils/queryClient'
 
 import DocsLayout from './DocsLayout.vue'
@@ -24,6 +25,9 @@ const createQueryClient = () => new QueryClient({
 const browserQueryClient = inBrowser ? createQueryClient() : undefined
 
 if (browserQueryClient) setQueryClient(browserQueryClient)
+
+// File drop zones light up while a file is dragged over the page, and a file dropped beside them isn't opened.
+preventDragFile()
 
 export default {
   extends: DefaultTheme,

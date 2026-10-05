@@ -164,7 +164,7 @@
 
       <DocsHomeTile
         title="Date picker"
-        link="/components/pickers"
+        link="/components/date-picker"
         class="lg:row-span-2"
       >
         <WDatePicker
@@ -179,7 +179,7 @@
 
       <DocsHomeTile
         title="Status"
-        link="/components/status-and-loading#chips-counters-and-status-icons"
+        link="/components/chip"
       >
         <div class="flex flex-wrap items-center gap-2">
           <WChip
@@ -273,7 +273,7 @@
 
       <DocsHomeTile
         title="Progress"
-        link="/components/status-and-loading#progress"
+        link="/components/progress"
       >
         <div
           v-for="tray in trays"
@@ -477,7 +477,7 @@
 
       <DocsHomeTile
         title="Skeletons"
-        link="/components/status-and-loading"
+        link="/components/skeleton"
       >
         <WToggle
           v-model="isLoading"
@@ -518,7 +518,7 @@
 
       <DocsHomeTile
         title="Reorder"
-        link="/components/utilities#reorder-by-dragging"
+        link="/components/drag-container"
         class="lg:row-span-2"
       >
         <WDragContainer
@@ -547,7 +547,7 @@
 
       <DocsHomeTile
         title="Sliders"
-        link="/components/pickers#sliders"
+        link="/components/slider"
         class="lg:col-span-2"
       >
         <WSlider
@@ -577,7 +577,7 @@
 
       <DocsHomeTile
         title="Expansion"
-        link="/components/content-blocks#expansion"
+        link="/components/expansion"
         class="lg:row-span-2"
       >
         <div class="border-line-subtle rounded-xl border [--inner-margin:1rem]">
@@ -660,7 +660,7 @@
 
       <DocsHomeTile
         title="Numbers"
-        link="/components/content-blocks#wnumberformatter"
+        link="/components/number-formatter"
       >
         <div class="grid grid-cols-2 gap-4">
           <div class="grid">
@@ -729,7 +729,7 @@
 
       <DocsHomeTile
         title="Info cards"
-        link="/components/content-blocks#info-cards"
+        link="/components/info-card"
       >
         <WInfoCard
           :icon="markRaw(IconDanger)"
@@ -788,7 +788,7 @@
 
       <DocsHomeTile
         title="File picker"
-        link="/components/pickers#files"
+        link="/components/file-picker"
       >
         <WFilePicker
           v-model="files"
