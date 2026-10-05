@@ -5,22 +5,17 @@
     leave-from-class="opacity-1 grid-rows-[1fr]"
     leave-to-class="opacity-0 grid-rows-[0fr]"
     tag="div"
-    class="fixed right-0 top-2 isolate z-10000"
+    class="fixed right-0 top-[calc(var(--header-height,0px)+0.5rem)] isolate z-10000"
   >
     <div
-      v-for="config in list"
-      :key="config.id"
+      v-for="item in notifyCenterToastEntries"
+      :key="getNotifyItemKey(item)"
       class="grid justify-end transition-[translate,opacity,grid-template-rows] duration-500"
     >
       <div class="min-h-0">
         <NotifyCard
-          :title="config.title"
-          :caption="config.caption"
-          :type="config.type"
-          :count="config.count"
-          :to="config.to"
-          :user-input="config.userInput"
-          @click:close="removeNotify(config)"
+          :item="item"
+          @click:close="entry => (entry.items ?? [entry]).forEach(value => hideToast(value.id))"
         />
       </div>
     </div>
@@ -28,63 +23,12 @@
 </template>
 
 <script lang="ts" setup>
-import type {AddNotify, NotifyConfig} from './models/types'
-
-import {onBeforeMount, onBeforeUnmount, ref} from 'vue'
+import {onBeforeMount, onBeforeUnmount} from 'vue'
 
 import {initNotify} from '@/utils/Notify'
 
 import NotifyCard from './components/NotifyCard.vue'
-
-type NotifyMeta = {
-  id: number
-  count: number
-  timeout: ReturnType<typeof setTimeout>
-}
-
-const NOTIFY_DELAY = 5000
-
-const list = ref<Array<NotifyConfig & NotifyMeta>>([])
-
-let i = 0
-const getId = () => ++i
-
-const addNotify: AddNotify = (config: NotifyConfig): void => {
-  const index = list.value.findIndex(item => item.type === config.type
-    && (typeof config.title !== 'string' || item.title === config.title)
-    && (typeof config.caption !== 'string' || item.caption === config.caption)
-    && item.userInput === config.userInput
-    && (item.to as {name: string})?.name === (config.to as {name: string})?.name,
-  )
-
-  const configMeta = {
-    ...config,
-    id: list.value[index]?.id ?? getId(),
-    count: 1,
-    timeout: setTimeout(
-      () => {
-        removeNotify(configMeta)
-      },
-      NOTIFY_DELAY,
-    ),
-  }
-
-  if (index !== -1) {
-    configMeta.count += list.value[index]?.count ?? 0
-
-    list.value.splice(index, 1, configMeta).forEach(item => clearTimeout(item.timeout))
-  } else {
-    list.value.push(configMeta)
-  }
-}
-
-const removeNotify = (config: NotifyConfig & NotifyMeta): void => {
-  const index = list.value.indexOf(config)
-
-  if (index === -1) return
-
-  list.value.splice(index, 1)
-}
+import {addNotify, getNotifyItemKey, hideToast, notifyCenterToastEntries} from './models/notifyCenter'
 
 onBeforeMount(() => {
   initNotify(addNotify)

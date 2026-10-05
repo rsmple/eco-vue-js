@@ -11,7 +11,7 @@
         <a
           :href="withBase('/')"
           :aria-label="site.title"
-          class="inline-flex items-center gap-2.5 no-underline"
+          class="flex items-center gap-2.5 no-underline"
         >
           <IconLogo class="size-8 tone-primary text-tone-fill" />
 
@@ -72,6 +72,8 @@
           <!-- The theme is only known in the browser, so the server can't render the right icon or the chosen preset. -->
           <div class="flex gap-1 sm:gap-2 items-center min-w-22">
             <ClientOnly>
+              <DocsNotifyButton />
+
               <ThemeMenu />
 
               <WToggleTheme
@@ -130,6 +132,7 @@ import DocsHomeFooter from './components/DocsHomeFooter.vue'
 import DocsHomeGallery from './components/DocsHomeGallery.vue'
 import DocsHomeHero from './components/DocsHomeHero.vue'
 import DocsNav from './components/DocsNav.vue'
+import DocsNotifyButton from './components/DocsNotifyButton.vue'
 import KitContainers from './components/KitContainers.vue'
 import ThemeMenu from './components/ThemeMenu.vue'
 import {installDocsTheme} from './docsTheme'

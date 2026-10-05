@@ -1,123 +1,198 @@
 <template>
-  <!-- A dark island in either mode: everything inside resolves its colors for dark mode. -->
-  <div class="dark bg-surface-muted relative my-2 mr-4 grid min-h-18 max-w-[calc(100vw-2rem)] grid-cols-[auto_1fr_auto] rounded-xl shadow-md sm:max-w-lg">
+  <div
+    class="text-accent relative grid grid-cols-[auto_1fr] gap-x-4 rounded-xl border border-l-4 border-solid border-line-subtle border-l-tone-fill pl-4 text-sm"
+    :class="[
+      notifyTypeToneMap[item.type],
+      history ? 'bg-surface-subtle w-full' : 'bg-surface-raised my-1.5 mr-4 w-[min(24rem,calc(100vw-2rem))] shadow-lg',
+    ]"
+  >
     <WCounter
-      v-show="count > 1"
-      class="absolute left-[-0.625em] top-[-0.625em] text-xs shadow-md"
-      :count="count"
+      v-show="item.count > 1"
+      class="absolute left-[-0.75em] top-[-0.5em] text-xs shadow-md"
+      :count="item.count"
+      :semantic-type="notifyTypeSemanticTypeMap[item.type]"
     />
 
-    <div class="m-7">
-      <IconDanger
-        v-if="type === NotifyType.DANGER"
-        class="tone-negative square-6 text-tone"
-      />
-
-      <IconWarn
-        v-else-if="type === NotifyType.WARN"
-        class="tone-warning square-6 text-tone"
-      />
-
-      <IconSuccess
-        v-else-if="type === NotifyType.SUCCESS"
-        class="tone-positive square-6 text-tone"
+    <div class="py-2.5">
+      <component
+        :is="notifyTypeIconMap[item.type]"
+        class="text-tone square-5"
       />
     </div>
 
-    <div class="grid items-center py-4">
-      <div class="text-accent font-semibold">
-        <template v-if="typeof title === 'string'">
-          {{ title }}
+    <div class="grid grid-cols-[1fr_auto] gap-4">
+      <div class="py-2.5 font-semibold">
+        <template v-if="typeof item.title === 'string'">
+          {{ item.title }}
         </template>
         <component
-          :is="title"
+          :is="item.title"
           v-else
         />
       </div>
 
-      <div
-        v-if="caption || userInput"
-        class="text-accent whitespace-pre-wrap wrap-break-word font-normal [word-break:break-word]"
+      <button
+        v-if="!(history && isNotifyPending(item))"
+        class="w-ripple-trigger w-ripple-hover text-description flex cursor-pointer self-start p-2"
+        aria-label="Close notification"
+        @click.stop="$emit('click:close', item)"
       >
-        <template v-if="typeof caption === 'string'">
-          {{ caption }}
-        </template>
-        <component
-          :is="caption"
-          v-else-if="caption"
-        /> <span class="break-all">{{ userInput }}</span>
-      </div>
+        <div class="square-6 w-ripple relative flex items-center justify-center rounded-full">
+          <IconCancel class="square-3.5" />
+        </div>
+      </button>
+    </div>
+
+    <div class="col-start-2 -mt-1.5 grid grid-cols-1 gap-1 pb-2 pr-4">
+      <div
+        v-if="typeof item.caption === 'string' || item.userInput"
+        class="whitespace-pre-wrap wrap-break-word [word-break:break-word]"
+      >{{ item.caption }}<span
+        v-if="item.userInput"
+        class="break-all"
+      >{{ item.caption ? ' ' : '' }}{{ item.userInput }}</span></div>
+      <component
+        :is="item.caption"
+        v-else-if="item.caption"
+      />
+
+      <component
+        :is="item.component"
+        v-if="item.component"
+        v-bind="item.componentProps"
+        @update="updateNotify(item.id, $event)"
+        @remove="discardNotify(item.id)"
+      />
 
       <WButton
-        v-if="to"
-        :to="to"
+        v-if="item.to"
+        :to="item.to"
         :semantic-type="SemanticType.SECONDARY"
-        class="mt-4 justify-self-start"
+        class="w-button-h-8 mt-1 justify-self-start text-xs"
       >
         {{ linkText }} <IconBack class="rotate-180" />
       </WButton>
-    </div>
 
-    <button
-      class="w-ripple-trigger w-ripple-hover text-description flex cursor-pointer p-6"
-      @click="$emit('click:close')"
-    >
-      <div class="square-8 w-ripple relative flex items-center justify-center rounded-full">
-        <IconCancel class="square-4" />
+      <template v-if="item.items">
+        <button
+          class="tone-primary text-tone mt-1 cursor-pointer justify-self-start text-xs font-semibold"
+          :aria-expanded="isExpanded"
+          @click.stop="isExpanded = !isExpanded"
+        >
+          {{ isExpanded ? 'Hide' : `Show all ${ item.items.length }` }}
+        </button>
+
+        <div
+          v-show="isExpanded"
+          class="grid text-xs"
+        >
+          <div
+            v-for="child in item.items"
+            :key="child.id"
+            class="border-line-subtle grid grid-cols-[auto_1fr_auto] items-center gap-x-2 border-t border-solid py-1"
+          >
+            <component
+              :is="notifyTypeIconMap[child.type]"
+              :class="notifyTypeToneMap[child.type]"
+              class="text-tone square-4"
+            />
+
+            <div class="flex min-w-0 items-center gap-2">
+              <div class="min-w-0 flex-1 truncate">
+                <template v-if="typeof (child.caption || child.title) === 'string'">
+                  {{ child.caption || child.title }}
+                </template>
+                <component
+                  :is="child.caption || child.title"
+                  v-else
+                />
+              </div>
+
+              <component
+                :is="child.component"
+                v-if="child.component"
+                v-bind="child.componentProps"
+                compact
+                @update="updateNotify(child.id, $event)"
+                @remove="discardNotify(child.id)"
+              />
+            </div>
+
+            <button
+              v-if="!isNotifyPending(child)"
+              class="w-ripple-trigger w-ripple-hover text-description flex cursor-pointer"
+              aria-label="Close notification"
+              @click.stop="$emit('click:close', child)"
+            >
+              <div class="square-6 w-ripple relative flex items-center justify-center rounded-full">
+                <IconCancel class="square-3" />
+              </div>
+            </button>
+
+            <div
+              v-else
+              class="square-6"
+            />
+          </div>
+        </div>
+      </template>
+
+      <div
+        v-if="history"
+        class="text-description text-xs"
+      >
+        {{ timeFormat(item.date) }}{{ isSameDate(new Date(), item.date) ? '' : (', ' + dateFormatShort(item.date)) }}
       </div>
-    </button>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import type {LinkProps} from '@/types/types'
+import type {NotifyItem} from '../models/types'
 
-import {type VNode, computed} from 'vue'
+import {computed, ref} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
 import WCounter from '@/components/Counter/WCounter.vue'
 
 import IconBack from '@/assets/icons/IconBack.svg?component'
 import IconCancel from '@/assets/icons/IconCancel.svg?component'
-import IconDanger from '@/assets/icons/IconDanger.svg?component'
-import IconSuccess from '@/assets/icons/IconSuccess.svg?component'
-import IconWarn from '@/assets/icons/IconWarn.svg?component'
 
 import {useOptionalRouter} from '@/composables/useOptionalRouter'
 import {SemanticType} from '@/utils/SemanticType'
+import {dateFormatShort, isSameDate, timeFormat} from '@/utils/dateTime'
 
 import {NotifyType} from '../models/NotifyType'
+import {discardNotify, isNotifyPending, notifyTypeIconMap, notifyTypeSemanticTypeMap, updateNotify} from '../models/notifyCenter'
 
-interface Props extends Partial<LinkProps> {
-  title: string | VNode
-  caption?: string | VNode
-  userInput?: string
-  type: NotifyType
-  count: number
-}
-
-const props = withDefaults(
-  defineProps<Props>(),
-  {
-    caption: undefined,
-    userInput: undefined,
-    to: undefined,
-  },
-)
+const props = defineProps<{
+  item: NotifyItem
+  /** Shown in the notify center: full width, with the time, and a pending one can't be closed. */
+  history?: boolean
+}>()
 
 defineEmits<{
-  (e: 'click:close'): void
+  (e: 'click:close', value: NotifyItem): void
 }>()
+
+const notifyTypeToneMap: Record<NotifyType, string> = {
+  [NotifyType.PENDING]: 'tone-primary',
+  [NotifyType.SUCCESS]: 'tone-positive',
+  [NotifyType.WARN]: 'tone-warning',
+  [NotifyType.DANGER]: 'tone-negative',
+}
 
 const router = useOptionalRouter()
 
-const linkText = computed(() => {
-  if (!props.to) return undefined
+const isExpanded = ref(false)
 
-  if (props.to instanceof Object && 'meta' in props.to && props.to.meta instanceof Object && 'title' in props.to.meta) {
-    return props.to.meta.title
+const linkText = computed(() => {
+  if (!props.item.to) return undefined
+
+  if (props.item.to instanceof Object && 'meta' in props.item.to && props.item.to.meta instanceof Object && 'title' in props.item.to.meta) {
+    return props.item.to.meta.title
   }
 
-  return router.resolve(props.to).meta?.title
+  return router.resolve(props.item.to).meta?.title
 })
 </script>
