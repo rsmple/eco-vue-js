@@ -11,7 +11,7 @@ export interface DropdownMenuProps extends Omit<DropdownProps, 'parentElement' |
   dropdownClass?: string
 }
 
-export interface DropdownAdaptiveProps extends Pick<OverlayDropdownOptions, 'frameClass' | 'sheetClass' | 'closeOnClick'> {
+export interface DropdownAdaptiveProps extends Pick<OverlayDropdownOptions, 'frameClass' | 'closeOnClick'> {
   /** Shows the dropdown. */
   isOpen: boolean
   /** Element the dropdown opens at. Defaults to the element rendered by the `toggle` slot. */

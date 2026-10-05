@@ -78,7 +78,6 @@ const open = () => {
     dropdown: {
       align: props.horizontalAlign,
       frameClass: props.frameClass,
-      sheetClass: props.sheetClass,
       closeOnClick: props.closeOnClick,
       title: slots.header ? renderHeader : undefined,
       onTop: value => isTop.value = value,
