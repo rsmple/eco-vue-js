@@ -63,6 +63,12 @@ export const wOverlayLayer = Symbol('wOverlayLayer') as InjectionKey<() => numbe
 /** Frame of the layer the content belongs to, `null` on the page. */
 export const wOverlayFrame = Symbol('wOverlayFrame') as InjectionKey<OverlayFrame | null>
 
+/** Pinned header of the dropdown layer the content belongs to, which OverlayHeader renders its slot into. */
+export const wOverlayHeader = Symbol('wOverlayHeader') as InjectionKey<{
+  add: (render: Component) => void
+  remove: (render: Component) => void
+}>
+
 let isHosted = false
 
 /** Called by the host, WModal, as it mounts and unmounts. Nothing opens without it, as nothing would render. */

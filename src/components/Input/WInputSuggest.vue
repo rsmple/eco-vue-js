@@ -1,11 +1,11 @@
 <template>
   <component
-    :is="isStatic ? InputSuggestStatic : WDropdownAdaptive"
+    :is="static ? InputSuggestStatic : embedded ? InputSuggestEmbedded : WDropdownAdaptive"
     v-bind="isStatic ? undefined : {
       isOpen,
       parentElement: parentEl,
       horizontalAlign,
-      frameClass: dropdownClass ? `w-dropdown-frame ${dropdownClass}` : undefined,
+      frameClass: `w-dropdown-frame max-h-80 ${dropdownClass}`,
       nested: true,
       onClose: dismiss,
     }"
@@ -22,12 +22,14 @@
           seamless: toggleScope?.unclickable === false ? false : props.seamless,
           topText: topText || (isOpen && !toggleScope?.isTop),
           autofocus: autofocus ?? embedded,
+          embedded: false,
+          hideTitle: hideTitle || embedded,
+          noMargin: noMargin || embedded,
         }"
         :class="{
           'cursor-pointer': !isDisabled && !isReadonly,
           'cursor-not-allowed': isDisabled && !isReadonly,
           'mb-3': isMobile && !toggleScope?.unclickable,
-          'sm:pt-3': embedded,
         }"
         @update:model-value="!loading && $emit('update:model-value', $event as NonNullable<ModelValue>)"
 
@@ -84,20 +86,10 @@
         </template>
 
         <template
-          v-if="$slots.bottom || (isStatic && $slots.content)"
+          v-if="$slots.bottom || (static && $slots.content)"
           #bottom
         >
-          <template v-if="embedded">
-            <div class="pb-4" />
-            <WInfiniteListScrollingElement class="overflow-y-auto overscroll-y-contain">
-              <slot
-                name="content"
-                v-bind="{focused, focus, blur}"
-              />
-            </WInfiniteListScrollingElement>
-          </template>
-
-          <template v-else-if="static">
+          <template v-if="static">
             <div class="pb-4" />
             <slot
               name="content"
@@ -136,14 +128,14 @@
       </WInput>
     </template>
 
+    <!-- The dropdown or bottom sheet scrolls the menu on its own — in a sheet with room under it for the keyboard. -->
     <template
-      v-if="!isStatic"
+      v-if="!static"
       #content
     >
-      <!-- The bottom sheet scrolls on its own, with room under the content for the keyboard. -->
       <div
         v-if="isMobile"
-        class="w-full pb-[50vh]"
+        class="pb-[50vh]"
       >
         <slot
           name="content"
@@ -151,15 +143,11 @@
         />
       </div>
 
-      <WInfiniteListScrollingElement
+      <slot
         v-else
-        class="w-full overflow-auto overscroll-contain"
-      >
-        <slot
-          name="content"
-          v-bind="{focused, focus, blur}"
-        />
-      </WInfiniteListScrollingElement>
+        name="content"
+        v-bind="{focused, focus, blur}"
+      />
     </template>
   </component>
 </template>
@@ -170,7 +158,6 @@ import type {InputSuggestProps, WrapSelection} from './types'
 import {type VNode, computed, ref, shallowRef, useTemplateRef} from 'vue'
 
 import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
-import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
 import WInput from '@/components/Input/WInput.vue'
 
 import IconArrow from '@/assets/icons/IconArrow.svg?component'
@@ -180,6 +167,7 @@ import {useIsMobile} from '@/utils/mobile'
 import {useComponentStates} from '@/utils/useComponentStates'
 
 import InputActionsButton from './components/InputActionsButton.vue'
+import InputSuggestEmbedded from './components/InputSuggestEmbedded.vue'
 import InputSuggestStatic from './components/InputSuggestStatic.vue'
 
 type ModelValue = Required<InputSuggestProps<Type>>['modelValue']
@@ -300,7 +288,7 @@ defineSlots<{
   before?: (props: {modelValue: ModelValue | undefined, focused: boolean}) => void
   /** Content to the right of the field. `unclickable` is `true` for the field that opens the mobile bottom sheet. */
   right?: (props: {unclickable?: boolean | null}) => void
-  /** Content under the field, after a `static` or `embedded` menu. */
+  /** Content under the field, after a `static` menu. */
   bottom?: () => void
   /** Menu content. `focus` and `blur` move focus to and from the input, which opens and closes the menu. */
   content?: (props: {focused: boolean, blur: () => void, focus: () => void}) => VNode[]

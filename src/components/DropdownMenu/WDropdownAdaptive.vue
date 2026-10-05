@@ -9,9 +9,10 @@
 <script lang="ts" setup>
 import type {DropdownAdaptiveProps} from './types'
 
-import {type VNode, computed, defineComponent, markRaw, onMounted, ref, useSlots, useTemplateRef, watch} from 'vue'
+import {type VNode, computed, defineComponent, h, markRaw, onMounted, ref, useSlots, useTemplateRef, watch} from 'vue'
 
-import {useOverlay} from '@/utils/Overlay'
+import OverlayHeader from '@/components/Modal/components/OverlayHeader.vue'
+import {useOverlay, useOverlayFrame} from '@/utils/Overlay'
 import {useIsMobile} from '@/utils/mobile'
 
 // Opens the `content` slot with the overlay manager while `isOpen` is true — a dropdown at the `toggle` element, or a bottom sheet on phones.
@@ -48,9 +49,19 @@ const isTop = ref(false)
 
 // The overlay host renders the slots, as components so they keep this component's context.
 // The content declares `close:modal`, which the host listens to on every content, as the slot may render several nodes for the listener to fall through to.
-const renderContent = markRaw(defineComponent({emits: ['close:modal'], setup: () => () => slots.content?.()}))
+// In a bottom sheet without a `header`, the content pins a copy of the toggle above itself.
+const renderContent = markRaw(defineComponent({
+  emits: ['close:modal'],
+  setup: () => {
+    const hasToggleCopy = useOverlayFrame() === 'sheet' && !slots.header
+
+    return () => [
+      hasToggleCopy ? h(OverlayHeader, null, {default: () => slots.toggle?.({isTop: false, unclickable: false})}) : null,
+      slots.content?.(),
+    ]
+  },
+}))
 const renderHeader = markRaw(() => slots.header?.())
-const renderToggle = markRaw(() => slots.toggle?.({isTop: false, unclickable: false}))
 
 const overlay = useOverlay()
 
@@ -70,7 +81,6 @@ const open = () => {
       sheetClass: props.sheetClass,
       closeOnClick: props.closeOnClick,
       title: slots.header ? renderHeader : undefined,
-      header: slots.header ? undefined : renderToggle,
       onTop: value => isTop.value = value,
     },
     onClose: () => {

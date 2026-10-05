@@ -44,10 +44,8 @@ export type OverlayDropdownOptions = {
   align?: HorizontalAlign
   /** Classes of the dropdown's box, replacing the default frame. */
   frameClass?: string
-  /** Heading at the top of the bottom sheet on phones, such as the name of the button that opened it. */
+  /** Heading at the top of the bottom sheet on phones, such as the name of the button that opened it. The content can pin more under it with OverlayHeader, such as a field. */
   title?: string | Component
-  /** Replaces the heading at the top of the bottom sheet on phones, such as an editable copy of the field that opened it. */
-  header?: Component
   /** Classes added to the content's box in the bottom sheet on phones. */
   sheetClass?: string
   /** A click on the content closes the layer, as in a menu. */
