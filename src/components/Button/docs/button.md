@@ -1,6 +1,6 @@
 ---
 group: Actions
-description: WButton — the base action element with semantic colors, loading and disabled states, links and tooltips.
+description: WButton — the base action element with semantic colors, loading and disabled states, links and tooltips — plus WButtonCopy and WButtonInput.
 ---
 
 # Button
@@ -121,6 +121,65 @@ const save = () => {
 
 <!-- @example-end -->
 
+## Small buttons
+
+`WButtonCopy` copies `value` to the clipboard. Its icon turns into a check for a moment after copying.
+
+`WButtonInput` is a square icon button as tall as an input (`--w-input-height`), with the input's border and corners, to sit next to an input or in its `right` slot. `tooltipText` names it, `loading` swaps the icon for a spinner, and `to` makes it a router link.
+
+<!-- @example Button/SmallButtons -->
+
+<DocsDemo name="Button/SmallButtons" />
+
+```vue
+<template>
+  <div class="grid gap-6">
+    <div class="flex items-center gap-2">
+      <code class="rounded-lg bg-surface-muted px-2 py-1">{{ token }}</code>
+
+      <WButtonCopy :value="token" />
+    </div>
+
+    <div class="flex max-w-md items-center gap-2">
+      <WInput
+        v-model="search"
+        placeholder="Sensor"
+        class="flex-1"
+        no-margin
+      />
+
+      <WButtonInput
+        :icon="markRaw(IconRefresh)"
+        tooltip-text="Sync sensors"
+        :loading="syncing"
+        @click="sync"
+      />
+    </div>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import {markRaw, ref} from 'vue'
+
+import WButtonCopy from 'eco-vue-js/dist/components/Button/WButtonCopy.vue'
+import WButtonInput from 'eco-vue-js/dist/components/Button/WButtonInput.vue'
+import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
+
+import IconRefresh from 'eco-vue-js/dist/assets/icons/IconRefresh'
+
+const token = 'gh2_4f9c2e1a7b'
+const search = ref<string>()
+const syncing = ref(false)
+
+const sync = () => {
+  syncing.value = true
+  setTimeout(() => syncing.value = false, 1500)
+}
+</script>
+```
+
+<!-- @example-end -->
+
 ## API
 
 <!-- @api WButton -->
@@ -166,5 +225,48 @@ import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 | Slot | Props | Description |
 | --- | --- | --- |
 | `default` | — | Button content. |
+
+<!-- @api-end -->
+
+<!-- @api WButtonCopy -->
+
+### WButtonCopy
+
+```ts
+import WButtonCopy from 'eco-vue-js/dist/components/Button/WButtonCopy.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | **required** | Text copied to the clipboard on click. |
+
+<!-- @api-end -->
+
+<!-- @api WButtonInput -->
+
+### WButtonInput
+
+```ts
+import WButtonInput from 'eco-vue-js/dist/components/Button/WButtonInput.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `icon` | `SVGComponent` | **required** | Icon of the button. |
+| `to` | `RouteLocationRaw` | — | Router location — renders a router link. Needs vue-router installed in the app. |
+| `tooltipText` | `string` | — | Tooltip text, which also names the button. |
+| `loading` | `boolean` | — | Shows a spinner instead of the icon and ignores clicks. |
+| `skeleton` | `boolean` | — | Shows a placeholder instead of the button. |
+| `disabled` | `boolean` | — | Grays the button out and ignores clicks. |
+
+#### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `click` | `(value: MouseEvent)` | The button was clicked, unless it is disabled or loading. |
 
 <!-- @api-end -->
