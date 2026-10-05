@@ -2,7 +2,7 @@
   <ClientOnly>
     <div class="vp-raw">
       <WTooltipContainer />
-      <WNotify />
+      <WNotify :position="notifyPosition" />
       <WModal />
     </div>
   </ClientOnly>
@@ -12,4 +12,6 @@
 import WModal from '@/components/Modal/WModal.vue'
 import WNotify from '@/components/Notify/WNotify.vue'
 import WTooltipContainer from '@/components/Tooltip/WTooltipContainer.vue'
+
+import {notifyPosition} from '../notifyPosition'
 </script>
