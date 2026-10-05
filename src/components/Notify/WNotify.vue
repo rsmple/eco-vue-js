@@ -7,9 +7,9 @@
     tag="div"
     class="fixed isolate z-10000"
     :class="{
-      'top-[calc(var(--header-height,0px)+0.5rem)]': isTop,
-      'bottom-[calc(env(safe-area-inset-bottom,0px)+0.5rem)]': !isTop,
-      'right-(--w-right-inner)': !isCenter,
+      'top-(--w-top-inner,0.5rem)': isTop,
+      'bottom-[calc(var(--w-bottom-inner,0.5rem)+0.5rem)]': !isTop,
+      'right-(--w-right-inner,0.5rem)': !isCenter,
       'left-1/2 -translate-x-1/2': isCenter,
     }"
   >
