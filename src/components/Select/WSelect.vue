@@ -86,7 +86,6 @@
     <template #content>
       <div
         role="listbox"
-        class="max-h-80"
       >
         <slot name="content" />
 

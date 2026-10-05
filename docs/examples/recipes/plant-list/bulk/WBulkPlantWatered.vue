@@ -21,6 +21,8 @@ import WButtonSelectionAction from 'eco-vue-js/dist/components/Button/WButtonSel
 
 import IconDrop from 'eco-vue-js/dist/assets/icons/IconDrop'
 
+import {numberFormatter} from '@/utils/utils'
+
 import {type QueryParamsPlants, plantModelApi} from '../api/Plant'
 
 const props = defineProps<BulkProps<QueryParamsPlants>>()
@@ -36,14 +38,16 @@ const isOpen = ref(false)
 const markWatered = (event: MouseEvent) => {
   isOpen.value = true
 
+  const countText = `${ numberFormatter.format(props.selectionCount) } plant${ props.selectionCount === 1 ? '' : 's' } `
+
   overlay.addConfirm({
-    title: `Mark ${ props.selectionCount } plant${ props.selectionCount === 1 ? '' : 's' } as watered?`,
+    title: `Mark ${ countText } as watered?`,
     description: 'Their next watering is no longer due.',
     acceptText: 'Mark as watered',
     anchor: event.currentTarget as Element,
     onAccept: () => plantModelApi.paginated.actions.updateMany(props.queryParamsGetter(), {watered: true, waterBy: null})
       .then(() => {
-        Notify.success({title: 'Marked as watered'})
+        Notify.success({title: `${ countText } marked as watered`})
       })
       .catch(handleApiError),
   }, () => isOpen.value = false)

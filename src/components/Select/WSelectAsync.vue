@@ -105,7 +105,6 @@
         :reverse="reverse"
         :scroll-selected="isOpen"
         :cursor-selected="cursorSelected"
-        class="max-h-80"
         @select="select"
         @unselect="unselect"
         @create:option="create(search)"

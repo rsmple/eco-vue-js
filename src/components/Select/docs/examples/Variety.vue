@@ -10,6 +10,7 @@
     class="max-w-xl"
     @select="varietyIds = [...varietyIds, $event]"
     @unselect="varietyIds = varietyIds.filter(item => item !== $event)"
+    @update:model-value="varietyIds = $event"
   >
     <!-- A legend for the calendar strip, above the options. -->
     <template #content>

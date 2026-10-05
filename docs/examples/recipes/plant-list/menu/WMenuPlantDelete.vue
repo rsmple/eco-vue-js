@@ -21,6 +21,8 @@ import WButtonMoreItem from 'eco-vue-js/dist/components/Button/WButtonMoreItem.v
 
 import IconTrash from 'eco-vue-js/dist/assets/icons/IconTrash'
 
+import {Notify} from '@/utils/Notify'
+
 import {plantModelApi} from '../api/Plant'
 
 const props = defineProps<MenuProps<Plant>>()
@@ -31,13 +33,18 @@ defineEmits<MenuEmits<Plant>>()
 const overlay = useOverlay()
 
 const remove = () => {
+  const name = props.item.name
   overlay.addConfirm({
     title: 'Remove plant',
-    description: `"${ props.item.name }" will be removed from the collection.`,
+    description: `"${ name }" will be removed from the collection.`,
     acceptText: 'Remove',
     acceptSemanticType: SemanticType.NEGATIVE,
     // The confirm shows a loading state until the action resolves, which also drops the plant from every cached page.
-    onAccept: () => plantModelApi.item.actions.delete(props.item.id).catch(handleApiError),
+    onAccept: () => plantModelApi.item.actions.delete(props.item.id)
+      .then(() => {
+        Notify.success({title: `"${ name }" removed`})
+      })
+      .catch(handleApiError),
   })
 }
 </script>

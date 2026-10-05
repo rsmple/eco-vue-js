@@ -8,27 +8,30 @@
     @close="dismiss"
   >
     <template
-      v-if="header || title"
+      v-if="title || headers.length"
       #toggle="{unclickable}"
     >
-      <component
-        :is="header"
-        v-if="header && !unclickable"
-      />
+      <template v-if="!unclickable">
+        <div
+          v-if="title"
+          class="flex items-center gap-2 py-2 text-base text-center font-semibold"
+        >
+          <template v-if="typeof title === 'string'">
+            {{ title }}
+          </template>
 
-      <div
-        v-else-if="!unclickable"
-        class="flex items-center gap-2 py-2 text-base text-center font-semibold"
-      >
-        <template v-if="typeof title === 'string'">
-          {{ title }}
-        </template>
+          <component
+            :is="title"
+            v-else
+          />
+        </div>
 
         <component
-          :is="title"
-          v-else
+          :is="render"
+          v-for="(render, index) in headers"
+          :key="index"
         />
-      </div>
+      </template>
     </template>
 
     <template #content>
@@ -78,16 +81,33 @@
             :no-filter="closeOnClick"
             :class="[
               frameClass ?? 'w-dropdown-frame',
-              hasTip ? 'w-tooltip-center-x max-w-[calc(100vw-1.5rem)]' : cornered ? frameClass === undefined && {
+              hasTip ? 'w-tooltip-center-x' : undefined,
+              cornered && frameClass === undefined && {
                 'rounded-bl-none': isRight && isTop,
                 'rounded-tl-none': isRight && !isTop,
                 'rounded-br-none': isLeft && isTop,
                 'rounded-tr-none': isLeft && !isTop,
-              } : 'flex max-h-[inherit] flex-col',
+              },
             ]"
+            class="flex flex-col"
             @click="dismissOutside"
           >
-            <slot />
+            <!-- The content's pinned header, such as the field of an embedded select. It is inset like the sheet's, so the content brings no padding of its own. -->
+            <div
+              v-if="headers.length"
+              class="shrink-0 px-3 pb-4 pt-3"
+            >
+              <component
+                :is="render"
+                v-for="(render, index) in headers"
+                :key="index"
+              />
+            </div>
+
+            <!-- The dropdown sizes to the space left on screen, and the content scrolls here. Infinite lists inside follow it. -->
+            <WInfiniteListScrollingElement class="min-h-0 overflow-auto overscroll-contain">
+              <slot />
+            </WInfiniteListScrollingElement>
           </WClickOutside>
         </template>
       </WDropdown>
@@ -98,7 +118,7 @@
 <script lang="ts" setup>
 import type {OverlayAnchor, OverlayDropdownOptions} from '@/utils/Overlay'
 
-import {computed, inject, onBeforeUnmount, provide, useTemplateRef, watch} from 'vue'
+import {type Component, computed, inject, onBeforeUnmount, provide, shallowRef, useTemplateRef, watch} from 'vue'
 
 import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
@@ -110,7 +130,7 @@ import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {getIsMobile} from '@/utils/mobile'
 import {BASE_ZINDEX_DROPDOWN, wBaseZIndex} from '@/utils/utils'
 
-import {isInLayerWithin, setLayerElement, wOverlayFrame, wOverlayLayer} from '../models/overlayRegistry'
+import {isInLayerWithin, setLayerElement, wOverlayFrame, wOverlayHeader, wOverlayLayer} from '../models/overlayRegistry'
 
 // Frame of a `dropdown` layer — a dropdown at the anchor, or a bottom sheet on phones.
 const props = withDefaults(
@@ -128,7 +148,6 @@ const props = withDefaults(
     frameClass: undefined,
     sheetClass: undefined,
     title: undefined,
-    header: undefined,
     onTop: undefined,
   },
 )
@@ -144,6 +163,14 @@ const sheetRef = useTemplateRef('sheet')
 const isMobile = getIsMobile()
 
 provide(wOverlayFrame, isMobile ? 'sheet' : 'dropdown')
+
+// Pinned under the sheet's title, or at the top of the dropdown, above the content that scrolls.
+const headers = shallowRef<Component[]>([])
+
+provide(wOverlayHeader, {
+  add: render => headers.value = [...headers.value, render],
+  remove: render => headers.value = headers.value.filter(item => item !== render),
+})
 
 const dropdownRef = useTemplateRef('dropdown')
 

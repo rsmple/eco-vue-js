@@ -1,6 +1,7 @@
 <template>
   <WDropdownAdaptive
     :is-open="isOpen"
+    frame-class="max-w-96 max-h-80 w-dropdown-frame"
     @close="$emit('close')"
   >
     <template #toggle>
@@ -45,7 +46,7 @@
     <template #content>
       <div
         class="text-start font-normal"
-        :class="meta.embedded ? 'sm:max-w-96 sm-not:w-screen' : 'p-4 sm:w-96'"
+        :class="meta.embedded ? undefined : 'p-4 sm:w-96'"
       >
         <component
           :is="item[0].default"
