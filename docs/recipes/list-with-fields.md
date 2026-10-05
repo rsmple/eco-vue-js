@@ -335,7 +335,11 @@ import {paginateList} from 'eco-vue-js/dist/utils/useDefaultQuery'
 import type {QueryParamsSelection} from 'eco-vue-js/dist/utils/useSelected'
 import {isId, parseBoolean, parseId, parseString, parseStringList} from 'eco-vue-js/dist/utils/utils'
 
+import {gardeners} from '../../../shared/Gardener'
 import {Kind, Light, type Plant, plants} from '../models/Plant'
+
+/** What the API takes to create or change a plant: the caretaker goes by id. */
+export type PlantPayload = Partial<Omit<Plant, 'caretaker'> & {caretaker: number}>
 
 /** Parses a comma-separated list, dropping values that are not in `values`, such as ones edited into the URL by hand. */
 const parseEnumList = <Value extends string>(values: Value[]): ParseFn<Value[]> => value => {
@@ -366,7 +370,50 @@ const respond = <Data>(handler: () => Data) => new Promise<Data>(resolve => {
   setTimeout(() => resolve(structuredClone(handler())), 300)
 })
 
-const toSortable = (value: Plant[keyof Plant]) => value instanceof Date ? value.getTime() : value
+/** Copies a value the way sending it would: a form's payload holds its reactive objects, which cannot be stored or cloned. */
+const toPlain = <Value>(value: Value): Value => {
+  if (Array.isArray(value)) return value.map(toPlain) as Value
+  if (value instanceof Date) return new Date(value) as Value
+  if (value instanceof Object) return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, toPlain(item)])) as Value
+
+  return value
+}
+
+/** Applies a payload the way the backend would, looking up the caretaker by id. */
+const applyPayload = (plant: Plant, {caretaker, ...payload}: PlantPayload): Plant => ({
+  ...plant,
+  ...toPlain(payload),
+  caretaker: gardeners.find(item => item.id === caretaker) ?? plant.caretaker,
+})
+
+/** The defaults the backend fills in for a new plant. */
+const createPlant = (payload: PlantPayload): Plant => {
+  const today = new Date()
+  const height = payload.height ?? 0
+
+  return applyPayload({
+    id: Math.max(0, ...source.map(plant => plant.id)) + 1,
+    name: '',
+    species: '',
+    kind: Kind.TROPICAL,
+    height,
+    watered: true,
+    humidity: 50,
+    seeds: 0,
+    water: 200,
+    waterBy: null,
+    light: Light.BRIGHT,
+    health: 100,
+    growth: [{date: +today, height}],
+    waterings: [today],
+    temperature: [16, 26],
+    caretaker: gardeners[0]!,
+    tasks: [],
+    description: '',
+  }, payload)
+}
+
+const toSortable =(value: Plant[keyof Plant]) => value instanceof Date ? value.getTime() : value
 
 /** Sorts in `direction`, with empty values last either way. */
 const compare = (a: Plant, b: Plant, field: keyof Plant, direction: 1 | -1) => {
@@ -426,8 +473,8 @@ export const plantModelApi = createRestModelApi({
       queryFn: ({queryKey}) => respond(() => source.find(plant => plant.id === queryKey[2])!),
       actions: {
         // In an app, a PATCH to `/plants/<id>/`.
-        update: ({set}, id, payload: Partial<Plant>) => respond(() => {
-          source = source.map(plant => plant.id === id ? {...plant, ...payload} : plant)
+        update: ({set}, id, payload: PlantPayload) => respond(() => {
+          source = source.map(plant => plant.id === id ? applyPayload(plant, payload) : plant)
 
           return source.find(plant => plant.id === id)!
         })
@@ -447,6 +494,30 @@ export const plantModelApi = createRestModelApi({
       },
     },
 
+    list: {
+      scope: 'list',
+      dataType: [] as Plant[],
+      // In an app, a GET to `/plants/` without pagination — for selects.
+      queryFn: () => respond(() => source.toSorted((a, b) => a.name.localeCompare(b.name))),
+      actions: {
+        // In an app, a POST to `/plants/`.
+        create: ({set, invalidate}, payload: PlantPayload) => respond(() => {
+          const plant = createPlant(payload)
+
+          source = [...source, plant]
+
+          return plant
+        })
+          .then(plant => {
+            // Caches the new plant for its item query, and refetches the lists it may now appear in.
+            set(plant)
+            invalidate()
+
+            return plant
+          }),
+      },
+    },
+
     paginated: {
       scope: 'paginated',
       dataType: {} as PaginatedResponse<Plant>,
@@ -455,10 +526,10 @@ export const plantModelApi = createRestModelApi({
       queryFn: ({queryKey}) => respond(() => paginateList(filterPlants(queryKey[2]), queryKey[2]?.page, 10)),
       actions: {
         // In an app, a PATCH to `/plants/bulk/` with the filters and the selection as query params.
-        updateMany: ({invalidate}, queryParams, payload: Partial<Plant>) => respond(() => {
+        updateMany: ({invalidate}, queryParams, payload: PlantPayload) => respond(() => {
           const ids = new Set(filterPlants(queryParams).map(plant => plant.id))
 
-          source = source.map(plant => ids.has(plant.id) ? {...plant, ...payload} : plant)
+          source = source.map(plant => ids.has(plant.id) ? applyPayload(plant, payload) : plant)
         })
           // Refetches every cached page, since the change can move plants in and out of the filters.
           .then(() => invalidate()),
