@@ -1,22 +1,19 @@
 <template>
-  <!-- On a page it is framed and scrolls its list itself. In an overlay the frame does both, and pins the header above the list. -->
   <div
     :class="{
-      'bg-surface border-line-subtle grid max-h-[min(40rem,calc(100vh-2rem))] w-[min(28rem,calc(100vw-1rem))] grid-rows-[auto_1fr_auto] overflow-hidden rounded-2xl border border-solid': frame === null,
+      'bg-surface border-line-subtle grid max-h-[min(40rem,calc(100vh-2rem))] w-[min(28rem,calc(100vw-var(--inner-margin,1fr)*2))] grid-rows-[auto_1fr_auto] overflow-hidden rounded-2xl border border-solid': frame === null,
       'pb-[50vh]': frame === 'sheet',
     }"
     role="region"
+    class="grid grid-rows-[1fr_auto] h-full"
     :aria-label="title ?? 'Notifications'"
   >
     <OverlayHeader>
       <div
         class="flex items-center justify-between gap-4"
-        :class="{
-          'border-line-subtle border-b border-solid px-4 py-3': frame === null,
-          'pb-4': frame === 'sheet',
-        }"
+        :class="frame === null ? 'border-line-subtle border-b border-solid px-4 py-3' : frame === 'sheet' ? 'pb-4' : undefined"
       >
-        <div class="text-accent font-semibold">
+        <div class="text-accent font-semibold h-8 flex items-center">
           {{ title ?? 'Notifications' }}
         </div>
 
@@ -32,49 +29,79 @@
     </OverlayHeader>
 
     <div
-      class="grid content-start gap-2"
-      :class="frame === null ? 'overflow-y-auto overscroll-contain p-4' : frame === 'sheet' ? 'px-3' : 'p-2'"
+      v-if="!notifyCenterItems.length"
+      class="text-description py-2 text-center self-center"
+    >
+      {{ emptyText ?? 'No notifications yet' }}
+    </div>
+
+    <div
+      v-else
+      class="grid content-start"
+      :class="frame === null ? 'overflow-y-auto overscroll-contain px-4 py-3' : frame === 'dropdown' ? 'px-3 pb-2 pt-1' : 'px-3 py-1'"
     >
       <div
-        v-if="!notifyCenterItems.length"
-        class="text-description py-10 text-center"
+        v-if="notifyCenterActionItems.length"
+        class="tone-negative text-tone py-1 text-xs font-semibold uppercase"
       >
-        {{ emptyText ?? 'No notifications yet' }}
+        {{ actionText ?? 'Action required' }}
       </div>
 
-      <template v-if="notifyCenterActionItems.length">
-        <div class="tone-negative text-tone px-2 pt-1 text-xs font-semibold uppercase">
-          {{ actionText ?? 'Action required' }}
-        </div>
-
-        <NotifyCard
+      <TransitionGroup
+        enter-from-class="opacity-0 grid-rows-[0fr]"
+        enter-to-class="opacity-1 grid-rows-[1fr]"
+        leave-from-class="opacity-1 grid-rows-[1fr]"
+        leave-to-class="opacity-0 grid-rows-[0fr]"
+      >
+        <div
           v-for="item in notifyCenterActionEntries"
           :key="getNotifyItemKey(item)"
-          :item="item"
-          history
-          @click:close="removeNotifyEntry"
-        />
-
-        <div
-          v-if="notifyCenterActivityItems.length"
-          class="text-description px-2 pt-2 text-xs font-semibold uppercase"
+          class="grid transition-[transform,grid-template-rows] duration-300"
         >
-          {{ activityText ?? 'Activity' }}
+          <div class="min-h-0">
+            <NotifyCard
+              :item="item"
+              history
+              class="my-1"
+              @click:close="removeNotifyEntry"
+            />
+          </div>
         </div>
-      </template>
+      </TransitionGroup>
 
-      <NotifyCard
-        v-for="item in notifyCenterActivityEntries"
-        :key="getNotifyItemKey(item)"
-        :item="item"
-        history
-        @click:close="removeNotifyEntry"
-      />
+      <div
+        v-if="notifyCenterActivityItems.length && notifyCenterActionItems.length"
+        class="text-description pt-2 pb-1 text-xs font-semibold uppercase"
+      >
+        {{ activityText ?? 'Activity' }}
+      </div>
+
+      <TransitionGroup
+        enter-from-class="opacity-0 grid-rows-[0fr]"
+        enter-to-class="opacity-1 grid-rows-[1fr]"
+        leave-from-class="opacity-1 grid-rows-[1fr]"
+        leave-to-class="opacity-0 grid-rows-[0fr]"
+      >
+        <div
+          v-for="item in notifyCenterActivityEntries"
+          :key="getNotifyItemKey(item)"
+          class="grid transition-[transform,grid-template-rows] duration-300"
+        >
+          <div class="min-h-0">
+            <NotifyCard
+              :item="item"
+              history
+              class="my-1"
+              @click:close="removeNotifyEntry"
+            />
+          </div>
+        </div>
+      </TransitionGroup>
     </div>
 
     <div
       v-if="$slots.footer"
-      class="border-line-subtle border-t border-solid"
+      class="border-line-subtle border-t border-solid sticky bottom-0 bg-surface"
     >
       <slot name="footer" />
     </div>

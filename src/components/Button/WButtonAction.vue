@@ -70,7 +70,7 @@
     </div>
 
     <WTooltip
-      v-if="tooltipText || (!titleText && title)"
+      v-if="(tooltipText || (!titleText && title)) && !active"
       ref="tooltip"
       :text="tooltipText ?? (titleText ? undefined : title)"
       left

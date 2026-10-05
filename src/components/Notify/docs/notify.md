@@ -110,7 +110,7 @@ A pending notification can't be closed in the notify center; closing its toast o
 
 ## Notify center
 
-Every notification is also kept in a history of the last 50, shown by `WNotifyCenter`. `WNotifyCenterButton` is a bell for the [actions bar](/guide/app-shell) that opens it as a dropdown — a bottom sheet on phones. It counts the notifications that need action and runs a shimmer while any is pending. Toasts are hidden while the center is open.
+Every notification is also kept in a history of the last 50, shown by `WNotifyCenter`. `WNotifyCenterButton` is a bell for the [actions bar](/guide/app-shell) that opens it as a dropdown — a bottom sheet on phones. It counts the notifications that need action and runs a shimmer while any is pending. Toasts are hidden while the center is open. The center opens under the button with a tip; `horizontal-align` places it otherwise. `HorizontalAlign.LEFT_INNER` suits a bell at the right end of the header — it grows left from the button's right edge, without a tip. `HorizontalAlign.LEFT_CENTER` suits a bell in a side rail — it opens beside the button with the tip pointing at it, and near the top or bottom of the screen only the box shifts, keeping a margin from the edge.
 
 ```vue
 <template>
@@ -139,12 +139,16 @@ import WNotifyCenterButton from 'eco-vue-js/dist/components/Notify/WNotifyCenter
 </script>
 ```
 
-For a trigger of your own, such as the bell in this site's header, open it with `useNotifyCenter`, called in setup. It returns `isOpen`, `open(anchor)`, `close` and `toggle(anchor)`, and takes the center's props and footer:
+For a trigger of your own, such as the bell in this site's header, open it with `useNotifyCenter`, called in setup. It returns `isOpen`, `open(anchor)`, `close` and `toggle(anchor)`, and takes the center's props, footer and `horizontalAlign`:
 
 ```ts
+import {HorizontalAlign} from 'eco-vue-js/dist/utils/HorizontalAlign'
 import {useNotifyCenter} from 'eco-vue-js/dist/utils/NotifyCenter'
 
-const {isOpen, toggle} = useNotifyCenter({props: () => ({title: 'Alerts'})})
+const {isOpen, toggle} = useNotifyCenter({
+  props: () => ({title: 'Alerts'}),
+  horizontalAlign: () => HorizontalAlign.LEFT_INNER,
+})
 ```
 
 `WNotifyCenter` can also be placed on a page as it is. Notifications on the `ACTION` channel need the user: they are pinned on top under their own heading, their toast stays until closed, and clearing the history keeps them — as it keeps pending ones.
@@ -310,6 +314,7 @@ import WNotifyCenterButton from 'eco-vue-js/dist/components/Notify/WNotifyCenter
 | --- | --- | --- | --- |
 | `title` | `string` | — | Tooltip of the button and heading of the notify center. Defaults to `Notifications`. |
 | `icon` | `SVGComponent` | — | Icon of the button. Defaults to a bell. |
+| `horizontalAlign` | `HorizontalAlign` | — | Aligns the notify center to the button — such as `HorizontalAlign.LEFT_INNER` to grow left from its right edge, without a tip, or `HorizontalAlign.LEFT_CENTER` beside it with a tip, for a button in a side rail. Defaults to centered under the button with a tip. |
 | `clearText` | `string` | — | Text of the button that clears the history. Defaults to `Clear`. |
 | `emptyText` | `string` | — | Shown when there are no notifications. Defaults to `No notifications yet`. |
 | `actionText` | `string` | — | Heading of the notifications that need action (`NotifyChannel.ACTION`). Defaults to `Action required`. |
