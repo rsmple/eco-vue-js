@@ -1,6 +1,3 @@
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="16.97" height="16.97" fill="currentcolor" rx="4" transform="rotate(45 11.78 0)" x="11.78"/>
-  <circle class="fill-tone-on" cx="7.36" cy="12.27" fill="#fff" r="1.47"/>
-  <circle class="fill-tone-on" cx="11.78" cy="12.27" fill="#fff" r="1.47"/>
-  <circle class="fill-tone-on" cx="16.2" cy="12.27" fill="#fff" r="1.47"/>
+  <path clip-rule="evenodd" d="M8.95 2.83a4 4 0 0 1 5.66 0l6.34 6.34a4 4 0 0 1 0 5.66l-6.34 6.34a4 4 0 0 1-5.66 0l-6.34-6.34a4 4 0 0 1 0-5.66zM7.36 10.8a1.47 1.47 0 1 0 0 2.94 1.47 1.47 0 1 0 0-2.94m4.42 0a1.47 1.47 0 1 0 0 2.94 1.47 1.47 0 1 0 0-2.94m4.42 0a1.47 1.47 0 1 0 0 2.94 1.47 1.47 0 1 0 0-2.94" fill="currentcolor" fill-rule="evenodd"/>
 </svg>
