@@ -69,13 +69,12 @@
             />
           </a>
 
-          <!-- The theme is only known in the browser, so the server can't render the right icon or the chosen preset. -->
+          <DocsNotifyButton />
+
+          <ThemeMenu />
+
           <div class="flex gap-1 sm:gap-2 items-center min-w-22">
             <ClientOnly>
-              <DocsNotifyButton />
-
-              <ThemeMenu />
-
               <WToggleTheme
                 :model-value="isDark ? Theme.DARK : Theme.LIGHT"
                 no-margin
