@@ -4,7 +4,10 @@
     class="demo vp-raw"
     :class="overflow ? 'overflow-auto overscroll-contain max-h-(--docs-demo-max-height)' : overflowHidden ? 'overflow-hidden' : undefined"
   >
-    <div class="demo-content">
+    <div
+      class="demo-content"
+      :class="overflow ? 'sm:px-(--inner-margin) py-(--inner-margin)' : 'p-(--inner-margin)'"
+    >
       <ClientOnly v-if="component && clientOnly">
         <component :is="component" />
       </ClientOnly>
