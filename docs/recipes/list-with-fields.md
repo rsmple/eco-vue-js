@@ -1000,6 +1000,8 @@ import WButtonMoreItem from 'eco-vue-js/dist/components/Button/WButtonMoreItem.v
 
 import IconTrash from 'eco-vue-js/dist/assets/icons/IconTrash'
 
+import {Notify} from '@/utils/Notify'
+
 import {plantModelApi} from '../api/Plant'
 
 const props = defineProps<MenuProps<Plant>>()
@@ -1010,13 +1012,18 @@ defineEmits<MenuEmits<Plant>>()
 const overlay = useOverlay()
 
 const remove = () => {
+  const name = props.item.name
   overlay.addConfirm({
     title: 'Remove plant',
-    description: `"${ props.item.name }" will be removed from the collection.`,
+    description: `"${ name }" will be removed from the collection.`,
     acceptText: 'Remove',
     acceptSemanticType: SemanticType.NEGATIVE,
     // The confirm shows a loading state until the action resolves, which also drops the plant from every cached page.
-    onAccept: () => plantModelApi.item.actions.delete(props.item.id).catch(handleApiError),
+    onAccept: () => plantModelApi.item.actions.delete(props.item.id)
+      .then(() => {
+        Notify.success({title: `"${ name }" removed`})
+      })
+      .catch(handleApiError),
   })
 }
 </script>
@@ -1065,6 +1072,8 @@ import WButtonSelectionAction from 'eco-vue-js/dist/components/Button/WButtonSel
 
 import IconTrash from 'eco-vue-js/dist/assets/icons/IconTrash'
 
+import {numberFormatter} from '@/utils/utils'
+
 import {type QueryParamsPlants, plantModelApi} from '../api/Plant'
 
 const props = defineProps<BulkProps<QueryParamsPlants>>()
@@ -1080,8 +1089,10 @@ const isOpen = ref(false)
 const remove = (event: MouseEvent) => {
   isOpen.value = true
 
+  const countText = `${ numberFormatter.format(props.selectionCount) } plant${ props.selectionCount === 1 ? '' : 's' } `
+
   overlay.addConfirm({
-    title: `Remove ${ props.selectionCount } plant${ props.selectionCount === 1 ? '' : 's' }?`,
+    title: `Remove ${ countText }?`,
     description: 'They will be removed from the collection.',
     acceptText: 'Remove',
     acceptSemanticType: SemanticType.NEGATIVE,
@@ -1090,7 +1101,7 @@ const remove = (event: MouseEvent) => {
     // The page is held still until the request settles, so the selection cannot change under it.
     onAccept: () => plantModelApi.paginated.actions.deleteMany(props.queryParamsGetter())
       .then(() => {
-        Notify.success({title: 'Plants removed'})
+        Notify.success({title: `${ countText } removed`})
         emit('clear:selected')
       })
       .catch(handleApiError),
@@ -1128,6 +1139,8 @@ import WButtonSelectionAction from 'eco-vue-js/dist/components/Button/WButtonSel
 
 import IconSun from 'eco-vue-js/dist/assets/icons/IconSun'
 
+import {numberFormatter} from '@/utils/utils'
+
 import {type QueryParamsPlants, plantModelApi} from '../api/Plant'
 
 const props = defineProps<BulkProps<QueryParamsPlants>>()
@@ -1143,15 +1156,17 @@ const isOpen = ref(false)
 const markDry = (event: MouseEvent) => {
   isOpen.value = true
 
+  const countText = `${ numberFormatter.format(props.selectionCount) } plant${ props.selectionCount === 1 ? '' : 's' } `
+
   overlay.addConfirm({
-    title: `Mark ${ props.selectionCount } plant${ props.selectionCount === 1 ? '' : 's' } as dry?`,
+    title: `Mark ${ countText } as dry?`,
     description: 'They will need water within three days.',
     acceptText: 'Mark as dry',
     anchor: event.currentTarget as Element,
     // Dry soil needs water within three days.
     onAccept: () => plantModelApi.paginated.actions.updateMany(props.queryParamsGetter(), {watered: false, waterBy: addDay(getStartOfDay(), 3)})
       .then(() => {
-        Notify.success({title: 'Marked as dry'})
+        Notify.success({title: `${ countText } marked as dry`})
       })
       .catch(handleApiError),
   }, () => isOpen.value = false)

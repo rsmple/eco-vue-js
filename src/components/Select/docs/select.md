@@ -436,8 +436,8 @@ const gardenerId = ref<number | null>(1)
     :class="model ? 'w-option-has-bg' : undefined"
   >
     <span
-      class="surface-fill flex shrink-0 items-center justify-center rounded-full font-semibold option-shift"
-      :class="[option.tone, model ? 'size-5 text-[0.625rem]' : 'size-8 text-xs']"
+      class="surface-fill flex shrink-0 items-center justify-center rounded-full font-semibold"
+      :class="[option.tone, model ? 'size-5 text-[0.625rem] option-shift' : 'size-8 text-xs']"
     >
       {{ initials(option.name) }}
     </span>
@@ -855,6 +855,7 @@ A seed variety with its crop, flags drawn as icons and a sowing calendar — twe
     class="max-w-xl"
     @select="varietyIds = [...varietyIds, $event]"
     @unselect="varietyIds = varietyIds.filter(item => item !== $event)"
+    @update:model-value="varietyIds = $event"
   >
     <!-- A legend for the calendar strip, above the options. -->
     <template #content>
