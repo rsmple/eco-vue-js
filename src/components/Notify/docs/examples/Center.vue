@@ -28,8 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-import {NotifyChannel} from 'eco-vue-js/dist/components/Notify/models/NotifyType'
-import {Notify} from 'eco-vue-js/dist/utils/Notify'
+import {Notify, NotifyChannel} from 'eco-vue-js/dist/utils/Notify'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'

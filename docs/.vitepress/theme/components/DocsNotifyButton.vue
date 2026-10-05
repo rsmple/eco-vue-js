@@ -24,8 +24,7 @@
 <script lang="ts" setup>
 import {useTemplateRef} from 'vue'
 
-import {notifyCenterActionCount, notifyCenterPendingCount} from 'eco-vue-js/dist/components/Notify/models/notifyCenter'
-import {useNotifyCenter} from 'eco-vue-js/dist/components/Notify/use/useNotifyCenter'
+import {notifyCenterActionCount, notifyCenterPendingCount, useNotifyCenter} from 'eco-vue-js/dist/utils/NotifyCenter'
 
 import WCounter from 'eco-vue-js/dist/components/Counter/WCounter.vue'
 

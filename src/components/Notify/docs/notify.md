@@ -89,8 +89,7 @@ The kit shows notifications itself in a few places: copying and pasting, invalid
 </template>
 
 <script lang="ts" setup>
-import {NotifyType} from 'eco-vue-js/dist/components/Notify/models/NotifyType'
-import {Notify} from 'eco-vue-js/dist/utils/Notify'
+import {Notify, NotifyType} from 'eco-vue-js/dist/utils/Notify'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
@@ -131,7 +130,7 @@ Every notification is also kept in a history of the last 50, shown by `WNotifyCe
 </template>
 
 <script lang="ts" setup>
-import {closeNotifyCenter} from 'eco-vue-js/dist/components/Notify/models/notifyCenter'
+import {closeNotifyCenter} from 'eco-vue-js/dist/utils/NotifyCenter'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
 import WActionsBar from 'eco-vue-js/dist/components/ActionsBar/WActionsBar.vue'
@@ -143,7 +142,7 @@ import WNotifyCenterButton from 'eco-vue-js/dist/components/Notify/WNotifyCenter
 For a trigger of your own, such as the bell in this site's header, open it with `useNotifyCenter`, called in setup. It returns `isOpen`, `open(anchor)`, `close` and `toggle(anchor)`, and takes the center's props and footer:
 
 ```ts
-import {useNotifyCenter} from 'eco-vue-js/dist/components/Notify/use/useNotifyCenter'
+import {useNotifyCenter} from 'eco-vue-js/dist/utils/NotifyCenter'
 
 const {isOpen, toggle} = useNotifyCenter({props: () => ({title: 'Alerts'})})
 ```
@@ -185,8 +184,7 @@ const {isOpen, toggle} = useNotifyCenter({props: () => ({title: 'Alerts'})})
 </template>
 
 <script lang="ts" setup>
-import {NotifyChannel} from 'eco-vue-js/dist/components/Notify/models/NotifyType'
-import {Notify} from 'eco-vue-js/dist/utils/Notify'
+import {Notify, NotifyChannel} from 'eco-vue-js/dist/utils/Notify'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
@@ -210,7 +208,7 @@ Notifications with the same `group.key` show as one entry while there are two or
 
 ## Custom content
 
-`component` renders under the caption with `componentProps`, such as the progress of a background operation. It may emit `update` with new fields — `title`, `caption`, `type`, `channel` or `group` — and `remove` to take the notification away; type its emits with `NotifyContentEmits`. In a group's list it gets `compact`.
+`component` renders under the caption with `componentProps`, such as the progress of a background operation. It may emit `update` with new fields — `title`, `caption`, `type`, `channel` or `group` — and `remove` to take the notification away; type its emits with `NotifyContentEmits` from `eco-vue-js/dist/utils/Notify`. In a group's list it gets `compact`.
 
 The toast and the center each render their own copy, so keep the state outside the component — in a query or a reactive object — rather than in it.
 
