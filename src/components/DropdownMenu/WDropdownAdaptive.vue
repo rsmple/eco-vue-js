@@ -47,21 +47,24 @@ const element = computed(() => props.parentElement ?? (toggleRef.value instanceo
 
 const isTop = ref(false)
 
-// The overlay host renders the slots, as components so they keep this component's context.
+// The overlay host renders the slot, as a component so it keeps this component's context.
 // The content declares `close:modal`, which the host listens to on every content, as the slot may render several nodes for the listener to fall through to.
-// In a bottom sheet without a `header`, the content pins a copy of the toggle above itself.
+// In a bottom sheet, the content pins the `header` slot above itself, or else a copy of the toggle.
 const renderContent = markRaw(defineComponent({
   emits: ['close:modal'],
   setup: () => {
-    const hasToggleCopy = useOverlayFrame() === 'sheet' && !slots.header
+    const isSheet = useOverlayFrame() === 'sheet'
+
+    const renderHeader = () => slots.header
+      ? h('div', {class: 'flex items-center gap-2 py-2 text-base text-center font-semibold'}, slots.header())
+      : slots.toggle?.({isTop: false, unclickable: false})
 
     return () => [
-      hasToggleCopy ? h(OverlayHeader, null, {default: () => slots.toggle?.({isTop: false, unclickable: false})}) : null,
+      isSheet ? h(OverlayHeader, null, {default: renderHeader}) : null,
       slots.content?.(),
     ]
   },
 }))
-const renderHeader = markRaw(() => slots.header?.())
 
 const overlay = useOverlay()
 
@@ -74,12 +77,10 @@ const open = () => {
     present: 'dropdown',
     anchor: element.value,
     content: renderContent,
-    nested: props.nested,
     dropdown: {
       align: props.horizontalAlign,
       frameClass: props.frameClass,
       closeOnClick: props.closeOnClick,
-      title: slots.header ? renderHeader : undefined,
       onTop: value => isTop.value = value,
     },
     onClose: () => {

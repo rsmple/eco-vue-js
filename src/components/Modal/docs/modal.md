@@ -181,7 +181,7 @@ const confirmClear = () => {
 `useOverlay()`, called in setup, opens any component and lets WModal frame it. Say how with `present`:
 
 - `modal` — centered over the backdrop, stacked over other modals. The component brings its own frame, such as `WModalWrapper`.
-- `dropdown` — at `anchor`, one at a time, and a bottom sheet on phones. It is centered on the anchor with a tip pointing at it, and near the edge of the screen the box shifts aside while the tip stays. `dropdown` options open it at a point instead (`cornered`) or aligned to the anchor without the tip (`align`, such as `HorizontalAlign.FILL` for a field's menu), set its box (`frameClass`), the bottom sheet's heading (`title`), and whether a click inside closes it (`closeOnClick`). A dropdown opened from inside another one takes its place, as from a menu, unless it is `nested` — like a select's menu inside a filter, which stays over it and closes first on Escape.
+- `dropdown` — at `anchor`, one at a time, and a bottom sheet on phones. It is centered on the anchor with a tip pointing at it, and near the edge of the screen the box shifts aside while the tip stays. `dropdown` options open it at a point instead (`cornered`) or aligned to the anchor without the tip (`align`, such as `HorizontalAlign.FILL` for a field's menu), set its box (`frameClass`), and whether a click inside closes it (`closeOnClick`). A layer opened from a dropdown with `closeOnClick` takes its place, as from a menu. Opened from any other dropdown, it stays over it — like a select's menu inside a filter, which closes first on Escape.
 
 `open` returns a function that closes the layer, or `null` if nothing opened. The component closes the layer by emitting `close:modal`. Inside it:
 

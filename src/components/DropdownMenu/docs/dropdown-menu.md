@@ -166,7 +166,7 @@ const visible = ref(['Name', 'Species', 'Height'])
 - **`parentElement`** anchors the content to another element than the toggle. `updateAlign` picks the sides again when the toggle moves while the dropdown is open.
 - **`dropdownClass`** goes on the positioned box, for its width or max height.
 
-`WDropdownAdaptive` opens its `content` with the overlay manager, like the list's sort and filter menus: a dropdown in the standard `w-dropdown-frame`, or a bottom sheet on phones. Only one is open at a time, and it emits `close` when it closes on its own — a click outside, Escape, a swipe, or another dropdown taking its place. Without `horizontalAlign` it is centered on the toggle with a tip. The sheet starts with the `header` slot, or else a copy of the toggle with `unclickable` false. `nested` opens it over the dropdown it is inside of, instead of taking its place.
+`WDropdownAdaptive` opens its `content` with the overlay manager, like the list's sort and filter menus: a dropdown in the standard `w-dropdown-frame`, or a bottom sheet on phones. Only one is open at a time, and it emits `close` when it closes on its own — a click outside, Escape, a swipe, or another dropdown taking its place. Without `horizontalAlign` it is centered on the toggle with a tip. The sheet starts with the `header` slot, or else a copy of the toggle with `unclickable` false. Opened from inside a dropdown with `closeOnClick` it takes that one's place; from any other, such as a filter, it opens over it.
 
 `WMenuItem` is a row for the content of a custom menu — the row that `WButtonMoreItem` and the list menus are built from. It is a button, a router link with `to`, or a plain link with `href` (and `download` for a file). `active` marks the picked option with a check; `false` keeps room for the check, so that the rows of a picker line up. `loading` shows a spinner over it while its action runs.
 
@@ -240,9 +240,8 @@ import WDropdownAdaptive from 'eco-vue-js/dist/components/DropdownMenu/WDropdown
 | `isOpen` | `boolean` | **required** | Shows the dropdown. |
 | `parentElement` | `(Pick<Element, "getBoundingClientRect"> & { contextElement?: Element \| undefined; }) \| null` | — | Element the dropdown opens at. Defaults to the element rendered by the `toggle` slot. |
 | `horizontalAlign` | `HorizontalAlign` | — | Aligns the dropdown to the parent without a tip, such as a field's menu with `HorizontalAlign.FILL`. Otherwise it is centered on the parent with a tip pointing at it. |
-| `nested` | `boolean` | — | Opens over the dropdown this one is inside of, instead of taking its place. |
 | `frameClass` | `string` | — | Classes of the dropdown's box, replacing the default frame. |
-| `closeOnClick` | `boolean` | — | A click on the content closes the layer, as in a menu. |
+| `closeOnClick` | `boolean` | — | A click on the content closes the layer, as in a menu. What is opened from it takes its place; from a dropdown without it, such as a filter, it stays over it. |
 
 #### Events
 
