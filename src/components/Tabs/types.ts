@@ -19,7 +19,7 @@ export interface TabsProps {
   headerClass?: string
   /** Switches to a tab when it is added. */
   switchToNew?: boolean
-  /** Numbers the tab titles and disables every tab after the first one with `hasValue` false. Enables `update:progress`, `update:first` and `update:last`. */
+  /** Numbers the tab titles and disables every tab after the first one with `hasValue` false. The exposed `next` and `jump` check the Uniform fields of the tab they leave and stay on it if one is invalid. Enables `update:progress`, `update:first` and `update:last`. */
   stepper?: boolean
   /** Colors the titles of tabs that have a value. */
   showHasValue?: boolean

@@ -315,7 +315,7 @@ If the modal body contains a form with unsaved changes, exposing it as `formRef`
 
 ## Steps
 
-`WModalStepper` is a `WModalWrapper` with steps: its default slot takes `WTabsItem` items, one per step. The title is the current step's title, with a progress line under it, and the footer has Close or Back and Next or Submit. `validate` on an item runs before Next leaves it — an error message is shown and the step stays open — and `requireSave` submits the form inside first. The last step's button emits `submit`; `submitText` names it. `loading` shows its spinner while the submit runs, and `disabledNext` disables it, e.g. until something is picked. A template ref gives `next()` and `previous()`, to move on after a pick.
+`WModalStepper` is a `WModalWrapper` with steps: its default slot takes `WTabsItem` items, one per step. The title is the current step's title, with a progress line under it, and the footer has Close or Back and Next or Submit. `validate` on an item runs before Next leaves it, and so do the Uniform fields inside the step — an error message is shown and the step stays open — and `requireSave` submits the form inside first. The last step's button emits `submit`; `submitText` names it. `loading` shows its spinner while the submit runs, and `disabledNext` disables it, e.g. until something is picked. A template ref gives `next()` and `previous()`, to move on after a pick.
 
 <!-- @example Modal/Stepper -->
 

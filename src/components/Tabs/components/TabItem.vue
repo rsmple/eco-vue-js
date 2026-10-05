@@ -36,7 +36,7 @@ const emit = defineEmits<{
   (e: 'update:active'): void
 }>()
 
-const {hasChanges, hasValue, hasError} = useUniformState()
+const {hasChanges, hasValue, hasError, validate} = useUniformState()
 
 const {callListeners} = useTabItemActiveListener()
 
@@ -86,5 +86,6 @@ defineExpose({
   hasChanges,
   hasValue,
   hasError,
+  validate,
 })
 </script>

@@ -204,7 +204,7 @@ import IconUser from 'eco-vue-js/dist/assets/icons/IconUser'
 
 An item's `hasError`, `hasChanges` and `hasValue` mark its button — `statusIcon` shows them as icons, `showHasValue` marks tabs with a value. When a tab gets an error while another is open, the tabs switch to it; `noSwitchOnInvalid` turns that off. Inside a Uniform form the tab items pick these states up from their fields on their own.
 
-`stepper` turns the tabs into steps: the tabs after the first one with `hasValue` set to `false` are disabled, `validate` on an item runs before leaving it, and `next()`, `previous()` and `jump(name)` on a template ref move between steps. `update:progress`, `update:first` and `update:last` emit where the stepper is, for the buttons around it.
+`stepper` turns the tabs into steps: the tabs after the first one with `hasValue` set to `false` are disabled, and `next()`, `previous()` and `jump(name)` on a template ref move between steps. Before `next()` and `jump(name)` leave a step, `validate` on its item runs, then the Uniform fields inside it are checked: invalid fields show their errors, a warning lists them, and the step stays open. `update:progress`, `update:first` and `update:last` emit where the stepper is, for the buttons around it.
 
 ## API
 
@@ -229,7 +229,7 @@ import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 | `noHeader` | `boolean` | — | Hides the tab buttons. Switch tabs through the exposed methods. |
 | `headerClass` | `string` | — | Classes for the row of tab buttons. |
 | `switchToNew` | `boolean` | — | Switches to a tab when it is added. |
-| `stepper` | `boolean` | — | Numbers the tab titles and disables every tab after the first one with `hasValue` false. Enables `update:progress`, `update:first` and `update:last`. |
+| `stepper` | `boolean` | — | Numbers the tab titles and disables every tab after the first one with `hasValue` false. The exposed `next` and `jump` check the Uniform fields of the tab they leave and stay on it if one is invalid. Enables `update:progress`, `update:first` and `update:last`. |
 | `showHasValue` | `boolean` | — | Colors the titles of tabs that have a value. |
 | `noSwitchOnInvalid` | `boolean` | — | Stays on the current tab when another one gets an error. By default the first tab with an error is opened. |
 | `wrap` | `boolean` | — | Wraps the tab buttons onto new lines instead of scrolling sideways. |
