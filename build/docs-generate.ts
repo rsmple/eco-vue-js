@@ -13,10 +13,11 @@
  *
  * `@api` tables are rendered in a pool of worker threads (this same file), each with its own type checker.
  */
-import {type ComponentMeta, type PropertyMeta, createChecker} from 'vue-component-meta'
+import {type ComponentMeta, type PropertyMeta, createCheckerByJson} from 'vue-component-meta'
 
+import {createHash} from 'node:crypto'
 import {existsSync, readFileSync} from 'node:fs'
-import {glob, readFile, readdir, writeFile} from 'node:fs/promises'
+import {glob, mkdir, readFile, readdir, writeFile} from 'node:fs/promises'
 import {availableParallelism} from 'node:os'
 import path from 'node:path'
 import {Worker, isMainThread, parentPort} from 'node:worker_threads'
@@ -34,12 +35,10 @@ const TYPE_REPLACEMENTS: [RegExp, string][] = [
   [/VNode<RendererNode, RendererElement, \{ \[key: string\]: any; \}>/g, 'VNode'],
 ]
 
-let checker: ReturnType<typeof createChecker> | undefined
-
-const getChecker = () => checker ??= createChecker(path.join(ROOT, 'tsconfig.vue.json'), {
-  forceUseTs: true,
-  printer: {newLine: 1},
-})
+const TSCONFIG = JSON.parse(readFileSync(path.join(ROOT, 'tsconfig.vue.json'), 'utf8'))
+// Ambient declarations every component sees; components themselves are added one at a time as `files`.
+const TSCONFIG_GLOBALS = (TSCONFIG.include as string[]).filter(pattern => pattern.endsWith('.d.ts'))
+const CHECKER_OPTIONS = {forceUseTs: true, printer: {newLine: 1}}
 
 const findComponent = async (name: string): Promise<string> => {
   for (const folder of await readdir(path.join(ROOT, 'src/components'))) {
@@ -188,34 +187,90 @@ const fence = (file: string, title?: string) => async () => {
 
 const renderComponentApi = async (name: string) => {
   const file = await findComponent(name)
-  const checker = getChecker()
 
-  // A fresh type checker per component: TypeScript orders union members and inherited props by the order it first
-  // saw the types, so a shared checker would reshuffle one page's tables whenever another page is added.
-  checker.reload()
+  // A fresh type checker per component, rooted at that component only: TypeScript orders union members and inherited
+  // props by the order it first saw the types, so a shared checker would reshuffle one page's tables whenever another
+  // page is added. Its program is then exactly the component's dependencies, which keys the cache.
+  const checker = createCheckerByJson(ROOT, {...TSCONFIG, include: TSCONFIG_GLOBALS, files: [file]}, CHECKER_OPTIONS)
+  const result = renderApi(name, file, checker.getComponentMeta(file))
+  const deps = checker.getProgram()!.getSourceFiles()
+    .map(source => path.relative(ROOT, source.fileName))
+    .filter(source => !source.startsWith('..') && !source.startsWith('node_modules/'))
 
-  return renderApi(name, file, checker.getComponentMeta(file))
+  return {result, deps}
 }
 
-const renderApiInWorker = (worker: Worker, name: string) => new Promise<string>((resolve, reject) => {
+type ApiRender = Awaited<ReturnType<typeof renderComponentApi>>
+
+const renderApiInWorker = (worker: Worker, name: string) => new Promise<ApiRender>((resolve, reject) => {
   const onError = (error: Error) => reject(error)
 
   worker.once('error', onError)
-  worker.once('message', (message: {result?: string, error?: string}) => {
+  worker.once('message', (message: {render?: ApiRender, error?: string}) => {
     worker.off('error', onError)
     if (message.error !== undefined) reject(new Error(message.error))
-    else resolve(message.result!)
+    else resolve(message.render!)
   })
   worker.postMessage(name)
 })
+
+// API tables are cached per component, keyed by the content of every file in its program. Anything that can change
+// them without being one of those files (this script, the tsconfig, dependencies, a new file shadowing an import)
+// goes into the global key and drops the whole cache.
+type ApiCache = {key: string, entries: Record<string, {result: string, deps: Record<string, string>}>}
+
+const CACHE_FILE = path.join(ROOT, 'node_modules/.cache/docs-generate.json')
+
+const hashes = new Map<string, string | null>()
+
+const hashFile = (file: string) => {
+  if (!hashes.has(file)) {
+    const absolute = path.join(ROOT, file)
+    hashes.set(file, existsSync(absolute) ? createHash('sha1').update(readFileSync(absolute)).digest('base64url') : null)
+  }
+  return hashes.get(file)!
+}
+
+const cacheKey = async () => {
+  const sources: string[] = []
+  for await (const file of glob('src/**/*.{ts,vue}', {cwd: ROOT})) sources.push(file)
+
+  return createHash('sha1')
+    .update([path.relative(ROOT, import.meta.filename), 'tsconfig.vue.json', 'package-lock.json'].map(hashFile).join())
+    .update(sources.sort().join())
+    .digest('base64url')
+}
+
+const readCache = (key: string): ApiCache => {
+  try {
+    const cache = JSON.parse(readFileSync(CACHE_FILE, 'utf8')) as ApiCache
+    if (cache.key === key) return cache
+  } catch {
+    // Missing or unreadable cache — start over.
+  }
+  return {key, entries: {}}
+}
+
+const writeCache = async (cache: ApiCache) => {
+  await mkdir(path.dirname(CACHE_FILE), {recursive: true})
+  await writeFile(CACHE_FILE, JSON.stringify(cache), 'utf8')
+}
 
 const showProgress = (text: string) => {
   if (process.stdout.isTTY) process.stdout.write(`\r\x1b[K${ text }`)
 }
 
-const renderAllApis = async (names: string[]): Promise<Map<string, string>> => {
+const renderAllApis = async (names: string[]): Promise<{results: Map<string, string>, rendered: number}> => {
+  const cache = readCache(await cacheKey())
   const results = new Map<string, string>()
-  const queue = [...names]
+
+  for (const name of names) {
+    const entry = cache.entries[name]
+    if (entry && Object.entries(entry.deps).every(([file, hash]) => hashFile(file) === hash)) results.set(name, entry.result)
+  }
+
+  const queue = names.filter(name => !results.has(name))
+  const total = queue.length
   let done = 0
 
   const runWorker = async () => {
@@ -224,22 +279,27 @@ const renderAllApis = async (names: string[]): Promise<Map<string, string>> => {
     try {
       while (queue.length) {
         const name = queue.shift()!
-        results.set(name, await renderApiInWorker(worker, name))
-        showProgress(`API tables ${ ++done }/${ names.length } — ${ name }`)
+        const {result, deps} = await renderApiInWorker(worker, name)
+        results.set(name, result)
+        cache.entries[name] = {result, deps: Object.fromEntries(deps.map(file => [file, hashFile(file)!]))}
+        showProgress(`API tables ${ ++done }/${ total } — ${ name }`)
       }
     } finally {
       await worker.terminate()
     }
   }
 
-  showProgress(`API tables 0/${ names.length }`)
-  try {
-    await Promise.all(Array.from({length: Math.min(WORKERS, names.length)}, runWorker))
-  } finally {
-    showProgress('')
+  if (total) {
+    showProgress(`API tables 0/${ total }`)
+    try {
+      await Promise.all(Array.from({length: Math.min(WORKERS, total)}, runWorker))
+    } finally {
+      showProgress('')
+      await writeCache(cache)
+    }
   }
 
-  return results
+  return {results, rendered: total}
 }
 
 let apiResults = new Map<string, string>()
@@ -336,7 +396,8 @@ const main = async () => {
     }
   }
 
-  apiResults = await renderAllApis([...apiNames])
+  const {results, rendered} = await renderAllApis([...apiNames])
+  apiResults = results
 
   const changed: string[] = []
   const details: string[] = []
@@ -349,14 +410,14 @@ const main = async () => {
     details.push(`  ${ file }`, ...stale.map(item => `    ${ item }`))
   }
 
-  const seconds = ((performance.now() - start) / 1000).toFixed(1)
+  const seconds = `${ ((performance.now() - start) / 1000).toFixed(1) }s, ${ rendered }/${ apiNames.size } API tables rendered`
 
   if (CHECK && changed.length) {
     console.error(`Generated docs are stale — run \`npm run docs:generate\`:\n${ details.join('\n') }`)
     process.exit(1)
   }
 
-  console.log(changed.length ? `Updated ${ changed.length } file(s) in ${ seconds }s:\n${ changed.map(file => `  ${ file }`).join('\n') }` : `Docs are up to date (${ seconds }s)`)
+  console.log(changed.length ? `Updated ${ changed.length } file(s) (${ seconds }):\n${ changed.map(file => `  ${ file }`).join('\n') }` : `Docs are up to date (${ seconds })`)
 }
 
 if (isMainThread) {
@@ -364,7 +425,7 @@ if (isMainThread) {
 } else {
   parentPort!.on('message', async (name: string) => {
     try {
-      parentPort!.postMessage({result: await renderComponentApi(name)})
+      parentPort!.postMessage({render: await renderComponentApi(name)})
     } catch (error) {
       parentPort!.postMessage({error: error instanceof Error ? error.stack ?? error.message : String(error)})
     }
