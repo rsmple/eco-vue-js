@@ -194,7 +194,14 @@ watch(() => toastIds.value.length, length => {
 })
 
 const showToast = (id: number): void => {
-  if (isNotifyCenterOpen.value) return
+  // Added by the click that closes the center, such as on a button beside it, it shows once that click is done.
+  if (isNotifyCenterOpen.value) {
+    setTimeout(() => {
+      if (!isNotifyCenterOpen.value && findItem(id)) showToast(id)
+    })
+
+    return
+  }
 
   if (!toastIds.value.includes(id)) toastIds.value = [...toastIds.value, id]
 
