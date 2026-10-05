@@ -21,8 +21,6 @@ export type OverlayLayer = {
   readonly present: OverlayPresentation
   /** Layer it was opened from, closed together with it. `null` for the page. */
   readonly parent: number | null
-  /** What the layer is for, such as a list row, to mark it while the layer is open. */
-  readonly owner: unknown
   readonly anchor: OverlayAnchor | undefined
   /** Rendered by the host inside the frame `present` calls for, emitting `close:modal` to close the layer. */
   readonly content: Component
@@ -123,18 +121,23 @@ export const isInLayerWithin = (path: EventTarget[], ancestor: number): boolean 
   })
 }
 
-/** Whether opening from `parent` hands off: a menu closes on the click that opens something from it, taking the clicked item with it. */
-export const isHandoff = (parent: number | null): boolean => findLayer(parent)?.present === 'dropdown'
+/** The menu opening from `parent` hands off from: a dropdown with `closeOnClick` closes on the click that opens something from it, taking the clicked item with it. */
+const findHandoff = (parent: number | null): LayerEntry | undefined => {
+  const entry = findLayer(parent)
 
-/** The anchor a layer opened from `parent` takes over, so a layer opened from a menu sticks to the menu's anchor. */
-export const getHandoffAnchor = (parent: number | null): OverlayAnchor | undefined => {
-  return isHandoff(parent) ? findLayer(parent)?.anchor : undefined
+  return entry?.present === 'dropdown' && entry.dropdown.closeOnClick ? entry : undefined
 }
 
+/** Whether opening from `parent` hands off, taking the place of the menu it is opened from. */
+export const isHandoff = (parent: number | null): boolean => findHandoff(parent) !== undefined
+
+/** The anchor a layer opened from `parent` takes over, so a layer opened from a menu sticks to the menu's anchor. */
+export const getHandoffAnchor = (parent: number | null): OverlayAnchor | undefined => findHandoff(parent)?.anchor
+
 /**
- * Opens a layer. Opened from a `replace` layer — a menu — it takes the menu's place: the menu closes,
- * and the new layer belongs to the menu's parent. A `replace` layer also inherits the menu's anchor and owner,
- * so it stays where the menu was and keeps its row marked. A `nested` layer stays over the menu instead.
+ * Opens a layer. Opened from a menu — a dropdown with `closeOnClick` — it takes the menu's place: the menu closes,
+ * and the new layer belongs to the menu's parent. A dropdown also inherits the menu's anchor, so it stays where the menu was,
+ * and the menu's opener still sees it with `hasAnchorLayer`. Opened from any other dropdown, such as a filter, it stays over it.
  *
  * Returns `null` when nothing opened: without the host, or when `toggle` closed a layer instead.
  */
@@ -144,20 +147,16 @@ export const openLayer = (options: OverlayOptions): OverlayLayer | null => {
   const isDropdown = options.present === 'dropdown'
 
   let parent = findLayer(options.parent ?? null) ? options.parent ?? null : null
-  let owner = options.owner
   let anchor = options.anchor
 
-  const parentEntry = findLayer(parent)
+  const handoff = findHandoff(parent)
 
-  if (parentEntry?.present === 'dropdown' && !options.nested) {
-    parent = parentEntry.parent
+  if (handoff) {
+    parent = handoff.parent
 
-    if (isDropdown) {
-      owner ??= parentEntry.owner
-      anchor = parentEntry.anchor ?? anchor
-    }
+    if (isDropdown) anchor = handoff.anchor ?? anchor
 
-    closeLayer(parentEntry.id)
+    closeLayer(handoff.id)
   }
 
   if (isDropdown) {
@@ -172,7 +171,6 @@ export const openLayer = (options: OverlayOptions): OverlayLayer | null => {
     id: nextId++,
     present: options.present,
     parent,
-    owner,
     anchor,
     content: markRaw(options.content),
     props: options.props,
@@ -196,8 +194,8 @@ export const closeChildLayers = (id: number): boolean => {
   return children.length > 0
 }
 
-/** Whether a layer is open for the owner. */
-export const hasOwnerLayer = (owner: unknown): boolean => layers.value.some(item => item.owner === owner)
+/** Whether a layer is open at the anchor — a menu, or a confirm it handed off to. */
+export const hasAnchorLayer = (anchor: OverlayAnchor): boolean => layers.value.some(item => item.anchor === anchor)
 
 const busyLayers = shallowReactive(new Set<number>())
 

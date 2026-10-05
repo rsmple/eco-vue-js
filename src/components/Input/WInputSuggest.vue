@@ -6,7 +6,6 @@
       parentElement: parentEl,
       horizontalAlign,
       frameClass: `w-dropdown-frame max-h-80 ${dropdownClass}`,
-      nested: true,
       onClose: dismiss,
     }"
   >

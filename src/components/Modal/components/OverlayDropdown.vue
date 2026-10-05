@@ -8,24 +8,10 @@
     @close="dismiss"
   >
     <template
-      v-if="title || headers.length"
+      v-if="headers.length"
       #toggle="{unclickable}"
     >
       <template v-if="!unclickable">
-        <div
-          v-if="title"
-          class="flex items-center gap-2 py-2 text-base text-center font-semibold"
-        >
-          <template v-if="typeof title === 'string'">
-            {{ title }}
-          </template>
-
-          <component
-            :is="title"
-            v-else
-          />
-        </div>
-
         <component
           :is="render"
           v-for="(render, index) in headers"
@@ -146,7 +132,6 @@ const props = withDefaults(
   {
     align: undefined,
     frameClass: undefined,
-    title: undefined,
     onTop: undefined,
   },
 )
@@ -163,7 +148,7 @@ const isMobile = getIsMobile()
 
 provide(wOverlayFrame, isMobile ? 'sheet' : 'dropdown')
 
-// Pinned under the sheet's title, or at the top of the dropdown, above the content that scrolls.
+// Pinned at the top of the sheet or the dropdown, above the content that scrolls, such as the sheet's title.
 const headers = shallowRef<Component[]>([])
 
 provide(wOverlayHeader, {

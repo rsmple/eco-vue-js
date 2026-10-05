@@ -30,11 +30,12 @@
 </template>
 
 <script lang="ts" setup>
-import {markRaw, ref, useSlots, useTemplateRef} from 'vue'
+import {computed, markRaw, ref, shallowRef, useSlots, useTemplateRef} from 'vue'
 
 import IconMore from '@/assets/icons/IconMore.svg?component'
 
-import {type OverlayAnchor, useOverlay, useOwnerActive} from '@/utils/Overlay'
+import {hasAnchorLayer} from '@/components/Modal/models/overlayRegistry'
+import {type OverlayAnchor, useOverlay} from '@/utils/Overlay'
 
 const props = defineProps<{
   /** Icon of the button. Defaults to three dots. */
@@ -67,26 +68,26 @@ const buttonRef = useTemplateRef('button')
 
 const overlay = useOverlay()
 
-// Marks the menu and whatever it hands off to, such as a confirm, so a row can stay highlighted while either is open.
-const owner = Symbol('WButtonMore')
-
 let closeMenu: (() => void) | null = null
 
 const isOpen = ref(false)
 const isCustomAnchor = ref(false)
 
-const isActive = useOwnerActive(owner)
+// Whatever the menu hands off to, such as a confirm, takes over its anchor, so a row can stay highlighted while either is open.
+const anchorOpened = shallowRef<OverlayAnchor | null>(null)
+
+const isActive = computed(() => anchorOpened.value !== null && hasAnchorLayer(anchorOpened.value))
 
 /** Opens the menu at `anchor` — such as a point made with `createPointAnchor` — instead of the `anchor` prop or the button. */
 const open = (anchor?: OverlayAnchor): void => {
   const target = anchor ?? props.anchor
+  const opened = target ?? buttonRef.value
 
-  if (!target && !buttonRef.value) return
+  if (!opened) return
 
   const value: (() => void) | null = overlay.open({
     present: 'dropdown',
-    owner,
-    anchor: target ?? buttonRef.value!,
+    anchor: opened,
     content: renderSlot,
     dropdown: {
       cornered: target !== undefined,
@@ -103,6 +104,7 @@ const open = (anchor?: OverlayAnchor): void => {
   })
 
   closeMenu = value
+  anchorOpened.value = opened
   isOpen.value = value !== null
   isCustomAnchor.value = target !== undefined
 }
