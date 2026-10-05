@@ -271,6 +271,7 @@ updaterInjected?.(reactive({
   hasValue: (props.initHasValue !== undefined ? toRef(props, 'initHasValue') : scope?.hasValue ?? null) as Ref<boolean | null>,
   hasError: (props.initHasError !== undefined ? toRef(props, 'initHasError') : scope?.hasShownError ?? null) as Ref<boolean>,
   fullPayload: toRef(() => props.fullPayload),
+  validate: scopeField?.validate,
 }), id)
 
 defineExpose({

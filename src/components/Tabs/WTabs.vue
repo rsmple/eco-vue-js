@@ -135,7 +135,9 @@
 <script lang="ts" setup>
 import type {TabsItemProps, TabsProps} from './types'
 
-import {type Component, type RendererElement, type RendererNode, type VNode, type VNodeRef, computed, inject, onBeforeUpdate, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch} from 'vue'
+import {type Component, type RendererElement, type RendererNode, type VNode, type VNodeRef, computed, h, inject, onBeforeUpdate, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch} from 'vue'
+
+import WUniformErrorMessage from '@/components/Uniform/WUniformErrorMessage.vue'
 
 import IconClose from '@/assets/icons/IconClose.svg?component'
 
@@ -318,14 +320,30 @@ const setCurrentDebounced = debounce((value: string) => {
 
 const stepperController = inject(wUniformStepperController, null)
 
-const next = async (update = false): Promise<void> => {
-  const errorMessage = update ? validate(currentIndex.value) : validateIfNoError(currentIndex.value)
+/** Runs the tab's `validate` and, in a stepper, checks the fields inside it. Shows a warning and returns `false` if anything is invalid. */
+const checkTab = (index: number, update: boolean): boolean => {
+  const errorMessage = update ? validate(index) : validateIfNoError(index)
 
   if (errorMessage) {
     Notify.warn({title: 'Form contains invalid values', caption: errorMessage.length < 200 ? errorMessage : undefined})
 
-    return
+    return false
   }
+
+  const key = defaultSlotsKeys.value[index]
+  const message = props.stepper && key !== undefined ? tabItemRefByName.value[key]?.validate() : undefined
+
+  if (message) {
+    Notify.warn({title: 'Form contains invalid data', caption: h(WUniformErrorMessage, {message})})
+
+    return false
+  }
+
+  return true
+}
+
+const next = async (update = false): Promise<void> => {
+  if (!checkTab(currentIndex.value, update)) return
 
   switchTab(defaultSlotsKeys.value[currentIndex.value + 1]!)
 }
@@ -337,18 +355,7 @@ const previous = (): void => {
 const jump = (name: string, update: boolean) => {
   const valid = defaultSlotsKeys.value
     .slice(currentIndex.value, defaultSlotsKeys.value.indexOf(name))
-    .every(item => {
-      const index = defaultSlotsKeys.value.indexOf(item)
-      const errorMessage = update ? validate(index) : validateIfNoError(index)
-
-      if (errorMessage) {
-        Notify.warn({title: 'Form contains invalid values', caption: errorMessage.length < 200 ? errorMessage : undefined})
-
-        return false
-      }
-
-      return true
-    })
+    .every(item => checkTab(defaultSlotsKeys.value.indexOf(item), update))
 
   if (valid) return switchTab(name)
 }
