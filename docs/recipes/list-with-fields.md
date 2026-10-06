@@ -847,7 +847,7 @@ export const defaultFieldConfigMapPlant = getDefaultFieldConfigMap(listFieldsPla
 
 Each filter is a module like a field: the component renders the control inside a `WUniform` bound to its param, and `meta` gives the chip's `title`, `icon` and the `fields` it sets — removing the chip clears them. The control is the same one a form would use: a `WSelect` for kinds, a `WCheckboxGroupMultiple` for light, a radio `WCheckboxGroup` for watered, where `undefined` means "Any", and a `WSelectSingle` for the caretaker. The two selects reuse option components from the [Select](/components/select) examples — the tone tag and the gardener with their week of watering — so a kind looks the same in the filter as in its column.
 
-`embedded: true` in `meta` drops the dropdown's padding, and `:embedded="!global"` drops the control's title and margin, so the control fills the dropdown edge to edge — the chip already names it. With `global` the filters go into the app shell's filter panel instead, where each control keeps its title.
+`embedded: true` in `meta` drops the dropdown's padding, and `:embedded="!global"` drops the control's title and margin, so the control fills the dropdown edge to edge — the chip already names it. With `global` the filters go into the app shell's filter panel instead, where each control keeps its title. A filter applies as it changes, so picking a caretaker closes the dropdown, as a single select's menu would — a multiple select stays open to pick more.
 
 ::: code-group
 
@@ -1250,7 +1250,7 @@ const markDry = (event: MouseEvent) => {
 
 An action that needs input, such as a new caretaker, opens a small form instead of a confirm: `useOverlay().open` with `present: 'dropdown'` puts it under the button — a bottom sheet on phones — and the same form serves the bulk action and the row menu. From the More menu or a row's `⋯` menu, it takes the menu's place, as a confirm does.
 
-The form is a `WModalWrapper` with a `WUniform` inside, the way it would be in a modal. The frame takes its title and buttons and pads the field, so the form brings no padding or layout for being in a dropdown, and it would open as a modal unchanged. The select is `embedded`, as in a filter: its search is pinned under the title and the caretakers are listed in place of a menu, with Save and Cancel pinned under them. A click outside, Escape or a swipe dismisses it like a menu, and while the form saves, the dropdown stays open.
+The form is a `WModalWrapper` with a `WUniform` inside, the way it would be in a modal. The frame takes its title and buttons and pads the field, so the form brings no padding or layout for being in a dropdown, and it would open as a modal unchanged. The select is `embedded`, as in a filter: its search is pinned under the title and the caretakers are listed in place of a menu, with Save and Cancel pinned under them — unlike the filter, a pick waits for Save, so the list stays open. A click outside, Escape or a swipe dismisses it like a menu, and while the form saves, the dropdown stays open.
 
 <!-- @source docs/examples/recipes/plant-list/PlantCaretakerForm.vue PlantCaretakerForm.vue -->
 

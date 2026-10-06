@@ -188,6 +188,16 @@ const useLayerFlag = (set: (id: number, source: symbol, value: boolean) => void,
   })
 }
 
+/**
+ * Closes the layer the component is in, as its content emitting `close:modal` does — without asking about unsaved changes, such as from its own Cancel button
+ * or once a filter is applied. `null` outside overlays. Called in setup.
+ */
+export const useOverlayClose = (): (() => void) | null => {
+  const id = inject(wOverlayLayer, () => null)()
+
+  return id === null ? null : () => closeLayer(id)
+}
+
 /** Frame the component is shown in, `null` outside overlays. Called in setup. */
 export const useOverlayFrame = (): OverlayFrame | null => inject(wOverlayFrame, null)
 
