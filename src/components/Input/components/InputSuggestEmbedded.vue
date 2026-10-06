@@ -6,8 +6,8 @@
     />
   </OverlayRegionPart>
 
-  <!-- The options reach the edges of the frame, as in a menu, also when the frame pads a form around them. -->
-  <div class="w-frame-bleed">
+  <!-- The options reach the edges of the frame, as in a menu, also when the frame pads a form around them, and line up with the field above. -->
+  <div class="w-frame-bleed [&_.w-select-option]:px-(--w-frame-padding)">
     <slot name="content" />
   </div>
 </template>
