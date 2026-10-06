@@ -37,7 +37,7 @@
         </template>
 
         <template #content>
-          <div class="py-2">
+          <div class="py-2 grid">
             <slot
               name="more"
               v-bind="{
