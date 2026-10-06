@@ -156,7 +156,7 @@ Around them, `WModalWrapper` holds what the form shows outside its fields, built
 - The buttons are Close or Back on the left, and Next, Add plant or Save on the right.
 - With `async`, on a page, there are neither: each field saves on its own.
 
-The form does not know where it is shown. The frame it opens in — a modal, or a dropdown and a bottom sheet for a small form — takes the title and the buttons from `WModalWrapper` and places them, pads the fields, and scrolls them between. On a page there is no frame, and `WModalWrapper` lays everything out in place. The `WUniform` tells the frame it is saving, which keeps it open, and that it has unsaved changes, so the frame asks before closing.
+The form does not know where it is shown. The frame it opens in — a modal, or a dropdown and a bottom sheet for a small form — takes the title and the buttons from `WModalWrapper` and places them, pads the fields, and scrolls them between. On a page there is no frame, and `WModalWrapper` lays everything out in place. The `WUniform` tells the frame it is saving, which keeps it open, and that it has unsaved changes, so a modal asks before closing.
 
 <!-- @source docs/examples/recipes/plant-form/PlantForm.vue PlantForm.vue -->
 

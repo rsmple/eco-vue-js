@@ -1250,7 +1250,7 @@ const markDry = (event: MouseEvent) => {
 
 An action that needs input, such as a new caretaker, opens a small form instead of a confirm: `useOverlay().open` with `present: 'dropdown'` puts it under the button — a bottom sheet on phones — and the same form serves the bulk action and the row menu. From the More menu or a row's `⋯` menu, it takes the menu's place, as a confirm does.
 
-The form is a `WModalWrapper` with a `WUniform` inside, the way it would be in a modal. The frame takes its title and buttons and pads the field, so the form brings no padding or layout for being in a dropdown, and it would open as a modal unchanged. The select is `embedded`, as in a filter: its search is pinned under the title and the caretakers are listed in place of a menu, with Save and Cancel pinned under them. A click outside, Escape or a swipe asks before discarding a picked caretaker, and while the form saves, the dropdown stays open.
+The form is a `WModalWrapper` with a `WUniform` inside, the way it would be in a modal. The frame takes its title and buttons and pads the field, so the form brings no padding or layout for being in a dropdown, and it would open as a modal unchanged. The select is `embedded`, as in a filter: its search is pinned under the title and the caretakers are listed in place of a menu, with Save and Cancel pinned under them. A click outside, Escape or a swipe dismisses it like a menu, and while the form saves, the dropdown stays open.
 
 <!-- @source docs/examples/recipes/plant-list/PlantCaretakerForm.vue PlantCaretakerForm.vue -->
 
@@ -1401,7 +1401,7 @@ const overlay = useOverlay()
 
 const isOpen = ref(false)
 
-// The form opens at the button, so the selected rows stay in view. It asks before closing on an outside click once a caretaker is picked.
+// The form opens at the button, so the selected rows stay in view.
 const openForm = (event: MouseEvent) => {
   isOpen.value = true
 

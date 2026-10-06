@@ -29,7 +29,7 @@ const overlay = useOverlay()
 
 const isOpen = ref(false)
 
-// The form opens at the button, so the selected rows stay in view. It asks before closing on an outside click once a caretaker is picked.
+// The form opens at the button, so the selected rows stay in view.
 const openForm = (event: MouseEvent) => {
   isOpen.value = true
 

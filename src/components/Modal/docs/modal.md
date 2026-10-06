@@ -193,7 +193,7 @@ A dropdown closes when the opener unmounts, unless it took a menu's place; a mod
 
 The frame owns the layout around the content. A component built on `WModalWrapper` opens as a modal, a dropdown or a bottom sheet unchanged: the frame takes its `title`, `subtitle` and `actions` and places them — a sticky header and footer in a modal, a compact heading and pinned buttons in a dropdown, a centered title and stacked buttons in a sheet — and pads the body by `--w-frame-padding`. The content brings no padding of its own; what reaches the edges, such as a list, takes `w-frame-bleed`. Outside an overlay, `WModalWrapper` lays the same parts out on the page. Content without it, such as a menu, is shown edge to edge; `useOverlayFrameOptions(() => ({padded: true}))` asks for the padding.
 
-A `WUniform` with `api-method` keeps its layer open while it saves, and asks before the layer closes with unsaved changes — on the close button, Escape, an outside click or a swipe. `useLayerBusy` and `useLayerChanges` do the same for other content.
+A `WUniform` with `api-method` keeps its layer open while it saves, and in a modal asks before the close button discards unsaved changes. A dropdown is dismissed without asking, as a menu is — keep forms in it small enough to fill again. `useLayerBusy` and `useLayerChanges` do the same for other content.
 
 ```ts
 import {useOverlay} from 'eco-vue-js/dist/utils/Overlay'

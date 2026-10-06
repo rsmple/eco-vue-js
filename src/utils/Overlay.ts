@@ -148,8 +148,8 @@ export const useLayerBusy = (source: () => boolean): void => {
 }
 
 /**
- * Asks before the layer the component is in closes without the content's say — its close button, Escape, an outside click or a swipe — while `source` is `true`,
- * such as while a form has unsaved changes. A form with `api-method` does it on its own. Called in setup.
+ * Asks before the modal the component is in closes with its close button while `source` is `true`, such as while a form has unsaved changes.
+ * A dropdown is dismissed without asking, as a menu is. A form with `api-method` does it on its own. Called in setup.
  */
 export const useLayerChanges = (source: () => boolean): void => {
   useLayerFlag(setLayerChanges, source)

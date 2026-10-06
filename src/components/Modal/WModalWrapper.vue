@@ -15,14 +15,7 @@
       <slot name="subtitle" />
     </OverlayRegionPart>
 
-    <div
-      v-if="frame === 'dropdown'"
-      class="w-[min(24rem,calc(100vw-2rem))]"
-    >
-      <slot />
-    </div>
-
-    <slot v-else />
+    <slot />
 
     <OverlayRegionPart
       v-if="$slots.actions"
@@ -84,7 +77,7 @@
 <script lang="ts" setup>
 import {inject, useAttrs, useId} from 'vue'
 
-import {useOverlayFrame, useOverlayFrameOptions} from '@/utils/Overlay'
+import {useOverlayFrameOptions} from '@/utils/Overlay'
 
 import OverlayRegion from './components/OverlayRegion.vue'
 import OverlayRegionPart from './components/OverlayRegionPart.vue'
@@ -112,8 +105,6 @@ defineSlots<{
 }>()
 
 const attrs = useAttrs()
-
-const frame = useOverlayFrame()
 
 const outerRegions = inject(wOverlayRegions, null)
 
