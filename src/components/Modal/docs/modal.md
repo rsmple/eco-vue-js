@@ -212,7 +212,7 @@ const openNotes = (event: MouseEvent) => {
 
 ## Custom modal
 
-`Modal.add(component, props)` opens any component. Wrap its content in `WModalWrapper`, which provides the title, a scrolling body and a sticky footer with the actions. Its padding comes from `--w-modal-wrapper-padding`, set once for the app (`w-modal-wrapper-p---inner-margin` on `body`), and the frame pads the title, the body and the actions with it — the content brings no padding of its own. Content that reaches the edges, such as a list or a tab bar, takes `w-frame-bleed`. Give the action buttons `w-full` to share the footer width. The modal closes when it emits `close:modal`, when the backdrop's close button is clicked, or when the function returned by `Modal.add` is called.
+`Modal.add(component, props)` opens any component. Wrap its content in `WModalWrapper`, which provides the title, a scrolling body and a sticky footer with the actions. Its padding comes from `--w-modal-wrapper-padding`, set once for the app (`w-modal-wrapper-p---inner-margin` on `body`), and the frame pads the title, the body and the actions with it — the content brings no padding of its own. Content that reaches the edges, such as a list, takes `w-frame-bleed`; WTabs and WInfoCard do it on their own. Give the action buttons `w-full` to share the footer width. The modal closes when it emits `close:modal`, when the backdrop's close button is clicked, or when the function returned by `Modal.add` is called.
 
 Pass callbacks as props to get results back. Load the modal with `defineAsyncComponent`, so its code is fetched on first open, and wrap it in `markRaw`, as for every component passed as a prop.
 

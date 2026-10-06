@@ -1267,7 +1267,7 @@ The form is a `WModalWrapper` with a `WUniform` inside, the way it would be in a
 
     <WUniform
       ref="form"
-      :init-data="() => ({caretaker: undefined})"
+      :init-data="() => ({caretaker})"
       :api-method="save"
       full-payload
       @success="$emit('close:modal')"
@@ -1343,6 +1343,8 @@ const props = defineProps<{
   /** The plants to change: the list's filters and selection, or one plant by id. */
   queryParams: QueryParamsPlants
   count: number
+  /** Current caretaker, known for one plant, which the form starts with. */
+  caretaker?: number
   /** Called once saved, such as to clear the selection. */
   onSaved?: () => void
 }>()

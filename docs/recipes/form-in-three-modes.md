@@ -251,7 +251,7 @@ The form does not know where it is shown. The frame it opens in — a modal, or 
                   <WButtonGroup
                     v-bind="scopeField"
                     :list="Object.values(Kind)"
-                    class="mb-4"
+                    wrap
                   >
                     <template #option="{option}">
                       <component
@@ -285,6 +285,10 @@ The form does not know where it is shown. The frame it opens in — a modal, or 
             name="care"
           >
             <div class="py-2">
+              <WInfoCard class="mb-6">
+                Light and watering are for a typical room — set them for where the plant stands.
+              </WInfoCard>
+
               <WUniform
                 v-bind="scope"
                 field="light"
@@ -294,7 +298,7 @@ The form does not know where it is shown. The frame it opens in — a modal, or 
                   <WButtonGroup
                     v-bind="scopeField"
                     :list="Object.values(Light)"
-                    class="mb-4"
+                    wrap
                   >
                     <template #option="{option}">
                       <component
@@ -517,6 +521,7 @@ import {isId} from 'eco-vue-js/dist/utils/utils'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
+import WInfoCard from 'eco-vue-js/dist/components/InfoCard/WInfoCard.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
 import WModalWrapper from 'eco-vue-js/dist/components/Modal/WModalWrapper.vue'

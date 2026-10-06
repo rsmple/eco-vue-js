@@ -27,7 +27,7 @@ defineEmits<MenuEmits<Plant>>()
 
 const overlay = useOverlay()
 
-// The same form as the bulk action. Opened from the row menu, it takes the menu's place and keeps the row highlighted.
+// The same form as the bulk action, starting with the plant's caretaker. Opened from the row menu, it takes the menu's place and keeps the row highlighted.
 const openForm = (event: MouseEvent) => {
   overlay.open({
     present: 'dropdown',
@@ -36,6 +36,7 @@ const openForm = (event: MouseEvent) => {
     props: {
       queryParams: {id__in: [props.item.id]},
       count: 1,
+      caretaker: props.item.caretaker.id,
     },
   })
 }

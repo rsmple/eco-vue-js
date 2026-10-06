@@ -12,7 +12,10 @@
       class="relative"
       :class="{
         'sm-not:snap-start grid grid-cols-[1fr_auto]': side,
-        'no-scrollbar sm-not:pl---inner-margin mb-4 flex overflow-x-auto overscroll-x-contain': !side,
+        'no-scrollbar mb-4 flex overflow-x-auto overscroll-x-contain': !side,
+        // In an overlay frame the bar scrolls from edge to edge, with the first tab in line with the content. On a page it keeps the phone inset.
+        'w-frame-bleed px-(--w-frame-padding)': !side && frame !== null,
+        'sm-not:pl---inner-margin': !side && frame === null,
         'flex-wrap': !side && wrap,
         [headerClass ?? '']: true,
       }"
@@ -143,6 +146,7 @@ import IconClose from '@/assets/icons/IconClose.svg?component'
 
 import {wUniformStepperController} from '@/components/Uniform/utils/injection'
 import {Notify} from '@/utils/Notify'
+import {useOverlayFrame} from '@/utils/Overlay'
 import {useIsMobile} from '@/utils/mobile'
 import {debounce, getHasScrollbar, getPropValue, throttle, unwrapSlots} from '@/utils/utils'
 
@@ -319,6 +323,8 @@ const setCurrentDebounced = debounce((value: string) => {
 }, 100)
 
 const stepperController = inject(wUniformStepperController, null)
+
+const frame = useOverlayFrame()
 
 /** Runs the tab's `validate` and, in a stepper, checks the fields inside it. Shows a warning and returns `false` if anything is invalid. */
 const checkTab = (index: number, update: boolean): boolean => {
