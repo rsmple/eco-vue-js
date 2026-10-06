@@ -5,8 +5,8 @@
     class="w-full"
     @click.stop.prevent="$emit('cancel')"
   >
-    <template v-if="typeof cancelText === 'string'">
-      {{ cancelText }}
+    <template v-if="cancelText === undefined || typeof cancelText === 'string'">
+      {{ cancelText ?? getText('cancel') }}
     </template>
 
     <component
@@ -42,8 +42,8 @@
     class="w-full"
     @click.stop.prevent="$emit('accept')"
   >
-    <template v-if="typeof acceptText === 'string'">
-      {{ acceptText }}
+    <template v-if="acceptText === undefined || typeof acceptText === 'string'">
+      {{ acceptText ?? getText('accept') }}
     </template>
 
     <component
@@ -59,6 +59,7 @@ import type {ConfirmModalProps} from '../../types'
 import WButton from '@/components/Button/WButton.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {getText} from '@/utils/texts'
 
 defineOptions({inheritAttrs: false})
 
@@ -69,8 +70,6 @@ withDefaults(
     disabled: boolean
   }>(),
   {
-    cancelText: 'Cancel',
-    acceptText: 'Accept',
     acceptSemanticType: SemanticType.PRIMARY,
     intermediateSemanticType: SemanticType.SECONDARY,
   },

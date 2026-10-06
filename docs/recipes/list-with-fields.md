@@ -847,7 +847,7 @@ export const defaultFieldConfigMapPlant = getDefaultFieldConfigMap(listFieldsPla
 
 Each filter is a module like a field: the component renders the control inside a `WUniform` bound to its param, and `meta` gives the chip's `title`, `icon` and the `fields` it sets — removing the chip clears them. The control is the same one a form would use: a `WSelect` for kinds, a `WCheckboxGroupMultiple` for light, a radio `WCheckboxGroup` for watered, where `undefined` means "Any", and a `WSelectSingle` for the caretaker. The two selects reuse option components from the [Select](/components/select) examples — the tone tag and the gardener with their week of watering — so a kind looks the same in the filter as in its column.
 
-`embedded: true` in `meta` drops the dropdown's padding, and `:embedded="!global"` drops the control's title and margin, so the control fills the dropdown edge to edge — the chip already names it. With `global` the filters go into the app shell's filter panel instead, where each control keeps its title. A filter applies as it changes, so picking a caretaker closes the dropdown, as a single select's menu would — a multiple select stays open to pick more.
+The dropdown is titled with the filter's name and pads the control like a small form. `:embedded="!global"` drops the control's own title and margin, and lets a select's options and a checkbox list reach the dropdown's edges, as in a menu. With `global` the filters go into the app shell's filter panel instead, where each control keeps its title. A filter applies as it changes, so picking a caretaker closes the dropdown, as a single select's menu would — a multiple select stays open to pick more.
 
 ::: code-group
 
@@ -905,7 +905,6 @@ export const meta = {
   icon: markRaw(IconPlant),
   fields: ['kind__in'],
   // The control fills the filter's dropdown edge to edge, so the dropdown drops its padding.
-  embedded: true,
 } as const satisfies FilterMeta<QueryParamsPlants>
 </script>
 ```
@@ -962,7 +961,6 @@ export const meta = {
   title: 'Watered',
   icon: markRaw(IconDrop),
   fields: ['watered'],
-  embedded: true,
 } as const satisfies FilterMeta<QueryParamsPlants>
 </script>
 ```

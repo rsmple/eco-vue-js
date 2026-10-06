@@ -1,6 +1,6 @@
 ---
 group: Overlays
-description: Opening modals with Modal.add and Modal.addConfirm, or useOverlay from a component — which also opens any component in a dropdown — anchoring a confirm to the element it is about, building a modal body with WModalWrapper, steps with WModalStepper, and closing it with close:modal.
+description: Opening modals with Modal.add and Modal.addConfirm, or useOverlay from a component — which also opens any component in a dropdown — anchoring a confirm to the element it is about, building a modal body with WModalWrapper, steps with a stepper WTabs, and closing it with close:modal.
 ---
 
 # Modal
@@ -319,7 +319,19 @@ If the modal body contains a form with unsaved changes, exposing it as `formRef`
 
 ## Steps
 
-`WModalStepper` is a `WModalWrapper` with steps: its default slot takes `WTabsItem` items, one per step. The title is the current step's title, with a progress line under it, and the footer has Close or Back and Next or Submit. `validate` on an item runs before Next leaves it, and so do the Uniform fields inside the step — an error message is shown and the step stays open — and `requireSave` submits the form inside first. The last step's button emits `submit`; `submitText` names it. `loading` shows its spinner while the submit runs, and `disabledNext` disables it, e.g. until something is picked. A template ref gives `next()` and `previous()`, to move on after a pick.
+A stepper `WTabs` with `stepper-controls` inside a `WModalWrapper` is a wizard: one `WTabsItem` per step. It hands the modal the current step's title, a progress line under it, and the buttons — Close, or Cancel once something is changed, or Back, and Next or the submit. `validate` on an item runs before Next leaves it, and so do the Uniform fields inside the step — an error message is shown and the step stays open — and `requireSave` submits the form inside first. The last step's button submits the form with `api-method` around the stepper, or emits `submit`; `submitText` names it. `submitting` shows its spinner while a submit on `submit` runs, and `disabledNext` disables it, e.g. until something is picked. A template ref gives `next()` and `previous()`, to move on after a pick. The button texts come from `setTexts`, so an app translates them once.
+
+`WModalStepper` is deprecated: it is the same wizard with its own buttons, without Cancel or the form's submit. Move to a `WModalWrapper` around `WTabs stepper no-header stepper-controls`:
+
+| WModalStepper | Instead |
+| --- | --- |
+| `loading` | `submitting` on WTabs, or nothing inside a form with `api-method` |
+| `disabledNext`, `submitText`, `disableMinHeight` | the same props on WTabs |
+| `disabled` | `submitting`, or `disabled` on the items |
+| `@submit` | `@submit` on WTabs, or the form's `api-method` |
+| `@close:modal` on the first step | not needed: Close closes the modal it is in |
+| `#title` | `#title` on WModalWrapper, which stays over the step's title |
+| `next()`, `previous()` | the same methods of WTabs |
 
 <!-- @example Modal/Stepper -->
 
@@ -366,53 +378,59 @@ const invite = () => {
 
 ```vue [InviteModal.vue]
 <template>
-  <WModalStepper
-    :loading="sending"
-    submit-text="Send invite"
+  <!-- The stepper brings the title, the progress and the buttons; the wrapper hands them to the modal. -->
+  <WModalWrapper
+    maximized
     class="w-modal-wrapper-w-160"
-    @close:modal="$emit('close:modal')"
-    @submit="send"
-    @update:has-changes="$emit('update:has-changes', $event)"
   >
-    <WTabsItem
-      title="Who to invite"
-      name="email"
-      :validate="() => email ? undefined : 'Enter an email to invite'"
+    <WTabs
+      :submitting="sending"
+      submit-text="Send invite"
+      stepper
+      no-header
+      stepper-controls
+      @submit="send"
     >
-      <WInput
-        v-model="email"
-        title="Email"
-        type="email"
-        autofocus
-        class="pt-4"
-      />
-    </WTabsItem>
-
-    <WTabsItem
-      title="Role"
-      name="role"
-    >
-      <WButtonGroup
-        v-model="role"
-        :list="ROLES"
-        title="Role"
-        class="pt-4"
+      <WTabsItem
+        title="Who to invite"
+        name="email"
+        :validate="() => email ? undefined : 'Enter an email to invite'"
       >
-        <template #option="{option}">
-          {{ option }}
-        </template>
-      </WButtonGroup>
-    </WTabsItem>
+        <WInput
+          v-model="email"
+          title="Email"
+          type="email"
+          autofocus
+          class="pt-4"
+        />
+      </WTabsItem>
 
-    <WTabsItem
-      title="Check and send"
-      name="summary"
-    >
-      <p class="pt-4">
-        {{ email }} will join as {{ role }}.
-      </p>
-    </WTabsItem>
-  </WModalStepper>
+      <WTabsItem
+        title="Role"
+        name="role"
+      >
+        <WButtonGroup
+          v-model="role"
+          :list="ROLES"
+          title="Role"
+          class="pt-4"
+        >
+          <template #option="{option}">
+            {{ option }}
+          </template>
+        </WButtonGroup>
+      </WTabsItem>
+
+      <WTabsItem
+        title="Check and send"
+        name="summary"
+      >
+        <p class="pt-4">
+          {{ email }} will join as {{ role }}.
+        </p>
+      </WTabsItem>
+    </WTabs>
+  </WModalWrapper>
 </template>
 
 <script lang="ts" setup>
@@ -420,7 +438,8 @@ import {ref} from 'vue'
 
 import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
-import WModalStepper from 'eco-vue-js/dist/components/Modal/WModalStepper.vue'
+import WModalWrapper from 'eco-vue-js/dist/components/Modal/WModalWrapper.vue'
+import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 import WTabsItem from 'eco-vue-js/dist/components/Tabs/WTabsItem.vue'
 
 const ROLES = ['Viewer', 'Editor', 'Admin']
@@ -431,7 +450,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'close:modal'): void
-  (e: 'update:has-changes', value: boolean): void
 }>()
 
 const email = ref<string>()

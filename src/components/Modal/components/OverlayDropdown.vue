@@ -99,8 +99,9 @@
             :no-filter="closeOnClick"
             :class="[
               frameClass ?? 'w-dropdown-frame',
-              // Content with a title is a dialog, such as a small form: it keeps to a width and a height, as a filter does, and what is in it scrolls between its title and buttons.
-              regions.title.length ? 'w-[min(24rem,calc(100vw-2rem))] max-h-112' : undefined,
+              // Content with a title is a dialog, such as a small form: it keeps to a width and a height, and what is in it scrolls between its title and buttons.
+              // A list of options, such as a filter's, sizes to its content up to that width.
+              regions.title.length ? [options?.fitContent ? 'w-max min-w-48 max-w-[min(24rem,calc(100vw-2rem))]' : 'w-[min(24rem,calc(100vw-2rem))]', 'max-h-112'] : undefined,
               hasTip ? isBeside ? 'w-tooltip-center-y' : 'w-tooltip-center-x' : undefined,
               cornered && frameClass === undefined && {
                 'rounded-bl-none': isRight && isTop,
@@ -109,7 +110,7 @@
                 'rounded-tr-none': isLeft && !isTop,
               },
             ]"
-            class="flex min-h-0 flex-col [--w-frame-padding:--spacing(3)]"
+            class="flex min-h-0 flex-col [--w-frame-padding:--spacing(4)]"
             :role="regions.title.length ? 'dialog' : undefined"
             :aria-labelledby="regions.title.length ? titleId : undefined"
             @click="dismissOutside"
@@ -133,7 +134,8 @@
             <!-- The content's pinned header, such as the field of an embedded select. It is inset like the sheet's, so the content brings no padding of its own. -->
             <div
               v-if="regions.header.length"
-              class="px-(--w-frame-padding) pt-(--w-frame-padding) pb-4"
+              class="px-(--w-frame-padding) pb-4"
+              :class="{'pt-(--w-frame-padding)': !regions.title.length && !regions.subtitle.length}"
             >
               <OverlayRegion :parts="regions.header" />
             </div>
@@ -141,7 +143,7 @@
             <!-- The dropdown sizes to the space left on screen, and the content scrolls here. Infinite lists inside follow it. -->
             <WInfiniteListScrollingElement
               class="min-h-0 flex-1 overflow-auto overscroll-contain"
-              :class="options?.padded ? ['px-(--w-frame-padding)', {'pt-(--w-frame-padding)': !hasTop}] : '[--w-frame-padding:0px]'"
+              :class="options?.padded ? ['px-(--w-frame-padding)', {'pt-(--w-frame-padding)': !hasTop, 'pb-(--w-frame-padding)': !regions.actions.length}] : '[--w-frame-padding:0px]'"
             >
               <slot />
             </WInfiniteListScrollingElement>

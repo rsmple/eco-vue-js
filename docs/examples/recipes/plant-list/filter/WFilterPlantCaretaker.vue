@@ -46,6 +46,5 @@ export const meta = {
   title: 'Caretaker',
   icon: markRaw(IconUser),
   fields: ['caretaker'],
-  embedded: true,
 } as const satisfies FilterMeta<QueryParamsPlants>
 </script>

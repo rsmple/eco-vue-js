@@ -6,7 +6,7 @@
     class="w-full"
     @click="$emit('previous')"
   >
-    Back
+    {{ getText('back') }}
   </WButton>
 
   <WButton
@@ -16,16 +16,17 @@
     class="w-full"
     @click="$emit('close')"
   >
-    Close
+    {{ hasChanges ? getText('cancel') : getText('close') }}
   </WButton>
 
   <WButton
     :semantic-type="SemanticType.PRIMARY"
     :loading="submitting"
+    :disabled="disabledNext"
     class="w-full"
     @click="last ? $emit('submit') : $emit('next')"
   >
-    {{ last ? submitText ?? 'Submit' : 'Next' }}
+    {{ last ? submitText ?? getText('submit') : getText('next') }}
   </WButton>
 </template>
 
@@ -33,14 +34,17 @@
 import WButton from '@/components/Button/WButton.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {getText} from '@/utils/texts'
 
-// Buttons of a stepper: Back, or Close on the first step, and Next, or the submit on the last.
+// Buttons of a stepper: Back, or Close on the first step — Cancel once something is changed — and Next, or the submit on the last.
 defineProps<{
   first: boolean
   last: boolean
   /** On the first step there is something to close, such as the overlay the stepper is in. */
   closable: boolean
+  hasChanges: boolean
   submitting: boolean
+  disabledNext: boolean
   submitText: string | undefined
 }>()
 
