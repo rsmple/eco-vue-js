@@ -187,6 +187,7 @@ const confirmClear = () => {
 
 - It sees the opener's injections, and its own `useOverlay()` opens what belongs to the same layer.
 - `useOverlayFrame()` tells whether it is shown in a `modal`, a `dropdown` or a `sheet`, to adjust its layout.
+- `useOverlayClose()` closes the layer it is in, as emitting `close:modal` does — for content deeper than the root, such as a step's own Cancel button.
 - `useLayerBusy(() => loading.value)` keeps the layer open on Escape, outside clicks, swipes and a removed anchor while something runs.
 
 A dropdown closes when the opener unmounts, unless it took a menu's place; a modal stays.

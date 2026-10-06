@@ -301,6 +301,11 @@ const blur = () => {
   inputRef.value?.blur()
 }
 
+// Closes the menu. On phones it is a bottom sheet, which stays open when the field loses focus.
+const closeMenu = () => {
+  inputRef.value?.close()
+}
+
 const setSearch = (value: string): void => {
   search.value = value
 }
@@ -325,6 +330,7 @@ watch(() => props.modelValue, async () => {
 defineExpose({
   focus,
   blur,
+  close: closeMenu,
   setSearch,
 })
 
