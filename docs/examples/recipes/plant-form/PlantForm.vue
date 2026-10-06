@@ -1,21 +1,17 @@
 <template>
-  <!-- The form brings its own title, progress and buttons: the frame it opens in — a modal, a dropdown, a bottom sheet — places them. On a page, there are none. -->
+  <!--
+    The form brings its own title and buttons: the frame it opens in — a modal, a dropdown, a bottom sheet — places them. On a page, there are none.
+    Creating, the stepper brings its own instead: the step's title, the progress, and Back, Next and Add plant.
+  -->
   <WModalWrapper
     maximized
     class="sm:w-modal-wrapper-w-160"
   >
     <template
-      v-if="!async"
+      v-if="!async && !isCreate"
       #title
     >
-      {{ isCreate ? currentTitle : formRef?.modelValue.name || 'Plant' }}
-    </template>
-
-    <template
-      v-if="isCreate"
-      #subtitle
-    >
-      <WProgress :model-value="progress" />
+      {{ formRef?.modelValue.name || 'Plant' }}
     </template>
 
     <WUniform
@@ -32,14 +28,11 @@
       <template #default="scope">
         <!-- One set of tabs, three layouts: steps when creating, tabs when editing, every tab under its title on a page. -->
         <WTabs
-          ref="tabs"
           :stepper="isCreate"
           :no-header="isCreate"
           :flat="async"
-          @update:first="first = $event"
-          @update:last="last = $event"
-          @update:current-title="currentTitle = $event"
-          @update:progress="progress = $event"
+          submit-text="Add plant"
+          stepper-controls
         >
           <WTabsItem
             title="Plant"
@@ -303,13 +296,12 @@
       </template>
     </WUniform>
 
-    <!-- Steps get Back and Next until the last one; editing gets Cancel and Save on every tab. -->
+    <!-- Editing gets Cancel and Save on every tab. -->
     <template
-      v-if="!async"
+      v-if="!async && !isCreate"
       #actions
     >
       <WButton
-        v-if="!isCreate || first"
         :disabled="formRef?.submitting"
         :semantic-type="SemanticType.SECONDARY"
         class="w-full"
@@ -319,38 +311,19 @@
       </WButton>
 
       <WButton
-        v-else
-        :disabled="formRef?.submitting"
-        :semantic-type="SemanticType.SECONDARY"
-        class="w-full"
-        @click="tabsRef?.previous()"
-      >
-        Back
-      </WButton>
-
-      <WButton
-        v-if="isCreate && !last"
-        class="w-full"
-        @click="tabsRef?.next()"
-      >
-        Next
-      </WButton>
-
-      <WButton
-        v-else
-        :disabled="!isCreate && !formRef?.hasChanges"
+        :disabled="!formRef?.hasChanges"
         :loading="formRef?.submitting"
         class="w-full"
         @click="formRef?.submit?.()"
       >
-        {{ isCreate ? 'Add plant' : 'Save' }}
+        Save
       </WButton>
     </template>
   </WModalWrapper>
 </template>
 
 <script lang="ts" setup>
-import {computed, markRaw, ref, useTemplateRef} from 'vue'
+import {computed, markRaw, useTemplateRef} from 'vue'
 
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 import {getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
@@ -362,7 +335,6 @@ import WInfoCard from 'eco-vue-js/dist/components/InfoCard/WInfoCard.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
 import WModalWrapper from 'eco-vue-js/dist/components/Modal/WModalWrapper.vue'
-import WProgress from 'eco-vue-js/dist/components/Progress/WProgress.vue'
 import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 import WTabsItem from 'eco-vue-js/dist/components/Tabs/WTabsItem.vue'
@@ -396,14 +368,8 @@ defineEmits<{
 }>()
 
 const formRef = useTemplateRef<ComponentInstance<typeof WUniform<PlantFormData, number, undefined, Plant, PlantFormData>>>('form')
-const tabsRef = useTemplateRef('tabs')
 
 const isCreate = computed(() => !props.async && !isId(props.plantId))
-
-const first = ref(true)
-const last = ref(false)
-const currentTitle = ref<string>()
-const progress = ref(0)
 
 /** Builds the editable model from the loaded plant. It gets `{}` until the plant loads, and when creating. */
 const getModel = (plant: Partial<Plant>): PlantFormData => ({

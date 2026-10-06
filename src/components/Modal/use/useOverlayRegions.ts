@@ -19,6 +19,8 @@ export const useOverlayRegions = (accepted: readonly OverlayRegion[]): {
 
   const optionSources = shallowReactive(new Map<symbol, () => OverlayFrameOptions>())
 
+  const owners = new Map<string, symbol>()
+
   provide(wOverlayRegions, {
     add: (region, part) => {
       if (!accepted.includes(region)) return false
@@ -33,6 +35,18 @@ export const useOverlayRegions = (accepted: readonly OverlayRegion[]): {
     setOptions: (source, getOptions) => {
       if (getOptions) optionSources.set(source, getOptions)
       else optionSources.delete(source)
+    },
+    claim: (role, owner) => {
+      const current = owners.get(role)
+
+      if (current !== undefined && current !== owner) return false
+
+      owners.set(role, owner)
+
+      return true
+    },
+    release: (role, owner) => {
+      if (owners.get(role) === owner) owners.delete(role)
     },
   })
 

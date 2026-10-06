@@ -12,7 +12,7 @@ description: One WUniform form component split into WTabs, used as a step-by-ste
 
 | Mode | Props | What changes |
 | --- | --- | --- |
-| Create, in a modal | no `plantId` | The tabs become steps without buttons (`stepper`, `no-header`). Next checks the step's fields. The whole model is sent once, at the end (`full-payload`). |
+| Create, in a modal | no `plantId` | The tabs become steps without tab buttons (`stepper`, `no-header`), bringing their own title, progress line and Back, Next and Add plant (`stepper-controls`). Next checks the step's fields. The whole model is sent once, at the end (`full-payload`). |
 | Edit, in a modal | `plantId` | The tabs get their buttons. Only the changed fields are sent, on Save. |
 | Edit, on a page | `plantId`, `async` | Every tab is shown under its title (`flat`). Each field saves when it changes. |
 
@@ -21,7 +21,7 @@ The pieces:
 | Piece | What it is |
 | --- | --- |
 | A model | `createRestModelApi` with an item query that loads the plant, an `update` action on it, and a `create` action on the list. |
-| The form | A `WUniform` that loads the model with `useQueryFn`, around a `WTabs`, inside a `WModalWrapper` that holds the title, the progress line and the buttons. |
+| The form | A `WUniform` that loads the model with `useQueryFn`, around a `WTabs`, inside a `WModalWrapper` that holds the title and the buttons when editing. |
 | The modal | The form itself, opened with `Modal.add`. The modal's frame places the title and the buttons. |
 | The page | The form with `async`. Outside an overlay, `WModalWrapper` lays it out in the flow of the page, without a title or buttons. |
 
@@ -150,10 +150,10 @@ The tasks are an array, edited as a nested form with one row per item: `modelVal
 - `init-data` makes it keep its own copy of the tasks. Its `api-method` only returns the value, and `@success` writes it into the plant's model, which then saves the field as any other.
 - In a modal or a wizard, both are left unset, and the tasks are a part of the plant's form.
 
-Around them, `WModalWrapper` holds what the form shows outside its fields, built from the tabs' `update:first`, `update:last`, `update:current-title` and `update:progress` and from the `WUniform`'s template ref:
+What the form shows outside its fields comes from two places:
 
-- The title is the step's title when creating, and the plant's name when editing. A progress line goes under it while creating.
-- The buttons are Close or Back on the left, and Next, Add plant or Save on the right.
+- Creating, the stepper brings it with `stepper-controls`: the step's title, a progress line under it, and Close or Back with Next or Add plant (`submit-text`). Add plant checks the last step and submits the `WUniform` around it.
+- Editing, `WModalWrapper` holds the plant's name as the title, and Cancel and Save, built from the `WUniform`'s template ref.
 - With `async`, on a page, there are neither: each field saves on its own.
 
 The form does not know where it is shown. The frame it opens in — a modal, or a dropdown and a bottom sheet for a small form — takes the title and the buttons from `WModalWrapper` and places them, pads the fields, and scrolls them between. On a page there is no frame, and `WModalWrapper` lays everything out in place. The `WUniform` tells the frame it is saving, which keeps it open, and that it has unsaved changes, so a modal asks before closing.
@@ -162,23 +162,19 @@ The form does not know where it is shown. The frame it opens in — a modal, or 
 
 ```vue [PlantForm.vue]
 <template>
-  <!-- The form brings its own title, progress and buttons: the frame it opens in — a modal, a dropdown, a bottom sheet — places them. On a page, there are none. -->
+  <!--
+    The form brings its own title and buttons: the frame it opens in — a modal, a dropdown, a bottom sheet — places them. On a page, there are none.
+    Creating, the stepper brings its own instead: the step's title, the progress, and Back, Next and Add plant.
+  -->
   <WModalWrapper
     maximized
     class="sm:w-modal-wrapper-w-160"
   >
     <template
-      v-if="!async"
+      v-if="!async && !isCreate"
       #title
     >
-      {{ isCreate ? currentTitle : formRef?.modelValue.name || 'Plant' }}
-    </template>
-
-    <template
-      v-if="isCreate"
-      #subtitle
-    >
-      <WProgress :model-value="progress" />
+      {{ formRef?.modelValue.name || 'Plant' }}
     </template>
 
     <WUniform
@@ -195,14 +191,11 @@ The form does not know where it is shown. The frame it opens in — a modal, or 
       <template #default="scope">
         <!-- One set of tabs, three layouts: steps when creating, tabs when editing, every tab under its title on a page. -->
         <WTabs
-          ref="tabs"
           :stepper="isCreate"
           :no-header="isCreate"
           :flat="async"
-          @update:first="first = $event"
-          @update:last="last = $event"
-          @update:current-title="currentTitle = $event"
-          @update:progress="progress = $event"
+          submit-text="Add plant"
+          stepper-controls
         >
           <WTabsItem
             title="Plant"
@@ -466,13 +459,12 @@ The form does not know where it is shown. The frame it opens in — a modal, or 
       </template>
     </WUniform>
 
-    <!-- Steps get Back and Next until the last one; editing gets Cancel and Save on every tab. -->
+    <!-- Editing gets Cancel and Save on every tab. -->
     <template
-      v-if="!async"
+      v-if="!async && !isCreate"
       #actions
     >
       <WButton
-        v-if="!isCreate || first"
         :disabled="formRef?.submitting"
         :semantic-type="SemanticType.SECONDARY"
         class="w-full"
@@ -482,38 +474,19 @@ The form does not know where it is shown. The frame it opens in — a modal, or 
       </WButton>
 
       <WButton
-        v-else
-        :disabled="formRef?.submitting"
-        :semantic-type="SemanticType.SECONDARY"
-        class="w-full"
-        @click="tabsRef?.previous()"
-      >
-        Back
-      </WButton>
-
-      <WButton
-        v-if="isCreate && !last"
-        class="w-full"
-        @click="tabsRef?.next()"
-      >
-        Next
-      </WButton>
-
-      <WButton
-        v-else
-        :disabled="!isCreate && !formRef?.hasChanges"
+        :disabled="!formRef?.hasChanges"
         :loading="formRef?.submitting"
         class="w-full"
         @click="formRef?.submit?.()"
       >
-        {{ isCreate ? 'Add plant' : 'Save' }}
+        Save
       </WButton>
     </template>
   </WModalWrapper>
 </template>
 
 <script lang="ts" setup>
-import {computed, markRaw, ref, useTemplateRef} from 'vue'
+import {computed, markRaw, useTemplateRef} from 'vue'
 
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 import {getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
@@ -525,7 +498,6 @@ import WInfoCard from 'eco-vue-js/dist/components/InfoCard/WInfoCard.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
 import WModalWrapper from 'eco-vue-js/dist/components/Modal/WModalWrapper.vue'
-import WProgress from 'eco-vue-js/dist/components/Progress/WProgress.vue'
 import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 import WTabsItem from 'eco-vue-js/dist/components/Tabs/WTabsItem.vue'
@@ -559,14 +531,8 @@ defineEmits<{
 }>()
 
 const formRef = useTemplateRef<ComponentInstance<typeof WUniform<PlantFormData, number, undefined, Plant, PlantFormData>>>('form')
-const tabsRef = useTemplateRef('tabs')
 
 const isCreate = computed(() => !props.async && !isId(props.plantId))
-
-const first = ref(true)
-const last = ref(false)
-const currentTitle = ref<string>()
-const progress = ref(0)
 
 /** Builds the editable model from the loaded plant. It gets `{}` until the plant loads, and when creating. */
 const getModel = (plant: Partial<Plant>): PlantFormData => ({

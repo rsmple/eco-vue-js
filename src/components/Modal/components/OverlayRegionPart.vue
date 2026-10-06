@@ -11,6 +11,10 @@ import {type OverlayPart, type OverlayRegion, getInstanceProvides, wOverlayRegio
 // Without a frame that has the area, the slot renders in place.
 const props = defineProps<{
   region: OverlayRegion
+  /** Shown by the frame only while no other part is in the area, such as a stepper's step title under a form's own title. */
+  fallback?: boolean
+  /** Renders in place, not handed to the frame, such as the controls of a stepper that is not the one the frame shows. */
+  inPlace?: boolean
 }>()
 
 defineSlots<{
@@ -25,9 +29,10 @@ const regions = inject(wOverlayRegions, null)
 const part: OverlayPart = markRaw({
   render: markRaw(() => slots.default?.()),
   provides: getInstanceProvides(getCurrentInstance()),
+  fallback: props.fallback,
 })
 
-const isHanded = regions?.add(props.region, part) ?? false
+const isHanded = props.inPlace ? false : regions?.add(props.region, part) ?? false
 
 if (isHanded) onBeforeUnmount(() => regions?.remove(props.region, part))
 </script>
