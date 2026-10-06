@@ -81,10 +81,11 @@
         <template #default="{isTop, isLeft, isRight}">
           <!--
             Centered on the anchor with the tip pointing at it, under or over it — or beside it with `LEFT_CENTER` and `RIGHT_CENTER`.
-            Near the edge of the screen only the box shifts, like a tooltip's, so the tip stays on the anchor.
+            Near the edge of the screen only the box shifts, like a tooltip's, so the tip stays on the anchor. When the box is cut to the screen, the tip keeps its size.
           -->
           <WDropdownTip
             v-if="hasTip"
+            class="shrink-0"
             :top="!isBeside && isTop"
             :left="isBeside && isLeft"
             :right="isBeside && isRight"
@@ -98,6 +99,8 @@
             :no-filter="closeOnClick"
             :class="[
               frameClass ?? 'w-dropdown-frame',
+              // Content with a title is a dialog, such as a small form: it keeps to a width and a height, as a filter does, and what is in it scrolls between its title and buttons.
+              regions.title.length ? 'w-[min(24rem,calc(100vw-2rem))] max-h-112' : undefined,
               hasTip ? isBeside ? 'w-tooltip-center-y' : 'w-tooltip-center-x' : undefined,
               cornered && frameClass === undefined && {
                 'rounded-bl-none': isRight && isTop,

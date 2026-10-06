@@ -62,7 +62,7 @@
         :closing="leavingLayers.includes(layer)"
         :detached="detachedLayers.includes(layer)"
         :busy="isLayerBusy(layer.id)"
-        @close="closeWithConfirm(layer)"
+        @close="closeLayer(layer.id)"
         @closed="removeLeaving(layer)"
       >
         <component
@@ -171,11 +171,7 @@ const closeModalWithConfirm = (layer: OverlayLayer): void => {
   // A click beside the modal closes what was opened from it first, such as a menu or a confirm.
   if (closeChildLayers(layer.id)) return
 
-  closeWithConfirm(layer)
-}
-
-// Closing without the content's say — the close button, Escape, an outside click or a swipe — asks first while a form inside has unsaved changes.
-const closeWithConfirm = (layer: OverlayLayer): void => {
+  // A dropdown is dismissed lightly, as a menu is, so only a modal asks while a form inside has unsaved changes.
   if (layer.autoclose || !(hasLayerChanges(layer.id) || modalComponentMap[layer.id]?.formRef?.hasChanges)) {
     closeLayer(layer.id)
     return
@@ -184,12 +180,10 @@ const closeWithConfirm = (layer: OverlayLayer): void => {
   closeConfirm?.()
 
   closeConfirm = toClose(openConfirm({
-    title: layer.present === 'modal' ? 'Are you sure want to close modal?' : 'Are you sure want to close?',
-    description: layer.present === 'modal' ? 'Closing the modal will undo any changes' : 'Closing will undo any changes',
+    title: 'Are you sure want to close modal?',
+    description: 'Closing the modal will undo any changes',
     acceptSemanticType: SemanticType.WARNING,
     acceptText: 'Close',
-    // A dropdown sits above the modals, so the question opens at its anchor, over it.
-    anchor: layer.present === 'dropdown' ? layer.anchor : undefined,
     onAccept() {
       closeLayer(layer.id)
     },
@@ -201,7 +195,7 @@ const onKeydown = (event: KeyboardEvent) => {
 
   const top = layers.value[layers.value.length - 1]
 
-  if (top?.present === 'dropdown' && !isLayerBusy(top.id)) closeWithConfirm(top)
+  if (top?.present === 'dropdown' && !isLayerBusy(top.id)) closeLayer(top.id)
 }
 
 let timeout: ReturnType<typeof setTimeout> | undefined
