@@ -70,6 +70,8 @@ export type OverlayRegion = 'title' | 'subtitle' | 'header' | 'actions'
 export type OverlayPart = {
   readonly render: Component
   readonly provides: Record<string | symbol, unknown> | undefined
+  /** Shown only while no other part is in the area, such as a stepper's step title under a form's own title. */
+  readonly fallback: boolean
 }
 
 /** How the content asks its frame to look, such as WModalWrapper's props and classes. A frame takes what applies to it. */
@@ -87,11 +89,14 @@ export type OverlayFrameOptions = {
 /**
  * Areas of the frame the content belongs to, which OverlayRegionPart renders its slot into. `add` returns `false` for an area the frame does not have, and the part renders in place.
  * `setOptions` asks the frame to look a certain way while `getOptions` is set — the latest one counts — and `null` takes it back.
+ * `claim` lets one owner take a role in the frame, such as the stepper whose steps the frame shows: it returns `true` for the first owner, until it calls `release`.
  */
 export const wOverlayRegions = Symbol('wOverlayRegions') as InjectionKey<{
   add: (region: OverlayRegion, part: OverlayPart) => boolean
   remove: (region: OverlayRegion, part: OverlayPart) => void
   setOptions: (source: symbol, getOptions: (() => OverlayFrameOptions) | null) => void
+  claim: (role: string, owner: symbol) => boolean
+  release: (role: string, owner: symbol) => void
 } | null>
 
 let isHosted = false
