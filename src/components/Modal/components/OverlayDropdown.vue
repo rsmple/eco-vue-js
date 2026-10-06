@@ -100,8 +100,8 @@
             :class="[
               frameClass ?? 'w-dropdown-frame',
               // Content with a title is a dialog, such as a small form: it keeps to a width and a height, and what is in it scrolls between its title and buttons.
-              // A list of options, such as a filter's, sizes to its content up to that width.
-              regions.title.length ? [options?.fitContent ? 'w-max min-w-48 max-w-[min(24rem,calc(100vw-2rem))]' : 'w-[min(24rem,calc(100vw-2rem))]', 'max-h-112'] : undefined,
+              // A list of options, such as a filter's, sizes to its content up to that width. Fields have no width of their own, so a form of fields, such as a text filter, keeps to the smallest width.
+              regions.title.length ? [options?.fitContent ? 'w-max min-w-[min(18rem,calc(100vw-2rem))] max-w-[min(24rem,calc(100vw-2rem))]' : 'w-[min(24rem,calc(100vw-2rem))]', 'max-h-112'] : undefined,
               hasTip ? isBeside ? 'w-tooltip-center-y' : 'w-tooltip-center-x' : undefined,
               cornered && frameClass === undefined && {
                 'rounded-bl-none': isRight && isTop,

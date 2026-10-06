@@ -84,7 +84,7 @@ export type OverlayFrameOptions = {
   maximized?: boolean
   /** Stacks the buttons vertically on every screen size. */
   actionsCol?: boolean
-  /** A dropdown with a title sizes to the content, up to the width it keeps otherwise, such as a filter's list of options. */
+  /** A dropdown with a title sizes to the content, from 18rem up to the width it keeps otherwise (24rem), such as a filter's list of options. */
   fitContent?: boolean
 }
 
