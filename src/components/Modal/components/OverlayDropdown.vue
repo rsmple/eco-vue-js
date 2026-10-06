@@ -140,9 +140,9 @@
               <OverlayRegion :parts="regions.header" />
             </div>
 
-            <!-- The dropdown sizes to the space left on screen, and the content scrolls here. Infinite lists inside follow it. -->
+            <!-- The dropdown sizes to the space left on screen, and the content scrolls here. Infinite lists inside follow it. Content with `flex-1` fills it, such as an empty state centered in a frame with a min height. -->
             <WInfiniteListScrollingElement
-              class="min-h-0 flex-1 overflow-auto overscroll-contain"
+              class="flex min-h-0 flex-1 flex-col overflow-auto overscroll-contain"
               :class="options?.padded ? ['px-(--w-frame-padding)', {'pt-(--w-frame-padding)': !hasTop, 'pb-(--w-frame-padding)': !regions.actions.length}] : '[--w-frame-padding:0px]'"
             >
               <slot />

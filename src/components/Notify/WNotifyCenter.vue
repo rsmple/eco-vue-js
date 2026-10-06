@@ -1,11 +1,12 @@
 <template>
   <div
     :class="{
-      'bg-surface border-line-subtle grid max-h-[min(40rem,calc(100vh-2rem))] w-[min(28rem,calc(100vw-var(--inner-margin,1fr)*2))] grid-rows-[auto_1fr_auto] overflow-hidden rounded-2xl border border-solid': frame === null,
+      'bg-surface border-line-subtle max-h-[min(40rem,calc(100vh-2rem))] w-[min(28rem,calc(100vw-var(--inner-margin,1fr)*2))] grid-rows-[auto_1fr_auto] overflow-hidden rounded-2xl border border-solid': frame === null,
+      'flex-1': frame === 'dropdown',
       'pb-[50vh]': frame === 'sheet',
     }"
     role="region"
-    class="grid grid-rows-[1fr_auto] h-full"
+    class="grid"
     :aria-label="title ?? 'Notifications'"
   >
     <OverlayRegionPart region="header">
@@ -38,7 +39,7 @@
     <div
       v-else
       class="grid content-start"
-      :class="frame === null ? 'overflow-y-auto overscroll-contain px-4 py-3' : 'pb-2'"
+      :class="frame === null ? 'overflow-y-auto overscroll-contain px-4 py-3' : 'pt-1'"
     >
       <div
         v-if="notifyCenterActionItems.length"
@@ -99,12 +100,18 @@
       </TransitionGroup>
     </div>
 
-    <div
+    <!-- In an overlay, the frame pins it under the list with its buttons. -->
+    <OverlayRegionPart
       v-if="$slots.footer"
-      class="border-line-subtle border-t border-solid sticky bottom-0 bg-surface"
+      region="actions"
     >
-      <slot name="footer" />
-    </div>
+      <div
+        class="min-w-0 flex-1"
+        :class="{'border-line-subtle border-t border-solid px-4 py-3': frame === null}"
+      >
+        <slot name="footer" />
+      </div>
+    </OverlayRegionPart>
   </div>
 </template>
 
@@ -138,6 +145,6 @@ defineSlots<{
 
 const frame = useOverlayFrame()
 
-// In an overlay, the frame pads the header and the list; on its own, it is the frame.
+// In an overlay, the frame pads the header, the list and the footer; on its own, it is the frame.
 useOverlayFrameOptions(() => ({padded: true}))
 </script>
