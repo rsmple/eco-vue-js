@@ -63,7 +63,8 @@
         'pr-9': !title && !$slots.title && filterField,
         'col-start-2 -col-end-1 row-start-1 -row-end-3 grid-cols-subgrid': subgrid,
         'grid-cols-[1fr_auto]': !subgrid,
-        'px-3': embedded,
+        // Inset like a menu's options. A frame that pads its content, such as a filter's dropdown, gives part of it.
+        'px-[max(0px,calc(--spacing(3)-var(--w-frame-padding,0px)))]': embedded,
       }"
     >
       <div

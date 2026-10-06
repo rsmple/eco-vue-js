@@ -49,6 +49,5 @@ export const meta = {
   icon: markRaw(IconPlant),
   fields: ['kind__in'],
   // The control fills the filter's dropdown edge to edge, so the dropdown drops its padding.
-  embedded: true,
 } as const satisfies FilterMeta<QueryParamsPlants>
 </script>

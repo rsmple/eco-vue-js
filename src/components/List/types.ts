@@ -198,7 +198,6 @@ export type FilterMeta<QueryParams> = {
   title?: string | ((queryParams: QueryParams) => string)
   icon?: SVGComponent | ((queryParams: QueryParams) => SVGComponent)
   hidden?: boolean | ((queryParams: QueryParams) => boolean)
-  embedded?: boolean
 }
 
 export type FilterEmits = {

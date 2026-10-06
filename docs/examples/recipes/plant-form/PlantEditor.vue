@@ -39,7 +39,7 @@
 <script lang="ts" setup>
 import type {Plant} from '../plant-list/models/Plant'
 
-import {defineAsyncComponent, markRaw, ref} from 'vue'
+import {markRaw, ref} from 'vue'
 
 import {Modal} from 'eco-vue-js/dist/utils/Modal'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
@@ -54,15 +54,13 @@ import PlantForm from './PlantForm.vue'
 
 import {plantModelApi} from '../plant-list/api/Plant'
 
-const PlantFormModal = defineAsyncComponent(() => import('./PlantFormModal.vue'))
-
 const queryPlants = plantModelApi.list.use()
 
 const plantId = ref<number | undefined>(1)
 
-/** Edits the plant, or walks through adding one when there is no id. A new plant opens on the page. */
+/** Opens the same form as a modal: it edits the plant, or walks through adding one when there is no id. A new plant opens on the page. */
 const openModal = (id?: number) => {
-  Modal.add(markRaw(PlantFormModal), {
+  Modal.add(markRaw(PlantForm), {
     plantId: id,
     onSaved: (plant: Plant) => plantId.value = plant.id,
   })

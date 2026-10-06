@@ -53,6 +53,5 @@ export const meta = {
   title: 'Light',
   icon: markRaw(IconSun),
   fields: ['light__in'],
-  embedded: true,
 } as const satisfies FilterMeta<QueryParamsPlants>
 </script>

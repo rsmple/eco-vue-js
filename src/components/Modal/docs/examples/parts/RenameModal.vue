@@ -8,7 +8,6 @@
       v-model="value"
       title="Name"
       autofocus
-      class="sm-not:px---inner-margin"
     />
 
     <template #actions>

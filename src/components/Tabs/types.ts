@@ -21,6 +21,18 @@ export interface TabsProps {
   switchToNew?: boolean
   /** Numbers the tab titles and disables every tab after the first one with `hasValue` false. The exposed `next` and `jump` check the Uniform fields of the tab they leave and stay on it if one is invalid. Enables `update:progress`, `update:first` and `update:last`. */
   stepper?: boolean
+  /**
+   * With `stepper`, brings its own controls: the open step's title, a progress line, and Back, Next and submit buttons — Close on the first step in an overlay.
+   * In a frame, such as a modal or a page WModalWrapper, they go to its title, subtitle and actions, under a title of the form's own if there is one; the first stepper in the frame takes it.
+   * The submit checks the last step and submits the enclosing form with `api-method`, or emits `submit`.
+   */
+  stepperControls?: boolean
+  /** Text of the submit button on the last step with `stepperControls`. Defaults to the `submit` text of `setTexts`. */
+  submitText?: string
+  /** With `stepperControls`, shows a spinner in the Next or submit button and disables Back and Close, such as while a submit on `submit` runs. A form with `api-method` around the stepper does it on its own. */
+  submitting?: boolean
+  /** With `stepperControls`, disables the Next or submit button, such as until something is picked on the step. */
+  disabledNext?: boolean
   /** Colors the titles of tabs that have a value. */
   showHasValue?: boolean
   /** Stays on the current tab when another one gets an error. By default the first tab with an error is opened. */

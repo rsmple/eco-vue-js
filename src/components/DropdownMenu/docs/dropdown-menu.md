@@ -231,6 +231,7 @@ import WDropdownAdaptive from 'eco-vue-js/dist/components/DropdownMenu/WDropdown
 | `isOpen` | `boolean` | **required** | Shows the dropdown. |
 | `parentElement` | `(Pick<Element, "getBoundingClientRect"> & { contextElement?: Element \| undefined; }) \| null` | — | Element the dropdown opens at. Defaults to the element rendered by the `toggle` slot. |
 | `horizontalAlign` | `HorizontalAlign` | — | Aligns the dropdown to the parent without a tip, such as a field's menu with `HorizontalAlign.FILL`. Otherwise it is centered on the parent with a tip pointing at it. |
+| `dialog` | `boolean` | — | The content is a small form, such as a filter: the `header` slot is its title on every screen, and the frame pads the content and sizes to it. |
 | `frameClass` | `string` | — | Classes of the dropdown's box, replacing the default frame. |
 | `closeOnClick` | `boolean` | — | A click on the content closes the layer, as in a menu. What is opened from it takes its place; from a dropdown without it, such as a filter, it stays over it. |
 
@@ -245,8 +246,8 @@ import WDropdownAdaptive from 'eco-vue-js/dist/components/DropdownMenu/WDropdown
 | Slot | Props | Description |
 | --- | --- | --- |
 | `toggle` | `{ isTop: boolean; unclickable: boolean \| undefined; }` | Element that opens the dropdown, which it points at. `isTop` is true while the dropdown is open above it. On phones it is repeated at the top of the bottom sheet, unless there is a `header` — `unclickable` is true for the one on the page and false for the copy in the sheet. |
-| `header` | — | Heading of the bottom sheet on phones, instead of the copy of `toggle`. |
-| `content` | — | Content of the dropdown, which brings its own padding. A click inside closes it with `closeOnClick`. |
+| `header` | — | Heading of the bottom sheet on phones, instead of the copy of `toggle`. With `dialog`, the title of the dropdown too. |
+| `content` | — | Content of the dropdown, which brings its own padding, unless it is a `dialog`. A click inside closes it with `closeOnClick`. |
 
 <!-- @api-end -->
 

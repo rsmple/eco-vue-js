@@ -1,14 +1,17 @@
 <template>
-  <OverlayHeader>
+  <OverlayRegionPart region="header">
     <slot
       name="toggle"
       v-bind="{unclickable: undefined, isTop: false}"
     />
-  </OverlayHeader>
+  </OverlayRegionPart>
 
-  <slot name="content" />
+  <!-- The options reach the edges of the frame, as in a menu, also when the frame pads a form around them. -->
+  <div class="w-frame-bleed">
+    <slot name="content" />
+  </div>
 </template>
 
 <script setup lang="ts">
-import OverlayHeader from '@/components/Modal/components/OverlayHeader.vue'
+import OverlayRegionPart from '@/components/Modal/components/OverlayRegionPart.vue'
 </script>

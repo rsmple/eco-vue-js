@@ -6,13 +6,37 @@
     }"
     class="grid"
   >
+    <!-- A stepper's title and progress go to the frame it is in, such as a modal's header. Outside a frame, or when another stepper has it, the progress is shown here. -->
+    <template v-if="hasControls">
+      <OverlayRegionPart
+        v-if="isFramed"
+        region="title"
+        fallback
+      >
+        {{ currentTitle }}
+      </OverlayRegionPart>
+
+      <OverlayRegionPart
+        region="subtitle"
+        :in-place="!isFramed"
+      >
+        <WProgress
+          :model-value="progress"
+          :class="{'mb-4': !isFramed}"
+        />
+      </OverlayRegionPart>
+    </template>
+
     <div
       v-if="!noHeader && !flat"
       ref="buttonContainer"
       class="relative"
       :class="{
         'sm-not:snap-start grid grid-cols-[1fr_auto]': side,
-        'no-scrollbar sm-not:pl---inner-margin mb-4 flex overflow-x-auto overscroll-x-contain': !side,
+        'no-scrollbar mb-4 flex overflow-x-auto overscroll-x-contain': !side,
+        // In an overlay frame the bar scrolls from edge to edge, with the first tab in line with the content. On a page it keeps the phone inset.
+        'w-frame-bleed px-(--w-frame-padding)': !side && frame !== null,
+        'sm-not:pl---inner-margin': !side && frame === null,
         'flex-wrap': !side && wrap,
         [headerClass ?? '']: true,
       }"
@@ -129,6 +153,21 @@
         </TabItem>
       </TransitionGroup>
     </div>
+
+    <!-- The stepper's buttons, pinned by the frame, such as a modal's footer. -->
+    <OverlayRegionPart
+      v-if="hasControls && isFramed"
+      region="actions"
+    >
+      <TabsStepperButtons v-bind="stepperButtons" />
+    </OverlayRegionPart>
+
+    <div
+      v-else-if="hasControls"
+      class="gap---inner-margin mt-4 flex"
+    >
+      <TabsStepperButtons v-bind="stepperButtons" />
+    </div>
   </div>
 </template>
 
@@ -137,17 +176,23 @@ import type {TabsItemProps, TabsProps} from './types'
 
 import {type Component, type RendererElement, type RendererNode, type VNode, type VNodeRef, computed, h, inject, onBeforeUpdate, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch} from 'vue'
 
+import WProgress from '@/components/Progress/WProgress.vue'
 import WUniformErrorMessage from '@/components/Uniform/WUniformErrorMessage.vue'
 
 import IconClose from '@/assets/icons/IconClose.svg?component'
 
+import OverlayRegionPart from '@/components/Modal/components/OverlayRegionPart.vue'
+import {wOverlayRegions} from '@/components/Modal/models/overlayRegistry'
 import {wUniformStepperController} from '@/components/Uniform/utils/injection'
 import {Notify} from '@/utils/Notify'
+import {useOverlayClose, useOverlayFrame} from '@/utils/Overlay'
 import {useIsMobile} from '@/utils/mobile'
+import {getText} from '@/utils/texts'
 import {debounce, getHasScrollbar, getPropValue, throttle, unwrapSlots} from '@/utils/utils'
 
 import TabItem from './components/TabItem.vue'
 import TabTitleButton from './components/TabTitleButton.vue'
+import TabsStepperButtons from './components/TabsStepperButtons.vue'
 import {wTabItemListener, wTabItemUnlistener} from './models/injection'
 
 const props = defineProps<TabsProps>()
@@ -169,6 +214,8 @@ const emit = defineEmits<{
   (e: 'update:first', value: boolean): void
   /** With `stepper`, whether the last tab is open. */
   (e: 'update:last', value: boolean): void
+  /** With `stepperControls`, the submit button was clicked on the last step and the step is valid. Not emitted inside a form with `api-method`, which is submitted instead. */
+  (e: 'submit'): void
 }>()
 
 const {isMobile} = useIsMobile()
@@ -320,12 +367,27 @@ const setCurrentDebounced = debounce((value: string) => {
 
 const stepperController = inject(wUniformStepperController, null)
 
+const frame = useOverlayFrame()
+
+const hasControls = props.stepper && props.stepperControls && !props.flat
+
+// The frame shows one stepper — the first to claim it. Another one, such as a stepper inside a step, keeps its controls in itself.
+const regions = hasControls ? inject(wOverlayRegions, null) : null
+const owner = Symbol('stepper')
+const isFramed = regions?.claim('stepper', owner) ?? false
+
+if (isFramed) onUnmounted(() => regions?.release('stepper', owner))
+
+const closeOverlay = useOverlayClose()
+
+const currentTitle = computed(() => defaultSlots.value[currentIndex.value]?.props.title)
+
 /** Runs the tab's `validate` and, in a stepper, checks the fields inside it. Shows a warning and returns `false` if anything is invalid. */
 const checkTab = (index: number, update: boolean): boolean => {
   const errorMessage = update ? validate(index) : validateIfNoError(index)
 
   if (errorMessage) {
-    Notify.warn({title: 'Form contains invalid values', caption: errorMessage.length < 200 ? errorMessage : undefined})
+    Notify.warn({title: getText('invalidData'), caption: errorMessage.length < 200 ? errorMessage : undefined})
 
     return false
   }
@@ -334,7 +396,7 @@ const checkTab = (index: number, update: boolean): boolean => {
   const message = props.stepper && key !== undefined ? tabItemRefByName.value[key]?.validate() : undefined
 
   if (message) {
-    Notify.warn({title: 'Form contains invalid data', caption: h(WUniformErrorMessage, {message})})
+    Notify.warn({title: getText('invalidData'), caption: h(WUniformErrorMessage, {message})})
 
     return false
   }
@@ -359,6 +421,28 @@ const jump = (name: string, update: boolean) => {
 
   if (valid) return switchTab(name)
 }
+
+const submit = async (): Promise<void> => {
+  if (!checkTab(currentIndex.value, false)) return
+
+  if (stepperController) await stepperController.submit()
+  else emit('submit')
+}
+
+const stepperButtons = computed(() => ({
+  first: first.value,
+  last: last.value,
+  // Only the stepper the frame shows closes it; one inside, such as in a step, goes back no further than its first step.
+  closable: isFramed && closeOverlay !== null,
+  hasChanges: hasChanges.value || (stepperController?.hasChanges() ?? false),
+  submitting: props.submitting || (stepperController?.submitting() ?? false),
+  disabledNext: props.disabledNext ?? false,
+  submitText: props.submitText,
+  onPrevious: previous,
+  onNext: () => next(),
+  onSubmit: submit,
+  onClose: () => closeOverlay?.(),
+}))
 
 const updateHeight = (value: number): void => {
   if (minHeight.value >= value) return
@@ -433,9 +517,9 @@ watch(defaultSlotsKeys, newKeys => {
   }
 }, {flush: 'post'})
 
-if (props.stepper) {
-  const progress = computed(() => 100 * (currentIndex.value + 1) / defaultSlotsKeys.value.length)
+const progress = computed(() => 100 * (currentIndex.value + 1) / defaultSlotsKeys.value.length)
 
+if (props.stepper) {
   watch(progress, value => {
     emit('update:progress', value)
   }, {immediate: true})

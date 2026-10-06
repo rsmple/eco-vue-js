@@ -9,12 +9,11 @@
     :disable-message="bulkDisableMessage"
     :selected-count="selectionCount"
     :style="{zIndex: BASE_ZINDEX_DROPDOWN}"
-    more-toggle-class="nth-[-n+3]:hidden sm:nth-[-n+5]:hidden"
     @clear:selection="$emit('reset:selection')"
   >
     <template
       v-if="bulk || action || !disableExport"
-      #default="{disableMessage, cssClass}"
+      #default="{disableMessage, cssClass, visibleCount}"
     >
       <template v-if="selectionCount === 0 && action">
         <template
@@ -53,18 +52,16 @@
             :disable-message="disableMessage"
             :readonly="readonly"
             :clear-selection="resetSelection"
-            :class="[
-              cssClass,
-              'sm-not:nth-[n+3]:hidden nth-[n+5]:hidden',
-            ]"
+            :class="[cssClass, {hidden: bulkOffset + index >= visibleCount}]"
             @clear:selected="$emit('reset:selection')"
           />
         </template>
       </template>
     </template>
 
+    <!-- The bulk actions that do not fit the bar, after the export. -->
     <template
-      v-if="bulk && bulk.length > 2"
+      v-if="bulk?.length && !(selectionCount === 0 && action)"
       #more="scope"
     >
       <template
@@ -73,12 +70,12 @@
       >
         <component
           :is="item"
+          v-if="bulkOffset + index >= scope.visibleCount"
           :selection-count="selectionCount"
           :query-params-getter="getQueryParamsBulk"
-          :disable-message="scope?.disableMessage"
+          :disable-message="scope.disableMessage"
           :readonly="readonly"
           :clear-selection="resetSelection"
-          class="last:pb-2 nth-[-n+1]:hidden sm:nth-[-n+3]:hidden nth-2:pt-2 sm:nth-4:pt-2"
           @clear:selected="$emit('reset:selection')"
         />
       </template>
@@ -204,7 +201,7 @@ import type {ActionComponent, BulkComponent, FieldConfig, ListFields, MenuCompon
 import type {OrderItem} from '@/utils/order'
 import type {ListMode} from '@/utils/utils'
 
-import {markRaw} from 'vue'
+import {computed, markRaw} from 'vue'
 
 import WButtonSelection from '@/components/Button/WButtonSelection.vue'
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
@@ -224,7 +221,7 @@ import WListHeader from '../WListHeader.vue'
 import WListHeaderItem from '../WListHeaderItem.vue'
 import {getFieldVariable, getFieldWidthSumStyles} from '../use/useListConfig'
 
-defineProps<{
+const props = defineProps<{
   /** The count discovered by the list itself - what the `header` slot receives. */
   count: number | undefined
   /** The consumer-supplied count when there is one, falling back to `count`. */
@@ -284,6 +281,9 @@ const emit = defineEmits<{
   (e: 'save:width'): void
   (e: 'click:reset'): void
 }>()
+
+// The export comes first in the bar, so the bulk actions start after it.
+const bulkOffset = computed(() => props.disableExport ? 0 : 1)
 
 // A bulk action in the More menu unmounts once its confirm takes the menu's place, so its own emits no longer arrive.
 const resetSelection = () => emit('reset:selection')

@@ -1,7 +1,10 @@
 <template>
   <div 
-    class="sm-not:px---inner-margin sm-not:-mx---inner-margin p-4 sm:rounded-3xl"
+    class="p-4 sm:rounded-3xl"
     :class="{
+      // On phones it spans the screen: in an overlay frame to its edges, keeping the text at least as inset as on larger screens; on a page past its inset.
+      'sm-not:w-frame-bleed sm-not:px-[max(var(--w-frame-padding),1rem)]': frame !== null,
+      'sm-not:px---inner-margin sm-not:-mx---inner-margin': frame === null,
       [infoCardSemanticTypeMap[semanticType ?? SemanticType.SECONDARY]]: !noBg,
     }"
   >
@@ -31,6 +34,7 @@
 <script lang="ts" setup>
 import IconNegativeInfo from '@/assets/icons/IconNegativeInfo.svg?component'
 
+import {useOverlayFrame} from '@/utils/Overlay'
 import {SemanticType} from '@/utils/SemanticType'
 
 import {infoCardIconSemanticTypeMap, infoCardSemanticTypeMap} from './models/utils'
@@ -54,4 +58,6 @@ defineSlots<{
   /** Content under the icon and text, such as actions. */
   bottom?: () => void
 }>()
+
+const frame = useOverlayFrame()
 </script>
