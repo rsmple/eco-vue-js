@@ -8,15 +8,32 @@
     @close="dismiss"
   >
     <template
-      v-if="headers.length"
+      v-if="hasTop"
       #toggle="{unclickable}"
     >
+      <!-- The sheet insets its top by the frame's padding on its own. -->
       <template v-if="!unclickable">
-        <component
-          :is="render"
-          v-for="(render, index) in headers"
-          :key="index"
-        />
+        <h2
+          v-if="regions.title.length"
+          :id="titleId"
+          class="text-accent pb-2 text-center text-lg font-semibold text-balance"
+        >
+          <OverlayRegion :parts="regions.title" />
+        </h2>
+
+        <div
+          v-if="regions.subtitle.length"
+          class="w-frame-bleed [--w-frame-padding:--spacing(3)]"
+        >
+          <OverlayRegion :parts="regions.subtitle" />
+        </div>
+
+        <div
+          v-if="regions.header.length"
+          class="pb-4"
+        >
+          <OverlayRegion :parts="regions.header" />
+        </div>
       </template>
     </template>
 
@@ -24,13 +41,22 @@
       <!-- Clicks inside the sheet stop at its content, so `closeOnClick` closes it here. It is the sheet's scroll container, which infinite lists inside follow. -->
       <WInfiniteListScrollingElement parent>
         <div
-          class="pb-4 text-start font-normal"
-          :class="{'pointer-events-none': closing}"
+          class="text-start font-normal [--w-frame-padding:--spacing(3)]"
+          :class="[{'pointer-events-none': closing, 'pb-4': !regions.actions.length}, options?.padded ? 'px-(--w-frame-padding)' : '[--w-frame-padding:0px]']"
           @click="closeOnClick && dismiss()"
         >
           <slot />
         </div>
       </WInfiniteListScrollingElement>
+    </template>
+
+    <template
+      v-if="regions.actions.length"
+      #footer
+    >
+      <div class="gap---inner-margin flex flex-col p-(--w-frame-padding) pb-4 [--w-frame-padding:--spacing(3)]">
+        <OverlayRegion :parts="regions.actions" />
+      </div>
     </template>
   </WBottomSheet>
 
@@ -80,25 +106,51 @@
                 'rounded-tr-none': isLeft && !isTop,
               },
             ]"
-            class="grid grid-rows-[auto_1fr]"
+            class="flex min-h-0 flex-col [--w-frame-padding:--spacing(3)]"
+            :role="regions.title.length ? 'dialog' : undefined"
+            :aria-labelledby="regions.title.length ? titleId : undefined"
             @click="dismissOutside"
           >
+            <!-- The content's title, such as a form's. It wraps to the width of the content rather than widening the dropdown. -->
+            <h2
+              v-if="regions.title.length"
+              :id="titleId"
+              class="text-accent contain-inline-size px-(--w-frame-padding) pt-(--w-frame-padding) pb-2 text-base font-semibold"
+            >
+              <OverlayRegion :parts="regions.title" />
+            </h2>
+
+            <div
+              v-if="regions.subtitle.length"
+              class="contain-inline-size pb-2"
+            >
+              <OverlayRegion :parts="regions.subtitle" />
+            </div>
+
             <!-- The content's pinned header, such as the field of an embedded select. It is inset like the sheet's, so the content brings no padding of its own. -->
             <div
-              v-if="headers.length"
-              class="px-3 pb-4 pt-3"
+              v-if="regions.header.length"
+              class="px-(--w-frame-padding) pt-(--w-frame-padding) pb-4"
             >
-              <component
-                :is="render"
-                v-for="(render, index) in headers"
-                :key="index"
-              />
+              <OverlayRegion :parts="regions.header" />
             </div>
 
             <!-- The dropdown sizes to the space left on screen, and the content scrolls here. Infinite lists inside follow it. -->
-            <WInfiniteListScrollingElement class="min-h-0 overflow-auto overscroll-contain">
+            <WInfiniteListScrollingElement
+              class="min-h-0 flex-1 overflow-auto overscroll-contain"
+              :class="options?.padded ? ['px-(--w-frame-padding)', {'pt-(--w-frame-padding)': !hasTop}] : '[--w-frame-padding:0px]'"
+            >
               <slot />
             </WInfiniteListScrollingElement>
+
+            <!-- The content's buttons, pinned under what scrolls. -->
+            <div
+              v-if="regions.actions.length"
+              class="contain-inline-size flex gap-2 p-(--w-frame-padding)"
+              :class="{'flex-col': options?.actionsCol}"
+            >
+              <OverlayRegion :parts="regions.actions" />
+            </div>
           </WClickOutside>
         </template>
       </WDropdown>
@@ -109,7 +161,7 @@
 <script lang="ts" setup>
 import type {OverlayAnchor, OverlayDropdownOptions} from '@/utils/Overlay'
 
-import {type Component, computed, inject, provide, shallowRef, useTemplateRef, watch} from 'vue'
+import {computed, inject, provide, useId, useTemplateRef, watch} from 'vue'
 
 import WBottomSheet from '@/components/BottomSheet/WBottomSheet.vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
@@ -121,7 +173,10 @@ import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {getIsMobile} from '@/utils/mobile'
 import {BASE_ZINDEX_DROPDOWN, wBaseZIndex} from '@/utils/utils'
 
-import {LAYER_ATTRIBUTE, isInLayerWithin, wOverlayFrame, wOverlayHeader, wOverlayLayer} from '../models/overlayRegistry'
+import OverlayRegion from './OverlayRegion.vue'
+
+import {LAYER_ATTRIBUTE, isInLayerWithin, wOverlayFrame, wOverlayLayer} from '../models/overlayRegistry'
+import {useOverlayRegions} from '../use/useOverlayRegions'
 
 // Frame of a `dropdown` layer — a dropdown at the anchor, or a bottom sheet on phones.
 const props = withDefaults(
@@ -153,13 +208,12 @@ const isMobile = getIsMobile()
 
 provide(wOverlayFrame, isMobile ? 'sheet' : 'dropdown')
 
-// Pinned at the top of the sheet or the dropdown, above the content that scrolls, such as the sheet's title.
-const headers = shallowRef<Component[]>([])
+// Parts the content hands over: the title and the pinned header above what scrolls, and the buttons under it.
+const {regions, options} = useOverlayRegions(['title', 'subtitle', 'header', 'actions'])
 
-provide(wOverlayHeader, {
-  add: render => headers.value = [...headers.value, render],
-  remove: render => headers.value = headers.value.filter(item => item !== render),
-})
+const hasTop = computed(() => regions.title.length > 0 || regions.subtitle.length > 0 || regions.header.length > 0)
+
+const titleId = useId()
 
 const dropdownRef = useTemplateRef('dropdown')
 

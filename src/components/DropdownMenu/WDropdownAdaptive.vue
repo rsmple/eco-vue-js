@@ -11,7 +11,7 @@ import type {DropdownAdaptiveProps} from './types'
 
 import {type VNode, computed, defineComponent, h, markRaw, onMounted, ref, useSlots, useTemplateRef, watch} from 'vue'
 
-import OverlayHeader from '@/components/Modal/components/OverlayHeader.vue'
+import OverlayRegionPart from '@/components/Modal/components/OverlayRegionPart.vue'
 import {useOverlay, useOverlayFrame} from '@/utils/Overlay'
 import {useIsMobile} from '@/utils/mobile'
 
@@ -60,7 +60,7 @@ const renderContent = markRaw(defineComponent({
       : slots.toggle?.({isTop: false, unclickable: false})
 
     return () => [
-      isSheet ? h(OverlayHeader, null, {default: renderHeader}) : null,
+      isSheet ? h(OverlayRegionPart, {region: 'header'}, {default: renderHeader}) : null,
       slots.content?.(),
     ]
   },

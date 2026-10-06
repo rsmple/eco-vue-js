@@ -94,6 +94,11 @@
   @apply surface-raised rounded-xl text-start font-normal shadow-md border border-solid border-line-raised overflow-clip;
 }
 
+/* Reaches past the padding of the overlay frame the element is in — a modal, a dropdown or a bottom sheet — to its edges, such as a list or a tab bar in a form. */
+@utility w-frame-bleed {
+  margin-inline: calc(var(--w-frame-padding, 0px) * -1);
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
 }
