@@ -64,6 +64,8 @@ type OverlayContentOptions = {
   props?: object
   /** Runs once the layer is closed — by its close function, its content, the user, a sibling taking its place, or the layer it was opened from closing. */
   onClose?: () => void
+  /** Takes the place of the dropdown it is opened from, as from a menu, such as the next step of a small form. A dropdown sticks to that dropdown's anchor. */
+  replace?: boolean
 }
 
 export type OverlayOpenOptions = OverlayContentOptions & (
@@ -85,7 +87,7 @@ export type OverlayOpenOptions = OverlayContentOptions & (
  * - From a modal, it closes together with the modal.
  * - From a menu — a dropdown with `closeOnClick`, such as WButtonMore — it takes the menu's place, since the menu closes on the click.
  *   A dropdown, such as a confirm, sticks to the menu's anchor and keeps the menu's row marked.
- * - From any other dropdown, such as a filter, it stays over it, like the menu of a select inside.
+ * - From any other dropdown, such as a filter, it stays over it, like the menu of a select inside — or takes its place the same way with `replace`.
  *
  * A dropdown closes when the component unmounts, unless it took a menu's place. A modal stays.
  */
@@ -103,9 +105,9 @@ export const useOverlay = () => {
   const getContext = (): OpenContext => ({parent: getParent(), provides: getInstanceProvides(instance)})
 
   // `open` gets a callback to run once the layer closes, which forgets it.
-  const track = (open: (context: OpenContext, untrack: () => void) => OverlayLayer | null) => {
+  const track = (open: (context: OpenContext, untrack: () => void) => OverlayLayer | null, replace?: boolean) => {
     const context = getContext()
-    const handoff = isHandoff(context.parent)
+    const handoff = isHandoff(context.parent, replace)
 
     const layer: OverlayLayer | null = open(context, () => {
       if (layer) dropdowns.delete(layer.id)
@@ -119,7 +121,7 @@ export const useOverlay = () => {
   return {
     /** Opens `content` the way `present` says. WModal picks the frame, such as a dropdown that is a bottom sheet on phones. */
     open(options: OverlayOpenOptions): (() => void) | null {
-      return track((context, untrack) => openWithCallback(options, untrack, context))
+      return track((context, untrack) => openWithCallback(options, untrack, context), options.replace)
     },
 
     /** Opens a modal. `cb` runs after it closes. */

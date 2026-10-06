@@ -159,21 +159,24 @@ export const isInLayerWithin = (path: EventTarget[], ancestor: number): boolean 
   })
 }
 
-/** The menu opening from `parent` hands off from: a dropdown with `closeOnClick` closes on the click that opens something from it, taking the clicked item with it. */
-const findHandoff = (parent: number | null): LayerEntry | undefined => {
+/**
+ * The menu opening from `parent` hands off from: a dropdown with `closeOnClick` closes on the click that opens something from it, taking the clicked item with it.
+ * With `replace`, any dropdown hands off the same way.
+ */
+const findHandoff = (parent: number | null, replace?: boolean): LayerEntry | undefined => {
   const entry = findLayer(parent)
 
-  return entry?.present === 'dropdown' && entry.dropdown.closeOnClick ? entry : undefined
+  return entry?.present === 'dropdown' && (replace || entry.dropdown.closeOnClick) ? entry : undefined
 }
 
-/** Whether opening from `parent` hands off, taking the place of the menu it is opened from. */
-export const isHandoff = (parent: number | null): boolean => findHandoff(parent) !== undefined
+/** Whether opening from `parent` hands off, taking the place of the menu it is opened from, or of any dropdown with `replace`. */
+export const isHandoff = (parent: number | null, replace?: boolean): boolean => findHandoff(parent, replace) !== undefined
 
 /** The anchor a layer opened from `parent` takes over, so a layer opened from a menu sticks to the menu's anchor. */
 export const getHandoffAnchor = (parent: number | null): OverlayAnchor | undefined => findHandoff(parent)?.anchor
 
 /**
- * Opens a layer. Opened from a menu — a dropdown with `closeOnClick` — it takes the menu's place: the menu closes,
+ * Opens a layer. Opened from a menu — a dropdown with `closeOnClick` — or from any dropdown with `replace`, it takes its place: the menu closes,
  * and the new layer belongs to the menu's parent. A dropdown also inherits the menu's anchor, so it stays where the menu was,
  * and the menu's opener still sees it with `hasAnchorLayer`. Opened from any other dropdown, such as a filter, it stays over it.
  *
@@ -187,7 +190,7 @@ export const openLayer = (options: OverlayOptions): OverlayLayer | null => {
   let parent = findLayer(options.parent ?? null) ? options.parent ?? null : null
   let anchor = options.anchor
 
-  const handoff = findHandoff(parent)
+  const handoff = findHandoff(parent, options.replace)
 
   if (handoff) {
     parent = handoff.parent
