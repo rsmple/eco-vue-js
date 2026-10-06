@@ -24,10 +24,12 @@
     :bulk="[
       markRaw(WBulkPlantWatered),
       markRaw(WBulkPlantDry),
+      markRaw(WBulkPlantCaretaker),
       markRaw(WBulkPlantRemove),
     ]"
     :menu="[
       markRaw(WMenuPlantToggle),
+      markRaw(WMenuPlantCaretaker),
       markRaw(WMenuPlantDelete),
     ]"
     selection-title="plant"
@@ -60,11 +62,13 @@ import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 import PlantContent from './PlantContent.vue'
 import {plantModelApi, useQueryParamsPlants} from './api/Plant'
+import WBulkPlantCaretaker from './bulk/WBulkPlantCaretaker.vue'
 import WBulkPlantDry from './bulk/WBulkPlantDry.vue'
 import WBulkPlantRemove from './bulk/WBulkPlantRemove.vue'
 import WBulkPlantWatered from './bulk/WBulkPlantWatered.vue'
 import {defaultFieldConfigMapPlant, listFieldsPlant} from './fields'
 import {listFilterPlant} from './filter'
+import WMenuPlantCaretaker from './menu/WMenuPlantCaretaker.vue'
 import WMenuPlantDelete from './menu/WMenuPlantDelete.vue'
 import WMenuPlantToggle from './menu/WMenuPlantToggle.vue'
 

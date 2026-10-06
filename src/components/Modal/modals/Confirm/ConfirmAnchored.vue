@@ -17,7 +17,7 @@
     :aria-describedby="descriptionId"
     tabindex="-1"
     class="outline-none"
-    :class="isSheet ? 'px---inner-margin pb-4' : 'w-96 max-w-[calc(100vw-2rem)] p-4'"
+    :class="{'w-[calc(min(24rem,100vw-2rem)-var(--w-frame-padding)*2)]': !isSheet}"
   >
     <h2
       :id="titleId"
@@ -76,7 +76,7 @@ import type {ConfirmModalProps} from '../../types'
 
 import {inject, nextTick, onBeforeUnmount, onMounted, useId, useTemplateRef} from 'vue'
 
-import {useLayerBusy, useOverlayFrame} from '@/utils/Overlay'
+import {useLayerBusy, useOverlayFrame, useOverlayFrameOptions} from '@/utils/Overlay'
 import {BASE_ZINDEX_BOTTOM_SHEET, BASE_ZINDEX_DROPDOWN, wBaseZIndex} from '@/utils/utils'
 
 import ConfirmActions from './ConfirmActions.vue'
@@ -109,6 +109,9 @@ const {disabledInner, loadingAccept, loadingIntermediate, loading, accept, inter
 
 // The confirm stays open while its action runs, even on Escape, a click outside or its anchor leaving the page.
 useLayerBusy(() => loading.value)
+
+// The frame pads it like any small form in a dropdown or a bottom sheet.
+useOverlayFrameOptions(() => ({padded: true}))
 
 onMounted(() => {
   nextTick(() => dialogRef.value?.focus({preventScroll: true}))

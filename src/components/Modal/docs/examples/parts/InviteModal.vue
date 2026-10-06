@@ -1,51 +1,57 @@
 <template>
-  <WModalStepper
-    :loading="sending"
-    submit-text="Send invite"
+  <!-- The stepper brings the title, the progress and the buttons; the wrapper hands them to the modal. -->
+  <WModalWrapper
+    maximized
     class="w-modal-wrapper-w-160"
-    @close:modal="$emit('close:modal')"
-    @submit="send"
-    @update:has-changes="$emit('update:has-changes', $event)"
   >
-    <WTabsItem
-      title="Who to invite"
-      name="email"
-      :validate="() => email ? undefined : 'Enter an email to invite'"
+    <WTabs
+      :submitting="sending"
+      submit-text="Send invite"
+      stepper
+      no-header
+      stepper-controls
+      @submit="send"
     >
-      <WInput
-        v-model="email"
-        title="Email"
-        type="email"
-        autofocus
-        class="sm-not:px---inner-margin pt-4"
-      />
-    </WTabsItem>
-
-    <WTabsItem
-      title="Role"
-      name="role"
-    >
-      <WButtonGroup
-        v-model="role"
-        :list="ROLES"
-        title="Role"
-        class="sm-not:px---inner-margin pt-4"
+      <WTabsItem
+        title="Who to invite"
+        name="email"
+        :validate="() => email ? undefined : 'Enter an email to invite'"
       >
-        <template #option="{option}">
-          {{ option }}
-        </template>
-      </WButtonGroup>
-    </WTabsItem>
+        <WInput
+          v-model="email"
+          title="Email"
+          type="email"
+          autofocus
+          class="pt-4"
+        />
+      </WTabsItem>
 
-    <WTabsItem
-      title="Check and send"
-      name="summary"
-    >
-      <p class="sm-not:px---inner-margin pt-4">
-        {{ email }} will join as {{ role }}.
-      </p>
-    </WTabsItem>
-  </WModalStepper>
+      <WTabsItem
+        title="Role"
+        name="role"
+      >
+        <WButtonGroup
+          v-model="role"
+          :list="ROLES"
+          title="Role"
+          class="pt-4"
+        >
+          <template #option="{option}">
+            {{ option }}
+          </template>
+        </WButtonGroup>
+      </WTabsItem>
+
+      <WTabsItem
+        title="Check and send"
+        name="summary"
+      >
+        <p class="pt-4">
+          {{ email }} will join as {{ role }}.
+        </p>
+      </WTabsItem>
+    </WTabs>
+  </WModalWrapper>
 </template>
 
 <script lang="ts" setup>
@@ -53,7 +59,8 @@ import {ref} from 'vue'
 
 import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
-import WModalStepper from 'eco-vue-js/dist/components/Modal/WModalStepper.vue'
+import WModalWrapper from 'eco-vue-js/dist/components/Modal/WModalWrapper.vue'
+import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 import WTabsItem from 'eco-vue-js/dist/components/Tabs/WTabsItem.vue'
 
 const ROLES = ['Viewer', 'Editor', 'Admin']
@@ -64,7 +71,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'close:modal'): void
-  (e: 'update:has-changes', value: boolean): void
 }>()
 
 const email = ref<string>()

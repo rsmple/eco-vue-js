@@ -8,10 +8,10 @@
     class="grid grid-rows-[1fr_auto] h-full"
     :aria-label="title ?? 'Notifications'"
   >
-    <OverlayHeader>
+    <OverlayRegionPart region="header">
       <div
         class="flex items-center justify-between gap-4"
-        :class="frame === null ? 'border-line-subtle border-b border-solid px-4 py-3' : frame === 'sheet' ? 'pb-4' : undefined"
+        :class="{'border-line-subtle border-b border-solid px-4 py-3': frame === null}"
       >
         <div class="text-accent font-semibold h-8 flex items-center">
           {{ title ?? 'Notifications' }}
@@ -26,7 +26,7 @@
           {{ clearText ?? 'Clear' }}
         </WButton>
       </div>
-    </OverlayHeader>
+    </OverlayRegionPart>
 
     <div
       v-if="!notifyCenterItems.length"
@@ -38,7 +38,7 @@
     <div
       v-else
       class="grid content-start"
-      :class="frame === null ? 'overflow-y-auto overscroll-contain px-4 py-3' : frame === 'dropdown' ? 'px-3 pb-2 pt-1' : 'px-3 py-1'"
+      :class="frame === null ? 'overflow-y-auto overscroll-contain px-4 py-3' : 'pb-2'"
     >
       <div
         v-if="notifyCenterActionItems.length"
@@ -113,8 +113,8 @@ import type {NotifyCenterProps} from './types'
 
 import WButton from '@/components/Button/WButton.vue'
 
-import OverlayHeader from '@/components/Modal/components/OverlayHeader.vue'
-import {useOverlayFrame} from '@/utils/Overlay'
+import OverlayRegionPart from '@/components/Modal/components/OverlayRegionPart.vue'
+import {useOverlayFrame, useOverlayFrameOptions} from '@/utils/Overlay'
 import {SemanticType} from '@/utils/SemanticType'
 
 import NotifyCard from './components/NotifyCard.vue'
@@ -137,4 +137,7 @@ defineSlots<{
 }>()
 
 const frame = useOverlayFrame()
+
+// In an overlay, the frame pads the header and the list; on its own, it is the frame.
+useOverlayFrameOptions(() => ({padded: true}))
 </script>

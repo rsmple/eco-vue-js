@@ -206,6 +206,8 @@ An item's `hasError`, `hasChanges` and `hasValue` mark its button — `statusIco
 
 `stepper` turns the tabs into steps: the tabs after the first one with `hasValue` set to `false` are disabled, and `next()`, `previous()` and `jump(name)` on a template ref move between steps. Before `next()` and `jump(name)` leave a step, `validate` on its item runs, then the Uniform fields inside it are checked: invalid fields show their errors, a warning lists them, and the step stays open. `update:progress`, `update:first` and `update:last` emit where the stepper is, for the buttons around it.
 
+`stepperControls` lets the stepper bring those buttons itself: Back, or on the first step in an overlay Close — Cancel once something is changed — and Next, or the submit on the last, named by `submitText`. `submitting` shows a spinner in it while a submit on `submit` runs, and `disabledNext` disables it. The texts come from `setTexts` ([Getting started](/guide/getting-started#texts)). The submit checks the last step and submits the Uniform form with `api-method` around it, or emits `submit`. In an overlay frame, or in a WModalWrapper on a page, the step's title, a progress line and the buttons go to the frame's title, subtitle and actions — the form's own title, if it has one, stays instead of the step's. A frame shows one stepper: the first one to mount takes it, and another one, such as a stepper inside a step, keeps its progress and buttons in itself.
+
 ## API
 
 <!-- @api WTabs -->
@@ -230,6 +232,10 @@ import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 | `headerClass` | `string` | — | Classes for the row of tab buttons. |
 | `switchToNew` | `boolean` | — | Switches to a tab when it is added. |
 | `stepper` | `boolean` | — | Numbers the tab titles and disables every tab after the first one with `hasValue` false. The exposed `next` and `jump` check the Uniform fields of the tab they leave and stay on it if one is invalid. Enables `update:progress`, `update:first` and `update:last`. |
+| `stepperControls` | `boolean` | — | With `stepper`, brings its own controls: the open step's title, a progress line, and Back, Next and submit buttons — Close on the first step in an overlay. In a frame, such as a modal or a page WModalWrapper, they go to its title, subtitle and actions, under a title of the form's own if there is one; the first stepper in the frame takes it. The submit checks the last step and submits the enclosing form with `api-method`, or emits `submit`. |
+| `submitText` | `string` | — | Text of the submit button on the last step with `stepperControls`. Defaults to the `submit` text of `setTexts`. |
+| `submitting` | `boolean` | — | With `stepperControls`, shows a spinner in the Next or submit button and disables Back and Close, such as while a submit on `submit` runs. A form with `api-method` around the stepper does it on its own. |
+| `disabledNext` | `boolean` | — | With `stepperControls`, disables the Next or submit button, such as until something is picked on the step. |
 | `showHasValue` | `boolean` | — | Colors the titles of tabs that have a value. |
 | `noSwitchOnInvalid` | `boolean` | — | Stays on the current tab when another one gets an error. By default the first tab with an error is opened. |
 | `wrap` | `boolean` | — | Wraps the tab buttons onto new lines instead of scrolling sideways. |
@@ -249,6 +255,7 @@ import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 | `update:progress` | `(value: number)` | With `stepper`, the share of steps reached, in percent. |
 | `update:first` | `(value: boolean)` | With `stepper`, whether the first tab is open. |
 | `update:last` | `(value: boolean)` | With `stepper`, whether the last tab is open. |
+| `submit` | — | With `stepperControls`, the submit button was clicked on the last step and the step is valid. Not emitted inside a form with `api-method`, which is submitted instead. |
 
 #### Slots
 

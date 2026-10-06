@@ -1,6 +1,6 @@
 ---
 group: Overlays
-description: Opening modals with Modal.add and Modal.addConfirm, or useOverlay from a component — which also opens any component in a dropdown — anchoring a confirm to the element it is about, building a modal body with WModalWrapper, steps with WModalStepper, and closing it with close:modal.
+description: Opening modals with Modal.add and Modal.addConfirm, or useOverlay from a component — which also opens any component in a dropdown — anchoring a confirm to the element it is about, building a modal body with WModalWrapper, steps with a stepper WTabs, and closing it with close:modal.
 ---
 
 # Modal
@@ -187,9 +187,14 @@ const confirmClear = () => {
 
 - It sees the opener's injections, and its own `useOverlay()` opens what belongs to the same layer.
 - `useOverlayFrame()` tells whether it is shown in a `modal`, a `dropdown` or a `sheet`, to adjust its layout.
+- `useOverlayClose()` closes the layer it is in, as emitting `close:modal` does — for content deeper than the root, such as a step's own Cancel button.
 - `useLayerBusy(() => loading.value)` keeps the layer open on Escape, outside clicks, swipes and a removed anchor while something runs.
 
 A dropdown closes when the opener unmounts, unless it took a menu's place; a modal stays.
+
+The frame owns the layout around the content. A component built on `WModalWrapper` opens as a modal, a dropdown or a bottom sheet unchanged: the frame takes its `title`, `subtitle` and `actions` and places them — a sticky header and footer in a modal, a compact heading and pinned buttons in a dropdown, a centered title and stacked buttons in a sheet — and pads the body by `--w-frame-padding`. The content brings no padding of its own; what reaches the edges, such as a list, takes `w-frame-bleed`. Outside an overlay, `WModalWrapper` lays the same parts out on the page. Content without it, such as a menu, is shown edge to edge; `useOverlayFrameOptions(() => ({padded: true}))` asks for the padding.
+
+A `WUniform` with `api-method` keeps its layer open while it saves, and in a modal asks before the close button discards unsaved changes. A dropdown is dismissed without asking, as a menu is — keep forms in it small enough to fill again. `useLayerBusy` and `useLayerChanges` do the same for other content.
 
 ```ts
 import {useOverlay} from 'eco-vue-js/dist/utils/Overlay'
@@ -208,7 +213,7 @@ const openNotes = (event: MouseEvent) => {
 
 ## Custom modal
 
-`Modal.add(component, props)` opens any component. Wrap its content in `WModalWrapper`, which provides the title, a scrolling body and a sticky footer with the actions. Its padding comes from `--w-modal-wrapper-padding`, set once for the app (`w-modal-wrapper-p---inner-margin` on `body`); on phones the body is edge to edge, so pad the content with `sm-not:px---inner-margin`. Give the action buttons `w-full` to share the footer width. The modal closes when it emits `close:modal`, when the backdrop's close button is clicked, or when the function returned by `Modal.add` is called.
+`Modal.add(component, props)` opens any component. Wrap its content in `WModalWrapper`, which provides the title, a scrolling body and a sticky footer with the actions. Its padding comes from `--w-modal-wrapper-padding`, set once for the app (`w-modal-wrapper-p---inner-margin` on `body`), and the frame pads the title, the body and the actions with it — the content brings no padding of its own. Content that reaches the edges, such as a list, takes `w-frame-bleed`; WTabs and WInfoCard do it on their own. Give the action buttons `w-full` to share the footer width. The modal closes when it emits `close:modal`, when the backdrop's close button is clicked, or when the function returned by `Modal.add` is called.
 
 Pass callbacks as props to get results back. Load the modal with `defineAsyncComponent`, so its code is fetched on first open, and wrap it in `markRaw`, as for every component passed as a prop.
 
@@ -259,7 +264,6 @@ const rename = () => {
       v-model="value"
       title="Name"
       autofocus
-      class="sm-not:px---inner-margin"
     />
 
     <template #actions>
@@ -315,7 +319,19 @@ If the modal body contains a form with unsaved changes, exposing it as `formRef`
 
 ## Steps
 
-`WModalStepper` is a `WModalWrapper` with steps: its default slot takes `WTabsItem` items, one per step. The title is the current step's title, with a progress line under it, and the footer has Close or Back and Next or Submit. `validate` on an item runs before Next leaves it, and so do the Uniform fields inside the step — an error message is shown and the step stays open — and `requireSave` submits the form inside first. The last step's button emits `submit`; `submitText` names it. `loading` shows its spinner while the submit runs, and `disabledNext` disables it, e.g. until something is picked. A template ref gives `next()` and `previous()`, to move on after a pick.
+A stepper `WTabs` with `stepper-controls` inside a `WModalWrapper` is a wizard: one `WTabsItem` per step. It hands the modal the current step's title, a progress line under it, and the buttons — Close, or Cancel once something is changed, or Back, and Next or the submit. `validate` on an item runs before Next leaves it, and so do the Uniform fields inside the step — an error message is shown and the step stays open — and `requireSave` submits the form inside first. The last step's button submits the form with `api-method` around the stepper, or emits `submit`; `submitText` names it. `submitting` shows its spinner while a submit on `submit` runs, and `disabledNext` disables it, e.g. until something is picked. A template ref gives `next()` and `previous()`, to move on after a pick. The button texts come from `setTexts`, so an app translates them once.
+
+`WModalStepper` is deprecated: it is the same wizard with its own buttons, without Cancel or the form's submit. Move to a `WModalWrapper` around `WTabs stepper no-header stepper-controls`:
+
+| WModalStepper | Instead |
+| --- | --- |
+| `loading` | `submitting` on WTabs, or nothing inside a form with `api-method` |
+| `disabledNext`, `submitText`, `disableMinHeight` | the same props on WTabs |
+| `disabled` | `submitting`, or `disabled` on the items |
+| `@submit` | `@submit` on WTabs, or the form's `api-method` |
+| `@close:modal` on the first step | not needed: Close closes the modal it is in |
+| `#title` | `#title` on WModalWrapper, which stays over the step's title |
+| `next()`, `previous()` | the same methods of WTabs |
 
 <!-- @example Modal/Stepper -->
 
@@ -362,53 +378,59 @@ const invite = () => {
 
 ```vue [InviteModal.vue]
 <template>
-  <WModalStepper
-    :loading="sending"
-    submit-text="Send invite"
+  <!-- The stepper brings the title, the progress and the buttons; the wrapper hands them to the modal. -->
+  <WModalWrapper
+    maximized
     class="w-modal-wrapper-w-160"
-    @close:modal="$emit('close:modal')"
-    @submit="send"
-    @update:has-changes="$emit('update:has-changes', $event)"
   >
-    <WTabsItem
-      title="Who to invite"
-      name="email"
-      :validate="() => email ? undefined : 'Enter an email to invite'"
+    <WTabs
+      :submitting="sending"
+      submit-text="Send invite"
+      stepper
+      no-header
+      stepper-controls
+      @submit="send"
     >
-      <WInput
-        v-model="email"
-        title="Email"
-        type="email"
-        autofocus
-        class="sm-not:px---inner-margin pt-4"
-      />
-    </WTabsItem>
-
-    <WTabsItem
-      title="Role"
-      name="role"
-    >
-      <WButtonGroup
-        v-model="role"
-        :list="ROLES"
-        title="Role"
-        class="sm-not:px---inner-margin pt-4"
+      <WTabsItem
+        title="Who to invite"
+        name="email"
+        :validate="() => email ? undefined : 'Enter an email to invite'"
       >
-        <template #option="{option}">
-          {{ option }}
-        </template>
-      </WButtonGroup>
-    </WTabsItem>
+        <WInput
+          v-model="email"
+          title="Email"
+          type="email"
+          autofocus
+          class="pt-4"
+        />
+      </WTabsItem>
 
-    <WTabsItem
-      title="Check and send"
-      name="summary"
-    >
-      <p class="sm-not:px---inner-margin pt-4">
-        {{ email }} will join as {{ role }}.
-      </p>
-    </WTabsItem>
-  </WModalStepper>
+      <WTabsItem
+        title="Role"
+        name="role"
+      >
+        <WButtonGroup
+          v-model="role"
+          :list="ROLES"
+          title="Role"
+          class="pt-4"
+        >
+          <template #option="{option}">
+            {{ option }}
+          </template>
+        </WButtonGroup>
+      </WTabsItem>
+
+      <WTabsItem
+        title="Check and send"
+        name="summary"
+      >
+        <p class="pt-4">
+          {{ email }} will join as {{ role }}.
+        </p>
+      </WTabsItem>
+    </WTabs>
+  </WModalWrapper>
 </template>
 
 <script lang="ts" setup>
@@ -416,7 +438,8 @@ import {ref} from 'vue'
 
 import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
-import WModalStepper from 'eco-vue-js/dist/components/Modal/WModalStepper.vue'
+import WModalWrapper from 'eco-vue-js/dist/components/Modal/WModalWrapper.vue'
+import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 import WTabsItem from 'eco-vue-js/dist/components/Tabs/WTabsItem.vue'
 
 const ROLES = ['Viewer', 'Editor', 'Admin']
@@ -427,7 +450,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'close:modal'): void
-  (e: 'update:has-changes', value: boolean): void
 }>()
 
 const email = ref<string>()

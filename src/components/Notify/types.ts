@@ -1,7 +1,7 @@
 export type NotifyPosition = 'top-right' | 'top-center' | 'bottom-right' | 'bottom-center'
 
 export interface NotifyProps {
-  /** Corner or edge of the screen the toasts show in. On top they sit under the header (`--header-height`); new toasts stack away from the edge. */
+  /** Corner or edge of the screen the toasts show in. On top they sit under the header (`--header-height`); new toasts stack away from the edge. On phones they always show at the top edge, over the header or a modal's title, clear of the buttons at the bottom and the fields under the header. */
   position?: NotifyPosition
 }
 

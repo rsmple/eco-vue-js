@@ -18,4 +18,6 @@ export interface DropdownAdaptiveProps extends Pick<OverlayDropdownOptions, 'fra
   parentElement?: OverlayAnchor | null
   /** Aligns the dropdown to the parent without a tip, such as a field's menu with `HorizontalAlign.FILL`. Otherwise it is centered on the parent with a tip pointing at it. */
   horizontalAlign?: HorizontalAlign
+  /** The content is a small form, such as a filter: the `header` slot is its title on every screen, and the frame pads the content and sizes to it. */
+  dialog?: boolean
 }

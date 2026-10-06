@@ -68,6 +68,8 @@ import type {InnerInstanceExpose, UniformScope, UniformScopeField} from './types
 
 import {type Ref, type VNode, computed, inject, onUnmounted, provide, reactive, toRef, useId} from 'vue'
 
+import {useLayerBusy, useLayerChanges} from '@/utils/Overlay'
+
 import {useUniformField} from './use/useUniformField'
 import {useUniformForm} from './use/useUniformForm'
 import {useUniformModel} from './use/useUniformModel'
@@ -261,6 +263,10 @@ if (scopeSubmit && scope) {
     hasChanges: () => props.noChanges ? false : scope.hasChanges?.value ?? false,
     fullPayload: () => props.fullPayload,
   })
+
+  // In an overlay, the form keeps it open while it saves, and has it ask before closing with unsaved changes — saved as they change with `async`, they never wait.
+  useLayerBusy(() => scopeSubmit.submitting.value)
+  useLayerChanges(() => !props.async && !props.noChanges && (scope.hasChanges?.value ?? false))
 }
 
 const updaterInjected = inject(wUniformUpdater, undefined)

@@ -34,12 +34,14 @@
           :provides="layer.provides"
           modal
         >
-          <component
-            :is="layer.content"
-            :ref="(value: unknown) => setModalComponent(layer.id, value)"
-            v-bind="layer.props"
-            @close:modal="closeLayer(layer.id)"
-          />
+          <OverlayModal>
+            <component
+              :is="layer.content"
+              :ref="(value: unknown) => setModalComponent(layer.id, value)"
+              v-bind="layer.props"
+              @close:modal="closeLayer(layer.id)"
+            />
+          </OverlayModal>
         </OverlayLayerProvider>
       </div>
     </TransitionGroup>
@@ -77,13 +79,15 @@
 import {computed, onBeforeMount, onBeforeUnmount, onMounted, provide, shallowRef, watch} from 'vue'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {getText} from '@/utils/texts'
 import {BASE_ZINDEX_MODAL, getIsClientSide, isAnchorConnected, wBaseZIndex} from '@/utils/utils'
 
 import ModalCloseButton from './components/ModalCloseButton.vue'
 import OverlayDropdown from './components/OverlayDropdown.vue'
 import OverlayLayerProvider from './components/OverlayLayerProvider.vue'
+import OverlayModal from './components/OverlayModal.vue'
 import {wIsModal} from './models/injection'
-import {type OverlayLayer, closeChildLayers, closeLayer, isLayerBusy, openConfirm, setOverlayHost, toClose, useOverlayLayers} from './models/overlayRegistry'
+import {type OverlayLayer, closeChildLayers, closeLayer, hasLayerChanges, isLayerBusy, openConfirm, setOverlayHost, toClose, useOverlayLayers} from './models/overlayRegistry'
 import {useIsBackdrop} from './use/useIsBackdrop'
 
 // Renders every overlay layer in the frame it asks for: modals, and dropdowns such as menus and confirms.
@@ -168,7 +172,8 @@ const closeModalWithConfirm = (layer: OverlayLayer): void => {
   // A click beside the modal closes what was opened from it first, such as a menu or a confirm.
   if (closeChildLayers(layer.id)) return
 
-  if (layer.autoclose || !modalComponentMap[layer.id]?.formRef?.hasChanges) {
+  // A dropdown is dismissed lightly, as a menu is, so only a modal asks while a form inside has unsaved changes.
+  if (layer.autoclose || !(hasLayerChanges(layer.id) || modalComponentMap[layer.id]?.formRef?.hasChanges)) {
     closeLayer(layer.id)
     return
   }
@@ -176,10 +181,10 @@ const closeModalWithConfirm = (layer: OverlayLayer): void => {
   closeConfirm?.()
 
   closeConfirm = toClose(openConfirm({
-    title: 'Are you sure want to close modal?',
-    description: 'Closing the modal will undo any changes',
+    title: getText('closeModalTitle'),
+    description: getText('closeModalDescription'),
     acceptSemanticType: SemanticType.WARNING,
-    acceptText: 'Close',
+    acceptText: getText('closeModalAccept'),
     onAccept() {
       closeLayer(layer.id)
     },

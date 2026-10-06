@@ -104,6 +104,7 @@ import WBottomSheet from 'eco-vue-js/dist/components/BottomSheet/WBottomSheet.vu
 | --- | --- | --- |
 | `toggle` | `{ unclickable: boolean; isTop?: boolean \| undefined; }` | Element that opens the sheet, rendered in place and again at the top of the sheet — `unclickable` is `true` for the one in place and `false` for the copy. |
 | `content` | — | Content of the sheet, which scrolls under the toggle. |
+| `footer` | — | Pinned at the bottom of the sheet, under the content that scrolls, such as a form's buttons. |
 
 <!-- @api-end -->
 

@@ -4,6 +4,7 @@ import {h, ref} from 'vue'
 
 import {Notify} from '@/utils/Notify'
 import {ApiError, ApiErrorCancel, isRequestResponse} from '@/utils/api'
+import {getText} from '@/utils/texts'
 
 import WUniformErrorMessage from '../WUniformErrorMessage.vue'
 
@@ -38,7 +39,7 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
 
     if (message && !partial) {
       if (!asyncGetter()) Notify.warn({
-        title: 'Form contains invalid data',
+        title: getText('invalidData'),
         caption: h(WUniformErrorMessage, {message}),
       })
 

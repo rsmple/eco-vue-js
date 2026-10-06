@@ -8,7 +8,7 @@ import {getCurrentInstance, provide} from 'vue'
 import {BASE_ZINDEX_MODAL, wBaseZIndex} from '@/utils/utils'
 
 import {wIsModal} from '../models/injection'
-import {setInstanceProvides, wOverlayFrame, wOverlayLayer} from '../models/overlayRegistry'
+import {setInstanceProvides, wOverlayFrame, wOverlayLayer, wOverlayRegions} from '../models/overlayRegistry'
 
 const props = defineProps<{
   /** Overlay layer the content belongs to. */
@@ -27,6 +27,8 @@ provide(wBaseZIndex, BASE_ZINDEX_MODAL)
 provide(wOverlayLayer, () => props.layer)
 // A dropdown layer's frame provides its own.
 provide(wOverlayFrame, 'modal')
+// The opener's areas, such as those of a dropdown it is in, belong to the opener's layer. A modal's content brings its own frame.
+provide(wOverlayRegions, null)
 
 if (props.modal) provide(wIsModal, true)
 </script>

@@ -64,7 +64,7 @@ Each call takes:
 
 A toast closes after 5 seconds. While the pointer is over the toasts, none of them close: their time stops and goes on from where it was once the pointer leaves. The same notification shown again within those 5 seconds doesn't stack: the one on screen stays, gets a counter, and its 5 seconds start over. Clicking the same failing button five times shows one error with a 5 on it.
 
-Toasts show in the top right corner, under the header. `position` on `WNotify` moves them to `top-center`, `bottom-right` or `bottom-center`; at the bottom the newest toast is closest to the edge.
+Toasts show in the top right corner, under the header. `position` on `WNotify` moves them to `top-center`, `bottom-right` or `bottom-center`; at the bottom the newest toast is closest to the edge. On phones every position shows at the top edge of the screen, over the header or a modal's title — the bottom holds the buttons of a modal, a sheet or a page.
 
 <NotifyPositionPlayground />
 
@@ -270,7 +270,7 @@ import WNotify from 'eco-vue-js/dist/components/Notify/WNotify.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `position` | `NotifyPosition` | `"top-right"` | Corner or edge of the screen the toasts show in. On top they sit under the header (`--header-height`); new toasts stack away from the edge. |
+| `position` | `NotifyPosition` | `"top-right"` | Corner or edge of the screen the toasts show in. On top they sit under the header (`--header-height`); new toasts stack away from the edge. On phones they always show at the top edge, over the header or a modal's title, clear of the buttons at the bottom and the fields under the header. |
 
 <!-- @api-end -->
 

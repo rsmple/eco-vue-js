@@ -1,7 +1,7 @@
 ---
 group: Recipes
 aside: false
-description: One WUniform form component split into WTabs, used as a step-by-step wizard to create an item, as tabs in a modal to edit it, and on a page where every field saves on its own — with a modal wrapper built from the state the form exposes.
+description: One WUniform form component split into WTabs, used as a step-by-step wizard to create an item, as tabs in a modal to edit it, and on a page where every field saves on its own — with its title and buttons in WModalWrapper, which the frame it opens in places.
 ---
 
 # Form in three modes
@@ -12,7 +12,7 @@ description: One WUniform form component split into WTabs, used as a step-by-ste
 
 | Mode | Props | What changes |
 | --- | --- | --- |
-| Create, in a modal | no `plantId` | The tabs become steps without buttons (`stepper`, `no-header`). Next checks the step's fields. The whole model is sent once, at the end (`full-payload`). |
+| Create, in a modal | no `plantId` | The tabs become steps without tab buttons (`stepper`, `no-header`), bringing their own title, progress line and Back, Next and Add plant (`stepper-controls`). Next checks the step's fields. The whole model is sent once, at the end (`full-payload`). |
 | Edit, in a modal | `plantId` | The tabs get their buttons. Only the changed fields are sent, on Save. |
 | Edit, on a page | `plantId`, `async` | Every tab is shown under its title (`flat`). Each field saves when it changes. |
 
@@ -21,9 +21,9 @@ The pieces:
 | Piece | What it is |
 | --- | --- |
 | A model | `createRestModelApi` with an item query that loads the plant, an `update` action on it, and a `create` action on the list. |
-| The form | A `WUniform` that loads the model with `useQueryFn`, around a `WTabs`. It exposes the step, the title and the submit state. |
-| A modal | `WModalWrapper` with the form inside. It builds the title, the progress line and the buttons from what the form exposes. |
-| The page | The form with `async`, and nothing around it. |
+| The form | A `WUniform` that loads the model with `useQueryFn`, around a `WTabs`, inside a `WModalWrapper` that holds the title and the buttons when editing. |
+| The modal | The form itself, opened with `Modal.add`. The modal's frame places the title and the buttons. |
+| The page | The form with `async`. Outside an overlay, `WModalWrapper` lays it out in the flow of the page, without a title or buttons. |
 
 <!-- @example recipes/plant-form/PlantEditor -->
 
@@ -71,7 +71,7 @@ The pieces:
 <script lang="ts" setup>
 import type {Plant} from '../plant-list/models/Plant'
 
-import {defineAsyncComponent, markRaw, ref} from 'vue'
+import {markRaw, ref} from 'vue'
 
 import {Modal} from 'eco-vue-js/dist/utils/Modal'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
@@ -86,15 +86,13 @@ import PlantForm from './PlantForm.vue'
 
 import {plantModelApi} from '../plant-list/api/Plant'
 
-const PlantFormModal = defineAsyncComponent(() => import('./PlantFormModal.vue'))
-
 const queryPlants = plantModelApi.list.use()
 
 const plantId = ref<number | undefined>(1)
 
-/** Edits the plant, or walks through adding one when there is no id. A new plant opens on the page. */
+/** Opens the same form as a modal: it edits the plant, or walks through adding one when there is no id. A new plant opens on the page. */
 const openModal = (id?: number) => {
-  Modal.add(markRaw(PlantFormModal), {
+  Modal.add(markRaw(PlantForm), {
     plantId: id,
     onSaved: (plant: Plant) => plantId.value = plant.id,
   })
@@ -152,143 +150,117 @@ The tasks are an array, edited as a nested form with one row per item: `modelVal
 - `init-data` makes it keep its own copy of the tasks. Its `api-method` only returns the value, and `@success` writes it into the plant's model, which then saves the field as any other.
 - In a modal or a wizard, both are left unset, and the tasks are a part of the plant's form.
 
-The form exposes what a wrapper needs to draw around it: whether it creates, the step state from the tabs' `update:first`, `update:last`, `update:current-title` and `update:progress`, `submitting` and `hasChanges`, and `submit`, `next` and `previous`.
+What the form shows outside its fields comes from two places:
+
+- Creating, the stepper brings it with `stepper-controls`: the step's title, a progress line under it, and Close or Back with Next or Add plant (`submit-text`). Add plant checks the last step and submits the `WUniform` around it.
+- Editing, `WModalWrapper` holds the plant's name as the title, and Cancel and Save, built from the `WUniform`'s template ref.
+- With `async`, on a page, there are neither: each field saves on its own.
+
+The form does not know where it is shown. The frame it opens in — a modal, or a dropdown and a bottom sheet for a small form — takes the title and the buttons from `WModalWrapper` and places them, pads the fields, and scrolls them between. On a page there is no frame, and `WModalWrapper` lays everything out in place. The `WUniform` tells the frame it is saving, which keeps it open, and that it has unsaved changes, so a modal asks before closing.
 
 <!-- @source docs/examples/recipes/plant-form/PlantForm.vue PlantForm.vue -->
 
 ```vue [PlantForm.vue]
 <template>
-  <WUniform
-    ref="form"
-    :use-query-fn="plantModelApi.item.use"
-    :query-params="plantId ?? 0"
-    :init-data="getModel"
-    :api-method="save"
-    :full-payload="!isId(plantId)"
-    :async="async"
-    :readonly="readonly"
-    @success="$emit('saved', $event)"
+  <!--
+    The form brings its own title and buttons: the frame it opens in — a modal, a dropdown, a bottom sheet — places them. On a page, there are none.
+    Creating, the stepper brings its own instead: the step's title, the progress, and Back, Next and Add plant.
+  -->
+  <WModalWrapper
+    maximized
+    class="sm:w-modal-wrapper-w-160"
   >
-    <template #default="scope">
-      <!-- One set of tabs, three layouts: steps when creating, tabs when editing, every tab under its title on a page. -->
-      <WTabs
-        ref="tabs"
-        :stepper="isCreate"
-        :no-header="isCreate"
-        :flat="async"
-        @update:first="first = $event"
-        @update:last="last = $event"
-        @update:current-title="currentTitle = $event"
-        @update:progress="progress = $event"
-      >
-        <WTabsItem
-          title="Plant"
-          name="plant"
+    <template
+      v-if="!async && !isCreate"
+      #title
+    >
+      {{ formRef?.modelValue.name || 'Plant' }}
+    </template>
+
+    <WUniform
+      ref="form"
+      :use-query-fn="plantModelApi.item.use"
+      :query-params="plantId ?? 0"
+      :init-data="getModel"
+      :api-method="save"
+      :full-payload="!isId(plantId)"
+      :async="async"
+      :readonly="readonly"
+      @success="$emit('saved', $event); async || $emit('close:modal')"
+    >
+      <template #default="scope">
+        <!-- One set of tabs, three layouts: steps when creating, tabs when editing, every tab under its title on a page. -->
+        <WTabs
+          :stepper="isCreate"
+          :no-header="isCreate"
+          :flat="async"
+          submit-text="Add plant"
+          stepper-controls
         >
-          <div class="sm-not:px---inner-margin py-2">
-            <WUniform
-              v-bind="scope"
-              field="name"
-              title="Name"
-              required
-            >
-              <template #field="scopeField">
-                <WInput
-                  v-bind="scopeField"
-                  :max-length="100"
-                  :autofocus="isCreate"
-                  required
-                />
-              </template>
-            </WUniform>
-
-            <WUniform
-              v-bind="scope"
-              field="species"
-              title="Species"
-              required
-            >
-              <template #field="scopeField">
-                <WInput
-                  v-bind="scopeField"
-                  :max-length="100"
-                  placeholder="Monstera deliciosa"
-                  required
-                />
-              </template>
-            </WUniform>
-
-            <WUniform
-              v-bind="scope"
-              field="kind"
-              title="Kind"
-              required
-            >
-              <template #field="scopeField">
-                <WButtonGroup
-                  v-bind="scopeField"
-                  :list="Object.values(Kind)"
-                  class="mb-4"
-                >
-                  <template #option="{option}">
-                    <component
-                      :is="kindDisplay[option].icon"
-                      class="square-[1.25em]"
-                    />
-                    {{ kindDisplay[option].name }}
-                  </template>
-                </WButtonGroup>
-              </template>
-            </WUniform>
-
-            <WUniform
-              v-bind="scope"
-              field="height"
-              title="Height, cm"
-              :validate="validatePositive"
-            >
-              <template #field="scopeField">
-                <WInput
-                  v-bind="scopeField"
-                  type="number"
-                />
-              </template>
-            </WUniform>
-          </div>
-        </WTabsItem>
-
-        <WTabsItem
-          title="Care"
-          name="care"
-        >
-          <div class="sm-not:px---inner-margin py-2">
-            <WUniform
-              v-bind="scope"
-              field="light"
-              title="Light"
-            >
-              <template #field="scopeField">
-                <WButtonGroup
-                  v-bind="scopeField"
-                  :list="Object.values(Light)"
-                  class="mb-4"
-                >
-                  <template #option="{option}">
-                    <component
-                      :is="lightDisplay[option].icon"
-                      class="square-[1.25em]"
-                    />
-                    {{ lightDisplay[option].name }}
-                  </template>
-                </WButtonGroup>
-              </template>
-            </WUniform>
-
-            <div class="grid grid-cols-2 gap-4">
+          <WTabsItem
+            title="Plant"
+            name="plant"
+          >
+            <div class="py-2">
               <WUniform
                 v-bind="scope"
-                field="water"
-                title="Water per watering, ml"
+                field="name"
+                title="Name"
+                required
+              >
+                <template #field="scopeField">
+                  <WInput
+                    v-bind="scopeField"
+                    :max-length="100"
+                    :autofocus="isCreate"
+                    required
+                  />
+                </template>
+              </WUniform>
+
+              <WUniform
+                v-bind="scope"
+                field="species"
+                title="Species"
+                required
+              >
+                <template #field="scopeField">
+                  <WInput
+                    v-bind="scopeField"
+                    :max-length="100"
+                    placeholder="Monstera deliciosa"
+                    required
+                  />
+                </template>
+              </WUniform>
+
+              <WUniform
+                v-bind="scope"
+                field="kind"
+                title="Kind"
+                required
+              >
+                <template #field="scopeField">
+                  <WButtonGroup
+                    v-bind="scopeField"
+                    :list="Object.values(Kind)"
+                    wrap
+                  >
+                    <template #option="{option}">
+                      <component
+                        :is="kindDisplay[option].icon"
+                        class="square-[1.25em]"
+                      />
+                      {{ kindDisplay[option].name }}
+                    </template>
+                  </WButtonGroup>
+                </template>
+              </WUniform>
+
+              <WUniform
+                v-bind="scope"
+                field="height"
+                title="Height, cm"
                 :validate="validatePositive"
               >
                 <template #field="scopeField">
@@ -298,150 +270,223 @@ The form exposes what a wrapper needs to draw around it: whether it creates, the
                   />
                 </template>
               </WUniform>
+            </div>
+          </WTabsItem>
+
+          <WTabsItem
+            title="Care"
+            name="care"
+          >
+            <div class="py-2">
+              <WInfoCard class="mb-6">
+                Light and watering are for a typical room — set them for where the plant stands.
+              </WInfoCard>
 
               <WUniform
                 v-bind="scope"
-                field="humidity"
-                title="Humidity, %"
-                :validate="validatePercent"
+                field="light"
+                title="Light"
               >
                 <template #field="scopeField">
-                  <WInput
+                  <WButtonGroup
                     v-bind="scopeField"
-                    type="number"
+                    :list="Object.values(Light)"
+                    wrap
+                  >
+                    <template #option="{option}">
+                      <component
+                        :is="lightDisplay[option].icon"
+                        class="square-[1.25em]"
+                      />
+                      {{ lightDisplay[option].name }}
+                    </template>
+                  </WButtonGroup>
+                </template>
+              </WUniform>
+
+              <div class="grid grid-cols-2 gap-4">
+                <WUniform
+                  v-bind="scope"
+                  field="water"
+                  title="Water per watering, ml"
+                  :validate="validatePositive"
+                >
+                  <template #field="scopeField">
+                    <WInput
+                      v-bind="scopeField"
+                      type="number"
+                    />
+                  </template>
+                </WUniform>
+
+                <WUniform
+                  v-bind="scope"
+                  field="humidity"
+                  title="Humidity, %"
+                  :validate="validatePercent"
+                >
+                  <template #field="scopeField">
+                    <WInput
+                      v-bind="scopeField"
+                      type="number"
+                    />
+                  </template>
+                </WUniform>
+              </div>
+
+              <WUniform
+                v-bind="scope"
+                field="caretaker"
+                title="Caretaker"
+                required
+              >
+                <template #field="scopeField">
+                  <WSelectSingle
+                    v-bind="scopeField"
+                    :options="gardeners"
+                    :value-getter="item => item.id"
+                    :search-fn="(item, search) => item.name.toLowerCase().includes(search)"
+                    :option-component="markRaw(OptionGardener)"
+                    placeholder="Search caretakers"
+                    required
                   />
                 </template>
               </WUniform>
             </div>
+          </WTabsItem>
 
-            <WUniform
-              v-bind="scope"
-              field="caretaker"
-              title="Caretaker"
-              required
-            >
-              <template #field="scopeField">
-                <WSelectSingle
-                  v-bind="scopeField"
-                  :options="gardeners"
-                  :value-getter="item => item.id"
-                  :search-fn="(item, search) => item.name.toLowerCase().includes(search)"
-                  :option-component="markRaw(OptionGardener)"
-                  placeholder="Search caretakers"
-                  required
-                />
-              </template>
-            </WUniform>
-          </div>
-        </WTabsItem>
+          <WTabsItem
+            title="Tasks"
+            name="tasks"
+          >
+            <div class="py-2">
+              <!--
+                The task list is saved as a whole. On the page it is a form of its own, with Save and Cancel,
+                so a half-typed task is not sent; elsewhere it is a part of the form it is in.
+              -->
+              <WUniform
+                v-bind="{...scope, async: false}"
+                field="tasks"
+                :init-data="async ? copyTasks : undefined"
+                :api-method="async ? (value => value as Task[]) : undefined"
+                full-payload
+                @success="scope.updateModelValueInner($event, ['tasks'] as const)"
+              >
+                <template #default="scopeTasks">
+                  <WUniform
+                    v-for="(item, key, index) in scopeTasks.modelValueList"
+                    :key="key"
+                    v-bind="scopeTasks"
+                    :field="index"
+                  >
+                    <template #default="scopeTask">
+                      <div class="grid grid-cols-[1fr_10rem_auto] items-end gap-2">
+                        <WUniform
+                          v-bind="scopeTask"
+                          field="title"
+                          title="Task"
+                          required
+                        >
+                          <template #field="scopeField">
+                            <WInput
+                              v-bind="scopeField"
+                              :hide-title="index !== 0"
+                              required
+                            />
+                          </template>
+                        </WUniform>
 
-        <WTabsItem
-          title="Tasks"
-          name="tasks"
-        >
-          <div class="sm-not:px---inner-margin py-2">
-            <!--
-              The task list is saved as a whole. On the page it is a form of its own, with Save and Cancel,
-              so a half-typed task is not sent; elsewhere it is a part of the form it is in.
-            -->
-            <WUniform
-              v-bind="{...scope, async: false}"
-              field="tasks"
-              :init-data="async ? copyTasks : undefined"
-              :api-method="async ? (value => value as Task[]) : undefined"
-              full-payload
-              @success="scope.updateModelValueInner($event, ['tasks'] as const)"
-            >
-              <template #default="scopeTasks">
-                <WUniform
-                  v-for="(item, key, index) in scopeTasks.modelValueList"
-                  :key="key"
-                  v-bind="scopeTasks"
-                  :field="index"
-                >
-                  <template #default="scopeTask">
-                    <div class="grid grid-cols-[1fr_10rem_auto] items-end gap-2">
-                      <WUniform
-                        v-bind="scopeTask"
-                        field="title"
-                        title="Task"
-                        required
-                      >
-                        <template #field="scopeField">
-                          <WInput
-                            v-bind="scopeField"
-                            :hide-title="index !== 0"
-                            required
-                          />
-                        </template>
-                      </WUniform>
+                        <WUniform
+                          v-bind="scopeTask"
+                          field="due"
+                          title="Due"
+                          required
+                        >
+                          <template #field="scopeField">
+                            <WInputDate
+                              v-bind="scopeField"
+                              :hide-title="index !== 0"
+                              required
+                            />
+                          </template>
+                        </WUniform>
 
-                      <WUniform
-                        v-bind="scopeTask"
-                        field="due"
-                        title="Due"
-                        required
-                      >
-                        <template #field="scopeField">
-                          <WInputDate
-                            v-bind="scopeField"
-                            :hide-title="index !== 0"
-                            required
-                          />
-                        </template>
-                      </WUniform>
+                        <WButton
+                          :semantic-type="SemanticType.SECONDARY"
+                          :disabled="scopeTasks.readonly || scopeTasks.submitting || scopeTasks.skeleton"
+                          class="mb-4 w-(--w-input-height)"
+                          @click="scopeTasks.unselect(item)"
+                        >
+                          <IconClose class="square-4" />
+                        </WButton>
+                      </div>
+                    </template>
+                  </WUniform>
 
+                  <div class="flex flex-wrap gap-4">
+                    <WButton
+                      v-if="!scopeTasks.readonly"
+                      :semantic-type="SemanticType.SECONDARY"
+                      :disabled="scopeTasks.skeleton || scopeTasks.submitting"
+                      @click="scopeTasks.select({title: '', due: getStartOfDay()})"
+                    >
+                      <IconAdd class="square-4" /> Add task
+                    </WButton>
+
+                    <template v-if="async && scopeTasks.hasChanges">
                       <WButton
                         :semantic-type="SemanticType.SECONDARY"
-                        :disabled="scopeTasks.readonly || scopeTasks.submitting || scopeTasks.skeleton"
-                        class="mb-4 w-(--w-input-height)"
-                        @click="scopeTasks.unselect(item)"
+                        :disabled="scopeTasks.submitting"
+                        class="ml-auto"
+                        @click="scopeTasks.initModel()"
                       >
-                        <IconClose class="square-4" />
+                        Cancel
                       </WButton>
-                    </div>
-                  </template>
-                </WUniform>
 
-                <div class="flex flex-wrap gap-4">
-                  <WButton
-                    v-if="!scopeTasks.readonly"
-                    :semantic-type="SemanticType.SECONDARY"
-                    :disabled="scopeTasks.skeleton || scopeTasks.submitting"
-                    @click="scopeTasks.select({title: '', due: getStartOfDay()})"
-                  >
-                    <IconAdd class="square-4" /> Add task
-                  </WButton>
+                      <WButton
+                        :loading="scopeTasks.submitting"
+                        @click="scopeTasks.submit?.()"
+                      >
+                        Save tasks
+                      </WButton>
+                    </template>
+                  </div>
+                </template>
+              </WUniform>
+            </div>
+          </WTabsItem>
+        </WTabs>
+      </template>
+    </WUniform>
 
-                  <template v-if="async && scopeTasks.hasChanges">
-                    <WButton
-                      :semantic-type="SemanticType.SECONDARY"
-                      :disabled="scopeTasks.submitting"
-                      class="ml-auto"
-                      @click="scopeTasks.initModel()"
-                    >
-                      Cancel
-                    </WButton>
+    <!-- Editing gets Cancel and Save on every tab. -->
+    <template
+      v-if="!async && !isCreate"
+      #actions
+    >
+      <WButton
+        :disabled="formRef?.submitting"
+        :semantic-type="SemanticType.SECONDARY"
+        class="w-full"
+        @click="$emit('close:modal')"
+      >
+        {{ formRef?.hasChanges ? 'Cancel' : 'Close' }}
+      </WButton>
 
-                    <WButton
-                      :loading="scopeTasks.submitting"
-                      @click="scopeTasks.submit?.()"
-                    >
-                      Save tasks
-                    </WButton>
-                  </template>
-                </div>
-              </template>
-            </WUniform>
-          </div>
-        </WTabsItem>
-      </WTabs>
+      <WButton
+        :disabled="!formRef?.hasChanges"
+        :loading="formRef?.submitting"
+        class="w-full"
+        @click="formRef?.submit?.()"
+      >
+        Save
+      </WButton>
     </template>
-  </WUniform>
+  </WModalWrapper>
 </template>
 
 <script lang="ts" setup>
-import {computed, markRaw, ref, useTemplateRef} from 'vue'
+import {computed, markRaw, useTemplateRef} from 'vue'
 
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 import {getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
@@ -449,8 +494,10 @@ import {isId} from 'eco-vue-js/dist/utils/utils'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
+import WInfoCard from 'eco-vue-js/dist/components/InfoCard/WInfoCard.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
+import WModalWrapper from 'eco-vue-js/dist/components/Modal/WModalWrapper.vue'
 import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 import WTabsItem from 'eco-vue-js/dist/components/Tabs/WTabsItem.vue'
@@ -480,17 +527,12 @@ const props = defineProps<{
 
 defineEmits<{
   (e: 'saved', value: Plant): void
+  (e: 'close:modal'): void
 }>()
 
 const formRef = useTemplateRef<ComponentInstance<typeof WUniform<PlantFormData, number, undefined, Plant, PlantFormData>>>('form')
-const tabsRef = useTemplateRef('tabs')
 
 const isCreate = computed(() => !props.async && !isId(props.plantId))
-
-const first = ref(true)
-const last = ref(false)
-const currentTitle = ref<string>()
-const progress = ref(0)
 
 /** Builds the editable model from the loaded plant. It gets `{}` until the plant loads, and when creating. */
 const getModel = (plant: Partial<Plant>): PlantFormData => ({
@@ -517,137 +559,16 @@ const save = (payload: Partial<PlantFormData>) => {
 const validatePositive = (value: unknown) => typeof value === 'number' && value < 0 ? 'Must not be negative' : undefined
 
 const validatePercent = (value: unknown) => typeof value === 'number' && (value < 0 || value > 100) ? 'Must be from 0 to 100' : undefined
-
-// What a wrapper — a modal, a page header — needs to render the title, progress and buttons around the form.
-defineExpose({
-  isCreate,
-  first,
-  last,
-  currentTitle,
-  progress,
-  name: computed(() => formRef.value?.modelValue.name),
-  submitting: computed(() => formRef.value?.submitting ?? false),
-  hasChanges: computed(() => formRef.value?.hasChanges ?? false),
-  submit: () => formRef.value?.submit?.(),
-  next: () => tabsRef.value?.next(),
-  previous: () => tabsRef.value?.previous(),
-})
 </script>
 ```
 
 <!-- @source-end -->
 
-### The modal
+### Opening it
 
-The modal holds no state of its own. It reads the form through a template ref:
+The form is the modal: `Modal.add(markRaw(PlantForm), {plantId, onSaved})`. `saved` passes the saved plant back to whoever opened it — here it opens the new plant on the page — and after a save in an overlay the form emits `close:modal`. Load it with `defineAsyncComponent` where it is only opened, so its code is fetched on first open.
 
-- The title is the step's title when creating, and the plant's name when editing. A progress line goes under it while creating.
-- The buttons are Close or Back on the left, and Next, Add plant or Save on the right.
-- The form is exposed as `formRef`. A modal reads `formRef.hasChanges` and asks before it closes with unsaved changes.
-
-`onSaved` passes the saved plant back to whoever opened the modal. Here it opens the new plant on the page. Open the modal with `Modal.add`, and load it with `defineAsyncComponent`, so its code is fetched on first open.
-
-`WModalStepper` is the shorter way to a wizard in a modal, but it takes the steps in its own slot. Here the steps belong to the form, which also renders them as tabs and on a page, so the modal is built from `WModalWrapper`.
-
-<!-- @source docs/examples/recipes/plant-form/PlantFormModal.vue PlantFormModal.vue -->
-
-```vue [PlantFormModal.vue]
-<template>
-  <WModalWrapper
-    maximized
-    class="sm:w-modal-wrapper-w-160"
-  >
-    <template #title>
-      {{ form?.isCreate ? form.currentTitle : form?.name || 'Plant' }}
-    </template>
-
-    <template
-      v-if="form?.isCreate"
-      #subtitle
-    >
-      <WProgress :model-value="form.progress" />
-    </template>
-
-    <PlantForm
-      ref="form"
-      :plant-id="plantId"
-      @saved="onSaved?.($event); $emit('close:modal')"
-    />
-
-    <!-- Steps get Back and Next until the last one; editing gets Cancel and Save on every tab. -->
-    <template #actions>
-      <WButton
-        v-if="!form?.isCreate || form.first"
-        :disabled="form?.submitting"
-        :semantic-type="SemanticType.SECONDARY"
-        class="w-full"
-        @click="$emit('close:modal')"
-      >
-        {{ form?.hasChanges ? 'Cancel' : 'Close' }}
-      </WButton>
-
-      <WButton
-        v-else
-        :disabled="form.submitting"
-        :semantic-type="SemanticType.SECONDARY"
-        class="w-full"
-        @click="form.previous()"
-      >
-        Back
-      </WButton>
-
-      <WButton
-        v-if="form?.isCreate && !form.last"
-        class="w-full"
-        @click="form.next()"
-      >
-        Next
-      </WButton>
-
-      <WButton
-        v-else
-        :disabled="!form?.isCreate && !form?.hasChanges"
-        :loading="form?.submitting"
-        class="w-full"
-        @click="form?.submit()"
-      >
-        {{ form?.isCreate ? 'Add plant' : 'Save' }}
-      </WButton>
-    </template>
-  </WModalWrapper>
-</template>
-
-<script lang="ts" setup>
-import type {Plant} from '../plant-list/models/Plant'
-
-import {useTemplateRef} from 'vue'
-
-import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
-
-import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
-import WModalWrapper from 'eco-vue-js/dist/components/Modal/WModalWrapper.vue'
-import WProgress from 'eco-vue-js/dist/components/Progress/WProgress.vue'
-
-import PlantForm from './PlantForm.vue'
-
-defineProps<{
-  /** The plant to edit. Without it, the modal walks through creating one. */
-  plantId?: number
-  onSaved?: (plant: Plant) => void
-}>()
-
-defineEmits<{
-  (e: 'close:modal'): void
-}>()
-
-const form = useTemplateRef('form')
-
-// The modal reads `formRef.hasChanges` to ask before it closes with unsaved changes.
-defineExpose({formRef: form})
-</script>
-```
-
-<!-- @source-end -->
+The steps belong to the form, which also renders them as tabs and on a page, so the form keeps them in its own `WTabs` rather than in a modal's. With `stepper-controls` the stepper hands its title, progress and buttons to the frame only while it is one; as tabs and on a page it has none.
 
 ### The page
 
@@ -656,7 +577,7 @@ On a page, the form is all there is: `<PlantForm :plant-id="id" async />`. Every
 ## Why it is built this way
 
 - **One set of fields.** A field, its validation and its control are written once. The modes differ only in layout and in when the model is sent, and both come from props on `WTabs` and `WUniform`.
-- **The wrapper reads the form.** The form does not know whether it is in a modal, so it exposes its state instead of rendering buttons. A page header or a side panel can be built from the same state.
+- **The frame places the form's parts.** The form renders its title and buttons once, in `WModalWrapper`, and does not know where it is shown. A modal, a dropdown, a bottom sheet and a page each put them where their layout needs, with their own padding.
 - **The cache is the shared state.** The form loads the plant with the item query, and the model's actions write to it. Every open view of the plant stays current without passing data around.
 - **The form edits its own shape.** `initData` turns the API's plant into what the controls need, and the payload is shaped back the way the API takes it.
 
@@ -666,4 +587,4 @@ On a page, the form is all there is: `<PlantForm :plant-id="id" async />`. Every
 - **Save in the middle of the wizard**: `requireSave` on a step submits the form before moving past it, e.g. when a later step needs the saved id. After that save, the form updates the item it created: build the id from `plantId` or the saved model's id, and pass `full-payload` only while neither exists.
 - **Side tabs**: `side` on `WTabs` puts the tab buttons in a column, for a form with many tabs in a wide modal.
 - **Read-only users**: pass `readonly` to the form, or provide it for the whole page with `useProvideReadonly`.
-- **From the list**: a row menu item that opens `PlantFormModal` with the row's id edits the plant from [the list](/recipes/list-with-fields), and the list's row updates from the cache.
+- **From the list**: a row menu item that opens `PlantForm` with the row's id edits the plant from [the list](/recipes/list-with-fields), and the list's row updates from the cache.

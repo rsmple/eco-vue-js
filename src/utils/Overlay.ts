@@ -7,6 +7,7 @@ import {type Component, getCurrentInstance, inject, onScopeDispose, watch} from 
 
 import {
   type OpenContext,
+  type OverlayFrameOptions,
   type OverlayLayer,
   closeLayer,
   getInstanceProvides,
@@ -15,10 +16,14 @@ import {
   openModal,
   openWithCallback,
   setLayerBusy,
+  setLayerChanges,
   toClose,
   wOverlayFrame,
   wOverlayLayer,
+  wOverlayRegions,
 } from '@/components/Modal/models/overlayRegistry'
+
+export type {OverlayFrameOptions}
 
 /** Element, range or virtual element — such as one made with `createPointAnchor` — a dropdown opens at. */
 export type OverlayAnchor = DropdownProps['parentElement']
@@ -139,19 +144,58 @@ export const useOverlay = () => {
 
 /** Keeps the layer the component is in open on Escape, outside clicks, swipes and a detached anchor while `source` is `true` — such as while an action runs. Called in setup. */
 export const useLayerBusy = (source: () => boolean): void => {
+  useLayerFlag(setLayerBusy, source)
+}
+
+/**
+ * Asks before the modal the component is in closes with its close button while `source` is `true`, such as while a form has unsaved changes.
+ * A dropdown is dismissed without asking, as a menu is. A form with `api-method` does it on its own. Called in setup.
+ */
+export const useLayerChanges = (source: () => boolean): void => {
+  useLayerFlag(setLayerChanges, source)
+}
+
+/**
+ * Asks the frame the component is in — a modal, a dropdown or a bottom sheet — to look a certain way while it is mounted, such as to pad the content like its title and buttons.
+ * The frame takes what applies to it; the latest component to ask counts. Outside a frame it does nothing. WModalWrapper does it on its own. Called in setup.
+ */
+export const useOverlayFrameOptions = (getOptions: () => OverlayFrameOptions): void => {
+  const regions = inject(wOverlayRegions, null)
+
+  if (!regions) return
+
+  const source = Symbol('options')
+
+  regions.setOptions(source, getOptions)
+
+  onScopeDispose(() => regions.setOptions(source, null))
+}
+
+const useLayerFlag = (set: (id: number, source: symbol, value: boolean) => void, source: () => boolean): void => {
   const getLayer = inject(wOverlayLayer, () => null)
+  const key = Symbol('source')
 
   watch(source, value => {
     const id = getLayer()
 
-    if (id !== null) setLayerBusy(id, value)
+    if (id !== null) set(id, key, value)
   }, {immediate: true})
 
   onScopeDispose(() => {
     const id = getLayer()
 
-    if (id !== null) setLayerBusy(id, false)
+    if (id !== null) set(id, key, false)
   })
+}
+
+/**
+ * Closes the layer the component is in, as its content emitting `close:modal` does — without asking about unsaved changes, such as from its own Cancel button
+ * or once a filter is applied. `null` outside overlays. Called in setup.
+ */
+export const useOverlayClose = (): (() => void) | null => {
+  const id = inject(wOverlayLayer, () => null)()
+
+  return id === null ? null : () => closeLayer(id)
 }
 
 /** Frame the component is shown in, `null` outside overlays. Called in setup. */

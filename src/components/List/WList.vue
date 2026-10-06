@@ -217,7 +217,7 @@ const props = withDefaults(
     bulkDisableMessage?: string
     /** Singular noun in the "Selected N items" counter of the selection bar. */
     selectionTitle: string
-    /** Actions in the selection bar while items are selected. Each gets the selection count and a getter of the query params narrowed to the selection. From the third on they move into a More menu. */
+    /** Actions in the selection bar while items are selected. Each gets the selection count and a getter of the query params narrowed to the selection. The ones that do not fit the bar move into a More menu. */
     bulk?: BulkComponent<QueryParams>[]
     /** Actions in the selection bar while nothing is selected, with the current query params. */
     action?: ActionComponent<QueryParams>[]

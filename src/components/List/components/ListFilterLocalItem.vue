@@ -1,7 +1,8 @@
 <template>
+  <!-- A small form titled by the filter's name: the frame pads it, and an embedded select or option list inside reaches its edges. -->
   <WDropdownAdaptive
     :is-open="isOpen"
-    frame-class="max-w-96 max-h-80 w-dropdown-frame"
+    dialog
     @close="$emit('close')"
   >
     <template #toggle>
@@ -44,10 +45,7 @@
     </template>
 
     <template #content>
-      <div
-        class="text-start font-normal"
-        :class="meta.embedded ? undefined : 'p-4 sm:w-96'"
-      >
+      <div class="text-start font-normal">
         <component
           :is="item[0].default"
           v-if="Array.isArray(item)"
@@ -73,13 +71,14 @@
 import type {FilterComponent} from '../types'
 import type {UniformScope} from '@/components/Uniform/types'
 
-import {computed} from 'vue'
+import {computed, provide} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
 import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconClose from '@/assets/icons/IconClose.svg?component'
 
+import {wCloseOverlayOnPick} from '@/components/Select/models/useCloseOnPick'
 import {SemanticType} from '@/utils/SemanticType'
 
 import {getMetaValue} from '../models/utils'
@@ -96,6 +95,9 @@ defineEmits<{
   (e: 'close'): void
   (e: 'remove'): void
 }>()
+
+// A filter applies as it changes, so a pick in an embedded single select inside is done with it, and closes it.
+provide(wCloseOverlayOnPick, true)
 
 const meta = computed(() => Array.isArray(props.item) ? props.item[0].meta : props.item.meta)
 

@@ -73,6 +73,7 @@ import {computed, toRef, useTemplateRef, watch} from 'vue'
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 
 import {useClearValue} from './models/useClearValue'
+import {useCloseOnPick} from './models/useCloseOnPick'
 
 type EmitType = AllowClear extends true ? Model | ClearValue : NonNullable<Model>
 
@@ -104,8 +105,12 @@ const getClearValue = useClearValue(props)
 
 const arrayValue = computed<Model[]>(() => props.modelValue ? [props.modelValue] : [])
 
+const closeOnPick = useCloseOnPick(() => props.embedded ?? false, () => selectComponentRef.value?.close())
+
 const updateModelValue = (value: Model | ClearValue, data: Data | undefined): void => {
   emit('update:model-value', value as EmitType, data)
+
+  closeOnPick()
 }
 
 const blur = () => {
