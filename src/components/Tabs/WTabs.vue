@@ -187,6 +187,7 @@ import {wUniformStepperController} from '@/components/Uniform/utils/injection'
 import {Notify} from '@/utils/Notify'
 import {useOverlayClose, useOverlayFrame} from '@/utils/Overlay'
 import {useIsMobile} from '@/utils/mobile'
+import {getText} from '@/utils/texts'
 import {debounce, getHasScrollbar, getPropValue, throttle, unwrapSlots} from '@/utils/utils'
 
 import TabItem from './components/TabItem.vue'
@@ -386,7 +387,7 @@ const checkTab = (index: number, update: boolean): boolean => {
   const errorMessage = update ? validate(index) : validateIfNoError(index)
 
   if (errorMessage) {
-    Notify.warn({title: 'Form contains invalid values', caption: errorMessage.length < 200 ? errorMessage : undefined})
+    Notify.warn({title: getText('invalidData'), caption: errorMessage.length < 200 ? errorMessage : undefined})
 
     return false
   }
@@ -395,7 +396,7 @@ const checkTab = (index: number, update: boolean): boolean => {
   const message = props.stepper && key !== undefined ? tabItemRefByName.value[key]?.validate() : undefined
 
   if (message) {
-    Notify.warn({title: 'Form contains invalid data', caption: h(WUniformErrorMessage, {message})})
+    Notify.warn({title: getText('invalidData'), caption: h(WUniformErrorMessage, {message})})
 
     return false
   }
@@ -433,7 +434,9 @@ const stepperButtons = computed(() => ({
   last: last.value,
   // Only the stepper the frame shows closes it; one inside, such as in a step, goes back no further than its first step.
   closable: isFramed && closeOverlay !== null,
-  submitting: stepperController?.submitting() ?? false,
+  hasChanges: hasChanges.value || (stepperController?.hasChanges() ?? false),
+  submitting: props.submitting || (stepperController?.submitting() ?? false),
+  disabledNext: props.disabledNext ?? false,
   submitText: props.submitText,
   onPrevious: previous,
   onNext: () => next(),

@@ -93,6 +93,23 @@ import WTooltipContainer from 'eco-vue-js/dist/components/Tooltip/WTooltipContai
 </script>
 ```
 
+## Texts
+
+A few texts the components show on their own are in English: the Back, Next, Close, Cancel and submit buttons of a stepper, a confirm's Cancel and Accept, the question before a modal with unsaved changes closes, and the warning about invalid fields. Replace them once, before the app mounts. A getter is read as the text renders, so a translation follows the locale:
+
+```ts
+import {setTexts} from 'eco-vue-js/dist/utils/texts'
+
+setTexts({
+  back: () => i18n.global.t('modal.back'),
+  next: () => i18n.global.t('modal.next'),
+  close: () => i18n.global.t('modal.close'),
+  cancel: () => i18n.global.t('modal.cancel'),
+})
+```
+
+A prop such as `submitText` or a confirm's `acceptText` still names its own button.
+
 ## Importing
 
 Import each component, utility and icon by its own path — there is no barrel import:

@@ -32,7 +32,7 @@
         class="w-full"
         @click="$emit('close:modal')"
       >
-        Close
+        {{ getText('close') }}
       </WButton>
 
       <WButton
@@ -42,7 +42,7 @@
         class="w-full"
         @click="tabsStepperRef?.previous()"
       >
-        Back
+        {{ getText('back') }}
       </WButton>
 
       <WButton
@@ -53,7 +53,7 @@
         class="w-full"
         @click="$emit('submit')"
       >
-        {{ submitText ?? 'Submit' }}
+        {{ submitText ?? getText('submit') }}
       </WButton>
 
       <WButton
@@ -64,13 +64,14 @@
         class="w-full"
         @click="tabsStepperRef?.next()"
       >
-        Next
+        {{ getText('next') }}
       </WButton>
     </template>
   </WModalWrapper>
 </template>
 
 <script lang="ts" setup>
+// Deprecated: a WModalWrapper around a stepper WTabs with `stepperControls` does the same, with Cancel, the form's submit and texts from `setTexts`.
 import {ref, useTemplateRef} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
@@ -79,6 +80,7 @@ import WProgress from '@/components/Progress/WProgress.vue'
 import WTabs from '@/components/Tabs/WTabs.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {getText} from '@/utils/texts'
 
 defineProps<{
   /** Shows a spinner in the Next or Submit button and disables Back and Close, e.g. while the form submits. */

@@ -568,7 +568,7 @@ const validatePercent = (value: unknown) => typeof value === 'number' && (value 
 
 The form is the modal: `Modal.add(markRaw(PlantForm), {plantId, onSaved})`. `saved` passes the saved plant back to whoever opened it — here it opens the new plant on the page — and after a save in an overlay the form emits `close:modal`. Load it with `defineAsyncComponent` where it is only opened, so its code is fetched on first open.
 
-`WModalStepper` is the shorter way to a wizard in a modal, but it takes the steps in its own slot. Here the steps belong to the form, which also renders them as tabs and on a page, so the form holds its own buttons in `WModalWrapper`.
+The steps belong to the form, which also renders them as tabs and on a page, so the form keeps them in its own `WTabs` rather than in a modal's. With `stepper-controls` the stepper hands its title, progress and buttons to the frame only while it is one; as tabs and on a page it has none.
 
 ### The page
 

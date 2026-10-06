@@ -79,6 +79,7 @@
 import {computed, onBeforeMount, onBeforeUnmount, onMounted, provide, shallowRef, watch} from 'vue'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {getText} from '@/utils/texts'
 import {BASE_ZINDEX_MODAL, getIsClientSide, isAnchorConnected, wBaseZIndex} from '@/utils/utils'
 
 import ModalCloseButton from './components/ModalCloseButton.vue'
@@ -180,10 +181,10 @@ const closeModalWithConfirm = (layer: OverlayLayer): void => {
   closeConfirm?.()
 
   closeConfirm = toClose(openConfirm({
-    title: 'Are you sure want to close modal?',
-    description: 'Closing the modal will undo any changes',
+    title: getText('closeModalTitle'),
+    description: getText('closeModalDescription'),
     acceptSemanticType: SemanticType.WARNING,
-    acceptText: 'Close',
+    acceptText: getText('closeModalAccept'),
     onAccept() {
       closeLayer(layer.id)
     },

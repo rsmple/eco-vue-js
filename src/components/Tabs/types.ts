@@ -27,8 +27,12 @@ export interface TabsProps {
    * The submit checks the last step and submits the enclosing form with `api-method`, or emits `submit`.
    */
   stepperControls?: boolean
-  /** Text of the submit button on the last step with `stepperControls`. Defaults to "Submit". */
+  /** Text of the submit button on the last step with `stepperControls`. Defaults to the `submit` text of `setTexts`. */
   submitText?: string
+  /** With `stepperControls`, shows a spinner in the Next or submit button and disables Back and Close, such as while a submit on `submit` runs. A form with `api-method` around the stepper does it on its own. */
+  submitting?: boolean
+  /** With `stepperControls`, disables the Next or submit button, such as until something is picked on the step. */
+  disabledNext?: boolean
   /** Colors the titles of tabs that have a value. */
   showHasValue?: boolean
   /** Stays on the current tab when another one gets an error. By default the first tab with an error is opened. */

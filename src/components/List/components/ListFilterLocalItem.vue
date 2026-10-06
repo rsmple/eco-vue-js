@@ -1,7 +1,8 @@
 <template>
+  <!-- A small form titled by the filter's name: the frame pads it, and an embedded select or option list inside reaches its edges. -->
   <WDropdownAdaptive
     :is-open="isOpen"
-    frame-class="max-w-96 max-h-80 w-dropdown-frame"
+    dialog
     @close="$emit('close')"
   >
     <template #toggle>
@@ -44,10 +45,7 @@
     </template>
 
     <template #content>
-      <div
-        class="text-start font-normal"
-        :class="meta.embedded ? undefined : 'p-4 sm:w-96'"
-      >
+      <div class="text-start font-normal">
         <component
           :is="item[0].default"
           v-if="Array.isArray(item)"
