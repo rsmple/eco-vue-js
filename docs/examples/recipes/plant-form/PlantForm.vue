@@ -88,7 +88,7 @@
                   <WButtonGroup
                     v-bind="scopeField"
                     :list="Object.values(Kind)"
-                    class="mb-4"
+                    wrap
                   >
                     <template #option="{option}">
                       <component
@@ -131,7 +131,7 @@
                   <WButtonGroup
                     v-bind="scopeField"
                     :list="Object.values(Light)"
-                    class="mb-4"
+                    wrap
                   >
                     <template #option="{option}">
                       <component
