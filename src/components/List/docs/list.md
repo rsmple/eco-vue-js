@@ -88,7 +88,7 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 | `queryOptions` | `DefaultQueryOptions<PaginatedResponse<Data>>` | — | Options for every page query. |
 | `bulkDisableMessage` | `string` | — | Tooltip on the `bulk` actions while nothing is selected. Defaults to "No selected items". |
 | `selectionTitle` | `string` | **required** | Singular noun in the "Selected N items" counter of the selection bar. |
-| `bulk` | `BulkComponent<QueryParams>[]` | — | Actions in the selection bar while items are selected. Each gets the selection count and a getter of the query params narrowed to the selection. From the third on they move into a More menu. |
+| `bulk` | `BulkComponent<QueryParams>[]` | — | Actions in the selection bar while items are selected. Each gets the selection count and a getter of the query params narrowed to the selection. The ones that do not fit the bar move into a More menu. |
 | `action` | `ActionComponent<QueryParams>[]` | — | Actions in the selection bar while nothing is selected, with the current query params. |
 | `menu` | `MenuComponent<Data>[]` | — | Row menu items, opened by the row's more button or a right click. A `[component, props]` tuple passes extra props. |
 | `readonlyGetter` | `((item: Data) => boolean)` | — | Makes a single row readonly. |
@@ -187,7 +187,6 @@ import WButtonSelection from 'eco-vue-js/dist/components/Button/WButtonSelection
 | `title` | `string` | `"item"` | Singular noun in the "Selected N items" counter. An "s" is added for more than one. |
 | `disableMessage` | `string` | `"No selected items"` | Tooltip of the actions while nothing is selected, which also disables them. |
 | `selectedCount` | `number` | — | Number of selected items. While it is above 0, the counter with a clear button replaces the `settings` slot. |
-| `moreToggleClass` | `string` | — | Class of the More menu's toggle, e.g. to hide it while all actions fit. |
 
 #### Events
 
@@ -199,8 +198,8 @@ import WButtonSelection from 'eco-vue-js/dist/components/Button/WButtonSelection
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `default` | `{ disableMessage: string \| undefined; cssClass: string; }` | WButtonSelectionAction buttons. Pass them `disableMessage`, and `cssClass` for the dividers between them. |
-| `more` | `{ disableMessage: string \| undefined; cssClass: string; }` | Actions in the More menu at the end of the row. |
+| `default` | `{ disableMessage: string \| undefined; cssClass: string; visibleCount: number; }` | WButtonSelectionAction buttons. Pass them `disableMessage`, and `cssClass` for the dividers between them. Hide the ones from `visibleCount` on, which do not fit — the `more` slot shows them instead. |
+| `more` | `{ disableMessage: string \| undefined; cssClass: string; visibleCount: number; }` | Actions in the More menu at the end of the row: the ones of the `default` slot from `visibleCount` on, which do not fit the row. The menu shows only when some do not. |
 | `settings` | — | Content at the end of the bar while nothing is selected, such as list settings. |
 
 <!-- @api-end -->
