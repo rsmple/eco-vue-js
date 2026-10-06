@@ -110,6 +110,9 @@ export const setOverlayHost = (value: boolean): void => {
 
 const layers = shallowRef<LayerEntry[]>([])
 
+/** Layers with async content that is still loading, shown once it has. */
+const pendingLayers = shallowReactive(new Map<number, LayerEntry>())
+
 /** Open layers, bottom to top, for the host to render. */
 export const useOverlayLayers = (): Readonly<Ref<readonly OverlayLayer[]>> => layers
 
@@ -123,6 +126,15 @@ const findLayer = (id: number | null): LayerEntry | undefined => {
  * Closes the layer and everything opened from it, the top-most first.
  */
 export const closeLayer = (id: number): void => {
+  const pending = pendingLayers.get(id)
+
+  if (pending) {
+    pendingLayers.delete(id)
+    pending.onClose?.()
+
+    return
+  }
+
   const entry = findLayer(id)
 
   if (!entry) return
@@ -175,10 +187,20 @@ export const isHandoff = (parent: number | null, replace?: boolean): boolean => 
 /** The anchor a layer opened from `parent` takes over, so a layer opened from a menu sticks to the menu's anchor. */
 export const getHandoffAnchor = (parent: number | null): OverlayAnchor | undefined => findHandoff(parent)?.anchor
 
+/** The loader of an async component that has not loaded yet, such as one made with `defineAsyncComponent` in `<script setup>`, which is made anew for each instance. Internal to Vue, but stable. */
+const getAsyncLoader = (content: Component): (() => Promise<unknown>) | undefined => {
+  const value = content as {__asyncLoader?: () => Promise<unknown>, __asyncResolved?: unknown}
+
+  return value.__asyncLoader && !value.__asyncResolved ? value.__asyncLoader : undefined
+}
+
 /**
  * Opens a layer. Opened from a menu — a dropdown with `closeOnClick` — or from any dropdown with `replace`, it takes its place: the menu closes,
  * and the new layer belongs to the menu's parent. A dropdown also inherits the menu's anchor, so it stays where the menu was,
  * and the menu's opener still sees it with `hasAnchorLayer`. Opened from any other dropdown, such as a filter, it stays over it.
+ * With `replace`, it also carries on the `onClose` of the dropdown it replaces, so that dropdown's opener sees one overlay until the last of them closes.
+ *
+ * Async content shows once it has loaded, and what it takes the place of stays until then, so the frame never shows empty.
  *
  * Returns `null` when nothing opened: without the host, or when `toggle` closed a layer instead.
  */
@@ -196,16 +218,16 @@ export const openLayer = (options: OverlayOptions): OverlayLayer | null => {
     parent = handoff.parent
 
     if (isDropdown) anchor = handoff.anchor ?? anchor
-
-    closeLayer(handoff.id)
   }
 
-  if (isDropdown) {
-    const siblings = layers.value.filter(item => item.present === 'dropdown' && item.parent === parent)
+  const getSiblings = () => isDropdown ? layers.value.filter(item => item.present === 'dropdown' && item.parent === parent && item !== handoff) : []
 
-    siblings.reverse().forEach(item => closeLayer(item.id))
+  if (options.toggle && anchor && getSiblings().some(item => item.anchor === anchor)) {
+    if (handoff) closeLayer(handoff.id)
 
-    if (options.toggle && anchor && siblings.some(item => item.anchor === anchor)) return null
+    getSiblings().reverse().forEach(item => closeLayer(item.id))
+
+    return null
   }
 
   const entry: LayerEntry = {
@@ -221,7 +243,55 @@ export const openLayer = (options: OverlayOptions): OverlayLayer | null => {
     onClose: options.onClose,
   }
 
-  layers.value = [...layers.value, entry]
+  const cancel = () => {
+    pendingLayers.delete(entry.id)
+    entry.onClose?.()
+  }
+
+  const show = () => {
+    // What it was opened from closed while it loaded. A menu closes on the click itself, so only a menu is expected to be gone.
+    if (parent !== null && !findLayer(parent)) return cancel()
+    if (handoff && !handoff.dropdown.closeOnClick && !findLayer(handoff.id)) return cancel()
+
+    if (handoff && findLayer(handoff.id)) {
+      if (!handoff.dropdown.closeOnClick) {
+        const onClose = entry.onClose
+        const onCloseReplaced = handoff.onClose
+
+        handoff.onClose = undefined
+        entry.onClose = () => {
+          onClose?.()
+          onCloseReplaced?.()
+        }
+      }
+
+      closeLayer(handoff.id)
+    }
+
+    getSiblings().reverse().forEach(item => closeLayer(item.id))
+
+    pendingLayers.delete(entry.id)
+    layers.value = [...layers.value, entry]
+  }
+
+  const loader = getAsyncLoader(options.content)
+
+  if (!loader) {
+    show()
+
+    return entry
+  }
+
+  pendingLayers.set(entry.id, entry)
+
+  loader().then(
+    () => {
+      if (pendingLayers.has(entry.id)) show()
+    },
+    () => {
+      if (pendingLayers.has(entry.id)) cancel()
+    },
+  )
 
   return entry
 }
@@ -236,7 +306,7 @@ export const closeChildLayers = (id: number): boolean => {
 }
 
 /** Whether a layer is open at the anchor — a menu, or a confirm it handed off to. */
-export const hasAnchorLayer = (anchor: OverlayAnchor): boolean => layers.value.some(item => item.anchor === anchor)
+export const hasAnchorLayer = (anchor: OverlayAnchor): boolean => layers.value.some(item => item.anchor === anchor) || [...pendingLayers.values()].some(item => item.anchor === anchor)
 
 /** A flag of a layer that several components inside set on their own, such as two forms: it is on while any of them sets it. */
 const createLayerFlag = () => {
