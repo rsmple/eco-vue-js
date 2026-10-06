@@ -1,9 +1,13 @@
 <template>
+  <!--
+    On phones the bottom of the screen holds the buttons of a modal, a sheet or a page, and right under the header is the first field of a full-screen modal,
+    so the toasts show at the top edge, over the header or the modal's title.
+  -->
   <div
-    class="fixed isolate z-10000"
+    class="sm-not:top-[max(env(safe-area-inset-top),0.5rem)] fixed isolate z-10000"
     :class="{
-      'top-(--w-top-inner,0.5rem)': isTop,
-      'bottom-[calc(var(--w-bottom-inner,0.5rem)+0.5rem)]': !isTop,
+      'sm:top-(--w-top-inner,0.5rem)': isTop,
+      'sm:bottom-[calc(var(--w-bottom-inner,0.5rem)+0.5rem)]': !isTop,
       'right-(--w-right-inner,0.5rem)': !isCenter,
       'left-1/2 -translate-x-1/2': isCenter,
     }"
