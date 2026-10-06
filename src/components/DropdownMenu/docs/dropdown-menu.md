@@ -304,7 +304,7 @@ import WButtonDropdown from 'eco-vue-js/dist/components/Button/WButtonDropdown.v
 | Slot | Props | Description |
 | --- | --- | --- |
 | `button` | — | Buttons joined to the arrow button. They keep their own click handlers. |
-| `content` | `{ close: () => void; }` | Menu content, usually WButtonMoreItem. A click inside closes the menu, and so does `close`. |
+| `content` | `{ close: () => void; }` | Menu content, usually WButtonMoreItem. A click inside closes the menu, and so does `close`. On phones it is a bottom sheet. |
 
 <!-- @api-end -->
 
