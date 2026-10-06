@@ -110,6 +110,9 @@ const updateModelValue = (value: Model | ClearValue, data: Data | undefined): vo
   emit('update:model-value', value as EmitType, data)
 
   blur()
+
+  // A pick is done with the menu, also as a bottom sheet on phones. Embedded, the options are part of the form instead, such as in a filter.
+  if (!props.embedded) selectComponentRef.value?.close()
 }
 
 const blur = () => {
