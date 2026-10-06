@@ -69,12 +69,12 @@
             />
           </a>
 
-          <DocsNotifyButton />
-
-          <ThemeMenu />
-
-          <div class="flex gap-1 sm:gap-2 items-center min-w-22">
+          <div class="flex gap-1 sm:gap-2 items-center min-w-31">
             <ClientOnly>
+              <DocsNotifyButton />
+
+              <ThemeMenu />
+
               <WToggleTheme
                 :model-value="isDark ? Theme.DARK : Theme.LIGHT"
                 no-margin
