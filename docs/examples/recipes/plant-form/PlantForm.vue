@@ -122,6 +122,10 @@
             name="care"
           >
             <div class="py-2">
+              <WInfoCard class="mb-6">
+                Light and watering are for a typical room — set them for where the plant stands.
+              </WInfoCard>
+
               <WUniform
                 v-bind="scope"
                 field="light"
@@ -354,6 +358,7 @@ import {isId} from 'eco-vue-js/dist/utils/utils'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
+import WInfoCard from 'eco-vue-js/dist/components/InfoCard/WInfoCard.vue'
 import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
 import WModalWrapper from 'eco-vue-js/dist/components/Modal/WModalWrapper.vue'
