@@ -64,7 +64,7 @@ type OverlayContentOptions = {
   props?: object
   /** Runs once the layer is closed — by its close function, its content, the user, a sibling taking its place, or the layer it was opened from closing. */
   onClose?: () => void
-  /** Takes the place of the dropdown it is opened from, as from a menu, such as the next step of a small form. A dropdown sticks to that dropdown's anchor. */
+  /** Takes the place of the dropdown it is opened from, as from a menu, such as the next step of a small form. A dropdown sticks to that dropdown's anchor, and that dropdown's `onClose` runs once this one closes, so its opener stays marked. */
   replace?: boolean
 }
 
