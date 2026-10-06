@@ -9,7 +9,7 @@
       ref="dismissable"
       :is-open="isOpen"
       class="fixed inset-0"
-      :class="noOverlay ? 'pointer-events-none' : 'bg-backdrop backdrop-blur'"
+      :class="noOverlay ? '' : 'bg-backdrop backdrop-blur'"
       :content-class="contentClass"
       :style="{zIndex: baseZIndex + BASE_ZINDEX_BOTTOM_SHEET}"
       @close="$emit('close')"
