@@ -16,7 +16,7 @@
       />
     </template>
 
-    <div class="text-accent sm-not:px---inner-margin mb-6 min-h-5 text-balance text-center font-normal">
+    <div class="text-accent mb-6 min-h-5 text-balance text-center font-normal">
       <template v-if="typeof description === 'string'">
         {{ description }}
       </template>

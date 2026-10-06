@@ -191,6 +191,10 @@ const confirmClear = () => {
 
 A dropdown closes when the opener unmounts, unless it took a menu's place; a modal stays.
 
+The frame owns the layout around the content. A component built on `WModalWrapper` opens as a modal, a dropdown or a bottom sheet unchanged: the frame takes its `title`, `subtitle` and `actions` and places them — a sticky header and footer in a modal, a compact heading and pinned buttons in a dropdown, a centered title and stacked buttons in a sheet — and pads the body by `--w-frame-padding`. The content brings no padding of its own; what reaches the edges, such as a list, takes `w-frame-bleed`. Outside an overlay, `WModalWrapper` lays the same parts out on the page. Content without it, such as a menu, is shown edge to edge; `useOverlayFrameOptions(() => ({padded: true}))` asks for the padding.
+
+A `WUniform` with `api-method` keeps its layer open while it saves, and asks before the layer closes with unsaved changes — on the close button, Escape, an outside click or a swipe. `useLayerBusy` and `useLayerChanges` do the same for other content.
+
 ```ts
 import {useOverlay} from 'eco-vue-js/dist/utils/Overlay'
 
@@ -208,7 +212,7 @@ const openNotes = (event: MouseEvent) => {
 
 ## Custom modal
 
-`Modal.add(component, props)` opens any component. Wrap its content in `WModalWrapper`, which provides the title, a scrolling body and a sticky footer with the actions. Its padding comes from `--w-modal-wrapper-padding`, set once for the app (`w-modal-wrapper-p---inner-margin` on `body`); on phones the body is edge to edge, so pad the content with `sm-not:px---inner-margin`. Give the action buttons `w-full` to share the footer width. The modal closes when it emits `close:modal`, when the backdrop's close button is clicked, or when the function returned by `Modal.add` is called.
+`Modal.add(component, props)` opens any component. Wrap its content in `WModalWrapper`, which provides the title, a scrolling body and a sticky footer with the actions. Its padding comes from `--w-modal-wrapper-padding`, set once for the app (`w-modal-wrapper-p---inner-margin` on `body`), and the frame pads the title, the body and the actions with it — the content brings no padding of its own. Content that reaches the edges, such as a list or a tab bar, takes `w-frame-bleed`. Give the action buttons `w-full` to share the footer width. The modal closes when it emits `close:modal`, when the backdrop's close button is clicked, or when the function returned by `Modal.add` is called.
 
 Pass callbacks as props to get results back. Load the modal with `defineAsyncComponent`, so its code is fetched on first open, and wrap it in `markRaw`, as for every component passed as a prop.
 
@@ -259,7 +263,6 @@ const rename = () => {
       v-model="value"
       title="Name"
       autofocus
-      class="sm-not:px---inner-margin"
     />
 
     <template #actions>
@@ -380,7 +383,7 @@ const invite = () => {
         title="Email"
         type="email"
         autofocus
-        class="sm-not:px---inner-margin pt-4"
+        class="pt-4"
       />
     </WTabsItem>
 
@@ -392,7 +395,7 @@ const invite = () => {
         v-model="role"
         :list="ROLES"
         title="Role"
-        class="sm-not:px---inner-margin pt-4"
+        class="pt-4"
       >
         <template #option="{option}">
           {{ option }}
@@ -404,7 +407,7 @@ const invite = () => {
       title="Check and send"
       name="summary"
     >
-      <p class="sm-not:px---inner-margin pt-4">
+      <p class="pt-4">
         {{ email }} will join as {{ role }}.
       </p>
     </WTabsItem>

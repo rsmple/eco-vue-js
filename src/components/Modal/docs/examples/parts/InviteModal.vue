@@ -17,7 +17,7 @@
         title="Email"
         type="email"
         autofocus
-        class="sm-not:px---inner-margin pt-4"
+        class="pt-4"
       />
     </WTabsItem>
 
@@ -29,7 +29,7 @@
         v-model="role"
         :list="ROLES"
         title="Role"
-        class="sm-not:px---inner-margin pt-4"
+        class="pt-4"
       >
         <template #option="{option}">
           {{ option }}
@@ -41,7 +41,7 @@
       title="Check and send"
       name="summary"
     >
-      <p class="sm-not:px---inner-margin pt-4">
+      <p class="pt-4">
         {{ email }} will join as {{ role }}.
       </p>
     </WTabsItem>

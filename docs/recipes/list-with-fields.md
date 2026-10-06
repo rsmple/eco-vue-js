@@ -52,10 +52,12 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
     :bulk="[
       markRaw(WBulkPlantWatered),
       markRaw(WBulkPlantDry),
+      markRaw(WBulkPlantCaretaker),
       markRaw(WBulkPlantRemove),
     ]"
     :menu="[
       markRaw(WMenuPlantToggle),
+      markRaw(WMenuPlantCaretaker),
       markRaw(WMenuPlantDelete),
     ]"
     selection-title="plant"
@@ -88,11 +90,13 @@ import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 import PlantContent from './PlantContent.vue'
 import {plantModelApi, useQueryParamsPlants} from './api/Plant'
+import WBulkPlantCaretaker from './bulk/WBulkPlantCaretaker.vue'
 import WBulkPlantDry from './bulk/WBulkPlantDry.vue'
 import WBulkPlantRemove from './bulk/WBulkPlantRemove.vue'
 import WBulkPlantWatered from './bulk/WBulkPlantWatered.vue'
 import {defaultFieldConfigMapPlant, listFieldsPlant} from './fields'
 import {listFilterPlant} from './filter'
+import WMenuPlantCaretaker from './menu/WMenuPlantCaretaker.vue'
 import WMenuPlantDelete from './menu/WMenuPlantDelete.vue'
 import WMenuPlantToggle from './menu/WMenuPlantToggle.vue'
 
@@ -1241,6 +1245,183 @@ const markDry = (event: MouseEvent) => {
 <!-- @source-end -->
 
 :::
+
+#### Actions with a form
+
+An action that needs input, such as a new caretaker, opens a small form instead of a confirm: `useOverlay().open` with `present: 'dropdown'` puts it under the button — a bottom sheet on phones — and the same form serves the bulk action and the row menu. From the More menu or a row's `⋯` menu, it takes the menu's place, as a confirm does.
+
+The form is a `WModalWrapper` with a `WUniform` inside, the way it would be in a modal. The frame takes its title and buttons and pads the field, so the form brings no padding or layout for being in a dropdown, and it would open as a modal unchanged. The select is `embedded`, as in a filter: its search is pinned under the title and the caretakers are listed in place of a menu, with Save and Cancel pinned under them. A click outside, Escape or a swipe asks before discarding a picked caretaker, and while the form saves, the dropdown stays open.
+
+<!-- @source docs/examples/recipes/plant-list/PlantCaretakerForm.vue PlantCaretakerForm.vue -->
+
+```vue [PlantCaretakerForm.vue]
+<template>
+  <!--
+    A small form, opened as a dropdown at the button — a bottom sheet on phones — or as a modal: the frame places its title and buttons.
+    The select is embedded, as in a filter: its search field is pinned under the title, and the caretakers are listed in place of a menu.
+  -->
+  <WModalWrapper>
+    <template #title>
+      Change caretaker of {{ countText }}
+    </template>
+
+    <WUniform
+      ref="form"
+      :init-data="() => ({caretaker: undefined})"
+      :api-method="save"
+      full-payload
+      @success="$emit('close:modal')"
+    >
+      <template #default="scope">
+        <WUniform
+          v-bind="scope"
+          field="caretaker"
+          title="Caretaker"
+          required
+        >
+          <template #field="scopeField">
+            <WSelectSingle
+              v-bind="scopeField"
+              :options="gardeners"
+              :value-getter="item => item.id"
+              :search-fn="(item, search) => item.name.toLowerCase().includes(search)"
+              :option-component="markRaw(OptionGardener)"
+              placeholder="Search caretakers"
+              required
+              embedded
+            />
+          </template>
+        </WUniform>
+      </template>
+    </WUniform>
+
+    <template #actions>
+      <WButton
+        :disabled="formRef?.submitting"
+        :semantic-type="SemanticType.SECONDARY"
+        class="w-full"
+        @click="$emit('close:modal')"
+      >
+        Cancel
+      </WButton>
+
+      <WButton
+        :disabled="!formRef?.hasChanges"
+        :loading="formRef?.submitting"
+        class="w-full"
+        @click="formRef?.submit?.()"
+      >
+        Save
+      </WButton>
+    </template>
+  </WModalWrapper>
+</template>
+
+<script lang="ts" setup>
+import {markRaw, useTemplateRef} from 'vue'
+
+import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
+
+import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
+import WModalWrapper from 'eco-vue-js/dist/components/Modal/WModalWrapper.vue'
+import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
+import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
+
+import {Notify} from '@/utils/Notify'
+import {numberFormatter} from '@/utils/utils'
+
+import {type QueryParamsPlants, plantModelApi} from './api/Plant'
+
+import {gardeners} from '../../shared/Gardener'
+import OptionGardener from '../../shared/OptionGardener.vue'
+
+type CaretakerFormData = {
+  caretaker: number | undefined
+}
+
+const props = defineProps<{
+  /** The plants to change: the list's filters and selection, or one plant by id. */
+  queryParams: QueryParamsPlants
+  count: number
+  /** Called once saved, such as to clear the selection. */
+  onSaved?: () => void
+}>()
+
+defineEmits<{
+  (e: 'close:modal'): void
+}>()
+
+const formRef = useTemplateRef('form')
+
+const countText = `${ numberFormatter.format(props.count) } plant${ props.count === 1 ? '' : 's' }`
+
+const save = (payload: Partial<CaretakerFormData>) => {
+  return plantModelApi.paginated.actions.updateMany(props.queryParams, {caretaker: payload.caretaker})
+    .then(() => {
+      Notify.success({title: `Caretaker changed for ${ countText }`})
+      props.onSaved?.()
+    })
+}
+</script>
+```
+
+<!-- @source-end -->
+
+<!-- @source docs/examples/recipes/plant-list/bulk/WBulkPlantCaretaker.vue WBulkPlantCaretaker.vue -->
+
+```vue [WBulkPlantCaretaker.vue]
+<template>
+  <WButtonSelectionAction
+    title="Change caretaker"
+    :icon="markRaw(IconUser)"
+    :disable-message="disableMessage"
+    :disabled="readonly"
+    :active="isOpen"
+    @click="openForm"
+  />
+</template>
+
+<script lang="ts" setup>
+import {defineAsyncComponent, markRaw, ref} from 'vue'
+
+import type {BulkProps} from 'eco-vue-js/dist/components/List/types'
+import {useOverlay} from 'eco-vue-js/dist/utils/Overlay'
+
+import WButtonSelectionAction from 'eco-vue-js/dist/components/Button/WButtonSelectionAction.vue'
+
+import IconUser from 'eco-vue-js/dist/assets/icons/IconUser'
+
+import {type QueryParamsPlants} from '../api/Plant'
+
+const PlantCaretakerForm = defineAsyncComponent(() => import('../PlantCaretakerForm.vue'))
+
+const props = defineProps<BulkProps<QueryParamsPlants>>()
+
+const overlay = useOverlay()
+
+const isOpen = ref(false)
+
+// The form opens at the button, so the selected rows stay in view. It asks before closing on an outside click once a caretaker is picked.
+const openForm = (event: MouseEvent) => {
+  isOpen.value = true
+
+  overlay.open({
+    present: 'dropdown',
+    anchor: event.currentTarget as Element,
+    content: markRaw(PlantCaretakerForm),
+    props: {
+      queryParams: props.queryParamsGetter(),
+      count: props.selectionCount,
+      // A function, not an emit: in the More menu this component is gone by now, as the form took the menu's place.
+      onSaved: props.clearSelection,
+    },
+    onClose: () => isOpen.value = false,
+  })
+}
+</script>
+```
+
+<!-- @source-end -->
 
 ### Expansion
 

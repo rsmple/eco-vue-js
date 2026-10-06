@@ -58,11 +58,41 @@ export const wOverlayLayer = Symbol('wOverlayLayer') as InjectionKey<() => numbe
 /** Frame of the layer the content belongs to, `null` on the page. */
 export const wOverlayFrame = Symbol('wOverlayFrame') as InjectionKey<OverlayFrame | null>
 
-/** Pinned header of the dropdown layer the content belongs to, which OverlayHeader renders its slot into. */
-export const wOverlayHeader = Symbol('wOverlayHeader') as InjectionKey<{
-  add: (render: Component) => void
-  remove: (render: Component) => void
-}>
+/**
+ * Areas of a frame the content hands parts of itself to, so the frame places them where its layout needs:
+ * - `title` and `subtitle` — the heading, and what is pinned under it, such as a progress line.
+ * - `header` — pinned above the content that scrolls, such as the field of an embedded select.
+ * - `actions` — the buttons, pinned at the bottom.
+ */
+export type OverlayRegion = 'title' | 'subtitle' | 'header' | 'actions'
+
+/** A part handed to a frame: its render, and the injections of the component it came from, which it renders with. */
+export type OverlayPart = {
+  readonly render: Component
+  readonly provides: Record<string | symbol, unknown> | undefined
+}
+
+/** How the content asks its frame to look, such as WModalWrapper's props and classes. A frame takes what applies to it. */
+export type OverlayFrameOptions = {
+  /** Pads the content like the frame's title and buttons, by `--w-frame-padding`, such as a form's body. Content that reaches the edges, such as a list, takes `w-frame-bleed`. */
+  padded?: boolean
+  /** Classes of the frame's box, such as a modal's width. */
+  class?: unknown
+  /** Fills the whole screen on small screens, as a modal. */
+  maximized?: boolean
+  /** Stacks the buttons vertically on every screen size. */
+  actionsCol?: boolean
+}
+
+/**
+ * Areas of the frame the content belongs to, which OverlayRegionPart renders its slot into. `add` returns `false` for an area the frame does not have, and the part renders in place.
+ * `setOptions` asks the frame to look a certain way while `getOptions` is set — the latest one counts — and `null` takes it back.
+ */
+export const wOverlayRegions = Symbol('wOverlayRegions') as InjectionKey<{
+  add: (region: OverlayRegion, part: OverlayPart) => boolean
+  remove: (region: OverlayRegion, part: OverlayPart) => void
+  setOptions: (source: symbol, getOptions: (() => OverlayFrameOptions) | null) => void
+} | null>
 
 let isHosted = false
 
@@ -97,7 +127,8 @@ export const closeLayer = (id: number): void => {
 
   layers.value = layers.value.filter(item => item !== entry)
 
-  setLayerBusy(id, false)
+  busyLayers.clear(id)
+  changedLayers.clear(id)
 
   entry.onClose?.()
 }
@@ -197,15 +228,45 @@ export const closeChildLayers = (id: number): boolean => {
 /** Whether a layer is open at the anchor — a menu, or a confirm it handed off to. */
 export const hasAnchorLayer = (anchor: OverlayAnchor): boolean => layers.value.some(item => item.anchor === anchor)
 
-const busyLayers = shallowReactive(new Set<number>())
+/** A flag of a layer that several components inside set on their own, such as two forms: it is on while any of them sets it. */
+const createLayerFlag = () => {
+  const sources = shallowReactive(new Map<number, ReadonlySet<symbol>>())
 
-/** Marks a layer busy, such as a confirm running its action. A busy layer stays open on Escape, outside clicks, swipes and a detached anchor. */
-export const setLayerBusy = (id: number, value: boolean): void => {
-  if (!value) busyLayers.delete(id)
-  else if (findLayer(id)) busyLayers.add(id)
+  return {
+    set(id: number, source: symbol, value: boolean): void {
+      const current = sources.get(id)
+
+      if (value === (current?.has(source) ?? false)) return
+      if (value && !findLayer(id)) return
+
+      const next = new Set(current)
+
+      if (value) next.add(source)
+      else next.delete(source)
+
+      if (next.size) sources.set(id, next)
+      else sources.delete(id)
+    },
+    has: (id: number): boolean => sources.has(id),
+    clear: (id: number): void => {
+      sources.delete(id)
+    },
+  }
 }
 
-export const isLayerBusy = (id: number): boolean => busyLayers.has(id)
+const busyLayers = createLayerFlag()
+
+/** Marks a layer busy for `source`, such as a confirm running its action. A busy layer stays open on Escape, outside clicks, swipes and a detached anchor. */
+export const setLayerBusy = busyLayers.set
+
+export const isLayerBusy = busyLayers.has
+
+const changedLayers = createLayerFlag()
+
+/** Marks a layer as holding unsaved changes for `source`, such as a form. Closing it without the content's say asks first. */
+export const setLayerChanges = changedLayers.set
+
+export const hasLayerChanges = changedLayers.has
 
 export type OpenContext = {
   parent: number | null

@@ -32,6 +32,8 @@
         <slot name="content" />
       </div>
 
+      <slot name="footer" />
+
       <div class="absolute top-full h-screen w-full bg-inherit" />
 
       <!-- Clicks inside the sheet stop at its content, so any click that reaches the document landed outside. -->
@@ -72,6 +74,8 @@ defineSlots<{
   toggle?: (props: {unclickable: boolean, isTop?: boolean}) => void
   /** Content of the sheet, which scrolls under the toggle. */
   content?: () => void
+  /** Pinned at the bottom of the sheet, under the content that scrolls, such as a form's buttons. */
+  footer?: () => void
 }>()
 
 const baseZIndex = inject(wBaseZIndex, 0)
@@ -84,7 +88,7 @@ defineExpose({
 })
 
 const contentClass = computed(() => [
-  'bg-surface grid-cols-[1fr] grid-rows-[auto_1fr] rounded-t-3xl shadow-md relative grid',
+  'bg-surface grid-cols-[1fr] grid-rows-[auto_1fr_auto] rounded-t-3xl shadow-md relative grid',
   props.compact ? 'max-h-[90%]' : 'height-[90%]',
   props.noOverlay ? 'pointer-events-auto border-t border-solid border-line-raised' : '',
 ].join(' '))

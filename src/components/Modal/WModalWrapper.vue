@@ -1,75 +1,99 @@
 <template>
-  <WInfiniteListScrollingElement
-    ref="content"
-    role="dialog"
-    aria-modal="true"
-    :aria-labelledby="$slots.title ? titleId : undefined"
-    class="
-      bg-surface w-modal-wrapper
-      scrollbar-width-thin grid
-      max-h-[calc(100%-var(--inner-margin,2rem)*2)]
-      w-(--w-modal-wrapper-width,35rem) max-w-[calc(100%-var(--inner-margin,2rem)*2)] grid-cols-[1fr] grid-rows-[auto_1fr_auto]
-      overflow-auto overscroll-contain rounded-(--w-modal-wrapper-rounded,1.5rem) shadow-md
-    "
-    :class="{
-      'sm-not:max-w-full sm-not:h-full sm-not:rounded-none sm-not:max-h-full': maximized,
-    }"
-    :style="{
-      '--w-modal-header-height': headerHeight + 'px',
-      '--w-modal-footer-height': footerHeight + 'px',
-      '--w-modal-content-height': contentHeight + 'px'
-    }"
-  >
-    <div
-      ref="header"
-      class="bg-surface sticky left-0 top-0 z-1 w-(--w-width-inner-out)"
-      :class="{
-        'sm-not:w-full': !maximized,
-        'sm-not:w-screen': maximized,
-      }"
+  <!-- In an overlay, the frame — a modal, a dropdown or a bottom sheet — shows the title and the buttons around the content, so only the body renders here. -->
+  <template v-if="!pageRegions">
+    <OverlayRegionPart
+      v-if="$slots.title"
+      region="title"
     >
-      <h2
-        :id="titleId"
-        class="text-accent p---w-modal-wrapper-padding flex items-center justify-center text-balance text-center text-xl font-semibold"
-      >
-        <slot name="title" />
-      </h2>
+      <slot name="title" />
+    </OverlayRegionPart>
 
+    <OverlayRegionPart
+      v-if="$slots.subtitle"
+      region="subtitle"
+    >
       <slot name="subtitle" />
-    </div>
+    </OverlayRegionPart>
 
-    <div class="sm:px---w-modal-wrapper-padding">
+    <div
+      v-if="frame === 'dropdown'"
+      class="w-[min(24rem,calc(100vw-2rem))]"
+    >
       <slot />
     </div>
 
-    <div
-      ref="footer"
-      class="
-        bg-surface gap---inner-margin p---w-modal-wrapper-padding
-        md-not:pb-8 sticky bottom-0 left-0 flex w-(--w-width-inner-out) justify-center
-      "
-      :class="{
-        'sm-not:flex-col sm-not:w-full': !maximized,
-        'sm-not:w-screen': maximized,
-        'flex-col': actionsCol,
-      }"
-      :style="{zIndex: BASE_ZINDEX_DROPDOWN}"
+    <slot v-else />
+
+    <OverlayRegionPart
+      v-if="$slots.actions"
+      region="actions"
     >
       <slot name="actions" />
+    </OverlayRegionPart>
+  </template>
+
+  <!-- On a page, such as a form that is also opened in overlays elsewhere, it is laid out in the flow of the page, with what the content inside hands over. -->
+  <section
+    v-else
+    v-bind="$attrs"
+    :aria-labelledby="pageRegions.title.length ? titleId : undefined"
+  >
+    <h2
+      v-if="pageRegions.title.length"
+      :id="titleId"
+      class="text-accent mb-4 flex items-center text-xl font-semibold"
+    >
+      <OverlayRegion :parts="pageRegions.title" />
+    </h2>
+
+    <OverlayRegion :parts="pageRegions.subtitle" />
+
+    <OverlayRegionPart
+      v-if="$slots.title"
+      region="title"
+    >
+      <slot name="title" />
+    </OverlayRegionPart>
+
+    <OverlayRegionPart
+      v-if="$slots.subtitle"
+      region="subtitle"
+    >
+      <slot name="subtitle" />
+    </OverlayRegionPart>
+
+    <slot />
+
+    <OverlayRegionPart
+      v-if="$slots.actions"
+      region="actions"
+    >
+      <slot name="actions" />
+    </OverlayRegionPart>
+
+    <div
+      v-if="pageRegions.actions.length"
+      class="gap---inner-margin mt-4 flex justify-end"
+      :class="{'flex-col': actionsCol}"
+    >
+      <OverlayRegion :parts="pageRegions.actions" />
     </div>
-  </WInfiniteListScrollingElement>
+  </section>
 </template>
 
 <script lang="ts" setup>
-import {onBeforeUnmount, onMounted, provide, ref, useId, useTemplateRef, watch} from 'vue'
+import {inject, useAttrs, useId} from 'vue'
 
-import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteListScrollingElement.vue'
+import {useOverlayFrame, useOverlayFrameOptions} from '@/utils/Overlay'
 
-import {BASE_ZINDEX_DROPDOWN} from '@/utils/utils'
+import OverlayRegion from './components/OverlayRegion.vue'
+import OverlayRegionPart from './components/OverlayRegionPart.vue'
+import {wOverlayRegions} from './models/overlayRegistry'
+import {useOverlayRegions} from './use/useOverlayRegions'
 
-import {wModalHeaderHeight} from './models/injection'
+defineOptions({inheritAttrs: false})
 
-defineProps<{
+const props = defineProps<{
   /** Fills the whole screen on small screens instead of floating with a margin. */
   maximized?: boolean
   /** Stacks the `actions` buttons vertically on every screen size, not only on small ones. */
@@ -87,50 +111,21 @@ defineSlots<{
   actions?: () => void
 }>()
 
+const attrs = useAttrs()
+
+const frame = useOverlayFrame()
+
+const outerRegions = inject(wOverlayRegions, null)
+
+// In an overlay it hands its parts and its look to the frame. On a page it is the frame, for itself and for what the content inside hands over.
+const pageRegions = outerRegions ? null : useOverlayRegions(['title', 'subtitle', 'actions']).regions
+
+useOverlayFrameOptions(() => ({
+  padded: true,
+  class: attrs.class,
+  maximized: props.maximized,
+  actionsCol: props.actionsCol,
+}))
+
 const titleId = useId()
-
-const headerRef = useTemplateRef('header')
-const footerRef = useTemplateRef('footer')
-const contentRef = useTemplateRef<{$el: HTMLElement}>('content')
-
-const headerHeight = ref(0)
-const footerHeight = ref(0)
-const contentHeight = ref(0)
-
-provide(wModalHeaderHeight, headerHeight)
-
-let observer: ResizeObserver | null = null
-const observed = new Map<Element, (height: number) => void>()
-
-const observe = (el: Element | null | undefined, setter: (height: number) => void) => {
-  if (!el || !observer) return
-  observed.set(el, setter)
-  observer.observe(el)
-}
-
-onMounted(() => {
-  observer = new ResizeObserver(entries => {
-    for (const entry of entries) {
-      const setter = observed.get(entry.target)
-      if (!setter) continue
-      const height = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height
-      setter(height)
-    }
-  })
-
-  observe(headerRef.value, value => { headerHeight.value = value })
-  observe(footerRef.value, value => { footerHeight.value = value })
-  observe(contentRef.value?.$el, value => { contentHeight.value = value })
-})
-
-watch(contentRef, value => {
-  if (!observer || !value?.$el || observed.has(value.$el)) return
-  observe(value.$el, height => { contentHeight.value = height })
-})
-
-onBeforeUnmount(() => {
-  observer?.disconnect()
-  observer = null
-  observed.clear()
-})
 </script>
