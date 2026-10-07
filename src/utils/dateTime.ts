@@ -1,17 +1,70 @@
-export const weekdayShortFormatter = Intl.DateTimeFormat('en', {weekday: 'short'})
-export const monthShortFormatter = Intl.DateTimeFormat('en', {month: 'short'})
-export const dateFormatter = Intl.DateTimeFormat('en', {year: 'numeric', month: 'numeric', day: 'numeric'})
+import {getIntl} from './locale'
+
+const dateTimeFormatter = (key: string, options: Intl.DateTimeFormatOptions | ((locale: string) => Intl.DateTimeFormatOptions)): Pick<Intl.DateTimeFormat, 'format' | 'formatToParts'> => {
+  const get = () => getIntl(key, locale => new Intl.DateTimeFormat(locale, typeof options === 'function' ? options(locale) : options))
+
+  return {
+    format: date => get().format(date),
+    formatToParts: date => get().formatToParts(date),
+  }
+}
+
+/** Hours with a leading zero on a 24-hour clock, `14:05` and `09:05`, and without one on a 12-hour clock, `9:05 AM`. */
+const timeOptions = (locale: string, seconds: boolean): Intl.DateTimeFormatOptions => {
+  const hour12 = new Intl.DateTimeFormat(locale, {timeStyle: 'short'}).resolvedOptions().hour12
+
+  return {hour: hour12 ? 'numeric' : '2-digit', minute: '2-digit', second: seconds ? '2-digit' : undefined}
+}
+
+/** Formatters in the locale set with `setLocale`. */
+export const weekdayShortFormatter = dateTimeFormatter('weekdayShort', {weekday: 'short'})
+export const weekdayNarrowFormatter = dateTimeFormatter('weekdayNarrow', {weekday: 'narrow'})
+export const monthShortFormatter = dateTimeFormatter('monthShort', {month: 'short'})
+export const dateFormatter = dateTimeFormatter('date', {year: 'numeric', month: 'numeric', day: 'numeric'})
+
+const dayMonthFormatter = dateTimeFormatter('dayMonth', {day: '2-digit', month: 'short'})
+const dayMonthYearFormatter = dateTimeFormatter('dayMonthYear', {day: '2-digit', month: 'short', year: 'numeric'})
+const dateInputFormatter = dateTimeFormatter('dateInput', {day: '2-digit', month: '2-digit', year: 'numeric'})
+const timeFormatter = dateTimeFormatter('time', {timeStyle: 'medium'})
+const timeShortFormatter = dateTimeFormatter('timeShort', {timeStyle: 'short'})
+const datetimeFormatter = dateTimeFormatter('datetime', locale => ({day: '2-digit', month: 'short', year: 'numeric', ...timeOptions(locale, true)}))
+const datetimeShortFormatter = dateTimeFormatter('datetimeShort', locale => ({day: '2-digit', month: 'short', ...timeOptions(locale, false)}))
+const datetimeShortYearFormatter = dateTimeFormatter('datetimeShortYear', locale => ({day: '2-digit', month: 'short', year: 'numeric', ...timeOptions(locale, false)}))
+
+const getDate = (year: number, month: number, day: number): Date | undefined => {
+  const date = new Date(year, month - 1, day)
+
+  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day ? date : undefined
+}
 
 export const dateRegexp = /\d\d\.\d\d\.\d\d\d\d/i
 
+/** Reads `dd.mm.yyyy`, the same in every locale, such as from a query param. Returns `undefined` for text that is not a date. */
 export const parseDate = (value: string): Date | undefined => {
   if (!dateRegexp.test(value)) return
 
-  const timestamp = Date.parse(value.split('.').reverse().join('.'))
+  const [day, month, year] = value.match(dateRegexp)![0].split('.').map(Number) as [number, number, number]
 
-  if (isNaN(timestamp)) return
+  return getDate(year, month, day)
+}
 
-  return new Date(timestamp)
+/** The date as typed in a date field in the current locale: `07/10/2026` in `en-GB`, `10/07/2026` in `en-US`, `07.10.2026` in `ru`. `parseDateInput` reads it back. */
+export function dateInputFormat(date: Date): string {
+  return dateInputFormatter.format(date)
+}
+
+/** Reads a date typed as `dateInputFormat` writes it: the day, month and 4-digit year in the order of the current locale, with any separators. Returns `undefined` for text that is not a date. */
+export const parseDateInput = (value: string): Date | undefined => {
+  const numbers = value.match(/\d+/g)
+
+  if (numbers?.length !== 3) return
+
+  const order = dateInputFormatter.formatToParts(new Date()).map(part => part.type).filter(type => type === 'day' || type === 'month' || type === 'year')
+  const parts = Object.fromEntries(order.map((type, index) => [type, numbers[index]!])) as Record<'day' | 'month' | 'year', string>
+
+  if (parts.year.length !== 4) return
+
+  return getDate(Number(parts.year), Number(parts.month), Number(parts.day))
 }
 
 export enum WeekDay {
@@ -47,88 +100,36 @@ export function dateToQueryString(date: Date): string {
   return date.toISOString().split('T')[0]!
 }
 
+/** The date with the month name, so it reads the same way in any locale: `07 Oct 2026`, or `Oct 07, 2026` in `en-US`. */
 export function dateFormat(date: Date): string {
-  const month = date.getMonth() + 1
-  return `${ date.getDate().toString().padStart(2, '0') }.${ month.toString().padStart(2, '0') }.${ date.getFullYear() }`
+  return dayMonthYearFormatter.format(date)
 }
 
-export function dateFormatShort(date: Date): string {
-  const dayMonth = `${ date.getDate().toString().padStart(2, '0') } ${ monthShortFormatter.format(date) }`
+/** `Today` in the current locale, as a label. */
+export function todayFormat(): string {
+  const text = getIntl('today', locale => new Intl.RelativeTimeFormat(locale, {numeric: 'auto'})).format(0, 'day')
 
-  return isSameYear(date, new Date()) ? dayMonth : `${ dayMonth } ${ date.getFullYear() }`
+  return text.charAt(0).toLocaleUpperCase() + text.slice(1)
+}
+
+/** `07 Oct`, with the year added when it is not the current one. */
+export function dateFormatShort(date: Date): string {
+  return (isSameYear(date, new Date()) ? dayMonthFormatter : dayMonthYearFormatter).format(date)
 }
 
 export function timeFormat(date: Date): string {
-  return date.toLocaleTimeString('en-GB')
+  return timeFormatter.format(date)
 }
 
 export function timeFormatShort(date: Date): string {
-  return date.toLocaleTimeString('en-GB', {timeStyle: 'short'})
+  return timeShortFormatter.format(date)
 }
 
+/** The date, then the time, joined the way the locale joins them: `07 Oct 2026, 14:30:05`. `short` drops the seconds, and the year when it is the current one: `07 Oct, 14:30`. */
 export function datetimeFormat(date: Date, short?: boolean): string {
-  return `${ (short ? timeFormatShort : timeFormat)(date) } - ${ (short ? dateFormatShort : dateFormat)(date) }`
-}
+  if (!short) return datetimeFormatter.format(date)
 
-export function durationHumanize(durationSeconds: number, full?: boolean, round?: boolean): string {
-  const cb = full ? getDurationStringFull : getDurationString
-
-  const seconds = durationSeconds % 60
-  if (durationSeconds === seconds) return round ? cb(Math.round(seconds)) : cb(seconds)
-
-  const durationMinutes = (durationSeconds - seconds) / 60
-  const minutes = durationMinutes % 60
-  if (durationMinutes === minutes) return round ? cb(0, Math.round(minutes + (seconds / 60))) : cb(seconds, minutes)
-
-  const durationHours = (durationMinutes - minutes) / 60
-  const hours = durationHours % 24
-  if (durationHours === hours && (!round || durationHours < 22)) return round ? cb(0, 0, Math.round(hours + (minutes / 60))) :cb(seconds, minutes, hours)
-
-  const durationDays = (durationHours - hours) / 24
-  const days = durationDays % 365
-  if (durationDays === days) {
-    if (days < 30) return round ? cb(0, 0, 0, Math.round(days + (hours / 24))) : cb(seconds, minutes, hours, days)
-
-    const newDays = days % 30
-    const months = (days - newDays) / 30
-
-    return round ? cb(0, 0, 0, 0, Math.round(months)) : cb(seconds, minutes, hours, newDays, months)
-  } else {
-    const durationYears = (durationDays - days) / 365
-
-    if (days < 30) return round ? cb(0, 0, 0, 0, 0, Math.round(durationYears)) : cb(seconds, minutes, hours, days, 0, durationYears)
-
-    const newDays = days % 30
-    const months = (days - newDays) / 30
-
-    return round ? cb(0, 0, 0, 0, 0, Math.round(durationYears)) : cb(seconds, minutes, hours, newDays, months, durationYears)
-  }
-}
-
-function getDurationString(seconds: number, minutes?: number, hours?: number, days?: number, months?: number, years?: number) {
-  const parts: string[] = []
-
-  if (years) parts.push(`${ years } Y`)
-  if (months) parts.push(`${ months } M`)
-  if (days) parts.push(`${ days } d`)
-  if (hours) parts.push(`${ hours } h`)
-  if (minutes && !days) parts.push(`${ minutes } m`)
-  if (seconds && !days && !hours) parts.push(`${ seconds } s`)
-
-  return parts.join(' ')
-}
-
-function getDurationStringFull(seconds: number, minutes?: number, hours?: number, days?: number, months?: number, years?: number) {
-  const parts: string[] = []
-
-  if (years) parts.push(`${ years } year${ years === 1 ? '' : 's' }`)
-  if (months) parts.push(`${ months } month${ months === 1 ? '' : 's' }`)
-  if (days) parts.push(`${ days } day${ days === 1 ? '' : 's' }`)
-  if (hours) parts.push(`${ hours } hour${ hours === 1 ? '' : 's' }`)
-  if (minutes && !days) parts.push(`${ minutes } minute${ minutes === 1 ? '' : 's' }`)
-  if (seconds && !days && !hours) parts.push(`${ seconds } second${ seconds === 1 ? '' : 's' }`)
-
-  return parts.join(' ')
+  return (isSameYear(date, new Date()) ? datetimeShortFormatter : datetimeShortYearFormatter).format(date)
 }
 
 const minute = 60
@@ -136,6 +137,62 @@ const hour = 60 * minute
 const day = 24 * hour
 const month = 30 * day
 const year = 365 * day
+
+type DurationUnit = 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second'
+
+const durationUnits: [DurationUnit, number][] = [
+  ['year', year],
+  ['month', month],
+  ['day', day],
+  ['hour', hour],
+  ['minute', minute],
+  ['second', 1],
+]
+
+const getDurationParts = (seconds: number, round?: boolean): [DurationUnit, number][] => {
+  if (round) {
+    if (seconds < 1) return [['second', Math.round(seconds * 100) / 100]]
+    if (seconds < minute) return [['second', Math.round(seconds)]]
+    if (seconds < hour) return [['minute', Math.round(seconds / minute)]]
+    if (seconds < 22 * hour) return [['hour', Math.round(seconds / hour)]]
+    if (seconds < month) return [['day', Math.round(seconds / day)]]
+    if (seconds < year) return [['month', Math.round(seconds / month)]]
+    return [['year', Math.round(seconds / year)]]
+  }
+
+  let rest = seconds
+
+  const values = durationUnits.map(([unit, size]): [DurationUnit, number] => {
+    const value = size === 1 ? rest : Math.floor(rest / size)
+
+    rest -= value * size
+
+    return [unit, value]
+  })
+
+  const largest = values.findIndex(([, value]) => value !== 0)
+
+  if (largest === -1) return [['second', 0]]
+
+  return values.slice(largest, largest + 2).filter(([, value]) => value !== 0)
+}
+
+/**
+ * The duration in the locale set with `setLocale`: `1 hr 30 min`, or `1 hour 30 minutes` with `full`.
+ * Shows the largest part and the one right below it; `round` keeps only the largest part, rounded.
+ */
+export function durationHumanize(durationSeconds: number, full?: boolean, round?: boolean): string {
+  const unitDisplay = full ? 'long' : 'short'
+  const negative = durationSeconds < 0
+
+  const parts = getDurationParts(Math.abs(durationSeconds), round).map(([unit, value], index) => {
+    const formatter = getIntl(`duration|${ unit }|${ unitDisplay }`, locale => new Intl.NumberFormat(locale, {style: 'unit', unit, unitDisplay}))
+
+    return formatter.format(negative && index === 0 ? -value : value)
+  })
+
+  return getIntl('durationList', locale => new Intl.ListFormat(locale, {type: 'unit', style: 'narrow'})).format(parts)
+}
 
 export function getDurationRound(seconds: number): number {
   if (seconds < 0) return 0

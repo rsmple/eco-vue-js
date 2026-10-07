@@ -59,7 +59,7 @@ import WDatePickerSingle from '@/components/DatePicker/WDatePickerSingle.vue'
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
-import {dateFormat, parseDate} from '@/utils/dateTime'
+import {dateInputFormat, parseDateInput} from '@/utils/dateTime'
 
 defineOptions({inheritAttrs: false})
 
@@ -92,7 +92,7 @@ defineSlots<{
 
 const inputComponentRef = useTemplateRef('inputComponent')
 
-const inputValue = ref<string>(props.modelValue ? dateFormat(props.modelValue) : '')
+const inputValue = ref<string>(props.modelValue ? dateInputFormat(props.modelValue) : '')
 
 const updateInputValue = (value: string | null) => {
   inputValue.value = value ?? ''
@@ -102,7 +102,7 @@ const updateInputValue = (value: string | null) => {
     return
   }
 
-  const date = parseDate(value)
+  const date = parseDateInput(value)
 
   if (!date) return
 
@@ -120,10 +120,10 @@ const updateInputValue = (value: string | null) => {
 }
 
 const formatModelValue = (value: Date | undefined) => {
-  inputValue.value = value ? dateFormat(value) : ''
+  inputValue.value = value ? dateInputFormat(value) : ''
 }
 
 watch(() => props.modelValue, value => {
-  inputValue.value = value ? dateFormat(value) : ''
+  inputValue.value = value ? dateInputFormat(value) : ''
 })
 </script>

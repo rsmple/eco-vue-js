@@ -16,7 +16,7 @@
         'opacity-50': !value,
       }"
     >
-      {{ value ? dateFormat(value) : 'NONE' }}
+      {{ value ? dateFormat(value) : getText('noDate') }}
     </div>
   </div>
 </template>
@@ -26,6 +26,7 @@ import {computed, onBeforeMount} from 'vue'
 
 import {SemanticType, useSemanticTypeBackgroundMap} from '@/utils/SemanticType'
 import {dateFormat, getStartOfMonth, isSameMonth} from '@/utils/dateTime'
+import {getText} from '@/utils/texts'
 
 const props = defineProps<{
   title: string

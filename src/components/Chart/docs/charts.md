@@ -147,7 +147,7 @@ import WChartLinear from 'eco-vue-js/dist/components/Chart/WChartLinear.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `xDomain` | `[number, number]` | **required** | Time range of the x axis, as `[from, to]` timestamps in ms. The axis labels are dates, and "Today". |
+| `xDomain` | `[number, number]` | **required** | Time range of the x axis, as `[from, to]` timestamps in ms. The axis labels are dates, and "Today", in the locale set with `setLocale`. |
 | `yDomainGetter` | `((extent: [number, number]) => [number, number])` | — | Range of the y axis from the range of all the lines' values. By default it is rounded out to tens or hundreds and starts at 0 or below. |
 | `height` | `number` | `0` | Height of the chart in px. By default it fills the height of its parent. |
 | `xHidden` | `boolean` | — | Hides the x axis. |
@@ -189,7 +189,7 @@ import WChartLine from 'eco-vue-js/dist/components/Chart/WChartLine.vue'
 | `strokeWidth` | `number` | — | Width of the line in px. Defaults to 2. |
 | `hasArea` | `boolean` | — | Fills the area under the line with a fading color. |
 | `pointRadius` | `number` | — | Radius in px of the point marked under the tooltip. Defaults to 3. |
-| `emptyStub` | `string` | — | Text shown when there are no points in range. The `empty` slot replaces it. |
+| `emptyStub` | `string` | — | Text shown when there are no points in range, instead of the `noData` text set with `setTexts`. The `empty` slot replaces it. |
 | `calcMin` | `boolean` | — | Lets the y axis start above 0, at the lowest value. By default it includes 0. |
 | `scaleX` | `(value: number) => number` | **required** | Converts a timestamp to an x position in px. |
 | `scaleY` | `(value: number) => number` | **required** | Converts a value to a y position in px. |

@@ -4,6 +4,8 @@ import type {InjectionKey, VNode, VNodeProps} from 'vue'
 
 import {isField} from '@/components/List/models/utils'
 
+import {getIntl} from './locale'
+
 const overflowScrollRegexp = /auto|scroll|overlay/
 
 const getStyleValue = (node: Element, prop: string) => getComputedStyle(node, null).getPropertyValue(prop)
@@ -133,17 +135,21 @@ export const isEqualObj = (obj1: NonNullable<unknown>, obj2: NonNullable<unknown
     })
 }
 
-const getFormatter = (formatter: Intl.NumberFormat): Pick<Intl.NumberFormat, 'format'> => {
+/** A number formatter in the locale set with `setLocale`. Thousands are grouped with a space in every locale, `1 234 567.5`, as a comma or a dot there reads as a decimal separator in other locales. */
+const localeNumberFormatter = (key: string, options: Intl.NumberFormatOptions): Pick<Intl.NumberFormat, 'format'> => {
   return {
-    format: (value: number) => formatter.format(value).replaceAll(',', ' '),
+    format: (value: number) => getIntl(`number|${ key }`, locale => new Intl.NumberFormat(locale, options))
+      .formatToParts(value)
+      .map(part => part.type === 'group' ? ' ' : part.value)
+      .join(''),
   }
 }
 
-export const percentCompactFormatter = Intl.NumberFormat('en', {notation: 'compact', style: 'percent'})
-export const percentFormatter = getFormatter(Intl.NumberFormat('en', {maximumFractionDigits: 3, style: 'percent'}))
+export const percentCompactFormatter = localeNumberFormatter('percentCompact', {notation: 'compact', style: 'percent'})
+export const percentFormatter = localeNumberFormatter('percent', {maximumFractionDigits: 3, style: 'percent'})
 
-export const numberCompactFormatter = Intl.NumberFormat('en', {notation: 'compact'})
-export const numberFormatter = getFormatter(Intl.NumberFormat('en', {maximumFractionDigits: 3}))
+export const numberCompactFormatter = localeNumberFormatter('numberCompact', {notation: 'compact'})
+export const numberFormatter = localeNumberFormatter('number', {maximumFractionDigits: 3})
 
 export const dateFormatterCsv = new Intl.DateTimeFormat('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false})
 

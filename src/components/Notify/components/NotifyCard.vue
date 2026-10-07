@@ -141,7 +141,7 @@
         v-if="history"
         class="text-description text-xs"
       >
-        {{ timeFormat(item.date) }}{{ isSameDate(new Date(), item.date) ? '' : (', ' + dateFormatShort(item.date)) }}
+        {{ isSameDate(new Date(), item.date) ? timeFormat(item.date) : datetimeFormat(item.date, true) }}
       </div>
     </div>
   </div>
@@ -160,7 +160,7 @@ import IconCancel from '@/assets/icons/IconCancel.svg?component'
 
 import {useOptionalRouter} from '@/composables/useOptionalRouter'
 import {SemanticType} from '@/utils/SemanticType'
-import {dateFormatShort, isSameDate, timeFormat} from '@/utils/dateTime'
+import {datetimeFormat, isSameDate, timeFormat} from '@/utils/dateTime'
 
 import {NotifyType} from '../models/NotifyType'
 import {discardNotify, isNotifyPending, notifyTypeIconMap, notifyTypeSemanticTypeMap, updateNotify} from '../models/notifyCenter'
