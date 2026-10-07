@@ -745,7 +745,7 @@ export const meta = {
   >
     <template #inner>
       <span class="list:hidden">{{ meta.title }}: </span>
-      {{ item.waterBy ? dateFormatShort(item.waterBy) : '-' }}
+      {{ item.waterBy ? dateFormat(item.waterBy, {year: 'auto'}) : '-' }}
     </template>
   </WListCardField>
 </template>
@@ -754,7 +754,7 @@ export const meta = {
 import type {Plant} from '../models/Plant'
 
 import type {FieldProps, ListField} from 'eco-vue-js/dist/components/List/types'
-import {dateFormat, dateFormatShort, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
+import {dateFormat, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 
 import WListCardField from 'eco-vue-js/dist/components/List/WListCardField.vue'
 
@@ -1496,7 +1496,7 @@ The expansion gets the row's `item` and has the full width of the list, so it ca
           >
             <template #tooltip="{d, prev}">
               <div class="grid text-sm text-start">
-                <span class="text-description">{{ dateFormatShort(new Date(d.date)) }}</span>
+                <span class="text-description">{{ dateFormat(new Date(d.date), {year: 'auto'}) }}</span>
                 <span>
                   <span class="font-semibold">{{ d.height }} cm</span> <span
                     v-if="prev"
@@ -1581,7 +1581,7 @@ import {markRaw} from 'vue'
 
 import type {FieldProps} from 'eco-vue-js/dist/components/List/types'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
-import {addDay, addMonth, dateFormat, dateFormatShort, getStartOfDay, isSameDate} from 'eco-vue-js/dist/utils/dateTime'
+import {addDay, addMonth, dateFormat, getStartOfDay, isSameDate} from 'eco-vue-js/dist/utils/dateTime'
 
 import WChartLine from 'eco-vue-js/dist/components/Chart/WChartLine.vue'
 import WChartLinear from 'eco-vue-js/dist/components/Chart/WChartLinear.vue'

@@ -10,7 +10,7 @@
   >
     <template #inner>
       <span class="list:hidden">{{ meta.title }}: </span>
-      {{ item.waterBy ? dateFormatShort(item.waterBy) : '-' }}
+      {{ item.waterBy ? dateFormat(item.waterBy, {year: 'auto'}) : '-' }}
     </template>
   </WListCardField>
 </template>
@@ -19,7 +19,7 @@
 import type {Plant} from '../models/Plant'
 
 import type {FieldProps, ListField} from 'eco-vue-js/dist/components/List/types'
-import {dateFormat, dateFormatShort, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
+import {dateFormat, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 
 import WListCardField from 'eco-vue-js/dist/components/List/WListCardField.vue'
 

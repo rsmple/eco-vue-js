@@ -20,7 +20,7 @@
         v-if="!xHidden"
         orientation="x"
         :scale="scaleX"
-        :format="value => isSameDate(new Date(value), new Date) ? todayFormat() : dateFormatShort(new Date(value))"
+        :format="value => isSameDate(new Date(value), new Date) ? todayFormat() : dateFormat(new Date(value), {year: 'auto'})"
         :domain="xExtent"
         :transform="`translate(0, ${svgHeight - bottom})`"
         :y-right="yRight === true"
@@ -60,7 +60,7 @@ import {type VNode, computed, onBeforeUnmount, onMounted, ref, useTemplateRef, w
 
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
-import {dateFormatShort, isSameDate, todayFormat} from '@/utils/dateTime'
+import {dateFormat, isSameDate, todayFormat} from '@/utils/dateTime'
 import {useComponentStatesSkeleton} from '@/utils/useComponentStates'
 
 import ChartAxis from './components/ChartAxis.vue'
