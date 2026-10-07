@@ -33,7 +33,7 @@
         "
       >
         <div
-          v-for="(label, i) in DAY_LABELS"
+          v-for="(label, i) in dayLabels"
           :key="i"
           class="my-(--w-chart-heatmap-gap,0.125rem) flex h-(--w-chart-heatmap-size,1rem) items-center"
         >
@@ -52,7 +52,7 @@
             class="flex flex-col"
           >
             <div class="text-2xs text-description flex h-4 w-0 items-end whitespace-nowrap">
-              {{ week.monthLabel }}
+              {{ week.month ? monthShortFormatter.format(week.month) : '' }}
             </div>
 
             <template
@@ -83,6 +83,7 @@ import {computed, nextTick, onMounted, useTemplateRef, watch} from 'vue'
 
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
+import {addDay, getStartOfWeek, monthShortFormatter, weekdayNarrowFormatter} from '@/utils/dateTime'
 import {useComponentStatesSkeleton} from '@/utils/useComponentStates'
 
 import HeatmapCell from './components/HeatmapCell.vue'
@@ -90,7 +91,12 @@ import {dateToKey, weekGrid} from './models/WeekGrid'
 
 const OPACITIES = [0.2, 0.4, 0.6, 0.8, 1] as const
 
-const DAY_LABELS = ['M', '', 'W', '', 'F', '', ''] as const
+// Monday, Wednesday and Friday, in the locale set with `setLocale`.
+const dayLabels = computed(() => {
+  const monday = getStartOfWeek()
+
+  return Array.from({length: 7}, (_, index) => index % 2 || index > 4 ? '' : weekdayNarrowFormatter.format(addDay(monday, index)))
+})
 
 type DataEntry = {
   opacity: number

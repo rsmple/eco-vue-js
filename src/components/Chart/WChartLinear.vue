@@ -20,7 +20,7 @@
         v-if="!xHidden"
         orientation="x"
         :scale="scaleX"
-        :format="value => isSameDate(new Date(value), new Date) ? 'Today' : dateFormatShort(new Date(value))"
+        :format="value => isSameDate(new Date(value), new Date) ? todayFormat() : dateFormatShort(new Date(value))"
         :domain="xExtent"
         :transform="`translate(0, ${svgHeight - bottom})`"
         :y-right="yRight === true"
@@ -60,14 +60,14 @@ import {type VNode, computed, onBeforeUnmount, onMounted, ref, useTemplateRef, w
 
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
-import {dateFormatShort, isSameDate} from '@/utils/dateTime'
+import {dateFormatShort, isSameDate, todayFormat} from '@/utils/dateTime'
 import {useComponentStatesSkeleton} from '@/utils/useComponentStates'
 
 import ChartAxis from './components/ChartAxis.vue'
 
 const props = withDefaults(
   defineProps<{
-    /** Time range of the x axis, as `[from, to]` timestamps in ms. The axis labels are dates, and "Today". */
+    /** Time range of the x axis, as `[from, to]` timestamps in ms. The axis labels are dates, and "Today", in the locale set with `setLocale`. */
     xDomain: [number, number]
     /** Range of the y axis from the range of all the lines' values. By default it is rounded out to tens or hundreds and starts at 0 or below. */
     yDomainGetter?: (extent: [number, number]) => [number, number]

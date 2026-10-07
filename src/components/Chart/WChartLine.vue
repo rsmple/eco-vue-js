@@ -144,7 +144,7 @@
     <div class="text-description text-2xs flex size-full cursor-not-allowed items-center opacity-40">
       <slot name="empty">
         <div>
-          {{ emptyStub ?? 'No data' }}
+          {{ emptyStub ?? getText('noData') }}
         </div>
       </slot>
     </div>
@@ -157,6 +157,8 @@ import type {ChartContext} from './types'
 import {computed, nextTick, onUnmounted, ref, useId, useTemplateRef, watch} from 'vue'
 
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
+
+import {getText} from '@/utils/texts'
 
 type DataPrepared = {x: number, y: number, yMin: number, yMax: number, d: Data, imagine: boolean}
 
@@ -179,7 +181,7 @@ const props = defineProps<{
   hasArea?: boolean
   /** Radius in px of the point marked under the tooltip. Defaults to 3. */
   pointRadius?: number
-  /** Text shown when there are no points in range. The `empty` slot replaces it. */
+  /** Text shown when there are no points in range, instead of the `noData` text set with `setTexts`. The `empty` slot replaces it. */
   emptyStub?: string
   /** Lets the y axis start above 0, at the lowest value. By default it includes 0. */
   calcMin?: boolean

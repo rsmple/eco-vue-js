@@ -1,5 +1,3 @@
-const monthFormatter = new Intl.DateTimeFormat('en', {month: 'short'})
-
 export const dateToKey = (date: Date): string => {
   return `${ date.getFullYear() }-${ String(date.getMonth() + 1).padStart(2, '0') }-${ String(date.getDate()).padStart(2, '0') }`
 }
@@ -19,7 +17,7 @@ export const weekGrid = (() => {
   const endDay = (gridEnd.getDay() + 6) % 7
   if (endDay < 6) gridEnd.setDate(gridEnd.getDate() + (6 - endDay))
 
-  const result: Array<{days: Array<string | null>, monthLabel: string | undefined}> = []
+  const result: Array<{days: Array<string | null>, month: Date | undefined}> = []
   const current = new Date(gridStart)
   let lastMonth = -1
 
@@ -38,17 +36,17 @@ export const weekGrid = (() => {
       current.setDate(current.getDate() + 1)
     }
 
-    let monthLabel: string | undefined
+    let monthStart: Date | undefined
 
     if (firstVisibleDate) {
       const month = firstVisibleDate.getMonth()
       if (month !== lastMonth) {
-        monthLabel = monthFormatter.format(firstVisibleDate)
+        monthStart = firstVisibleDate
         lastMonth = month
       }
     }
 
-    result.push({days, monthLabel})
+    result.push({days, month: monthStart})
   }
 
   return result

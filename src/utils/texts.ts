@@ -21,6 +21,13 @@ export type Texts = {
   closeModalAccept: string
   /** Warning when a step, or a form being submitted, has invalid fields. */
   invalidData: string
+  /** A chart line with no points in range, unless its `emptyStub` is set. */
+  noData: string
+  /** Titles of the start and end of a date picker range. */
+  dateFrom: string
+  dateTo: string
+  /** A date picker value that is not picked. */
+  noDate: string
 }
 
 type TextSource = string | (() => string)
@@ -36,6 +43,10 @@ const texts = shallowReactive<Record<keyof Texts, TextSource>>({
   closeModalDescription: 'Closing the modal will undo any changes',
   closeModalAccept: 'Close',
   invalidData: 'Form contains invalid data',
+  noData: 'No data',
+  dateFrom: 'From:',
+  dateTo: 'To:',
+  noDate: 'None',
 })
 
 /**

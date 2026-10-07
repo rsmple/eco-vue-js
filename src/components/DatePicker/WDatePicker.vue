@@ -2,7 +2,7 @@
   <div>
     <div class="mb-4 grid grid-cols-2 gap-5">
       <CalendarValue
-        title="From:"
+        :title="getText('dateFrom')"
         :value="dateRange?.from"
         :current-date="currentDate"
         auto-focus
@@ -10,7 +10,7 @@
       />
 
       <CalendarValue
-        title="To:"
+        :title="getText('dateTo')"
         :value="dateRange?.to"
         :current-date="currentDate"
         @update:current-date="setCurrentDate"
@@ -71,6 +71,7 @@ import type {DateRange} from './models/types'
 import {ref, toRef, watch} from 'vue'
 
 import {getStartOfDay, isSameMonth, monthShortFormatter} from '@/utils/dateTime'
+import {getText} from '@/utils/texts'
 import {useComponentStates} from '@/utils/useComponentStates'
 
 import CalendarMonth from './components/CalendarMonth.vue'
