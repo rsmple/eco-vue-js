@@ -88,9 +88,17 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
 
     // A new value from the parent or the query — e.g. a save that updated the cache — keeps the changes not saved yet,
     // unless the query now loads another item or the parent form was reset.
+    // While that item loads, the form keeps its model — e.g. the one a create just returned — and takes the loaded one whole.
+    let resetPending = false
+
     watch([innerModel, () => queryParams?.value, () => parentReset?.value], ([value, params, parentResetValue], [, paramsOld, parentResetOld]) => {
+      const isReset = resetPending || !isSame(params, paramsOld) || parentResetValue !== parentResetOld
+
+      resetPending = isReset && value === undefined && (query?.isEnabled.value ?? false)
+
+      if (resetPending) return
+
       const next = (initFn ?? copyItem)(value ?? {} as InnerModel)
-      const isReset = !isSame(params, paramsOld) || parentResetValue !== parentResetOld
 
       data.value = isReset ? next : keepChanges(next, data.value, modelValueInitRef.value)
       modelValueInitRef.value = (initFn ?? copyItem)(value ?? {} as InnerModel)

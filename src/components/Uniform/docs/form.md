@@ -240,7 +240,7 @@ const confirmDisable = (value: boolean): ConfirmProps | undefined => value ? und
 </WUniform>
 ```
 
-When the loaded value changes — another view saved the item and updated the cache, or an auto-save did — the form takes it and keeps the changes not saved yet. When `queryParams` change, the form loads another item and drops its changes, and so do the forms inside it that keep their own copy of the model.
+When the loaded value changes — another view saved the item and updated the cache, or an auto-save did — the form takes it and keeps the changes not saved yet. When `queryParams` change, the form loads another item and drops its changes, and so do the forms inside it that keep their own copy of the model. Until that item loads, the form keeps its current model, so a create whose result carries the new id stays filled while the saved item loads.
 
 ## Nested objects
 
