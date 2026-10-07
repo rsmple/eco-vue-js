@@ -64,7 +64,7 @@
           >
             <template #tooltip="{d, prev}">
               <div class="grid text-sm text-start">
-                <span class="text-description">{{ dateFormatShort(new Date(d.date)) }}</span>
+                <span class="text-description">{{ dateFormat(new Date(d.date), {year: 'auto'}) }}</span>
                 <span>
                   <span class="font-semibold">{{ d.height }} cm</span> <span
                     v-if="prev"
@@ -149,7 +149,7 @@ import {markRaw} from 'vue'
 
 import type {FieldProps} from 'eco-vue-js/dist/components/List/types'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
-import {addDay, addMonth, dateFormat, dateFormatShort, getStartOfDay, isSameDate} from 'eco-vue-js/dist/utils/dateTime'
+import {addDay, addMonth, dateFormat, getStartOfDay, isSameDate} from 'eco-vue-js/dist/utils/dateTime'
 
 import WChartLine from 'eco-vue-js/dist/components/Chart/WChartLine.vue'
 import WChartLinear from 'eco-vue-js/dist/components/Chart/WChartLinear.vue'

@@ -27,9 +27,12 @@ const dayMonthYearFormatter = dateTimeFormatter('dayMonthYear', {day: '2-digit',
 const dateInputFormatter = dateTimeFormatter('dateInput', {day: '2-digit', month: '2-digit', year: 'numeric'})
 const timeFormatter = dateTimeFormatter('time', {timeStyle: 'medium'})
 const timeShortFormatter = dateTimeFormatter('timeShort', {timeStyle: 'short'})
-const datetimeFormatter = dateTimeFormatter('datetime', locale => ({day: '2-digit', month: 'short', year: 'numeric', ...timeOptions(locale, true)}))
-const datetimeShortFormatter = dateTimeFormatter('datetimeShort', locale => ({day: '2-digit', month: 'short', ...timeOptions(locale, false)}))
-const datetimeShortYearFormatter = dateTimeFormatter('datetimeShortYear', locale => ({day: '2-digit', month: 'short', year: 'numeric', ...timeOptions(locale, false)}))
+const datetimeFormatters = {
+  'year|seconds': dateTimeFormatter('datetime|year|seconds', locale => ({day: '2-digit', month: 'short', year: 'numeric', ...timeOptions(locale, true)})),
+  'year|': dateTimeFormatter('datetime|year|', locale => ({day: '2-digit', month: 'short', year: 'numeric', ...timeOptions(locale, false)})),
+  '|seconds': dateTimeFormatter('datetime||seconds', locale => ({day: '2-digit', month: 'short', ...timeOptions(locale, true)})),
+  '|': dateTimeFormatter('datetime||', locale => ({day: '2-digit', month: 'short', ...timeOptions(locale, false)})),
+}
 
 const getDate = (year: number, month: number, day: number): Date | undefined => {
   const date = new Date(year, month - 1, day)
@@ -40,7 +43,7 @@ const getDate = (year: number, month: number, day: number): Date | undefined => 
 export const dateRegexp = /\d\d\.\d\d\.\d\d\d\d/i
 
 /** Reads `dd.mm.yyyy`, the same in every locale, such as from a query param. Returns `undefined` for text that is not a date. */
-export const parseDate = (value: string): Date | undefined => {
+export const parseDateQuery = (value: string): Date | undefined => {
   if (!dateRegexp.test(value)) return
 
   const [day, month, year] = value.match(dateRegexp)![0].split('.').map(Number) as [number, number, number]
@@ -100,9 +103,33 @@ export function dateToQueryString(date: Date): string {
   return date.toISOString().split('T')[0]!
 }
 
-/** The date with the month name, so it reads the same way in any locale: `07 Oct 2026`, or `Oct 07, 2026` in `en-US`. */
-export function dateFormat(date: Date): string {
-  return dayMonthYearFormatter.format(date)
+export type DateFormatOptions = {
+  /** `always` shows the year, `auto` only when it is not the current one. Defaults to `always`. */
+  year?: 'always' | 'auto'
+}
+
+export type TimeFormatOptions = {
+  /** Shows the seconds. Defaults to `true`. */
+  seconds?: boolean
+}
+
+export type DatetimeFormatOptions = DateFormatOptions & TimeFormatOptions
+
+const hasYear = (date: Date, year: DateFormatOptions['year'] = 'always'): boolean => year === 'always' || !isSameYear(date, new Date())
+
+/** The date with the month name, so it reads the same way in any locale: `07 Oct 2026`, or `Oct 07, 2026` in `en-US`. With `year: 'auto'`, `07 Oct` this year. */
+export function dateFormat(date: Date, {year}: DateFormatOptions = {}): string {
+  return (hasYear(date, year) ? dayMonthYearFormatter : dayMonthFormatter).format(date)
+}
+
+/** `14:30:05`, or `2:30:05 PM` in a locale with a 12-hour clock. With `seconds: false`, `14:30`. */
+export function timeFormat(date: Date, {seconds = true}: TimeFormatOptions = {}): string {
+  return (seconds ? timeFormatter : timeShortFormatter).format(date)
+}
+
+/** The date, then the time, joined the way the locale joins them: `07 Oct 2026, 14:30:05`. With `{year: 'auto', seconds: false}`, `07 Oct, 14:30` this year. */
+export function datetimeFormat(date: Date, {year, seconds = true}: DatetimeFormatOptions = {}): string {
+  return datetimeFormatters[`${ hasYear(date, year) ? 'year' : '' }|${ seconds ? 'seconds' : '' }`].format(date)
 }
 
 /** `Today` in the current locale, as a label. */
@@ -110,26 +137,6 @@ export function todayFormat(): string {
   const text = getIntl('today', locale => new Intl.RelativeTimeFormat(locale, {numeric: 'auto'})).format(0, 'day')
 
   return text.charAt(0).toLocaleUpperCase() + text.slice(1)
-}
-
-/** `07 Oct`, with the year added when it is not the current one. */
-export function dateFormatShort(date: Date): string {
-  return (isSameYear(date, new Date()) ? dayMonthFormatter : dayMonthYearFormatter).format(date)
-}
-
-export function timeFormat(date: Date): string {
-  return timeFormatter.format(date)
-}
-
-export function timeFormatShort(date: Date): string {
-  return timeShortFormatter.format(date)
-}
-
-/** The date, then the time, joined the way the locale joins them: `07 Oct 2026, 14:30:05`. `short` drops the seconds, and the year when it is the current one: `07 Oct, 14:30`. */
-export function datetimeFormat(date: Date, short?: boolean): string {
-  if (!short) return datetimeFormatter.format(date)
-
-  return (isSameYear(date, new Date()) ? datetimeShortFormatter : datetimeShortYearFormatter).format(date)
 }
 
 const minute = 60
@@ -177,12 +184,15 @@ const getDurationParts = (seconds: number, round?: boolean): [DurationUnit, numb
   return values.slice(largest, largest + 2).filter(([, value]) => value !== 0)
 }
 
-/**
- * The duration in the locale set with `setLocale`: `1 hr 30 min`, or `1 hour 30 minutes` with `full`.
- * Shows the largest part and the one right below it; `round` keeps only the largest part, rounded.
- */
-export function durationHumanize(durationSeconds: number, full?: boolean, round?: boolean): string {
-  const unitDisplay = full ? 'long' : 'short'
+export type DurationFormatOptions = {
+  /** `short` for `1 hr 30 mins`, `long` for `1 hour 30 minutes`. Defaults to `short`. */
+  style?: 'short' | 'long'
+  /** Keeps only the largest part, rounded: `2 hrs`. */
+  round?: boolean
+}
+
+/** The duration in seconds, in the locale set with `setLocale`: `1 hr 30 mins`. Shows the largest part and the one right below it. */
+export function durationFormat(durationSeconds: number, {style: unitDisplay = 'short', round}: DurationFormatOptions = {}): string {
   const negative = durationSeconds < 0
 
   const parts = getDurationParts(Math.abs(durationSeconds), round).map(([unit, value], index) => {

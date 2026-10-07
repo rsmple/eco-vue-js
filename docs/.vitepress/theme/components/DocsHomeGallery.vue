@@ -173,7 +173,7 @@
         />
 
         <span class="text-description text-sm">
-          {{ vacation ? `Plant-sitter needed ${ dateFormatShort(vacation.from) } – ${ dateFormatShort(vacation.to) }` : 'Pick your vacation dates' }}
+          {{ vacation ? `Plant-sitter needed ${ dateFormat(vacation.from, {year: 'auto'}) } – ${ dateFormat(vacation.to, {year: 'auto'}) }` : 'Pick your vacation dates' }}
         </span>
       </DocsHomeTile>
 
@@ -261,7 +261,7 @@
             class="tone-primary text-tone-fill"
           >
             <template #tooltip="{d}">
-              {{ d.count }} waterings on {{ dateFormatShort(new Date(d.date)) }}
+              {{ d.count }} waterings on {{ dateFormat(new Date(d.date), {year: 'auto'}) }}
             </template>
           </WChartHeatmap>
 
@@ -422,7 +422,7 @@
                 >
                   <template #tooltip="{d, index}">
                     <div class="grid text-sm text-start">
-                      <span class="text-description text-xs">{{ dateFormatShort(new Date(d.date)) }}</span>
+                      <span class="text-description text-xs">{{ dateFormat(new Date(d.date), {year: 'auto'}) }}</span>
                       <span class="font-semibold">{{ d.value }}% soil moisture <span class="text-description">±{{ d.max - d.value }}%</span></span>
                       <span class="font-semibold">{{ HUMIDITY_TREND[index!].value }}% air humidity</span>
                     </div>
@@ -812,7 +812,7 @@ import type {DateRange} from 'eco-vue-js/dist/components/DatePicker/models/types
 import type {NotifyPosition} from 'eco-vue-js/dist/components/Notify/types'
 import {Notify, NotifyChannel} from 'eco-vue-js/dist/utils/Notify'
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
-import {addDay, dateFormatShort, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
+import {addDay, dateFormat, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 import {numberCompactFormatter} from 'eco-vue-js/dist/utils/utils'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'

@@ -1,6 +1,6 @@
 ---
 group: Utilities
-description: Date, duration and number formatting from eco-vue-js — dateFormat, durationHumanize and date math in dateTime, the number and percent formatters, and buildCsvContent for CSV exports.
+description: Date, duration and number formatting from eco-vue-js — dateFormat, durationFormat and date math in dateTime, the number and percent formatters, and buildCsvContent for CSV exports.
 ---
 
 # Formatting
@@ -37,7 +37,7 @@ The functions the kit's components format values with, for the same output elsew
 
 <script lang="ts" setup>
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
-import {addDay, dateFormat, dateFormatShort, dateToQueryString, datetimeFormat, durationHumanize} from 'eco-vue-js/dist/utils/dateTime'
+import {addDay, dateFormat, dateToQueryString, datetimeFormat, durationFormat} from 'eco-vue-js/dist/utils/dateTime'
 import {buildCsvContent} from 'eco-vue-js/dist/utils/exportToCsv'
 import {numberCompactFormatter, numberFormatter, percentFormatter} from 'eco-vue-js/dist/utils/utils'
 
@@ -47,12 +47,12 @@ const now = new Date()
 
 const rows = [
   {code: 'dateFormat(now)', value: dateFormat(now)},
-  {code: 'dateFormatShort(addDay(now, -3))', value: dateFormatShort(addDay(now, -3))},
-  {code: 'datetimeFormat(now, true)', value: datetimeFormat(now, true)},
+  {code: 'dateFormat(addDay(now, -3), {year: \'auto\'})', value: dateFormat(addDay(now, -3), {year: 'auto'})},
+  {code: 'datetimeFormat(now, {year: \'auto\', seconds: false})', value: datetimeFormat(now, {year: 'auto', seconds: false})},
   {code: 'dateToQueryString(now)', value: dateToQueryString(now)},
-  {code: 'durationHumanize(5400)', value: durationHumanize(5400)},
-  {code: 'durationHumanize(5400, true)', value: durationHumanize(5400, true)},
-  {code: 'durationHumanize(200000, true, true)', value: durationHumanize(200000, true, true)},
+  {code: 'durationFormat(5400)', value: durationFormat(5400)},
+  {code: 'durationFormat(5400, {style: \'long\'})', value: durationFormat(5400, {style: 'long'})},
+  {code: 'durationFormat(200000, {style: \'long\', round: true})', value: durationFormat(200000, {style: 'long', round: true})},
   {code: 'numberFormatter.format(1234567.5)', value: numberFormatter.format(1234567.5)},
   {code: 'numberCompactFormatter.format(12840)', value: numberCompactFormatter.format(12840)},
   {code: 'percentFormatter.format(0.4375)', value: percentFormatter.format(0.4375)},
@@ -84,7 +84,7 @@ const download = () => {
 ## Dates
 
 ```ts
-import {addDay, dateFormat, durationHumanize, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
+import {addDay, dateFormat, durationFormat, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 ```
 
 All of them work in local time, and format in the locale set with `setLocale` — `en-GB` by default. The examples are in `en-GB`.
@@ -99,15 +99,14 @@ A getter is read as the value renders, so the text follows a change of locale.
 
 | Function | Result |
 | --- | --- |
-| `dateFormat(date)` | `05 Oct 2026` — with the month name, so the date reads the same way in any locale. |
-| `dateFormatShort(date)` | `05 Oct`, with the year added when it isn't the current one. |
-| `timeFormat(date)`, `timeFormatShort(date)` | `14:30:05` and `14:30` — or `2:30 PM`, in a locale with a 12-hour clock. |
-| `datetimeFormat(date, short?)` | The date and the time, in the order and with the separator of the locale: `05 Oct 2026, 14:30:05`. `short` drops the seconds, and the year when it is the current one: `05 Oct, 14:30`. |
+| `dateFormat(date, {year?})` | `05 Oct 2026` — with the month name, so the date reads the same way in any locale. `year: 'auto'` drops the year when it is the current one: `05 Oct`. |
+| `timeFormat(date, {seconds?})` | `14:30:05`, or `2:30:05 PM` in a locale with a 12-hour clock. `seconds: false` drops the seconds: `14:30`. |
+| `datetimeFormat(date, {year?, seconds?})` | The date and the time, in the order and with the separator of the locale: `05 Oct 2026, 14:30:05`. Takes the options of both: `05 Oct, 14:30` with `{year: 'auto', seconds: false}`. |
 | `todayFormat()` | `Today`, as a label. |
 | `dateInputFormat(date)` | `05/10/2026` — the numeric date of the locale (`10/05/2026` in `en-US`), as [WInputDate](/components/input#date) shows it. `parseDateInput(text)` reads it back with any separators, or returns `undefined`. |
-| `parseDate(text)` | Reads `05.10.2026` in every locale, such as from a query param, or returns `undefined`. |
+| `parseDateQuery(text)` | Reads `05.10.2026` in every locale, such as from a query param, or returns `undefined`. |
 | `dateToQueryString(date)` | `2026-10-05`, the local date in ISO format, for a query param. |
-| `durationHumanize(seconds, full?, round?)` | `1 hr 30 mins`, or `1 hour 30 minutes` with `full`. Shows the largest part and the one right below it, so `10 mths` and `10 mins` can't be mixed up; `round` keeps only the largest part, rounded. |
+| `durationFormat(seconds, {style?, round?})` | `1 hr 30 mins`, or `1 hour 30 minutes` with `style: 'long'`. Shows the largest part and the one right below it, so `10 mths` and `10 mins` can't be mixed up; `round: true` keeps only the largest part, rounded: `2 hrs`. |
 | `getDurationRound(seconds)` | Rounds a duration up to a step that reads well — 10 seconds, a minute, 10 minutes, an hour, a day and so on. |
 
 Date math returns a new `Date` and leaves the one passed in as it was:

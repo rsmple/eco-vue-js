@@ -141,7 +141,7 @@
         v-if="history"
         class="text-description text-xs"
       >
-        {{ isSameDate(new Date(), item.date) ? timeFormat(item.date) : datetimeFormat(item.date, true) }}
+        {{ isSameDate(new Date(), item.date) ? timeFormat(item.date) : datetimeFormat(item.date, {year: 'auto', seconds: false}) }}
       </div>
     </div>
   </div>

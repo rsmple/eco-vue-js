@@ -23,7 +23,7 @@
 
 <script lang="ts" setup>
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
-import {addDay, dateFormat, dateFormatShort, dateToQueryString, datetimeFormat, durationHumanize} from 'eco-vue-js/dist/utils/dateTime'
+import {addDay, dateFormat, dateToQueryString, datetimeFormat, durationFormat} from 'eco-vue-js/dist/utils/dateTime'
 import {buildCsvContent} from 'eco-vue-js/dist/utils/exportToCsv'
 import {numberCompactFormatter, numberFormatter, percentFormatter} from 'eco-vue-js/dist/utils/utils'
 
@@ -33,12 +33,12 @@ const now = new Date()
 
 const rows = [
   {code: 'dateFormat(now)', value: dateFormat(now)},
-  {code: 'dateFormatShort(addDay(now, -3))', value: dateFormatShort(addDay(now, -3))},
-  {code: 'datetimeFormat(now, true)', value: datetimeFormat(now, true)},
+  {code: 'dateFormat(addDay(now, -3), {year: \'auto\'})', value: dateFormat(addDay(now, -3), {year: 'auto'})},
+  {code: 'datetimeFormat(now, {year: \'auto\', seconds: false})', value: datetimeFormat(now, {year: 'auto', seconds: false})},
   {code: 'dateToQueryString(now)', value: dateToQueryString(now)},
-  {code: 'durationHumanize(5400)', value: durationHumanize(5400)},
-  {code: 'durationHumanize(5400, true)', value: durationHumanize(5400, true)},
-  {code: 'durationHumanize(200000, true, true)', value: durationHumanize(200000, true, true)},
+  {code: 'durationFormat(5400)', value: durationFormat(5400)},
+  {code: 'durationFormat(5400, {style: \'long\'})', value: durationFormat(5400, {style: 'long'})},
+  {code: 'durationFormat(200000, {style: \'long\', round: true})', value: durationFormat(200000, {style: 'long', round: true})},
   {code: 'numberFormatter.format(1234567.5)', value: numberFormatter.format(1234567.5)},
   {code: 'numberCompactFormatter.format(12840)', value: numberCompactFormatter.format(12840)},
   {code: 'percentFormatter.format(0.4375)', value: percentFormatter.format(0.4375)},
