@@ -20,8 +20,8 @@
             'bg-track-strong': disabled,
           }"
           :style="{
-            left: percentCompactFormatter.format(rangeScale(cursorRange.from)),
-            right: percentCompactFormatter.format(1 - rangeScale(cursorRange.to)),
+            left: `${ rangeScale(cursorRange.from) * 100 }%`,
+            right: `${ (1 - rangeScale(cursorRange.to)) * 100 }%`,
           }"
         >
           <div
@@ -70,7 +70,6 @@
 import {computed, onBeforeUnmount, ref, useTemplateRef, watch} from 'vue'
 
 import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
-import {percentCompactFormatter} from '@/utils/utils'
 
 type Range = {from: number, to: number}
 

@@ -145,10 +145,26 @@ const localeNumberFormatter = (key: string, options: Intl.NumberFormatOptions): 
   }
 }
 
-export const percentCompactFormatter = localeNumberFormatter('percentCompact', {notation: 'compact', style: 'percent'})
+/** A compact number formatter with the short `en-US` suffixes in every locale, `102K` and `1.2M`, as the localized ones are long, `102 тыс.`, or missing, `102.345` in `de`. Only the decimal separator follows the locale set with `setLocale`. */
+const compactNumberFormatter = (options: Intl.NumberFormatOptions): Pick<Intl.NumberFormat, 'format'> => {
+  const formatter = new Intl.NumberFormat('en-US', {...options, notation: 'compact'})
+
+  return {
+    format: (value: number) => {
+      const decimal = getIntl('number|decimal', locale => new Intl.NumberFormat(locale).formatToParts(1.5).find(part => part.type === 'decimal')?.value ?? '.')
+
+      return formatter
+        .formatToParts(value)
+        .map(part => part.type === 'decimal' ? decimal : part.value)
+        .join('')
+    },
+  }
+}
+
+export const percentCompactFormatter = compactNumberFormatter({style: 'percent'})
 export const percentFormatter = localeNumberFormatter('percent', {maximumFractionDigits: 3, style: 'percent'})
 
-export const numberCompactFormatter = localeNumberFormatter('numberCompact', {notation: 'compact'})
+export const numberCompactFormatter = compactNumberFormatter({})
 export const numberFormatter = localeNumberFormatter('number', {maximumFractionDigits: 3})
 
 export const dateFormatterCsv = new Intl.DateTimeFormat('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false})
