@@ -77,7 +77,7 @@
               v-if="!skeleton && counter !== undefined && counter !== 0"
               :count="counter"
               :trigger="1"
-              class="text-2xs absolute -top-2.5 left-[calc(100%-1em)]"
+              class="text-2xs absolute -top-2.5 right-[-1em]"
             />
           </span>
         </div>
