@@ -20,7 +20,7 @@
             [semanticTypeBackgroundMap[errorMessage ? SemanticType.NEGATIVE : semanticType]]: !disabled,
             'bg-track-strong': disabled,
           }"
-          :style="{width: percentCompactFormatter.format(rangeScale(cursor ?? modelValue))}"
+          :style="{width: `${ rangeScale(cursor ?? modelValue) * 100 }%`}"
         >
           <div
             class="square-4 relative right-0 -mr-2 rounded-full bg-inherit transition-transform"
@@ -56,7 +56,6 @@ import {computed, onBeforeUnmount, ref, useTemplateRef, watch} from 'vue'
 
 import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
 import {SemanticType, useSemanticTypeBackgroundMap} from '@/utils/SemanticType'
-import {percentCompactFormatter} from '@/utils/utils'
 
 const POINTER_EVENTS_NONE_CLASS = 'pointer-events-none'
 
