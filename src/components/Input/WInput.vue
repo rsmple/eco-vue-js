@@ -193,7 +193,7 @@
               class="flex-1"
               :class="{
                 'w-full': !hideInput && !$slots.prefix,
-                'w-option-has-bg-input': $slots.prefix,
+                'w-option-has-bg-input': $slots.prefix && !unclickable,
                 'resize-y': resize && textarea,
                 'resize-none': !resize && textarea,
                 'w-option': !textarea && $slots.prefix && !hideInput,
@@ -202,7 +202,7 @@
                 'text-accent/50': isDisabled,
                 'scrollbar-width-thin min-h-(--w-textarea-height,10rem) w-full overflow-auto overscroll-contain': textarea,
                 'h-(--w-textarea-height,10rem)': textarea && resize,
-                'absolute': hideInput,
+                'absolute': hideInput || unclickable,
                 'opacity-0': textSecure && modelValue as string | true === true && (!asyncState.isAsync.value || !asyncState.value.value) && !focused,
               }"
             >
@@ -229,7 +229,7 @@
                     outline-0 placeholder:text-description disabled:cursor-not-allowed
                   "
                   :class="{
-                    'w-0 max-w-0': hideInput,
+                    'w-0 max-w-0': hideInput || unclickable,
                     'text-secure w-input-whitespace-pre-wrap break-all': textSecure && !isSecureVisible,
                     '[-webkit-text-fill-color:transparent]': textTransparent,
                     'sm-not:text-base': !unclickable,
@@ -237,7 +237,7 @@
                     'py---w-option-padding': textarea,
                   }"
                   :value="gateValue(asyncState.isAsync.value ? asyncState.value.value : modelValue)"
-                  :placeholder="hasNoValue ? placeholder : undefined"
+                  :placeholder="hasNoValue && !unclickable ? placeholder : undefined"
                   :type="type ?? 'text'"
                   :name="name"
                   :disabled="isDisabled"
