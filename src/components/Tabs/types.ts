@@ -39,6 +39,8 @@ export interface TabsProps {
   noSwitchOnInvalid?: boolean
   /** Wraps the tab buttons onto new lines instead of scrolling sideways. */
   wrap?: boolean
+  /** Draws a line under the row of tab buttons, which the open tab's underline covers. */
+  divider?: boolean
   /** Shows a value and error status icon next to each title. */
   statusIcon?: boolean
   /** Renders all tabs one after another, each under its title, without the buttons. */
@@ -70,6 +72,6 @@ export type TabsItemProps = {
   validate?: () => string | undefined
   /** Submits the enclosing stepper form before moving forward past this tab, and stays on it if the submit fails. */
   requireSave?: boolean
-  /** Number shown in brackets after the title. */
+  /** Number shown in a badge after the title, tinted while the tab is open. */
   count?: number
 }

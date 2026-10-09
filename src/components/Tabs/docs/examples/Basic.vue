@@ -1,6 +1,7 @@
 <template>
   <WTabs
     :init-tab="current"
+    divider
     @update:current="current = $event"
   >
     <WTabsItem

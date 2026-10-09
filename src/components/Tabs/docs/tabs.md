@@ -5,7 +5,7 @@ description: WTabs and WTabsItem — tabbed content with icons, counters and dis
 
 # Tabs
 
-`WTabs` takes `WTabsItem` children and renders a header of tab buttons above the active tab's content. Each item needs a unique `name`; `title`, `icon` and `count` go on its button. The first tab opens unless `initTab`, `initTabIndex` or an item's `init` says otherwise.
+`WTabs` takes `WTabsItem` children and renders a header of tab buttons above the active tab's content. Each item needs a unique `name`; `title`, `icon` and `count` go on its button, the count as a badge. `divider` draws a line under the buttons. The first tab opens unless `initTab`, `initTabIndex` or an item's `init` says otherwise.
 
 <!-- @example Tabs/Basic overflowHidden -->
 
@@ -15,6 +15,7 @@ description: WTabs and WTabsItem — tabbed content with icons, counters and dis
 <template>
   <WTabs
     :init-tab="current"
+    divider
     @update:current="current = $event"
   >
     <WTabsItem
@@ -239,6 +240,7 @@ import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 | `showHasValue` | `boolean` | — | Colors the titles of tabs that have a value. |
 | `noSwitchOnInvalid` | `boolean` | — | Stays on the current tab when another one gets an error. By default the first tab with an error is opened. |
 | `wrap` | `boolean` | — | Wraps the tab buttons onto new lines instead of scrolling sideways. |
+| `divider` | `boolean` | — | Draws a line under the row of tab buttons, which the open tab's underline covers. |
 | `statusIcon` | `boolean` | — | Shows a value and error status icon next to each title. |
 | `flat` | `boolean` | — | Renders all tabs one after another, each under its title, without the buttons. |
 | `indicator` | `boolean` | — | Shows a large status circle on each tab button — error, has value or empty. |
@@ -288,7 +290,7 @@ import WTabsItem from 'eco-vue-js/dist/components/Tabs/WTabsItem.vue'
 | `hasChanges` | `boolean` | — | Shows the unsaved changes dot. By default it is read from the forms inside the tab. |
 | `validate` | `(() => string \| undefined)` | — | Checks the tab before the exposed `next` and `jump` leave it. A returned error message is shown as a warning and the tab stays open. |
 | `requireSave` | `boolean` | — | Submits the enclosing stepper form before moving forward past this tab, and stays on it if the submit fails. |
-| `count` | `number` | — | Number shown in brackets after the title. |
+| `count` | `number` | — | Number shown in a badge after the title, tinted while the tab is open. |
 
 #### Events
 
@@ -331,7 +333,7 @@ import WButtonTab from 'eco-vue-js/dist/components/Button/WButtonTab.vue'
 | `statusIcon` | `boolean` | — | Shows a value and error status icon after the title. |
 | `showHasValue` | `boolean` | — | Colors the title green when `hasValue` is set and the tab isn't open. |
 | `enableOverflow` | `boolean` | — | Scrolls a title that doesn't fit into view on hover. |
-| `count` | `number` | — | Number shown in brackets after the title. |
+| `count` | `number` | — | Number shown in a badge after the title, tinted while the tab is open. |
 
 #### Events
 

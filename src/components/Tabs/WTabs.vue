@@ -38,6 +38,7 @@
         'w-frame-bleed px-(--w-frame-padding)': !side && frame !== null,
         'sm-not:pl---inner-margin': !side && frame === null,
         'flex-wrap': !side && wrap,
+        'shadow-[inset_0_-1px_var(--color-line-subtle)]': !side && divider,
         [headerClass ?? '']: true,
       }"
     >
