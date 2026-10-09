@@ -4,6 +4,7 @@
     :scope="scope"
     :filter="filter"
     :filter-search="filterSearch"
+    :pinned="pinned ?? []"
     :search="search === true"
     :disabled-filter-fields="disabledFilterFields ?? []"
     :readonly="readonly ?? false"
@@ -22,6 +23,8 @@ defineProps<{
   scope: UniformScope<QueryParams>
   /** Filter components, one per filter, each with a `meta` export. A tuple adds props for it. */
   filter?: FilterComponent<QueryParams>[]
+  /** Filters of `filter` always shown as chips, first, instead of behind "Add filter". Their remove button only clears them. */
+  pinned?: FilterComponent<QueryParams>[]
   /** Component for the search field, instead of the default text search on `search`. */
   filterSearch?: FilterComponent<QueryParams>
   /** Query params that can't be changed, e.g. fixed by the page. Their filters are left out. */

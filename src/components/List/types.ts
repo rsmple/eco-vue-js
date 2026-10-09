@@ -198,6 +198,8 @@ export type FilterMeta<QueryParams> = {
   title?: string | ((queryParams: QueryParams) => string)
   icon?: SVGComponent | ((queryParams: QueryParams) => SVGComponent)
   hidden?: boolean | ((queryParams: QueryParams) => boolean)
+  /** Picked values for the filter chip, such as option titles. Without it, the chip shows how many values are picked. */
+  summary?: (queryParams: QueryParams) => string | string[] | undefined
 }
 
 export type FilterEmits = {

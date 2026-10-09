@@ -1,9 +1,28 @@
 <template>
-  <div class="list:left---left-inner list:w---width-inner list:sticky grid w-full grid-cols-[1fr_auto] pb-3">
+  <div
+    class="list:left---left-inner list:w---width-inner list:sticky grid w-full pb-3 [--w-list-toolbar-inherited-height:var(--w-input-height,2.75rem)]"
+    :class="{
+      'grid-cols-[1fr_auto]': !isFilterShown,
+      'gap-x-2': $slots.filter,
+      'grid-cols-[minmax(0,max-content)_minmax(var(--w-selection-more-width,calc(var(--w-list-padding,1rem)*2+1.25em)),1fr)_auto]': isFilterShown && $slots.more,
+      'grid-cols-[minmax(0,max-content)_minmax(0,1fr)_auto]': isFilterShown && !$slots.more,
+    }"
+    :style="moreMinWidth ? {'--w-selection-more-width': `${ moreMinWidth }px`} : undefined"
+  >
+    <div
+      v-if="$slots.filter"
+      v-show="isFilterShown"
+      :class="cellClass"
+      class="min-w-0"
+    >
+      <slot name="filter" />
+    </div>
+
     <!-- Actions keep their width; the ones that do not fit beside the end of the bar are hidden, and the More menu takes them. -->
     <div
       ref="row"
       class="flex min-w-0"
+      :class="[cellClass, {'justify-end': isFilterShown}]"
     >
       <slot
         v-bind="{
@@ -51,17 +70,19 @@
       </WDropdownAdaptive>
     </div>
 
-    <WButtonSelectionState
-      v-if="selectedCount"
-      @click="$emit('clear:selection')"
-    >
-      <span class="sm-not:hidden">Selected&nbsp;</span><span class="tone-primary text-tone font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedCount === 1 ? '' : 's' }}</span>
-    </WButtonSelectionState>
+    <div :class="cellClass">
+      <WButtonSelectionState
+        v-if="selectedCount"
+        @click="$emit('clear:selection')"
+      >
+        <span class="sm-not:hidden">Selected&nbsp;</span><span class="tone-primary text-tone font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedCount === 1 ? '' : 's' }}</span>
+      </WButtonSelectionState>
 
-    <slot
-      v-else
-      name="settings"
-    />
+      <slot
+        v-else
+        name="settings"
+      />
+    </div>
   </div>
 </template>
 
@@ -115,6 +136,7 @@ const isOverflowing = ref(false)
 // Widths of the actions as last shown: a hidden one has none, so it keeps the one it had.
 const widths = new WeakMap<Element, number>()
 let moreWidth = 0
+const moreMinWidth = ref(0)
 
 const isShown = (element: Element) => element.getClientRects().length > 0
 
@@ -131,7 +153,10 @@ const update = () => {
     if (isShown(element)) widths.set(element, element.getBoundingClientRect().width)
   })
 
-  if (more && isShown(more)) moreWidth = more.getBoundingClientRect().width
+  if (more && isShown(more)) {
+    moreWidth = more.getBoundingClientRect().width
+    moreMinWidth.value = Math.ceil(moreWidth)
+  }
 
   // An action not shown yet, such as one of the bulk actions once something is selected, is shown to be measured first.
   if (items.some(element => !widths.has(element))) {
@@ -184,7 +209,7 @@ onBeforeUnmount(() => {
   observer = null
 })
 
-defineSlots<{
+const slots = defineSlots<{
   /**
    * WButtonSelectionAction buttons. Pass them `disableMessage`, and `cssClass` for the dividers between them.
    * Hide the ones from `visibleCount` on, which do not fit — the `more` slot shows them instead.
@@ -192,7 +217,13 @@ defineSlots<{
   default?: (props: {disableMessage: string | undefined, cssClass: string, visibleCount: number}) => VNode[]
   /** Actions in the More menu at the end of the row: the ones of the `default` slot from `visibleCount` on, which do not fit the row. The menu shows only when some do not. */
   more?: (props: {disableMessage: string | undefined, cssClass: string, visibleCount: number}) => VNode[]
+  /** Filters at the start of the bar while nothing is selected. The actions then move to the end, beside `settings`, and the selection replaces the filters. */
+  filter?: () => VNode[]
   /** Content at the end of the bar while nothing is selected, such as list settings. */
   settings?: () => VNode[]
 }>()
+
+const cellClass = '[--w-input-height:var(--w-list-toolbar-height,var(--w-list-toolbar-inherited-height))] [--w-button-height:var(--w-list-toolbar-height,var(--w-list-toolbar-inherited-height))]'
+
+const isFilterShown = computed(() => !!slots.filter && !props.selectedCount)
 </script>

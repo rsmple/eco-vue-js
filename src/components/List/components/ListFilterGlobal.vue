@@ -71,6 +71,7 @@ const props = defineProps<{
   scope: UniformScope<QueryParams>
   filter: FilterComponent<QueryParams>[] | undefined
   filterSearch: FilterComponent<QueryParams> | undefined
+  pinned: FilterComponent<QueryParams>[]
   search: boolean
   disabledFilterFields: Array<keyof QueryParams>
   readonly: boolean
