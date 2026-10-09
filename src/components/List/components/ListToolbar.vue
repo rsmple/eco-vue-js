@@ -126,7 +126,7 @@
         <HeaderSort
           v-if="!noOrdering"
           :ordering="ordering"
-          :fields="fieldsFiltered"
+          :fields="fieldsVisible"
           :query-params="queryParams"
           class="last-not:border-r border-solid border-line"
           @update:ordering="$emit('update:ordering', $event)"

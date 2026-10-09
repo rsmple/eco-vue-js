@@ -20,7 +20,10 @@
       }"
       @click="allowSort && setOrdering()"
     >
-      <div :class="allowSort ? 'group-hover:underline' : undefined">
+      <div
+        :class="allowSort ? 'group-hover:underline' : undefined"
+        class="overflow-hidden"
+      >
         <slot>
           {{ title }}
         </slot>

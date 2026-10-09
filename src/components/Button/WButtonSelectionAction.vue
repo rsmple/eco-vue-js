@@ -69,6 +69,8 @@
     </WTooltip>
 
     <WShine v-if="!disabled && !disableMessage && !loading && !overlay" />
+
+    <slot />
   </component>
 </template>
 
@@ -117,6 +119,8 @@ defineEmits<{
 }>()
 
 defineSlots<{
+  /** Slot for absolute positioned content, like counter */
+  default?: () => void
   /** Rich content of the tooltip, replacing `disableMessage` or `tooltipText`. */
   tooltip?: () => void
 }>()
