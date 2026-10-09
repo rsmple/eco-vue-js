@@ -109,7 +109,7 @@
       </template>
     </template>
 
-    <template #settings>
+    <template #settings="{isFilterShown}">
       <slot
         v-if="$slots.selection"
         name="selection"
@@ -118,6 +118,7 @@
       <div
         v-else
         class="flex"
+        :class="isFilterShown && (action?.length || !disableExport) ? 'border-l border-solid border-line' : undefined"
       >
         <WButtonSelectionAction
           v-if="allowSelect"

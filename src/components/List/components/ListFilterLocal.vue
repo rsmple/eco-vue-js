@@ -7,7 +7,7 @@
   >
     <div
       v-if="searchComponent"
-      :class="inToolbar ? 'w-60 shrink-0' : 'min-w-52 max-w-full'"
+      :class="inToolbar ? 'w-48 shrink-0' : 'min-w-48 max-w-full'"
     >
       <component
         :is="searchComponent[0].default"
@@ -45,7 +45,6 @@
     <WDropdownAdaptive
       v-if="inToolbar"
       :is-open="isOverflowOpen"
-      dialog
       @close="isOverflowOpen = false"
     >
       <template #toggle>
@@ -69,7 +68,7 @@
       </template>
 
       <template #content>
-        <div class="grid min-w-80 text-start font-normal">
+        <div class="grid min-w-104 text-start font-normal">
           <ListFilterGlobalItem
             v-for="item in hiddenList"
             :key="item.id"
@@ -78,6 +77,7 @@
             :is-open="overflowOpenId === item.id"
             :disabled-filter-fields="disabledFilterFields"
             :readonly="readonly"
+            class="px---inner-margin"
             @toggle="overflowOpenId = overflowOpenId === item.id ? null : item.id"
           />
         </div>

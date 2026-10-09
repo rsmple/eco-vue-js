@@ -3,7 +3,6 @@
     class="list:left---left-inner list:w---width-inner list:sticky grid w-full pb-3 [--w-list-toolbar-inherited-height:var(--w-input-height,2.75rem)]"
     :class="{
       'grid-cols-[1fr_auto]': !isFilterShown,
-      'gap-x-2': $slots.filter,
       'grid-cols-[minmax(0,max-content)_minmax(var(--w-selection-more-width,calc(var(--w-list-padding,1rem)*2+1.25em)),1fr)_auto]': isFilterShown && $slots.more,
       'grid-cols-[minmax(0,max-content)_minmax(0,1fr)_auto]': isFilterShown && !$slots.more,
     }"
@@ -13,7 +12,7 @@
       v-if="$slots.filter"
       v-show="isFilterShown"
       :class="cellClass"
-      class="min-w-0"
+      class="min-w-0 mr-2"
     >
       <slot name="filter" />
     </div>
@@ -27,7 +26,7 @@
       <slot
         v-bind="{
           disableMessage: disableMessageValue,
-          cssClass: 'shrink-0 border-l border-solid border-line first:border-l-0',
+          cssClass: 'shrink-0 first-not:border-l border-solid border-line',
           visibleCount,
         }"
       />
@@ -43,9 +42,9 @@
             title="More"
             :icon="markRaw(IconMore)"
             :aria-expanded="isOpen"
-            :disable-message="disableMessageValue"
-            class="shrink-0 border-l border-solid border-line"
-            :class="{hidden: !isOverflowing}"
+            :disable-message="isFilterShown ? undefined : disableMessageValue"
+            class="shrink-0 border-solid border-line"
+            :class="{hidden: !isOverflowing, 'border-l': !isFilterShown || visibleCount !== 0}"
             v-bind="{'data-selection-more': ''}"
             @click="isOpen = !isOpen"
           />
@@ -81,6 +80,7 @@
       <slot
         v-else
         name="settings"
+        v-bind="{isFilterShown}"
       />
     </div>
   </div>
@@ -220,7 +220,7 @@ const slots = defineSlots<{
   /** Filters at the start of the bar while nothing is selected. The actions then move to the end, beside `settings`, and the selection replaces the filters. */
   filter?: () => VNode[]
   /** Content at the end of the bar while nothing is selected, such as list settings. */
-  settings?: () => VNode[]
+  settings?: (props: {isFilterShown: boolean}) => VNode[]
 }>()
 
 const cellClass = '[--w-input-height:var(--w-list-toolbar-height,var(--w-list-toolbar-inherited-height))] [--w-button-height:var(--w-list-toolbar-height,var(--w-list-toolbar-inherited-height))]'
