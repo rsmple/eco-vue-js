@@ -1,15 +1,15 @@
 <template>
   <div
-    class="relative flex h-(--w-input-height,2.75rem) max-w-80 shrink-0 select-none items-center rounded-(--w-input-rounded,0.75rem) border border-solid transition-colors"
+    class="relative tone-primary flex h-(--w-input-height,2.75rem) max-w-80 shrink-0 select-none items-center rounded-(--w-input-rounded,0.75rem) border border-solid"
     :class="{
-      'tone-primary border-tone-line bg-tone-soft/40': hasValue,
+      'border-tone-line bg-tone-soft/40': hasValue,
       'border-line bg-surface': !hasValue,
-      'outline-solid outline-2 outline-focus/20': isOpen,
+      'outline-solid outline-2 outline-focus/20 border-tone-line': isOpen,
     }"
   >
     <button
       type="button"
-      class="flex h-full min-w-0 cursor-pointer items-center gap-1.5 rounded-[inherit] pl-3 outline-none disabled:cursor-default"
+      class="flex h-full min-w-0 cursor-pointer items-center gap-1.5 rounded-inherit pl-3 outline-none disabled:cursor-default"
       :class="isRemovable ? 'pr-1' : 'pr-3'"
       :aria-expanded="isOpen"
       :disabled="disabled"
