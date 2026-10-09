@@ -83,7 +83,15 @@
               </template>
             </Suspense>
 
-            {{ title }} {{ count !== undefined ? `(${numberFormatter.format(count)})` : '' }}
+            {{ title }}
+
+            <span
+              v-if="count !== undefined"
+              class="ml-0.5 inline-block min-w-[1.75em] rounded-full px-1.5 text-center text-xs/5 tabular-nums transition-colors duration-500"
+              :class="active && !hasError ? 'bg-tone-soft' : 'bg-surface-muted text-description'"
+            >
+              {{ numberFormatter.format(count) }}
+            </span>
           </component>
         </div>
 
@@ -171,7 +179,7 @@ defineProps<{
   showHasValue?: boolean
   /** Scrolls a title that doesn't fit into view on hover. */
   enableOverflow?: boolean
-  /** Number shown in brackets after the title. */
+  /** Number shown in a badge after the title, tinted while the tab is open. */
   count?: number
 }>()
 
