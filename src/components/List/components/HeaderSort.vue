@@ -1,6 +1,6 @@
 <template>
   <WDropdownAdaptive
-    v-if="fieldsFiltered.length"
+    v-if="fieldsFlat.length"
     :is-open="isOpen"
     @close="isOpen = false"
   >
@@ -13,7 +13,14 @@
         label="Sort"
         :aria-expanded="isOpen"
         @click="isOpen = !isOpen"
-      />
+      >
+        <WCounter
+          v-if="ordering.length"
+          :count="ordering.length"
+          :semantic-type="SemanticType.SECONDARY"
+          class="absolute top-0 right-1 text-2xs"
+        />
+      </WButtonSelectionAction>
     </template>
 
     <template #header>
@@ -22,7 +29,7 @@
 
     <template #content>
       <HeaderSortItem
-        v-for="field in fieldsFiltered"
+        v-for="field in fieldsFlat"
         :key="field.meta.label"
         :title="typeof field.meta.title === 'string' ? field.meta.title : field.meta.title(queryParams)"
         :field="typeof field.meta.field === 'string' ? field.meta.field : field.meta.field(queryParams)!"
@@ -50,10 +57,6 @@
       </div>
     </template>
   </WDropdownAdaptive>
-  <div
-    v-else-if="fieldsFlat.length"
-    class="h-8"
-  />
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
@@ -63,10 +66,12 @@ import type {OrderItem} from '@/utils/order'
 import {computed, markRaw, ref} from 'vue'
 
 import WButtonSelectionAction from '@/components/Button/WButtonSelectionAction.vue'
+import WCounter from '@/components/Counter/WCounter.vue'
 import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconSort from '@/assets/icons/IconSort.svg?component'
 
+import {SemanticType} from '@/utils/SemanticType.ts'
 import {type ListMode} from '@/utils/utils'
 
 import HeaderSortItem from './HeaderSortItem.vue'
@@ -107,6 +112,4 @@ const fieldsFlat = computed(() => {
 
   return result
 })
-
-const fieldsFiltered = computed(() => fieldsFlat.value.filter(item => typeof item.meta.field === 'string' || item.meta.field(props.queryParams)))
 </script>

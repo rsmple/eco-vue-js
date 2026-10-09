@@ -51,7 +51,13 @@ const parseFieldConfigMap = <Fields extends ListFields<unknown>>(value: unknown,
         return
       }
 
-      const defaultConfig = fieldConfigMap[field.meta.label as keyof typeof fieldConfigMap]
+      // A field missing from the default map (added after the map was built) is hidden and goes last.
+      const defaultConfig: FieldConfig = fieldConfigMap[field.meta.label as keyof typeof fieldConfigMap] ?? {
+        width: null,
+        visible: false,
+        order: Number.MAX_SAFE_INTEGER,
+        sticky: field.meta.sticky ?? false,
+      }
       const configValue = value instanceof Object && field.meta.label in value ? value[field.meta.label as keyof typeof value] as unknown as Partial<FieldConfig> : undefined
       const config: FieldConfig | undefined = configValue instanceof Object ? {
         width: configValue.width ?? null,
@@ -185,6 +191,11 @@ export const useListConfig = <Fields extends ListFields<any, any>>(
       hasSaved.value = getHasSavedConfig(key())
     })
   }
+
+  // Fields can change at runtime: keep the current config and fill in the fields it does not cover yet.
+  watch(fields, newFields => {
+    value.value = parseListConfig(value.value, newFields, defaultConfigMap(), defailtMode())
+  })
 
   return {
     listConfig,
