@@ -6,32 +6,16 @@
     @close="$emit('close')"
   >
     <template #toggle>
-      <WButton
-        :semantic-type="isOpen ? SemanticType.PRIMARY : SemanticType.SECONDARY"
-        :class="isOpen ? 'outline-solid outline-2 outline-focus/20 before:opacity-15' : undefined"
-        outline
-        @click="$emit('toggle')"
-      >
-        <component
-          :is="icon"
-          v-if="icon"
-          class="square-[1.25em]"
-        />
-
-        <span class="whitespace-nowrap">{{ title }} ({{ count }})</span>
-
-        <div
-          v-if="!readonly"
-          role="button"
-          aria-label="Remove filter"
-          class="group p-1"
-          @click.stop="$emit('remove')"
-        >
-          <div class="square-4 relative flex items-center justify-center rounded-full group-hover:bg-surface-muted">
-            <IconClose class="square-[1em]" />
-          </div>
-        </div>
-      </WButton>
+      <ListFilterChip
+        :title="title"
+        :icon="icon"
+        :values="values"
+        :count="count"
+        :is-open="isOpen"
+        :remove-label="readonly ? undefined : pinned ? (count ? 'Clear filter' : undefined) : 'Remove filter'"
+        @toggle="$emit('toggle')"
+        @remove="$emit('remove')"
+      />
     </template>
 
     <template #header>
@@ -73,13 +57,11 @@ import type {UniformScope} from '@/components/Uniform/types'
 
 import {computed, provide} from 'vue'
 
-import WButton from '@/components/Button/WButton.vue'
 import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
-import IconClose from '@/assets/icons/IconClose.svg?component'
-
 import {wCloseOverlayOnPick} from '@/components/Select/models/useCloseOnPick'
-import {SemanticType} from '@/utils/SemanticType'
+
+import ListFilterChip from './ListFilterChip.vue'
 
 import {getMetaValue} from '../models/utils'
 
@@ -87,6 +69,7 @@ const props = defineProps<{
   scope: UniformScope<QueryParams>
   item: FilterComponent<QueryParams>
   isOpen: boolean
+  pinned: boolean
   readonly: boolean
 }>()
 
@@ -105,7 +88,21 @@ const title = computed(() => getMetaValue(meta.value.title, props.scope.modelVal
 
 const icon = computed(() => getMetaValue(meta.value.icon, props.scope.modelValue))
 
-const count = computed(() => meta.value.fields
-  ?.filter(field => field in (props.scope.modelValue as Record<string, unknown>) && props.scope.modelValue[field] !== undefined)
-  .length ?? 0)
+const count = computed(() => (meta.value.fields ?? []).reduce((sum, field) => {
+  const value = props.scope.modelValue[field]
+
+  if (Array.isArray(value)) return sum + value.length
+
+  return value === undefined || value === null ? sum : sum + 1
+}, 0))
+
+const values = computed<string[] | undefined>(() => {
+  const summary = meta.value.summary?.(props.scope.modelValue)
+
+  if (summary === undefined) return undefined
+
+  const list = Array.isArray(summary) ? summary : [summary]
+
+  return list.length ? list : undefined
+})
 </script>

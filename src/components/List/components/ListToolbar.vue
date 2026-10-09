@@ -24,7 +24,7 @@
             :is="item"
             :query-params="queryParams"
             :readonly="readonly"
-            :class="cssClass"
+            :class="[cssClass, {hidden: index >= visibleCount}]"
           />
         </template>
       </template>
@@ -41,27 +41,55 @@
           :class="cssClass"
         />
 
-        <template
-          v-for="(item, index) in bulk"
-          :key="index"
-        >
-          <component
-            :is="item"
-            :selection-count="selectionCount"
-            :query-params-getter="getQueryParamsBulk"
-            :disable-message="disableMessage"
-            :readonly="readonly"
-            :clear-selection="resetSelection"
-            :class="[cssClass, {hidden: bulkOffset + index >= visibleCount}]"
-            @clear:selected="$emit('reset:selection')"
-          />
+        <template v-if="!isFilterIdle">
+          <template
+            v-for="(item, index) in bulk"
+            :key="index"
+          >
+            <component
+              :is="item"
+              :selection-count="selectionCount"
+              :query-params-getter="getQueryParamsBulk"
+              :disable-message="disableMessage"
+              :readonly="readonly"
+              :clear-selection="resetSelection"
+              :class="[cssClass, {hidden: bulkOffset + index >= visibleCount}]"
+              @clear:selected="$emit('reset:selection')"
+            />
+          </template>
         </template>
       </template>
     </template>
 
+    <template
+      v-if="$slots.filter"
+      #filter
+    >
+      <ListToolbarFilter>
+        <slot name="filter" />
+      </ListToolbarFilter>
+    </template>
+
     <!-- The bulk actions that do not fit the bar, after the export. -->
     <template
-      v-if="bulk?.length && !(selectionCount === 0 && action)"
+      v-if="isFilterIdle && action?.length"
+      #more="scope"
+    >
+      <template
+        v-for="(item, index) in action"
+        :key="index"
+      >
+        <component
+          :is="item"
+          v-if="index >= scope.visibleCount"
+          :query-params="queryParams"
+          :readonly="readonly"
+        />
+      </template>
+    </template>
+
+    <template
+      v-else-if="bulk?.length && !(selectionCount === 0 && action) && !isFilterIdle"
       #more="scope"
     >
       <template
@@ -216,6 +244,7 @@ import HeaderExport from './HeaderExport.vue'
 import HeaderFieldNested from './HeaderFieldNested.vue'
 import HeaderSettings from './HeaderSettings.vue'
 import HeaderSort from './HeaderSort.vue'
+import ListToolbarFilter from './ListToolbarFilter.vue'
 
 import WListHeader from '../WListHeader.vue'
 import WListHeaderItem from '../WListHeaderItem.vue'
@@ -282,14 +311,17 @@ const emit = defineEmits<{
   (e: 'click:reset'): void
 }>()
 
+const slots = defineSlots<{
+  header?: (props: {count: number | undefined}) => void
+  filter?: () => void
+  selection?: () => void
+}>()
+
+const isFilterIdle = computed(() => !!slots.filter && props.selectionCount === 0)
+
 // The export comes first in the bar, so the bulk actions start after it.
 const bulkOffset = computed(() => props.disableExport ? 0 : 1)
 
 // A bulk action in the More menu unmounts once its confirm takes the menu's place, so its own emits no longer arrive.
 const resetSelection = () => emit('reset:selection')
-
-defineSlots<{
-  header?: (props: {count: number | undefined}) => void
-  selection?: () => void
-}>()
 </script>

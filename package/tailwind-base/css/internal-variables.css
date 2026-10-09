@@ -190,6 +190,11 @@
   --w-input-height: --value(--spacing-*, --w-size-*, [*]);
 }
 
+@utility w-list-toolbar-h-* {
+  --w-list-toolbar-height: --spacing(--value(number));
+  --w-list-toolbar-height: --value(--spacing-*, --w-size-*, [*]);
+}
+
 @utility w-input-min-h-* {
   --w-input-min-height: --spacing(--value(number));
   --w-input-min-height: --value(--spacing-*, --w-size-*, [*]);

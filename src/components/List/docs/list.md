@@ -61,9 +61,15 @@ const archive = () => plantApi.archive(props.queryParamsGetter()).then(() => pro
 
 `WListFilter` renders filter components for query params held in a Uniform form's `scope` — usually a form over the route query. Each filter is a component with a `meta` export (its `title`, `icon` and the `fields` it sets) that gets `scope`, `global` and `readonly`. `search` adds a text search for the `search` param, or `filterSearch` for your own.
 
-In place, the filters are chips in a row: the set ones are shown, and a button adds another. With `global` they go into the app shell instead — the filters into the actions bar's panel and the search into the header bar — with a button that resets them. `disabledFilterFields` leaves out filters for params the page fixes. The [List with fields](/recipes/list-with-fields#filters) recipe builds a set of filters for its list.
+In place, the filters are chips in a row: the set ones are shown, and a button adds another. With `global` they go into the app shell instead — the filters into the actions bar's panel and the search into the header bar — with a button that resets them. `disabledFilterFields` leaves out filters for params the page fixes. `pinned` filters are always shown, first, and their remove button only clears them. The [List with fields](/recipes/list-with-fields#filters) recipe builds a set of filters for its list.
 
 `WListHeader` and `WListHeaderItem` are the table header row of the list, with the select-all checkbox and sortable, resizable column titles. `WList` renders them from `fields`.
+
+### Filters in the selection bar
+
+Put the `WListFilter` in WList's `filter` slot to show it at the start of the selection bar, on one line with the list actions and the list settings. Chips that do not fit go into a "more" chip that opens them as a list, and the list actions, which move to the end of the bar, fold into More before any chip does. While rows are selected, the selection with its bulk actions replaces the filters, so the bar keeps its height. `--w-list-toolbar-height` (`w-list-toolbar-h-*`) sets the height of the bar's inputs, chips and actions, by default the inherited input height.
+
+Each chip names its filter and, when set, the picked values. A filter's `meta.summary` returns them from the query params, such as the titles of the picked options; without it the chip shows how many values are picked.
 
 ## API
 
@@ -141,6 +147,7 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 | Slot | Props | Description |
 | --- | --- | --- |
 | `header` | `{ count: number \| undefined; }` | Content above the selection bar, with the count returned by the query. |
+| `filter` | — | Filters at the start of the selection bar, usually a WListFilter. They keep to one line, the chips that do not fit go to a menu, the list actions move to the end and fold into More first, and a selection replaces them. `--w-list-toolbar-height` sets the bar's height, the inherited input height by default. |
 | `selection` | — | Replaces the buttons at the end of the selection bar — range select, refetch, sort and column settings. |
 | `group` | `{ item: Data; previous: Data \| undefined; skeleton: boolean; }` | Heading before each group of rows, with `groupBy`. `skeleton` is true while the page loads. |
 | `empty` | — | Shown instead of the rows when the query returns no items. |
@@ -200,6 +207,7 @@ import WButtonSelection from 'eco-vue-js/dist/components/Button/WButtonSelection
 | --- | --- | --- |
 | `default` | `{ disableMessage: string \| undefined; cssClass: string; visibleCount: number; }` | WButtonSelectionAction buttons. Pass them `disableMessage`, and `cssClass` for the dividers between them. Hide the ones from `visibleCount` on, which do not fit — the `more` slot shows them instead. |
 | `more` | `{ disableMessage: string \| undefined; cssClass: string; visibleCount: number; }` | Actions in the More menu at the end of the row: the ones of the `default` slot from `visibleCount` on, which do not fit the row. The menu shows only when some do not. |
+| `filter` | — | Filters at the start of the bar while nothing is selected. The actions then move to the end, beside `settings`, and the selection replaces the filters. |
 | `settings` | — | Content at the end of the bar while nothing is selected, such as list settings. |
 
 <!-- @api-end -->
@@ -309,6 +317,7 @@ import WListFilter from 'eco-vue-js/dist/components/List/WListFilter.vue'
 | --- | --- | --- | --- |
 | `scope` | `UniformScope<QueryParams>` | **required** | Scope of the Uniform form that holds the query params, usually synced with the route query. |
 | `filter` | `FilterComponent<QueryParams>[]` | — | Filter components, one per filter, each with a `meta` export. A tuple adds props for it. |
+| `pinned` | `FilterComponent<QueryParams>[]` | — | Filters of `filter` always shown as chips, first, instead of behind "Add filter". Their remove button only clears them. |
 | `filterSearch` | `FilterComponent<QueryParams>` | — | Component for the search field, instead of the default text search on `search`. |
 | `disabledFilterFields` | `(keyof QueryParams)[]` | — | Query params that can't be changed, e.g. fixed by the page. Their filters are left out. |
 | `search` | `boolean` | — | Adds a search field for the `search` query param. |
