@@ -86,6 +86,7 @@ import WInfoCard from 'eco-vue-js/dist/components/InfoCard/WInfoCard.vue'
 | `noIcon` | `boolean` | — | Hides the icon. |
 | `icon` | `SVGComponent` | — | Icon before the text. Defaults to an info icon, or an exclamation mark for `WARNING` and `NEGATIVE`. |
 | `semanticType` | `SemanticType` | — | Color scheme of the background and icon. Defaults to `SECONDARY`. |
+| `iconClass` | `string` | — | Class to apply to icon |
 
 #### Slots
 

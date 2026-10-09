@@ -240,6 +240,7 @@ import WButtonSelectionAction from 'eco-vue-js/dist/components/Button/WButtonSel
 
 | Slot | Props | Description |
 | --- | --- | --- |
+| `default` | — | Slot for absolute positioned content, like counter |
 | `tooltip` | — | Rich content of the tooltip, replacing `disableMessage` or `tooltipText`. |
 
 <!-- @api-end -->
