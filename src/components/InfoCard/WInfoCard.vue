@@ -12,14 +12,10 @@
 
     <div class="gap---inner-margin grid grid-cols-[auto_1fr]">
       <component
-        :is="icon ?? IconNegativeInfo"
+        :is="icon ?? IconInfo"
         v-if="!noIcon"
-        class="square-[1.5em] inline-block"
-        :class="{
-          [infoCardIconSemanticTypeMap[semanticType ?? SemanticType.SECONDARY]]: true,
-          'rotate-180': !icon && semanticType !== SemanticType.WARNING && semanticType !== SemanticType.NEGATIVE,
-          '**:stroke-2': !icon,
-        }"
+        class="square-[1.5em]"
+        :class="[infoCardIconSemanticTypeMap[semanticType ?? SemanticType.SECONDARY], iconClass]"
       />
 
       <div class="text-pretty leading-relaxed">
@@ -32,7 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-import IconNegativeInfo from '@/assets/icons/IconNegativeInfo.svg?component'
+import IconInfo from '@/assets/icons/IconInfo.svg?component'
 
 import {useOverlayFrame} from '@/utils/Overlay'
 import {SemanticType} from '@/utils/SemanticType'
@@ -48,6 +44,8 @@ defineProps<{
   icon?: SVGComponent
   /** Color scheme of the background and icon. Defaults to `SECONDARY`. */
   semanticType?: SemanticType
+  /** Class to apply to icon */
+  iconClass?: string
 }>()
 
 defineSlots<{
