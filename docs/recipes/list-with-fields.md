@@ -996,7 +996,7 @@ export const listFilterPlant = [
 // Always shown as chips, first; the rest are behind the add-filter button.
 export const listFilterPlantPinned = [
   FilterPlantKind,
-  FilterPlantWatered,
+  // FilterPlantWatered,
 ] satisfies FilterComponent<QueryParamsPlants>[]
 ```
 
