@@ -20,11 +20,83 @@
         'pr---inner-margin': !search
       }"
     >
-      <h1 class="text-accent sm:text-2.5xl flex-1 truncate text-xl font-semibold">
+      <h1
+        v-if="title !== undefined || $slots.title"
+        class="text-accent sm:text-2.5xl flex-1 truncate text-xl font-semibold"
+      >
         <slot name="title">
           {{ title }}
         </slot>
       </h1>
+
+      <div
+        v-else
+        class="flex min-w-0 flex-1 items-baseline gap-2 text-lg leading-tight sm:text-xl"
+      >
+        <nav
+          v-if="parentTitles.length"
+          aria-label="Breadcrumb"
+          class="sm-not:hidden text-description flex shrink-0 items-baseline gap-2"
+        >
+          <template
+            v-for="(item, index) in parentTitles"
+            :key="index"
+          >
+            <WRouterLink
+              v-if="item.to"
+              :to="item.to"
+              class="hover:text-accent max-w-64 truncate no-underline transition-colors"
+            >
+              <template v-if="getRouteTitleShort(item) !== undefined">
+                {{ getRouteTitleShort(item) }}
+              </template>
+
+              <WSkeleton
+                v-else
+                class="inline-flex w-24"
+              />
+            </WRouterLink>
+
+            <span
+              v-else
+              class="max-w-64 truncate"
+            >
+              {{ getRouteTitleShort(item) }}
+            </span>
+
+            <span
+              aria-hidden="true"
+              class="opacity-50"
+            >/</span>
+          </template>
+        </nav>
+
+        <h1
+          v-if="currentTitle"
+          class="text-accent min-w-0 truncate font-semibold"
+        >
+          <template v-if="currentTitle.title !== undefined">
+            {{ currentTitle.title }}
+
+            <WTooltip
+              :text="currentTitle.title"
+              overflow-only
+            />
+          </template>
+
+          <WSkeleton
+            v-else
+            class="inline-flex w-40"
+          />
+        </h1>
+
+        <div
+          v-if="currentTitle?.suffix"
+          class="flex min-w-max flex-1 items-center self-center"
+        >
+          <component :is="currentTitle.suffix" />
+        </div>
+      </div>
 
       <slot name="right" />
 
@@ -55,10 +127,15 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeUnmount, onMounted, provide, ref, useTemplateRef} from 'vue'
+import {computed, onBeforeUnmount, onMounted, provide, ref, useTemplateRef} from 'vue'
+
+import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
+import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 import IconSearch from '@/assets/icons/IconSearch.svg?component'
 
+import {getRouteTitleShort, useRouteTitles} from '@/utils/useRouteTitle'
 import {BASE_ZINDEX_HEADER_BAR, wBaseZIndex} from '@/utils/utils'
 
 import {useHeader} from './use/useHeader'
@@ -66,7 +143,7 @@ import {useHeaderSearch} from './use/useHeaderSearch'
 import {useHeaderSearchVisible} from './use/useHeaderSearchVisible'
 
 defineProps<{
-  /** Title of the page. The `title` slot replaces it. */
+  /** Title of the page. The `title` slot replaces it. Without both, the header shows the titles of the current route: a breadcrumb of its parents and the page title, see `useRouteTitle`. */
   title?: string
 }>()
 
@@ -82,6 +159,10 @@ provide(wBaseZIndex, BASE_ZINDEX_HEADER_BAR)
 const {headerPadding, updateHeaderHeight} = useHeader()
 const {search} = useHeaderSearch()
 const {visible, updateVisible} = useHeaderSearchVisible()
+const {titles} = useRouteTitles()
+
+const parentTitles = computed(() => titles.value.slice(0, -1))
+const currentTitle = computed(() => titles.value.at(-1))
 const elementRef = useTemplateRef('element')
 
 const isTransparent = ref(false)

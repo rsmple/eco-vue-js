@@ -12,7 +12,7 @@ import {type App, type PropType, defineComponent, h, reactive, watch} from 'vue'
 export const installKitRouter = (app: App, router: Router, base: string) => {
   const stripBase = (path: string) => '/' + path.slice(base.length).replace(/\.html$/, '')
 
-  const route = reactive<FallbackRoute>({name: '', query: {}, hash: '', fullPath: ''})
+  const route = reactive<FallbackRoute>({name: '', query: {}, hash: '', fullPath: '', matched: []})
 
   const sync = () => {
     route.name = stripBase(router.route.path)
