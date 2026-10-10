@@ -80,6 +80,17 @@ The slide moves content its full width plus `--inner-margin` past the edge of th
 
 `update:current` and `update:current-index` emit the active tab, and `update:current-title` its title — for putting it in a page header when the tabs' own header is hidden with `noHeader`. To switch from code, call `updateCurrent(name)` or `updateIndex(index)` on a template ref. The first `update:current` comes during setup, so when the parent shows the current tab, seed it and pass it as `initTab`, as the demo does — otherwise a server-rendered page shows a different value than the first client render.
 
+## Tabs as routes
+
+Give each `WTabsItem` a `to`, and the route opens the tab: the one whose location has the current route's path, whatever the query and hash. The tab buttons become links that replace the history entry, so Back leaves the page instead of stepping through tabs, and they open in a new browser tab on a middle click. Anything else that links to a tab's location — a summary card above the tabs, say, with filters in the query — switches to it, and `updateCurrent` navigates. `initTab` is only used when no tab matches the route.
+
+```vue
+<WTabs>
+  <WTabsItem name="findings" :to="{name: 'asset', params: {assetId, tab: 'findings'}}" />
+  <WTabsItem name="settings" :to="{name: 'asset', params: {assetId, tab: 'settings'}}" />
+</WTabs>
+```
+
 ## Closable and added tabs
 
 A tab with a `close` listener gets a close button. Children that aren't `WTabsItem` render in the header after the tab buttons, which is where an add button goes; `switchToNew` opens a tab as soon as it is added. When the active tab is removed, the one before it opens.
@@ -291,6 +302,7 @@ import WTabsItem from 'eco-vue-js/dist/components/Tabs/WTabsItem.vue'
 | `validate` | `(() => string \| undefined)` | — | Checks the tab before the exposed `next` and `jump` leave it. A returned error message is shown as a warning and the tab stays open. |
 | `requireSave` | `boolean` | — | Submits the enclosing stepper form before moving forward past this tab, and stays on it if the submit fails. |
 | `count` | `number` | — | Number shown in a badge after the title, tinted while the tab is open. |
+| `to` | `RouteLocationRaw` | — | Router location of the tab. The tab button becomes a link that replaces the history entry. While any tab has one, the route decides the open tab — the one whose location has the current route's path, whatever the query and hash — and the exposed methods navigate to the tab instead of opening it. |
 
 #### Events
 
@@ -334,6 +346,7 @@ import WButtonTab from 'eco-vue-js/dist/components/Button/WButtonTab.vue'
 | `showHasValue` | `boolean` | — | Colors the title green when `hasValue` is set and the tab isn't open. |
 | `enableOverflow` | `boolean` | — | Scrolls a title that doesn't fit into view on hover. |
 | `count` | `number` | — | Number shown in a badge after the title, tinted while the tab is open. |
+| `to` | `RouteLocationRaw` | — | Router location — renders a link that replaces the current history entry, unless `disabled`. |
 
 #### Events
 

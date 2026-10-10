@@ -1,6 +1,7 @@
 <template>
-  <button
-    :disabled="disabled"
+  <component
+    :is="to && !disabled ? WRouterLink : 'button'"
+    v-bind="to && !disabled ? {to, replace: true} : {disabled}"
     class="w-ripple-trigger grid select-none grid-cols-[auto_1fr] font-semibold outline-none"
     :class="{
       'tone-primary text-tone': !hasError && active,
@@ -140,10 +141,12 @@
         />
       </Transition>
     </div>
-  </button>
+  </component>
 </template>
 
 <script setup lang="ts">
+import type {LinkProps} from '@/types/types'
+
 import IconCheckCircle from '@/assets/icons/IconCheckCircle.svg?component'
 import IconClose from '@/assets/icons/IconClose.svg?component'
 import IconNegativeInfo from '@/assets/icons/IconNegativeInfo.svg?component'
@@ -151,6 +154,7 @@ import IconNegativeInfo from '@/assets/icons/IconNegativeInfo.svg?component'
 import {numberFormatter} from '@/utils/utils.ts'
 
 import WEmptyComponent from '../EmptyComponent/WEmptyComponent.vue'
+import WRouterLink from '../RouterLink/WRouterLink.vue'
 import WStatusIcon from '../Status/WStatusIcon.vue'
 import WTextOverflow from '../TextOverflow/WTextOverflow.vue'
 
@@ -181,6 +185,8 @@ defineProps<{
   enableOverflow?: boolean
   /** Number shown in a badge after the title, tinted while the tab is open. */
   count?: number
+  /** Router location — renders a link that replaces the current history entry, unless `disabled`. */
+  to?: LinkProps['to']
 }>()
 
 defineEmits<{

@@ -1,7 +1,7 @@
 <template>
   <component
     :is="to && RouterLinkComponent ? RouterLinkComponent : 'a'"
-    v-bind="to && RouterLinkComponent ? { to } : { href }"
+    v-bind="to && RouterLinkComponent ? { to, replace } : { href }"
   >
     <slot />
   </component>
@@ -16,6 +16,8 @@ import {getCurrentInstance} from 'vue'
 interface Props extends LinkProps {
   /** URL of a plain link, used when `to` is empty. */
   href?: string
+  /** Replaces the current history entry instead of adding one, with `to`. */
+  replace?: boolean
 }
 
 defineProps<Props>()

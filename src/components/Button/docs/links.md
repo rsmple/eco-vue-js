@@ -118,6 +118,7 @@ import WRouterLink from 'eco-vue-js/dist/components/RouterLink/WRouterLink.vue'
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `href` | `string` | — | URL of a plain link, used when `to` is empty. |
+| `replace` | `boolean` | — | Replaces the current history entry instead of adding one, with `to`. |
 | `to` | `RouteLocationRaw` | **required** | Router location — renders a router link. Needs vue-router installed in the app. |
 
 #### Slots

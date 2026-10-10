@@ -54,6 +54,7 @@
           :title="slot.props.title"
           :icon="slot.props.icon"
           :count="slot.props.count"
+          :to="slot.props.to"
           :has-changes="slot.props.hasChanges ?? slot.props['has-changes' as never] ?? tabItemRefByName[slot.props.name]?.hasChanges"
           :has-error="slot.props.hasError ?? slot.props['has-error' as never] ?? tabItemRefByName[slot.props.name]?.hasError"
           :has-value="slot.props.hasValue ?? slot.props['has-value' as never] ?? tabItemRefByName[slot.props.name]?.hasValue"
@@ -67,7 +68,7 @@
           :enable-overflow="side"
           :indicator="indicator"
           @update:scroll-position="updateScrollPosition"
-          @click="switchTab(slot.props?.name)"
+          @click="slot.props.to === undefined ? switchTab(slot.props.name) : scrollToTabContent()"
         >
           <template
             v-if="(slot.children as Record<string, Component>)?.title"
@@ -185,6 +186,7 @@ import IconClose from '@/assets/icons/IconClose.svg?component'
 import OverlayRegionPart from '@/components/Modal/components/OverlayRegionPart.vue'
 import {wOverlayRegions} from '@/components/Modal/models/overlayRegistry'
 import {wUniformStepperController} from '@/components/Uniform/utils/injection'
+import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRouter'
 import {Notify} from '@/utils/Notify'
 import {useOverlayClose, useOverlayFrame} from '@/utils/Overlay'
 import {useIsMobile} from '@/utils/mobile'
@@ -268,7 +270,14 @@ const defaultSlotsIndexByName = computed<Record<string, number>>(() => {
   return map
 })
 
-const current = ref<string>(props.initTab ?? (props.initTabIndex !== undefined
+const router = useOptionalRouter()
+const route = useOptionalRoute()
+
+const routeTabName = computed<string | undefined>(() => defaultSlots.value
+  .find(slot => slot.props.to !== undefined && router.resolve(slot.props.to).path === route.path)
+  ?.props.name)
+
+const current = ref<string>(routeTabName.value ?? props.initTab ?? (props.initTabIndex !== undefined
   ? defaultSlotsKeys.value[props.initTabIndex]!
   : defaultSlots.value.find(slot => !!slot.props?.init)?.props?.name ?? defaultSlotsKeys.value[0]!
 ))
@@ -357,16 +366,27 @@ const scrollToTabContent = () => {
   }, 300)
 }
 
-const setCurrentDebounced = debounce((value: string) => {
+const setCurrent = (value: string) => {
   if (current.value === value || !defaultSlotsKeys.value.includes(value)) return
-  const slot = defaultSlots.value[defaultSlotsKeys.value.indexOf(value)]
-  if (slot && isSlotDisabled(slot)) return
 
   isDirect.value = defaultSlotsKeys.value.indexOf(current.value) < defaultSlotsKeys.value.indexOf(value)
   current.value = value
 
   scrollToTabContent()
+}
+
+const setCurrentDebounced = debounce((value: string) => {
+  if (current.value === value) return
+  const slot = defaultSlots.value[defaultSlotsKeys.value.indexOf(value)]
+  if (!slot || isSlotDisabled(slot)) return
+
+  if (slot.props.to !== undefined && !router.noRouter) router.replace(slot.props.to)
+  else setCurrent(value)
 }, 100)
+
+watch(routeTabName, value => {
+  if (value !== undefined) setCurrent(value)
+})
 
 const stepperController = inject(wUniformStepperController, null)
 
