@@ -44,7 +44,7 @@ interface SelectPropsWithOptions<Data extends DefaultData> {
 type SelectPropsOptions<Data extends DefaultData, QueryParams> = SelectPropsNoParams<Data> | SelectPropsWithParams<Data, QueryParams> | SelectPropsWithOptions<Data>
 
 export interface SelectProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
-  extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'async' | 'debounce' | 'hideDebounce'>,
+  extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'allowClear' | 'clearValue' | 'async' | 'debounce' | 'hideDebounce'>,
   SelectOptionComponentProps<Data, OptionComponent>,
   Omit<SelectPropsOptions<Data, QueryParams>, 'modelValue'> {
   /** Selected values. The component does not change it — update it from `select` and `unselect`. */

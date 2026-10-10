@@ -377,8 +377,8 @@
   </WFieldWrapper>
 </template>
 
-<script lang="ts" setup generic="Type extends InputType = 'text'">
-import type {InputProps, TextPart, WrapSelection} from './types'
+<script lang="ts" setup generic="Type extends InputType = 'text', ClearValue extends InputClearValue = ''">
+import type {InputClearValue, InputProps, TextPart, WrapSelection} from './types'
 import type {ShowMessage} from '../FieldWrapper/use/useFieldSaved'
 
 import {computed, defineAsyncComponent, hydrateOnInteraction, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch} from 'vue'
@@ -390,6 +390,7 @@ import IconCheckSecret from '@/assets/icons/IconCheckSecret.svg?component'
 import {Notify} from '@/utils/Notify'
 import {getIsMobile} from '@/utils/mobile'
 import {isDragging} from '@/utils/preventDragFile'
+import {useClearValue} from '@/utils/useClearValue'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {checkPermissionPaste} from '@/utils/useCopy'
 import {useTabActiveListener} from '@/utils/useTabActiveListener'
@@ -410,6 +411,7 @@ const InputAsyncButtons = defineAsyncComponent(() => import('./components/InputA
 const InputToolbar = defineAsyncComponent(() => import('./components/InputToolbar.vue'))
 
 type ModelValue = Required<InputProps<Type>>['modelValue']
+type EmitType = NonNullable<ModelValue> | Extract<ClearValue, null> | undefined
 
 interface HistoryEntry {
   value: ModelValue | undefined
@@ -419,7 +421,7 @@ interface HistoryEntry {
 defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
-  defineProps<InputProps<Type>>(),
+  defineProps<InputProps<Type, ClearValue>>(),
   {
     size: 10,
     autocomplete: 'off',
@@ -432,7 +434,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   /** The new value — on every change, or only when saved with `async`. */
-  (e: 'update:model-value', value: NonNullable<ModelValue> | undefined): void
+  (e: 'update:model-value', value: EmitType): void
   /** Enter without modifiers. Not emitted by an `async` single-line input, where Enter saves. */
   (e: 'keypress:enter', value: KeyboardEvent): void
   /** Arrow Up without modifiers. */
@@ -458,6 +460,8 @@ const emit = defineEmits<{
   /** The textarea rendered its `textParts`, with the tagged elements in order. */
   (e: 'rendered', taggedList: HTMLElement[]): void
 }>()
+
+const getClearValue = useClearValue(props, '')
 
 defineSlots<{
   /** Replaces the `title` text. */
@@ -603,12 +607,14 @@ const handleHistoryKeydown = (event: KeyboardEvent): void => {
   else undo()
 }
 
-const updateModelValue = (value: string | undefined, noDebounce = false): void => {
+const updateModelValue = (value: string | null | undefined, noDebounce = false): void => {
   if (props.loading || isDisabled.value || isReadonly.value || props.unclickable) return
 
-  let newValue: NonNullable<ModelValue>
-  if (props.type === 'number') newValue = (typeof value === 'string' && value.length ? Number.parseFloat(value) : undefined) as NonNullable<ModelValue>
-  else newValue = value as NonNullable<ModelValue>
+  if (value === '') value = getClearValue()
+
+  let newValue: EmitType
+  if (props.type === 'number') newValue = (typeof value === 'string' ? value.length ? Number.parseFloat(value) : undefined : value) as EmitType
+  else newValue = value as EmitType
 
   if (!props.textSecure) addToHistory(newValue, noDebounce)
 
@@ -669,8 +675,7 @@ const handleInputEvent = (event: Event): void => {
 const clearValue = () => {
   if (isDisabled.value || isReadonly.value || props.unclickable) return
 
-  if (typeof props.modelValue === 'string') updateModelValue('', true)
-  else updateModelValue(undefined, true)
+  updateModelValue(getClearValue(), true)
 
   emit('click:clear')
 }
