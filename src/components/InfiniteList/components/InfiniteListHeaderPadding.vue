@@ -24,8 +24,7 @@ const updateHeaderHeight = () => {
   }
 }
 
-watch(() => props.isIntersecting, updateHeaderHeight)
-watch(() => props.headerHeight, updateHeaderHeight)
+watch(() => [props.isIntersecting, props.headerHeight], updateHeaderHeight)
 
 onUnmounted(() => {
   updateHeaderPadding(0)

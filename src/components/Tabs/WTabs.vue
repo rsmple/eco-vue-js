@@ -250,8 +250,10 @@ const refreshSlots = () => {
 onBeforeUpdate(refreshSlots)
 
 watch(
-  () => unwrapSlots(props.customSlots ?? slots.default?.() ?? []).length,
-  refreshSlots,
+  () => props.customSlots ?? slots.default?.() ?? [],
+  value => {
+    defaultSlotsRaw.value = value
+  },
 )
 
 const defaultSlotsAll = computed(() => unwrapSlots(defaultSlotsRaw.value))
