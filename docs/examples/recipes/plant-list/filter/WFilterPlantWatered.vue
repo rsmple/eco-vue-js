@@ -45,5 +45,6 @@ export const meta = {
   title: 'Watered',
   icon: markRaw(IconDrop),
   fields: ['watered'],
+  summary: queryParams => queryParams.watered === undefined ? undefined : queryParams.watered ? 'Watered' : 'Thirsty',
 } as const satisfies FilterMeta<QueryParamsPlants>
 </script>

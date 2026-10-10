@@ -53,5 +53,6 @@ export const meta = {
   title: 'Light',
   icon: markRaw(IconSun),
   fields: ['light__in'],
+  summary: queryParams => queryParams.light__in?.map(item => lightDisplay[item].name),
 } as const satisfies FilterMeta<QueryParamsPlants>
 </script>
