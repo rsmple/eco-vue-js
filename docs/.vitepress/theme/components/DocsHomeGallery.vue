@@ -354,7 +354,7 @@
             <button
               v-for="option in NOTIFY_POSITIONS"
               :key="option.value"
-              class="tone-primary h-2.5 cursor-pointer rounded-sm border transition-colors"
+              class="tone-primary h-2.5 cursor-pointer rounded-sm border"
               :class="[
                 option.class,
                 notifyPosition === option.value ? 'bg-tone-fill border-tone-fill' : 'border-line-subtle bg-surface-raised hover:border-tone-line',

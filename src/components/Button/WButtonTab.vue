@@ -1,7 +1,7 @@
 <template>
   <button
     :disabled="disabled"
-    class="w-ripple-trigger grid select-none grid-cols-[auto_1fr] font-semibold outline-none transition-colors duration-500"
+    class="w-ripple-trigger grid select-none grid-cols-[auto_1fr] font-semibold outline-none"
     :class="{
       'tone-primary text-tone': !hasError && active,
       'tone-negative text-tone': hasError,
@@ -87,7 +87,7 @@
 
             <span
               v-if="count !== undefined"
-              class="ml-0.5 inline-block min-w-[1.75em] rounded-full px-1.5 text-center text-xs/5 tabular-nums duration-500"
+              class="ml-0.5 inline-block min-w-[1.75em] rounded-full px-1.5 text-center text-xs/5 tabular-nums"
               :class="active && !hasError ? 'bg-tone-soft' : 'bg-surface-muted text-description'"
             >
               {{ numberFormatter.format(count) }}
@@ -116,7 +116,7 @@
       >
         <div
           v-if="hasChanges"
-          class="square-2 absolute right-1 top-1 rounded-full transition-colors duration-200"
+          class="square-2 absolute right-1 top-1 rounded-full"
           :class="{
             'tone-info bg-tone-fill': !hasError,
             'tone-negative bg-tone-fill': hasError,

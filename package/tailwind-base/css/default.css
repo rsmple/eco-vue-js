@@ -99,6 +99,15 @@
   margin-inline: calc(var(--w-frame-padding, 0px) * -1);
 }
 
+/* The selection bar with filters: filters at their natural width, actions keeping at least `--w-selection-actions-width`, settings at the end. On phones the filters take a row of their own. */
+@utility w-selection-filter-grid {
+  grid-template-columns: minmax(0, max-content) minmax(var(--w-selection-actions-width, 0px), 1fr) auto;
+
+  @variant sm-not {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
 }

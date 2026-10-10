@@ -18,7 +18,7 @@
           class="
             tone-primary border-tone-line/40 text-description hover:text-accent
             hover:border-tone-line mb-6 inline-flex items-center gap-2
-            rounded-full border px-3 py-1 text-sm font-medium transition-colors
+            rounded-full border px-3 py-1 text-sm font-medium
           "
         >
           <span class="tone-positive bg-tone-fill size-2 rounded-full" />

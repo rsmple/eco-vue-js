@@ -3,16 +3,15 @@
     class="list:left---left-inner list:w---width-inner list:sticky grid w-full pb-3 [--w-list-toolbar-inherited-height:var(--w-input-height,2.75rem)]"
     :class="{
       'grid-cols-[1fr_auto]': !isFilterShown,
-      'grid-cols-[minmax(0,max-content)_minmax(var(--w-selection-more-width,calc(var(--w-list-padding,1rem)*2+1.25em)),1fr)_auto]': isFilterShown && $slots.more,
-      'grid-cols-[minmax(0,max-content)_minmax(0,1fr)_auto]': isFilterShown && !$slots.more,
+      'w-selection-filter-grid': isFilterShown,
     }"
-    :style="moreMinWidth ? {'--w-selection-more-width': `${ moreMinWidth }px`} : undefined"
+    :style="actionsMinWidth ? {'--w-selection-actions-width': `${ actionsMinWidth }px`} : undefined"
   >
     <div
       v-if="$slots.filter"
       v-show="isFilterShown"
       :class="cellClass"
-      class="min-w-0 mr-2"
+      class="min-w-0 sm:mr-20 sm-not:col-span-full sm-not:mr-0 sm-not:mb-2 sm-not:px-(--w-list-padding,1rem)"
     >
       <slot name="filter" />
     </div>
@@ -136,7 +135,7 @@ const isOverflowing = ref(false)
 // Widths of the actions as last shown: a hidden one has none, so it keeps the one it had.
 const widths = new WeakMap<Element, number>()
 let moreWidth = 0
-const moreMinWidth = ref(0)
+const actionsMinWidth = ref(0)
 
 const isShown = (element: Element) => element.getClientRects().length > 0
 
@@ -153,10 +152,7 @@ const update = () => {
     if (isShown(element)) widths.set(element, element.getBoundingClientRect().width)
   })
 
-  if (more && isShown(more)) {
-    moreWidth = more.getBoundingClientRect().width
-    moreMinWidth.value = Math.ceil(moreWidth)
-  }
+  if (more && isShown(more)) moreWidth = more.getBoundingClientRect().width
 
   // An action not shown yet, such as one of the bulk actions once something is selected, is shown to be measured first.
   if (items.some(element => !widths.has(element))) {
@@ -167,6 +163,8 @@ const update = () => {
 
   const available = row.clientWidth
   const total = items.reduce((sum, element) => sum + widths.get(element)!, 0)
+
+  actionsMinWidth.value = Math.ceil(more ? moreWidth : total)
 
   if (total <= available || !more) {
     visibleCount.value = Infinity

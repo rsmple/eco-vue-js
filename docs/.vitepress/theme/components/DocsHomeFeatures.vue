@@ -32,7 +32,7 @@
 
         <span class="text-description text-sm leading-relaxed">{{ feature.details }}</span>
 
-        <span class="text-description group-hover:text-accent group-focus-visible:text-accent mt-auto pt-1 text-sm font-medium transition-colors">
+        <span class="text-description group-hover:text-accent group-focus-visible:text-accent mt-auto pt-1 text-sm font-medium">
           {{ feature.action }} →
         </span>
       </a>

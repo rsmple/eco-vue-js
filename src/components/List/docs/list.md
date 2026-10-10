@@ -67,9 +67,9 @@ In place, the filters are chips in a row: the set ones are shown, and a button a
 
 ### Filters in the selection bar
 
-Put the `WListFilter` in WList's `filter` slot to show it at the start of the selection bar, on one line with the list actions and the list settings. Chips that do not fit go into a "more" chip that opens them as a list, and the list actions, which move to the end of the bar, fold into More before any chip does. While rows are selected, the selection with its bulk actions replaces the filters, so the bar keeps its height. `--w-list-toolbar-height` (`w-list-toolbar-h-*`) sets the height of the bar's inputs, chips and actions, by default the inherited input height.
+Put the `WListFilter` in WList's `filter` slot to show it at the start of the selection bar, on one line with the list actions and the list settings. Chips that do not fit go into a "more" chip that opens them as a list, and the list actions, which move to the end of the bar, fold into More before any chip does. While rows are selected, the selection with its bulk actions replaces the filters, so the bar keeps its height. On phones the filters take a row of their own above the actions, and the search narrows for them. `--w-list-toolbar-height` (`w-list-toolbar-h-*`) sets the height of the bar's inputs, chips and actions, by default the inherited input height.
 
-Each chip names its filter and, when set, the picked values. A filter's `meta.summary` returns them from the query params, such as the titles of the picked options; without it the chip shows how many values are picked.
+Each chip names its filter and, when set, the picked values. A filter's `meta.summary` returns them from the query params, such as the titles of the picked options; without it the chip shows how many values are picked. A chip in the "more" list can be removed there too.
 
 ## API
 
@@ -208,7 +208,7 @@ import WButtonSelection from 'eco-vue-js/dist/components/Button/WButtonSelection
 | `default` | `{ disableMessage: string \| undefined; cssClass: string; visibleCount: number; }` | WButtonSelectionAction buttons. Pass them `disableMessage`, and `cssClass` for the dividers between them. Hide the ones from `visibleCount` on, which do not fit — the `more` slot shows them instead. |
 | `more` | `{ disableMessage: string \| undefined; cssClass: string; visibleCount: number; }` | Actions in the More menu at the end of the row: the ones of the `default` slot from `visibleCount` on, which do not fit the row. The menu shows only when some do not. |
 | `filter` | — | Filters at the start of the bar while nothing is selected. The actions then move to the end, beside `settings`, and the selection replaces the filters. |
-| `settings` | — | Content at the end of the bar while nothing is selected, such as list settings. |
+| `settings` | `{ isFilterShown: boolean; }` | Content at the end of the bar while nothing is selected, such as list settings. |
 
 <!-- @api-end -->
 

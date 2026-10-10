@@ -25,7 +25,16 @@
     />
 
     <WButton
-      v-if="!readonly && hasChanges"
+      v-if="removeLabel !== undefined"
+      :semantic-type="SemanticType.SECONDARY"
+      class="mt-4 w-full"
+      @click="$emit('remove')"
+    >
+      {{ removeLabel }}
+    </WButton>
+
+    <WButton
+      v-else-if="!readonly && hasChanges"
       :semantic-type="SemanticType.SECONDARY"
       :disabled="!hasChanges"
       class="mt-4 w-full"
@@ -55,10 +64,13 @@ const props = defineProps<{
   isOpen: boolean
   disabledFilterFields: Array<keyof QueryParams>
   readonly: boolean
+  /** Label of a button that takes the filter off the list, shown instead of the reset button. */
+  removeLabel?: string
 }>()
 
 defineEmits<{
   (e: 'toggle'): void
+  (e: 'remove'): void
 }>()
 
 const meta = computed(() => Array.isArray(props.item) ? props.item[0].meta : props.item.meta)

@@ -101,7 +101,7 @@
 
         <span
           v-if="hasChanges"
-          class="square-2 absolute right-0 top-0 rounded-full bg-(--has-changes-bg) transition-colors"
+          class="square-2 absolute right-0 top-0 rounded-full bg-(--has-changes-bg)"
         />
 
         <div

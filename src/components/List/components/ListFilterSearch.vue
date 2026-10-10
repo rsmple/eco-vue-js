@@ -9,7 +9,7 @@
         placeholder="Search.."
         allow-clear
         class="w-full"
-        :no-margin="global"
+        no-margin
         :icon="markRaw(IconSearch)"
         :autofocus="autofocus"
         @click:clear="$emit('close')"

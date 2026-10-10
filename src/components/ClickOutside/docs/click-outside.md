@@ -17,7 +17,7 @@ description: WClickOutside — emits click on a click or right-click anywhere ou
 <template>
   <div class="grid max-w-md gap-4">
     <WClickOutside
-      class="rounded-xl border border-solid p-4 transition-colors"
+      class="rounded-xl border border-solid p-4"
       :class="active ? 'tone-primary border-tone' : 'border-line-subtle'"
       @click="clickOutside"
     >

@@ -1,7 +1,7 @@
 <template>
   <button
     ref="button"
-    class="relative flex rounded-lg p-2 transition-colors"
+    class="relative flex rounded-lg p-2"
     :class="isOpen ? 'tone-primary text-tone' : 'text-description hover:text-accent'"
     aria-label="Notifications"
     :aria-expanded="isOpen"
