@@ -2,12 +2,12 @@
   <div
     ref="root"
     class="w-button-rounded-xl flex items-center gap-2 text-sm"
-    :class="inToolbar ? 'max-w-full' : 'flex-wrap py-2'"
-    :style="inToolbar && naturalWidth ? {width: `${ naturalWidth }px`} : undefined"
+    :class="isCompact ? 'w-full' : inToolbar ? 'max-w-full' : 'flex-wrap py-2'"
+    :style="inToolbar && !isCompact && naturalWidth ? {width: `${ naturalWidth }px`} : undefined"
   >
     <div
       v-if="searchComponent"
-      :class="inToolbar ? 'w-48 shrink-0' : 'min-w-48 max-w-full'"
+      :class="inToolbar ? isCompact ? 'min-w-0 flex-1' : 'w-48 shrink-0' : 'min-w-48 max-w-full'"
     >
       <component
         :is="searchComponent[0].default"
@@ -28,7 +28,7 @@
     </div>
 
     <ListFilterLocalItem
-      v-for="item in shownList"
+      v-for="item in chipList"
       :key="item.id"
       :scope="scope"
       :item="item.item"
@@ -49,13 +49,13 @@
     >
       <template #toggle>
         <ListFilterChip
-          :title="`${ hiddenList.length } more`"
+          :title="isCompact ? 'Filters' : `${ hiddenList.length } more`"
           :icon="markRaw(IconFilter)"
           :values="undefined"
           :count="hiddenActiveCount"
           :is-open="isOverflowOpen"
           :remove-label="undefined"
-          :class="{hidden: !hiddenList.length}"
+          :class="{hidden: !overflowList.length}"
           v-bind="{'data-filter-overflow': ''}"
           @toggle="isOverflowOpen = !isOverflowOpen"
         />
@@ -68,27 +68,30 @@
       </template>
 
       <template #content>
-        <div class="grid min-w-104 text-start font-normal">
+        <div class="grid sm:min-w-104 text-start font-normal">
           <ListFilterGlobalItem
-            v-for="item in hiddenList"
+            v-for="(item, index) in overflowList"
             :key="item.id"
             :scope="scope"
             :item="item.item"
             :is-open="overflowOpenId === item.id"
             :disabled-filter-fields="disabledFilterFields"
             :readonly="readonly"
+            :remove-label="readonly || isCompact || pinnedIds.includes(item.id) || !allShown.includes(item.id) ? undefined : 'Remove filter'"
             class="px---inner-margin"
+            :class="index === overflowList.length - 1 ? 'pb---inner-margin' : undefined"
             @toggle="overflowOpenId = overflowOpenId === item.id ? null : item.id"
+            @remove="removeFilterItem(item)"
           />
         </div>
       </template>
     </WDropdownAdaptive>
 
     <ListFilterSelect
-      v-if="!readonly && availableList.length"
+      v-if="!readonly && availableList.length && !isCompact"
       :filter="availableList"
       :query-params="scope.modelValue"
-      @select="selected.push($event); openId = $event"
+      @select="addFilterItem"
     />
   </div>
 </template>
@@ -103,6 +106,7 @@ import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconFilter from '@/assets/icons/IconFilter.svg?component'
 
+import {useIsMobile} from '@/utils/mobile'
 import {BASE_ZINDEX_ACTIONS_BAR, wBaseZIndex} from '@/utils/utils.ts'
 
 import ListFilterChip from './ListFilterChip.vue'
@@ -127,6 +131,10 @@ const props = defineProps<{
 provide(wBaseZIndex, inject(wBaseZIndex, 0) + BASE_ZINDEX_ACTIONS_BAR)
 
 const inToolbar = inject(wListToolbar, false)
+
+const {isMobile} = useIsMobile()
+
+const isCompact = computed(() => inToolbar && isMobile.value)
 
 const searchComponent: FilterComponent<QueryParams> | undefined = props.search ? props.filterSearch ?? ListFilterSearch : undefined
 
@@ -173,6 +181,15 @@ const closeFilterItem = (item: {id: string}) => {
   if (openId.value === item.id) openId.value = null
 }
 
+const pendingOpenId = ref<string | null>(null)
+
+const addFilterItem = (id: string) => {
+  selected.value.push(id)
+
+  if (inToolbar && !isCompact.value) pendingOpenId.value = id
+  else openId.value = id
+}
+
 const removeFilterItem = (item: {id: string, item: FilterComponent<QueryParams>}) => {
   const result: QueryParams = {...props.scope.modelValue} as QueryParams
 
@@ -196,7 +213,11 @@ const hiddenIds = ref<string[]>([])
 
 const hiddenList = computed(() => shownList.value.filter(item => hiddenIds.value.includes(item.id)))
 
-const hiddenActiveCount = computed(() => hiddenList.value.filter(item => hasValue(item.item)).length)
+const chipList = computed(() => isCompact.value ? [] : shownList.value)
+
+const overflowList = computed(() => isCompact.value ? [...shownList.value, ...availableList.value] : hiddenList.value)
+
+const hiddenActiveCount = computed(() => overflowList.value.filter(item => hasValue(item.item)).length)
 
 const rootRef = useTemplateRef('root')
 
@@ -214,10 +235,18 @@ const measure = (element: Element) => {
   return widths.get(element)
 }
 
-const update = () => {
+const setHiddenIds = (ids: string[]) => {
+  if (ids.join() === hiddenIds.value.join()) return false
+
+  hiddenIds.value = ids
+
+  return true
+}
+
+const layout = (): boolean => {
   const root = rootRef.value
 
-  if (!inToolbar || !root) return
+  if (!inToolbar || !root || isCompact.value) return false
 
   const children = Array.from(root.children)
   const chips = children.filter(element => element.hasAttribute('data-filter-chip'))
@@ -228,41 +257,45 @@ const update = () => {
   const fixedWidth = fixed.reduce((sum, element) => sum + (measure(element) ?? 0), 0)
   const overflowWidth = (overflow && measure(overflow)) ?? OVERFLOW_WIDTH_FALLBACK
 
-  if (chipWidths.some(width => width === undefined)) {
-    hiddenIds.value = []
-    return
-  }
+  if (chipWidths.some(width => width === undefined)) return setHiddenIds([])
 
   const gap = parseFloat(getComputedStyle(root).columnGap) || 0
   const chipsWidth = (chipWidths as number[]).reduce((sum, width) => sum + width, 0)
   const itemCount = fixed.length + chips.length
 
+  const previousWidth = naturalWidth.value
+  const limit = root.parentElement?.clientWidth ?? root.clientWidth
+
   naturalWidth.value = Math.ceil(fixedWidth + chipsWidth + gap * Math.max(itemCount - 1, 0))
 
-  const available = root.clientWidth
+  const isWidthChanged = naturalWidth.value !== previousWidth
 
-  if (naturalWidth.value <= available) {
-    hiddenIds.value = []
-    return
-  }
+  if (naturalWidth.value <= limit || (previousWidth && Math.abs(limit - previousWidth) < 1)) return setHiddenIds([]) || isWidthChanged
 
   const ids = shownList.value.map(item => item.id)
-  const openIndex = openId.value === null ? -1 : ids.indexOf(openId.value)
-  const order = openIndex === -1 ? ids.map((_, index) => index) : [openIndex, ...ids.map((_, index) => index).filter(index => index !== openIndex)]
+  const keptId = openId.value ?? pendingOpenId.value
+  const openIndex = keptId === null ? -1 : ids.indexOf(keptId)
 
-  let used = fixedWidth + overflowWidth + gap * fixed.length
-  const visible = new Set<number>()
+  let used = fixedWidth + overflowWidth + gap * fixed.length + (openIndex === -1 ? 0 : gap + chipWidths[openIndex]!)
+  const visible = new Set<number>(openIndex === -1 ? [] : [openIndex])
 
-  for (const index of order) {
-    const width = chipWidths[index]!
-
-    if (used + gap + width > available) break
+  for (const [index, width] of (chipWidths as number[]).entries()) {
+    if (index === openIndex) continue
+    if (used + gap + width > limit) break
 
     used += gap + width
     visible.add(index)
   }
 
-  hiddenIds.value = ids.filter((_, index) => !visible.has(index))
+  return setHiddenIds(ids.filter((_, index) => !visible.has(index))) || isWidthChanged
+}
+
+const update = () => {
+  if (layout() || pendingOpenId.value === null) return
+
+  if (selected.value.includes(pendingOpenId.value)) openId.value = pendingOpenId.value
+
+  pendingOpenId.value = null
 }
 
 let observer: ResizeObserver | null = null

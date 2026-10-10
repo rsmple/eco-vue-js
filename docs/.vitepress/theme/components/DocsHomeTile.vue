@@ -5,7 +5,7 @@
 
       <a
         :href="withBase(link)"
-        class="text-description hover:text-accent text-sm font-medium transition-colors"
+        class="text-description hover:text-accent text-sm font-medium"
       >
         Docs →
       </a>

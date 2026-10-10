@@ -30,7 +30,7 @@
           :href="isExternal(link.href) ? link.href : withBase(link.href)"
           :target="isExternal(link.href) ? '_blank' : undefined"
           :rel="isExternal(link.href) ? 'noopener' : undefined"
-          class="text-description hover:text-accent w-fit transition-colors"
+          class="text-description hover:text-accent w-fit"
         >
           {{ link.text }}
         </a>
@@ -46,7 +46,7 @@
           href="https://github.com/rsmple/eco-vue-js/blob/main/docs/.vitepress/theme/DocsLayout.vue"
           target="_blank"
           rel="noopener"
-          class="hover:text-accent underline underline-offset-2 transition-colors"
+          class="hover:text-accent underline underline-offset-2"
         >see the layout</a>
       </span>
     </div>

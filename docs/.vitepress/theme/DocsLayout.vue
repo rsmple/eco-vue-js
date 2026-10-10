@@ -30,7 +30,7 @@
             :href="item.isExternal ? item.link : withBase(item.link)"
             :target="item.isExternal ? '_blank' : undefined"
             :rel="item.isExternal ? 'noopener' : undefined"
-            class="transition-colors hover:text-accent"
+            class="hover:text-accent"
             :class="item.isActive ? 'text-accent' : 'text-description'"
           >
             {{ item.text }}
@@ -40,7 +40,7 @@
         <div class="flex items-center gap-1 pl-4 sm:gap-2 md:pl-6">
           <button
             class="
-              text-description hover:text-accent flex items-center gap-2 rounded-lg p-2 transition-colors
+              text-description hover:text-accent flex items-center gap-2 rounded-lg p-2
  sm:border sm:border-line-subtle sm:py-1.5 sm:pr-2 sm:pl-3
             "
             aria-label="Search"
@@ -61,7 +61,7 @@
             :aria-label="link.title"
             target="_blank"
             rel="noopener"
-            class="text-description hover:text-accent hidden p-2 transition-colors sm:block"
+            class="text-description hover:text-accent hidden p-2 sm:block"
           >
             <component
               :is="link.icon"

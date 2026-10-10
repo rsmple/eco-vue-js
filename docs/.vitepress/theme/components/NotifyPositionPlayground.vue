@@ -10,7 +10,7 @@
       <button
         v-for="option in options"
         :key="option.value"
-        class="h-5 cursor-pointer rounded-md border border-solid transition-colors"
+        class="h-5 cursor-pointer rounded-md border border-solid"
         :class="[
           option.class,
           notifyPosition === option.value
