@@ -12,6 +12,7 @@
         :values="values"
         :count="count"
         :is-open="isOpen"
+        :shrink="shrink"
         :remove-label="readonly ? undefined : pinned ? (count ? 'Clear filter' : undefined) : 'Remove filter'"
         @toggle="$emit('toggle')"
         @remove="$emit('remove')"
@@ -71,6 +72,8 @@ const props = defineProps<{
   isOpen: boolean
   pinned: boolean
   readonly: boolean
+  /** Lets the chip shrink, truncating its values, when it does not fit the bar. */
+  shrink?: boolean
 }>()
 
 defineEmits<{

@@ -1,15 +1,17 @@
 <template>
   <div
-    class="relative tone-primary flex h-(--w-input-height,2.75rem) max-w-80 shrink-0 select-none items-center rounded-(--w-input-rounded,0.75rem) border border-solid"
+    class="relative tone-primary flex h-(--w-input-height,2.75rem) max-w-80 select-none items-center rounded-(--w-input-rounded,0.75rem) border border-solid"
     :class="{
       'border-tone-line bg-tone-soft/40': hasValue,
       'border-line bg-surface': !hasValue,
       'outline-solid outline-2 outline-focus/20 border-tone-line': isOpen,
+      'min-w-0': shrink,
+      'shrink-0': !shrink,
     }"
   >
     <button
       type="button"
-      class="flex h-full min-w-0 cursor-pointer items-center gap-1.5 rounded-inherit pl-3 outline-none disabled:cursor-default"
+      class="flex h-full min-w-0 cursor-pointer items-center gap-1.5 overflow-hidden rounded-inherit pl-3 outline-none disabled:cursor-default"
       :class="isRemovable ? 'pr-1' : 'pr-3'"
       :aria-expanded="isOpen"
       :disabled="disabled"
@@ -23,7 +25,7 @@
       />
 
       <span
-        class="whitespace-nowrap"
+        class="truncate"
         :class="valuesShown.length ? 'text-description' : 'text-accent'"
       >
         {{ title }}{{ valuesShown.length ? ':' : '' }}
@@ -32,7 +34,7 @@
       <span
         v-if="valuesShown.length"
         :title="valueList.join(', ')"
-        class="text-tone truncate font-semibold"
+        class="text-tone shrink-100 truncate font-semibold"
       >
         {{ valuesShown.join(', ') }}
       </span>
@@ -84,6 +86,8 @@ const props = defineProps<{
   /** Label of the remove button, which shows when set. */
   removeLabel: string | undefined
   disabled?: boolean
+  /** Lets the chip shrink, truncating its values. */
+  shrink?: boolean
 }>()
 
 defineEmits<{

@@ -7,7 +7,7 @@
   >
     <div
       v-if="searchComponent"
-      :class="inToolbar ? isCompact ? 'min-w-0 flex-1' : 'w-48 shrink-0' : 'min-w-48 max-w-full'"
+      :class="inToolbar ? isCompact ? 'min-w-0 flex-1' : isSqueezed ? 'w-48 min-w-28 shrink-100' : 'w-48 shrink-0' : 'min-w-48 max-w-full'"
     >
       <component
         :is="searchComponent[0].default"
@@ -35,6 +35,7 @@
       :is-open="openId === item.id"
       :pinned="pinnedIds.includes(item.id)"
       :readonly="readonly"
+      :shrink="isSqueezed && keptId === item.id"
       :class="{hidden: hiddenIds.includes(item.id)}"
       v-bind="{'data-filter-chip': ''}"
       @toggle="openId = openId === item.id ? null : item.id"
@@ -225,12 +226,27 @@ const naturalWidth = ref(0)
 
 const widths = new WeakMap<Element, number>()
 
+// The chip kept open, which stays shown even when nothing else fits beside it.
+const keptId = computed(() => openId.value ?? pendingOpenId.value)
+
+// The kept chip and the search do not fit at their natural widths, so they shrink instead of overflowing the bar — the search first, then the chip, truncating its values.
+const isSqueezed = ref(false)
+
+const setSqueezed = (value: boolean) => {
+  if (isSqueezed.value === value) return false
+
+  isSqueezed.value = value
+
+  return true
+}
+
 const OVERFLOW_WIDTH_FALLBACK = 112
 
 const isShown = (element: Element) => element.getClientRects().length > 0
 
+// While squeezed, the widths are the shrunk ones, so the natural widths measured before are kept.
 const measure = (element: Element) => {
-  if (isShown(element)) widths.set(element, element.getBoundingClientRect().width)
+  if (isShown(element) && (!isSqueezed.value || !widths.has(element))) widths.set(element, element.getBoundingClientRect().width)
 
   return widths.get(element)
 }
@@ -270,11 +286,10 @@ const layout = (): boolean => {
 
   const isWidthChanged = naturalWidth.value !== previousWidth
 
-  if (naturalWidth.value <= limit || (previousWidth && Math.abs(limit - previousWidth) < 1)) return setHiddenIds([]) || isWidthChanged
+  if (naturalWidth.value <= limit || (previousWidth && Math.abs(limit - previousWidth) < 1)) return [setHiddenIds([]), setSqueezed(false)].some(Boolean) || isWidthChanged
 
   const ids = shownList.value.map(item => item.id)
-  const keptId = openId.value ?? pendingOpenId.value
-  const openIndex = keptId === null ? -1 : ids.indexOf(keptId)
+  const openIndex = keptId.value === null ? -1 : ids.indexOf(keptId.value)
 
   let used = fixedWidth + overflowWidth + gap * fixed.length + (openIndex === -1 ? 0 : gap + chipWidths[openIndex]!)
   const visible = new Set<number>(openIndex === -1 ? [] : [openIndex])
@@ -287,7 +302,7 @@ const layout = (): boolean => {
     visible.add(index)
   }
 
-  return setHiddenIds(ids.filter((_, index) => !visible.has(index))) || isWidthChanged
+  return [setHiddenIds(ids.filter((_, index) => !visible.has(index))), setSqueezed(openIndex !== -1 && used > limit)].some(Boolean) || isWidthChanged
 }
 
 const update = () => {

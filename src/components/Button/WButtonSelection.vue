@@ -11,7 +11,7 @@
       v-if="$slots.filter"
       v-show="isFilterShown"
       :class="cellClass"
-      class="min-w-0 sm:mr-20 sm-not:col-span-full sm-not:mr-0 sm-not:mb-2 sm-not:px-(--w-list-padding,1rem)"
+      class="min-w-0 sm:mr-12 sm-not:col-span-full sm-not:mr-0 sm-not:mb-2 sm-not:px-(--w-list-padding,1rem)"
     >
       <slot name="filter" />
     </div>
