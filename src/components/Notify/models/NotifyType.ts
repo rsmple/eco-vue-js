@@ -2,7 +2,7 @@ export enum NotifyType {
   SUCCESS = 'success',
   WARN = 'warn',
   DANGER = 'danger',
-  /** Something in progress, shown with a spinner until it is updated to another type. */
+  /** Something in progress, shown with a spinner until it is updated to another type. Its toast stays on screen until then. */
   PENDING = 'pending',
 }
 

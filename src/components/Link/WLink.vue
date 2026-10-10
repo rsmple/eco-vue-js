@@ -2,7 +2,7 @@
   <component
     v-bind="!to ? {href, target, rel} : {to, target, rel}"
     :is="to ? WRouterLink : 'a'"
-    class="cursor-pointer overflow-hidden truncate whitespace-normal font-normal no-underline hover:underline"
+    class="cursor-pointer whitespace-normal font-normal no-underline hover:underline"
     :class="semanticTypeTextMap[semanticType]"
   >
     <component
