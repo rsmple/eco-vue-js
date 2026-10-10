@@ -2,7 +2,7 @@ import {type Query, type QueryClient, type QueryFunction, type UseQueryOptions, 
 import {type MaybeRef, computed, isRef, toValue, unref, watch} from 'vue'
 
 import {ApiError} from './api'
-import {type QueryModel, type QueryModelId, type QueryScope, type QueryScopeItem, removeQueryItem, setListItem, setQueryItem} from './queryCache'
+import {type QueryModel, type QueryModelId, type QueryScope, type QueryScopeItem, getQueryItem, isQueryModelId, removeQueryItem, setListItem, setQueryItem} from './queryCache'
 
 export const PAGE_LENGTH = 24
 
@@ -10,7 +10,23 @@ type SetQueriesDataResult = ReturnType<QueryClient['setQueriesData']>
 
 type QueryOptionsObject<Data> = Exclude<UseQueryOptions<Data, ApiError, Data>, {value: unknown}>
 
-export type DefaultQueryOptions<Data> = Omit<Partial<QueryOptionsObject<Data>>, 'queryKey' | 'queryFn'>
+export type DefaultQueryOptions<Data> = Omit<Partial<QueryOptionsObject<Data>>, 'queryKey' | 'queryFn'> & {
+  /**
+   * Opts an item query into showing the item already cached by a list or page of the model while its own request is
+   * in flight - only an item this accepts is used, so a thin preview can be told apart from a full item.
+   */
+  isPlaceholderItem?: (item: QueryScopeItem<Data>) => boolean
+}
+
+const queryOptionsOf = <Data>(options: DefaultQueryOptions<Data>) => {
+  if (!('isPlaceholderItem' in options)) return options
+
+  const result = {...options}
+
+  delete result.isPlaceholderItem
+
+  return result
+}
 
 export const normalizeQueryParamsValue = <QueryParams>(value: QueryParams): QueryParams => {
   return value !== null && typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0
@@ -168,13 +184,23 @@ export const createDefaultQuery = (<
     ): UseQueryReturnTypeDefault<QueryData> => {
       const resolvedClient = queryClient ?? useQueryClient()
       const normalizedParams = normalize(queryParams)
+      const isPlaceholderItem = options.isPlaceholderItem ?? optionsDefault.isPlaceholderItem
 
       const query = useQuery<QueryData, ApiError, QueryData, QueryKey>({
         queryKey: keyOf(normalizedParams),
         queryFn,
 
-        ...optionsDefault,
-        ...options,
+        // The placeholder is never written to the cache, so the response still replaces it in full.
+        placeholderData: scope === 'item' && isPlaceholderItem
+          ? () => {
+            const id = unref(normalizedParams)
+
+            return isQueryModelId(id) ? getQueryItem(modelKey, id, resolvedClient, isPlaceholderItem as (item: QueryModel) => boolean) : undefined
+          }
+          : undefined,
+
+        ...queryOptionsOf(optionsDefault),
+        ...queryOptionsOf(options),
 
         enabled: enabledOf(options),
       } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
@@ -190,8 +216,8 @@ export const createDefaultQuery = (<
       queryKey: keyOf(normalizeValue(queryParams)),
       queryFn,
 
-      ...optionsDefault,
-      ...options,
+      ...queryOptionsOf(optionsDefault),
+      ...queryOptionsOf(options),
 
       enabled: enabledOf(options),
     })
@@ -224,8 +250,8 @@ export const createDefaultQuery = (<
       queryKey: keyOf(),
       queryFn,
 
-      ...optionsDefault,
-      ...options,
+      ...queryOptionsOf(optionsDefault),
+      ...queryOptionsOf(options),
 
       enabled: enabledOf(options),
     } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
@@ -239,8 +265,8 @@ export const createDefaultQuery = (<
     queryKey: keyOf(),
     queryFn,
 
-    ...optionsDefault,
-    ...options,
+    ...queryOptionsOf(optionsDefault),
+    ...queryOptionsOf(options),
 
     enabled: enabledOf(options),
   })
