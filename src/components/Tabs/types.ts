@@ -1,3 +1,4 @@
+import type {LinkProps} from '@/types/types'
 import type {VNode} from 'vue'
 
 export interface TabsProps {
@@ -74,4 +75,10 @@ export type TabsItemProps = {
   requireSave?: boolean
   /** Number shown in a badge after the title, tinted while the tab is open. */
   count?: number
+  /**
+   * Router location of the tab. The tab button becomes a link that replaces the history entry. While any tab has one, the route
+   * decides the open tab — the one whose location has the current route's path, whatever the query and hash — and the exposed
+   * methods navigate to the tab instead of opening it.
+   */
+  to?: LinkProps['to']
 }

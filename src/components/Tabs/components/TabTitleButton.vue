@@ -21,6 +21,7 @@
       :show-has-value="showHasValue"
       :enable-overflow="enableOverflow"
       :count="count"
+      :to="to"
       @click="$emit('click', $event)"
     >
       <template
@@ -52,6 +53,8 @@
 </template>
 
 <script setup lang="ts">
+import type {LinkProps} from '@/types/types'
+
 import {nextTick, useTemplateRef, watch} from 'vue'
 
 import WButtonTab from '@/components/Button/WButtonTab.vue'
@@ -74,6 +77,7 @@ const props = defineProps<{
   enableOverflow?: boolean
   indicator?: boolean
   count: number | undefined
+  to: LinkProps['to'] | undefined
 }>()
 
 const emit = defineEmits<{

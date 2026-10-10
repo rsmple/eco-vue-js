@@ -22,7 +22,7 @@ type Router = ReturnType<typeof useRouter>
 
 export type FallbackRouter = {
   push: Router['push']
-  resolve(to: RouteLocationRaw): Pick<ReturnType<Router['resolve']>, 'name' | 'query' | 'href' | 'matched'> & {meta: Record<string, string> | undefined, name: string}
+  resolve(to: RouteLocationRaw): Pick<ReturnType<Router['resolve']>, 'name' | 'path' | 'query' | 'href' | 'matched'> & {meta: Record<string, string> | undefined, name: string}
   replace: Router['replace']
   noRouter?: true | undefined
 }
@@ -41,6 +41,7 @@ const fallbackRouter: FallbackRouter = {
     const result = {
       name: typeof to === 'string' ? to : 'name' in to ? to.name as string : to.path ?? '',
       href: typeof to === 'string' ? to : 'href' in to && typeof to.href === 'string' ? to.href : to.path ?? '',
+      path: typeof to === 'string' ? to.split(/[?#]/)[0]! : 'path' in to ? to.path ?? '' : '',
       query: typeof to === 'string' ? {} : to.query as LocationQuery ?? {},
       meta: undefined,
     }
@@ -79,6 +80,7 @@ type Route = ReturnType<typeof useRoute>
 
 export type FallbackRoute = {
   name: string
+  path: Route['path']
   query: LocationQuery
   hash: Route['hash']
   fullPath: Route['fullPath']
@@ -119,6 +121,7 @@ export const useOptionalRoute = (): FallbackRoute => {
   return {
     query: Object.fromEntries(url.searchParams.entries()),
     name: url.pathname,
+    path: url.pathname,
     hash: url.hash,
     fullPath: url.pathname,
     matched: [],
