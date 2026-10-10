@@ -29,7 +29,7 @@
         </template>
       </template>
 
-      <template v-else>
+      <template v-else-if="!isFilterIdle">
         <HeaderExport
           v-if="!disableExport"
           :fields="fieldsVisible"
@@ -41,22 +41,20 @@
           :class="cssClass"
         />
 
-        <template v-if="!isFilterIdle">
-          <template
-            v-for="(item, index) in bulk"
-            :key="index"
-          >
-            <component
-              :is="item"
-              :selection-count="selectionCount"
-              :query-params-getter="getQueryParamsBulk"
-              :disable-message="disableMessage"
-              :readonly="readonly"
-              :clear-selection="resetSelection"
-              :class="[cssClass, {hidden: bulkOffset + index >= visibleCount}]"
-              @clear:selected="$emit('reset:selection')"
-            />
-          </template>
+        <template
+          v-for="(item, index) in bulk"
+          :key="index"
+        >
+          <component
+            :is="item"
+            :selection-count="selectionCount"
+            :query-params-getter="getQueryParamsBulk"
+            :disable-message="disableMessage"
+            :readonly="readonly"
+            :clear-selection="resetSelection"
+            :class="[cssClass, {hidden: bulkOffset + index >= visibleCount}]"
+            @clear:selected="$emit('reset:selection')"
+          />
         </template>
       </template>
     </template>
@@ -118,7 +116,7 @@
       <div
         v-else
         class="flex"
-        :class="isFilterShown && (action?.length || !disableExport) ? 'border-l border-solid border-line' : undefined"
+        :class="isFilterShown && action?.length ? 'border-l border-solid border-line' : undefined"
       >
         <WButtonSelectionAction
           v-if="allowSelect"
