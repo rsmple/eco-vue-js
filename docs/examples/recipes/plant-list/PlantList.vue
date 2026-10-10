@@ -1,19 +1,4 @@
 <template>
-  <!-- The filters edit the same query params the list reads. -->
-  <WUniform
-    :model-value="queryParams"
-    @update:model-value="updateQueryParams"
-  >
-    <template #default="scope">
-      <WListFilter
-        :scope="scope"
-        :filter="listFilterPlant"
-        search
-        class="sticky left---left-inner mb-2 w---width-inner"
-      />
-    </template>
-  </WUniform>
-
   <WList
     :use-query-fn="plantModelApi.paginated.use"
     :query-params="queryParams"
@@ -50,7 +35,24 @@
     min-height
     class="card:w-list-gap-3"
     @update:query-params="updateQueryParams"
-  />
+  >
+    <!-- The filters edit the same query params the list reads, in the selection bar above the rows. -->
+    <template #filter>
+      <WUniform
+        :model-value="queryParams"
+        @update:model-value="updateQueryParams"
+      >
+        <template #default="scope">
+          <WListFilter
+            :scope="scope"
+            :filter="listFilterPlant"
+            :pinned="listFilterPlantPinned"
+            search
+          />
+        </template>
+      </WUniform>
+    </template>
+  </WList>
 </template>
 
 <script lang="ts" setup>
@@ -67,7 +69,7 @@ import WBulkPlantDry from './bulk/WBulkPlantDry.vue'
 import WBulkPlantRemove from './bulk/WBulkPlantRemove.vue'
 import WBulkPlantWatered from './bulk/WBulkPlantWatered.vue'
 import {defaultFieldConfigMapPlant, listFieldsPlant} from './fields'
-import {listFilterPlant} from './filter'
+import {listFilterPlant, listFilterPlantPinned} from './filter'
 import WMenuPlantCaretaker from './menu/WMenuPlantCaretaker.vue'
 import WMenuPlantDelete from './menu/WMenuPlantDelete.vue'
 import WMenuPlantToggle from './menu/WMenuPlantToggle.vue'

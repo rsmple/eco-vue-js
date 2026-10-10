@@ -48,6 +48,7 @@ export const meta = {
   title: 'Kind',
   icon: markRaw(IconPlant),
   fields: ['kind__in'],
-  // The control fills the filter's dropdown edge to edge, so the dropdown drops its padding.
+  // The chip names the picked kinds instead of counting them.
+  summary: queryParams => queryParams.kind__in?.map(item => kindDisplay[item].name),
 } as const satisfies FilterMeta<QueryParamsPlants>
 </script>

@@ -27,21 +27,6 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
 
 ```vue
 <template>
-  <!-- The filters edit the same query params the list reads. -->
-  <WUniform
-    :model-value="queryParams"
-    @update:model-value="updateQueryParams"
-  >
-    <template #default="scope">
-      <WListFilter
-        :scope="scope"
-        :filter="listFilterPlant"
-        search
-        class="sticky left---left-inner mb-2 w---width-inner"
-      />
-    </template>
-  </WUniform>
-
   <WList
     :use-query-fn="plantModelApi.paginated.use"
     :query-params="queryParams"
@@ -78,7 +63,24 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
     min-height
     class="card:w-list-gap-3"
     @update:query-params="updateQueryParams"
-  />
+  >
+    <!-- The filters edit the same query params the list reads, in the selection bar above the rows. -->
+    <template #filter>
+      <WUniform
+        :model-value="queryParams"
+        @update:model-value="updateQueryParams"
+      >
+        <template #default="scope">
+          <WListFilter
+            :scope="scope"
+            :filter="listFilterPlant"
+            :pinned="listFilterPlantPinned"
+            search
+          />
+        </template>
+      </WUniform>
+    </template>
+  </WList>
 </template>
 
 <script lang="ts" setup>
@@ -95,7 +97,7 @@ import WBulkPlantDry from './bulk/WBulkPlantDry.vue'
 import WBulkPlantRemove from './bulk/WBulkPlantRemove.vue'
 import WBulkPlantWatered from './bulk/WBulkPlantWatered.vue'
 import {defaultFieldConfigMapPlant, listFieldsPlant} from './fields'
-import {listFilterPlant} from './filter'
+import {listFilterPlant, listFilterPlantPinned} from './filter'
 import WMenuPlantCaretaker from './menu/WMenuPlantCaretaker.vue'
 import WMenuPlantDelete from './menu/WMenuPlantDelete.vue'
 import WMenuPlantToggle from './menu/WMenuPlantToggle.vue'
@@ -109,7 +111,7 @@ const selectAllTextGetter = (isUnselect: boolean, count: number) => `${ isUnsele
 
 <!-- @example-end -->
 
-Try adding a filter, sorting by a few columns from the sort menu, resizing Name, hiding columns from the header settings, switching to cards, expanding a row, using the `⋯` menu, and selecting a few rows for the bulk actions above the list. The data is in memory here, behind the same model API a real endpoint would use.
+Try picking a kind from the pinned chip, adding a filter, sorting by a few columns from the sort menu, resizing Name, hiding columns from the header settings, switching to cards, expanding a row, using the `⋯` menu, and selecting a few rows for the bulk actions above the list. The data is in memory here, behind the same model API a real endpoint would use.
 
 ## The code
 
@@ -843,9 +845,11 @@ export const defaultFieldConfigMapPlant = getDefaultFieldConfigMap(listFieldsPla
 
 ### Filters
 
-`WListFilter` edits the same query params the list reads. Wrap it in a `WUniform` over `queryParams` and pass the `scope` down; `search` adds the search field. Without `global`, the filters sit above the list as chips: the add button offers the rest, and each chip opens its control in a dropdown and shows how many values are set.
+`WListFilter` edits the same query params the list reads. Wrap it in a `WUniform` over `queryParams` and pass the `scope` down; `search` adds the search field. Put it in WList's `filter` slot and the filters sit in the selection bar, on one line with the list settings: each chip opens its control in a dropdown, the add button offers the rest, and chips that do not fit go into a "more" chip. While rows are selected, the bulk actions take the bar's place.
 
-Each filter is a module like a field: the component renders the control inside a `WUniform` bound to its param, and `meta` gives the chip's `title`, `icon` and the `fields` it sets — removing the chip clears them. The control is the same one a form would use: a `WSelect` for kinds, a `WCheckboxGroupMultiple` for light, a radio `WCheckboxGroup` for watered, where `undefined` means "Any", and a `WSelectSingle` for the caretaker. The two selects reuse option components from the [Select](/components/select) examples — the tone tag and the gardener with their week of watering — so a kind looks the same in the filter as in its column.
+`pinned` filters are always shown, first — here kind and watered, the ones most often reached for. Their remove button only clears them, so they stay in the bar.
+
+Each filter is a module like a field: the component renders the control inside a `WUniform` bound to its param, and `meta` gives the chip's `title`, `icon` and the `fields` it sets — removing the chip clears them. `meta.summary` returns the picked values for the chip from the query params — the kind and light names, "Watered" or "Thirsty", the caretaker's name. Without it, the chip shows how many values are picked. The control is the same one a form would use: a `WSelect` for kinds, a `WCheckboxGroupMultiple` for light, a radio `WCheckboxGroup` for watered, where `undefined` means "Any", and a `WSelectSingle` for the caretaker. The two selects reuse option components from the [Select](/components/select) examples — the tone tag and the gardener with their week of watering — so a kind looks the same in the filter as in its column.
 
 The dropdown is titled with the filter's name and pads the control like a small form. `:embedded="!global"` drops the control's own title and margin, and lets a select's options and a checkbox list reach the dropdown's edges, as in a menu. With `global` the filters go into the app shell's filter panel instead, where each control keeps its title. A filter applies as it changes, so picking a caretaker closes the dropdown, as a single select's menu would — a multiple select stays open to pick more.
 
@@ -904,7 +908,8 @@ export const meta = {
   title: 'Kind',
   icon: markRaw(IconPlant),
   fields: ['kind__in'],
-  // The control fills the filter's dropdown edge to edge, so the dropdown drops its padding.
+  // The chip names the picked kinds instead of counting them.
+  summary: queryParams => queryParams.kind__in?.map(item => kindDisplay[item].name),
 } as const satisfies FilterMeta<QueryParamsPlants>
 </script>
 ```
@@ -961,6 +966,7 @@ export const meta = {
   title: 'Watered',
   icon: markRaw(IconDrop),
   fields: ['watered'],
+  summary: queryParams => queryParams.watered === undefined ? undefined : queryParams.watered ? 'Watered' : 'Thirsty',
 } as const satisfies FilterMeta<QueryParamsPlants>
 </script>
 ```
@@ -985,6 +991,12 @@ export const listFilterPlant = [
   FilterPlantLight,
   FilterPlantWatered,
   FilterPlantCaretaker,
+] satisfies FilterComponent<QueryParamsPlants>[]
+
+// Always shown as chips, first; the rest are behind the add-filter button.
+export const listFilterPlantPinned = [
+  FilterPlantKind,
+  FilterPlantWatered,
 ] satisfies FilterComponent<QueryParamsPlants>[]
 ```
 
@@ -1631,6 +1643,7 @@ const getDueText = (due: Date) => {
 
 ## Variations
 
+- **Filters above the list**: render the `WUniform` with `WListFilter` before `WList` instead of in its `filter` slot, and the chips wrap onto as many lines as they need.
 - **Filters in the app shell**: pass `global` to `WListFilter` to put the filters into the actions bar's panel and the search into the header bar, with a button that resets them. `disabledFilterFields` leaves out filters for params the page fixes, e.g. `caretaker` on a caretaker's own page.
 - **Toolbar actions** (e.g. "Create"): pass `action` with components typed by `ActionProps<QueryParams>`.
 - **Nested columns**: a field's `meta` can be `{keyEntity, fields}` or `{keyArray, fields}` to render columns of a related object or of every item in an array.

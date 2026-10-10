@@ -46,5 +46,6 @@ export const meta = {
   title: 'Caretaker',
   icon: markRaw(IconUser),
   fields: ['caretaker'],
+  summary: queryParams => gardeners.find(item => item.id === queryParams.caretaker)?.name,
 } as const satisfies FilterMeta<QueryParamsPlants>
 </script>
