@@ -3,7 +3,9 @@ import type {FieldWrapperProps} from '@/components/FieldWrapper/types'
 import type {WrapSelectionType} from '@/utils/utils'
 import type {Component} from 'vue'
 
-export interface InputProps<Type extends InputType> extends Omit<FieldWrapperProps, 'modelValue'> {
+export type InputClearValue = '' | undefined | null
+
+export interface InputProps<Type extends InputType, ClearValue extends InputClearValue = ''> extends Omit<FieldWrapperProps, 'modelValue'> {
   /** Field value — a `number` when `type` is `number`, otherwise a `string`. */
   modelValue?: (Type extends 'number' ? number : string) | undefined | null
   /** Native input type. `number` parses the value into a number. */
@@ -52,8 +54,10 @@ export interface InputProps<Type extends InputType> extends Omit<FieldWrapperPro
   textSecure?: boolean
   /** Shows the secret-set check mark while the field is empty. */
   placeholderSecure?: boolean
-  /** Adds a button that clears the value. */
+  /** Adds a button that clears the value, emitting `clearValue`. */
   allowClear?: boolean
+  /** Value emitted when cleared or emptied by editing. Defaults to `''` (`undefined` for `type="number"`); set it explicitly to emit `undefined` or `null`. */
+  clearValue?: ClearValue
   /** Adds a button that pastes from the clipboard, replacing the value. */
   allowPaste?: boolean
   /** Hides the text input, leaving only the `prefix` content. */
@@ -81,12 +85,12 @@ export interface InputProps<Type extends InputType> extends Omit<FieldWrapperPro
   explicit?: boolean
 }
 
-export interface InputAsyncProps<Type extends InputType> extends InputProps<Type> {
+export interface InputAsyncProps<Type extends InputType, ClearValue extends InputClearValue = ''> extends InputProps<Type, ClearValue> {
   /** Checks the value before it is saved. A returned error message is shown under the field and the value is not emitted. */
   validate?: ValidateFn | ValidateFn[]
 }
 
-export interface InputSuggestProps<Type extends InputType> extends Omit<InputProps<Type>, 'unclickable'>, Partial<Pick<DropdownMenuProps, 'horizontalAlign' | 'dropdownClass'>> {
+export interface InputSuggestProps<Type extends InputType, ClearValue extends InputClearValue = ''> extends Omit<InputProps<Type, ClearValue>, 'unclickable'>, Partial<Pick<DropdownMenuProps, 'horizontalAlign' | 'dropdownClass'>> {
   /** Title for the mobile bottom sheet the menu opens in. Defaults to `title`. */
   mobileTitle?: string
   /** Keeps the menu open when the input loses focus. */
@@ -99,7 +103,7 @@ export interface InputSuggestProps<Type extends InputType> extends Omit<InputPro
   hideToggle?: boolean
 }
 
-export interface InputOptionsProps<Type extends InputType, Option> extends InputSuggestProps<Type> {
+export interface InputOptionsProps<Type extends InputType, Option, ClearValue extends InputClearValue = ''> extends InputSuggestProps<Type, ClearValue> {
   /** Suggestions shown in the menu. Picking one sets the value and blurs the input. */
   options: Option[]
   /** Value an option puts into the input. */
@@ -110,7 +114,7 @@ export interface InputOptionsProps<Type extends InputType, Option> extends Input
   optionComponent?: Component<{option: Option, selected?: boolean, model?: boolean}>
 }
 
-export interface InputDateProps extends Omit<InputSuggestProps<'text'>, 'modelValue'> {
+export interface InputDateProps extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'clearValue'> {
   /** Selected date. Typed text is parsed into a date as it changes. */
   modelValue?: Date | undefined
   /** Earliest selectable date. A typed date before it is replaced with it. */

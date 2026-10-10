@@ -10,7 +10,7 @@ description: WInput — text, number, password and multiline inputs with titles,
 
 ## Basic usage
 
-`type="number"` makes the model a `number`; everything else is a `string`. `textarea` switches to a multiline field that grows with its content, `resize` lets the user drag it taller. `allowClear` adds a clear button, `icon` an icon at the start.
+`type="number"` makes the model a `number`; everything else is a `string`. `textarea` switches to a multiline field that grows with its content, `resize` lets the user drag it taller. `allowClear` adds a clear button. Clearing or deleting all the text emits `''` — or `undefined` or `null` set with `clearValue`, which also narrows the emitted type. `icon` adds an icon at the start.
 
 <!-- @example Input/Basic -->
 
@@ -283,7 +283,8 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 | `customBackspaceHandle` | `boolean` | — | Handles Backspace in code — removes the character or selection and emits the new value — instead of leaving it to the browser. |
 | `textSecure` | `boolean` | — | Masks the value, with a button to reveal it, for secrets. A model value of `true` means a secret is set but not sent to the client, and shows a check mark instead. |
 | `placeholderSecure` | `boolean` | — | Shows the secret-set check mark while the field is empty. |
-| `allowClear` | `boolean` | — | Adds a button that clears the value. |
+| `allowClear` | `boolean` | — | Adds a button that clears the value, emitting `clearValue`. |
+| `clearValue` | `ClearValue` | — | Value emitted when cleared or emptied by editing. Defaults to `''` (`undefined` for `type="number"`); set it explicitly to emit `undefined` or `null`. |
 | `allowPaste` | `boolean` | — | Adds a button that pastes from the clipboard, replacing the value. |
 | `hideInput` | `boolean` | — | Hides the text input, leaving only the `prefix` content. |
 | `noWrap` | `boolean` | — | Keeps the `prefix` content on one line, scrolling sideways instead of wrapping. |
@@ -329,7 +330,7 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:model-value` | `(((Type extends "number" ? number : string) & {}) \| undefined)` | The new value — on every change, or only when saved with `async`. |
+| `update:model-value` | `(EmitType)` | The new value — on every change, or only when saved with `async`. |
 | `keypress:enter` | `(KeyboardEvent)` | Enter without modifiers. Not emitted by an `async` single-line input, where Enter saves. |
 | `keypress:up` | `(KeyboardEvent)` | Arrow Up without modifiers. |
 | `keypress:down` | `(KeyboardEvent)` | Arrow Down without modifiers. |
@@ -395,7 +396,8 @@ import WInputAsync from 'eco-vue-js/dist/components/Input/WInputAsync.vue'
 | `customBackspaceHandle` | `boolean` | — | Handles Backspace in code — removes the character or selection and emits the new value — instead of leaving it to the browser. |
 | `textSecure` | `boolean` | — | Masks the value, with a button to reveal it, for secrets. A model value of `true` means a secret is set but not sent to the client, and shows a check mark instead. |
 | `placeholderSecure` | `boolean` | — | Shows the secret-set check mark while the field is empty. |
-| `allowClear` | `boolean` | — | Adds a button that clears the value. |
+| `allowClear` | `boolean` | — | Adds a button that clears the value, emitting `clearValue`. |
+| `clearValue` | `ClearValue` | — | Value emitted when cleared or emptied by editing. Defaults to `''` (`undefined` for `type="number"`); set it explicitly to emit `undefined` or `null`. |
 | `allowPaste` | `boolean` | — | Adds a button that pastes from the clipboard, replacing the value. |
 | `hideInput` | `boolean` | — | Hides the text input, leaving only the `prefix` content. |
 | `noWrap` | `boolean` | — | Keeps the `prefix` content on one line, scrolling sideways instead of wrapping. |
@@ -441,7 +443,7 @@ import WInputAsync from 'eco-vue-js/dist/components/Input/WInputAsync.vue'
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:model-value` | `(((Type extends "number" ? number : string) & {}) \| undefined)` | The saved value — on Enter, blur, `debounce` or Save — once it passes `validate`. |
+| `update:model-value` | `(EmitType)` | The saved value — on Enter, blur, `debounce` or Save — once it passes `validate`. |
 
 #### Slots
 
@@ -493,7 +495,8 @@ import WInputSuggest from 'eco-vue-js/dist/components/Input/WInputSuggest.vue'
 | `customBackspaceHandle` | `boolean` | — | Handles Backspace in code — removes the character or selection and emits the new value — instead of leaving it to the browser. |
 | `textSecure` | `boolean` | — | Masks the value, with a button to reveal it, for secrets. A model value of `true` means a secret is set but not sent to the client, and shows a check mark instead. |
 | `placeholderSecure` | `boolean` | — | Shows the secret-set check mark while the field is empty. |
-| `allowClear` | `boolean` | — | Adds a button that clears the value. |
+| `allowClear` | `boolean` | — | Adds a button that clears the value, emitting `clearValue`. |
+| `clearValue` | `ClearValue` | — | Value emitted when cleared or emptied by editing. Defaults to `''` (`undefined` for `type="number"`); set it explicitly to emit `undefined` or `null`. |
 | `allowPaste` | `boolean` | — | Adds a button that pastes from the clipboard, replacing the value. |
 | `hideInput` | `boolean` | — | Hides the text input, leaving only the `prefix` content. |
 | `noWrap` | `boolean` | — | Keeps the `prefix` content on one line, scrolling sideways instead of wrapping. |
@@ -541,7 +544,7 @@ import WInputSuggest from 'eco-vue-js/dist/components/Input/WInputSuggest.vue'
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `update:model-value` | `((Type extends "number" ? number : string) & {})` | The typed value. Not emitted while `loading`. |
+| `update:model-value` | `(EmitType)` | The typed value. Not emitted while `loading`. |
 | `keypress:enter` | `(KeyboardEvent)` | Enter without modifiers. |
 | `keypress:up` | `(KeyboardEvent)` | Arrow Up without modifiers. |
 | `keypress:down` | `(KeyboardEvent)` | Arrow Down without modifiers. |
@@ -609,7 +612,8 @@ import WInputOptions from 'eco-vue-js/dist/components/Input/WInputOptions.vue'
 | `customBackspaceHandle` | `boolean` | — | Handles Backspace in code — removes the character or selection and emits the new value — instead of leaving it to the browser. |
 | `textSecure` | `boolean` | — | Masks the value, with a button to reveal it, for secrets. A model value of `true` means a secret is set but not sent to the client, and shows a check mark instead. |
 | `placeholderSecure` | `boolean` | — | Shows the secret-set check mark while the field is empty. |
-| `allowClear` | `boolean` | — | Adds a button that clears the value. |
+| `allowClear` | `boolean` | — | Adds a button that clears the value, emitting `clearValue`. |
+| `clearValue` | `ClearValue` | — | Value emitted when cleared or emptied by editing. Defaults to `''` (`undefined` for `type="number"`); set it explicitly to emit `undefined` or `null`. |
 | `allowPaste` | `boolean` | — | Adds a button that pastes from the clipboard, replacing the value. |
 | `hideInput` | `boolean` | — | Hides the text input, leaving only the `prefix` content. |
 | `noWrap` | `boolean` | — | Keeps the `prefix` content on one line, scrolling sideways instead of wrapping. |
@@ -705,7 +709,7 @@ import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
 | `customBackspaceHandle` | `boolean` | — | Handles Backspace in code — removes the character or selection and emits the new value — instead of leaving it to the browser. |
 | `textSecure` | `boolean` | — | Masks the value, with a button to reveal it, for secrets. A model value of `true` means a secret is set but not sent to the client, and shows a check mark instead. |
 | `placeholderSecure` | `boolean` | — | Shows the secret-set check mark while the field is empty. |
-| `allowClear` | `boolean` | — | Adds a button that clears the value. |
+| `allowClear` | `boolean` | — | Adds a button that clears the value, emitting `clearValue`. |
 | `allowPaste` | `boolean` | — | Adds a button that pastes from the clipboard, replacing the value. |
 | `hideInput` | `boolean` | — | Hides the text input, leaving only the `prefix` content. |
 | `noWrap` | `boolean` | — | Keeps the `prefix` content on one line, scrolling sideways instead of wrapping. |

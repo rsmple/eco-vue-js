@@ -12,7 +12,7 @@ interface InputAsyncProps {
 
 interface InputAsyncContext {
   props: InputAsyncProps
-  emit: (e: 'update:model-value', value: NonNullable<ModelValue> | undefined) => void
+  emit: (e: 'update:model-value', value: ModelValue) => void
   blur: () => void
 }
 
@@ -24,10 +24,10 @@ export const useInputAsync = (context: InputAsyncContext) => {
 
   const focused = ref(false)
   const saved = ref(false)
-  const value = ref<NonNullable<ModelValue> | undefined>()
+  const value = ref<ModelValue>()
   const timeout = ref<ReturnType<typeof setTimeout> | null>(null)
 
-  const hasChanges = computed(() => isAsync.value && (props.modelValue ?? undefined) !== value.value && !(props.textSecure && typeof props.modelValue !== 'string' && !value.value))
+  const hasChanges = computed(() => isAsync.value && (props.modelValue ?? undefined) !== (value.value ?? undefined) && !(props.textSecure && typeof props.modelValue !== 'string' && !value.value))
 
   const doClearTimeout = () => {
     if (timeout.value) {
@@ -68,14 +68,14 @@ export const useInputAsync = (context: InputAsyncContext) => {
   // Debounce
   if (props.debounce) {
     const saveDebounced = () => {
-      if (value.value !== (props.modelValue ?? undefined)) emit('update:model-value', value.value)
+      if ((value.value ?? undefined) !== (props.modelValue ?? undefined)) emit('update:model-value', value.value)
       timeout.value = null
     }
 
     watch(value, () => {
       doClearTimeout()
 
-      if (value.value === (props.modelValue ?? undefined)) return
+      if ((value.value ?? undefined) === (props.modelValue ?? undefined)) return
 
       timeout.value = setTimeout(saveDebounced, props.debounce)
     })

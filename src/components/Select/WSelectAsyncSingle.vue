@@ -72,7 +72,8 @@ import {computed, toRef, useTemplateRef, watch} from 'vue'
 
 import WSelectAsync from '@/components/Select/WSelectAsync.vue'
 
-import {useClearValue} from './models/useClearValue'
+import {useClearValue} from '@/utils/useClearValue'
+
 import {useCloseOnPick} from './models/useCloseOnPick'
 
 type EmitType = AllowClear extends true ? Model | ClearValue : NonNullable<Model>

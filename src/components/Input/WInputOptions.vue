@@ -1,7 +1,7 @@
 <template>
   <WInputSuggest
     ref="input"
-    v-bind="props"
+    v-bind="{...props, clearValue: getClearValue()}"
     :class="$attrs.class"
     @update:model-value="updateModelValue"
 
@@ -79,27 +79,30 @@
   </WInputSuggest>
 </template>
 
-<script lang="ts" setup generic="Type extends InputType = 'text', Option extends Record<string, any> & {id: number} = Record<string, any> & {id: number}">
-import type {InputOptionsProps} from './types'
+<script lang="ts" setup generic="Type extends InputType = 'text', Option extends Record<string, any> & {id: number} = Record<string, any> & {id: number}, ClearValue extends InputClearValue = ''">
+import type {InputClearValue, InputOptionsProps} from './types'
 
 import {computed, ref, useTemplateRef} from 'vue'
 
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 import SelectOption from '@/components/Select/components/SelectOption.vue'
+import {useClearValue} from '@/utils/useClearValue'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {debounce as debounceImport} from '@/utils/utils'
 
 type ModelValue = Required<InputOptionsProps<Type, Option>>['modelValue']
 
 const props = withDefaults(
-  defineProps<InputOptionsProps<Type, Option>>(),
+  defineProps<InputOptionsProps<Type, Option, ClearValue>>(),
   {
     readonly: undefined,
     disabled: undefined,
     skeleton: undefined,
   },
 )
+
+const getClearValue = useClearValue(props, '')
 
 const emit = defineEmits<{
   /** The typed value, or the value of a picked option. */

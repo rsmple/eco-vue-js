@@ -15,6 +15,7 @@
         v-bind="{
           ...props,
           ...$attrs,
+          clearValue: getClearValue(),
           title: toggleScope?.unclickable === false ? mobileTitle ?? title : title,
           unclickable: toggleScope?.unclickable,
           description: toggleScope?.unclickable === false ? undefined : description,
@@ -30,7 +31,7 @@
           'cursor-not-allowed': isDisabled && !isReadonly,
           'mb-3': isMobile && !toggleScope?.unclickable,
         }"
-        @update:model-value="!loading && $emit('update:model-value', $event as NonNullable<ModelValue>)"
+        @update:model-value="!loading && $emit('update:model-value', $event as EmitType)"
 
         @keypress:enter="$emit('keypress:enter', $event)"
         @keypress:up="$emit('keypress:up', $event)"
@@ -151,8 +152,8 @@
   </component>
 </template>
 
-<script lang="ts" setup generic="Type extends InputType = 'text'">
-import type {InputSuggestProps, WrapSelection} from './types'
+<script lang="ts" setup generic="Type extends InputType = 'text', ClearValue extends InputClearValue = ''">
+import type {InputClearValue, InputSuggestProps, WrapSelection} from './types'
 
 import {type VNode, computed, ref, shallowRef, useTemplateRef} from 'vue'
 
@@ -163,6 +164,7 @@ import IconArrow from '@/assets/icons/IconArrow.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {useIsMobile} from '@/utils/mobile'
+import {useClearValue} from '@/utils/useClearValue'
 import {useComponentStates} from '@/utils/useComponentStates'
 
 import InputActionsButton from './components/InputActionsButton.vue'
@@ -170,11 +172,12 @@ import InputSuggestEmbedded from './components/InputSuggestEmbedded.vue'
 import InputSuggestStatic from './components/InputSuggestStatic.vue'
 
 type ModelValue = Required<InputSuggestProps<Type>>['modelValue']
+type EmitType = NonNullable<ModelValue> | Extract<ClearValue, null>
 
 defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
-  defineProps<InputSuggestProps<Type>>(),
+  defineProps<InputSuggestProps<Type, ClearValue>>(),
   {
     horizontalAlign: HorizontalAlign.FILL,
     readonly: undefined,
@@ -183,9 +186,11 @@ const props = withDefaults(
   },
 )
 
+const getClearValue = useClearValue(props, '')
+
 const emit = defineEmits<{
   /** The typed value. Not emitted while `loading`. */
-  (e: 'update:model-value', event: NonNullable<ModelValue>): void
+  (e: 'update:model-value', event: EmitType): void
   /** Enter without modifiers. */
   (e: 'keypress:enter', event: KeyboardEvent): void
   /** Arrow Up without modifiers. */

@@ -3,6 +3,7 @@
     ref="input"
     v-bind="{
       ...props,
+      clearValue: getClearValue(),
       async: true,
       errorMessage: errorMessageValue ?? errorMessage,
     }"
@@ -52,19 +53,22 @@
   </WInput>
 </template>
 
-<script lang="ts" setup generic="Type extends InputType = 'text'">
-import type {InputAsyncProps} from './types'
+<script lang="ts" setup generic="Type extends InputType = 'text', ClearValue extends InputClearValue = ''">
+import type {InputAsyncProps, InputClearValue} from './types'
 
 import {ref, watch} from 'vue'
 
 import WInput from '@/components/Input/WInput.vue'
 
+import {useClearValue} from '@/utils/useClearValue'
+
 type ModelValue = Required<InputAsyncProps<Type>>['modelValue']
+type EmitType = NonNullable<ModelValue> | Extract<ClearValue, null> | undefined
 
 defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
-  defineProps<InputAsyncProps<Type>>(),
+  defineProps<InputAsyncProps<Type, ClearValue>>(),
   {
     readonly: undefined,
     disabled: undefined,
@@ -73,9 +77,11 @@ const props = withDefaults(
   },
 )
 
+const getClearValue = useClearValue(props, '')
+
 const emit = defineEmits<{
   /** The saved value — on Enter, blur, `debounce` or Save — once it passes `validate`. */
-  (e: 'update:model-value', value: NonNullable<ModelValue> | undefined): void
+  (e: 'update:model-value', value: EmitType): void
 }>()
 
 defineSlots<{
@@ -105,7 +111,7 @@ watch(() => props.modelValue, (newValue: ModelValue | undefined): void => {
   errorMessageValue.value = getErrorMessage(newValue)
 })
 
-const onUpdateModelValue = (newValue: NonNullable<ModelValue> | undefined) => {
+const onUpdateModelValue = (newValue: EmitType) => {
   // Validate the value being saved, not the last accepted one — otherwise one invalid value blocks every later save.
   errorMessageValue.value = getErrorMessage(newValue)
 
