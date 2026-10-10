@@ -165,7 +165,7 @@ import WNavItem from 'eco-vue-js/dist/components/Nav/WNavItem.vue'
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `icon` | `SVGComponent` | — | Icon before the title. Defaults to the route's `meta.icon`. |
-| `title` | `string` | — | Title of the item. Defaults to the route's `meta.titleShort`, then `meta.title`. |
+| `title` | `string` | — | Title of the item. Defaults to the title the route's page registers with `useRouteTitle` while it is open, then the route's `meta.titleShort`, then `meta.title`. |
 | `count` | `number` | — | Number after the title in brackets, such as the number of items on the page it opens. |
 | `counter` | `number` | — | Number in a badge over the end of the title, such as unread items. Hidden at 0. |
 | `skeleton` | `boolean` | — | Shows a placeholder for `count` and hides `counter`, while they load. |

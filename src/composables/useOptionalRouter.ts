@@ -1,6 +1,6 @@
 import type {LocationQuery, RouteLocationRaw, RouteRecordNormalized, useRoute, useRouter} from 'vue-router'
 
-import {type App, getCurrentInstance, inject} from 'vue'
+import {type App, type ComputedRef, getCurrentInstance, inject, isRef} from 'vue'
 
 let cachedRouterAvailable: boolean | null = null
 
@@ -82,6 +82,7 @@ export type FallbackRoute = {
   query: LocationQuery
   hash: Route['hash']
   fullPath: Route['fullPath']
+  matched: Route['matched']
   noRouter?: true | undefined
 }
 
@@ -120,6 +121,35 @@ export const useOptionalRoute = (): FallbackRoute => {
     name: url.pathname,
     hash: url.hash,
     fullPath: url.pathname,
+    matched: [],
     noRouter: true,
   }
+}
+
+const isMatchedRouteRef = (value: unknown): value is ComputedRef<RouteRecordNormalized | undefined> => {
+  if (!isRef(value)) return false
+
+  const record = value.value
+
+  return record instanceof Object && 'instances' in record && 'components' in record && 'path' in record
+}
+
+export const useOptionalMatchedRoute = (): ComputedRef<RouteRecordNormalized | undefined> | undefined => {
+  if (!isRouterAvailable()) return undefined
+
+  const instance = getCurrentInstance() as {provides?: object} | null
+
+  let provides: object | null = instance?.provides ?? null
+
+  while (provides) {
+    for (const key of Object.getOwnPropertySymbols(provides)) {
+      const value = (provides as Record<symbol, unknown>)[key]
+
+      if (isMatchedRouteRef(value)) return value
+    }
+
+    provides = Object.getPrototypeOf(provides)
+  }
+
+  return undefined
 }

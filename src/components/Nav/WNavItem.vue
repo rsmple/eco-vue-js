@@ -1,7 +1,7 @@
 <template>
   <WRouterLink
     :to="to"
-    class="w-ripple-trigger relative block py-1 no-underline"
+    class="w-ripple-trigger group/overflow relative block py-1 no-underline"
     :class="{
       'tone-primary text-tone': isTextColor,
       'text-accent': !isTextColor,
@@ -45,9 +45,9 @@
         }"
       >
         <div class="flex items-center">
-          <template v-if="icon ?? routeTo?.meta?.icon">
+          <template v-if="iconLocal">
             <component
-              :is="icon ?? routeTo?.meta?.icon"
+              :is="iconLocal"
               class="square-[1.25em]"
             />
           </template>
@@ -58,20 +58,23 @@
           />
         </div>
 
-        <div class="last-not:pr-1 whitespace-nowrap font-normal">
-          <span class="relative">
-            <span class="tracking-wide">
-              <span class="leading-loose">
-                {{ titleLocal }}
-              </span>&nbsp;<span v-if="!skeleton">
-                {{ typeof count === 'number' ? `(${numberCompactFormatter.format(count)})` : '' }}
-              </span>
+        <div class="last-not:pr-1 min-w-0 font-normal">
+          <span class="relative inline-flex max-w-full items-center whitespace-nowrap tracking-wide">
+            <WTextOverflow class="min-w-0 leading-loose">
+              {{ titleLocal }}
+            </WTextOverflow>
 
-              <WSkeleton
-                v-else
-                class="inline-flex max-w-10"
-              />
+            <span
+              v-if="!skeleton"
+              class="shrink-0"
+            >
+              {{ typeof count === 'number' ? `\u00A0(${numberCompactFormatter.format(count)})` : '' }}
             </span>
+
+            <WSkeleton
+              v-else
+              class="ml-1 inline-flex max-w-10 shrink-0"
+            />
 
             <WCounter
               v-if="!skeleton && counter !== undefined && counter !== 0"
@@ -96,8 +99,10 @@ import {computed} from 'vue'
 import WCounter from '@/components/Counter/WCounter.vue'
 import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
+import WTextOverflow from '@/components/TextOverflow/WTextOverflow.vue'
 
 import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRouter'
+import {getRouteTitle, getRouteTitleShort} from '@/utils/useRouteTitle'
 import {isEqualObj, numberCompactFormatter} from '@/utils/utils'
 
 const EXCLUDE_QUERY_FIELDS = ['ordering', 'page']
@@ -123,7 +128,11 @@ const isActive = computed<boolean>(() => {
   return isEqualObj(route.query, routeTo.value.query ?? {}, EXCLUDE_QUERY_FIELDS, props.queryFields)
 })
 
-const titleLocal = computed<string>(() => props.title ?? (typeof routeTo.value?.meta?.titleShort === 'string' ? routeTo.value.meta.titleShort : typeof routeTo.value?.meta?.title === 'string' ? routeTo.value.meta.title : ''))
+const routeTitle = computed(() => getRouteTitle(routeTo.value?.matched.at(-1)))
+
+const iconLocal = computed(() => props.icon ?? routeTo.value?.meta?.icon)
+
+const titleLocal = computed<string>(() => props.title ?? (routeTitle.value ? getRouteTitleShort(routeTitle.value) : undefined) ?? (typeof routeTo.value?.meta?.titleShort === 'string' ? routeTo.value.meta.titleShort : typeof routeTo.value?.meta?.title === 'string' ? routeTo.value.meta.title : ''))
 
 const isTextColor = computed(() => props.hasActive ? !props.indent : isActive.value)
 

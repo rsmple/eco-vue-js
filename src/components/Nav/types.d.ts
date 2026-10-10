@@ -3,7 +3,7 @@ import type {LinkProps} from '@/types/types'
 export interface NavItemProps extends LinkProps {
   /** Icon before the title. Defaults to the route's `meta.icon`. */
   icon?: SVGComponent
-  /** Title of the item. Defaults to the route's `meta.titleShort`, then `meta.title`. */
+  /** Title of the item. Defaults to the title the route's page registers with `useRouteTitle` while it is open, then the route's `meta.titleShort`, then `meta.title`. */
   title?: string
   /** Number after the title in brackets, such as the number of items on the page it opens. */
   count?: number

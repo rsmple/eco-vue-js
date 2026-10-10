@@ -79,6 +79,35 @@ const search = ref<string>()
 
 <!-- @example-end -->
 
+## Route titles
+
+Without a `title` prop or slot, the header shows the titles of the current route as one line: its parent pages as muted links and the page's own title in bold. Each level of `route.matched` takes its title from the page, or from its `meta.title`.
+
+A page reports a title that depends on its data from setup with `useRouteTitle`. It registers the title for the route record the page is rendered by, and removes it when the page unmounts:
+
+```ts
+import {useRouteTitle} from 'eco-vue-js/dist/utils/useRouteTitle'
+
+useRouteTitle(() => ({
+  title: query.data.value?.name,
+  suffix: ProductTitleSuffix,
+}))
+```
+
+- `title` is `undefined` while the data loads, and the header shows a placeholder.
+- `titleShort` goes to the breadcrumb, the browser tab and nav items, instead of `title`.
+- `documentTitle` goes to the browser tab only — e.g. a long name the page shows in full in its body, while the header shows a short label.
+- `to` is the breadcrumb link while a child page is open. It defaults to the level's named route, then its named `''` child, then its `redirect`.
+- `suffix` is a component shown after the title, only while the page is the current one — a parent page's chips leave the header on its child pages.
+
+Records that share a path, such as a parent and its `''` child, are one level, so a parent layout can title its index page.
+
+The same titles fill other places:
+
+- `useDocumentTitle(suffix)` keeps `document.title` in sync, page first: `payments/api · Payments Platform · App`. Call it once in the app's root component.
+- WNavItem shows the short title its route's page registers, while the page is open, so a nav item of an item page shows the item instead of a static "Item".
+- `useRouteTitles()` returns the levels for a custom header.
+
 ## API
 
 <!-- @api WHeaderBar -->
@@ -93,7 +122,7 @@ import WHeaderBar from 'eco-vue-js/dist/components/HeaderBar/WHeaderBar.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `title` | `string` | — | Title of the page. The `title` slot replaces it. |
+| `title` | `string` | — | Title of the page. The `title` slot replaces it. Without both, the header shows the titles of the current route: a breadcrumb of its parents and the page title, see `useRouteTitle`. |
 
 #### Slots
 
