@@ -112,7 +112,39 @@ export const updateQueryItems = <Model extends QueryModel>(
   )
 }
 
-export const setQueryItems = <Model extends QueryModel>(modelKey: string, items: Model[], queryClient?: QueryClient): void => {
+/**
+ * Finds a cached item of the model by id across the id-bearing scopes - item queries first, then lists and pages.
+ * A match `isItem` rejects is skipped, so a thin preview does not shadow a full item cached elsewhere.
+ */
+export const getQueryItem = <Model extends QueryModel>(
+  modelKey: string,
+  id: QueryModelId,
+  queryClient?: QueryClient,
+  isItem: (item: Model) => boolean = () => true,
+): Model | undefined => {
+  const resolvedClient = queryClient ?? useQueryClient()
+  const isMatch = (item: Model | undefined): item is Model => item?.id === id && isItem(item)
+
+  for (const [, data] of resolvedClient.getQueriesData<Model>({queryKey: [modelKey, 'item' satisfies QueryScope]} as QueryFilters)) {
+    if (isMatch(data)) return data
+  }
+
+  for (const [, data] of resolvedClient.getQueriesData<Model[]>({queryKey: [modelKey, 'list' satisfies QueryScope]} as QueryFilters)) {
+    const item = data?.find(isMatch)
+
+    if (item) return item
+  }
+
+  for (const [, data] of resolvedClient.getQueriesData<PaginatedResponse<Model>>({queryKey: [modelKey, 'paginated' satisfies QueryScope]} as QueryFilters)) {
+    const item = data?.results.find(isMatch)
+
+    if (item) return item
+  }
+
+  return undefined
+}
+
+export const setQueryItems =<Model extends QueryModel>(modelKey: string, items: Model[], queryClient?: QueryClient): void => {
   const map = new Map(items.map(item => [item.id, item]))
 
   updateQueryItems<Model>(modelKey, map.keys(), item => map.get(item.id) ?? item, queryClient)
