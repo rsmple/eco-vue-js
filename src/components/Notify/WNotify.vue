@@ -6,9 +6,9 @@
   <div
     class="sm-not:top-[max(env(safe-area-inset-top),0.5rem)] fixed isolate z-10000"
     :class="{
-      'sm:top-(--w-top-inner,0.5rem)': isTop,
-      'sm:bottom-[calc(var(--w-bottom-inner,0.5rem)+0.5rem)]': !isTop,
-      'right-(--w-right-inner,0.5rem)': !isCenter,
+      'sm:top-[max(env(safe-area-inset-top),0.5rem)]': isTop,
+      'sm:bottom-[max(env(safe-area-inset-bottom),0.5rem)]': !isTop,
+      'right-[max(env(safe-area-inset-right),0.5rem)]': !isCenter,
       'left-1/2 -translate-x-1/2': isCenter,
     }"
     @pointerenter="setToastsPaused(true)"
