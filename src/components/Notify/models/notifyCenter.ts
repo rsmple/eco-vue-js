@@ -48,6 +48,9 @@ const isActionRequired = (item: NotifyItem) => item.channel === NotifyChannel.AC
 
 export const isNotifyPending = (item: NotifyItem) => item.type === NotifyType.PENDING
 
+/** Stays on screen until the user closes it or, for a pending one, until it finishes. */
+const isToastPinned = (item: NotifyItem) => isActionRequired(item) || isNotifyPending(item)
+
 export const notifyCenterActionItems: ComputedRef<NotifyItem[]> = computed(() => items.value.filter(isActionRequired))
 
 export const notifyCenterActivityItems: ComputedRef<NotifyItem[]> = computed(() => items.value.filter(item => !isActionRequired(item)))
@@ -147,7 +150,7 @@ const hideToastGroup = (id: number): void => {
   const ids = getToastGroupIds(id).filter(value => {
     const item = findItem(value)
 
-    return value === id || !item || !isActionRequired(item)
+    return value === id || !item || !isToastPinned(item)
   })
 
   ids.forEach(clearToastTimer)
@@ -165,7 +168,7 @@ const scheduleToastHide = (id: number): void => {
 
   const item = findItem(id)
 
-  if (item && isActionRequired(item)) return
+  if (item && isToastPinned(item)) return
 
   const timer: ToastTimer = {remaining: TOAST_DELAY, startedAt: 0}
 
