@@ -15,7 +15,7 @@
         v-bind="searchComponent[1]"
         :scope="scope"
         :readonly="readonly"
-        :global="true"
+        :global="false"
       />
 
       <component
@@ -23,7 +23,7 @@
         v-else
         :scope="scope"
         :readonly="readonly"
-        :global="true"
+        :global="false"
       />
     </div>
 
