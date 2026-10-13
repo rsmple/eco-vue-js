@@ -9,7 +9,7 @@
       'hover:text-tone cursor-pointer': !disabled && !loading,
       'cursor-not-allowed opacity-50': disabled,
       'text-tone': active && !disabled,
-      'text-description': (!active && !toned) || disabled,
+      'text-accent': (!active && !toned) || disabled,
       'cursor-progress': loading,
     }"
     :disabled="disabled"
