@@ -39,6 +39,23 @@ export const setSemanticTypeChipMap = (value: Partial<Record<SemanticType, strin
   Object.assign(semanticTypeChipMap, value)
 }
 
+const semanticTypeChipSoftMap = reactive<Record<SemanticType, string>>({
+  [SemanticType.PRIMARY]: 'tone-primary bg-tone-soft text-tone',
+  [SemanticType.SECONDARY]: 'bg-surface-muted text-accent',
+  [SemanticType.NEGATIVE]: 'tone-negative bg-tone-soft text-tone',
+  [SemanticType.POSITIVE]: 'tone-positive bg-tone-soft text-tone',
+  [SemanticType.WARNING]: 'tone-warning bg-tone-soft text-tone',
+  [SemanticType.INFO]: 'tone-info bg-tone-soft text-tone',
+})
+
+export const useSemanticTypeChipSoftMap = () => {
+  return semanticTypeChipSoftMap
+}
+
+export const setSemanticTypeChipSoftMap = (value: Partial<Record<SemanticType, string>>) => {
+  Object.assign(semanticTypeChipSoftMap, value)
+}
+
 const semanticTypeBorderMap = reactive<Record<SemanticType, string>>({
   [SemanticType.PRIMARY]: 'tone-primary border-solid border-tone-fill',
   [SemanticType.SECONDARY]: 'border-solid border-line',

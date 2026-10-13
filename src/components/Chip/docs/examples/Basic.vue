@@ -10,10 +10,28 @@
     </div>
 
     <div class="flex flex-wrap items-center gap-2">
-      <WChip :semantic-type="SemanticType.POSITIVE">
-        <IconCheck class="square-3.5" />
-        Watered
-      </WChip>
+      <WChip
+        v-for="type in semanticTypes"
+        :key="type"
+        :text="type"
+        :semantic-type="type"
+        soft
+      />
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <WChip
+        text="Watered"
+        :semantic-type="SemanticType.POSITIVE"
+        :icon="IconCheck"
+      />
+
+      <WChip
+        text="Watered"
+        :semantic-type="SemanticType.POSITIVE"
+        :icon="IconCheck"
+        soft
+      />
 
       <WChip
         text="Gardener"

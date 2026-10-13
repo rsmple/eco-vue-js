@@ -123,7 +123,7 @@ const save = () => {
 
 ## Small buttons
 
-`WButtonCopy` copies `value` to the clipboard. Its icon turns into a check for a moment after copying.
+`WButtonCopy` copies `value` to the clipboard. Its icon turns into a check for a moment after copying. By default it takes up one line of the surrounding text, so it sits inside a sentence without changing the line height; `noInline` lays it out as a regular block instead.
 
 `WButtonInput` is a square icon button as tall as an input (`--w-input-height`), with the input's border and corners, to sit next to an input or in its `right` slot. `tooltipText` names it, `loading` swaps the icon for a spinner, and `to` makes it a router link.
 
@@ -241,6 +241,7 @@ import WButtonCopy from 'eco-vue-js/dist/components/Button/WButtonCopy.vue'
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `value` | `string` | **required** | Text copied to the clipboard on click. |
+| `noInline` | `boolean` | — | Lays the button out as a regular block instead of sizing it to one line of the surrounding text. |
 
 <!-- @api-end -->
 
