@@ -99,7 +99,7 @@ const getSeededThemes = (count: number) => {
   }))
 }
 
-const kitCss = '@import "tailwindcss";\n' + ['theme.css', 'roles.css', 'default.css'].map(file => readFileSync(CSS_DIR + file, 'utf8')).join('\n')
+const kitCss = '@import "tailwindcss";\n' + ['theme.css', 'roles.css', 'breakpoints.css', 'default.css'].map(file => readFileSync(CSS_DIR + file, 'utf8')).join('\n')
 const candidates = [...new Set(html.match(/[\w:/.#[\]-]+/g))]
 const themes = [
   {name: 'default', css: ''},

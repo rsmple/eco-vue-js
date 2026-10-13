@@ -33,7 +33,7 @@ export const PRESETS = [
     tokens: {
       neutral: 'slate',
       'color-primary': 'oklch(54% 0.15 250)',
-      'color-info': 'oklch(55% 0.11 215)',
+      'color-info': 'oklch(61% 0.11 215)',
     },
   },
   {
@@ -43,7 +43,7 @@ export const PRESETS = [
     tokens: {
       neutral: 'stone',
       'color-primary': 'oklch(52% 0.11 165)',
-      'color-positive': 'oklch(55% 0.15 135)',
+      'color-positive': 'oklch(61% 0.15 135)',
       'w-input-rounded': '1.125rem',
       'w-button-rounded': '1.125rem',
     },
@@ -55,7 +55,7 @@ export const PRESETS = [
     tokens: {
       neutral: 'stone',
       'color-primary': 'oklch(57% 0.17 45)',
-      'color-negative': 'oklch(55% 0.21 10)',
+      'color-negative': 'oklch(64% 0.21 10)',
       'color-warning': 'oklch(80% 0.15 75)',
     },
   },
@@ -282,8 +282,8 @@ export const getHueGradient = (styleId: RandomStyleId, range: HueRange, alpha = 
  */
 const isMuddy = (l: number, hue: number) => (hue >= 55 && hue < 128) || (hue >= 35 && hue < 55 && l < 0.55)
 
-/** A fill's lightness and chroma, and whether `text-tone-on` puts white text on it. */
-type Fill = {l: number, c: number, white: boolean}
+/** A fill's lightness and chroma, whether `text-tone-on` puts white text on it, and that text's APCA contrast. */
+type Fill = {l: number, c: number, white: boolean, onFill: number}
 
 /**
  * The status tones: the hues each one keeps to, the wider range it shifts into when the primary takes those (a red
@@ -299,6 +299,12 @@ const STATUS_TONES = [
   {key: 'warning', hues: [65, 95], shifted: [50, 105], distance: 30, fill: 'light'},
   {key: 'info', hues: [205, 265], shifted: [190, 280], distance: 30, fill: 'primary'},
 ] as const
+
+/**
+ * The most APCA contrast white text keeps on a status fill: a status tone with white text is no deeper than this, even
+ * beside a deep primary, so badges and alerts don't outweigh the content around them. The kit's defaults are at 65 to 69.
+ */
+const MAX_STATUS_ON_FILL = 70
 
 /** What a status hue settles for when nothing in its wider range is its `distance` away, as warning beside a yellow primary. */
 const STATUS_HUE_FALLBACK_DISTANCE = 20
@@ -367,16 +373,17 @@ const passingFills = (hue: number, saturation: number, style: RandomStyle, pageL
     const rgb = toLinearRgb(l, c, hue) as [number, number, number]
     const fill = luminance(rgb)
     const white = fill < ON_FILL_LIGHTNESS ** 3
+    const onFill = apca(white ? 1 : 0, apcaLuminance(rgb))
 
     const toneText = luminance(toLinearRgb(lightPage ? Math.min(l, 0.53) : Math.max(l, 0.72), c, hue, true))
     const toneLine = luminance(toLinearRgb(lightPage ? Math.min(l, 0.62) : Math.max(l, 0.72), c, hue, true))
 
     if (
       contrast(fill, pageLuminance) >= (white ? MIN_PAGE.white : MIN_PAGE.black)
-      && apca(white ? 1 : 0, apcaLuminance(rgb)) >= MIN_ON_FILL
+      && onFill >= MIN_ON_FILL
       && contrast(toneText, pageLuminance) >= 4.52
       && contrast(toneLine, pageLuminance) >= 3.02
-    ) result.push({l, c, white})
+    ) result.push({l, c, white, onFill})
   }
 
   return result
@@ -436,9 +443,9 @@ const toColor = (fill: Fill, hue: number) => `oklch(${ (fill.l * 100).toFixed(1)
 /**
  * A status tone in the theme's style and saturation, with the hue it took: a hue away from the `taken` ones from
  * `statusHues`, and among the fills near its peak chroma, the one nearest the primary's lightness with the same black
- * or white text, so the tones carry the same weight. Warning is always a light fill with black text, the most
- * saturated one that passes, and so is every tone but negative when the primary is a light fill: negative stays deep,
- * since a light red is pink or salmon, and takes its most saturated fill.
+ * or white text, so the tones carry the same weight, but none deeper than `MAX_STATUS_ON_FILL`. Warning is always a
+ * light fill with black text, the most saturated one that passes, and so is every tone but negative when the primary
+ * is a light fill: negative stays deep, since a light red is pink or salmon, and takes its most saturated fill.
  */
 const getStatusTokens = (
   tone: typeof STATUS_TONES[number],
@@ -457,7 +464,8 @@ const getStatusTokens = (
     const dark = passingFills(hue, saturation, style, darkPageLuminance, limits)
     if (!passing.length || !dark.length) continue
 
-    const light = nearPeak(passing, style)
+    const lightEnough = passing.filter(fill => !fill.white || fill.onFill <= MAX_STATUS_ON_FILL)
+    const light = nearPeak(lightEnough.some(fill => fill.white) ? lightEnough : passing, style)
     const sameText = light.filter(fill => fill.white === primary.white)
     const fill = lightFill || lightPrimary
       ? light.reduce((best, item) => item.c > best.c ? item : best)
