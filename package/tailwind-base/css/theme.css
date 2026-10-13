@@ -12,7 +12,7 @@
    * Fills are dark enough for white text and light enough to stand out on the dark surface, so one value serves both
    * modes; text shades and the text on fills are derived from them (roles.css).
    */
-  --color-primary: oklch(55% 0.17 286.8);
+  --color-primary: oklch(62% 0.17 286.8);
   --color-primary-dark: var(--color-primary);
   --color-primary-light: color-mix(in oklab, var(--color-primary) 7%, var(--color-default));
   --color-primary-darkest: color-mix(in oklab, var(--color-primary-dark) 10%, var(--color-default-dark));
@@ -47,12 +47,12 @@
   --color-slate-950: oklch(12.9% 0.042 264.695);
 
   /*
-   * Status fills are lighter than the primary: white text on them keeps APCA Lc 65–69 rather than 80, still clear of
+   * Status fills are lighter than the primary: white text on them keeps APCA Lc 64–69 rather than 80, still clear of
    * the 60 it needs, so a badge or an alert doesn't weigh more than the content beside it.
    */
   --color-negative: oklch(64% 0.2 24.1);
   --color-negative-dark: var(--color-negative);
-  --color-positive: oklch(63% 0.148 150);
+  --color-positive: oklch(69% 0.148 150);
   --color-positive-dark: var(--color-positive);
   --color-warning: oklch(85% 0.16 85);
   --color-warning-dark: var(--color-warning);

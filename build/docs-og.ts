@@ -39,7 +39,7 @@ const template = (host: string) => /* html */ `<!doctype html>
   @font-face { font-family: RobotoMono; font-weight: 100 700; src: ${ font('docs/.vitepress/theme/fonts/roboto-mono-latin-wght-normal.woff2') }; }
 
   :root {
-    --primary: oklch(55% 0.17 286.8);
+    --primary: oklch(62% 0.17 286.8);
     --primary-soft: oklch(72% 0.13 286.8);
     --bg: oklch(19% 0.045 286.8);
   }
@@ -54,7 +54,7 @@ const template = (host: string) => /* html */ `<!doctype html>
     font-family: MontSerrat, sans-serif;
     color: white;
     background:
-      radial-gradient(900px 600px at 105% -10%, oklch(55% 0.17 286.8 / 0.55), transparent 60%),
+      radial-gradient(900px 600px at 105% -10%, oklch(62% 0.17 286.8 / 0.55), transparent 60%),
       radial-gradient(700px 500px at -10% 120%, oklch(45% 0.14 250 / 0.35), transparent 60%),
       var(--bg);
   }
@@ -109,7 +109,7 @@ const template = (host: string) => /* html */ `<!doctype html>
     gap: 12px;
     padding: 10px 20px;
     border-radius: 999px;
-    background: oklch(55% 0.17 286.8 / 0.25);
+    background: oklch(62% 0.17 286.8 / 0.25);
     border: 1px solid oklch(72% 0.13 286.8 / 0.4);
     color: oklch(88% 0.06 286.8);
     font-size: 22px;
