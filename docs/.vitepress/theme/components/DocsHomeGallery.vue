@@ -48,12 +48,12 @@
                 <div
                   v-for="stat in PLANT_STATS"
                   :key="stat.title"
-                  class="bg-tone/10 grid gap-1 rounded-xl p-4"
+                  class="bg-tone-fill/20 dark:bg-tone-fill/10 grid gap-1 rounded-xl p-4"
                   :class="stat.tone"
                 >
                   <component
                     :is="stat.icon"
-                    class="square-[1.25em] text-tone-fill"
+                    class="square-[1.25em] text-tone-line"
                   />
                   <span class="text-tone text-sm font-semibold">{{ stat.value }}</span>
                   <span class="text-description text-xs">{{ stat.title }}</span>
