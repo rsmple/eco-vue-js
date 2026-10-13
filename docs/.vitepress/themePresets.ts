@@ -302,7 +302,7 @@ const STATUS_TONES = [
 
 /**
  * The most APCA contrast white text keeps on a status fill: a status tone with white text is no deeper than this, even
- * beside a deep primary, so badges and alerts don't outweigh the content around them. The kit's defaults are at 65 to 69.
+ * beside a deep primary, so badges and alerts don't outweigh the content around them. The kit's defaults are at 64 to 69.
  */
 const MAX_STATUS_ON_FILL = 70
 
