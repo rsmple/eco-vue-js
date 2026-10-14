@@ -178,7 +178,7 @@ const isEmail: ValidateFn = value => typeof value === 'string' && value.includes
   >
     <template #option="{option}">
       <div class="w-option flex items-center">
-        {{ option.emoji }} {{ option.name }}
+        {{ option?.emoji }} {{ option?.name }}
       </div>
     </template>
   </WInputOptions>
@@ -205,6 +205,49 @@ const plants = [
 const plant = ref<string | null>()
 
 const filtered = computed(() => plants.filter(item => item.name.toLowerCase().includes(plant.value?.toLowerCase() ?? '')))
+</script>
+```
+
+<!-- @example-end -->
+
+The suggestions can come from a paginated query instead: pass `useQueryFnOptions` and `queryParamsOptions` in place of `options`. The typed text is sent in `searchField` (`search` by default), more pages load as the menu scrolls, and `optionComponent` takes the same components as `WSelectAsync`. The value stays free text — a suggestion only fills it in.
+
+With `draft`, typing changes only the suggestions, not the value. An apply row at the top of the menu shows the typed text; it, Enter, or a picked suggestion sets the value, and closing the menu drops the draft. Use it where every change is costly, like a list filter.
+
+<!-- @example Input/OptionsPaginated -->
+
+<DocsDemo name="Input/OptionsPaginated" />
+
+```vue
+<template>
+  <WInputOptions
+    v-model="variety"
+    title="Variety"
+    placeholder="Type any name or pick a known one"
+    :use-query-fn-options="varietyModelApi.paginated.use"
+    :query-params-options="{}"
+    :value-getter="option => option.name"
+    :option-component="OptionVariety"
+    empty-stub="No known variety"
+    draft
+    allow-clear
+    class="max-w-xl"
+  />
+
+  <p class="text-sm text-description">
+    Model: {{ variety || '—' }}
+  </p>
+</template>
+
+<script lang="ts" setup>
+import {ref} from 'vue'
+
+import WInputOptions from 'eco-vue-js/dist/components/Input/WInputOptions.vue'
+
+import {varietyModelApi} from '../../../Select/docs/examples/api/garden'
+import OptionVariety from '../../../Select/docs/examples/parts/OptionVariety.vue'
+
+const variety = ref<string | null>()
 </script>
 ```
 
@@ -582,10 +625,6 @@ import WInputOptions from 'eco-vue-js/dist/components/Input/WInputOptions.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `options` | `Option[]` | **required** | Suggestions shown in the menu. Picking one sets the value and blurs the input. |
-| `valueGetter` | `(option: Option) => (Type extends "number" ? number : string) \| null` | **required** | Value an option puts into the input. |
-| `emptyStub` | `string` | — | Text shown when `options` is empty. Defaults to "No suggestion". |
-| `optionComponent` | `Component<{ option: Option; selected?: boolean \| undefined; model?: boolean \| undefined; }>` | — | Renders an option in the menu. The `option` slot replaces it. |
 | `mobileTitle` | `string` | — | Title for the mobile bottom sheet the menu opens in. Defaults to `title`. |
 | `persist` | `boolean` | — | Keeps the menu open when the input loses focus. |
 | `closeOnClear` | `boolean` | — | Closes the menu when the value is cleared. |
@@ -626,8 +665,18 @@ import WInputOptions from 'eco-vue-js/dist/components/Input/WInputOptions.vue'
 | `debounce` | `number` | — | With `async`, also saves after this many ms without typing, showing a progress bar under the text. |
 | `hideDebounce` | `boolean` | — | Hides the `debounce` progress bar. |
 | `explicit` | `boolean` | — | With `async`, shows Save and Cancel buttons while there are unsaved edits. Always on for `textarea` and `textSecure`. |
+| `options` | `Option[]` | — | Suggestions shown in the menu. Filter them by the typed text yourself. Use either this or `useQueryFnOptions`. |
+| `useQueryFnOptions` | `UseQueryDefault<PaginatedResponse<Option>, QueryParams>` | — | Paginated query that loads the suggestions, page by page as the menu scrolls. The typed text is sent in `searchField`. Use either this or `options`. |
+| `queryParamsOptions` | `QueryParams` | — | Parameters for `useQueryFnOptions`. |
+| `searchField` | `keyof QueryParams` | — | Query parameter that receives the typed text. Defaults to `search`. |
+| `valueGetter` | `(option: Option) => (Type extends "number" ? number : string) & {}` | **required** | Value an option puts into the input. |
+| `emptyStub` | `string` | — | Text shown when there are no suggestions. Defaults to "No suggestion". |
+| `draft` | `boolean` | — | Treats the typed text as a draft: it only drives the suggestions, and the value changes when a suggestion is picked, on Enter, or from the apply row at the top of the menu. The draft is dropped when the menu closes. Clearing applies at once. |
+| `applyPrefix` | `string` | — | Label before the typed text in the apply row of a `draft` input. Defaults to "Apply:". |
 | `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
 | `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
+| `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |
+| `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | Extra props passed to every `optionComponent`. |
 
 ::: details Inherited from `src/components/FieldWrapper/types.ts` (21)
 
@@ -670,7 +719,7 @@ import WInputOptions from 'eco-vue-js/dist/components/Input/WInputOptions.vue'
 | `title` | — | Replaces the `title` text. |
 | `subtitle` | — | Content between the title and the field. |
 | `right` | — | Content to the right of the field. |
-| `option` | `{ option: Option; selected: boolean; model: boolean; }` | Content of an option in the menu. Replaces `optionComponent`. |
+| `option` | `PartialNot<SelectOptionProps<Option>>` | Content of an option in the menu. Replaces `optionComponent`. `option` is `undefined` on a loading skeleton row. |
 
 <!-- @api-end -->
 
