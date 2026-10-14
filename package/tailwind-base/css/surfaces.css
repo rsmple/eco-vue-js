@@ -168,8 +168,48 @@
     background-color: color-mix(in oklab, var(--w-surface) calc(var(--w-chrome-float) * 100%), transparent);
   }
 
+  /*
+   * Floating, the items keep off the nav's edges, and their hover pill and the active marker follow its rounding: the
+   * pill's radius is the nav's less the inset, so the two curves run parallel. Docked, the pill and the marker meet
+   * the edges as before.
+   */
   .w-nav-bar-content {
+    --w-nav-item-rounded: max(var(--radius-lg), var(--w-chrome-rounded) - 0.5rem);
+
     margin-top: calc((1 - var(--w-chrome-float)) * var(--header-height, 0px));
+    padding-block: calc(var(--w-chrome-float) * 0.25rem);
+  }
+
+  /* On the item, not the nav: the nav's content has a fixed width. Docked, xl and up, items run to the edge. */
+  .w-nav-bar .w-nav-item-inset {
+    padding-inline-end: calc(var(--w-chrome-float) * 0.5rem);
+
+    @variant xl-not {
+      padding-inline-end: max(0.25rem, var(--w-chrome-float) * 0.5rem);
+    }
+  }
+
+  .w-nav-item-indicator {
+    inset-block: calc(var(--w-chrome-float) * 0.5rem);
+    left: calc(var(--w-chrome-float) * 0.125rem);
+    height: auto;
+    border-radius: calc(var(--w-chrome-float) * 9999px);
+  }
+
+  /*
+   * A group's dropdown shares the nav's paint (`.w-nav-bar`) but not its place: it sizes to its items. Its corners
+   * are the nav's when floating; docked they stay rounded, as before.
+   */
+  .w-nav-bar.w-nav-bar-dropdown {
+    --w-nav-item-rounded: max(var(--radius-lg), var(--w-nav-dropdown-rounded) - 0.25rem);
+    --w-nav-dropdown-rounded: calc(
+      var(--radius-xl) * (1 - var(--w-chrome-float)) + var(--w-chrome-rounded) * var(--w-chrome-float)
+    );
+
+    top: auto;
+    left: auto;
+    height: auto;
+    border-radius: var(--w-nav-dropdown-rounded);
   }
 
   .w-nav-bar-toggle {
