@@ -100,6 +100,10 @@ body {
   overflow-x: clip;
 }
 
+.docs-scroll-x .docs-shell {
+  overflow-x: visible;
+}
+
 /* The home footer follows VPHome directly, without VitePress's bottom margin. */
 #VPContent .VPHome {
   overflow-x: visible;

@@ -110,14 +110,12 @@
       </div>
     </section>
 
-    <section class="surface-section">
-      <PlantList />
-    </section>
+    <PlantList scroll-page />
   </div>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue'
+import {onMounted, onUnmounted, ref} from 'vue'
 
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
@@ -161,6 +159,12 @@ const setLayout = (value: Layout) => {
 }
 
 onMounted(() => {
+  // The page scrolls sideways under a wide list, as an app page does: the docs shell clips that elsewhere.
+  document.documentElement.classList.add('docs-scroll-x')
   layout.value = (document.documentElement.dataset.layout as Layout | undefined) ?? 'flat'
+})
+
+onUnmounted(() => {
+  document.documentElement.classList.remove('docs-scroll-x')
 })
 </script>

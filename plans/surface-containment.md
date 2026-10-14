@@ -207,6 +207,14 @@ Fixed after review (2026-10-14):
 
 To experiment with for 1 (the gutter masks): they exist because rows scrolled sideways would show beside the sticky columns. `overflow-x: clip` on the section keeps sticky working (it doesn't make a scroll container, unlike `hidden`/`auto`) but leaves nothing to scroll sideways, so it only fits lists that fit. JS-positioned columns lag behind scrolling. Untried: masks with a two-stop background (canvas to the section edge, section paint over the padding); a `clip-path` on rows driven by a scroll timeline (`animation-timeline: scroll(root inline)`) so the clip follows the scroll on the compositor — Chromium and Safari 26 only, Firefox behind a flag.
 
+List clipping experiment (2026-10-14), on `/spike/surfaces` with the plant list scrolling with the page (`scroll-page`; the docs shell's `overflow-x: clip` is lifted on that page):
+
+- **A page list is its own section.** A list that scrolls with the page (not in a modal, a scrolling element or `minHeight`) can't sit in a `surface-section`: the section is as wide as the frame and the rows scroll past it. WList paints the surface itself instead: a `.w-list-page-surface` behind the rows, sticky sideways and sized to the frame plus the section padding, with the section tokens. The list re-maps `--w-surface` like a section. Lists that don't scroll with the page sit entirely inside their container.
+- **Clip instead of masks.** The gutter masks are hidden in page mode. The rows (`.w-list-rows`) and the stuck header (`.w-infinite-list-sticky`) get a `clip-path` to the frame, its left and right insets animated from the page's horizontal scroll: `animation-timeline: scroll(nearest inline)`, keyframes from `inset(… calc(100% - W) … 0)` to `inset(… 0 … calc(100% - W))`, W being `--w-width-inner`. No JS and no measuring: the scroll range is the list's width less the frame. Where scroll timelines are missing (Firefox), WList writes `--w-scroll-x` from a passive scroll listener into the same inset; only the clip edge follows by JS, the sticky columns stay CSS. Works in Chromium, WebKit and Firefox, light and dark; flat looks as before, and the stuck toolbar no longer slides under the nav when scrolled sideways.
+- **The scroll range has to match.** The page's scroll width ended at the rows, not at the right inset, so the clip ran `--w-right-inner` ahead of the scroll. The page list now carries the right inset as padding (`min-width: calc(100% + inset)`, a negative end margin). As a side effect the last column is no longer hidden under the sticky menu column at full scroll. A sticky box stops at its container's content edge, so the surface takes a negative end margin to reach the frame's edge.
+- **Assumes** the list starts at `--w-left-inner` (as the sticky columns already do) and is what makes the page wide. A second, narrower wide list on the same page would get the wrong range.
+- **Still opaque in glass:** the checkbox and menu columns, user-sticky columns and the stuck toolbar. Next to try: wrap the non-sticky cells of a row in one box and clip that box at the columns' inner edge. Then nothing scrolls under the sticky columns, and they can drop their background. User-sticky columns would need the clip to start after all of them. Not measured: whether Chromium runs the scroll-linked `clip-path` on the compositor, or the clip edge lags fast scrolls the way the JS fallback would.
+
 ### 1. Foundation in `tailwind-base`
 
 - [ ] `canvas` role, `--w-surface-step`, section and card shape tokens, utilities; `body` on `canvas`.
@@ -237,7 +245,7 @@ Open:
 
 - Names: `canvas`, `section`, `card`, "layout style", `chrome`.
 - Utilities only, or WSection / WCard components (a component can provide the frame and handle phones).
-- Whether a WList on a list page is its own section, or sits in one.
+- ~~Whether a WList on a list page is its own section, or sits in one~~ — its own section: a page list paints the section surface itself; a contained list sits entirely inside its container.
 - One card look, or a filled / outlined variant kept for cards inside sections.
 - ~~Floating chrome on phones~~ — spike: docked on phones (gap 0 in the presets), sections span the screen.
 
@@ -246,3 +254,4 @@ Open:
 - 2026-10-14: plan written; consumers measured (Inventory).
 - 2026-10-14: consistency over preservation; app chrome added to the model.
 - 2026-10-14: spike on the `surface-containment` branch — flat unchanged, card and glass render in three engines; list chrome inside sections, wide lists and glass sticky columns are the open problems (Spike findings). Not measured yet: scroll cost of blurred tiles, nav drawer on phones.
+- 2026-10-14: WNavBar opens with a `clip-path` wipe. Page lists paint their own section surface and clip rows to the frame with a scroll timeline (JS fallback in Firefox) instead of gutter masks.

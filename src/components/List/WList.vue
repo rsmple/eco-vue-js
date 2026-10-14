@@ -1,9 +1,11 @@
 <template>
   <div
+    ref="root"
     role="list"
     :class="{
       'w-card': isGrid,
       'w-list': !isGrid,
+      'w-list-page': isPage,
       '[--w-list-right:calc(var(--w-list-padding,1rem)*2+1.25em)]': hasMenu,
       '[--w-list-right:var(--w-list-header-rounded,1rem)]': !hasMenu,
       '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em+1px)]': allowSelect,
@@ -11,172 +13,179 @@
     }"
     :style="[stylesWidth, stylesFixed]"
   >
-    <WInfiniteList
-      :use-query-fn="useQueryFn"
-      :query-params="queryParams"
-      :query-options="queryOptions"
-      :skeleton-length="count ?? listCount ?? PAGE_LENGTH"
-      :refetch-interval="refetchInterval"
+    <div
+      v-if="isPage"
+      class="w-list-page-surface"
+    />
 
-      :page-length="PAGE_LENGTH"
-      :page-class="
-        isGrid
-          ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-(--w-list-gap,0) isolate'
-          : 'grid grid-cols-1 gap-(--w-list-gap,0) isolate'
-      "
-      :min-height-only="minHeight"
-      :no-header-update="noHeaderUpdate"
-      :style="cardStyles"
-      :class="$attrs.class"
+    <div :class="isPage ? 'w-list-page-content' : 'contents'">
+      <WInfiniteList
+        :use-query-fn="useQueryFn"
+        :query-params="queryParams"
+        :query-options="queryOptions"
+        :skeleton-length="count ?? listCount ?? PAGE_LENGTH"
+        :refetch-interval="refetchInterval"
 
-      @update:count="listCount = $event; $emit('update:count', $event)"
-      @update:error="$emit('update:error', $event)"
-    >
-      <template #header="{updateHeader, isRefetchingAll, refetchAll}">
-        <ListToolbar
-          :count="listCount"
-          :total-count="countValue"
-          :selection-title="selectionTitle"
-          :bulk-disable-message="bulkDisableMessage"
-          :selection-count="selectionCount"
-          :select-all-value="selectAllValue"
-          :select-all-text-getter="selectAllTextGetter"
-          :is-shift="isShift"
-          :allow-select="allowSelect"
-          :select-only="selectOnly"
-          :readonly="isReadonly ?? isDisabled ?? false"
+        :page-length="PAGE_LENGTH"
+        :page-class="
+          isGrid
+            ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-(--w-list-gap,0) isolate'
+            : 'w-list-rows grid grid-cols-1 gap-(--w-list-gap,0) isolate'
+        "
+        :min-height-only="minHeight"
+        :no-header-update="noHeaderUpdate"
+        :style="cardStyles"
+        :class="$attrs.class"
 
-          :query-params="queryParams"
-          :use-query-fn="useQueryFn"
-          :use-query-fn-export="useQueryFnExport"
-          :api-method-export="apiMethodExport"
-          :export-file-name="exportFileName"
-          :get-query-params-bulk="getQueryParamsBulk"
-          :to-markdown="toMarkdown"
-
-          :bulk="bulk"
-          :action="action"
-          :menu="menu"
-
-          :fields-visible="fieldsVisible"
-          :fields-filtered="fieldsFiltered"
-          :fields-sorted="fieldsSorted"
-          :field-config-map="fieldConfigMap"
-          :styles-width="stylesWidth"
-          :ordering="ordering"
-          :mode="listConfig.mode"
-
-          :card="isGrid"
-          :mobile="isMobile"
-          :has-saved="hasSaved"
-          :no-refetch="noRefetch"
-          :no-ordering="noOrdering"
-          :no-header-settings="noHeaderSettings"
-          :no-mode="noMode"
-          :disable-export="disableExport"
-
-          :is-refetching-all="isRefetchingAll"
-          :refetch-all="refetchAll"
-          :update-header="updateHeader"
-
-          @reset:selection="resetSelection"
-          @toggle:selection="toggleSelectAll"
-          @set:is-selecting="setIsSelecting()"
-          @update:ordering="updateOrdering"
-          @update:mode="updateMode"
-          @update:field-config-map="updateFieldConfigMap"
-          @update:width="updateFieldWidth"
-          @save:width="save"
-          @click:reset="resetConfig"
-        >
-          <template
-            v-if="$slots.header"
-            #header="scope"
-          >
-            <slot
-              name="header"
-              v-bind="scope"
-            />
-          </template>
-
-          <template
-            v-if="$slots.filter"
-            #filter
-          >
-            <slot name="filter" />
-          </template>
-
-          <template
-            v-if="$slots.selection"
-            #selection
-          >
-            <slot name="selection" />
-          </template>
-        </ListToolbar>
-      </template>
-
-      <template #default="{item, skeleton, setter, refetch, previous, index, position, value, results, intersecting}">
-        <slot
-          v-if="groupBy && (index === 0 || (!skeleton && (!previous || !groupBy(item, previous))))"
-          name="group"
-          :item="item"
-          :previous="previous"
-          :skeleton="skeleton"
-        />
-
-        <ListItem
-          :item="item"
-          :skeleton="skeleton"
-          :setter="setter"
-          :refetch="refetch"
-          :index="index"
-          :position="position"
-          :value="(value as number)"
-          :results="results"
-          :intersecting="intersecting"
-
-          :fields="fieldsSorted"
-          :field-config-map="fieldConfigMap"
-          :column-data-map="columnDataMap"
-          :query-params="queryParams"
-          :readonly="isReadonly ?? isDisabled ?? false"
-          :readonly-getter="readonlyGetter"
-          :form-field-getter="formFieldGetter"
-          :uniform-scope="uniformScope"
-          :expansion="expansion"
-          :menu="menu"
-          :to-markdown="toMarkdown"
-
-          :card="isGrid"
-          :mobile="isMobile"
-          :card-class="cardClass"
-          :card-wrapper-class="cardWrapperClass"
-          :has-border="hasBorder"
-          :align-top="alignTop"
-          :allow-open="allowOpen"
-          :disable-more="disableMore"
-          :action-mode="actionMode"
-          :card-to="cardTo"
-          :content-visibility="contentVisibility"
-
-          :selected="skeleton ? false : getIsSelected(value as number, position)"
-          :allow-select="allowSelect"
-          :allow-select-hover="allowSelectHover"
-          :always-select="alwaysSelect ?? false"
-
-          @toggle:selected="toggleSelected"
-          @hover:selected="hoverSelected"
-          @click:action="emitClickAction"
-        />
-      </template>
-
-      <template
-        v-if="$slots.empty"
-        #empty
+        @update:count="listCount = $event; $emit('update:count', $event)"
+        @update:error="$emit('update:error', $event)"
       >
-        <slot name="empty" />
-      </template>
-    </WInfiniteList>
+        <template #header="{updateHeader, isRefetchingAll, refetchAll}">
+          <ListToolbar
+            :count="listCount"
+            :total-count="countValue"
+            :selection-title="selectionTitle"
+            :bulk-disable-message="bulkDisableMessage"
+            :selection-count="selectionCount"
+            :select-all-value="selectAllValue"
+            :select-all-text-getter="selectAllTextGetter"
+            :is-shift="isShift"
+            :allow-select="allowSelect"
+            :select-only="selectOnly"
+            :readonly="isReadonly ?? isDisabled ?? false"
+
+            :query-params="queryParams"
+            :use-query-fn="useQueryFn"
+            :use-query-fn-export="useQueryFnExport"
+            :api-method-export="apiMethodExport"
+            :export-file-name="exportFileName"
+            :get-query-params-bulk="getQueryParamsBulk"
+            :to-markdown="toMarkdown"
+
+            :bulk="bulk"
+            :action="action"
+            :menu="menu"
+
+            :fields-visible="fieldsVisible"
+            :fields-filtered="fieldsFiltered"
+            :fields-sorted="fieldsSorted"
+            :field-config-map="fieldConfigMap"
+            :styles-width="stylesWidth"
+            :ordering="ordering"
+            :mode="listConfig.mode"
+
+            :card="isGrid"
+            :mobile="isMobile"
+            :has-saved="hasSaved"
+            :no-refetch="noRefetch"
+            :no-ordering="noOrdering"
+            :no-header-settings="noHeaderSettings"
+            :no-mode="noMode"
+            :disable-export="disableExport"
+
+            :is-refetching-all="isRefetchingAll"
+            :refetch-all="refetchAll"
+            :update-header="updateHeader"
+
+            @reset:selection="resetSelection"
+            @toggle:selection="toggleSelectAll"
+            @set:is-selecting="setIsSelecting()"
+            @update:ordering="updateOrdering"
+            @update:mode="updateMode"
+            @update:field-config-map="updateFieldConfigMap"
+            @update:width="updateFieldWidth"
+            @save:width="save"
+            @click:reset="resetConfig"
+          >
+            <template
+              v-if="$slots.header"
+              #header="scope"
+            >
+              <slot
+                name="header"
+                v-bind="scope"
+              />
+            </template>
+
+            <template
+              v-if="$slots.filter"
+              #filter
+            >
+              <slot name="filter" />
+            </template>
+
+            <template
+              v-if="$slots.selection"
+              #selection
+            >
+              <slot name="selection" />
+            </template>
+          </ListToolbar>
+        </template>
+
+        <template #default="{item, skeleton, setter, refetch, previous, index, position, value, results, intersecting}">
+          <slot
+            v-if="groupBy && (index === 0 || (!skeleton && (!previous || !groupBy(item, previous))))"
+            name="group"
+            :item="item"
+            :previous="previous"
+            :skeleton="skeleton"
+          />
+
+          <ListItem
+            :item="item"
+            :skeleton="skeleton"
+            :setter="setter"
+            :refetch="refetch"
+            :index="index"
+            :position="position"
+            :value="(value as number)"
+            :results="results"
+            :intersecting="intersecting"
+
+            :fields="fieldsSorted"
+            :field-config-map="fieldConfigMap"
+            :column-data-map="columnDataMap"
+            :query-params="queryParams"
+            :readonly="isReadonly ?? isDisabled ?? false"
+            :readonly-getter="readonlyGetter"
+            :form-field-getter="formFieldGetter"
+            :uniform-scope="uniformScope"
+            :expansion="expansion"
+            :menu="menu"
+            :to-markdown="toMarkdown"
+
+            :card="isGrid"
+            :mobile="isMobile"
+            :card-class="cardClass"
+            :card-wrapper-class="cardWrapperClass"
+            :has-border="hasBorder"
+            :align-top="alignTop"
+            :allow-open="allowOpen"
+            :disable-more="disableMore"
+            :action-mode="actionMode"
+            :card-to="cardTo"
+            :content-visibility="contentVisibility"
+
+            :selected="skeleton ? false : getIsSelected(value as number, position)"
+            :allow-select="allowSelect"
+            :allow-select-hover="allowSelectHover"
+            :always-select="alwaysSelect ?? false"
+
+            @toggle:selected="toggleSelected"
+            @hover:selected="hoverSelected"
+            @click:action="emitClickAction"
+          />
+        </template>
+
+        <template
+          v-if="$slots.empty"
+          #empty
+        >
+          <slot name="empty" />
+        </template>
+      </WInfiniteList>
+    </div>
   </div>
 </template>
 
@@ -186,10 +195,12 @@ import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type Ref, type StyleValue, computed, nextTick, onMounted, ref, toRef, watch} from 'vue'
+import {type Ref, type StyleValue, computed, inject, nextTick, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
+import {wScrollingElement} from '@/components/InfiniteList/models/injection'
+import {wIsModal} from '@/components/Modal/models/injection'
 import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
 import {useComponentStates} from '@/utils/useComponentStates'
@@ -354,6 +365,9 @@ defineSlots<{
 const {isDisabled, isReadonly} = useComponentStates(props)
 
 const {isMobile} = useIsMobile()
+
+// Scrolls with the page, not inside a modal or a scrolling element: the list paints its own section surface.
+const isPage = !props.minHeight && !inject(wIsModal, false) && inject(wScrollingElement, null) === null
 
 const listCount = ref<number | undefined>(undefined)
 
@@ -553,6 +567,26 @@ const resetConfig = () => {
   updateStylesWidth()
   updateStylesFixed()
 }
+
+// Without scroll timelines the page list's clip follows the horizontal scroll from here; the sticky columns stay CSS.
+const root = useTemplateRef('root')
+
+const updateScrollX = () => {
+  root.value?.style.setProperty('--w-scroll-x', `${ window.scrollX }px`)
+}
+
+const hasScrollTimeline = typeof CSS !== 'undefined' && CSS.supports('animation-timeline', 'scroll()')
+
+onMounted(() => {
+  if (!isPage || hasScrollTimeline) return
+
+  updateScrollX()
+  window.addEventListener('scroll', updateScrollX, {passive: true})
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', updateScrollX)
+})
 
 // The saved config loads on mount, after the watcher below may have stopped on the defaults' styles.
 onMounted(() => {

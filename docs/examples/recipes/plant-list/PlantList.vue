@@ -32,7 +32,7 @@
     ]"
     card-class="list:h-11 card:gap-1 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-line-subtle"
     card-wrapper-class="card:self-start"
-    min-height
+    :min-height="!scrollPage"
     class="card:w-list-gap-3"
     @update:query-params="updateQueryParams"
   >
@@ -73,6 +73,11 @@ import {listFilterPlant, listFilterPlantPinned} from './filter'
 import WMenuPlantCaretaker from './menu/WMenuPlantCaretaker.vue'
 import WMenuPlantDelete from './menu/WMenuPlantDelete.vue'
 import WMenuPlantToggle from './menu/WMenuPlantToggle.vue'
+
+defineProps<{
+  /** Scrolls with the page under a sticky header, as a list page in an app does, instead of filling its container. */
+  scrollPage?: boolean
+}>()
 
 // The docs have no router, so the filters stay in the page. In an app, keep them in the URL: `useQueryParamsPlants(useRoute())`.
 const {queryParams, updateQueryParams} = useQueryParamsPlants.useQueryParamsLocal()

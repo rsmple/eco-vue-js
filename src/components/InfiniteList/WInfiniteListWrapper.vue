@@ -6,7 +6,7 @@
 
   <InfiniteListHeaderHeight
     :is-intersecting="isIntersecting"
-    class="sticky print:hidden"
+    class="w-infinite-list-sticky sticky print:hidden"
     :class="{
       'top-(--w-header-inner)': !isContained,
       'w-infinite-list-header': !isContained && !noHeaderUpdate,
