@@ -21,7 +21,7 @@
 
   <nav
     class="
-      w-nav-bar fixed left-(--left-margin,0px) top-0 h-full overflow-hidden
+      w-nav-bar fixed left-(--left-margin,0px) top-0 grid h-full overflow-hidden
       transition-[clip-path] duration-200 [clip-path:inset(-2rem)] print:hidden
     "
     :class="[{
