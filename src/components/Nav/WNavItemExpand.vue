@@ -61,7 +61,7 @@
         >
           <div
             class="
-              w-nav-bar w-nav-bar-width overflow-hidden rounded-xl border
+              w-nav-bar w-nav-bar-dropdown w-nav-bar-width overflow-hidden border
               border-solid border-line-raised text-start font-normal shadow
             "
           >

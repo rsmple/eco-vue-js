@@ -6,7 +6,7 @@
       'tone-primary text-tone': isTextColor,
       'text-accent': !isTextColor,
       'px-1': even,
-      'xl-not:pr-1 pl-2': !even,
+      'w-nav-item-inset xl-not:pr-1 pl-2': !even,
     }"
   >
     <Transition
@@ -17,7 +17,7 @@
     >
       <div
         v-if="!indent && (isActive || hasActive)"
-        class="tone-primary bg-tone-fill absolute left-0 top-0 h-full w-1"
+        class="w-nav-item-indicator tone-primary bg-tone-fill absolute left-0 top-0 h-full w-1"
       />
     </Transition>
 
@@ -37,7 +37,7 @@
 
     <div class="[overflow:inherit]">
       <div
-        class="w-ripple w-ripple-hover relative grid grid-cols-[1.5rem_1fr_auto] items-center rounded-lg pr-2"
+        class="w-ripple w-ripple-hover relative grid grid-cols-[1.5rem_1fr_auto] items-center rounded-(--w-nav-item-rounded,var(--radius-lg)) pr-2"
         :class="{
           'before:opacity-10': hovered,
           'pl-4': indent,
