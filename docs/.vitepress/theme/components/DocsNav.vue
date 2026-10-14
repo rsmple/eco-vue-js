@@ -1,7 +1,7 @@
 <template>
   <WNavBar @update:is-open="$emit('update:isOpen', $event)">
     <div class="w-nav-bar-width no-scrollbar flex h-full flex-col overflow-y-auto overscroll-contain">
-      <div class="mb-auto pb-4">
+      <div class="mb-auto">
         <WNavItemTransition>
           <WNavItemExpand
             v-for="group in groups"
