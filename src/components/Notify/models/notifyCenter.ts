@@ -2,10 +2,10 @@ import type {NotifyConfig, NotifyGroup, NotifyItem, NotifyPatch} from './types'
 
 import {type ComputedRef, type Ref, computed, markRaw, ref, watch} from 'vue'
 
-import IconDanger from '@/assets/icons/IconDanger.svg?component'
+import IconDangerSolid from '@/assets/icons/IconDangerSolid.svg?component'
 import IconSpinner from '@/assets/icons/IconSpinner.svg?component'
-import IconSuccess from '@/assets/icons/IconSuccess.svg?component'
-import IconWarn from '@/assets/icons/IconWarn.svg?component'
+import IconSuccessSolid from '@/assets/icons/IconSuccessSolid.svg?component'
+import IconWarnSolid from '@/assets/icons/IconWarnSolid.svg?component'
 
 import {SemanticType} from '@/utils/SemanticType'
 
@@ -19,9 +19,9 @@ export const notifyTypeSemanticTypeMap: Record<NotifyType, SemanticType> = {
 }
 
 export const notifyTypeIconMap: Record<NotifyType, SVGComponent> = {
-  [NotifyType.SUCCESS]: markRaw(IconSuccess),
-  [NotifyType.WARN]: markRaw(IconWarn),
-  [NotifyType.DANGER]: markRaw(IconDanger),
+  [NotifyType.SUCCESS]: markRaw(IconSuccessSolid),
+  [NotifyType.WARN]: markRaw(IconWarnSolid),
+  [NotifyType.DANGER]: markRaw(IconDangerSolid),
   [NotifyType.PENDING]: markRaw(IconSpinner),
 }
 
