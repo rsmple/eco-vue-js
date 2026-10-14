@@ -10,6 +10,7 @@
     :class="{
       'top-(--w-header-inner)': !isContained,
       'w-infinite-list-header': !isContained && !noHeaderUpdate,
+      'w-infinite-list-header-stuck': !isContained && !noHeaderUpdate && isIntersecting === false,
       'top-0 not-empty:pt-3': isContained && !isModal,
       'top---modal-header-height': isModal,
       'bg-surface': noHeaderUpdate || isContained,

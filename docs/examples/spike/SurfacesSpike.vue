@@ -19,6 +19,15 @@
             >
               {{ item }}
             </button>
+
+            <button
+              v-if="layout === 'glass'"
+              class="rounded-lg border border-solid px-3 py-1 text-sm"
+              :class="noise ? 'tone-primary border-tone-line text-tone bg-tone-soft' : 'border-line-subtle text-description'"
+              @click="setNoise(!noise)"
+            >
+              Noise
+            </button>
           </div>
 
           <div class="sm:w-page-bleed grid grid-cols-2 gap-(--w-chrome-gap,1rem) lg:grid-cols-4">
@@ -155,6 +164,23 @@ const tab = ref('profile')
 const name = ref<string | undefined>()
 const notes = ref<string | undefined>()
 
+const NOISE_KEY = 'docs-canvas'
+
+const noise = ref(false)
+
+const setNoise = (value: boolean) => {
+  noise.value = value
+
+  if (value) document.documentElement.dataset.canvas = 'noise'
+  else delete document.documentElement.dataset.canvas
+
+  try {
+    localStorage.setItem(NOISE_KEY, value ? 'noise' : '')
+  } catch {
+    // Storage blocked: the choice lasts until reload.
+  }
+}
+
 const setLayout = (value: Layout) => {
   layout.value = value
 
@@ -172,6 +198,12 @@ onMounted(() => {
   // The page scrolls sideways under a wide list, as an app page does: the docs shell clips that elsewhere.
   document.documentElement.classList.add('docs-scroll-x')
   layout.value = (document.documentElement.dataset.layout as Layout | undefined) ?? 'flat'
+
+  try {
+    setNoise(localStorage.getItem(NOISE_KEY) === 'noise')
+  } catch {
+    // Storage blocked: no grain.
+  }
 })
 
 onUnmounted(() => {

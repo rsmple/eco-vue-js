@@ -257,11 +257,33 @@
     background-attachment: fixed;
   }
 
-  /* Docked (flat), the stuck header stays clear and the header bar grows behind it: the backdrop is sized to 0 there. */
+  /*
+   * Floating, the stuck header paints the backdrop over itself and up to the top of the screen, under the header bar:
+   * no rows show in the gap above it or around the header's corners. It goes under the header bar for that. Docked
+   * (flat) it stays clear and above the header bar, which grows behind it.
+   */
   .w-list-page .w-infinite-list-header {
-    background-color: color-mix(in oklab, var(--w-canvas) calc(var(--w-chrome-float) * 100%), transparent);
-    background-image: var(--w-page-backdrop);
-    background-attachment: fixed;
-    background-size: calc(100% * var(--w-chrome-float));
+    background-color: transparent;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      top: 0;
+      bottom: 0;
+      z-index: -1;
+      opacity: var(--w-chrome-float);
+      background-color: var(--w-canvas);
+      background-image: var(--w-page-backdrop);
+      background-attachment: fixed;
+    }
+  }
+
+  .w-list-page .w-infinite-list-header-stuck {
+    z-index: calc(20 - var(--w-chrome-float) * 15) !important;
+
+    &::before {
+      top: calc(var(--w-header-inner) * -1);
+    }
   }
 }
