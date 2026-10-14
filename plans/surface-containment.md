@@ -201,7 +201,7 @@ What breaks — to solve before phase 1:
 
 Fixed after review (2026-10-14):
 
-- **Closed nav left a line**: below xl the closed nav is 0 wide but kept its edge and shadow. WNavBar marks itself `w-nav-bar-closed`; the edge and shadow go with it.
+- **Closed nav left a line**: below xl the closed nav collapsed to 0fr, but a grid track can't shrink an edge, so the border stayed. WNavBar now opens and closes with a `clip-path` wipe instead of `grid-template-columns`: nothing is laid out narrower, the shadow is kept (the clip reaches 2rem past the box), and clipped parts take no clicks.
 - **Page gutter**: sections reach into the gutter (`--w-page-bleed`, with `--w-section-padding` set to the gutter) so their edges line up with the bars and their content with the page; `w-page-bleed` does the same for a row of cards. Phones: the bars dock (gap 0) and sections span the screen, so the content has the same insets as in flat — no extra padding.
 - **Header growth**: docked, the header grows over a stuck list toolbar (`headerPadding`) so two blurred bars read as one and rows blur under both. Floating, it keeps its height (`--w-chrome-float` cancels the padding) and the stuck toolbar paints the surface (`.w-infinite-list-header`). The growth was also what painted the white band over the gap when stuck.
 

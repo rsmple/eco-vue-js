@@ -21,12 +21,11 @@
 
   <nav
     class="
-      w-nav-bar fixed left-(--left-margin,0px) top-0 grid h-full overflow-hidden
-      transition-[grid-template-columns] duration-200 xl:grid-cols-[1fr] print:hidden 
+      w-nav-bar fixed left-(--left-margin,0px) top-0 h-full overflow-hidden
+      transition-[clip-path] duration-200 [clip-path:inset(-2rem)] print:hidden
     "
     :class="[{
-      'w-nav-bar-closed xl-not:grid-cols-[0fr]': !isOpen,
-      'grid-cols-[1fr]': isOpen,
+      'xl-not:[clip-path:inset(-2rem_calc(100%+2rem)_-2rem_-2rem)]': !isOpen,
     }, $attrs.class]"
     :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
   >
