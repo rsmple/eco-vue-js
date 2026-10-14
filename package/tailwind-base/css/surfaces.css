@@ -92,6 +92,14 @@
   margin-inline: calc(var(--w-page-bleed, 0px) * -1);
 }
 
+/*
+ * The page's bottom inset, for the app's main area: a floating theme keeps the last section `--w-chrome-gap` off the
+ * screen's bottom edge, as the bars are off the others. Docked it is 0.
+ */
+@utility w-page-pb {
+  padding-bottom: var(--w-chrome-gap);
+}
+
 @utility surface-card {
   --w-surface: color-mix(in oklab, var(--w-card-base) calc(var(--w-card-opacity) * 100%), var(--w-canvas));
   --w-frame-padding: var(--w-card-padding);

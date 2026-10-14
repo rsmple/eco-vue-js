@@ -4,7 +4,7 @@
     block has room to stick (a sticky box stays inside its parent's box, not the grid area).
   -->
   <div class="grid grid-cols-[1fr]">
-    <main>
+    <main class="w-page-pb">
       <div class="sm:left---left-inner sm:max-w---width-inner sm:sticky">
         <div class="grid grid-cols-[minmax(0,1fr)] gap-6 pb-6">
           <div class="flex flex-wrap items-center gap-2">
