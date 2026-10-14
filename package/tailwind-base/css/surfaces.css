@@ -166,3 +166,80 @@
     left: calc(var(--left-margin, 0px) + var(--w-chrome-gap));
   }
 }
+
+/*
+ * A list that scrolls with the page is a section of its own: a surface sized to the frame stays in place while the
+ * rows scroll sideways under the sticky columns. The rows and the stuck header are clipped to the frame instead of
+ * masked, so nothing opaque is painted into the gutter: the clip follows the page's horizontal scroll through a
+ * scroll timeline (the scroll range is the list's width less the frame's, as the list is what makes the page wide).
+ */
+@layer utilities {
+  .w-list-page {
+    --w-surface: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), var(--w-canvas));
+
+    display: grid;
+    padding-block: var(--w-section-padding);
+  }
+
+  /* As wide as its rows, plus the right inset: the page then scrolls exactly the rows' overflow past the frame. */
+  .w-list.w-list-page {
+    width: max-content;
+    min-width: calc(100% + var(--w-right-inner));
+    padding-inline-end: var(--w-right-inner);
+    margin-inline-end: calc(var(--w-right-inner) * -1);
+  }
+
+  .w-list-page-surface,
+  .w-list-page-content {
+    grid-area: 1 / 1;
+  }
+
+  .w-list-page-content {
+    position: relative;
+    min-width: 0;
+  }
+
+  .w-list-page-surface {
+    position: sticky;
+    left: calc(var(--w-left-inner) - var(--w-section-padding));
+    width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
+    margin-block: calc(var(--w-section-padding) * -1);
+    margin-inline-start: calc(var(--w-section-padding) * -1);
+    /* A sticky box stops at its container's content edge: this lets it reach past it by the padding at the end. */
+    margin-inline-end: calc(var(--w-section-padding) * -1 - var(--w-right-inner));
+
+    background-color: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), transparent);
+    border: var(--w-section-border) solid var(--w-line-subtle);
+    border-radius: var(--w-section-rounded);
+    box-shadow: var(--w-section-shadow);
+    backdrop-filter: var(--w-section-backdrop);
+
+    @variant sm-not {
+      border-inline-width: 0;
+      border-radius: 0;
+    }
+  }
+
+  .w-list.w-list-page :is(.w-list-rows, .w-infinite-list-sticky) {
+    clip-path: inset(-100vh calc(100% - var(--w-width-inner) - var(--w-scroll-x, 0px)) -100vh var(--w-scroll-x, 0px));
+
+    @supports (animation-timeline: scroll()) {
+      animation: w-list-clip linear both;
+      animation-timeline: scroll(nearest inline);
+    }
+  }
+
+  .w-list-page .w-list-mask {
+    display: none;
+  }
+}
+
+@keyframes w-list-clip {
+  from {
+    clip-path: inset(-100vh calc(100% - var(--w-width-inner)) -100vh 0);
+  }
+
+  to {
+    clip-path: inset(-100vh 0 -100vh calc(100% - var(--w-width-inner)));
+  }
+}

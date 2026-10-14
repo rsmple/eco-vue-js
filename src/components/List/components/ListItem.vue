@@ -41,7 +41,7 @@
             'width-(--w-list-header-rounded,1rem)': !allowSelect,
           }"
         >
-          <div class="bg-surface w---left-inner absolute right-full top-0 -z-1 h-full" />
+          <div class="w-list-mask bg-surface w---left-inner absolute right-full top-0 -z-1 h-full" />
 
           <div
             class="h-full rounded-l-(--w-list-rounded,unset)"
@@ -196,7 +196,7 @@
             'width-(--w-list-header-rounded,1rem)': !hasMenu,
           }"
         >
-          <div class="bg-surface w---right-inner absolute left-full top-0 -z-1 h-full" />
+          <div class="w-list-mask bg-surface w---right-inner absolute left-full top-0 -z-1 h-full" />
 
           <div
             class="h-full rounded-r-(--w-list-rounded,unset)"
