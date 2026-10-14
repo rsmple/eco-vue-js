@@ -8,7 +8,7 @@
       'w-list-page-repaint': isRepaint,
       '[--w-list-right:calc(var(--w-list-padding,1rem)*2+1.25em)]': hasMenu,
       '[--w-list-right:var(--w-list-header-rounded,1rem)]': !hasMenu,
-      '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em+1px)]': allowSelect,
+      '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em-1px)]': allowSelect,
       '[--w-list-left:var(--w-list-header-rounded,1rem)]': !allowSelect,
     }"
     :style="[stylesWidth, stylesFixed]"
