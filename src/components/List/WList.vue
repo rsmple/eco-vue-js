@@ -1,6 +1,5 @@
 <template>
   <div
-    ref="root"
     role="list"
     :class="{
       'w-card': isGrid,
@@ -30,7 +29,7 @@
         :page-class="
           isGrid
             ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-(--w-list-gap,0) isolate'
-            : 'w-list-rows grid grid-cols-1 gap-(--w-list-gap,0) isolate'
+            : 'grid grid-cols-1 gap-(--w-list-gap,0) isolate'
         "
         :min-height-only="minHeight"
         :no-header-update="noHeaderUpdate"
@@ -195,7 +194,7 @@ import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type Ref, type StyleValue, computed, inject, nextTick, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
+import {type Ref, type StyleValue, computed, inject, nextTick, onMounted, ref, toRef, watch} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
@@ -567,26 +566,6 @@ const resetConfig = () => {
   updateStylesWidth()
   updateStylesFixed()
 }
-
-// Without scroll timelines the page list's clip follows the horizontal scroll from here; the sticky columns stay CSS.
-const root = useTemplateRef('root')
-
-const updateScrollX = () => {
-  root.value?.style.setProperty('--w-scroll-x', `${ window.scrollX }px`)
-}
-
-const hasScrollTimeline = typeof CSS !== 'undefined' && CSS.supports('animation-timeline', 'scroll()')
-
-onMounted(() => {
-  if (!isPage || hasScrollTimeline) return
-
-  updateScrollX()
-  window.addEventListener('scroll', updateScrollX, {passive: true})
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('scroll', updateScrollX)
-})
 
 // The saved config loads on mount, after the watcher below may have stopped on the defaults' styles.
 onMounted(() => {

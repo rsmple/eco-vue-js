@@ -1,116 +1,126 @@
 <template>
-  <div class="grid grid-cols-[minmax(0,1fr)] gap-6">
-    <div class="flex flex-wrap items-center gap-2">
-      <span class="text-description text-sm">Layout style</span>
+  <!--
+    As an app's main column: a `1fr` track grows to the list's width and the item in it with the track, so the sticky top
+    block has room to stick (a sticky box stays inside its parent's box, not the grid area).
+  -->
+  <div class="grid grid-cols-[1fr]">
+    <main>
+      <div class="sm:left---left-inner sm:max-w---width-inner sm:sticky">
+        <div class="grid grid-cols-[minmax(0,1fr)] gap-6 pb-6">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-description text-sm">Layout style</span>
 
-      <button
-        v-for="item in LAYOUTS"
-        :key="item"
-        class="rounded-lg border border-solid px-3 py-1 text-sm capitalize"
-        :class="layout === item ? 'tone-primary border-tone-line text-tone bg-tone-soft' : 'border-line-subtle text-description'"
-        @click="setLayout(item)"
-      >
-        {{ item }}
-      </button>
-    </div>
-
-    <div class="sm:w-page-bleed grid grid-cols-2 gap-(--w-chrome-gap,1rem) lg:grid-cols-4">
-      <div
-        v-for="stat in STATS"
-        :key="stat.title"
-        class="surface-card grid gap-1"
-      >
-        <span class="text-description text-sm">{{ stat.title }}</span>
-
-        <span class="text-accent text-2xl font-semibold">{{ stat.value }}</span>
-
-        <span
-          class="bg-tone-soft text-tone w-fit rounded-md px-1.5 text-xs font-medium"
-          :class="stat.tone"
-        >{{ stat.change }}</span>
-      </div>
-    </div>
-
-    <section class="surface-section grid gap-4">
-      <h2 class="text-accent text-xl font-semibold">
-        Settings
-      </h2>
-
-      <WInfoCard :semantic-type="SemanticType.WARNING">
-        The moisture sensors haven't reported for 3 days — readings may be out of date.
-      </WInfoCard>
-
-      <WTabs
-        :init-tab="tab"
-        divider
-        @update:current="tab = $event"
-      >
-        <WTabsItem
-          name="profile"
-          title="Profile"
-        >
-          <div class="grid max-w-md gap-2">
-            <WInput
-              v-model="name"
-              title="Name"
-              placeholder="Monstera"
-              allow-clear
-            />
-
-            <WInput
-              v-model="notes"
-              title="Notes"
-              textarea
-            />
+            <button
+              v-for="item in LAYOUTS"
+              :key="item"
+              class="rounded-lg border border-solid px-3 py-1 text-sm capitalize"
+              :class="layout === item ? 'tone-primary border-tone-line text-tone bg-tone-soft' : 'border-line-subtle text-description'"
+              @click="setLayout(item)"
+            >
+              {{ item }}
+            </button>
           </div>
-        </WTabsItem>
 
-        <WTabsItem
-          name="beds"
-          title="Beds"
-        >
-          <div class="grid grid-cols-2 gap-3">
-            <div class="surface-card">
-              <p class="text-accent font-medium">
-                North bed
-              </p>
+          <div class="sm:w-page-bleed grid grid-cols-2 gap-(--w-chrome-gap,1rem) lg:grid-cols-4">
+            <div
+              v-for="stat in STATS"
+              :key="stat.title"
+              class="surface-card grid gap-1"
+            >
+              <span class="text-description text-sm">{{ stat.title }}</span>
 
-              <p class="text-description text-sm">
-                A card inside a section: filled, one step off.
-              </p>
+              <span class="text-accent text-2xl font-semibold">{{ stat.value }}</span>
 
-              <div class="surface-card mt-3">
-                <p class="text-description text-sm">
-                  A card inside that card.
-                </p>
-              </div>
-            </div>
-
-            <div class="surface-card">
-              <p class="text-accent font-medium">
-                South bed
-              </p>
-
-              <p class="text-description text-sm">
-                12 plants
-              </p>
+              <span
+                class="bg-tone-soft text-tone w-fit rounded-md px-1.5 text-xs font-medium"
+                :class="stat.tone"
+              >{{ stat.change }}</span>
             </div>
           </div>
-        </WTabsItem>
-      </WTabs>
 
-      <div class="flex gap-2">
-        <WButton :semantic-type="SemanticType.PRIMARY">
-          Save
-        </WButton>
+          <section class="surface-section grid gap-4">
+            <h2 class="text-accent text-xl font-semibold">
+              Settings
+            </h2>
 
-        <WButton :semantic-type="SemanticType.SECONDARY">
-          Cancel
-        </WButton>
+            <WInfoCard :semantic-type="SemanticType.WARNING">
+              The moisture sensors haven't reported for 3 days — readings may be out of date.
+            </WInfoCard>
+
+            <WTabs
+              :init-tab="tab"
+              divider
+              @update:current="tab = $event"
+            >
+              <WTabsItem
+                name="profile"
+                title="Profile"
+              >
+                <div class="grid max-w-md gap-2">
+                  <WInput
+                    v-model="name"
+                    title="Name"
+                    placeholder="Monstera"
+                    allow-clear
+                  />
+
+                  <WInput
+                    v-model="notes"
+                    title="Notes"
+                    textarea
+                  />
+                </div>
+              </WTabsItem>
+
+              <WTabsItem
+                name="beds"
+                title="Beds"
+              >
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="surface-card">
+                    <p class="text-accent font-medium">
+                      North bed
+                    </p>
+
+                    <p class="text-description text-sm">
+                      A card inside a section: filled, one step off.
+                    </p>
+
+                    <div class="surface-card mt-3">
+                      <p class="text-description text-sm">
+                        A card inside that card.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="surface-card">
+                    <p class="text-accent font-medium">
+                      South bed
+                    </p>
+
+                    <p class="text-description text-sm">
+                      12 plants
+                    </p>
+                  </div>
+                </div>
+              </WTabsItem>
+            </WTabs>
+
+            <div class="flex gap-2">
+              <WButton :semantic-type="SemanticType.PRIMARY">
+                Save
+              </WButton>
+
+              <WButton :semantic-type="SemanticType.SECONDARY">
+                Cancel
+              </WButton>
+            </div>
+          </section>
+        </div>
       </div>
-    </section>
 
-    <PlantList scroll-page />
+      <PlantList scroll-page />
+    </main>
   </div>
 </template>
 
