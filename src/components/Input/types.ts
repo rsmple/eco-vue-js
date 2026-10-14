@@ -1,7 +1,7 @@
 import type {DropdownMenuProps} from '../DropdownMenu/types'
+import type {SelectOptionComponent, SelectOptionComponentProps} from '../Select/types'
 import type {FieldWrapperProps} from '@/components/FieldWrapper/types'
 import type {WrapSelectionType} from '@/utils/utils'
-import type {Component} from 'vue'
 
 export type InputClearValue = '' | undefined | null
 
@@ -103,16 +103,38 @@ export interface InputSuggestProps<Type extends InputType, ClearValue extends In
   hideToggle?: boolean
 }
 
-export interface InputOptionsProps<Type extends InputType, Option, ClearValue extends InputClearValue = ''> extends InputSuggestProps<Type, ClearValue> {
-  /** Suggestions shown in the menu. Picking one sets the value and blurs the input. */
+interface InputOptionsStatic<Option> {
+  /** Suggestions shown in the menu. Filter them by the typed text yourself. Use either this or `useQueryFnOptions`. */
   options: Option[]
-  /** Value an option puts into the input. */
-  valueGetter: (option: Option) => Required<InputSuggestProps<Type>>['modelValue']
-  /** Text shown when `options` is empty. Defaults to "No suggestion". */
-  emptyStub?: string
-  /** Renders an option in the menu. The `option` slot replaces it. */
-  optionComponent?: Component<{option: Option, selected?: boolean, model?: boolean}>
+  useQueryFnOptions?: never
+  queryParamsOptions?: never
+  searchField?: never
 }
+
+interface InputOptionsPaginated<Option, QueryParams> {
+  options?: never
+  /** Paginated query that loads the suggestions, page by page as the menu scrolls. The typed text is sent in `searchField`. Use either this or `options`. */
+  useQueryFnOptions: UseQueryDefault<PaginatedResponse<Option>, QueryParams>
+  /** Parameters for `useQueryFnOptions`. */
+  queryParamsOptions: QueryParams
+  /** Query parameter that receives the typed text. Defaults to `search`. */
+  searchField?: keyof QueryParams
+}
+
+export type InputOptionsProps<Type extends InputType, Option, QueryParams, OptionComponent extends SelectOptionComponent<Option>, ClearValue extends InputClearValue = ''> =
+  InputSuggestProps<Type, ClearValue>
+  & SelectOptionComponentProps<Option, OptionComponent>
+  & (InputOptionsStatic<Option> | InputOptionsPaginated<Option, QueryParams>)
+  & {
+    /** Value an option puts into the input. */
+    valueGetter: (option: Option) => NonNullable<InputSuggestProps<Type>['modelValue']>
+    /** Text shown when there are no suggestions. Defaults to "No suggestion". */
+    emptyStub?: string
+    /** Treats the typed text as a draft: it only drives the suggestions, and the value changes when a suggestion is picked, on Enter, or from the apply row at the top of the menu. The draft is dropped when the menu closes. Clearing applies at once. */
+    draft?: boolean
+    /** Label before the typed text in the apply row of a `draft` input. Defaults to "Apply:". */
+    applyPrefix?: string
+  }
 
 export interface InputDateProps extends Omit<InputSuggestProps<'text'>, 'modelValue' | 'clearValue'> {
   /** Selected date. Typed text is parsed into a date as it changes. */
