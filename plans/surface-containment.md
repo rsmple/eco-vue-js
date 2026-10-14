@@ -1,0 +1,216 @@
+# Surface containment
+
+Living plan for letting a theme choose how content is contained — flat, card or glass — instead of the kit assuming the page and every block share one background. Builds on [color roles](color-roles.md): the scopes there are the mechanism, this adds the page/container split and shape tokens. Update the status table and the log as work lands; decisions go in [Decisions](#decisions) with a date.
+
+| Phase | Status |
+| --- | --- |
+| 0. Spike | not started |
+| 1. Foundation in `tailwind-base` | not started |
+| 2. Kit and playground | not started |
+| 3. Consumers | not started |
+
+## Goals
+
+- A theme picks a layout style — `flat`, `card` or `glass` — and content blocks and app chrome follow without code changes in the app.
+- Consistency: a small, fixed vocabulary of containers whose look comes from the theme only. Today every block picks its own radius, padding and border, and they drift; the migration replaces those choices instead of preserving them.
+- Flat is the default, and releasing the foundation changes nothing until a consumer adopts the containers. Adopting them changes looks on purpose — see [Starting point](#starting-point-not-a-reference).
+- Everything that paints an opaque background to cover content (sticky columns, list headers, soft tones mixed over the surface) keeps matching the container it sits in, in every style.
+- Glass is a configuration of card, not a third code path.
+
+Non-goals: the structure of the page layout (which bars exist, the grid of the main area), density, and the marketing pages of whitespots-io. How the bars look and where they sit within the layout style is in scope.
+
+## Terms
+
+There is no single standard name for the flat ↔ carded axis. Design systems model it as surface levels:
+
+- Material 3: surface container roles `surfaceContainerLowest` … `surfaceContainerHighest`; cards come as elevated, filled and outlined.
+- Atlassian: `elevation.surface`, `.raised`, `.overlay`, `.sunken`.
+- Primer: `bgColor-default`, `-muted`, `-inset` (formerly `canvas-default`, `-subtle`, `-inset`).
+- Fluent / Windows 11: Mica base with Layer surfaces; Acrylic for blur. Apple: materials, and Liquid Glass (2025).
+- Common speech: "flat design" vs "card-based layout"; "glassmorphism" for translucent blurred cards.
+
+Here: **layout style** (`flat | card | glass`) for the setting, **canvas** for the page background, **section** and **card** for the two container kinds below.
+
+## Starting point, not a reference
+
+The portal, auditor and the kit never had a container approach, so their blocks are not a design to reproduce. The [inventory](#inventory) shows the drift: four radii (`rounded-lg` to `-3xl`) for the same kind of block, padding from `p-3` to `p-6`, two border colors for one outline (`border-gray-100`, `border-line-subtle`), filled and outlined tiles side by side on one dashboard.
+
+So the model is designed top-down, and the inventory is a review list, not a mapping table:
+
+- Each existing block becomes a section, a card, a tone area (banners on `bg-tone-soft`), or nothing — and loses its own radius, padding, border and shadow classes. The tokens decide those.
+- A block that fits none of the kinds is a question for the model, not a local exception: either the model gets a kind, or the block gets redesigned.
+- The color diff harness lists the visible changes of a migration for review; it does not gate on zero.
+- After the migration, an optional rule in the shipped eslint config flags container-like class combinations (radius + padding + background or border) outside the kit, as planned for raw palette classes in color roles.
+
+## Model
+
+### Canvas
+
+A new role, the page background. Today `--role-surface` is documented as "Page and cards" — one value for both. `canvas` defaults to `surface`, so flat stays as is; a card theme sets it a step off (`gray-50` under white cards, or darker than the cards in dark mode). `body` paints `canvas`.
+
+### Two container kinds
+
+The measurements below show two different things consumers build, and they need different flat behavior:
+
+| Kind | What it is | Flat | Card | Glass |
+| --- | --- | --- | --- | --- |
+| **section** (`surface-section`) | Page-level content area: a list page's list, a form, a settings group | nothing: no background, padding or radius | `surface`, padding, radius, line or shadow | translucent `surface` + blur, light edge, shadow |
+| **card** (`surface-card`) | A block that is visible in every style: dashboard tiles, stat cards, report blocks | filled: one step off the surface (`surface-subtle`), as appsec's tiles are today | one step off what it sits on: `surface` on the canvas, `surface-subtle` inside a section | glass on the canvas, filled inside a glass section |
+
+"One step off what it sits on" is a variable each scope sets: the canvas sets `--w-surface-step` to the card color, a section or card sets it to `surface-subtle`. A card in a card is filled, never a second glass layer.
+
+Both are scopes in the color-roles sense: they paint their background and re-map `--w-surface` for their subtree, as `surface-muted` and `surface-raised` do already. That is what keeps sticky columns (`WListHeader.vue`, `ListItem.vue`, `WList.vue` paint `bg-surface`), soft tones (mixed over `--w-surface`) and on-colors right inside them, with no change to those components.
+
+### Shape tokens
+
+Set per theme, like the existing `w-*` sizes; all zero / none by default for sections.
+
+| Token | Section | Card |
+| --- | --- | --- |
+| padding | `--w-section-padding` | `--w-card-padding` |
+| radius | `--w-section-rounded` | `--w-card-rounded` |
+| edge | `--w-section-border` (width; color is `line-subtle`) | `--w-card-border` |
+| shadow | `--w-section-shadow` | `--w-card-shadow` |
+| blur | `--w-section-blur` | `--w-card-blur` |
+
+Filled vs outlined vs elevated cards (Material's three) become token choices: appsec has filled tiles (`bg-surface-subtle rounded-xl p-3`, WrtTile) and outlined ones (`bg-surface border-line-subtle rounded-xl`, StatTile) side by side today; a theme would pick one look for both.
+
+On phones a section drops its radius and takes the page inset as padding, reaching the screen edges — what WInfoCard does on a page already.
+
+### Frames
+
+The kit already has a frame concept for overlays: `--w-frame-padding` and `w-frame-bleed` let tabs, info cards and embedded fields reach a modal's or dropdown's edges. A section is a frame on the page: it sets `--w-frame-padding` to its padding, so WTabs and WInfoCard bleed to its edges without new code.
+
+Catch: WInfoCard and WTabs pick frame vs page behavior from `useOverlayFrame()` (an injection: modal, dropdown, sheet), and on a page they bleed by `--inner-margin` instead. Whether the padding is zero is a theme (CSS) fact the injection can't see. Proposed: express the page case in CSS too — the main area sets `--w-frame-padding` to the page inset on phones — so components use one CSS path and a section only overrides the variable. Settle in the spike.
+
+### App chrome
+
+WHeaderBar, WNavBar and WActionsBar are raised surfaces, and today they are locked to the flat look: docked to the screen edges, square, separated from the page by a shadow or nothing. In card and glass styles they become cards themselves:
+
+| | Flat | Card | Glass |
+| --- | --- | --- | --- |
+| Position | docked to the screen edges | floating: a gap from the screen edges and from each other | floating |
+| Shape | square, no edge | rounded on all sides, `line-subtle` edge, shadow | rounded, light edge, shadow |
+| Background | `canvas` | `surface` (or `surface-raised` in dark mode) | translucent + blur — content scrolls under the header, the most natural glass element |
+
+Tokens, separate from the section ones since chrome is a raised surface: `--w-chrome-gap`, `--w-chrome-rounded`, `--w-chrome-border`, `--w-chrome-shadow`, `--w-chrome-blur`. Flat sets the gap and radius to zero.
+
+What the kit has to build on:
+
+- `--left-margin` and `--right-margin` already offset WNavBar and WActionsBar from the screen edge, and `--w-left-inner` / `--w-right-inner` add them into the page insets — the gap can go through them.
+- WHeaderBar has no top or side offset; it gets the gap on top and between the nav and the actions bar.
+- `--w-top-inner` (sticky list headers, scroll offsets) is `--header-height` today; with a floating header it adds the gap.
+- Content scrolling through the gap above a floating header: in glass that is the point; in card the header's fixed backing (the element sized by `--header-height-padding` today) paints `canvas` over the gap.
+- The background of WNavBar and WActionsBar is painted by consumers today — appsec's `styles.css` has `.w-nav-bar { @apply bg-surface xl:shadow-none shadow-md }` and the same for the actions bar. That moves into the kit, or chrome can't follow the layout style.
+- Phones: the nav is a drawer over a backdrop and the actions bar slides in; in card and glass they float as sheets with the gap. Whether the header stays docked on phones, where the gap costs height, is open.
+
+### Glass
+
+Glass needs two values where card has one:
+
+- **paint** — the translucent color plus `backdrop-filter`, on the section or card itself;
+- **effective `--w-surface`** — opaque: the paint mixed over the canvas (`color-mix` of the paint over a canvas reference color). Sticky parts, soft tones, on-colors and contrast checks use this one, since nothing can be mixed over or measured against a translucent color.
+
+The canvas needs something to blur: a gradient from primary and the data hues, generated by the playground; aspm (`OrbitBackground`) and traio (`GeometricBackground`) have branded backgrounds on their login pages already.
+
+Known risks, for the spike:
+
+- Sticky columns over scrolling rows inside a glass section: the effective opaque color differs slightly from the blurred paint around it. Alternative: sticky parts take their own `backdrop-filter`; with the parent a backdrop root, they blur only the section's content — check engines.
+- Cost of many blurred layers (a dashboard has ~12 tiles) on low-end hardware and while scrolling.
+- Contrast: text on glass is checked against the effective color over the darkest and the lightest part of the canvas, not one value.
+- Dark mode: glass over a near-black canvas barely reads; the generator likely lightens the paint or the edge there.
+
+## Inventory
+
+What exists, to plan the migration — not a target look (see [Starting point](#starting-point-not-a-reference)). Measured 2026-10-14 by scanning templates for class strings: every class string with a radius, padding ≥ 3 and a background, border or shadow counts as container-like (chips and buttons excluded by padding).
+
+### The fleet
+
+aspm (both fronts) and traio (both fronts) contain 2–3 `.vue` files each: they are branded shells over `@whitespots/portal` (appsec-portal-app) and `@whitespots/auditor`, adding a theme. So the code to migrate is appsec-portal-app, auditor and whitespots-io; the layout style gets **chosen** in the shells, per brand.
+
+| Repo | Kit | `.vue` files | Container-like strings | Page background |
+| --- | --- | --- | --- | --- |
+| appsec-portal-app | 0.25.2 | 1123 | 78 in 55 files | `bg-surface` on `html` |
+| auditor | 0.25.2 | 115 | 2 in 1 file | via portal styles |
+| aspm, traio (shells) | 0.15.6 | 2–3 | — | `bg-default` / `bg-default-dark` on body; pre-roles |
+| whitespots-io | 0.23.1 | 137 (+ 193 `.astro`) | 102 in 57 files | `bg-default` / `bg-default-dark` |
+
+### appsec-portal-app
+
+- **Page shell**: `MainView.vue` renders a bare `<main>` with page insets; route views render straight into it on the body background. No layout component sits between the shell and the content — the section boundary has to be added per view, or in a small number of view wrappers (`ProductViewWrapper` and similar).
+- **Container-like strings**: by kind 37 background only, 18 background + border, 16 border only, 7 with shadow. Radius `rounded-xl` 34, `-2xl` 17, `-3xl` 15, `-lg` 9. Padding `p-4` 22, `p-6` 18, `px-4` 12, `p-3` 10, `p-3.5` 9.
+- **Backgrounds**: `bg-surface-subtle` 14 (filled cards — DashboardCharts tiles), `bg-tone-soft` 13 (banners — stay as they are, they are tone areas, not containers), `bg-gray-50` 11 + `bg-gray-850` 4 (palette pairs the color-roles codemod left: `surface-subtle`), `bg-surface` 8 (outlined cards with `border-line-subtle` / `border-gray-100`).
+- **Kit containers**: WInfoCard 92, WModalWrapper 62, WFieldWrapper 53, WList 27, WTabs 18, WPage 8, WExpansion 5.
+- **Sticky**: 79 class strings, 15 of them paint `bg-surface` — they follow a section's re-mapped surface. One `backdrop-blur`.
+- 41 components named like containers (`*Card`, `*Tile`, `*Panel`, `*Container`, …): InsightCard, StatTile, WrtTile, ScannerCard, AuditCard, LicenseCard, GlobalSettingsCard, … — the review list for "is this a section, a card, or neither".
+
+### auditor
+
+Almost flat: one modal with two `bg-surface-subtle rounded-3xl p-4` blocks. WInfoCard 10, WModalWrapper 4, WList 2. Migrates in an afternoon once appsec has settled the pattern.
+
+### whitespots-io
+
+- Already card-styled: outlined cards on a same-colored page — `bg-default dark:bg-gray-900` 28/23, `border-line-subtle` 27, `rounded-2xl` 46, `p-6` 29. Still palette pairs, not roles.
+- Already glass in places: 13 strings with `backdrop-blur`, translucent `bg-default/40 dark:bg-gray-900/60`, sticky bars on `bg-default/70`.
+- The store and inspector app (`engine/store/…`) is in scope; the marketing sections (`site/…`, `.astro`) are not.
+
+### The kit itself
+
+13 container-like strings, mostly docs examples. Real ones: WDatePicker (`bg-surface rounded-xl`), WInfoCardNegative, NotifyCard, TooltipContainer — overlays and notifications, which stay as they are (`surface-raised`). The kit has no page-level container component today.
+
+## Rollout to consumers
+
+- Foundation and kit ship with flat as default: no visual change, a minor release.
+- appsec first: wrap the content area of each route view (or its wrapper) in a section, turn the filled and outlined tiles into cards, replace the leftover `bg-gray-50 dark:bg-gray-850` pairs, drop the nav and actions bar backgrounds from `styles.css`. Visible changes in flat are expected wherever a block had its own radius, padding or border; the color diff and screenshots list them for review.
+- auditor next, same pattern.
+- aspm and traio pick a layout style in their theme — blocked on their upgrade from 0.15.6 to the color roles (color-roles phase 5).
+- whitespots-io's app part last; its outlined cards become `surface-card` with a border token.
+
+## Phases
+
+### 0. Spike
+
+- [ ] `canvas`, `surface-section`, `surface-card` and the tokens in a scratch copy of `roles.css`; check that flat gives 0 differences in the color diff harness (`build/color-roles/color-diff.ts`).
+- [ ] Card theme on the docs site: a list page, a form and the home gallery; sticky columns and the list header inside a section.
+- [ ] Glass: effective-surface derivation, sticky parts (opaque vs nested blur) in Chromium, Firefox and WebKit, native and lowered CSS; scroll cost of ~12 blurred tiles.
+- [ ] Frames: the CSS-only page frame (`--w-frame-padding` on the main area) for WInfoCard and WTabs, phones included.
+- [ ] Floating chrome in the docs layout: header, nav and actions bar with the gap; sticky list header and scroll offsets under a floating header; the gap above it in card and glass; nav drawer on phones.
+
+### 1. Foundation in `tailwind-base`
+
+- [ ] `canvas` role, `--w-surface-step`, section and card shape tokens, utilities; `body` on `canvas`.
+- [ ] Chrome tokens; WHeaderBar, WNavBar and WActionsBar paint their own background and take the gap, radius, edge and blur from them. Flat: as today, on `canvas`.
+- [ ] `--w-top-inner` and the page insets include the chrome gap.
+- [ ] Role equivalence test extended: section and card in flat equal today's classes; re-mapped surface inside both.
+
+### 2. Kit and playground
+
+- [ ] Components for the two kinds, if utilities aren't enough (frame provide/inject, phone behavior): WSection, WCard — names to settle.
+- [ ] Playground: a Layout group — style (flat / card / glass) and the shape tokens; presets with each style; glass generates the canvas gradient.
+- [ ] Generator contrast checks against the effective surface for glass.
+- [ ] Theming guide: layout styles, with the three side by side.
+
+### 3. Consumers
+
+- [ ] appsec-portal-app (see [Rollout](#rollout-to-consumers)).
+- [ ] auditor.
+- [ ] aspm, traio: choose a style per brand.
+- [ ] whitespots-io app part.
+
+## Decisions
+
+- 2026-10-14: existing blocks in the kit, portal and auditor are not a reference. The migration maps them onto the container kinds and drops their own shape classes; visible changes are reviewed, not avoided.
+- 2026-10-14: app chrome (header, nav, actions bar) follows the layout style — docked in flat, floating cards in card and glass.
+
+Open:
+
+- Names: `canvas`, `section`, `card`, "layout style", `chrome`.
+- Utilities only, or WSection / WCard components (a component can provide the frame and handle phones).
+- Whether a WList on a list page is its own section, or sits in one.
+- One card look, or a filled / outlined variant kept for cards inside sections.
+- Floating chrome on phones, or docked there in every style.
+
+## Log
+
+- 2026-10-14: plan written; consumers measured (Inventory).
+- 2026-10-14: consistency over preservation; app chrome added to the model.
