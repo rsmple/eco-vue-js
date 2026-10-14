@@ -6,7 +6,7 @@
   >
     <DocsNav v-if="!isHome || isTablet" />
 
-    <WHeaderBar class="pl-[calc(var(--left-margin)+var(--nav-bar-width))] pr-(--right-margin)">
+    <WHeaderBar class="pl-[calc(var(--w-left-inner)-var(--inner-margin))] pr-[calc(var(--w-right-inner)-var(--inner-margin))]">
       <template #title>
         <a
           :href="withBase('/')"
@@ -87,7 +87,7 @@
       </template>
     </WHeaderBar>
 
-    <div class="pl-[calc(var(--left-margin)+var(--nav-bar-width))] pr-(--right-margin)">
+    <div class="pl-[calc(var(--w-left-inner)-var(--inner-margin))] pr-[calc(var(--w-right-inner)-var(--inner-margin))]">
       <VPContent>
         <template #home-hero-before>
           <DocsHomeHero />
@@ -184,6 +184,14 @@ const onKeydown = (event: KeyboardEvent) => {
 onMounted(() => {
   window.addEventListener('keydown', onKeydown)
   installDocsTheme()
+
+  // Spike (plans/surface-containment.md): the layout style picked on /spike/surfaces.
+  try {
+    const layout = localStorage.getItem('docs-layout')
+    if (layout && layout !== 'flat') document.documentElement.dataset.layout = layout
+  } catch {
+    // Storage blocked: flat.
+  }
 })
 onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 </script>

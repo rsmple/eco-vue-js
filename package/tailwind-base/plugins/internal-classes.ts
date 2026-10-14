@@ -5,11 +5,13 @@ import {DARK_SELECTOR} from '../constants.js'
 const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
   addBase({
     '*': {
-      '--w-left-inner': 'calc(var(--left-margin, 0px) + var(--nav-bar-width, 0px) + var(--inner-margin, 0px))',
-      '--w-right-inner': 'calc(var(--right-margin, 0px) + var(--actions-bar-width, 0px) + var(--inner-margin, 0px))',
+      // A floating bar adds the chrome gap on the screen side, and another between it and the page.
+      '--w-left-inner': 'calc(var(--left-margin, 0px) + var(--w-chrome-gap, 0px) + var(--nav-bar-width, 0px) + min(var(--nav-bar-width, 0px) * 1000, var(--w-chrome-gap, 0px)) + var(--inner-margin, 0px))',
+      '--w-right-inner': 'calc(var(--right-margin, 0px) + var(--w-chrome-gap, 0px) + var(--actions-bar-width, 0px) + min(var(--actions-bar-width, 0px) * 1000, var(--w-chrome-gap, 0px)) + var(--inner-margin, 0px))',
       '--w-width-inner': 'calc(100vw - var(--w-left-inner, 0px) - var(--w-right-inner, 0px))',
 
-      '--w-top-inner': 'calc(var(--header-height, 0px) + var(--infinite-list-header-height, 0px))',
+      '--w-header-inner': 'calc(var(--header-height, 0px) + var(--w-chrome-gap, 0px) * 2)',
+      '--w-top-inner': 'calc(var(--w-header-inner) + var(--infinite-list-header-height, 0px))',
       '--w-bottom-inner': '0px',
       '--w-height-inner': 'calc(100vh - var(--w-top-inner, 0px) - var(--w-bottom-inner, 0px))',
     },

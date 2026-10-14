@@ -25,18 +25,18 @@
       transition-[grid-template-columns] duration-200 xl:grid-cols-[1fr] print:hidden 
     "
     :class="[{
-      'xl-not:grid-cols-[0fr]': !isOpen,
+      'w-nav-bar-closed xl-not:grid-cols-[0fr]': !isOpen,
       'grid-cols-[1fr]': isOpen,
     }, $attrs.class]"
     :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
   >
-    <div class="mt---header-height overflow-hidden">
+    <div class="w-nav-bar-content mt---header-height overflow-hidden">
       <slot />
     </div>
   </nav>
 
   <div
-    class="square---header-height w-ripple fixed left-(--left-margin,0px) top-0 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
+    class="w-nav-bar-toggle square---header-height w-ripple fixed left-(--left-margin,0px) top-0 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
     :class="{'tone-primary text-tone': isOpen}"
     :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
     @click.stop="toggle"
