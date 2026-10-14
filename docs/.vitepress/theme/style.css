@@ -256,7 +256,12 @@ body {
   --w-section-opacity: 0.55;
   --w-section-border: 1px;
   --w-section-shadow: 0 8px 32px -8px var(--w-shadow);
-  --w-section-backdrop: blur(24px) saturate(1.6);
+  /* No saturate(): what repaints the canvas inside a page list (sticky columns, masks) can't reproduce it. */
+  --w-section-backdrop: blur(24px);
+  --w-canvas-image:
+    radial-gradient(circle at 10% 10%, color-mix(in oklab, var(--color-primary) 45%, transparent), transparent 45%),
+    radial-gradient(circle at 90% 30%, color-mix(in oklab, var(--color-data-fuchsia, #d946ef) 35%, transparent), transparent 45%),
+    radial-gradient(circle at 40% 90%, color-mix(in oklab, var(--color-data-teal, #14b8a6) 35%, transparent), transparent 50%);
   --w-card-opacity: 0.55;
   --w-card-border: 1px;
   --w-card-shadow: var(--w-section-shadow);
@@ -264,14 +269,6 @@ body {
 
   --w-chrome-border: 1px;
   --w-chrome-shadow: var(--w-section-shadow);
-}
-
-:root[data-layout="glass"] body {
-  background-image:
-    radial-gradient(circle at 10% 10%, color-mix(in oklab, var(--color-primary) 45%, transparent), transparent 45%),
-    radial-gradient(circle at 90% 30%, color-mix(in oklab, var(--color-data-fuchsia, #d946ef) 35%, transparent), transparent 45%),
-    radial-gradient(circle at 40% 90%, color-mix(in oklab, var(--color-data-teal, #14b8a6) 35%, transparent), transparent 50%);
-  background-attachment: fixed;
 }
 
 :root[data-layout="card"] .w-nav-bar,

@@ -52,10 +52,15 @@
     --w-chrome-shadow: none;
     /* What fills the gap around a floating bar, so content scrolling under the header doesn't show above it. */
     --w-chrome-ring: transparent;
+
+    /* A picture on the canvas, such as a glass theme's gradient: fixed to the viewport, so what paints it again matches. */
+    --w-canvas-image: none;
   }
 
   body {
     background-color: var(--w-canvas);
+    background-image: var(--w-canvas-image);
+    background-attachment: fixed;
   }
 }
 
@@ -169,19 +174,46 @@
 
 /*
  * A list that scrolls with the page is a section of its own: a surface sized to the frame stays in place while the
- * rows scroll sideways under the sticky columns. The rows and the stuck header are clipped to the frame instead of
- * masked, so nothing opaque is painted into the gutter: the clip follows the page's horizontal scroll through a
- * scroll timeline (the scroll range is the list's width less the frame's, as the list is what makes the page wide).
+ * rows scroll sideways under the sticky columns.
+ *
+ * Whatever has to hide the rows scrolling under it — the sticky columns, the masks over the gutter beside them, the
+ * stuck header — paints what is behind it instead of a flat color: the canvas, and the section's fill and edges as
+ * bands over the frame. All of it is attached to the viewport, so it lines up with the surface wherever the element
+ * is, and sticky positioning keeps it in step with scrolling on the compositor. Blur is not reproduced: over a smooth
+ * canvas it is hardly visible.
  */
 @layer utilities {
   .w-list-page {
     --w-surface: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), var(--w-canvas));
+    --w-section-paint: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), transparent);
+    --w-band-start: calc(var(--w-left-inner) - var(--w-section-padding));
+    --w-band-end: calc(100vw - var(--w-right-inner) + var(--w-section-padding));
+    --w-page-backdrop:
+      linear-gradient(
+        to right,
+        transparent var(--w-band-start),
+        var(--w-line-subtle) var(--w-band-start) calc(var(--w-band-start) + var(--w-section-border)),
+        transparent calc(var(--w-band-start) + var(--w-section-border)) calc(var(--w-band-end) - var(--w-section-border)),
+        var(--w-line-subtle) calc(var(--w-band-end) - var(--w-section-border)) var(--w-band-end),
+        transparent var(--w-band-end)
+      ),
+      linear-gradient(
+        to right,
+        transparent var(--w-band-start),
+        var(--w-section-paint) var(--w-band-start) var(--w-band-end),
+        transparent var(--w-band-end)
+      ),
+      var(--w-canvas-image);
 
     display: grid;
     padding-block: var(--w-section-padding);
+
+    @variant sm-not {
+      --w-section-border: 0px;
+    }
   }
 
-  /* As wide as its rows, plus the right inset: the page then scrolls exactly the rows' overflow past the frame. */
+  /* As wide as its rows, plus the right inset: the last column scrolls clear of the sticky menu column. */
   .w-list.w-list-page {
     width: max-content;
     min-width: calc(100% + var(--w-right-inner));
@@ -201,45 +233,35 @@
 
   .w-list-page-surface {
     position: sticky;
-    left: calc(var(--w-left-inner) - var(--w-section-padding));
+    left: var(--w-band-start);
     width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
     margin-block: calc(var(--w-section-padding) * -1);
     margin-inline-start: calc(var(--w-section-padding) * -1);
     /* A sticky box stops at its container's content edge: this lets it reach past it by the padding at the end. */
     margin-inline-end: calc(var(--w-section-padding) * -1 - var(--w-right-inner));
 
-    background-color: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), transparent);
+    background-color: var(--w-section-paint);
     border: var(--w-section-border) solid var(--w-line-subtle);
     border-radius: var(--w-section-rounded);
     box-shadow: var(--w-section-shadow);
     backdrop-filter: var(--w-section-backdrop);
 
     @variant sm-not {
-      border-inline-width: 0;
       border-radius: 0;
     }
   }
 
-  .w-list.w-list-page :is(.w-list-rows, .w-infinite-list-sticky) {
-    clip-path: inset(-100vh calc(100% - var(--w-width-inner) - var(--w-scroll-x, 0px)) -100vh var(--w-scroll-x, 0px));
-
-    @supports (animation-timeline: scroll()) {
-      animation: w-list-clip linear both;
-      animation-timeline: scroll(nearest inline);
-    }
+  .w-list-page :is(.w-list-mask, .sticky.bg-surface) {
+    background-color: var(--w-canvas);
+    background-image: var(--w-page-backdrop);
+    background-attachment: fixed;
   }
 
-  .w-list-page .w-list-mask {
-    display: none;
-  }
-}
-
-@keyframes w-list-clip {
-  from {
-    clip-path: inset(-100vh calc(100% - var(--w-width-inner)) -100vh 0);
-  }
-
-  to {
-    clip-path: inset(-100vh 0 -100vh calc(100% - var(--w-width-inner)));
+  /* Docked (flat), the stuck header stays clear and the header bar grows behind it: the backdrop is sized to 0 there. */
+  .w-list-page .w-infinite-list-header {
+    background-color: color-mix(in oklab, var(--w-canvas) calc(var(--w-chrome-float) * 100%), transparent);
+    background-image: var(--w-page-backdrop);
+    background-attachment: fixed;
+    background-size: calc(100% * var(--w-chrome-float));
   }
 }
