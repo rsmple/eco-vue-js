@@ -139,6 +139,12 @@
     border: var(--w-chrome-border) solid var(--w-line-subtle);
     border-radius: var(--w-chrome-rounded);
     box-shadow: var(--w-chrome-shadow, 0 0 #0000), 0 0 0 var(--w-chrome-gap) var(--w-chrome-ring);
+
+    /* On phones it spans the screen, like a section: only the edge toward the page is left. */
+    @variant sm-not {
+      border-top-width: 0;
+      border-inline-width: 0;
+    }
   }
 
   .w-nav-bar,
@@ -205,6 +211,16 @@
       ),
       var(--w-canvas-image);
 
+    /*
+     * Striped card rows on phones are as see-through as the section. A section that paints nothing (flat) keeps them
+     * opaque, over the canvas.
+     */
+    --w-list-stripe: color-mix(
+      in oklab,
+      var(--w-surface-subtle) calc(max(var(--w-section-opacity), 1 - round(up, var(--w-section-opacity), 1)) * 100%),
+      transparent
+    );
+
     display: grid;
     padding-block: var(--w-section-padding);
 
@@ -230,6 +246,11 @@
   .w-list-page-content {
     position: relative;
     min-width: 0;
+
+    /* On phones the section spans the screen and the cards have padding of their own: they run to its edges. */
+    @variant sm-not {
+      margin-inline: calc(var(--w-page-bleed, 0px) * -1);
+    }
   }
 
   .w-list-page-surface,
@@ -283,7 +304,14 @@
    * (flat) it stays clear and above the header bar, which grows behind it.
    */
   .w-list-page .w-infinite-list-header {
+    /* On phones the header bar is docked, with no gap under it: the stuck toolbar keeps a small one. */
+    --w-list-header-top: calc(var(--w-header-inner) + var(--w-chrome-float) * 0.5rem);
+
     background-color: transparent;
+
+    @variant sm-not {
+      top: var(--w-list-header-top);
+    }
 
     &::before {
       content: "";
@@ -304,6 +332,10 @@
 
     &::before {
       top: calc(var(--w-header-inner) * -1);
+
+      @variant sm-not {
+        top: calc(var(--w-list-header-top) * -1);
+      }
     }
   }
 }
