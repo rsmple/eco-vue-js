@@ -249,7 +249,7 @@ To make a theme from a description — "a warm, rounded theme for a finance dash
 | `color-default-dark` | `oklch(21% 0.006 285.885)`, zinc's 900 | Page and card background in dark mode |
 | `color-black-default` | `#333333` | Main text in light mode |
 | `color-negative` | `oklch(64% 0.2 24.1)` | Errors and destructive actions |
-| `color-positive` | `oklch(64% 0.148 150)` | Success |
+| `color-positive` | `oklch(69% 0.148 150)` | Success |
 | `color-warning` | `oklch(85% 0.16 85)` | Warnings; black text on the fill |
 | `color-info` | `oklch(63% 0.16 262.6)` | Information |
 | `color-*-dark` | the light value | Each status color in dark mode |
