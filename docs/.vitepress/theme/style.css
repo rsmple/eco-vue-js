@@ -280,9 +280,3 @@ body {
   background-color: color-mix(in oklab, var(--w-surface) 55%, transparent);
   backdrop-filter: var(--w-section-backdrop);
 }
-
-/* Closed below xl the nav is 0 wide: no edge or shadow left as a line. */
-:root[data-layout] .w-nav-bar-closed {
-  border-color: transparent;
-  box-shadow: none;
-}
