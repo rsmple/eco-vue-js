@@ -128,7 +128,8 @@
 /*
  * App chrome. Docked (flat), the header spans the screen and the nav and the actions bar run its full height under it.
  * Floating, each bar is a card `--w-chrome-gap` off the screen edges and the shell's margins, the nav and the actions
- * bar under the header. A floating header paints `--w-chrome-ring` over the gap around it.
+ * bar under the header. A floating header paints `--w-chrome-ring` over the gap above it and beside it,
+ * not below: there the page shows, such as a stuck list's section above its toolbar.
  */
 @layer utilities {
   .w-header-bar {
@@ -146,7 +147,9 @@
     right: calc(var(--right-margin, 0px) * var(--w-chrome-float) + var(--w-chrome-gap));
     border: var(--w-chrome-border) solid var(--w-line-subtle);
     border-radius: var(--w-chrome-rounded);
-    box-shadow: var(--w-chrome-shadow, 0 0 #0000), 0 0 0 var(--w-chrome-gap) var(--w-chrome-ring);
+    box-shadow:
+      var(--w-chrome-shadow, 0 0 #0000),
+      0 calc(var(--w-chrome-gap) * -1) 0 var(--w-chrome-gap) var(--w-chrome-ring);
 
     /* On phones it spans the screen, like a section: only the edge toward the page is left. */
     @variant sm-not {
