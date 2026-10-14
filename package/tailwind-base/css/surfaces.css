@@ -222,7 +222,8 @@
   }
 
   .w-list-page-surface,
-  .w-list-page-content {
+  .w-list-page-content,
+  .w-list-page-frame {
     grid-area: 1 / 1;
   }
 
@@ -231,7 +232,8 @@
     min-width: 0;
   }
 
-  .w-list-page-surface {
+  .w-list-page-surface,
+  .w-list-page-frame {
     position: sticky;
     left: var(--w-band-start);
     width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
@@ -239,16 +241,28 @@
     margin-inline-start: calc(var(--w-section-padding) * -1);
     /* A sticky box stops at its container's content edge: this lets it reach past it by the padding at the end. */
     margin-inline-end: calc(var(--w-section-padding) * -1 - var(--w-right-inner));
-
-    background-color: var(--w-section-paint);
-    border: var(--w-section-border) solid var(--w-line-subtle);
     border-radius: var(--w-section-rounded);
-    box-shadow: var(--w-section-shadow);
-    backdrop-filter: var(--w-section-backdrop);
 
     @variant sm-not {
       border-radius: 0;
     }
+  }
+
+  .w-list-page-surface {
+    background-color: var(--w-section-paint);
+    border: var(--w-section-border) solid var(--w-line-subtle);
+    backdrop-filter: var(--w-section-backdrop);
+  }
+
+  /*
+   * The shadow goes on a frame over the rows: the masks beside the sticky columns would paint over it on the surface.
+   * An outer shadow is drawn only outside the box, so it never covers the rows. Above the stuck header, under the
+   * header bar.
+   */
+  .w-list-page-frame {
+    z-index: calc(21 - var(--w-chrome-float) * 15);
+    pointer-events: none;
+    box-shadow: var(--w-section-shadow);
   }
 
   .w-list-page :is(.w-list-mask, .sticky.bg-surface) {

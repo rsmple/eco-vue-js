@@ -185,6 +185,11 @@
         </template>
       </WInfiniteList>
     </div>
+
+    <div
+      v-if="isPage"
+      class="w-list-page-frame"
+    />
   </div>
 </template>
 
