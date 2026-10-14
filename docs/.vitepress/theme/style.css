@@ -44,7 +44,7 @@ body {
   --right-margin: var(--left-margin);
 
   @apply
-    bg-surface text-accent
+    bg-canvas text-accent
     w-checkbox-size-3
     w-modal-wrapper-p---inner-margin
     w-button-h-9
@@ -92,7 +92,7 @@ body {
 /* VPContent pads itself for VitePress's own nav and sidebar; the shell wrapper handles that instead. */
 #VPContent.VPContent {
   margin: 0;
-  padding: var(--header-height) 0 0;
+  padding: var(--w-header-inner) 0 0;
 }
 
 /* The home hero's backdrop runs to the viewport's edges, past VPHome's box: the shell clips it instead of VPHome. */
@@ -162,6 +162,8 @@ body {
    inside a scroll container's padding, so it can't go on `.demo`. */
 .demo {
   --header-height: 0px;
+  --w-chrome-gap: 0px;
+  --w-chrome-float: 0;
   --left-margin: 0px;
   --right-margin: 0px;
   --nav-bar-width: 0px;
@@ -199,3 +201,88 @@ body {
   --w-height-inner: calc(var(--docs-demo-max-height) - var(--w-top-inner) - var(--w-bottom-inner));
 }
 
+
+/*
+ * Spike (plans/surface-containment.md): the card and glass layout styles as a theme would set them. Picked on
+ * /spike/surfaces and kept in localStorage.
+ */
+:root[data-layout="card"],
+:root[data-layout="glass"] {
+  --w-section-rounded: 1.5rem;
+  --w-card-padding: 1rem;
+  --w-card-rounded: 1rem;
+
+  --w-chrome-float: 1;
+  --w-chrome-gap: 0.75rem;
+  --w-chrome-rounded: 1rem;
+}
+
+/* On body, where the gutter is set. Phones: the bars dock and sections span the screen, as in flat. */
+:root[data-layout="card"] body,
+:root[data-layout="glass"] body {
+  --w-section-padding: var(--inner-margin);
+  --w-page-bleed: var(--inner-margin);
+
+  @variant sm-not {
+    --w-chrome-gap: 0px;
+    --w-chrome-rounded: 0px;
+  }
+}
+
+:root[data-layout="card"] {
+  --role-canvas: oklch(from var(--color-default) calc(l - 0.035) c h);
+  --role-canvas-dark: oklch(from var(--color-default-dark) calc(l - 0.035) c h);
+  --role-card: var(--role-surface);
+  --role-card-dark: var(--role-surface-dark);
+
+  --w-section-opacity: 1;
+  --w-section-shadow: 0 1px 2px oklch(from var(--w-shadow) l c h / calc(alpha * 0.5));
+  --w-card-shadow: var(--w-section-shadow);
+
+  --w-chrome-shadow: var(--w-section-shadow);
+  --w-chrome-ring: var(--w-canvas);
+}
+
+:root[data-layout="glass"] {
+  --role-canvas: oklch(from var(--color-primary) 0.93 0.04 h);
+  --role-canvas-dark: oklch(from var(--color-primary) 0.2 0.04 h);
+  --role-card: var(--role-surface);
+  --role-card-dark: var(--role-surface-dark);
+
+  --w-section-opacity: 0.55;
+  --w-section-border: 1px;
+  --w-section-shadow: 0 8px 32px -8px var(--w-shadow);
+  --w-section-backdrop: blur(24px) saturate(1.6);
+  --w-card-opacity: 0.55;
+  --w-card-border: 1px;
+  --w-card-shadow: var(--w-section-shadow);
+  --w-card-backdrop: var(--w-section-backdrop);
+
+  --w-chrome-border: 1px;
+  --w-chrome-shadow: var(--w-section-shadow);
+}
+
+:root[data-layout="glass"] body {
+  background-image:
+    radial-gradient(circle at 10% 10%, color-mix(in oklab, var(--color-primary) 45%, transparent), transparent 45%),
+    radial-gradient(circle at 90% 30%, color-mix(in oklab, var(--color-data-fuchsia, #d946ef) 35%, transparent), transparent 45%),
+    radial-gradient(circle at 40% 90%, color-mix(in oklab, var(--color-data-teal, #14b8a6) 35%, transparent), transparent 50%);
+  background-attachment: fixed;
+}
+
+:root[data-layout="card"] .w-nav-bar,
+:root[data-layout="glass"] .w-nav-bar {
+  border: var(--w-chrome-border) solid var(--w-line-subtle);
+  box-shadow: var(--w-chrome-shadow);
+}
+
+:root[data-layout="glass"] .w-nav-bar {
+  background-color: color-mix(in oklab, var(--w-surface) 55%, transparent);
+  backdrop-filter: var(--w-section-backdrop);
+}
+
+/* Closed below xl the nav is 0 wide: no edge or shadow left as a line. */
+:root[data-layout] .w-nav-bar-closed {
+  border-color: transparent;
+  box-shadow: none;
+}

@@ -8,7 +8,8 @@
     :is-intersecting="isIntersecting"
     class="sticky print:hidden"
     :class="{
-      'top---header-height': !isContained,
+      'top-(--w-header-inner)': !isContained,
+      'w-infinite-list-header': !isContained && !noHeaderUpdate,
       'top-0 not-empty:pt-3': isContained && !isModal,
       'top---modal-header-height': isModal,
       'bg-surface': noHeaderUpdate || isContained,

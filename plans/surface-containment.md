@@ -4,7 +4,7 @@ Living plan for letting a theme choose how content is contained — flat, card o
 
 | Phase | Status |
 | --- | --- |
-| 0. Spike | not started |
+| 0. Spike | done — findings below; items 1–3 to settle before phase 1 |
 | 1. Foundation in `tailwind-base` | not started |
 | 2. Kit and playground | not started |
 | 3. Consumers | not started |
@@ -170,11 +170,42 @@ Almost flat: one modal with two `bg-surface-subtle rounded-3xl p-4` blocks. WInf
 
 ### 0. Spike
 
-- [ ] `canvas`, `surface-section`, `surface-card` and the tokens in a scratch copy of `roles.css`; check that flat gives 0 differences in the color diff harness (`build/color-roles/color-diff.ts`).
-- [ ] Card theme on the docs site: a list page, a form and the home gallery; sticky columns and the list header inside a section.
-- [ ] Glass: effective-surface derivation, sticky parts (opaque vs nested blur) in Chromium, Firefox and WebKit, native and lowered CSS; scroll cost of ~12 blurred tiles.
-- [ ] Frames: the CSS-only page frame (`--w-frame-padding` on the main area) for WInfoCard and WTabs, phones included.
-- [ ] Floating chrome in the docs layout: header, nav and actions bar with the gap; sticky list header and scroll offsets under a floating header; the gap above it in card and glass; nav drawer on phones.
+- [x] `canvas`, `surface-section`, `surface-card` and the tokens in a scratch copy of `roles.css`; check that flat gives 0 differences in the color diff harness (`build/color-roles/color-diff.ts`).
+- [x] Card theme on the docs site: a list page, a form and the home gallery; sticky columns and the list header inside a section.
+- [x] Glass: effective-surface derivation, sticky parts (opaque vs nested blur) in Chromium, Firefox and WebKit, native and lowered CSS; scroll cost of ~12 blurred tiles.
+- [x] Frames: the CSS-only page frame (`--w-frame-padding` on the main area) for WInfoCard and WTabs, phones included.
+- [x] Floating chrome in the docs layout: header, nav and actions bar with the gap; sticky list header and scroll offsets under a floating header; the gap above it in card and glass; nav drawer on phones.
+
+#### Spike findings (2026-10-14)
+
+Built on the `surface-containment` branch: `tailwind-base/css/surfaces.css` (canvas role, `surface-section`, `surface-card`, section / card / chrome tokens, chrome geometry on `.w-header-bar`, `.w-nav-bar`, `.w-actions-bar`), gap-aware `--w-left-inner` / `--w-right-inner` / `--w-top-inner` and a new `--w-header-inner` in `internal-classes.ts`, card and glass presets in the docs (`:root[data-layout]` in `style.css`), and the page `/spike/surfaces` (stat cards, a settings section with WInfoCard and WTabs, the plant list in a section). Screenshots in Chromium, Firefox and WebKit, desktop and phone, light and dark.
+
+What holds:
+
+- **Flat is unchanged.** Color diff of the docs, main vs the branch, 54 pages in light and dark: the only change is the header backing's border color (`currentColor` → `line-subtle`) on a border 0px wide, plus a port in an asset URL. Nothing visible.
+- **One opacity token gives all three styles.** A container paints its base color at `--w-*-opacity` and re-maps `--w-surface` to `color-mix(base opacity%, canvas)`: 0 is flat (invisible, surface = canvas), 1 is card, 0.55 is glass. No style switch in code; presets are token sets. Nested containers are forced opaque, so the mix is always over the canvas and never chains.
+- **Card style works as is**: white sections and stat cards on a canvas 0.035 L darker, floating header and nav with a 0.75rem gap, header title aligned with the content through the page insets. Soft tones (WInfoCard warning) and inputs follow the re-mapped surface.
+- **Glass works in all three engines**, light and dark: translucent tiles and sections over a generated gradient (primary, fuchsia, teal radials, `background-attachment: fixed`), blur, a 1px edge. Dark needs the edge — without it sections dissolve.
+- **Floating chrome from tokens**: `--w-chrome-float` (0/1) and `--w-chrome-gap` position the header backing, the nav, its toggle and the actions bar; the header's spread ring (`0 0 0 gap canvas`) hides content scrolling through the gap in card style, and is transparent in glass. `WInfiniteListWrapper` sticks at `--w-header-inner`, so the list header lands under a floating header.
+- **The CSS-only frame mostly works**: a section sets `--w-frame-padding`; on phones it bleeds by `--inner-margin` and pads by it, which is what WInfoCard's page branch already assumes — WInfoCard reaches the section edges without a change.
+
+What breaks — to solve before phase 1:
+
+1. **List chrome assumes the page is the frame.** WList's sticky columns, their gutter masks (`w---left-inner` / `w---right-inner` absolute boxes beside them) and the stuck header backdrop are sized by the page insets. Inside a section they spill out of it: a white band from the screen edge across the canvas gap at the header row, over the nav card in WebKit, and over the floating header's ring when stuck. A section has to redefine the insets for its subtree, as `.w-modal-wrapper *` does — but on a page it needs **two** values the modal gets away with as one: the sticky offset (viewport → section content, page inset + section padding) and the gutter the mask covers (canvas from the screen edge, then section paint over the padding). Proposed: `--w-left-gutter` / `--w-right-gutter` for the masks, a two-stop mask background, `--w-width-inner` falling out of the redefined insets.
+2. **Wide lists in a section.** A list wider than the section can't scroll inside it (`overflow-x: auto` makes the section the scroll container and the header stops sticking to the window); `overflow-x: clip` hides the overflow. Options: the section grows with the list (`min-width: 100%; width: max-content`) and the window scrolls, as today; or lists fit their section (columns hide) and the section never scrolls. Decide with 1.
+3. **Glass and sticky columns don't mix.** Sticky cells paint the opaque effective color — clear stripes over the translucent section, as predicted. Blurring them likely doesn't help (not tried): inside a section with `backdrop-filter`, a backdrop root, they can't see the canvas. Workable: a section holding a list is opaque in every style (`--w-section-opacity: 1` set by the list or a `surface-section-solid` variant), and glass stays for chrome, tiles and sections without sticky parts. Since the canvas is a smooth gradient, sections may not need `backdrop-filter` at all — only the chrome does, where content scrolls under it; to compare side by side.
+4. **WTabs inside a section on phones** adds its page inset (`sm-not:pl---inner-margin`) on top of the section's padding — the tab bar is indented twice. WTabs' page branch has to become the frame branch (`w-frame-bleed px-(--w-frame-padding)`), i.e. the page sets `--w-frame-padding` too, as the plan proposed.
+5. **Consumers pad the header themselves** (`pl---nav-bar-width`, the docs' `pl-[calc(var(--left-margin)+var(--nav-bar-width))]`). With a gap that padding must come from `--w-left-inner`; in phase 1 the header should align its title with the content on its own and the consumer padding goes.
+6. **JS still measures the docked header.** `InfiniteListHeaderHeight` (`getTopOffset`) and the wrapper's IntersectionObserver (`rootMargin`) use the header element's height, not `--w-header-inner`: off by twice the gap when floating. Harmless while the header doesn't grow (below), but scroll-to-top math is off.
+7. **Opaque stripes in glass, beyond sticky columns**: the card list's striped rows on phones (`sm-not:even:bg-surface-subtle`) and the stuck toolbar are opaque over a translucent section. Same answer as 3.
+
+Fixed after review (2026-10-14):
+
+- **Closed nav left a line**: below xl the closed nav is 0 wide but kept its edge and shadow. WNavBar marks itself `w-nav-bar-closed`; the edge and shadow go with it.
+- **Page gutter**: sections reach into the gutter (`--w-page-bleed`, with `--w-section-padding` set to the gutter) so their edges line up with the bars and their content with the page; `w-page-bleed` does the same for a row of cards. Phones: the bars dock (gap 0) and sections span the screen, so the content has the same insets as in flat — no extra padding.
+- **Header growth**: docked, the header grows over a stuck list toolbar (`headerPadding`) so two blurred bars read as one and rows blur under both. Floating, it keeps its height (`--w-chrome-float` cancels the padding) and the stuck toolbar paints the surface (`.w-infinite-list-header`). The growth was also what painted the white band over the gap when stuck.
+
+To experiment with for 1 (the gutter masks): they exist because rows scrolled sideways would show beside the sticky columns. `overflow-x: clip` on the section keeps sticky working (it doesn't make a scroll container, unlike `hidden`/`auto`) but leaves nothing to scroll sideways, so it only fits lists that fit. JS-positioned columns lag behind scrolling. Untried: masks with a two-stop background (canvas to the section edge, section paint over the padding); a `clip-path` on rows driven by a scroll timeline (`animation-timeline: scroll(root inline)`) so the clip follows the scroll on the compositor — Chromium and Safari 26 only, Firefox behind a flag.
 
 ### 1. Foundation in `tailwind-base`
 
@@ -208,9 +239,10 @@ Open:
 - Utilities only, or WSection / WCard components (a component can provide the frame and handle phones).
 - Whether a WList on a list page is its own section, or sits in one.
 - One card look, or a filled / outlined variant kept for cards inside sections.
-- Floating chrome on phones, or docked there in every style.
+- ~~Floating chrome on phones~~ — spike: docked on phones (gap 0 in the presets), sections span the screen.
 
 ## Log
 
 - 2026-10-14: plan written; consumers measured (Inventory).
 - 2026-10-14: consistency over preservation; app chrome added to the model.
+- 2026-10-14: spike on the `surface-containment` branch — flat unchanged, card and glass render in three engines; list chrome inside sections, wide lists and glass sticky columns are the open problems (Spike findings). Not measured yet: scroll cost of blurred tiles, nav drawer on phones.

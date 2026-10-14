@@ -1,0 +1,168 @@
+/*
+ * Surface containment (spike — plans/surface-containment.md): the page background, the two container kinds and the app
+ * chrome, shaped by tokens a theme sets. The defaults are the flat layout, which looks as before.
+ *
+ * Each container paints its base color at `--w-*-opacity` — 0 shows nothing (flat section), 1 is a card, between is
+ * glass — and re-maps `--w-surface` to the opaque color it ends up as over the canvas, so sticky columns, soft tones and
+ * on-colors inside match it. Containers inside a section or a card are opaque: only what sits on the canvas is glass,
+ * which also keeps the mix one level deep.
+ */
+
+@theme {
+  --role-canvas: var(--role-surface);
+  --role-canvas-dark: var(--role-surface-dark);
+  /* A card on the canvas: filled, one step off the page, while the canvas is the surface. A card theme makes it the surface. */
+  --role-card: var(--role-surface-subtle);
+  --role-card-dark: var(--role-surface-subtle-dark);
+}
+
+@theme inline {
+  --color-canvas: var(--w-canvas);
+}
+
+@layer base {
+  :root,
+  .light,
+  .dark {
+    --w-canvas: light-dark(var(--role-canvas), var(--role-canvas-dark));
+    --w-section-base: light-dark(var(--role-surface), var(--role-surface-dark));
+    --w-card-base: light-dark(var(--role-card), var(--role-card-dark));
+  }
+
+  :root {
+    --w-section-opacity: 0;
+    --w-section-padding: 0px;
+    --w-section-rounded: 0px;
+    --w-section-border: 0px;
+    --w-section-shadow: none;
+    --w-section-backdrop: none;
+
+    --w-card-opacity: 1;
+    --w-card-padding: 1rem;
+    --w-card-rounded: 1rem;
+    --w-card-border: 0px;
+    --w-card-shadow: none;
+    --w-card-backdrop: none;
+
+    /* 0: the bars are docked to the screen edges; 1: they float `--w-chrome-gap` off them, the nav and the actions bar under the header. */
+    --w-chrome-float: 0;
+    --w-chrome-gap: 0px;
+    --w-chrome-rounded: 0px;
+    --w-chrome-border: 0px;
+    --w-chrome-shadow: none;
+    /* What fills the gap around a floating bar, so content scrolling under the header doesn't show above it. */
+    --w-chrome-ring: transparent;
+  }
+
+  body {
+    background-color: var(--w-canvas);
+  }
+}
+
+@utility surface-section {
+  --w-surface: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), var(--w-canvas));
+  --w-frame-padding: var(--w-section-padding);
+
+  background-color: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), transparent);
+  padding: var(--w-section-padding);
+  border: var(--w-section-border) solid var(--w-line-subtle);
+  border-radius: var(--w-section-rounded);
+  box-shadow: var(--w-section-shadow);
+  backdrop-filter: var(--w-section-backdrop);
+
+  /*
+   * Reaches into the page gutter by `--w-page-bleed`: a card theme sets it and the padding to the gutter, so the
+   * section's edges line up with the bars and its content with the page's. On phones it spans the screen.
+   */
+  margin-inline: calc(var(--w-page-bleed, 0px) * -1);
+
+  @variant sm-not {
+    border-inline-width: 0;
+    border-radius: 0;
+  }
+}
+
+/* Reaches into the page gutter like a section: for a row of cards on the canvas. */
+@utility w-page-bleed {
+  margin-inline: calc(var(--w-page-bleed, 0px) * -1);
+}
+
+@utility surface-card {
+  --w-surface: color-mix(in oklab, var(--w-card-base) calc(var(--w-card-opacity) * 100%), var(--w-canvas));
+  --w-frame-padding: var(--w-card-padding);
+
+  background-color: color-mix(in oklab, var(--w-card-base) calc(var(--w-card-opacity) * 100%), transparent);
+  padding: var(--w-card-padding);
+  border: var(--w-card-border) solid var(--w-line-subtle);
+  border-radius: var(--w-card-rounded);
+  box-shadow: var(--w-card-shadow);
+  backdrop-filter: var(--w-card-backdrop);
+
+  /* Inside a section or another card: opaque and flat, one step darker than what it sits on. */
+  :where(.surface-section, .surface-card) & {
+    --w-card-base: var(--w-surface-subtle);
+    --w-card-opacity: 1;
+    --w-card-border: 0px;
+    --w-card-shadow: none;
+    --w-card-backdrop: none;
+  }
+
+  :where(.surface-card) & {
+    --w-card-base: var(--w-surface-muted);
+  }
+}
+
+/*
+ * App chrome. Docked (flat), the header spans the screen and the nav and the actions bar run its full height under it.
+ * Floating, each bar is a card `--w-chrome-gap` off the screen edges and the shell's margins, the nav and the actions
+ * bar under the header. A floating header paints `--w-chrome-ring` over the gap around it.
+ */
+@layer utilities {
+  .w-header-bar {
+    top: var(--w-chrome-gap);
+  }
+
+  /*
+   * Docked, the header grows over a stuck list toolbar, so the two blurred bars read as one. Floating, it keeps its
+   * height and the toolbar paints its own background.
+   */
+  .w-header-bar-bg {
+    height: calc(var(--header-height) + var(--header-height-padding, 0px) * (1 - var(--w-chrome-float)));
+    top: var(--w-chrome-gap);
+    left: calc(var(--left-margin, 0px) * var(--w-chrome-float) + var(--w-chrome-gap));
+    right: calc(var(--right-margin, 0px) * var(--w-chrome-float) + var(--w-chrome-gap));
+    border: var(--w-chrome-border) solid var(--w-line-subtle);
+    border-radius: var(--w-chrome-rounded);
+    box-shadow: var(--w-chrome-shadow, 0 0 #0000), 0 0 0 var(--w-chrome-gap) var(--w-chrome-ring);
+  }
+
+  .w-nav-bar,
+  .w-actions-bar {
+    --w-chrome-top: calc(var(--w-chrome-float) * (var(--header-height, 0px) + var(--w-chrome-gap) * 2));
+
+    top: var(--w-chrome-top);
+    height: calc(100% - var(--w-chrome-top) - var(--w-chrome-gap));
+    border-radius: var(--w-chrome-rounded);
+  }
+
+  .w-nav-bar {
+    left: calc(var(--left-margin, 0px) + var(--w-chrome-gap));
+  }
+
+  .w-actions-bar {
+    right: calc(var(--right-margin, 0px) + var(--w-chrome-gap));
+  }
+
+  .w-infinite-list-header {
+    background-color: color-mix(in oklab, var(--w-surface) calc(var(--w-chrome-float) * 100%), transparent);
+  }
+
+  .w-nav-bar-content {
+    margin-top: calc((1 - var(--w-chrome-float)) * var(--header-height, 0px));
+  }
+
+  .w-nav-bar-toggle {
+    top: var(--w-chrome-gap);
+    left: calc(var(--left-margin, 0px) + var(--w-chrome-gap));
+  }
+}
