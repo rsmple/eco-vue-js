@@ -5,6 +5,7 @@
       'w-card': isGrid,
       'w-list': !isGrid,
       'w-list-page': isPage,
+      'w-list-page-repaint': isRepaint,
       '[--w-list-right:calc(var(--w-list-padding,1rem)*2+1.25em)]': hasMenu,
       '[--w-list-right:var(--w-list-header-rounded,1rem)]': !hasMenu,
       '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em+1px)]': allowSelect,
@@ -17,7 +18,10 @@
       class="w-list-page-surface"
     />
 
-    <div :class="isPage ? 'w-list-page-content' : 'contents'">
+    <div
+      ref="pageContent"
+      :class="isPage ? 'w-list-page-content' : 'contents'"
+    >
       <WInfiniteList
         :use-query-fn="useQueryFn"
         :query-params="queryParams"
@@ -199,7 +203,7 @@ import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type Ref, type StyleValue, computed, inject, nextTick, onMounted, ref, toRef, watch} from 'vue'
+import {type Ref, type StyleValue, computed, inject, nextTick, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
@@ -372,6 +376,28 @@ const {isMobile} = useIsMobile()
 
 // Scrolls with the page, not inside a modal or a scrolling element: the list paints its own section surface.
 const isPage = !props.minHeight && !inject(wIsModal, false) && inject(wScrollingElement, null) === null
+
+// Chromium moves a sticky column's layer when rows above it open or close without repainting it, so the backdrop it
+// paints, fixed to the viewport, stays where the column was until the next scroll. A no-op paint change on resize
+// repaints it.
+const isRepaint = ref(false)
+const pageContentRef = useTemplateRef('pageContent')
+
+let resizeObserver: ResizeObserver | null = null
+
+onMounted(() => {
+  if (!isPage || !pageContentRef.value) return
+
+  resizeObserver = new ResizeObserver(() => {
+    isRepaint.value = !isRepaint.value
+  })
+
+  resizeObserver.observe(pageContentRef.value)
+})
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+})
 
 const listCount = ref<number | undefined>(undefined)
 

@@ -271,6 +271,12 @@
     background-attachment: fixed;
   }
 
+  /* A fixed background is positioned against the viewport, so the origin changes nothing but a repaint: see WList. */
+  .w-list-page-repaint :is(.w-list-mask, .sticky.bg-surface),
+  .w-list-page-repaint .w-infinite-list-header::before {
+    background-origin: border-box;
+  }
+
   /*
    * Floating, the stuck header paints the backdrop over itself and up to the top of the screen, under the header bar:
    * no rows show in the gap above it or around the header's corners. It goes under the header bar for that. Docked
