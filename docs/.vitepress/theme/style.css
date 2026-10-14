@@ -219,6 +219,7 @@ body {
   --w-chrome-float: 1;
   --w-chrome-gap: 0.75rem;
   --w-chrome-rounded: 1rem;
+  --w-nav-height: auto;
 }
 
 /* On body, where the gutter is set. Phones: the bars dock and sections span the screen, as in flat. */

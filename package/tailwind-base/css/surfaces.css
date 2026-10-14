@@ -164,13 +164,23 @@
     border-radius: var(--w-chrome-rounded);
   }
 
-  /* On phones the nav is a drawer under the docked header: it runs to the screen's top, as docked, and its content starts under the header. */
+  /*
+   * A theme can set `--w-nav-height: auto` for a floating nav that is as tall as its items, down to the gap off the
+   * screen's bottom edge, past which they scroll. Pinning items to the nav's bottom needs the full height.
+   * On phones the nav is a drawer under the docked header: it runs to the screen's top, as docked, and its content
+   * starts under the header.
+   */
   .w-nav-bar {
+    --w-nav-max-height: calc(100% - var(--w-chrome-top) - var(--w-chrome-gap));
+
     left: calc(var(--left-margin, 0px) + var(--w-chrome-gap));
+    height: var(--w-nav-height, var(--w-nav-max-height));
+    max-height: var(--w-nav-max-height);
 
     @variant sm-not {
       top: 0;
       height: 100%;
+      max-height: none;
     }
   }
 
@@ -191,10 +201,22 @@
     --w-nav-item-rounded: max(var(--radius-lg), var(--w-chrome-rounded) - 0.5rem);
 
     margin-top: calc((1 - var(--w-chrome-float)) * var(--header-height, 0px));
-    padding-block: calc(var(--w-chrome-float) * 0.25rem);
+    padding-top: calc(var(--w-chrome-float) * 0.25rem);
 
     @variant sm-not {
       margin-top: var(--header-height, 0px);
+    }
+  }
+
+  /*
+   * Room under the last item, on the nav's scroller (its content's child) so it scrolls with the items: docked it
+   * clears the screen's edge, floating it matches the gap above the first item. The phone drawer is docked.
+   */
+  :where(.w-nav-bar-content > *) {
+    padding-bottom: calc((1 - var(--w-chrome-float)) * 1rem + var(--w-chrome-float) * 0.25rem);
+
+    @variant sm-not {
+      padding-bottom: 1rem;
     }
   }
 
@@ -227,6 +249,7 @@
     top: auto;
     left: auto;
     height: auto;
+    max-height: none;
     border-radius: var(--w-nav-dropdown-rounded);
   }
 

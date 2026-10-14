@@ -21,7 +21,7 @@
 
   <nav
     class="
-      w-nav-bar fixed left-(--left-margin,0px) top-0 grid h-full overflow-hidden
+      w-nav-bar fixed left-(--left-margin,0px) top-0 flex h-full flex-col overflow-hidden
       transition-[clip-path] duration-200 [clip-path:inset(-2rem)] print:hidden
     "
     :class="[{
@@ -29,7 +29,7 @@
     }, $attrs.class]"
     :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
   >
-    <div class="w-nav-bar-content mt---header-height overflow-hidden">
+    <div class="w-nav-bar-content mt---header-height flex min-h-0 flex-auto flex-col overflow-hidden">
       <slot />
     </div>
   </nav>
