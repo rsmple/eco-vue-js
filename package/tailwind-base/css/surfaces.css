@@ -156,8 +156,14 @@
     border-radius: var(--w-chrome-rounded);
   }
 
+  /* On phones the nav is a drawer under the docked header: it runs to the screen's top, as docked, and its content starts under the header. */
   .w-nav-bar {
     left: calc(var(--left-margin, 0px) + var(--w-chrome-gap));
+
+    @variant sm-not {
+      top: 0;
+      height: 100%;
+    }
   }
 
   .w-actions-bar {
@@ -178,6 +184,10 @@
 
     margin-top: calc((1 - var(--w-chrome-float)) * var(--header-height, 0px));
     padding-block: calc(var(--w-chrome-float) * 0.25rem);
+
+    @variant sm-not {
+      margin-top: var(--header-height, 0px);
+    }
   }
 
   /* On the item, not the nav: the nav's content has a fixed width. Docked, xl and up, items run to the edge. */
