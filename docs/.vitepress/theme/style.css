@@ -271,10 +271,20 @@ body {
   --w-chrome-shadow: var(--w-section-shadow);
 }
 
+/*
+ * The edge is an inset shadow, not a border: the nav's width is its content's, and a border would widen it past
+ * `--nav-bar-width`, narrowing the gap to the page. Phones: the nav is a drawer under the docked header, so only the
+ * edge toward the page is left, as on the header.
+ */
 :root[data-layout="card"] .w-nav-bar,
 :root[data-layout="glass"] .w-nav-bar {
-  border: var(--w-chrome-border) solid var(--w-line-subtle);
-  box-shadow: var(--w-chrome-shadow);
+  box-shadow: var(--w-chrome-shadow), inset 0 0 0 var(--w-chrome-border) var(--w-line-subtle);
+
+  @variant sm-not {
+    &:not(.w-nav-bar-dropdown) {
+      box-shadow: var(--w-chrome-shadow), inset calc(var(--w-chrome-border) * -1) 0 0 0 var(--w-line-subtle);
+    }
+  }
 }
 
 :root[data-layout="glass"] .w-nav-bar {
