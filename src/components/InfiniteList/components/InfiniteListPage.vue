@@ -185,6 +185,7 @@ const reconcileSlots = () => {
     const id = props.valueGetter(item)
     const kept = keepById.get(id)
     if (kept) {
+      keepById.delete(id)
       newSlots.push({key: kept.key, id})
     } else if (isFullReplacement && freeIdx < freed.length) {
       newSlots.push({key: freed[freeIdx++]!.key, id})

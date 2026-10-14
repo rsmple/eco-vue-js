@@ -73,6 +73,8 @@ const props = defineProps<{
   reverse?: boolean
   /** Emits `scroll:selected` once the option shows as selected — set while the menu opens. */
   scrollSelected?: boolean
+  /** Picks the option when this number changes while it has the cursor. */
+  selectCursorTrigger?: number
 }>()
 
 const emit = defineEmits<{
@@ -105,6 +107,8 @@ const toggleCursor = (): void => {
 
   toggle()
 }
+
+watch(() => props.selectCursorTrigger, toggleCursor)
 
 const scrollIntoView = () => {
   if (elementRef.value) scrollInParent(elementRef.value)
