@@ -134,8 +134,8 @@
       :style="flat ? undefined : {minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
     >
       <TransitionGroup
-        enter-active-class="transition-[translate,opacity] duration-250 w-full"
-        leave-active-class="transition-[translate,opacity] duration-250 w-full absolute top-0"
+        enter-active-class="transition-[translate,opacity] duration-250 w-full [overflow-anchor:none]"
+        leave-active-class="transition-[translate,opacity] duration-250 w-full absolute top-0 [overflow-anchor:none]"
         :enter-from-class="lessTransitions || side || hasScrollbar ? 'opacity-0' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]'"
         :leave-to-class="lessTransitions || side || hasScrollbar ? 'opacity-0 absolute' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]'"
         :css="!flat"
