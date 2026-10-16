@@ -11,7 +11,7 @@
       :scroll="isCursorLocked"
       :previous="lastItem"
       :next="firstItem"
-      :first="count === 0"
+      :first="cursorOnCreate || count === 0"
       :is-no-cursor="cursor === undefined"
       :hide-option-icon="hideOptionIcon"
       :disabled="!search || isModelValueSearch"
@@ -26,7 +26,7 @@
     >
       <template #prefix>
         <span class="w-option w-option-padding-y flex items-center self-start pr-2">
-          new:
+          {{ createPrefix ?? 'new:' }}
         </span>
       </template>
 
@@ -62,7 +62,6 @@
     >
       <template #default="{item, skeleton, previous, next, first, last, index}">
         <SelectOption
-          ref="option"
           :index="index"
           :is-selected="!skeleton && modelValue.includes(valueGetter(item))"
           :is-cursor="!skeleton && valueGetter(item) === cursor"
@@ -73,9 +72,10 @@
           :last="last"
           :previous="first && allowCreate ? null : previous ? valueGetter(previous) : undefined"
           :next="last && allowCreate ? null : next ? valueGetter(next) : undefined"
-          :is-no-cursor="cursor === undefined"
+          :is-no-cursor="cursor === undefined && !cursorOnCreate"
           :hide-option-icon="hideOptionIcon"
           :reverse="reverse"
+          :select-cursor-trigger="selectCursorTrigger"
           :scroll-selected="isScrollSelected"
           :class="{
             'pt---w-select-option-padding': !noPadding && first && !allowCreate,
@@ -114,7 +114,7 @@
           }"
         >
           <div class="w-option flex cursor-default select-none items-center">
-            {{ !search && emptyStub ? emptyStub : search ? 'No match' : 'Nothing to show' }}
+            {{ emptyStub ?? (search ? 'No match' : 'Nothing to show') }}
           </div>
         </div>
       </template>
@@ -125,7 +125,7 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
 import type {SelectOptionProps} from '../types'
 
-import {type UnwrapRef, computed, ref, useTemplateRef} from 'vue'
+import {type UnwrapRef, computed, ref} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
@@ -148,6 +148,9 @@ const props = defineProps<{
   selectOnly?: boolean
   unselectOnly?: boolean
   allowCreate?: boolean
+  createPrefix?: string
+  /** Puts the cursor on the create row instead of the first option, so Enter creates. */
+  cursorOnCreate?: boolean
   hideOptionIcon?: boolean
   valueGetter: (data: Data) => Model
   queryOptions?: Partial<Parameters<UseQueryDefault<PaginatedResponse<Data>, QueryParams>>[1]>
@@ -158,6 +161,7 @@ const props = defineProps<{
   scrollSelected?: boolean
   /** Also puts the cursor on that option. */
   cursorSelected?: boolean
+  applyAlways?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -167,7 +171,7 @@ const emit = defineEmits<{
   (e: 'create:option'): void
 }>()
 
-const optionRef = useTemplateRef<ComponentInstance<typeof SelectOption>[]>('option')
+const selectCursorTrigger = ref(0)
 
 const cursor = ref<Model | null | undefined>(undefined)
 const cursorPrevious = ref<Model | null | undefined>(undefined)
@@ -177,7 +181,7 @@ const loadingOption = ref<Model | null | undefined>(undefined)
 const firstItem = ref<Model | undefined>()
 const lastItem = ref<Model | undefined>()
 const count = ref(0)
-const isModelValueSearch = computed(() => !!props.search && props.modelValue.includes(props.search as Model))
+const isModelValueSearch = computed(() => !props.applyAlways && !!props.search && props.modelValue.includes(props.search as Model))
 
 const setLoadingOption = (value: Model | null): void => {
   loadingOption.value = value as UnwrapRef<Model>
@@ -232,7 +236,7 @@ const selectCursor = () => {
     return
   }
 
-  if (cursor.value) optionRef.value?.forEach(item => item.toggleCursor())
+  selectCursorTrigger.value++
 }
 
 const {isScrollSelected, takeSelected} = useScrollSelected(() => props.scrollSelected, () => props.search)
