@@ -5,7 +5,7 @@ description: WDragContainer — lets the user reorder a list by dragging its ite
 
 # Drag container
 
-`WDragContainer` lets the user reorder `list` by dragging its items. It doesn't render the items itself: the default slot renders each one, and binds `container` — the drag attributes and its place in the order — to the item's root. An item becomes draggable when `initDrag` is called, usually on mousedown of a drag handle, so that text in the item can still be selected. The items move as the dragged one passes over them; `update:list` emits the new order once it is dropped.
+`WDragContainer` lets the user reorder `list` by dragging its items. It doesn't render the items itself: the default slot renders each one, and binds `container` — the drag attributes and its place in the order — to the item's root. An item becomes draggable when `initDrag` is called, usually on mousedown of a drag handle, so that text in the item can still be selected. The items move as the dragged one passes over them; `update:list` emits the new order once it is dropped. Items are tracked by their position, so `list` may hold equal values — the same string twice, or the same object.
 
 The `w-drag-item-overlay-*` utility sets the color laid over the item being dragged.
 

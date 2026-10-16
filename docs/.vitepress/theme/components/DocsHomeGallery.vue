@@ -649,10 +649,10 @@
           <template #option="{option}">
             <div
               class="w-option flex items-center gap-2"
-              :class="option.tone"
+              :class="option?.tone"
             >
               <IconPlant class="text-tone square-[1.25em] shrink-0" />
-              <span class="truncate">{{ option.name }} <span class="text-description italic">{{ option.species }}</span></span>
+              <span class="truncate">{{ option?.name }} <span class="text-description italic">{{ option?.species }}</span></span>
             </div>
           </template>
         </WInputOptions>

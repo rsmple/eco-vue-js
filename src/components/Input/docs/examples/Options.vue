@@ -11,7 +11,7 @@
   >
     <template #option="{option}">
       <div class="w-option flex items-center">
-        {{ option.emoji }} {{ option.name }}
+        {{ option?.emoji }} {{ option?.name }}
       </div>
     </template>
   </WInputOptions>

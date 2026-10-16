@@ -5,8 +5,8 @@
       :key="index"
 
       :disabled="disabled || !draggable"
-      :order="value.indexOf(item as typeof value[number])"
-      @drag:start="dragStart(item as Data)"
+      :order="order.indexOf(index)"
+      @drag:start="dragStart(index)"
       @drag:enter="dragEnter"
       @drag:end="drop"
     >
@@ -14,9 +14,9 @@
         <slot
           v-bind="defaultScope"
           :item="item"
-          :index="value.indexOf(item as typeof value[number])"
-          :last="value.indexOf(item as typeof value[number]) === value.length - 1"
-          :ordered-list="(value as Data[])"
+          :index="order.indexOf(index)"
+          :last="order.indexOf(index) === order.length - 1"
+          :ordered-list="orderedList"
           :dragging="dragging"
         />
       </template>
@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts" setup generic="Data">
-import {type HTMLAttributes, ref, watch} from 'vue'
+import {type HTMLAttributes, computed, ref, watch} from 'vue'
 
 import DragItem from './components/DragItem.vue'
 import {useDragContainer} from './use/useDragContainer'
@@ -57,40 +57,44 @@ defineSlots<{
 
 const {draggable, dragging, startDrag, stopDrag} = useDragContainer()
 
-const value = ref(props.list.slice())
+const getInitialOrder = (list: Data[]): number[] => list.map((_, index) => index)
 
-let dragItem: Data | null = null
+const order = ref<number[]>(getInitialOrder(props.list))
 
-const dragStart = (item: Data): void => {
+const orderedList = computed<Data[]>(() => order.value.map(index => props.list[index]))
+
+let dragIndex: number | null = null
+
+const dragStart = (index: number): void => {
   startDrag()
 
-  dragItem = item
+  dragIndex = index
 }
 
-const dragEnter = (order: number): void => {
-  if (dragItem === null) return
+const dragEnter = (position: number): void => {
+  if (dragIndex === null) return
 
-  const index = value.value.indexOf(dragItem as typeof value.value[number])
+  const from = order.value.indexOf(dragIndex)
 
-  if (index === -1) return
+  if (from === -1) return
 
-  value.value.splice(index, 1)
-  value.value.splice(order, 0, dragItem as typeof value.value[number])
+  order.value.splice(from, 1)
+  order.value.splice(position, 0, dragIndex)
 }
 
 const dragEnd = () => {
   stopDrag()
 
-  dragItem = null
+  dragIndex = null
 }
 
 const drop = () => {
-  emit('update:list', value.value as Data[])
+  emit('update:list', orderedList.value)
 
   dragEnd()
 }
 
-watch(() => props.list, newList => {
-  value.value = newList.slice()
+watch([() => props.list, () => props.list.length], ([newList]) => {
+  order.value = getInitialOrder(newList)
 })
 </script>
