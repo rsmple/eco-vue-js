@@ -11,7 +11,11 @@ const isSelectionIdArray = (value: unknown): value is number[] => {
   return isIdArray(value) || (Array.isArray(value) && value.every(item => typeof item === 'string' && item.length > 0))
 }
 
-const keysLengthSelection: ObjectKeys<Selection<number>>['length'] = 3
+const isGroupKeyArray = (value: unknown): value is GroupKey[] => {
+  return Array.isArray(value) && value.every(item => item === null || typeof item === 'string' || Number.isInteger(item))
+}
+
+const keysLengthSelection: ObjectKeys<Selection<number>>['length'] = 5
 
 const isSelection = (value: unknown): value is Selection<number> => {
   return value instanceof Object && Object.keys(value).length <= keysLengthSelection
@@ -19,6 +23,7 @@ const isSelection = (value: unknown): value is Selection<number> => {
       ('range' in value && isSelectedRange(value.range))
       || ('id__in' in value && isSelectionIdArray(value.id__in))
       || ('id__not_in' in value && isSelectionIdArray(value.id__not_in))
+      || ('group__in' in value && isGroupKeyArray(value.group__in))
     )
 }
 
@@ -27,26 +32,45 @@ const parseSelection = (value: Partial<Selection<number>>): Selection<number> =>
     range: isSelectedRange(value.range) ? value.range : undefined,
     id__in: isSelectionIdArray(value.id__in) ? value.id__in : undefined,
     id__not_in: isSelectionIdArray(value.id__not_in) ? value.id__not_in : undefined,
+    group__in: isGroupKeyArray(value.group__in) ? value.group__in : undefined,
+    group__not_in: isGroupKeyArray(value.group__not_in) ? value.group__not_in : undefined,
   }
+}
+
+const toggleValue = <T>(list: T[], value: T): T[] => {
+  return list.includes(value) ? list.filter(item => item !== value) : [...list, value]
 }
 
 export const getPosition = (page: number, index: number, pageLength: number): number => {
   return ((page - 1) * pageLength) + index
 }
 
+/** Key of a list group, `null` for the group of items with an empty value. */
+export type GroupKey = string | number | null
+
+/**
+ * Items picked one by one (`id__in`), a range of positions (`range`), every item but some (`id__not_in`), or whole
+ * groups. `group__in` selects whole groups, with `id__not_in` as the items left out of them. Next to a bare
+ * `id__not_in`, `group__not_in` leaves whole groups out of select-all.
+ */
 export type Selection<Value> = {
   id__in?: Value[]
   id__not_in?: Value[]
   range?: [number, number]
+  group__in?: GroupKey[]
+  group__not_in?: GroupKey[]
 }
 
+/** Group keys go as JSON arrays, since a key may hold commas or be `null`. */
 export type QueryParamsSelection = {
   slice_indexes?: [number, number]
   id__in?: number[]
   id__not_in?: number[]
+  group__in?: string
+  group__not_in?: string
 }
 
-const isEmpty = <Value>(value: Selection<Value>) => !value.id__in?.length && !value.id__not_in && !value.range
+const isEmpty = <Value>(value: Selection<Value>) => !value.id__in?.length && !value.id__not_in && !value.range && !value.group__in?.length
 
 export const useSelection = () => {
   const selection = ref<Selection<number>>({})
@@ -100,6 +124,7 @@ export const useSelected = <Value extends number>(
   selection: Ref<Selection<Value>>,
   updateSelection: (value: Selection<Value>) => void,
   getIsSelectOnly: () => boolean,
+  groupCounts?: Ref<Map<GroupKey, number>>,
 ) => {
   const resetSelection = (): void => {
     hoverValue.value = null
@@ -154,7 +179,12 @@ export const useSelected = <Value extends number>(
     return null
   })
 
-  const getIsSelected = (id: Value, position: number): boolean => {
+  const getIsSelected = (id: Value, position: number, groupKey?: GroupKey): boolean => {
+    if (groupKey !== undefined) {
+      if (selection.value.group__in) return selection.value.group__in.includes(groupKey) && !selection.value.id__not_in?.includes(id)
+      if (selection.value.group__not_in?.includes(groupKey)) return false
+    }
+
     if (hoverAllowed.value === position) return true
 
     if (upValue.value !== null && downValue.value !== null) {
@@ -180,8 +210,16 @@ export const useSelected = <Value extends number>(
     hoverValue.value = position
   }
 
-  const toggleSelected = (id: Value, position: number): void => {
+  const toggleSelected = (id: Value, position: number, groupKey?: GroupKey): void => {
     if (unmounted.value || disabled.value) return
+
+    if (selection.value.group__in) {
+      if (groupKey === undefined || !selection.value.group__in.includes(groupKey)) return
+
+      updateSelection({group__in: selection.value.group__in, id__not_in: toggleValue(selection.value.id__not_in ?? [], id)})
+
+      return
+    }
 
     if (upValue.value !== null && downValue.value !== null) {
       let range: [number, number] | undefined
@@ -224,7 +262,7 @@ export const useSelected = <Value extends number>(
     if (index === -1) newValue.push(id)
     else newValue.splice(index, 1)
 
-    updateSelection({[key]: newValue})
+    updateSelection({[key]: newValue, group__not_in: key === 'id__not_in' ? selection.value.group__not_in : undefined})
 
     if (selection.value.id__in) {
       if (index === -1) preselectValue.value = position
@@ -235,18 +273,47 @@ export const useSelected = <Value extends number>(
     }
   }
 
+  const toggleGroupSelected = (key: GroupKey): void => {
+    if (unmounted.value || disabled.value) return
+
+    const {group__in, group__not_in, id__not_in} = selection.value
+
+    if (group__in) {
+      const groups = toggleValue(group__in, key)
+
+      updateSelection(groups.length ? {group__in: groups, id__not_in} : {})
+    } else if (id__not_in) {
+      updateSelection({id__not_in, group__not_in: toggleValue(group__not_in ?? [], key)})
+    } else {
+      updateSelection({group__in: [key]})
+    }
+  }
+
+  const getIsGroupSelected = (key: GroupKey): boolean => {
+    if (selection.value.group__in) return selection.value.group__in.includes(key)
+    if (selection.value.id__not_in) return !selection.value.group__not_in?.includes(key)
+
+    return false
+  }
+
+  const sumGroupCounts = (keys: GroupKey[] | undefined): number => {
+    return keys?.reduce<number>((sum, key) => sum + (groupCounts?.value.get(key) ?? 0), 0) ?? 0
+  }
+
   const selectionCount = computed(() => {
     if (selection.value.range) return selection.value.range[1] - selection.value.range[0] + 1
+
+    if (selection.value.group__in) return Math.max(sumGroupCounts(selection.value.group__in) - (selection.value.id__not_in?.length ?? 0), 0)
 
     const _count = unref(count)
 
     return selection.value.id__not_in && _count !== undefined
-      ? Math.max(_count - selection.value.id__not_in.length, 0)
+      ? Math.max(_count - selection.value.id__not_in.length - sumGroupCounts(selection.value.group__not_in), 0)
       : selection.value.id__in?.length ?? 0
   })
 
   const selectAllValue = computed<boolean | null>(() => {
-    if (selection.value.range) return null
+    if (selection.value.range || selection.value.group__in || selection.value.group__not_in?.length) return null
 
     const _count = unref(count)
 
@@ -309,6 +376,8 @@ export const useSelected = <Value extends number>(
     if (selection.value.range) result.slice_indexes = selection.value.range.slice() as [number, number]
     if (selection.value.id__not_in) result.id__not_in = selection.value.id__not_in.slice()
     if (selection.value.id__in) result.id__in = selection.value.id__in.slice()
+    if (selection.value.group__in) result.group__in = JSON.stringify(selection.value.group__in)
+    if (selection.value.group__not_in?.length) result.group__not_in = JSON.stringify(selection.value.group__not_in)
 
     return result
   }
@@ -342,6 +411,8 @@ export const useSelected = <Value extends number>(
     getIsSelected,
     hoverSelected,
     toggleSelected,
+    toggleGroupSelected,
+    getIsGroupSelected,
     selectAll,
     resetSelection,
     getQueryParams,

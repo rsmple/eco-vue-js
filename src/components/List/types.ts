@@ -1,4 +1,5 @@
 import type {UniformScope} from '../Uniform/types'
+import type {GroupKey} from '@/utils/useSelected'
 import type {ListMode} from '@/utils/utils'
 import type {Component, Raw, StyleValue} from 'vue'
 
@@ -216,3 +217,28 @@ export type FilterComponent<QueryParams> = ListFieldExport<Component<FilterProps
       : any
   },
 ]
+
+/** A group of a grouped list: its key and how many items of the list it holds. */
+export type ListGroup = {
+  key: GroupKey
+  count: number
+}
+
+/** A way to group a list, offered in the toolbar's Group by menu. */
+export type ListGroupingOption = {
+  /** Sent as the `group_by` query param. */
+  value: string
+  title: string
+}
+
+/**
+ * Splits a list into collapsible groups while its `group_by` query param names one of `options`. The groups query
+ * returns the groups of the list's `queryParams`; the items of a group load with the params narrowed by `group__in`,
+ * a JSON array of its key.
+ */
+export type ListGrouping<Group extends ListGroup, QueryParams> = {
+  useQueryFn: UseQueryDefault<PaginatedResponse<Group>, QueryParams>
+  options: ListGroupingOption[]
+  /** Groups expanded when the list opens. */
+  expanded?: boolean
+}

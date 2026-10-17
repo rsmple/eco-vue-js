@@ -119,7 +119,7 @@
         :class="isFilterShown && action?.length ? 'border-l border-solid border-line' : undefined"
       >
         <WButtonSelectionAction
-          v-if="allowSelect"
+          v-if="allowSelect && !noRange"
           :icon="markRaw(IconRange)"
           :active="isShift"
           :aria-pressed="isShift"
@@ -148,6 +148,14 @@
           tooltip-text="Refetch"
           class="last-not:border-r border-solid border-line"
           @click="refetchAll"
+        />
+
+        <HeaderGrouping
+          v-if="groupingOptions?.length"
+          :options="groupingOptions"
+          :group-by="groupBy"
+          class="last-not:border-r border-solid border-line"
+          @update:group-by="$emit('update:group-by', $event)"
         />
 
         <HeaderSort
@@ -224,7 +232,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
-import type {ActionComponent, BulkComponent, FieldConfig, ListFields, MenuComponent} from '../types'
+import type {ActionComponent, BulkComponent, FieldConfig, ListFields, ListGroupingOption, MenuComponent} from '../types'
 import type {OrderItem} from '@/utils/order'
 import type {ListMode} from '@/utils/utils'
 
@@ -241,6 +249,7 @@ import {BASE_ZINDEX_DROPDOWN} from '@/utils/utils'
 
 import HeaderExport from './HeaderExport.vue'
 import HeaderFieldNested from './HeaderFieldNested.vue'
+import HeaderGrouping from './HeaderGrouping.vue'
 import HeaderSettings from './HeaderSettings.vue'
 import HeaderSort from './HeaderSort.vue'
 import ListToolbarFilter from './ListToolbarFilter.vue'
@@ -262,6 +271,8 @@ const props = defineProps<{
   isShift: boolean
   allowSelect: boolean
   selectOnly: boolean | undefined
+  /** Hides the range select button, for a list whose positions are not one sequence, such as a grouped one. */
+  noRange?: boolean
   readonly: boolean
 
   queryParams: QueryParams
@@ -282,6 +293,8 @@ const props = defineProps<{
   fieldConfigMap: Record<string, FieldConfig>
   stylesWidth: Record<string, string>
   ordering: OrderItem<keyof Data>[]
+  groupingOptions: ListGroupingOption[] | undefined
+  groupBy: string | undefined
   mode: ListMode
 
   card: boolean
@@ -303,6 +316,7 @@ const emit = defineEmits<{
   (e: 'toggle:selection', value: boolean): void
   (e: 'set:is-selecting'): void
   (e: 'update:ordering', value: OrderItem<keyof Data>[]): void
+  (e: 'update:group-by', value: string | undefined): void
   (e: 'update:mode', value: ListMode): void
   (e: 'update:field-config-map', value: Record<string, FieldConfig>): void
   (e: 'update:width', label: string, value: number): void

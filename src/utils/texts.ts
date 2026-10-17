@@ -28,6 +28,10 @@ export type Texts = {
   dateTo: string
   /** A date picker value that is not picked. */
   noDate: string
+  /** Title of a list group whose items have an empty value. */
+  listGroupEmpty: string
+  /** Button that loads more items of an expanded list group. */
+  listGroupMore: string
 }
 
 type TextSource = string | (() => string)
@@ -47,6 +51,8 @@ const texts = shallowReactive<Record<keyof Texts, TextSource>>({
   dateFrom: 'From:',
   dateTo: 'To:',
   noDate: 'None',
+  listGroupEmpty: 'Empty',
+  listGroupMore: 'Show more',
 })
 
 /**
