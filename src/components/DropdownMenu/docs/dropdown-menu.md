@@ -10,7 +10,7 @@ For a menu of actions, use a ready-made button. For anything else anchored to an
 
 ## Action menus
 
-- `WButtonMore` is the "⋯" button: its default slot is the menu, and any click closes it. Only one menu is open at a time, and on phones it opens as a bottom sheet. The menu is rendered by `WModal` at the app root, with the slot keeping its context, and a confirm opened from an item with `useOverlay` takes its place — see [Anchored confirm](/components/modal#anchored-confirm).
+- `WButtonMore` is the "⋯" button: its default slot is the menu, and any click closes it. Only one menu is open at a time, and on phones it opens as a bottom sheet. The menu is rendered by `WModal` at the app root, with the slot keeping its context, and a confirm opened from an item with `useOverlay` takes its place — see [Anchored confirm](/components/modal#anchored-confirm). The `toggle` slot swaps the "⋯" for another button, such as a `WButtonInput`: it gets `toggle` for the click, `attrs` for the button and `active` for its highlight.
 - `WButtonDropdown` is a button with an arrow next to it: the `button` slot holds the main action and the `content` slot the others. The `content` slot gets `close`.
 
 Menu items are `WButtonMoreItem`s: a `text` (or the default slot), an `icon`, and `to` or `href` to make the item a link. A disabled item can explain itself with `tooltipText`. `semanticType` colors an item, like the red Delete below.
@@ -71,6 +71,28 @@ Menu items are `WButtonMoreItem`s: a `text` (or the default slot), an `icon`, an
         />
       </template>
     </WButtonDropdown>
+
+    <WButtonMore>
+      <template #toggle="{toggle, active, attrs}">
+        <WButtonInput
+          :icon="markRaw(IconSort)"
+          tooltip-text="Sort beds"
+          :active="active"
+          v-bind="attrs"
+          @click="toggle"
+        />
+      </template>
+
+      <WButtonMoreItem
+        text="Sort by name"
+        @click="action = 'Sort by name'"
+      />
+
+      <WButtonMoreItem
+        text="Sort by planting date"
+        @click="action = 'Sort by planting date'"
+      />
+    </WButtonMore>
   </div>
 
   <p class="text-description mt-4 text-sm">
@@ -85,12 +107,14 @@ import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WButtonDropdown from 'eco-vue-js/dist/components/Button/WButtonDropdown.vue'
+import WButtonInput from 'eco-vue-js/dist/components/Button/WButtonInput.vue'
 import WButtonMore from 'eco-vue-js/dist/components/Button/WButtonMore.vue'
 import WButtonMoreItem from 'eco-vue-js/dist/components/Button/WButtonMoreItem.vue'
 
 import IconArchiveBook from 'eco-vue-js/dist/assets/icons/IconArchiveBook'
 import IconCopy from 'eco-vue-js/dist/assets/icons/IconCopy'
 import IconEdit from 'eco-vue-js/dist/assets/icons/IconEdit'
+import IconSort from 'eco-vue-js/dist/assets/icons/IconSort'
 import IconTrash from 'eco-vue-js/dist/assets/icons/IconTrash'
 
 const action = ref<string>()
@@ -278,6 +302,7 @@ import WButtonMore from 'eco-vue-js/dist/components/Button/WButtonMore.vue'
 | Slot | Props | Description |
 | --- | --- | --- |
 | `default` | — | Menu items, usually WButtonMoreItem. A click inside closes the menu. Only one menu is open at a time, and on phones it is a bottom sheet. A confirm opened from an item with `useOverlay` takes the menu's place at the same anchor. |
+| `toggle` | `{ toggle: () => void; active: boolean; attrs: { 'aria-expanded': boolean; }; }` | Replaces the three-dots button, such as with WButtonInput: call `toggle` on click, bind `attrs` to the button and `active` to its highlight — `active` stays off while the menu is open at a custom anchor. |
 
 <!-- @api-end -->
 

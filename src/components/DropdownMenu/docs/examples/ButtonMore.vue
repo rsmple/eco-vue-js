@@ -49,6 +49,28 @@
         />
       </template>
     </WButtonDropdown>
+
+    <WButtonMore>
+      <template #toggle="{toggle, active, attrs}">
+        <WButtonInput
+          :icon="markRaw(IconSort)"
+          tooltip-text="Sort beds"
+          :active="active"
+          v-bind="attrs"
+          @click="toggle"
+        />
+      </template>
+
+      <WButtonMoreItem
+        text="Sort by name"
+        @click="action = 'Sort by name'"
+      />
+
+      <WButtonMoreItem
+        text="Sort by planting date"
+        @click="action = 'Sort by planting date'"
+      />
+    </WButtonMore>
   </div>
 
   <p class="text-description mt-4 text-sm">
@@ -63,12 +85,14 @@ import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WButtonDropdown from 'eco-vue-js/dist/components/Button/WButtonDropdown.vue'
+import WButtonInput from 'eco-vue-js/dist/components/Button/WButtonInput.vue'
 import WButtonMore from 'eco-vue-js/dist/components/Button/WButtonMore.vue'
 import WButtonMoreItem from 'eco-vue-js/dist/components/Button/WButtonMoreItem.vue'
 
 import IconArchiveBook from 'eco-vue-js/dist/assets/icons/IconArchiveBook'
 import IconCopy from 'eco-vue-js/dist/assets/icons/IconCopy'
 import IconEdit from 'eco-vue-js/dist/assets/icons/IconEdit'
+import IconSort from 'eco-vue-js/dist/assets/icons/IconSort'
 import IconTrash from 'eco-vue-js/dist/assets/icons/IconTrash'
 
 const action = ref<string>()

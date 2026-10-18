@@ -16,6 +16,7 @@
       'cursor-not-allowed opacity-50': disabled,
       'w-ripple w-ripple-hover cursor-pointer': !disabled,
       'cursor-progress': loading,
+      'tone-primary text-tone border-tone-line': active,
     }"
     :disabled="disabled"
     :aria-label="tooltipText"
@@ -62,6 +63,8 @@ defineProps<{
   skeleton?: boolean
   /** Grays the button out and ignores clicks. */
   disabled?: boolean
+  /** Highlights the button, such as while the menu it opens is shown. */
+  active?: boolean
 }>()
 
 defineEmits<{

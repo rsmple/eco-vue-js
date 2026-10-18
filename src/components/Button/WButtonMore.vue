@@ -1,5 +1,20 @@
 <template>
+  <div
+    v-if="$slots.toggle"
+    v-bind="$attrs"
+    ref="button"
+    class="inline-flex"
+  >
+    <slot
+      name="toggle"
+      :toggle="toggle"
+      :active="isOpen && !isCustomAnchor"
+      :attrs="{'aria-expanded': isOpen}"
+    />
+  </div>
+
   <button
+    v-else
     v-bind="$attrs"
     ref="button"
     :disabled="disabled"
@@ -57,6 +72,11 @@ defineSlots<{
    * A confirm opened from an item with `useOverlay` takes the menu's place at the same anchor.
    */
   default?: () => void
+  /**
+   * Replaces the three-dots button, such as with WButtonInput: call `toggle` on click, bind `attrs` to the button
+   * and `active` to its highlight — `active` stays off while the menu is open at a custom anchor.
+   */
+  toggle?: (props: {toggle: () => void, active: boolean, attrs: {'aria-expanded': boolean}}) => void
 }>()
 
 const slots = useSlots()
