@@ -1,5 +1,5 @@
 /*
- * Surface containment (spike — plans/surface-containment.md): the page background, the two container kinds and the app
+ * Surface containment (plans/surface-containment.md): the page background, the two container kinds and the app
  * chrome, shaped by tokens a theme sets. The defaults are the flat layout, which looks as before.
  *
  * Each container paints its base color at `--w-*-opacity` — 0 shows nothing (flat section), 1 is a card, between is
@@ -18,6 +18,8 @@
 
 @theme inline {
   --color-canvas: var(--w-canvas);
+  /* The bars' paint: the surface, translucent in a glass theme. */
+  --color-chrome: color-mix(in oklab, var(--w-chrome-base) calc(var(--w-chrome-opacity) * 100%), transparent);
 }
 
 @layer base {
@@ -27,6 +29,7 @@
     --w-canvas: light-dark(var(--role-canvas), var(--role-canvas-dark));
     --w-section-base: light-dark(var(--role-surface), var(--role-surface-dark));
     --w-card-base: light-dark(var(--role-card), var(--role-card-dark));
+    --w-chrome-base: light-dark(var(--role-surface), var(--role-surface-dark));
   }
 
   :root {
@@ -49,7 +52,10 @@
     --w-chrome-gap: 0px;
     --w-chrome-rounded: 0px;
     --w-chrome-border: 0px;
-    --w-chrome-shadow: none;
+    /* Shadows the bars combine with their edge and ring: a theme sets a shadow list, `0 0 #0000` for none, never `none`. */
+    --w-chrome-shadow: 0 0 #0000;
+    --w-chrome-opacity: 1;
+    /* What blurs behind the bars, such as a glass theme's blur. Unset, the header keeps its own and the others none. */
     /* What fills the gap around a floating bar, so content scrolling under the header doesn't show above it. */
     --w-chrome-ring: transparent;
 
@@ -182,8 +188,9 @@
     right: calc(var(--right-margin, 0px) * var(--w-chrome-float) + var(--w-chrome-gap));
     border: var(--w-chrome-border) solid var(--w-line-subtle);
     border-radius: var(--w-chrome-rounded);
+    backdrop-filter: var(--w-chrome-backdrop, blur(8px));
     box-shadow:
-      var(--w-chrome-shadow, 0 0 #0000),
+      var(--w-chrome-shadow),
       0 calc(var(--w-chrome-gap) * -1) 0 var(--w-chrome-gap) var(--w-chrome-ring);
 
     /* On phones it spans the screen, like a section: only the edge toward the page is left. */
@@ -193,13 +200,41 @@
     }
   }
 
+  /*
+   * The nav and the actions bar paint themselves. A bar over the page or against it, the nav below `xl` (a drawer) and
+   * the actions bar, casts `--w-chrome-bar-shadow`; the nav beside the page casts the chrome's, none when docked. The
+   * edge is an inset shadow, not a border: the nav's width is its content's, and a border would widen it past
+   * `--nav-bar-width`. On phones only the edge toward the page is left, as on the header.
+   */
   .w-nav-bar,
   .w-actions-bar {
     --w-chrome-top: calc(var(--w-chrome-float) * (var(--header-height, 0px) + var(--w-chrome-gap) * 2));
+    --w-chrome-edge: inset 0 0 0 var(--w-chrome-border) var(--w-line-subtle);
 
     top: var(--w-chrome-top);
     height: calc(100% - var(--w-chrome-top) - var(--w-chrome-gap));
     border-radius: var(--w-chrome-rounded);
+    background-color: var(--color-chrome);
+    backdrop-filter: var(--w-chrome-backdrop, none);
+    box-shadow: var(--w-chrome-bar-shadow, --theme(--shadow-md inline)), var(--w-chrome-edge);
+  }
+
+  .w-nav-bar {
+    @variant sm-not {
+      &:not(.w-nav-bar-dropdown) {
+        --w-chrome-edge: inset calc(var(--w-chrome-border) * -1) 0 0 0 var(--w-line-subtle);
+      }
+    }
+
+    @variant xl {
+      box-shadow: var(--w-chrome-shadow), var(--w-chrome-edge);
+    }
+  }
+
+  .w-actions-bar {
+    @variant sm-not {
+      --w-chrome-edge: inset var(--w-chrome-border) 0 0 0 var(--w-line-subtle);
+    }
   }
 
   /*
