@@ -8,6 +8,8 @@
       'list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem)': minHeightOnly,
     }"
   >
+    <slot name="before" />
+
     <div :style="{height: topSpacerHeight + 'px'}" />
     <div ref="topSentinel" />
 
@@ -621,6 +623,7 @@ defineSlots<{
     results: Data[] | undefined
     intersecting: boolean
   }) => void
+  before?: () => void
   empty?: () => void
 }>()
 </script>

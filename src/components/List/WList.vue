@@ -22,15 +22,6 @@
       ref="pageContent"
       :class="isPage ? 'w-list-page-content' : 'contents'"
     >
-      <div
-        v-if="isPage"
-        class="w-list-page-strip"
-      >
-        <div class="w-list-page-strip-track">
-          <div class="w-list-page-strip-sides" />
-        </div>
-      </div>
-
       <WInfiniteList
         :use-query-fn="useQueryFn"
         :query-params="queryParams"
@@ -190,6 +181,29 @@
             @hover:selected="hoverSelected"
             @click:action="emitClickAction"
           />
+        </template>
+
+        <template
+          v-if="isPage && !isGrid"
+          #pages-before
+        >
+          <div class="w-list-page-strip">
+            <div class="w-list-page-strip-track">
+              <div class="w-list-page-strip-sides" />
+
+              <div
+                v-if="stripColumns.some(column => column.sticky)"
+                class="w-list-page-strip-columns"
+              >
+                <div
+                  v-for="column in stripColumns"
+                  :key="column.label"
+                  :class="{'w-list-page-strip-column': column.sticky}"
+                  :style="column.style"
+                />
+              </div>
+            </div>
+          </div>
         </template>
 
         <template
@@ -472,6 +486,19 @@ const columnDataMap = computed<Record<string, ColumnData>>(() => {
   })
 
   return map
+})
+
+// The rows' columns in order, for the strip that covers the sticky ones under them: see surfaces.css.
+const stripColumns = computed(() => {
+  const columns: (ColumnData & {label: string})[] = []
+
+  forEachField(fieldsSorted.value, field => {
+    const column = columnDataMap.value[field.meta.label]
+
+    if (column) columns.push({...column, label: field.meta.label})
+  })
+
+  return columns
 })
 
 const allowSelect = computed(() => !props.disableSelect && (props.alwaysSelect || props.bulk !== undefined || !props.disableExport))

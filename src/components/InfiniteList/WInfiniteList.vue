@@ -60,6 +60,13 @@
         </template>
 
         <template
+          v-if="$slots['pages-before']"
+          #before
+        >
+          <slot name="pages-before" />
+        </template>
+
+        <template
           v-if="$slots.empty"
           #empty
         >
@@ -175,5 +182,7 @@ defineSlots<{
   header?: (props: InfiniteListHeaderScope & Partial<InfiniteListScope>) => void
   /** Shown when the query returns no items. Replaces `emptyStub`. */
   empty?: () => void
+  /** Rendered in the box that holds the loaded pages, before them, such as a layer that spans them. */
+  'pages-before'?: () => void
 }>()
 </script>
