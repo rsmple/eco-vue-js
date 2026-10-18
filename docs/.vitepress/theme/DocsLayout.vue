@@ -6,7 +6,7 @@
   >
     <DocsNav v-if="!isHome || isTablet" />
 
-    <WHeaderBar class="pl-[calc(var(--w-left-inner)-var(--inner-margin))] pr-[calc(var(--w-right-inner)-var(--inner-margin))]">
+    <WHeaderBar>
       <template #title>
         <a
           :href="withBase('/')"

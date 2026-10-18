@@ -164,8 +164,11 @@
  * not below: there the page shows, such as a stuck list's section above its toolbar.
  */
 @layer utilities {
+  /* Its content lines up with the page's: the header's own row adds `--inner-margin`, as the page does. */
   .w-header-bar {
     top: var(--w-chrome-gap);
+    padding-left: calc(var(--w-left-inner) - var(--inner-margin, 0px));
+    padding-right: calc(var(--w-right-inner) - var(--inner-margin, 0px));
   }
 
   /*
