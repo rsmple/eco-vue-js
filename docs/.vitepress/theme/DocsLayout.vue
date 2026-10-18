@@ -184,14 +184,6 @@ const onKeydown = (event: KeyboardEvent) => {
 onMounted(() => {
   window.addEventListener('keydown', onKeydown)
   installDocsTheme()
-
-  // Spike (plans/surface-containment.md): the layout style picked on /spike/surfaces.
-  try {
-    const layout = localStorage.getItem('docs-layout')
-    if (layout && layout !== 'flat') document.documentElement.dataset.layout = layout
-  } catch {
-    // Storage blocked: flat.
-  }
 })
 onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 </script>

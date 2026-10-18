@@ -11,21 +11,12 @@
 
           <button
             v-for="item in LAYOUTS"
-            :key="item"
-            class="rounded-lg border border-solid px-3 py-1 text-sm capitalize"
-            :class="layout === item ? 'tone-primary border-tone-line text-tone bg-tone-soft' : 'border-line-subtle text-description'"
-            @click="setLayout(item)"
-          >
-            {{ item }}
-          </button>
-
-          <button
-            v-if="layout === 'glass'"
+            :key="item.id"
             class="rounded-lg border border-solid px-3 py-1 text-sm"
-            :class="noise ? 'tone-primary border-tone-line text-tone bg-tone-soft' : 'border-line-subtle text-description'"
-            @click="setNoise(!noise)"
+            :class="layout === item.id ? 'tone-primary border-tone-line text-tone bg-tone-soft' : 'border-line-subtle text-description'"
+            @click="setToken('layout', item.id)"
           >
-            Noise
+            {{ item.name }}
           </button>
         </div>
 
@@ -151,7 +142,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, onUnmounted, ref} from 'vue'
+import {computed, onMounted, onUnmounted, ref} from 'vue'
 
 import {SemanticType} from 'eco-vue-js/dist/utils/SemanticType'
 
@@ -161,13 +152,8 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 import WTabsItem from 'eco-vue-js/dist/components/Tabs/WTabsItem.vue'
 
+import {LAYOUTS, setToken, themeTokens} from '../../.vitepress/theme/docsTheme'
 import PlantList from '../recipes/plant-list/PlantList.vue'
-
-const LAYOUTS = ['flat', 'card', 'glass'] as const
-
-type Layout = typeof LAYOUTS[number]
-
-const STORAGE_KEY = 'docs-layout'
 
 const STATS = [
   {title: 'Plants', value: '128', change: '+4 this week', tone: 'tone-positive'},
@@ -184,51 +170,15 @@ const SCHEDULE = [
   {day: 'Sunday', beds: 'Hanging baskets', plants: 10},
 ]
 
-const layout = ref<Layout>('flat')
+// The theme's layout token, as the playground sets it.
+const layout = computed(() => themeTokens.value.layout ?? 'flat')
 const tab = ref('profile')
 const name = ref<string | undefined>()
 const notes = ref<string | undefined>()
 
-const NOISE_KEY = 'docs-canvas'
-
-const noise = ref(false)
-
-const setNoise = (value: boolean) => {
-  noise.value = value
-
-  if (value) document.documentElement.dataset.canvas = 'noise'
-  else delete document.documentElement.dataset.canvas
-
-  try {
-    localStorage.setItem(NOISE_KEY, value ? 'noise' : '')
-  } catch {
-    // Storage blocked: the choice lasts until reload.
-  }
-}
-
-const setLayout = (value: Layout) => {
-  layout.value = value
-
-  if (value === 'flat') delete document.documentElement.dataset.layout
-  else document.documentElement.dataset.layout = value
-
-  try {
-    localStorage.setItem(STORAGE_KEY, value)
-  } catch {
-    // Storage blocked: the choice lasts until reload.
-  }
-}
-
 onMounted(() => {
   // The page scrolls sideways under a wide list, as an app page does: the docs shell clips that elsewhere.
   document.documentElement.classList.add('docs-scroll-x')
-  layout.value = (document.documentElement.dataset.layout as Layout | undefined) ?? 'flat'
-
-  try {
-    setNoise(localStorage.getItem(NOISE_KEY) === 'noise')
-  } catch {
-    // Storage blocked: no grain.
-  }
 })
 
 onUnmounted(() => {
