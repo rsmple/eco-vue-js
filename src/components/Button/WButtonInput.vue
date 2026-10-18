@@ -10,7 +10,7 @@
     v-bind="to ? {to} : undefined"
     class="
       square---w-input-height bg-surface relative flex select-none items-center
-      justify-center rounded-(--w-input-rounded,0.75rem) border border-solid border-line-subtle
+      justify-center rounded-(--w-input-rounded,0.75rem) border border-solid border-line-subtle w-ripple-border
     "
     :class="{
       'cursor-not-allowed opacity-50': disabled,

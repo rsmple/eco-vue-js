@@ -6,10 +6,7 @@ const pluginRipple = plugin(function ({matchUtilities, addUtilities, addBase}) {
       '&::before': {
         content: '""',
         position: 'absolute',
-        top: '0',
-        left: '0',
-        height: '100%',
-        width: '100%',
+        inset: 'calc(var(--w-ripple-border, 0px) * -1)',
         'border-radius': 'var(--w-ripple-rounded,inherit)',
         'background-color': 'currentColor',
         'pointer-events': 'none',
