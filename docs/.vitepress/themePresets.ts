@@ -45,7 +45,7 @@ const FLOATING: PresetTokens = {
 export const LAYOUT_TOKENS: Record<LayoutId, PresetTokens> = {
   flat: {},
   card: {
-    'role-canvas': 'oklch(from var(--role-surface) calc(l - 0.035) c h)',
+    'role-canvas': 'oklch(from var(--role-surface) calc(l - 0.015) c h)',
     'role-canvas-dark': 'oklch(from var(--role-surface-dark) calc(l - 0.035) c h)',
     'role-card': 'var(--role-surface)',
     'role-card-dark': 'var(--role-surface-dark)',
@@ -58,22 +58,24 @@ export const LAYOUT_TOKENS: Record<LayoutId, PresetTokens> = {
     'w-chrome-ring': 'var(--w-canvas)',
   },
   glass: {
-    'role-canvas': 'oklch(from var(--color-primary) 0.93 0.04 h)',
+    'role-canvas': 'oklch(from var(--color-primary) 0.96 0.04 h)',
     'role-canvas-dark': 'oklch(from var(--color-primary) 0.2 0.04 h)',
     'role-card': 'var(--role-surface)',
     'role-card-dark': 'var(--role-surface-dark)',
+    // A tinted surface takes the light gray of subtle lines down: a quarter of the way to `line`.
+    'role-line-subtle': 'color-mix(in oklab, var(--color-gray-200), var(--color-gray-300) 25%)',
     ...FLOATING,
     'w-canvas-image': [
-      'radial-gradient(circle at 10% 10%, color-mix(in oklab, var(--color-primary) 45%, transparent), transparent 45%)',
-      'radial-gradient(circle at 90% 30%, color-mix(in oklab, var(--color-data-fuchsia) 35%, transparent), transparent 45%)',
-      'radial-gradient(circle at 40% 90%, color-mix(in oklab, var(--color-data-teal) 35%, transparent), transparent 50%)',
+      'radial-gradient(circle at 10% 10%, color-mix(in oklab, var(--color-primary) 18%, transparent), transparent 45%)',
+      'radial-gradient(circle at 90% 30%, color-mix(in oklab, var(--color-data-fuchsia) 14%, transparent), transparent 45%)',
+      'radial-gradient(circle at 40% 90%, color-mix(in oklab, var(--color-data-teal) 14%, transparent), transparent 50%)',
     ].join(', '),
-    'w-section-opacity': '0.55',
+    'w-section-opacity': '0.85',
     'w-section-border': '1px',
     'w-section-shadow': '0 8px 32px -8px var(--w-shadow)',
     // No saturate(): what repaints the canvas inside a page list (sticky columns, masks) can't reproduce it.
     'w-section-backdrop': 'blur(24px)',
-    'w-card-opacity': '0.55',
+    'w-card-opacity': '0.85',
     'w-card-border': '1px',
     'w-card-shadow': 'var(--w-section-shadow)',
     'w-card-backdrop': 'var(--w-section-backdrop)',
@@ -86,15 +88,17 @@ export const LAYOUT_TOKENS: Record<LayoutId, PresetTokens> = {
 }
 
 /**
- * Where the glass canvas is darkest or most colored: the plain canvas and the centers of its gradient's spots, each as
- * a color over the canvas. Text on glass is checked over each.
+ * What the page background is under a layout, as colors over `canvas`: for glass the plain canvas and the centers of
+ * its gradient's spots, where it is darkest or most colored. Text on the canvas and on glass is checked over each.
  */
-export const GLASS_CANVAS_SAMPLES = [
-  'var(--w-canvas)',
-  'color-mix(in srgb, var(--color-primary) 45%, var(--w-canvas))',
-  'color-mix(in srgb, var(--color-data-fuchsia) 35%, var(--w-canvas))',
-  'color-mix(in srgb, var(--color-data-teal) 35%, var(--w-canvas))',
-]
+export const getCanvasSamples = (layout: string | undefined, canvas: string) => layout === 'glass'
+  ? [
+    canvas,
+    `color-mix(in srgb, var(--color-primary) 18%, ${ canvas })`,
+    `color-mix(in srgb, var(--color-data-fuchsia) 14%, ${ canvas })`,
+    `color-mix(in srgb, var(--color-data-teal) 14%, ${ canvas })`,
+  ]
+  : [canvas]
 
 /**
  * Keys are CSS variable names without `--`: `color-*` and `role-*` go in the app's `@theme`, `w-*` on `body`.
