@@ -108,6 +108,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'update:count', value: number): void
   (e: 'update:pages-count', value: number): void
+  (e: 'update:page-size', value: number): void
   (e: 'update:next-page', value: number | null): void
   (e: 'update:previous-page', value: number | null): void
   (e: 'remove:page', value: number): void
@@ -267,6 +268,8 @@ watch(data, value => {
   if (props.firstPage && value?.previous !== undefined) emit('update:previous-page', value.previous)
   if (props.lastPage && value?.next !== undefined) emit('update:next-page', value.next)
   if (value?.pages_count !== undefined) emit('update:pages-count', value.pages_count)
+  // A page with one after it is full, whatever page size the API settled on.
+  if (value?.next && value.results.length !== 0) emit('update:page-size', value.results.length)
   if (value?.count !== undefined) emit('update:count', value.count)
 }, {immediate: true})
 
