@@ -28,7 +28,7 @@
       relative isolate flex min-h---button-height
       items-center justify-center rounded-(--w-button-rounded,1rem)
       [border-width:var(--w-button-border,1px)] px-(--w-button-padding) font-medium
-      whitespace-nowrap select-none w-ripple-rounded-[calc(var(--w-button-rounded,1rem)-var(--w-button-border,1px))]
+      whitespace-nowrap select-none w-ripple-border-(--w-button-border,1px)
     "
     :class="{
       [semanticTypeButtonBackgroundMap[semanticType] ?? semanticTypeBackgroundMap[semanticType]]: !outline,

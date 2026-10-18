@@ -231,6 +231,15 @@
   --w-ripple-rounded: --value(--radius-*, --w-radius-*, [*]);
 }
 
+@utility w-ripple-border {
+  --w-ripple-border: 1px;
+}
+
+@utility w-ripple-border-* {
+  --w-ripple-border: calc(--value(integer) * 1px);
+  --w-ripple-border: --value([length], [*]);
+}
+
 @utility w-list-rounded-* {
   --w-list-rounded: --value(--radius-*, --w-radius-*, [*]);
 }
