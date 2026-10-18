@@ -41,6 +41,30 @@
           </div>
         </div>
 
+        <div
+          v-else-if="token.kind === 'layout'"
+          class="grid content-start gap-2 sm:col-span-2"
+        >
+          <div class="text-sm font-semibold">
+            {{ token.label }}
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <WButton
+              v-for="layout in LAYOUTS"
+              :key="layout.id"
+              :semantic-type="(themeTokens.layout ?? DEFAULT_TOKENS.layout) === layout.id ? SemanticType.PRIMARY : SemanticType.SECONDARY"
+              @click="scopeField.updateModelValue(layout.id)"
+            >
+              {{ layout.name }}
+            </WButton>
+          </div>
+
+          <div class="text-description text-xs">
+            {{ LAYOUTS.find(layout => layout.id === (themeTokens.layout ?? DEFAULT_TOKENS.layout))?.look }}. {{ token.description }}.
+          </div>
+        </div>
+
         <WInput
           v-else
           v-bind="scopeField"
@@ -105,7 +129,7 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WSlider from 'eco-vue-js/dist/components/Slider/WSlider.vue'
 import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
-import {DEFAULT_TOKENS, NEUTRAL_SCALES, type TOKENS, type ThemeFormModel, type TokenKey, getTokenError, themeTokens} from '../docsTheme'
+import {DEFAULT_TOKENS, LAYOUTS, NEUTRAL_SCALES, type TOKENS, type ThemeFormModel, type TokenKey, getTokenError, themeTokens} from '../docsTheme'
 
 const props = defineProps<{
   tokens: typeof TOKENS

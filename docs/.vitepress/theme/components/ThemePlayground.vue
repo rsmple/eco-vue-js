@@ -339,7 +339,6 @@ import ThemeSwatch from './ThemeSwatch.vue'
 
 import {
   ADVANCED_GROUPS,
-  DEFAULT_TOKENS,
   FULL_HUE_RANGE,
   type HueRange,
   PRESETS,
@@ -348,12 +347,12 @@ import {
   TOKENS,
   type ThemeConfig,
   type ThemeFormModel,
-  type ThemeTokens,
   activeTheme,
   activeThemeId,
   deleteTheme,
   duplicateTheme,
   findPreset,
+  getBaseTokens,
   getHueGradient,
   getHueSwatch,
   getThemeCss,
@@ -417,8 +416,8 @@ watch(themeConfig, config => {
   nextTick(() => form.value?.validate(true))
 })
 
-// What an empty field falls back to: the preset's value, or the site's.
-const baseTokens = computed(() => ({...DEFAULT_TOKENS, ...findPreset(activePreset.value)?.tokens as ThemeTokens}))
+// What an empty field falls back to: the preset's value, the layout's, or the site's.
+const baseTokens = computed(() => getBaseTokens(themeConfig.value))
 
 const css = computed(() => getThemeCss(themeTokens.value))
 

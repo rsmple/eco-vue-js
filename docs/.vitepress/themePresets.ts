@@ -18,9 +18,88 @@ export const NEUTRAL_STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 9
 
 export const isNeutralScale = (value: unknown): value is NeutralScale => typeof value === 'string' && Object.hasOwn(NEUTRAL_SCALES, value)
 
+/** How content is contained (plans/surface-containment.md): the `layout` token picks one, and it sets the tokens below. */
+export const LAYOUTS = [
+  {id: 'flat', name: 'Flat', look: 'Content on the page background, the bars docked to the screen edges'},
+  {id: 'card', name: 'Card', look: 'Sections and cards on a darker page, the bars floating as cards'},
+  {id: 'glass', name: 'Glass', look: 'Translucent sections, cards and bars over a gradient from the theme\'s colors'},
+] as const
+
+export type LayoutId = typeof LAYOUTS[number]['id']
+
+export const isLayoutId = (value: unknown): value is LayoutId => LAYOUTS.some(layout => layout.id === value)
+
+/** Card and glass: the bars float off the screen edges, and sections reach into the page gutter and pad by it. */
+const FLOATING: PresetTokens = {
+  'w-section-rounded': '1.5rem',
+  'w-section-padding': 'var(--inner-margin)',
+  'w-page-bleed': 'var(--inner-margin)',
+  'w-card-rounded': '1rem',
+  'w-chrome-float': '1',
+  'w-chrome-gap': '0.75rem',
+  'w-chrome-rounded': '1rem',
+  'w-nav-height': 'auto',
+}
+
+/** The tokens each layout sets; the theme's own override them. Flat is the kit's defaults. */
+export const LAYOUT_TOKENS: Record<LayoutId, PresetTokens> = {
+  flat: {},
+  card: {
+    'role-canvas': 'oklch(from var(--role-surface) calc(l - 0.035) c h)',
+    'role-canvas-dark': 'oklch(from var(--role-surface-dark) calc(l - 0.035) c h)',
+    'role-card': 'var(--role-surface)',
+    'role-card-dark': 'var(--role-surface-dark)',
+    ...FLOATING,
+    'w-section-opacity': '1',
+    'w-section-shadow': '0 1px 2px oklch(from var(--w-shadow) l c h / calc(alpha * 0.5))',
+    'w-card-shadow': 'var(--w-section-shadow)',
+    'w-chrome-shadow': 'var(--w-section-shadow)',
+    'w-chrome-bar-shadow': 'var(--w-chrome-shadow)',
+    'w-chrome-ring': 'var(--w-canvas)',
+  },
+  glass: {
+    'role-canvas': 'oklch(from var(--color-primary) 0.93 0.04 h)',
+    'role-canvas-dark': 'oklch(from var(--color-primary) 0.2 0.04 h)',
+    'role-card': 'var(--role-surface)',
+    'role-card-dark': 'var(--role-surface-dark)',
+    ...FLOATING,
+    'w-canvas-image': [
+      'radial-gradient(circle at 10% 10%, color-mix(in oklab, var(--color-primary) 45%, transparent), transparent 45%)',
+      'radial-gradient(circle at 90% 30%, color-mix(in oklab, var(--color-data-fuchsia) 35%, transparent), transparent 45%)',
+      'radial-gradient(circle at 40% 90%, color-mix(in oklab, var(--color-data-teal) 35%, transparent), transparent 50%)',
+    ].join(', '),
+    'w-section-opacity': '0.55',
+    'w-section-border': '1px',
+    'w-section-shadow': '0 8px 32px -8px var(--w-shadow)',
+    // No saturate(): what repaints the canvas inside a page list (sticky columns, masks) can't reproduce it.
+    'w-section-backdrop': 'blur(24px)',
+    'w-card-opacity': '0.55',
+    'w-card-border': '1px',
+    'w-card-shadow': 'var(--w-section-shadow)',
+    'w-card-backdrop': 'var(--w-section-backdrop)',
+    'w-chrome-border': '1px',
+    'w-chrome-shadow': 'var(--w-section-shadow)',
+    'w-chrome-bar-shadow': 'var(--w-chrome-shadow)',
+    'w-chrome-opacity': '0.55',
+    'w-chrome-backdrop': 'var(--w-section-backdrop)',
+  },
+}
+
+/**
+ * Where the glass canvas is darkest or most colored: the plain canvas and the centers of its gradient's spots, each as
+ * a color over the canvas. Text on glass is checked over each.
+ */
+export const GLASS_CANVAS_SAMPLES = [
+  'var(--w-canvas)',
+  'color-mix(in srgb, var(--color-primary) 45%, var(--w-canvas))',
+  'color-mix(in srgb, var(--color-data-fuchsia) 35%, var(--w-canvas))',
+  'color-mix(in srgb, var(--color-data-teal) 35%, var(--w-canvas))',
+]
+
 /**
  * Keys are CSS variable names without `--`: `color-*` and `role-*` go in the app's `@theme`, `w-*` on `body`.
- * `neutral` names a scale from `NEUTRAL_SCALES` and becomes the `gray-*` colors.
+ * `neutral` names a scale from `NEUTRAL_SCALES` and becomes the `gray-*` colors, `layout` one of `LAYOUTS` and the
+ * tokens it sets.
  */
 export type PresetTokens = Record<string, string>
 
@@ -29,8 +108,9 @@ export const PRESETS = [
   {
     id: 'ocean',
     name: 'Ocean',
-    look: 'Blue primary, cyan info, slate neutrals',
+    look: 'Blue primary, cyan info, slate neutrals, card layout',
     tokens: {
+      layout: 'card',
       neutral: 'slate',
       'color-primary': 'oklch(54% 0.15 250)',
       'color-info': 'oklch(61% 0.11 215)',
@@ -51,8 +131,9 @@ export const PRESETS = [
   {
     id: 'sunset',
     name: 'Sunset',
-    look: 'Orange primary, rose negative, stone neutrals',
+    look: 'Orange primary, rose negative, stone neutrals, glass layout',
     tokens: {
+      layout: 'glass',
       neutral: 'stone',
       'color-primary': 'oklch(57% 0.17 45)',
       'color-negative': 'oklch(64% 0.21 10)',
@@ -81,22 +162,48 @@ export const PRESETS = [
 export type PresetId = typeof PRESETS[number]['id']
 
 /**
- * `neutral` expanded to the `gray-*` colors it stands for, and the dark background to the scale's 900 unless the
- * theme sets its own; other tokens as they are. The kit keeps `default-dark` fixed, since apps that set their own
- * `gray-900` use the two as different surfaces.
+ * `layout` expanded to the tokens it sets, under the theme's own, and `neutral` to the `gray-*` colors it stands for,
+ * with the dark background as the scale's 900 unless the theme sets its own; other tokens as they are. The kit keeps
+ * `default-dark` fixed, since apps that set their own `gray-900` use the two as different surfaces.
  */
-export const expandNeutral = (tokens: PresetTokens): [key: string, value: string][] => Object.entries(tokens).flatMap(([key, value]): [string, string][] => {
-  if (key !== 'neutral') return [[key, value]]
-  if (!isNeutralScale(value)) return []
+export const expandTokens = (tokens: PresetTokens): [key: string, value: string][] => {
+  const {layout, ...rest} = tokens
+  const expanded: PresetTokens = {...isLayoutId(layout) ? LAYOUT_TOKENS[layout] : {}, ...rest}
 
-  const scale = NEUTRAL_SCALES[value].map((color, index): [string, string] => [`color-gray-${ NEUTRAL_STEPS[index] }`, `oklch(${ color })`])
+  return Object.entries(expanded).flatMap(([key, value]): [string, string][] => {
+    if (key !== 'neutral') return [[key, value]]
+    if (!isNeutralScale(value)) return []
 
-  return 'color-default-dark' in tokens ? scale : [...scale, ['color-default-dark', 'var(--color-gray-900)']]
-})
+    const scale = NEUTRAL_SCALES[value].map((color, index): [string, string] => [`color-gray-${ NEUTRAL_STEPS[index] }`, `oklch(${ color })`])
+
+    return 'color-default-dark' in expanded ? scale : [...scale, ['color-default-dark', 'var(--color-gray-900)']]
+  })
+}
+
+/**
+ * The rules a floating layout adds besides tokens: on phones the bars dock and sections span the screen, and the page
+ * doesn't bounce sideways, which would move it but not the fixed backgrounds that repaint a page list's section.
+ */
+export const getLayoutRules = (tokens: PresetTokens, root = ':root', body = 'body') => {
+  if (tokens.layout !== 'card' && tokens.layout !== 'glass') return ''
+
+  return [
+    `@media (max-width: 639px) {`,
+    `  ${ body } {`,
+    '    --w-chrome-gap: 0px;',
+    '    --w-chrome-rounded: 0px;',
+    '  }',
+    '}',
+    '',
+    `${ root } {`,
+    '  overscroll-behavior-x: none;',
+    '}',
+  ].join('\n')
+}
 
 /** The `@theme` block for the color tokens of a theme, or an empty string when there are none. */
 export const getThemeBlock = (tokens: PresetTokens) => {
-  const entries = expandNeutral(tokens).filter(([key]) => !key.startsWith('w-'))
+  const entries = expandTokens(tokens).filter(([key]) => !key.startsWith('w-'))
 
   return entries.length ? ['@theme {', ...entries.map(([key, value]) => `  --${ key }: ${ value };`), '}'].join('\n') : ''
 }
