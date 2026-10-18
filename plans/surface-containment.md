@@ -4,7 +4,7 @@ Living plan for letting a theme choose how content is contained — flat, card o
 
 | Phase | Status |
 | --- | --- |
-| 0. Spike | done — findings below; items 1–3 to settle before phase 1 |
+| 0. Spike | done — findings below; problems 4–6 and the card variant left before phase 1 |
 | 1. Foundation in `tailwind-base` | not started |
 | 2. Kit and playground | not started |
 | 3. Consumers | not started |
@@ -189,15 +189,15 @@ What holds:
 - **Floating chrome from tokens**: `--w-chrome-float` (0/1) and `--w-chrome-gap` position the header backing, the nav, its toggle and the actions bar; the header's spread ring (`0 0 0 gap canvas`) hides content scrolling through the gap in card style, and is transparent in glass. `WInfiniteListWrapper` sticks at `--w-header-inner`, so the list header lands under a floating header.
 - **The CSS-only frame mostly works**: a section sets `--w-frame-padding`; on phones it bleeds by `--inner-margin` and pads by it, which is what WInfoCard's page branch already assumes — WInfoCard reaches the section edges without a change.
 
-What breaks — to solve before phase 1:
+What breaks — to solve before phase 1. Status as of 2026-10-18 at the end of each item.
 
-1. **List chrome assumes the page is the frame.** WList's sticky columns, their gutter masks (`w---left-inner` / `w---right-inner` absolute boxes beside them) and the stuck header backdrop are sized by the page insets. Inside a section they spill out of it: a white band from the screen edge across the canvas gap at the header row, over the nav card in WebKit, and over the floating header's ring when stuck. A section has to redefine the insets for its subtree, as `.w-modal-wrapper *` does — but on a page it needs **two** values the modal gets away with as one: the sticky offset (viewport → section content, page inset + section padding) and the gutter the mask covers (canvas from the screen edge, then section paint over the padding). Proposed: `--w-left-gutter` / `--w-right-gutter` for the masks, a two-stop mask background, `--w-width-inner` falling out of the redefined insets.
-2. **Wide lists in a section.** A list wider than the section can't scroll inside it (`overflow-x: auto` makes the section the scroll container and the header stops sticking to the window); `overflow-x: clip` hides the overflow. Options: the section grows with the list (`min-width: 100%; width: max-content`) and the window scrolls, as today; or lists fit their section (columns hide) and the section never scrolls. Decide with 1.
-3. **Glass and sticky columns don't mix.** Sticky cells paint the opaque effective color — clear stripes over the translucent section, as predicted. Blurring them likely doesn't help (not tried): inside a section with `backdrop-filter`, a backdrop root, they can't see the canvas. Workable: a section holding a list is opaque in every style (`--w-section-opacity: 1` set by the list or a `surface-section-solid` variant), and glass stays for chrome, tiles and sections without sticky parts. Since the canvas is a smooth gradient, sections may not need `backdrop-filter` at all — only the chrome does, where content scrolls under it; to compare side by side.
-4. **WTabs inside a section on phones** adds its page inset (`sm-not:pl---inner-margin`) on top of the section's padding — the tab bar is indented twice. WTabs' page branch has to become the frame branch (`w-frame-bleed px-(--w-frame-padding)`), i.e. the page sets `--w-frame-padding` too, as the plan proposed.
-5. **Consumers pad the header themselves** (`pl---nav-bar-width`, the docs' `pl-[calc(var(--left-margin)+var(--nav-bar-width))]`). With a gap that padding must come from `--w-left-inner`; in phase 1 the header should align its title with the content on its own and the consumer padding goes.
-6. **JS still measures the docked header.** `InfiniteListHeaderHeight` (`getTopOffset`) and the wrapper's IntersectionObserver (`rootMargin`) use the header element's height, not `--w-header-inner`: off by twice the gap when floating. Harmless while the header doesn't grow (below), but scroll-to-top math is off.
-7. **Opaque stripes in glass, beyond sticky columns**: the card list's striped rows on phones (`sm-not:even:bg-surface-subtle`) and the stuck toolbar are opaque over a translucent section. Same answer as 3.
+1. **List chrome assumes the page is the frame.** WList's sticky columns, their gutter masks (`w---left-inner` / `w---right-inner` absolute boxes beside them) and the stuck header backdrop are sized by the page insets. Inside a section they spill out of it: a white band from the screen edge across the canvas gap at the header row, over the nav card in WebKit, and over the floating header's ring when stuck. A section has to redefine the insets for its subtree, as `.w-modal-wrapper *` does — but on a page it needs **two** values the modal gets away with as one: the sticky offset (viewport → section content, page inset + section padding) and the gutter the mask covers (canvas from the screen edge, then section paint over the padding). Proposed: `--w-left-gutter` / `--w-right-gutter` for the masks, a two-stop mask background, `--w-width-inner` falling out of the redefined insets. **Solved** differently: a page list is its own section, and what covers rows paints the viewport-fixed backdrop (List clipping experiment, Section edges and Safari below).
+2. **Wide lists in a section.** A list wider than the section can't scroll inside it (`overflow-x: auto` makes the section the scroll container and the header stops sticking to the window); `overflow-x: clip` hides the overflow. Options: the section grows with the list (`min-width: 100%; width: max-content`) and the window scrolls, as today; or lists fit their section (columns hide) and the section never scrolls. Decide with 1. **Decided**: the list grows and the window scrolls. Page content beside it sticks sideways: sections and `w-page-bleed` rows on their own, anything else with `w-page-sticky`, all only while a page list is on the page.
+3. **Glass and sticky columns don't mix.** Sticky cells paint the opaque effective color — clear stripes over the translucent section, as predicted. Blurring them likely doesn't help (not tried): inside a section with `backdrop-filter`, a backdrop root, they can't see the canvas. Workable: a section holding a list is opaque in every style (`--w-section-opacity: 1` set by the list or a `surface-section-solid` variant), and glass stays for chrome, tiles and sections without sticky parts. Since the canvas is a smooth gradient, sections may not need `backdrop-filter` at all — only the chrome does, where content scrolls under it; to compare side by side. **Solved** by the fixed backdrop: sticky columns paint the canvas and the section's paint, and match the glass.
+4. **WTabs inside a section on phones** adds its page inset (`sm-not:pl---inner-margin`) on top of the section's padding — the tab bar is indented twice. WTabs' page branch has to become the frame branch (`w-frame-bleed px-(--w-frame-padding)`), i.e. the page sets `--w-frame-padding` too, as the plan proposed. **Open.**
+5. **Consumers pad the header themselves** (`pl---nav-bar-width`, the docs' `pl-[calc(var(--left-margin)+var(--nav-bar-width))]`). With a gap that padding must come from `--w-left-inner`; in phase 1 the header should align its title with the content on its own and the consumer padding goes. **Open.**
+6. **JS still measures the docked header.** `InfiniteListHeaderHeight` (`getTopOffset`) and the wrapper's IntersectionObserver (`rootMargin`) use the header element's height, not `--w-header-inner`: off by twice the gap when floating. Harmless while the header doesn't grow (below), but scroll-to-top math is off. **Half solved**: the wrapper's observer reads the header's computed `top`. `getTopOffset` still subtracts only the header bar's height, so `headerTop` misses the gap.
+7. **Opaque stripes in glass, beyond sticky columns**: the card list's striped rows on phones (`sm-not:even:bg-surface-subtle`) and the stuck toolbar are opaque over a translucent section. Same answer as 3. **Solved**: striped rows take `--w-list-stripe`, the stuck toolbar paints the backdrop.
 
 Fixed after review (2026-10-14):
 
@@ -226,6 +226,17 @@ List clipping experiment (2026-10-14), on `/spike/surfaces` with the plant list 
 - **A floating nav can wrap its items.** `--w-nav-height: auto` (set by the docs' card and glass) makes the nav as tall as its items, capped at the chrome gap above the screen's bottom edge, past which they scroll; it lays its content out as a flex column so the consumer's scroller shrinks to the cap. Pinning items to the bottom needs the full height, the default. The room under the last item moved into the kit, on the scroller so it scrolls with the items: 1rem docked and in the phone drawer, 0.25rem floating to match the gap above the first item. Consumers drop their own `pb-4`. Flat is byte-identical.
 - **The header's ring stops at its bottom edge.** Card's `--w-chrome-ring` (canvas) covered the gap below the floating header too, over the stuck list header's backdrop, so the section showed above the toolbar in glass (transparent ring) but not in card. The ring is now shifted up by the gap: it fills the gap above and beside the header, and below it the page shows, so sections slide under the header there as in glass.
 
+#### Section edges and Safari (2026-10-15–18)
+
+- **Rounded section edges for page lists.** In card and glass the page list draws its section's top and bottom edges: the stuck toolbar draws the top edge and the canvas above it (`.w-infinite-list-header-edge`), and a bottom edge sticks to the screen's bottom while the list runs past it (`.w-list-page-end`).
+- **One strip for all pages.** The masks beside the rows and the backdrops of the sticky columns are one strip in the box that holds the loaded pages (WInfiniteList's `pages-before` slot), not one per page. With one per page, the clip edges crossed the screen while scrolling, and Safari didn't repaint what they uncovered: rows showed outside the section, in every layout.
+- **Safari and sideways scroll.** Safari repaints a fixed background late on a box that moves, and moves a box stuck on both axes a little out of step with the page. So:
+  - The stuck toolbar's canvas is drawn by the edge, which stays over the section, not by the toolbar, which is as wide as the rows.
+  - Every box that sticks on both axes is split: an outer box sticks vertically, a band inside it horizontally.
+  - The side masks run 0.5rem past the screen's sides, so a pixel of lag doesn't show row content.
+- **`--w-top-inner` counts the gap above the stuck toolbar** (`--w-list-header-gap`: the section padding, or 0.5rem on phones when floating). Dropdowns that open upward and `--w-height-inner` were 24px off in card and glass.
+- **Page content sticks beside a page list on its own.** Content beside a list wider than the screen needed `sm:sticky sm:left---left-inner sm:max-w---width-inner`, about 50 times in the portal. Sections and `w-page-bleed` rows now do it themselves, and `w-page-sticky` covers the rest. It's on only while a page list in row mode is on the page (`:root:has(.w-list.w-list-page)`, no JS): a sticky box is a layer and a stacking context of its own, and Safari's trouble with fixed backgrounds is on boxes that stick or move. The parent must still be as wide as the list.
+
 ### 1. Foundation in `tailwind-base`
 
 - [ ] `canvas` role, `--w-surface-step`, section and card shape tokens, utilities; `body` on `canvas`.
@@ -251,13 +262,14 @@ List clipping experiment (2026-10-14), on `/spike/surfaces` with the plant list 
 
 - 2026-10-14: existing blocks in the kit, portal and auditor are not a reference. The migration maps them onto the container kinds and drops their own shape classes; visible changes are reviewed, not avoided.
 - 2026-10-14: app chrome (header, nav, actions bar) follows the layout style — docked in flat, floating cards in card and glass.
+- 2026-10-18: names are final: `canvas`, `section`, `card`, `chrome`.
+- 2026-10-18: a list wider than the screen scrolls the window; page content beside a page list sticks sideways (problem 2).
+- 2026-10-18: both utilities and components ship. WSection / WCard validate their props and can handle the frame and phones; the `surface-section` / `surface-card` utilities stay for markup that doesn't want an import.
 
 Open:
 
-- Names: `canvas`, `section`, `card`, "layout style", `chrome`.
-- Utilities only, or WSection / WCard components (a component can provide the frame and handle phones).
 - ~~Whether a WList on a list page is its own section, or sits in one~~ — its own section: a page list paints the section surface itself; a contained list sits entirely inside its container.
-- One card look, or a filled / outlined variant kept for cards inside sections.
+- One card look, or a filled / outlined variant. Leaning: no variant prop; filled or outlined is the theme's choice through the card tokens, since each style works with either. A second kind only if a meaning needs it (emphasis, inset), named for the meaning.
 - ~~Floating chrome on phones~~ — spike: docked on phones (gap 0 in the presets), sections span the screen.
 
 ## Log
@@ -267,3 +279,5 @@ Open:
 - 2026-10-14: spike on the `surface-containment` branch — flat unchanged, card and glass render in three engines; list chrome inside sections, wide lists and glass sticky columns are the open problems (Spike findings). Not measured yet: scroll cost of blurred tiles, nav drawer on phones.
 - 2026-10-14: WNavBar opens with a `clip-path` wipe. Page lists paint their own section surface. Clipping rows with a scroll timeline lagged and was dropped. Masks and sticky columns paint the viewport-fixed backdrop instead.
 - 2026-10-14: stuck list header paints the backdrop up to the page header when floating; grain tested on the glass canvas; scroll-jump bug in the list header observer found.
+- 2026-10-15–18: page lists draw rounded section edges; one strip for all pages; Safari artifacts on vertical and sideways scroll fixed (Section edges and Safari).
+- 2026-10-18: `--w-top-inner` counts the gap above the stuck toolbar; sections, `w-page-bleed` rows and `w-page-sticky` stick beside a page list; names and utilities-plus-components decided.

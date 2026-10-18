@@ -11,7 +11,8 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
       '--w-width-inner': 'calc(100vw - var(--w-left-inner, 0px) - var(--w-right-inner, 0px))',
 
       '--w-header-inner': 'calc(var(--header-height, 0px) + var(--w-chrome-gap, 0px) * 2)',
-      '--w-top-inner': 'calc(var(--w-header-inner) + var(--infinite-list-header-height, 0px))',
+      // Under a list toolbar, the gap a page list keeps above it counts too.
+      '--w-top-inner': 'calc(var(--w-header-inner) + min(var(--infinite-list-header-height, 0px) * 1000, var(--w-list-header-gap, 0px)) + var(--infinite-list-header-height, 0px))',
       '--w-bottom-inner': '0px',
       '--w-height-inner': 'calc(100vh - var(--w-top-inner, 0px) - var(--w-bottom-inner, 0px))',
     },

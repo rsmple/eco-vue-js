@@ -85,11 +85,43 @@
     border-inline-width: 0;
     border-radius: 0;
   }
+
+  :root:has(.w-list.w-list-page) & {
+    @variant sm {
+      position: sticky;
+      left: calc(var(--w-left-inner) - var(--w-page-bleed, 0px));
+      max-width: calc(var(--w-width-inner) + var(--w-page-bleed, 0px) * 2);
+    }
+  }
 }
 
 /* Reaches into the page gutter like a section: for a row of cards on the canvas. */
 @utility w-page-bleed {
   margin-inline: calc(var(--w-page-bleed, 0px) * -1);
+
+  :root:has(.w-list.w-list-page) & {
+    @variant sm {
+      position: sticky;
+      left: calc(var(--w-left-inner) - var(--w-page-bleed, 0px));
+      max-width: calc(var(--w-width-inner) + var(--w-page-bleed, 0px) * 2);
+    }
+  }
+}
+
+/*
+ * Page content beside a page list. A list wider than the screen scrolls the window sideways: page content then sticks
+ * to the page's left inset and keeps the page's width, as sections and `w-page-bleed` rows do on their own. Only while
+ * a page list is on the page, since every sticky box is a layer and a stacking context of its own. Its parent must be
+ * as wide as the list, such as the app's main area in a `1fr` grid track.
+ */
+@utility w-page-sticky {
+  :root:has(.w-list.w-list-page) & {
+    @variant sm {
+      position: sticky;
+      left: var(--w-left-inner);
+      max-width: var(--w-width-inner);
+    }
+  }
 }
 
 /*
@@ -646,16 +678,18 @@
    * drawn one takes over from it in place. Docked (flat) it stays clear and above the header bar, which grows behind
    * it.
    */
-  .w-list-page .w-infinite-list-header {
-    /* On phones the header bar is docked, with no gap under it: the stuck toolbar keeps a small one. */
-    --w-list-header-top: calc(var(--w-header-inner) + var(--w-chrome-float) * 0.5rem);
-
-    background-color: transparent;
-    top: calc(var(--w-header-inner) + var(--w-section-padding));
+  .w-list-page {
+    /* The gap above the stuck header, which `--w-top-inner` counts too. On phones the header bar is docked, with no gap under it: the stuck toolbar keeps a small one. */
+    --w-list-header-gap: var(--w-section-padding);
 
     @variant sm-not {
-      top: var(--w-list-header-top);
+      --w-list-header-gap: calc(var(--w-chrome-float) * 0.5rem);
     }
+  }
+
+  .w-list-page .w-infinite-list-header {
+    background-color: transparent;
+    top: calc(var(--w-header-inner) + var(--w-list-header-gap));
 
     /*
      * Only once stuck: before, the header scrolls with the page over the section, which is all it would show, and
@@ -681,7 +715,7 @@
     @variant sm-not {
       &::before {
         content: "";
-        top: calc(var(--w-list-header-top) * -1);
+        top: calc((var(--w-header-inner) + var(--w-list-header-gap)) * -1);
       }
     }
   }
