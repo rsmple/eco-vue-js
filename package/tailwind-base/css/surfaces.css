@@ -486,13 +486,19 @@
   }
 
   /*
-   * Off phones, the rows' sticky columns and the gutters beside them share one strip a side instead of a mask each:
-   * the part of the list in view, stuck to the screen. Safari repaints a fixed background late on a box that moves
-   * while the page scrolls, and leaves stale tiles of it; this one does not move. The rows' pages are not isolated, so
-   * it lies over the scrolling cells and under the sticky ones, which paint their row's border and fill over it.
+   * Off phones, the gutters beside the rows and their sticky columns are covered by one strip each instead of a mask
+   * in every row: the part of the rows in view, stuck to the screen. Safari repaints a fixed background late on a box
+   * that moves while the page scrolls, and leaves stale tiles of it; these do not move, and the clip that ends them
+   * moves only at the ends of the rows. The box of the pages is isolated and the rows are not, so the strips lie over
+   * the scrolling cells and under the sticky ones, which paint their row's border and fill over them.
    */
   .w-list-page-strip {
     display: none;
+  }
+
+  .w-list-page :has(> .w-list-page-strip) {
+    position: relative;
+    isolation: isolate;
   }
 
   @variant sm {
@@ -500,17 +506,16 @@
     .w-list-page-strip {
       display: block;
       position: absolute;
-      inset-block: var(--w-section-padding);
-      inset-inline: 0;
+      inset: 0;
       z-index: 1;
       overflow-y: clip;
       pointer-events: none;
     }
 
     /*
-     * Two screens past either end of the rows, so the strip stays stuck to the screen even where an end of the list is
-     * in view, and the clip cuts it there instead. Safari moves a stuck box a frame or so behind the scroll, and that
-     * would bring its own ends into view: they lie half a screen past the screen's.
+     * Two screens past either end of the rows, so the strips stay stuck to the screen even where an end of them is in
+     * view, and the clip cuts them there instead. Safari moves a stuck box a frame or so behind the scroll, and that
+     * would bring their own ends into view: they lie half a screen past the screen's.
      */
     .w-list-page-strip-track {
       position: absolute;
@@ -518,12 +523,17 @@
       inset-inline: 0;
     }
 
-    .w-list-page-strip-sides {
+    .w-list-page-strip-sides,
+    .w-list-page-strip-columns {
       position: sticky;
       top: -50vh;
-      left: var(--w-band-start);
       height: 200vh;
+    }
+
+    .w-list-page-strip-sides {
+      left: var(--w-band-start);
       margin-inline: calc(var(--w-section-padding) * -1) calc(var(--w-section-padding) * -1 - var(--w-right-inner));
+      margin-bottom: -200vh;
       width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
 
       &::before,
@@ -552,8 +562,32 @@
       }
     }
 
+    /*
+     * The rows' columns laid out as in a row, between its select and menu columns: the sticky ones stick where their
+     * cells do, the rest only hold their place.
+     */
+    .w-list-page-strip-columns {
+      display: flex;
+      padding-inline: var(--w-list-left) var(--w-list-right);
+
+      @variant @max-lg {
+        padding-left: 0;
+      }
+
+      > * {
+        flex: none;
+      }
+    }
+
+    .w-list-page-strip-column {
+      position: sticky;
+      background-color: var(--w-canvas);
+      background-image: var(--w-page-backdrop);
+      background-attachment: fixed;
+    }
+
     /* Nothing to cover without rows, and the empty state keeps its full width. */
-    .w-list-page-content:not(:has(.w-list-item)) > .w-list-page-strip {
+    .w-list-page :has(> .w-list-page-strip):not(:has(.w-list-item)) > .w-list-page-strip {
       display: none;
     }
 
@@ -562,6 +596,14 @@
 
       > .w-list-mask {
         display: none;
+      }
+    }
+
+    .w-list-page-rows .w-list-item-middle {
+      isolation: auto;
+
+      .sticky.bg-surface {
+        background: none;
       }
     }
 
@@ -615,16 +657,11 @@
   .w-list-page .w-infinite-list-header-stuck {
     z-index: calc(20 - var(--w-chrome-float) * 15) !important;
 
-    &::before {
-      content: "";
-      top: calc((var(--w-header-inner) + var(--w-section-padding)) * -1);
-      inset-inline: calc(var(--w-section-padding) * -1);
-      background-image: var(--w-canvas-image);
-
-      @variant sm-not {
+    /* Off phones the edge paints it: the header is as wide as the rows, and moves while they scroll sideways. */
+    @variant sm-not {
+      &::before {
+        content: "";
         top: calc(var(--w-list-header-top) * -1);
-        inset-inline: 0;
-        background-image: var(--w-page-backdrop);
       }
     }
   }
@@ -640,6 +677,24 @@
     width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
     margin-inline-start: calc(var(--w-section-padding) * -1);
     margin-inline-end: calc(var(--w-section-padding) * -1 - var(--w-right-inner));
+  }
+
+  /* The canvas above the stuck header, up to the header bar, under the edge. */
+  .w-list-page .w-infinite-list-header-stuck .w-infinite-list-header-edge::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-inline: 0;
+    top: calc((var(--w-header-inner) + var(--w-section-padding)) * -1);
+    height: calc(var(--w-header-inner) + var(--w-section-padding) + var(--w-list-header-height, 0px));
+    opacity: var(--w-chrome-float);
+    background-color: var(--w-canvas);
+    background-image: var(--w-canvas-image);
+    background-attachment: fixed;
+
+    @variant sm-not {
+      content: none;
+    }
   }
 
   .w-list-page .w-infinite-list-header-stuck .w-infinite-list-header-edge::before {
@@ -662,7 +717,8 @@
     }
   }
 
-  .w-list-page-repaint .w-infinite-list-header-stuck .w-infinite-list-header-edge::before {
+  .w-list-page-repaint .w-infinite-list-header-stuck .w-infinite-list-header-edge::before,
+  .w-list-page-repaint .w-infinite-list-header-stuck .w-infinite-list-header-edge::after {
     background-origin: border-box;
   }
 }

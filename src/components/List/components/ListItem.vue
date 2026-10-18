@@ -74,7 +74,7 @@
         </div>
 
         <div
-          class="sm-not:px---inner-margin isolate"
+          class="w-list-item-middle sm-not:px---inner-margin isolate"
           :class="{
             [cardClass ?? '']: true,
             '[contain-intrinsic-size:auto_3rem] [content-visibility:auto]': contentVisibility,
