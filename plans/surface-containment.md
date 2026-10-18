@@ -6,7 +6,7 @@ Living plan for letting a theme choose how content is contained — flat, card o
 | --- | --- |
 | 0. Spike | done — findings below |
 | 1. Foundation in `tailwind-base` | done — flat renders as before; card and glass are token sets (the docs presets) |
-| 2. Kit and playground | not started |
+| 2. Kit and playground | done — WSection and WCard, the Layout group, layout contrast checks, the guide |
 | 3. Consumers | not started |
 
 ## Goals
@@ -246,10 +246,10 @@ List clipping experiment (2026-10-14), on `/spike/surfaces` with the plant list 
 
 ### 2. Kit and playground
 
-- [ ] Components for the two kinds, if utilities aren't enough (frame provide/inject, phone behavior): WSection, WCard — names to settle.
-- [ ] Playground: a Layout group — style (flat / card / glass) and the shape tokens; presets with each style; glass generates the canvas gradient.
-- [ ] Generator contrast checks against the effective surface for glass.
-- [ ] Theming guide: layout styles, with the three side by side.
+- [x] Components for the two kinds: WSection and WCard render the utilities with a `title` (prop or slot), an `actions` slot beside it and a `tag`. The frame and phones are CSS, so they need no more.
+- [x] Playground: a Layout group — the `layout` token (flat / card / glass) and section, card and bar radii and the bar gap. The layouts live in `themePresets.ts` (`LAYOUT_TOKENS`) and expand like `neutral`: roles into `@theme`, `w-*` onto `body`, plus the phone and overscroll rules. Ocean is card, Sunset glass. The glass canvas gradient refers to the theme's primary and data hues, so it follows any theme. The docs' `data-layout` presets are gone; the spike page sets the token.
+- [x] Contrast checks (`contrast-test.ts`): a card or glass theme is also measured in a section and a card, as the color they end up as over the canvas, and for glass over each spot of its gradient; on the canvas only main text. Tuning that took: the card canvas is 0.015 below the surface (0.035 left muted text at 4.29); glass is 0.85 opaque over a 0.96 canvas with its spots at 40% of the spike's, and a subtle line a quarter of the way to `line` (subtle lines fell to 1.17 on tinted glass).
+- [x] Theming guide: Layout styles, with the three side by side (`ThemeLayoutPreview`), and a Layout table.
 
 ### 3. Consumers
 
@@ -267,6 +267,8 @@ List clipping experiment (2026-10-14), on `/spike/surfaces` with the plant list 
 - 2026-10-18: one card look, no variant prop. Filled or outlined is the theme's choice through the card tokens. A second kind only if a meaning needs it (emphasis, inset), named for the meaning.
 - 2026-10-18: both utilities and components ship. WSection / WCard validate their props and can handle the frame and phones; the `surface-section` / `surface-card` utilities stay for markup that doesn't want an import.
 
+- 2026-10-18: in card and glass the canvas carries the page's headings; muted text, controls and tone colors go in a section or a card. Over the glass gradient nothing but main text keeps its contrast, and passing everything there would wash the gradient out.
+
 Open:
 
 - ~~Whether a WList on a list page is its own section, or sits in one~~ — its own section: a page list paints the section surface itself; a contained list sits entirely inside its container.
@@ -283,3 +285,4 @@ Open:
 - 2026-10-18: `--w-top-inner` counts the gap above the stuck toolbar; sections, `w-page-bleed` rows and `w-page-sticky` stick beside a page list; names and utilities-plus-components decided.
 - 2026-10-18: one card look decided; the header pads by the page insets (problem 5); the list header and page reset use the sticky top (problem 6); WTabs on phones takes the frame padding, PR #13 on main (problem 4).
 - 2026-10-18: phase 1: the nav and the actions bar paint themselves (`bg-chrome`, chrome blur and shadows, edges moved from the docs); the glass header is translucent and blurs like the nav; the role test covers sections, cards, canvas and chrome. Flat checked by the color diff and per-bar measurements at 390, 1100 and 1440 px.
+- 2026-10-18: phase 2: WSection and WCard; the playground's Layout group with presets per style; contrast checks in containers and over the glass canvas, and the card and glass values tuned to pass them; the theming guide's Layout styles. The `positive` pairs that fail on main (lightened in a0b45cb) fail the same in every context.
