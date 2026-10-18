@@ -34,9 +34,10 @@
       :class="{
         'sm-not:snap-start grid grid-cols-[1fr_auto]': side,
         'no-scrollbar mb-4 flex overflow-x-auto overscroll-x-contain': !side,
-        // In an overlay frame the bar scrolls from edge to edge, with the first tab in line with the content. On a page it keeps the phone inset.
+        // In an overlay frame the bar scrolls from edge to edge, with the first tab in line with the content. On a page it
+        // keeps the phone inset, or on phones takes the padding of a box that sets `--w-frame-padding` instead of adding to it.
         'w-frame-bleed px-(--w-frame-padding)': !side && frame !== null,
-        'sm-not:pl---inner-margin': !side && frame === null,
+        'sm-not:w-frame-bleed sm-not:pl-[var(--w-frame-padding,var(--inner-margin))] sm-not:pr-[var(--w-frame-padding,0px)]': !side && frame === null,
         'flex-wrap': !side && wrap,
         'shadow-[inset_0_-1px_var(--color-line-subtle)]': !side && divider,
         [headerClass ?? '']: true,
