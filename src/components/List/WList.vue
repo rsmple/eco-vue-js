@@ -22,6 +22,15 @@
       ref="pageContent"
       :class="isPage ? 'w-list-page-content' : 'contents'"
     >
+      <div
+        v-if="isPage"
+        class="w-list-page-strip"
+      >
+        <div class="w-list-page-strip-track">
+          <div class="w-list-page-strip-sides" />
+        </div>
+      </div>
+
       <WInfiniteList
         :use-query-fn="useQueryFn"
         :query-params="queryParams"
@@ -33,7 +42,9 @@
         :page-class="
           isGrid
             ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-(--w-list-gap,0) isolate'
-            : 'grid grid-cols-1 gap-(--w-list-gap,0) isolate'
+            : isPage
+              ? 'w-list-page-rows grid grid-cols-1 gap-(--w-list-gap,0)'
+              : 'grid grid-cols-1 gap-(--w-list-gap,0) isolate'
         "
         :min-height-only="minHeight"
         :no-header-update="noHeaderUpdate"
@@ -188,6 +199,13 @@
           <slot name="empty" />
         </template>
       </WInfiniteList>
+
+      <div
+        v-if="isPage"
+        class="w-list-page-end"
+      >
+        <div class="w-list-page-end-fill" />
+      </div>
     </div>
 
     <div

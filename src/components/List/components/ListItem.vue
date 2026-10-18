@@ -11,7 +11,7 @@
         v-bind="allowSelect ? {'onMouseover': () => $emit('hover:selected', position)} : undefined"
         ref="container"
         :role="skeleton ? undefined : 'listitem'"
-        class="relative"
+        class="w-list-item relative"
         :class="{
           [cardWrapperClass ?? '']: true,
           'w-ripple-trigger-list': isActionShown,
@@ -36,7 +36,7 @@
 
         <div
           v-if="!card"
-          class="left---left-inner bg-surface @max-lg:hidden sticky z-1"
+          class="w-list-item-sticky left---left-inner bg-surface @max-lg:hidden sticky z-1"
           :class="{
             'width-(--w-list-header-rounded,1rem)': !allowSelect,
           }"
@@ -190,7 +190,7 @@
 
         <div
           v-if="!card"
-          class="right---right-inner bg-surface sticky z-1"
+          class="w-list-item-sticky right---right-inner bg-surface sticky z-1"
           :class="{
             'width-[calc(var(--w-list-padding,1rem)*2+1.25em)]': hasMenu,
             'width-(--w-list-header-rounded,1rem)': !hasMenu,
@@ -257,7 +257,7 @@
 
       <div
         v-if="expansion && isOpen"
-        class="list:w---width-inner list:left---left-inner list:sticky col-span-full"
+        class="w-list-item-expansion list:w---width-inner list:left---left-inner list:sticky col-span-full"
         :class="{
           'border-line': hasBorder && !selected,
           'tone-primary border-tone-line': hasBorder && selected,

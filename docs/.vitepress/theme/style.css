@@ -220,6 +220,9 @@ body {
   --w-chrome-gap: 0.75rem;
   --w-chrome-rounded: 1rem;
   --w-nav-height: auto;
+
+  /* A sideways bounce moves the page but not the fixed backgrounds that repaint the section: they'd come apart. */
+  overscroll-behavior-x: none;
 }
 
 /* On body, where the gutter is set. Phones: the bars dock and sections span the screen, as in flat. */

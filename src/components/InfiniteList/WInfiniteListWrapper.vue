@@ -31,6 +31,11 @@
       v-else
       #header="scope"
     >
+      <div
+        class="w-infinite-list-header-edge"
+        :style="{'--w-list-header-height': scope.headerHeight + 'px'}"
+      />
+
       <InfiniteListHeaderPadding
         :is-intersecting="isIntersecting"
         :header-height="scope.headerHeight"
@@ -92,23 +97,46 @@ const observerCb = (entries: IntersectionObserverEntry[]) => {
 
 let observer: IntersectionObserver | null = null
 
+let observerTop: number | null = null
+
 const {headerHeight} = useHeader()
+
+// Where the header sticks: the gap and padding a theme keeps above it count, not just the header bar.
+const getStickyTop = (): number => {
+  const header = isContained ? null : indicatorRef.value?.nextElementSibling
+  const top = header ? parseFloat(getComputedStyle(header).top) : NaN
+
+  return Number.isNaN(top) ? headerHeight.value : top
+}
+
+const observe = () => {
+  if (!indicatorRef.value) return
+
+  const top = getStickyTop()
+  if (observer && top === observerTop) return
+
+  observer?.disconnect()
+  observerTop = top
+
+  // Reaches far below the screen: a jump from below it to past the top is still a change the observer reports.
+  observer = new IntersectionObserver(observerCb, {
+    root: null,
+    rootMargin: `-${ top }px 100% 100000px 0px`,
+    threshold: 1.0,
+  })
+
+  observer.observe(indicatorRef.value)
+}
 
 onMounted(() => {
   if (!getIsClientSide()) return
 
-  if (indicatorRef.value) {
-    observer = new IntersectionObserver(observerCb, {
-      root: null,
-      rootMargin: `-${ headerHeight.value }px 100% 0px 0px`,
-      threshold: 1.0,
-    })
-
-    observer.observe(indicatorRef.value)
-  }
+  observe()
+  window.addEventListener('resize', observe)
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('resize', observe)
   observer?.disconnect()
 })
 
