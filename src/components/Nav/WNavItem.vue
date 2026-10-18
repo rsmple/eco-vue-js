@@ -73,7 +73,7 @@
 
             <WSkeleton
               v-else
-              class="ml-1 inline-flex max-w-10 shrink-0"
+              class="w-skeleton-w-10 ml-1 inline-flex shrink-0"
             />
 
             <WCounter
