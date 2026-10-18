@@ -32,6 +32,7 @@
 
       @update:count="updateCount($event); $emit('update:count', $event)"
       @update:pages-count="updatePagesCount"
+      @update:page-size="pageSize = $event"
       @remove:page="removePage"
       @refetch="refetchNextPages(page)"
       @fetched="isResettingPage = false"
@@ -130,6 +131,8 @@ let slotIdCounter = 1
 const slotIds = ref<number[]>([slotIdCounter])
 const pagesCount = ref(1)
 const count = ref(0)
+/** Items on a full page as the API returns them, which can differ from the `size` the list asks for. */
+const pageSize = ref(props.pageLength)
 const nextPage = computed(() => {
   if (pagesCount.value === 0) return null
   const max = Math.max(...pages.value, 0)
@@ -145,12 +148,21 @@ const isResettingPage = ref(false)
 const disabledSlots = reactive(new Set<number>())
 let activationGen = 0
 
+/** Items on the page by the total count, a full page while the count is not known. */
+const getPageItemCount = (page: number): number => {
+  const remaining = count.value - (page - 1) * pageSize.value
+
+  return remaining > 0 ? Math.min(remaining, pageSize.value) : pageSize.value
+}
+
 const getSkeletonLength = (pagesBefore: number): number => {
-  if (props.skeletonLength === undefined) return props.pageLength
+  const itemCount = getPageItemCount(pagesBefore + 1)
 
-  const length = Math.min(props.skeletonLength - (pagesBefore * props.pageLength), props.pageLength)
+  if (props.skeletonLength === undefined) return itemCount
 
-  return length < 0 ? props.pageLength : length
+  const length = Math.min(props.skeletonLength - (pagesBefore * pageSize.value), itemCount)
+
+  return length < 0 ? itemCount : length
 }
 
 const pageComponentRef = useTemplateRef<ComponentInstance<typeof InfiniteListPage>[]>('pageComponent')
@@ -212,16 +224,21 @@ let resizeObserver: ResizeObserver | null = null
 const pageHeights = reactive(new Map<number, number>())
 const observedElements = new Map<HTMLElement, number>()
 
-const avgPageHeight = computed(() => {
+// Per item rather than per page: the last page can be short, and counted as a full one it would shrink every page.
+const avgItemHeight = computed(() => {
   let sum = 0
-  let count = 0
-  for (const h of pageHeights.values()) {
-    if (h <= 0) continue
+  let itemCount = 0
+  for (let i = 0; i < slotIds.value.length; i++) {
+    const h = pageHeights.get(slotIds.value[i]!)
+    const page = pages.value[i]
+    if (!h || h <= 0 || page === undefined) continue
     sum += h
-    count++
+    itemCount += getPageItemCount(page)
   }
-  return count === 0 ? 0 : Math.round(sum / count)
+  return itemCount === 0 ? 0 : sum / itemCount
 })
+
+const avgPageHeight = computed(() => Math.round(avgItemHeight.value * pageSize.value))
 
 const topSpacerHeight = computed(() => {
   if (!avgPageHeight.value) return 0
@@ -229,10 +246,13 @@ const topSpacerHeight = computed(() => {
   return Math.max(0, (firstRendered - 1) * avgPageHeight.value)
 })
 
+// Only the items left after the rendered pages, so a short last page is not reserved as a full one.
 const bottomSpacerHeight = computed(() => {
-  if (!avgPageHeight.value) return 0
+  if (!avgItemHeight.value) return 0
   const lastRendered = pages.value[pages.value.length - 1] ?? 1
-  return Math.max(0, (pagesCount.value - lastRendered) * avgPageHeight.value)
+  let itemCount = 0
+  for (let page = lastRendered + 1; page <= pagesCount.value; page++) itemCount += getPageItemCount(page)
+  return Math.round(itemCount * avgItemHeight.value)
 })
 
 const getScrollElementTop = (element: Element): number => {
@@ -439,6 +459,8 @@ const resetPage = async (page = 1) => {
   const recycledSlotId = index !== -1 ? slotIds.value[index] : undefined
 
   pagesCount.value = 1
+  // The count of the previous query would size the skeletons of the new one.
+  count.value = 0
   pages.value = [page]
   slotIds.value = [recycledSlotId ?? ++slotIdCounter]
 }
