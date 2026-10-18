@@ -21,6 +21,7 @@
         :transition="transition"
         :page-length="pageLength"
         :header-height="'headerHeight' in defaultScope ? defaultScope.headerHeight : 0"
+        :sticky-top="'stickyTop' in defaultScope ? defaultScope.stickyTop : undefined"
         :min-height="minHeight"
         :min-height-only="minHeightOnly"
         :exclude-params="excludeParams"
