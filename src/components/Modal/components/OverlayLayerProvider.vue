@@ -23,7 +23,8 @@ const instance = getCurrentInstance()
 
 if (props.provides) setInstanceProvides(instance, Object.create(props.provides))
 
-provide(wBaseZIndex, BASE_ZINDEX_MODAL)
+// An opener above the modals, such as a full-screen login, keeps its layers above itself.
+provide(wBaseZIndex, Math.max(BASE_ZINDEX_MODAL, (props.provides?.[wBaseZIndex] as number | undefined) ?? 0))
 provide(wOverlayLayer, () => props.layer)
 // A dropdown layer's frame provides its own.
 provide(wOverlayFrame, 'modal')
