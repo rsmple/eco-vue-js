@@ -34,6 +34,7 @@
 
       @update:count="updateCount($event); $emit('update:count', $event)"
       @update:pages-count="updatePagesCount"
+      @update:page-size="pageSize = $event"
       @remove:page="removePage"
       @refetch="refetchNextPages(page)"
       @fetched="isResettingPage = false"
@@ -132,6 +133,8 @@ let slotIdCounter = 1
 const slotIds = ref<number[]>([slotIdCounter])
 const pagesCount = ref(1)
 const count = ref(0)
+/** Items on a full page as the API returns them, which can differ from the `size` the list asks for. */
+const pageSize = ref(props.pageLength)
 const nextPage = computed(() => {
   if (pagesCount.value === 0) return null
   const max = Math.max(...pages.value, 0)
@@ -147,12 +150,21 @@ const isResettingPage = ref(false)
 const disabledSlots = reactive(new Set<number>())
 let activationGen = 0
 
+/** Items on the page by the total count, a full page while the count is not known. */
+const getPageItemCount = (page: number): number => {
+  const remaining = count.value - (page - 1) * pageSize.value
+
+  return remaining > 0 ? Math.min(remaining, pageSize.value) : pageSize.value
+}
+
 const getSkeletonLength = (pagesBefore: number): number => {
-  if (props.skeletonLength === undefined) return props.pageLength
+  const itemCount = getPageItemCount(pagesBefore + 1)
 
-  const length = Math.min(props.skeletonLength - (pagesBefore * props.pageLength), props.pageLength)
+  if (props.skeletonLength === undefined) return itemCount
 
-  return length < 0 ? props.pageLength : length
+  const length = Math.min(props.skeletonLength - (pagesBefore * pageSize.value), itemCount)
+
+  return length < 0 ? itemCount : length
 }
 
 const pageComponentRef = useTemplateRef<ComponentInstance<typeof InfiniteListPage>[]>('pageComponent')
@@ -169,9 +181,14 @@ const updatePagesCount = (value: number): void => {
   pagesCount.value = Math.max(value, 1)
 }
 
+/** The end a page was last added at, whose sentinel is observed anew once the pages have rendered. */
+let grownTowards: 'top' | 'bottom' | null = null
+
 const addNextPage = (silent?: boolean) => {
   if (!nextPage.value) return
   if (pages.value.includes(nextPage.value)) return
+
+  grownTowards = 'bottom'
 
   if (pages.value.length >= props.maxPages) {
     const recycledSlotId = slotIds.value.shift()!
@@ -190,6 +207,8 @@ const addPreviousPage = (silent?: boolean) => {
   if (!previousPage.value) return
   if (pages.value.includes(previousPage.value)) return
 
+  grownTowards = 'top'
+
   if (pages.value.length >= props.maxPages) {
     const recycledSlotId = slotIds.value.pop()!
     pages.value.pop()
@@ -207,16 +226,21 @@ let resizeObserver: ResizeObserver | null = null
 const pageHeights = reactive(new Map<number, number>())
 const observedElements = new Map<HTMLElement, number>()
 
-const avgPageHeight = computed(() => {
+// Per item rather than per page: the last page can be short, and counted as a full one it would shrink every page.
+const avgItemHeight = computed(() => {
   let sum = 0
-  let count = 0
-  for (const h of pageHeights.values()) {
-    if (h <= 0) continue
+  let itemCount = 0
+  for (let i = 0; i < slotIds.value.length; i++) {
+    const h = pageHeights.get(slotIds.value[i]!)
+    const page = pages.value[i]
+    if (!h || h <= 0 || page === undefined) continue
     sum += h
-    count++
+    itemCount += getPageItemCount(page)
   }
-  return count === 0 ? 0 : Math.round(sum / count)
+  return itemCount === 0 ? 0 : sum / itemCount
 })
+
+const avgPageHeight = computed(() => Math.round(avgItemHeight.value * pageSize.value))
 
 const topSpacerHeight = computed(() => {
   if (!avgPageHeight.value) return 0
@@ -224,10 +248,13 @@ const topSpacerHeight = computed(() => {
   return Math.max(0, (firstRendered - 1) * avgPageHeight.value)
 })
 
+// Only the items left after the rendered pages, so a short last page is not reserved as a full one.
 const bottomSpacerHeight = computed(() => {
-  if (!avgPageHeight.value) return 0
+  if (!avgItemHeight.value) return 0
   const lastRendered = pages.value[pages.value.length - 1] ?? 1
-  return Math.max(0, (pagesCount.value - lastRendered) * avgPageHeight.value)
+  let itemCount = 0
+  for (let page = lastRendered + 1; page <= pagesCount.value; page++) itemCount += getPageItemCount(page)
+  return Math.round(itemCount * avgItemHeight.value)
 })
 
 const getScrollElementTop = (element: Element): number => {
@@ -351,25 +378,24 @@ watch(nextPage, (value, oldValue) => {
   if (oldValue === null && value !== null && bottomSentinelIntersecting.value) addNextPage()
 })
 
-const isInViewport = (element: HTMLElement): boolean => {
-  // No box: the list is hidden (display: none), which the observer does not count as intersecting either.
-  if (element.getClientRects().length === 0) return false
+const reobserve = (element: HTMLElement | null) => {
+  if (!intersectionObserver || !element) return
 
-  const rect = element.getBoundingClientRect()
-  const viewport = scrollingElement?.value?.getBoundingClientRect() ?? {top: 0, bottom: window.innerHeight}
-
-  return rect.bottom >= viewport.top - SENTINEL_MARGIN && rect.top <= viewport.bottom + SENTINEL_MARGIN
+  intersectionObserver.unobserve(element)
+  intersectionObserver.observe(element)
 }
 
 // The observer only reports a sentinel entering or leaving the viewport. When an added page is too short to push the
-// sentinel back out, nothing is reported and the next page would wait for a scroll, so the sentinels are checked
-// again once the pages have rendered. Only while pages can still be added: recycling is left to scrolling, as with
-// fewer pages than fill the viewport it would swap pages back and forth.
+// sentinel back out, or a fast scroll brings it back before the observer runs again, nothing is reported and the
+// next page waits for the sentinel to leave and enter again. Observing a sentinel anew reports where it is now, so
+// it is done once the pages have rendered. Both while pages can still be added; once pages are recycled, only the
+// sentinel the list grew towards, as with fewer pages than fill the viewport it would swap pages back and forth.
 watch(pages, () => {
-  if (!intersectionObserver || pages.value.length >= props.maxPages) return
+  const towards = grownTowards
+  grownTowards = null
 
-  if (bottomSentinelRef.value && isInViewport(bottomSentinelRef.value)) addNextPage()
-  else if (topSentinelRef.value && isInViewport(topSentinelRef.value)) addPreviousPage()
+  if (pages.value.length < props.maxPages || towards === 'bottom') reobserve(bottomSentinelRef.value)
+  if (pages.value.length < props.maxPages || towards === 'top') reobserve(topSentinelRef.value)
 }, {deep: true, flush: 'post'})
 
 watch(previousPage, (value, oldValue) => {
@@ -435,6 +461,8 @@ const resetPage = async (page = 1) => {
   const recycledSlotId = index !== -1 ? slotIds.value[index] : undefined
 
   pagesCount.value = 1
+  // The count of the previous query would size the skeletons of the new one.
+  count.value = 0
   pages.value = [page]
   slotIds.value = [recycledSlotId ?? ++slotIdCounter]
 }
@@ -521,7 +549,8 @@ const getScrollPosition = () => {
 
   const isDocumentScroll = scrollEl === document.scrollingElement || scrollEl === document.body || scrollEl === document.documentElement
   const scrollTop = isDocumentScroll ? window.scrollY : scrollEl.scrollTop
-  const containerTop = isDocumentScroll ? containerEl.getBoundingClientRect().top + scrollTop : containerEl.offsetTop
+  // Not offsetTop: it is measured from the offsetParent, which is not the scrolling element unless that one is positioned.
+  const containerTop = containerEl.getBoundingClientRect().top - getScrollElementTop(scrollEl) + scrollTop
 
   return {scrollEl, isDocumentScroll, scrollTop, containerTop}
 }
