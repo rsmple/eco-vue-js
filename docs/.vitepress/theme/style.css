@@ -169,6 +169,8 @@ body {
   --nav-bar-width: 0px;
   --actions-bar-width: 0px;
   --inner-margin: 1.5rem;
+  /* Sections keep inside the box: it has no page gutter to reach into. */
+  --w-page-bleed: 0px;
   --docs-demo-max-height: min(40rem, 80vh);
 
   border: 1px solid var(--vp-c-divider);
@@ -176,7 +178,8 @@ body {
   margin: 1rem 0 0;
   /* Kit layers (list header 20, header bar 10) stay inside the box instead of competing with the page shell. */
   isolation: isolate;
-  background: var(--vp-c-bg);
+  /* The page background, so sections and cards show as on a page. */
+  background: var(--w-canvas);
 }
 
 /* Phones: edge to edge like VitePress code blocks, with the app's own inner margin — the width an app would have. */
