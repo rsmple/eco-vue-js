@@ -167,9 +167,14 @@ const updatePagesCount = (value: number): void => {
   pagesCount.value = Math.max(value, 1)
 }
 
+/** The end a page was last added at, whose sentinel is observed anew once the pages have rendered. */
+let grownTowards: 'top' | 'bottom' | null = null
+
 const addNextPage = (silent?: boolean) => {
   if (!nextPage.value) return
   if (pages.value.includes(nextPage.value)) return
+
+  grownTowards = 'bottom'
 
   if (pages.value.length >= props.maxPages) {
     const recycledSlotId = slotIds.value.shift()!
@@ -187,6 +192,8 @@ const addNextPage = (silent?: boolean) => {
 const addPreviousPage = (silent?: boolean) => {
   if (!previousPage.value) return
   if (pages.value.includes(previousPage.value)) return
+
+  grownTowards = 'top'
 
   if (pages.value.length >= props.maxPages) {
     const recycledSlotId = slotIds.value.pop()!
@@ -349,25 +356,24 @@ watch(nextPage, (value, oldValue) => {
   if (oldValue === null && value !== null && bottomSentinelIntersecting.value) addNextPage()
 })
 
-const isInViewport = (element: HTMLElement): boolean => {
-  // No box: the list is hidden (display: none), which the observer does not count as intersecting either.
-  if (element.getClientRects().length === 0) return false
+const reobserve = (element: HTMLElement | null) => {
+  if (!intersectionObserver || !element) return
 
-  const rect = element.getBoundingClientRect()
-  const viewport = scrollingElement?.value?.getBoundingClientRect() ?? {top: 0, bottom: window.innerHeight}
-
-  return rect.bottom >= viewport.top - SENTINEL_MARGIN && rect.top <= viewport.bottom + SENTINEL_MARGIN
+  intersectionObserver.unobserve(element)
+  intersectionObserver.observe(element)
 }
 
 // The observer only reports a sentinel entering or leaving the viewport. When an added page is too short to push the
-// sentinel back out, nothing is reported and the next page would wait for a scroll, so the sentinels are checked
-// again once the pages have rendered. Only while pages can still be added: recycling is left to scrolling, as with
-// fewer pages than fill the viewport it would swap pages back and forth.
+// sentinel back out, or a fast scroll brings it back before the observer runs again, nothing is reported and the
+// next page waits for the sentinel to leave and enter again. Observing a sentinel anew reports where it is now, so
+// it is done once the pages have rendered. Both while pages can still be added; once pages are recycled, only the
+// sentinel the list grew towards, as with fewer pages than fill the viewport it would swap pages back and forth.
 watch(pages, () => {
-  if (!intersectionObserver || pages.value.length >= props.maxPages) return
+  const towards = grownTowards
+  grownTowards = null
 
-  if (bottomSentinelRef.value && isInViewport(bottomSentinelRef.value)) addNextPage()
-  else if (topSentinelRef.value && isInViewport(topSentinelRef.value)) addPreviousPage()
+  if (pages.value.length < props.maxPages || towards === 'bottom') reobserve(bottomSentinelRef.value)
+  if (pages.value.length < props.maxPages || towards === 'top') reobserve(topSentinelRef.value)
 }, {deep: true, flush: 'post'})
 
 watch(previousPage, (value, oldValue) => {
@@ -519,7 +525,8 @@ const getScrollPosition = () => {
 
   const isDocumentScroll = scrollEl === document.scrollingElement || scrollEl === document.body || scrollEl === document.documentElement
   const scrollTop = isDocumentScroll ? window.scrollY : scrollEl.scrollTop
-  const containerTop = isDocumentScroll ? containerEl.getBoundingClientRect().top + scrollTop : containerEl.offsetTop
+  // Not offsetTop: it is measured from the offsetParent, which is not the scrolling element unless that one is positioned.
+  const containerTop = containerEl.getBoundingClientRect().top - getScrollElementTop(scrollEl) + scrollTop
 
   return {scrollEl, isDocumentScroll, scrollTop, containerTop}
 }
