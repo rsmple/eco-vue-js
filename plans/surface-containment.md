@@ -4,8 +4,8 @@ Living plan for letting a theme choose how content is contained — flat, card o
 
 | Phase | Status |
 | --- | --- |
-| 0. Spike | done — findings below; problem 4 waits on PR #13 |
-| 1. Foundation in `tailwind-base` | not started |
+| 0. Spike | done — findings below |
+| 1. Foundation in `tailwind-base` | done — flat renders as before; card and glass are token sets (the docs presets) |
 | 2. Kit and playground | not started |
 | 3. Consumers | not started |
 
@@ -239,10 +239,10 @@ List clipping experiment (2026-10-14), on `/spike/surfaces` with the plant list 
 
 ### 1. Foundation in `tailwind-base`
 
-- [ ] `canvas` role, `--w-surface-step`, section and card shape tokens, utilities; `body` on `canvas`.
-- [ ] Chrome tokens; WHeaderBar, WNavBar and WActionsBar paint their own background and take the gap, radius, edge and blur from them. Flat: as today, on `canvas`.
-- [ ] `--w-top-inner` and the page insets include the chrome gap.
-- [ ] Role equivalence test extended: section and card in flat equal today's classes; re-mapped surface inside both.
+- [x] `canvas` role, section and card shape tokens, utilities; `body` on `canvas`. "One step off" became the `card` role (`--role-card`, the filled `surface-subtle` by default, the surface in a card theme) with nested cards opaque and one step darker, instead of a `--w-surface-step` variable.
+- [x] Chrome tokens; WHeaderBar, WNavBar and WActionsBar paint their own background and take the gap, radius, edge and blur from them. Flat: as today. The paint is `bg-chrome` (the surface at `--w-chrome-opacity`), blur `--w-chrome-backdrop` (unset: the header keeps its 8px, the other bars none). The nav as a drawer below `xl` and the actions bar cast `--w-chrome-bar-shadow` (`shadow-md` by default, as the portal paints them), the nav beside the page `--w-chrome-shadow`. Shadow tokens are lists (`0 0 #0000` for none): `none` would void the edge and ring combined with them.
+- [x] `--w-top-inner` and the page insets include the chrome gap.
+- [x] Role equivalence test extended: `bg-canvas`, `bg-chrome`, section and card in flat equal today's classes; the surface re-mapped inside both, a card in a section and in a card, a soft tone in a card. Passes in three engines, native and lowered.
 
 ### 2. Kit and playground
 
@@ -282,3 +282,4 @@ Open:
 - 2026-10-15–18: page lists draw rounded section edges; one strip for all pages; Safari artifacts on vertical and sideways scroll fixed (Section edges and Safari).
 - 2026-10-18: `--w-top-inner` counts the gap above the stuck toolbar; sections, `w-page-bleed` rows and `w-page-sticky` stick beside a page list; names and utilities-plus-components decided.
 - 2026-10-18: one card look decided; the header pads by the page insets (problem 5); the list header and page reset use the sticky top (problem 6); WTabs on phones takes the frame padding, PR #13 on main (problem 4).
+- 2026-10-18: phase 1: the nav and the actions bar paint themselves (`bg-chrome`, chrome blur and shadows, edges moved from the docs); the glass header is translucent and blurs like the nav; the role test covers sections, cards, canvas and chrome. Flat checked by the color diff and per-bar measurements at 390, 1100 and 1440 px.

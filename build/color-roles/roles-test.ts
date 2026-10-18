@@ -52,10 +52,26 @@ const EQUIVALENT: [string, string][] = [
   ['tone-positive surface-fill', 'bg-positive dark:bg-positive-dark text-white'],
   ['tone-info surface-fill', 'bg-info dark:bg-info-dark text-white'],
   ['tone-warning surface-fill', 'bg-warning dark:bg-warning-dark text-black'],
+  // Surface containment in the flat defaults: the canvas and the bars are the surface, a section paints nothing and a
+  // card is filled. Their edge is 0px wide, in the subtle line color.
+  ['bg-canvas', 'bg-default dark:bg-default-dark'],
+  ['bg-chrome', 'bg-default dark:bg-default-dark'],
+  ['surface-section', 'border-gray-200 dark:border-gray-700'],
+  ['surface-card', 'bg-gray-50 dark:bg-gray-850 border-gray-200 dark:border-gray-700'],
+]
+
+/** [scope, classes inside it, old classes]: what a container re-maps for its subtree, as the same old classes. */
+const NESTED: [string, string, string][] = [
+  ['surface-section', 'bg-surface', 'bg-default dark:bg-default-dark'],
+  ['surface-section', 'surface-card', 'bg-gray-50 dark:bg-gray-850'],
+  ['surface-card', 'bg-surface', 'bg-gray-50 dark:bg-gray-850'],
+  ['surface-card', 'surface-card', 'bg-gray-100 dark:bg-gray-800'],
+  ['surface-card', 'tone-positive bg-tone-fill/10', 'bg-positive/10 dark:bg-positive-dark/10'],
 ]
 
 const HTML = `
 ${ EQUIVALENT.map(([next, prev], index) => `<div id="n${ index }" class="${ next }">x</div><div id="o${ index }" class="${ prev }">x</div>`).join('\n') }
+${ NESTED.map(([scope, next, prev], index) => `<div class="${ scope }"><div id="sn${ index }" class="${ next }">x</div></div><div class="${ scope }"><div id="so${ index }" class="${ prev }">x</div></div>`).join('\n') }
 <div class="tone-negative surface-fill">
   <span id="fill-accent" class="text-accent">a</span><span id="fill-description" class="text-description">d</span>
   <div class="surface"><span id="reset-accent" class="text-accent">r</span></div>
@@ -72,7 +88,7 @@ type Colors = Record<string, {color: string, background: string, border: string,
 
 const buildCss = async () => {
   // White and black are references for derived on-colors; the kit's theme resets the palette, so they're added here.
-  const source = '@import "tailwindcss";\n' + ['theme.css', 'roles.css', 'default.css'].map(file => readFileSync(CSS_DIR + file, 'utf8')).join('\n') + '\n@theme { --color-white: #fff; --color-black: #000; }'
+  const source = '@import "tailwindcss";\n' + ['theme.css', 'roles.css', 'breakpoints.css', 'surfaces.css', 'default.css'].map(file => readFileSync(CSS_DIR + file, 'utf8')).join('\n') + '\n@theme { --color-white: #fff; --color-black: #000; }'
   const compiler = await compile(source, {base: ROOT, onDependency: () => {}})
   const native = compiler.build([...new Set(HTML.match(/[\w:/.#[\]-]+/g))])
   const lowered = transform({filename: 'roles.css', code: Buffer.from(native), minify: true, targets: browserslistToTargets(browserslist(VITE_TARGETS))}).code.toString()
@@ -95,6 +111,13 @@ const check = (colors: Colors, dark: boolean, light?: Colors) => {
       if (key === 'outline' && !next.includes('outline')) continue
       if (a[key] !== b[key]) errors.push(`${ next } ≠ ${ prev } [${ key }] ${ a[key] } vs ${ b[key] }`)
     }
+  })
+
+  NESTED.forEach(([scope, next, prev], index) => {
+    const a = colors['sn' + index]
+    const b = colors['so' + index]
+
+    if (a.background !== b.background) errors.push(`${ next } in ${ scope } ≠ ${ prev } ${ a.background } vs ${ b.background }`)
   })
 
   if (colors['fill-accent'].color !== white) errors.push(`text-accent inside surface-fill: ${ colors['fill-accent'].color }`)

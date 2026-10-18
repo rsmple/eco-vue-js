@@ -6,7 +6,7 @@
   >
     <div
       :key="headerPadding"
-      class="w-header-bar-bg bg-surface supports-backdrop:backdrop-blur fixed inset-x-0 top-0 h-[calc(var(--header-height)+var(--header-height-padding))] print:hidden"
+      class="w-header-bar-bg bg-chrome fixed inset-x-0 top-0 h-[calc(var(--header-height)+var(--header-height-padding))] print:hidden"
       :class="{
         'supports-backdrop:bg-overlay': isTransparent,
       }"
