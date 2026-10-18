@@ -330,6 +330,13 @@
   .w-list-page-content {
     position: relative;
     min-width: 0;
+    /*
+     * The canvas the stuck header paints above itself ends at the section's top, as the rows do: what is above the list
+     * scrolls out under the header bar as it would without it. The padding takes the box up to there, the clip edge.
+     */
+    overflow-y: clip;
+    margin-block: calc(var(--w-section-padding) * -1);
+    padding-block: var(--w-section-padding);
 
     /* On phones the section spans the screen and the cards have padding of their own: they run to its edges. */
     @variant sm-not {
@@ -368,6 +375,102 @@
     z-index: calc(21 - var(--w-chrome-float) * 15);
     pointer-events: none;
     box-shadow: var(--w-section-shadow);
+
+    /*
+     * Only the part of the section in view, from the header bar's gap to the screen's bottom gap: its shadow wraps the
+     * edges the stuck header and the end draw there, not the rows running on under the header bar and off the screen.
+     */
+    @variant sm {
+      align-self: start;
+      top: var(--w-header-inner);
+      height: min(
+        calc(100% + var(--w-section-padding) * 2),
+        calc(100vh - var(--w-header-inner) - var(--w-chrome-gap))
+      );
+    }
+  }
+
+  /*
+   * The section's bottom edge while the rows run past the bottom of the screen: the fill with its rounded corners
+   * over the padding, and the canvas over a gap below it. It sticks to the bottom of the screen, and at the end of the
+   * rows it lies on the section's real edge. Over the frame: the canvas covers the frame's shadow beside it, and the
+   * edge casts its own, which takes over from the frame's further up. In the rows' box, which clips it at the
+   * section's edges: none of it shows past them on a short list or below the section at the end.
+   */
+  .w-list-page-end {
+    --w-list-end-height: calc(var(--w-section-padding) + var(--w-chrome-gap));
+    /*
+     * How far the canvas reaches past the edge, over the frame's shadow, and how far up the edge's shadow starts: past
+     * where the shadow fades out, or the handover between the two shows. The toolbar keeps the section taller than
+     * that and its corners.
+     */
+    --w-list-end-reach: 2rem;
+
+    position: sticky;
+    bottom: 0;
+    z-index: calc(22 - var(--w-chrome-float) * 15);
+    height: var(--w-list-end-height);
+    margin-bottom: calc(var(--w-list-end-height) * -1);
+    margin-inline: calc(var(--w-section-padding) * -1) calc(var(--w-section-padding) * -1 - var(--w-right-inner));
+    left: var(--w-band-start);
+    width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
+    pointer-events: none;
+    /* Docked (flat) the section has no edge to draw. */
+    opacity: var(--w-chrome-float);
+
+    /* The canvas around the edge: below it, and beside it up to the reach above it. */
+    &::before {
+      content: "";
+      position: absolute;
+      inset: calc(var(--w-list-end-reach) * -1) calc(var(--w-list-end-reach) * -1) 0;
+      background-color: var(--w-canvas);
+      background-image: var(--w-canvas-image);
+      background-attachment: fixed;
+      clip-path: polygon(
+        0 0,
+        var(--w-list-end-reach) 0,
+        var(--w-list-end-reach) var(--w-list-end-reach),
+        calc(100% - var(--w-list-end-reach)) var(--w-list-end-reach),
+        calc(100% - var(--w-list-end-reach)) 0,
+        100% 0,
+        100% 100%,
+        0 100%
+      );
+    }
+
+    /* The shadow, from a box running on up past the reach: beside it the shadow is as full as the frame's. */
+    &::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      top: calc(var(--w-list-end-reach) * -2);
+      bottom: var(--w-chrome-gap);
+      border-end-start-radius: var(--w-section-rounded);
+      border-end-end-radius: var(--w-section-rounded);
+      box-shadow: var(--w-section-shadow);
+      clip-path: inset(var(--w-list-end-reach) -100vw -100vh -100vw);
+    }
+
+    @variant sm-not {
+      display: none;
+    }
+  }
+
+  .w-list-page-end-fill {
+    position: relative;
+    height: var(--w-section-padding);
+    border: var(--w-section-border) solid var(--w-line-subtle);
+    border-top: 0;
+    border-end-start-radius: var(--w-section-rounded);
+    border-end-end-radius: var(--w-section-rounded);
+    background-color: var(--w-canvas);
+    background-image: var(--w-page-backdrop);
+    background-attachment: fixed;
+  }
+
+  .w-list-page-repaint .w-list-page-end::before,
+  .w-list-page-repaint .w-list-page-end-fill {
+    background-origin: border-box;
   }
 
   .w-list-page :is(.w-list-mask, .sticky.bg-surface) {
@@ -383,22 +486,120 @@
   }
 
   /*
-   * Floating, the stuck header paints the backdrop over itself and up to the top of the screen, under the header bar:
-   * no rows show in the gap above it or around the header's corners. It goes under the header bar for that. Docked
-   * (flat) it stays clear and above the header bar, which grows behind it.
+   * Off phones, the rows' sticky columns and the gutters beside them share one strip a side instead of a mask each:
+   * the part of the list in view, stuck to the screen. Safari repaints a fixed background late on a box that moves
+   * while the page scrolls, and leaves stale tiles of it; this one does not move. The rows' pages are not isolated, so
+   * it lies over the scrolling cells and under the sticky ones, which paint their row's border and fill over it.
+   */
+  .w-list-page-strip {
+    display: none;
+  }
+
+  @variant sm {
+    /* Over the rows, from the first to the last. */
+    .w-list-page-strip {
+      display: block;
+      position: absolute;
+      inset-block: var(--w-section-padding);
+      inset-inline: 0;
+      z-index: 1;
+      overflow-y: clip;
+      pointer-events: none;
+    }
+
+    /*
+     * Two screens past either end of the rows, so the strip stays stuck to the screen even where an end of the list is
+     * in view, and the clip cuts it there instead. Safari moves a stuck box a frame or so behind the scroll, and that
+     * would bring its own ends into view: they lie half a screen past the screen's.
+     */
+    .w-list-page-strip-track {
+      position: absolute;
+      inset-block: -200vh;
+      inset-inline: 0;
+    }
+
+    .w-list-page-strip-sides {
+      position: sticky;
+      top: -50vh;
+      left: var(--w-band-start);
+      height: 200vh;
+      margin-inline: calc(var(--w-section-padding) * -1) calc(var(--w-section-padding) * -1 - var(--w-right-inner));
+      width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        inset-block: 0;
+        background-color: var(--w-canvas);
+        background-image: var(--w-page-backdrop);
+        background-attachment: fixed;
+      }
+
+      &::before {
+        left: calc(var(--w-band-start) * -1);
+        width: calc(var(--w-left-inner) + var(--w-list-left));
+
+        /* Where the rows hide their select column. */
+        @variant @max-lg {
+          width: var(--w-left-inner);
+        }
+      }
+
+      &::after {
+        right: calc((var(--w-right-inner) - var(--w-section-padding)) * -1);
+        width: calc(var(--w-right-inner) + var(--w-list-right));
+      }
+    }
+
+    /* Nothing to cover without rows, and the empty state keeps its full width. */
+    .w-list-page-content:not(:has(.w-list-item)) > .w-list-page-strip {
+      display: none;
+    }
+
+    .w-list-page .w-list-item-sticky {
+      background: none;
+
+      > .w-list-mask {
+        display: none;
+      }
+    }
+
+    /* What runs across the row, and a group's heading between rows, stay over the strip. */
+    .w-list-page .w-list-item-expansion {
+      z-index: 1;
+    }
+
+    .w-list-page-rows > :not(.w-list-item, .w-list-item-expansion, :has(.w-list-item)),
+    .w-list-page-rows :has(> .w-list-item) > :not(.w-list-item, .w-list-item-expansion) {
+      position: relative;
+      z-index: 1;
+    }
+  }
+
+  /*
+   * Floating, the stuck header keeps the section's top edge: it sticks the section's padding below the header bar's
+   * gap, and draws the edge there — the fill with its rounded corners and border, and the canvas above it up to the
+   * section's top, under the header bar. The section's real edge is at that line when the header sticks, so the
+   * drawn one takes over from it in place. Docked (flat) it stays clear and above the header bar, which grows behind
+   * it.
    */
   .w-list-page .w-infinite-list-header {
     /* On phones the header bar is docked, with no gap under it: the stuck toolbar keeps a small one. */
     --w-list-header-top: calc(var(--w-header-inner) + var(--w-chrome-float) * 0.5rem);
 
     background-color: transparent;
+    top: calc(var(--w-header-inner) + var(--w-section-padding));
 
     @variant sm-not {
       top: var(--w-list-header-top);
     }
 
+    /*
+     * Only once stuck: before, the header scrolls with the page over the section, which is all it would show, and
+     * Safari leaves stale tiles of a fixed background on a box that moves.
+     */
     &::before {
-      content: "";
       position: absolute;
       inset-inline: 0;
       top: 0;
@@ -415,11 +616,53 @@
     z-index: calc(20 - var(--w-chrome-float) * 15) !important;
 
     &::before {
-      top: calc(var(--w-header-inner) * -1);
+      content: "";
+      top: calc((var(--w-header-inner) + var(--w-section-padding)) * -1);
+      inset-inline: calc(var(--w-section-padding) * -1);
+      background-image: var(--w-canvas-image);
 
       @variant sm-not {
         top: calc(var(--w-list-header-top) * -1);
+        inset-inline: 0;
+        background-image: var(--w-page-backdrop);
       }
     }
+  }
+
+  /*
+   * The edge, over the canvas: from the section's padding above the stuck header down to its bottom. It stays over
+   * the section while the list scrolls sideways under it, as the frame does. The frame casts its shadow.
+   */
+  .w-list-page .w-infinite-list-header-edge {
+    position: sticky;
+    left: var(--w-band-start);
+    z-index: -1;
+    width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
+    margin-inline-start: calc(var(--w-section-padding) * -1);
+    margin-inline-end: calc(var(--w-section-padding) * -1 - var(--w-right-inner));
+  }
+
+  .w-list-page .w-infinite-list-header-stuck .w-infinite-list-header-edge::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: calc(var(--w-section-padding) * -1);
+    height: calc(var(--w-section-padding) + var(--w-list-header-height, 0px));
+    opacity: var(--w-chrome-float);
+    border: var(--w-section-border) solid var(--w-line-subtle);
+    border-bottom: 0;
+    border-start-start-radius: var(--w-section-rounded);
+    border-start-end-radius: var(--w-section-rounded);
+    background-color: var(--w-canvas);
+    background-image: var(--w-page-backdrop);
+    background-attachment: fixed;
+
+    @variant sm-not {
+      content: none;
+    }
+  }
+
+  .w-list-page-repaint .w-infinite-list-header-stuck .w-infinite-list-header-edge::before {
+    background-origin: border-box;
   }
 }
