@@ -411,12 +411,25 @@
     z-index: calc(22 - var(--w-chrome-float) * 15);
     height: var(--w-list-end-height);
     margin-bottom: calc(var(--w-list-end-height) * -1);
-    margin-inline: calc(var(--w-section-padding) * -1) calc(var(--w-section-padding) * -1 - var(--w-right-inner));
-    left: var(--w-band-start);
-    width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
     pointer-events: none;
     /* Docked (flat) the section has no edge to draw. */
     opacity: var(--w-chrome-float);
+
+    @variant sm-not {
+      display: none;
+    }
+  }
+
+  /*
+   * Stuck to the bottom by its box and over the section by itself: Safari moves a box stuck on both axes a little out
+   * of step while the page scrolls sideways.
+   */
+  .w-list-page-end-band {
+    position: sticky;
+    left: var(--w-band-start);
+    height: 100%;
+    margin-inline: calc(var(--w-section-padding) * -1) calc(var(--w-section-padding) * -1 - var(--w-right-inner));
+    width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
 
     /* The canvas around the edge: below it, and beside it up to the reach above it. */
     &::before {
@@ -450,10 +463,6 @@
       box-shadow: var(--w-section-shadow);
       clip-path: inset(var(--w-list-end-reach) -100vw -100vh -100vw);
     }
-
-    @variant sm-not {
-      display: none;
-    }
   }
 
   .w-list-page-end-fill {
@@ -468,7 +477,7 @@
     background-attachment: fixed;
   }
 
-  .w-list-page-repaint .w-list-page-end::before,
+  .w-list-page-repaint .w-list-page-end-band::before,
   .w-list-page-repaint .w-list-page-end-fill {
     background-origin: border-box;
   }
@@ -531,9 +540,20 @@
     }
 
     .w-list-page-strip-sides {
-      left: var(--w-band-start);
-      margin-inline: calc(var(--w-section-padding) * -1) calc(var(--w-section-padding) * -1 - var(--w-right-inner));
       margin-bottom: -200vh;
+    }
+
+    /*
+     * Over the section by itself, as the end's band. The masks run a little past the screen's sides: Safari can leave
+     * the band a pixel out of step with the rows there while they scroll sideways.
+     */
+    .w-list-page-strip-band {
+      --w-list-strip-overrun: 0.5rem;
+
+      position: sticky;
+      left: var(--w-band-start);
+      height: 100%;
+      margin-inline: calc(var(--w-section-padding) * -1) calc(var(--w-section-padding) * -1 - var(--w-right-inner));
       width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
 
       &::before,
@@ -547,18 +567,18 @@
       }
 
       &::before {
-        left: calc(var(--w-band-start) * -1);
-        width: calc(var(--w-left-inner) + var(--w-list-left));
+        left: calc(var(--w-band-start) * -1 - var(--w-list-strip-overrun));
+        width: calc(var(--w-left-inner) + var(--w-list-left) + var(--w-list-strip-overrun));
 
         /* Where the rows hide their select column. */
         @variant @max-lg {
-          width: var(--w-left-inner);
+          width: calc(var(--w-left-inner) + var(--w-list-strip-overrun));
         }
       }
 
       &::after {
-        right: calc((var(--w-right-inner) - var(--w-section-padding)) * -1);
-        width: calc(var(--w-right-inner) + var(--w-list-right));
+        right: calc((var(--w-right-inner) - var(--w-section-padding)) * -1 - var(--w-list-strip-overrun));
+        width: calc(var(--w-right-inner) + var(--w-list-right) + var(--w-list-strip-overrun));
       }
     }
 

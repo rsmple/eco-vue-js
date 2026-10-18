@@ -189,7 +189,9 @@
         >
           <div class="w-list-page-strip">
             <div class="w-list-page-strip-track">
-              <div class="w-list-page-strip-sides" />
+              <div class="w-list-page-strip-sides">
+                <div class="w-list-page-strip-band" />
+              </div>
 
               <div
                 v-if="stripColumns.some(column => column.sticky)"
@@ -218,7 +220,9 @@
         v-if="isPage"
         class="w-list-page-end"
       >
-        <div class="w-list-page-end-fill" />
+        <div class="w-list-page-end-band">
+          <div class="w-list-page-end-fill" />
+        </div>
       </div>
     </div>
 
