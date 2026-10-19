@@ -2,7 +2,7 @@ import type {LocationQuery} from 'vue-router'
 
 import {type Ref, ref} from 'vue'
 
-import {checkExpirationDate, getLastRefreshPromise, removeExpirationDate, removeRefreshTimestamp, setExpirationDate, setRefreshTimestamp} from '@/components/Auth/utils/utils'
+import {EXPIRATION_DATE_KEY, checkExpirationDate, getLastRefreshPromise, removeExpirationDate, removeRefreshTimestamp, setExpirationDate, setRefreshTimestamp} from '@/components/Auth/utils/utils'
 
 import {ApiError, ApiErrorCancel, encodeQueryParams} from './api'
 
@@ -52,6 +52,8 @@ export class ApiClientInstance implements ApiClient {
     credentials?: RequestCredentials
     baseUrl?: BaseUrl
     noRecheck?: boolean
+    /** Cookie holding when to refresh the session, in epoch seconds. Defaults to `exp` */
+    expirationCookie?: string
   }) {
     if (typeof window !== 'undefined' && !config.noRecheck) {
       this.checkAuth()
@@ -64,12 +66,16 @@ export class ApiClientInstance implements ApiClient {
     }
   }
 
+  private get expirationCookie(): string {
+    return this.config.expirationCookie ?? EXPIRATION_DATE_KEY
+  }
+
   setOnFailure(value: (response: Response) => void) {
     this.config.onFailure = value
   }
 
   logout() {
-    removeExpirationDate()
+    removeExpirationDate(this.expirationCookie)
 
     this.auth.value = false
   }
@@ -90,7 +96,7 @@ export class ApiClientInstance implements ApiClient {
 
   private async refresh(): Promise<void> {
     if (!this.refreshPromise) {
-      const refreshTimeoutPromise = getLastRefreshPromise()
+      const refreshTimeoutPromise = getLastRefreshPromise(this.expirationCookie)
 
       if (refreshTimeoutPromise) {
         this.refreshPromise = refreshTimeoutPromise
@@ -117,7 +123,7 @@ export class ApiClientInstance implements ApiClient {
             }
           })
       } else {
-        setRefreshTimestamp()
+        setRefreshTimestamp(this.expirationCookie)
 
         const promise = this.config.tokenRefresh
           ? this.config.tokenRefresh()
@@ -134,7 +140,7 @@ export class ApiClientInstance implements ApiClient {
 
             return Promise.reject(error)
           })
-          .finally(removeRefreshTimestamp)
+          .finally(() => removeRefreshTimestamp(this.expirationCookie))
       }
     }
 
@@ -145,10 +151,10 @@ export class ApiClientInstance implements ApiClient {
     let result
 
     if (this.config.tokenGetter) result = !!this.config.tokenGetter?.()
-    else result = checkExpirationDate()
+    else result = checkExpirationDate(this.expirationCookie)
 
     if (result !== false) this.auth.value = result !== null
-    if (result === null) removeExpirationDate()
+    if (result === null) removeExpirationDate(this.expirationCookie)
 
     return result
   }
@@ -247,7 +253,7 @@ export class ApiClientInstance implements ApiClient {
           }
         })
         .finally(() => {
-          if (config?.updateToken) setExpirationDate()
+          if (config?.updateToken) setExpirationDate(this.expirationCookie)
         })
     })
   }
