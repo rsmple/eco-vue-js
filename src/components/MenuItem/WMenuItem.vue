@@ -1,7 +1,7 @@
 <template>
   <component
     :is="disabled || loading ? 'div' : to ? WRouterLink : href ? 'a' : 'button'"
-    v-bind="disabled || loading ? undefined : to ? {to} : href ? {href, download} : undefined"
+    v-bind="disabled || loading ? undefined : to ? {to, replace, target, rel} : href ? {href, download, target, rel} : undefined"
     class="w-ripple-trigger relative block w-full select-none items-center justify-start px-2 text-start outline-none first:pt-2 last:pb-2"
     :class="{
       [semanticTypeTextMap[semanticType]]: toned && !disabled,
@@ -80,6 +80,12 @@ interface Props extends Partial<LinkProps> {
   href?: string
   /** `download` attribute of the `href` link — the file name to save it as. */
   download?: string
+  /** With `to`, replaces the current history entry instead of pushing a new one. */
+  replace?: boolean
+  /** Native `target` of the link, with `href` or `to`. */
+  target?: '_self' | '_blank' | '_parent' | '_top'
+  /** Native `rel` of the link, with `href` or `to`. */
+  rel?: string
   /** Marks the item as picked, with primary text and a check. `false` leaves room for the check, to line up with picked items. */
   active?: boolean
   /** Tooltip text on the left of the item. */
@@ -97,6 +103,8 @@ const props = withDefaults(
     semanticType: SemanticType.PRIMARY,
     download: undefined,
     href: undefined,
+    target: undefined,
+    rel: undefined,
     tooltipText: undefined,
   },
 )
