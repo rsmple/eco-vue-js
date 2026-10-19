@@ -348,6 +348,9 @@ import WMenuItem from 'eco-vue-js/dist/components/MenuItem/WMenuItem.vue'
 | `disabled` | `boolean` | — | Grays the item out and ignores clicks. |
 | `href` | `string` | — | URL of a plain link, when there is no `to`. |
 | `download` | `string` | — | `download` attribute of the `href` link — the file name to save it as. |
+| `replace` | `boolean` | — | With `to`, replaces the current history entry instead of pushing a new one. |
+| `target` | `"_self" \| "_blank" \| "_parent" \| "_top"` | — | Native `target` of the link, with `href` or `to`. |
+| `rel` | `string` | — | Native `rel` of the link, with `href` or `to`. |
 | `active` | `boolean` | — | Marks the item as picked, with primary text and a check. `false` leaves room for the check, to line up with picked items. |
 | `tooltipText` | `string` | — | Tooltip text on the left of the item. |
 | `loading` | `boolean` | — | Shows a spinner over the item and ignores clicks. |
@@ -385,6 +388,9 @@ import WButtonMoreItem from 'eco-vue-js/dist/components/Button/WButtonMoreItem.v
 | `disabled` | `boolean` | — | Blocks clicks and dims the item. |
 | `href` | `string` | — | Renders the item as a link to this URL. |
 | `download` | `string` | — | Native `download` attribute, with `href`. |
+| `replace` | `boolean` | — | With `to`, replaces the current history entry instead of pushing a new one. |
+| `target` | `"_self" \| "_blank" \| "_parent" \| "_top"` | — | Native `target` of the link, with `href` or `to`. |
+| `rel` | `string` | — | Native `rel` of the link, with `href` or `to`. |
 | `tooltipText` | `string` | — | Tooltip over the item. |
 | `semanticType` | `SemanticType` | — | Color of the item. Types other than `primary` and `secondary` color the text at rest — a red "Delete". |
 | `to` | `RouteLocationRaw` | — | Router location — renders a router link. Needs vue-router installed in the app. |
