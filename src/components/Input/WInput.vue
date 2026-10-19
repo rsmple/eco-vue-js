@@ -870,5 +870,6 @@ defineExpose({
   undo,
   redo,
   showMessage,
+  cancel: asyncState.cancel,
 })
 </script>

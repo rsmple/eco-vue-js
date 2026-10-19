@@ -142,7 +142,7 @@ A form in a modal usually has its buttons in the modal's `actions` slot, outside
 
 ## Auto-save
 
-`async` saves every change right away, one field at a time. The changed field shows a spinner while it is saved, and the rest of the form stays editable. `confimGetter` asks before a change is applied — the change is dropped on cancel.
+`async` saves every change right away, one field at a time. The changed field shows a spinner while it is saved, and the rest of the form stays editable. `confimGetter` asks before a change is applied — on cancel the change is dropped and the field shows the saved value again.
 
 Only the changed fields are validated and sent. An invalid one shows its error at once and keeps its value without being saved, and changes to other fields are still saved. The value is sent once it is fixed. A change made while a save is in progress is sent when that save ends. When `apiMethod` returns nothing, the sent values become the initial ones for their fields. Fields that weren't sent keep their unsaved changes. `fullPayload` sends the whole model instead and waits until every field is valid.
 
@@ -390,7 +390,7 @@ import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 | `initHasValue` | `boolean \| null` | — | Overrides the `hasValue` state reported to the parent, e.g. while the fields are not mounted. |
 | `initHasError` | `boolean` | — | Overrides the error state reported to the parent, e.g. while the fields are not mounted. |
 | `noChanges` | `boolean` | — | Never reports unsaved changes. |
-| `confimGetter` | `((payload: ResultModel, data: Model) => ConfirmProps \| Promise<ConfirmProps \| undefined> \| undefined)` | — | Returns the props of a confirm modal to show before a change is applied. The change is dropped on cancel; returning nothing applies it at once. |
+| `confimGetter` | `((payload: ResultModel, data: Model) => ConfirmProps \| Promise<ConfirmProps \| undefined> \| undefined)` | — | Returns the props of a confirm modal to show before a change is applied. The change is dropped on cancel, along with the field's unsaved draft; returning nothing applies it at once. |
 | `useQueryFn` | `UseQueryDefault<InnerModel, QueryParams> \| UseQueryDefault<InnerModel, undefined>` | — | Query that loads the model when `modelValue` is not given. The form shows skeletons until it loads. |
 | `queryParams` | `QueryParams` | — | Params of `useQueryFn`. |
 | `noParams` | `true` | — | `useQueryFn` takes no params. |

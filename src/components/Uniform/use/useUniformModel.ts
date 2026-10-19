@@ -62,6 +62,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   submit: () => void,
   emitInitModel: () => void,
   validateOnUpdate: ((newValue: ResultModel) => void) | undefined,
+  onConfirmCancel: (() => void) | undefined,
 ) => {
   const query = useQueryFn
     ? useQueryFn(queryParams as Ref<QueryParams>, {enabled: computed(() => !parentModel.value)})
@@ -194,10 +195,13 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
 
     if (!confirmProps) return emitValue(value)
 
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       closeModal = Modal.addConfirm({
         ...confirmProps,
-        onCancel: reject,
+        onCancel: () => {
+          onConfirmCancel?.()
+          resolve()
+        },
         onAccept: () => resolve(emitValue(value)),
       }, () => closeModal = null)
     })
