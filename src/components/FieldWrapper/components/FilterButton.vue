@@ -8,7 +8,7 @@
     v-else
     class="w-ripple w-ripple-hover rounded p-[0.125em]"
     :class="{
-      'text-description': $route.query[filterField] !== encodedQueryParam,
+      'text-description opacity-0 group-hover/field:opacity-100': $route.query[filterField] !== encodedQueryParam,
       'tone-primary surface-fill': $route.query[filterField] === encodedQueryParam,
     }"
     :aria-pressed="$route.query[filterField] === encodedQueryParam"
