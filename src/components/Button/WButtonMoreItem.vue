@@ -3,6 +3,9 @@
     :to="to"
     :href="href"
     :download="download"
+    :replace="replace"
+    :target="target"
+    :rel="rel"
     :disabled="disabled"
     :tooltip-text="tooltipText"
     :semantic-type="semanticType"
@@ -42,6 +45,12 @@ interface Props extends Partial<LinkProps> {
   href?: string
   /** Native `download` attribute, with `href`. */
   download?: string
+  /** With `to`, replaces the current history entry instead of pushing a new one. */
+  replace?: boolean
+  /** Native `target` of the link, with `href` or `to`. */
+  target?: '_self' | '_blank' | '_parent' | '_top'
+  /** Native `rel` of the link, with `href` or `to`. */
+  rel?: string
   /** Tooltip over the item. */
   tooltipText?: string
   /** Color of the item. Types other than `primary` and `secondary` color the text at rest — a red "Delete". */
