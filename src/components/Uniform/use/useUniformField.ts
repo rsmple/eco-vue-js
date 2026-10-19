@@ -135,6 +135,12 @@ export const useUniformField = <Model>(
     if (!onlyChanged || hasChanges?.value) showMessage(message)
   }
 
+  const cancelField = (): void => {
+    for (const instance of Array.isArray(fieldRef.value) ? fieldRef.value : [fieldRef.value]) {
+      if (instance && 'cancel' in instance && typeof instance.cancel === 'function') instance.cancel()
+    }
+  }
+
   const getFieldChanged = (field: string): boolean => {
     if (fieldGetter() === field) return hasChanges?.value ?? false
     return false
@@ -153,5 +159,6 @@ export const useUniformField = <Model>(
     getInvalidatePayload,
     showMessage: showMessageField,
     getFieldChanged,
+    cancelField,
   }
 }
