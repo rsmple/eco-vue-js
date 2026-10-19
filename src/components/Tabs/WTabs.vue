@@ -192,7 +192,7 @@ import {Notify} from '@/utils/Notify'
 import {useOverlayClose, useOverlayFrame} from '@/utils/Overlay'
 import {useIsMobile} from '@/utils/mobile'
 import {getText} from '@/utils/texts'
-import {debounce, getHasScrollbar, getPropValue, throttle, unwrapSlots} from '@/utils/utils'
+import {debounce, getHasScrollbar, getPropValue, getScrollParent, throttle, unwrapSlots} from '@/utils/utils'
 
 import TabItem from './components/TabItem.vue'
 import TabTitleButton from './components/TabTitleButton.vue'
@@ -367,9 +367,16 @@ const scrollToTabContent = () => {
   }, 300)
 }
 
+const resetHorizontalScroll = () => {
+  const parent = containerRef.value && (getScrollParent(containerRef.value) ?? document.scrollingElement)
+
+  if (parent?.scrollLeft) parent.scrollTo({left: 0, behavior: 'instant'})
+}
+
 const setCurrent = (value: string) => {
   if (current.value === value || !defaultSlotsKeys.value.includes(value)) return
 
+  resetHorizontalScroll()
   isDirect.value = defaultSlotsKeys.value.indexOf(current.value) < defaultSlotsKeys.value.indexOf(value)
   current.value = value
 
