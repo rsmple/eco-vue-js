@@ -425,6 +425,7 @@ const props = withDefaults(
   {
     size: 10,
     autocomplete: 'off',
+    maxSizeKb: 100,
     readonly: undefined,
     disabled: undefined,
     skeleton: undefined,
@@ -775,14 +776,11 @@ const autofocusDebounced = () => {
   }, typeof props.autofocus === 'number' ? props.autofocus : 250)
 }
 
-const maxSizeKb = 10
-const maxSize = maxSizeKb * 1024 // 10 KB
-
 let closeModal: (() => void) | null = null
 
 const processFile = async (file: File) => {
-  if (file.size > maxSize) {
-    fieldWrapperRef.value?.showMessage(`File is too large. Max size is ${ (maxSizeKb).toFixed(0) } KB`, 4000)
+  if (file.size > props.maxSizeKb * 1024) {
+    fieldWrapperRef.value?.showMessage(`File is too large. Max size is ${ props.maxSizeKb.toFixed(0) } KB`, 4000)
     return
   }
 

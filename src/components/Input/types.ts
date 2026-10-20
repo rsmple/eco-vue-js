@@ -24,6 +24,8 @@ export interface InputProps<Type extends InputType, ClearValue extends InputClea
   size?: number
   /** Cuts off input longer than this, and shows a `length / maxLength` counter under the field while it is focused. */
   maxLength?: number
+  /** Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. */
+  maxSizeKb?: number
   /** Native `step` attribute for `type="number"`. */
   step?: number
   /** Native `min` attribute for `type="number"`. */

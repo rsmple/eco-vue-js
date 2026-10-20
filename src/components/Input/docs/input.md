@@ -312,6 +312,7 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | `10` | Native `size` attribute, which sets the input's minimum width in characters. |
 | `maxLength` | `number` | — | Cuts off input longer than this, and shows a `length / maxLength` counter under the field while it is focused. |
+| `maxSizeKb` | `number` | `100` | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
@@ -425,6 +426,7 @@ import WInputAsync from 'eco-vue-js/dist/components/Input/WInputAsync.vue'
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
 | `maxLength` | `number` | — | Cuts off input longer than this, and shows a `length / maxLength` counter under the field while it is focused. |
+| `maxSizeKb` | `number` | — | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
@@ -526,6 +528,7 @@ import WInputSuggest from 'eco-vue-js/dist/components/Input/WInputSuggest.vue'
 | `placeholder` | `string` | — | Hint shown while the field is empty. |
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxSizeKb` | `number` | — | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
@@ -639,6 +642,7 @@ import WInputOptions from 'eco-vue-js/dist/components/Input/WInputOptions.vue'
 | `placeholder` | `string` | — | Hint shown while the field is empty. |
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxSizeKb` | `number` | — | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
@@ -746,6 +750,7 @@ import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
 | `placeholder` | `string` | — | Hint shown while the field is empty. |
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxSizeKb` | `number` | — | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |

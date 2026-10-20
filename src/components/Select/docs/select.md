@@ -1244,7 +1244,7 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 
 :::
 
-::: details Inherited from `src/components/Input/types.ts` (34)
+::: details Inherited from `src/components/Input/types.ts` (35)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1256,6 +1256,7 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 | `placeholder` | `string` | — | Hint shown while the field is empty. |
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxSizeKb` | `number` | — | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
@@ -1372,7 +1373,7 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 
 :::
 
-::: details Inherited from `src/components/Input/types.ts` (34)
+::: details Inherited from `src/components/Input/types.ts` (35)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1384,6 +1385,7 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 | `placeholder` | `string` | — | Hint shown while the field is empty. |
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxSizeKb` | `number` | — | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
@@ -1504,7 +1506,7 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 
 :::
 
-::: details Inherited from `src/components/Input/types.ts` (34)
+::: details Inherited from `src/components/Input/types.ts` (35)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1516,6 +1518,7 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 | `placeholder` | `string` | — | Hint shown while the field is empty. |
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxSizeKb` | `number` | — | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
@@ -1634,7 +1637,7 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 
 :::
 
-::: details Inherited from `src/components/Input/types.ts` (34)
+::: details Inherited from `src/components/Input/types.ts` (35)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1646,6 +1649,7 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 | `placeholder` | `string` | — | Hint shown while the field is empty. |
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxSizeKb` | `number` | — | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
@@ -1764,7 +1768,7 @@ import WSelectStringified from 'eco-vue-js/dist/components/Select/WSelectStringi
 
 :::
 
-::: details Inherited from `src/components/Input/types.ts` (34)
+::: details Inherited from `src/components/Input/types.ts` (35)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1776,6 +1780,7 @@ import WSelectStringified from 'eco-vue-js/dist/components/Select/WSelectStringi
 | `placeholder` | `string` | — | Hint shown while the field is empty. |
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxSizeKb` | `number` | — | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
