@@ -20,6 +20,7 @@
           unclickable: toggleScope?.unclickable,
           description: toggleScope?.unclickable === false ? undefined : description,
           seamless: toggleScope?.unclickable === false ? false : props.seamless,
+          placeholder: toggleScope.unclickable && isOpen ? undefined : props.placeholder,
           topText: topText || (isOpen && !toggleScope?.isTop),
           autofocus: autofocus ?? embedded,
           embedded: false,
@@ -29,7 +30,6 @@
         :class="{
           'cursor-pointer': !isDisabled && !isReadonly,
           'cursor-not-allowed': isDisabled && !isReadonly,
-          'mb-3': isMobile && !toggleScope?.unclickable,
         }"
         @update:model-value="!loading && $emit('update:model-value', $event as EmitType)"
 
