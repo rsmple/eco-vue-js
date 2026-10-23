@@ -1,7 +1,8 @@
 import {type Query, type QueryClient, useQueryClient} from '@tanstack/vue-query'
-import {type MaybeRefOrGetter, hasInjectionContext, toValue, watch} from 'vue'
+import {type MaybeRefOrGetter, hasInjectionContext, shallowReactive, toValue, watch} from 'vue'
 
 import {ApiError, ApiErrorCancel, ApiErrorUnavailable} from './api'
+import {getText} from './texts'
 
 export const MAX_QUERY_RETRIES = 2
 
@@ -25,10 +26,43 @@ export const defaultQueryRetry = (failureCount: number, error: unknown): boolean
   return failureCount < MAX_QUERY_RETRIES && isRetryableError(error)
 }
 
+const MAX_DETAIL_LENGTH = 200
+
+/** A short message for a query that failed to load: the server is unavailable, the server's own short `detail`, or a generic failure */
+export const getLoadErrorMessage = (error: unknown): string => {
+  if (error instanceof ApiErrorUnavailable) return getText('serverUnavailable')
+
+  const detail = error instanceof ApiError ? error.response?.data?.detail : undefined
+
+  return typeof detail === 'string' && detail.length < MAX_DETAIL_LENGTH ? detail : getText('loadError')
+}
+
+const handledQueryErrorSet = shallowReactive(new Set<unknown>())
+
+/** Marks the error a component already shows, such as a failed list page or a page error, so `WQueryStatus` leaves it out of its message */
+export const useHandledQueryError = (error: MaybeRefOrGetter<unknown>): void => {
+  watch(() => toValue(error), (value, _, onCleanup) => {
+    if (!value) return
+
+    handledQueryErrorSet.add(value)
+    onCleanup(() => handledQueryErrorSet.delete(value))
+  }, {immediate: true})
+}
+
+export const isHandledQueryError = (error: unknown): boolean => handledQueryErrorSet.has(error)
+
 const RECOVERY_DELAY_MIN = 2_000
 const RECOVERY_DELAY_MAX = 10_000
 
 const isRecoverableQuery = (query: Query): boolean => query.state.status === 'error' && isRetryableError(query.state.error)
+
+/** The queries on screen that failed without data with an error asking again may fix, apart from those a component already shows */
+export const findFailedQueries = (queryClient: QueryClient): Query[] => {
+  return queryClient.getQueryCache().findAll({
+    type: 'active',
+    predicate: query => isRecoverableQuery(query) && query.state.data === undefined && !isHandledQueryError(query.state.error),
+  })
+}
 
 /** Fetches again every query on screen that failed with an error asking again may fix */
 export const refetchFailedQueries = (queryClient: QueryClient): Promise<void> => {

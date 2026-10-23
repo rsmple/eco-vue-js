@@ -63,7 +63,7 @@ import WButton from '@/components/Button/WButton.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
 import {ApiError, ApiErrorUnavailable} from '@/utils/api'
-import {getQueryClient, isRetryableError, refetchFailedQueries} from '@/utils/queryClient'
+import {getQueryClient, isRetryableError, refetchFailedQueries, useHandledQueryError} from '@/utils/queryClient'
 import {getText} from '@/utils/texts'
 
 defineOptions({inheritAttrs: false})
@@ -79,6 +79,8 @@ defineSlots<{
   /** The page, shown while there is no error. */
   default?: () => void
 }>()
+
+useHandledQueryError(() => props.error)
 
 const status = computed(() => props.error instanceof ApiError ? props.error.response?.status : undefined)
 

@@ -47,7 +47,7 @@ import {watchServerRecovery} from 'eco-vue-js/dist/utils/queryClient'
 watchServerRecovery(queryClient, apiClient.useAvailable(), () => apiClient.get('/profile/'))
 ```
 
-While the server is unreachable, the probe is sent every few seconds, and at once when the browser comes back online or the tab is shown. Once the server answers again, the failed queries on screen are fetched again. Their error states, such as a list's Retry or a [page error](/components/page-error), stay in place until then. A probe answered right away means the server is up and only some endpoints fail, so their queries wait for Retry instead of being fetched again and again.
+While the server is unreachable, the probe is sent every few seconds, and at once when the browser comes back online or the tab is shown. Once the server answers again, the failed queries on screen are fetched again. Their error states, such as a list's Retry, a [page error](/components/page-error) or the [query status](/components/query-status) message, stay in place until then. A probe answered right away means the server is up and only some endpoints fail, so their queries wait for Retry instead of being fetched again and again.
 
 ### Auth
 
