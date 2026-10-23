@@ -43,6 +43,9 @@ export class ApiClientInstance implements ApiClient {
   refreshPromise: Promise<void> | null = null
   private readonly auth = ref(true)
   public readonly useAuth: () => Ref<boolean>
+  private readonly available = ref(true)
+  /** Whether the server answered the last request itself: false after a network failure or a 502, 503 or 504 from a gateway, true again on its next answer */
+  public readonly useAvailable: () => Readonly<Ref<boolean>>
 
   constructor(private config: {
     tokenGetter?: () => string | null
@@ -63,6 +66,10 @@ export class ApiClientInstance implements ApiClient {
 
     this.useAuth = () => {
       return this.auth
+    }
+
+    this.useAvailable = () => {
+      return this.available
     }
   }
 
@@ -172,8 +179,14 @@ export class ApiClientInstance implements ApiClient {
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') throw new ApiErrorCancel<D>({data: undefined, config, request})
 
+      this.available.value = false
+
       throw new ApiErrorUnavailable<D>({data: undefined, config, request})
     }
+
+    const isUnavailable = UNAVAILABLE_STATUS_LIST.includes(response.status)
+
+    this.available.value = !isUnavailable
 
     const data = await response.json().catch(() => undefined)
 
@@ -191,7 +204,7 @@ export class ApiClientInstance implements ApiClient {
 
     this.config.onFailure?.(response)
 
-    const ErrorClass = UNAVAILABLE_STATUS_LIST.includes(response.status) ? ApiErrorUnavailable : ApiError
+    const ErrorClass = isUnavailable ? ApiErrorUnavailable : ApiError
 
     throw new ErrorClass<D>({data, status: response.status, config, request})
   }
