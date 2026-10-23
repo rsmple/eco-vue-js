@@ -4,7 +4,7 @@ import {type Ref, ref} from 'vue'
 
 import {EXPIRATION_DATE_KEY, checkExpirationDate, getLastRefreshPromise, removeExpirationDate, removeRefreshTimestamp, setExpirationDate, setRefreshTimestamp} from '@/components/Auth/utils/utils'
 
-import {ApiError, ApiErrorCancel, encodeQueryParams} from './api'
+import {ApiError, ApiErrorCancel, ApiErrorUnavailable, UNAVAILABLE_STATUS_LIST, encodeQueryParams} from './api'
 
 export {updateExpirationDate} from '@/components/Auth/utils/utils'
 
@@ -80,20 +80,6 @@ export class ApiClientInstance implements ApiClient {
     this.auth.value = false
   }
 
-  private async retry(request: Request) {
-    const token = this.config.tokenGetter?.()
-
-    if (token) request.headers.set('Authorization', 'Bearer ' + token)
-
-    const response = await fetch(request)
-
-    return {
-      data: await response.json(),
-      status: response.status,
-      request,
-    }
-  }
-
   private async refresh(): Promise<void> {
     if (!this.refreshPromise) {
       const refreshTimeoutPromise = getLastRefreshPromise(this.expirationCookie)
@@ -136,7 +122,8 @@ export class ApiClientInstance implements ApiClient {
           })
           .catch((error: unknown) => {
             this.refreshPromise = null
-            this.auth.value = false
+
+            if (!(error instanceof ApiErrorUnavailable)) this.auth.value = false
 
             return Promise.reject(error)
           })
@@ -159,103 +146,103 @@ export class ApiClientInstance implements ApiClient {
     return result
   }
 
-  private fetch<R, D extends RequestData>(method: string, url: ApiUrl, config?: RequestConfig<D>, baseUrl?: BaseUrl): Promise<RequestResponse<R, D>> {
-    return new Promise(async (resolve, reject) => {
-      const headers = new Headers(config?.data instanceof FormData ? HEADERS_FORMDATA : HEADERS_JSON)
+  private get canRefresh(): boolean {
+    return !!(this.config.refreshUrl || this.config.tokenRefresh)
+  }
 
-      if (!config?.noAuth && !config?.updateToken) {
-        if (this.refreshPromise) await this.refreshPromise
+  private setAuthorization(headers: Headers): boolean {
+    if (!this.config.tokenGetter) return true
 
-        const check = this.checkAuth()
+    const token = this.config.tokenGetter()
 
-        if (!check) {
-          if (check !== null && (this.config.refreshUrl || this.config.tokenRefresh)) await this.refresh()
+    if (!token) return false
 
-          if (!this.checkAuth() && !this.config.tokenGetter) {
-            this.auth.value = false
+    headers.set('Authorization', 'Bearer ' + token)
 
-            reject()
-            return
-          }
-        }
+    return true
+  }
 
-        if (this.config.tokenGetter) {
-          const token = this.config.tokenGetter()
+  private async send<R, D extends RequestData>(request: Request, config: RequestConfig<D> | undefined, refreshOnUnauthorized: boolean): Promise<RequestResponse<R, D>> {
+    const requestClone = refreshOnUnauthorized ? request.clone() : null
 
-          if (token) headers.append('Authorization', 'Bearer ' + token)
-          else {
-            this.auth.value = false
-            reject()
-            return
-          }
+    let response: Response
+
+    try {
+      response = await fetch(request)
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') throw new ApiErrorCancel<D>({data: undefined, config, request})
+
+      throw new ApiErrorUnavailable<D>({data: undefined, config, request})
+    }
+
+    const data = await response.json().catch(() => undefined)
+
+    if (response.ok) return {data, status: response.status, config, request}
+
+    if (response.status === 401 && requestClone) {
+      if (this.canRefresh) {
+        await this.refresh()
+
+        if (this.setAuthorization(requestClone.headers)) return this.send<R, D>(requestClone, config, false)
+      }
+
+      this.auth.value = false
+    }
+
+    this.config.onFailure?.(response)
+
+    const ErrorClass = UNAVAILABLE_STATUS_LIST.includes(response.status) ? ApiErrorUnavailable : ApiError
+
+    throw new ErrorClass<D>({data, status: response.status, config, request})
+  }
+
+  private async fetch<R, D extends RequestData>(method: string, url: ApiUrl, config?: RequestConfig<D>, baseUrl?: BaseUrl): Promise<RequestResponse<R, D>> {
+    const headers = new Headers(config?.data instanceof FormData ? HEADERS_FORMDATA : HEADERS_JSON)
+
+    if (!config?.noAuth && !config?.updateToken) {
+      if (this.refreshPromise) await this.refreshPromise
+
+      const check = this.checkAuth()
+
+      if (!check) {
+        if (check !== null && this.canRefresh) await this.refresh()
+
+        if (!this.checkAuth() && !this.config.tokenGetter) {
+          this.auth.value = false
+
+          return Promise.reject()
         }
       }
 
-      const params = config?.params ? '?' + getURLParams(config.params) : ''
+      if (!this.setAuthorization(headers)) {
+        this.auth.value = false
 
-      const request = new Request(
-        (baseUrl ?? this.config.baseUrl) + url + params,
-        {
-          method: method,
-          mode: 'cors',
-          cache: 'no-cache',
-          credentials: this.config.credentials ?? 'same-origin',
-          headers,
-          redirect: 'follow',
-          referrerPolicy: 'no-referrer',
-          body: config?.data ? config.data instanceof FormData ? config.data : JSON.stringify(config.data) : undefined,
-          signal: config?.signal,
-        },
-      )
+        return Promise.reject()
+      }
+    }
 
-      const requestClone = request.clone()
+    const params = config?.params ? '?' + getURLParams(config.params) : ''
 
-      fetch(request)
-        .then(response => {
-          response
-            .json()
-            .catch(() => undefined)
-            .then(data => {
-              if (response.ok) {
-                resolve({
-                  data,
-                  status: response.status,
-                  config: config,
-                  request,
-                })
-              } else {
-                if (response.status === 401) {
-                  if (this.config.refreshUrl || this.config.tokenRefresh) return this.refresh().then(() => this.retry(requestClone).then(resolve).catch(reject))
+    const request = new Request(
+      (baseUrl ?? this.config.baseUrl) + url + params,
+      {
+        method: method,
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: this.config.credentials ?? 'same-origin',
+        headers,
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: config?.data ? config.data instanceof FormData ? config.data : JSON.stringify(config.data) : undefined,
+        signal: config?.signal,
+      },
+    )
 
-                  this.auth.value = false
-                }
-
-                this.config.onFailure?.(response)
-
-                reject(new ApiError<D>({
-                  data,
-                  status: response.status,
-                  config: config,
-                  request,
-                }))
-              }
-            })
-        })
-        .catch(error => {
-          if (error instanceof DOMException && error.name === 'AbortError') {
-            reject(new ApiErrorCancel<D>({
-              data: undefined,
-              config: config,
-              request,
-            }))
-          } else {
-            reject(error)
-          }
-        })
-        .finally(() => {
-          if (config?.updateToken) setExpirationDate(this.expirationCookie)
-        })
-    })
+    try {
+      return await this.send<R, D>(request, config, !config?.noAuth && !config?.updateToken)
+    } finally {
+      if (config?.updateToken) setExpirationDate(this.expirationCookie)
+    }
   }
 
   public get baseUrl() {

@@ -24,6 +24,15 @@ export class ApiErrorCancel<Data extends RequestData = NonNullable<unknown>> ext
   }
 }
 
+export const UNAVAILABLE_STATUS_LIST: readonly number[] = [502, 503, 504]
+
+/** The server could not be reached, or a gateway in front of it answered instead; a network failure has no `status` */
+export class ApiErrorUnavailable<Data extends RequestData = NonNullable<unknown>> extends ApiError<Data, ErrorResponse<Data> | undefined> {
+  constructor(response: RequestResponse<ErrorResponse<Data> | undefined, Data>) {
+    super(response)
+  }
+}
+
 export const handleApiError = <Error>(
   error: Error,
   form?: {invalidate: ComponentInstance<typeof WForm>['invalidate']} | null,
