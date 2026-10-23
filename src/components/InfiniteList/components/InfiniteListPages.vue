@@ -63,6 +63,16 @@
       >
         <slot name="empty" />
       </template>
+
+      <template
+        v-if="$slots.error"
+        #error="scope"
+      >
+        <slot
+          name="error"
+          v-bind="scope"
+        />
+      </template>
     </InfiniteListPage>
 
     <div ref="bottomSentinel" />
@@ -651,5 +661,6 @@ defineSlots<{
     intersecting: boolean
   }) => void
   empty?: () => void
+  error?: (props: {error: Error, retry: () => Promise<void>, isFetching: boolean}) => void
 }>()
 </script>

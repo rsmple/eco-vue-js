@@ -151,6 +151,7 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 | `selection` | — | Replaces the buttons at the end of the selection bar — range select, refetch, sort and column settings. |
 | `group` | `{ item: Data; previous: Data \| undefined; skeleton: boolean; }` | Heading before each group of rows, with `groupBy`. `skeleton` is true while the page loads. |
 | `empty` | — | Shown instead of the rows when the query returns no items. |
+| `error` | `{ error: Error; retry: () => Promise<void>; isFetching: boolean; }` | Shown instead of a page that failed to load and has nothing cached. Gets the `error`, `retry` to load the page again, and `isFetching`. Replaces the message and Retry button. |
 
 <!-- @api-end -->
 

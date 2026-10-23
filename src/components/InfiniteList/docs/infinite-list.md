@@ -301,6 +301,7 @@ import WInfiniteList from 'eco-vue-js/dist/components/InfiniteList/WInfiniteList
 | `default` | `{ item: Data; setter: (newItem?: Data \| undefined) => void; skeleton: boolean; refetch: () => void; previous: Data \| undefined; next: Data \| undefined; first: boolean; last: boolean; resetting: boolean; page: number; index: number; position: number; value: Model; results: Data[] \| undefined; intersecting: boolean; }` | An item, or a skeleton placeholder while its page loads. `setter` writes a changed item to the query cache, or removes it when called with nothing; `position` is the item's index in the whole list. |
 | `header` | `InfiniteListHeaderScope & Partial<InfiniteListScope>` | Sticky content above the items, such as a toolbar. Gets `refetchAll`, `resetPage`, `goto`, `isFetching` and `isRefetchingAll`, and `updateHeader` to re-measure it right away. |
 | `empty` | — | Shown when the query returns no items. Replaces `emptyStub`. |
+| `error` | `{ error: Error; retry: () => Promise<void>; isFetching: boolean; }` | Shown instead of a page that failed to load and has nothing cached. Gets the `error`, `retry` to load the page again, and `isFetching`. Replaces the message and Retry button. |
 
 <!-- @api-end -->
 

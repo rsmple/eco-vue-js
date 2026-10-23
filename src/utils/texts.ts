@@ -28,6 +28,12 @@ export type Texts = {
   dateTo: string
   /** A date picker value that is not picked. */
   noDate: string
+  /** A list page that failed to load, when the server sends no `detail`. */
+  loadError: string
+  /** A list page that failed to load because the server could not be reached. */
+  serverUnavailable: string
+  /** Button that loads a failed list page again. */
+  retry: string
 }
 
 type TextSource = string | (() => string)
@@ -47,6 +53,9 @@ const texts = shallowReactive<Record<keyof Texts, TextSource>>({
   dateFrom: 'From:',
   dateTo: 'To:',
   noDate: 'None',
+  loadError: 'Failed to load',
+  serverUnavailable: 'Server is unavailable',
+  retry: 'Retry',
 })
 
 /**

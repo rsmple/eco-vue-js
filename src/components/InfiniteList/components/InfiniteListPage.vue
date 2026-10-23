@@ -3,7 +3,27 @@
     ref="element"
     class="relative"
   >
-    <template v-if="page && slotList.length !== 0">
+    <slot
+      v-if="isFailed"
+      name="error"
+      :error="error!"
+      :retry="refetchPage"
+      :is-fetching="isFetching"
+    >
+      <div class="sm:left---left-inner sm:max-w---width-inner flex flex-col items-center gap-4 px-8 py-16 text-center sm:sticky">
+        <span class="text-accent font-normal">{{ errorMessage }}</span>
+
+        <WButton
+          :semantic-type="SemanticType.SECONDARY"
+          :loading="isFetching"
+          @click="refetchPage"
+        >
+          {{ getText('retry') }}
+        </WButton>
+      </div>
+    </slot>
+
+    <template v-else-if="page && slotList.length !== 0">
       <div
         ref="items"
         :class="[pageClass, page !== 1 ? 'pt-(--w-list-gap)' : undefined]"
@@ -69,9 +89,12 @@ import type {DefaultQueryOptions} from '@/utils/useDefaultQuery'
 
 import {type Ref, TransitionGroup, computed, inject, onBeforeUnmount, onMounted, ref, toRef, toValue, useTemplateRef, watch} from 'vue'
 
+import WButton from '@/components/Button/WButton.vue'
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
-import {ApiError} from '@/utils/api'
+import {SemanticType} from '@/utils/SemanticType'
+import {ApiError, ApiErrorCancel, ApiErrorUnavailable} from '@/utils/api'
+import {getText} from '@/utils/texts'
 import {scrollInParent} from '@/utils/utils'
 
 import {wScrollingElement} from '../models/injection'
@@ -275,10 +298,22 @@ watch(data, value => {
 
 const errorStatusList: (number | undefined)[] = [404, 400]
 
+const MAX_DETAIL_LENGTH = 200
+
+const isFailed = computed(() => !!error.value && !(error.value instanceof ApiErrorCancel) && !data.value)
+
+const errorMessage = computed(() => {
+  if (error.value instanceof ApiErrorUnavailable) return getText('serverUnavailable')
+
+  const detail = error.value instanceof ApiError ? error.value.response?.data?.detail : undefined
+
+  return typeof detail === 'string' && detail.length < MAX_DETAIL_LENGTH ? detail : getText('loadError')
+})
+
 watch(error, error => {
   if (!(error instanceof ApiError)) return
 
-  if (errorStatusList.includes(error.response?.status) && page.value !== null) emit('remove:page', page.value)
+  if (errorStatusList.includes(error.response?.status) && page.value !== null && page.value > 1) emit('remove:page', page.value)
 
   emit('update:error', error)
 }, {immediate: true})
@@ -347,5 +382,6 @@ defineSlots<{
     intersecting: boolean
   }) => void
   empty?: () => void
+  error?: (props: {error: Error, retry: () => Promise<void>, isFetching: boolean}) => void
 }>()
 </script>

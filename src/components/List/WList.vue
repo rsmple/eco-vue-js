@@ -176,6 +176,16 @@
       >
         <slot name="empty" />
       </template>
+
+      <template
+        v-if="$slots.error"
+        #error="scope"
+      >
+        <slot
+          name="error"
+          v-bind="scope"
+        />
+      </template>
     </WInfiniteList>
   </div>
 </template>
@@ -349,6 +359,8 @@ defineSlots<{
   group?: (props: {item: Data, previous: Data | undefined, skeleton: boolean}) => void
   /** Shown instead of the rows when the query returns no items. */
   empty?: () => void
+  /** Shown instead of a page that failed to load and has nothing cached. Gets the `error`, `retry` to load the page again, and `isFetching`. Replaces the message and Retry button. */
+  error?: (props: {error: Error, retry: () => Promise<void>, isFetching: boolean}) => void
 }>()
 
 const {isDisabled, isReadonly} = useComponentStates(props)
