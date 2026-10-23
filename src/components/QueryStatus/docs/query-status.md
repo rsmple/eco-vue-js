@@ -1,5 +1,5 @@
 ---
-group: Feedback
+group: Display
 description: WQueryStatus — one message for the whole app when queries on screen fail to load, with Retry, and frozen skeletons while the server is down.
 ---
 
