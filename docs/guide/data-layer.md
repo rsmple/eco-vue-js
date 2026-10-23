@@ -39,6 +39,16 @@ URLs start and end with a slash â€” `/products/` or `` `/products/${ id }/` `` â
 
 A failed request rejects with an `ApiError`, whose `response` has the `status` and the error body in `data`. A cancelled one rejects with `ApiErrorCancel`, which error handlers skip. When the server can't be reached, or a gateway answers 502, 503 or 504 in its place, the request rejects with `ApiErrorUnavailable`, a subclass of `ApiError` with no `status` for a network failure.
 
+`useAvailable()` returns a ref that turns false on such a failure and true again on the server's next answer. Hand it to `watchServerRecovery`, with a cheap request as the probe, to bring back what failed during an outage. vue-query's `refetchOnReconnect` only follows the browser's own connection, so it never notices a server coming back:
+
+```ts
+import {watchServerRecovery} from 'eco-vue-js/dist/utils/queryClient'
+
+watchServerRecovery(queryClient, apiClient.useAvailable(), () => apiClient.get('/profile/'))
+```
+
+While the server is unreachable, the probe is sent every few seconds, and at once when the browser comes back online or the tab is shown. Once the server answers again, the failed queries on screen are fetched again. Their error states, such as a list's Retry or a [page error](/components/page-error), stay in place until then. A probe answered right away means the server is up and only some endpoints fail, so their queries wait for Retry instead of being fetched again and again.
+
 ### Auth
 
 The client supports two kinds of auth:
