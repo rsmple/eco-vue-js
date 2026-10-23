@@ -28,11 +28,13 @@ export type Texts = {
   dateTo: string
   /** A date picker value that is not picked. */
   noDate: string
-  /** A list page that failed to load, when the server sends no `detail`. */
+  /** A list page or a card in a `WQueryBoundary` that failed to load, when the server sends no short `detail`. */
   loadError: string
-  /** A list page or a page error when the server could not be reached. */
+  /** Shown once for the whole page by `WQueryStatus` when some queries on screen failed while the server answers. */
+  partialLoadError: string
+  /** A list page, a card in a `WQueryBoundary`, a page error or `WQueryStatus` when the server could not be reached. */
   serverUnavailable: string
-  /** Button that loads a failed list page or page again. */
+  /** Button that loads a failed list page, card, page or every failed query on screen again. */
   retry: string
   /** Heading of a page error. */
   errorTitle: string
@@ -60,6 +62,7 @@ const texts = shallowReactive<Record<keyof Texts, TextSource>>({
   dateTo: 'To:',
   noDate: 'None',
   loadError: 'Failed to load',
+  partialLoadError: 'Some data failed to load',
   serverUnavailable: 'Server is unavailable',
   retry: 'Retry',
   errorTitle: 'Oops!',

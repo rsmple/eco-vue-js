@@ -93,7 +93,8 @@ import WButton from '@/components/Button/WButton.vue'
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
-import {ApiError, ApiErrorCancel, ApiErrorUnavailable} from '@/utils/api'
+import {ApiError, ApiErrorCancel} from '@/utils/api'
+import {getLoadErrorMessage, useHandledQueryError} from '@/utils/queryClient'
 import {getText} from '@/utils/texts'
 import {scrollInParent} from '@/utils/utils'
 
@@ -298,17 +299,11 @@ watch(data, value => {
 
 const errorStatusList: (number | undefined)[] = [404, 400]
 
-const MAX_DETAIL_LENGTH = 200
-
 const isFailed = computed(() => !!error.value && !(error.value instanceof ApiErrorCancel) && !data.value)
 
-const errorMessage = computed(() => {
-  if (error.value instanceof ApiErrorUnavailable) return getText('serverUnavailable')
+const errorMessage = computed(() => getLoadErrorMessage(error.value))
 
-  const detail = error.value instanceof ApiError ? error.value.response?.data?.detail : undefined
-
-  return typeof detail === 'string' && detail.length < MAX_DETAIL_LENGTH ? detail : getText('loadError')
-})
+useHandledQueryError(() => isFailed.value ? error.value : null)
 
 watch(error, error => {
   if (!(error instanceof ApiError)) return
