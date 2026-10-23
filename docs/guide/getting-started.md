@@ -43,13 +43,25 @@ List, select and async components fetch through `@tanstack/vue-query`. Install t
 
 ```ts
 import {QueryClient, VueQueryPlugin} from '@tanstack/vue-query'
-import {setQueryClient} from 'eco-vue-js/dist/utils/queryClient'
+import {defaultQueryRetry, setQueryClient} from 'eco-vue-js/dist/utils/queryClient'
 
-export const queryClient = new QueryClient()
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {retry: defaultQueryRetry},
+  },
+})
 
 setQueryClient(queryClient)
 
 app.use(VueQueryPlugin, {queryClient})
+```
+
+`defaultQueryRetry` retries a query twice when asking again may help: the server was unreachable, answered 5xx, 408 or 429. Other 4xx, cancelled requests and errors thrown by the query function fail at once. A query that must skip more composes it with `isRetryableError` or the same function:
+
+```ts
+options: {
+  retry: (failureCount, error) => error.response?.status !== 504 && defaultQueryRetry(failureCount, error),
+}
 ```
 
 The queries themselves are declared per model — see [Data layer](/guide/data-layer).

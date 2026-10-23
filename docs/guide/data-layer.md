@@ -37,13 +37,13 @@ export const apiClient = new ApiClientInstance({
 
 URLs start and end with a slash — `/products/` or `` `/products/${ id }/` `` — and are typed that way. `addInstance(baseUrl)` gives a client for another prefix that shares the auth.
 
-A failed request rejects with an `ApiError`, whose `response` has the `status` and the error body in `data`. A cancelled one rejects with `ApiErrorCancel`, which error handlers skip.
+A failed request rejects with an `ApiError`, whose `response` has the `status` and the error body in `data`. A cancelled one rejects with `ApiErrorCancel`, which error handlers skip. When the server can't be reached, or a gateway answers 502, 503 or 504 in its place, the request rejects with `ApiErrorUnavailable`, a subclass of `ApiError` with no `status` for a network failure.
 
 ### Auth
 
 The client supports two kinds of auth:
 
-- **Cookie session** (the default). The server sets an `exp` cookie, readable from JS, with the session's expiry in seconds. Before each request the client checks it. Once it has passed, the client calls `refreshUrl` — or your own `tokenRefresh` — and then sends the request. A 401 also refreshes and retries once. Open tabs share the refresh, so only one of them calls the server. Without an `exp` cookie the client counts as logged out and rejects every request not sent with `noAuth`.
+- **Cookie session** (the default). The server sets an `exp` cookie, readable from JS, with the session's expiry in seconds. Before each request the client checks it. Once it has passed, the client calls `refreshUrl` — or your own `tokenRefresh` — and then sends the request. A 401 also refreshes and retries once, except for requests sent with `noAuth`. A refresh that fails with `ApiErrorUnavailable` keeps the session and rejects the request; any other failed refresh logs out. Open tabs share the refresh, so only one of them calls the server. Without an `exp` cookie the client counts as logged out and rejects every request not sent with `noAuth`.
 - **Bearer token.** With `tokenGetter`, the client adds `Authorization: Bearer <token>` to each request and counts as logged out when it returns nothing.
 
 `useAuth()` returns a ref of the logged-in state, for a guard that shows the login page. `logout()` clears the session. `onFailure`, or `setOnFailure` later, is called with every failed response, e.g. to redirect on 403.
