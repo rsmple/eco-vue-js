@@ -107,7 +107,7 @@ import WTooltipContainer from 'eco-vue-js/dist/components/Tooltip/WTooltipContai
 
 ## Texts
 
-A few texts the components show on their own are in English: the Back, Next, Close, Cancel and submit buttons of a stepper, a confirm's Cancel and Accept, the question before a modal with unsaved changes closes, the warning about invalid fields, the From and To of a date picker, and No data on an empty chart. Replace them once, before the app mounts. A getter is read as the text renders, so a translation follows the locale:
+A few texts the components show on their own are in English: the Back, Next, Close, Cancel and submit buttons of a stepper, a confirm's Cancel and Accept, the question before a modal with unsaved changes closes, the warning about invalid fields, the From and To of a date picker, No data on an empty chart, the error and Retry of a list page that failed to load, and the heading, messages and buttons of a [page error](/components/page-error). Replace them once, before the app mounts. A getter is read as the text renders, so a translation follows the locale:
 
 ```ts
 import {setTexts} from 'eco-vue-js/dist/utils/texts'
