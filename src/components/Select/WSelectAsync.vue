@@ -43,6 +43,7 @@
         v-bind="{modelValue: modelValue ?? []}"
       >
         <SelectAsyncPrefix
+          :key="getQueryFnKey(useQueryFnPrefix ?? useQueryFnOptions)"
           :use-query-fn="useQueryFnPrefix ?? useQueryFnOptions"
           :model-value="modelValue ?? []"
           :disabled="isDisabled"
@@ -89,6 +90,7 @@
 
     <template #content>
       <SelectAsyncList
+        :key="getQueryFnKey(useQueryFnOptions)"
         ref="list"
         :model-value="modelValue ?? []"
         :use-query-fn="useQueryFnOptions"
@@ -145,8 +147,8 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
 import type {SelectAsyncProps, SelectOptionComponent, SelectOptionComponentProps, SelectOptionProps} from './types'
 
-import {keepPreviousData} from '@tanstack/vue-query'
-import {computed, nextTick, ref, useTemplateRef, watch} from 'vue'
+import {keepPreviousData, useQueryClient} from '@tanstack/vue-query'
+import {computed, effectScope, nextTick, ref, shallowRef, useTemplateRef, watch} from 'vue'
 
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
@@ -200,13 +202,37 @@ const search = ref('')
 const loadingCreate = ref(false)
 const knownData = new Map<string, Data>()
 
+// Keys the list and the prefix by query fn, so their pages query again when it changes.
+const queryFnKeys = new WeakMap<object, number>()
+let queryFnKeyLast = 0
+
+const getQueryFnKey = (useQueryFn: object): number => {
+  if (!queryFnKeys.has(useQueryFn)) queryFnKeys.set(useQueryFn, ++queryFnKeyLast)
+  return queryFnKeys.get(useQueryFn)!
+}
+
 const isDisabledComputed = computed(() => props.loading || isReadonly.value || isDisabled.value)
 const isModelValueSearch = computed(() => !!search.value && props.modelValue?.includes(search.value as Model))
 const queryParams = computed(() => ({...props.queryParamsOptions, [props.searchField ?? 'search']: search.value}))
 const queryParamsFirstPage = computed(() => ({...queryParams.value, size: PAGE_LENGTH, page: 1}))
 const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
 
-const {data: firstPageData} = props.useQueryFnOptions(queryParamsFirstPage, {enabled: queryEnabled})
+const queryClient = useQueryClient()
+const firstPageData = shallowRef<PaginatedResponse<Data> | undefined>()
+
+// The query fn may change while the menu is open, so the first-page query is rebuilt in its own scope.
+// Outside setup there is no injection context, hence the query client is passed explicitly.
+watch(() => props.useQueryFnOptions, (useQueryFn, _, onCleanup) => {
+  const scope = effectScope()
+
+  scope.run(() => {
+    const {data} = useQueryFn(queryParamsFirstPage, {enabled: queryEnabled}, queryClient)
+
+    watch(data, value => firstPageData.value = value, {immediate: true})
+  })
+
+  onCleanup(() => scope.stop())
+}, {immediate: true})
 
 const hasSearchOption = computed(() => {
   if (props.createdData?.some(option => props.valueGetter(option) === search.value)) return true

@@ -226,18 +226,17 @@
                   :aria-labelledby="textarea ? `${id}-label` : undefined"
                   class="
                     w-input min-h-full flex-1 basis-auto appearance-none border-none bg-inherit
-                    outline-0 placeholder:text-description disabled:cursor-not-allowed
+                    outline-0 placeholder:text-description disabled:cursor-not-allowed sm-not:text-base
                   "
                   :class="{
-                    'w-0 max-w-0': hideInput || unclickable,
+                    'w-0 max-w-0': hideInput,
                     'text-secure w-input-whitespace-pre-wrap break-all': textSecure && !isSecureVisible,
                     '[-webkit-text-fill-color:transparent]': textTransparent,
-                    'sm-not:text-base': !unclickable,
                     'opacity-0': placeholder && textarea && hasNoValue && !focused,
                     'py---w-option-padding': textarea,
                   }"
                   :value="gateValue(asyncState.isAsync.value ? asyncState.value.value : modelValue)"
-                  :placeholder="hasNoValue && !unclickable ? placeholder : undefined"
+                  :placeholder="hasNoValue ? placeholder : undefined"
                   :type="type ?? 'text'"
                   :name="name"
                   :disabled="isDisabled"
