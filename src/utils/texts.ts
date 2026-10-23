@@ -2,7 +2,7 @@ import {shallowReactive} from 'vue'
 
 /** Texts the components show on their own, such as the buttons of a stepper. Each one is a string, or a getter — read as it renders, so a translation follows the locale. */
 export type Texts = {
-  /** Stepper button to the previous step. */
+  /** Button back to the previous step of a stepper, or to the previous page from a page error. */
   back: string
   /** Stepper button to the next step. */
   next: string
@@ -30,10 +30,16 @@ export type Texts = {
   noDate: string
   /** A list page that failed to load, when the server sends no `detail`. */
   loadError: string
-  /** A list page that failed to load because the server could not be reached. */
+  /** A list page or a page error when the server could not be reached. */
   serverUnavailable: string
-  /** Button that loads a failed list page again. */
+  /** Button that loads a failed list page or page again. */
   retry: string
+  /** Heading of a page error. */
+  errorTitle: string
+  /** A page error for a missing page, or any failure without a `detail` from the server. */
+  pageNotFound: string
+  /** A page error for a 5xx answer without a `detail`. */
+  serverError: string
 }
 
 type TextSource = string | (() => string)
@@ -56,6 +62,9 @@ const texts = shallowReactive<Record<keyof Texts, TextSource>>({
   loadError: 'Failed to load',
   serverUnavailable: 'Server is unavailable',
   retry: 'Retry',
+  errorTitle: 'Oops!',
+  pageNotFound: 'This page does not exist or was removed',
+  serverError: 'Something went wrong on the server. Try again in a moment',
 })
 
 /**
