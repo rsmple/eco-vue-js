@@ -1,10 +1,10 @@
 <template>
   <div
-    ref="element"
-    class="relative"
+    v-if="isFailed"
+    ref="state"
+    class="col-span-full"
   >
     <slot
-      v-if="isFailed"
       name="error"
       :error="error!"
       :retry="refetchPage"
@@ -22,61 +22,60 @@
         </WButton>
       </div>
     </slot>
+  </div>
 
-    <template v-else-if="page && slotList.length !== 0">
-      <div
-        ref="items"
-        :class="[pageClass, page !== 1 ? 'pt-(--w-list-gap)' : undefined]"
+  <component
+    :is="transition ? TransitionGroup : WEmptyComponent"
+    v-else-if="page && slotList.length !== 0"
+    v-bind="transition ? {
+      'enter-active-class': 'overflow-hidden opacity-0',
+      'enter-from-class': 'grid-rows-[0fr]',
+      'enter-to-class': 'grid-rows-[1fr]',
+      'leave-active-class': 'overflow-hidden opacity-0',
+      'leave-from-class': 'grid-rows-[1fr]',
+      'leave-to-class': 'grid-rows-[0fr]',
+      css: !resetting,
+    } : undefined"
+  >
+    <template
+      v-for="(slot, slotIndex) in slotList"
+      :key="slot.key"
+    >
+      <component
+        :is="transition ? 'div' : WEmptyComponent"
+        v-bind="transition ? {class: 'w-full grid transition-[grid-template-rows] duration-300'} : undefined"
       >
         <component
-          :is="transition ? TransitionGroup : WEmptyComponent"
-          v-bind="transition ? {
-            'enter-active-class': 'overflow-hidden opacity-0',
-            'enter-from-class': 'grid-rows-[0fr]',
-            'enter-to-class': 'grid-rows-[1fr]',
-            'leave-active-class': 'overflow-hidden opacity-0',
-            'leave-from-class': 'grid-rows-[1fr]',
-            'leave-to-class': 'grid-rows-[0fr]',
-            css: !resetting,
-          } : undefined"
+          :is="transition ? 'div' : WEmptyComponent"
+          v-bind="transition ? {class: '[overflow:inherit]'} : undefined"
         >
-          <template
-            v-for="(slot, slotIndex) in slotList"
-            :key="slot.key"
-          >
-            <component
-              :is="transition ? 'div' : WEmptyComponent"
-              v-bind="transition ? {class: 'w-full grid transition-[grid-template-rows] duration-300'} : undefined"
-            >
-              <component
-                :is="transition ? 'div' : WEmptyComponent"
-                v-bind="transition ? {class: '[overflow:inherit]'} : undefined"
-              >
-                <slot
-                  :item="slot.id !== null && data?.results ? data.results[slotIndex]! : ({id: slot.key * -1} as unknown as Data)"
-                  :setter="getSetter(slotIndex)"
-                  :refetch="emitRefetch"
-                  :skeleton="slot.id === null"
-                  :next="slot.id !== null && data?.results ? data.results[slotIndex + 1] : undefined"
-                  :previous="slot.id !== null && data?.results ? data.results[slotIndex - 1] : undefined"
-                  :first="firstPage && slotIndex === 0"
-                  :last="lastPage && slotIndex === slotList.length - 1"
-                  :page="page"
-                  :index="slotIndex"
-                  :results="data?.results"
-                  :intersecting="isIntersecting"
-                />
-              </component>
-            </component>
-          </template>
+          <InfiniteListPageItem :ref="item => setItemRef(slot.key, item as ItemInstance | null)">
+            <slot
+              :item="slot.id !== null && data?.results ? data.results[slotIndex]! : ({id: slot.key * -1} as unknown as Data)"
+              :setter="getSetter(slotIndex)"
+              :refetch="emitRefetch"
+              :skeleton="slot.id === null"
+              :next="slot.id !== null && data?.results ? data.results[slotIndex + 1] : undefined"
+              :previous="slot.id !== null && data?.results ? data.results[slotIndex - 1] : undefined"
+              :first="firstPage && slotIndex === 0"
+              :last="lastPage && slotIndex === slotList.length - 1"
+              :page="page"
+              :index="slotIndex"
+              :results="data?.results"
+              :intersecting="isIntersecting"
+            />
+          </InfiniteListPageItem>
         </component>
-      </div>
+      </component>
     </template>
+  </component>
 
-    <slot
-      v-else
-      name="empty"
-    >
+  <div
+    v-else
+    ref="state"
+    class="col-span-full"
+  >
+    <slot name="empty">
       <div class="text-accent sm:left---left-inner sm:max-w---width-inner flex justify-center px-8 py-16 text-center font-normal sm:sticky">
         {{ emptyStub }}
       </div>
@@ -98,6 +97,8 @@ import {getLoadErrorMessage, useHandledQueryError} from '@/utils/queryClient'
 import {getText} from '@/utils/texts'
 import {scrollInParent} from '@/utils/utils'
 
+import InfiniteListPageItem from './InfiniteListPageItem.vue'
+
 import {wScrollingElement} from '../models/injection'
 
 const props = withDefaults(
@@ -110,7 +111,6 @@ const props = withDefaults(
     transition?: boolean
     resetting?: boolean
     emptyStub?: string
-    pageClass?: string
     refetchInterval?: number | false
     queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>
     enabled?: boolean
@@ -122,7 +122,6 @@ const props = withDefaults(
     selected: undefined,
     previous: undefined,
     emptyStub: 'Nothing to show',
-    pageClass: undefined,
     refetchInterval: undefined,
     queryOptions: undefined,
     enabled: true,
@@ -142,8 +141,9 @@ const emit = defineEmits<{
   (e: 'update:error', value: ApiError): void
 }>()
 
-const elementRef = useTemplateRef('element')
-const itemsRef = useTemplateRef('items')
+type ItemInstance = ComponentInstance<typeof InfiniteListPageItem>
+
+const stateRef = useTemplateRef<HTMLDivElement>('state')
 const isIntersecting = ref(false)
 
 const scrollingElement = inject(wScrollingElement, null)
@@ -223,6 +223,20 @@ const reconcileSlots = () => {
 }
 
 watch([data, () => props.skeletonLength], reconcileSlots, {immediate: true})
+
+const itemRefs = new Map<number, ItemInstance>()
+
+const setItemRef = (key: number, item: ItemInstance | null) => {
+  if (item) itemRefs.set(key, item)
+  else itemRefs.delete(key)
+}
+
+/** The page renders no element of its own, its items are placed straight in the list, so it is found by the elements of its items. */
+const getElements = (): Element[] => {
+  if (stateRef.value) return [stateRef.value]
+
+  return slotList.value.flatMap(slot => itemRefs.get(slot.key)?.getElements() ?? [])
+}
 const nextPage = computed(() => data.value?.next)
 const previousPage = computed(() => data.value?.previous)
 
@@ -270,7 +284,9 @@ const getLast = () => {
 let pendingIndex: number | undefined
 
 const scrollToItem = (index: number | undefined, behavior: ScrollBehavior) => {
-  const item = (index === undefined ? undefined : itemsRef.value?.children[index]) ?? elementRef.value
+  const slot = index === undefined ? undefined : slotList.value[index]
+  // The last element: whatever is rendered with the item, such as a group heading, comes before it.
+  const item = (slot ? itemRefs.get(slot.key)?.getElements().at(-1) : undefined) ?? getElements()[0]
 
   if (item) scrollInParent(item, {block: 'center', behavior})
 }
@@ -320,39 +336,68 @@ watch(isFetching, value => {
 }, {immediate: true})
 
 let intersectionObserver: IntersectionObserver | undefined
+const observedElements = new Set<Element>()
+const intersectingElements = new Set<Element>()
 
 const observerCb = (entries: IntersectionObserverEntry[]) => {
-  isIntersecting.value = entries.some(entry => {
-    if (entry.target === elementRef.value) {
-      return entry.isIntersecting
-    }
-  })
+  for (const entry of entries) {
+    if (entry.isIntersecting && observedElements.has(entry.target)) intersectingElements.add(entry.target)
+    else intersectingElements.delete(entry.target)
+  }
+
+  isIntersecting.value = intersectingElements.size !== 0
+}
+
+/** Observes the elements the page renders now, which change as its items load, are added or removed. */
+const observeElements = () => {
+  if (!intersectionObserver) return
+
+  const elements = new Set(getElements())
+
+  for (const element of observedElements) {
+    if (elements.has(element)) continue
+
+    intersectionObserver.unobserve(element)
+    observedElements.delete(element)
+    intersectingElements.delete(element)
+  }
+
+  for (const element of elements) {
+    if (observedElements.has(element)) continue
+
+    intersectionObserver.observe(element)
+    observedElements.add(element)
+  }
+
+  isIntersecting.value = intersectingElements.size !== 0
 }
 
 onMounted(() => {
-  if (elementRef.value) {
-    intersectionObserver = new IntersectionObserver(
-      observerCb,
-      {
-        root: scrollingElement?.value,
-        rootMargin: '0px',
-        threshold: 0,
-      },
-    )
+  intersectionObserver = new IntersectionObserver(
+    observerCb,
+    {
+      root: scrollingElement?.value,
+      rootMargin: '0px',
+      threshold: 0,
+    },
+  )
 
-    intersectionObserver.observe(elementRef.value)
-  }
+  observeElements()
 })
+
+watch([slotList, isFailed], observeElements, {flush: 'post'})
 
 onBeforeUnmount(() => {
   intersectionObserver?.disconnect()
   intersectionObserver = undefined
+  observedElements.clear()
+  intersectingElements.clear()
 
   if (page.value !== null) emit('remove:page', page.value)
 })
 
 defineExpose({
-  getElement: (): HTMLElement | null => elementRef.value,
+  getElements,
   getFirst,
   getLast,
   refetch: refetchPage,

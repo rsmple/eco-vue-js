@@ -11,69 +11,79 @@
     <div :style="{height: topSpacerHeight + 'px'}" />
     <div ref="topSentinel" />
 
-    <InfiniteListPage
-      v-for="(page, index) in pages"
-      ref="pageComponent"
-      :key="slotIds[index]"
-      :query-params="{...(queryParams as QueryParams), page, size: pageLength}"
-      :use-query-fn="useQueryFn"
-      :skeleton-length="getSkeletonLength(page - 1)"
-      :first-page="index === 0"
-      :last-page="index === pages.length - 1"
-      :transition="transition"
-      :resetting="isResettingPage"
-      :empty-stub="emptyStub"
-      :page-class="pageClass"
-      :refetch-interval="refetchInterval"
-      :query-options="queryOptions"
-      :enabled="!disabledSlots.has(slotIds[index]!)"
-
-      :value-getter="valueGetter"
-
-      @update:count="updateCount($event); $emit('update:count', $event)"
-      @update:pages-count="updatePagesCount"
-      @update:page-size="pageSize = $event"
-      @remove:page="removePage"
-      @refetch="refetchNextPages(page)"
-      @fetched="isResettingPage = false"
-      @update:error="$emit('update:error', $event)"
+    <div
+      ref="items"
+      :class="pageClass"
     >
-      <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page: itemPage, index: itemIndex, results, intersecting}">
-        <slot
-          :item="(item as Data)"
-          :setter="setter"
-          :skeleton="skeleton || isRefetchingAll"
-          :refetch="refetch"
-          :previous="((previous ?? pageComponentRef?.[index - 1]?.getLast() ?? pageComponentRef?.[pageComponentRef.length - 1]?.getLast()) as Data | undefined)"
-          :next="((next ?? pageComponentRef?.[index + 1]?.getFirst() ?? pageComponentRef?.[0]?.getFirst()) as Data | undefined)"
-          :first="first"
-          :last="last"
-          :resetting="isResettingPage"
-          :page="itemPage"
-          :index="itemIndex"
-          :value="valueGetter(item as Data)"
-          :results="results"
-          :intersecting="intersecting"
-        />
-      </template>
+      <div
+        v-if="columnOffset"
+        aria-hidden="true"
+        :style="{gridColumn: 'span ' + columnOffset}"
+      />
 
-      <template
-        v-if="$slots.empty"
-        #empty
-      >
-        <slot name="empty" />
-      </template>
+      <InfiniteListPage
+        v-for="(page, index) in pages"
+        ref="pageComponent"
+        :key="slotIds[index]"
+        :query-params="{...(queryParams as QueryParams), page, size: pageLength}"
+        :use-query-fn="useQueryFn"
+        :skeleton-length="getSkeletonLength(page - 1)"
+        :first-page="index === 0"
+        :last-page="index === pages.length - 1"
+        :transition="transition"
+        :resetting="isResettingPage"
+        :empty-stub="emptyStub"
+        :refetch-interval="refetchInterval"
+        :query-options="queryOptions"
+        :enabled="!disabledSlots.has(slotIds[index]!)"
 
-      <template
-        v-if="$slots.error"
-        #error="scope"
+        :value-getter="valueGetter"
+
+        @update:count="updateCount($event); $emit('update:count', $event)"
+        @update:pages-count="updatePagesCount"
+        @update:page-size="pageSize = $event"
+        @remove:page="removePage"
+        @refetch="refetchNextPages(page)"
+        @fetched="isResettingPage = false"
+        @update:error="$emit('update:error', $event)"
       >
-        <slot
-          name="error"
-          v-bind="scope"
-        />
-      </template>
-    </InfiniteListPage>
+        <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page: itemPage, index: itemIndex, results, intersecting}">
+          <slot
+            :item="(item as Data)"
+            :setter="setter"
+            :skeleton="skeleton || isRefetchingAll"
+            :refetch="refetch"
+            :previous="((previous ?? getPageComponent(page - 1)?.getLast()) as Data | undefined)"
+            :next="((next ?? getPageComponent(page + 1)?.getFirst()) as Data | undefined)"
+            :first="first"
+            :last="last"
+            :resetting="isResettingPage"
+            :page="itemPage"
+            :index="itemIndex"
+            :value="valueGetter(item as Data)"
+            :results="results"
+            :intersecting="intersecting"
+          />
+        </template>
+
+        <template
+          v-if="$slots.empty"
+          #empty
+        >
+          <slot name="empty" />
+        </template>
+
+        <template
+          v-if="$slots.error"
+          #error="scope"
+        >
+          <slot
+            name="error"
+            v-bind="scope"
+          />
+        </template>
+      </InfiniteListPage>
+    </div>
 
     <div ref="bottomSentinel" />
     <div :style="{height: bottomSpacerHeight + 'px'}" />
@@ -176,6 +186,7 @@ const getSkeletonLength = (pagesBefore: number): number => {
 }
 
 const pageComponentRef = useTemplateRef<ComponentInstance<typeof InfiniteListPage>[]>('pageComponent')
+const itemsRef = useTemplateRef<HTMLDivElement>('items')
 const topSentinelRef = useTemplateRef<HTMLDivElement>('topSentinel')
 const bottomSentinelRef = useTemplateRef<HTMLDivElement>('bottomSentinel')
 
@@ -232,7 +243,8 @@ const addPreviousPage = (silent?: boolean) => {
 
 let resizeObserver: ResizeObserver | null = null
 const pageHeights = reactive(new Map<number, number>())
-const observedElements = new Map<HTMLElement, number>()
+/** Where each page starts within the items, to tell whether the page in view moved. */
+const pageOffsets = new Map<number, number>()
 
 // Per item rather than per page: the last page can be short, and counted as a full one it would shrink every page.
 const avgItemHeight = computed(() => {
@@ -265,89 +277,105 @@ const bottomSpacerHeight = computed(() => {
   return Math.round(itemCount * avgItemHeight.value)
 })
 
+const columnCount = ref(1)
+
+const getColumnCount = (element: HTMLElement): number => {
+  const style = getComputedStyle(element)
+  if (style.display !== 'grid' && style.display !== 'inline-grid') return 1
+
+  // A grid's computed columns are the resolved track sizes, one length per column.
+  return Math.max(style.gridTemplateColumns.match(/[\d.]+px/g)?.length ?? 1, 1)
+}
+
+/**
+ * Empty cells before the first rendered item, as many as the column it has in the whole list. Without them, a list
+ * starting past the first page, or one dropping a page at the top, would move every item to another column whenever
+ * the page size is not a multiple of the column count.
+ */
+const columnOffset = computed(() => {
+  if (columnCount.value <= 1) return 0
+
+  return (((pages.value[0] ?? 1) - 1) * pageSize.value) % columnCount.value
+})
+
 const getScrollElementTop = (element: Element): number => {
   if (element === document.scrollingElement || element === document.body || element === document.documentElement) return 0
   return element.getBoundingClientRect().top
 }
 
-const handleResize: ResizeObserverCallback = (entries) => {
+/**
+ * The pages render no element of their own, so the items of all pages share one layout, and a grid row can hold the
+ * end of one page and the start of the next. A page spans from its first element to the first element of the next
+ * page, the last one to the end of the items, so the heights add up to the list's height.
+ *
+ * With `correctScroll`, the list scrolls by as much as the first page in view moved within the items, so the items in
+ * view stay in place when the pages above them change their height. Moved, not the change of the heights above: a
+ * page that takes over or gives up a shared row changes its height while nothing moves. Not when pages are added or
+ * removed, which move the pages after them by design.
+ */
+const measurePages = (correctScroll: boolean) => {
+  const itemsEl = itemsRef.value
+  if (!itemsEl) return
+
+  columnCount.value = getColumnCount(itemsEl)
+
+  const instances = pageComponentRef.value ?? []
+  const tops = pages.value.map(page => instances.find(instance => instance?.pageNumber === page)?.getElements()[0]?.getBoundingClientRect().top)
+  const itemsBottom = itemsEl.getBoundingClientRect().bottom
+
+  const itemsTop = itemsEl.getBoundingClientRect().top
+
   const scrollEl = scrollingElement?.value ?? document.scrollingElement
-  if (!scrollEl) return
-
-  const scrollElTop = getScrollElementTop(scrollEl)
+  const scrollElTop = scrollEl ? getScrollElementTop(scrollEl) : 0
   let totalDelta = 0
+  let isInViewFound = false
 
-  for (const entry of entries) {
-    const el = entry.target as HTMLElement
-    const slotId = observedElements.get(el)
-    if (slotId === undefined) continue
+  for (let i = 0; i < pages.value.length; i++) {
+    const slotId = slotIds.value[i]
+    const top = tops[i]
+    if (slotId === undefined || top === undefined) continue
 
-    const newHeight = Math.round(entry.contentRect.height)
-    const oldHeight = pageHeights.get(slotId)
+    const bottom = tops.slice(i + 1).find(value => value !== undefined) ?? itemsBottom
+    const offset = Math.round(top - itemsTop)
+    const oldOffset = pageOffsets.get(slotId)
 
-    pageHeights.set(slotId, newHeight)
+    pageHeights.set(slotId, Math.round(bottom - top))
+    pageOffsets.set(slotId, offset)
 
-    if (oldHeight === undefined || oldHeight === newHeight) continue
+    if (isInViewFound || bottom <= scrollElTop) continue
 
-    if (el.getBoundingClientRect().bottom <= scrollElTop) {
-      totalDelta += newHeight - oldHeight
-    }
+    isInViewFound = true
+
+    if (correctScroll && i !== 0 && oldOffset !== undefined) totalDelta = offset - oldOffset
   }
 
-  if (totalDelta !== 0 && scrollEl.scrollTop !== 0) {
+  for (const slotId of Array.from(pageHeights.keys())) {
+    if (slotIds.value.includes(slotId)) continue
+
+    pageHeights.delete(slotId)
+    pageOffsets.delete(slotId)
+  }
+
+  if (scrollEl && totalDelta !== 0 && scrollEl.scrollTop !== 0) {
     scrollEl.scrollTop += totalDelta
   }
 }
 
 onMounted(() => {
-  resizeObserver = new ResizeObserver(handleResize)
+  resizeObserver = new ResizeObserver(() => measurePages(true))
+
+  if (itemsRef.value) resizeObserver.observe(itemsRef.value)
 })
 
 onBeforeUnmount(() => {
   resizeObserver?.disconnect()
   resizeObserver = null
   pageHeights.clear()
-  observedElements.clear()
+  pageOffsets.clear()
 })
 
-watch([pageComponentRef, slotIds], () => {
-  if (!resizeObserver) return
-
-  const instances = pageComponentRef.value ?? []
-  const ids = slotIds.value
-
-  if (instances.length === 0 && ids.length > 0) return
-
-  const currentEls = new Set<HTMLElement>()
-
-  for (let i = 0; i < instances.length; i++) {
-    const el = instances[i]?.getElement() ?? null
-    if (!el) continue
-    currentEls.add(el)
-
-    const slotId = ids[i]
-    if (slotId === undefined) continue
-
-    if (!observedElements.has(el)) {
-      observedElements.set(el, slotId)
-      if (!pageHeights.has(slotId)) {
-        pageHeights.set(slotId, Math.round(el.getBoundingClientRect().height))
-      }
-      resizeObserver.observe(el)
-    }
-  }
-
-  if (currentEls.size === 0) return
-
-  for (const el of Array.from(observedElements.keys())) {
-    if (!currentEls.has(el)) {
-      const id = observedElements.get(el)!
-      resizeObserver.unobserve(el)
-      observedElements.delete(el)
-      pageHeights.delete(id)
-    }
-  }
-}, {flush: 'post', immediate: true})
+// By the ids, as pages are added and removed by changing the array in place.
+watch([pageComponentRef, () => slotIds.value.join()], () => measurePages(false), {flush: 'post', immediate: true})
 
 const SENTINEL_MARGIN = 200
 
@@ -540,14 +568,10 @@ const anyPageInViewport = (): boolean => {
   const viewportTop = isDocumentScroll ? 0 : scrollEl.getBoundingClientRect().top
   const viewportBottom = isDocumentScroll ? window.innerHeight : scrollEl.getBoundingClientRect().bottom
 
-  const instances = pageComponentRef.value ?? []
-  for (const instance of instances) {
-    const el = instance?.getElement() ?? null
-    if (!el) continue
-    const rect = el.getBoundingClientRect()
-    if (rect.bottom > viewportTop && rect.top < viewportBottom) return true
-  }
-  return false
+  const rect = itemsRef.value?.getBoundingClientRect()
+  if (!rect) return true
+
+  return rect.bottom > viewportTop && rect.top < viewportBottom
 }
 
 const getScrollPosition = () => {

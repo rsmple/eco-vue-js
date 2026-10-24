@@ -279,7 +279,7 @@ import WInfiniteList from 'eco-vue-js/dist/components/InfiniteList/WInfiniteList
 | `noHeaderUpdate` | `boolean` | — | Keeps the sticky header out of the app header bar's padding while scrolled. |
 | `excludeParams` | `(keyof QueryParams)[]` | — | Params whose change refetches the loaded pages in place instead of resetting the list to the first page. |
 | `emptyStub` | `string` | — | Text shown when the query returns no items. The `empty` slot replaces it. |
-| `pageClass` | `string` | — | Class of each page's element, e.g. a grid layout for the items. |
+| `pageClass` | `string` | — | Class of the element holding the items of all loaded pages, e.g. a grid layout. The pages render no element of their own, so a grid row runs on from one page into the next. |
 | `maxPages` | `number` | — | Number of pages kept rendered, 5 by default. Scrolling further drops pages at the other end, keeping their height as space. |
 | `refetchInterval` | `number \| false` | — | Refetches the pages in view every this many ms. |
 | `queryOptions` | `DefaultQueryOptions<PaginatedResponse<Data>>` | — | Options for every page query. |

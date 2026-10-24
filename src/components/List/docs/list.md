@@ -71,6 +71,14 @@ Put the `WListFilter` in WList's `filter` slot to show it at the start of the se
 
 Each chip names its filter and, when set, the picked values. A filter's `meta.summary` returns them from the query params, such as the titles of the picked options; without it the chip shows how many values are picked. A chip in the "more" list can be removed there too.
 
+## Groups
+
+`groupBy` tells whether two neighbouring items belong to the same group, and the `group` slot renders a heading before the first item of each group and before the first item rendered. Only neighbours are compared, so the query has to sort by the field the list groups by.
+
+The items of all loaded pages share one layout. A group runs on across pages without a new heading, and in the grid a page that ends in the middle of a row is continued in that row by the next one. The list places the heading: it takes a row of its own in the grid, stays under the toolbar while its group scrolls past and, in list mode, stays at the left edge when the rows scroll sideways. The slot gives its content and lays it out.
+
+<DocsDemo name="recipes/plant-list/PlantListGrouped" overflow />
+
 ## API
 
 <!-- @api WList -->
@@ -149,7 +157,7 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 | `header` | `{ count: number \| undefined; }` | Content above the selection bar, with the count returned by the query. |
 | `filter` | — | Filters at the start of the selection bar, usually a WListFilter. They keep to one line, the chips that do not fit go to a menu, the list actions move to the end and fold into More first, and a selection replaces them. `--w-list-toolbar-height` sets the bar's height, the inherited input height by default. |
 | `selection` | — | Replaces the buttons at the end of the selection bar — range select, refetch, sort and column settings. |
-| `group` | `{ item: Data; previous: Data \| undefined; skeleton: boolean; }` | Heading before each group of rows, with `groupBy`. `skeleton` is true while the page loads. |
+| `group` | `{ item: Data; previous: Data \| undefined; skeleton: boolean; }` | Content of the heading before each group of rows, with `groupBy`. The heading spans the whole row, sticks under the toolbar and, in list mode, to the left edge while the rows scroll sideways. Its content is laid out by the slot. `skeleton` is true while the page loads. |
 | `empty` | — | Shown instead of the rows when the query returns no items. |
 | `error` | `{ error: Error; retry: () => Promise<void>; isFetching: boolean; }` | Shown instead of a page that failed to load and has nothing cached. Gets the `error`, `retry` to load the page again, and `isFetching`. Replaces the message and Retry button. |
 

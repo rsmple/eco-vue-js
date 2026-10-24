@@ -151,8 +151,14 @@ const SOURCE: [string, string, Kind, number][] = [
   ['Sorrel', 'Rumex acetosa', Kind.HERB, 60],
 ]
 
+/** Each plant of `SOURCE` grows in several pots, numbered after the first, so the list runs over many pages. */
+const POTS = 4
+
 /** In-memory stand-in for a REST collection. */
-export const plants: Plant[] = SOURCE.map(([name, species, kind, height], index) => {
+export const plants: Plant[] = Array.from({length: SOURCE.length * POTS}, (_, index) => {
+  const [title, species, kind, height] = SOURCE[index % SOURCE.length]!
+  const pot = Math.floor(index / SOURCE.length) + 1
+  const name = pot === 1 ? title : `${ title } ${ pot }`
   const today = getStartOfDay()
   // The kinds repeat every four rows, so `round` steps each kind through every light level and caretaker in turn.
   const round = index + Math.floor(index / 4)

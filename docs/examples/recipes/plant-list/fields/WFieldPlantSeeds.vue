@@ -2,7 +2,6 @@
   <WListCardField
     :skeleton="skeleton"
     allow-open
-    class="card:text-xs"
   >
     <template #inner>
       <span class="list:hidden">{{ meta.title }}: </span>
@@ -36,7 +35,7 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'seeds',
-  cssClass: 'basis-[7rem]',
+  cssClass: 'basis-[7rem] card:text-xs',
   title: 'Seeds',
   field: 'seeds',
 } as const satisfies ListField<Plant>
