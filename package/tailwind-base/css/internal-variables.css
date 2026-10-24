@@ -140,6 +140,11 @@
   --w-list-padding: --value(--spacing-*, --w-size-*, [*]);
 }
 
+@utility w-list-align-top-* {
+  --w-list-align-top: --spacing(--value(number));
+  --w-list-align-top: --value(--spacing-*, --w-size-*, [*]);
+}
+
 @utility w-list-gap-* {
   --w-list-gap: --spacing(--value(number));
   --w-list-gap: --value(--spacing-*, --w-size-*, [*]);

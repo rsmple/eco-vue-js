@@ -5,7 +5,7 @@
   >
     <!-- A tinted tag in the kind's own tone. -->
     <span
-      class="bg-tone-soft text-tone flex w-max items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-semibold"
+      class="bg-tone-soft text-tone my-0.5 flex w-max items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-semibold"
       :class="kindDisplay[item.kind].tone"
     >
       <component

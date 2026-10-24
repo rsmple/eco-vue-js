@@ -155,6 +155,9 @@ export type Task = {
   due: Date
 }
 
+/** A task with the key a list row of it needs. */
+export type TaskItem = Task & {id: number}
+
 export type Plant = {
   id: number
   name: string
@@ -1653,6 +1656,6 @@ const getDueText = (due: Date) => {
 - **Filters above the list**: render the `WUniform` with `WListFilter` before `WList` instead of in its `filter` slot, and the chips wrap onto as many lines as they need.
 - **Filters in the app shell**: pass `global` to `WListFilter` to put the filters into the actions bar's panel and the search into the header bar, with a button that resets them. `disabledFilterFields` leaves out filters for params the page fixes, e.g. `caretaker` on a caretaker's own page.
 - **Toolbar actions** (e.g. "Create"): pass `action` with components typed by `ActionProps<QueryParams>`.
-- **Nested columns**: a field's `meta` can be `{keyEntity, fields}` or `{keyArray, fields}` to render columns of a related object or of every item in an array.
+- **Nested columns**: a field's `meta` can be `{keyEntity, fields}` or `{keyArray, fields}` to render columns of a related object or of every item in an array — see [Nested fields](/components/list#nested-fields).
 - **Embedded lists**: a list is sized as a page by default — it reserves the viewport height. Inside a card, tab or docs page like this one, pass `min-height` to drop that.
 - **Read-only rows**: `readonlyGetter` marks individual rows read-only; menu items receive `readonly` and should disable themselves.

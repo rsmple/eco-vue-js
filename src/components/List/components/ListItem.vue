@@ -60,7 +60,7 @@
               v-if="allowSelect && skeleton"
               class="flex h-full px-(--w-list-padding,1rem)"
               :class="{
-                'pt-4.5 items-start': alignTop,
+                'pt-(--w-list-align-top,1.125rem) items-start': alignTop,
                 'items-center': !alignTop,
               }"
             >
@@ -77,7 +77,7 @@
               class="h-full px-(--w-list-padding,1rem)"
               :class="{
                 'opacity-50': allowSelectHover,
-                'pt-4.5': alignTop,
+                'pt-(--w-list-align-top,1.125rem)': alignTop,
               }"
               @update:model-value="$emit('toggle:selected', value, position)"
             />
@@ -240,7 +240,7 @@
               ref="more"
               class="flex h-full px-(--w-list-padding,1rem)"
               :class="{
-                'pt-4.5 items-start': alignTop,
+                'pt-(--w-list-align-top,1.125rem) items-start': alignTop,
                 'items-center': !alignTop,
               }"
               :disabled="disableMore"
