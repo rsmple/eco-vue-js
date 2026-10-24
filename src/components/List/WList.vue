@@ -216,7 +216,7 @@ import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {type DefaultQueryOptions, PAGE_LENGTH} from '@/utils/useDefaultQuery'
 import {type Selection, useSelected, useSelectionHash} from '@/utils/useSelected'
-import {ListMode} from '@/utils/utils'
+import {ListMode, isEqualObj} from '@/utils/utils'
 
 import ListItem from './components/ListItem.vue'
 import ListToolbar from './components/ListToolbar.vue'
@@ -536,16 +536,21 @@ const getQueryParamsBulk = (): QueryParams => {
   return props.queryParams
 }
 
+// Replaced only on a change: a new style re-renders the list, and every header cell reports its width separately.
 const updateStylesWidth = async () => {
   await nextTick()
 
-  stylesWidth.value = getFieldStylesWidth(fieldsFiltered.value, fieldConfigMap.value)
+  const value = getFieldStylesWidth(fieldsFiltered.value, fieldConfigMap.value)
+
+  if (!isEqualObj(value, stylesWidth.value)) stylesWidth.value = value
 }
 
 const updateStylesFixed = async () => {
   await nextTick()
 
-  stylesFixed.value = getFieldStylesFixed(sortFields(fieldsFiltered.value, fieldConfigMap.value), fieldConfigMap.value)
+  const value = getFieldStylesFixed(sortFields(fieldsFiltered.value, fieldConfigMap.value), fieldConfigMap.value)
+
+  if (!isEqualObj(value, stylesFixed.value)) stylesFixed.value = value
 }
 
 const toggleSelectAll = (value: boolean) => {

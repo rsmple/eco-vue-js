@@ -51,7 +51,7 @@
         >
           <InfiniteListPageItem :ref="item => setItemRef(slot.key, item as ItemInstance | null)">
             <slot
-              :item="slot.id !== null && data?.results ? data.results[slotIndex]! : ({id: slot.key * -1} as unknown as Data)"
+              :item="slot.id !== null && data?.results ? data.results[slotIndex]! : getPlaceholder(slot.key)"
               :setter="getSetter(slotIndex)"
               :refetch="emitRefetch"
               :skeleton="slot.id === null"
@@ -222,7 +222,29 @@ const reconcileSlots = () => {
   slotList.value = newSlots
 }
 
-watch([data, () => props.skeletonLength], reconcileSlots, {immediate: true})
+/** The item of a skeleton slot, the same object for as long as the slot stays a skeleton, so the page re-rendering does not re-render every row. */
+const placeholders = new Map<number, Data>()
+
+const getPlaceholder = (key: number): Data => {
+  let placeholder = placeholders.get(key)
+
+  if (!placeholder) {
+    placeholder = {id: key * -1} as unknown as Data
+    placeholders.set(key, placeholder)
+  }
+
+  return placeholder
+}
+
+watch([data, () => props.skeletonLength], () => {
+  reconcileSlots()
+
+  const skeletonKeys = new Set(slotList.value.filter(slot => slot.id === null).map(slot => slot.key))
+
+  for (const key of placeholders.keys()) {
+    if (!skeletonKeys.has(key)) placeholders.delete(key)
+  }
+}, {immediate: true})
 
 const itemRefs = new Map<number, ItemInstance>()
 
