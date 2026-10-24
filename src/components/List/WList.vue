@@ -118,7 +118,7 @@
 
       <template #default="{item, skeleton, setter, refetch, previous, first, index, position, value, results, intersecting}">
         <ListGroupHeading
-          v-if="groupBy && $slots.group && (first || (!skeleton && (!previous || !groupBy(item, previous))))"
+          v-if="groupBy && $slots.group && (first || (!skeleton && (position === 0 || (!!previous && !groupBy(item, previous)))))"
           :class="position === 0 ? 'list:-mt-2' : 'card:mt-2'"
         >
           <slot
