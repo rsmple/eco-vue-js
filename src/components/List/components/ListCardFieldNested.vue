@@ -16,7 +16,8 @@
         <component
           :is="field.default ?? 'div'"
           v-bind="field.default ? {item, skeleton, card, readonly, config, uniformScope, queryParams, results, intersecting} : (undefined as never)"
-          :class="field.meta.cssClassArray"
+          :class="[field.meta.cssClassArray, {'grid grid-cols-subgrid': !card}]"
+          :style="card ? undefined : {gridColumn: `span ${ getFieldColumnCount(field.meta.fields) }`}"
         >
           <ListCardFieldNestedArrayItems
             :item="item"
@@ -31,8 +32,7 @@
                     v-bind="field.meta.componentItem ? {item, skeleton, card, index, last, first} : undefined"
                   >
                     <div
-                      class="flex"
-                      :class="field.meta.cssClass"
+                      :class="[field.meta.cssClass, card ? 'flex' : 'col-span-full grid grid-cols-subgrid']"
                     >
                       <ListCardFieldNested
                         :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
@@ -64,8 +64,8 @@
         :is="field.default ?? 'div'"
         v-else
         v-bind="field.default ? {item, skeleton, card, readonly, config, uniformScope, queryParams, results, intersecting} : (undefined as never)"
-        :class="field.meta.cssClass"
-        class="flex"
+        :class="[field.meta.cssClass, card ? 'flex' : 'grid grid-cols-subgrid']"
+        :style="card ? undefined : {gridColumn: `span ${ getFieldColumnCount(field.meta.fields) }`}"
       >
         <ListCardFieldNested
           :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
@@ -99,7 +99,7 @@ import ListCardFieldNestedArrayItems from './ListCardFieldNestedArrayItems.vue'
 import ListCardFieldNestedItem from './ListCardFieldNestedItem.vue'
 
 import {isField} from '../models/utils'
-import {getFirstFieldLabel} from '../use/useListConfig'
+import {getFieldColumnCount, getFirstFieldLabel} from '../use/useListConfig'
 
 const config = {width: null, visible: true, order: 0, sticky: false}
 

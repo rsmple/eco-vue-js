@@ -6,7 +6,7 @@ import IconList from '@/assets/icons/IconList.svg?component'
 import {useIsMobile} from '@/utils/mobile'
 import {ListMode, getIsClientSide} from '@/utils/utils'
 
-import {type FieldConfig, type FieldConfigMap, type ListConfig, type ListField, type ListFields} from '../types'
+import {type FieldConfig, type FieldConfigMap, type ListColumnWidth, type ListConfig, type ListField, type ListFields} from '../types'
 
 export const listModeList = [
   ListMode.TABLE,
@@ -235,46 +235,61 @@ export const forEachField = <Fields extends ListFields<any, any>>(fields: Fields
   })
 }
 
-export const getFieldVariable = <T extends 'width' | 'left' | 'right', Label extends string>(type: T, label: Label): `--w-list-field-${ T }-${ Label }` => {
-  return `--w-list-field-${ type }-${ label }`
+const DEFAULT_COLUMN_WIDTH: ListColumnWidth = '10rem'
+
+const getFieldTrack = (field: ListField<unknown>, config: FieldConfig | undefined): string => {
+  return config?.width ? `${ config.width }px` : field.width ?? DEFAULT_COLUMN_WIDTH
 }
 
+// The width of a flexible column while the list scrolls sideways, the only time a sticky column moves from its place.
+const getFieldTrackMin = (track: string): string => {
+  return track.startsWith('minmax(') ? track.slice('minmax('.length, track.indexOf(',')) : track
+}
+
+/** Track sizes of the table columns, in the order the fields are rendered. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getFieldStylesWidth = <Fields extends ListFields<any, any>>(fields: Fields, fieldConfigMap: Record<string, FieldConfig>): Record<string, string> => {
-  const styles: Record<string, string> = {}
+export const getFieldTracks = <Fields extends ListFields<any, any>>(fields: Fields, fieldConfigMap: Record<string, FieldConfig>): string => {
+  const tracks: string[] = []
 
   forEachField(fields, field => {
-    if (fieldConfigMap[field.meta.label]?.width) {
-      styles[getFieldVariable('width', field.meta.label)] = fieldConfigMap[field.meta.label]!.width + 'px'
+    tracks.push(getFieldTrack(field.meta, fieldConfigMap[field.meta.label]))
+  })
+
+  return tracks.join(' ')
+}
+
+/** Offsets of the sticky columns, from the widths of the sticky columns before and after each. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getFieldStylesSticky = <Fields extends ListFields<any, any>>(fields: Fields, fieldConfigMap: Record<string, FieldConfig>): Record<string, {left: string, right: string}> => {
+  const sticky: {label: string, width: string}[] = []
+
+  forEachField(fields, field => {
+    const config = fieldConfigMap[field.meta.label]
+
+    if (config?.sticky) sticky.push({label: field.meta.label, width: getFieldTrackMin(getFieldTrack(field.meta, config))})
+  })
+
+  const styles: Record<string, {left: string, right: string}> = {}
+
+  sticky.forEach(({label}, index) => {
+    const left = sticky.slice(0, index).map(item => item.width).join(' + ')
+    const right = sticky.slice(index + 1).map(item => item.width).join(' + ')
+
+    styles[label] = {
+      left: `calc(var(--w-left-inner) + var(--w-list-left)${ left ? ` + ${ left }` : '' })`,
+      right: `calc(var(--w-right-inner) + var(--w-list-right)${ right ? ` + ${ right }` : '' })`,
     }
   })
 
   return styles
 }
 
+/** Number of table columns the fields take, counting the columns of nested fields. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getFieldStylesFixed = <Fields extends ListFields<any, any>>(fields: Fields, fieldConfigMap: Record<string, FieldConfig>): Record<string, string> => {
-  const styles: Record<string, string> = {}
+export const getFieldColumnCount = <Fields extends ListFields<any, any>>(fields: Fields): number => {
+  let count = 0
 
-  const fixedLabels: string[] = []
+  forEachField(fields, () => count++)
 
-  forEachField(fields, field => {
-    if (fieldConfigMap[field.meta.label]?.sticky) {
-      fixedLabels.push(field.meta.label)
-    }
-  })
-
-  fixedLabels.forEach((label, index, array) => {
-    const left = array.slice(0, index).map(label => `var(${ getFieldVariable('width', label) })`).join(' + ')
-    styles[getFieldVariable('left', label)] = `calc(var(--w-left-inner) + var(--w-list-left)${ left ? ` + ${ left }` : '' })`
-
-    const right = array.slice(index + 1).map(label => `var(${ getFieldVariable('width', label) })`).join(' + ')
-    styles[getFieldVariable('right', label)] = `calc(var(--w-right-inner) + var(--w-list-right)${ right ? ` + ${ right }` : '' })`
-  })
-
-  return styles
-}
-
-export const getFieldWidthSumStyles = (fieldConfigMap: Record<string, FieldConfig>): string => {
-  return 'calc(' + Object.keys(fieldConfigMap).filter(key => fieldConfigMap[key]?.visible).map(label => `var(${ getFieldVariable('width', label) }, 0px)`).join(' + ') + ')'
+  return count
 }

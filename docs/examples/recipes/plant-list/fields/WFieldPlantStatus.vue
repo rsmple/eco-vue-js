@@ -31,7 +31,8 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'watered',
-  cssClass: 'basis-[7rem] w-skeleton-h-5',
+  width: '7rem',
+  cssClass: 'w-skeleton-h-5',
   title: 'Status',
   field: 'watered',
   textFormat: item => item.watered ? 'Watered' : 'Thirsty',

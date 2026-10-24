@@ -26,6 +26,7 @@
         :exclude-params="excludeParams"
         :empty-stub="emptyStub"
         :page-class="pageClass"
+        :page-style="pageStyle"
         :max-pages="maxPages"
         :refetch-interval="refetchInterval"
         :query-options="queryOptions"
@@ -85,7 +86,7 @@ import type {InfiniteListHeaderScope, InfiniteListScope} from './types'
 import type {ApiError} from '@/utils/api'
 import type {DefaultQueryOptions} from '@/utils/useDefaultQuery'
 
-import {computed, useTemplateRef} from 'vue'
+import {type StyleValue, computed, useTemplateRef} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
@@ -116,6 +117,8 @@ const props = withDefaults(
     emptyStub?: string
     /** Class of the element holding the items of all loaded pages, e.g. a grid layout. The pages render no element of their own, so a grid row runs on from one page into the next. */
     pageClass?: string
+    /** Style of the element holding the items, e.g. the columns of a grid. */
+    pageStyle?: StyleValue
     /** Number of pages kept rendered, 5 by default. Scrolling further drops pages at the other end, keeping their height as space. */
     maxPages?: number
     /** Refetches the pages in view every this many ms. */
@@ -134,6 +137,7 @@ const props = withDefaults(
     excludeParams: undefined,
     emptyStub: undefined,
     pageClass: undefined,
+    pageStyle: undefined,
     maxPages: undefined,
     refetchInterval: undefined,
     valueGetter: (item: Data) => (item as unknown as {id: Model}).id,

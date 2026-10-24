@@ -29,9 +29,18 @@ export type FieldComponentItem<Data> = Component<{
   last: boolean
 }>
 
+/**
+ * Track size of a table column, as in `grid-template-columns`. A `minmax` with `fr` takes a share of the space the
+ * other columns leave, and shrinks to its minimum when the list scrolls sideways. A `var()` lets the width change with
+ * the breakpoint, from a variable set on the list.
+ */
+export type ListColumnWidth = `${ number }rem` | `${ number }px` | `minmax(${ number }rem, ${ number }fr)` | `var(--${ string })`
+
 export type ListField<Data, QueryParams = unknown> = {
   title: string | ((params: QueryParams) => string)
   label: string
+  /** Width of the column until the user resizes it. Defaults to `10rem`. */
+  width?: ListColumnWidth
   cssClass?: string
   cssClassHeader?: string
   field?: Extract<keyof Data, string> | ((params: QueryParams) => Extract<keyof Data, string> | undefined)

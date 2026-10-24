@@ -37,7 +37,7 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'kind',
-  cssClass: 'basis-[7.5rem]',
+  width: '7.5rem',
   title: 'Kind',
   field: 'kind',
   // Used by CSV export and "copy as Markdown", which cannot render the tag.

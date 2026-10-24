@@ -16,7 +16,7 @@
           [cardWrapperClass ?? '']: true,
           'w-ripple-trigger-list': isActionShown,
           'sm-not:even:bg-surface-subtle grid grid-cols-1': card,
-          'flex': !card,
+          'col-span-full grid grid-cols-subgrid': !card,
           '-mb-px': !card && isOpen,
           'w-hover-checked': allowSelectHover,
         }"
@@ -78,7 +78,7 @@
           :class="{
             [cardClass ?? '']: true,
             '[contain-intrinsic-size:auto_3rem] [content-visibility:auto]': contentVisibility,
-            'flex flex-1': !card,
+            'col-[2/-2] grid grid-cols-subgrid': !card,
             'grid grid-cols-(--w-list-grid-cols) [grid-template-areas:var(--w-list-grid-areas)] sm:rounded-(--w-list-rounded,unset)': card,
             'sm:border-y': hasBorder,
             'border-line': hasBorder && !selected,

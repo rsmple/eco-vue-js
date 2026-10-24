@@ -186,9 +186,7 @@
 
     :count="totalCount"
     :selection="selectAllValue"
-    :style="{
-      '--list-header-width': getFieldWidthSumStyles(fieldConfigMap),
-    }"
+    :columns="fieldTracks"
     @toggle:selection="$emit('toggle:selection', $event)"
     @update:header="updateHeader"
   >
@@ -202,13 +200,7 @@
             :disabled="noOrdering"
             :allow-resize="field.meta.allowResize"
             :item-class="field.meta.cssClassHeader"
-            :style-value="card ? {gridArea: field.meta.label} : {
-              minWidth: field.meta.allowResize ? `var(${getFieldVariable('width', field.meta.label)})` : undefined,
-              maxWidth: field.meta.allowResize ? `var(${getFieldVariable('width', field.meta.label)})` : undefined,
-              left: fieldConfigMap[field.meta.label]?.sticky ? `var(${getFieldVariable('left', field.meta.label)})` : undefined,
-              right: fieldConfigMap[field.meta.label]?.sticky ? `var(${getFieldVariable('right', field.meta.label)})` : undefined,
-            }"
-            :has-width="stylesWidth[getFieldVariable('width', field.meta.label)] !== undefined"
+            :style-value="stylesSticky[field.meta.label]"
             :class="{
               [field.meta.cssClass ?? '']: true,
               'sticky z-1 bg-inherit': !card && fieldConfigMap[field.meta.label]?.sticky,
@@ -247,7 +239,6 @@ import ListToolbarFilter from './ListToolbarFilter.vue'
 
 import WListHeader from '../WListHeader.vue'
 import WListHeaderItem from '../WListHeaderItem.vue'
-import {getFieldVariable, getFieldWidthSumStyles} from '../use/useListConfig'
 
 const props = defineProps<{
   /** The count discovered by the list itself - what the `header` slot receives. */
@@ -280,7 +271,8 @@ const props = defineProps<{
   fieldsFiltered: ListFields<Data, QueryParams>
   fieldsSorted: ListFields<Data, QueryParams>
   fieldConfigMap: Record<string, FieldConfig>
-  stylesWidth: Record<string, string>
+  fieldTracks: string
+  stylesSticky: Record<string, {left: string, right: string}>
   ordering: OrderItem<keyof Data>[]
   mode: ListMode
 

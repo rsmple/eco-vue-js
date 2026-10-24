@@ -35,7 +35,8 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'seeds',
-  cssClass: 'basis-[7rem] card:text-xs',
+  width: '7rem',
+  cssClass: 'card:text-xs',
   title: 'Seeds',
   field: 'seeds',
 } as const satisfies ListField<Plant>
