@@ -246,7 +246,10 @@ const getFieldTrackMin = (track: string): string => {
   return track.startsWith('minmax(') ? track.slice('minmax('.length, track.indexOf(',')) : track
 }
 
-/** Track sizes of the table columns, in the order the fields are rendered. */
+/**
+ * Track sizes of the table columns, in the order the fields are rendered. Without a flexible column, an empty last
+ * track takes the space the columns leave, so the header and the rows still stretch to the full width of the list.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getFieldTracks = <Fields extends ListFields<any, any>>(fields: Fields, fieldConfigMap: Record<string, FieldConfig>): string => {
   const tracks: string[] = []
@@ -254,6 +257,8 @@ export const getFieldTracks = <Fields extends ListFields<any, any>>(fields: Fiel
   forEachField(fields, field => {
     tracks.push(getFieldTrack(field.meta, fieldConfigMap[field.meta.label]))
   })
+
+  if (!tracks.some(track => track.startsWith('minmax('))) tracks.push('minmax(0,1fr)')
 
   return tracks.join(' ')
 }
