@@ -25,7 +25,7 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'name',
-  cssClass: 'flex-1 basis-[12rem]',
+  width: 'minmax(12rem, 1fr)',
   title: 'Name',
   field: 'name',
   allowResize: true,

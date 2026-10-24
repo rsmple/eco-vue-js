@@ -25,7 +25,7 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'species',
-  cssClass: 'basis-[10rem]',
+  width: '10rem',
   title: 'Species',
   field: 'species',
   allowResize: true,

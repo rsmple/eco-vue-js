@@ -568,6 +568,7 @@ export const plantModelApi = createRestModelApi({
 Each field is a module with two exports: the component (default) renders the cell, and `meta` describes the column. Keep both in one file — the column cannot drift from what it renders.
 
 - `label` is the column's stable id: it keys the saved column config and names the area in `cardAreas`.
+- `width` is the column's width until the user resizes it: a length such as `'8rem'`, or `'minmax(12rem, 1fr)'` for a column that takes the space the others leave and shrinks to its minimum when the list scrolls sideways. The header and every row share these widths, so nothing is measured.
 - `field` makes the column sortable — its value is sent as `ordering` (`height`, `-height`).
 - `textFormat` gives a plain-text value for CSV export and "copy as Markdown", for cells that render components or format the value for display — like the water-by date, which is shown short and exported in full.
 - `allow-open` on `WListCardField` makes that cell toggle the expansion row.
@@ -605,7 +606,7 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'name',
-  cssClass: 'flex-1 basis-[12rem]',
+  width: 'minmax(12rem, 1fr)',
   title: 'Name',
   field: 'name',
   allowResize: true,
@@ -683,7 +684,7 @@ const getGain = (item: Plant) => item.height - item.growth[0]!.height
 
 export const meta = {
   label: 'growth',
-  cssClass: 'basis-[8rem]',
+  width: '8rem',
   title: 'Growth',
   textFormat: item => `+${ getGain(item) } cm`,
 } as const satisfies ListField<Plant>
@@ -728,7 +729,8 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'watered',
-  cssClass: 'basis-[7rem] w-skeleton-h-5',
+  width: '7rem',
+  cssClass: 'w-skeleton-h-5',
   title: 'Status',
   field: 'watered',
   textFormat: item => item.watered ? 'Watered' : 'Thirsty',
@@ -779,7 +781,8 @@ const today = getStartOfDay()
 <script lang="ts">
 export const meta = {
   label: 'due',
-  cssClass: 'basis-[8rem] card:text-xs',
+  width: '8rem',
+  cssClass: 'card:text-xs',
   title: 'Water by',
   field: 'waterBy',
   textFormat: item => item.waterBy ? dateFormat(item.waterBy) : undefined,

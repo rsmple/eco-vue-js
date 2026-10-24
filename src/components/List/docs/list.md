@@ -9,7 +9,7 @@ description: WList — paginated, sortable collections shown as a table on deskt
 `WList` renders a paginated collection as a table on desktop and as cards on mobile. It owns pagination, selection, column settings (show, hide, reorder, resize) and ordering. You give it:
 
 - `useQueryFn` and `queryParams` — a paginated query.
-- `fields` — one component per column. Each has a `meta` export with its title, ordering field and CSS class, and renders one cell from `item`.
+- `fields` — one component per column. Each has a `meta` export with its title, width, ordering field and CSS class, and renders one cell from `item`.
 - `cardColumns` and `cardAreas` — the card layout as a CSS grid, with field labels as area names. Every field must appear in `cardAreas`, even ones hidden by default; a field left out renders in an extra grid column.
 - Optionally an expansion component for a detail row and a menu component for row actions.
 
@@ -348,6 +348,7 @@ import WListHeader from 'eco-vue-js/dist/components/List/WListHeader.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
+| `columns` | `string` | **required** | Track sizes of the columns between the checkbox and the end cap, as in `grid-template-columns`. The rows use the same tracks, so the cells line up with them. |
 | `allowSelect` | `boolean` | — | Shows the select-all checkbox. |
 | `selectOnly` | `boolean` | — | Keeps the checkbox column's space without the checkbox, for lists without select-all. |
 | `hideMore` | `boolean` | — | Narrows the end cap when the rows have no menu. |
@@ -390,8 +391,7 @@ import WListHeaderItem from 'eco-vue-js/dist/components/List/WListHeaderItem.vue
 | `disabled` | `boolean` | — | Turns sorting off. |
 | `allowResize` | `boolean` | — | Adds a handle to resize the column. |
 | `itemClass` | `string` | — | Class of the title, replacing the default bold one-line style. |
-| `styleValue` | `Record<string, string \| undefined>` | **required** | Style of the column, such as its width. |
-| `hasWidth` | `boolean` | **required** | Whether the column has a width set, for the resize handle. |
+| `styleValue` | `Record<string, string \| undefined> \| undefined` | **required** | Style of the column, such as its sticky offsets. |
 
 #### Events
 

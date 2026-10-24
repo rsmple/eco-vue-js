@@ -63,7 +63,7 @@ const getGain = (item: Plant) => item.height - item.growth[0]!.height
 
 export const meta = {
   label: 'growth',
-  cssClass: 'basis-[8rem]',
+  width: '8rem',
   title: 'Growth',
   textFormat: item => `+${ getGain(item) } cm`,
 } as const satisfies ListField<Plant>

@@ -14,6 +14,7 @@
     <div
       ref="items"
       :class="pageClass"
+      :style="pageStyle"
     >
       <div
         v-if="columnOffset"
@@ -94,7 +95,7 @@
 import type {ApiError} from '@/utils/api'
 import type {DefaultQueryOptions} from '@/utils/useDefaultQuery'
 
-import {computed, inject, nextTick, onBeforeUnmount, onMounted, provide, reactive, ref, useTemplateRef, watch} from 'vue'
+import {type StyleValue, computed, inject, nextTick, onBeforeUnmount, onMounted, provide, reactive, ref, useTemplateRef, watch} from 'vue'
 
 import {debounce, getIsClientSide, getOffsetTop, isEqualObj} from '@/utils/utils'
 
@@ -117,6 +118,7 @@ const props = withDefaults(
     excludeParams?: (keyof QueryParams)[]
     emptyStub?: string
     pageClass?: string
+    pageStyle?: StyleValue
     maxPages?: number
     refetchInterval?: number | false
     queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>
@@ -130,6 +132,7 @@ const props = withDefaults(
     excludeParams: undefined,
     emptyStub: undefined,
     pageClass: undefined,
+    pageStyle: undefined,
     maxPages: 5,
     refetchInterval: undefined,
     queryOptions: undefined,

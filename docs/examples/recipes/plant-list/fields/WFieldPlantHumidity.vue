@@ -34,7 +34,8 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'humidity',
-  cssClass: 'basis-[9rem] card:text-xs',
+  width: '9rem',
+  cssClass: 'card:text-xs',
   title: 'Humidity',
   field: 'humidity',
   textFormat: item => `${ item.humidity }%`,

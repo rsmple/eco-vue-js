@@ -36,7 +36,8 @@ const today = getStartOfDay()
 <script lang="ts">
 export const meta = {
   label: 'due',
-  cssClass: 'basis-[8rem] card:text-xs',
+  width: '8rem',
+  cssClass: 'card:text-xs',
   title: 'Water by',
   field: 'waterBy',
   textFormat: item => item.waterBy ? dateFormat(item.waterBy) : undefined,

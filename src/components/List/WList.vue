@@ -9,7 +9,6 @@
       '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em+1px)]': allowSelect,
       '[--w-list-left:var(--w-list-header-rounded,1rem)]': !allowSelect,
     }"
-    :style="[stylesWidth, stylesFixed]"
   >
     <WInfiniteList
       :use-query-fn="useQueryFn"
@@ -22,8 +21,9 @@
       :page-class="
         isGrid
           ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-(--w-list-gap,0) isolate'
-          : 'grid grid-cols-1 gap-(--w-list-gap,0) isolate'
+          : 'grid gap-(--w-list-gap,0) isolate'
       "
+      :page-style="isGrid ? undefined : {gridTemplateColumns: `var(--w-list-left) ${ fieldTracks } var(--w-list-right)`}"
       :min-height-only="minHeight"
       :no-header-update="noHeaderUpdate"
       :style="cardStyles"
@@ -62,7 +62,8 @@
           :fields-filtered="fieldsFiltered"
           :fields-sorted="fieldsSorted"
           :field-config-map="fieldConfigMap"
-          :styles-width="stylesWidth"
+          :field-tracks="fieldTracks"
+          :styles-sticky="stylesSticky"
           :ordering="ordering"
           :mode="listConfig.mode"
 
@@ -200,7 +201,7 @@ import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type Ref, type StyleValue, computed, nextTick, onMounted, ref, toRef, watch} from 'vue'
+import {type Ref, type StyleValue, computed, ref, toRef} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
@@ -209,13 +210,13 @@ import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {type DefaultQueryOptions, PAGE_LENGTH} from '@/utils/useDefaultQuery'
 import {type Selection, useSelected, useSelectionHash} from '@/utils/useSelected'
-import {ListMode, isEqualObj} from '@/utils/utils'
+import {ListMode} from '@/utils/utils'
 
 import ListGroupHeading from './components/ListGroupHeading.vue'
 import ListItem from './components/ListItem.vue'
 import ListToolbar from './components/ListToolbar.vue'
 import {AREA_MORE, AREA_SELECT} from './types'
-import {filterFields, forEachField, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, sortFields, sortFieldsDeep, useListConfig} from './use/useListConfig'
+import {filterFields, forEachField, getFieldStylesSticky, getFieldTracks, sortFieldsDeep, useListConfig} from './use/useListConfig'
 
 defineOptions({inheritAttrs: false})
 
@@ -398,6 +399,12 @@ const fieldsFiltered = computed(() => filterFields(fieldsVisible.value, field =>
 
 const fieldsSorted = computed(() => isGrid.value ? fieldsFiltered.value : sortFieldsDeep(fieldsFiltered.value, fieldConfigMap.value))
 
+// Columns are tracks of one grid that the header and every row share as a subgrid, so the widths need no measuring,
+// and a new width restyles the grid alone instead of every cell.
+const fieldTracks = computed(() => getFieldTracks(fieldsSorted.value, fieldConfigMap.value))
+
+const stylesSticky = computed(() => getFieldStylesSticky(fieldsSorted.value, fieldConfigMap.value))
+
 const columnDataMap = computed<Record<string, ColumnData>>(() => {
   const map: Record<string, ColumnData> = {}
   const card = isGrid.value
@@ -409,14 +416,7 @@ const columnDataMap = computed<Record<string, ColumnData>>(() => {
     const stickyInTable = !card && sticky
 
     map[label] = {
-      style: card
-        ? {gridArea: label}
-        : {
-          minWidth: `var(${ getFieldVariable('width', label) })`,
-          maxWidth: `var(${ getFieldVariable('width', label) })`,
-          left: sticky ? `var(${ getFieldVariable('left', label) })` : undefined,
-          right: sticky ? `var(${ getFieldVariable('right', label) })` : undefined,
-        },
+      style: card ? {gridArea: label} : stylesSticky.value[label],
       baseClass: {
         'items-center': !at,
         'items-start': at,
@@ -507,10 +507,6 @@ const ordering = computed<OrderItem<keyof Data>[]>(() => {
   return []
 })
 
-const stylesWidth = ref<Record<string, string>>({})
-
-const stylesFixed = ref<Record<string, string>>({})
-
 const updateOrdering = (value: OrderItem<keyof Data>[]) => {
   const ordering = encodeOrdering(value)
 
@@ -530,23 +526,6 @@ const getQueryParamsBulk = (): QueryParams => {
   return props.queryParams
 }
 
-// Replaced only on a change: a new style re-renders the list, and every header cell reports its width separately.
-const updateStylesWidth = async () => {
-  await nextTick()
-
-  const value = getFieldStylesWidth(fieldsFiltered.value, fieldConfigMap.value)
-
-  if (!isEqualObj(value, stylesWidth.value)) stylesWidth.value = value
-}
-
-const updateStylesFixed = async () => {
-  await nextTick()
-
-  const value = getFieldStylesFixed(sortFields(fieldsFiltered.value, fieldConfigMap.value), fieldConfigMap.value)
-
-  if (!isEqualObj(value, stylesFixed.value)) stylesFixed.value = value
-}
-
 const toggleSelectAll = (value: boolean) => {
   if (value) selectAll()
   else resetSelection()
@@ -558,36 +537,13 @@ const emitClickAction = (value: CardActionParams<Data>) => {
 
 const updateFieldConfigMap = (value: Record<string, FieldConfig>) => {
   fieldConfigMap.value = value
-
-  updateStylesWidth()
-  updateStylesFixed()
 }
 
 const updateFieldWidth = (label: string, value: number) => {
   fieldConfigMap.value[label]!.width = value
-
-  updateStylesWidth()
 }
 
 const resetConfig = () => {
   reset()
-
-  updateStylesWidth()
-  updateStylesFixed()
 }
-
-// The saved config loads on mount, after the watcher below may have stopped on the defaults' styles.
-onMounted(() => {
-  updateStylesWidth()
-  updateStylesFixed()
-})
-
-const unwatch = watch(fieldsFiltered, async () => {
-  await Promise.all([
-    updateStylesWidth(),
-    updateStylesFixed(),
-  ])
-
-  if (Object.keys(stylesWidth.value).length !== 0 || Object.keys(stylesFixed.value).length !== 0) unwatch.stop()
-}, {immediate: true})
 </script>

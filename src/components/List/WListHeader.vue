@@ -1,5 +1,8 @@
 <template>
-  <div class="flex h-(--w-list-header-height,2rem)">
+  <div
+    class="grid h-(--w-list-header-height,2rem)"
+    :style="{gridTemplateColumns: `var(--w-list-left,auto) ${ columns } var(--w-list-right,auto)`}"
+  >
     <div class="left---left-inner bg-surface sticky z-1">
       <div class="bg-surface w---left-inner absolute right-full top-0 -z-1 h-full" />
 
@@ -26,7 +29,7 @@
       </div>
     </div>
 
-    <div class="flex min-w-(--list-header-width) flex-1 border-y border-solid border-line bg-(--w-list-header-bg,inherit)">
+    <div class="col-[2/-2] grid grid-cols-subgrid border-y border-solid border-line bg-(--w-list-header-bg,inherit)">
       <slot />
     </div>
 
@@ -52,6 +55,8 @@ import {onMounted, onUnmounted} from 'vue'
 import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 
 defineProps<{
+  /** Track sizes of the columns between the checkbox and the end cap, as in `grid-template-columns`. The rows use the same tracks, so the cells line up with them. */
+  columns: string
   /** Shows the select-all checkbox. */
   allowSelect?: boolean
   /** Keeps the checkbox column's space without the checkbox, for lists without select-all. */
