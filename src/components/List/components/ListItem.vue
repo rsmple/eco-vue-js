@@ -55,10 +55,21 @@
               ...beforeClass,
             }"
           >
+            <!-- A loading row draws the box alone: the checkbox would only be disabled, and is the larger part of the row. -->
+            <div
+              v-if="allowSelect && skeleton"
+              class="flex h-full px-(--w-list-padding,1rem)"
+              :class="{
+                'pt-4.5 items-start': alignTop,
+                'items-center': !alignTop,
+              }"
+            >
+              <div class="square-[1.5em] border-line rounded-md border border-solid opacity-70 [font-size:var(--w-checkbox-size)]" />
+            </div>
+
             <WCheckbox
-              v-if="allowSelect"
+              v-else-if="allowSelect"
               :model-value="selected"
-              :disabled="skeleton"
               :readonly="false"
               label="Select row"
               :align-top="alignTop"
@@ -88,9 +99,8 @@
           }"
         >
           <WCheckbox
-            v-if="allowSelect && card"
+            v-if="allowSelect && card && !skeleton"
             :model-value="selected"
-            :disabled="skeleton"
             :readonly="false"
             label="Select row"
             class="p---inner-margin -my---inner-margin -mr---inner-margin justify-end self-start"
@@ -101,7 +111,23 @@
             @update:model-value="$emit('toggle:selected', value, position)"
           />
 
+          <template v-if="skeleton && skeletonFields">
+            <div
+              v-for="field in skeletonFields"
+              :key="field.meta.label"
+              class="list:pr-3 list:first-not:pl-3 grid grid-cols-1"
+              :class="[field.meta.cssClass, columnDataMap[field.meta.label]!.baseClass]"
+              :style="columnDataMap[field.meta.label]!.style"
+            >
+              <div
+                class="tone-primary bg-tone-soft w-skeleton w-skeleton-opacity-50 dark:w-skeleton-opacity-5 before:animate-ticker w-option-has-bg"
+                :style="{'--skeleton-width-internal': getSkeletonWidth(field.meta.label, position) + '%'}"
+              />
+            </div>
+          </template>
+
           <ListCardFieldNested
+            v-else
             :fields="fields"
             :column-data-map="columnDataMap"
             :item="item"
@@ -148,10 +174,10 @@
           />
 
           <WButtonMore
-            v-if="card && hasMenu"
+            v-if="card && hasMenu && !skeleton"
             ref="more"
             class="p---inner-margin -my---inner-margin -mr---inner-margin flex items-center"
-            :disabled="skeleton || disableMore"
+            :disabled="disableMore"
             :style="{gridArea: AREA_MORE}"
           >
             <WButtonMoreItem
@@ -163,7 +189,7 @@
             />
 
             <ListMenuMarkdown
-              v-if="toMarkdown && !skeleton"
+              v-if="toMarkdown"
               :item="item"
               :index="index"
               :to-markdown="toMarkdown"
@@ -210,14 +236,14 @@
             }"
           >
             <WButtonMore
-              v-if="hasMenu"
+              v-if="hasMenu && !skeleton"
               ref="more"
               class="flex h-full px-(--w-list-padding,1rem)"
               :class="{
                 'pt-4.5 items-start': alignTop,
                 'items-center': !alignTop,
               }"
-              :disabled="skeleton || disableMore"
+              :disabled="disableMore"
             >
               <WButtonMoreItem
                 v-if="alwaysSelect && allowSelect && to"
@@ -228,7 +254,7 @@
               />
 
               <ListMenuMarkdown
-                v-if="toMarkdown && !skeleton"
+                v-if="toMarkdown"
                 :item="item"
                 :index="index"
                 :to-markdown="toMarkdown"
@@ -284,7 +310,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams">
-import type {CardActionParams, ColumnData, ExpansionComponent, FieldConfig, ListActionMode, ListFields, MenuComponent} from '../types'
+import type {CardActionParams, ColumnData, ExpansionComponent, FieldComponent, FieldConfig, ListActionMode, ListField, ListFieldExport, ListFields, MenuComponent} from '../types'
 import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 
@@ -306,6 +332,7 @@ import ListCardFieldItem from './ListCardFieldItem.vue'
 import ListCardFieldNested from './ListCardFieldNested.vue'
 import ListMenuMarkdown from './ListMenuMarkdown.vue'
 
+import {getSkeletonWidth} from '../models/utils'
 import {AREA_MORE, AREA_SELECT} from '../types'
 
 const props = defineProps<{
@@ -320,6 +347,8 @@ const props = defineProps<{
   intersecting: boolean
 
   fields: ListFields<Data, QueryParams>
+  /** The fields, when a loading row can draw all of them as plain placeholders without mounting a component per field. */
+  skeletonFields: ListFieldExport<FieldComponent<Data, QueryParams>, ListField<Data, QueryParams>>[] | undefined
   fieldConfigMap: Record<string, FieldConfig>
   columnDataMap: Record<string, ColumnData>
   queryParams: QueryParams

@@ -141,6 +141,7 @@
           :intersecting="intersecting"
 
           :fields="fieldsSorted"
+          :skeleton-fields="skeletonFields"
           :field-config-map="fieldConfigMap"
           :column-data-map="columnDataMap"
           :query-params="queryParams"
@@ -215,6 +216,7 @@ import {ListMode} from '@/utils/utils'
 import ListGroupHeading from './components/ListGroupHeading.vue'
 import ListItem from './components/ListItem.vue'
 import ListToolbar from './components/ListToolbar.vue'
+import {isField} from './models/utils'
 import {AREA_MORE, AREA_SELECT} from './types'
 import {filterFields, forEachField, getFieldStylesSticky, getFieldTracks, sortFieldsDeep, useListConfig} from './use/useListConfig'
 
@@ -401,6 +403,12 @@ const fieldsSorted = computed(() => isGrid.value ? fieldsFiltered.value : sortFi
 
 // Columns are tracks of one grid that the header and every row share as a subgrid, so the widths need no measuring,
 // and a new width restyles the grid alone instead of every cell.
+// Loading rows draw plain placeholders in place of the field components, unless a field is nested or draws its own skeleton.
+const skeletonFields = computed(() => fieldsSorted.value.every(field => isField(field) && !field.meta.customSkeleton)
+  ? fieldsSorted.value.filter(isField)
+  : undefined,
+)
+
 const fieldTracks = computed(() => getFieldTracks(fieldsSorted.value, fieldConfigMap.value))
 
 const stylesSticky = computed(() => getFieldStylesSticky(fieldsSorted.value, fieldConfigMap.value))
