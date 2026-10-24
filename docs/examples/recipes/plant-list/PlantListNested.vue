@@ -51,7 +51,7 @@ const listFieldsPlantNested = [
     // The columns of the plant's caretaker, a related object.
     meta: {
       getterEntity: plant => plant.caretaker,
-      cssClass: 'card:flex-col card:items-start card:[grid-area:gardener]',
+      cssClass: 'card:flex-col card:items-start card:[grid-area:gardener] list:pl-3',
       fields: [
         FieldGardenerName,
         FieldGardenerRole,
