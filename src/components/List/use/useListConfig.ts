@@ -143,7 +143,10 @@ export const useListConfig = <Fields extends ListFields<any, any>>(
 
   if (!disable) {
     onMounted(() => {
-      value.value = parseListConfig(getListConfig(key()), fields(), defaultConfigMap(), defailtMode())
+      const saved = parseListConfig(getListConfig(key()), fields(), defaultConfigMap(), defailtMode())
+
+      // Kept when nothing differs from the defaults, so every row is not re-rendered for new but equal configs.
+      if (JSON.stringify(saved) !== JSON.stringify(value.value)) value.value = saved
       hasSaved.value = getHasSavedConfig(key())
     })
   }
