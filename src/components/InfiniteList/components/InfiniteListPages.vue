@@ -1,9 +1,9 @@
 <template>
   <InfiniteListScroll
     ref="infiniteScroll"
-    :style="{'--infinite-list-header-height': headerHeight + 'px'}"
+    :style="!minHeight && !minHeightOnly ? {minHeight: `calc(var(--w-height-inner) - ${ headerHeight }px)`} : undefined"
     :class="{
-      'min-h---height-inner list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem) modal:min-h-[50vh] pb-16': !minHeight && !minHeightOnly,
+      'list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem) modal:min-h-[50vh] pb-16': !minHeight && !minHeightOnly,
       'min-h-full': minHeight,
       'list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem)': minHeightOnly,
     }"
@@ -94,14 +94,14 @@
 import type {ApiError} from '@/utils/api'
 import type {DefaultQueryOptions} from '@/utils/useDefaultQuery'
 
-import {computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref, useTemplateRef, watch} from 'vue'
+import {computed, inject, nextTick, onBeforeUnmount, onMounted, provide, reactive, ref, useTemplateRef, watch} from 'vue'
 
 import {debounce, getIsClientSide, getOffsetTop, isEqualObj} from '@/utils/utils'
 
 import InfiniteListPage from './InfiniteListPage.vue'
 import InfiniteListScroll from './InfiniteListScroll.vue'
 
-import {wScrollingElement} from '../models/injection'
+import {wInfiniteListHeaderHeight, wScrollingElement} from '../models/injection'
 import {useRefetchNextPages} from '../use/useRefetchNextPages'
 
 const props = withDefaults(
@@ -145,6 +145,9 @@ const emit = defineEmits<{
 const infiniteScrollRef = useTemplateRef('infiniteScroll')
 
 const scrollingElement = inject(wScrollingElement, null)
+
+// Provided rather than set as a variable on the root: a variable there restyles every row when the header is measured.
+provide(wInfiniteListHeaderHeight, computed(() => props.headerHeight))
 
 const pages = ref<number[]>([(props.queryParams as {page?: number}).page ?? 1])
 let slotIdCounter = 1
