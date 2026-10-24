@@ -16,10 +16,12 @@
       :class="pageClass"
       :style="pageStyle"
     >
+      <!-- Not a scroll anchor: it moves to the start of the first page whenever one is added or dropped at the top. -->
       <div
         v-if="columnOffset"
         aria-hidden="true"
-        :style="{gridColumn: 'span ' + columnOffset}"
+        class="[overflow-anchor:none]"
+        :style="{gridColumn: 'span ' + columnOffset, gridRow: leadingRows ? leadingRows + 1 : undefined}"
       />
 
       <InfiniteListPage
@@ -298,11 +300,118 @@ const getColumnCount = (element: HTMLElement): number => {
  * starting past the first page, or one dropping a page at the top, would move every item to another column whenever
  * the page size is not a multiple of the column count.
  */
-const columnOffset = computed(() => {
+const columnOffset = ref(0)
+
+/**
+ * The column each page started in when it was last rendered after the pages before it. Items spanning the whole row,
+ * such as group headings, end a row early, so the column cannot be told from the count of items before the page.
+ */
+const pageColumns = new Map<number, number>()
+
+/** Set when the first page was not rendered before, so its offset is a guess to correct from the pages after it. */
+let isOffsetGuessed = false
+
+const getGuessedColumnOffset = (page: number): number => {
   if (columnCount.value <= 1) return 0
 
-  return (((pages.value[0] ?? 1) - 1) * pageSize.value) % columnCount.value
+  return ((page - 1) * pageSize.value) % columnCount.value
+}
+
+watch(() => pages.value[0], page => {
+  const column = page === undefined ? undefined : pageColumns.get(page)
+
+  isOffsetGuessed = column === undefined
+  columnOffset.value = column ?? getGuessedColumnOffset(page ?? 1)
 })
+
+watch(pageSize, () => pageColumns.clear())
+
+/**
+ * Rows the first page opens with, of items spanning the whole row such as the heading of the group it continues. The
+ * empty cells go in the row after them, so the cells come before the first item that takes a column.
+ */
+const leadingRows = ref(0)
+
+const getIsFullRow = (element: Element): boolean => {
+  const start = getComputedStyle(element).gridColumnStart
+
+  return start !== 'auto' && !start.startsWith('span')
+}
+
+/** The start of each column of the items, from the left of their content. */
+const getColumnStarts = (element: HTMLElement): number[] => {
+  const style = getComputedStyle(element)
+  const gap = Number.parseFloat(style.columnGap) || 0
+  let start = element.getBoundingClientRect().left + (Number.parseFloat(style.borderLeftWidth) || 0) + (Number.parseFloat(style.paddingLeft) || 0)
+
+  return (style.gridTemplateColumns.match(/[\d.]+px/g) ?? []).map(value => {
+    const current = start
+    start += Number.parseFloat(value) + gap
+    return current
+  })
+}
+
+const getColumn = (element: Element, starts: number[]): number => {
+  const left = element.getBoundingClientRect().left
+  let column = 0
+
+  for (let i = 1; i < starts.length; i++) if (left >= starts[i]! - 1) column = i
+
+  return column
+}
+
+/**
+ * Keeps the empty cells true to the columns the pages had. A guessed offset is corrected by a page rendered before, so
+ * its items stay in their columns. Returns whether the cells changed, after which the pages are measured again.
+ */
+const updateColumnOffset = (pageElements: Element[][]): boolean => {
+  const itemsEl = itemsRef.value
+  if (!itemsEl) return false
+
+  const firstElements = pageElements[0] ?? []
+  const firstItemIndex = firstElements.findIndex(element => !getIsFullRow(element))
+  const newLeadingRows = firstItemIndex === -1 ? 0 : firstItemIndex
+
+  if (columnCount.value <= 1 || firstItemIndex === -1) {
+    isOffsetGuessed = false
+    const isChanged = columnOffset.value !== 0 || leadingRows.value !== newLeadingRows
+    columnOffset.value = 0
+    leadingRows.value = newLeadingRows
+    return isChanged
+  }
+
+  if (leadingRows.value !== newLeadingRows) {
+    leadingRows.value = newLeadingRows
+    return true
+  }
+
+  const starts = getColumnStarts(itemsEl)
+  const columns = pageElements.map(elements => {
+    const item = elements.find(element => !getIsFullRow(element))
+    return item ? getColumn(item, starts) : undefined
+  })
+
+  if (isOffsetGuessed) {
+    isOffsetGuessed = false
+
+    for (let i = 1; i < pages.value.length; i++) {
+      const known = pageColumns.get(pages.value[i]!)
+      const actual = columns[i]
+      if (known === undefined || actual === undefined) continue
+      if (known === actual) break
+
+      columnOffset.value = (columnOffset.value + known - actual + columnCount.value) % columnCount.value
+      return true
+    }
+  }
+
+  pages.value.forEach((page, index) => {
+    const column = columns[index]
+    if (column !== undefined) pageColumns.set(page, column)
+  })
+
+  return false
+}
 
 const getScrollElementTop = (element: Element): number => {
   if (element === document.scrollingElement || element === document.body || element === document.documentElement) return 0
@@ -323,10 +432,27 @@ const measurePages = (correctScroll: boolean) => {
   const itemsEl = itemsRef.value
   if (!itemsEl) return
 
-  columnCount.value = getColumnCount(itemsEl)
+  const newColumnCount = getColumnCount(itemsEl)
+
+  if (newColumnCount !== columnCount.value) {
+    columnCount.value = newColumnCount
+    pageColumns.clear()
+    isOffsetGuessed = true
+    columnOffset.value = getGuessedColumnOffset(pages.value[0] ?? 1)
+    nextTick(() => measurePages(correctScroll))
+    return
+  }
 
   const instances = pageComponentRef.value ?? []
-  const tops = pages.value.map(page => instances.find(instance => instance?.pageNumber === page)?.getElements()[0]?.getBoundingClientRect().top)
+  const pageElements = pages.value.map(page => instances.find(instance => instance?.pageNumber === page)?.getElements() ?? [])
+
+  // The layout changes with the cells, so the pages are measured once it has rendered.
+  if (updateColumnOffset(pageElements)) {
+    nextTick(() => measurePages(correctScroll))
+    return
+  }
+
+  const tops = pageElements.map(elements => elements[0]?.getBoundingClientRect().top)
   const itemsBottom = itemsEl.getBoundingClientRect().bottom
 
   const itemsTop = itemsEl.getBoundingClientRect().top
@@ -505,6 +631,7 @@ const resetPage = async (page = 1) => {
   pagesCount.value = 1
   // The count of the previous query would size the skeletons of the new one.
   count.value = 0
+  pageColumns.clear()
   pages.value = [page]
   slotIds.value = [recycledSlotId ?? ++slotIdCounter]
 }
