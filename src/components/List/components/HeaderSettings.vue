@@ -20,7 +20,7 @@
     </template>
 
     <template #content>
-      <div class="grid grid-cols-1 overflow-hidden">
+      <div class="grid grid-cols-1">
         <div class="p-4">
           <div
             class="grid items-start"

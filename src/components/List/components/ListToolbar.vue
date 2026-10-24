@@ -202,7 +202,6 @@
             :item-class="field.meta.cssClassHeader"
             :style-value="stylesSticky[field.meta.label]"
             :class="{
-              [field.meta.cssClass ?? '']: true,
               'sticky z-1 bg-inherit': !card && fieldConfigMap[field.meta.label]?.sticky,
             }"
             @update:width="$emit('update:width', field.meta.label, $event)"
