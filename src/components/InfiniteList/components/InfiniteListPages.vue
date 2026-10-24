@@ -8,7 +8,11 @@
       'list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem)': minHeightOnly,
     }"
   >
-    <div :style="{height: topSpacerHeight + 'px'}" />
+    <!-- Not a scroll anchor: it changes by an average page height when a page is added or dropped at the top, not by the page's own. -->
+    <div
+      class="[overflow-anchor:none]"
+      :style="{height: topSpacerHeight + 'px'}"
+    />
     <div ref="topSentinel" />
 
     <div
@@ -308,20 +312,15 @@ const columnOffset = ref(0)
  */
 const pageColumns = new Map<number, number>()
 
-/** Set when the first page was not rendered before, so its offset is a guess to correct from the pages after it. */
-let isOffsetGuessed = false
-
 const getGuessedColumnOffset = (page: number): number => {
   if (columnCount.value <= 1) return 0
 
   return ((page - 1) * pageSize.value) % columnCount.value
 }
 
+// Before the first page renders, so the pages after it do not move for a frame when its column is known.
 watch(() => pages.value[0], page => {
-  const column = page === undefined ? undefined : pageColumns.get(page)
-
-  isOffsetGuessed = column === undefined
-  columnOffset.value = column ?? getGuessedColumnOffset(page ?? 1)
+  columnOffset.value = (page === undefined ? undefined : pageColumns.get(page)) ?? getGuessedColumnOffset(page ?? 1)
 })
 
 watch(pageSize, () => pageColumns.clear())
@@ -361,8 +360,10 @@ const getColumn = (element: Element, starts: number[]): number => {
 }
 
 /**
- * Keeps the empty cells true to the columns the pages had. A guessed offset is corrected by a page rendered before, so
- * its items stay in their columns. Returns whether the cells changed, after which the pages are measured again.
+ * Keeps the empty cells true to the columns the pages had: the first page after it rendered before keeps its column, so
+ * its items do not move. Not the first page's own, which is a guess for a page not rendered before, and changes as its
+ * items load, while a page still loading has no group headings to end its rows early. Returns whether the cells
+ * changed, after which the pages are measured again.
  */
 const updateColumnOffset = (pageElements: Element[][]): boolean => {
   const itemsEl = itemsRef.value
@@ -373,7 +374,6 @@ const updateColumnOffset = (pageElements: Element[][]): boolean => {
   const newLeadingRows = firstItemIndex === -1 ? 0 : firstItemIndex
 
   if (columnCount.value <= 1 || firstItemIndex === -1) {
-    isOffsetGuessed = false
     const isChanged = columnOffset.value !== 0 || leadingRows.value !== newLeadingRows
     columnOffset.value = 0
     leadingRows.value = newLeadingRows
@@ -391,17 +391,32 @@ const updateColumnOffset = (pageElements: Element[][]): boolean => {
     return item ? getColumn(item, starts) : undefined
   })
 
-  if (isOffsetGuessed) {
-    isOffsetGuessed = false
-
+  // The list starts in the first column.
+  if (pages.value[0] === 1) {
+    if (columnOffset.value !== 0) {
+      columnOffset.value = 0
+      return true
+    }
+  } else if (!firstElements.slice(firstItemIndex).some(getIsFullRow)) {
+    // Up to the next item spanning the whole row, which starts the next row whatever the cells.
     for (let i = 1; i < pages.value.length; i++) {
+      const elements = pageElements[i] ?? []
+      const itemIndex = elements.findIndex(element => !getIsFullRow(element))
+      if (itemIndex !== 0) {
+        if (elements.length === 0) continue
+        break
+      }
+
       const known = pageColumns.get(pages.value[i]!)
       const actual = columns[i]
-      if (known === undefined || actual === undefined) continue
-      if (known === actual) break
+      if (known !== undefined && actual !== undefined) {
+        if (known === actual) break
 
-      columnOffset.value = (columnOffset.value + known - actual + columnCount.value) % columnCount.value
-      return true
+        columnOffset.value = (columnOffset.value + known - actual + columnCount.value) % columnCount.value
+        return true
+      }
+
+      if (elements.some(getIsFullRow)) break
     }
   }
 
@@ -437,7 +452,6 @@ const measurePages = (correctScroll: boolean) => {
   if (newColumnCount !== columnCount.value) {
     columnCount.value = newColumnCount
     pageColumns.clear()
-    isOffsetGuessed = true
     columnOffset.value = getGuessedColumnOffset(pages.value[0] ?? 1)
     nextTick(() => measurePages(correctScroll))
     return
