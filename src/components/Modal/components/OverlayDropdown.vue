@@ -75,7 +75,7 @@
         :horizontal-align="cornered ? HorizontalAlign.RIGHT_INNER : align ?? HorizontalAlign.CENTER"
         :update-align="!cornered"
         :freeze="detached"
-        :inner-class="hasTip ? isBeside ? 'w-max tone-surface-raised flex items-center' : 'w-max tone-surface-raised flex flex-col items-center' : undefined"
+        :inner-class="hasTip ? isBeside ? 'w-max tone-surface-raised flex items-center' : 'w-max tone-surface-raised flex flex-col items-center' : 'w-max flex flex-col'"
         :style="{zIndex}"
       >
         <template #default="{isTop, isLeft, isRight}">
