@@ -2,6 +2,7 @@
   <div
     ref="element"
     class="demo vp-raw"
+    :style="initialWidth ? {'--docs-demo-width': `${ initialWidth }px`} : undefined"
     :class="overflow ? 'overflow-auto overscroll-contain max-h-(--docs-demo-max-height)' : overflowHidden ? 'overflow-hidden' : undefined"
   >
     <div
@@ -55,6 +56,10 @@ const elementRef = useTemplateRef('element')
 // Lists inside page and stick against the demo box, as they do inside a modal.
 provide(wScrollingElement, elementRef)
 
+// Demos share the page column, so after a navigation a demo starts at the width the last one measured. The
+// measurement then changes nothing, instead of landing a frame later and restyling everything inside the demo.
+const initialWidth = lastWidth
+
 let observer: ResizeObserver | null = null
 
 onMounted(() => {
@@ -62,7 +67,10 @@ onMounted(() => {
 
   // clientWidth: the scrollport, padding included and scrollbar excluded — what 100vw stands for in an app.
   observer = new ResizeObserver(() => {
-    elementRef.value?.style.setProperty('--docs-demo-width', `${ elementRef.value.clientWidth }px`)
+    if (!elementRef.value) return
+
+    lastWidth = elementRef.value.clientWidth
+    elementRef.value.style.setProperty('--docs-demo-width', `${ lastWidth }px`)
   })
 
   observer.observe(elementRef.value)
@@ -72,4 +80,8 @@ onBeforeUnmount(() => {
   observer?.disconnect()
   observer = null
 })
+</script>
+
+<script lang="ts">
+let lastWidth: number | null = null
 </script>

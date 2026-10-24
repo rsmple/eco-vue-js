@@ -116,15 +116,8 @@
       </template>
 
       <template #default="{item, skeleton, setter, refetch, previous, first, index, position, value, results, intersecting}">
-        <div
+        <ListGroupHeading
           v-if="groupBy && $slots.group && (first || (!skeleton && (!previous || !groupBy(item, previous))))"
-          role="heading"
-          aria-level="3"
-          class="
-            bg-surface list:left---left-inner list:w---width-inner sm-not:px---inner-margin
-            top-[calc(var(--header-height,0px)+var(--infinite-list-header-height,0px))]
-            list:pt-2 z-2 col-span-full pb-2 sm:sticky sm:px-(--w-list-padding,1rem)
-          "
           :class="position === 0 ? 'list:-mt-2' : 'card:mt-2'"
         >
           <slot
@@ -133,7 +126,7 @@
             :previous="previous"
             :skeleton="skeleton"
           />
-        </div>
+        </ListGroupHeading>
 
         <ListItem
           :item="item"
@@ -218,6 +211,7 @@ import {type DefaultQueryOptions, PAGE_LENGTH} from '@/utils/useDefaultQuery'
 import {type Selection, useSelected, useSelectionHash} from '@/utils/useSelected'
 import {ListMode, isEqualObj} from '@/utils/utils'
 
+import ListGroupHeading from './components/ListGroupHeading.vue'
 import ListItem from './components/ListItem.vue'
 import ListToolbar from './components/ListToolbar.vue'
 import {AREA_MORE, AREA_SELECT} from './types'
