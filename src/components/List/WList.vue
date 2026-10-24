@@ -115,14 +115,25 @@
         </ListToolbar>
       </template>
 
-      <template #default="{item, skeleton, setter, refetch, previous, index, position, value, results, intersecting}">
-        <slot
-          v-if="groupBy && (index === 0 || (!skeleton && (!previous || !groupBy(item, previous))))"
-          name="group"
-          :item="item"
-          :previous="previous"
-          :skeleton="skeleton"
-        />
+      <template #default="{item, skeleton, setter, refetch, previous, first, index, position, value, results, intersecting}">
+        <div
+          v-if="groupBy && $slots.group && (first || (!skeleton && (!previous || !groupBy(item, previous))))"
+          role="heading"
+          aria-level="3"
+          class="
+            bg-surface list:left---left-inner list:w---width-inner sm-not:px---inner-margin
+            top-[calc(var(--header-height,0px)+var(--infinite-list-header-height,0px))]
+            list:pt-2 z-2 col-span-full pb-2 sm:sticky sm:px-(--w-list-padding,1rem)
+          "
+          :class="position === 0 ? 'list:-mt-2' : 'card:mt-2'"
+        >
+          <slot
+            name="group"
+            :item="item"
+            :previous="previous"
+            :skeleton="skeleton"
+          />
+        </div>
 
         <ListItem
           :item="item"
@@ -355,7 +366,7 @@ defineSlots<{
   filter?: () => void
   /** Replaces the buttons at the end of the selection bar — range select, refetch, sort and column settings. */
   selection?: () => void
-  /** Heading before each group of rows, with `groupBy`. `skeleton` is true while the page loads. */
+  /** Content of the heading before each group of rows, with `groupBy`. The heading spans the whole row, sticks under the toolbar and, in list mode, to the left edge while the rows scroll sideways. Its content is laid out by the slot. `skeleton` is true while the page loads. */
   group?: (props: {item: Data, previous: Data | undefined, skeleton: boolean}) => void
   /** Shown instead of the rows when the query returns no items. */
   empty?: () => void

@@ -285,8 +285,14 @@ const SOURCE: [string, string, Kind, number][] = [
   ['Sorrel', 'Rumex acetosa', Kind.HERB, 60],
 ]
 
+/** Each plant of `SOURCE` grows in several pots, numbered after the first, so the list runs over many pages. */
+const POTS = 4
+
 /** In-memory stand-in for a REST collection. */
-export const plants: Plant[] = SOURCE.map(([name, species, kind, height], index) => {
+export const plants: Plant[] = Array.from({length: SOURCE.length * POTS}, (_, index) => {
+  const [title, species, kind, height] = SOURCE[index % SOURCE.length]!
+  const pot = Math.floor(index / SOURCE.length) + 1
+  const name = pot === 1 ? title : `${ title } ${ pot }`
   const today = getStartOfDay()
   // The kinds repeat every four rows, so `round` steps each kind through every light level and caretaker in turn.
   const round = index + Math.floor(index / 4)
@@ -722,7 +728,7 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'watered',
-  cssClass: 'basis-[7rem]',
+  cssClass: 'basis-[7rem] w-skeleton-h-5',
   title: 'Status',
   field: 'watered',
   textFormat: item => item.watered ? 'Watered' : 'Thirsty',
@@ -743,7 +749,6 @@ export const meta = {
       'text-description': !item.waterBy,
       'tone-negative text-tone': item.waterBy && item.waterBy < today,
     }"
-    class="card:text-xs"
   >
     <template #inner>
       <span class="list:hidden">{{ meta.title }}: </span>
@@ -774,7 +779,7 @@ const today = getStartOfDay()
 <script lang="ts">
 export const meta = {
   label: 'due',
-  cssClass: 'basis-[8rem]',
+  cssClass: 'basis-[8rem] card:text-xs',
   title: 'Water by',
   field: 'waterBy',
   textFormat: item => item.waterBy ? dateFormat(item.waterBy) : undefined,

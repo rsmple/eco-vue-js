@@ -2,7 +2,7 @@
   <WListCardField
     :skeleton="skeleton"
     allow-open
-    class="tabular-nums card:text-xs"
+    class="tabular-nums"
   >
     <template #inner>
       <span class="list:hidden">{{ meta.title }}: </span>
@@ -34,7 +34,7 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'humidity',
-  cssClass: 'basis-[9rem]',
+  cssClass: 'basis-[9rem] card:text-xs',
   title: 'Humidity',
   field: 'humidity',
   textFormat: item => `${ item.humidity }%`,

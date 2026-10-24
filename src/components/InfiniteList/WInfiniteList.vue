@@ -114,7 +114,7 @@ const props = withDefaults(
     excludeParams?: (keyof QueryParams)[]
     /** Text shown when the query returns no items. The `empty` slot replaces it. */
     emptyStub?: string
-    /** Class of each page's element, e.g. a grid layout for the items. */
+    /** Class of the element holding the items of all loaded pages, e.g. a grid layout. The pages render no element of their own, so a grid row runs on from one page into the next. */
     pageClass?: string
     /** Number of pages kept rendered, 5 by default. Scrolling further drops pages at the other end, keeping their height as space. */
     maxPages?: number
