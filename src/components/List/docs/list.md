@@ -79,6 +79,22 @@ The items of all loaded pages share one layout. A group runs on across pages wit
 
 <DocsDemo name="recipes/plant-list/PlantListGrouped" overflow />
 
+## Nested fields
+
+A field's `meta` can hold `fields` instead of being a column itself. Its columns then show a related object or every item of an array:
+
+- `keyEntity`, or `getterEntity` for a computed one, gives the nested field components that object as `item`.
+- `keyArray`, or `getterArray`, repeats the columns once per array item, one line each. The items need an `id`. `componentItem` wraps each line, for example to draw a separator between them.
+- With neither, `fields` only groups the columns, such as to place them in one card area.
+
+In the table, nested columns are list columns like any other: each has its own header and width, can be hidden in the list settings, and lines up across the rows, including each line of an array. In a card, a nested field is a flex row. `cssClass` styles it, `cssClassArray` styles the wrapper of an array's lines, and `[grid-area:…]` places it in one of `cardAreas`; pick labels without `_` for that, since Tailwind reads `_` in a class as a space.
+
+In the table, the root of `componentItem` is a line of the table, and each of its children spans the whole line. Put a separator next to `<slot />`, not around it.
+
+Rows with lines of an array are taller than one line, so the demo uses `align-top`. The checkbox and the row menu then sit `--w-list-align-top` from the top of the row. Set it with `w-list-align-top-*` on WList to match the row's top padding and first line: here the rows have `py-2`, and `w-list-align-top-2.5` centers the box on the first line.
+
+<DocsDemo name="recipes/plant-list/PlantListNested" overflow />
+
 ## API
 
 <!-- @api WList -->
@@ -113,7 +129,7 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 | `configKey` | `string` | **required** | `localStorage` key the column settings and view mode are saved under. |
 | `defaultConfigMap` | `FieldConfigMap<Fields>` | **required** | Width, visibility, order and stickiness of each field by label, until the user changes them. |
 | `defaultMode` | `ListMode` | `ListMode.TABLE` | Table or grid view, until the user picks one. Small screens always show cards. |
-| `alignTop` | `boolean` | — | Aligns cells and the checkbox to the top of the row instead of centering them. |
+| `alignTop` | `boolean` | — | Aligns cells, the checkbox and the row menu to the top of the row instead of centering them. `--w-list-align-top` (`w-list-align-top-*`) sets how far the checkbox and the menu are from the top, `1.125rem` by default, so they line up with the first line of the cells. |
 | `disableMore` | `boolean` | — | Disables the row menu, both the more button and the right click. |
 | `readonly` | `boolean` | — | Makes every row readonly, and passes `readonly` to the `bulk`, `action` and `menu` components. When unset, inherits the readonly state provided by a parent. |
 | `noOrdering` | `boolean` | — | Hides the sort control and makes the column headers not sortable. |

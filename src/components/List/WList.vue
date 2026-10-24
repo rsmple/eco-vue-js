@@ -264,7 +264,7 @@ const props = withDefaults(
     defaultConfigMap: FieldConfigMap<Fields>
     /** Table or grid view, until the user picks one. Small screens always show cards. */
     defaultMode?: ListMode
-    /** Aligns cells and the checkbox to the top of the row instead of centering them. */
+    /** Aligns cells, the checkbox and the row menu to the top of the row instead of centering them. `--w-list-align-top` (`w-list-align-top-*`) sets how far the checkbox and the menu are from the top, `1.125rem` by default, so they line up with the first line of the cells. */
     alignTop?: boolean
     /** Disables the row menu, both the more button and the right click. */
     disableMore?: boolean

@@ -21,6 +21,9 @@ export type Task = {
   due: Date
 }
 
+/** A task with the key a list row of it needs. */
+export type TaskItem = Task & {id: number}
+
 export type Plant = {
   id: number
   name: string

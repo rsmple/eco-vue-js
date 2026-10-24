@@ -27,9 +27,11 @@
             <template #default="{items}">
               <ListCardFieldNestedItem :items="items">
                 <template #default="{inner, index, last, first}">
+                  <!-- In the table the item is a line of the table, and what it adds besides the fields, like a separator, spans the line. -->
                   <component
                     :is="field.meta.componentItem ?? WEmptyComponent"
                     v-bind="field.meta.componentItem ? {item, skeleton, card, index, last, first} : undefined"
+                    :class="field.meta.componentItem && !card ? 'col-span-full grid grid-cols-subgrid *:col-span-full' : undefined"
                   >
                     <div
                       :class="[field.meta.cssClass, card ? 'flex' : 'col-span-full grid grid-cols-subgrid']"
