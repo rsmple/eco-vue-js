@@ -97,7 +97,7 @@ const isOpen = ref(false)
 const canClear = computed(() => !props.disabled && props.ordering.length !== 0)
 
 const isFieldRequired = (field: ListFields<Data, QueryParams>[number]): field is RequiredField => {
-  return 'field' in field.meta && field.meta.field !== undefined
+  return 'field' in field.meta && (typeof field.meta.field === 'string' || typeof field.meta.field?.(props.queryParams) === 'string')
 }
 
 const fieldsFlat = computed(() => {
