@@ -8,13 +8,8 @@
     selection-title="plant"
     :select-all-text-getter="selectAllTextGetter"
     align-top
-    :card-columns="(['1fr', 'auto'] as const)"
-    :card-areas="[
-      ['name', 'area_select'],
-      ['kind', 'area_more'],
-      ['gardener', 'gardener'],
-      ['task', 'task'],
-    ]"
+    :card-columns="cardColumns"
+    :card-areas="cardAreas"
     card-class="list:min-h-11 list:py-2 card:gap-1 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-line-subtle card:overflow-clip"
     card-wrapper-class="card:self-start"
     min-height
@@ -30,7 +25,7 @@ import type {Gardener} from '../../shared/Gardener'
 
 import {markRaw} from 'vue'
 
-import type {ListFieldNestedArrayGetter, ListFieldNestedEntityGetter, ListFields} from 'eco-vue-js/dist/components/List/types'
+import type {CardAreas, GridCol, ListFieldNestedArrayGetter, ListFieldNestedEntityGetter, ListFields} from 'eco-vue-js/dist/components/List/types'
 import {getDefaultFieldConfigMap} from 'eco-vue-js/dist/utils/utils'
 
 import WList from 'eco-vue-js/dist/components/List/WList.vue'
@@ -44,6 +39,10 @@ import * as FieldTaskDue from './fields/WFieldTaskDue.vue'
 import * as FieldTaskTitle from './fields/WFieldTaskTitle.vue'
 import WTaskItem from './fields/WTaskItem.vue'
 
+const selectAllTextGetter = (isUnselect: boolean, count: number) => `${ isUnselect ? 'Unselect' : 'Select' } all ${ count } plants`
+</script>
+
+<script lang="ts">
 const listFieldsPlantNested = [
   FieldPlantName,
   FieldPlantKind,
@@ -75,5 +74,12 @@ const listFieldsPlantNested = [
 
 const defaultConfigMap = getDefaultFieldConfigMap(listFieldsPlantNested, ['name', 'kind', 'gardener', 'role', 'task', 'due'])
 
-const selectAllTextGetter = (isUnselect: boolean, count: number) => `${ isUnselect ? 'Unselect' : 'Select' } all ${ count } plants`
+const cardColumns = ['1fr', 'auto'] as const satisfies GridCol[]
+
+const cardAreas: CardAreas<typeof listFieldsPlantNested, typeof cardColumns['length']> = [
+  ['name', 'area_select'],
+  ['kind', 'area_more'],
+  ['gardener', 'gardener'],
+  ['task', 'task'],
+]
 </script>

@@ -34,30 +34,12 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
     :default-config-map="defaultFieldConfigMapPlant"
     config-key="w-list-docs-plant"
     :expansion="markRaw(PlantContent)"
-    :bulk="[
-      markRaw(WBulkPlantWatered),
-      markRaw(WBulkPlantDry),
-      markRaw(WBulkPlantCaretaker),
-      markRaw(WBulkPlantRemove),
-    ]"
-    :menu="[
-      markRaw(WMenuPlantToggle),
-      markRaw(WMenuPlantCaretaker),
-      markRaw(WMenuPlantDelete),
-    ]"
+    :bulk="bulk"
+    :menu="menu"
     selection-title="plant"
     :select-all-text-getter="selectAllTextGetter"
-    :card-columns="(['2fr', '1fr', 'auto'] as const)"
-    :card-areas="[
-      ['name', 'name', 'area_select'],
-      ['species','species', 'area_more'],
-      ['kind', 'light', 'light'],
-      ['health', 'growth', 'growth'],
-      ['watered', 'due', 'due'],
-      ['height', 'humidity', 'humidity'],
-      ['water', 'seeds', 'seeds'],
-      ['caretaker', 'caretaker', 'caretaker'],
-    ]"
+    :card-columns="cardColumns"
+    :card-areas="cardAreas"
     card-class="list:h-11 card:gap-1 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-line-subtle"
     card-wrapper-class="card:self-start"
     min-height
@@ -84,14 +66,18 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
 </template>
 
 <script lang="ts" setup>
+import type {Plant} from './models/Plant'
+
 import {markRaw} from 'vue'
+
+import type {BulkComponent, CardAreas, GridCol, MenuComponent} from 'eco-vue-js/dist/components/List/types'
 
 import WList from 'eco-vue-js/dist/components/List/WList.vue'
 import WListFilter from 'eco-vue-js/dist/components/List/WListFilter.vue'
 import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 import PlantContent from './PlantContent.vue'
-import {plantModelApi, useQueryParamsPlants} from './api/Plant'
+import {type QueryParamsPlants, plantModelApi, useQueryParamsPlants} from './api/Plant'
 import WBulkPlantCaretaker from './bulk/WBulkPlantCaretaker.vue'
 import WBulkPlantDry from './bulk/WBulkPlantDry.vue'
 import WBulkPlantRemove from './bulk/WBulkPlantRemove.vue'
@@ -106,6 +92,34 @@ import WMenuPlantToggle from './menu/WMenuPlantToggle.vue'
 const {queryParams, updateQueryParams} = useQueryParamsPlants.useQueryParamsLocal()
 
 const selectAllTextGetter = (isUnselect: boolean, count: number) => `${ isUnselect ? 'Unselect' : 'Select' } all ${ count } plants`
+</script>
+
+<script lang="ts">
+const bulk: BulkComponent<QueryParamsPlants>[] = [
+  markRaw(WBulkPlantWatered),
+  markRaw(WBulkPlantDry),
+  markRaw(WBulkPlantCaretaker),
+  markRaw(WBulkPlantRemove),
+]
+
+const menu: MenuComponent<Plant>[] = [
+  markRaw(WMenuPlantToggle),
+  markRaw(WMenuPlantCaretaker),
+  markRaw(WMenuPlantDelete),
+]
+
+const cardColumns = ['2fr', '1fr', 'auto'] as const satisfies GridCol[]
+
+const cardAreas: CardAreas<typeof listFieldsPlant, typeof cardColumns['length']> = [
+  ['name', 'name', 'area_select'],
+  ['species', 'species', 'area_more'],
+  ['kind', 'light', 'light'],
+  ['health', 'growth', 'growth'],
+  ['watered', 'due', 'due'],
+  ['height', 'humidity', 'humidity'],
+  ['water', 'seeds', 'seeds'],
+  ['caretaker', 'caretaker', 'caretaker'],
+]
 </script>
 ```
 

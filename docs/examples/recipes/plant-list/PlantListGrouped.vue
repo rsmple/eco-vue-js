@@ -9,17 +9,8 @@
     :group-by="(a, b) => a.kind === b.kind"
     selection-title="plant"
     :select-all-text-getter="selectAllTextGetter"
-    :card-columns="(['2fr', '1fr', 'auto'] as const)"
-    :card-areas="[
-      ['name', 'name', 'area_select'],
-      ['species','species', 'area_more'],
-      ['kind', 'light', 'light'],
-      ['health', 'growth', 'growth'],
-      ['watered', 'due', 'due'],
-      ['height', 'humidity', 'humidity'],
-      ['water', 'seeds', 'seeds'],
-      ['caretaker', 'caretaker', 'caretaker'],
-    ]"
+    :card-columns="cardColumns"
+    :card-areas="cardAreas"
     card-class="list:h-11 card:gap-1 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-line-subtle"
     card-wrapper-class="card:self-start"
     min-height
@@ -45,6 +36,7 @@
 </template>
 
 <script lang="ts" setup>
+import type {CardAreas, GridCol} from 'eco-vue-js/dist/components/List/types'
 import {ListMode} from 'eco-vue-js/dist/utils/utils'
 
 import WList from 'eco-vue-js/dist/components/List/WList.vue'
@@ -58,4 +50,19 @@ import {kindDisplay} from './models/PlantDisplay'
 const queryParams = {ordering: 'kind'}
 
 const selectAllTextGetter = (isUnselect: boolean, count: number) => `${ isUnselect ? 'Unselect' : 'Select' } all ${ count } plants`
+</script>
+
+<script lang="ts">
+const cardColumns = ['2fr', '1fr', 'auto'] as const satisfies GridCol[]
+
+const cardAreas: CardAreas<typeof listFieldsPlant, typeof cardColumns['length']> = [
+  ['name', 'name', 'area_select'],
+  ['species', 'species', 'area_more'],
+  ['kind', 'light', 'light'],
+  ['health', 'growth', 'growth'],
+  ['watered', 'due', 'due'],
+  ['height', 'humidity', 'humidity'],
+  ['water', 'seeds', 'seeds'],
+  ['caretaker', 'caretaker', 'caretaker'],
+]
 </script>
