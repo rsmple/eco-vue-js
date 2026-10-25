@@ -116,7 +116,7 @@ A template ref gives `refetchAll`, `resetPage(page)` to start over from a page, 
 
 ## Long lists
 
-However long the query, the list keeps only `maxPages` pages in the DOM. Pages scrolled past are dropped and leave a space of their height, and their queries stay cached, so scrolling back renders them again at once. Spacers above and below the rendered pages stand in for the rest, sized by the number of pages times the average height of those rendered, so the scrollbar covers the whole list from the first page on.
+However long the query, the list keeps only `maxPages` pages in the DOM. Pages scrolled past are dropped and leave a space of their height, and their queries stay cached, so scrolling back renders them again at once. Spacers above and below the rendered pages stand in for the rest, sized by the number of pages times the average height of those rendered, so the scrollbar covers the whole list from the first page on. Browsers cap the height of an element, so for a list too long to fit under 15M px — about a million rows — the spacers shrink to fit, and the scrollbar moves through the list faster than the rows scroll.
 
 The demo below pages through 10,000 events, 50 at a time. The counter shows how many rows are in the DOM while scrolling. "Go to row" calls `goto` with the row's page and its index in the page, and the pages around it load in place.
 

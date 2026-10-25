@@ -274,10 +274,24 @@ const avgItemHeight = computed(() => {
 
 const avgPageHeight = computed(() => Math.round(avgItemHeight.value * pageSize.value))
 
+/**
+ * Browsers cap the height of an element, at about 17.9M px in Firefox and 33.5M px in Chrome and Safari, and lay out
+ * whatever is past it at the cap. There the sentinels never leave the view, and pages are added one after another.
+ */
+const MAX_SPACER_HEIGHT = 15_000_000
+
+/** Scales down the space of the pages not rendered when those of a long list would not fit under the cap. */
+const spacerScale = computed(() => {
+  const height = avgPageHeight.value * pagesCount.value
+  return height > MAX_SPACER_HEIGHT ? MAX_SPACER_HEIGHT / height : 1
+})
+
+const spacerPageHeight = computed(() => avgPageHeight.value * spacerScale.value)
+
 const topSpacerHeight = computed(() => {
-  if (!avgPageHeight.value) return 0
+  if (!spacerPageHeight.value) return 0
   const firstRendered = pages.value[0] ?? 1
-  return Math.max(0, (firstRendered - 1) * avgPageHeight.value)
+  return Math.max(0, Math.round((firstRendered - 1) * spacerPageHeight.value))
 })
 
 // Only the items left after the rendered pages, so a short last page is not reserved as a full one.
@@ -286,7 +300,7 @@ const bottomSpacerHeight = computed(() => {
   const lastRendered = pages.value[pages.value.length - 1] ?? 1
   let itemCount = 0
   for (let page = lastRendered + 1; page <= pagesCount.value; page++) itemCount += getPageItemCount(page)
-  return Math.round(itemCount * avgItemHeight.value)
+  return Math.round(itemCount * avgItemHeight.value * spacerScale.value)
 })
 
 const columnCount = ref(1)
@@ -615,7 +629,7 @@ const goto = async (page = 1, itemIndex?: number) => {
 
   // Scrolls to where the page will be first, so the sentinels are out of view when the pages change,
   // as they are when the list is scrolled far. Otherwise a sentinel still reported in view adds a page and drops the target.
-  scrollToOffset((page - 1) * avgPageHeight.value)
+  scrollToOffset((page - 1) * spacerPageHeight.value)
 
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
 
@@ -756,7 +770,7 @@ const checkScrollJump = debounce(() => {
 
   const y = Math.max(0, position.scrollTop - position.containerTop)
 
-  const target = Math.max(1, Math.min(Math.ceil(y / avgPageHeight.value) + 1, pagesCount.value))
+  const target = Math.max(1, Math.min(Math.ceil(y / spacerPageHeight.value) + 1, pagesCount.value))
   if (pages.value.includes(target)) return
 
   jumpToPage(target)
