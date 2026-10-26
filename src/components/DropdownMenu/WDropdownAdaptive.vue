@@ -9,7 +9,7 @@
 <script lang="ts" setup>
 import type {DropdownAdaptiveProps} from './types'
 
-import {type VNode, computed, defineComponent, h, markRaw, onMounted, ref, useSlots, useTemplateRef, watch} from 'vue'
+import {type VNode, computed, defineComponent, h, markRaw, onBeforeUpdate, onMounted, ref, shallowRef, useSlots, useTemplateRef, watch} from 'vue'
 
 import OverlayRegionPart from '@/components/Modal/components/OverlayRegionPart.vue'
 import {useOverlay, useOverlayFrame, useOverlayFrameOptions} from '@/utils/Overlay'
@@ -47,6 +47,11 @@ const element = computed(() => props.parentElement ?? (toggleRef.value instanceo
 
 const isTop = ref(false)
 
+// Slots are not reactive, and the overlay host renders the content apart from this component — so a slot the parent adds or removes while open, such as content behind a `v-if`, reaches it through this.
+const slotsVersion = shallowRef(0)
+
+onBeforeUpdate(() => slotsVersion.value++)
+
 // The overlay host renders the slot, as a component so it keeps this component's context.
 // The content declares `close:modal`, which the host listens to on every content, as the slot may render several nodes for the listener to fall through to.
 // In a bottom sheet, the content pins the `header` slot above itself, or else a copy of the toggle.
@@ -64,12 +69,12 @@ const renderContent = markRaw(defineComponent({
 
     const renderTitle = () => h('span', {class: 'inline-flex items-center gap-2'}, slots.header?.())
 
-    return () => [
+    return () => (slotsVersion.value, [
       props.dialog
         ? h(OverlayRegionPart, {region: 'title'}, {default: renderTitle})
         : isSheet ? h(OverlayRegionPart, {region: 'header'}, {default: renderHeader}) : null,
       slots.content?.(),
-    ]
+    ])
   },
 }))
 
