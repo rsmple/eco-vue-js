@@ -43,10 +43,14 @@ const getStaticTitle = (record: RouteLocationMatched): RouteTitle | undefined =>
   }
 }
 
-export const getRouteTitle = (record: RouteRecordNormalized | undefined): RouteTitle | undefined => {
-  if (!record) return undefined
+export const getRouteTitle = (matched: RouteLocationMatched[]): RouteTitle | undefined => {
+  const path = matched.at(-1)?.path
 
-  return registrations.get(record)?.entry.value
+  return matched
+    .filter(record => record.path === path)
+    .reverse()
+    .map(record => registrations.get(record)?.entry.value)
+    .find(item => item !== undefined)
 }
 
 export const getRouteTitleShort = (value: RouteTitle): string | undefined => value.titleShort ?? value.title
