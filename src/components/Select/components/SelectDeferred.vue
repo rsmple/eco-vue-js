@@ -16,33 +16,39 @@
         class="flex max-w-full gap-(--w-input-gap,0.25rem) py-(--w-input-gap,0.25rem)"
         :class="field.seamless ? 'overflow-hidden' : 'flex-wrap'"
       >
-        <SelectOptionPrefix
-          v-for="(value, index) in modelValue"
-          :key="value"
-          :option="getOption(value)"
-          :option-component="optionComponent"
-          :option-component-props="optionComponentProps"
-          :index="index"
-          :loading="loading"
-          :disabled="isDisabled"
+        <slot
+          name="chips"
           :readonly="true"
-          :disable-clear="true"
-          :search="value"
+          :disabled="isDisabled"
         >
-          <template
-            v-if="$slots.option"
-            #option="optionScope"
+          <SelectOptionPrefix
+            v-for="(value, index) in modelValue"
+            :key="value"
+            :option="getOption?.(value)"
+            :option-component="optionComponent"
+            :option-component-props="optionComponentProps"
+            :index="index"
+            :loading="loading"
+            :disabled="isDisabled"
+            :readonly="true"
+            :disable-clear="true"
+            :search="value"
           >
-            <slot
-              name="option"
-              v-bind="optionScope"
-              :selected="true"
-              :model="true"
-              :index="index"
-              :skeleton="false"
-            />
-          </template>
-        </SelectOptionPrefix>
+            <template
+              v-if="$slots.option"
+              #option="optionScope"
+            >
+              <slot
+                name="option"
+                v-bind="optionScope"
+                :selected="true"
+                :model="true"
+                :index="index"
+                :skeleton="false"
+              />
+            </template>
+          </SelectOptionPrefix>
+        </slot>
 
         <div
           v-if="!modelValue.length && !hideInput"
@@ -81,37 +87,43 @@
             class="w-skeleton-w-32 not-has-[.w-option-has-bg]:px---w-option-padding flex gap-(--w-input-gap,0.25rem)"
             :class="{'w-full min-w-max': noWrap}"
           >
-            <SelectOptionPrefix
-              v-for="(value, index) in modelValue"
-              :key="value"
-              :option="getOption(value)"
-              :option-component="optionComponent"
-              :option-component-props="optionComponentProps"
-              :index="index"
-              :loading="loading"
-              :disabled="isDisabled"
+            <slot
+              name="chips"
               :readonly="false"
-              :disable-clear="true"
-              :search="value"
-              :class="{
-                'cursor-pointer': !isDisabled,
-                'cursor-not-allowed opacity-50': isDisabled,
-              }"
+              :disabled="isDisabled"
             >
-              <template
-                v-if="$slots.option"
-                #option="optionScope"
+              <SelectOptionPrefix
+                v-for="(value, index) in modelValue"
+                :key="value"
+                :option="getOption?.(value)"
+                :option-component="optionComponent"
+                :option-component-props="optionComponentProps"
+                :index="index"
+                :loading="loading"
+                :disabled="isDisabled"
+                :readonly="false"
+                :disable-clear="true"
+                :search="value"
+                :class="{
+                  'cursor-pointer': !isDisabled,
+                  'cursor-not-allowed opacity-50': isDisabled,
+                }"
               >
-                <slot
-                  name="option"
-                  v-bind="optionScope"
-                  :selected="true"
-                  :model="true"
-                  :index="index"
-                  :skeleton="false"
-                />
-              </template>
-            </SelectOptionPrefix>
+                <template
+                  v-if="$slots.option"
+                  #option="optionScope"
+                >
+                  <slot
+                    name="option"
+                    v-bind="optionScope"
+                    :selected="true"
+                    :model="true"
+                    :index="index"
+                    :skeleton="false"
+                  />
+                </template>
+              </SelectOptionPrefix>
+            </slot>
 
             <div
               class="w-option-has-bg-input flex-1"
@@ -174,6 +186,8 @@ const emit = defineEmits<{
 
 defineSlots<{
   option?: (props: PartialNot<SelectOptionProps<Data>>) => void
+  /** Replaces the chips, for a select that renders them on its own. */
+  chips?: (props: {readonly: boolean, disabled: boolean | undefined}) => void
 }>()
 
 const {isReadonly, isDisabled} = useComponentStates({

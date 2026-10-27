@@ -80,6 +80,13 @@ export interface SelectProps<Model extends number | string, Data extends Default
   placeholderEmpty?: string
   /** Puts the cursor on the first selected option when the menu opens, so Enter toggles it — by default the menu only scrolls to it. Always set in the single selects. */
   cursorSelected?: boolean
+  /** Selected options, shown in the chips until the options load — and, with `deferred`, before the select mounts. */
+  previewData?: Data[]
+  /**
+   * Renders only the selected options until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells.
+   * The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`.
+   */
+  deferred?: boolean
 }
 
 export interface SelectPrefixProps<Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>>
@@ -97,7 +104,7 @@ export interface SelectDeferredProps<Model extends number | string, Data extends
   extends SelectOptionComponentProps<Data, OptionComponent>,
   Pick<InputSuggestProps<'text'>, 'placeholder' | 'name' | 'size' | 'noWrap' | 'borderClass' | 'hideInput' | 'loading'> {
   modelValue: Model[]
-  getOption: (value: Model) => Data | undefined
+  getOption?: (value: Model) => Data | undefined
   field: FieldWrapperProps
   placeholderEmpty?: string
 }
@@ -105,7 +112,7 @@ export interface SelectDeferredProps<Model extends number | string, Data extends
 export type SelectClearValue = null | undefined | ''
 
 export interface SelectSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean, ClearValue extends SelectClearValue = null>
-  extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'createdData' | 'cursorSelected'> {
+  extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'createdData' | 'previewData' | 'cursorSelected'> {
   /** Selected value. */
   modelValue: Model | ClearValue | null | undefined
   /** Adds a button that clears the value, emitting `clearValue`. */
@@ -116,11 +123,6 @@ export interface SelectSingleProps<Model extends number | string, Data extends D
   createdData?: Data
   /** Selected option, shown in the field until the options load — and, with `deferred`, before the select mounts. */
   previewData?: Data
-  /**
-   * Renders only the selected option until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells.
-   * The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`.
-   */
-  deferred?: boolean
 }
 
 export interface SelectStringifiedProps<Model extends string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
@@ -132,7 +134,7 @@ export interface SelectStringifiedProps<Model extends string, Data extends Defau
 }
 
 export interface SelectAsyncProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
-  extends Omit<SelectProps<Model, Data, QueryParams, Component>, 'options' | 'optionComponent' | 'optionComponentProps' | 'searchFn' | 'useQueryFnOptions' | 'queryParamsOptions' | 'filterOptions' | 'useFirstDefault'>,
+  extends Omit<SelectProps<Model, Data, QueryParams, Component>, 'options' | 'optionComponent' | 'optionComponentProps' | 'searchFn' | 'useQueryFnOptions' | 'queryParamsOptions' | 'filterOptions' | 'useFirstDefault' | 'previewData'>,
   SelectOptionComponentProps<Data, OptionComponent> {
   /** Paginated query that loads the options, page by page as the menu scrolls. The search text is sent in `searchField`. */
   useQueryFnOptions: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
@@ -142,7 +144,7 @@ export interface SelectAsyncProps<Model extends number | string, Data extends De
   queryParamsOptions: QueryParams
   /** Query parameter that receives the search text. Defaults to `search`. */
   searchField?: keyof QueryParams
-  /** Selected options, used for the chips instead of loading them. */
+  /** Selected options, used for the chips instead of loading them — also before the select mounts with `deferred`. */
   previewData?: Data[]
   /** Query parameter that receives the selected values, comma-separated, when loading the chips. */
   valueQueryKey?: string
