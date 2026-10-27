@@ -1,0 +1,377 @@
+<template>
+  <WInputSuggest
+    ref="input"
+    v-bind="{
+      ...props,
+      modelValue: search,
+      placeholder: !focused && !modelValue?.length ? placeholderEmpty ?? placeholder : placeholder,
+      loading: loading || isFetchingPrefix || loadingCreate,
+      hideInput: !modelValue?.length ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
+      filterValue: filterValue === undefined ? modelValue : filterValue,
+    }"
+    :class="$attrs.class"
+    @update:model-value="!loading && !isFetchingPrefix && (search = $event as string ?? '')"
+
+    @keypress:enter.stop.prevent="listRef?.selectCursor()"
+    @keypress:up.prevent="listRef?.cursorUp()"
+    @keypress:down.prevent="listRef?.cursorDown()"
+    @keypress:delete="captureDoubleDelete"
+
+    @open="isOpen = true"
+    @close="close"
+    @focus="focused = true; $emit('focus', $event)"
+    @blur="focused = false; $emit('blur', $event)"
+  >
+    <template
+      v-if="$slots.title"
+      #title
+    >
+      <slot name="title" />
+    </template>
+
+    <template
+      v-if="$slots.subtitle"
+      #subtitle
+    >
+      <slot name="subtitle" />
+    </template>
+
+    <template #prefix="{unclickable}">
+      <slot
+        v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true"
+        name="prefix"
+        v-bind="{modelValue: modelValue ?? []}"
+      >
+        <SelectAsyncPrefix
+          :key="getQueryFnKey(useQueryFnPrefix ?? useQueryFnOptions)"
+          :use-query-fn="useQueryFnPrefix ?? useQueryFnOptions"
+          :model-value="modelValue ?? []"
+          :disabled="isDisabled"
+          :loading="loading || isFetchingPrefix"
+          :option-component="(optionComponent as SelectOptionComponent<Data>)"
+          :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
+          :disable-clear="disableClear || isReadonly || (seamless && !focused) || modelValue?.length === 0"
+          :preview-data="previewData"
+          :created-data="createdData"
+          :value-getter="valueGetter"
+          :value-query-key="valueQueryKey"
+          :readonly="isReadonly"
+          :prefix-text="prefixText"
+          :prefix-max="prefixMax"
+          :known-data="knownData"
+          @unselect="unselect"
+          @update:fetching="isFetchingPrefix = $event"
+          @update:model-value="updateSelected"
+        >
+          <template
+            v-if="$slots.option"
+            #option="{option, index, skeleton: skeletonOption}"
+          >
+            <slot
+              name="option"
+              :option="option"
+              :index="index"
+              :selected="true"
+              :model="true"
+              :skeleton="skeletonOption"
+              :search="undefined"
+            />
+          </template>
+        </SelectAsyncPrefix>
+      </slot>
+    </template>
+
+    <template
+      v-if="$slots.right"
+      #right
+    >
+      <slot name="right" />
+    </template>
+
+    <template #content>
+      <SelectAsyncList
+        :key="getQueryFnKey(useQueryFnOptions)"
+        ref="list"
+        :model-value="modelValue ?? []"
+        :use-query-fn="useQueryFnOptions"
+        :query-params="queryParams"
+        :loading="loading || isFetchingPrefix"
+        :disabled="isDisabledComputed"
+        :empty-stub="!search && emptyStub ? emptyStub : undefined"
+        :allow-create="createOption && (!hasSearchOption || isModelValueSearch)"
+        :hide-option-icon="hideOptionIcon"
+        :value-getter="valueGetter"
+        :loading-create="loadingCreate"
+        :query-options="{placeholderData: keepPreviousData}"
+        :search="search"
+        :reverse="reverse"
+        :scroll-selected="isOpen"
+        :cursor-selected="cursorSelected"
+        @select="select"
+        @unselect="unselect"
+        @create:option="create(search)"
+      >
+        <template #default="{option, selected, skeleton: skeletonList, index}">
+          <slot
+            name="option"
+            :option="option"
+            :selected="selected"
+            :skeleton="skeletonList"
+            :model="false"
+            :search="search"
+            :index="index"
+          >
+            <component
+              v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
+              :is="optionComponent"
+              :option="option"
+              :selected="selected"
+              :skeleton="skeletonList"
+              :model="false"
+              :search="search"
+            />
+          </slot>
+        </template>
+
+        <template
+          v-if="$slots.content"
+          #content
+        >
+          <slot name="content" />
+        </template>
+      </SelectAsyncList>
+    </template>
+  </WInputSuggest>
+</template>
+
+<script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
+import type {SelectAsyncProps, SelectOptionComponent, SelectOptionComponentProps, SelectOptionProps} from '../types'
+
+import {keepPreviousData, useQueryClient} from '@tanstack/vue-query'
+import {computed, effectScope, nextTick, ref, shallowRef, useTemplateRef, watch} from 'vue'
+
+import WInputSuggest from '@/components/Input/WInputSuggest.vue'
+
+import {useIsMobile} from '@/utils/mobile'
+import {useComponentStates} from '@/utils/useComponentStates'
+import {PAGE_LENGTH} from '@/utils/useDefaultQuery.ts'
+
+import SelectAsyncList from './SelectAsyncList.vue'
+import SelectAsyncPrefix from './SelectAsyncPrefix.vue'
+
+defineOptions({inheritAttrs: false})
+
+const props = withDefaults(
+  defineProps<SelectAsyncProps<Model, Data, QueryParams, OptionComponent>>(),
+  {
+    emptyStub: 'No match',
+    valueGetter: (data: Data) => (data as unknown as {id: Model}).id,
+    valueQueryKey: 'id__in',
+    prefixMax: 8,
+    readonly: undefined,
+    disabled: undefined,
+    skeleton: undefined,
+  },
+)
+
+const emit = defineEmits<{
+  /** An option was picked. Add it to `modelValue`. */
+  (e: 'select', item: Model, data: Data): void
+  /** An option was removed, from its chip or the menu. Remove it from `modelValue`. */
+  (e: 'unselect', item: Model, data: Data | undefined): void
+  /** Emits `[]` from the clear-all button shown with the count, when more than `prefixMax` values are selected. */
+  (e: 'update:model-value', value: Model[]): void
+  /** A default value was selected by `useQueryFnDefault`. */
+  (e: 'init-model'): void
+  /** The field was focused. */
+  (e: 'focus', value: FocusEvent | undefined): void
+  /** The field lost focus. */
+  (e: 'blur', value: FocusEvent): void
+}>()
+
+const {isReadonly, isDisabled} = useComponentStates(props)
+
+const {isMobile} = useIsMobile()
+
+const isOpen = ref(false)
+const inputRef = useTemplateRef('input')
+const listRef = useTemplateRef('list')
+const focused = ref(false)
+const isFetchingPrefix = ref(false)
+const search = ref('')
+const loadingCreate = ref(false)
+const knownData = new Map<string, Data>()
+
+// Keys the list and the prefix by query fn, so their pages query again when it changes.
+const queryFnKeys = new WeakMap<object, number>()
+let queryFnKeyLast = 0
+
+const getQueryFnKey = (useQueryFn: object): number => {
+  if (!queryFnKeys.has(useQueryFn)) queryFnKeys.set(useQueryFn, ++queryFnKeyLast)
+  return queryFnKeys.get(useQueryFn)!
+}
+
+const isDisabledComputed = computed(() => props.loading || isReadonly.value || isDisabled.value)
+const isModelValueSearch = computed(() => !!search.value && props.modelValue?.includes(search.value as Model))
+const queryParams = computed(() => ({...props.queryParamsOptions, [props.searchField ?? 'search']: search.value}))
+const queryParamsFirstPage = computed(() => ({...queryParams.value, size: PAGE_LENGTH, page: 1}))
+const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
+
+const queryClient = useQueryClient()
+const firstPageData = shallowRef<PaginatedResponse<Data> | undefined>()
+
+// The query fn may change while the menu is open, so the first-page query is rebuilt in its own scope.
+// Outside setup there is no injection context, hence the query client is passed explicitly.
+watch(() => props.useQueryFnOptions, (useQueryFn, _, onCleanup) => {
+  const scope = effectScope()
+
+  scope.run(() => {
+    const {data} = useQueryFn(queryParamsFirstPage, {enabled: queryEnabled}, queryClient)
+
+    watch(data, value => firstPageData.value = value, {immediate: true})
+  })
+
+  onCleanup(() => scope.stop())
+}, {immediate: true})
+
+const hasSearchOption = computed(() => {
+  if (props.createdData?.some(option => props.valueGetter(option) === search.value)) return true
+
+  return firstPageData.value?.results.some(option => props.valueGetter(option) === search.value)
+})
+
+const close = () => {
+  isOpen.value = false
+  focused.value = false
+
+  if (props.searchModel && search.value && !isModelValueSearch.value) {
+    const optionExact = firstPageData.value?.results.find(option => props.valueGetter(option) === search.value)
+
+    if (optionExact) select(props.valueGetter(optionExact), optionExact)
+    else if (search.value) create(search.value)
+    else if (props.modelValue?.length) {
+      const last = props.modelValue[props.modelValue.length - 1]!
+      unselect(last, firstPageData.value?.results.find(option => props.valueGetter(option) === last))
+    }
+  }
+
+  search.value = ''
+}
+
+let deletePressTimeout: ReturnType<typeof setTimeout> | null = null
+
+const captureDoubleDelete = () => {
+  if (!props.modelValue?.length || search.value.length) return
+
+  if (deletePressTimeout) {
+    const last = props.modelValue[props.modelValue.length - 1]!
+    unselect(last, firstPageData.value?.results.find(option => props.valueGetter(option) === last))
+
+    clearTimeout(deletePressTimeout)
+    deletePressTimeout = null
+  } else {
+    deletePressTimeout = setTimeout(() => {
+      deletePressTimeout = null
+    }, 500)
+  }
+}
+
+const select = (item: Model, data: Data): void => {
+  if (isDisabledComputed.value) return
+
+  knownData.set(String(item), data)
+
+  emit('select', item, data)
+
+  search.value = ''
+}
+
+const unselect = (item: Model, data: Data | undefined): void => {
+  if (isDisabledComputed.value) return
+
+  emit('unselect', item, data)
+
+  search.value = ''
+}
+
+const create = async (value: string) => {
+  if (isDisabledComputed.value) return
+  if (!props.createOption) return
+
+  loadingCreate.value = true
+
+  const option = await props.createOption(value)
+
+  if (option) {
+    select(props.valueGetter(option), option)
+
+    search.value = ''
+  }
+
+  loadingCreate.value = false
+}
+
+const updateSelected = (value: Model[]): void => {
+  if (isDisabledComputed.value) return
+
+  emit('update:model-value', value)
+
+  search.value = ''
+}
+
+const focus = () => {
+  inputRef.value?.focus()
+}
+
+const blur = () => {
+  inputRef.value?.blur()
+}
+
+// Closes the menu. On phones it is a bottom sheet, which stays open when the field loses focus.
+const closeMenu = () => {
+  inputRef.value?.close()
+}
+
+const setSearch = (value: string): void => {
+  search.value = value
+}
+
+if (props.useQueryFnDefault) {
+  const {data: defaultData} = props.useQueryFnDefault(undefined, {enabled: computed(() => !props.disabled)})
+
+  watch(defaultData, value => {
+    if (value && props.modelValue?.length === 0) {
+      select(props.valueGetter(value), value)
+      emit('init-model')
+    }
+  }, {immediate: true})
+}
+
+watch(() => props.modelValue, async () => {
+  await nextTick()
+
+  if (props.seamless) inputRef.value?.scrollToInput()
+})
+
+defineExpose({
+  focus,
+  blur,
+  close: closeMenu,
+  setSearch,
+})
+
+defineSlots<{
+  /** Replaces the `title` text. */
+  title?: () => void
+  /** Content between the title and the field. */
+  subtitle?: () => void
+  /** Content to the right of the field. */
+  right?: (props: Record<string, never>) => void
+  /** Renders an option, in the menu and in the selected chips — `model` is `true` in a chip. Replaces `optionComponent`. */
+  option?: (props: PartialNot<SelectOptionProps<Data>>) => void
+  /** Content at the top of the menu, above the options. */
+  content?: () => void
+  /** Replaces the selected chips. */
+  prefix?: (props: {modelValue: Model[]}) => void
+}>()
+</script>

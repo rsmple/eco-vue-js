@@ -1,26 +1,89 @@
 <template>
-  <WInputSuggest
-    ref="input"
-    v-bind="{
-      ...props,
-      modelValue: search,
-      placeholder: !focused && !modelValue?.length ? placeholderEmpty ?? placeholder : placeholder,
-      loading: loading || isFetchingPrefix || loadingCreate,
-      hideInput: !modelValue?.length ? hideInput && !isOpen : isMobile ? !focused : !isOpen,
-      filterValue: filterValue === undefined ? modelValue : filterValue,
-    }"
+  <SelectDeferred
+    v-if="isDeferred"
+    :model-value="modelValue ?? []"
+    :get-option="getOption"
+    :field="deferredField"
+    :option-component="(optionComponent as SelectOptionComponent<Data>)"
+    :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
+    :placeholder="placeholder"
+    :placeholder-empty="placeholderEmpty"
+    :name="name"
+    :size="size"
+    :no-wrap="noWrap"
+    :border-class="borderClass"
+    :hide-input="hideInput"
+    :loading="loading"
     :class="$attrs.class"
-    @update:model-value="!loading && !isFetchingPrefix && (search = $event as string ?? '')"
+    @activate="activate"
+  >
+    <template
+      v-if="$slots.option"
+      #option="scope"
+    >
+      <slot
+        name="option"
+        v-bind="scope"
+      />
+    </template>
 
-    @keypress:enter.stop.prevent="listRef?.selectCursor()"
-    @keypress:up.prevent="listRef?.cursorUp()"
-    @keypress:down.prevent="listRef?.cursorDown()"
-    @keypress:delete="captureDoubleDelete"
+    <template
+      v-if="$slots.prefix || !hasPreview"
+      #chips="{readonly: readonlyChips, disabled: disabledChips}"
+    >
+      <slot
+        v-if="$slots.prefix"
+        name="prefix"
+        :model-value="modelValue ?? []"
+      />
 
-    @open="isOpen = true"
-    @close="close"
-    @focus="focused = true; $emit('focus', $event)"
-    @blur="focused = false; $emit('blur', $event)"
+      <SelectAsyncPrefix
+        v-else
+        :use-query-fn="useQueryFnPrefix ?? useQueryFnOptions"
+        :model-value="modelValue ?? []"
+        :disabled="disabledChips"
+        :loading="loading"
+        :option-component="(optionComponent as SelectOptionComponent<Data>)"
+        :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
+        :disable-clear="true"
+        :preview-data="previewData"
+        :created-data="createdData"
+        :value-getter="valueGetter"
+        :value-query-key="valueQueryKey"
+        :readonly="readonlyChips"
+        :prefix-text="prefixText"
+        :prefix-max="prefixMax"
+        :known-data="knownData"
+      >
+        <template
+          v-if="$slots.option"
+          #option="{option, index, skeleton: skeletonOption}"
+        >
+          <slot
+            name="option"
+            :option="option"
+            :index="index"
+            :selected="true"
+            :model="true"
+            :skeleton="skeletonOption"
+            :search="undefined"
+          />
+        </template>
+      </SelectAsyncPrefix>
+    </template>
+  </SelectDeferred>
+
+  <SelectAsyncBase
+    v-else
+    ref="selectComponent"
+    v-bind="getDefinedProps(props)"
+    :class="$attrs.class"
+    @select="(value, data) => $emit('select', value, data)"
+    @unselect="(value, data) => $emit('unselect', value, data)"
+    @update:model-value="$emit('update:model-value', $event)"
+    @focus="$emit('focus', $event)"
+    @blur="$emit('blur', $event)"
+    @init-model="$emit('init-model')"
   >
     <template
       v-if="$slots.title"
@@ -36,49 +99,14 @@
       <slot name="subtitle" />
     </template>
 
-    <template #prefix="{unclickable}">
+    <template
+      v-if="$slots.option"
+      #option="scope"
+    >
       <slot
-        v-if="hidePrefix ? isMobile ? (unclickable || !focused) : !isOpen : true"
-        name="prefix"
-        v-bind="{modelValue: modelValue ?? []}"
-      >
-        <SelectAsyncPrefix
-          :key="getQueryFnKey(useQueryFnPrefix ?? useQueryFnOptions)"
-          :use-query-fn="useQueryFnPrefix ?? useQueryFnOptions"
-          :model-value="modelValue ?? []"
-          :disabled="isDisabled"
-          :loading="loading || isFetchingPrefix"
-          :option-component="(optionComponent as SelectOptionComponent<Data>)"
-          :option-component-props="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
-          :disable-clear="disableClear || isReadonly || (seamless && !focused) || modelValue?.length === 0"
-          :preview-data="previewData"
-          :created-data="createdData"
-          :value-getter="valueGetter"
-          :value-query-key="valueQueryKey"
-          :readonly="isReadonly"
-          :prefix-text="prefixText"
-          :prefix-max="prefixMax"
-          :known-data="knownData"
-          @unselect="unselect"
-          @update:fetching="isFetchingPrefix = $event"
-          @update:model-value="updateSelected"
-        >
-          <template
-            v-if="$slots.option"
-            #option="{option, index, skeleton: skeletonOption}"
-          >
-            <slot
-              name="option"
-              :option="option"
-              :index="index"
-              :selected="true"
-              :model="true"
-              :skeleton="skeletonOption"
-              :search="undefined"
-            />
-          </template>
-        </SelectAsyncPrefix>
-      </slot>
+        name="option"
+        v-bind="scope"
+      />
     </template>
 
     <template
@@ -88,76 +116,34 @@
       <slot name="right" />
     </template>
 
-    <template #content>
-      <SelectAsyncList
-        :key="getQueryFnKey(useQueryFnOptions)"
-        ref="list"
-        :model-value="modelValue ?? []"
-        :use-query-fn="useQueryFnOptions"
-        :query-params="queryParams"
-        :loading="loading || isFetchingPrefix"
-        :disabled="isDisabledComputed"
-        :empty-stub="!search && emptyStub ? emptyStub : undefined"
-        :allow-create="createOption && (!hasSearchOption || isModelValueSearch)"
-        :hide-option-icon="hideOptionIcon"
-        :value-getter="valueGetter"
-        :loading-create="loadingCreate"
-        :query-options="{placeholderData: keepPreviousData}"
-        :search="search"
-        :reverse="reverse"
-        :scroll-selected="isOpen"
-        :cursor-selected="cursorSelected"
-        @select="select"
-        @unselect="unselect"
-        @create:option="create(search)"
-      >
-        <template #default="{option, selected, skeleton: skeletonList, index}">
-          <slot
-            name="option"
-            :option="option"
-            :selected="selected"
-            :skeleton="skeletonList"
-            :model="false"
-            :search="search"
-            :index="index"
-          >
-            <component
-              v-bind="(optionComponentProps as SelectOptionComponentProps<Data, OptionComponent>)"
-              :is="optionComponent"
-              :option="option"
-              :selected="selected"
-              :skeleton="skeletonList"
-              :model="false"
-              :search="search"
-            />
-          </slot>
-        </template>
-
-        <template
-          v-if="$slots.content"
-          #content
-        >
-          <slot name="content" />
-        </template>
-      </SelectAsyncList>
+    <template
+      v-if="$slots.content"
+      #content
+    >
+      <slot name="content" />
     </template>
-  </WInputSuggest>
+
+    <template
+      v-if="$slots.prefix"
+      #prefix="scope"
+    >
+      <slot
+        name="prefix"
+        v-bind="scope"
+      />
+    </template>
+  </SelectAsyncBase>
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>">
 import type {SelectAsyncProps, SelectOptionComponent, SelectOptionComponentProps, SelectOptionProps} from './types'
 
-import {keepPreviousData, useQueryClient} from '@tanstack/vue-query'
-import {computed, effectScope, nextTick, ref, shallowRef, useTemplateRef, watch} from 'vue'
+import {computed, useTemplateRef} from 'vue'
 
-import WInputSuggest from '@/components/Input/WInputSuggest.vue'
-
-import {useIsMobile} from '@/utils/mobile'
-import {useComponentStates} from '@/utils/useComponentStates'
-import {PAGE_LENGTH} from '@/utils/useDefaultQuery.ts'
-
-import SelectAsyncList from './components/SelectAsyncList.vue'
+import SelectAsyncBase from './components/SelectAsyncBase.vue'
 import SelectAsyncPrefix from './components/SelectAsyncPrefix.vue'
+import SelectDeferred from './components/SelectDeferred.vue'
+import {getDefinedProps, useDeferred} from './models/useDeferred'
 
 defineOptions({inheritAttrs: false})
 
@@ -174,7 +160,7 @@ const props = withDefaults(
   },
 )
 
-const emit = defineEmits<{
+defineEmits<{
   /** An option was picked. Add it to `modelValue`. */
   (e: 'select', item: Model, data: Data): void
   /** An option was removed, from its chip or the menu. Remove it from `modelValue`. */
@@ -189,175 +175,29 @@ const emit = defineEmits<{
   (e: 'blur', value: FocusEvent): void
 }>()
 
-const {isReadonly, isDisabled} = useComponentStates(props)
+const selectComponentRef = useTemplateRef('selectComponent')
 
-const {isMobile} = useIsMobile()
+const {isDeferred, deferredField, activate, focus} = useDeferred(props, () => selectComponentRef.value?.focus())
 
-const isOpen = ref(false)
-const inputRef = useTemplateRef('input')
-const listRef = useTemplateRef('list')
-const focused = ref(false)
-const isFetchingPrefix = ref(false)
-const search = ref('')
-const loadingCreate = ref(false)
+const getOption = (value: Model): Data | undefined => {
+  return [...props.createdData ?? [], ...props.previewData ?? []]
+    .find(option => props.valueGetter(option) === value)
+}
+
+// Chips from `previewData` need no query, so the chips render without one when it has every selected option.
+const hasPreview = computed(() => {
+  if (!props.modelValue?.length) return true
+
+  return props.modelValue.length <= props.prefixMax && props.modelValue.every(value => getOption(value) !== undefined)
+})
+
 const knownData = new Map<string, Data>()
-
-// Keys the list and the prefix by query fn, so their pages query again when it changes.
-const queryFnKeys = new WeakMap<object, number>()
-let queryFnKeyLast = 0
-
-const getQueryFnKey = (useQueryFn: object): number => {
-  if (!queryFnKeys.has(useQueryFn)) queryFnKeys.set(useQueryFn, ++queryFnKeyLast)
-  return queryFnKeys.get(useQueryFn)!
-}
-
-const isDisabledComputed = computed(() => props.loading || isReadonly.value || isDisabled.value)
-const isModelValueSearch = computed(() => !!search.value && props.modelValue?.includes(search.value as Model))
-const queryParams = computed(() => ({...props.queryParamsOptions, [props.searchField ?? 'search']: search.value}))
-const queryParamsFirstPage = computed(() => ({...queryParams.value, size: PAGE_LENGTH, page: 1}))
-const queryEnabled = computed(() => props.lazy ? isOpen.value : true)
-
-const queryClient = useQueryClient()
-const firstPageData = shallowRef<PaginatedResponse<Data> | undefined>()
-
-// The query fn may change while the menu is open, so the first-page query is rebuilt in its own scope.
-// Outside setup there is no injection context, hence the query client is passed explicitly.
-watch(() => props.useQueryFnOptions, (useQueryFn, _, onCleanup) => {
-  const scope = effectScope()
-
-  scope.run(() => {
-    const {data} = useQueryFn(queryParamsFirstPage, {enabled: queryEnabled}, queryClient)
-
-    watch(data, value => firstPageData.value = value, {immediate: true})
-  })
-
-  onCleanup(() => scope.stop())
-}, {immediate: true})
-
-const hasSearchOption = computed(() => {
-  if (props.createdData?.some(option => props.valueGetter(option) === search.value)) return true
-
-  return firstPageData.value?.results.some(option => props.valueGetter(option) === search.value)
-})
-
-const close = () => {
-  isOpen.value = false
-  focused.value = false
-
-  if (props.searchModel && search.value && !isModelValueSearch.value) {
-    const optionExact = firstPageData.value?.results.find(option => props.valueGetter(option) === search.value)
-
-    if (optionExact) select(props.valueGetter(optionExact), optionExact)
-    else if (search.value) create(search.value)
-    else if (props.modelValue?.length) {
-      const last = props.modelValue[props.modelValue.length - 1]!
-      unselect(last, firstPageData.value?.results.find(option => props.valueGetter(option) === last))
-    }
-  }
-
-  search.value = ''
-}
-
-let deletePressTimeout: ReturnType<typeof setTimeout> | null = null
-
-const captureDoubleDelete = () => {
-  if (!props.modelValue?.length || search.value.length) return
-
-  if (deletePressTimeout) {
-    const last = props.modelValue[props.modelValue.length - 1]!
-    unselect(last, firstPageData.value?.results.find(option => props.valueGetter(option) === last))
-
-    clearTimeout(deletePressTimeout)
-    deletePressTimeout = null
-  } else {
-    deletePressTimeout = setTimeout(() => {
-      deletePressTimeout = null
-    }, 500)
-  }
-}
-
-const select = (item: Model, data: Data): void => {
-  if (isDisabledComputed.value) return
-
-  knownData.set(String(item), data)
-
-  emit('select', item, data)
-
-  search.value = ''
-}
-
-const unselect = (item: Model, data: Data | undefined): void => {
-  if (isDisabledComputed.value) return
-
-  emit('unselect', item, data)
-
-  search.value = ''
-}
-
-const create = async (value: string) => {
-  if (isDisabledComputed.value) return
-  if (!props.createOption) return
-
-  loadingCreate.value = true
-
-  const option = await props.createOption(value)
-
-  if (option) {
-    select(props.valueGetter(option), option)
-
-    search.value = ''
-  }
-
-  loadingCreate.value = false
-}
-
-const updateSelected = (value: Model[]): void => {
-  if (isDisabledComputed.value) return
-
-  emit('update:model-value', value)
-
-  search.value = ''
-}
-
-const focus = () => {
-  inputRef.value?.focus()
-}
-
-const blur = () => {
-  inputRef.value?.blur()
-}
-
-// Closes the menu. On phones it is a bottom sheet, which stays open when the field loses focus.
-const closeMenu = () => {
-  inputRef.value?.close()
-}
-
-const setSearch = (value: string): void => {
-  search.value = value
-}
-
-if (props.useQueryFnDefault) {
-  const {data: defaultData} = props.useQueryFnDefault(undefined, {enabled: computed(() => !props.disabled)})
-
-  watch(defaultData, value => {
-    if (value && props.modelValue?.length === 0) {
-      select(props.valueGetter(value), value)
-      emit('init-model')
-    }
-  }, {immediate: true})
-}
-
-watch(() => props.modelValue, async () => {
-  await nextTick()
-
-  if (props.seamless) inputRef.value?.scrollToInput()
-})
 
 defineExpose({
   focus,
-  blur,
-  close: closeMenu,
-  setSearch,
+  blur: () => selectComponentRef.value?.blur(),
+  close: () => selectComponentRef.value?.close(),
+  setSearch: (value: string) => selectComponentRef.value?.setSearch(value),
 })
 
 defineSlots<{

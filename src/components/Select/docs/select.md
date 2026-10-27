@@ -1175,7 +1175,7 @@ export const varietyModelApi = createRestModelApi({
 
 ## In list cells
 
-A select per row costs most of a list's first render: each one sets up its search, cursor, dropdown and input, and a query of its own when the options come from `useQueryFnOptions`. With `deferred`, a `seamless` `WSelectSingle` renders only its field and the selected option until it is pressed or focused — then it mounts the full select and opens it. Options from a query are not loaded before that, so give the selected one in `previewData`, from data the row already has.
+A select per row costs most of a list's first render: each one sets up its search, cursor, dropdown and input, and a query of its own when the options come from `useQueryFnOptions`. With `deferred`, a `seamless` select renders only its field and the selected options until it is pressed or focused — then it mounts the full select and opens it. Options from a query are not loaded before that, so give the selected ones in `previewData`, from data the row already has. The async selects load their chips on their own when `previewData` is not given, as they do when mounted.
 
 <!-- @example Select/Deferred -->
 
@@ -1257,7 +1257,6 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 | `clearValue` | `ClearValue` | — | Value emitted when cleared. Defaults to `null`; set it explicitly to emit `undefined` or `''`. |
 | `createdData` | `Data` | — | Option to add to the loaded ones — for a selected value the query does not return, such as one created elsewhere. |
 | `previewData` | `Data` | — | Selected option, shown in the field until the options load — and, with `deferred`, before the select mounts. |
-| `deferred` | `boolean` | — | Renders only the selected option until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells. The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`. |
 | `useQueryFnOptions` | `UseQueryDefault<Data[], unknown> \| UseQueryDefault<Data[], QueryParamsOptions>` | — | Query that loads the options. Takes `queryParamsOptions` when the query has parameters. Use either this or `options`. |
 | `queryParamsOptions` | `QueryParamsOptions` | — | Parameters for `useQueryFnOptions`. |
 | `options` | `Data[]` | — | Static list of options, instead of loading them with `useQueryFnOptions`. |
@@ -1273,6 +1272,7 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 | `searchModel` | `boolean` | — | Commits the typed text when the menu closes — selects the option matching it exactly, or creates one with `createOption`. In a single select, the selected value is also put into the search text on focus, so it can be edited. For string values. |
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
 | `placeholderEmpty` | `string` | — | Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. |
+| `deferred` | `boolean` | — | Renders only the selected options until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells. The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`. |
 | `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |
 | `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | Extra props passed to every `optionComponent`. |
 | `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
@@ -1399,6 +1399,8 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
 | `placeholderEmpty` | `string` | — | Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. |
 | `cursorSelected` | `boolean` | — | Puts the cursor on the first selected option when the menu opens, so Enter toggles it — by default the menu only scrolls to it. Always set in the single selects. |
+| `previewData` | `Data[]` | — | Selected options, shown in the chips until the options load — and, with `deferred`, before the select mounts. |
+| `deferred` | `boolean` | — | Renders only the selected options until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells. The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`. |
 | `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |
 | `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | Extra props passed to every `optionComponent`. |
 | `useQueryFnOptions` | `UseQueryDefault<Data[], unknown> \| UseQueryDefault<Data[], QueryParamsOptions>` | — | Query that loads the options. Takes `queryParamsOptions` when the query has parameters. Use either this or `options`. |
@@ -1531,11 +1533,12 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 | `searchModel` | `boolean` | — | Commits the typed text when the menu closes — selects the option matching it exactly, or creates one with `createOption`. In a single select, the selected value is also put into the search text on focus, so it can be edited. For string values. |
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
 | `placeholderEmpty` | `string` | — | Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. |
+| `deferred` | `boolean` | — | Renders only the selected options until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells. The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`. |
 | `useQueryFnPrefix` | `UseQueryDefault<PaginatedResponse<Data>, QueryParams>` | — | Paginated query that loads the selected options for the chips. Defaults to `useQueryFnOptions`. |
 | `searchField` | `keyof QueryParams` | — | Query parameter that receives the search text. Defaults to `search`. |
-| `valueQueryKey` | `string` | — | Query parameter that receives the selected values, comma-separated, when loading the chips. |
+| `valueQueryKey` | `string` | `"id__in"` | Query parameter that receives the selected values, comma-separated, when loading the chips. |
 | `prefixText` | `string` | — | Word after the count shown instead of chips when more than `prefixMax` values are selected. Defaults to "items". |
-| `prefixMax` | `number` | — | Most selected values shown as chips; above it, a count with a clear-all button is shown instead. |
+| `prefixMax` | `number` | `8` | Most selected values shown as chips; above it, a count with a clear-all button is shown instead. |
 | `reverse` | `boolean` | — | Shows the check mark on options that are not selected instead of those that are — for a select that picks what to exclude. |
 | `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
 | `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
@@ -1648,7 +1651,7 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 | `useQueryFnPrefix` | `UseQueryDefault<PaginatedResponse<Data>, QueryParams>` | — | Paginated query that loads the selected options for the chips. Defaults to `useQueryFnOptions`. |
 | `queryParamsOptions` | `QueryParams` | **required** | Parameters for `useQueryFnOptions`. |
 | `searchField` | `keyof QueryParams` | — | Query parameter that receives the search text. Defaults to `search`. |
-| `previewData` | `Data[]` | — | Selected options, used for the chips instead of loading them. |
+| `previewData` | `Data[]` | — | Selected options, used for the chips instead of loading them — also before the select mounts with `deferred`. |
 | `valueQueryKey` | `string` | `"id__in"` | Query parameter that receives the selected values, comma-separated, when loading the chips. |
 | `prefixText` | `string` | — | Word after the count shown instead of chips when more than `prefixMax` values are selected. Defaults to "items". |
 | `prefixMax` | `number` | `8` | Most selected values shown as chips; above it, a count with a clear-all button is shown instead. |
@@ -1666,6 +1669,7 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
 | `placeholderEmpty` | `string` | — | Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. |
 | `cursorSelected` | `boolean` | — | Puts the cursor on the first selected option when the menu opens, so Enter toggles it — by default the menu only scrolls to it. Always set in the single selects. |
+| `deferred` | `boolean` | — | Renders only the selected options until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells. The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`. |
 | `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |
 | `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | Extra props passed to every `optionComponent`. |
 | `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
@@ -1797,6 +1801,8 @@ import WSelectStringified from 'eco-vue-js/dist/components/Select/WSelectStringi
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
 | `placeholderEmpty` | `string` | — | Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. |
 | `cursorSelected` | `boolean` | — | Puts the cursor on the first selected option when the menu opens, so Enter toggles it — by default the menu only scrolls to it. Always set in the single selects. |
+| `previewData` | `Data[]` | — | Selected options, shown in the chips until the options load — and, with `deferred`, before the select mounts. |
+| `deferred` | `boolean` | — | Renders only the selected options until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells. The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`. |
 | `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |
 | `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | Extra props passed to every `optionComponent`. |
 | `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
