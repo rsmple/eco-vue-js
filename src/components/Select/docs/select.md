@@ -1173,6 +1173,66 @@ export const varietyModelApi = createRestModelApi({
 
 <!-- @source-end -->
 
+## In list cells
+
+A select per row costs most of a list's first render: each one sets up its search, cursor, dropdown and input, and a query of its own when the options come from `useQueryFnOptions`. With `deferred`, a `seamless` `WSelectSingle` renders only its field and the selected option until it is pressed or focused — then it mounts the full select and opens it. Options from a query are not loaded before that, so give the selected one in `previewData`, from data the row already has.
+
+<!-- @example Select/Deferred -->
+
+<DocsDemo name="Select/Deferred" />
+
+```vue
+<template>
+  <div class="grid max-w-md grid-cols-[1fr_10rem] items-center gap-x-4">
+    <template
+      v-for="plant in plants"
+      :key="plant.id"
+    >
+      <div>{{ plant.name }}</div>
+
+      <WSelectSingle
+        v-model="plant.soil"
+        :options="soils"
+        :value-getter="item => item.code"
+        :search-fn="(item, search) => item.name.toLowerCase().includes(search.toLowerCase())"
+        placeholder="Soil"
+        seamless
+        deferred
+        no-margin
+      >
+        <template #option="{option, search}">
+          <div class="w-option flex items-center">
+            {{ option?.name ?? search }}
+          </div>
+        </template>
+      </WSelectSingle>
+    </template>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import {ref} from 'vue'
+
+import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
+
+const soils = [
+  {id: 1, code: 'loam', name: 'Loam'},
+  {id: 2, code: 'sand', name: 'Sandy'},
+  {id: 3, code: 'clay', name: 'Clay'},
+  {id: 4, code: 'peat', name: 'Peat'},
+]
+
+const plants = ref([
+  {id: 1, name: 'Monstera', soil: 'peat' as string | null},
+  {id: 2, name: 'Aloe', soil: 'sand' as string | null},
+  {id: 3, name: 'Fern', soil: null as string | null},
+  {id: 4, name: 'Basil', soil: 'loam' as string | null},
+])
+</script>
+```
+
+<!-- @example-end -->
+
 ## Other forms
 
 - **`WSelectStringified`** is a `WSelect` whose model is one string — the values joined by `divider`, such as `"high,critical"` for a query param, or a JSON array with `divider="json"`.
@@ -1196,6 +1256,8 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 | `allowClear` | `AllowClear` | — | Adds a button that clears the value, emitting `clearValue`. |
 | `clearValue` | `ClearValue` | — | Value emitted when cleared. Defaults to `null`; set it explicitly to emit `undefined` or `''`. |
 | `createdData` | `Data` | — | Option to add to the loaded ones — for a selected value the query does not return, such as one created elsewhere. |
+| `previewData` | `Data` | — | Selected option, shown in the field until the options load — and, with `deferred`, before the select mounts. |
+| `deferred` | `boolean` | — | Renders only the selected option until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells. The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`. |
 | `useQueryFnOptions` | `UseQueryDefault<Data[], unknown> \| UseQueryDefault<Data[], QueryParamsOptions>` | — | Query that loads the options. Takes `queryParamsOptions` when the query has parameters. Use either this or `options`. |
 | `queryParamsOptions` | `QueryParamsOptions` | — | Parameters for `useQueryFnOptions`. |
 | `options` | `Data[]` | — | Static list of options, instead of loading them with `useQueryFnOptions`. |
