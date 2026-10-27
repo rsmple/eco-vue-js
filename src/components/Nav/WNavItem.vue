@@ -128,7 +128,7 @@ const isActive = computed<boolean>(() => {
   return isEqualObj(route.query, routeTo.value.query ?? {}, EXCLUDE_QUERY_FIELDS, props.queryFields)
 })
 
-const routeTitle = computed(() => getRouteTitle(routeTo.value?.matched.at(-1)))
+const routeTitle = computed(() => getRouteTitle(routeTo.value?.matched ?? []))
 
 const iconLocal = computed(() => props.icon ?? routeTo.value?.meta?.icon)
 
