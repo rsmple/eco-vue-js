@@ -134,7 +134,7 @@ export interface SelectStringifiedProps<Model extends string, Data extends Defau
 }
 
 export interface SelectAsyncProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
-  extends Omit<SelectProps<Model, Data, QueryParams, Component>, 'options' | 'optionComponent' | 'optionComponentProps' | 'searchFn' | 'useQueryFnOptions' | 'queryParamsOptions' | 'filterOptions' | 'useFirstDefault' | 'previewData'>,
+  extends Omit<SelectProps<Model, Data, QueryParams, Component>, 'options' | 'optionComponent' | 'optionComponentProps' | 'searchFn' | 'useQueryFnOptions' | 'queryParamsOptions' | 'filterOptions' | 'useFirstDefault' | 'previewData' | 'valueGetter'>,
   SelectOptionComponentProps<Data, OptionComponent> {
   /** Paginated query that loads the options, page by page as the menu scrolls. The search text is sent in `searchField`. */
   useQueryFnOptions: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
@@ -144,6 +144,8 @@ export interface SelectAsyncProps<Model extends number | string, Data extends De
   queryParamsOptions: QueryParams
   /** Query parameter that receives the search text. Defaults to `search`. */
   searchField?: keyof QueryParams
+  /** Gets the value stored in the model from an option. Defaults to the option's `id`. */
+  valueGetter?: (value: Data) => Model
   /** Selected options, used for the chips instead of loading them — also before the select mounts with `deferred`. */
   previewData?: Data[]
   /** Query parameter that receives the selected values, comma-separated, when loading the chips. */

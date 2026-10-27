@@ -1524,7 +1524,7 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 | `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | Extra props passed to every `optionComponent`. |
 | `useQueryFnOptions` | `UseQueryDefault<PaginatedResponse<Data>, QueryParams>` | **required** | Paginated query that loads the options, page by page as the menu scrolls. The search text is sent in `searchField`. |
 | `queryParamsOptions` | `QueryParams` | **required** | Parameters for `useQueryFnOptions`. |
-| `valueGetter` | `(value: Data) => Model` | **required** | Gets the value stored in the model from an option. |
+| `valueGetter` | `((value: Data) => Model)` | `(data as unknown as {     id: Model; }).id` | Gets the value stored in the model from an option. Defaults to the option's `id`. |
 | `useQueryFnDefault` | `UseQueryDefault<Data, undefined>` | — | Query that loads a default option. When it resolves while nothing is selected, the option is selected and `init-model` is emitted. |
 | `emptyStub` | `string` | — | Shown in the menu instead of "Nothing to show" when there are no options and no search. |
 | `hidePrefix` | `boolean` | — | Hides the selected chips while the menu is open, leaving room to type. |
@@ -1651,13 +1651,13 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 | `useQueryFnPrefix` | `UseQueryDefault<PaginatedResponse<Data>, QueryParams>` | — | Paginated query that loads the selected options for the chips. Defaults to `useQueryFnOptions`. |
 | `queryParamsOptions` | `QueryParams` | **required** | Parameters for `useQueryFnOptions`. |
 | `searchField` | `keyof QueryParams` | — | Query parameter that receives the search text. Defaults to `search`. |
+| `valueGetter` | `((value: Data) => Model)` | `(data as unknown as {     id: Model; }).id` | Gets the value stored in the model from an option. Defaults to the option's `id`. |
 | `previewData` | `Data[]` | — | Selected options, used for the chips instead of loading them — also before the select mounts with `deferred`. |
 | `valueQueryKey` | `string` | `"id__in"` | Query parameter that receives the selected values, comma-separated, when loading the chips. |
 | `prefixText` | `string` | — | Word after the count shown instead of chips when more than `prefixMax` values are selected. Defaults to "items". |
 | `prefixMax` | `number` | `8` | Most selected values shown as chips; above it, a count with a clear-all button is shown instead. |
 | `reverse` | `boolean` | — | Shows the check mark on options that are not selected instead of those that are — for a select that picks what to exclude. |
 | `modelValue` | `Model[] \| undefined` | **required** | Selected values. The component does not change it — update it from `select` and `unselect`. |
-| `valueGetter` | `(value: Data) => Model` | **required** | Gets the value stored in the model from an option. |
 | `useQueryFnDefault` | `UseQueryDefault<Data, undefined>` | — | Query that loads a default option. When it resolves while nothing is selected, the option is selected and `init-model` is emitted. |
 | `emptyStub` | `string` | `"No match"` | Shown in the menu instead of "Nothing to show" when there are no options and no search. |
 | `disableClear` | `boolean` | — | Hides the remove button on the selected chips. |

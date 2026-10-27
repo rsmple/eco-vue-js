@@ -2,7 +2,7 @@
   <WInput
     ref="input"
     v-bind="{
-      ...props,
+      ...getDefinedProps(props),
       clearValue: getClearValue(),
       async: true,
       errorMessage: errorMessageValue ?? errorMessage,
@@ -60,6 +60,7 @@ import {ref, watch} from 'vue'
 
 import WInput from '@/components/Input/WInput.vue'
 
+import {getDefinedProps} from '@/components/Select/models/useDeferred'
 import {useClearValue} from '@/utils/useClearValue'
 
 type ModelValue = Required<InputAsyncProps<Type>>['modelValue']
