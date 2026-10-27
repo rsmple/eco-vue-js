@@ -1,11 +1,41 @@
 <template>
+  <SelectDeferred
+    v-if="isDeferred"
+    :model-value="arrayValue"
+    :get-option="getOption"
+    :field="deferredField"
+    :option-component="optionComponent"
+    :option-component-props="optionComponentProps"
+    :placeholder="placeholder"
+    :placeholder-empty="placeholderEmpty"
+    :name="name"
+    :size="size"
+    :no-wrap="noWrap"
+    :border-class="borderClass"
+    :hide-input="hideInput"
+    :loading="loading"
+    :class="$attrs.class"
+    @activate="activate"
+  >
+    <template
+      v-if="$slots.option"
+      #option="scope"
+    >
+      <slot
+        name="option"
+        v-bind="scope"
+      />
+    </template>
+  </SelectDeferred>
+
   <WSelect
+    v-else
     ref="selectComponent"
     v-bind="{
       ...props,
       modelValue: arrayValue,
       disableClear: !allowClear,
-      createdData: createdData ? [createdData] as Data[] : undefined,
+      createdData: createdDataList,
       hidePrefix: true,
       cursorSelected: true,
       filterValue: filterValue === undefined ? modelValue : filterValue,
@@ -68,12 +98,14 @@
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParamsOptions, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean = false, ClearValue extends SelectClearValue = null">
 import type {SelectClearValue, SelectOptionComponent, SelectOptionProps, SelectSingleProps} from './types'
 
-import {type VNode, computed, toRef, useTemplateRef, watch} from 'vue'
+import {type VNode, computed, nextTick, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import WSelect from '@/components/Select/WSelect.vue'
 
 import {useClearValue} from '@/utils/useClearValue'
 
+import SelectDeferred from './components/SelectDeferred.vue'
+import {getDeferredField} from './models/getDeferredField'
 import {useCloseOnPick} from './models/useCloseOnPick'
 
 type EmitType = AllowClear extends true ? Model | ClearValue : NonNullable<Model>
@@ -108,6 +140,40 @@ const getClearValue = useClearValue(props)
 
 const arrayValue = computed<Model[]>(() => props.modelValue !== null && props.modelValue !== undefined && props.modelValue !== '' ? [props.modelValue] : [])
 
+const createdDataList = computed<Data[] | undefined>(() => {
+  const list = [props.createdData, props.previewData].filter(item => item !== undefined)
+
+  return list.length ? list : undefined
+})
+
+// A default option is selected on mount, so a select with one mounts at once.
+const isActive = ref(!props.deferred || !props.seamless || !!props.useQueryFnDefault || !!props.useFirstDefault)
+
+const isDeferred = computed(() => !isActive.value && props.deferred)
+
+const deferredField = computed(() => {
+  const field = getDeferredField(props)
+
+  if (props.filterField && props.filterValue === undefined) field.filterValue = props.modelValue
+
+  return field
+})
+
+const getOption = (value: Model): Data | undefined => {
+  return props.options?.find(option => props.valueGetter(option) === value)
+    ?? createdDataList.value?.find(option => props.valueGetter(option) === value)
+}
+
+const activate = async () => {
+  if (isActive.value) return
+
+  isActive.value = true
+
+  await nextTick()
+
+  focus()
+}
+
 const closeOnPick = useCloseOnPick(() => props.embedded ?? false, () => selectComponentRef.value?.close())
 
 const updateModelValue = (value: Model | ClearValue, data: Data | undefined): void => {
@@ -122,7 +188,8 @@ const blur = () => {
 }
 
 const focus = () => {
-  selectComponentRef.value?.focus()
+  if (isActive.value) selectComponentRef.value?.focus()
+  else activate()
 }
 
 watch(toRef(props, 'modelValue'), blur)

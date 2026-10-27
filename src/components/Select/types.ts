@@ -1,3 +1,4 @@
+import type {FieldWrapperProps} from '@/components/FieldWrapper/types'
 import type {InputSuggestProps} from '@/components/Input/types'
 import type {Component} from 'vue'
 
@@ -92,6 +93,15 @@ export interface SelectPrefixProps<Data extends DefaultData, OptionComponent ext
   disableClear: boolean | undefined
 }
 
+export interface SelectDeferredProps<Model extends number | string, Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>>
+  extends SelectOptionComponentProps<Data, OptionComponent>,
+  Pick<InputSuggestProps<'text'>, 'placeholder' | 'name' | 'size' | 'noWrap' | 'borderClass' | 'hideInput' | 'loading'> {
+  modelValue: Model[]
+  getOption: (value: Model) => Data | undefined
+  field: FieldWrapperProps
+  placeholderEmpty?: string
+}
+
 export type SelectClearValue = null | undefined | ''
 
 export interface SelectSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean, ClearValue extends SelectClearValue = null>
@@ -104,6 +114,13 @@ export interface SelectSingleProps<Model extends number | string, Data extends D
   clearValue?: ClearValue
   /** Option to add to the loaded ones — for a selected value the query does not return, such as one created elsewhere. */
   createdData?: Data
+  /** Selected option, shown in the field until the options load — and, with `deferred`, before the select mounts. */
+  previewData?: Data
+  /**
+   * Renders only the selected option until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells.
+   * The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`.
+   */
+  deferred?: boolean
 }
 
 export interface SelectStringifiedProps<Model extends string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
