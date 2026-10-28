@@ -7,6 +7,7 @@
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
+    "e2e/**/*",
     "build/**/*",
     "docs/.vitepress/config.ts",
     "docs/.vitepress/sidebar.ts",
