@@ -5,7 +5,6 @@
         :title="getText('dateFrom')"
         :value="dateRange?.from"
         :current-date="currentDate"
-        auto-focus
         @update:current-date="setCurrentDate"
       />
 
@@ -123,6 +122,9 @@ const {
   toNextYear,
   isSameCalendarPage,
 } = useCalendarNavigation(props)
+
+// In setup, not on mount, so the server renders the same month.
+if (props.modelValue) setCurrentDate(props.modelValue.from)
 
 const dateRange = ref<DateRange | undefined>(props.modelValue)
 const preselectedValue = ref<Date | null>(null)
