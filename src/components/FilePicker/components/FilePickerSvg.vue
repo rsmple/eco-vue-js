@@ -3,16 +3,8 @@
     stroke="currentColor"
     stroke-linecap="round"
     stroke-dasharray="4px 8px"
-  >
-    <animate
-      v-if="animate"
-      attributeName="stroke-dashoffset"
-      from="0px"
-      to="-12px"
-      dur="0.5s"
-      repeatCount="indefinite"
-    />
-  </WBorderSvg>
+    :rect-class="animate ? 'animate-border-march' : undefined"
+  />
 </template>
 
 <script lang="ts" setup>
