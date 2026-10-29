@@ -3,7 +3,7 @@
     v-if="!isMobile"
     width="100%"
     height="100%"
-    class="pointer-events-none fixed top-0 print:hidden"
+    class="pointer-events-none fixed top-0 motion-reduce:hidden print:hidden"
   >
     <defs>
       <linearGradient

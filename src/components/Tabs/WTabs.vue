@@ -192,7 +192,7 @@ import {Notify} from '@/utils/Notify'
 import {useOverlayClose, useOverlayFrame} from '@/utils/Overlay'
 import {useIsMobile} from '@/utils/mobile'
 import {getText} from '@/utils/texts'
-import {debounce, getHasScrollbar, getPropValue, getScrollParent, throttle, unwrapSlots} from '@/utils/utils'
+import {debounce, getHasScrollbar, getPropValue, getScrollParent, getSmoothScrollBehavior, throttle, unwrapSlots} from '@/utils/utils'
 
 import TabItem from './components/TabItem.vue'
 import TabTitleButton from './components/TabTitleButton.vue'
@@ -361,7 +361,7 @@ const scrollToTabContent = () => {
   }
 
   timeout = setTimeout(() => {
-    containerRef.value?.scrollTo({left: document.documentElement.offsetWidth, behavior: 'smooth'})
+    containerRef.value?.scrollTo({left: document.documentElement.offsetWidth, behavior: getSmoothScrollBehavior()})
 
     timeout = null
   }, 300)
@@ -503,11 +503,11 @@ const updateScrollPosition = (value: {left?: number, top?: number}) => {
   if (props.side) {
     if (buttonContainerRef.value.scrollHeight <= buttonContainerRef.value.offsetHeight) return
 
-    buttonContainerRef.value.scrollTo({top: value.top! - buttonContainerRef.value.offsetHeight / 2, behavior: 'smooth'})
+    buttonContainerRef.value.scrollTo({top: value.top! - buttonContainerRef.value.offsetHeight / 2, behavior: getSmoothScrollBehavior()})
   } else {
     if (buttonContainerRef.value.scrollWidth <= buttonContainerRef.value.offsetWidth) return
 
-    buttonContainerRef.value.scrollTo({left: value.left! - buttonContainerRef.value.offsetWidth / 2, behavior: 'smooth'})
+    buttonContainerRef.value.scrollTo({left: value.left! - buttonContainerRef.value.offsetWidth / 2, behavior: getSmoothScrollBehavior()})
   }
 }
 
