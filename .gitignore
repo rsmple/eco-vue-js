@@ -39,3 +39,7 @@ eco-vue-js-*.*.*.tgz
 docs/.vitepress/cache
 docs/.vitepress/dist
 docs/releases.md
+
+/test-results/
+/playwright-report/
+/blob-report/

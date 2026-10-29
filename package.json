@@ -18,7 +18,8 @@
     "docs:generate": "node build/docs-generate.ts",
     "docs:dev": "npm run docs:generate && node build/docs-releases.ts && vitepress dev docs",
     "docs:build": "node build/docs-generate.ts --check && node build/docs-releases.ts && vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@stylistic/eslint-plugin": "5.10.0",
@@ -48,6 +49,7 @@
   "devDependencies": {
     "@emnapi/core": "1.11.3",
     "@emnapi/runtime": "1.11.3",
+    "@playwright/test": "1.63.0",
     "@tailwindcss/cli": "4.3.3",
     "@tailwindcss/vite": "4.3.3",
     "@tsconfig/node22": "22.0.6",

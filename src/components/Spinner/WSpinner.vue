@@ -6,7 +6,7 @@
     class="animate-spin"
   >
     <circle
-      class="animate-spinner-dash"
+      class="animate-spinner-dash motion-reduce:[stroke-dasharray:40,57]"
       cx="12"
       cy="12"
       fill="none"

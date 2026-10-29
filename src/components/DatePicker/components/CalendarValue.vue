@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onBeforeMount} from 'vue'
+import {computed} from 'vue'
 
 import {SemanticType, useSemanticTypeBackgroundMap} from '@/utils/SemanticType'
 import {dateFormat, getStartOfMonth, isSameMonth} from '@/utils/dateTime'
@@ -32,7 +32,6 @@ const props = defineProps<{
   title: string
   currentDate: Date
   value?: Date
-  autoFocus?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -48,10 +47,4 @@ const updateCurrentDate = () => {
 }
 
 const semanticTypeBackgroundMap = useSemanticTypeBackgroundMap()
-
-onBeforeMount(() => {
-  if (props.autoFocus) {
-    updateCurrentDate()
-  }
-})
 </script>
