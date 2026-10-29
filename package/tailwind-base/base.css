@@ -6,6 +6,7 @@
 @import "./css/internal-variants.css";
 @import "./css/internal-variables.css";
 @import "./css/textarea.css";
+@import "./css/reduced-motion.css";
 
 @source "../dist/components";
 @source "../dist/utils";

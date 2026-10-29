@@ -1,7 +1,7 @@
 <template>
   <div
     ref="element"
-    class="rounded-inherit sm-not:hidden w-shine pointer-events-none absolute inset-0 overflow-hidden print:hidden"
+    class="rounded-inherit sm-not:hidden w-shine pointer-events-none absolute inset-0 overflow-hidden motion-reduce:hidden print:hidden"
   >
     <div
       class="bg-primary-light/70 dark:bg-primary-light/50 pointer-events-none absolute h-full w-screen bg-clip-border"

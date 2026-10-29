@@ -33,6 +33,8 @@
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, useTemplateRef, watch} from 'vue'
 
+import {getSmoothScrollBehavior} from '@/utils/utils'
+
 const props = defineProps<{
   /** Shows the layer and scrolls the content into view. */
   isOpen: boolean
@@ -80,13 +82,13 @@ const hide = (): Promise<void> => new Promise(resolve => {
 
   container.addEventListener('scrollend', finish)
 
-  container.scrollTo({top: 0, behavior: 'smooth'})
+  container.scrollTo({top: 0, behavior: getSmoothScrollBehavior()})
 })
 
 const show = () => {
   isShown = true
 
-  containerRef.value?.scrollTo({top: contentRef.value?.offsetTop, behavior: 'smooth'})
+  containerRef.value?.scrollTo({top: contentRef.value?.offsetTop, behavior: getSmoothScrollBehavior()})
 }
 
 // Content that grows once open, such as one still loading, would stay partly below the screen — and be taken as swiped out.

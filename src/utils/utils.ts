@@ -49,7 +49,7 @@ export const scrollInParent = (
       ? top - (parent.clientHeight - height) / 2
       : top < 0 ? top : top + height - parent.clientHeight
 
-  parent.scrollTo({top: parent.scrollTop + delta, behavior})
+  parent.scrollTo({top: parent.scrollTop + delta, behavior: behavior === 'smooth' ? getSmoothScrollBehavior() : behavior})
 }
 
 export const getAllScrollParents = (node?: Node, max = 10): Array<Element> => {
@@ -174,6 +174,11 @@ export const numberFormatCsv = (value: number) => String(value).replace('.', ','
 export const getIsClientSide = () => typeof window !== 'undefined'
 
 export const isClientSide = getIsClientSide()
+
+export const getPrefersReducedMotion = (): boolean => getIsClientSide() && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+/** `smooth`, or `instant` when the user asks for reduced motion — a `behavior` passed to `scrollTo` is not affected by CSS `scroll-behavior`. */
+export const getSmoothScrollBehavior = (): ScrollBehavior => getPrefersReducedMotion() ? 'instant' : 'smooth'
 
 let iterator = 1
 
