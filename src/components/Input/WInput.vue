@@ -230,6 +230,7 @@
                   "
                   :class="{
                     'w-0 max-w-0': hideInput,
+                    'min-w-0': !$slots.prefix,
                     'text-secure w-input-whitespace-pre-wrap break-all': textSecure && !isSecureVisible,
                     '[-webkit-text-fill-color:transparent]': textTransparent,
                     'opacity-0': placeholder && textarea && hasNoValue && !focused,
