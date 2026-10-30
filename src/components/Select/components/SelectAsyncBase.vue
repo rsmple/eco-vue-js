@@ -234,10 +234,16 @@ watch(() => props.useQueryFnOptions, (useQueryFn, _, onCleanup) => {
   onCleanup(() => scope.stop())
 }, {immediate: true})
 
-const hasSearchOption = computed(() => {
-  if (props.createdData?.some(option => props.valueGetter(option) === search.value)) return true
+const isSearchOption = (option: Data): boolean => {
+  if (props.labelGetter) return props.labelGetter(option).trim().toLowerCase() === search.value.trim().toLowerCase()
 
-  return firstPageData.value?.results.some(option => props.valueGetter(option) === search.value)
+  return props.valueGetter(option) === search.value
+}
+
+const hasSearchOption = computed(() => {
+  if (props.createdData?.some(isSearchOption)) return true
+
+  return firstPageData.value?.results.some(isSearchOption)
 })
 
 const close = () => {

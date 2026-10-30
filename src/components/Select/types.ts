@@ -66,6 +66,8 @@ export interface SelectProps<Model extends number | string, Data extends Default
   hidePrefix?: boolean
   /** Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. */
   createOption?: (search: string) => (Data | undefined) | Promise<Data | undefined>
+  /** Gets an option's label for hiding the "New:" row when an option with the typed text exists — compared trimmed and lowercased. Defaults to an exact match on `valueGetter`. */
+  labelGetter?: (option: Data) => string
   /** Hides options for which it returns `false`. */
   filterOptions?: (option: Data) => boolean
   /** Hides the check mark next to selected options in the menu. */

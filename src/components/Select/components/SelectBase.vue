@@ -280,7 +280,13 @@ const loadingCreate = ref(false)
 
 const isDisabledComputed = computed(() => props.loading || isReadonly.value || isDisabled.value)
 
-const hasCreateOption = computed(() => props.createOption && !isFetching.value && (!optionsFiltered.value.some(option => props.valueGetter(option) === search.value) || isModelValueSearch.value))
+const isSearchOption = (option: Data): boolean => {
+  if (props.labelGetter) return props.labelGetter(option).trim().toLowerCase() === search.value.trim().toLowerCase()
+
+  return props.valueGetter(option) === search.value
+}
+
+const hasCreateOption = computed(() => props.createOption && !isFetching.value && (!optionsFiltered.value.some(isSearchOption) || isModelValueSearch.value))
 
 const close = () => {
   if (props.searchModel && focused.value && !isModelValueSearch.value) {
