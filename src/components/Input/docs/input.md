@@ -318,7 +318,7 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | `"off"` | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `readonly` | `boolean` | — | Shows the value as text without an input. When unset, inherits the readonly state provided by a parent. |
 | `unclickable` | `boolean \| null` | `null` | Blocks typing and turns a click into a `focus` event, for fields that open a menu instead of taking text. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
@@ -432,7 +432,7 @@ import WInputAsync from 'eco-vue-js/dist/components/Input/WInputAsync.vue'
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | — | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `readonly` | `boolean` | — | Shows the value as text without an input. When unset, inherits the readonly state provided by a parent. |
 | `unclickable` | `boolean \| null` | `null` | Blocks typing and turns a click into a `focus` event, for fields that open a menu instead of taking text. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
@@ -534,7 +534,7 @@ import WInputSuggest from 'eco-vue-js/dist/components/Input/WInputSuggest.vue'
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | — | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
 | `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
 | `spellcheck` | `boolean` | — | Enables the browser's spell check. |
@@ -648,7 +648,7 @@ import WInputOptions from 'eco-vue-js/dist/components/Input/WInputOptions.vue'
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | — | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
 | `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
 | `spellcheck` | `boolean` | — | Enables the browser's spell check. |
@@ -756,7 +756,7 @@ import WInputDate from 'eco-vue-js/dist/components/Input/WInputDate.vue'
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | — | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
 | `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
 | `spellcheck` | `boolean` | — | Enables the browser's spell check. |

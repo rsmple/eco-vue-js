@@ -6,20 +6,28 @@ const collectLines = (parent: Element): HTMLElement[] => {
   return out
 }
 
+// a line ending in a non-editable part has no text node after it, so the caret goes right after the part's element
+const afterNonEditable = (line: HTMLElement, text: Text): {node: Node, offset: number} => {
+  let element = text.parentElement!
+  while (element.parentElement && element.parentElement !== line && element.parentElement.contentEditable === 'false') element = element.parentElement
+  const parent = element.parentNode!
+  return {node: parent, offset: Array.prototype.indexOf.call(parent.childNodes, element) + 1}
+}
+
 const findInLine = (line: HTMLElement, offsetInLine: number): {node: Node, offset: number} => {
   const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT, null)
   let node: Node | null
   let remaining = offsetInLine
-  let lastEditable: Text | null = null
+  let tail: {node: Node, offset: number} | null = null
   while ((node = walker.nextNode())) {
     const text = node as Text
     const len = text.nodeValue?.length ?? 0
     const editable = text.parentElement?.contentEditable !== 'false'
     if (editable && remaining <= len) return {node: text, offset: Math.max(remaining, 0)}
-    if (editable) lastEditable = text
+    tail = editable ? {node: text, offset: len} : afterNonEditable(line, text)
     remaining -= len
   }
-  if (lastEditable) return {node: lastEditable, offset: lastEditable.nodeValue?.length ?? 0}
+  if (tail) return tail
 
   let container: Element = line
   while (container.firstElementChild

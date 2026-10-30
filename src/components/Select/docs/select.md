@@ -1324,7 +1324,7 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | — | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
 | `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
 | `spellcheck` | `boolean` | — | Enables the browser's spell check. |
@@ -1455,7 +1455,7 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | — | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
 | `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
 | `spellcheck` | `boolean` | — | Enables the browser's spell check. |
@@ -1589,7 +1589,7 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | — | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
 | `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
 | `spellcheck` | `boolean` | — | Enables the browser's spell check. |
@@ -1721,7 +1721,7 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | — | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
 | `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
 | `spellcheck` | `boolean` | — | Enables the browser's spell check. |
@@ -1854,7 +1854,7 @@ import WSelectStringified from 'eco-vue-js/dist/components/Select/WSelectStringi
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | — | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
 | `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
 | `spellcheck` | `boolean` | — | Enables the browser's spell check. |
