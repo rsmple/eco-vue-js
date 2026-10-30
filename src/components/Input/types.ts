@@ -37,7 +37,7 @@ export interface InputProps<Type extends InputType, ClearValue extends InputClea
   name?: string
   /** Native `autocomplete` attribute. */
   autocomplete?: 'off' | string
-  /** Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. */
+  /** Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. */
   autofocus?: boolean | number
   /** Shows the value as text without an input. When unset, inherits the readonly state provided by a parent. */
   readonly?: boolean
