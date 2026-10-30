@@ -1267,6 +1267,7 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 | `emptyStub` | `string` | — | Shown in the menu instead of "Nothing to show" when there are no options and no search. |
 | `hidePrefix` | `boolean` | — | Hides the selected chips while the menu is open, leaving room to type. |
 | `createOption` | `((search: string) => Data \| Promise<Data \| undefined> \| undefined)` | — | Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. |
+| `labelGetter` | `((option: Data) => string)` | — | Gets an option's label for hiding the "New:" row when an option with the typed text exists — compared trimmed and lowercased. Defaults to an exact match on `valueGetter`. |
 | `filterOptions` | `((option: Data) => boolean)` | — | Hides options for which it returns `false`. |
 | `hideOptionIcon` | `boolean` | — | Hides the check mark next to selected options in the menu. |
 | `searchModel` | `boolean` | — | Commits the typed text when the menu closes — selects the option matching it exactly, or creates one with `createOption`. In a single select, the selected value is also put into the search text on focus, so it can be edited. For string values. |
@@ -1392,6 +1393,7 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 | `disableClear` | `boolean` | — | Hides the remove button on the selected chips. |
 | `hidePrefix` | `boolean` | — | Hides the selected chips while the menu is open, leaving room to type. |
 | `createOption` | `((search: string) => Data \| Promise<Data \| undefined> \| undefined)` | — | Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. |
+| `labelGetter` | `((option: Data) => string)` | — | Gets an option's label for hiding the "New:" row when an option with the typed text exists — compared trimmed and lowercased. Defaults to an exact match on `valueGetter`. |
 | `filterOptions` | `((option: Data) => boolean)` | — | Hides options for which it returns `false`. |
 | `hideOptionIcon` | `boolean` | — | Hides the check mark next to selected options in the menu. |
 | `createdData` | `Data[]` | — | Options to add to the loaded ones — for selected values the query does not return, such as ones created elsewhere. |
@@ -1529,6 +1531,7 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 | `emptyStub` | `string` | — | Shown in the menu instead of "Nothing to show" when there are no options and no search. |
 | `hidePrefix` | `boolean` | — | Hides the selected chips while the menu is open, leaving room to type. |
 | `createOption` | `((search: string) => Data \| Promise<Data \| undefined> \| undefined)` | — | Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. |
+| `labelGetter` | `((option: Data) => string)` | — | Gets an option's label for hiding the "New:" row when an option with the typed text exists — compared trimmed and lowercased. Defaults to an exact match on `valueGetter`. |
 | `hideOptionIcon` | `boolean` | — | Hides the check mark next to selected options in the menu. |
 | `searchModel` | `boolean` | — | Commits the typed text when the menu closes — selects the option matching it exactly, or creates one with `createOption`. In a single select, the selected value is also put into the search text on focus, so it can be edited. For string values. |
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
@@ -1663,6 +1666,7 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 | `disableClear` | `boolean` | — | Hides the remove button on the selected chips. |
 | `hidePrefix` | `boolean` | — | Hides the selected chips while the menu is open, leaving room to type. |
 | `createOption` | `((search: string) => Data \| Promise<Data \| undefined> \| undefined)` | — | Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. |
+| `labelGetter` | `((option: Data) => string)` | — | Gets an option's label for hiding the "New:" row when an option with the typed text exists — compared trimmed and lowercased. Defaults to an exact match on `valueGetter`. |
 | `hideOptionIcon` | `boolean` | — | Hides the check mark next to selected options in the menu. |
 | `createdData` | `Data[]` | — | Options to add to the loaded ones — for selected values the query does not return, such as ones created elsewhere. |
 | `searchModel` | `boolean` | — | Commits the typed text when the menu closes — selects the option matching it exactly, or creates one with `createOption`. In a single select, the selected value is also put into the search text on focus, so it can be edited. For string values. |
@@ -1794,6 +1798,7 @@ import WSelectStringified from 'eco-vue-js/dist/components/Select/WSelectStringi
 | `disableClear` | `boolean` | — | Hides the remove button on the selected chips. |
 | `hidePrefix` | `boolean` | — | Hides the selected chips while the menu is open, leaving room to type. |
 | `createOption` | `((search: string) => Data \| Promise<Data \| undefined> \| undefined)` | — | Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. |
+| `labelGetter` | `((option: Data) => string)` | — | Gets an option's label for hiding the "New:" row when an option with the typed text exists — compared trimmed and lowercased. Defaults to an exact match on `valueGetter`. |
 | `filterOptions` | `((option: Data) => boolean)` | — | Hides options for which it returns `false`. |
 | `hideOptionIcon` | `boolean` | — | Hides the check mark next to selected options in the menu. |
 | `createdData` | `Data[]` | — | Options to add to the loaded ones — for selected values the query does not return, such as ones created elsewhere. |
