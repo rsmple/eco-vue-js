@@ -282,26 +282,16 @@ const handleBeforeInput = (e: InputEvent) => {
   }
 
   if (e.inputType === 'insertText' && e.data && autoPairMap[e.data]) {
+    const {start, end} = getCaret()
+    if (start === end) return
+
     e.preventDefault()
 
-    const {start, end} = getCaret()
     const currentText = getCurrentText()
-    const closingChar = autoPairMap[e.data]
+    const newText = currentText.slice(0, start) + e.data + currentText.slice(start, end) + autoPairMap[e.data] + currentText.slice(end)
 
-    if (start !== end) {
-      const before = currentText.slice(0, start)
-      const selected = currentText.slice(start, end)
-      const after = currentText.slice(end)
-      const newText = before + e.data + selected + closingChar + after
-
-      emit('update:model-value', newText, true)
-      nextTick(() => setCaret(start + 1, end + 1))
-    } else {
-      const newText = currentText.slice(0, start) + e.data + closingChar + currentText.slice(start)
-
-      emit('update:model-value', newText, true)
-      nextTick(() => setCaret(start + 1))
-    }
+    emit('update:model-value', newText, true)
+    nextTick(() => setCaret(start + 1, end + 1))
   }
 }
 
