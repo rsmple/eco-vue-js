@@ -7,7 +7,7 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
     '*': {
       '--w-left-inner': 'calc(var(--left-margin, 0px) + var(--nav-bar-width, 0px) + var(--inner-margin, 0px))',
       '--w-right-inner': 'calc(var(--right-margin, 0px) + var(--actions-bar-width, 0px) + var(--inner-margin, 0px))',
-      '--w-width-inner': 'calc(100vw - var(--w-left-inner, 0px) - var(--w-right-inner, 0px))',
+      '--w-width-inner': 'calc(100vw - var(--scroll-bar-width, 0px) - var(--w-left-inner, 0px) - var(--w-right-inner, 0px))',
 
       '--w-top-inner': 'calc(var(--header-height, 0px) + var(--infinite-list-header-height, 0px))',
       '--w-bottom-inner': '0px',
