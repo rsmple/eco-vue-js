@@ -2,7 +2,7 @@
   <div
     v-if="isFailed"
     ref="state"
-    class="col-span-full"
+    class="w-infinite-list-state col-span-full"
   >
     <slot
       name="error"
@@ -73,7 +73,7 @@
   <div
     v-else
     ref="state"
-    class="col-span-full"
+    class="w-infinite-list-state col-span-full"
   >
     <slot name="empty">
       <div class="text-accent sm:left---left-inner sm:max-w---width-inner flex justify-center px-8 py-16 text-center font-normal sm:sticky">

@@ -775,8 +775,8 @@
       z-index: 1;
     }
 
-    .w-list-page-rows > :not(.w-list-item, .w-list-item-expansion, :has(.w-list-item)),
-    .w-list-page-rows :has(> .w-list-item) > :not(.w-list-item, .w-list-item-expansion) {
+    /* Named rather than matched as "not a row": a :has() over the rows restyles all of them whenever a page swaps. */
+    .w-list-page-rows :is(.w-list-group-heading, .w-infinite-list-state) {
       position: relative;
       z-index: 1;
     }
