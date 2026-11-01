@@ -1,5 +1,6 @@
 ---
 group: Recipes
+order: 1
 aside: false
 description: One WUniform form component split into WTabs, used as a step-by-step wizard to create an item, as tabs in a modal to edit it, and on a page where every field saves on its own — with its title and buttons in WModalWrapper, which the frame it opens in places.
 ---

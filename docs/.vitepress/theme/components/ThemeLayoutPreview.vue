@@ -10,7 +10,7 @@
       </div>
 
       <div
-        class="border-line-subtle grid gap-3 overflow-hidden rounded-xl border border-solid bg-(--w-canvas) bg-(image:--w-canvas-image) p-(--w-chrome-gap) [--inner-margin:0.75rem]"
+        class="surface-root border-line-subtle grid gap-3 overflow-hidden rounded-xl border border-solid bg-(--w-canvas) bg-(image:--w-canvas-image) p-(--w-chrome-gap) [--inner-margin:0.75rem]"
         :style="getLayoutStyle(layout.id)"
       >
         <div class="bg-chrome text-accent shadow-(--w-chrome-shadow) flex h-9 items-center rounded-(--w-chrome-rounded) border-(length:--w-chrome-border) border-solid border-line-subtle px-3 text-sm font-semibold backdrop-(--w-chrome-backdrop)">

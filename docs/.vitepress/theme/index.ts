@@ -13,6 +13,7 @@ import IconGallery from './components/IconGallery.vue'
 import NotifyPositionPlayground from './components/NotifyPositionPlayground.vue'
 import ThemeDataPreview from './components/ThemeDataPreview.vue'
 import ThemeLayoutPreview from './components/ThemeLayoutPreview.vue'
+import ThemeLayoutSwitch from './components/ThemeLayoutSwitch.vue'
 import ThemePlayground from './components/ThemePlayground.vue'
 import {installKitRouter} from './router'
 
@@ -48,5 +49,6 @@ export default {
     app.component('ThemePlayground', ThemePlayground)
     app.component('ThemeDataPreview', ThemeDataPreview)
     app.component('ThemeLayoutPreview', ThemeLayoutPreview)
+    app.component('ThemeLayoutSwitch', ThemeLayoutSwitch)
   },
 } satisfies Theme

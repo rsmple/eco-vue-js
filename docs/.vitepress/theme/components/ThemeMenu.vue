@@ -67,6 +67,14 @@
         <div class="my-2 border-t border-line-subtle" />
 
         <div class="text-xs mb-1 text-description font-semibold px-3">
+          Layout style
+        </div>
+
+        <ThemeLayoutSwitch class="w-button-h-8 w-button-rounded-lg mx-2 mt-1" />
+
+        <div class="my-2 border-t border-line-subtle" />
+
+        <div class="text-xs mb-1 text-description font-semibold px-3">
           Random theme
         </div>
 
@@ -148,6 +156,7 @@ import IconLink from 'eco-vue-js/dist/assets/icons/IconLink'
 import IconPalette from 'eco-vue-js/dist/assets/icons/IconPalette'
 import IconRefresh from 'eco-vue-js/dist/assets/icons/IconRefresh'
 
+import ThemeLayoutSwitch from './ThemeLayoutSwitch.vue'
 import ThemeSwatch from './ThemeSwatch.vue'
 
 import {PRESETS, RANDOM_STYLES, activeTheme, activeThemeId, getThemeCss, getThemeLink, hasCustomTokens, isRandomTheme, randomStyle, resetTheme, savedThemes, selectTheme, setPreset, setRandomTheme, themeConfig, themeTokens} from '../docsTheme'

@@ -54,7 +54,20 @@ A page holds two kinds of containers: a **section** ([WSection](/components/surf
   <ThemeLayoutPreview />
 </ClientOnly>
 
-Pick one under **Layout** in the playground; its radii and the bars' gap can be adjusted there. On phones the bars dock and sections span the screen in every style.
+Switch this site to one here, or from the theme menu in the header; the switch overrides only the theme's `layout`, and picking the preset again goes back to its own. Its radii and the bars' gap can be adjusted under **Layout** in the playground. On phones the bars dock and sections span the screen in every style.
+
+<div class="vp-raw max-w-80">
+  <ClientOnly>
+    <ThemeLayoutSwitch />
+  </ClientOnly>
+</div>
+
+What follows the switch on this site is what an app gets from the containers, with no code of its own per style:
+
+- **The bars**: the header and the nav are WHeaderBar and WNavBar, docked in flat and floating in card and glass.
+- **Docs pages**: a page is a stack of sections, one per heading and one per example (the demo with its code under it), and the outline is another. In flat they run together into one column as before; in card and glass they are separate surfaces on the canvas.
+- **The home page**: the hero's forms and the gallery's tiles are cards, and the footer is a section.
+- **A list page**: the [List page](/recipes/list-page) recipe ends in a list that scrolls with the window, which draws its own section.
 
 What paints the surface inside a container, such as sticky list columns, striped rows and soft tones, follows it, and a list that scrolls with the page draws its own section. The contrast checks hold in every container and style, measured against the color a section or card ends up as over the canvas; for glass that is over the plain canvas and over each spot of its gradient. The canvas itself is checked for main text only: in card and glass it carries the page's headings, and everything else goes in a section or a card.
 
@@ -294,6 +307,7 @@ To make a theme from a description — "a warm, rounded theme for a finance dash
 | --- | --- | --- | --- |
 | `layout` | `flat` | `card`, `glass` | The [layout style](#layout-styles), and with it the defaults below |
 | `w-section-rounded` | `0px` | `1.5rem` | Radius of sections |
+| `w-section-gap` | `0px` | `0.75rem` | Between sections in a `surface-stack`, such as the parts of a docs page |
 | `w-card-rounded` | `1rem` | `1rem` | Radius of cards |
 | `w-chrome-gap` | `0px` | `0.75rem` | Between the floating bars, the screen edges and the page; `0px` on phones |
 | `w-chrome-rounded` | `0px` | `1rem` | Radius of the floating header, nav and actions bar |

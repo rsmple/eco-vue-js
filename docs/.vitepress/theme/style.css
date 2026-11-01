@@ -140,11 +140,272 @@ body {
   margin-left: auto;
 }
 
-/* On phones VitePress runs code blocks to the screen edge with a fixed 24px; the gutter here is the inner margin. */
+/* The layout style contains the docs as it does an app's content. A page is split into sections (markdownSections.ts):
+   one per `##` and one per example, its demo and code. In flat they paint nothing and run together, so the page looks
+   as before; in card and glass they are separate surfaces on the canvas, their tops in line with the floating nav's.
+   The outline and the page footer are sections too. */
+#VPContent .VPDoc {
+  /* 1 where sections paint (card, glass), 0 in flat: the margins and rules a section's edge replaces scale by it. */
+  --docs-contained: min(1, var(--w-section-opacity) * 100);
+  --docs-flat: calc(1 - var(--docs-contained));
+  /* VitePress's top padding in flat, none when the bars float. */
+  --docs-top: calc(2rem * (1 - var(--w-chrome-float, 0)));
+
+  padding-top: var(--docs-top);
+
+  @media (width >= 48rem) {
+    --docs-top: calc(3rem * (1 - var(--w-chrome-float, 0)));
+  }
+}
+
+#VPContent .VPDoc .aside-container {
+  padding-top: calc(var(--w-header-inner) + var(--docs-top));
+}
+
+/* Contained, the outline is a section beside the text's: the bars' gap off the text's section, which reaches into the
+   gutter, and its right edge in line with the header's, in the gutter too. */
+#VPContent .VPDoc .aside {
+  padding-left: calc(32px * var(--docs-flat) + (var(--w-page-bleed, 0px) + var(--w-chrome-gap, 0px)) * var(--docs-contained));
+}
+
+/* Fixed, so sized by hand: the aside's width less its padding, plus the gutter it reaches into. */
+#VPContent .VPDoc :is(.aside-container, .aside-curtain) {
+  width: calc(var(--spacing-docs-aside-width) - 2rem * var(--docs-flat) - var(--w-chrome-gap, 0px) * var(--docs-contained));
+}
+
+#VPContent .VPDoc .vp-doc > div {
+  @apply surface-stack;
+}
+
+#VPContent .VPDoc .aside-content {
+  @apply surface-section;
+
+  /* Beside the text, not reaching into the page gutter, and as tall as the outline. */
+  --w-page-bleed: 0px;
+  min-height: 0;
+}
+
+#VPContent .VPDoc .VPDocFooter {
+  @apply surface-section;
+
+  margin-top: calc(4rem * var(--docs-flat) + var(--w-section-gap) * var(--docs-contained));
+}
+
+/* The fade under a long outline, painted as the canvas is: the gradient of a glass theme included. */
+#VPContent .VPDoc .aside-curtain {
+  background-color: var(--w-canvas);
+  background-image: var(--w-canvas-image);
+  background-attachment: fixed;
+  mask-image: linear-gradient(transparent, #000 70%);
+}
+
+/* A section's edge takes the place of the margins at its ends and of the rule above its heading. */
+#VPContent .vp-doc .docs-section > h2:first-child {
+  margin-top: calc(3rem * var(--docs-flat));
+  padding-top: calc(1.5rem * var(--docs-flat));
+  border-top-width: calc(1px * var(--docs-flat));
+}
+
+#VPContent .vp-doc .docs-section > :is(p, ul, ol, blockquote, .custom-block, div[class*="language-"]):first-child {
+  margin-top: calc(1rem * var(--docs-flat));
+}
+
+#VPContent .vp-doc .docs-section > :is(p, ul, ol, blockquote, .custom-block, div[class*="language-"]):last-child {
+  margin-bottom: calc(1rem * var(--docs-flat));
+}
+
+/* A code block right after another one sits closer to it, as VitePress places adjacent blocks. */
+#VPContent .vp-doc .docs-section:has(> div[class*="language-"]:last-child) + .docs-section > div[class*="language-"]:first-child {
+  margin-top: calc(-8px * var(--docs-flat));
+}
+
+#VPContent .vp-doc .docs-section > table:first-child {
+  margin-top: calc(20px * var(--docs-flat));
+}
+
+#VPContent .vp-doc .docs-section > table:last-child {
+  margin-bottom: calc(20px * var(--docs-flat));
+}
+
+/* An example is a section with no padding: the demo on top, painting the section's surface, the code under it. In flat
+   the demo keeps its own frame. */
+#VPContent .vp-doc .docs-example {
+  /* Its own padding only: the theme's section padding still holds for sections in a page demo. */
+  --w-frame-padding: 0px;
+
+  padding: 0;
+}
+
+#VPContent .vp-doc .docs-example > .demo {
+  --docs-example-rounded: calc(8px * var(--docs-flat) + var(--w-section-rounded) * var(--docs-contained));
+
+  margin-top: calc(1rem * var(--docs-flat));
+  border-width: calc(1px * var(--docs-flat));
+  border-radius: var(--docs-example-rounded) var(--docs-example-rounded) calc(8px * var(--docs-flat)) calc(8px * var(--docs-flat));
+  background: var(--w-surface);
+}
+
+/* A demo with no code under it rounds all its corners. */
+#VPContent .vp-doc .docs-example > .demo:last-child {
+  border-bottom-right-radius: var(--docs-example-rounded);
+  border-bottom-left-radius: var(--docs-example-rounded);
+}
+
+/* A demo of a page shows the page's own background. */
+#VPContent .vp-doc .docs-example > .demo-page {
+  background-color: var(--w-canvas);
+  background-image: var(--w-canvas-image);
+  background-attachment: fixed;
+}
+
+#VPContent .vp-doc .docs-example > div[class*="language-"] {
+  margin-top: calc(1rem * var(--docs-flat));
+}
+
+@media (width >= 40rem) {
+  #VPContent .vp-doc .docs-example > div[class*="language-"] {
+    --docs-example-rounded: calc(8px * var(--docs-flat) + var(--w-section-rounded) * var(--docs-contained));
+
+    border-radius: calc(8px * var(--docs-flat)) calc(8px * var(--docs-flat)) var(--docs-example-rounded) var(--docs-example-rounded);
+  }
+}
+
+/* A run of code blocks is a section of its own, with no padding: its code fills it to the edges, adjacent blocks
+   joined into one surface. In flat they keep their own margins and corners. */
+#VPContent .vp-doc .docs-code {
+  --w-frame-padding: 0px;
+
+  padding: 0;
+}
+
+#VPContent .vp-doc .docs-code > div[class*="language-"] {
+  margin-bottom: calc(1rem * var(--docs-flat));
+}
+
+#VPContent .vp-doc .docs-code > div[class*="language-"] + div[class*="language-"] {
+  margin-top: calc(-8px * var(--docs-flat));
+}
+
+#VPContent .vp-doc .docs-code > * + .vp-code-group {
+  margin-top: calc(1rem * var(--docs-flat));
+}
+
+/* Joined blocks keep a line between them. */
+#VPContent .vp-doc .docs-code > * + * {
+  border-top: calc(1px * var(--docs-contained)) solid var(--vp-c-divider);
+}
+
+/* A section that opens on a subheading, after code. */
+#VPContent .vp-doc .docs-section > h3:first-child {
+  margin-top: calc(32px * var(--docs-flat));
+}
+
+@media (width >= 40rem) {
+  #VPContent .vp-doc .docs-code {
+    --docs-code-rounded: calc(8px * var(--docs-flat) + var(--w-section-rounded) * var(--docs-contained));
+  }
+
+  /* A block, or a group's tabs and blocks: the corners at the section's edge take its rounding, the others none. */
+  #VPContent .vp-doc .docs-code > div[class*="language-"],
+  #VPContent .vp-doc .docs-code > .vp-code-group div[class*="language-"] {
+    border-radius: 0 0 calc(8px * var(--docs-flat)) calc(8px * var(--docs-flat));
+  }
+
+  #VPContent .vp-doc .docs-code > div[class*="language-"] {
+    border-top-left-radius: calc(8px * var(--docs-flat));
+    border-top-right-radius: calc(8px * var(--docs-flat));
+  }
+
+  #VPContent .vp-doc .docs-code > .vp-code-group .tabs {
+    border-radius: calc(8px * var(--docs-flat)) calc(8px * var(--docs-flat)) 0 0;
+  }
+
+  #VPContent .vp-doc .docs-code > div[class*="language-"]:first-child,
+  #VPContent .vp-doc .docs-code > .vp-code-group:first-child .tabs {
+    border-top-left-radius: var(--docs-code-rounded);
+    border-top-right-radius: var(--docs-code-rounded);
+  }
+
+  /* The language label clears the section's rounded corner. */
+  #VPContent .vp-doc .docs-code > div[class*="language-"]:first-child > span.lang {
+    top: calc(2px + var(--w-section-rounded) * 0.25 * var(--docs-contained));
+    right: calc(8px + var(--w-section-rounded) * 0.5 * var(--docs-contained));
+  }
+
+  #VPContent .vp-doc .docs-code > div[class*="language-"]:last-child,
+  #VPContent .vp-doc .docs-code > .vp-code-group:last-child div[class*="language-"] {
+    border-bottom-left-radius: var(--docs-code-rounded);
+    border-bottom-right-radius: var(--docs-code-rounded);
+  }
+}
+
+#VPContent .vp-doc .docs-section > .vp-code-group:first-child {
+  margin-top: calc(1rem * var(--docs-flat));
+}
+
+/* A group's blocks keep their bottom margin, which runs out through the group. */
+#VPContent .vp-doc .docs-section > .vp-code-group:last-child div[class*="language-"] {
+  margin-bottom: calc(1rem * var(--docs-flat));
+}
+
+/* A long code block shows its first lines, fading out over a button that shows all of it (markdownSections.ts). */
+.vp-doc .docs-code-long:not(:has(> .docs-code-more input:checked)) pre {
+  max-height: calc(1.25rem + 16 * var(--vp-code-line-height) * var(--vp-code-font-size));
+  overflow-y: hidden;
+  mask-image: linear-gradient(#000 calc(100% - 4rem), transparent);
+}
+
+.vp-doc .docs-code-more {
+  position: relative;
+  z-index: 2;
+  display: block;
+  padding: 0.25rem 1.5rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-align: center;
+  color: var(--vp-c-text-2);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.25s;
+
+  &:hover {
+    color: var(--vp-c-brand-1);
+  }
+
+  &:has(input:focus-visible) {
+    outline: 2px solid var(--vp-c-brand-1);
+    outline-offset: -2px;
+  }
+
+  & input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &:has(input:checked) .docs-code-show,
+  &:not(:has(input:checked)) .docs-code-hide {
+    display: none;
+  }
+}
+
+/* On phones VitePress runs code blocks to the screen edge with a fixed 24px; the gutter here is the inner margin. In an
+   example or a code section, which spans the screen itself, they stay in it. */
 @media (width < 40rem) {
   #VPContent .vp-doc div[class*="language-"],
   #VPContent .vp-doc .vp-code-group .tabs {
     margin-inline: calc(var(--inner-margin) * -1);
+  }
+
+  #VPContent .vp-doc .docs-example > div[class*="language-"],
+  #VPContent .vp-doc .docs-code div[class*="language-"],
+  #VPContent .vp-doc .docs-code .vp-code-group .tabs {
+    margin-inline: calc(var(--inner-margin) * -1 * var(--docs-flat));
+  }
+
+  #VPContent .vp-doc .docs-example > .demo {
+    margin-inline: calc(var(--docs-page-margin) * -1 * var(--docs-flat));
+    border-radius: 0;
   }
 }
 
@@ -202,4 +463,9 @@ body {
 .demo * {
   --w-width-inner: calc(var(--docs-demo-width, 100%) - var(--w-left-inner) - var(--w-right-inner));
   --w-height-inner: calc(var(--docs-demo-max-height) - var(--w-top-inner) - var(--w-bottom-inner));
+}
+
+/* The List page recipe: its text is a section as wide as the page, at the docs' text width. */
+.docs-list-page-text > * {
+  max-width: var(--spacing-docs-content-width);
 }

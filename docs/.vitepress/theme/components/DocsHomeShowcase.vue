@@ -276,7 +276,8 @@ import IconTrash from 'eco-vue-js/dist/assets/icons/IconTrash'
 
 import DocsHomeOptionTag, {type Tag} from './DocsHomeOptionTag.vue'
 
-const CARD_CLASS = 'border-line-subtle bg-surface-subtle/80 shadow-primary-dark/35 rounded-xl border p-4 shadow-[0_1.5rem_3rem_-1.5rem] backdrop-blur-md'
+// Cards as the layout style draws them, with the gallery tiles' padding.
+const CARD_CLASS = 'surface-card [--w-card-padding:1rem]'
 
 const TAG_OPTIONS: Tag[] = [
   {id: 1, name: 'tropical', tone: 'tone-data-green', icon: markRaw(IconPlant)},

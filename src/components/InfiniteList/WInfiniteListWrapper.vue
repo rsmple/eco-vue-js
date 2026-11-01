@@ -11,7 +11,7 @@
       'top-(--w-header-inner)': !isContained,
       'w-infinite-list-header': !isContained && !noHeaderUpdate,
       'w-infinite-list-header-stuck': !isContained && !noHeaderUpdate && isIntersecting === false,
-      'top-0 not-empty:pt-3': isContained && !isModal,
+      'top-0 not-empty:pt-(--w-list-contained-top,0.75rem)': isContained && !isModal,
       'top---modal-header-height': isModal,
       'bg-surface': noHeaderUpdate || isContained,
     }"
@@ -80,7 +80,8 @@ const isModal = inject(wIsModal, false)
 
 // Inside its own scroll container (a modal, or any WInfiniteListScrollingElement) the header sticks to that
 // container: it has its own background and leaves the page header alone. Outside a modal nothing sits above it,
-// so it keeps its own gap from the container's top edge.
+// so it keeps its own gap from the container's top edge: `--w-list-contained-top`, for a container whose padding it
+// should match.
 const isContained = isModal || inject(wScrollingElement, null) !== null
 
 // null until the observer reports, so the header padding is not applied before the real position is known

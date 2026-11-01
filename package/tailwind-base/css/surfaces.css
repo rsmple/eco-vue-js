@@ -39,6 +39,8 @@
     --w-section-border: 0px;
     --w-section-shadow: none;
     --w-section-backdrop: none;
+    /* Between the sections of a `surface-stack`: 0 runs them together into one column, as flat does. */
+    --w-section-gap: 0px;
 
     --w-card-opacity: 1;
     --w-card-padding: 1rem;
@@ -148,18 +150,60 @@
   border-radius: var(--w-card-rounded);
   box-shadow: var(--w-card-shadow);
   backdrop-filter: var(--w-card-backdrop);
+}
 
-  /* Inside a section or another card: opaque and flat, one step darker than what it sits on. */
-  :where(.surface-section, .surface-card) & {
-    --w-card-base: var(--w-surface-subtle);
-    --w-card-opacity: 1;
-    --w-card-border: 0px;
-    --w-card-shadow: none;
-    --w-card-backdrop: none;
+/*
+ * Sections one after another: a gap of `--w-section-gap` between them. Flat runs them together, so a page split into
+ * sections reads as one column there and as separate surfaces in card and glass. Block flow, not flex: in flat the
+ * sections paint nothing and their content's margins collapse across them as if they weren't there.
+ */
+@utility surface-stack {
+  & > * + * {
+    margin-top: var(--w-section-gap);
+  }
+}
+
+/*
+ * A new page inside a container, such as a preview of a page: sections and cards in it render as on the page, not as
+ * nested in the container around it.
+ */
+@utility surface-root {
+  --w-page-bleed: 0px;
+}
+
+/* Nesting, up to the closest `surface-root`. */
+@layer utilities {
+  /* A section in a section paints nothing: sections don't nest, its content is part of the outer one. */
+  @scope (.surface-section) to (.surface-root) {
+    :scope .surface-section {
+      --w-surface: inherit;
+      --w-frame-padding: inherit;
+
+      margin-inline: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background-color: transparent;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
   }
 
-  :where(.surface-card) & {
-    --w-card-base: var(--w-surface-muted);
+  /* A card in a section or another card: opaque and flat, one step darker than what it sits on. */
+  @scope (.surface-section, .surface-card) to (.surface-root) {
+    :scope .surface-card {
+      --w-card-base: var(--w-surface-subtle);
+      --w-card-opacity: 1;
+      --w-card-border: 0px;
+      --w-card-shadow: none;
+      --w-card-backdrop: none;
+    }
+  }
+
+  @scope (.surface-card) to (.surface-root) {
+    :scope .surface-card {
+      --w-card-base: var(--w-surface-muted);
+    }
   }
 }
 

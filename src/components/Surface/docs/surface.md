@@ -14,9 +14,9 @@ Both take a `title`, or a `title` slot, and an `actions` slot beside it. They do
 
 The same look without the component is the `surface-section` and `surface-card` classes. A list that scrolls with the page is a section of its own: put it on the page, not inside a `WSection`.
 
-<!-- @example Surface/Basic -->
+<!-- @example Surface/Basic page -->
 
-<DocsDemo name="Surface/Basic" />
+<DocsDemo name="Surface/Basic" page />
 
 ```vue
 <template>
@@ -71,6 +71,33 @@ const STATS = [
 ```
 
 <!-- @example-end -->
+
+## Sections in a row
+
+A long page splits into several sections, one per topic. Put them in `surface-stack`, and the theme's section gap (`--w-section-gap`) goes between them: `0` in flat, so the sections run together into one column, and a gap in card and glass, so they show as separate surfaces. In flat the sections paint nothing and their content's margins carry on across them, so the page looks the same as without the split. These docs are built this way: each page is a stack of sections, one per heading and one per example.
+
+```vue
+<template>
+  <div class="surface-stack">
+    <WSection title="Watering" />
+
+    <WSection title="Light" />
+  </div>
+</template>
+```
+
+## Nesting
+
+Sections don't nest. A section inside another one paints nothing and takes no padding: its content is part of the outer section. Cards do nest: a card in a section or in another card is filled and flat, one step darker than what it sits on.
+
+A preview of a page inside a container, such as a layout picker or a demo, is a page of its own: mark its box `surface-root`, and the sections and cards in it render as on a page, not nested in the container around it. It also keeps sections inside the box, not reaching into the page gutter.
+
+| Class | What it does |
+| --- | --- |
+| `surface-section` | A section; inside another section, nothing. |
+| `surface-card` | A card; inside a section or a card, one step darker. |
+| `surface-stack` | Sections one after another, `--w-section-gap` apart. |
+| `surface-root` | A page of its own: nesting starts over inside it. |
 
 ## API
 

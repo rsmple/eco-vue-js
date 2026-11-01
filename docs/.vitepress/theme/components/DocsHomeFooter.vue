@@ -1,56 +1,64 @@
 <template>
-  <footer class="mx-(--inner-margin) border-t border-line-subtle py-12 text-sm">
-    <div class="grid grid-cols-3 gap-10 md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
-      <div class="col-span-3 grid content-start gap-3 md:col-span-1">
-        <a
-          :href="withBase('/')"
-          class="inline-flex items-center gap-2.5"
-        >
-          <IconLogo class="size-7 tone-primary text-tone-fill" />
+  <!--
+    A section, as the layout style draws it, a gap off the screen's bottom when the bars float. The rule above it only
+    shows in flat, where the section paints nothing.
+  -->
+  <div class="px-(--inner-margin) pb-(--w-chrome-gap)">
+    <footer class="surface-section text-sm">
+      <div class="border-line-subtle border-t-[calc(1px*(1-var(--w-chrome-float,0)))] py-[calc(3rem*(1-var(--w-chrome-float,0)))]">
+        <div class="grid grid-cols-3 gap-10 md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
+          <div class="col-span-3 grid content-start gap-3 md:col-span-1">
+            <a
+              :href="withBase('/')"
+              class="inline-flex items-center gap-2.5"
+            >
+              <IconLogo class="size-7 tone-primary text-tone-fill" />
 
-          <span class="text-accent text-lg font-semibold tracking-tight">EcoVue</span>
-        </a>
+              <span class="text-accent text-lg font-semibold tracking-tight">EcoVue</span>
+            </a>
 
-        <p class="text-description max-w-xs leading-relaxed">
-          Vue 3 UI kit on Tailwind v4, with a shared eslint config for the apps that use it.
-        </p>
+            <p class="text-description max-w-xs leading-relaxed">
+              Vue 3 UI kit on Tailwind v4, with a shared eslint config for the apps that use it.
+            </p>
+          </div>
+
+          <nav
+            v-for="column in COLUMNS"
+            :key="column.title"
+            :aria-label="column.title"
+            class="grid content-start gap-2.5"
+          >
+            <span class="font-semibold">{{ column.title }}</span>
+
+            <a
+              v-for="link in column.links"
+              :key="link.text"
+              :href="isExternal(link.href) ? link.href : withBase(link.href)"
+              :target="isExternal(link.href) ? '_blank' : undefined"
+              :rel="isExternal(link.href) ? 'noopener' : undefined"
+              class="text-description hover:text-accent w-fit"
+            >
+              {{ link.text }}
+            </a>
+          </nav>
+        </div>
+
+        <div class="text-description mt-12 flex flex-wrap justify-between gap-x-6 gap-y-2 border-t border-line-subtle pt-6">
+          <span>Released under the MIT License.</span>
+
+          <span>
+            This site's shell is built with the kit —
+            <a
+              href="https://github.com/rsmple/eco-vue-js/blob/main/docs/.vitepress/theme/DocsLayout.vue"
+              target="_blank"
+              rel="noopener"
+              class="hover:text-accent underline underline-offset-2"
+            >see the layout</a>
+          </span>
+        </div>
       </div>
-
-      <nav
-        v-for="column in COLUMNS"
-        :key="column.title"
-        :aria-label="column.title"
-        class="grid content-start gap-2.5"
-      >
-        <span class="font-semibold">{{ column.title }}</span>
-
-        <a
-          v-for="link in column.links"
-          :key="link.text"
-          :href="isExternal(link.href) ? link.href : withBase(link.href)"
-          :target="isExternal(link.href) ? '_blank' : undefined"
-          :rel="isExternal(link.href) ? 'noopener' : undefined"
-          class="text-description hover:text-accent w-fit"
-        >
-          {{ link.text }}
-        </a>
-      </nav>
-    </div>
-
-    <div class="text-description mt-12 flex flex-wrap justify-between gap-x-6 gap-y-2 border-t border-line-subtle pt-6">
-      <span>Released under the MIT License.</span>
-
-      <span>
-        This site's shell is built with the kit —
-        <a
-          href="https://github.com/rsmple/eco-vue-js/blob/main/docs/.vitepress/theme/DocsLayout.vue"
-          target="_blank"
-          rel="noopener"
-          class="hover:text-accent underline underline-offset-2"
-        >see the layout</a>
-      </span>
-    </div>
-  </footer>
+    </footer>
+  </div>
 </template>
 
 <script lang="ts" setup>

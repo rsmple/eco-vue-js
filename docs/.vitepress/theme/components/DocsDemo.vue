@@ -3,11 +3,11 @@
     ref="element"
     class="demo vp-raw"
     :style="initialWidth ? {'--docs-demo-width': `${ initialWidth }px`} : undefined"
-    :class="overflow ? 'overflow-auto overscroll-contain max-h-(--docs-demo-max-height)' : overflowHidden ? 'overflow-hidden' : undefined"
+    :class="[overflow ? 'overflow-auto overscroll-contain max-h-(--docs-demo-max-height)' : overflowHidden ? 'overflow-hidden' : undefined, {'demo-page surface-root': page}]"
   >
     <div
       class="demo-content"
-      :class="overflow ? 'sm:px-(--inner-margin) py-(--inner-margin)' : 'p-(--inner-margin)'"
+      :class="overflow ? 'pb-(--inner-margin) [--w-list-contained-top:var(--inner-margin)] sm:px-(--inner-margin)' : 'p-(--inner-margin)'"
     >
       <ClientOnly v-if="component && clientOnly">
         <component :is="component" />
@@ -37,6 +37,11 @@ const props = defineProps<{
   clientOnly?: boolean
   overflow?: boolean
   overflowHidden?: boolean
+  /**
+   * For examples of page-level containers: the demo is a page of its own, on the canvas, so its sections and cards
+   * render as on a page instead of nested in the docs section around it.
+   */
+  page?: boolean
 }>()
 
 // Eager so demos render during SSR and their markup lands in the static HTML.

@@ -33,6 +33,7 @@ export const isLayoutId = (value: unknown): value is LayoutId => LAYOUTS.some(la
 const FLOATING: PresetTokens = {
   'w-section-rounded': '1.5rem',
   'w-section-padding': 'var(--inner-margin)',
+  'w-section-gap': '0.75rem',
   'w-page-bleed': 'var(--inner-margin)',
   'w-card-rounded': '1rem',
   'w-chrome-float': '1',
