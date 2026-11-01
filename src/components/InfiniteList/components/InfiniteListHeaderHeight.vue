@@ -90,7 +90,8 @@ onBeforeUnmount(() => {
   observer = null
 })
 
-watch(() => modalHeaderHeight?.value ?? headerHeightLayout.value, updateHeaderTop)
+// In another scroll container the page header has no part in where the header sticks.
+watch(() => modalHeaderHeight?.value ?? (scrollingElement ? 0 : headerHeightLayout.value), updateHeaderTop)
 
 defineSlots<{
   header: (props: InfiniteListHeaderScope) => VNode[]
