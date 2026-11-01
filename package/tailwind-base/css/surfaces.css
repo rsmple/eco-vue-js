@@ -268,6 +268,15 @@
     border: var(--w-chrome-border) solid var(--w-line-subtle);
     border-radius: var(--w-chrome-rounded);
     backdrop-filter: var(--w-chrome-backdrop, blur(8px));
+    /*
+     * Once the page settles the header turns translucent over what scrolls under it: docked, the overlay; floating,
+     * the chrome's own paint, opaque in card and translucent in glass.
+     */
+    --w-header-overlay: color-mix(
+      in oklab,
+      color-mix(in oklab, var(--w-chrome-base) calc(var(--w-chrome-opacity) * 100%), transparent) calc(var(--w-chrome-float) * 100%),
+      var(--w-overlay)
+    );
     box-shadow:
       var(--w-chrome-shadow),
       0 calc(var(--w-chrome-gap) * -1) 0 var(--w-chrome-gap) var(--w-chrome-ring);

@@ -74,7 +74,6 @@ export const LAYOUT_TOKENS: Record<LayoutId, PresetTokens> = {
     'w-card-shadow': 'var(--w-section-shadow)',
     'w-chrome-shadow': 'var(--w-section-shadow)',
     'w-chrome-bar-shadow': 'var(--w-chrome-shadow)',
-    'w-chrome-ring': 'var(--w-canvas)',
   },
   glass: {
     'role-canvas': 'oklch(from var(--color-primary) 0.96 0.04 h)',
