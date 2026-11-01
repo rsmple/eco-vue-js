@@ -83,6 +83,8 @@ export const LAYOUT_TOKENS: Record<LayoutId, PresetTokens> = {
     'role-card-dark': 'var(--role-surface-dark)',
     // A tinted surface takes the light gray of subtle lines down: a quarter of the way to `line`.
     'role-line-subtle': 'color-mix(in oklab, var(--color-gray-200), var(--color-gray-300) 25%)',
+    // In dark an opaque gray-700 outlines the translucent surface brighter than it: a faint white lets the glass show.
+    'role-line-subtle-dark': 'oklch(100% 0 0 / 0.12)',
     ...FLOATING,
     'w-canvas-image': [
       'radial-gradient(circle at 10% 10%, color-mix(in oklab, var(--color-primary) 18%, transparent), transparent 45%)',
