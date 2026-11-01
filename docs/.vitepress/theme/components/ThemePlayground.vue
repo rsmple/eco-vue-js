@@ -361,6 +361,7 @@ import {
   hasCustomTokens,
   isFullHueRange,
   isRandomTheme,
+  isTokenInLayout,
   loadTheme,
   parseThemeReply,
   randomHues,
@@ -380,11 +381,16 @@ import {confirmDeleteAllThemes, openSaveTheme} from '../themeConfirm'
 
 const ThemeNameModal = defineAsyncComponent(() => import('./ThemeNameModal.vue'))
 
-const allGroups = [...new Set(TOKENS.map(token => token.group))].map(name => ({name, description: ADVANCED_GROUPS[name], tokens: TOKENS.filter(token => token.group === name)}))
+// Tokens of another layout style than the one in use, such as the glass gradient's colors, are left out.
+const allGroups = computed(() => [...new Set(TOKENS.map(token => token.group))].map(name => ({
+  name,
+  description: ADVANCED_GROUPS[name],
+  tokens: TOKENS.filter(token => token.group === name && isTokenInLayout(token, themeTokens.value.layout)),
+})))
 
-const groups = allGroups.filter(group => !group.description)
+const groups = computed(() => allGroups.value.filter(group => !group.description))
 
-const advancedGroups = allGroups.filter(group => group.description)
+const advancedGroups = computed(() => allGroups.value.filter(group => group.description))
 
 const activePreset = computed(() => themeConfig.value.preset ?? 'default')
 

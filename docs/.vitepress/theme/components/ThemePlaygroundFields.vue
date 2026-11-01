@@ -65,6 +65,30 @@
           </div>
         </div>
 
+        <div
+          v-else-if="token.kind === 'noise'"
+          class="grid content-start gap-2"
+        >
+          <div class="text-sm font-semibold">
+            {{ token.label }}
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <WButton
+              v-for="level in NOISE_LEVELS"
+              :key="level.id"
+              :semantic-type="(themeTokens.noise ?? DEFAULT_TOKENS.noise) === level.id ? SemanticType.PRIMARY : SemanticType.SECONDARY"
+              @click="scopeField.updateModelValue(level.id)"
+            >
+              {{ level.name }}
+            </WButton>
+          </div>
+
+          <div class="text-description text-xs">
+            {{ token.description }}
+          </div>
+        </div>
+
         <WInput
           v-else
           v-bind="scopeField"
@@ -129,7 +153,7 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 import WSlider from 'eco-vue-js/dist/components/Slider/WSlider.vue'
 import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
-import {DEFAULT_TOKENS, LAYOUTS, NEUTRAL_SCALES, type TOKENS, type ThemeFormModel, type TokenKey, getTokenError, themeTokens} from '../docsTheme'
+import {DEFAULT_TOKENS, LAYOUTS, NEUTRAL_SCALES, NOISE_LEVELS, type TOKENS, type ThemeFormModel, type TokenKey, getTokenError, themeTokens} from '../docsTheme'
 
 const props = defineProps<{
   tokens: typeof TOKENS

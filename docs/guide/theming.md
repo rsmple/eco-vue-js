@@ -54,7 +54,7 @@ A page holds two kinds of containers: a **section** ([WSection](/components/surf
   <ThemeLayoutPreview />
 </ClientOnly>
 
-Switch this site to one here, or from the theme menu in the header; the switch overrides only the theme's `layout`, and picking the preset again goes back to its own. Its radii and the bars' gap can be adjusted under **Layout** in the playground. On phones the bars dock and sections span the screen in every style.
+Switch this site to one here, or from the theme menu in the header; the switch overrides only the theme's `layout`, and picking the preset again goes back to its own. Its radii and the bars' gap can be adjusted under **Layout** in the playground. The canvas is set under **Page background**: its color in either mode, the three colors of the glass gradient (the primary and two data hues by default; Randomize picks them for a glass theme) and a grain over it, in any style. On phones the bars dock and sections span the screen in every style.
 
 <div class="vp-raw max-w-80">
   <ClientOnly>

@@ -58,6 +58,45 @@ export const getCardDarkSurface = (l: number) => Math.max(l, Math.min(l + CARD_D
 
 const CARD_DARK_SURFACE_L = `max(l, min(calc(l + ${ CARD_DARK_LIFT }), ${ CARD_DARK_FLOOR }))`
 
+/**
+ * The spots of the glass canvas's gradient: where each sits, how much of its color it mixes in at its center and how
+ * far it fades out. Their colors are theme tokens, the primary and two data hues unless a theme sets its own.
+ */
+const CANVAS_SPOTS = [
+  {key: 'w-canvas-glow-1', at: '10% 10%', share: 18, size: 45},
+  {key: 'w-canvas-glow-2', at: '90% 30%', share: 14, size: 45},
+  {key: 'w-canvas-glow-3', at: '40% 90%', share: 14, size: 50},
+] as const
+
+export const CANVAS_GLOWS = {
+  'w-canvas-glow-1': 'var(--color-primary)',
+  'w-canvas-glow-2': 'var(--color-data-fuchsia)',
+  'w-canvas-glow-3': 'var(--color-data-teal)',
+} as const satisfies PresetTokens
+
+/**
+ * Grain over the page background, as glass themes often add so the blur reads: a 160px noise tile layered on top of
+ * the canvas's picture, fixed to the viewport with it, in any layout. `alpha` is how much of the noise shows. What
+ * repaints the canvas, such as a sticky column, can't blur it as a glass section does, so strong grain shows there.
+ */
+export const NOISE_LEVELS = [
+  {id: 'none', name: 'None', alpha: 0},
+  {id: 'subtle', name: 'Subtle', alpha: 0.22},
+  {id: 'strong', name: 'Strong', alpha: 0.4},
+] as const
+
+export type NoiseId = typeof NOISE_LEVELS[number]['id']
+
+export const isNoiseId = (value: unknown): value is NoiseId => NOISE_LEVELS.some(level => level.id === value)
+
+const getNoiseImage = (id: string | undefined) => {
+  const alpha = NOISE_LEVELS.find(level => level.id === id)?.alpha
+
+  if (!alpha) return undefined
+
+  return `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 ${ alpha } 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
+}
+
 /** The tokens each layout sets; the theme's own override them. Flat is the kit's defaults. */
 export const LAYOUT_TOKENS: Record<LayoutId, PresetTokens> = {
   flat: {},
@@ -85,11 +124,8 @@ export const LAYOUT_TOKENS: Record<LayoutId, PresetTokens> = {
     // In dark an opaque gray-700 outlines the translucent surface brighter than it: a faint white lets the glass show.
     'role-line-subtle-dark': 'oklch(100% 0 0 / 0.12)',
     ...FLOATING,
-    'w-canvas-image': [
-      'radial-gradient(circle at 10% 10%, color-mix(in oklab, var(--color-primary) 18%, transparent), transparent 45%)',
-      'radial-gradient(circle at 90% 30%, color-mix(in oklab, var(--color-data-fuchsia) 14%, transparent), transparent 45%)',
-      'radial-gradient(circle at 40% 90%, color-mix(in oklab, var(--color-data-teal) 14%, transparent), transparent 50%)',
-    ].join(', '),
+    ...CANVAS_GLOWS,
+    'w-canvas-image': CANVAS_SPOTS.map(spot => `radial-gradient(circle at ${ spot.at }, color-mix(in oklab, var(--${ spot.key }) ${ spot.share }%, transparent), transparent ${ spot.size }%)`).join(', '),
     // Translucent enough for the gradient to tint through, with a light top edge catching the light as glass does.
     'w-section-opacity': '0.4',
     'w-section-border': '1px',
@@ -113,18 +149,13 @@ export const LAYOUT_TOKENS: Record<LayoutId, PresetTokens> = {
  * its gradient's spots, where it is darkest or most colored. Text on the canvas and on glass is checked over each.
  */
 export const getCanvasSamples = (layout: string | undefined, canvas: string) => layout === 'glass'
-  ? [
-    canvas,
-    `color-mix(in srgb, var(--color-primary) 18%, ${ canvas })`,
-    `color-mix(in srgb, var(--color-data-fuchsia) 14%, ${ canvas })`,
-    `color-mix(in srgb, var(--color-data-teal) 14%, ${ canvas })`,
-  ]
+  ? [canvas, ...CANVAS_SPOTS.map(spot => `color-mix(in srgb, var(--${ spot.key }) ${ spot.share }%, ${ canvas })`)]
   : [canvas]
 
 /**
  * Keys are CSS variable names without `--`: `color-*` and `role-*` go in the app's `@theme`, `w-*` on `body`.
  * `neutral` names a scale from `NEUTRAL_SCALES` and becomes the `gray-*` colors, `layout` one of `LAYOUTS` and the
- * tokens it sets.
+ * tokens it sets, `noise` one of `NOISE_LEVELS` and the grain it layers over `w-canvas-image`.
  */
 export type PresetTokens = Record<string, string>
 
@@ -192,8 +223,11 @@ export type PresetId = typeof PRESETS[number]['id']
  * `default-dark` fixed, since apps that set their own `gray-900` use the two as different surfaces.
  */
 export const expandTokens = (tokens: PresetTokens): [key: string, value: string][] => {
-  const {layout, ...rest} = tokens
+  const {layout, noise, ...rest} = tokens
   const expanded: PresetTokens = {...isLayoutId(layout) ? LAYOUT_TOKENS[layout] : {}, ...rest}
+  const noiseImage = getNoiseImage(noise)
+
+  if (noiseImage) expanded['w-canvas-image'] = expanded['w-canvas-image'] ? `${ noiseImage }, ${ expanded['w-canvas-image'] }` : noiseImage
 
   return Object.entries(expanded).flatMap(([key, value]): [string, string][] => {
     if (key !== 'neutral') return [[key, value]]
@@ -625,6 +659,28 @@ const getStatusTokens = (
   return null
 }
 
+/** How far from the primary's hue the other two spots of a random glass canvas turn, one each way round. */
+const GLOW_HUE_OFFSET = [50, 150] as const
+
+/** The lightness of a random spot color: a mid-tone, which tints the canvas about as much in light and dark mode. */
+const GLOW_LIGHTNESS_L = 0.68
+
+/**
+ * The glass canvas's second and third spots for a random theme: hues turned away from the primary's either way, in
+ * the style's saturation. The first spot stays the primary.
+ */
+const getCanvasGlows = (hue: number, saturation: number, style: RandomStyle, random: () => number): PresetTokens => {
+  const [min, max] = GLOW_HUE_OFFSET
+  const hues = [1, -1].map(direction => Math.round(hue + direction * (min + random() * (max - min)) + 360) % 360)
+  const [second, third] = hues.map(item => {
+    const c = Math.min(maxChroma(GLOW_LIGHTNESS_L, item) * saturation, style.maxChroma)
+
+    return `oklch(${ (GLOW_LIGHTNESS_L * 100).toFixed(1) }% ${ c.toFixed(3) } ${ item })`
+  })
+
+  return {'w-canvas-glow-2': second, 'w-canvas-glow-3': third}
+}
+
 /**
  * A theme from one random primary in a style from `RANDOM_STYLES`, the status tones that go with it in the same style,
  * the neutral scale that suits its hue, and a size with a radius, in `layout` when given. The primary's hue is taken from `hues`. The primary's lightness is picked where the fill
@@ -673,6 +729,8 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', hues: HueRange
 
     const size = pick(SIZES, random)
     const radius = pick(RADII, random)
+    // Drawn last, so the rest of the theme stays the same when a random theme is made again for glass.
+    const glows = layout === 'glass' ? getCanvasGlows(hue, saturation, style, random) : {}
 
     return {
       ...layout ? {layout} : {},
@@ -689,6 +747,7 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', hues: HueRange
       'w-button-rounded': rem(Math.min(radius * 1.5, size.height / 2)),
       'w-list-header-height': rem(size.header),
       'w-list-header-rounded': rem(Math.min(radius * 1.5, size.header / 2)),
+      ...glows,
     }
   }
 }

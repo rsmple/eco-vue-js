@@ -3,9 +3,9 @@ import {computed, ref, shallowRef, toRaw, watch} from 'vue'
 import rolesCss from '../../../package/tailwind-base/css/roles.css?raw'
 import themeCss from '../../../package/tailwind-base/css/theme.css?raw'
 import {THEME_STORAGE_KEY as STORAGE_KEY, THEME_STYLE_ID as STYLE_ID} from '../themeHeadScript'
-import {FULL_HUE_RANGE, type HueRange, LAYOUTS, LAYOUT_TOKENS, NEUTRAL_SCALES, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, expandTokens, getHueGradient, getHueSwatch, getLayoutRules, getRandomTokens, getThemeBlock, isFullHueRange, isHueRange, isLayoutId, isNeutralScale, isRandomStyleId} from '../themePresets'
+import {CANVAS_GLOWS, FULL_HUE_RANGE, type HueRange, LAYOUTS, LAYOUT_TOKENS, type LayoutId, NEUTRAL_SCALES, NOISE_LEVELS, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, expandTokens, getHueGradient, getHueSwatch, getLayoutRules, getRandomTokens, getThemeBlock, isFullHueRange, isHueRange, isLayoutId, isNeutralScale, isNoiseId, isRandomStyleId} from '../themePresets'
 
-export {FULL_HUE_RANGE, type HueRange, LAYOUTS, NEUTRAL_SCALES, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, getHueGradient, getHueSwatch, isFullHueRange}
+export {FULL_HUE_RANGE, type HueRange, LAYOUTS, NEUTRAL_SCALES, NOISE_LEVELS, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, getHueGradient, getHueSwatch, isFullHueRange}
 
 type PaletteKey =
   | 'color-primary' | 'color-primary-dark' | 'color-primary-light' | 'color-primary-darkest'
@@ -45,7 +45,9 @@ type ShapeKey = 'w-input-height' | 'w-input-rounded' | 'w-input-gap' | 'w-button
 
 type LayoutKey = 'w-inner-margin' | 'w-inner-margin-sm' | 'w-section-rounded' | 'w-section-gap' | 'w-card-padding' | 'w-card-rounded' | 'w-chrome-gap' | 'w-chrome-rounded'
 
-export type TokenKey = PaletteKey | 'neutral' | `role-${ RoleName }` | `role-${ RoleName }-dark` | ShapeKey | 'layout' | LayoutKey | 'font-sans'
+type CanvasKey = 'role-canvas' | 'role-canvas-dark' | keyof typeof CANVAS_GLOWS | 'noise'
+
+export type TokenKey = PaletteKey | 'neutral' | `role-${ RoleName }` | `role-${ RoleName }-dark` | ShapeKey | 'layout' | LayoutKey | CanvasKey | 'font-sans'
 
 /**
  * The px a size slider runs through: from `min` to `max`, or for a radius to half of the `pillOf` height, where it
@@ -53,7 +55,8 @@ export type TokenKey = PaletteKey | 'neutral' | `role-${ RoleName }` | `role-${ 
  */
 type SizeRange = {min: number, max: number} | {min: number, pillOf: ShapeKey}
 
-type Token = {key: TokenKey, group: string, label: string, description?: string, kind: 'color' | 'neutral' | 'layout' | 'size' | 'font', range?: SizeRange}
+/** `layouts`: the layout styles a token has an effect in; the playground shows it only in those. */
+type Token = {key: TokenKey, group: string, label: string, description?: string, kind: 'color' | 'neutral' | 'layout' | 'noise' | 'size' | 'font', range?: SizeRange, layouts?: LayoutId[]}
 
 const HEIGHT_RANGE: SizeRange = {min: 24, max: 56}
 
@@ -110,6 +113,12 @@ export const TOKENS: Token[] = [
   {key: 'w-card-rounded', group: 'Layout', label: 'Card radius', description: 'Tiles and stat cards', kind: 'size', range: {min: 0, max: 32}},
   {key: 'w-chrome-gap', group: 'Layout', label: 'Bar gap', description: 'Between the floating bars, the screen edges and the page; 0 on phones', kind: 'size', range: {min: 0, max: 24}},
   {key: 'w-chrome-rounded', group: 'Layout', label: 'Bar radius', description: 'The floating header, nav and actions bar', kind: 'size', range: {min: 0, max: 32}},
+  {key: 'role-canvas', group: 'Page background', label: 'Page background', description: 'Under sections and cards in card and glass; the surface in flat', kind: 'color'},
+  {key: 'role-canvas-dark', group: 'Page background', label: 'Page background, dark mode', kind: 'color'},
+  {key: 'w-canvas-glow-1', group: 'Page background', label: 'Gradient, top left', description: 'Tints the glass canvas from its corner', kind: 'color', layouts: ['glass']},
+  {key: 'w-canvas-glow-2', group: 'Page background', label: 'Gradient, right', kind: 'color', layouts: ['glass']},
+  {key: 'w-canvas-glow-3', group: 'Page background', label: 'Gradient, bottom', kind: 'color', layouts: ['glass']},
+  {key: 'noise', group: 'Page background', label: 'Grain', description: 'Noise over the page background, so a glass blur reads', kind: 'noise'},
   {key: 'font-sans', group: 'Font', label: 'Font family', description: 'Only MontSerrat is loaded on this site; other families must be installed locally', kind: 'font'},
 ]
 
@@ -140,6 +149,10 @@ export const DEFAULT_TOKENS: Record<TokenKey, string> = {
   'w-card-rounded': '1rem',
   'w-chrome-gap': '0px',
   'w-chrome-rounded': '0px',
+  'role-canvas': 'var(--role-surface)',
+  'role-canvas-dark': 'var(--role-surface-dark)',
+  ...CANVAS_GLOWS,
+  noise: 'none',
 }
 
 /** The defaults of a theme's layout, over the site's: what an unset layout token falls back to. */
@@ -161,7 +174,7 @@ const MATH_FUNCTIONS = ['calc', 'min', 'max', 'clamp', 'var']
  * than filtered out: no quotes outside font names, so no strings for `image-set()` and the like to load, only the listed
  * functions, and no comments, which could swallow the end of the rule.
  */
-const VALUE_RULES: Record<Exclude<Token['kind'], 'neutral' | 'layout'>, {pattern: RegExp, functions: string[], property: string, error: string}> = {
+const VALUE_RULES: Record<Exclude<Token['kind'], 'neutral' | 'layout' | 'noise'>, {pattern: RegExp, functions: string[], property: string, error: string}> = {
   color: {
     pattern: /^[\w #%.,+*/()-]+$/,
     functions: ['rgb', 'rgba', 'hsl', 'hsla', 'hwb', 'lab', 'lch', 'oklab', 'oklch', 'color', 'color-mix', 'light-dark', ...MATH_FUNCTIONS],
@@ -188,6 +201,7 @@ export const getTokenError = (key: TokenKey, value: string): string | undefined 
 
   if (kind === 'neutral') return isNeutralScale(value) ? undefined : `Not a neutral scale: one of ${ Object.keys(NEUTRAL_SCALES).join(', ') }`
   if (kind === 'layout') return isLayoutId(value) ? undefined : `Not a layout style: one of ${ LAYOUTS.map(layout => layout.id).join(', ') }`
+  if (kind === 'noise') return isNoiseId(value) ? undefined : `Not a grain: one of ${ NOISE_LEVELS.map(level => level.id).join(', ') }`
   if (!kind) return 'Unknown token'
   if (value.length > VALUE_MAX_LENGTH) return `At most ${ VALUE_MAX_LENGTH } characters`
 
@@ -206,6 +220,9 @@ export const getTokenError = (key: TokenKey, value: string): string | undefined 
 
 export const isTokenKey = (key: string): key is TokenKey => TOKEN_KINDS.has(key)
 
+/** Whether a token has an effect in a layout style: the glass gradient's colors only in glass. */
+export const isTokenInLayout = (token: Token, layout: string | undefined) => !token.layouts || token.layouts.includes((layout ?? DEFAULT_TOKENS.layout) as LayoutId)
+
 export const findPreset = (id: string | undefined) => PRESETS.find(preset => preset.id === id)
 
 /** Keeps the known preset and tokens with valid values; drops everything else. */
@@ -223,6 +240,8 @@ export const normalizeConfig = (value: unknown): ThemeConfig => {
       if (isNeutralScale(item)) config.neutral = item
     } else if (key === 'layout') {
       if (isLayoutId(item)) config.layout = item
+    } else if (key === 'noise') {
+      if (isNoiseId(item) && item !== 'none') config.noise = item
     } else if (isTokenKey(key) && typeof item === 'string' && item.trim() && !getTokenError(key, item.trim())) {
       config[key] = item.trim()
     }
@@ -322,8 +341,9 @@ const RANDOM_HUES_STORAGE_KEY = 'eco-vue-docs-random-hues'
 export const randomHues = ref<HueRange>(FULL_HUE_RANGE)
 
 /**
- * A random primary and status tones in `randomStyle` with the neutral scale, size and radius that go with them; see
- * `getRandomTokens`. The layout style and its sizes stay as they are: a theme is generated for the layout in use.
+ * A random primary and status tones in `randomStyle` with the neutral scale, size and radius that go with them, and the
+ * glass canvas's gradient; see `getRandomTokens`. The layout style, its sizes and the grain stay as they are: a theme
+ * is generated for the layout in use.
  */
 export const setRandomTheme = () => {
   randomSource = {style: randomStyle.value, hues: randomHues.value, draws: []}
@@ -338,7 +358,7 @@ const makeRandomTheme = () => {
 
   const {style, hues, draws} = randomSource
   const tokens = getTokens(themeConfig.value)
-  const layoutTokens = Object.fromEntries(TOKENS.filter(token => token.group === 'Layout' && tokens[token.key]).map(token => [token.key, tokens[token.key]]))
+  const layoutTokens = Object.fromEntries(TOKENS.filter(token => (token.group === 'Layout' || token.key === 'noise') && tokens[token.key]).map(token => [token.key, tokens[token.key]]))
   const layout = isLayoutId(tokens.layout) ? tokens.layout : undefined
   let index = 0
   // The same draws in the same order, and new ones past them where the new layout asks for more.
@@ -477,6 +497,7 @@ export const getThemePrompt = (description: string, config: ThemeConfig) => {
     '',
     'Rules:',
     '- Colors as oklch(L% C H). "neutral" is one of: ' + Object.keys(NEUTRAL_SCALES).join(', ') + '.',
+    '- "noise" is one of: ' + NOISE_LEVELS.map(level => level.id).join(', ') + '. The w-canvas-glow-* colors tint the glass layout\'s page background only.',
     '- "layout" is one of: ' + LAYOUTS.map(layout => `${ layout.id } (${ layout.look.toLowerCase() })`).join(', ') + '. Its sizes are set only to change the layout\'s own.',
     '- Primary and the status colors are fills under black or white text, whichever reads better by APCA: white on fills with less luminance than a gray of L 71%, so a saturated purple or blue at L 65% still takes white. A fill with white text needs 3:1 contrast with the page, in light mode against the background and in dark mode against the dark background, and its text APCA Lc 60. Avoid fills right at the switch, where neither text reaches it. Keep status fills with white text near Lc 68, no deeper than Lc 70, so they don\'t outweigh the content beside them. When one value cannot pass in both modes, set its -dark variant.',
     '- Readable text, focus rings and soft backgrounds are derived from these fills, so don\'t ask for more colors to get them.',
@@ -522,11 +543,12 @@ export const parseThemeReply = (text: string): ThemeConfig | undefined => {
  */
 export const getThemeCss = (tokens: ThemeTokens) => {
   const effective = {...DEFAULT_TOKENS, ...getLayoutDefaults(tokens), ...tokens}
-  const changed = Object.fromEntries(TOKENS.filter(token => !token.key.startsWith('w-') && token.kind !== 'layout' && effective[token.key] !== DEFAULT_TOKENS[token.key]).map(token => [token.key, effective[token.key]]))
+  const changed = Object.fromEntries(TOKENS.filter(token => !token.key.startsWith('w-') && token.kind !== 'layout' && token.kind !== 'noise' && effective[token.key] !== DEFAULT_TOKENS[token.key]).map(token => [token.key, effective[token.key]]))
   const theme = getThemeBlock({...changed, ...tokens.layout ? {layout: tokens.layout} : {}})
+  // The grain is a picture, so `w-canvas-image` below carries it: expanded with the rest of the layout's tokens.
   // The playground's sizes, and the rest of what the layout sets, such as its opacities and shadows.
   const body = {
-    ...Object.fromEntries(TOKENS.filter(token => token.key.startsWith('w-')).map(token => [token.key, effective[token.key]])),
+    ...Object.fromEntries(TOKENS.filter(token => token.key.startsWith('w-') && isTokenInLayout(token, effective.layout)).map(token => [token.key, effective[token.key]])),
     ...Object.fromEntries(expandTokens(tokens).filter(([key]) => key.startsWith('w-') && !TOKEN_KINDS.has(key))),
   }
   const rules = getLayoutRules(tokens)
