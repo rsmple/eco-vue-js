@@ -20,6 +20,8 @@
   --color-canvas: var(--w-canvas);
   /* The bars' paint: the surface, translucent in a glass theme. */
   --color-chrome: color-mix(in oklab, var(--w-chrome-base) calc(var(--w-chrome-opacity) * 100%), transparent);
+  /* A dropdown's paint (`surface-dropdown`), for what draws in it besides the frame, such as a popover's tip (`tone-dropdown`). */
+  --color-dropdown: color-mix(in oklab, var(--w-surface-raised) calc(var(--w-dropdown-opacity, calc((1 + var(--w-card-opacity)) / 2)) * 100%), transparent);
 }
 
 @layer base {
@@ -159,6 +161,20 @@
   border-radius: var(--w-card-rounded);
   box-shadow: var(--w-card-shadow);
   backdrop-filter: var(--w-card-backdrop);
+}
+
+/*
+ * A dropdown or popover: the raised surface, glass where cards are. Unless a theme sets its own, it takes the cards' blur, and their
+ * opacity halfway to opaque, since it lies over content rather than the canvas: 1 stays 1, a glass card's 0.4 is 0.7.
+ * The fallbacks resolve here, so a theme setting the card tokens on `body` reaches it. Inside, `--w-surface` is the
+ * opaque color it ends up as over the canvas, as in a section, for the soft tones and sticky parts in it.
+ */
+@utility surface-dropdown {
+  --w-dropdown-opacity-resolved: var(--w-dropdown-opacity, calc((1 + var(--w-card-opacity)) / 2));
+  --w-surface: color-mix(in oklab, var(--w-surface-raised) calc(var(--w-dropdown-opacity-resolved) * 100%), var(--w-canvas));
+
+  background-color: color-mix(in oklab, var(--w-surface-raised) calc(var(--w-dropdown-opacity-resolved) * 100%), transparent);
+  backdrop-filter: var(--w-dropdown-backdrop, var(--w-card-backdrop));
 }
 
 /*

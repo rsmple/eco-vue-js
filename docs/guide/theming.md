@@ -314,4 +314,6 @@ To make a theme from a description — "a warm, rounded theme for a finance dash
 
 A layout also sets the canvas and card roles (`role-canvas`, `role-card`) and the `w-section-*`, `w-card-*` and `w-chrome-*` opacity, edge, shadow and blur variables; **Copy CSS** lists them.
 
+Dropdowns and popovers follow the cards: they take `w-card-backdrop` as their blur, and `w-card-opacity` halfway to opaque, since they lie over content rather than the page background. Glass cards at `0.4` make dropdowns at `0.7`; flat and card stay opaque. A theme sets `w-dropdown-opacity` and `w-dropdown-backdrop` to change them on their own.
+
 The kit has more `w-*` variables for single components, such as `w-list-padding` and `w-modal-wrapper-rounded`; the playground covers the ones that shape the whole app.
