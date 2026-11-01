@@ -326,11 +326,25 @@ export const randomHues = ref<HueRange>(FULL_HUE_RANGE)
  * `getRandomTokens`. The layout style and its sizes stay as they are: a theme is generated for the layout in use.
  */
 export const setRandomTheme = () => {
+  randomSource = {style: randomStyle.value, hues: randomHues.value, draws: []}
+  makeRandomTheme()
+}
+
+/** What the random theme in use was made from: replayed to make the same theme again for another layout. */
+let randomSource: {style: RandomStyleId, hues: HueRange, draws: number[]} | null = null
+
+const makeRandomTheme = () => {
+  if (!randomSource) return
+
+  const {style, hues, draws} = randomSource
   const tokens = getTokens(themeConfig.value)
   const layoutTokens = Object.fromEntries(TOKENS.filter(token => token.group === 'Layout' && tokens[token.key]).map(token => [token.key, tokens[token.key]]))
   const layout = isLayoutId(tokens.layout) ? tokens.layout : undefined
+  let index = 0
+  // The same draws in the same order, and new ones past them where the new layout asks for more.
+  const random = () => draws[index++] ??= Math.random()
 
-  randomConfig.value = normalizeConfig({...layoutTokens, ...getRandomTokens(randomStyle.value, randomHues.value, Math.random, layout)})
+  randomConfig.value = normalizeConfig({...layoutTokens, ...getRandomTokens(style, hues, random, layout)})
   loadTheme(randomConfig.value)
 }
 
@@ -393,6 +407,7 @@ export const deleteAllThemes = () => {
 
 /** Sets one token; an empty or invalid value, or the one the preset already gives, removes the override. */
 export const setToken = (key: TokenKey, value: string) => {
+  const wasRandom = isRandomTheme.value
   const config = {...themeConfig.value}
 
   delete config[key]
@@ -401,6 +416,9 @@ export const setToken = (key: TokenKey, value: string) => {
   const trimmed = value.trim()
 
   themeConfig.value = trimmed && !getTokenError(key, trimmed) && trimmed !== base[key] ? {...config, [key]: trimmed} : config
+
+  // A random theme is made for its layout: a new layout makes it again for that one, and it stays the random theme.
+  if (wasRandom && key === 'layout') makeRandomTheme()
 }
 
 /** The playground form's model: every token as typed, empty when unset. */
