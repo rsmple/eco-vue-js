@@ -258,7 +258,7 @@ import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type Ref, type StyleValue, computed, inject, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef} from 'vue'
+import {type Ref, type StyleValue, computed, inject, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
@@ -444,14 +444,27 @@ const pageContentRef = useTemplateRef('pageContent')
 
 let resizeObserver: ResizeObserver | null = null
 
-onMounted(() => {
-  if (!isPage || !pageContentRef.value) return
+// The rows, not the content around them: the list fits its spacers to the rows as it observes them, and a box above
+// them that resizes in that same pass is one WebKit reports as a ResizeObserver loop. Only the rows of a table have
+// sticky columns.
+const observeRows = () => {
+  resizeObserver?.disconnect()
 
-  resizeObserver = new ResizeObserver(() => {
+  const rows = isGrid.value ? null : pageContentRef.value?.querySelector('.w-list-page-rows')
+  if (!rows) return
+
+  resizeObserver ??= new ResizeObserver(() => {
     isRepaint.value = !isRepaint.value
   })
 
-  resizeObserver.observe(pageContentRef.value)
+  resizeObserver.observe(rows)
+}
+
+onMounted(() => {
+  if (!isPage) return
+
+  observeRows()
+  watch(isGrid, observeRows, {flush: 'post'})
 })
 
 onBeforeUnmount(() => {
