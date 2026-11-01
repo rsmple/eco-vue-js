@@ -229,6 +229,13 @@ body {
   mask-image: linear-gradient(transparent, #000 70%);
 }
 
+/* The heading's permalink follows its text instead of hanging in the gutter, which a card's padding leaves no room for,
+   at an offset VitePress ties to a top padding the card drops. */
+#VPContent .vp-doc :is(h1, h2, h3, h4, h5, h6) .header-anchor {
+  position: static;
+  margin-left: 0;
+}
+
 /* A section's edge takes the place of the margins at its ends and of the rule above its heading. */
 #VPContent .vp-doc .docs-section > h2:first-child {
   margin-top: calc(3rem * var(--docs-flat));
