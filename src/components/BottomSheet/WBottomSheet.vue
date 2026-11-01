@@ -34,7 +34,8 @@
 
       <slot name="footer" />
 
-      <div class="absolute top-full h-screen w-full bg-inherit" />
+      <!-- Under the sheet when it is pulled up past its end. Opaque, as its blur couldn't reach the page from inside the sheet: the sheet's surface, which is a glass sheet's color over the page background. -->
+      <div class="bg-surface absolute top-full h-screen w-full" />
 
       <!-- Clicks inside the sheet stop at its content, so any click that reaches the document landed outside. -->
       <WClickOutside
@@ -87,9 +88,11 @@ defineExpose({
   hide: (): Promise<void> => dismissableRef.value?.hide() ?? Promise.resolve(),
 })
 
+// Without the backdrop the page stays in view, as around a dropdown, and the sheet takes a dropdown's paint: glass in a glass theme.
+// Over the dimmed backdrop it stays opaque: that already blurs the page, and the sheet would only show its tint.
 const contentClass = computed(() => [
-  'bg-surface grid-cols-[1fr] grid-rows-[auto_1fr_auto] rounded-t-3xl shadow-md relative grid',
+  'grid-cols-[1fr] grid-rows-[auto_1fr_auto] rounded-t-3xl shadow-md relative grid',
   props.compact ? 'max-h-[90%]' : 'height-[90%]',
-  props.noOverlay ? 'pointer-events-auto border-t border-solid border-line-raised' : '',
+  props.noOverlay ? 'surface-dropdown pointer-events-auto border-t border-solid border-line-raised' : 'bg-surface',
 ].join(' '))
 </script>

@@ -217,7 +217,7 @@
                     :field="index"
                   >
                     <template #default="scopeTask">
-                      <div class="grid grid-cols-[1fr_10rem_auto] items-end gap-2">
+                      <div class="grid grid-cols-[1fr_10rem_auto] items-end gap-2 mb-4">
                         <WUniform
                           v-bind="scopeTask"
                           field="title"
@@ -229,6 +229,7 @@
                               v-bind="scopeField"
                               :hide-title="index !== 0"
                               required
+                              no-margin
                             />
                           </template>
                         </WUniform>
@@ -244,6 +245,7 @@
                               v-bind="scopeField"
                               :hide-title="index !== 0"
                               required
+                              no-margin
                             />
                           </template>
                         </WUniform>
@@ -251,7 +253,7 @@
                         <WButton
                           :semantic-type="SemanticType.SECONDARY"
                           :disabled="scopeTasks.readonly || scopeTasks.submitting || scopeTasks.skeleton"
-                          class="mb-4 w-(--w-input-height)"
+                          class="w-(--w-input-height)"
                           @click="scopeTasks.unselect(item)"
                         >
                           <IconClose class="square-4" />
