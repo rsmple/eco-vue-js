@@ -347,7 +347,7 @@
     --w-surface: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), var(--w-canvas));
     --w-section-paint: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), transparent);
     --w-band-start: calc(var(--w-left-inner) - var(--w-section-padding));
-    --w-band-end: calc(100vw - var(--w-right-inner) + var(--w-section-padding));
+    --w-band-end: calc(100vw - var(--vw-scroll-bar-width, 0px) - var(--w-right-inner) + var(--w-section-padding));
     --w-page-backdrop:
       linear-gradient(
         to right,

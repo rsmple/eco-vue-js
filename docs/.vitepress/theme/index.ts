@@ -5,6 +5,7 @@ import CopyOrDownloadAsMarkdownButtons from 'vitepress-plugin-llms/vitepress-com
 
 import {preventDragFile} from '@/utils/preventDragFile'
 import {setQueryClient} from '@/utils/queryClient'
+import {appendScrollbarStyles} from '@/utils/scrollbarStyles'
 
 import DocsLayout from './DocsLayout.vue'
 import DocsDemo from './components/DocsDemo.vue'
@@ -29,6 +30,9 @@ if (browserQueryClient) setQueryClient(browserQueryClient)
 
 // File drop zones light up while a file is dragged over the page, and a file dropped beside them isn't opened.
 preventDragFile()
+
+// As in an app: the page's inner width leaves out the scrollbar gutter where 100vw counts it.
+appendScrollbarStyles()
 
 export default {
   extends: DefaultTheme,
