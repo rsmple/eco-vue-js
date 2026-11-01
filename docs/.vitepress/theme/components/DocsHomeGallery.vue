@@ -1,5 +1,5 @@
 <template>
-  <section class="sm:px-(--inner-margin) pb-20 sm:pb-28">
+  <section class="pb-20 sm:pb-28">
     <div class="sm-not:px-(--inner-margin)">
       <p class="text-accent text-sm font-semibold tracking-[0.2em] uppercase">
         Try them

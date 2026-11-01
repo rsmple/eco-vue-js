@@ -67,8 +67,17 @@
 
   body {
     background-color: var(--w-canvas);
+  }
+
+  /* The picture on its own layer fixed to the viewport: a fixed background on the body moves with the page's
+     overscroll bounce, a fixed element stays put. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
     background-image: var(--w-canvas-image);
-    background-attachment: fixed;
+    pointer-events: none;
   }
 }
 
