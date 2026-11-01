@@ -288,11 +288,20 @@ body {
   border-bottom-left-radius: var(--docs-example-rounded);
 }
 
-/* A demo of a page shows the page's own background. */
+/* A demo of a page is a `surface-root` well: the page's own background with a line around it in every style, not only
+   in flat, so it reads apart from the canvas around the docs' sections. Where the section draws its own edge (glass),
+   the well doesn't repeat it: only the line above the code is its own. */
 #VPContent .vp-doc .docs-example > .demo-page {
+  border-width: max(0px, 1px - var(--w-section-border));
+  border-bottom-width: 1px;
+  border-color: var(--w-line-subtle);
   background-color: var(--w-canvas);
   background-image: var(--w-canvas-image);
   background-attachment: fixed;
+}
+
+#VPContent .vp-doc .docs-example > .demo-page:last-child {
+  border-bottom-width: max(0px, 1px - var(--w-section-border));
 }
 
 #VPContent .vp-doc .docs-example > div[class*="language-"] {

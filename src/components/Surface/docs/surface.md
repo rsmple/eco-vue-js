@@ -92,7 +92,7 @@ When the groups should read apart in flat too, such as the steps of a setup or t
 
 Sections don't nest. A section inside another one paints nothing and takes no padding: it is a part of the outer section. A `WSection` there gets a smaller heading, one level down, and a part that follows other content gets a line above it, `--w-subsection-divide` (`1rem`) over its content. Cards do nest: a card in a section or in another card is filled and flat, one step darker than what it sits on.
 
-A preview of a page inside a container, such as a layout picker or a demo, is a page of its own: mark its box `surface-root`, and the sections and cards in it render as on a page, not nested in the container around it. It also keeps sections inside the box, not reaching into the page gutter.
+A preview of a page inside a container, such as a layout picker or a demo, is a page of its own: mark its box `surface-root`, and the sections and cards in it render as on a page, not nested in the container around it. It also keeps sections inside the box, not reaching into the page gutter. The box is a well of the page's own background, the theme's gradient included, with a line around it in every layout style, so it reads apart from the page it sits on.
 
 | Class | What it does |
 | --- | --- |
@@ -100,7 +100,7 @@ A preview of a page inside a container, such as a layout picker or a demo, is a 
 | `surface-card` | A card; inside a section or a card, one step darker. |
 | `surface-stack` | Sections one after another, `--w-section-gap` apart. |
 | `surface-stack-divided` | The same, with a line between the sections in flat. |
-| `surface-root` | A page of its own: nesting starts over inside it. |
+| `surface-root` | A page of its own in a well of the page background: nesting starts over inside it. |
 
 ## API
 

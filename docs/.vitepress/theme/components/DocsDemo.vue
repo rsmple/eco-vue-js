@@ -39,7 +39,8 @@ const props = defineProps<{
   overflowHidden?: boolean
   /**
    * For examples of page-level containers: the demo is a page of its own, on the canvas, so its sections and cards
-   * render as on a page instead of nested in the docs section around it.
+   * render as on a page instead of nested in the docs section around it. Use it for every demo that shows a page built
+   * of sections and cards, not for a single component or a list in a box.
    */
   page?: boolean
 }>()

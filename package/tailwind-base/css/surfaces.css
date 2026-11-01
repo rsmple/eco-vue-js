@@ -221,10 +221,19 @@
 
 /*
  * A new page inside a container, such as a preview of a page: sections and cards in it render as on the page, not as
- * nested in the container around it.
+ * nested in the container around it. It is a well of the page's own background — the canvas and its picture, fixed to
+ * the viewport as the page's is — with a line around it in every style: on a page that already shows the canvas, as a
+ * card or glass page does around its sections, the line is what tells the preview apart.
  */
 @utility surface-root {
   --w-page-bleed: 0px;
+
+  background-color: var(--w-canvas);
+  background-image: var(--w-canvas-image);
+  background-attachment: fixed;
+  border: 1px solid var(--w-line-subtle);
+  border-radius: var(--w-section-rounded);
+  box-shadow: inset 0 1px 4px rgb(0 0 0 / 0.12);
 }
 
 /* Nesting, up to the closest `surface-root`. */
