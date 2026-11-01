@@ -1,6 +1,5 @@
 ---
 group: Data
-aside: false
 description: WList — paginated, sortable collections shown as a table on desktop and cards on mobile, with one field component per column.
 ---
 

@@ -1,7 +1,6 @@
 ---
 group: Recipes
 order: 4
-aside: false
 description: A settings page split into WSection groups that read apart in every layout style — separate surfaces in card and glass, lines between them in flat — with steps, parts inside a group, hints, an inner card and a Save under the group.
 ---
 
@@ -18,6 +17,8 @@ description: A settings page split into WSection groups that read apart in every
 | A `WSection` inside a section | A part of the group: it paints nothing, its heading is smaller and one level down, and a line sits above it when content comes before it. |
 | `WInfoCard`, `WCard` inside a section | A hint or a block of its own, one step darker than the section. |
 | `footer` slot | Buttons under the group's content, past a line, such as the group's Save. |
+
+## Try it
 
 Switch the layout style in the header's theme menu to see the same page in each.
 
@@ -182,5 +183,7 @@ const notifyHeat = ref(false)
 ```
 
 <!-- @example-end -->
+
+## Spacing in flat
 
 The space in flat is `--w-stack-divide` (`2rem`) between groups and `--w-subsection-divide` (`1rem`) above a part, for a page that needs it tighter or looser.

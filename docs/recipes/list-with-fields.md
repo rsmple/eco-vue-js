@@ -1,7 +1,6 @@
 ---
 group: Recipes
 order: 2
-aside: false
 description: Build a paginated, sortable, searchable WList on a createRestModelApi model, with one component per column, filters kept in the URL, an expansion row, a row menu and bulk actions that call the model's actions — the pattern used for every data table in eco-vue-js apps.
 ---
 
