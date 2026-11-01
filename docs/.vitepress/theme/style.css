@@ -24,7 +24,7 @@
 }
 
 @theme {
-  --spacing-nav-bar-width: 15rem;
+  --spacing-nav-bar-width: 15.5rem;
   --spacing-docs-max-width: 92rem;
   --spacing-docs-content-width: 56rem;
   --spacing-docs-aside-width: 16rem;
@@ -490,7 +490,96 @@ body {
   --w-height-inner: calc(var(--docs-demo-max-height) - var(--w-top-inner) - var(--w-bottom-inner));
 }
 
-/* The List page recipe: its text is a section as wide as the page, at the docs' text width. */
-.docs-list-page-text > * {
-  max-width: var(--spacing-docs-content-width);
+/* The List page recipe: the list runs the page's width; above it the text and its outline take the places they have on
+   a doc page. The row keeps the page's width while the list grows the main area, and stays in place, as a section
+   does, when the list scrolls the window sideways. The outline stays beside the text while it is in view. */
+.docs-list-page-intro {
+  --docs-contained: min(1, var(--w-section-opacity) * 100);
+  --docs-flat: calc(1 - var(--docs-contained));
+
+  display: flex;
+  align-items: flex-start;
+  max-width: var(--w-width-inner);
+
+  :root:has(.w-list.w-list-page) & {
+    @variant sm {
+      position: sticky;
+      left: var(--w-left-inner);
+    }
+  }
+}
+
+.docs-list-page-text {
+  /* The text's column, which the section reaches past into the gutter and toward the outline. */
+  --docs-list-page-bleed: calc(var(--w-page-bleed, 0px) * 2);
+
+  flex: 0 1 calc(var(--spacing-docs-content-width) + var(--docs-list-page-bleed));
+  min-width: 0;
+}
+
+.docs-list-page-outline {
+  display: none;
+}
+
+@media (width >= 80rem) {
+  .docs-list-page-text {
+    max-width: calc(
+      min(var(--spacing-docs-content-width), 100% - var(--spacing-docs-aside-width)) + var(--docs-list-page-bleed)
+    );
+  }
+
+  /* As the outline of a doc page: a gap off the text's section, which reaches into the gutter, and its right edge in
+     the gutter too, in line with the header's. */
+  .docs-list-page-outline.surface-section {
+    position: sticky;
+    top: var(--w-header-inner);
+    display: block;
+    flex: none;
+    width: calc(var(--spacing-docs-aside-width) - 2rem * var(--docs-flat) - var(--w-chrome-gap, 0px) * var(--docs-contained));
+    margin-left: auto;
+  }
+}
+
+.docs-page-outline-content {
+  position: relative;
+  border-left: 1px solid var(--vp-c-divider);
+  padding-left: 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.docs-page-outline-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 2.2857143;
+}
+
+.docs-page-outline-link {
+  display: block;
+  overflow: hidden;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 2.2857143;
+  color: var(--vp-c-text-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.5s;
+
+  &:hover,
+  &.docs-page-outline-link-active {
+    color: var(--vp-c-text-1);
+    transition: color 0.25s;
+  }
+
+  /* VitePress's marker, on the link instead of moved between them. */
+  &.docs-page-outline-link-active::before {
+    content: "";
+    position: absolute;
+    left: -1px;
+    width: 2px;
+    height: 1.125rem;
+    margin-top: 0.4375rem;
+    border-radius: 2px;
+    background-color: var(--vp-c-brand-1);
+  }
 }

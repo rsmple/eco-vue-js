@@ -365,6 +365,8 @@
 
   /* On the item, not the nav: the nav's content has a fixed width. Docked, xl and up, items run to the edge. */
   .w-nav-bar .w-nav-item-inset {
+    /* Floating, the active marker sits in the middle of this inset, clear of the nav's edge and of the item. */
+    padding-inline-start: calc(0.5rem + var(--w-chrome-float) * 0.25rem);
     padding-inline-end: calc(var(--w-chrome-float) * 0.5rem);
 
     @variant xl-not {
@@ -374,7 +376,7 @@
 
   .w-nav-item-indicator {
     inset-block: calc(var(--w-chrome-float) * 0.5rem);
-    left: calc(var(--w-chrome-float) * 0.125rem);
+    left: calc(var(--w-chrome-float) * 0.25rem);
     height: auto;
     border-radius: calc(var(--w-chrome-float) * 9999px);
   }

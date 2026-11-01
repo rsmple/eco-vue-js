@@ -11,6 +11,8 @@ description: A page whose WList scrolls with the window — a sticky toolbar und
 <div class="w-page-pb">
 <div class="grid grid-cols-[minmax(0,1fr)] gap-6 pb-6">
 
+<div class="docs-list-page-intro">
+
 <section class="surface-section vp-doc docs-list-page-text">
 
 # List page
@@ -87,6 +89,12 @@ Switch the layout style, then scroll the list below: down past its toolbar, and 
 
 </section>
 
+<ClientOnly>
+  <DocsPageOutline selector=".docs-list-page-text" class="docs-list-page-outline surface-section" />
+</ClientOnly>
+
+</div>
+
 </div>
 
 <ClientOnly>
@@ -98,5 +106,6 @@ Switch the layout style, then scroll the list below: down past its toolbar, and 
 </div>
 
 <script setup>
+import DocsPageOutline from '../.vitepress/theme/components/DocsPageOutline.vue'
 import ListPage from '../examples/recipes/list-page/ListPage.vue'
 </script>
