@@ -2,3 +2,7 @@ upgrade: true
 reject:
   # TS 7 (native compiler) is not yet supported by typescript-eslint (<6.1.0) — remove when it is
   - typescript
+  # 3.3.12+ appends `.value` to non-ref bindings in narrowing positions (imported enums, null-inferred consts) — remove when fixed upstream
+  - vue-tsc
+  - vue-component-meta
+  - "@vue/language-core"

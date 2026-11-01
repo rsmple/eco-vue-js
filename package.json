@@ -57,6 +57,7 @@
     "@types/node": "26.6.6",
     "@types/postcss-import": "14.0.3",
     "@vitejs/plugin-vue": "6.0.10",
+    "@vue/language-core": "3.3.11",
     "@vue/tsconfig": "0.9.1",
     "autoprefixer": "10.6.2",
     "eslint": "10.14.0",
@@ -73,9 +74,9 @@
     "vite-plugin-dts": "5.1.2",
     "vitepress": "2.0.0-alpha.20",
     "vitepress-plugin-llms": "1.14.0",
-    "vue-component-meta": "3.3.14",
+    "vue-component-meta": "3.3.11",
     "vue-router": "5.4.0",
-    "vue-tsc": "3.3.14"
+    "vue-tsc": "3.3.11"
   },
   "type": "module",
   "files": [
