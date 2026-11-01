@@ -45,7 +45,7 @@
             <WRouterLink
               v-if="item.to"
               :to="item.to"
-              class="hover:text-accent max-w-64 truncate no-underline transition-colors"
+              class="hover:text-accent max-w-64 truncate no-underline"
             >
               <template v-if="getRouteTitleShort(item) !== undefined">
                 {{ getRouteTitleShort(item) }}
