@@ -1,6 +1,6 @@
 <template>
   <div class="vp-raw grid gap-8">
-    <div class="grid gap-3 rounded-xl border border-solid border-line-subtle p-4">
+    <div class="grid min-w-0 gap-3 rounded-xl border border-solid border-line-subtle p-4">
       <div class="flex items-center gap-2 font-semibold">
         <div class="flex gap-2 items-center mr-auto">
           <ThemeSwatch :config="themeConfig" />
@@ -79,7 +79,7 @@
         </WButton>
       </div>
 
-      <details>
+      <details class="min-w-0">
         <summary class="text-description cursor-pointer text-sm font-semibold">
           CSS
         </summary>
