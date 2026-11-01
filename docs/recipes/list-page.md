@@ -59,7 +59,7 @@ While a page list is on the page, page content sticks to the page's left inset a
   <div class="grid gap-6">
     <WSection title="Plants" />
 
-    <div class="sm:w-page-bleed grid grid-cols-2 gap-(--w-chrome-gap,1rem) lg:grid-cols-4">
+    <div class="sm:w-page-bleed grid grid-cols-2 gap-3 lg:grid-cols-4">
       <WCard
         v-for="stat in stats"
         :key="stat.title"

@@ -1,6 +1,6 @@
 <template>
   <div class="vp-raw grid gap-6">
-    <div class="sm:w-page-bleed grid grid-cols-2 gap-(--w-chrome-gap,1rem) lg:grid-cols-4">
+    <div class="sm:w-page-bleed grid grid-cols-2 gap-3 lg:grid-cols-4">
       <WCard
         v-for="stat in STATS"
         :key="stat.title"
