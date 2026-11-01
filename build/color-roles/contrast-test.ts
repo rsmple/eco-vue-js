@@ -10,7 +10,7 @@
  *
  * Fails when a pair is under its minimum; `--report` prints every pair without failing. `--presets` also checks every
  * docs theme preset, with the CSS the playground gives an app. `--random` checks 12 themes of each style of the
- * playground's Random button, from a fixed seed so a failure repeats.
+ * playground's Random button, from a fixed seed so a failure repeats, in each layout in turn.
  *
  * A theme with a card or glass layout is also checked on the page background, in a section and in a card, as the
  * surface they end up as over the canvas. For glass that is over the plain canvas and over each spot of its gradient.
@@ -23,7 +23,7 @@ import {chromium} from 'playwright-core'
 import {readFileSync} from 'node:fs'
 import {fileURLToPath} from 'node:url'
 
-import {PRESETS, type PresetTokens, RANDOM_STYLES, expandTokens, getCanvasSamples, getRandomTokens, getThemeBlock} from '../../docs/.vitepress/themePresets.ts'
+import {LAYOUTS, PRESETS, type PresetTokens, RANDOM_STYLES, expandTokens, getCanvasSamples, getRandomTokens, getThemeBlock} from '../../docs/.vitepress/themePresets.ts'
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url))
 const CSS_DIR = ROOT + 'package/tailwind-base/css/'
@@ -126,8 +126,9 @@ const seeded = (seed: number) => () => {
 const getSeededThemes = (count: number) => {
   const random = seeded(1)
 
-  return RANDOM_STYLES.flatMap(style => Array.from({length: count}, () => {
-    const tokens = getRandomTokens(style.id, undefined, random)
+  // Each style in every layout in turn: card lifts the dark surfaces, glass mixes the containers with its canvas.
+  return RANDOM_STYLES.flatMap(style => Array.from({length: count}, (_, index) => {
+    const tokens = getRandomTokens(style.id, undefined, random, LAYOUTS[index % LAYOUTS.length].id)
 
     return {name: `random ${ style.id } ${ getThemeBlock(tokens).split('\n').filter(line => !line.includes('gray-')).join(' ') }`, tokens}
   }))

@@ -71,11 +71,15 @@ const BEDS = [
  */
 const getLayoutStyle = (id: LayoutId) => {
   const tokens = Object.fromEntries(expandTokens({layout: id}))
-  const mode = (key: string, fallback: string) => `light-dark(${ tokens[key] ?? `var(--${ fallback })` }, ${ tokens[key + '-dark'] ?? `var(--${ fallback }-dark)` })`
+  // A role the layout sets itself, such as card's lifted dark surface, is read from the layout, not from `:root`.
+  const resolve = (value: string) => value.replace(/var\(--(role-[\w-]+)\)/g, (match, key: string) => tokens[key] ?? match)
+  const mode = (key: string, fallback: string) => `light-dark(${ resolve(tokens[key] ?? `var(--${ fallback })`) }, ${ resolve(tokens[key + '-dark'] ?? `var(--${ fallback }-dark)`) })`
 
   return {
     ...Object.fromEntries(Object.entries(tokens).filter(([key]) => key.startsWith('w-')).map(([key, value]) => [`--${ key }`, value])),
     '--w-canvas': mode('role-canvas', 'role-surface'),
+    '--w-section-base': mode('role-surface', 'role-surface'),
+    '--w-chrome-base': mode('role-surface', 'role-surface'),
     '--w-card-base': mode('role-card', 'role-surface-subtle'),
     '--w-line-subtle': mode('role-line-subtle', 'role-line-subtle'),
     '--w-page-bleed': '0px',

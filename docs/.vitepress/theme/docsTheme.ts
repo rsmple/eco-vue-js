@@ -315,9 +315,16 @@ const RANDOM_HUES_STORAGE_KEY = 'eco-vue-docs-random-hues'
 /** The hues a random primary is taken from. Remembered in this browser. */
 export const randomHues = ref<HueRange>(FULL_HUE_RANGE)
 
-/** A random primary and status tones in `randomStyle` with the neutral scale, size and radius that go with them; see `getRandomTokens`. */
+/**
+ * A random primary and status tones in `randomStyle` with the neutral scale, size and radius that go with them; see
+ * `getRandomTokens`. The layout style and its sizes stay as they are: a theme is generated for the layout in use.
+ */
 export const setRandomTheme = () => {
-  randomConfig.value = normalizeConfig(getRandomTokens(randomStyle.value, randomHues.value))
+  const tokens = getTokens(themeConfig.value)
+  const layoutTokens = Object.fromEntries(TOKENS.filter(token => token.group === 'Layout' && tokens[token.key]).map(token => [token.key, tokens[token.key]]))
+  const layout = isLayoutId(tokens.layout) ? tokens.layout : undefined
+
+  randomConfig.value = normalizeConfig({...layoutTokens, ...getRandomTokens(randomStyle.value, randomHues.value, Math.random, layout)})
   loadTheme(randomConfig.value)
 }
 

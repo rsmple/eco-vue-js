@@ -106,6 +106,12 @@ body {
   margin-bottom: 0;
 }
 
+/* In flat the page has no canvas or shadow to set the home page's cards off, so they take an outline. Not the cards
+   nested in them, which stay flat fills. */
+#VPContent .VPHome .surface-card:not(.surface-card .surface-card) {
+  border-width: max(var(--w-card-border), calc(1px * (1 - min(1, var(--w-section-opacity) * 100))));
+}
+
 /* Content starts at the app's inner margin, like a page in a kit app, so it lines up with the header title. */
 #VPContent .VPDoc {
   padding-inline: var(--inner-margin);

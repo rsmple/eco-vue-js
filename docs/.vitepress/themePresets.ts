@@ -42,12 +42,30 @@ const FLOATING: PresetTokens = {
   'w-nav-height': 'auto',
 }
 
+/**
+ * Card in dark mode: the page is a step darker than the surface. Below about 0.2 a darker page can't show, it is
+ * black either way, so there the surface steps up off the theme's background instead, by `CARD_DARK_LIFT` up to
+ * `CARD_DARK_FLOOR`, and the page keeps the background: Neon's near-black page with its cards lifted off it.
+ */
+const CARD_DARK_LIFT = 0.08
+
+const CARD_DARK_FLOOR = 0.2
+
+const CARD_DARK_STEP = 0.035
+
+/** The card layout's dark surface lightness for a dark background of lightness `l`, as `role-surface-dark` computes it. */
+export const getCardDarkSurface = (l: number) => Math.max(l, Math.min(l + CARD_DARK_LIFT, CARD_DARK_FLOOR))
+
+const CARD_DARK_SURFACE_L = `max(l, min(calc(l + ${ CARD_DARK_LIFT }), ${ CARD_DARK_FLOOR }))`
+
 /** The tokens each layout sets; the theme's own override them. Flat is the kit's defaults. */
 export const LAYOUT_TOKENS: Record<LayoutId, PresetTokens> = {
   flat: {},
   card: {
     'role-canvas': 'oklch(from var(--role-surface) calc(l - 0.015) c h)',
-    'role-canvas-dark': 'oklch(from var(--role-surface-dark) calc(l - 0.035) c h)',
+    'role-surface-dark': `oklch(from var(--color-default-dark) ${ CARD_DARK_SURFACE_L } c h)`,
+    'role-surface-raised-dark': 'oklch(from var(--role-surface-dark) calc(l + 0.04) c h)',
+    'role-canvas-dark': `oklch(from var(--color-default-dark) min(l, calc(${ CARD_DARK_SURFACE_L } - ${ CARD_DARK_STEP })) c h)`,
     'role-card': 'var(--role-surface)',
     'role-card-dark': 'var(--role-surface-dark)',
     ...FLOATING,
@@ -71,19 +89,20 @@ export const LAYOUT_TOKENS: Record<LayoutId, PresetTokens> = {
       'radial-gradient(circle at 90% 30%, color-mix(in oklab, var(--color-data-fuchsia) 14%, transparent), transparent 45%)',
       'radial-gradient(circle at 40% 90%, color-mix(in oklab, var(--color-data-teal) 14%, transparent), transparent 50%)',
     ].join(', '),
-    'w-section-opacity': '0.85',
+    // Translucent enough for the gradient to tint through, with a light top edge catching the light as glass does.
+    'w-section-opacity': '0.4',
     'w-section-border': '1px',
-    'w-section-shadow': '0 8px 32px -8px var(--w-shadow)',
+    'w-section-shadow': '0 8px 32px -8px var(--w-shadow), inset 0 1px 0 0 light-dark(oklch(100% 0 0 / 0.7), oklch(100% 0 0 / 0.08))',
     // No saturate(): what repaints the canvas inside a page list (sticky columns, masks) can't reproduce it.
     'w-section-backdrop': 'blur(24px)',
-    'w-card-opacity': '0.85',
+    'w-card-opacity': '0.4',
     'w-card-border': '1px',
     'w-card-shadow': 'var(--w-section-shadow)',
     'w-card-backdrop': 'var(--w-section-backdrop)',
     'w-chrome-border': '1px',
     'w-chrome-shadow': 'var(--w-section-shadow)',
     'w-chrome-bar-shadow': 'var(--w-chrome-shadow)',
-    'w-chrome-opacity': '0.55',
+    'w-chrome-opacity': '0.5',
     'w-chrome-backdrop': 'var(--w-section-backdrop)',
   },
 }
@@ -540,14 +559,23 @@ const getShadow = (style: RandomStyle): PresetTokens => {
   }
 }
 
-/** The style's dark background and the surfaces on it, in the tint of the neutral scale's 900; none for Vivid. */
+/**
+ * The style's dark background, in the tint of the neutral scale's 900, and the surfaces on it as steps up from the
+ * surface, so they follow it where a layout lifts it off the background; none for Vivid.
+ */
 const getDarkSurfaces = (neutral: NeutralScale, style: RandomStyle): PresetTokens => {
   if (!style.dark) return {}
 
   const [, chroma, hue] = NEUTRAL_SCALES[neutral][9].split(' ')
-  const [surface, subtle, muted, inset] = style.dark.map(l => `oklch(${ +(l * 100).toFixed(1) }% ${ chroma } ${ hue })`)
+  const [background, ...steps] = style.dark
+  const [subtle, muted, inset] = steps.map(l => `oklch(from var(--role-surface-dark) calc(l + ${ +(l - background).toFixed(3) }) c h)`)
 
-  return {'color-default-dark': surface, 'role-surface-subtle-dark': subtle, 'role-surface-muted-dark': muted, 'role-surface-inset-dark': inset}
+  return {
+    'color-default-dark': `oklch(${ +(background * 100).toFixed(1) }% ${ chroma } ${ hue })`,
+    'role-surface-subtle-dark': subtle,
+    'role-surface-muted-dark': muted,
+    'role-surface-inset-dark': inset,
+  }
 }
 
 const toColor = (fill: Fill, hue: number) => `oklch(${ (fill.l * 100).toFixed(1) }% ${ fill.c.toFixed(3) } ${ hue })`
@@ -598,14 +626,14 @@ const getStatusTokens = (
 
 /**
  * A theme from one random primary in a style from `RANDOM_STYLES`, the status tones that go with it in the same style,
- * the neutral scale that suits its hue, and a size with a radius. The primary's hue is taken from `hues`. The primary's lightness is picked where the fill
+ * the neutral scale that suits its hue, and a size with a radius, in `layout` when given. The primary's hue is taken from `hues`. The primary's lightness is picked where the fill
  * passes the contrast checks on a white page and stays near the hue's peak chroma; when it fails on the dark page, the
  * nearest fill that passes there becomes `color-primary-dark`. A yellow or lime primary is a light fill with black text,
  * as warning is, and the status tones turn light with it. A hue that holds less chroma on a white page than the style
  * asks takes the most it has there. They follow with
  * `getStatusTokens`, each keeping away from the primary's hues and the ones before it.
  */
-export const getRandomTokens = (styleId: RandomStyleId = 'vivid', hues: HueRange = FULL_HUE_RANGE, random: () => number = Math.random): PresetTokens => {
+export const getRandomTokens = (styleId: RandomStyleId = 'vivid', hues: HueRange = FULL_HUE_RANGE, random: () => number = Math.random, layout?: LayoutId): PresetTokens => {
   const style = RANDOM_STYLES.find(item => item.id === styleId) ?? RANDOM_STYLES[1]
 
   for (;;) {
@@ -615,7 +643,9 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', hues: HueRange
     const saturation = style.saturation[0] + random() * (style.saturation[1] - style.saturation[0])
     const neutral = neutralForHue(hue, random)
     const darkSurfaces = getDarkSurfaces(neutral, style)
-    const darkPage = toLinearRgb(style.dark?.[0] ?? parseLightness(NEUTRAL_SCALES[neutral][9]), 0, 0) as [number, number, number]
+    const darkBackground = style.dark?.[0] ?? parseLightness(NEUTRAL_SCALES[neutral][9])
+    // Card lifts the dark surface off the background: the fills sit on the lighter of the two, where they stand out least.
+    const darkPage = toLinearRgb(layout === 'card' ? getCardDarkSurface(darkBackground) : darkBackground, 0, 0) as [number, number, number]
     const dark = passingFills(hue, saturation, style, luminance(darkPage), limits)
     const vivid = passingFills(hue, saturation, style, 1, limits)
     // Teals and cyans pass on a white page only where sRGB holds less chroma than Neon asks: the light fill takes what
@@ -644,6 +674,7 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', hues: HueRange
     const radius = pick(RADII, random)
 
     return {
+      ...layout ? {layout} : {},
       neutral,
       ...darkSurfaces,
       ...getShadow(style),

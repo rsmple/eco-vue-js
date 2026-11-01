@@ -1,5 +1,5 @@
 <template>
-  <section class="pb-20 sm:pb-28">
+  <section class="px-[calc(var(--inner-margin)-var(--w-page-bleed,0px))] pb-20 sm:pb-28">
     <p class="text-accent text-sm font-semibold tracking-[0.2em] uppercase">
       What's inside
     </p>

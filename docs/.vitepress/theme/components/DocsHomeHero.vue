@@ -1,5 +1,5 @@
 <template>
-  <section class="vp-raw isolate pt-12 pb-16 sm:pt-20 lg:pb-24">
+  <section class="vp-raw isolate px-[calc(var(--inner-margin)-var(--w-page-bleed,0px))] pt-12 pb-16 sm:pt-20 lg:pb-24">
     <div
       aria-hidden="true"
       class="
