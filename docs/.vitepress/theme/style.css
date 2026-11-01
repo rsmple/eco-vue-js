@@ -128,6 +128,14 @@ body {
   padding-inline: 0;
 }
 
+/* Where the outline shows, a page without one (`aside: false`) keeps its column free, so its text is as wide as on
+   pages with one. */
+@media (width >= 80rem) {
+  #VPContent .VPDoc:not(.has-aside) .container > .content {
+    max-width: min(var(--spacing-docs-content-width), 100% - var(--spacing-docs-aside-width));
+  }
+}
+
 #VPContent .VPDoc .content-container {
   max-width: none;
   margin-inline: 0;
