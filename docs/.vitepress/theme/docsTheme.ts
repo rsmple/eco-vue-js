@@ -43,7 +43,7 @@ type RoleName = keyof typeof ROLES
 
 type ShapeKey = 'w-input-height' | 'w-input-rounded' | 'w-input-gap' | 'w-button-height' | 'w-button-rounded' | 'w-list-header-height' | 'w-list-header-rounded' | 'w-checkbox-size' | 'w-shadow-lift'
 
-type LayoutKey = 'w-section-rounded' | 'w-section-gap' | 'w-card-rounded' | 'w-chrome-gap' | 'w-chrome-rounded'
+type LayoutKey = 'w-inner-margin' | 'w-inner-margin-sm' | 'w-section-rounded' | 'w-section-gap' | 'w-card-padding' | 'w-card-rounded' | 'w-chrome-gap' | 'w-chrome-rounded'
 
 export type TokenKey = PaletteKey | 'neutral' | `role-${ RoleName }` | `role-${ RoleName }-dark` | ShapeKey | 'layout' | LayoutKey | 'font-sans'
 
@@ -102,8 +102,11 @@ export const TOKENS: Token[] = [
   {key: 'w-checkbox-size', group: 'Shape', label: 'Checkbox size', kind: 'size', range: {min: 10, max: 24}},
   {key: 'w-shadow-lift', group: 'Shape', label: 'Shadow lift', description: 'How far shadows fall under dropdowns, modals and tooltips; 0 centers them into a glow', kind: 'size', range: {min: 0, max: 16}},
   {key: 'layout', group: 'Layout', label: 'Layout style', description: 'How sections, cards and the bars look; the sizes below start from it', kind: 'layout'},
+  {key: 'w-inner-margin', group: 'Layout', label: 'Page margin, phones', description: 'Where page content starts off the screen edges and the bars; card and glass sections pad by it', kind: 'size', range: {min: 8, max: 32}},
+  {key: 'w-inner-margin-sm', group: 'Layout', label: 'Page margin', description: 'The same from 640px up', kind: 'size', range: {min: 8, max: 48}},
   {key: 'w-section-rounded', group: 'Layout', label: 'Section radius', description: 'Sections, such as a list or a form, on the page', kind: 'size', range: {min: 0, max: 32}},
   {key: 'w-section-gap', group: 'Layout', label: 'Section gap', description: 'Between sections one after another, such as on these docs pages; 0 runs them together', kind: 'size', range: {min: 0, max: 32}},
+  {key: 'w-card-padding', group: 'Layout', label: 'Card padding', description: 'Inside tiles and stat cards', kind: 'size', range: {min: 0, max: 40}},
   {key: 'w-card-rounded', group: 'Layout', label: 'Card radius', description: 'Tiles and stat cards', kind: 'size', range: {min: 0, max: 32}},
   {key: 'w-chrome-gap', group: 'Layout', label: 'Bar gap', description: 'Between the floating bars, the screen edges and the page; 0 on phones', kind: 'size', range: {min: 0, max: 24}},
   {key: 'w-chrome-rounded', group: 'Layout', label: 'Bar radius', description: 'The floating header, nav and actions bar', kind: 'size', range: {min: 0, max: 32}},
@@ -129,8 +132,11 @@ export const DEFAULT_TOKENS: Record<TokenKey, string> = {
   'w-checkbox-size': '0.75rem',
   'w-shadow-lift': '0.5rem',
   layout: 'flat',
+  'w-inner-margin': '1rem',
+  'w-inner-margin-sm': '1.5rem',
   'w-section-rounded': '0px',
   'w-section-gap': '0px',
+  'w-card-padding': '1rem',
   'w-card-rounded': '1rem',
   'w-chrome-gap': '0px',
   'w-chrome-rounded': '0px',

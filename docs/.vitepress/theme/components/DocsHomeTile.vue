@@ -1,5 +1,5 @@
 <template>
-  <div class="surface-card w-chart-heatmap-bg-surface grid content-start gap-4 [--w-card-padding:var(--inner-margin)]">
+  <div class="surface-card w-chart-heatmap-bg-surface grid content-start gap-4">
     <div class="flex items-center justify-between gap-2">
       <span class="font-semibold">{{ title }}</span>
 

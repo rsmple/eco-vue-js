@@ -35,6 +35,10 @@
   }
 
   :root {
+    /* The page inset (`--inner-margin`) on phones and from `sm` up: sections, card-style page bleed, list rows and the bars' content all start at it. */
+    --w-inner-margin: 1rem;
+    --w-inner-margin-sm: 1.5rem;
+
     --w-section-opacity: 0;
     --w-section-padding: 0px;
     --w-section-rounded: 0px;
@@ -67,8 +71,15 @@
     --w-canvas-image: none;
   }
 
+  /* On `body`, where a theme sets its `w-*` tokens, so they resolve. An app that sets `--inner-margin` itself overrides it. */
   body {
+    --inner-margin: var(--w-inner-margin);
+
     background-color: var(--w-canvas);
+
+    @media (width >= 40rem) {
+      --inner-margin: var(--w-inner-margin-sm);
+    }
   }
 
   /* The picture on its own layer fixed to the viewport: a fixed background on the body moves with the page's

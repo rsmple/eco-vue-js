@@ -36,7 +36,7 @@ body {
   --nav-bar-width: 0px;
   /* The site has no actions bar: search, links and the theme toggle are in the header. */
   --actions-bar-width: 0px;
-  --inner-margin: 1rem;
+  /* `--inner-margin` comes from the theme's `w-inner-margin` tokens. */
   --inner-width-diff: calc(var(--nav-bar-width) + var(--actions-bar-width) + (var(--inner-margin) * 2));
 
   /* On wide screens the whole shell is centred; the bars are offset by the same margins. */
@@ -52,7 +52,6 @@ body {
     w-input-gap-0.5
     w-list-header-h-9 w-list-header-rounded-xl w-list-padding-3
     w-list-header-bg-primary-light dark:w-list-header-bg-primary-darkest
-    sm:[--inner-margin:1.5rem]
     xl:[--nav-bar-width:var(--spacing-nav-bar-width)];
 }
 
@@ -460,7 +459,7 @@ body {
   --right-margin: 0px;
   --nav-bar-width: 0px;
   --actions-bar-width: 0px;
-  --inner-margin: 1.5rem;
+  --inner-margin: var(--w-inner-margin-sm);
   /* Sections keep inside the box: it has no page gutter to reach into. */
   --w-page-bleed: 0px;
   --docs-demo-max-height: min(40rem, 80vh);
@@ -477,7 +476,7 @@ body {
 /* Phones: edge to edge like VitePress code blocks, with the app's own inner margin — the width an app would have. */
 @media (width < 40rem) {
   .demo {
-    --inner-margin: 1rem;
+    --inner-margin: var(--w-inner-margin);
 
     margin-inline: calc(var(--docs-page-margin) * -1);
     border-inline: none;

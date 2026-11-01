@@ -75,7 +75,6 @@ body {
   --header-height: 3.5rem;
   --nav-bar-width: 0px;
   --actions-bar-width: 0px;
-  --inner-margin: 1rem;
 
   @apply sm:[--actions-bar-width:3.5rem] xl:[--nav-bar-width:15rem];
 }

@@ -306,8 +306,11 @@ To make a theme from a description — "a warm, rounded theme for a finance dash
 | Key | Flat | Card and glass | Controls |
 | --- | --- | --- | --- |
 | `layout` | `flat` | `card`, `glass` | The [layout style](#layout-styles), and with it the defaults below |
+| `w-inner-margin` | `1rem` | `1rem` | The page margin on phones (`--inner-margin`): where content starts off the screen edges and the bars. Card and glass sections reach into it and pad by it |
+| `w-inner-margin-sm` | `1.5rem` | `1.5rem` | The same from `sm` up |
 | `w-section-rounded` | `0px` | `1.5rem` | Radius of sections |
 | `w-section-gap` | `0px` | `0.75rem` | Between sections in a `surface-stack`, such as the parts of a docs page |
+| `w-card-padding` | `1rem` | `1rem` | Inside cards |
 | `w-card-rounded` | `1rem` | `1rem` | Radius of cards |
 | `w-chrome-gap` | `0px` | `0.75rem` | Between the floating bars, the screen edges and the page; `0px` on phones |
 | `w-chrome-rounded` | `0px` | `1rem` | Radius of the floating header, nav and actions bar |

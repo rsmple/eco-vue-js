@@ -12,14 +12,14 @@ This site is built that way: its layout is [`DocsLayout.vue`](https://github.com
 
 ## Frame variables
 
-Set them on `body`. Each one is the space a part of the frame takes *in layout* at the current breakpoint, so all default to `0px`:
+Set them on `body`. Each one is the space a part of the frame takes *in layout* at the current breakpoint, so all but `--inner-margin` default to `0px`:
 
 | Variable | What it is |
 | --- | --- |
 | `--header-height` | Height of the header. |
 | `--nav-bar-width` | Space taken by the nav — `0px` below `xl`, where the nav is an overlay opened from the header. |
 | `--actions-bar-width` | Space taken by the actions bar — `0px` on phones, where it is hidden. |
-| `--inner-margin` | Horizontal padding of the content. |
+| `--inner-margin` | Horizontal padding of the content. Comes from the theme — `w-inner-margin`, `w-inner-margin-sm` from `sm` up, `1rem` and `1.5rem` by default (see [Theming](./theming#layout)); set it here only to override the theme. |
 | `--left-margin`, `--right-margin` | Space outside the frame when it is centred on a wide screen — see [Centred frame](#centred-frame). |
 | `--w-actions-bar-width` | Width of the actions bar itself, at every breakpoint. |
 | `--actions-bar-filter-width` | Width of the filter panel that slides out of the actions bar on `sm` and up — see [Filters](#filters-and-search). |
@@ -39,13 +39,11 @@ body {
   --header-height: 3.5rem;
   --nav-bar-width: 0px;
   --actions-bar-width: 0px;
-  --inner-margin: 1rem;
   --w-actions-bar-width: var(--spacing-actions-bar-width);
   --actions-bar-filter-width: 24rem;
 
   @apply
     bg-surface text-accent
-    sm:[--inner-margin:1.5rem]
     sm:[--actions-bar-width:var(--spacing-actions-bar-width)]
     xl:[--nav-bar-width:var(--spacing-nav-bar-width)];
 }
