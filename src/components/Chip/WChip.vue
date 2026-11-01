@@ -6,10 +6,10 @@
 
   <div
     v-else
-    class="w-max"
+    class="w-max inline-flex items-center gap-1 px-2 py-0.5 text-xs"
     :class="soft
-      ? ['inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium', semanticTypeChipSoftMap[semanticType]]
-      : ['rounded-md px-2 py-0.5 text-xs font-semibold', semanticTypeChipMap[semanticType]]"
+      ? ['rounded-full font-medium', semanticTypeChipSoftMap[semanticType]]
+      : ['rounded-md font-semibold', semanticTypeChipMap[semanticType]]"
   >
     <component
       :is="icon"
