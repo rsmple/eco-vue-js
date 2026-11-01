@@ -164,6 +164,26 @@
 }
 
 /*
+ * Sections one after another with a line between them in flat, for a page whose groups should read apart there too,
+ * such as the steps of a setup or the groups of a settings page. In card and glass the gap separates them, as in
+ * `surface-stack`. Only between sections: other content in the stack, such as a row of cards, keeps the plain gap.
+ */
+@utility surface-stack-divided {
+  /* 1 in flat, where sections paint nothing, 0 where they do. */
+  --w-stack-flat: calc(1 - min(1, var(--w-section-opacity) * 100));
+
+  & > * + * {
+    margin-top: var(--w-section-gap);
+  }
+
+  & > .surface-section + .surface-section {
+    margin-top: calc(var(--w-section-gap) + var(--w-stack-divide, 2rem) * var(--w-stack-flat));
+    padding-top: calc(var(--w-section-padding) + var(--w-stack-divide, 2rem) * var(--w-stack-flat));
+    border-top-width: calc(var(--w-section-border) + 1px * var(--w-stack-flat));
+  }
+}
+
+/*
  * A new page inside a container, such as a preview of a page: sections and cards in it render as on the page, not as
  * nested in the container around it.
  */
@@ -186,6 +206,12 @@
       background-color: transparent;
       box-shadow: none;
       backdrop-filter: none;
+    }
+
+    /* A part after other content: a line above it, as between the groups of a form. */
+    :scope * + .surface-section {
+      border-top: 1px solid var(--w-line-subtle);
+      padding-top: var(--w-subsection-divide, 1rem);
     }
   }
 
