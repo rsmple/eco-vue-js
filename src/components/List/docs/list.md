@@ -9,7 +9,7 @@ description: WList — paginated, sortable collections shown as a table on deskt
 `WList` renders a paginated collection as a table on desktop and as cards on mobile. It owns pagination, selection, column settings (show, hide, reorder, resize) and ordering. You give it:
 
 - `useQueryFn` and `queryParams` — a paginated query.
-- `fields` — one component per column. Each has a `meta` export with its title, ordering field and CSS class, and renders one cell from `item`.
+- `fields` — one component per column. Each has a `meta` export with its title, width, ordering field and CSS class, and renders one cell from `item`.
 - `cardColumns` and `cardAreas` — the card layout as a CSS grid, with field labels as area names. Every field must appear in `cardAreas`, even ones hidden by default; a field left out renders in an extra grid column.
 - Optionally an expansion component for a detail row and a menu component for row actions.
 
@@ -71,6 +71,30 @@ Put the `WListFilter` in WList's `filter` slot to show it at the start of the se
 
 Each chip names its filter and, when set, the picked values. A filter's `meta.summary` returns them from the query params, such as the titles of the picked options; without it the chip shows how many values are picked. A chip in the "more" list can be removed there too.
 
+## Groups
+
+`groupBy` tells whether two neighbouring items belong to the same group, and the `group` slot renders a heading before the first item of each group and before the first item rendered. Only neighbours are compared, so the query has to sort by the field the list groups by.
+
+The items of all loaded pages share one layout. A group runs on across pages without a new heading, and in the grid a page that ends in the middle of a row is continued in that row by the next one. The list places the heading: it takes a row of its own in the grid, stays under the toolbar while its group scrolls past and, in list mode, stays at the left edge when the rows scroll sideways. The slot gives its content and lays it out.
+
+<DocsDemo name="recipes/plant-list/PlantListGrouped" overflow />
+
+## Nested fields
+
+A field's `meta` can hold `fields` instead of being a column itself. Its columns then show a related object or every item of an array:
+
+- `keyEntity`, or `getterEntity` for a computed one, gives the nested field components that object as `item`.
+- `keyArray`, or `getterArray`, repeats the columns once per array item, one line each. The items need an `id`. `componentItem` wraps each line, for example to draw a separator between them.
+- With neither, `fields` only groups the columns, such as to place them in one card area.
+
+In the table, nested columns are list columns like any other: each has its own header and width, can be hidden in the list settings, and lines up across the rows, including each line of an array. In a card, a nested field is a flex row. `cssClass` styles it, `cssClassArray` styles the wrapper of an array's lines, and `[grid-area:…]` places it in one of `cardAreas`; pick labels without `_` for that, since Tailwind reads `_` in a class as a space.
+
+In the table, the root of `componentItem` is a line of the table, and each of its children spans the whole line. Put a separator next to `<slot />`, not around it.
+
+Rows with lines of an array are taller than one line, so the demo uses `align-top`. The checkbox and the row menu then sit `--w-list-align-top` from the top of the row. Set it with `w-list-align-top-*` on WList to match the row's top padding and first line: here the rows have `py-2`, and `w-list-align-top-2.5` centers the box on the first line.
+
+<DocsDemo name="recipes/plant-list/PlantListNested" overflow />
+
 ## API
 
 <!-- @api WList -->
@@ -105,7 +129,7 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 | `configKey` | `string` | **required** | `localStorage` key the column settings and view mode are saved under. |
 | `defaultConfigMap` | `FieldConfigMap<Fields>` | **required** | Width, visibility, order and stickiness of each field by label, until the user changes them. |
 | `defaultMode` | `ListMode` | `ListMode.TABLE` | Table or grid view, until the user picks one. Small screens always show cards. |
-| `alignTop` | `boolean` | — | Aligns cells and the checkbox to the top of the row instead of centering them. |
+| `alignTop` | `boolean` | — | Aligns cells, the checkbox and the row menu to the top of the row instead of centering them. `--w-list-align-top` (`w-list-align-top-*`) sets how far the checkbox and the menu are from the top, `1.125rem` by default, so they line up with the first line of the cells. |
 | `disableMore` | `boolean` | — | Disables the row menu, both the more button and the right click. |
 | `readonly` | `boolean` | — | Makes every row readonly, and passes `readonly` to the `bulk`, `action` and `menu` components. When unset, inherits the readonly state provided by a parent. |
 | `noOrdering` | `boolean` | — | Hides the sort control and makes the column headers not sortable. |
@@ -149,8 +173,9 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 | `header` | `{ count: number \| undefined; }` | Content above the selection bar, with the count returned by the query. |
 | `filter` | — | Filters at the start of the selection bar, usually a WListFilter. They keep to one line, the chips that do not fit go to a menu, the list actions move to the end and fold into More first, and a selection replaces them. `--w-list-toolbar-height` sets the bar's height, the inherited input height by default. |
 | `selection` | — | Replaces the buttons at the end of the selection bar — range select, refetch, sort and column settings. |
-| `group` | `{ item: Data; previous: Data \| undefined; skeleton: boolean; }` | Heading before each group of rows, with `groupBy`. `skeleton` is true while the page loads. |
+| `group` | `{ item: Data; previous: Data \| undefined; skeleton: boolean; }` | Content of the heading before each group of rows, with `groupBy`. The heading spans the whole row, sticks under the toolbar and, in list mode, to the left edge while the rows scroll sideways. Its content is laid out by the slot. `skeleton` is true while the page loads. |
 | `empty` | — | Shown instead of the rows when the query returns no items. |
+| `error` | `{ error: Error; retry: () => Promise<void>; isFetching: boolean; }` | Shown instead of a page that failed to load and has nothing cached. Gets the `error`, `retry` to load the page again, and `isFetching`. Replaces the message and Retry button. |
 
 <!-- @api-end -->
 
@@ -339,6 +364,7 @@ import WListHeader from 'eco-vue-js/dist/components/List/WListHeader.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
+| `columns` | `string` | **required** | Track sizes of the columns between the checkbox and the end cap, as in `grid-template-columns`. The rows use the same tracks, so the cells line up with them. |
 | `allowSelect` | `boolean` | — | Shows the select-all checkbox. |
 | `selectOnly` | `boolean` | — | Keeps the checkbox column's space without the checkbox, for lists without select-all. |
 | `hideMore` | `boolean` | — | Narrows the end cap when the rows have no menu. |
@@ -381,8 +407,7 @@ import WListHeaderItem from 'eco-vue-js/dist/components/List/WListHeaderItem.vue
 | `disabled` | `boolean` | — | Turns sorting off. |
 | `allowResize` | `boolean` | — | Adds a handle to resize the column. |
 | `itemClass` | `string` | — | Class of the title, replacing the default bold one-line style. |
-| `styleValue` | `Record<string, string \| undefined>` | **required** | Style of the column, such as its width. |
-| `hasWidth` | `boolean` | **required** | Whether the column has a width set, for the resize handle. |
+| `styleValue` | `Record<string, string \| undefined> \| undefined` | **required** | Style of the column, such as its sticky offsets. |
 
 #### Events
 

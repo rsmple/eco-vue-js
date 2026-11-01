@@ -6,7 +6,6 @@
       'text-description': !item.waterBy,
       'tone-negative text-tone': item.waterBy && item.waterBy < today,
     }"
-    class="card:text-xs"
   >
     <template #inner>
       <span class="list:hidden">{{ meta.title }}: </span>
@@ -37,7 +36,8 @@ const today = getStartOfDay()
 <script lang="ts">
 export const meta = {
   label: 'due',
-  cssClass: 'basis-[8rem]',
+  width: '8rem',
+  cssClass: 'card:text-xs',
   title: 'Water by',
   field: 'waterBy',
   textFormat: item => item.waterBy ? dateFormat(item.waterBy) : undefined,

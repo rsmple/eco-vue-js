@@ -11,7 +11,6 @@
       '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em-1px)]': allowSelect,
       '[--w-list-left:var(--w-list-header-rounded,1rem)]': !allowSelect,
     }"
-    :style="[stylesWidth, stylesFixed]"
   >
     <div
       v-if="isPage"
@@ -34,9 +33,10 @@
           isGrid
             ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-(--w-list-gap,0) isolate'
             : isPage
-              ? 'w-list-page-rows grid grid-cols-1 gap-(--w-list-gap,0)'
-              : 'grid grid-cols-1 gap-(--w-list-gap,0) isolate'
+              ? 'w-list-page-rows grid gap-(--w-list-gap,0)'
+              : 'grid gap-(--w-list-gap,0) isolate'
         "
+        :page-style="isGrid ? undefined : {gridTemplateColumns: `var(--w-list-left) ${ fieldTracks } var(--w-list-right)`}"
         :min-height-only="minHeight"
         :no-header-update="noHeaderUpdate"
         :style="cardStyles"
@@ -75,7 +75,8 @@
             :fields-filtered="fieldsFiltered"
             :fields-sorted="fieldsSorted"
             :field-config-map="fieldConfigMap"
-            :styles-width="stylesWidth"
+            :field-tracks="fieldTracks"
+            :styles-sticky="stylesSticky"
             :ordering="ordering"
             :mode="listConfig.mode"
 
@@ -128,14 +129,18 @@
           </ListToolbar>
         </template>
 
-        <template #default="{item, skeleton, setter, refetch, previous, index, position, value, results, intersecting}">
-          <slot
-            v-if="groupBy && (index === 0 || (!skeleton && (!previous || !groupBy(item, previous))))"
-            name="group"
-            :item="item"
-            :previous="previous"
-            :skeleton="skeleton"
-          />
+        <template #default="{item, skeleton, setter, refetch, previous, first, index, position, value, results, intersecting}">
+          <ListGroupHeading
+            v-if="groupBy && $slots.group && (first || (!skeleton && (position === 0 || (!!previous && !groupBy(item, previous)))))"
+            :class="position === 0 ? 'list:-mt-2' : 'card:mt-2'"
+          >
+            <slot
+              name="group"
+              :item="item"
+              :previous="previous"
+              :skeleton="skeleton"
+            />
+          </ListGroupHeading>
 
           <ListItem
             :item="item"
@@ -149,6 +154,7 @@
             :intersecting="intersecting"
 
             :fields="fieldsSorted"
+            :skeleton-fields="skeletonFields"
             :field-config-map="fieldConfigMap"
             :column-data-map="columnDataMap"
             :query-params="queryParams"
@@ -196,7 +202,10 @@
               <div
                 v-if="stripColumns.some(column => column.sticky)"
                 class="w-list-page-strip-columns"
+                :style="{gridTemplateColumns: `var(--w-list-left) ${ fieldTracks } var(--w-list-right)`}"
               >
+                <div />
+
                 <div
                   v-for="column in stripColumns"
                   :key="column.label"
@@ -213,6 +222,16 @@
           #empty
         >
           <slot name="empty" />
+        </template>
+
+        <template
+          v-if="$slots.error"
+          #error="scope"
+        >
+          <slot
+            name="error"
+            v-bind="scope"
+          />
         </template>
       </WInfiniteList>
 
@@ -239,7 +258,7 @@ import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type Ref, type StyleValue, computed, inject, nextTick, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
+import {type Ref, type StyleValue, computed, inject, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
@@ -252,10 +271,12 @@ import {type DefaultQueryOptions, PAGE_LENGTH} from '@/utils/useDefaultQuery'
 import {type Selection, useSelected, useSelectionHash} from '@/utils/useSelected'
 import {ListMode} from '@/utils/utils'
 
+import ListGroupHeading from './components/ListGroupHeading.vue'
 import ListItem from './components/ListItem.vue'
 import ListToolbar from './components/ListToolbar.vue'
+import {isField} from './models/utils'
 import {AREA_MORE, AREA_SELECT} from './types'
-import {filterFields, forEachField, getFieldStylesFixed, getFieldStylesWidth, getFieldVariable, sortFields, sortFieldsDeep, useListConfig} from './use/useListConfig'
+import {filterFields, forEachField, getFieldStylesSticky, getFieldTracks, sortFieldsDeep, useListConfig} from './use/useListConfig'
 
 defineOptions({inheritAttrs: false})
 
@@ -301,7 +322,7 @@ const props = withDefaults(
     defaultConfigMap: FieldConfigMap<Fields>
     /** Table or grid view, until the user picks one. Small screens always show cards. */
     defaultMode?: ListMode
-    /** Aligns cells and the checkbox to the top of the row instead of centering them. */
+    /** Aligns cells, the checkbox and the row menu to the top of the row instead of centering them. `--w-list-align-top` (`w-list-align-top-*`) sets how far the checkbox and the menu are from the top, `1.125rem` by default, so they line up with the first line of the cells. */
     alignTop?: boolean
     /** Disables the row menu, both the more button and the right click. */
     disableMore?: boolean
@@ -400,10 +421,12 @@ defineSlots<{
   filter?: () => void
   /** Replaces the buttons at the end of the selection bar — range select, refetch, sort and column settings. */
   selection?: () => void
-  /** Heading before each group of rows, with `groupBy`. `skeleton` is true while the page loads. */
+  /** Content of the heading before each group of rows, with `groupBy`. The heading spans the whole row, sticks under the toolbar and, in list mode, to the left edge while the rows scroll sideways. Its content is laid out by the slot. `skeleton` is true while the page loads. */
   group?: (props: {item: Data, previous: Data | undefined, skeleton: boolean}) => void
   /** Shown instead of the rows when the query returns no items. */
   empty?: () => void
+  /** Shown instead of a page that failed to load and has nothing cached. Gets the `error`, `retry` to load the page again, and `isFetching`. Replaces the message and Retry button. */
+  error?: (props: {error: Error, retry: () => Promise<void>, isFetching: boolean}) => void
 }>()
 
 const {isDisabled, isReadonly} = useComponentStates(props)
@@ -461,6 +484,18 @@ const fieldsFiltered = computed(() => filterFields(fieldsVisible.value, field =>
 
 const fieldsSorted = computed(() => isGrid.value ? fieldsFiltered.value : sortFieldsDeep(fieldsFiltered.value, fieldConfigMap.value))
 
+// Columns are tracks of one grid that the header and every row share as a subgrid, so the widths need no measuring,
+// and a new width restyles the grid alone instead of every cell.
+// Loading rows draw plain placeholders in place of the field components, unless a field is nested or draws its own skeleton.
+const skeletonFields = computed(() => fieldsSorted.value.every(field => isField(field) && !field.meta.customSkeleton)
+  ? fieldsSorted.value.filter(isField)
+  : undefined,
+)
+
+const fieldTracks = computed(() => getFieldTracks(fieldsSorted.value, fieldConfigMap.value))
+
+const stylesSticky = computed(() => getFieldStylesSticky(fieldsSorted.value, fieldConfigMap.value))
+
 const columnDataMap = computed<Record<string, ColumnData>>(() => {
   const map: Record<string, ColumnData> = {}
   const card = isGrid.value
@@ -472,14 +507,7 @@ const columnDataMap = computed<Record<string, ColumnData>>(() => {
     const stickyInTable = !card && sticky
 
     map[label] = {
-      style: card
-        ? {gridArea: label}
-        : {
-          minWidth: `var(${ getFieldVariable('width', label) })`,
-          maxWidth: `var(${ getFieldVariable('width', label) })`,
-          left: sticky ? `var(${ getFieldVariable('left', label) })` : undefined,
-          right: sticky ? `var(${ getFieldVariable('right', label) })` : undefined,
-        },
+      style: card ? {gridArea: label} : stylesSticky.value[label],
       baseClass: {
         'items-center': !at,
         'items-start': at,
@@ -583,10 +611,6 @@ const ordering = computed<OrderItem<keyof Data>[]>(() => {
   return []
 })
 
-const stylesWidth = ref<Record<string, string>>({})
-
-const stylesFixed = ref<Record<string, string>>({})
-
 const updateOrdering = (value: OrderItem<keyof Data>[]) => {
   const ordering = encodeOrdering(value)
 
@@ -606,18 +630,6 @@ const getQueryParamsBulk = (): QueryParams => {
   return props.queryParams
 }
 
-const updateStylesWidth = async () => {
-  await nextTick()
-
-  stylesWidth.value = getFieldStylesWidth(fieldsFiltered.value, fieldConfigMap.value)
-}
-
-const updateStylesFixed = async () => {
-  await nextTick()
-
-  stylesFixed.value = getFieldStylesFixed(sortFields(fieldsFiltered.value, fieldConfigMap.value), fieldConfigMap.value)
-}
-
 const toggleSelectAll = (value: boolean) => {
   if (value) selectAll()
   else resetSelection()
@@ -629,36 +641,13 @@ const emitClickAction = (value: CardActionParams<Data>) => {
 
 const updateFieldConfigMap = (value: Record<string, FieldConfig>) => {
   fieldConfigMap.value = value
-
-  updateStylesWidth()
-  updateStylesFixed()
 }
 
 const updateFieldWidth = (label: string, value: number) => {
   fieldConfigMap.value[label]!.width = value
-
-  updateStylesWidth()
 }
 
 const resetConfig = () => {
   reset()
-
-  updateStylesWidth()
-  updateStylesFixed()
 }
-
-// The saved config loads on mount, after the watcher below may have stopped on the defaults' styles.
-onMounted(() => {
-  updateStylesWidth()
-  updateStylesFixed()
-})
-
-const unwatch = watch(fieldsFiltered, async () => {
-  await Promise.all([
-    updateStylesWidth(),
-    updateStylesFixed(),
-  ])
-
-  if (Object.keys(stylesWidth.value).length !== 0 || Object.keys(stylesFixed.value).length !== 0) unwatch.stop()
-}, {immediate: true})
 </script>

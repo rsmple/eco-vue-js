@@ -34,30 +34,12 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
     :default-config-map="defaultFieldConfigMapPlant"
     config-key="w-list-docs-plant"
     :expansion="markRaw(PlantContent)"
-    :bulk="[
-      markRaw(WBulkPlantWatered),
-      markRaw(WBulkPlantDry),
-      markRaw(WBulkPlantCaretaker),
-      markRaw(WBulkPlantRemove),
-    ]"
-    :menu="[
-      markRaw(WMenuPlantToggle),
-      markRaw(WMenuPlantCaretaker),
-      markRaw(WMenuPlantDelete),
-    ]"
+    :bulk="bulk"
+    :menu="menu"
     selection-title="plant"
     :select-all-text-getter="selectAllTextGetter"
-    :card-columns="(['2fr', '1fr', 'auto'] as const)"
-    :card-areas="[
-      ['name', 'name', 'area_select'],
-      ['species','species', 'area_more'],
-      ['kind', 'light', 'light'],
-      ['health', 'growth', 'growth'],
-      ['watered', 'due', 'due'],
-      ['height', 'humidity', 'humidity'],
-      ['water', 'seeds', 'seeds'],
-      ['caretaker', 'caretaker', 'caretaker'],
-    ]"
+    :card-columns="cardColumns"
+    :card-areas="cardAreas"
     card-class="list:h-11 card:gap-1 sm:card:p-4 sm-not:card:py-3 sm:card:w-list-rounded-xl sm:card:border sm:card:shadow-sm border-line-subtle"
     card-wrapper-class="card:self-start"
     :min-height="!scrollPage"
@@ -84,14 +66,18 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
 </template>
 
 <script lang="ts" setup>
+import type {Plant} from './models/Plant'
+
 import {markRaw} from 'vue'
+
+import type {BulkComponent, CardAreas, GridCol, MenuComponent} from 'eco-vue-js/dist/components/List/types'
 
 import WList from 'eco-vue-js/dist/components/List/WList.vue'
 import WListFilter from 'eco-vue-js/dist/components/List/WListFilter.vue'
 import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 import PlantContent from './PlantContent.vue'
-import {plantModelApi, useQueryParamsPlants} from './api/Plant'
+import {type QueryParamsPlants, plantModelApi, useQueryParamsPlants} from './api/Plant'
 import WBulkPlantCaretaker from './bulk/WBulkPlantCaretaker.vue'
 import WBulkPlantDry from './bulk/WBulkPlantDry.vue'
 import WBulkPlantRemove from './bulk/WBulkPlantRemove.vue'
@@ -111,6 +97,34 @@ defineProps<{
 const {queryParams, updateQueryParams} = useQueryParamsPlants.useQueryParamsLocal()
 
 const selectAllTextGetter = (isUnselect: boolean, count: number) => `${ isUnselect ? 'Unselect' : 'Select' } all ${ count } plants`
+</script>
+
+<script lang="ts">
+const bulk: BulkComponent<QueryParamsPlants>[] = [
+  markRaw(WBulkPlantWatered),
+  markRaw(WBulkPlantDry),
+  markRaw(WBulkPlantCaretaker),
+  markRaw(WBulkPlantRemove),
+]
+
+const menu: MenuComponent<Plant>[] = [
+  markRaw(WMenuPlantToggle),
+  markRaw(WMenuPlantCaretaker),
+  markRaw(WMenuPlantDelete),
+]
+
+const cardColumns = ['2fr', '1fr', 'auto'] as const satisfies GridCol[]
+
+const cardAreas: CardAreas<typeof listFieldsPlant, typeof cardColumns['length']> = [
+  ['name', 'name', 'area_select'],
+  ['species', 'species', 'area_more'],
+  ['kind', 'light', 'light'],
+  ['health', 'growth', 'growth'],
+  ['watered', 'due', 'due'],
+  ['height', 'humidity', 'humidity'],
+  ['water', 'seeds', 'seeds'],
+  ['caretaker', 'caretaker', 'caretaker'],
+]
 </script>
 ```
 
@@ -159,6 +173,9 @@ export type Task = {
   title: string
   due: Date
 }
+
+/** A task with the key a list row of it needs. */
+export type TaskItem = Task & {id: number}
 
 export type Plant = {
   id: number
@@ -290,8 +307,14 @@ const SOURCE: [string, string, Kind, number][] = [
   ['Sorrel', 'Rumex acetosa', Kind.HERB, 60],
 ]
 
+/** Each plant of `SOURCE` grows in several pots, numbered after the first, so the list runs over many pages. */
+const POTS = 4
+
 /** In-memory stand-in for a REST collection. */
-export const plants: Plant[] = SOURCE.map(([name, species, kind, height], index) => {
+export const plants: Plant[] = Array.from({length: SOURCE.length * POTS}, (_, index) => {
+  const [title, species, kind, height] = SOURCE[index % SOURCE.length]!
+  const pot = Math.floor(index / SOURCE.length) + 1
+  const name = pot === 1 ? title : `${ title } ${ pot }`
   const today = getStartOfDay()
   // The kinds repeat every four rows, so `round` steps each kind through every light level and caretaker in turn.
   const round = index + Math.floor(index / 4)
@@ -567,6 +590,7 @@ export const plantModelApi = createRestModelApi({
 Each field is a module with two exports: the component (default) renders the cell, and `meta` describes the column. Keep both in one file — the column cannot drift from what it renders.
 
 - `label` is the column's stable id: it keys the saved column config and names the area in `cardAreas`.
+- `width` is the column's width until the user resizes it: a length such as `'8rem'`, or `'minmax(12rem, 1fr)'` for a column that takes the space the others leave and shrinks to its minimum when the list scrolls sideways. The header and every row share these widths, so nothing is measured.
 - `field` makes the column sortable — its value is sent as `ordering` (`height`, `-height`).
 - `textFormat` gives a plain-text value for CSV export and "copy as Markdown", for cells that render components or format the value for display — like the water-by date, which is shown short and exported in full.
 - `allow-open` on `WListCardField` makes that cell toggle the expansion row.
@@ -604,7 +628,7 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'name',
-  cssClass: 'flex-1 basis-[12rem]',
+  width: 'minmax(12rem, 1fr)',
   title: 'Name',
   field: 'name',
   allowResize: true,
@@ -682,7 +706,7 @@ const getGain = (item: Plant) => item.height - item.growth[0]!.height
 
 export const meta = {
   label: 'growth',
-  cssClass: 'basis-[8rem]',
+  width: '8rem',
   title: 'Growth',
   textFormat: item => `+${ getGain(item) } cm`,
 } as const satisfies ListField<Plant>
@@ -727,7 +751,8 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'watered',
-  cssClass: 'basis-[7rem]',
+  width: '7rem',
+  cssClass: 'w-skeleton-h-5',
   title: 'Status',
   field: 'watered',
   textFormat: item => item.watered ? 'Watered' : 'Thirsty',
@@ -748,7 +773,6 @@ export const meta = {
       'text-description': !item.waterBy,
       'tone-negative text-tone': item.waterBy && item.waterBy < today,
     }"
-    class="card:text-xs"
   >
     <template #inner>
       <span class="list:hidden">{{ meta.title }}: </span>
@@ -779,7 +803,8 @@ const today = getStartOfDay()
 <script lang="ts">
 export const meta = {
   label: 'due',
-  cssClass: 'basis-[8rem]',
+  width: '8rem',
+  cssClass: 'card:text-xs',
   title: 'Water by',
   field: 'waterBy',
   textFormat: item => item.waterBy ? dateFormat(item.waterBy) : undefined,
@@ -1650,6 +1675,6 @@ const getDueText = (due: Date) => {
 - **Filters above the list**: render the `WUniform` with `WListFilter` before `WList` instead of in its `filter` slot, and the chips wrap onto as many lines as they need.
 - **Filters in the app shell**: pass `global` to `WListFilter` to put the filters into the actions bar's panel and the search into the header bar, with a button that resets them. `disabledFilterFields` leaves out filters for params the page fixes, e.g. `caretaker` on a caretaker's own page.
 - **Toolbar actions** (e.g. "Create"): pass `action` with components typed by `ActionProps<QueryParams>`.
-- **Nested columns**: a field's `meta` can be `{keyEntity, fields}` or `{keyArray, fields}` to render columns of a related object or of every item in an array.
+- **Nested columns**: a field's `meta` can be `{keyEntity, fields}` or `{keyArray, fields}` to render columns of a related object or of every item in an array — see [Nested fields](/components/list#nested-fields).
 - **Embedded lists**: a list is sized as a page by default — it reserves the viewport height. Inside a card, tab or docs page like this one, pass `min-height` to drop that.
 - **Read-only rows**: `readonlyGetter` marks individual rows read-only; menu items receive `readonly` and should disable themselves.

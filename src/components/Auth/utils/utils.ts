@@ -1,4 +1,4 @@
-const EXPIRATION_DATE_KEY = 'exp'
+export const EXPIRATION_DATE_KEY = 'exp'
 const REFRESH_TIMESTAMP_KEY = 'refresh-ts'
 const REFRESH_BUFFER_TIMEOUT = 3 * 1000
 const REFRESH_BUFFER_TICK = 1000
@@ -23,51 +23,59 @@ function deleteCookie(name: string) {
 
 const EXP_FACTOR = 1000
 
-export function checkExpirationDate(): boolean | null {
-  const exp = Number.parseFloat(getCookie(EXPIRATION_DATE_KEY))
+// Apps sharing an origin each need their own key, so one app's refresh does not hold up the other's
+function getRefreshTimestampKey(key: string): string {
+  return key === EXPIRATION_DATE_KEY ? REFRESH_TIMESTAMP_KEY : key + '-' + REFRESH_TIMESTAMP_KEY
+}
+
+export function checkExpirationDate(key = EXPIRATION_DATE_KEY): boolean | null {
+  const exp = Number.parseFloat(getCookie(key))
 
   if (!exp || !Number.isFinite(exp)) return null
 
   return exp > Date.now() / EXP_FACTOR
 }
 
-export function updateExpirationDate(date: Date) {
+export function updateExpirationDate(date: Date, key = EXPIRATION_DATE_KEY) {
   const exp = (date.getTime() / EXP_FACTOR).toString()
-  setCookie(EXPIRATION_DATE_KEY, exp, date)
-  localStorage.setItem(EXPIRATION_DATE_KEY, exp)
+  setCookie(key, exp, date)
+  localStorage.setItem(key, exp)
 }
 
-export function setExpirationDate() {
-  const exp = Number.parseFloat(getCookie(EXPIRATION_DATE_KEY))
+export function setExpirationDate(key = EXPIRATION_DATE_KEY) {
+  const exp = Number.parseFloat(getCookie(key))
 
   if (!exp || !Number.isFinite(exp)) return
 
-  localStorage.setItem(EXPIRATION_DATE_KEY, exp.toString())
+  localStorage.setItem(key, exp.toString())
 }
 
-export function removeExpirationDate() {
-  localStorage.removeItem(EXPIRATION_DATE_KEY)
-  deleteCookie(EXPIRATION_DATE_KEY)
+export function removeExpirationDate(key = EXPIRATION_DATE_KEY) {
+  localStorage.removeItem(key)
+  deleteCookie(key)
 }
 
-let refreshTimestampTimeout: ReturnType<typeof setTimeout> | null = null
+const refreshTimestampTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 
-export function setRefreshTimestamp() {
-  localStorage.setItem(REFRESH_TIMESTAMP_KEY, new Date().getTime().toString())
+export function setRefreshTimestamp(key = EXPIRATION_DATE_KEY) {
+  const refreshKey = getRefreshTimestampKey(key)
 
-  if (refreshTimestampTimeout) clearTimeout(refreshTimestampTimeout)
+  localStorage.setItem(refreshKey, new Date().getTime().toString())
 
-  refreshTimestampTimeout = setTimeout(() => {
-    localStorage.removeItem(REFRESH_TIMESTAMP_KEY)
-  }, REFRESH_BUFFER_TIMEOUT)
+  clearTimeout(refreshTimestampTimeouts.get(refreshKey))
+
+  refreshTimestampTimeouts.set(refreshKey, setTimeout(() => {
+    refreshTimestampTimeouts.delete(refreshKey)
+    localStorage.removeItem(refreshKey)
+  }, REFRESH_BUFFER_TIMEOUT))
 }
 
-export function removeRefreshTimestamp(): void {
-  localStorage.removeItem(REFRESH_TIMESTAMP_KEY)
+export function removeRefreshTimestamp(key = EXPIRATION_DATE_KEY): void {
+  localStorage.removeItem(getRefreshTimestampKey(key))
 }
 
-export function getLastRefreshPromise(): Promise<void> | null {
-  const lastRefreshTimeStamp = Number.parseInt(localStorage.getItem(REFRESH_TIMESTAMP_KEY) ?? '')
+export function getLastRefreshPromise(key = EXPIRATION_DATE_KEY): Promise<void> | null {
+  const lastRefreshTimeStamp = Number.parseInt(localStorage.getItem(getRefreshTimestampKey(key)) ?? '')
 
   if (!Number.isInteger(lastRefreshTimeStamp) || lastRefreshTimeStamp <= 0) return null
 
@@ -82,7 +90,7 @@ export function getLastRefreshPromise(): Promise<void> | null {
       if (count < 1) {
         clearInterval(interval)
         reject(new Error('Timed out'))
-      } else if (checkExpirationDate()) {
+      } else if (checkExpirationDate(key)) {
         clearInterval(interval)
         resolve()
       } else {

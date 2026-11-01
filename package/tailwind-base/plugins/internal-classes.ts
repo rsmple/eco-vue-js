@@ -8,7 +8,7 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
       // A floating bar adds the chrome gap on the screen side, and another between it and the page.
       '--w-left-inner': 'calc(var(--left-margin, 0px) + var(--w-chrome-gap, 0px) + var(--nav-bar-width, 0px) + min(var(--nav-bar-width, 0px) * 1000, var(--w-chrome-gap, 0px)) + var(--inner-margin, 0px))',
       '--w-right-inner': 'calc(var(--right-margin, 0px) + var(--w-chrome-gap, 0px) + var(--actions-bar-width, 0px) + min(var(--actions-bar-width, 0px) * 1000, var(--w-chrome-gap, 0px)) + var(--inner-margin, 0px))',
-      '--w-width-inner': 'calc(100vw - var(--w-left-inner, 0px) - var(--w-right-inner, 0px))',
+      '--w-width-inner': 'calc(100vw - var(--vw-scroll-bar-width, 0px) - var(--w-left-inner, 0px) - var(--w-right-inner, 0px))',
 
       '--w-header-inner': 'calc(var(--header-height, 0px) + var(--w-chrome-gap, 0px) * 2)',
       // Under a list toolbar, the gap a page list keeps above it counts too.

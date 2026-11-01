@@ -203,7 +203,7 @@ export const createDefaultQuery = (<
         ...queryOptionsOf(options),
 
         enabled: enabledOf(options),
-      } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
+      } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>, resolvedClient) as UseQueryReturnTypeDefault<QueryData>
 
       query.setData = (data: QueryData) => isQueryParams(unref(normalizedParams))
         ? resolvedClient.setQueriesData({queryKey: keyOf(normalizedParams)}, data)
@@ -254,7 +254,7 @@ export const createDefaultQuery = (<
       ...queryOptionsOf(options),
 
       enabled: enabledOf(options),
-    } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>) as UseQueryReturnTypeDefault<QueryData>
+    } as unknown as UseQueryOptions<QueryData, ApiError, QueryData, QueryData, QueryKey>, resolvedClient) as UseQueryReturnTypeDefault<QueryData>
 
     query.setData = (data: QueryData) => resolvedClient.setQueriesData({queryKey: keyOf()}, data)
 

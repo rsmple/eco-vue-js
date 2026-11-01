@@ -1,5 +1,146 @@
-import {type QueryClient, useQueryClient} from '@tanstack/vue-query'
-import {hasInjectionContext} from 'vue'
+import {type Query, type QueryClient, useQueryClient} from '@tanstack/vue-query'
+import {type MaybeRefOrGetter, hasInjectionContext, shallowReactive, toValue, watch} from 'vue'
+
+import {ApiError, ApiErrorCancel, ApiErrorUnavailable} from './api'
+import {getText} from './texts'
+
+export const MAX_QUERY_RETRIES = 2
+
+const RETRYABLE_CLIENT_STATUS_LIST: readonly number[] = [408, 429]
+
+/** Whether asking again may get a different answer: the server was unreachable, failed, or asked to be retried */
+export const isRetryableError = (error: unknown): boolean => {
+  if (!(error instanceof ApiError) || error instanceof ApiErrorCancel) return false
+
+  if (error instanceof ApiErrorUnavailable) return true
+
+  const status = error.response?.status
+
+  if (status === undefined) return false
+
+  return status >= 500 || RETRYABLE_CLIENT_STATUS_LIST.includes(status)
+}
+
+/** The `retry` option for a `QueryClient`'s query defaults; compose it in a query that needs to skip more */
+export const defaultQueryRetry = (failureCount: number, error: unknown): boolean => {
+  return failureCount < MAX_QUERY_RETRIES && isRetryableError(error)
+}
+
+const MAX_DETAIL_LENGTH = 200
+
+/** A short message for a query that failed to load: the server is unavailable, the server's own short `detail`, or a generic failure */
+export const getLoadErrorMessage = (error: unknown): string => {
+  if (error instanceof ApiErrorUnavailable) return getText('serverUnavailable')
+
+  const detail = error instanceof ApiError ? error.response?.data?.detail : undefined
+
+  return typeof detail === 'string' && detail.length < MAX_DETAIL_LENGTH ? detail : getText('loadError')
+}
+
+const handledQueryErrorSet = shallowReactive(new Set<unknown>())
+
+/** Marks the error a component already shows, such as a failed list page or a page error, so `WQueryStatus` leaves it out of its message */
+export const useHandledQueryError = (error: MaybeRefOrGetter<unknown>): void => {
+  watch(() => toValue(error), (value, _, onCleanup) => {
+    if (!value) return
+
+    handledQueryErrorSet.add(value)
+    onCleanup(() => handledQueryErrorSet.delete(value))
+  }, {immediate: true})
+}
+
+export const isHandledQueryError = (error: unknown): boolean => handledQueryErrorSet.has(error)
+
+const RECOVERY_DELAY_MIN = 2_000
+const RECOVERY_DELAY_MAX = 10_000
+
+const isRecoverableQuery = (query: Query): boolean => query.state.status === 'error' && isRetryableError(query.state.error)
+
+/** The queries on screen that failed without data with an error asking again may fix, apart from those a component already shows */
+export const findFailedQueries = (queryClient: QueryClient): Query[] => {
+  return queryClient.getQueryCache().findAll({
+    type: 'active',
+    predicate: query => isRecoverableQuery(query) && query.state.data === undefined && !isHandledQueryError(query.state.error),
+  })
+}
+
+/** Fetches again every query on screen that failed with an error asking again may fix */
+export const refetchFailedQueries = (queryClient: QueryClient): Promise<void> => {
+  return queryClient.refetchQueries({type: 'active', predicate: isRecoverableQuery}, {cancelRefetch: false})
+}
+
+/**
+ * Brings back the queries that failed while the server was unreachable, which vue-query's own `refetchOnReconnect`
+ * cannot see: it only follows the browser's connection. While `available` is false, `probe` - a cheap request through
+ * the same client - is sent with a growing delay, and at once when the browser comes back online or the tab is shown.
+ * Once the probe has failed and the server answers again, the failed queries are fetched again. A probe answered at
+ * once means only some endpoints fail, and those queries wait for their own Retry instead of being fetched in a loop.
+ * Returns a function that stops watching.
+ */
+export const watchServerRecovery = (
+  queryClient: QueryClient,
+  available: MaybeRefOrGetter<boolean>,
+  probe: () => Promise<unknown>,
+): (() => void) => {
+  let delay = RECOVERY_DELAY_MIN
+  let timeout: ReturnType<typeof setTimeout> | undefined
+  let isOutage = false
+
+  const schedule = () => {
+    clearTimeout(timeout)
+    timeout = setTimeout(check, delay)
+    delay = Math.min(delay * 2, RECOVERY_DELAY_MAX)
+  }
+
+  const check = () => {
+    clearTimeout(timeout)
+
+    void probe().catch(() => undefined).finally(() => {
+      if (toValue(available)) return
+
+      isOutage = true
+      schedule()
+    })
+  }
+
+  const checkNow = () => {
+    if (toValue(available)) return
+
+    delay = RECOVERY_DELAY_MIN
+    check()
+  }
+
+  const checkWhenShown = () => {
+    if (document.visibilityState === 'visible') checkNow()
+  }
+
+  const stopWatch = watch(() => toValue(available), value => {
+    if (!value) return schedule()
+
+    clearTimeout(timeout)
+    delay = RECOVERY_DELAY_MIN
+
+    if (!isOutage) return
+
+    isOutage = false
+    void refetchFailedQueries(queryClient)
+  })
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('online', checkNow)
+    document.addEventListener('visibilitychange', checkWhenShown)
+  }
+
+  return () => {
+    stopWatch()
+    clearTimeout(timeout)
+
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('online', checkNow)
+      document.removeEventListener('visibilitychange', checkWhenShown)
+    }
+  }
+}
 
 let queryClientGlobal: QueryClient | undefined
 

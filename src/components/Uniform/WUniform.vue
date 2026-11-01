@@ -123,7 +123,7 @@ type PropsBase = {
   initHasError?: boolean
   /** Never reports unsaved changes. */
   noChanges?: boolean
-  /** Returns the props of a confirm modal to show before a change is applied. The change is dropped on cancel; returning nothing applies it at once. */
+  /** Returns the props of a confirm modal to show before a change is applied. The change is dropped on cancel, along with the field's unsaved draft; returning nothing applies it at once. */
   confimGetter?: (payload: ResultModel, data: Model) => ConfirmProps | Promise<ConfirmProps | undefined> | undefined
 }
 
@@ -236,6 +236,7 @@ const scopeModel = useUniformModel(
   (): void => void scopeSubmit?.submit(),
   () => emit('init-model'),
   slots.field ? value => scopeField?.validateFieldOnUpdate(value) : undefined,
+  slots.field ? (): void => scopeField?.cancelField() : undefined,
 )
 
 const scopeField = slots.field ? useUniformField(

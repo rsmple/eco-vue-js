@@ -140,6 +140,11 @@
   --w-list-padding: --value(--spacing-*, --w-size-*, [*]);
 }
 
+@utility w-list-align-top-* {
+  --w-list-align-top: --spacing(--value(number));
+  --w-list-align-top: --value(--spacing-*, --w-size-*, [*]);
+}
+
 @utility w-list-gap-* {
   --w-list-gap: --spacing(--value(number));
   --w-list-gap: --value(--spacing-*, --w-size-*, [*]);
@@ -229,6 +234,15 @@
 
 @utility w-ripple-rounded-* {
   --w-ripple-rounded: --value(--radius-*, --w-radius-*, [*]);
+}
+
+@utility w-ripple-border {
+  --w-ripple-border: 1px;
+}
+
+@utility w-ripple-border-* {
+  --w-ripple-border: calc(--value(integer) * 1px);
+  --w-ripple-border: --value([length], [*]);
 }
 
 @utility w-list-rounded-* {

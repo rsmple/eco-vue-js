@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="skeleton && !field.meta.customSkeleton"
-    class="list:pr-3 list:first-not:pl-3 grid shrink-0 grid-cols-1"
+    class="list:pr-3 list:first-not:pl-3 grid grid-cols-1"
     :class="[field.meta.cssClass, column.baseClass, beforeClass]"
     :style="card && nested ? undefined : column.style"
   >

@@ -37,13 +37,23 @@ export const apiClient = new ApiClientInstance({
 
 URLs start and end with a slash — `/products/` or `` `/products/${ id }/` `` — and are typed that way. `addInstance(baseUrl)` gives a client for another prefix that shares the auth.
 
-A failed request rejects with an `ApiError`, whose `response` has the `status` and the error body in `data`. A cancelled one rejects with `ApiErrorCancel`, which error handlers skip.
+A failed request rejects with an `ApiError`, whose `response` has the `status` and the error body in `data`. A cancelled one rejects with `ApiErrorCancel`, which error handlers skip. When the server can't be reached, or a gateway answers 502, 503 or 504 in its place, the request rejects with `ApiErrorUnavailable`, a subclass of `ApiError` with no `status` for a network failure.
+
+`useAvailable()` returns a ref that turns false on such a failure and true again on the server's next answer. Hand it to `watchServerRecovery`, with a cheap request as the probe, to bring back what failed during an outage. vue-query's `refetchOnReconnect` only follows the browser's own connection, so it never notices a server coming back:
+
+```ts
+import {watchServerRecovery} from 'eco-vue-js/dist/utils/queryClient'
+
+watchServerRecovery(queryClient, apiClient.useAvailable(), () => apiClient.get('/profile/'))
+```
+
+While the server is unreachable, the probe is sent every few seconds, and at once when the browser comes back online or the tab is shown. Once the server answers again, the failed queries on screen are fetched again. Their error states, such as a list's Retry, a [page error](/components/page-error) or the [query status](/components/query-status) message, stay in place until then. A probe answered right away means the server is up and only some endpoints fail, so their queries wait for Retry instead of being fetched again and again.
 
 ### Auth
 
 The client supports two kinds of auth:
 
-- **Cookie session** (the default). The server sets an `exp` cookie, readable from JS, with the session's expiry in seconds. Before each request the client checks it. Once it has passed, the client calls `refreshUrl` — or your own `tokenRefresh` — and then sends the request. A 401 also refreshes and retries once. Open tabs share the refresh, so only one of them calls the server. Without an `exp` cookie the client counts as logged out and rejects every request not sent with `noAuth`.
+- **Cookie session** (the default). The server sets an `exp` cookie, readable from JS, with the session's expiry in seconds. Before each request the client checks it. Once it has passed, the client calls `refreshUrl` — or your own `tokenRefresh` — and then sends the request. A 401 also refreshes and retries once, except for requests sent with `noAuth`. A refresh that fails with `ApiErrorUnavailable` keeps the session and rejects the request; any other failed refresh logs out. Open tabs share the refresh, so only one of them calls the server. Without an `exp` cookie the client counts as logged out and rejects every request not sent with `noAuth`.
 - **Bearer token.** With `tokenGetter`, the client adds `Authorization: Bearer <token>` to each request and counts as logged out when it returns nothing.
 
 `useAuth()` returns a ref of the logged-in state, for a guard that shows the login page. `logout()` clears the session. `onFailure`, or `setOnFailure` later, is called with every failed response, e.g. to redirect on 403.

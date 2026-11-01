@@ -1173,6 +1173,66 @@ export const varietyModelApi = createRestModelApi({
 
 <!-- @source-end -->
 
+## In list cells
+
+A select per row costs most of a list's first render: each one sets up its search, cursor, dropdown and input, and a query of its own when the options come from `useQueryFnOptions`. With `deferred`, a `seamless` select renders only its field and the selected options until it is pressed or focused — then it mounts the full select and opens it. Options from a query are not loaded before that, so give the selected ones in `previewData`, from data the row already has. The async selects load their chips on their own when `previewData` is not given, as they do when mounted.
+
+<!-- @example Select/Deferred -->
+
+<DocsDemo name="Select/Deferred" />
+
+```vue
+<template>
+  <div class="grid max-w-md grid-cols-[1fr_10rem] items-center gap-x-4">
+    <template
+      v-for="plant in plants"
+      :key="plant.id"
+    >
+      <div>{{ plant.name }}</div>
+
+      <WSelectSingle
+        v-model="plant.soil"
+        :options="soils"
+        :value-getter="item => item.code"
+        :search-fn="(item, search) => item.name.toLowerCase().includes(search.toLowerCase())"
+        placeholder="Soil"
+        seamless
+        deferred
+        no-margin
+      >
+        <template #option="{option, search}">
+          <div class="w-option flex items-center">
+            {{ option?.name ?? search }}
+          </div>
+        </template>
+      </WSelectSingle>
+    </template>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import {ref} from 'vue'
+
+import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
+
+const soils = [
+  {id: 1, code: 'loam', name: 'Loam'},
+  {id: 2, code: 'sand', name: 'Sandy'},
+  {id: 3, code: 'clay', name: 'Clay'},
+  {id: 4, code: 'peat', name: 'Peat'},
+]
+
+const plants = ref([
+  {id: 1, name: 'Monstera', soil: 'peat' as string | null},
+  {id: 2, name: 'Aloe', soil: 'sand' as string | null},
+  {id: 3, name: 'Fern', soil: null as string | null},
+  {id: 4, name: 'Basil', soil: 'loam' as string | null},
+])
+</script>
+```
+
+<!-- @example-end -->
+
 ## Other forms
 
 - **`WSelectStringified`** is a `WSelect` whose model is one string — the values joined by `divider`, such as `"high,critical"` for a query param, or a JSON array with `divider="json"`.
@@ -1196,6 +1256,7 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 | `allowClear` | `AllowClear` | — | Adds a button that clears the value, emitting `clearValue`. |
 | `clearValue` | `ClearValue` | — | Value emitted when cleared. Defaults to `null`; set it explicitly to emit `undefined` or `''`. |
 | `createdData` | `Data` | — | Option to add to the loaded ones — for a selected value the query does not return, such as one created elsewhere. |
+| `previewData` | `Data` | — | Selected option, shown in the field until the options load — and, with `deferred`, before the select mounts. |
 | `useQueryFnOptions` | `UseQueryDefault<Data[], unknown> \| UseQueryDefault<Data[], QueryParamsOptions>` | — | Query that loads the options. Takes `queryParamsOptions` when the query has parameters. Use either this or `options`. |
 | `queryParamsOptions` | `QueryParamsOptions` | — | Parameters for `useQueryFnOptions`. |
 | `options` | `Data[]` | — | Static list of options, instead of loading them with `useQueryFnOptions`. |
@@ -1206,11 +1267,13 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 | `emptyStub` | `string` | — | Shown in the menu instead of "Nothing to show" when there are no options and no search. |
 | `hidePrefix` | `boolean` | — | Hides the selected chips while the menu is open, leaving room to type. |
 | `createOption` | `((search: string) => Data \| Promise<Data \| undefined> \| undefined)` | — | Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. |
+| `labelGetter` | `((option: Data) => string)` | — | Gets an option's label for hiding the "New:" row when an option with the typed text exists — compared trimmed and lowercased. Defaults to an exact match on `valueGetter`. |
 | `filterOptions` | `((option: Data) => boolean)` | — | Hides options for which it returns `false`. |
 | `hideOptionIcon` | `boolean` | — | Hides the check mark next to selected options in the menu. |
 | `searchModel` | `boolean` | — | Commits the typed text when the menu closes — selects the option matching it exactly, or creates one with `createOption`. In a single select, the selected value is also put into the search text on focus, so it can be edited. For string values. |
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
 | `placeholderEmpty` | `string` | — | Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. |
+| `deferred` | `boolean` | — | Renders only the selected options until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells. The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`. |
 | `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |
 | `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | Extra props passed to every `optionComponent`. |
 | `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
@@ -1244,7 +1307,7 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 
 :::
 
-::: details Inherited from `src/components/Input/types.ts` (34)
+::: details Inherited from `src/components/Input/types.ts` (35)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1256,12 +1319,13 @@ import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
 | `placeholder` | `string` | — | Hint shown while the field is empty. |
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxSizeKb` | `number` | — | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | — | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
 | `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
 | `spellcheck` | `boolean` | — | Enables the browser's spell check. |
@@ -1329,6 +1393,7 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 | `disableClear` | `boolean` | — | Hides the remove button on the selected chips. |
 | `hidePrefix` | `boolean` | — | Hides the selected chips while the menu is open, leaving room to type. |
 | `createOption` | `((search: string) => Data \| Promise<Data \| undefined> \| undefined)` | — | Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. |
+| `labelGetter` | `((option: Data) => string)` | — | Gets an option's label for hiding the "New:" row when an option with the typed text exists — compared trimmed and lowercased. Defaults to an exact match on `valueGetter`. |
 | `filterOptions` | `((option: Data) => boolean)` | — | Hides options for which it returns `false`. |
 | `hideOptionIcon` | `boolean` | — | Hides the check mark next to selected options in the menu. |
 | `createdData` | `Data[]` | — | Options to add to the loaded ones — for selected values the query does not return, such as ones created elsewhere. |
@@ -1336,6 +1401,8 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
 | `placeholderEmpty` | `string` | — | Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. |
 | `cursorSelected` | `boolean` | — | Puts the cursor on the first selected option when the menu opens, so Enter toggles it — by default the menu only scrolls to it. Always set in the single selects. |
+| `previewData` | `Data[]` | — | Selected options, shown in the chips until the options load — and, with `deferred`, before the select mounts. |
+| `deferred` | `boolean` | — | Renders only the selected options until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells. The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`. |
 | `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |
 | `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | Extra props passed to every `optionComponent`. |
 | `useQueryFnOptions` | `UseQueryDefault<Data[], unknown> \| UseQueryDefault<Data[], QueryParamsOptions>` | — | Query that loads the options. Takes `queryParamsOptions` when the query has parameters. Use either this or `options`. |
@@ -1372,7 +1439,7 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 
 :::
 
-::: details Inherited from `src/components/Input/types.ts` (34)
+::: details Inherited from `src/components/Input/types.ts` (35)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1384,12 +1451,13 @@ import WSelect from 'eco-vue-js/dist/components/Select/WSelect.vue'
 | `placeholder` | `string` | — | Hint shown while the field is empty. |
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxSizeKb` | `number` | — | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | — | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
 | `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
 | `spellcheck` | `boolean` | — | Enables the browser's spell check. |
@@ -1458,20 +1526,22 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 | `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | Extra props passed to every `optionComponent`. |
 | `useQueryFnOptions` | `UseQueryDefault<PaginatedResponse<Data>, QueryParams>` | **required** | Paginated query that loads the options, page by page as the menu scrolls. The search text is sent in `searchField`. |
 | `queryParamsOptions` | `QueryParams` | **required** | Parameters for `useQueryFnOptions`. |
-| `valueGetter` | `(value: Data) => Model` | **required** | Gets the value stored in the model from an option. |
+| `valueGetter` | `((value: Data) => Model)` | `(data as unknown as {     id: Model; }).id` | Gets the value stored in the model from an option. Defaults to the option's `id`. |
 | `useQueryFnDefault` | `UseQueryDefault<Data, undefined>` | — | Query that loads a default option. When it resolves while nothing is selected, the option is selected and `init-model` is emitted. |
 | `emptyStub` | `string` | — | Shown in the menu instead of "Nothing to show" when there are no options and no search. |
 | `hidePrefix` | `boolean` | — | Hides the selected chips while the menu is open, leaving room to type. |
 | `createOption` | `((search: string) => Data \| Promise<Data \| undefined> \| undefined)` | — | Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. |
+| `labelGetter` | `((option: Data) => string)` | — | Gets an option's label for hiding the "New:" row when an option with the typed text exists — compared trimmed and lowercased. Defaults to an exact match on `valueGetter`. |
 | `hideOptionIcon` | `boolean` | — | Hides the check mark next to selected options in the menu. |
 | `searchModel` | `boolean` | — | Commits the typed text when the menu closes — selects the option matching it exactly, or creates one with `createOption`. In a single select, the selected value is also put into the search text on focus, so it can be edited. For string values. |
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
 | `placeholderEmpty` | `string` | — | Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. |
+| `deferred` | `boolean` | — | Renders only the selected options until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells. The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`. |
 | `useQueryFnPrefix` | `UseQueryDefault<PaginatedResponse<Data>, QueryParams>` | — | Paginated query that loads the selected options for the chips. Defaults to `useQueryFnOptions`. |
 | `searchField` | `keyof QueryParams` | — | Query parameter that receives the search text. Defaults to `search`. |
-| `valueQueryKey` | `string` | — | Query parameter that receives the selected values, comma-separated, when loading the chips. |
+| `valueQueryKey` | `string` | `"id__in"` | Query parameter that receives the selected values, comma-separated, when loading the chips. |
 | `prefixText` | `string` | — | Word after the count shown instead of chips when more than `prefixMax` values are selected. Defaults to "items". |
-| `prefixMax` | `number` | — | Most selected values shown as chips; above it, a count with a clear-all button is shown instead. |
+| `prefixMax` | `number` | `8` | Most selected values shown as chips; above it, a count with a clear-all button is shown instead. |
 | `reverse` | `boolean` | — | Shows the check mark on options that are not selected instead of those that are — for a select that picks what to exclude. |
 | `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
 | `dropdownClass` | `string` | — | Classes for the menu's content box. Defaults to `w-max`. |
@@ -1504,7 +1574,7 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 
 :::
 
-::: details Inherited from `src/components/Input/types.ts` (34)
+::: details Inherited from `src/components/Input/types.ts` (35)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1516,12 +1586,13 @@ import WSelectAsyncSingle from 'eco-vue-js/dist/components/Select/WSelectAsyncSi
 | `placeholder` | `string` | — | Hint shown while the field is empty. |
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxSizeKb` | `number` | — | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | — | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
 | `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
 | `spellcheck` | `boolean` | — | Enables the browser's spell check. |
@@ -1583,24 +1654,26 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 | `useQueryFnPrefix` | `UseQueryDefault<PaginatedResponse<Data>, QueryParams>` | — | Paginated query that loads the selected options for the chips. Defaults to `useQueryFnOptions`. |
 | `queryParamsOptions` | `QueryParams` | **required** | Parameters for `useQueryFnOptions`. |
 | `searchField` | `keyof QueryParams` | — | Query parameter that receives the search text. Defaults to `search`. |
-| `previewData` | `Data[]` | — | Selected options, used for the chips instead of loading them. |
+| `valueGetter` | `((value: Data) => Model)` | `(data as unknown as {     id: Model; }).id` | Gets the value stored in the model from an option. Defaults to the option's `id`. |
+| `previewData` | `Data[]` | — | Selected options, used for the chips instead of loading them — also before the select mounts with `deferred`. |
 | `valueQueryKey` | `string` | `"id__in"` | Query parameter that receives the selected values, comma-separated, when loading the chips. |
 | `prefixText` | `string` | — | Word after the count shown instead of chips when more than `prefixMax` values are selected. Defaults to "items". |
 | `prefixMax` | `number` | `8` | Most selected values shown as chips; above it, a count with a clear-all button is shown instead. |
 | `reverse` | `boolean` | — | Shows the check mark on options that are not selected instead of those that are — for a select that picks what to exclude. |
 | `modelValue` | `Model[] \| undefined` | **required** | Selected values. The component does not change it — update it from `select` and `unselect`. |
-| `valueGetter` | `(value: Data) => Model` | **required** | Gets the value stored in the model from an option. |
 | `useQueryFnDefault` | `UseQueryDefault<Data, undefined>` | — | Query that loads a default option. When it resolves while nothing is selected, the option is selected and `init-model` is emitted. |
 | `emptyStub` | `string` | `"No match"` | Shown in the menu instead of "Nothing to show" when there are no options and no search. |
 | `disableClear` | `boolean` | — | Hides the remove button on the selected chips. |
 | `hidePrefix` | `boolean` | — | Hides the selected chips while the menu is open, leaving room to type. |
 | `createOption` | `((search: string) => Data \| Promise<Data \| undefined> \| undefined)` | — | Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. |
+| `labelGetter` | `((option: Data) => string)` | — | Gets an option's label for hiding the "New:" row when an option with the typed text exists — compared trimmed and lowercased. Defaults to an exact match on `valueGetter`. |
 | `hideOptionIcon` | `boolean` | — | Hides the check mark next to selected options in the menu. |
 | `createdData` | `Data[]` | — | Options to add to the loaded ones — for selected values the query does not return, such as ones created elsewhere. |
 | `searchModel` | `boolean` | — | Commits the typed text when the menu closes — selects the option matching it exactly, or creates one with `createOption`. In a single select, the selected value is also put into the search text on focus, so it can be edited. For string values. |
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
 | `placeholderEmpty` | `string` | — | Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. |
 | `cursorSelected` | `boolean` | — | Puts the cursor on the first selected option when the menu opens, so Enter toggles it — by default the menu only scrolls to it. Always set in the single selects. |
+| `deferred` | `boolean` | — | Renders only the selected options until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells. The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`. |
 | `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |
 | `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | Extra props passed to every `optionComponent`. |
 | `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
@@ -1634,7 +1707,7 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 
 :::
 
-::: details Inherited from `src/components/Input/types.ts` (34)
+::: details Inherited from `src/components/Input/types.ts` (35)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1646,12 +1719,13 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 | `placeholder` | `string` | — | Hint shown while the field is empty. |
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxSizeKb` | `number` | — | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | — | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
 | `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
 | `spellcheck` | `boolean` | — | Enables the browser's spell check. |
@@ -1724,6 +1798,7 @@ import WSelectStringified from 'eco-vue-js/dist/components/Select/WSelectStringi
 | `disableClear` | `boolean` | — | Hides the remove button on the selected chips. |
 | `hidePrefix` | `boolean` | — | Hides the selected chips while the menu is open, leaving room to type. |
 | `createOption` | `((search: string) => Data \| Promise<Data \| undefined> \| undefined)` | — | Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. |
+| `labelGetter` | `((option: Data) => string)` | — | Gets an option's label for hiding the "New:" row when an option with the typed text exists — compared trimmed and lowercased. Defaults to an exact match on `valueGetter`. |
 | `filterOptions` | `((option: Data) => boolean)` | — | Hides options for which it returns `false`. |
 | `hideOptionIcon` | `boolean` | — | Hides the check mark next to selected options in the menu. |
 | `createdData` | `Data[]` | — | Options to add to the loaded ones — for selected values the query does not return, such as ones created elsewhere. |
@@ -1731,6 +1806,8 @@ import WSelectStringified from 'eco-vue-js/dist/components/Select/WSelectStringi
 | `lazy` | `boolean` | — | Waits until the menu is first opened before loading the options. |
 | `placeholderEmpty` | `string` | — | Placeholder while nothing is selected and the field is not focused. Defaults to `placeholder`. |
 | `cursorSelected` | `boolean` | — | Puts the cursor on the first selected option when the menu opens, so Enter toggles it — by default the menu only scrolls to it. Always set in the single selects. |
+| `previewData` | `Data[]` | — | Selected options, shown in the chips until the options load — and, with `deferred`, before the select mounts. |
+| `deferred` | `boolean` | — | Renders only the selected options until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells. The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`. |
 | `optionComponent` | `OptionComponent` | — | Component that renders an option, in the menu and in the selected chips. Receives `option`, `selected`, `model` and `search`. The `option` slot replaces it. |
 | `optionComponentProps` | `(OptionComponent extends Component<infer Props> ? Partial<Omit<Props, keyof SelectOptionProps<Option>>> : never)` | — | Extra props passed to every `optionComponent`. |
 | `horizontalAlign` | `HorizontalAlign` | — | Horizontal placement relative to the parent. When it does not fit the viewport, the next placement in order is tried. |
@@ -1764,7 +1841,7 @@ import WSelectStringified from 'eco-vue-js/dist/components/Select/WSelectStringi
 
 :::
 
-::: details Inherited from `src/components/Input/types.ts` (34)
+::: details Inherited from `src/components/Input/types.ts` (35)
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1776,12 +1853,13 @@ import WSelectStringified from 'eco-vue-js/dist/components/Select/WSelectStringi
 | `placeholder` | `string` | — | Hint shown while the field is empty. |
 | `icon` | `SVGComponent` | — | Icon at the start of the field, highlighted while focused. |
 | `size` | `number` | — | Native `size` attribute, which sets the input's minimum width in characters. |
+| `maxSizeKb` | `number` | — | Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. |
 | `step` | `number` | — | Native `step` attribute for `type="number"`. |
 | `min` | `number` | — | Native `min` attribute for `type="number"`. |
 | `max` | `number` | — | Native `max` attribute for `type="number"`. |
 | `name` | `string` | — | Native `name` attribute. |
 | `autocomplete` | `string` | — | Native `autocomplete` attribute. |
-| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. |
+| `autofocus` | `number \| boolean` | — | Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. |
 | `disabledActions` | `boolean` | — | Disables the action buttons (clear, paste, copy) while keeping the input editable. |
 | `loading` | `boolean` | — | Shows a spinner in the actions and blocks input. |
 | `spellcheck` | `boolean` | — | Enables the browser's spell check. |

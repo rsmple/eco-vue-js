@@ -43,13 +43,25 @@ List, select and async components fetch through `@tanstack/vue-query`. Install t
 
 ```ts
 import {QueryClient, VueQueryPlugin} from '@tanstack/vue-query'
-import {setQueryClient} from 'eco-vue-js/dist/utils/queryClient'
+import {defaultQueryRetry, setQueryClient} from 'eco-vue-js/dist/utils/queryClient'
 
-export const queryClient = new QueryClient()
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {retry: defaultQueryRetry},
+  },
+})
 
 setQueryClient(queryClient)
 
 app.use(VueQueryPlugin, {queryClient})
+```
+
+`defaultQueryRetry` retries a query twice when asking again may help: the server was unreachable, answered 5xx, 408 or 429. Other 4xx, cancelled requests and errors thrown by the query function fail at once. A query that must skip more composes it with `isRetryableError` or the same function:
+
+```ts
+options: {
+  retry: (failureCount, error) => error.response?.status !== 504 && defaultQueryRetry(failureCount, error),
+}
 ```
 
 The queries themselves are declared per model — see [Data layer](/guide/data-layer).
@@ -73,7 +85,7 @@ body {
 
 ## Global containers
 
-Modals, menus, notifications and tooltips render into containers mounted once at the root of the app — `WModal` renders the modals and every `WButtonMore` menu. `WShineEffect` is optional: it drives the moving shine on action buttons. `WNotify` shows the toasts; their history opens from `WNotifyCenterButton` in the actions bar (see [Notify](/components/notify#notify-center)).
+Modals, menus, notifications and tooltips render into containers mounted once at the root of the app — `WModal` renders the modals and every `WButtonMore` menu. `WShineEffect` is optional: it drives the moving shine on action buttons. `WNotify` shows the toasts; their history opens from `WNotifyCenterButton` in the actions bar (see [Notify](/components/notify#notify-center)). `WQueryStatus` shows one message with Retry when queries on screen fail to load (see [Query status](/components/query-status)).
 
 ```vue
 <template>
@@ -81,6 +93,7 @@ Modals, menus, notifications and tooltips render into containers mounted once at
 
   <WTooltipContainer />
   <WNotify />
+  <WQueryStatus />
   <WModal />
   <WShineEffect />
 </template>
@@ -88,6 +101,7 @@ Modals, menus, notifications and tooltips render into containers mounted once at
 <script setup lang="ts">
 import WModal from 'eco-vue-js/dist/components/Modal/WModal.vue'
 import WNotify from 'eco-vue-js/dist/components/Notify/WNotify.vue'
+import WQueryStatus from 'eco-vue-js/dist/components/QueryStatus/WQueryStatus.vue'
 import WShineEffect from 'eco-vue-js/dist/components/Shine/WShineEffect.vue'
 import WTooltipContainer from 'eco-vue-js/dist/components/Tooltip/WTooltipContainer.vue'
 </script>
@@ -95,7 +109,7 @@ import WTooltipContainer from 'eco-vue-js/dist/components/Tooltip/WTooltipContai
 
 ## Texts
 
-A few texts the components show on their own are in English: the Back, Next, Close, Cancel and submit buttons of a stepper, a confirm's Cancel and Accept, the question before a modal with unsaved changes closes, the warning about invalid fields, the From and To of a date picker, and No data on an empty chart. Replace them once, before the app mounts. A getter is read as the text renders, so a translation follows the locale:
+A few texts the components show on their own are in English: the Back, Next, Close, Cancel and submit buttons of a stepper, a confirm's Cancel and Accept, the question before a modal with unsaved changes closes, the warning about invalid fields, the From and To of a date picker, No data on an empty chart, the error and Retry of a list page, a [query boundary](/components/query-boundary) or the [query status](/components/query-status), and the heading, messages and buttons of a [page error](/components/page-error). Replace them once, before the app mounts. A getter is read as the text renders, so a translation follows the locale:
 
 ```ts
 import {setTexts} from 'eco-vue-js/dist/utils/texts'

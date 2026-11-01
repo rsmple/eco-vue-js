@@ -24,6 +24,8 @@ export interface InputProps<Type extends InputType, ClearValue extends InputClea
   size?: number
   /** Cuts off input longer than this, and shows a `length / maxLength` counter under the field while it is focused. */
   maxLength?: number
+  /** Largest file, in KB, that `allowDropFile` accepts by drop or picker. Defaults to 100. */
+  maxSizeKb?: number
   /** Native `step` attribute for `type="number"`. */
   step?: number
   /** Native `min` attribute for `type="number"`. */
@@ -35,7 +37,7 @@ export interface InputProps<Type extends InputType, ClearValue extends InputClea
   name?: string
   /** Native `autocomplete` attribute. */
   autocomplete?: 'off' | string
-  /** Focuses the field after mount, and again when the browser tab becomes active. A number sets the delay in ms (`0` focuses at once). Skipped while another input has focus. */
+  /** Focuses the field after mount, and again when the browser tab becomes active. Skipped while another input has focus. A number sets the delay in ms; `0` focuses at once, even if another input has focus. */
   autofocus?: boolean | number
   /** Shows the value as text without an input. When unset, inherits the readonly state provided by a parent. */
   readonly?: boolean

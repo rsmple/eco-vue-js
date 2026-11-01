@@ -43,7 +43,7 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'health',
-  cssClass: 'basis-[6.5rem]',
+  width: '6.5rem',
   title: 'Health',
   field: 'health',
 } as const satisfies ListField<Plant>

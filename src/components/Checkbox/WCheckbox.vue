@@ -26,7 +26,7 @@
         'text-tone-on': modelValue && !isDisabled && !isSkeleton,
         'tone-primary text-tone': !modelValue && !isDisabled && !isSkeleton,
         'text-subtle': !modelValue && isDisabled && !isSkeleton,
-        'w-ripple w-hover-circle before:text-accent after:text-accent': !isDisabled && !isReadonly && !isSkeleton,
+        'w-ripple w-ripple-border w-hover-circle before:text-accent after:text-accent': !isDisabled && !isReadonly && !isSkeleton,
         'rounded-full': radio,
         'rounded-md': !radio,
         'border-line': isDisabled || isSkeleton,

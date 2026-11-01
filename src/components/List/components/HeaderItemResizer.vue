@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup generic="Field">
-import {nextTick, onBeforeUnmount, useTemplateRef, watch} from 'vue'
+import {onBeforeUnmount, useTemplateRef} from 'vue'
 
 import IconDrag from '@/assets/icons/IconDrag.svg?component'
 
@@ -25,10 +25,6 @@ import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
 
 const MIN_WIDTH = 64
 const MAX_WIDTH = 2000
-
-const props = defineProps<{
-  hasWidth: boolean
-}>()
 
 const emit = defineEmits<{
   (e: 'update:width', value: number): void
@@ -73,36 +69,7 @@ const endDrag = () => {
   emit('save:width')
 }
 
-let measureObserver: ResizeObserver | null = null
-
-const stopMeasuring = () => {
-  measureObserver?.disconnect()
-  measureObserver = null
-}
-
-watch(() => props.hasWidth, async value => {
-  await nextTick()
-
-  if (value) {
-    stopMeasuring()
-    return
-  }
-  if (!elementRef.value || measureObserver) return
-
-  measureObserver = new ResizeObserver(entries => {
-    const entry = entries[0]
-    if (!entry) return
-
-    const width = entry.borderBoxSize?.[0]?.inlineSize ?? entry.contentRect.width
-    emit('update:width', width)
-    stopMeasuring()
-  })
-
-  measureObserver.observe(elementRef.value)
-}, {immediate: true, flush: 'post'})
-
 onBeforeUnmount(() => {
   listenerContainer.destroy()
-  stopMeasuring()
 })
 </script>

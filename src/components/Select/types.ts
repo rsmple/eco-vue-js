@@ -1,3 +1,4 @@
+import type {FieldWrapperProps} from '@/components/FieldWrapper/types'
 import type {InputSuggestProps} from '@/components/Input/types'
 import type {Component} from 'vue'
 
@@ -65,6 +66,8 @@ export interface SelectProps<Model extends number | string, Data extends Default
   hidePrefix?: boolean
   /** Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. */
   createOption?: (search: string) => (Data | undefined) | Promise<Data | undefined>
+  /** Gets an option's label for hiding the "New:" row when an option with the typed text exists — compared trimmed and lowercased. Defaults to an exact match on `valueGetter`. */
+  labelGetter?: (option: Data) => string
   /** Hides options for which it returns `false`. */
   filterOptions?: (option: Data) => boolean
   /** Hides the check mark next to selected options in the menu. */
@@ -79,6 +82,13 @@ export interface SelectProps<Model extends number | string, Data extends Default
   placeholderEmpty?: string
   /** Puts the cursor on the first selected option when the menu opens, so Enter toggles it — by default the menu only scrolls to it. Always set in the single selects. */
   cursorSelected?: boolean
+  /** Selected options, shown in the chips until the options load — and, with `deferred`, before the select mounts. */
+  previewData?: Data[]
+  /**
+   * Renders only the selected options until the field is first pressed or focused, then mounts the full select and opens it — for selects repeated in list cells.
+   * The options are not loaded before that, so pass `previewData` when they come from a query. With `seamless`, and not with `useQueryFnDefault` or `useFirstDefault`.
+   */
+  deferred?: boolean
 }
 
 export interface SelectPrefixProps<Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>>
@@ -92,10 +102,19 @@ export interface SelectPrefixProps<Data extends DefaultData, OptionComponent ext
   disableClear: boolean | undefined
 }
 
+export interface SelectDeferredProps<Model extends number | string, Data extends DefaultData, OptionComponent extends SelectOptionComponent<Data>>
+  extends SelectOptionComponentProps<Data, OptionComponent>,
+  Pick<InputSuggestProps<'text'>, 'placeholder' | 'name' | 'size' | 'noWrap' | 'borderClass' | 'hideInput' | 'loading'> {
+  modelValue: Model[]
+  getOption?: (value: Model) => Data | undefined
+  field: FieldWrapperProps
+  placeholderEmpty?: string
+}
+
 export type SelectClearValue = null | undefined | ''
 
 export interface SelectSingleProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>, AllowClear extends boolean, ClearValue extends SelectClearValue = null>
-  extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'createdData' | 'cursorSelected'> {
+  extends Omit<SelectProps<Model, Data, QueryParams, OptionComponent>, 'modelValue' | 'disableClear' | 'createdData' | 'previewData' | 'cursorSelected'> {
   /** Selected value. */
   modelValue: Model | ClearValue | null | undefined
   /** Adds a button that clears the value, emitting `clearValue`. */
@@ -104,6 +123,8 @@ export interface SelectSingleProps<Model extends number | string, Data extends D
   clearValue?: ClearValue
   /** Option to add to the loaded ones — for a selected value the query does not return, such as one created elsewhere. */
   createdData?: Data
+  /** Selected option, shown in the field until the options load — and, with `deferred`, before the select mounts. */
+  previewData?: Data
 }
 
 export interface SelectStringifiedProps<Model extends string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
@@ -115,7 +136,7 @@ export interface SelectStringifiedProps<Model extends string, Data extends Defau
 }
 
 export interface SelectAsyncProps<Model extends number | string, Data extends DefaultData, QueryParams, OptionComponent extends SelectOptionComponent<Data>>
-  extends Omit<SelectProps<Model, Data, QueryParams, Component>, 'options' | 'optionComponent' | 'optionComponentProps' | 'searchFn' | 'useQueryFnOptions' | 'queryParamsOptions' | 'filterOptions' | 'useFirstDefault'>,
+  extends Omit<SelectProps<Model, Data, QueryParams, Component>, 'options' | 'optionComponent' | 'optionComponentProps' | 'searchFn' | 'useQueryFnOptions' | 'queryParamsOptions' | 'filterOptions' | 'useFirstDefault' | 'previewData' | 'valueGetter'>,
   SelectOptionComponentProps<Data, OptionComponent> {
   /** Paginated query that loads the options, page by page as the menu scrolls. The search text is sent in `searchField`. */
   useQueryFnOptions: UseQueryDefault<PaginatedResponse<Data>, QueryParams>
@@ -125,7 +146,9 @@ export interface SelectAsyncProps<Model extends number | string, Data extends De
   queryParamsOptions: QueryParams
   /** Query parameter that receives the search text. Defaults to `search`. */
   searchField?: keyof QueryParams
-  /** Selected options, used for the chips instead of loading them. */
+  /** Gets the value stored in the model from an option. Defaults to the option's `id`. */
+  valueGetter?: (value: Data) => Model
+  /** Selected options, used for the chips instead of loading them — also before the select mounts with `deferred`. */
   previewData?: Data[]
   /** Query parameter that receives the selected values, comma-separated, when loading the chips. */
   valueQueryKey?: string

@@ -71,6 +71,6 @@ import {appendScrollbarStyles} from 'eco-vue-js/dist/utils/scrollbarStyles'
 Call these once when the app starts:
 
 - `preventDragFile()` stops the browser from opening a file dropped outside a drop zone, and keeps `isDragging` from the same file `true` while a file is dragged over the page — the [file picker](/components/file-picker)'s drop zone lights up with it.
-- `appendScrollbarStyles()` sets `--scroll-bar-width` on `<html>` to the width of the page's scrollbar — 0 with overlay scrollbars. The kit subtracts it from the content box in modals, and layouts that must line up with the scrolled content can use it too.
+- `appendScrollbarStyles()` sets `--scroll-bar-width` on `<html>` to the width of the page's scrollbar — 0 with overlay scrollbars. The kit subtracts it from the content box in modals, and layouts that must line up with the scrolled content can use it too. It also sets `--vw-scroll-bar-width` to how far `100vw` reaches past the page's box — the scrollbar gutter in browsers whose `100vw` still includes it, 0 in those that leave it out — and the kit subtracts that from `--w-width-inner`.
 
 `getIsClientSide()` is `false` during a server render, for code that touches `window` or `document`.

@@ -1,4 +1,4 @@
-import {type Ref, computed, inject, nextTick, provide, ref, useId, watch} from 'vue'
+import {type Ref, computed, inject, nextTick, provide, ref, watch} from 'vue'
 
 import {Modal} from '@/utils/Modal'
 
@@ -14,6 +14,10 @@ const copyItem = <Value>(value: Value): Value => Array.isArray(value)
         return result
       }, {} as Value)
       : value
+
+// Keys for the items of an array model. Not useId: the list is computed while some other component renders, and
+// taking an id from it shifts the ids of the fields after it between the server and the client.
+let itemKey = 0
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> => value instanceof Object && !Array.isArray(value) && !(value instanceof Date)
 
@@ -62,6 +66,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
   submit: () => void,
   emitInitModel: () => void,
   validateOnUpdate: ((newValue: ResultModel) => void) | undefined,
+  onConfirmCancel: (() => void) | undefined,
 ) => {
   const query = useQueryFn
     ? useQueryFn(queryParams as Ref<QueryParams>, {enabled: computed(() => !parentModel.value)})
@@ -124,7 +129,7 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
         continue
       }
 
-      result[useId()] = item
+      result[`item-${ itemKey++ }`] = item
     }
 
     for (const removedItem in result) {
@@ -194,10 +199,13 @@ export const useUniformModel = <ParentModel, Field extends keyof NonNullable<Par
 
     if (!confirmProps) return emitValue(value)
 
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       closeModal = Modal.addConfirm({
         ...confirmProps,
-        onCancel: reject,
+        onCancel: () => {
+          onConfirmCancel?.()
+          resolve()
+        },
         onAccept: () => resolve(emitValue(value)),
       }, () => closeModal = null)
     })

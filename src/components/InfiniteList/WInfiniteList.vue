@@ -27,6 +27,7 @@
         :exclude-params="excludeParams"
         :empty-stub="emptyStub"
         :page-class="pageClass"
+        :page-style="pageStyle"
         :max-pages="maxPages"
         :refetch-interval="refetchInterval"
         :query-options="queryOptions"
@@ -73,6 +74,16 @@
         >
           <slot name="empty" />
         </template>
+
+        <template
+          v-if="$slots.error"
+          #error="scope"
+        >
+          <slot
+            name="error"
+            v-bind="scope"
+          />
+        </template>
       </InfiniteListPages>
     </template>
   </component>
@@ -83,7 +94,7 @@ import type {InfiniteListHeaderScope, InfiniteListScope} from './types'
 import type {ApiError} from '@/utils/api'
 import type {DefaultQueryOptions} from '@/utils/useDefaultQuery'
 
-import {computed, useTemplateRef} from 'vue'
+import {type StyleValue, computed, useTemplateRef} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
@@ -112,8 +123,10 @@ const props = withDefaults(
     excludeParams?: (keyof QueryParams)[]
     /** Text shown when the query returns no items. The `empty` slot replaces it. */
     emptyStub?: string
-    /** Class of each page's element, e.g. a grid layout for the items. */
+    /** Class of the element holding the items of all loaded pages, e.g. a grid layout. The pages render no element of their own, so a grid row runs on from one page into the next. */
     pageClass?: string
+    /** Style of the element holding the items, e.g. the columns of a grid. */
+    pageStyle?: StyleValue
     /** Number of pages kept rendered, 5 by default. Scrolling further drops pages at the other end, keeping their height as space. */
     maxPages?: number
     /** Refetches the pages in view every this many ms. */
@@ -132,6 +145,7 @@ const props = withDefaults(
     excludeParams: undefined,
     emptyStub: undefined,
     pageClass: undefined,
+    pageStyle: undefined,
     maxPages: undefined,
     refetchInterval: undefined,
     valueGetter: (item: Data) => (item as unknown as {id: Model}).id,
@@ -185,5 +199,7 @@ defineSlots<{
   empty?: () => void
   /** Rendered in the box that holds the loaded pages, before them, such as a layer that spans them. */
   'pages-before'?: () => void
+  /** Shown instead of a page that failed to load and has nothing cached. Gets the `error`, `retry` to load the page again, and `isFetching`. Replaces the message and Retry button. */
+  error?: (props: {error: Error, retry: () => Promise<void>, isFetching: boolean}) => void
 }>()
 </script>

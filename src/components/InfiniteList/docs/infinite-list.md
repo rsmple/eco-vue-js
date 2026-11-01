@@ -116,7 +116,7 @@ A template ref gives `refetchAll`, `resetPage(page)` to start over from a page, 
 
 ## Long lists
 
-However long the query, the list keeps only `maxPages` pages in the DOM. Pages scrolled past are dropped and leave a space of their height, and their queries stay cached, so scrolling back renders them again at once. Spacers above and below the rendered pages stand in for the rest, sized by the number of pages times the average height of those rendered, so the scrollbar covers the whole list from the first page on.
+However long the query, the list keeps only `maxPages` pages in the DOM. Pages scrolled past are dropped and leave a space of their height, and their queries stay cached, so scrolling back renders them again at once. Spacers above and below the rendered pages stand in for the rest, sized by the number of pages times the average height of those rendered, so the scrollbar covers the whole list from the first page on. Browsers cap the height of an element, so for a list too long to fit under 15M px — about a million rows — the spacers shrink to fit, and the scrollbar moves through the list faster than the rows scroll.
 
 The demo below pages through 10,000 events, 50 at a time. The counter shows how many rows are in the DOM while scrolling. "Go to row" calls `goto` with the row's page and its index in the page, and the pages around it load in place.
 
@@ -279,7 +279,8 @@ import WInfiniteList from 'eco-vue-js/dist/components/InfiniteList/WInfiniteList
 | `noHeaderUpdate` | `boolean` | — | Keeps the sticky header out of the app header bar's padding while scrolled. |
 | `excludeParams` | `(keyof QueryParams)[]` | — | Params whose change refetches the loaded pages in place instead of resetting the list to the first page. |
 | `emptyStub` | `string` | — | Text shown when the query returns no items. The `empty` slot replaces it. |
-| `pageClass` | `string` | — | Class of each page's element, e.g. a grid layout for the items. |
+| `pageClass` | `string` | — | Class of the element holding the items of all loaded pages, e.g. a grid layout. The pages render no element of their own, so a grid row runs on from one page into the next. |
+| `pageStyle` | `StyleValue` | — | Style of the element holding the items, e.g. the columns of a grid. |
 | `maxPages` | `number` | — | Number of pages kept rendered, 5 by default. Scrolling further drops pages at the other end, keeping their height as space. |
 | `refetchInterval` | `number \| false` | — | Refetches the pages in view every this many ms. |
 | `queryOptions` | `DefaultQueryOptions<PaginatedResponse<Data>>` | — | Options for every page query. |
@@ -302,6 +303,7 @@ import WInfiniteList from 'eco-vue-js/dist/components/InfiniteList/WInfiniteList
 | `header` | `InfiniteListHeaderScope & Partial<InfiniteListScope>` | Sticky content above the items, such as a toolbar. Gets `refetchAll`, `resetPage`, `goto`, `isFetching` and `isRefetchingAll`, and `updateHeader` to re-measure it right away. |
 | `empty` | — | Shown when the query returns no items. Replaces `emptyStub`. |
 | `pages-before` | — | Rendered in the box that holds the loaded pages, before them, such as a layer that spans them. |
+| `error` | `{ error: Error; retry: () => Promise<void>; isFetching: boolean; }` | Shown instead of a page that failed to load and has nothing cached. Gets the `error`, `retry` to load the page again, and `isFetching`. Replaces the message and Retry button. |
 
 <!-- @api-end -->
 

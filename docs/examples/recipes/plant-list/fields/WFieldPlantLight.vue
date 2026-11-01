@@ -36,7 +36,7 @@ defineEmits<{
 <script lang="ts">
 export const meta = {
   label: 'light',
-  cssClass: 'basis-[7rem]',
+  width: '7rem',
   title: 'Light',
   field: 'light',
   textFormat: item => lightDisplay[item.light].name,

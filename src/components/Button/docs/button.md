@@ -263,6 +263,7 @@ import WButtonInput from 'eco-vue-js/dist/components/Button/WButtonInput.vue'
 | `loading` | `boolean` | — | Shows a spinner instead of the icon and ignores clicks. |
 | `skeleton` | `boolean` | — | Shows a placeholder instead of the button. |
 | `disabled` | `boolean` | — | Grays the button out and ignores clicks. |
+| `active` | `boolean` | — | Highlights the button, such as while the menu it opens is shown. |
 
 #### Events
 

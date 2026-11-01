@@ -30,8 +30,9 @@ const MARKDOWN_GLOBS = ['docs/**/*.md', 'src/components/*/docs/*.md']
 const INHERITED_COLLAPSE_MIN = 4
 
 // Types that print badly from .d.ts files (vue-router ships minified declaration names).
+// The minified aliases change between vue-router releases (`it | et` in 5.3, `et | X` in 5.4), so match any 1–2 char pair.
 const TYPE_REPLACEMENTS: [RegExp, string][] = [
-  [/string \| it \| et/g, 'RouteLocationRaw'],
+  [/string \| [A-Za-z$_][\w$]? \| [A-Za-z$_][\w$]?(?![\w$<])/g, 'RouteLocationRaw'],
   [/VNode<RendererNode, RendererElement, \{ \[key: string\]: any; \}>/g, 'VNode'],
 ]
 

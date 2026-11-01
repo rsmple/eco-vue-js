@@ -99,6 +99,16 @@ useRouteTitle(() => ({
 - `documentTitle` goes to the browser tab only — e.g. a long name the page shows in full in its body, while the header shows a short label.
 - `to` is the breadcrumb link while a child page is open. It defaults to the level's named route, then its named `''` child, then its `redirect`.
 - `suffix` is a component shown after the title, only while the page is the current one — a parent page's chips leave the header on its child pages.
+- `trail` adds levels after the page that are not routes, such as the active filter of a list. The page level becomes a link (set its `to` to keep the other filters), and the last trail level is the current one, with its own `suffix`:
+
+```ts
+useRouteTitle(() => ({
+  title: t('nav.pipelines'),
+  to: {query: {...route.query, status: undefined}},
+  trail: status.value ? [{title: statusTitleMap[status.value], suffix: WorkersText}] : [],
+  suffix: WorkersText,
+}))
+```
 
 Records that share a path, such as a parent and its `''` child, are one level, so a parent layout can title its index page.
 

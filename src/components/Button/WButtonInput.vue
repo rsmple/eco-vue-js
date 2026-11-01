@@ -10,12 +10,13 @@
     v-bind="to ? {to} : undefined"
     class="
       square---w-input-height bg-surface relative flex select-none items-center
-      justify-center rounded-(--w-input-rounded,0.75rem) border border-solid border-line-subtle
+      justify-center rounded-(--w-input-rounded,0.75rem) border border-solid border-line-subtle w-ripple-border
     "
     :class="{
       'cursor-not-allowed opacity-50': disabled,
       'w-ripple w-ripple-hover cursor-pointer': !disabled,
       'cursor-progress': loading,
+      'tone-primary text-tone border-tone-line': active,
     }"
     :disabled="disabled"
     :aria-label="tooltipText"
@@ -62,6 +63,8 @@ defineProps<{
   skeleton?: boolean
   /** Grays the button out and ignores clicks. */
   disabled?: boolean
+  /** Highlights the button, such as while the menu it opens is shown. */
+  active?: boolean
 }>()
 
 defineEmits<{

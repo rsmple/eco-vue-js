@@ -4,6 +4,7 @@
   --animate-move-horizontal: move-horizontal var(--tiker-duration, 0.8s) linear infinite;
   --animate-shake: shake .6s linear infinite;
   --animate-border-rotate: border-rotate linear infinite 10s;
+  --animate-border-march: border-march 0.5s linear infinite;
   --animate-dojo-logo-dashoffset: dojo-logo-dashoffset 1.6s linear 1;
   --animate-spinner-dash: spinner-dash 1.6s linear infinite;
   --animate-ping-fast: ping-big .5s cubic-bezier(0, 0, 0.2, 1);
@@ -60,6 +61,15 @@
     }
     to {
       stroke-dashoffset: var(--border-rotate-offset-to, -100%);
+    }
+  }
+
+  @keyframes border-march {
+    from {
+      stroke-dashoffset: 0px;
+    }
+    to {
+      stroke-dashoffset: -12px;
     }
   }
 

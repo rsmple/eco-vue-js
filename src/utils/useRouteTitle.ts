@@ -15,6 +15,8 @@ export type RouteTitle = {
   suffix?: Component
   /** Link for the breadcrumb. Defaults to the level's named route, then its named `''` child, then its `redirect`. */
   to?: RouteLocationRaw
+  /** Levels after this one that are not routes, e.g. the active filter of a list: `Pipelines / In progress`. The last one is the current page and shows its own `suffix`. */
+  trail?: RouteTitle[]
 }
 
 type Registration = {
@@ -41,10 +43,14 @@ const getStaticTitle = (record: RouteLocationMatched): RouteTitle | undefined =>
   }
 }
 
-export const getRouteTitle = (record: RouteRecordNormalized | undefined): RouteTitle | undefined => {
-  if (!record) return undefined
+export const getRouteTitle = (matched: RouteLocationMatched[]): RouteTitle | undefined => {
+  const path = matched.at(-1)?.path
 
-  return registrations.get(record)?.entry.value
+  return matched
+    .filter(record => record.path === path)
+    .reverse()
+    .map(record => registrations.get(record)?.entry.value)
+    .find(item => item !== undefined)
 }
 
 export const getRouteTitleShort = (value: RouteTitle): string | undefined => value.titleShort ?? value.title
@@ -108,7 +114,8 @@ export const useRouteTitles = () => {
 
   const titles = computed<RouteTitle[]>(() => groupByPath(route.matched ?? [])
     .map(getGroupTitle)
-    .filter(item => item !== undefined))
+    .filter(item => item !== undefined)
+    .flatMap(item => [item, ...item.trail ?? []]))
 
   return {
     titles,

@@ -2,7 +2,7 @@ import {shallowReactive} from 'vue'
 
 /** Texts the components show on their own, such as the buttons of a stepper. Each one is a string, or a getter — read as it renders, so a translation follows the locale. */
 export type Texts = {
-  /** Stepper button to the previous step. */
+  /** Button back to the previous step of a stepper, or to the previous page from a page error. */
   back: string
   /** Stepper button to the next step. */
   next: string
@@ -28,6 +28,20 @@ export type Texts = {
   dateTo: string
   /** A date picker value that is not picked. */
   noDate: string
+  /** A list page or a card in a `WQueryBoundary` that failed to load, when the server sends no short `detail`. */
+  loadError: string
+  /** Shown once for the whole page by `WQueryStatus` when some queries on screen failed while the server answers. */
+  partialLoadError: string
+  /** A list page, a card in a `WQueryBoundary`, a page error or `WQueryStatus` when the server could not be reached. */
+  serverUnavailable: string
+  /** Button that loads a failed list page, card, page or every failed query on screen again. */
+  retry: string
+  /** Heading of a page error. */
+  errorTitle: string
+  /** A page error for a missing page, or any failure without a `detail` from the server. */
+  pageNotFound: string
+  /** A page error for a 5xx answer without a `detail`. */
+  serverError: string
 }
 
 type TextSource = string | (() => string)
@@ -47,6 +61,13 @@ const texts = shallowReactive<Record<keyof Texts, TextSource>>({
   dateFrom: 'From:',
   dateTo: 'To:',
   noDate: 'None',
+  loadError: 'Failed to load',
+  partialLoadError: 'Some data failed to load',
+  serverUnavailable: 'Server is unavailable',
+  retry: 'Retry',
+  errorTitle: 'Oops!',
+  pageNotFound: 'This page does not exist or was removed',
+  serverError: 'Something went wrong on the server. Try again in a moment',
 })
 
 /**

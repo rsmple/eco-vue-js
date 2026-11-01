@@ -1,71 +1,98 @@
 <template>
   <InfiniteListScroll
     ref="infiniteScroll"
-    :style="{'--infinite-list-header-height': headerHeight + 'px'}"
+    :style="!minHeight && !minHeightOnly ? {minHeight: `calc(var(--w-height-inner) - ${ headerHeight }px)`} : undefined"
     :class="{
-      'min-h---height-inner list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem) modal:min-h-[50vh] pb-16': !minHeight && !minHeightOnly,
+      'list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem) modal:min-h-[50vh] pb-16': !minHeight && !minHeightOnly,
       'min-h-full': minHeight,
       'list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem)': minHeightOnly,
     }"
   >
     <slot name="before" />
 
-    <div :style="{height: topSpacerHeight + 'px'}" />
+    <!-- Not a scroll anchor: it changes by an average page height when a page is added or dropped at the top, not by the page's own. -->
+    <div
+      class="[overflow-anchor:none]"
+      :style="{height: topSpacerHeight + 'px'}"
+    />
     <div ref="topSentinel" />
 
-    <InfiniteListPage
-      v-for="(page, index) in pages"
-      ref="pageComponent"
-      :key="slotIds[index]"
-      :query-params="{...(queryParams as QueryParams), page, size: pageLength}"
-      :use-query-fn="useQueryFn"
-      :skeleton-length="getSkeletonLength(page - 1)"
-      :first-page="index === 0"
-      :last-page="index === pages.length - 1"
-      :transition="transition"
-      :resetting="isResettingPage"
-      :empty-stub="emptyStub"
-      :page-class="pageClass"
-      :refetch-interval="refetchInterval"
-      :query-options="queryOptions"
-      :enabled="!disabledSlots.has(slotIds[index]!)"
-
-      :value-getter="valueGetter"
-
-      @update:count="updateCount($event); $emit('update:count', $event)"
-      @update:pages-count="updatePagesCount"
-      @update:page-size="pageSize = $event"
-      @remove:page="removePage"
-      @refetch="refetchNextPages(page)"
-      @fetched="isResettingPage = false"
-      @update:error="$emit('update:error', $event)"
+    <div
+      ref="items"
+      :class="pageClass"
+      :style="pageStyle"
     >
-      <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page: itemPage, index: itemIndex, results, intersecting}">
-        <slot
-          :item="(item as Data)"
-          :setter="setter"
-          :skeleton="skeleton || isRefetchingAll"
-          :refetch="refetch"
-          :previous="((previous ?? pageComponentRef?.[index - 1]?.getLast() ?? pageComponentRef?.[pageComponentRef.length - 1]?.getLast()) as Data | undefined)"
-          :next="((next ?? pageComponentRef?.[index + 1]?.getFirst() ?? pageComponentRef?.[0]?.getFirst()) as Data | undefined)"
-          :first="first"
-          :last="last"
-          :resetting="isResettingPage"
-          :page="itemPage"
-          :index="itemIndex"
-          :value="valueGetter(item as Data)"
-          :results="results"
-          :intersecting="intersecting"
-        />
-      </template>
+      <!-- Not a scroll anchor: it moves to the start of the first page whenever one is added or dropped at the top. -->
+      <div
+        v-if="columnOffset"
+        aria-hidden="true"
+        class="[overflow-anchor:none]"
+        :style="{gridColumn: 'span ' + columnOffset, gridRow: leadingRows ? leadingRows + 1 : undefined}"
+      />
 
-      <template
-        v-if="$slots.empty"
-        #empty
+      <InfiniteListPage
+        v-for="(page, index) in pages"
+        ref="pageComponent"
+        :key="slotIds[index]"
+        :query-params="{...(queryParams as QueryParams), page, size: pageLength}"
+        :use-query-fn="useQueryFn"
+        :skeleton-length="getSkeletonLength(page - 1)"
+        :first-page="index === 0"
+        :last-page="index === pages.length - 1"
+        :transition="transition"
+        :resetting="isResettingPage"
+        :empty-stub="emptyStub"
+        :refetch-interval="refetchInterval"
+        :query-options="queryOptions"
+        :enabled="!disabledSlots.has(slotIds[index]!)"
+
+        :value-getter="valueGetter"
+
+        @update:count="updateCount($event); $emit('update:count', $event)"
+        @update:pages-count="updatePagesCount"
+        @update:page-size="pageSize = $event"
+        @remove:page="removePage"
+        @refetch="refetchNextPages(page)"
+        @fetched="isResettingPage = false"
+        @update:error="$emit('update:error', $event)"
       >
-        <slot name="empty" />
-      </template>
-    </InfiniteListPage>
+        <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page: itemPage, index: itemIndex, results, intersecting}">
+          <slot
+            :item="(item as Data)"
+            :setter="setter"
+            :skeleton="skeleton || isRefetchingAll"
+            :refetch="refetch"
+            :previous="((previous ?? getPageComponent(page - 1)?.getLast()) as Data | undefined)"
+            :next="((next ?? getPageComponent(page + 1)?.getFirst()) as Data | undefined)"
+            :first="first"
+            :last="last"
+            :resetting="isResettingPage"
+            :page="itemPage"
+            :index="itemIndex"
+            :value="valueGetter(item as Data)"
+            :results="results"
+            :intersecting="intersecting"
+          />
+        </template>
+
+        <template
+          v-if="$slots.empty"
+          #empty
+        >
+          <slot name="empty" />
+        </template>
+
+        <template
+          v-if="$slots.error"
+          #error="scope"
+        >
+          <slot
+            name="error"
+            v-bind="scope"
+          />
+        </template>
+      </InfiniteListPage>
+    </div>
 
     <div ref="bottomSentinel" />
     <div :style="{height: bottomSpacerHeight + 'px'}" />
@@ -76,14 +103,14 @@
 import type {ApiError} from '@/utils/api'
 import type {DefaultQueryOptions} from '@/utils/useDefaultQuery'
 
-import {computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref, useTemplateRef, watch} from 'vue'
+import {type StyleValue, computed, inject, nextTick, onBeforeUnmount, onMounted, provide, reactive, ref, useTemplateRef, watch} from 'vue'
 
 import {debounce, getIsClientSide, getOffsetTop, isEqualObj} from '@/utils/utils'
 
 import InfiniteListPage from './InfiniteListPage.vue'
 import InfiniteListScroll from './InfiniteListScroll.vue'
 
-import {wScrollingElement} from '../models/injection'
+import {wInfiniteListHeaderHeight, wScrollingElement} from '../models/injection'
 import {useRefetchNextPages} from '../use/useRefetchNextPages'
 
 const props = withDefaults(
@@ -101,6 +128,7 @@ const props = withDefaults(
     excludeParams?: (keyof QueryParams)[]
     emptyStub?: string
     pageClass?: string
+    pageStyle?: StyleValue
     maxPages?: number
     refetchInterval?: number | false
     queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>
@@ -115,6 +143,7 @@ const props = withDefaults(
     excludeParams: undefined,
     emptyStub: undefined,
     pageClass: undefined,
+    pageStyle: undefined,
     maxPages: 5,
     refetchInterval: undefined,
     queryOptions: undefined,
@@ -130,6 +159,9 @@ const emit = defineEmits<{
 const infiniteScrollRef = useTemplateRef('infiniteScroll')
 
 const scrollingElement = inject(wScrollingElement, null)
+
+// Provided rather than set as a variable on the root: a variable there restyles every row when the header is measured.
+provide(wInfiniteListHeaderHeight, computed(() => props.headerHeight))
 
 const pages = ref<number[]>([(props.queryParams as {page?: number}).page ?? 1])
 let slotIdCounter = 1
@@ -171,6 +203,7 @@ const getSkeletonLength = (pagesBefore: number): number => {
 }
 
 const pageComponentRef = useTemplateRef<ComponentInstance<typeof InfiniteListPage>[]>('pageComponent')
+const itemsRef = useTemplateRef<HTMLDivElement>('items')
 const topSentinelRef = useTemplateRef<HTMLDivElement>('topSentinel')
 const bottomSentinelRef = useTemplateRef<HTMLDivElement>('bottomSentinel')
 
@@ -227,7 +260,8 @@ const addPreviousPage = (silent?: boolean) => {
 
 let resizeObserver: ResizeObserver | null = null
 const pageHeights = reactive(new Map<number, number>())
-const observedElements = new Map<HTMLElement, number>()
+/** Where each page starts within the items, to tell whether the page in view moved. */
+const pageOffsets = new Map<number, number>()
 
 // Per item rather than per page: the last page can be short, and counted as a full one it would shrink every page.
 const avgItemHeight = computed(() => {
@@ -245,10 +279,24 @@ const avgItemHeight = computed(() => {
 
 const avgPageHeight = computed(() => Math.round(avgItemHeight.value * pageSize.value))
 
+/**
+ * Browsers cap the height of an element, at about 17.9M px in Firefox and 33.5M px in Chrome and Safari, and lay out
+ * whatever is past it at the cap. There the sentinels never leave the view, and pages are added one after another.
+ */
+const MAX_SPACER_HEIGHT = 15_000_000
+
+/** Scales down the space of the pages not rendered when those of a long list would not fit under the cap. */
+const spacerScale = computed(() => {
+  const height = avgPageHeight.value * pagesCount.value
+  return height > MAX_SPACER_HEIGHT ? MAX_SPACER_HEIGHT / height : 1
+})
+
+const spacerPageHeight = computed(() => avgPageHeight.value * spacerScale.value)
+
 const topSpacerHeight = computed(() => {
-  if (!avgPageHeight.value) return 0
+  if (!spacerPageHeight.value) return 0
   const firstRendered = pages.value[0] ?? 1
-  return Math.max(0, (firstRendered - 1) * avgPageHeight.value)
+  return Math.max(0, Math.round((firstRendered - 1) * spacerPageHeight.value))
 })
 
 // Only the items left after the rendered pages, so a short last page is not reserved as a full one.
@@ -257,92 +305,242 @@ const bottomSpacerHeight = computed(() => {
   const lastRendered = pages.value[pages.value.length - 1] ?? 1
   let itemCount = 0
   for (let page = lastRendered + 1; page <= pagesCount.value; page++) itemCount += getPageItemCount(page)
-  return Math.round(itemCount * avgItemHeight.value)
+  return Math.round(itemCount * avgItemHeight.value * spacerScale.value)
 })
+
+const columnCount = ref(1)
+
+const getColumnCount = (element: HTMLElement): number => {
+  const style = getComputedStyle(element)
+  if (style.display !== 'grid' && style.display !== 'inline-grid') return 1
+
+  // A grid's computed columns are the resolved track sizes, one length per column.
+  return Math.max(style.gridTemplateColumns.match(/[\d.]+px/g)?.length ?? 1, 1)
+}
+
+/**
+ * Empty cells before the first rendered item, as many as the column it has in the whole list. Without them, a list
+ * starting past the first page, or one dropping a page at the top, would move every item to another column whenever
+ * the page size is not a multiple of the column count.
+ */
+const columnOffset = ref(0)
+
+/**
+ * The column each page started in when it was last rendered after the pages before it. Items spanning the whole row,
+ * such as group headings, end a row early, so the column cannot be told from the count of items before the page.
+ */
+const pageColumns = new Map<number, number>()
+
+const getGuessedColumnOffset = (page: number): number => {
+  if (columnCount.value <= 1) return 0
+
+  return ((page - 1) * pageSize.value) % columnCount.value
+}
+
+// Before the first page renders, so the pages after it do not move for a frame when its column is known.
+watch(() => pages.value[0], page => {
+  columnOffset.value = (page === undefined ? undefined : pageColumns.get(page)) ?? getGuessedColumnOffset(page ?? 1)
+})
+
+watch(pageSize, () => pageColumns.clear())
+
+/**
+ * Rows the first page opens with, of items spanning the whole row such as the heading of the group it continues. The
+ * empty cells go in the row after them, so the cells come before the first item that takes a column.
+ */
+const leadingRows = ref(0)
+
+const getIsFullRow = (element: Element): boolean => {
+  const start = getComputedStyle(element).gridColumnStart
+
+  return start !== 'auto' && !start.startsWith('span')
+}
+
+/** The start of each column of the items, from the left of their content. */
+const getColumnStarts = (element: HTMLElement): number[] => {
+  const style = getComputedStyle(element)
+  const gap = Number.parseFloat(style.columnGap) || 0
+  let start = element.getBoundingClientRect().left + (Number.parseFloat(style.borderLeftWidth) || 0) + (Number.parseFloat(style.paddingLeft) || 0)
+
+  return (style.gridTemplateColumns.match(/[\d.]+px/g) ?? []).map(value => {
+    const current = start
+    start += Number.parseFloat(value) + gap
+    return current
+  })
+}
+
+const getColumn = (element: Element, starts: number[]): number => {
+  const left = element.getBoundingClientRect().left
+  let column = 0
+
+  for (let i = 1; i < starts.length; i++) if (left >= starts[i]! - 1) column = i
+
+  return column
+}
+
+/**
+ * Keeps the empty cells true to the columns the pages had: the first page after it rendered before keeps its column, so
+ * its items do not move. Not the first page's own, which is a guess for a page not rendered before, and changes as its
+ * items load, while a page still loading has no group headings to end its rows early. Returns whether the cells
+ * changed, after which the pages are measured again.
+ */
+const updateColumnOffset = (pageElements: Element[][]): boolean => {
+  const itemsEl = itemsRef.value
+  if (!itemsEl) return false
+
+  const firstElements = pageElements[0] ?? []
+  const firstItemIndex = firstElements.findIndex(element => !getIsFullRow(element))
+  const newLeadingRows = firstItemIndex === -1 ? 0 : firstItemIndex
+
+  if (columnCount.value <= 1 || firstItemIndex === -1) {
+    const isChanged = columnOffset.value !== 0 || leadingRows.value !== newLeadingRows
+    columnOffset.value = 0
+    leadingRows.value = newLeadingRows
+    return isChanged
+  }
+
+  if (leadingRows.value !== newLeadingRows) {
+    leadingRows.value = newLeadingRows
+    return true
+  }
+
+  const starts = getColumnStarts(itemsEl)
+  const columns = pageElements.map(elements => {
+    const item = elements.find(element => !getIsFullRow(element))
+    return item ? getColumn(item, starts) : undefined
+  })
+
+  // The list starts in the first column.
+  if (pages.value[0] === 1) {
+    if (columnOffset.value !== 0) {
+      columnOffset.value = 0
+      return true
+    }
+  } else if (!firstElements.slice(firstItemIndex).some(getIsFullRow)) {
+    // Up to the next item spanning the whole row, which starts the next row whatever the cells.
+    for (let i = 1; i < pages.value.length; i++) {
+      const elements = pageElements[i] ?? []
+      const itemIndex = elements.findIndex(element => !getIsFullRow(element))
+      if (itemIndex !== 0) {
+        if (elements.length === 0) continue
+        break
+      }
+
+      const known = pageColumns.get(pages.value[i]!)
+      const actual = columns[i]
+      if (known !== undefined && actual !== undefined) {
+        if (known === actual) break
+
+        columnOffset.value = (columnOffset.value + known - actual + columnCount.value) % columnCount.value
+        return true
+      }
+
+      if (elements.some(getIsFullRow)) break
+    }
+  }
+
+  pages.value.forEach((page, index) => {
+    const column = columns[index]
+    if (column !== undefined) pageColumns.set(page, column)
+  })
+
+  return false
+}
 
 const getScrollElementTop = (element: Element): number => {
   if (element === document.scrollingElement || element === document.body || element === document.documentElement) return 0
   return element.getBoundingClientRect().top
 }
 
-const handleResize: ResizeObserverCallback = (entries) => {
-  const scrollEl = scrollingElement?.value ?? document.scrollingElement
-  if (!scrollEl) return
+/**
+ * The pages render no element of their own, so the items of all pages share one layout, and a grid row can hold the
+ * end of one page and the start of the next. A page spans from its first element to the first element of the next
+ * page, the last one to the end of the items, so the heights add up to the list's height.
+ *
+ * With `correctScroll`, the list scrolls by as much as the first page in view moved within the items, so the items in
+ * view stay in place when the pages above them change their height. Moved, not the change of the heights above: a
+ * page that takes over or gives up a shared row changes its height while nothing moves. Not when pages are added or
+ * removed, which move the pages after them by design.
+ */
+const measurePages = (correctScroll: boolean) => {
+  const itemsEl = itemsRef.value
+  if (!itemsEl) return
 
-  const scrollElTop = getScrollElementTop(scrollEl)
-  let totalDelta = 0
+  const newColumnCount = getColumnCount(itemsEl)
 
-  for (const entry of entries) {
-    const el = entry.target as HTMLElement
-    const slotId = observedElements.get(el)
-    if (slotId === undefined) continue
-
-    const newHeight = Math.round(entry.contentRect.height)
-    const oldHeight = pageHeights.get(slotId)
-
-    pageHeights.set(slotId, newHeight)
-
-    if (oldHeight === undefined || oldHeight === newHeight) continue
-
-    if (el.getBoundingClientRect().bottom <= scrollElTop) {
-      totalDelta += newHeight - oldHeight
-    }
+  if (newColumnCount !== columnCount.value) {
+    columnCount.value = newColumnCount
+    pageColumns.clear()
+    columnOffset.value = getGuessedColumnOffset(pages.value[0] ?? 1)
+    nextTick(() => measurePages(correctScroll))
+    return
   }
 
-  if (totalDelta !== 0 && scrollEl.scrollTop !== 0) {
+  const instances = pageComponentRef.value ?? []
+  const pageElements = pages.value.map(page => instances.find(instance => instance?.pageNumber === page)?.getElements() ?? [])
+
+  // The layout changes with the cells, so the pages are measured once it has rendered.
+  if (updateColumnOffset(pageElements)) {
+    nextTick(() => measurePages(correctScroll))
+    return
+  }
+
+  const tops = pageElements.map(elements => elements[0]?.getBoundingClientRect().top)
+  const itemsBottom = itemsEl.getBoundingClientRect().bottom
+
+  const itemsTop = itemsEl.getBoundingClientRect().top
+
+  const scrollEl = scrollingElement?.value ?? document.scrollingElement
+  const scrollElTop = scrollEl ? getScrollElementTop(scrollEl) : 0
+  let totalDelta = 0
+  let isInViewFound = false
+
+  for (let i = 0; i < pages.value.length; i++) {
+    const slotId = slotIds.value[i]
+    const top = tops[i]
+    if (slotId === undefined || top === undefined) continue
+
+    const bottom = tops.slice(i + 1).find(value => value !== undefined) ?? itemsBottom
+    const offset = Math.round(top - itemsTop)
+    const oldOffset = pageOffsets.get(slotId)
+
+    pageHeights.set(slotId, Math.round(bottom - top))
+    pageOffsets.set(slotId, offset)
+
+    if (isInViewFound || bottom <= scrollElTop) continue
+
+    isInViewFound = true
+
+    if (correctScroll && i !== 0 && oldOffset !== undefined) totalDelta = offset - oldOffset
+  }
+
+  for (const slotId of Array.from(pageHeights.keys())) {
+    if (slotIds.value.includes(slotId)) continue
+
+    pageHeights.delete(slotId)
+    pageOffsets.delete(slotId)
+  }
+
+  if (scrollEl && totalDelta !== 0 && scrollEl.scrollTop !== 0) {
     scrollEl.scrollTop += totalDelta
   }
 }
 
 onMounted(() => {
-  resizeObserver = new ResizeObserver(handleResize)
+  resizeObserver = new ResizeObserver(() => measurePages(true))
+
+  if (itemsRef.value) resizeObserver.observe(itemsRef.value)
 })
 
 onBeforeUnmount(() => {
   resizeObserver?.disconnect()
   resizeObserver = null
   pageHeights.clear()
-  observedElements.clear()
+  pageOffsets.clear()
 })
 
-watch([pageComponentRef, slotIds], () => {
-  if (!resizeObserver) return
-
-  const instances = pageComponentRef.value ?? []
-  const ids = slotIds.value
-
-  if (instances.length === 0 && ids.length > 0) return
-
-  const currentEls = new Set<HTMLElement>()
-
-  for (let i = 0; i < instances.length; i++) {
-    const el = instances[i]?.getElement() ?? null
-    if (!el) continue
-    currentEls.add(el)
-
-    const slotId = ids[i]
-    if (slotId === undefined) continue
-
-    if (!observedElements.has(el)) {
-      observedElements.set(el, slotId)
-      if (!pageHeights.has(slotId)) {
-        pageHeights.set(slotId, Math.round(el.getBoundingClientRect().height))
-      }
-      resizeObserver.observe(el)
-    }
-  }
-
-  if (currentEls.size === 0) return
-
-  for (const el of Array.from(observedElements.keys())) {
-    if (!currentEls.has(el)) {
-      const id = observedElements.get(el)!
-      resizeObserver.unobserve(el)
-      observedElements.delete(el)
-      pageHeights.delete(id)
-    }
-  }
-}, {flush: 'post', immediate: true})
+// By the ids, as pages are added and removed by changing the array in place.
+watch([pageComponentRef, () => slotIds.value.join()], () => measurePages(false), {flush: 'post', immediate: true})
 
 const SENTINEL_MARGIN = 200
 
@@ -436,7 +634,7 @@ const goto = async (page = 1, itemIndex?: number) => {
 
   // Scrolls to where the page will be first, so the sentinels are out of view when the pages change,
   // as they are when the list is scrolled far. Otherwise a sentinel still reported in view adds a page and drops the target.
-  scrollToOffset((page - 1) * avgPageHeight.value)
+  scrollToOffset((page - 1) * spacerPageHeight.value)
 
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
 
@@ -468,6 +666,7 @@ const resetPage = async (page = 1) => {
   pagesCount.value = 1
   // The count of the previous query would size the skeletons of the new one.
   count.value = 0
+  pageColumns.clear()
   pages.value = [page]
   slotIds.value = [recycledSlotId ?? ++slotIdCounter]
 }
@@ -537,14 +736,10 @@ const anyPageInViewport = (): boolean => {
   const viewportTop = isDocumentScroll ? 0 : scrollEl.getBoundingClientRect().top
   const viewportBottom = isDocumentScroll ? window.innerHeight : scrollEl.getBoundingClientRect().bottom
 
-  const instances = pageComponentRef.value ?? []
-  for (const instance of instances) {
-    const el = instance?.getElement() ?? null
-    if (!el) continue
-    const rect = el.getBoundingClientRect()
-    if (rect.bottom > viewportTop && rect.top < viewportBottom) return true
-  }
-  return false
+  const rect = itemsRef.value?.getBoundingClientRect()
+  if (!rect) return true
+
+  return rect.bottom > viewportTop && rect.top < viewportBottom
 }
 
 const getScrollPosition = () => {
@@ -582,7 +777,7 @@ const checkScrollJump = debounce(() => {
 
   const y = Math.max(0, position.scrollTop - position.containerTop)
 
-  const target = Math.max(1, Math.min(Math.ceil(y / avgPageHeight.value) + 1, pagesCount.value))
+  const target = Math.max(1, Math.min(Math.ceil(y / spacerPageHeight.value) + 1, pagesCount.value))
   if (pages.value.includes(target)) return
 
   jumpToPage(target)
@@ -659,5 +854,6 @@ defineSlots<{
   }) => void
   before?: () => void
   empty?: () => void
+  error?: (props: {error: Error, retry: () => Promise<void>, isFetching: boolean}) => void
 }>()
 </script>

@@ -656,17 +656,9 @@
      * The rows' columns laid out as in a row, between its select and menu columns: the sticky ones stick where their
      * cells do, the rest only hold their place.
      */
+    /* On the rows' tracks, which WList sets on it too. */
     .w-list-page-strip-columns {
-      display: flex;
-      padding-inline: var(--w-list-left) var(--w-list-right);
-
-      @variant @max-lg {
-        padding-left: 0;
-      }
-
-      > * {
-        flex: none;
-      }
+      display: grid;
     }
 
     .w-list-page-strip-column {
