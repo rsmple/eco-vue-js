@@ -546,7 +546,13 @@
     }
   }
 
+  /*
+   * Docked, the actions bar casts its shadow only toward the page: on a screen wider than the frame it stands off the
+   * screen edge, and the shadow would fall on the empty margin past it. Floating, it casts it all round.
+   */
   .w-actions-bar {
+    clip-path: inset(-100vmax calc(-100vmax * var(--w-chrome-float)) -100vmax -100vmax);
+
     @variant sm-not {
       --w-chrome-edge: inset var(--w-chrome-border) 0 0 0 var(--w-line-subtle);
     }
