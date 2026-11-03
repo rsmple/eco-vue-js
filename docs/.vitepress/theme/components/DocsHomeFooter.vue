@@ -1,9 +1,5 @@
 <template>
-  <!--
-    A section, as the layout style draws it, a gap off the screen's bottom when the bars float. The rule above it only
-    shows in flat, where the section paints nothing.
-  -->
-  <div class="px-(--inner-margin) pb-(--w-chrome-gap)">
+  <div class="px-(--inner-margin) pb-(--w-chrome-gap) sm-not:[--w-page-inset:var(--inner-margin)]">
     <footer class="surface-section text-sm">
       <div class="border-line-subtle border-t-[calc(1px*(1-var(--w-chrome-float,0)))] py-[calc(3rem*(1-var(--w-chrome-float,0)))]">
         <div class="grid grid-cols-3 gap-10 md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
