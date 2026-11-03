@@ -6,7 +6,7 @@
       w-list-group-heading bg-surface list:left---left-inner list:w---width-inner sm-not:px---inner-margin
       list:pt-2 z-2 col-span-full pb-2 sm:sticky sm:px-(--w-list-padding,1rem)
     "
-    :style="{top: `calc(var(--header-height,0px) + ${ headerHeight ?? 0 }px)`}"
+    :style="{top: `calc(var(--w-list-header-top,var(--header-height,0px)) + ${ headerHeight ?? 0 }px)`}"
   >
     <slot />
   </div>

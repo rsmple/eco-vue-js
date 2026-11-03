@@ -1,10 +1,13 @@
 <template>
   <div
     ref="container"
-    :class="{
-      'sm-not:grid-cols-[repeat(2,100vw)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain grid-cols-[minmax(auto,var(--w-tabs-side-width,auto))_1fr] items-start gap-4': side && !flat,
+    :class="flat ? 'surface-stack-divided' : {
+      'grid': true,
+      'w-tabs-section': section,
+      // On phones the tab list and the open tab are two panes, each as wide as the box, however long the titles: the row
+      // reaches the box's edges, and each pane takes its padding, or the page inset outside a box.
+      'sm-not:[contain:inline-size] sm-not:grid-cols-[repeat(2,100%)] sm-not:gap-0 sm-not:mx-[calc(var(--w-frame-padding,var(--inner-margin))*-1)] sm-not:snap-x sm-not:snap-mandatory sm-not:snap-always sm-not:overflow-x-auto sm-not:overscroll-x-contain min-w-0 grid-cols-[minmax(auto,var(--w-tabs-side-width,auto))_1fr] items-start gap-4': side,
     }"
-    class="grid"
   >
     <!-- A stepper's title and progress go to the frame it is in, such as a modal's header. Outside a frame, or when another stepper has it, the progress is shown here. -->
     <template v-if="hasControls">
@@ -32,14 +35,17 @@
       ref="buttonContainer"
       class="relative"
       :class="{
-        'sm-not:snap-start grid grid-cols-[1fr_auto]': side,
-        'no-scrollbar mb-4 flex overflow-x-auto overscroll-x-contain': !side,
+        'sm-not:snap-start sm-not:px-(--w-frame-padding,var(--inner-margin)) grid grid-cols-[1fr_auto]': side,
+        'no-scrollbar flex overflow-x-auto overscroll-x-contain': !side,
+        'mb-4': !side && !section,
+        'surface-section-head': !side && section,
         // In an overlay frame the bar scrolls from edge to edge, with the first tab in line with the content. On a page it
         // keeps the phone inset, or on phones takes the padding of a box that sets `--w-frame-padding` instead of adding to it.
+        // A section head has the section's edges and padding.
         'w-frame-bleed px-(--w-frame-padding)': !side && frame !== null,
-        'sm-not:w-frame-bleed sm-not:pl-[var(--w-frame-padding,var(--inner-margin))] sm-not:pr-[var(--w-frame-padding,0px)]': !side && frame === null,
+        'sm-not:w-frame-bleed sm-not:pl-[var(--w-frame-padding,var(--inner-margin))] sm-not:pr-[var(--w-frame-padding,0px)]': !side && frame === null && !section,
         'flex-wrap': !side && wrap,
-        'shadow-[inset_0_-1px_var(--color-line-subtle)]': !side && divider,
+        'shadow-[inset_0_-1px_var(--color-line-subtle)]': !side && divider && !section,
         [headerClass ?? '']: true,
       }"
     >
@@ -125,21 +131,36 @@
       </template>
     </div>
 
+    <!-- Flat, the tabs' sections are the stack's own children, so they stack as a page's sections do. -->
+    <template v-if="flat">
+      <TabItem
+        v-for="slot in defaultSlots"
+        :ref="(setTabRef as VNodeRef)"
+        :key="slot.props.name"
+        :name="slot.props.name"
+        :title="slot.props.title"
+        :active="slot.props.name === current"
+        :removable="false"
+        flat
+      >
+        <component :is="slot" />
+      </TabItem>
+    </template>
+
     <div
-      v-if="defaultSlots.some(slot => (slot.children as Record<string, Component>)?.default)"
-      class="relative h-full"
+      v-else-if="defaultSlots.some(slot => (slot.children as Record<string, Component>)?.default)"
+      class="relative h-full transition-[min-height] duration-300"
       :class="{
-        'transition-[min-height] duration-300': !flat,
-        'sm-not:snap-start': side,
+        'surface-section-joined': !side && section,
+        'sm-not:snap-start sm-not:px-(--w-frame-padding,var(--inner-margin))': side,
       }"
-      :style="flat ? undefined : {minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
+      :style="[{minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}, sectionHeadStyle]"
     >
       <TransitionGroup
         enter-active-class="transition-[translate,opacity] duration-250 w-full [overflow-anchor:none]"
         leave-active-class="transition-[translate,opacity] duration-250 w-full absolute top-0 [overflow-anchor:none]"
         :enter-from-class="lessTransitions || side || hasScrollbar ? 'opacity-0' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]'"
         :leave-to-class="lessTransitions || side || hasScrollbar ? 'opacity-0 absolute' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]'"
-        :css="!flat"
       >
         <TabItem
           v-for="slot in defaultSlots"
@@ -149,8 +170,8 @@
           :title="slot.props.title"
           :active="slot.props.name === current"
           :removable="slot.props.removable ?? false"
-          :flat="flat ?? false"
-          @update:height="!disableMinHeight && !flat && updateHeight($event)"
+          :flat="false"
+          @update:height="!disableMinHeight && updateHeight($event)"
         >
           <component :is="slot" />
         </TabItem>
@@ -186,6 +207,7 @@ import IconClose from '@/assets/icons/IconClose.svg?component'
 
 import OverlayRegionPart from '@/components/Modal/components/OverlayRegionPart.vue'
 import {wOverlayRegions} from '@/components/Modal/models/overlayRegistry'
+import {useSectionHead} from '@/components/Surface/use/useSectionHead'
 import {wUniformStepperController} from '@/components/Uniform/utils/injection'
 import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRouter'
 import {Notify} from '@/utils/Notify'
@@ -233,6 +255,12 @@ const slots = defineSlots<{
 
 const containerRef = useTemplateRef('container')
 const buttonContainerRef = useTemplateRef('buttonContainer')
+
+// With `section`, the row of tabs sticks over a page list in the open tab, and the list's header under it.
+const {style: sectionHeadStyle} = useSectionHead(
+  buttonContainerRef,
+  () => props.section === true && !props.side && !props.flat && !props.noHeader,
+)
 
 const isTabItem = (slot: VNode): slot is VNode<RendererNode, RendererElement, TabsItemProps> & {props: TabsItemProps} => {
   return slot.type instanceof Object && '__name' in slot.type && slot.type.__name === 'WTabsItem'

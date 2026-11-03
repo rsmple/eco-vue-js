@@ -90,7 +90,7 @@
             [cardClass ?? '']: true,
             '[contain-intrinsic-size:auto_3rem] [content-visibility:auto]': contentVisibility,
             'col-[2/-2] grid grid-cols-subgrid': !card,
-            'grid grid-cols-(--w-list-grid-cols) [grid-template-areas:var(--w-list-grid-areas)] sm:rounded-(--w-list-rounded,unset)': card,
+            'grid grid-cols-(--w-list-grid-cols) [grid-template-areas:var(--w-list-grid-areas)] sm:rounded-(--w-list-rounded,unset) sm:bg-(--w-list-card,var(--w-surface-subtle))': card,
             'sm:border-y': hasBorder,
             'border-line': hasBorder && !selected,
             'tone-primary border-tone-line': hasBorder && selected,

@@ -12,6 +12,8 @@ A page groups its content in two kinds of containers, and the theme decides how 
 
 Both take a `title`, or a `title` slot, and an `actions` slot beside it. A section also takes an `eyebrow`, a short line above its heading such as a step number, and a `footer` slot for buttons under its content, past a line. They don't set their own radius, padding or border: those come from the theme, so every container on the page matches. Content that paints the surface, such as sticky list columns and soft tones, follows the container it is in.
 
+With a `semanticType` a section is in that tone: its soft paint in every layout style, flat included, and its heading in the tone. For a danger zone, `NEGATIVE`, a block of its own that reads apart from the page, in place of an info card in a section.
+
 The same look without the component is the `surface-section` and `surface-card` classes. A list that scrolls with the page is a section of its own: put it on the page, not inside a `WSection`.
 
 <!-- @example Surface/Basic page -->
@@ -76,7 +78,7 @@ const STATS = [
 
 A long page splits into several sections, one per topic. Put them in `surface-stack`, and the theme's section gap (`--w-section-gap`) goes between them: `0` in flat, so the sections run together into one column, and a gap in card and glass, so they show as separate surfaces. In flat the sections paint nothing and their content's margins carry on across them, so the page looks the same as without the split. These docs are built this way: each page is a stack of sections, one per heading and one per example.
 
-When the groups should read apart in flat too, such as the steps of a setup or the groups of a settings page, use `surface-stack-divided`: in flat a line goes between the sections, `--w-stack-divide` (`2rem`) below and above it. Card and glass are the same as with `surface-stack`. See [Settings page](/recipes/settings-page).
+When the groups should read apart in flat too, such as the steps of a setup or the groups of a settings page, use `surface-stack-divided`: in flat a line goes between the sections, `--w-stack-divide` (`2rem`) below and above it, and other blocks in it, such as a page list, are as far apart without the line. Card and glass are the same as with `surface-stack`. See [Settings page](/recipes/settings-page).
 
 ```vue
 <template>
@@ -102,6 +104,17 @@ A preview of a page inside a container, such as a layout picker or a demo, is a 
 | `surface-stack-divided` | The same, with a line between the sections in flat. |
 | `surface-root` | A page of its own in a well of the page background: nesting starts over inside it. |
 
+## On the page
+
+The app's main area is `w-page`, and the kit places the sections on it: on phones a section spans the screen with its content at the page inset, beside a list wider than the screen it stays in view, and under the last one the main area leaves room. Pages set no padding or positioning of their own. The rules for a whole page are in [Page layout](/recipes/page-layout).
+
+| Class | What it does |
+| --- | --- |
+| `w-page` | The app's main area: the page's inset at every width, the room under it, and content beside a wide list kept in view. |
+| `w-page-bleed` | A row of cards on the canvas, reaching into the gutter as a section does. |
+| `surface-columns` | Sections side by side on a grid, spaced for the layout style. |
+| `w-page-column` | The page's first column, for a page list beside other content: the list's section, header and bottom edge keep to the column. |
+
 ## API
 
 <!-- @api WSection -->
@@ -119,6 +132,7 @@ import WSection from 'eco-vue-js/dist/components/Surface/WSection.vue'
 | `title` | `string` | — | Heading of the section. The `title` slot replaces it. |
 | `eyebrow` | `string` | — | A short line above the heading, such as a step number. |
 | `tag` | `string` | `"section"` | Element to render. |
+| `semanticType` | `SemanticType` | — | Paints the section in the type's soft tone in every layout style, and its heading in the tone, such as a danger zone with `NEGATIVE`. `SECONDARY` is a plain section. |
 
 #### Slots
 

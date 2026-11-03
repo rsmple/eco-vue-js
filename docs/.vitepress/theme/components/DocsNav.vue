@@ -1,5 +1,9 @@
 <template>
   <WNavBar @update:is-open="$emit('update:isOpen', $event)">
+    <template #brand>
+      <DocsBrand compact />
+    </template>
+
     <div class="w-nav-bar-width no-scrollbar flex h-full flex-col overflow-y-auto overscroll-contain">
       <div class="mb-auto">
         <WNavItemTransition>
@@ -45,6 +49,8 @@ import IconNote from 'eco-vue-js/dist/assets/icons/IconNote'
 import IconSettings from 'eco-vue-js/dist/assets/icons/IconSettings'
 import IconTable from 'eco-vue-js/dist/assets/icons/IconTable'
 import IconTask from 'eco-vue-js/dist/assets/icons/IconTask'
+
+import DocsBrand from './DocsBrand.vue'
 
 const ICONS: Record<Group, SVGComponent> = {
   Guide: markRaw(IconNote),

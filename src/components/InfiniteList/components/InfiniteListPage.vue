@@ -2,7 +2,7 @@
   <div
     v-if="isFailed"
     ref="state"
-    class="w-infinite-list-state col-span-full"
+    class="w-infinite-list-state sm:left---left-inner sm:max-w---width-inner col-span-full sm:sticky"
   >
     <slot
       name="error"
@@ -10,7 +10,7 @@
       :retry="refetchPage"
       :is-fetching="isFetching"
     >
-      <div class="sm:left---left-inner sm:max-w---width-inner flex flex-col items-center gap-4 px-8 py-16 text-center sm:sticky">
+      <div class="flex flex-col items-center gap-4 px-8 py-16 text-center">
         <span class="text-accent font-normal">{{ errorMessage }}</span>
 
         <WButton
@@ -73,10 +73,10 @@
   <div
     v-else
     ref="state"
-    class="w-infinite-list-state col-span-full"
+    class="w-infinite-list-state sm:left---left-inner sm:max-w---width-inner col-span-full sm:sticky"
   >
     <slot name="empty">
-      <div class="text-accent sm:left---left-inner sm:max-w---width-inner flex justify-center px-8 py-16 text-center font-normal sm:sticky">
+      <div class="text-accent flex justify-center px-8 py-16 text-center font-normal">
         {{ emptyStub }}
       </div>
     </slot>

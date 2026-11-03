@@ -165,7 +165,7 @@ body {
   --docs-top: calc(2rem * (1 - var(--w-chrome-float, 0)));
 
   /* VitePress's bottom padding in flat; contained, the page's last section ends the bars' gap off the bottom, as
-     `w-page-pb` ends an app page. */
+     `w-page` ends an app page. */
   --docs-bottom-gap: calc(var(--w-chrome-gap, 0px) * var(--docs-contained));
 
   padding-top: var(--docs-top);
