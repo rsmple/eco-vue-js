@@ -39,7 +39,6 @@
         'no-scrollbar flex overflow-x-auto overscroll-x-contain': !side,
         'mb-4': !side && !section,
         'surface-section-head': !side && section,
-        'w-section-head-stuck': !side && section && isHeadStuck,
         // In an overlay frame the bar scrolls from edge to edge, with the first tab in line with the content. On a page it
         // keeps the phone inset, or on phones takes the padding of a box that sets `--w-frame-padding` instead of adding to it.
         // A section head has the section's edges and padding.
@@ -258,7 +257,7 @@ const containerRef = useTemplateRef('container')
 const buttonContainerRef = useTemplateRef('buttonContainer')
 
 // With `section`, the row of tabs sticks over a page list in the open tab, and the list's header under it.
-const {style: sectionHeadStyle, isStuck: isHeadStuck, observe: observeSectionHead} = useSectionHead(
+const {style: sectionHeadStyle} = useSectionHead(
   buttonContainerRef,
   () => props.section === true && !props.side && !props.flat && !props.noHeader,
 )
@@ -312,9 +311,6 @@ const current = ref<string>(routeTabName.value ?? props.initTab ?? (props.initTa
   : defaultSlots.value.find(slot => !!slot.props?.init)?.props?.name ?? defaultSlotsKeys.value[0]!
 ))
 const currentIndex = computed(() => defaultSlotsKeys.value.indexOf(current.value))
-
-// The open tab decides whether the head sticks: it does over a page list.
-watch(current, () => observeSectionHead(), {flush: 'post'})
 
 watch(
   () => unwrapSlots(props.customSlots ?? slots.default?.() ?? []).filter(isTabItem)[currentIndex.value]?.props?.title,

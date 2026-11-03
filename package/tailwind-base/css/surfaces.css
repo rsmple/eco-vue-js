@@ -1222,35 +1222,6 @@
     backdrop-filter: none;
   }
 
-  /*
-   * Stuck, the canvas above it, up to the header bar, and beside its rounded corners: what scrolls under it does not
-   * show there before the list's header sticks and covers it too.
-   */
-  .surface-section-head.w-section-head-stuck:has(+ * .w-list-page)::before {
-    --w-head-rounded: var(--w-section-rounded);
-
-    content: "";
-    position: absolute;
-    z-index: -1;
-    inset-inline: calc(var(--w-section-border) * -1);
-    top: calc((var(--w-header-inner) + var(--w-section-border)) * -1);
-    height: calc(var(--w-header-inner) + var(--w-head-rounded));
-    background-color: var(--w-canvas);
-    background-image: var(--w-canvas-image);
-    background-attachment: fixed;
-    pointer-events: none;
-    mask:
-      linear-gradient(#000 0 0) top / 100% calc(100% - var(--w-head-rounded)) no-repeat,
-      radial-gradient(circle at 100% 100%, transparent calc(var(--w-head-rounded) - 0.5px), #000 var(--w-head-rounded))
-        left bottom / var(--w-head-rounded) var(--w-head-rounded) no-repeat,
-      radial-gradient(circle at 0 100%, transparent calc(var(--w-head-rounded) - 0.5px), #000 var(--w-head-rounded))
-        right bottom / var(--w-head-rounded) var(--w-head-rounded) no-repeat;
-
-    @variant sm-not {
-      --w-head-rounded: 0px;
-    }
-  }
-
   .w-list-page-repaint .w-infinite-list-header-stuck .w-infinite-list-header-edge::before,
   .w-list-page-repaint .w-infinite-list-header-stuck .w-infinite-list-header-edge::after {
     background-origin: border-box;
