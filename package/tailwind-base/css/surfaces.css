@@ -640,14 +640,17 @@
    * pill is as far off the nav's top and bottom as off its end, and its corners run parallel to the nav's. Docked, the
    * last item clears the screen's edge. Not on the nav's scroller: content stuck to its edges would leave a strip
    * where the items show through. Content other than an item at an end, such as a block stuck to the bottom, sets its
-   * own room.
+   * own room. A collapsed group's items are hidden, not removed: the group's own item is then the last.
    */
   .w-nav-bar-content:not(.w-nav-bar-brand + *)
     .w-nav-item-inset:first-child:not(.w-nav-bar-content :not(:first-child) .w-nav-item-inset) {
     padding-top: calc(0.25rem + var(--w-chrome-float) * 0.25rem);
   }
 
-  .w-nav-bar-content .w-nav-item-inset:last-child:not(.w-nav-bar-content :not(:last-child) .w-nav-item-inset) {
+  .w-nav-bar-content
+    .w-nav-item-inset:not(:has(~ :not(.w-nav-group-collapsed))):not(
+      .w-nav-bar-content :has(~ :not(.w-nav-group-collapsed)) .w-nav-item-inset
+    ) {
     padding-bottom: calc(0.25rem + (1 - var(--w-chrome-float)) * 1rem + var(--w-chrome-float) * 0.25rem);
 
     @variant sm-not {

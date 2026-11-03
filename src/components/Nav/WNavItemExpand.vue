@@ -80,7 +80,10 @@
       </template>
     </WDropdownMenu>
 
-    <WExpansion :is-shown="isActive || even">
+    <WExpansion
+      :is-shown="isActive || even"
+      :class="{'w-nav-group-collapsed': !isActive && !even}"
+    >
       <WNavItemTransition>
         <component
           :is="slot"
