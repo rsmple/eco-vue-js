@@ -8,7 +8,7 @@ description: A settings page split into WSection groups that read apart in every
 
 **Problem:** a settings or setup page has several groups — the steps of a setup, the areas of a configuration. In card and glass each group is its own surface, but in flat they run together into one column, and nothing shows where one group ends and the next begins.
 
-**Pattern:** the page title and the page's buttons sit on the page, outside any section. Each group is a `WSection`, and the groups go in `surface-stack-divided`:
+**Pattern:** the page title and the page's buttons sit on the page, outside any section. Each group is a `WSection`. On the page (`w-page`) the kit sets them apart on its own; off it, as in the demo below, the groups go in `surface-stack-divided`:
 
 | Piece | What it is |
 | --- | --- |
@@ -16,7 +16,7 @@ description: A settings page split into WSection groups that read apart in every
 | `eyebrow` | A short line above a section's heading, such as a step number. |
 | A `WSection` inside a section | A part of the group: it paints nothing, its heading is smaller and one level down, and a line sits above it when content comes before it. |
 | `WInfoCard`, `WCard` inside a section | A hint or a block of its own, one step darker than the section. |
-| `footer` slot | Buttons under the group's content, past a line, such as the group's Save. |
+| `footer` slot | Buttons under the group's content, such as the group's Save: past a line, or on the page in flat, past a space, as the line there is between the groups. |
 
 ## Try it
 

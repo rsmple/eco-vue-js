@@ -29,7 +29,7 @@ When the app's layout already puts something before the main area, such as a gri
 
 ## Blocks
 
-Blocks one after another on the page are the theme's section gap apart, through any wrappers: a page needs no stack only to keep them from touching. Put them in `surface-stack-divided` when they should read apart in flat too, such as the groups of a settings page, or in `surface-stack` when other content between them, such as a line of text, should keep the gap too. Each block is one of these:
+Blocks one after another on the page are apart through any wrappers, so a page needs no stack of its own: the theme's section gap in card and glass, and in flat `--w-stack-divide` (`2rem`) with a line between two sections, so its groups read apart there too. Put them in `surface-stack` only when they should run together in flat, one column as if unsplit, or when other content between them, such as a line of text, should keep the gap too. Each block is one of these:
 
 | Block | For | How |
 | --- | --- | --- |
@@ -37,7 +37,7 @@ Blocks one after another on the page are the theme's section gap apart, through 
 | Page list | The list the page is about, scrolling with the window | `WList` straight on the page, not in a section |
 | Tabs over lists | Several lists, one per tab | `WTabs` with `section`: the tab row is the top of the open list's section |
 | Form in tabs | A long form whose tabs are all shown on the page | `WTabs` with `flat`: each tab is a section |
-| Danger zone | An action that can't be undone, such as deleting the item | `WSection` with `semanticType` `NEGATIVE`, last on the page. When a page list ends the page, it scrolls on and on: the button goes in the `footer` of the item's section instead |
+| Danger zone | An action that can't be undone, such as deleting the item | `WSection` with `semanticType` `NEGATIVE`, last on the page: a `description` of what goes and what stays, and the button in the `footer`. When a page list ends the page, it scrolls on and on: the button goes in the `footer` of the item's section instead |
 | Row of cards | Stats or tiles on the canvas, not in a section | `WCard`s in a grid with `w-page-bleed` |
 
 Content fills its section: the frame stops growing at `--w-content-max-width`, so a section is never too wide for fields, and a `max-w-*` on a page's content only leaves an empty side. A group of fields or text with a heading of its own is a section of its own, not a heading inside one.
@@ -60,14 +60,12 @@ Sections side by side are a grid with `surface-columns`, which spaces them by `-
 
 ## Variants
 
-**Form page.** Sections in `surface-stack-divided`, a danger zone last, the Save in a section's `footer` (see [Settings page](/recipes/settings-page)).
+**Form page.** Sections on the page, a danger zone last, the Save in a section's `footer` (see [Settings page](/recipes/settings-page)).
 
 ```vue
-<div class="surface-stack-divided">
-  <WSection title="General" />
-  <WSection title="Notifications" />
-  <WSection title="Danger zone" :semantic-type="SemanticType.NEGATIVE" />
-</div>
+<WSection title="General" />
+<WSection title="Notifications" />
+<WSection title="Danger zone" :semantic-type="SemanticType.NEGATIVE" />
 ```
 
 **List page.** The page list, with a description or filters above it when it needs them (see [List page](/recipes/list-page)).
@@ -81,27 +79,23 @@ Sections side by side are a grid with `surface-columns`, which spaces them by `-
 **Item page with tabs.** A section with the item's header, then tabs over its lists, or a form in a tab as a stack of sections.
 
 ```vue
-<div class="surface-stack">
-  <WSection :title="plant.name" />
+<WSection :title="plant.name" />
 
-  <WTabs section>
-    <WTabsItem name="beds" title="Beds">
-      <BedList />
-    </WTabsItem>
-  </WTabs>
-</div>
+<WTabs section>
+  <WTabsItem name="beds" title="Beds">
+    <BedList />
+  </WTabsItem>
+</WTabs>
 ```
 
-**Dashboard.** Rows of cards and sections in a stack.
+**Dashboard.** Rows of cards and sections, one after another.
 
 ```vue
-<div class="surface-stack">
-  <div class="w-page-bleed grid grid-cols-2 gap-3 lg:grid-cols-4">
-    <WCard v-for="stat in stats" :key="stat.title" :title="stat.title" />
-  </div>
-
-  <WSection title="Recent" />
+<div class="w-page-bleed grid grid-cols-2 gap-3 lg:grid-cols-4">
+  <WCard v-for="stat in stats" :key="stat.title" :title="stat.title" />
 </div>
+
+<WSection title="Recent" />
 ```
 
 ## What the kit does

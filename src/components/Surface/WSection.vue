@@ -5,7 +5,7 @@
     :class="semanticType && semanticType !== SemanticType.SECONDARY ? ['surface-section-tone', sectionToneMap[semanticType]] : undefined"
   >
     <div
-      v-if="title || eyebrow || $slots.title || $slots.actions"
+      v-if="title || eyebrow || description || $slots.title || $slots.description || $slots.actions"
       class="flex flex-wrap items-center gap-x-4 gap-y-2"
     >
       <div class="mr-auto grid gap-1">
@@ -25,6 +25,15 @@
             {{ title }}
           </slot>
         </component>
+
+        <p
+          v-if="description || $slots.description"
+          class="text-description max-w-prose text-sm text-pretty"
+        >
+          <slot name="description">
+            {{ description }}
+          </slot>
+        </p>
       </div>
 
       <slot name="actions" />
@@ -34,7 +43,7 @@
 
     <div
       v-if="$slots.footer"
-      class="border-line-subtle flex flex-wrap items-center justify-end gap-2 border-t border-solid pt-4"
+      class="surface-section-footer flex flex-wrap items-center gap-2"
     >
       <slot name="footer" />
     </div>
@@ -56,6 +65,11 @@ withDefaults(
     title?: string
     /** A short line above the heading, such as a step number. */
     eyebrow?: string
+    /**
+     * A line under the heading on what the section is for, such as what a danger zone's action deletes and what stays,
+     * with its button in the `footer`.
+     */
+    description?: string
     /** Element to render. */
     tag?: string
     /**
@@ -67,6 +81,7 @@ withDefaults(
   {
     title: undefined,
     eyebrow: undefined,
+    description: undefined,
     semanticType: undefined,
     tag: 'section',
   },
@@ -77,9 +92,11 @@ defineSlots<{
   default?: () => void
   /** Heading of the section, in place of `title`. */
   title?: () => void
+  /** Line under the heading, in place of `description`. */
+  description?: () => void
   /** Buttons beside the heading. */
   actions?: () => void
-  /** Buttons under the content, past a line, such as Save. */
+  /** Buttons under the content, such as Save: past a line, or on the page in flat, past a space. */
   footer?: () => void
 }>()
 
