@@ -12,7 +12,7 @@ description: A settings page split into WSection groups that read apart in every
 
 | Piece | What it is |
 | --- | --- |
-| `surface-stack-divided` | Sections one after another: the theme's gap between them in card and glass, and a line with space around it in flat. Content in it that is not a section, such as a row of cards, keeps the plain gap. |
+| `surface-stack-divided` | Sections one after another: the theme's gap between them in card and glass, and a line with space around it in flat. Content in it that is not a section, such as a page list, gets the same space in flat, without the line. |
 | `eyebrow` | A short line above a section's heading, such as a step number. |
 | A `WSection` inside a section | A part of the group: it paints nothing, its heading is smaller and one level down, and a line sits above it when content comes before it. |
 | `WInfoCard`, `WCard` inside a section | A hint or a block of its own, one step darker than the section. |

@@ -38,7 +38,7 @@
 
       <InfiniteListHeaderPadding
         :is-intersecting="isIntersecting"
-        :header-height="scope.headerHeight"
+        :header-height="scope.headerHeight + sectionHeadOffset"
       >
         <slot
           name="header"
@@ -56,9 +56,10 @@
 <script lang="ts" setup>
 import type {InfiniteListHeaderScope} from './types'
 
-import {type VNode, inject, onBeforeUnmount, onMounted, ref, useTemplateRef} from 'vue'
+import {type VNode, computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef, watch} from 'vue'
 
 import {wIsModal} from '@/components/Modal/models/injection'
+import {wSectionHeadHeight} from '@/components/Surface/models/injection'
 import {BASE_ZINDEX_DROPDOWN, BASE_ZINDEX_LIST_HEADER, getIsClientSide} from '@/utils/utils'
 
 import InfiniteListHeaderHeight from './components/InfiniteListHeaderHeight.vue'
@@ -110,8 +111,16 @@ const getStickyTop = (): number => {
   return Number.isNaN(top) ? headerHeight.value : top
 }
 
+// A page list's header sticks under a section head over it, such as WTabs `section`, which sticks above it: what the
+// header covers of the page then starts at the head.
+const sectionHeadHeight = isContained ? null : inject(wSectionHeadHeight, null)
+const isPage = ref(false)
+const sectionHeadOffset = computed(() => isPage.value ? sectionHeadHeight?.value ?? 0 : 0)
+
 const observe = () => {
   if (!indicatorRef.value) return
+
+  isPage.value = indicatorRef.value.closest('.w-list-page') !== null
 
   const top = getStickyTop()
   if (observer && top === observerTop) return
@@ -135,6 +144,8 @@ onMounted(() => {
   observe()
   window.addEventListener('resize', observe)
 })
+
+if (sectionHeadHeight) watch(sectionHeadHeight, observe, {flush: 'post'})
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', observe)

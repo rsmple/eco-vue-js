@@ -21,7 +21,7 @@
 
   <nav
     class="
-      w-nav-bar fixed left-(--left-margin,0px) top-0 flex h-full flex-col overflow-hidden
+      w-nav-bar fixed left-(--w-left-margin,0px) top-0 flex h-full flex-col overflow-hidden
       transition-[clip-path] duration-200 [clip-path:inset(-2rem)] print:hidden
     "
     :class="[{
@@ -29,13 +29,30 @@
     }, $attrs.class]"
     :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
   >
+    <WRouterLink
+      v-if="$slots.brand && brandTo"
+      :to="brandTo"
+      class="w-nav-bar-brand w-ripple-trigger h---header-height flex shrink-0 no-underline"
+    >
+      <div class="w-ripple w-ripple-hover tone-primary text-tone relative flex items-center justify-center rounded-(--w-nav-item-rounded)">
+        <slot name="brand" />
+      </div>
+    </WRouterLink>
+
+    <div
+      v-else-if="$slots.brand"
+      class="w-nav-bar-brand h---header-height flex shrink-0"
+    >
+      <slot name="brand" />
+    </div>
+
     <div class="w-nav-bar-content mt---header-height flex min-h-0 flex-auto flex-col overflow-hidden">
       <slot />
     </div>
   </nav>
 
   <div
-    class="w-nav-bar-toggle square---header-height w-ripple fixed left-(--left-margin,0px) top-0 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
+    class="w-nav-bar-toggle square---header-height w-ripple fixed left-(--w-left-margin,0px) top-0 flex cursor-pointer items-center justify-center xl:hidden print:hidden"
     :class="{'tone-primary text-tone': isOpen}"
     :style="{zIndex: BASE_ZINDEX_NAV_BAR}"
     @click.stop="toggle"
@@ -45,12 +62,21 @@
 </template>
 
 <script lang="ts" setup>
+import type {LinkProps} from '@/types/types'
+
 import {provide, ref} from 'vue'
+
+import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 
 import IconMenu from '@/assets/icons/IconMenu.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
 import {BASE_ZINDEX_NAV_BAR, wBaseZIndex} from '@/utils/utils'
+
+defineProps<{
+  /** Where the brand links to, such as the home page. The whole brand row is the link, as an item is, with its hover pill inset as the items' and the brand mark centered in it. */
+  brandTo?: LinkProps['to']
+}>()
 
 const emit = defineEmits<{
   /** The nav opened or closed below `xl`, where it is an overlay. */
@@ -60,6 +86,8 @@ const emit = defineEmits<{
 defineSlots<{
   /** Content of the nav, such as WNavItem items. */
   default?: () => void
+  /** A logo or brand mark in the frame's top-left corner: the nav's top row, level with the header. With `brandTo` the row is a link and the slot is the mark in its pill. Without it the row is inset as the items are and the slot fills it, so content with `rounded-(--w-nav-item-rounded)` lines up with them. Below `xl` it starts after the toggle. */
+  brand?: () => void
 }>()
 
 provide(wBaseZIndex, BASE_ZINDEX_NAV_BAR)

@@ -5,21 +5,27 @@ import {DARK_SELECTOR} from '../constants.js'
 const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
   addBase({
     '*': {
+      // Space outside the frame: past `--w-content-max-width` the frame stops growing and centres itself. An app that
+      // sets `--left-margin` and `--right-margin` itself, such as to a frame width of its own, overrides it.
+      '--w-left-margin': 'var(--left-margin, max(0px, (100vw - var(--vw-scroll-bar-width, 0px) - var(--w-content-max-width, 100vw) - var(--nav-bar-width, 0px) - min(var(--nav-bar-width, 0px) * 1000, var(--w-chrome-gap, 0px)) - var(--actions-bar-width, 0px) - min(var(--actions-bar-width, 0px) * 1000, var(--w-chrome-gap, 0px)) - var(--w-chrome-gap, 0px) * 2 - var(--inner-margin, 0px) * 2) / 2))',
+      '--w-right-margin': 'var(--right-margin, var(--w-left-margin))',
       // A floating bar adds the chrome gap on the screen side, and another between it and the page.
-      '--w-left-inner': 'calc(var(--left-margin, 0px) + var(--w-chrome-gap, 0px) + var(--nav-bar-width, 0px) + min(var(--nav-bar-width, 0px) * 1000, var(--w-chrome-gap, 0px)) + var(--inner-margin, 0px))',
-      '--w-right-inner': 'calc(var(--right-margin, 0px) + var(--w-chrome-gap, 0px) + var(--actions-bar-width, 0px) + min(var(--actions-bar-width, 0px) * 1000, var(--w-chrome-gap, 0px)) + var(--inner-margin, 0px))',
+      '--w-left-inner': 'calc(var(--w-left-margin, 0px) + var(--w-chrome-gap, 0px) + var(--nav-bar-width, 0px) + min(var(--nav-bar-width, 0px) * 1000, var(--w-chrome-gap, 0px)) + var(--inner-margin, 0px))',
+      '--w-right-inner': 'calc(var(--w-right-margin, 0px) + var(--w-chrome-gap, 0px) + var(--actions-bar-width, 0px) + min(var(--actions-bar-width, 0px) * 1000, var(--w-chrome-gap, 0px)) + var(--inner-margin, 0px))',
       '--w-width-inner': 'calc(100vw - var(--vw-scroll-bar-width, 0px) - var(--w-left-inner, 0px) - var(--w-right-inner, 0px))',
 
       '--w-header-inner': 'calc(var(--header-height, 0px) + var(--w-chrome-gap, 0px) * 2)',
       // Under a list toolbar, the gap a page list keeps above it counts too.
       '--w-top-inner': 'calc(var(--w-header-inner) + min(var(--infinite-list-header-height, 0px) * 1000, var(--w-list-header-gap, 0px)) + var(--infinite-list-header-height, 0px))',
-      '--w-bottom-inner': '0px',
+      // In a page list, the section's bottom edge stuck to the bottom of the screen counts too.
+      '--w-bottom-inner': 'var(--w-list-end-inner, 0px)',
       '--w-height-inner': 'calc(100vh - var(--w-top-inner, 0px) - var(--w-bottom-inner, 0px))',
     },
     '.w-modal-wrapper *': {
       '--w-left-inner': 'var(--w-modal-wrapper-padding, 0px)',
       '--w-right-inner': 'var(--w-modal-wrapper-padding, 0px)',
-      '--w-width-inner-out': 'calc(var(--w-modal-wrapper-width, 35rem) - var(--scroll-bar-width, 0px))',
+      // The box's width: its own, unless the screen is narrower, as the box's max width keeps it.
+      '--w-width-inner-out': 'calc(min(var(--w-modal-wrapper-width, 35rem), var(--w-modal-wrapper-max-width, 100vw - var(--vw-scroll-bar-width, 0px) - var(--inner-margin, 2rem) * 2)) - var(--scroll-bar-width, 0px))',
       '--w-width-inner': 'calc(var(--w-width-inner-out) - var(--w-left-inner, 0px) - var(--w-right-inner, 0px))',
 
       '--w-top-inner': 'calc(var(--w-modal-header-height, 0px) + var(--infinite-list-header-height, 0px))',

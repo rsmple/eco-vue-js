@@ -16,7 +16,7 @@
         w-(--w-modal-wrapper-width,35rem) max-w-[calc(100%-var(--inner-margin,2rem)*2)] grid-cols-[1fr] grid-rows-[auto_1fr_auto]
         overflow-auto overscroll-contain rounded-(--w-modal-wrapper-rounded,1.5rem) shadow-md
       `,
-      {'sm-not:max-w-full sm-not:h-full sm-not:rounded-none sm-not:max-h-full': options.maximized},
+      {'sm-not:max-w-full sm-not:h-full sm-not:rounded-none sm-not:max-h-full sm-not:[--w-modal-wrapper-max-width:100vw]': options.maximized},
       options.class,
     ] : undefined"
     :style="{
@@ -28,7 +28,7 @@
     <div
       ref="header"
       :class="options ? [
-        'bg-surface sticky left-0 top-0 z-1 w-(--w-width-inner-out)',
+        'bg-surface sticky left-0 top-0 z-1 w-(--w-width-inner-out) max-w-none',
         options.maximized ? 'sm-not:w-screen' : 'sm-not:w-full',
       ] : undefined"
     >
@@ -53,7 +53,7 @@
       :class="options ? [
         `
           bg-surface gap---inner-margin p-(--w-frame-padding)
-          md-not:pb-8 sticky bottom-0 left-0 flex w-(--w-width-inner-out) justify-center
+          md-not:pb-8 sticky bottom-0 left-0 flex w-(--w-width-inner-out) max-w-none justify-center
         `,
         options.maximized ? 'sm-not:w-screen' : 'sm-not:flex-col sm-not:w-full',
         {'flex-col': options.actionsCol},

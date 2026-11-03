@@ -37,7 +37,7 @@
               : 'grid gap-(--w-list-gap,0) isolate'
         "
         :page-style="isGrid ? undefined : {gridTemplateColumns: `var(--w-list-left) ${ fieldTracks } var(--w-list-right)`}"
-        :min-height-only="minHeight"
+        :min-height-only="minHeight || isSectionNested"
         :no-header-update="noHeaderUpdate"
         :style="cardStyles"
         :class="$attrs.class"
@@ -264,6 +264,7 @@ import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
 import {wScrollingElement} from '@/components/InfiniteList/models/injection'
 import {wIsModal} from '@/components/Modal/models/injection'
+import {wSectionNested} from '@/components/Surface/models/injection'
 import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
 import {useComponentStates} from '@/utils/useComponentStates'
@@ -362,7 +363,7 @@ const props = withDefaults(
     selection?: Selection<number>
     /** Keeps the sticky list header out of the app header bar's padding while scrolled. */
     noHeaderUpdate?: boolean
-    /** Drops the full-screen minimum height and the bottom padding, for a list inside other content. */
+    /** Drops the full-screen minimum height and the bottom padding, for a list inside other content. A list in a WSection always goes without them. */
     minHeight?: boolean
     /** Converts an item to Markdown. Adds a Copy as Markdown item to the row menu and a Markdown option to export. */
     toMarkdown?: (data: Data, index: number) => string
@@ -433,8 +434,10 @@ const {isDisabled, isReadonly} = useComponentStates(props)
 
 const {isMobile} = useIsMobile()
 
-// Scrolls with the page, not inside a modal or a scrolling element: the list paints its own section surface.
-const isPage = !props.minHeight && !inject(wIsModal, false) && inject(wScrollingElement, null) === null
+// Scrolls with the page, not inside a modal, a scrolling element or a section: the list paints its own section surface.
+// Also with `minHeight`, such as a list under tabs: it is still the page's section, only without the full-screen height.
+const isSectionNested = inject(wSectionNested, false)
+const isPage = !inject(wIsModal, false) && inject(wScrollingElement, null) === null && !isSectionNested
 
 // Chromium moves a sticky column's layer when rows above it open or close without repainting it, so the backdrop it
 // paints, fixed to the viewport, stays where the column was until the next scroll. A no-op paint change on resize

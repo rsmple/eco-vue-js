@@ -7,6 +7,18 @@ description: WNavBar, WNavItem, WNavItemExpand and WNavItemTransition — the ap
 
 `WNavBar` is the nav on the left of the [app shell](/guide/app-shell) — the one on the left of this page. It is `position: fixed` under the header and takes `--nav-bar-width` in layout from `xl` (1280px) up. Below it, it collapses and adds a menu button in the header's top-left corner, and opens as an overlay over the page; it emits `update:is-open` when the overlay opens or closes. Its class `w-nav-bar` is the hook for the app's surface and shadow, and its content uses `w-nav-bar-width` to keep its width while the nav collapses.
 
+The `brand` slot is the nav's top row, level with the header, for a logo. With `brandTo` the whole row is a link to it, such as the home page, with a hover pill inset as the items' are. In the floating layout styles the pill keeps as far off the nav's top edge as off its side, so its corners run parallel to the nav's, and so do the first and last items' at the nav's ends: the room there is in the item, so it is clickable up to the edge. Content at an end other than an item, such as a block stuck to the bottom, sets its own room.
+
+```vue
+<WNavBar :brand-to="{name: RouteName.HOME}">
+  <template #brand>
+    <AppLogo class="square-6" />
+  </template>
+
+  <WNavItem :to="{name: RouteName.PROJECTS}" />
+</WNavBar>
+```
+
 ## Nav items
 
 `WNavItem` is a router link with an icon and a title. Both default to the route's `meta.icon` and `meta.titleShort` (or `meta.title`), so an item is often just `<WNavItem :to="{name: RouteName.PROJECTS}" />`. It is active while the current route has the same name; `queryFields` lists the query params that must match too, for items that open the same route with different filters. `count` shows a number in brackets after the title and `counter` a badge, with `skeleton` while they load.
@@ -136,7 +148,9 @@ import WNavBar from 'eco-vue-js/dist/components/Nav/WNavBar.vue'
 
 #### Props
 
-_No props._
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `brandTo` | `RouteLocationRaw` | — | Where the brand links to, such as the home page. The whole brand row is the link, as an item is, with its hover pill inset as the items' and the brand mark centered in it. |
 
 #### Events
 
@@ -149,6 +163,7 @@ _No props._
 | Slot | Props | Description |
 | --- | --- | --- |
 | `default` | — | Content of the nav, such as WNavItem items. |
+| `brand` | — | A logo or brand mark in the frame's top-left corner: the nav's top row, level with the header. With `brandTo` the row is a link and the slot is the mark in its pill. Without it the row is inset as the items are and the slot fills it, so content with `rounded-(--w-nav-item-rounded)` lines up with them. Below `xl` it starts after the toggle. |
 
 <!-- @api-end -->
 

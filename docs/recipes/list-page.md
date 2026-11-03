@@ -6,9 +6,8 @@ title: List page
 description: A page whose WList scrolls with the window — a sticky toolbar under the header, a wide table that scrolls the window sideways, and page content above it that stays in place — and draws its own section in the card and glass layout styles.
 ---
 
-<div class="px-(--inner-margin)">
 <div class="grid grid-cols-[1fr]">
-<div class="w-page-pb">
+<div class="w-page pt-0! [--w-page-start:calc(var(--w-left-inner)-var(--inner-margin))]">
 <div class="grid grid-cols-[minmax(0,1fr)] gap-6 pb-6">
 
 <div class="docs-list-page-intro">
@@ -29,15 +28,15 @@ The rest is in the app shell and the content beside the list.
 
 ## The app shell
 
-The main area sits in a `1fr` grid track. A sticky box stays inside its parent, so content that sticks beside a wide list needs a parent as wide as the list: the track grows to the list's width, and the main area with it. `w-page-pb` keeps the last section a gap off the screen's bottom when the bars float.
+The main area is `w-page`, in a `1fr` grid track. A sticky box stays inside its parent, so content that sticks beside a wide list needs a parent as wide as the list: the track grows to the list's width, and the main area with it.
 
 ```vue
 <template>
   <WHeaderBar />
   <WNavBar />
 
-  <div class="grid grid-cols-[1fr] pt-(--w-header-inner) pl---left-inner pr---right-inner">
-    <main class="w-page-pb">
+  <div class="grid grid-cols-[1fr]">
+    <main class="w-page">
       <RouterView />
     </main>
   </div>
@@ -46,20 +45,14 @@ The main area sits in a `1fr` grid track. A sticky box stays inside its parent, 
 
 ## Content beside the list
 
-While a page list is on the page, page content sticks to the page's left inset and keeps the page's width when the window scrolls sideways. Sections and rows that bleed into the gutter do this on their own:
-
-| Content | Class |
-| --- | --- |
-| A section — a form, a settings group, this text | `WSection` or `surface-section` |
-| A row of cards on the canvas, reaching into the gutter like a section | `w-page-bleed` |
-| Anything else, such as a page title or a toolbar | `w-page-sticky` |
+While a page list is on the page, everything beside it sticks to the page's left inset and keeps the page's width when the window scrolls sideways: a section, a heading, a filter, and the wrappers around them, however deep the list is. It needs no class. The list's own toolbar, empty state and error stay in view too.
 
 ```vue
 <template>
   <div class="grid gap-6">
     <WSection title="Plants" />
 
-    <div class="sm:w-page-bleed grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div class="w-page-bleed grid grid-cols-2 gap-3 lg:grid-cols-4">
       <WCard
         v-for="stat in stats"
         :key="stat.title"
@@ -101,7 +94,6 @@ Switch the layout style, then scroll the list below: down past its toolbar, and 
   <ListPage />
 </ClientOnly>
 
-</div>
 </div>
 </div>
 

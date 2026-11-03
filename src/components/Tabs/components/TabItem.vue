@@ -1,23 +1,27 @@
 <template>
-  <div
-    v-if="!removable || active || flat"
-    v-show="active || flat"
-    ref="element"
-    :class="flat ? 'first-not:mt-12' : 'h-full'"
+  <!-- Flat, each tab is a section of the page under its title: a card in a card theme, a part of the stack in flat. -->
+  <WSection
+    v-if="flat"
+    :title="title"
+    tag="div"
   >
-    <div
-      v-if="flat && title"
-      class="text-accent mb-2 text-xl font-semibold"
-    >
-      {{ title }}
-    </div>
+    <slot />
+  </WSection>
 
+  <div
+    v-else-if="!removable || active"
+    v-show="active"
+    ref="element"
+    class="h-full"
+  >
     <slot />
   </div>
 </template>
 
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
+
+import WSection from '@/components/Surface/WSection.vue'
 
 import {useUniformState} from '@/components/Uniform/utils/injection'
 

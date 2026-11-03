@@ -2,6 +2,7 @@
   <component
     :is="tag"
     class="surface-section grid gap-4"
+    :class="semanticType && semanticType !== SemanticType.SECONDARY ? ['surface-section-tone', sectionToneMap[semanticType]] : undefined"
   >
     <div
       v-if="title || eyebrow || $slots.title || $slots.actions"
@@ -17,8 +18,8 @@
 
         <component
           :is="isNested ? 'h3' : 'h2'"
-          class="text-accent font-semibold"
-          :class="isNested ? 'text-base' : 'text-xl'"
+          class="font-semibold"
+          :class="[isNested ? 'text-base' : 'text-xl', semanticType && semanticType !== SemanticType.SECONDARY ? 'text-tone' : 'text-accent']"
         >
           <slot name="title">
             {{ title }}
@@ -43,7 +44,11 @@
 <script lang="ts" setup>
 import {inject, provide} from 'vue'
 
+import {wIsModal} from '@/components/Modal/models/injection'
+import {SemanticType} from '@/utils/SemanticType'
+
 import {wSectionNested} from './models/injection'
+import {sectionToneMap} from './models/utils'
 
 withDefaults(
   defineProps<{
@@ -53,10 +58,16 @@ withDefaults(
     eyebrow?: string
     /** Element to render. */
     tag?: string
+    /**
+     * Paints the section in the type's soft tone in every layout style, and its heading in the tone, such as a danger
+     * zone with `NEGATIVE`. `SECONDARY` is a plain section.
+     */
+    semanticType?: SemanticType
   }>(),
   {
     title: undefined,
     eyebrow: undefined,
+    semanticType: undefined,
     tag: 'section',
   },
 )
@@ -72,8 +83,8 @@ defineSlots<{
   footer?: () => void
 }>()
 
-// A section inside another one is a part of it: a smaller heading, one level down.
-const isNested = inject(wSectionNested, false)
+// A section inside another one, or in a modal, is a part of it: a smaller heading, one level down.
+const isNested = inject(wSectionNested, false) || inject(wIsModal, false)
 
 provide(wSectionNested, true)
 </script>

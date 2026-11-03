@@ -1,8 +1,13 @@
 <template>
-  <slot
-    name="header"
-    :count="count"
-  />
+  <div
+    v-if="$slots.header"
+    class="w-list-header"
+  >
+    <slot
+      name="header"
+      :count="count"
+    />
+  </div>
 
   <WButtonSelection
     :title="selectionTitle"

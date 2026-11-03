@@ -3,7 +3,7 @@ import {computed, ref, shallowRef, toRaw, watch} from 'vue'
 import rolesCss from '../../../package/tailwind-base/css/roles.css?raw'
 import themeCss from '../../../package/tailwind-base/css/theme.css?raw'
 import {THEME_STORAGE_KEY as STORAGE_KEY, THEME_STYLE_ID as STYLE_ID} from '../themeHeadScript'
-import {CANVAS_GLOWS, FULL_HUE_RANGE, type HueRange, LAYOUTS, LAYOUT_TOKENS, type LayoutId, NEUTRAL_SCALES, NOISE_LEVELS, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, expandTokens, getHueGradient, getHueSwatch, getLayoutRules, getRandomTokens, getThemeBlock, isFullHueRange, isHueRange, isLayoutId, isNeutralScale, isNoiseId, isRandomStyleId} from '../themePresets'
+import {CANVAS_GLOWS, FULL_HUE_RANGE, type HueRange, LAYOUTS, LAYOUT_TOKENS, type LayoutId, NEUTRAL_SCALES, NOISE_LEVELS, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, expandTokens, getHueGradient, getHueSwatch, getLayoutClass, getLayoutRules, getRandomTokens, getThemeBlock, isFullHueRange, isHueRange, isLayoutId, isNeutralScale, isNoiseId, isRandomStyleId} from '../themePresets'
 
 export {FULL_HUE_RANGE, type HueRange, LAYOUTS, NEUTRAL_SCALES, NOISE_LEVELS, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, getHueGradient, getHueSwatch, isFullHueRange}
 
@@ -539,26 +539,31 @@ export const parseThemeReply = (text: string): ThemeConfig | undefined => {
 
 /**
  * CSS for an app's stylesheet: changed colors, roles and fonts as theme tokens, and every shape variable, since an
- * app's defaults differ from this site's.
+ * app's defaults differ from this site's. A card or glass layout ships with the kit as a class (`layouts.css`), so
+ * only what the theme changes from it is written out, and a role it sets goes on `:root`, past the class.
  */
 export const getThemeCss = (tokens: ThemeTokens) => {
-  const effective = {...DEFAULT_TOKENS, ...getLayoutDefaults(tokens), ...tokens}
-  const changed = Object.fromEntries(TOKENS.filter(token => !token.key.startsWith('w-') && token.kind !== 'layout' && token.kind !== 'noise' && effective[token.key] !== DEFAULT_TOKENS[token.key]).map(token => [token.key, effective[token.key]]))
-  const theme = getThemeBlock({...changed, ...tokens.layout ? {layout: tokens.layout} : {}})
+  const layout = isLayoutId(tokens.layout) && tokens.layout !== 'flat' ? tokens.layout : undefined
+  const preset: Record<string, string> = layout ? LAYOUT_TOKENS[layout] : {}
+  const effective = {...DEFAULT_TOKENS, ...preset, ...tokens}
+  const isOwn = (key: string, value: string) => preset[key] !== value
+  const changed = TOKENS.filter(token => !token.key.startsWith('w-') && token.kind !== 'layout' && token.kind !== 'noise' && effective[token.key] !== DEFAULT_TOKENS[token.key] && isOwn(token.key, effective[token.key])).map(token => [token.key, effective[token.key]] as const)
+  const theme = getThemeBlock(Object.fromEntries(changed.filter(([key]) => !(key in preset))))
+  const root = changed.filter(([key]) => key in preset)
   // The grain is a picture, so `w-canvas-image` below carries it: expanded with the rest of the layout's tokens.
-  // The playground's sizes, and the rest of what the layout sets, such as its opacities and shadows.
-  const body = {
+  // The playground's sizes, and what the theme sets besides its layout's, such as its opacities and shadows.
+  const body = Object.entries({
     ...Object.fromEntries(TOKENS.filter(token => token.key.startsWith('w-') && isTokenInLayout(token, effective.layout)).map(token => [token.key, effective[token.key]])),
     ...Object.fromEntries(expandTokens(tokens).filter(([key]) => key.startsWith('w-') && !TOKEN_KINDS.has(key))),
-  }
-  const rules = getLayoutRules(tokens)
+  }).filter(([key, value]) => isOwn(key, value))
 
   return [
+    ...layout ? [`/* The ${ layout } layout: \`class="${ getLayoutClass(layout) }"\` on <html>. */`, ''] : [],
     ...theme ? [theme, ''] : [],
+    ...root.length ? [':root {', ...root.map(([key, value]) => `  --${ key }: ${ value };`), '}', ''] : [],
     'body {',
-    ...Object.entries(body).map(([key, value]) => `  --${ key }: ${ value };`),
+    ...body.map(([key, value]) => `  --${ key }: ${ value };`),
     '}',
-    ...rules ? ['', rules] : [],
   ].join('\n')
 }
 

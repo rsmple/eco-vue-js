@@ -56,6 +56,8 @@ A page holds two kinds of containers: a **section** ([WSection](/components/surf
 
 Switch this site to one here, or from the theme menu in the header; the switch overrides only the theme's `layout`, and picking the preset again goes back to its own. Its radii and the bars' gap can be adjusted under **Layout** in the playground. The canvas is set under **Page background**: its color in either mode, the three colors of the glass gradient (the primary and two data hues by default; Randomize picks them for a glass theme) and a grain over it, in any style. On phones the bars dock and sections span the screen in every style.
 
+Card and glass ship with the kit: put `class="w-layout-card"` or `class="w-layout-glass"` on `<html>` and the app gets the style's tokens, kept in step with the kit's own. The CSS the playground gives then holds only what a theme changes on top of the style; a role the style sets goes on `:root` there, not in `@theme`, so it wins over the class.
+
 <div class="vp-raw max-w-80">
   <ClientOnly>
     <ThemeLayoutSwitch />

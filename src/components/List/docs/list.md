@@ -148,7 +148,7 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 | `alwaysSelect` | `boolean` | — | Shows the checkboxes even without `bulk` or export, and makes a row click toggle its selection. With `cardTo`, the row link moves into a View menu item. |
 | `selection` | `Selection<number>` | — | Selected items, controlled from outside with `update:selection`. By default the selection is kept in the URL hash. |
 | `noHeaderUpdate` | `boolean` | — | Keeps the sticky list header out of the app header bar's padding while scrolled. |
-| `minHeight` | `boolean` | — | Drops the full-screen minimum height and the bottom padding, for a list inside other content. |
+| `minHeight` | `boolean` | — | Drops the full-screen minimum height and the bottom padding, for a list inside other content. A list in a WSection always goes without them. |
 | `toMarkdown` | `((data: Data, index: number) => string)` | — | Converts an item to Markdown. Adds a Copy as Markdown item to the row menu and a Markdown option to export. |
 | `noMode` | `boolean` | — | Hides the table and grid switch in the column settings. |
 | `disableSelect` | `boolean` | — | Hides the checkboxes and turns selection off. |
