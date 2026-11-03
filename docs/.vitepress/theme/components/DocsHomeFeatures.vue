@@ -1,5 +1,5 @@
 <template>
-  <section class="px-(--inner-margin) pb-20 sm:pb-28">
+  <section class="px-[calc(var(--inner-margin)-var(--w-page-bleed,0px))] pb-20 sm:pb-28">
     <p class="text-accent text-sm font-semibold tracking-[0.2em] uppercase">
       What's inside
     </p>
@@ -16,9 +16,8 @@
         :target="feature.external ? '_blank' : undefined"
         :rel="feature.external ? 'noopener' : undefined"
         class="
-          group border-line-subtle bg-surface-subtle shadow-primary-dark/35 hover:border-primary/60 focus-visible:border-primary/60 flex flex-col gap-3
-          rounded-2xl border p-6 transition-[border-color,box-shadow,translate] hover:-translate-y-0.5
-          hover:shadow-[0_1rem_2rem_-1rem] focus-visible:shadow-[0_1rem_2rem_-1rem]
+          group surface-card flex flex-col gap-3 transition-[translate]
+          hover:-translate-y-0.5 focus-visible:-translate-y-0.5
         "
       >
         <span class="tone-primary bg-tone-soft text-accent grid size-10 place-items-center rounded-xl">

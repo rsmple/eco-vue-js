@@ -6,20 +6,10 @@
   >
     <DocsNav v-if="!isHome || isTablet" />
 
-    <WHeaderBar class="pl-[calc(var(--left-margin)+var(--nav-bar-width))] pr-(--right-margin)">
+    <WHeaderBar>
+      <!-- The brand keeps the frame's top-left corner: the nav's top row where the nav is beside the page, the header's start otherwise. -->
       <template #title>
-        <a
-          :href="withBase('/')"
-          :aria-label="site.title"
-          class="flex items-center gap-2.5 no-underline"
-        >
-          <IconLogo class="size-8 tone-primary text-tone-fill" />
-
-          <span class="leading-none">
-            <span class="text-accent text-xl font-semibold tracking-tight sm:text-2xl leading-none">EcoVue</span>
-            <span class="text-description mx-4 hidden text-base font-medium tracking-[0.2em] uppercase lg:inline">UI Library</span>
-          </span>
-        </a>
+        <DocsBrand v-if="isHome || isTablet" />
       </template>
 
       <template #right>
@@ -87,7 +77,7 @@
       </template>
     </WHeaderBar>
 
-    <div class="pl-[calc(var(--left-margin)+var(--nav-bar-width))] pr-(--right-margin)">
+    <div class="pl-[calc(var(--w-left-inner)-var(--inner-margin))] pr-[calc(var(--w-right-inner)-var(--inner-margin))]">
       <VPContent>
         <template #home-hero-before>
           <DocsHomeHero />
@@ -126,6 +116,7 @@ import WToggleTheme from 'eco-vue-js/dist/components/Toggle/WToggleTheme.vue'
 
 import IconSearch from 'eco-vue-js/dist/assets/icons/IconSearch'
 
+import DocsBrand from './components/DocsBrand.vue'
 import DocsHomeFeatures from './components/DocsHomeFeatures.vue'
 import DocsHomeFooter from './components/DocsHomeFooter.vue'
 import DocsHomeGallery from './components/DocsHomeGallery.vue'
@@ -138,8 +129,6 @@ import {installDocsTheme} from './docsTheme'
 import IconGithub from './icons/IconGithub.svg?component'
 import IconNpm from './icons/IconNpm.svg?component'
 
-import IconLogo from '../../public/logo.svg?component'
-
 // Loaded on first open, like VitePress does: the search index and its deps stay out of the page bundle.
 const VPLocalSearchBox = defineAsyncComponent(() => import('vitepress/dist/client/theme-default/components/VPLocalSearchBox.vue'))
 
@@ -148,7 +137,7 @@ const SOCIAL_LINKS = [
   {title: 'npm', icon: markRaw(IconNpm), href: 'https://www.npmjs.com/package/eco-vue-js'},
 ]
 
-const {site, theme, page, isDark, frontmatter} = useData()
+const {theme, page, isDark, frontmatter} = useData()
 
 const isHome = computed(() => frontmatter.value.layout === 'home')
 

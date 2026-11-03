@@ -28,12 +28,13 @@
     </WButton>
   </div>
 
-  <!-- The same form on the page: each field saves as it changes. -->
-  <PlantForm
-    v-if="isId(plantId)"
-    :plant-id="plantId"
-    async
-  />
+  <!-- The same form on the page, in a section of its own: each field saves as it changes. -->
+  <WSection v-if="isId(plantId)">
+    <PlantForm
+      :plant-id="plantId"
+      async
+    />
+  </WSection>
 </template>
 
 <script lang="ts" setup>
@@ -47,6 +48,7 @@ import {isId} from 'eco-vue-js/dist/utils/utils'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
+import WSection from 'eco-vue-js/dist/components/Surface/WSection.vue'
 
 import IconAdd from 'eco-vue-js/dist/assets/icons/IconAdd'
 

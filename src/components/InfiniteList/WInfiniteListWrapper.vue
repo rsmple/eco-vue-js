@@ -8,8 +8,10 @@
     :is-intersecting="isIntersecting"
     class="sticky print:hidden"
     :class="{
-      'top---header-height': !isContained,
-      'top-0 not-empty:pt-3': isContained && !isModal,
+      'top-(--w-header-inner)': !isContained,
+      'w-infinite-list-header': !isContained && !noHeaderUpdate,
+      'w-infinite-list-header-stuck': !isContained && !noHeaderUpdate && isIntersecting === false,
+      'top-0 not-empty:pt-(--w-list-contained-top,0.75rem)': isContained && !isModal,
       'top---modal-header-height': isModal,
       'bg-surface': noHeaderUpdate || isContained,
     }"
@@ -29,9 +31,14 @@
       v-else
       #header="scope"
     >
+      <div
+        class="w-infinite-list-header-edge"
+        :style="{'--w-list-header-height': scope.headerHeight + 'px'}"
+      />
+
       <InfiniteListHeaderPadding
         :is-intersecting="isIntersecting"
-        :header-height="scope.headerHeight"
+        :header-height="scope.headerHeight + sectionHeadOffset"
       >
         <slot
           name="header"
@@ -49,9 +56,10 @@
 <script lang="ts" setup>
 import type {InfiniteListHeaderScope} from './types'
 
-import {type VNode, inject, onBeforeUnmount, onMounted, ref, useTemplateRef} from 'vue'
+import {type VNode, computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef, watch} from 'vue'
 
 import {wIsModal} from '@/components/Modal/models/injection'
+import {wSectionHeadHeight} from '@/components/Surface/models/injection'
 import {BASE_ZINDEX_DROPDOWN, BASE_ZINDEX_LIST_HEADER, getIsClientSide} from '@/utils/utils'
 
 import InfiniteListHeaderHeight from './components/InfiniteListHeaderHeight.vue'
@@ -73,7 +81,8 @@ const isModal = inject(wIsModal, false)
 
 // Inside its own scroll container (a modal, or any WInfiniteListScrollingElement) the header sticks to that
 // container: it has its own background and leaves the page header alone. Outside a modal nothing sits above it,
-// so it keeps its own gap from the container's top edge.
+// so it keeps its own gap from the container's top edge: `--w-list-contained-top`, for a container whose padding it
+// should match.
 const isContained = isModal || inject(wScrollingElement, null) !== null
 
 // null until the observer reports, so the header padding is not applied before the real position is known
@@ -90,23 +99,56 @@ const observerCb = (entries: IntersectionObserverEntry[]) => {
 
 let observer: IntersectionObserver | null = null
 
+let observerTop: number | null = null
+
 const {headerHeight} = useHeader()
+
+// Where the header sticks: the gap and padding a theme keeps above it count, not just the header bar.
+const getStickyTop = (): number => {
+  const header = isContained ? null : indicatorRef.value?.nextElementSibling
+  const top = header ? parseFloat(getComputedStyle(header).top) : NaN
+
+  return Number.isNaN(top) ? headerHeight.value : top
+}
+
+// A page list's header sticks under a section head over it, such as WTabs `section`, which sticks above it: what the
+// header covers of the page then starts at the head.
+const sectionHeadHeight = isContained ? null : inject(wSectionHeadHeight, null)
+const isPage = ref(false)
+const sectionHeadOffset = computed(() => isPage.value ? sectionHeadHeight?.value ?? 0 : 0)
+
+const observe = () => {
+  if (!indicatorRef.value) return
+
+  isPage.value = indicatorRef.value.closest('.w-list-page') !== null
+
+  const top = getStickyTop()
+  if (observer && top === observerTop) return
+
+  observer?.disconnect()
+  observerTop = top
+
+  // Reaches far below the screen: a jump from below it to past the top is still a change the observer reports.
+  observer = new IntersectionObserver(observerCb, {
+    root: null,
+    rootMargin: `-${ top }px 100% 100000px 0px`,
+    threshold: 1.0,
+  })
+
+  observer.observe(indicatorRef.value)
+}
 
 onMounted(() => {
   if (!getIsClientSide()) return
 
-  if (indicatorRef.value) {
-    observer = new IntersectionObserver(observerCb, {
-      root: null,
-      rootMargin: `-${ headerHeight.value }px 100% 0px 0px`,
-      threshold: 1.0,
-    })
-
-    observer.observe(indicatorRef.value)
-  }
+  observe()
+  window.addEventListener('resize', observe)
 })
 
+if (sectionHeadHeight) watch(sectionHeadHeight, observe, {flush: 'post'})
+
 onBeforeUnmount(() => {
+  window.removeEventListener('resize', observe)
   observer?.disconnect()
 })
 

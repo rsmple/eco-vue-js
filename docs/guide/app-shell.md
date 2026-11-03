@@ -12,15 +12,15 @@ This site is built that way: its layout is [`DocsLayout.vue`](https://github.com
 
 ## Frame variables
 
-Set them on `body`. Each one is the space a part of the frame takes *in layout* at the current breakpoint, so all default to `0px`:
+Set them on `body`. Each one is the space a part of the frame takes *in layout* at the current breakpoint, so all but `--inner-margin` default to `0px`:
 
 | Variable | What it is |
 | --- | --- |
 | `--header-height` | Height of the header. |
 | `--nav-bar-width` | Space taken by the nav — `0px` below `xl`, where the nav is an overlay opened from the header. |
 | `--actions-bar-width` | Space taken by the actions bar — `0px` on phones, where it is hidden. |
-| `--inner-margin` | Horizontal padding of the content. |
-| `--left-margin`, `--right-margin` | Space outside the frame when it is centred on a wide screen — see [Centred frame](#centred-frame). |
+| `--inner-margin` | Horizontal padding of the content. Comes from the theme — `w-inner-margin`, `w-inner-margin-sm` from `sm` up, `1rem` and `1.5rem` by default (see [Theming](./theming#layout)); set it here only to override the theme. |
+| `--left-margin`, `--right-margin` | Space outside the frame, to centre it yourself — by default it centres past `--w-content-max-width`, see [Centred frame](#centred-frame). |
 | `--w-actions-bar-width` | Width of the actions bar itself, at every breakpoint. |
 | `--actions-bar-filter-width` | Width of the filter panel that slides out of the actions bar on `sm` and up — see [Filters](#filters-and-search). |
 
@@ -39,13 +39,11 @@ body {
   --header-height: 3.5rem;
   --nav-bar-width: 0px;
   --actions-bar-width: 0px;
-  --inner-margin: 1rem;
   --w-actions-bar-width: var(--spacing-actions-bar-width);
   --actions-bar-filter-width: 24rem;
 
   @apply
     bg-surface text-accent
-    sm:[--inner-margin:1.5rem]
     sm:[--actions-bar-width:var(--spacing-actions-bar-width)]
     xl:[--nav-bar-width:var(--spacing-nav-bar-width)];
 }
@@ -76,15 +74,11 @@ From the frame variables the kit derives the content box on every element, and e
 
 The frame variables are sizes too: `pt---header-height`, `pl---nav-bar-width`, `px---inner-margin`. Inside a modal, the modal replaces the content box with its own, so the same classes work there.
 
-An element that should stay in view while a wide list scrolls sideways sticks to the content's left edge and takes its width — the search input in the [list recipe](../recipes/list-with-fields) does this:
-
-```vue
-<WInput class="sticky left---left-inner w---width-inner" />
-```
+On a page (`w-page`) and in a modal, content beside a list wider than the view stays in view on its own while the list scrolls sideways: it sticks to the content's left edge and takes its width (see [List page](../recipes/list-page#content-beside-the-list)). Pages don't set these sizes for positioning; they are for what the kit doesn't place, such as a fixed overlay over the content.
 
 ## Layout component
 
-The root layout mounts the three bars and pads the content by the frame:
+The root layout mounts the three bars, and its main area is `w-page`: it pads the content by the frame, under the header and off the bottom (see [Page layout](../recipes/page-layout)):
 
 ```vue
 <template>
@@ -109,7 +103,7 @@ The root layout mounts the three bars and pads the content by the frame:
     class="pl---nav-bar-width pr---actions-bar-width"
   />
 
-  <main class="pt---header-height pl---left-inner pr---right-inner">
+  <main class="w-page">
     <RouterView />
   </main>
 
@@ -214,19 +208,20 @@ Everything measures from inherited variables, so a route without a bar only need
 
 ## Centred frame
 
-On very wide screens the frame can keep a maximum width and centre itself. Set the space outside it as `--left-margin` and `--right-margin`: `WNavBar` and `WActionsBar` offset themselves by them, and `---left-inner` and `---right-inner` already include them. The header needs them added to its padding:
+On a wide screen the frame stops growing and centres itself: past `--w-content-max-width` (`80rem` by default, a theme token on `body`) the page between the nav and the actions bar keeps its width, and the space outside the frame grows on both sides. `WNavBar`, `WActionsBar` and `WHeaderBar` move in with it, and `---left-inner` and `---right-inner` include it, so the page needs nothing of its own.
 
 ```css
-@theme {
-  --spacing-frame-max-width: 92rem;
-}
-
 body {
-  --left-margin: max(0px, (100vw - var(--spacing-frame-max-width)) / 2);
-  --right-margin: var(--left-margin);
+  /* Wider pages, or `100vw` for no limit. */
+  --w-content-max-width: 96rem;
 }
 ```
 
-```vue
-<WHeaderBar class="pl-[calc(var(--left-margin)+var(--nav-bar-width))] pr-[calc(var(--right-margin)+var(--actions-bar-width))]" />
+To size the frame some other way, set the space outside it yourself as `--left-margin` and `--right-margin`, which take over from the token:
+
+```css
+body {
+  --left-margin: max(0px, (100vw - 92rem) / 2);
+  --right-margin: var(--left-margin);
+}
 ```

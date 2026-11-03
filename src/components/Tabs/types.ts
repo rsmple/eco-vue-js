@@ -42,9 +42,11 @@ export interface TabsProps {
   wrap?: boolean
   /** Draws a line under the row of tab buttons, which the open tab's underline covers. */
   divider?: boolean
+  /** The row of tab buttons is the top of a section on the page, and the open tab's section or page list joins it below. For tabs over the page's content, such as the lists of an item's page. Implies `divider`. */
+  section?: boolean
   /** Shows a value and error status icon next to each title. */
   statusIcon?: boolean
-  /** Renders all tabs one after another, each under its title, without the buttons. */
+  /** Renders all tabs one after another without the buttons, each a section (WSection) under its title: a card of its own in a card theme, the groups of a settings page. Its sections stack as a page's do, with a line between them in flat. */
   flat?: boolean
   /** Shows a large status circle on each tab button — error, has value or empty. */
   indicator?: boolean

@@ -1,9 +1,9 @@
 <template>
-  <section class="vp-raw relative isolate px-(--inner-margin) pt-12 pb-16 sm:pt-20 lg:pb-24">
+  <section class="vp-raw isolate px-[calc(var(--inner-margin)-var(--w-page-bleed,0px))] pt-12 pb-16 sm:pt-20 lg:pb-24">
     <div
       aria-hidden="true"
       class="
-        pointer-events-none absolute -top-(--header-height) bottom-0 -left-[(var(--left-margin)+var(--nav-bar-width))] -z-10 w-screen
+        pointer-events-none absolute inset-0 -z-10
         bg-[radial-gradient(40rem_28rem_at_70%_35%,color-mix(in_oklab,var(--color-primary)_22%,transparent),transparent_70%),radial-gradient(32rem_24rem_at_15%_10%,color-mix(in_oklab,var(--color-info)_10%,transparent),transparent_70%)]
         before:absolute before:inset-0 before:bg-[radial-gradient(color-mix(in_oklab,var(--color-track-strong)_35%,transparent)_1px,transparent_1px)] before:bg-size-[24px_24px]
         before:mask-radial-[60%_70%] before:mask-radial-at-[60%_40%] before:mask-radial-from-0% before:mask-radial-to-100%

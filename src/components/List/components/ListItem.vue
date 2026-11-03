@@ -11,11 +11,11 @@
         v-bind="allowSelect ? {'onMouseover': () => $emit('hover:selected', position)} : undefined"
         ref="container"
         :role="skeleton ? undefined : 'listitem'"
-        class="relative"
+        class="w-list-item relative"
         :class="{
           [cardWrapperClass ?? '']: true,
           'w-ripple-trigger-list': isActionShown,
-          'sm-not:even:bg-surface-subtle grid grid-cols-1': card,
+          'sm-not:even:bg-(--w-list-stripe,var(--w-surface-subtle)) grid grid-cols-1': card,
           'col-span-full grid grid-cols-subgrid': !card,
           '-mb-px': !card && isOpen,
           'w-hover-checked': allowSelectHover,
@@ -36,12 +36,12 @@
 
         <div
           v-if="!card"
-          class="left---left-inner bg-surface @max-lg:hidden sticky z-1"
+          class="w-list-item-sticky left---left-inner bg-surface @max-lg:hidden sticky z-1"
           :class="{
             'width-(--w-list-header-rounded,1rem)': !allowSelect,
           }"
         >
-          <div class="bg-surface w---left-inner absolute right-full top-0 -z-1 h-full" />
+          <div class="w-list-mask bg-surface w---left-inner absolute right-full top-0 -z-1 h-full" />
 
           <div
             class="h-full rounded-l-(--w-list-rounded,unset)"
@@ -85,12 +85,12 @@
         </div>
 
         <div
-          class="sm-not:px---inner-margin isolate"
+          class="w-list-item-middle sm-not:px---inner-margin isolate"
           :class="{
             [cardClass ?? '']: true,
             '[contain-intrinsic-size:auto_3rem] [content-visibility:auto]': contentVisibility,
             'col-[2/-2] grid grid-cols-subgrid': !card,
-            'grid grid-cols-(--w-list-grid-cols) [grid-template-areas:var(--w-list-grid-areas)] sm:rounded-(--w-list-rounded,unset)': card,
+            'grid grid-cols-(--w-list-grid-cols) [grid-template-areas:var(--w-list-grid-areas)] sm:rounded-(--w-list-rounded,unset) sm:bg-(--w-list-card,var(--w-surface-subtle))': card,
             'sm:border-y': hasBorder,
             'border-line': hasBorder && !selected,
             'tone-primary border-tone-line': hasBorder && selected,
@@ -216,13 +216,13 @@
 
         <div
           v-if="!card"
-          class="right---right-inner bg-surface sticky z-1"
+          class="w-list-item-sticky right---right-inner bg-surface sticky z-1"
           :class="{
             'width-[calc(var(--w-list-padding,1rem)*2+1.25em)]': hasMenu,
             'width-(--w-list-header-rounded,1rem)': !hasMenu,
           }"
         >
-          <div class="bg-surface w---right-inner absolute left-full top-0 -z-1 h-full" />
+          <div class="w-list-mask bg-surface w---right-inner absolute left-full top-0 -z-1 h-full" />
 
           <div
             class="h-full rounded-r-(--w-list-rounded,unset)"
@@ -283,7 +283,7 @@
 
       <div
         v-if="expansion && isOpen"
-        class="list:w---width-inner list:left---left-inner list:sticky col-span-full"
+        class="w-list-item-expansion list:w---width-inner list:left---left-inner list:sticky col-span-full"
         :class="{
           'border-line': hasBorder && !selected,
           'tone-primary border-tone-line': hasBorder && selected,

@@ -21,7 +21,7 @@
     <template #content>
       <div
         class="
-          surface-raised flex overflow-y-auto overscroll-y-contain rounded-md
+          surface-dropdown flex overflow-y-auto overscroll-y-contain rounded-md
           text-xs shadow-md border border-solid border-line-raised
         "
         @mouseenter="enter"

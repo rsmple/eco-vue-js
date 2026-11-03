@@ -64,12 +64,7 @@
           'text-start': side,
         }"
       >
-        <div
-          class="whitespace-nowrap px-3"
-          :class="{
-            'sm-not:pl---inner-margin': side,
-          }"
-        >
+        <div class="whitespace-nowrap px-3">
           <component :is="enableOverflow ? WTextOverflow : WEmptyComponent">
             <Suspense v-if="icon !== undefined">
               <component 
@@ -100,7 +95,7 @@
           v-if="statusIcon"
           :has-value="hasValue"
           :has-error="hasError"
-          class="sm-not:mr---inner-margin square-4 ml-auto mr-4"
+          class="square-4 ml-auto mr-4"
         />
 
         <slot
@@ -135,9 +130,6 @@
         <div
           v-if="active || indicator"
           class="absolute inset-x-0 bg-current bottom-0 h-0.5 rounded-sm"
-          :class="{
-            'sm-not:left---inner-margin': side,
-          }"
         />
       </Transition>
     </div>

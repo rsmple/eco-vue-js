@@ -1,0 +1,1229 @@
+/*
+ * Surface containment: the page background, the two container kinds and the app
+ * chrome, shaped by tokens a theme sets. The defaults are the flat layout, which looks as before.
+ *
+ * Each container paints its base color at `--w-*-opacity` — 0 shows nothing (flat section), 1 is a card, between is
+ * glass — and re-maps `--w-surface` to the opaque color it ends up as over the canvas, so sticky columns, soft tones and
+ * on-colors inside match it. Containers inside a section or a card are opaque: only what sits on the canvas is glass,
+ * which also keeps the mix one level deep.
+ */
+
+@theme {
+  --role-canvas: var(--role-surface);
+  --role-canvas-dark: var(--role-surface-dark);
+  /* A card on the canvas: filled, one step off the page, while the canvas is the surface. A card theme makes it the surface. */
+  --role-card: var(--role-surface-subtle);
+  --role-card-dark: var(--role-surface-subtle-dark);
+}
+
+@theme inline {
+  --color-canvas: var(--w-canvas);
+  /* The bars' paint: the surface, translucent in a glass theme. */
+  --color-chrome: color-mix(in oklab, var(--w-chrome-base) calc(var(--w-chrome-opacity) * 100%), transparent);
+  /* A dropdown's paint (`surface-dropdown`), for what draws in it besides the frame, such as a popover's tip (`tone-dropdown`). */
+  --color-dropdown: color-mix(in oklab, var(--w-surface-raised) calc(var(--w-dropdown-opacity, calc((1 + var(--w-card-opacity)) / 2)) * 100%), transparent);
+}
+
+@layer base {
+  :root,
+  .light,
+  .dark {
+    --w-canvas: light-dark(var(--role-canvas), var(--role-canvas-dark));
+    --w-section-base: light-dark(var(--role-surface), var(--role-surface-dark));
+    --w-card-base: light-dark(var(--role-card), var(--role-card-dark));
+    --w-chrome-base: light-dark(var(--role-surface), var(--role-surface-dark));
+  }
+
+  :root {
+    /* The page inset (`--inner-margin`) on phones and from `sm` up: sections, card-style page bleed, list rows and the bars' content all start at it. */
+    --w-inner-margin: 1rem;
+    --w-inner-margin-sm: 1.5rem;
+    /*
+     * The widest the page's content gets, between the nav and the actions bar: on a wider screen the frame stops
+     * growing and centres itself, its bars moving in off the screen edges. `100vw` lets it grow without limit.
+     */
+    --w-content-max-width: 80rem;
+
+    --w-section-opacity: 0;
+    --w-section-padding: 0px;
+    --w-section-rounded: 0px;
+    --w-section-border: 0px;
+    --w-section-shadow: none;
+    --w-section-backdrop: none;
+    /* Between the sections of a `surface-stack`: 0 runs them together into one column, as flat does. */
+    --w-section-gap: 0px;
+
+    --w-card-opacity: 1;
+    --w-card-padding: 1rem;
+    --w-card-rounded: 1rem;
+    --w-card-border: 0px;
+    --w-card-shadow: none;
+    --w-card-backdrop: none;
+
+    /* 0: the bars are docked to the screen edges; 1: they float `--w-chrome-gap` off them, the nav and the actions bar under the header. */
+    --w-chrome-float: 0;
+    --w-chrome-gap: 0px;
+    --w-chrome-rounded: 0px;
+    --w-chrome-border: 0px;
+    /* Shadows the bars combine with their edge and ring: a theme sets a shadow list, `0 0 #0000` for none, never `none`. */
+    --w-chrome-shadow: 0 0 #0000;
+    --w-chrome-opacity: 1;
+    /* What blurs behind the bars, such as a glass theme's blur. Unset, the header keeps its own and the others none. */
+    /* What fills the gap around a floating bar, so content scrolling under the header doesn't show above it. */
+    --w-chrome-ring: transparent;
+
+    /* A picture on the canvas, such as a glass theme's gradient: fixed to the viewport, so what paints it again matches. */
+    --w-canvas-image: none;
+  }
+
+  /* On `body`, where a theme sets its `w-*` tokens, so they resolve. An app that sets `--inner-margin` itself overrides it. */
+  body {
+    --inner-margin: var(--w-inner-margin);
+
+    background-color: var(--w-canvas);
+
+    @media (width >= 40rem) {
+      --inner-margin: var(--w-inner-margin-sm);
+    }
+  }
+
+  /* The picture on its own layer fixed to the viewport: a fixed background on the body moves with the page's
+     overscroll bounce, a fixed element stays put. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: var(--w-canvas-image);
+    pointer-events: none;
+  }
+}
+
+@utility surface-section {
+  --w-surface: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), var(--w-canvas));
+  --w-frame-padding: var(--w-section-padding);
+
+  background-color: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), transparent);
+  padding: var(--w-section-padding);
+  border: var(--w-section-border) solid var(--w-line-subtle);
+  border-radius: var(--w-section-rounded);
+  box-shadow: var(--w-section-shadow);
+  backdrop-filter: var(--w-section-backdrop);
+
+  /* Joined to a section head above it (`surface-section-joined`), it goes on from the head's bottom without a top edge. */
+  border-top-width: calc(var(--w-section-border) * (1 - var(--w-joined, 0)));
+  border-start-start-radius: calc(var(--w-section-rounded) * (1 - var(--w-joined, 0)));
+  border-start-end-radius: calc(var(--w-section-rounded) * (1 - var(--w-joined, 0)));
+
+  & > * {
+    --w-joined: 0;
+  }
+
+  /*
+   * Reaches into the page gutter by `--w-page-bleed`: a card theme sets it and the padding to the gutter, so the
+   * section's edges line up with the bars and its content with the page's. On phones it spans the screen, its content
+   * at the page inset (`w-page`).
+   */
+  margin-inline: calc(var(--w-page-bleed, 0px) * -1);
+
+  @variant sm-not {
+    --w-frame-padding: var(--inner-margin);
+
+    margin-inline: calc(var(--w-page-inset, 0px) * -1);
+    padding-inline: var(--inner-margin);
+    border-inline-width: 0;
+    border-radius: 0;
+  }
+
+  :root:has(.w-list.w-list-page) & {
+    @variant sm {
+      position: sticky;
+      left: calc(var(--w-left-inner) - var(--w-page-bleed, 0px));
+      max-width: calc(var(--w-width-inner) + var(--w-page-bleed, 0px) * 2);
+    }
+  }
+}
+
+/*
+ * The top of a section that goes on in the content below it, such as a row of tabs over the open tab's list
+ * (WTabs `section`): the section's paint, edges and top corners, its top and side padding and a line along its bottom.
+ * The content after it is `surface-section-joined`.
+ */
+@utility surface-section-head {
+  --w-surface: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), var(--w-canvas));
+
+  position: relative;
+  background-color: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), transparent);
+  padding-top: var(--w-section-padding);
+  border: var(--w-section-border) solid var(--w-line-subtle);
+  border-bottom-width: 0;
+  border-radius: var(--w-section-rounded) var(--w-section-rounded) 0 0;
+  box-shadow: var(--w-section-shadow);
+  backdrop-filter: var(--w-section-backdrop);
+  /* Its shadow stops at its bottom: below, it would be a second line over the content it goes on in. */
+  clip-path: inset(-100vh -100vw 0);
+
+  /* The line along its bottom, under its content only: it takes the head's side padding. */
+  &::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 1px;
+    padding-inline: inherit;
+    background-color: var(--color-line-subtle);
+    background-clip: content-box;
+    pointer-events: none;
+  }
+
+  /* Reaches into the page gutter as a section does, with the section's padding. */
+  margin-inline: calc(var(--w-page-bleed, 0px) * -1);
+  padding-inline: var(--w-section-padding);
+
+  @variant sm-not {
+    margin-inline: calc(var(--w-page-inset, 0px) * -1);
+    padding-inline: var(--inner-margin);
+    border-inline-width: 0;
+    border-radius: 0;
+  }
+
+  :root:has(.w-list.w-list-page) & {
+    @variant sm {
+      position: sticky;
+      left: calc(var(--w-left-inner) - var(--w-page-bleed, 0px));
+      max-width: calc(var(--w-width-inner) + var(--w-page-bleed, 0px) * 2);
+    }
+  }
+}
+
+/*
+ * What follows a section head: a section or page list in it joins the head, the first of a stack only. Where the
+ * section's padding is less than a gap under the head's line (flat), it makes up the rest.
+ */
+@utility surface-section-joined {
+  --w-joined: 1;
+
+  padding-top: max(0px, 1rem - var(--w-section-padding));
+}
+
+/* Reaches into the page gutter like a section: for a row of cards on the canvas. On phones the cards keep the page inset. */
+@utility w-page-bleed {
+  margin-inline: calc(var(--w-page-bleed, 0px) * -1);
+
+  @variant sm-not {
+    margin-inline: 0;
+  }
+
+  :root:has(.w-list.w-list-page) & {
+    @variant sm {
+      position: sticky;
+      left: calc(var(--w-left-inner) - var(--w-page-bleed, 0px));
+      max-width: calc(var(--w-width-inner) + var(--w-page-bleed, 0px) * 2);
+    }
+  }
+}
+
+/*
+ * Sections side by side, such as a list of items next to the open one, on a grid: `--w-section-gap` between their
+ * edges, which reach into the gap by `--w-page-bleed` each, and `--w-columns-gap` (`2rem`) more in flat, where they
+ * paint nothing and only the space tells them apart. Stacked, as on phones, they are as in `surface-stack`.
+ */
+@utility surface-columns {
+  /* 1 in flat, where sections paint nothing, 0 where they do. */
+  --w-stack-flat: calc(1 - min(1, var(--w-section-opacity) * 100));
+
+  column-gap: calc(var(--w-page-bleed, 0px) * 2 + var(--w-section-gap) + var(--w-columns-gap, 2rem) * var(--w-stack-flat));
+  row-gap: calc(var(--w-section-gap) + var(--w-columns-gap, 2rem) * var(--w-stack-flat));
+}
+
+/*
+ * The page's first column, for a page list beside other content, such as a list of items next to the panes of the
+ * open one: the list is a page list in it, its section, stuck header and bottom edge as wide as the column. A size
+ * container: the page's width and right inset are the column's to what is in it. Its left edge must be the page's.
+ */
+@utility w-page-column {
+  @variant sm {
+    container-type: inline-size;
+
+    /* On every element in it, as the kit's base sets them on every element. */
+    & * {
+      --w-width-inner: 100cqw;
+      --w-right-inner: calc(100vw - var(--vw-scroll-bar-width, 0px) - var(--w-left-inner) - 100cqw);
+    }
+  }
+}
+
+/*
+ * Content beside a list wider than the view, on the page (`w-page`) or in a modal. The list scrolls sideways — the
+ * window, or the modal's box — and what is beside it, a heading, a filter or a form, sticks to the left inset and
+ * keeps the view's width instead of scrolling away with it. On every box on the way to the list, so it works through
+ * the wrappers of any page. Sections and `w-page-bleed` rows set their own, reaching into the gutter; a page's own
+ * `position` class wins. Only while there is such a list, a table (`w-list`): a list of cards wraps and never scrolls
+ * sideways, and every sticky box is a layer of its own.
+ */
+@layer components {
+  :where(.w-page, .w-page *):has(.w-list.w-list-page) > :where(:not(.w-list-page, :has(.w-list.w-list-page))),
+  :where(.w-modal-wrapper, .w-modal-wrapper :not(.w-list *)):has(.w-list) > :where(:not(.w-list, :has(.w-list))) {
+    @variant sm {
+      position: sticky;
+      left: var(--w-left-inner);
+      max-width: var(--w-width-inner);
+    }
+  }
+}
+
+/*
+ * Blocks one after another on the page — sections, stacks of them, page lists, rows of cards, tabs over a section —
+ * are `--w-section-gap` apart, as in `surface-stack`, through the wrappers of any page: a page doesn't need a stack
+ * only to keep its blocks from touching in card and glass. Only in block flow, as a grid or a flex box spaces its
+ * children itself, and not inside a section, where blocks are its parts.
+ */
+@layer components {
+  @scope (.w-page) to (.surface-section *, .surface-root *) {
+    :where(:scope, :scope :not(.grid, .flex, .inline-grid, .inline-flex, .surface-columns))
+      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section)
+      + :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section) {
+      --w-joined: 0;
+
+      margin-top: var(--w-section-gap);
+    }
+  }
+}
+
+/*
+ * The app's main area, the page: under the header bar, between the nav and the actions bar, and off the screen's
+ * bottom edge. Its padding is the page's inset, `--w-left-inner` and `--w-right-inner`, at every width. On phones
+ * sections and page lists span the screen: they reach out by the inset, `--w-page-inset`, and keep their content at
+ * it. A floating theme keeps the last section `--w-chrome-gap` off the bottom edge, as the bars are off the others;
+ * docked (flat), where the content ends on the canvas without an edge, it leaves `--w-page-end` of room under it.
+ * Pages need no padding of their own. `--w-page-start` is what the app's layout already puts before it, such as a
+ * grid column for the nav. Content beside a wide list on it stays in view (below), so it is the class itself, not
+ * one under a variant.
+ */
+@utility w-page {
+  padding-top: var(--w-header-inner);
+  padding-left: calc(var(--w-left-inner) - var(--w-page-start, 0px));
+  padding-right: var(--w-right-inner);
+  padding-bottom: max(var(--w-chrome-gap), calc((1 - var(--w-chrome-float)) * var(--w-page-end, 4rem)));
+
+  @variant sm-not {
+    --w-page-inset: var(--w-left-inner);
+  }
+
+  /* Printed, the page is the paper's: no bars to keep clear of. */
+  @media print {
+    padding: 0;
+  }
+}
+
+@utility surface-card {
+  --w-surface: color-mix(in oklab, var(--w-card-base) calc(var(--w-card-opacity) * 100%), var(--w-canvas));
+  --w-frame-padding: var(--w-card-padding);
+
+  background-color: color-mix(in oklab, var(--w-card-base) calc(var(--w-card-opacity) * 100%), transparent);
+  padding: var(--w-card-padding);
+  border: var(--w-card-border) solid var(--w-line-subtle);
+  border-radius: var(--w-card-rounded);
+  box-shadow: var(--w-card-shadow);
+  backdrop-filter: var(--w-card-backdrop);
+}
+
+/*
+ * A dropdown or popover: the raised surface, glass where cards are. Unless a theme sets its own, it takes the cards' blur, and their
+ * opacity halfway to opaque, since it lies over content rather than the canvas: 1 stays 1, a glass card's 0.4 is 0.7.
+ * The fallbacks resolve here, so a theme setting the card tokens on `body` reaches it. Inside, `--w-surface` is the
+ * opaque color it ends up as over the canvas, as in a section, for the soft tones and sticky parts in it.
+ */
+@utility surface-dropdown {
+  --w-dropdown-opacity-resolved: var(--w-dropdown-opacity, calc((1 + var(--w-card-opacity)) / 2));
+  --w-surface: color-mix(in oklab, var(--w-surface-raised) calc(var(--w-dropdown-opacity-resolved) * 100%), var(--w-canvas));
+
+  background-color: color-mix(in oklab, var(--w-surface-raised) calc(var(--w-dropdown-opacity-resolved) * 100%), transparent);
+  backdrop-filter: var(--w-dropdown-backdrop, var(--w-card-backdrop));
+}
+
+/*
+ * Sections one after another: a gap of `--w-section-gap` between them. Flat runs them together, so a page split into
+ * sections reads as one column there and as separate surfaces in card and glass. Block flow, not flex: in flat the
+ * sections paint nothing and their content's margins collapse across them as if they weren't there.
+ */
+@utility surface-stack {
+  & > * + * {
+    --w-joined: 0;
+
+    margin-top: var(--w-section-gap);
+  }
+}
+
+/*
+ * Sections one after another with a line between them in flat, for a page whose groups should read apart there too,
+ * such as the steps of a setup or the groups of a settings page. In card and glass the gap separates them, as in
+ * `surface-stack`. In flat every block is `--w-stack-divide` (`2rem`) apart, and a section after a section has a line
+ * that far above its content: a page list or a row of cards between them keeps the space, without the line.
+ */
+@utility surface-stack-divided {
+  /* 1 in flat, where sections paint nothing, 0 where they do. */
+  --w-stack-flat: calc(1 - min(1, var(--w-section-opacity) * 100));
+
+  & > * + * {
+    --w-joined: 0;
+
+    margin-top: calc(var(--w-section-gap) + var(--w-stack-divide, 2rem) * var(--w-stack-flat));
+  }
+
+  & > .surface-section + .surface-section {
+    padding-top: calc(var(--w-section-padding) + var(--w-stack-divide, 2rem) * var(--w-stack-flat));
+    border-top-width: calc(var(--w-section-border) + 1px * var(--w-stack-flat));
+  }
+}
+
+/*
+ * A new page inside a container, such as a preview of a page: sections and cards in it render as on the page, not as
+ * nested in the container around it. It is a well of the page's own background — the canvas and its picture, fixed to
+ * the viewport as the page's is — with a line around it in every style: on a page that already shows the canvas, as a
+ * card or glass page does around its sections, the line is what tells the preview apart.
+ */
+@utility surface-root {
+  --w-page-bleed: 0px;
+  --w-page-inset: 0px;
+
+  background-color: var(--w-canvas);
+  background-image: var(--w-canvas-image);
+  background-attachment: fixed;
+  border: 1px solid var(--w-line-subtle);
+  border-radius: var(--w-section-rounded);
+  box-shadow: inset 0 1px 4px rgb(0 0 0 / 0.12);
+}
+
+/* Nesting, up to the closest `surface-root`. */
+@layer utilities {
+  /*
+   * A section in a section paints nothing: sections don't nest, its content is part of the outer one. So in a modal,
+   * which is a card of its own: a form's groups, sections on a page, are its parts there.
+   */
+  @scope (.surface-section, .w-modal-wrapper) to (.surface-root) {
+    :scope .surface-section {
+      --w-surface: inherit;
+      --w-frame-padding: inherit;
+
+      margin-inline: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background-color: transparent;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    /* A part after other content: a line above it, as between the groups of a form. */
+    :scope * + .surface-section {
+      border-top: 1px solid var(--w-line-subtle);
+      padding-top: var(--w-subsection-divide, 1rem);
+    }
+  }
+
+  /* A card in a section or another card: opaque and flat, one step darker than what it sits on. */
+  @scope (.surface-section, .surface-card) to (.surface-root) {
+    :scope .surface-card {
+      --w-card-base: var(--w-surface-subtle);
+      --w-card-opacity: 1;
+      --w-card-border: 0px;
+      --w-card-shadow: none;
+      --w-card-backdrop: none;
+    }
+  }
+
+  @scope (.surface-card) to (.surface-root) {
+    :scope .surface-card {
+      --w-card-base: var(--w-surface-muted);
+    }
+  }
+}
+
+/*
+ * A section in a tone (WSection `semanticType`), such as a danger zone: the tone's soft paint in every layout style,
+ * a section in flat included, with at least a card's padding and corners. It paints in a section or a modal too, where
+ * other sections are parts. After the nesting rules and above their specificity, which a scoped rule wins on proximity.
+ */
+@layer utilities {
+  .surface-section.surface-section-tone.surface-section-tone {
+    --w-frame-padding: max(var(--w-section-padding), var(--w-card-padding));
+
+    background-color: var(--w-tone-soft);
+    padding: max(var(--w-section-padding), var(--w-card-padding));
+    border: 0;
+    border-radius: max(var(--w-section-rounded), var(--w-card-rounded));
+    box-shadow: none;
+    backdrop-filter: none;
+
+    /* On phones a section on the page spans the screen, as other sections do; in a section or a modal it keeps its corners. */
+    @variant sm-not {
+      &:not(:is(.surface-section, .w-modal-wrapper) *) {
+        --w-frame-padding: var(--inner-margin);
+
+        padding-inline: var(--inner-margin);
+        border-radius: 0;
+      }
+    }
+  }
+}
+
+/*
+ * App chrome. The nav and the actions bar run the screen's full height, so the nav's top, the brand's place, is the
+ * frame's top-left corner in every style. Docked (flat), the header spans the screen under them. Floating, each bar
+ * is a card `--w-chrome-gap` off the screen edges and the frame's margins, and the header only spans the page between
+ * the nav and the actions bar. A floating header paints `--w-chrome-ring` over the gap above it and beside it, not
+ * below: there the page shows, such as a stuck list's section above its toolbar.
+ */
+@layer utilities {
+  /* Its content lines up with the page's: the header's own row adds `--inner-margin`, as the page does. */
+  .w-header-bar {
+    top: var(--w-chrome-gap);
+    padding-left: calc(var(--w-left-inner) - var(--inner-margin, 0px));
+    padding-right: calc(var(--w-right-inner) - var(--inner-margin, 0px));
+  }
+
+  /*
+   * Docked, the header grows over a stuck list toolbar, so the two blurred bars read as one. Floating, it keeps its
+   * height and the toolbar paints its own background.
+   */
+  .w-header-bar-bg {
+    height: calc(var(--header-height) + var(--header-height-padding, 0px) * (1 - var(--w-chrome-float)));
+    top: var(--w-chrome-gap);
+    /* Floating, from the page's edges less its inner margin: the edges of the sections under it. */
+    left: calc((var(--w-left-inner) - var(--inner-margin, 0px)) * var(--w-chrome-float));
+    right: calc((var(--w-right-inner) - var(--inner-margin, 0px)) * var(--w-chrome-float));
+    border: var(--w-chrome-border) solid var(--w-line-subtle);
+    border-radius: var(--w-chrome-rounded);
+    backdrop-filter: var(--w-chrome-backdrop, blur(8px));
+    /*
+     * Once the page settles the header turns translucent over what scrolls under it: docked, the overlay; floating,
+     * the chrome's own paint, opaque in card and translucent in glass.
+     */
+    --w-header-overlay: color-mix(
+      in oklab,
+      color-mix(in oklab, var(--w-chrome-base) calc(var(--w-chrome-opacity) * 100%), transparent) calc(var(--w-chrome-float) * 100%),
+      var(--w-overlay)
+    );
+    box-shadow:
+      var(--w-chrome-shadow),
+      0 calc(var(--w-chrome-gap) * -1) 0 var(--w-chrome-gap) var(--w-chrome-ring);
+
+    /* On phones it spans the screen, like a section: only the edge toward the page is left. */
+    @variant sm-not {
+      border-top-width: 0;
+      border-inline-width: 0;
+    }
+  }
+
+  /*
+   * The nav and the actions bar paint themselves. A bar over the page or against it, the nav below `xl` (a drawer) and
+   * the actions bar, casts `--w-chrome-bar-shadow`; the nav beside the page casts the chrome's, none when docked. The
+   * edge is an inset shadow, not a border: the nav's width is its content's, and a border would widen it past
+   * `--nav-bar-width`. On phones only the edge toward the page is left, as on the header.
+   */
+  .w-nav-bar,
+  .w-actions-bar {
+    --w-chrome-edge: inset 0 0 0 var(--w-chrome-border) var(--w-line-subtle);
+
+    top: var(--w-chrome-gap);
+    height: calc(100% - var(--w-chrome-gap) * 2);
+    border-radius: var(--w-chrome-rounded);
+    background-color: var(--color-chrome);
+    backdrop-filter: var(--w-chrome-backdrop, none);
+    box-shadow: var(--w-chrome-bar-shadow, --theme(--shadow-md inline)), var(--w-chrome-edge);
+  }
+
+  .w-nav-bar {
+    @variant sm-not {
+      &:not(.w-nav-bar-dropdown) {
+        --w-chrome-edge: inset calc(var(--w-chrome-border) * -1) 0 0 0 var(--w-line-subtle);
+      }
+    }
+
+    @variant xl {
+      box-shadow: var(--w-chrome-shadow), var(--w-chrome-edge);
+    }
+  }
+
+  .w-actions-bar {
+    @variant sm-not {
+      --w-chrome-edge: inset var(--w-chrome-border) 0 0 0 var(--w-line-subtle);
+    }
+  }
+
+  /*
+   * A theme can set `--w-nav-height: auto` for a floating nav that is as tall as its items, down to the gap off the
+   * screen's bottom edge, past which they scroll. Pinning items to the nav's bottom needs the full height.
+   * On phones the nav is a drawer over the docked header: it runs the screen's full height, as docked.
+   */
+  .w-nav-bar {
+    --w-nav-max-height: calc(100% - var(--w-chrome-gap) * 2);
+
+    left: calc(var(--w-left-margin, 0px) + var(--w-chrome-gap));
+    height: var(--w-nav-height, var(--w-nav-max-height));
+    max-height: var(--w-nav-max-height);
+
+    @variant sm-not {
+      top: 0;
+      height: 100%;
+      max-height: none;
+    }
+  }
+
+  .w-actions-bar {
+    right: calc(var(--w-right-margin, 0px) + var(--w-chrome-gap));
+  }
+
+  .w-infinite-list-header {
+    background-color: color-mix(in oklab, var(--w-surface) calc(var(--w-chrome-float) * 100%), transparent);
+  }
+
+  /*
+   * Floating, the items keep off the nav's edges, and their hover pill and the active marker follow its rounding: the
+   * pill's radius is the nav's less the inset, so the two curves run parallel. Docked, the pill and the marker meet
+   * the edges as before.
+   */
+  .w-nav-bar-content {
+    --w-nav-item-rounded: max(var(--radius-lg), var(--w-chrome-rounded) - 0.5rem);
+
+    margin-top: calc((1 - var(--w-chrome-float)) * var(--header-height, 0px));
+
+    @variant sm-not {
+      margin-top: var(--header-height, 0px);
+    }
+  }
+
+  /* The brand row is in the header's row: the items start under it. */
+  .w-nav-bar-brand + .w-nav-bar-content {
+    margin-top: 0;
+  }
+
+  /*
+   * The brand row is inset as an item is, with its pill's rounding: a link filling it lines up with the items. Floating,
+   * the pill is as far off the nav's top edge as off its end, so its corners run parallel to the nav's. Under xl it
+   * starts past the menu toggle.
+   */
+  .w-nav-bar-brand {
+    --w-nav-item-rounded: max(var(--radius-lg), var(--w-chrome-rounded) - 0.5rem);
+
+    padding-block: calc(0.25rem + var(--w-chrome-float) * 0.25rem) 0.25rem;
+    padding-inline: calc(0.5rem + var(--w-chrome-float) * 0.25rem) calc(var(--w-chrome-float) * 0.5rem);
+
+    @variant xl-not {
+      padding-inline: var(--header-height, 0px) max(0.25rem, var(--w-chrome-float) * 0.5rem);
+    }
+  }
+
+  :where(.w-nav-bar-brand > *) {
+    flex: auto;
+    min-width: 0;
+  }
+
+  /*
+   * Room above the first item and under the last, inside the items so they stay clickable up to the nav's edge: the
+   * pill is as far off the nav's top and bottom as off its end, and its corners run parallel to the nav's. Docked, the
+   * last item clears the screen's edge. Not on the nav's scroller: content stuck to its edges would leave a strip
+   * where the items show through. Content other than an item at an end, such as a block stuck to the bottom, sets its
+   * own room.
+   */
+  .w-nav-bar-content:not(.w-nav-bar-brand + *)
+    .w-nav-item-inset:first-child:not(.w-nav-bar-content :not(:first-child) .w-nav-item-inset) {
+    padding-top: calc(0.25rem + var(--w-chrome-float) * 0.25rem);
+  }
+
+  .w-nav-bar-content .w-nav-item-inset:last-child:not(.w-nav-bar-content :not(:last-child) .w-nav-item-inset) {
+    padding-bottom: calc(0.25rem + (1 - var(--w-chrome-float)) * 1rem + var(--w-chrome-float) * 0.25rem);
+
+    @variant sm-not {
+      padding-bottom: 1.25rem;
+    }
+  }
+
+  /* On the item, not the nav: the nav's content has a fixed width. Docked, xl and up, items run to the edge. */
+  .w-nav-bar .w-nav-item-inset {
+    /* Floating, the active marker sits in the middle of this inset, clear of the nav's edge and of the item. */
+    padding-inline-start: calc(0.5rem + var(--w-chrome-float) * 0.25rem);
+    padding-inline-end: calc(var(--w-chrome-float) * 0.5rem);
+
+    @variant xl-not {
+      padding-inline-end: max(0.25rem, var(--w-chrome-float) * 0.5rem);
+    }
+  }
+
+  .w-nav-item-indicator {
+    inset-block: calc(var(--w-chrome-float) * 0.5rem);
+    left: calc(var(--w-chrome-float) * 0.25rem);
+    height: auto;
+    border-radius: calc(var(--w-chrome-float) * 9999px);
+  }
+
+  /*
+   * A group's dropdown shares the nav's paint (`.w-nav-bar`) but not its place: it sizes to its items. Its corners
+   * are the nav's when floating; docked they stay rounded, as before.
+   */
+  .w-nav-bar.w-nav-bar-dropdown {
+    --w-nav-item-rounded: max(var(--radius-lg), var(--w-nav-dropdown-rounded) - 0.25rem);
+    --w-nav-dropdown-rounded: calc(
+      var(--radius-xl) * (1 - var(--w-chrome-float)) + var(--w-chrome-rounded) * var(--w-chrome-float)
+    );
+
+    top: auto;
+    left: auto;
+    height: auto;
+    max-height: none;
+    border-radius: var(--w-nav-dropdown-rounded);
+  }
+
+  .w-nav-bar-toggle {
+    top: var(--w-chrome-gap);
+    left: calc(var(--w-left-margin, 0px) + var(--w-chrome-gap));
+  }
+}
+
+/*
+ * A list that scrolls with the page is a section of its own: a surface sized to the frame stays in place while the
+ * rows scroll sideways under the sticky columns.
+ *
+ * Whatever has to hide the rows scrolling under it — the sticky columns, the masks over the gutter beside them, the
+ * stuck header — paints what is behind it instead of a flat color: the canvas, and the section's fill and edges as
+ * bands over the frame. All of it is attached to the viewport, so it lines up with the surface wherever the element
+ * is, and sticky positioning keeps it in step with scrolling on the compositor. Blur is not reproduced: over a smooth
+ * canvas it is hardly visible.
+ */
+@layer utilities {
+  /* What the parts of a page list paint behind them: the canvas, and the section's fill and edges as bands. */
+  .w-list-page,
+  .surface-section-head:has(+ * .w-list-page) {
+    --w-section-paint: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), transparent);
+    --w-band-start: calc(var(--w-left-inner) - var(--w-section-padding));
+    --w-band-end: calc(100vw - var(--vw-scroll-bar-width, 0px) - var(--w-right-inner) + var(--w-section-padding));
+    --w-page-backdrop:
+      linear-gradient(
+        to right,
+        transparent var(--w-band-start),
+        var(--w-line-subtle) var(--w-band-start) calc(var(--w-band-start) + var(--w-section-border)),
+        transparent calc(var(--w-band-start) + var(--w-section-border)) calc(var(--w-band-end) - var(--w-section-border)),
+        var(--w-line-subtle) calc(var(--w-band-end) - var(--w-section-border)) var(--w-band-end),
+        transparent var(--w-band-end)
+      ),
+      linear-gradient(
+        to right,
+        transparent var(--w-band-start),
+        var(--w-section-paint) var(--w-band-start) var(--w-band-end),
+        transparent var(--w-band-end)
+      ),
+      var(--w-canvas-image);
+  }
+
+  .w-list-page {
+    --w-surface: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), var(--w-canvas));
+    /*
+     * Striped card rows on phones are as see-through as the section. A section that paints nothing (flat) keeps them
+     * opaque, over the canvas.
+     */
+    --w-list-stripe: color-mix(
+      in oklab,
+      var(--w-surface-subtle) calc(max(var(--w-section-opacity), 1 - round(up, var(--w-section-opacity), 1)) * 100%),
+      transparent
+    );
+
+    display: grid;
+    padding-block: var(--w-section-padding);
+
+    @variant sm-not {
+      --w-section-border: 0px;
+    }
+  }
+
+  /* A section of its own: apart from the page content before it, as sections in a `surface-stack` are. A stack it is in sets its own. */
+  :where(* + .w-list.w-list-page) {
+    margin-top: var(--w-section-gap);
+  }
+
+  /* As wide as its rows, plus the right inset: the last column scrolls clear of the sticky menu column. */
+  .w-list.w-list-page {
+    width: max-content;
+    min-width: calc(100% + var(--w-right-inner));
+    padding-inline-end: var(--w-right-inner);
+    margin-inline-end: calc(var(--w-right-inner) * -1);
+  }
+
+  /* In a page column (`w-page-column`) it keeps to the column: its rows are cards there, not columns to scroll. */
+  .w-page-column .w-list.w-list-page {
+    @variant sm {
+      width: auto;
+      min-width: 0;
+      padding-inline-end: 0;
+      margin-inline-end: 0;
+    }
+  }
+
+  .w-list-page-surface,
+  .w-list-page-content,
+  .w-list-page-frame {
+    grid-area: 1 / 1;
+  }
+
+  .w-list-page-content {
+    position: relative;
+    min-width: 0;
+    /*
+     * The canvas the stuck header paints above itself ends at the section's top, as the rows do: what is above the list
+     * scrolls out under the header bar as it would without it. The padding takes the box up to there, the clip edge.
+     */
+    overflow-y: clip;
+    margin-block: calc(var(--w-section-padding) * -1);
+    padding-block: var(--w-section-padding);
+    /*
+     * The section's bottom edge (`w-list-page-end`) is stuck over the bottom of the screen when it floats: what a row
+     * sticks to the bottom, at `--w-bottom-inner`, stays above it.
+     */
+    --w-list-end-inner: calc(var(--w-chrome-float) * (var(--w-section-padding) + var(--w-chrome-gap)));
+
+    /* On phones the section spans the screen and the cards have padding of their own: they run to its edges. */
+    @variant sm-not {
+      margin-inline: calc(var(--w-page-inset, 0px) * -1);
+      --w-list-end-inner: 0px;
+    }
+  }
+
+  /* What a page sets in the list's header, such as its title, keeps the page inset there. */
+  .w-list-page .w-list-header {
+    @variant sm-not {
+      padding-inline: var(--w-page-inset, 0px);
+    }
+  }
+
+  .w-list-page-surface,
+  .w-list-page-frame {
+    position: sticky;
+    left: var(--w-band-start);
+    width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
+    margin-block: calc(var(--w-section-padding) * -1);
+    margin-inline-start: calc(var(--w-section-padding) * -1);
+    /* A sticky box stops at its container's content edge: this lets it reach past it by the padding at the end. */
+    margin-inline-end: calc(var(--w-section-padding) * -1 - var(--w-right-inner));
+    border-radius: var(--w-section-rounded);
+    /* Joined to a section head above it (`surface-section-joined`). */
+    border-start-start-radius: calc(var(--w-section-rounded) * (1 - var(--w-joined, 0)));
+    border-start-end-radius: calc(var(--w-section-rounded) * (1 - var(--w-joined, 0)));
+
+    @variant sm-not {
+      border-radius: 0;
+    }
+  }
+
+  .w-list-page-surface {
+    background-color: var(--w-section-paint);
+    border: var(--w-section-border) solid var(--w-line-subtle);
+    border-top-width: calc(var(--w-section-border) * (1 - var(--w-joined, 0)));
+    backdrop-filter: var(--w-section-backdrop);
+  }
+
+  /*
+   * The shadow goes on a frame over the rows: the masks beside the sticky columns would paint over it on the surface.
+   * An outer shadow is drawn only outside the box, so it never covers the rows. Above the stuck header, under the
+   * header bar.
+   */
+  .w-list-page-frame {
+    z-index: calc(21 - var(--w-chrome-float) * 15);
+    pointer-events: none;
+    box-shadow: var(--w-section-shadow);
+
+    /*
+     * Only the part of the section in view, from the header bar's gap to the screen's bottom gap: its shadow wraps the
+     * edges the stuck header and the end draw there, not the rows running on under the header bar and off the screen.
+     */
+    @variant sm {
+      align-self: start;
+      top: calc(var(--w-header-inner) + var(--w-section-head-height, 0px));
+      height: min(
+        calc(100% + var(--w-section-padding) * 2),
+        calc(100vh - var(--w-header-inner) - var(--w-section-head-height, 0px) - var(--w-chrome-gap))
+      );
+    }
+  }
+
+  /*
+   * The section's bottom edge while the rows run past the bottom of the screen: the fill with its rounded corners
+   * over the padding, and the canvas over a gap below it. It sticks to the bottom of the screen, and at the end of the
+   * rows it lies on the section's real edge. Over the frame: the canvas covers the frame's shadow beside it, and the
+   * edge casts its own, which takes over from the frame's further up. In the rows' box, which clips it at the
+   * section's edges: none of it shows past them on a short list or below the section at the end.
+   */
+  .w-list-page-end {
+    --w-list-end-height: calc(var(--w-section-padding) + var(--w-chrome-gap));
+    /*
+     * How far the canvas reaches past the edge, over the frame's shadow, and how far up the edge's shadow starts: past
+     * where the shadow fades out, or the handover between the two shows. The toolbar keeps the section taller than
+     * that and its corners.
+     */
+    --w-list-end-reach: 2rem;
+
+    position: sticky;
+    bottom: 0;
+    z-index: calc(22 - var(--w-chrome-float) * 15);
+    height: var(--w-list-end-height);
+    margin-bottom: calc(var(--w-list-end-height) * -1);
+    pointer-events: none;
+    /* Docked (flat) the section has no edge to draw. */
+    opacity: var(--w-chrome-float);
+
+    @variant sm-not {
+      display: none;
+    }
+  }
+
+  /*
+   * Stuck to the bottom by its box and over the section by itself: Safari moves a box stuck on both axes a little out
+   * of step while the page scrolls sideways.
+   */
+  .w-list-page-end-band {
+    position: sticky;
+    left: var(--w-band-start);
+    height: 100%;
+    margin-inline: calc(var(--w-section-padding) * -1) calc(var(--w-section-padding) * -1 - var(--w-right-inner));
+    width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
+
+    /* The canvas around the edge: below it, and beside it up to the reach above it. */
+    &::before {
+      content: "";
+      position: absolute;
+      inset: calc(var(--w-list-end-reach) * -1) calc(var(--w-list-end-reach) * -1) 0;
+      background-color: var(--w-canvas);
+      background-image: var(--w-canvas-image);
+      background-attachment: fixed;
+      clip-path: polygon(
+        0 0,
+        var(--w-list-end-reach) 0,
+        var(--w-list-end-reach) var(--w-list-end-reach),
+        calc(100% - var(--w-list-end-reach)) var(--w-list-end-reach),
+        calc(100% - var(--w-list-end-reach)) 0,
+        100% 0,
+        100% 100%,
+        0 100%
+      );
+    }
+
+    /* The shadow, from a box running on up past the reach: beside it the shadow is as full as the frame's. */
+    &::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      top: calc(var(--w-list-end-reach) * -2);
+      bottom: var(--w-chrome-gap);
+      border-end-start-radius: var(--w-section-rounded);
+      border-end-end-radius: var(--w-section-rounded);
+      box-shadow: var(--w-section-shadow);
+      clip-path: inset(var(--w-list-end-reach) -100vw -100vh -100vw);
+    }
+  }
+
+  .w-list-page-end-fill {
+    position: relative;
+    height: var(--w-section-padding);
+    border: var(--w-section-border) solid var(--w-line-subtle);
+    border-top: 0;
+    border-end-start-radius: var(--w-section-rounded);
+    border-end-end-radius: var(--w-section-rounded);
+    background-color: var(--w-canvas);
+    background-image: var(--w-page-backdrop);
+    background-attachment: fixed;
+  }
+
+  .w-list-page-repaint .w-list-page-end-band::before,
+  .w-list-page-repaint .w-list-page-end-fill {
+    background-origin: border-box;
+  }
+
+  .w-list-page :is(.w-list-mask, .sticky.bg-surface, .w-list-group-heading) {
+    background-color: var(--w-canvas);
+    background-image: var(--w-page-backdrop);
+    background-attachment: fixed;
+  }
+
+  /* A fixed background is positioned against the viewport, so the origin changes nothing but a repaint: see WList. */
+  .w-list-page-repaint :is(.w-list-mask, .sticky.bg-surface, .w-list-group-heading),
+  .w-list-page-repaint .w-infinite-list-header::before {
+    background-origin: border-box;
+  }
+
+  /*
+   * Off phones, the gutters beside the rows and their sticky columns are covered by one strip each instead of a mask
+   * in every row: the part of the rows in view, stuck to the screen. Safari repaints a fixed background late on a box
+   * that moves while the page scrolls, and leaves stale tiles of it; these do not move, and the clip that ends them
+   * moves only at the ends of the rows. The box of the pages is isolated and the rows are not, so the strips lie over
+   * the scrolling cells and under the sticky ones, which paint their row's border and fill over them.
+   */
+  .w-list-page-strip {
+    display: none;
+  }
+
+  .w-list-page :has(> .w-list-page-strip) {
+    position: relative;
+    isolation: isolate;
+  }
+
+  @variant sm {
+    /* Over the rows, from the first to the last. */
+    .w-list-page-strip {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      overflow-y: clip;
+      pointer-events: none;
+    }
+
+    /*
+     * Two screens past either end of the rows, so the strips stay stuck to the screen even where an end of them is in
+     * view, and the clip cuts them there instead. Safari moves a stuck box a frame or so behind the scroll, and that
+     * would bring their own ends into view: they lie half a screen past the screen's.
+     */
+    .w-list-page-strip-track {
+      position: absolute;
+      inset-block: -200vh;
+      inset-inline: 0;
+    }
+
+    .w-list-page-strip-sides,
+    .w-list-page-strip-columns {
+      position: sticky;
+      top: -50vh;
+      height: 200vh;
+    }
+
+    .w-list-page-strip-sides {
+      margin-bottom: -200vh;
+    }
+
+    /*
+     * Over the section by itself, as the end's band. The masks run a little past the screen's sides: Safari can leave
+     * the band a pixel out of step with the rows there while they scroll sideways.
+     */
+    .w-list-page-strip-band {
+      --w-list-strip-overrun: 0.5rem;
+
+      position: sticky;
+      left: var(--w-band-start);
+      height: 100%;
+      margin-inline: calc(var(--w-section-padding) * -1) calc(var(--w-section-padding) * -1 - var(--w-right-inner));
+      width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        inset-block: 0;
+        background-color: var(--w-canvas);
+        background-image: var(--w-page-backdrop);
+        background-attachment: fixed;
+      }
+
+      &::before {
+        left: calc(var(--w-band-start) * -1 - var(--w-list-strip-overrun));
+        width: calc(var(--w-left-inner) + var(--w-list-left) + var(--w-list-strip-overrun));
+
+        /* Where the rows hide their select column. */
+        @variant @max-lg {
+          width: calc(var(--w-left-inner) + var(--w-list-strip-overrun));
+        }
+      }
+
+      &::after {
+        right: calc((var(--w-right-inner) - var(--w-section-padding)) * -1 - var(--w-list-strip-overrun));
+        width: calc(var(--w-right-inner) + var(--w-list-right) + var(--w-list-strip-overrun));
+      }
+    }
+
+    /*
+     * The rows' columns laid out as in a row, between its select and menu columns: the sticky ones stick where their
+     * cells do, the rest only hold their place.
+     */
+    /* On the rows' tracks, which WList sets on it too. */
+    .w-list-page-strip-columns {
+      display: grid;
+    }
+
+    .w-list-page-strip-column {
+      position: sticky;
+      background-color: var(--w-canvas);
+      background-image: var(--w-page-backdrop);
+      background-attachment: fixed;
+    }
+
+    /* Nothing to cover without rows, and the empty state keeps its full width. */
+    .w-list-page :has(> .w-list-page-strip):not(:has(.w-list-item)) > .w-list-page-strip {
+      display: none;
+    }
+
+    .w-list-page .w-list-item-sticky {
+      background: none;
+
+      > .w-list-mask {
+        display: none;
+      }
+    }
+
+    .w-list-page-rows .w-list-item-middle {
+      isolation: auto;
+
+      .sticky.bg-surface {
+        background: none;
+      }
+    }
+
+    /*
+     * Without the row's own stacking context its action (the link or button over the whole row, under the cells) lies
+     * under the boxes of the rows, the row and its cells: those let the pointer through to it, and what is in them
+     * takes it back, so a cell's own pointer-events still decides.
+     */
+    .w-list-page-rows,
+    .w-list-page-rows .w-list-item,
+    .w-list-page-rows .w-list-item-middle {
+      pointer-events: none;
+    }
+
+    :where(.w-list-page-rows > *, .w-list-page-rows .w-list-item > *, .w-list-page-rows .w-list-item-middle > *) {
+      pointer-events: auto;
+    }
+
+    /* What runs across the row, and a group's heading between rows, stay over the strip. */
+    .w-list-page .w-list-item-expansion {
+      z-index: 1;
+    }
+
+    /*
+     * Named rather than matched as "not a row": a :has() over the rows restyles all of them whenever a page swaps. A
+     * group's heading is sticky, with a z-index of its own.
+     */
+    .w-list-page-rows .w-infinite-list-state {
+      z-index: 1;
+    }
+  }
+
+  /*
+   * Floating, the stuck header keeps the section's top edge: it sticks the section's padding below the header bar's
+   * gap, and draws the edge there — the fill with its rounded corners and border, and the canvas above it up to the
+   * section's top, under the header bar. The section's real edge is at that line when the header sticks, so the
+   * drawn one takes over from it in place. Docked (flat) it stays clear and above the header bar, which grows behind
+   * it.
+   */
+  .w-list-page {
+    /* The gap above the stuck header, which `--w-top-inner` counts too. On phones the header bar is docked, with no gap under it: the stuck toolbar keeps a small one. */
+    --w-list-header-gap: var(--w-section-padding);
+    /* Where the header sticks, and the group headings under it: under a section head over the list, which sticks above it. */
+    --w-list-header-top: calc(var(--w-header-inner) + var(--w-section-head-height, 0px) + var(--w-list-header-gap));
+
+    @variant sm-not {
+      --w-list-header-gap: calc(var(--w-chrome-float) * 0.5rem);
+    }
+  }
+
+  .w-list-page .w-infinite-list-header {
+    background-color: transparent;
+    top: var(--w-list-header-top);
+
+    /*
+     * Only once stuck: before, the header scrolls with the page over the section, which is all it would show, and
+     * Safari leaves stale tiles of a fixed background on a box that moves.
+     */
+    &::before {
+      position: absolute;
+      inset-inline: 0;
+      top: 0;
+      bottom: 0;
+      z-index: -1;
+      opacity: var(--w-chrome-float);
+      background-color: var(--w-canvas);
+      background-image: var(--w-page-backdrop);
+      background-attachment: fixed;
+    }
+  }
+
+  .w-list-page .w-infinite-list-header-stuck {
+    z-index: calc(20 - var(--w-chrome-float) * 15) !important;
+
+    /* Off phones the edge paints it: the header is as wide as the rows, and moves while they scroll sideways. */
+    @variant sm-not {
+      &::before {
+        content: "";
+        top: calc(var(--w-list-header-top) * -1);
+      }
+    }
+  }
+
+  /*
+   * The edge, over the canvas: from the section's padding above the stuck header down to its bottom. It stays over
+   * the section while the list scrolls sideways under it, as the frame does. The frame casts its shadow.
+   */
+  .w-list-page .w-infinite-list-header-edge {
+    position: sticky;
+    left: var(--w-band-start);
+    z-index: -1;
+    width: calc(var(--w-width-inner) + var(--w-section-padding) * 2);
+    margin-inline-start: calc(var(--w-section-padding) * -1);
+    margin-inline-end: calc(var(--w-section-padding) * -1 - var(--w-right-inner));
+  }
+
+  /* The canvas above the stuck header, up to the header bar, under the edge. */
+  .w-list-page .w-infinite-list-header-stuck .w-infinite-list-header-edge::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-inline: 0;
+    top: calc(var(--w-list-header-top) * -1);
+    height: calc(var(--w-list-header-top) + var(--w-list-header-height, 0px));
+    opacity: var(--w-chrome-float);
+    background-color: var(--w-canvas);
+    background-image: var(--w-canvas-image);
+    background-attachment: fixed;
+
+    @variant sm-not {
+      content: none;
+    }
+  }
+
+  .w-list-page .w-infinite-list-header-stuck .w-infinite-list-header-edge::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: calc(var(--w-list-header-gap) * -1);
+    height: calc(var(--w-list-header-gap) + var(--w-list-header-height, 0px));
+    opacity: var(--w-chrome-float);
+    border: var(--w-section-border) solid var(--w-line-subtle);
+    border-bottom: 0;
+    /* Joined to a section head, which sticks above it, it goes on from the head's bottom. */
+    border-top-width: calc(var(--w-section-border) * (1 - var(--w-joined, 0)));
+    border-start-start-radius: calc(var(--w-section-rounded) * (1 - var(--w-joined, 0)));
+    border-start-end-radius: calc(var(--w-section-rounded) * (1 - var(--w-joined, 0)));
+    background-color: var(--w-canvas);
+    background-image: var(--w-page-backdrop);
+    background-attachment: fixed;
+
+    @variant sm-not {
+      content: none;
+    }
+  }
+
+  /*
+   * A section head over a page list, such as WTabs `section` over a list in its open tab, sticks to the top where the
+   * list's section would, and the list's header sticks under it (`--w-section-head-height`): the two stay one top of
+   * the section while the rows scroll under them. It paints what is behind it, as the stuck header does.
+   */
+  .surface-section-head:has(+ * .w-list-page) {
+    position: sticky;
+    top: var(--w-header-inner);
+    z-index: calc(22 - var(--w-chrome-float) * 15);
+    background-color: var(--w-canvas);
+    background-image: var(--w-page-backdrop);
+    background-attachment: fixed;
+    backdrop-filter: none;
+  }
+
+  .w-list-page-repaint .w-infinite-list-header-stuck .w-infinite-list-header-edge::before,
+  .w-list-page-repaint .w-infinite-list-header-stuck .w-infinite-list-header-edge::after {
+    background-origin: border-box;
+  }
+}

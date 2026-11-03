@@ -252,8 +252,9 @@ import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 | `noSwitchOnInvalid` | `boolean` | — | Stays on the current tab when another one gets an error. By default the first tab with an error is opened. |
 | `wrap` | `boolean` | — | Wraps the tab buttons onto new lines instead of scrolling sideways. |
 | `divider` | `boolean` | — | Draws a line under the row of tab buttons, which the open tab's underline covers. |
+| `section` | `boolean` | — | The row of tab buttons is the top of a section on the page, and the open tab's section or page list joins it below. For tabs over the page's content, such as the lists of an item's page. Implies `divider`. |
 | `statusIcon` | `boolean` | — | Shows a value and error status icon next to each title. |
-| `flat` | `boolean` | — | Renders all tabs one after another, each under its title, without the buttons. |
+| `flat` | `boolean` | — | Renders all tabs one after another without the buttons, each a section (WSection) under its title: a card of its own in a card theme, the groups of a settings page. Its sections stack as a page's do, with a line between them in flat. |
 | `indicator` | `boolean` | — | Shows a large status circle on each tab button — error, has value or empty. |
 
 #### Events

@@ -4,7 +4,7 @@
     :style="{gridTemplateColumns: `var(--w-list-left,auto) ${ columns } var(--w-list-right,auto)`}"
   >
     <div class="left---left-inner bg-surface sticky z-1">
-      <div class="bg-surface w---left-inner absolute right-full top-0 -z-1 h-full" />
+      <div class="w-list-mask bg-surface w---left-inner absolute right-full top-0 -z-1 h-full" />
 
       <div
         class="h-full rounded-l-(--w-list-header-rounded,0.75rem) border-y border-l border-solid border-line bg-(--w-list-header-bg,inherit)"
@@ -34,7 +34,7 @@
     </div>
 
     <div class="right---right-inner bg-surface sticky z-1">
-      <div class="bg-surface w---right-inner absolute left-full top-0 -z-1 h-full" />
+      <div class="w-list-mask bg-surface w---right-inner absolute left-full top-0 -z-1 h-full" />
 
       <div
         class="h-full rounded-r-(--w-list-header-rounded,0.75rem) border-y border-r border-solid border-line bg-(--w-list-header-bg,inherit)"

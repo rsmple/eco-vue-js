@@ -1,6 +1,7 @@
 export type InfiniteListHeaderScope = {
   headerTop: number
   headerHeight: number
+  stickyTop: number
   updateHeader: () => void
 }
 

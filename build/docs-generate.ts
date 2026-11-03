@@ -22,6 +22,8 @@ import {availableParallelism} from 'node:os'
 import path from 'node:path'
 import {Worker, isMainThread, parentPort} from 'node:worker_threads'
 
+import {getLayoutsCss} from '../docs/.vitepress/themePresets.ts'
+
 const ROOT = path.resolve(import.meta.dirname, '..')
 const CHECK = process.argv.includes('--check')
 const WORKERS = Math.max(1, Math.min(availableParallelism() - 1, 6))
@@ -409,6 +411,18 @@ const main = async () => {
 
     changed.push(file)
     details.push(`  ${ file }`, ...stale.map(item => `    ${ item }`))
+  }
+
+  // The kit's layout presets, from the docs' theme tokens, so the two can't drift apart.
+  const layoutsFile = 'package/tailwind-base/css/layouts.css'
+  const layoutsCss = getLayoutsCss()
+  const layoutsPath = path.join(ROOT, layoutsFile)
+
+  if (!existsSync(layoutsPath) || await readFile(layoutsPath, 'utf8') !== layoutsCss) {
+    if (!CHECK) await writeFile(layoutsPath, layoutsCss, 'utf8')
+
+    changed.push(layoutsFile)
+    details.push(`  ${ layoutsFile }`, '    generated from LAYOUT_TOKENS in docs/.vitepress/themePresets.ts')
   }
 
   const seconds = `${ ((performance.now() - start) / 1000).toFixed(1) }s, ${ rendered }/${ apiNames.size } API tables rendered`

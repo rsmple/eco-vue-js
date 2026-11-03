@@ -21,6 +21,7 @@
         :transition="transition"
         :page-length="pageLength"
         :header-height="'headerHeight' in defaultScope ? defaultScope.headerHeight : 0"
+        :sticky-top="'stickyTop' in defaultScope ? defaultScope.stickyTop : undefined"
         :min-height="minHeight"
         :min-height-only="minHeightOnly"
         :exclude-params="excludeParams"
@@ -58,6 +59,13 @@
             :results="results"
             :intersecting="intersecting"
           />
+        </template>
+
+        <template
+          v-if="$slots['pages-before']"
+          #before
+        >
+          <slot name="pages-before" />
         </template>
 
         <template
@@ -189,6 +197,8 @@ defineSlots<{
   header?: (props: InfiniteListHeaderScope & Partial<InfiniteListScope>) => void
   /** Shown when the query returns no items. Replaces `emptyStub`. */
   empty?: () => void
+  /** Rendered in the box that holds the loaded pages, before them, such as a layer that spans them. */
+  'pages-before'?: () => void
   /** Shown instead of a page that failed to load and has nothing cached. Gets the `error`, `retry` to load the page again, and `isFetching`. Replaces the message and Retry button. */
   error?: (props: {error: Error, retry: () => Promise<void>, isFetching: boolean}) => void
 }>()

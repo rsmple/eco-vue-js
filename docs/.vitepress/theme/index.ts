@@ -5,12 +5,15 @@ import CopyOrDownloadAsMarkdownButtons from 'vitepress-plugin-llms/vitepress-com
 
 import {preventDragFile} from '@/utils/preventDragFile'
 import {setQueryClient} from '@/utils/queryClient'
+import {appendScrollbarStyles} from '@/utils/scrollbarStyles'
 
 import DocsLayout from './DocsLayout.vue'
 import DocsDemo from './components/DocsDemo.vue'
 import IconGallery from './components/IconGallery.vue'
 import NotifyPositionPlayground from './components/NotifyPositionPlayground.vue'
 import ThemeDataPreview from './components/ThemeDataPreview.vue'
+import ThemeLayoutPreview from './components/ThemeLayoutPreview.vue'
+import ThemeLayoutSwitch from './components/ThemeLayoutSwitch.vue'
 import ThemePlayground from './components/ThemePlayground.vue'
 import {installKitRouter} from './router'
 
@@ -29,6 +32,9 @@ if (browserQueryClient) setQueryClient(browserQueryClient)
 // File drop zones light up while a file is dragged over the page, and a file dropped beside them isn't opened.
 preventDragFile()
 
+// As in an app: the page's inner width leaves out the scrollbar gutter where 100vw counts it.
+appendScrollbarStyles()
+
 export default {
   extends: DefaultTheme,
   // VitePress renders the Markdown; the page chrome is the kit's own app shell.
@@ -42,5 +48,7 @@ export default {
     app.component('NotifyPositionPlayground', NotifyPositionPlayground)
     app.component('ThemePlayground', ThemePlayground)
     app.component('ThemeDataPreview', ThemeDataPreview)
+    app.component('ThemeLayoutPreview', ThemeLayoutPreview)
+    app.component('ThemeLayoutSwitch', ThemeLayoutSwitch)
   },
 } satisfies Theme

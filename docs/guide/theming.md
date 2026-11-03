@@ -11,6 +11,7 @@ The kit's look comes from three kinds of CSS variables:
 - **Palette** — a primary color, four status colors, a neutral `gray-*` scale, the page background and text, and fonts. They are Tailwind theme tokens: an app overrides them in its own `@theme`.
 - **Color roles** — what components actually paint with, named by purpose: main and muted text, surfaces, lines, focus. Each reads the palette by default, and an app can set any of them in `@theme` too.
 - **`w-*` variables** — sizes and radii of fields, buttons and list headers. An app sets them on `body`, directly or with the matching utilities (`w-input-h-9`, `w-button-rounded-xl`).
+- **Layout style** — how content is contained: flat, card or glass ([Layout styles](#layout-styles)). It is a set of the variables above, which the playground writes out.
 
 All are plain CSS variables at runtime, so this site can swap them live: the whole site follows the playground below, including the header and every component page.
 
@@ -41,6 +42,37 @@ All are plain CSS variables at runtime, so this site can swap them live: the who
   <ThemeDataPreview />
 </ClientOnly>
 
+## Layout styles
+
+A page holds two kinds of containers: a **section** ([WSection](/components/surface), `surface-section`) is a page-level area, such as a list, a form or a settings group, and a **card** ([WCard](/components/surface), `surface-card`) is a block that shows in every style, such as a tile or a stat. The layout style decides how they and the header, nav and actions bar look:
+
+- **Flat**, the default: sections paint nothing and their content sits on the page, cards are filled one step off the page, and the bars are docked to the screen edges.
+- **Card**: the page background (the canvas) is a step darker than the surface, sections and cards are surfaces on it with a radius and a light shadow, and the bars float as cards a gap off the screen edges.
+- **Glass**: as card, but sections, cards and bars are translucent over a canvas tinted with the primary color and a soft gradient of it and two data hues, and blur what is behind them.
+
+<ClientOnly>
+  <ThemeLayoutPreview />
+</ClientOnly>
+
+Switch this site to one here, or from the theme menu in the header; the switch overrides only the theme's `layout`, and picking the preset again goes back to its own. Its radii and the bars' gap can be adjusted under **Layout** in the playground. The canvas is set under **Page background**: its color in either mode, the three colors of the glass gradient (the primary and two data hues by default; Randomize picks them for a glass theme) and a grain over it, in any style. On phones the bars dock and sections span the screen in every style.
+
+Card and glass ship with the kit: put `class="w-layout-card"` or `class="w-layout-glass"` on `<html>` and the app gets the style's tokens, kept in step with the kit's own. The CSS the playground gives then holds only what a theme changes on top of the style; a role the style sets goes on `:root` there, not in `@theme`, so it wins over the class.
+
+<div class="vp-raw max-w-80">
+  <ClientOnly>
+    <ThemeLayoutSwitch />
+  </ClientOnly>
+</div>
+
+What follows the switch on this site is what an app gets from the containers, with no code of its own per style:
+
+- **The bars**: the header and the nav are WHeaderBar and WNavBar, docked in flat and floating in card and glass.
+- **Docs pages**: a page is a stack of sections, one per heading and one per example (the demo with its code under it), and the outline is another. In flat they run together into one column as before; in card and glass they are separate surfaces on the canvas.
+- **The home page**: the hero's forms and the gallery's tiles are cards, and the footer is a section.
+- **A list page**: the [List page](/recipes/list-page) recipe ends in a list that scrolls with the window, which draws its own section.
+
+What paints the surface inside a container, such as sticky list columns, striped rows and soft tones, follows it, and a list that scrolls with the page draws its own section. The contrast checks hold in every container and style, measured against the color a section or card ends up as over the canvas; for glass that is over the plain canvas and over each spot of its gradient. The canvas itself is checked for main text only: in card and glass it carries the page's headings, and everything else goes in a section or a card.
+
 ## In an app
 
 **Copy CSS** gives what goes in the app's stylesheet, after the kit's base:
@@ -62,7 +94,7 @@ body {
 }
 ```
 
-Only changed colors are listed, but every `w-*` variable is: this site sets its own sizes, and an app without them gets the kit's defaults instead (in the [shape table](#shape)).
+Only changed colors are listed, but every `w-*` variable is: this site sets its own sizes, and an app without them gets the kit's defaults instead (in the [shape table](#shape)). A card or glass layout adds its roles to `@theme`, its variables to `body`, and two rules after it: the bars dock on phones, and the page doesn't bounce sideways, which would move it but not the backgrounds that repaint a page list's section.
 
 ### Light and dark mode
 
@@ -222,7 +254,7 @@ https://rsmple.github.io/eco-vue-js/guide/theming?theme=ocean
 https://rsmple.github.io/eco-vue-js/components/select?theme={"preset":"compact","color-primary":"#e11d48","neutral":"stone"}
 ```
 
-Encode the JSON with `encodeURIComponent` when building a link in code; browsers accept it unencoded when typed. Keys are the variable names without `--`, plus `neutral`, which takes a scale name: `zinc`, `slate`, `gray`, `neutral` or `stone`. An optional `name` saves the theme among the opener's themes under that name, numbered when it is taken; opening a theme that is saved already switches to it instead of saving a copy. Unknown keys are ignored, and so are values with `;`, `{`, `}`, `<`, `>`, `\`, `url(` or `@import`. Colors take any CSS color syntax, including `var(--color-gray-400)`; sizes any CSS length. Radii double as side padding, so a pill shape is half the height (`1.125rem` for `2.25rem`), not `9999px`.
+Encode the JSON with `encodeURIComponent` when building a link in code; browsers accept it unencoded when typed. Keys are the variable names without `--`, plus `neutral`, which takes a scale name: `zinc`, `slate`, `gray`, `neutral` or `stone`, and `layout`: `flat`, `card` or `glass`. An optional `name` saves the theme among the opener's themes under that name, numbered when it is taken; opening a theme that is saved already switches to it instead of saving a copy. Unknown keys are ignored, and so are values with `;`, `{`, `}`, `<`, `>`, `\`, `url(` or `@import`. Colors take any CSS color syntax, including `var(--color-gray-400)`; sizes any CSS length. Radii double as side padding, so a pill shape is half the height (`1.125rem` for `2.25rem`), not `9999px`.
 
 To make a theme from a description — "a warm, rounded theme for a finance dashboard" — pick a neutral scale and a primary, adjust status colors only where they clash with it, and link to the page the theme should be seen on, or to this one to keep editing it. Mid-tone fills (OKLCH lightness 50–58%) work in both modes without `-dark` values.
 
@@ -231,9 +263,9 @@ To make a theme from a description — "a warm, rounded theme for a finance dash
 | Id | Look |
 | --- | --- |
 | `default` | The kit's violet on zinc, as this site ships |
-| `ocean` | Blue primary, cyan info, slate neutrals |
+| `ocean` | Blue primary, cyan info, slate neutrals, card layout |
 | `forest` | Green primary, lime positive, stone neutrals, pill-shaped fields and buttons |
-| `sunset` | Orange primary, rose negative, stone neutrals |
+| `sunset` | Orange primary, rose negative, stone neutrals, glass layout |
 | `compact` | Monochrome: near-black primary that turns light in dark mode, no tint, 2rem fields and buttons, small radii |
 
 ### Palette
@@ -270,5 +302,23 @@ To make a theme from a description — "a warm, rounded theme for a finance dash
 | `w-list-header-rounded` | `0.75rem` | `1rem` | Radius of list headers |
 | `w-checkbox-size` | `0.75rem` | `1rem` | Checkboxes and radios |
 | `w-shadow-lift` | `0.5rem` | `0.5rem` | How far `shadow-md` falls under dropdowns, modals and tooltips; `0rem` centers it into a glow |
+
+### Layout
+
+| Key | Flat | Card and glass | Controls |
+| --- | --- | --- | --- |
+| `layout` | `flat` | `card`, `glass` | The [layout style](#layout-styles), and with it the defaults below |
+| `w-inner-margin` | `1rem` | `1rem` | The page margin on phones (`--inner-margin`): where content starts off the screen edges and the bars. Card and glass sections reach into it and pad by it |
+| `w-inner-margin-sm` | `1.5rem` | `1.5rem` | The same from `sm` up |
+| `w-section-rounded` | `0px` | `1.5rem` | Radius of sections |
+| `w-section-gap` | `0px` | `0.75rem` | Between sections in a `surface-stack`, such as the parts of a docs page |
+| `w-card-padding` | `1rem` | `1rem` | Inside cards |
+| `w-card-rounded` | `1rem` | `1rem` | Radius of cards |
+| `w-chrome-gap` | `0px` | `0.75rem` | Between the floating bars, the screen edges and the page; `0px` on phones |
+| `w-chrome-rounded` | `0px` | `1rem` | Radius of the floating header, nav and actions bar |
+
+A layout also sets the canvas and card roles (`role-canvas`, `role-card`) and the `w-section-*`, `w-card-*` and `w-chrome-*` opacity, edge, shadow and blur variables; **Copy CSS** lists them.
+
+Dropdowns and popovers, and the bottom sheets that stand in for them on phones, follow the cards: they take `w-card-backdrop` as their blur, and `w-card-opacity` halfway to opaque, since they lie over content rather than the page background. Glass cards at `0.4` make dropdowns at `0.7`; flat and card stay opaque. A theme sets `w-dropdown-opacity` and `w-dropdown-backdrop` to change them on their own.
 
 The kit has more `w-*` variables for single components, such as `w-list-padding` and `w-modal-wrapper-rounded`; the playground covers the ones that shape the whole app.

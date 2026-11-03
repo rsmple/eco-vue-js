@@ -8,6 +8,8 @@
       'list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem)': minHeightOnly,
     }"
   >
+    <slot name="before" />
+
     <!-- Not a scroll anchor: it changes by an average page height when a page is added or dropped at the top, not by the page's own. -->
     <div
       class="[overflow-anchor:none]"
@@ -119,6 +121,8 @@ const props = withDefaults(
     transition?: boolean
     pageLength?: number
     headerHeight?: number
+    /** Where the header sticks, from the top of the screen. */
+    stickyTop?: number
     minHeight?: boolean
     minHeightOnly?: boolean
     excludeParams?: (keyof QueryParams)[]
@@ -135,6 +139,7 @@ const props = withDefaults(
     skeletonLength: undefined,
     pageLength: 24,
     headerHeight: 0,
+    stickyTop: undefined,
     excludeParams: undefined,
     emptyStub: undefined,
     pageClass: undefined,
@@ -644,7 +649,9 @@ const goto = async (page = 1, itemIndex?: number) => {
 const scrollTop = () => {
   const element = scrollingElement?.value ?? document.scrollingElement
 
-  const value = (infiniteScrollRef.value?.$el ? getOffsetTop(infiniteScrollRef.value.$el) : 0) - props.headerHeight - 60
+  // On the page the list scrolls back to where its first item shows under the stuck header.
+  const top = scrollingElement || props.stickyTop === undefined ? 60 : props.stickyTop
+  const value = (infiniteScrollRef.value?.$el ? getOffsetTop(infiniteScrollRef.value.$el) : 0) - props.headerHeight - top
 
   if (element && element.scrollTop > value) element.scrollTop = value
 }
@@ -845,6 +852,7 @@ defineSlots<{
     results: Data[] | undefined
     intersecting: boolean
   }) => void
+  before?: () => void
   empty?: () => void
   error?: (props: {error: Error, retry: () => Promise<void>, isFetching: boolean}) => void
 }>()

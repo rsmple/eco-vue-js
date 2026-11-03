@@ -1,6 +1,6 @@
 <template>
   <div class="vp-raw grid gap-8">
-    <div class="grid gap-3 rounded-xl border border-solid border-line-subtle p-4">
+    <div class="grid min-w-0 gap-3 rounded-xl border border-solid border-line-subtle p-4">
       <div class="flex items-center gap-2 font-semibold">
         <div class="flex gap-2 items-center mr-auto">
           <ThemeSwatch :config="themeConfig" />
@@ -79,7 +79,7 @@
         </WButton>
       </div>
 
-      <details>
+      <details class="min-w-0">
         <summary class="text-description cursor-pointer text-sm font-semibold">
           CSS
         </summary>
@@ -339,7 +339,6 @@ import ThemeSwatch from './ThemeSwatch.vue'
 
 import {
   ADVANCED_GROUPS,
-  DEFAULT_TOKENS,
   FULL_HUE_RANGE,
   type HueRange,
   PRESETS,
@@ -348,12 +347,12 @@ import {
   TOKENS,
   type ThemeConfig,
   type ThemeFormModel,
-  type ThemeTokens,
   activeTheme,
   activeThemeId,
   deleteTheme,
   duplicateTheme,
   findPreset,
+  getBaseTokens,
   getHueGradient,
   getHueSwatch,
   getThemeCss,
@@ -362,6 +361,7 @@ import {
   hasCustomTokens,
   isFullHueRange,
   isRandomTheme,
+  isTokenInLayout,
   loadTheme,
   parseThemeReply,
   randomHues,
@@ -381,11 +381,16 @@ import {confirmDeleteAllThemes, openSaveTheme} from '../themeConfirm'
 
 const ThemeNameModal = defineAsyncComponent(() => import('./ThemeNameModal.vue'))
 
-const allGroups = [...new Set(TOKENS.map(token => token.group))].map(name => ({name, description: ADVANCED_GROUPS[name], tokens: TOKENS.filter(token => token.group === name)}))
+// Tokens of another layout style than the one in use, such as the glass gradient's colors, are left out.
+const allGroups = computed(() => [...new Set(TOKENS.map(token => token.group))].map(name => ({
+  name,
+  description: ADVANCED_GROUPS[name],
+  tokens: TOKENS.filter(token => token.group === name && isTokenInLayout(token, themeTokens.value.layout)),
+})))
 
-const groups = allGroups.filter(group => !group.description)
+const groups = computed(() => allGroups.value.filter(group => !group.description))
 
-const advancedGroups = allGroups.filter(group => group.description)
+const advancedGroups = computed(() => allGroups.value.filter(group => group.description))
 
 const activePreset = computed(() => themeConfig.value.preset ?? 'default')
 
@@ -417,8 +422,8 @@ watch(themeConfig, config => {
   nextTick(() => form.value?.validate(true))
 })
 
-// What an empty field falls back to: the preset's value, or the site's.
-const baseTokens = computed(() => ({...DEFAULT_TOKENS, ...findPreset(activePreset.value)?.tokens as ThemeTokens}))
+// What an empty field falls back to: the preset's value, the layout's, or the site's.
+const baseTokens = computed(() => getBaseTokens(themeConfig.value))
 
 const css = computed(() => getThemeCss(themeTokens.value))
 

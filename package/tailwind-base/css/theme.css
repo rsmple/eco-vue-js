@@ -129,10 +129,13 @@
   --spacing---w-input-gap: var(--w-input-gap);
   --spacing---w-option-height: var(--w-option-height);
   --spacing---w-select-option-padding: var(--w-select-option-padding);
+  --spacing---header-inner: var(--w-header-inner);
+  --spacing---top-inner: var(--w-top-inner);
   --spacing---left-inner: var(--w-left-inner);
   --spacing---right-inner: var(--w-right-inner);
   --spacing---width-inner: var(--w-width-inner);
   --spacing---height-inner: var(--w-height-inner);
+  --spacing---bottom-inner: var(--w-bottom-inner);
   --spacing---modal-header-height: var(--w-modal-header-height, 0px);
   --spacing---modal-footer-height: var(--w-modal-footer-height, 0px);
   --spacing---modal-content-height: var(--w-modal-content-height, 0px);

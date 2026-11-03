@@ -18,9 +18,144 @@ export const NEUTRAL_STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 9
 
 export const isNeutralScale = (value: unknown): value is NeutralScale => typeof value === 'string' && Object.hasOwn(NEUTRAL_SCALES, value)
 
+/** How content is contained: the `layout` token picks one, and it sets the tokens below. */
+export const LAYOUTS = [
+  {id: 'flat', name: 'Flat', look: 'Content on the page background, the bars docked to the screen edges'},
+  {id: 'card', name: 'Card', look: 'Sections and cards on a darker page, the bars floating as cards'},
+  {id: 'glass', name: 'Glass', look: 'Translucent sections, cards and bars over a gradient from the theme\'s colors'},
+] as const
+
+export type LayoutId = typeof LAYOUTS[number]['id']
+
+export const isLayoutId = (value: unknown): value is LayoutId => LAYOUTS.some(layout => layout.id === value)
+
+/** Card and glass: the bars float off the screen edges, and sections reach into the page gutter and pad by it. */
+const FLOATING: PresetTokens = {
+  'w-section-rounded': '1.5rem',
+  'w-section-padding': 'var(--inner-margin)',
+  'w-section-gap': '0.75rem',
+  'w-page-bleed': 'var(--inner-margin)',
+  'w-card-rounded': '1rem',
+  'w-chrome-float': '1',
+  'w-chrome-gap': '0.75rem',
+  'w-chrome-rounded': '1rem',
+  'w-nav-height': 'auto',
+}
+
+/**
+ * Card in dark mode: the page is a step darker than the surface. Below about 0.2 a darker page can't show, it is
+ * black either way, so there the surface steps up off the theme's background instead, by `CARD_DARK_LIFT` up to
+ * `CARD_DARK_FLOOR`, and the page keeps the background: Neon's near-black page with its cards lifted off it.
+ */
+const CARD_DARK_LIFT = 0.08
+
+const CARD_DARK_FLOOR = 0.2
+
+const CARD_DARK_STEP = 0.035
+
+/** The card layout's dark surface lightness for a dark background of lightness `l`, as `role-surface-dark` computes it. */
+export const getCardDarkSurface = (l: number) => Math.max(l, Math.min(l + CARD_DARK_LIFT, CARD_DARK_FLOOR))
+
+const CARD_DARK_SURFACE_L = `max(l, min(calc(l + ${ CARD_DARK_LIFT }), ${ CARD_DARK_FLOOR }))`
+
+/**
+ * The spots of the glass canvas's gradient: where each sits, how much of its color it mixes in at its center and how
+ * far it fades out. Their colors are theme tokens, the primary and two data hues unless a theme sets its own.
+ */
+const CANVAS_SPOTS = [
+  {key: 'w-canvas-glow-1', at: '10% 10%', share: 18, size: 45},
+  {key: 'w-canvas-glow-2', at: '90% 30%', share: 14, size: 45},
+  {key: 'w-canvas-glow-3', at: '40% 90%', share: 14, size: 50},
+] as const
+
+export const CANVAS_GLOWS = {
+  'w-canvas-glow-1': 'var(--color-primary)',
+  'w-canvas-glow-2': 'var(--color-data-fuchsia)',
+  'w-canvas-glow-3': 'var(--color-data-teal)',
+} as const satisfies PresetTokens
+
+/**
+ * Grain over the page background, as glass themes often add so the blur reads: a 160px noise tile layered on top of
+ * the canvas's picture, fixed to the viewport with it, in any layout. `alpha` is how much of the noise shows. What
+ * repaints the canvas, such as a sticky column, can't blur it as a glass section does, so strong grain shows there.
+ */
+export const NOISE_LEVELS = [
+  {id: 'none', name: 'None', alpha: 0},
+  {id: 'subtle', name: 'Subtle', alpha: 0.22},
+  {id: 'strong', name: 'Strong', alpha: 0.4},
+] as const
+
+export type NoiseId = typeof NOISE_LEVELS[number]['id']
+
+export const isNoiseId = (value: unknown): value is NoiseId => NOISE_LEVELS.some(level => level.id === value)
+
+const getNoiseImage = (id: string | undefined) => {
+  const alpha = NOISE_LEVELS.find(level => level.id === id)?.alpha
+
+  if (!alpha) return undefined
+
+  return `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 ${ alpha } 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
+}
+
+/** The tokens each layout sets; the theme's own override them. Flat is the kit's defaults. */
+export const LAYOUT_TOKENS: Record<LayoutId, PresetTokens> = {
+  flat: {},
+  card: {
+    'role-canvas': 'oklch(from var(--role-surface) calc(l - 0.015) c h)',
+    'role-surface-dark': `oklch(from var(--color-default-dark) ${ CARD_DARK_SURFACE_L } c h)`,
+    'role-surface-raised-dark': 'oklch(from var(--role-surface-dark) calc(l + 0.04) c h)',
+    'role-canvas-dark': `oklch(from var(--color-default-dark) min(l, calc(${ CARD_DARK_SURFACE_L } - ${ CARD_DARK_STEP })) c h)`,
+    'role-card': 'var(--role-surface)',
+    'role-card-dark': 'var(--role-surface-dark)',
+    ...FLOATING,
+    'w-section-opacity': '1',
+    'w-section-shadow': '0 1px 2px oklch(from var(--w-shadow) l c h / calc(alpha * 0.5))',
+    'w-card-shadow': 'var(--w-section-shadow)',
+    'w-chrome-shadow': 'var(--w-section-shadow)',
+    'w-chrome-bar-shadow': 'var(--w-chrome-shadow)',
+  },
+  glass: {
+    'role-canvas': 'oklch(from var(--color-primary) 0.96 0.04 h)',
+    'role-canvas-dark': 'oklch(from var(--color-primary) 0.2 0.04 h)',
+    'role-card': 'var(--role-surface)',
+    'role-card-dark': 'var(--role-surface-dark)',
+    // A tinted surface takes the light gray of subtle lines down: a quarter of the way to `line`.
+    'role-line-subtle': 'color-mix(in oklab, var(--color-gray-200), var(--color-gray-300) 25%)',
+    // In dark an opaque gray-700 outlines the translucent surface brighter than it: a faint white lets the glass show.
+    'role-line-subtle-dark': 'oklch(100% 0 0 / 0.12)',
+    ...FLOATING,
+    ...CANVAS_GLOWS,
+    'w-canvas-image': CANVAS_SPOTS.map(spot => `radial-gradient(circle at ${ spot.at }, color-mix(in oklab, var(--${ spot.key }) ${ spot.share }%, transparent), transparent ${ spot.size }%)`).join(', '),
+    // Translucent enough for the gradient to tint through, with a light top edge catching the light as glass does.
+    'w-section-opacity': '0.4',
+    'w-section-border': '1px',
+    'w-section-shadow': '0 8px 32px -8px var(--w-shadow), inset 0 1px 0 0 light-dark(oklch(100% 0 0 / 0.7), oklch(100% 0 0 / 0.08))',
+    // No saturate(): what repaints the canvas inside a page list (sticky columns, masks) can't reproduce it.
+    'w-section-backdrop': 'blur(24px)',
+    'w-card-opacity': '0.4',
+    'w-card-border': '1px',
+    'w-card-shadow': 'var(--w-section-shadow)',
+    'w-card-backdrop': 'var(--w-section-backdrop)',
+    'w-chrome-border': '1px',
+    'w-chrome-shadow': 'var(--w-section-shadow)',
+    'w-chrome-bar-shadow': 'var(--w-chrome-shadow)',
+    'w-chrome-opacity': '0.5',
+    'w-chrome-backdrop': 'var(--w-section-backdrop)',
+  },
+}
+
+/**
+ * What the page background is under a layout, as colors over `canvas`: for glass the plain canvas and the centers of
+ * its gradient's spots, where it is darkest or most colored. Text on the canvas and on glass is checked over each.
+ */
+export const getCanvasSamples = (layout: string | undefined, canvas: string) => layout === 'glass'
+  ? [canvas, ...CANVAS_SPOTS.map(spot => `color-mix(in srgb, var(--${ spot.key }) ${ spot.share }%, ${ canvas })`)]
+  : [canvas]
+
 /**
  * Keys are CSS variable names without `--`: `color-*` and `role-*` go in the app's `@theme`, `w-*` on `body`.
- * `neutral` names a scale from `NEUTRAL_SCALES` and becomes the `gray-*` colors.
+ * `neutral` names a scale from `NEUTRAL_SCALES` and becomes the `gray-*` colors, `layout` one of `LAYOUTS` and the
+ * tokens it sets, `noise` one of `NOISE_LEVELS` and the grain it layers over `w-canvas-image`.
  */
 export type PresetTokens = Record<string, string>
 
@@ -29,8 +164,9 @@ export const PRESETS = [
   {
     id: 'ocean',
     name: 'Ocean',
-    look: 'Blue primary, cyan info, slate neutrals',
+    look: 'Blue primary, cyan info, slate neutrals, card layout',
     tokens: {
+      layout: 'card',
       neutral: 'slate',
       'color-primary': 'oklch(54% 0.15 250)',
       'color-info': 'oklch(61% 0.11 215)',
@@ -51,8 +187,9 @@ export const PRESETS = [
   {
     id: 'sunset',
     name: 'Sunset',
-    look: 'Orange primary, rose negative, stone neutrals',
+    look: 'Orange primary, rose negative, stone neutrals, glass layout',
     tokens: {
+      layout: 'glass',
       neutral: 'stone',
       'color-primary': 'oklch(57% 0.17 45)',
       'color-negative': 'oklch(64% 0.21 10)',
@@ -81,22 +218,100 @@ export const PRESETS = [
 export type PresetId = typeof PRESETS[number]['id']
 
 /**
- * `neutral` expanded to the `gray-*` colors it stands for, and the dark background to the scale's 900 unless the
- * theme sets its own; other tokens as they are. The kit keeps `default-dark` fixed, since apps that set their own
- * `gray-900` use the two as different surfaces.
+ * `layout` expanded to the tokens it sets, under the theme's own, and `neutral` to the `gray-*` colors it stands for,
+ * with the dark background as the scale's 900 unless the theme sets its own; other tokens as they are. The kit keeps
+ * `default-dark` fixed, since apps that set their own `gray-900` use the two as different surfaces.
  */
-export const expandNeutral = (tokens: PresetTokens): [key: string, value: string][] => Object.entries(tokens).flatMap(([key, value]): [string, string][] => {
-  if (key !== 'neutral') return [[key, value]]
-  if (!isNeutralScale(value)) return []
+export const expandTokens = (tokens: PresetTokens): [key: string, value: string][] => {
+  const {layout, noise, ...rest} = tokens
+  const expanded: PresetTokens = {...isLayoutId(layout) ? LAYOUT_TOKENS[layout] : {}, ...rest}
+  const noiseImage = getNoiseImage(noise)
 
-  const scale = NEUTRAL_SCALES[value].map((color, index): [string, string] => [`color-gray-${ NEUTRAL_STEPS[index] }`, `oklch(${ color })`])
+  if (noiseImage) expanded['w-canvas-image'] = expanded['w-canvas-image'] ? `${ noiseImage }, ${ expanded['w-canvas-image'] }` : noiseImage
 
-  return 'color-default-dark' in tokens ? scale : [...scale, ['color-default-dark', 'var(--color-gray-900)']]
-})
+  return Object.entries(expanded).flatMap(([key, value]): [string, string][] => {
+    if (key !== 'neutral') return [[key, value]]
+    if (!isNeutralScale(value)) return []
+
+    const scale = NEUTRAL_SCALES[value].map((color, index): [string, string] => [`color-gray-${ NEUTRAL_STEPS[index] }`, `oklch(${ color })`])
+
+    return 'color-default-dark' in expanded ? scale : [...scale, ['color-default-dark', 'var(--color-gray-900)']]
+  })
+}
+
+/**
+ * The rules a floating layout adds besides tokens: on phones the bars dock and sections span the screen, and the page
+ * doesn't bounce sideways, which would move it but not the fixed backgrounds that repaint a page list's section.
+ */
+export const getLayoutRules = (tokens: PresetTokens, root = ':root', body = 'body') => {
+  if (tokens.layout !== 'card' && tokens.layout !== 'glass') return ''
+
+  return [
+    `@media (max-width: 639px) {`,
+    `  ${ body } {`,
+    '    --w-chrome-gap: 0px;',
+    '    --w-chrome-rounded: 0px;',
+    '  }',
+    '}',
+    '',
+    `${ root } {`,
+    '  overscroll-behavior-x: none;',
+    '}',
+  ].join('\n')
+}
+
+/** The class on `<html>` that turns a layout's tokens on, from the kit's `layouts.css`. */
+export const getLayoutClass = (layout: LayoutId) => `w-layout-${ layout }`
+
+/**
+ * The kit's `tailwind-base/css/layouts.css`, generated from `LAYOUT_TOKENS` by `npm run docs:generate`: each floating
+ * layout as a class for `<html>`. Roles go on the root and `w-*` tokens on `body`, as an app sets them, and both at
+ * the lowest specificity, so an app's own `:root` and `body` rules win; the roles also win over its `@theme`, which is
+ * in an earlier layer, so a theme that retunes a role the layout sets does it on `:root`.
+ */
+export const getLayoutsCss = () => {
+  const floating = LAYOUTS.filter(layout => Object.keys(LAYOUT_TOKENS[layout.id]).length)
+  const block = (selector: string, entries: [string, string][], extra: string[] = []) => [
+    `  ${ selector } {`,
+    ...entries.map(([key, value]) => `    --${ key }: ${ value };`),
+    ...extra.map(line => `    ${ line }`),
+    '  }',
+  ]
+
+  return [
+    '/*',
+    ' * Generated by `npm run docs:generate` from `LAYOUT_TOKENS` in docs/.vitepress/themePresets.ts: do not edit.',
+    ' *',
+    ` * The floating layouts: ${ floating.map(layout => `\`class="${ getLayoutClass(layout.id) }"\``).join(' or ') } on`,
+    ' * `<html>`. Flat is the kit\'s defaults. An app\'s own tokens override the layout\'s: `w-*` on `body`, and a role the',
+    ' * layout sets on `:root` (not in `@theme`, which is in an earlier layer).',
+    ' */',
+    '@layer base {',
+    ...floating.flatMap(layout => {
+      const entries = Object.entries(LAYOUT_TOKENS[layout.id])
+      const selector = `:where(.${ getLayoutClass(layout.id) })`
+
+      return [
+        `  /* ${ layout.name }: ${ layout.look }. */`,
+        // The page doesn't bounce sideways: that would move it but not the fixed backgrounds that repaint a page list's section.
+        ...block(selector, entries.filter(([key]) => !key.startsWith('w-')), ['overscroll-behavior-x: none;']),
+        '',
+        ...block(`${ selector } body`, entries.filter(([key]) => key.startsWith('w-'))),
+        '',
+      ]
+    }),
+    '  /* On phones the bars dock and sections span the screen. */',
+    '  @media (width < 40rem) {',
+    ...block(`:where(${ floating.map(layout => `.${ getLayoutClass(layout.id) }`).join(', ') }) body`, [['w-chrome-gap', '0px'], ['w-chrome-rounded', '0px']]).map(line => `  ${ line }`),
+    '  }',
+    '}',
+    '',
+  ].join('\n')
+}
 
 /** The `@theme` block for the color tokens of a theme, or an empty string when there are none. */
 export const getThemeBlock = (tokens: PresetTokens) => {
-  const entries = expandNeutral(tokens).filter(([key]) => !key.startsWith('w-'))
+  const entries = expandTokens(tokens).filter(([key]) => !key.startsWith('w-'))
 
   return entries.length ? ['@theme {', ...entries.map(([key, value]) => `  --${ key }: ${ value };`), '}'].join('\n') : ''
 }
@@ -428,14 +643,23 @@ const getShadow = (style: RandomStyle): PresetTokens => {
   }
 }
 
-/** The style's dark background and the surfaces on it, in the tint of the neutral scale's 900; none for Vivid. */
+/**
+ * The style's dark background, in the tint of the neutral scale's 900, and the surfaces on it as steps up from the
+ * surface, so they follow it where a layout lifts it off the background; none for Vivid.
+ */
 const getDarkSurfaces = (neutral: NeutralScale, style: RandomStyle): PresetTokens => {
   if (!style.dark) return {}
 
   const [, chroma, hue] = NEUTRAL_SCALES[neutral][9].split(' ')
-  const [surface, subtle, muted, inset] = style.dark.map(l => `oklch(${ +(l * 100).toFixed(1) }% ${ chroma } ${ hue })`)
+  const [background, ...steps] = style.dark
+  const [subtle, muted, inset] = steps.map(l => `oklch(from var(--role-surface-dark) calc(l + ${ +(l - background).toFixed(3) }) c h)`)
 
-  return {'color-default-dark': surface, 'role-surface-subtle-dark': subtle, 'role-surface-muted-dark': muted, 'role-surface-inset-dark': inset}
+  return {
+    'color-default-dark': `oklch(${ +(background * 100).toFixed(1) }% ${ chroma } ${ hue })`,
+    'role-surface-subtle-dark': subtle,
+    'role-surface-muted-dark': muted,
+    'role-surface-inset-dark': inset,
+  }
 }
 
 const toColor = (fill: Fill, hue: number) => `oklch(${ (fill.l * 100).toFixed(1) }% ${ fill.c.toFixed(3) } ${ hue })`
@@ -484,16 +708,38 @@ const getStatusTokens = (
   return null
 }
 
+/** How far from the primary's hue the other two spots of a random glass canvas turn, one each way round. */
+const GLOW_HUE_OFFSET = [50, 150] as const
+
+/** The lightness of a random spot color: a mid-tone, which tints the canvas about as much in light and dark mode. */
+const GLOW_LIGHTNESS_L = 0.68
+
+/**
+ * The glass canvas's second and third spots for a random theme: hues turned away from the primary's either way, in
+ * the style's saturation. The first spot stays the primary.
+ */
+const getCanvasGlows = (hue: number, saturation: number, style: RandomStyle, random: () => number): PresetTokens => {
+  const [min, max] = GLOW_HUE_OFFSET
+  const hues = [1, -1].map(direction => Math.round(hue + direction * (min + random() * (max - min)) + 360) % 360)
+  const [second, third] = hues.map(item => {
+    const c = Math.min(maxChroma(GLOW_LIGHTNESS_L, item) * saturation, style.maxChroma)
+
+    return `oklch(${ (GLOW_LIGHTNESS_L * 100).toFixed(1) }% ${ c.toFixed(3) } ${ item })`
+  })
+
+  return {'w-canvas-glow-2': second, 'w-canvas-glow-3': third}
+}
+
 /**
  * A theme from one random primary in a style from `RANDOM_STYLES`, the status tones that go with it in the same style,
- * the neutral scale that suits its hue, and a size with a radius. The primary's hue is taken from `hues`. The primary's lightness is picked where the fill
+ * the neutral scale that suits its hue, and a size with a radius, in `layout` when given. The primary's hue is taken from `hues`. The primary's lightness is picked where the fill
  * passes the contrast checks on a white page and stays near the hue's peak chroma; when it fails on the dark page, the
  * nearest fill that passes there becomes `color-primary-dark`. A yellow or lime primary is a light fill with black text,
  * as warning is, and the status tones turn light with it. A hue that holds less chroma on a white page than the style
  * asks takes the most it has there. They follow with
  * `getStatusTokens`, each keeping away from the primary's hues and the ones before it.
  */
-export const getRandomTokens = (styleId: RandomStyleId = 'vivid', hues: HueRange = FULL_HUE_RANGE, random: () => number = Math.random): PresetTokens => {
+export const getRandomTokens = (styleId: RandomStyleId = 'vivid', hues: HueRange = FULL_HUE_RANGE, random: () => number = Math.random, layout?: LayoutId): PresetTokens => {
   const style = RANDOM_STYLES.find(item => item.id === styleId) ?? RANDOM_STYLES[1]
 
   for (;;) {
@@ -503,7 +749,9 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', hues: HueRange
     const saturation = style.saturation[0] + random() * (style.saturation[1] - style.saturation[0])
     const neutral = neutralForHue(hue, random)
     const darkSurfaces = getDarkSurfaces(neutral, style)
-    const darkPage = toLinearRgb(style.dark?.[0] ?? parseLightness(NEUTRAL_SCALES[neutral][9]), 0, 0) as [number, number, number]
+    const darkBackground = style.dark?.[0] ?? parseLightness(NEUTRAL_SCALES[neutral][9])
+    // Card lifts the dark surface off the background: the fills sit on the lighter of the two, where they stand out least.
+    const darkPage = toLinearRgb(layout === 'card' ? getCardDarkSurface(darkBackground) : darkBackground, 0, 0) as [number, number, number]
     const dark = passingFills(hue, saturation, style, luminance(darkPage), limits)
     const vivid = passingFills(hue, saturation, style, 1, limits)
     // Teals and cyans pass on a white page only where sRGB holds less chroma than Neon asks: the light fill takes what
@@ -530,8 +778,11 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', hues: HueRange
 
     const size = pick(SIZES, random)
     const radius = pick(RADII, random)
+    // Drawn last, so the rest of the theme stays the same when a random theme is made again for glass.
+    const glows = layout === 'glass' ? getCanvasGlows(hue, saturation, style, random) : {}
 
     return {
+      ...layout ? {layout} : {},
       neutral,
       ...darkSurfaces,
       ...getShadow(style),
@@ -545,6 +796,7 @@ export const getRandomTokens = (styleId: RandomStyleId = 'vivid', hues: HueRange
       'w-button-rounded': rem(Math.min(radius * 1.5, size.height / 2)),
       'w-list-header-height': rem(size.header),
       'w-list-header-rounded': rem(Math.min(radius * 1.5, size.header / 2)),
+      ...glows,
     }
   }
 }

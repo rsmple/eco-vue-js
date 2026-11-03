@@ -37,13 +37,14 @@
         text="Gardener"
         :skeleton="loading"
       />
-
-      <WToggle
-        v-model="loading"
-        title="Loading"
-        class="ml-4"
-      />
     </div>
+
+    <WToggle
+      v-model="loading"
+      title="Loading"
+      right-label
+      small
+    />
   </div>
 </template>
 

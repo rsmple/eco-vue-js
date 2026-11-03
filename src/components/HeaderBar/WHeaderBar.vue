@@ -1,14 +1,14 @@
 <template>
   <div
     ref="element"
-    class="h---header-height fixed inset-x-0 top-0 grid grid-cols-1 print:hidden"
+    class="w-header-bar h---header-height fixed inset-x-0 top-0 grid grid-cols-1 print:hidden"
     :style="{zIndex: BASE_ZINDEX_HEADER_BAR}"
   >
     <div
       :key="headerPadding"
-      class="bg-surface supports-backdrop:backdrop-blur fixed inset-x-0 top-0 h-[calc(var(--header-height)+var(--header-height-padding))] print:hidden"
+      class="w-header-bar-bg bg-chrome fixed inset-x-0 top-0 h-[calc(var(--header-height)+var(--header-height-padding))] print:hidden"
       :class="{
-        'supports-backdrop:bg-overlay': isTransparent,
+        'supports-backdrop:bg-(--w-header-overlay)': isTransparent,
       }"
       :style="{'--header-height-padding': headerPadding + 'px'}"
     />
@@ -45,7 +45,7 @@
             <WRouterLink
               v-if="item.to"
               :to="item.to"
-              class="hover:text-accent max-w-64 truncate no-underline transition-colors"
+              class="hover:text-accent max-w-64 truncate no-underline"
             >
               <template v-if="getRouteTitleShort(item) !== undefined">
                 {{ getRouteTitleShort(item) }}

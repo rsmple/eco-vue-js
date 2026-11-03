@@ -4,195 +4,251 @@
     :class="{
       'w-card': isGrid,
       'w-list': !isGrid,
+      'w-list-page': isPage,
+      'w-list-page-repaint': isRepaint,
       '[--w-list-right:calc(var(--w-list-padding,1rem)*2+1.25em)]': hasMenu,
       '[--w-list-right:var(--w-list-header-rounded,1rem)]': !hasMenu,
-      '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em+1px)]': allowSelect,
+      '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em-1px)]': allowSelect,
       '[--w-list-left:var(--w-list-header-rounded,1rem)]': !allowSelect,
     }"
   >
-    <WInfiniteList
-      :use-query-fn="useQueryFn"
-      :query-params="queryParams"
-      :query-options="queryOptions"
-      :skeleton-length="count ?? listCount ?? PAGE_LENGTH"
-      :refetch-interval="refetchInterval"
+    <div
+      v-if="isPage"
+      class="w-list-page-surface"
+    />
 
-      :page-length="PAGE_LENGTH"
-      :page-class="
-        isGrid
-          ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-(--w-list-gap,0) isolate'
-          : 'grid gap-(--w-list-gap,0) isolate'
-      "
-      :page-style="isGrid ? undefined : {gridTemplateColumns: `var(--w-list-left) ${ fieldTracks } var(--w-list-right)`}"
-      :min-height-only="minHeight"
-      :no-header-update="noHeaderUpdate"
-      :style="cardStyles"
-      :class="$attrs.class"
-
-      @update:count="listCount = $event; $emit('update:count', $event)"
-      @update:error="$emit('update:error', $event)"
+    <div
+      ref="pageContent"
+      :class="isPage ? 'w-list-page-content' : 'contents'"
     >
-      <template #header="{updateHeader, isRefetchingAll, refetchAll}">
-        <ListToolbar
-          :count="listCount"
-          :total-count="countValue"
-          :selection-title="selectionTitle"
-          :bulk-disable-message="bulkDisableMessage"
-          :selection-count="selectionCount"
-          :select-all-value="selectAllValue"
-          :select-all-text-getter="selectAllTextGetter"
-          :is-shift="isShift"
-          :allow-select="allowSelect"
-          :select-only="selectOnly"
-          :readonly="isReadonly ?? isDisabled ?? false"
+      <WInfiniteList
+        :use-query-fn="useQueryFn"
+        :query-params="queryParams"
+        :query-options="queryOptions"
+        :skeleton-length="count ?? listCount ?? PAGE_LENGTH"
+        :refetch-interval="refetchInterval"
 
-          :query-params="queryParams"
-          :use-query-fn="useQueryFn"
-          :use-query-fn-export="useQueryFnExport"
-          :api-method-export="apiMethodExport"
-          :export-file-name="exportFileName"
-          :get-query-params-bulk="getQueryParamsBulk"
-          :to-markdown="toMarkdown"
+        :page-length="PAGE_LENGTH"
+        :page-class="
+          isGrid
+            ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-(--w-list-gap,0) isolate'
+            : isPage
+              ? 'w-list-page-rows grid gap-(--w-list-gap,0)'
+              : 'grid gap-(--w-list-gap,0) isolate'
+        "
+        :page-style="isGrid ? undefined : {gridTemplateColumns: `var(--w-list-left) ${ fieldTracks } var(--w-list-right)`}"
+        :min-height-only="minHeight || isSectionNested"
+        :no-header-update="noHeaderUpdate"
+        :style="cardStyles"
+        :class="$attrs.class"
 
-          :bulk="bulk"
-          :action="action"
-          :menu="menu"
+        @update:count="listCount = $event; $emit('update:count', $event)"
+        @update:error="$emit('update:error', $event)"
+      >
+        <template #header="{updateHeader, isRefetchingAll, refetchAll}">
+          <ListToolbar
+            :count="listCount"
+            :total-count="countValue"
+            :selection-title="selectionTitle"
+            :bulk-disable-message="bulkDisableMessage"
+            :selection-count="selectionCount"
+            :select-all-value="selectAllValue"
+            :select-all-text-getter="selectAllTextGetter"
+            :is-shift="isShift"
+            :allow-select="allowSelect"
+            :select-only="selectOnly"
+            :readonly="isReadonly ?? isDisabled ?? false"
 
-          :fields-visible="fieldsVisible"
-          :fields-filtered="fieldsFiltered"
-          :fields-sorted="fieldsSorted"
-          :field-config-map="fieldConfigMap"
-          :field-tracks="fieldTracks"
-          :styles-sticky="stylesSticky"
-          :ordering="ordering"
-          :mode="listConfig.mode"
+            :query-params="queryParams"
+            :use-query-fn="useQueryFn"
+            :use-query-fn-export="useQueryFnExport"
+            :api-method-export="apiMethodExport"
+            :export-file-name="exportFileName"
+            :get-query-params-bulk="getQueryParamsBulk"
+            :to-markdown="toMarkdown"
 
-          :card="isGrid"
-          :mobile="isMobile"
-          :has-saved="hasSaved"
-          :no-refetch="noRefetch"
-          :no-ordering="noOrdering"
-          :no-header-settings="noHeaderSettings"
-          :no-mode="noMode"
-          :disable-export="disableExport"
+            :bulk="bulk"
+            :action="action"
+            :menu="menu"
 
-          :is-refetching-all="isRefetchingAll"
-          :refetch-all="refetchAll"
-          :update-header="updateHeader"
+            :fields-visible="fieldsVisible"
+            :fields-filtered="fieldsFiltered"
+            :fields-sorted="fieldsSorted"
+            :field-config-map="fieldConfigMap"
+            :field-tracks="fieldTracks"
+            :styles-sticky="stylesSticky"
+            :ordering="ordering"
+            :mode="listConfig.mode"
 
-          @reset:selection="resetSelection"
-          @toggle:selection="toggleSelectAll"
-          @set:is-selecting="setIsSelecting()"
-          @update:ordering="updateOrdering"
-          @update:mode="updateMode"
-          @update:field-config-map="updateFieldConfigMap"
-          @update:width="updateFieldWidth"
-          @save:width="save"
-          @click:reset="resetConfig"
-        >
-          <template
-            v-if="$slots.header"
-            #header="scope"
+            :card="isGrid"
+            :mobile="isMobile"
+            :has-saved="hasSaved"
+            :no-refetch="noRefetch"
+            :no-ordering="noOrdering"
+            :no-header-settings="noHeaderSettings"
+            :no-mode="noMode"
+            :disable-export="disableExport"
+
+            :is-refetching-all="isRefetchingAll"
+            :refetch-all="refetchAll"
+            :update-header="updateHeader"
+
+            @reset:selection="resetSelection"
+            @toggle:selection="toggleSelectAll"
+            @set:is-selecting="setIsSelecting()"
+            @update:ordering="updateOrdering"
+            @update:mode="updateMode"
+            @update:field-config-map="updateFieldConfigMap"
+            @update:width="updateFieldWidth"
+            @save:width="save"
+            @click:reset="resetConfig"
+          >
+            <template
+              v-if="$slots.header"
+              #header="scope"
+            >
+              <slot
+                name="header"
+                v-bind="scope"
+              />
+            </template>
+
+            <template
+              v-if="$slots.filter"
+              #filter
+            >
+              <slot name="filter" />
+            </template>
+
+            <template
+              v-if="$slots.selection"
+              #selection
+            >
+              <slot name="selection" />
+            </template>
+          </ListToolbar>
+        </template>
+
+        <template #default="{item, skeleton, setter, refetch, previous, first, index, position, value, results, intersecting}">
+          <ListGroupHeading
+            v-if="groupBy && $slots.group && (first || (!skeleton && (position === 0 || (!!previous && !groupBy(item, previous)))))"
+            :class="position === 0 ? 'list:-mt-2' : 'card:mt-2'"
           >
             <slot
-              name="header"
-              v-bind="scope"
+              name="group"
+              :item="item"
+              :previous="previous"
+              :skeleton="skeleton"
             />
-          </template>
+          </ListGroupHeading>
 
-          <template
-            v-if="$slots.filter"
-            #filter
-          >
-            <slot name="filter" />
-          </template>
+          <ListItem
+            :item="item"
+            :skeleton="skeleton"
+            :setter="setter"
+            :refetch="refetch"
+            :index="index"
+            :position="position"
+            :value="(value as number)"
+            :results="results"
+            :intersecting="intersecting"
 
-          <template
-            v-if="$slots.selection"
-            #selection
-          >
-            <slot name="selection" />
-          </template>
-        </ListToolbar>
-      </template>
+            :fields="fieldsSorted"
+            :skeleton-fields="skeletonFields"
+            :field-config-map="fieldConfigMap"
+            :column-data-map="columnDataMap"
+            :query-params="queryParams"
+            :readonly="isReadonly ?? isDisabled ?? false"
+            :readonly-getter="readonlyGetter"
+            :form-field-getter="formFieldGetter"
+            :uniform-scope="uniformScope"
+            :expansion="expansion"
+            :menu="menu"
+            :to-markdown="toMarkdown"
 
-      <template #default="{item, skeleton, setter, refetch, previous, first, index, position, value, results, intersecting}">
-        <ListGroupHeading
-          v-if="groupBy && $slots.group && (first || (!skeleton && (position === 0 || (!!previous && !groupBy(item, previous)))))"
-          :class="position === 0 ? 'list:-mt-2' : 'card:mt-2'"
+            :card="isGrid"
+            :mobile="isMobile"
+            :card-class="cardClass"
+            :card-wrapper-class="cardWrapperClass"
+            :has-border="hasBorder"
+            :align-top="alignTop"
+            :allow-open="allowOpen"
+            :disable-more="disableMore"
+            :action-mode="actionMode"
+            :card-to="cardTo"
+            :content-visibility="contentVisibility"
+
+            :selected="skeleton ? false : getIsSelected(value as number, position)"
+            :allow-select="allowSelect"
+            :allow-select-hover="allowSelectHover"
+            :always-select="alwaysSelect ?? false"
+
+            @toggle:selected="toggleSelected"
+            @hover:selected="hoverSelected"
+            @click:action="emitClickAction"
+          />
+        </template>
+
+        <template
+          v-if="isPage && !isGrid"
+          #pages-before
+        >
+          <div class="w-list-page-strip">
+            <div class="w-list-page-strip-track">
+              <div class="w-list-page-strip-sides">
+                <div class="w-list-page-strip-band" />
+              </div>
+
+              <div
+                v-if="stripColumns.some(column => column.sticky)"
+                class="w-list-page-strip-columns"
+                :style="{gridTemplateColumns: `var(--w-list-left) ${ fieldTracks } var(--w-list-right)`}"
+              >
+                <div />
+
+                <div
+                  v-for="column in stripColumns"
+                  :key="column.label"
+                  :class="{'w-list-page-strip-column': column.sticky}"
+                  :style="column.style"
+                />
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <template
+          v-if="$slots.empty"
+          #empty
+        >
+          <slot name="empty" />
+        </template>
+
+        <template
+          v-if="$slots.error"
+          #error="scope"
         >
           <slot
-            name="group"
-            :item="item"
-            :previous="previous"
-            :skeleton="skeleton"
+            name="error"
+            v-bind="scope"
           />
-        </ListGroupHeading>
+        </template>
+      </WInfiniteList>
 
-        <ListItem
-          :item="item"
-          :skeleton="skeleton"
-          :setter="setter"
-          :refetch="refetch"
-          :index="index"
-          :position="position"
-          :value="(value as number)"
-          :results="results"
-          :intersecting="intersecting"
-
-          :fields="fieldsSorted"
-          :skeleton-fields="skeletonFields"
-          :field-config-map="fieldConfigMap"
-          :column-data-map="columnDataMap"
-          :query-params="queryParams"
-          :readonly="isReadonly ?? isDisabled ?? false"
-          :readonly-getter="readonlyGetter"
-          :form-field-getter="formFieldGetter"
-          :uniform-scope="uniformScope"
-          :expansion="expansion"
-          :menu="menu"
-          :to-markdown="toMarkdown"
-
-          :card="isGrid"
-          :mobile="isMobile"
-          :card-class="cardClass"
-          :card-wrapper-class="cardWrapperClass"
-          :has-border="hasBorder"
-          :align-top="alignTop"
-          :allow-open="allowOpen"
-          :disable-more="disableMore"
-          :action-mode="actionMode"
-          :card-to="cardTo"
-          :content-visibility="contentVisibility"
-
-          :selected="skeleton ? false : getIsSelected(value as number, position)"
-          :allow-select="allowSelect"
-          :allow-select-hover="allowSelectHover"
-          :always-select="alwaysSelect ?? false"
-
-          @toggle:selected="toggleSelected"
-          @hover:selected="hoverSelected"
-          @click:action="emitClickAction"
-        />
-      </template>
-
-      <template
-        v-if="$slots.empty"
-        #empty
+      <div
+        v-if="isPage"
+        class="w-list-page-end"
       >
-        <slot name="empty" />
-      </template>
+        <div class="w-list-page-end-band">
+          <div class="w-list-page-end-fill" />
+        </div>
+      </div>
+    </div>
 
-      <template
-        v-if="$slots.error"
-        #error="scope"
-      >
-        <slot
-          name="error"
-          v-bind="scope"
-        />
-      </template>
-    </WInfiniteList>
+    <div
+      v-if="isPage"
+      class="w-list-page-frame"
+    />
   </div>
 </template>
 
@@ -202,10 +258,13 @@ import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type Ref, type StyleValue, computed, ref, toRef} from 'vue'
+import {type Ref, type StyleValue, computed, inject, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
+import {wScrollingElement} from '@/components/InfiniteList/models/injection'
+import {wIsModal} from '@/components/Modal/models/injection'
+import {wSectionNested} from '@/components/Surface/models/injection'
 import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
 import {useComponentStates} from '@/utils/useComponentStates'
@@ -304,7 +363,7 @@ const props = withDefaults(
     selection?: Selection<number>
     /** Keeps the sticky list header out of the app header bar's padding while scrolled. */
     noHeaderUpdate?: boolean
-    /** Drops the full-screen minimum height and the bottom padding, for a list inside other content. */
+    /** Drops the full-screen minimum height and the bottom padding, for a list inside other content. A list in a WSection always goes without them. */
     minHeight?: boolean
     /** Converts an item to Markdown. Adds a Copy as Markdown item to the row menu and a Markdown option to export. */
     toMarkdown?: (data: Data, index: number) => string
@@ -375,6 +434,46 @@ const {isDisabled, isReadonly} = useComponentStates(props)
 
 const {isMobile} = useIsMobile()
 
+// Scrolls with the page, not inside a modal, a scrolling element or a section: the list paints its own section surface.
+// Also with `minHeight`, such as a list under tabs: it is still the page's section, only without the full-screen height.
+const isSectionNested = inject(wSectionNested, false)
+const isPage = !inject(wIsModal, false) && inject(wScrollingElement, null) === null && !isSectionNested
+
+// Chromium moves a sticky column's layer when rows above it open or close without repainting it, so the backdrop it
+// paints, fixed to the viewport, stays where the column was until the next scroll. A no-op paint change on resize
+// repaints it.
+const isRepaint = ref(false)
+const pageContentRef = useTemplateRef('pageContent')
+
+let resizeObserver: ResizeObserver | null = null
+
+// The rows, not the content around them: the list fits its spacers to the rows as it observes them, and a box above
+// them that resizes in that same pass is one WebKit reports as a ResizeObserver loop. Only the rows of a table have
+// sticky columns.
+const observeRows = () => {
+  resizeObserver?.disconnect()
+
+  const rows = isGrid.value ? null : pageContentRef.value?.querySelector('.w-list-page-rows')
+  if (!rows) return
+
+  resizeObserver ??= new ResizeObserver(() => {
+    isRepaint.value = !isRepaint.value
+  })
+
+  resizeObserver.observe(rows)
+}
+
+onMounted(() => {
+  if (!isPage) return
+
+  observeRows()
+  watch(isGrid, observeRows, {flush: 'post'})
+})
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+})
+
 const listCount = ref<number | undefined>(undefined)
 
 const countValue = computed(() => props.count ?? listCount.value)
@@ -435,6 +534,19 @@ const columnDataMap = computed<Record<string, ColumnData>>(() => {
   })
 
   return map
+})
+
+// The rows' columns in order, for the strip that covers the sticky ones under them: see surfaces.css.
+const stripColumns = computed(() => {
+  const columns: (ColumnData & {label: string})[] = []
+
+  forEachField(fieldsSorted.value, field => {
+    const column = columnDataMap.value[field.meta.label]
+
+    if (column) columns.push({...column, label: field.meta.label})
+  })
+
+  return columns
 })
 
 const allowSelect = computed(() => !props.disableSelect && (props.alwaysSelect || props.bulk !== undefined || !props.disableExport))

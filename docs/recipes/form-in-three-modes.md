@@ -1,6 +1,6 @@
 ---
 group: Recipes
-aside: false
+order: 1
 description: One WUniform form component split into WTabs, used as a step-by-step wizard to create an item, as tabs in a modal to edit it, and on a page where every field saves on its own — with its title and buttons in WModalWrapper, which the frame it opens in places.
 ---
 
@@ -23,11 +23,11 @@ The pieces:
 | A model | `createRestModelApi` with an item query that loads the plant, an `update` action on it, and a `create` action on the list. |
 | The form | A `WUniform` that loads the model with `useQueryFn`, around a `WTabs`, inside a `WModalWrapper` that holds the title and the buttons when editing. |
 | The modal | The form itself, opened with `Modal.add`. The modal's frame places the title and the buttons. |
-| The page | The form with `async`. Outside an overlay, `WModalWrapper` lays it out in the flow of the page, without a title or buttons. |
+| The page | The form with `async`, in a `WSection`. Outside an overlay, `WModalWrapper` lays it out in the flow of the page, without a title or buttons. |
 
-<!-- @example recipes/plant-form/PlantEditor -->
+<!-- @example recipes/plant-form/PlantEditor page -->
 
-<DocsDemo name="recipes/plant-form/PlantEditor" />
+<DocsDemo name="recipes/plant-form/PlantEditor" page />
 
 ```vue
 <template>
@@ -60,12 +60,13 @@ The pieces:
     </WButton>
   </div>
 
-  <!-- The same form on the page: each field saves as it changes. -->
-  <PlantForm
-    v-if="isId(plantId)"
-    :plant-id="plantId"
-    async
-  />
+  <!-- The same form on the page, in a section of its own: each field saves as it changes. -->
+  <WSection v-if="isId(plantId)">
+    <PlantForm
+      :plant-id="plantId"
+      async
+    />
+  </WSection>
 </template>
 
 <script lang="ts" setup>
@@ -79,6 +80,7 @@ import {isId} from 'eco-vue-js/dist/utils/utils'
 
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 import WSelectSingle from 'eco-vue-js/dist/components/Select/WSelectSingle.vue'
+import WSection from 'eco-vue-js/dist/components/Surface/WSection.vue'
 
 import IconAdd from 'eco-vue-js/dist/assets/icons/IconAdd'
 
@@ -380,7 +382,7 @@ The form does not know where it is shown. The frame it opens in — a modal, or 
                     :field="index"
                   >
                     <template #default="scopeTask">
-                      <div class="grid grid-cols-[1fr_10rem_auto] items-end gap-2">
+                      <div class="grid grid-cols-[1fr_10rem_auto] items-end gap-2 mb-4">
                         <WUniform
                           v-bind="scopeTask"
                           field="title"
@@ -392,6 +394,7 @@ The form does not know where it is shown. The frame it opens in — a modal, or 
                               v-bind="scopeField"
                               :hide-title="index !== 0"
                               required
+                              no-margin
                             />
                           </template>
                         </WUniform>
@@ -407,6 +410,7 @@ The form does not know where it is shown. The frame it opens in — a modal, or 
                               v-bind="scopeField"
                               :hide-title="index !== 0"
                               required
+                              no-margin
                             />
                           </template>
                         </WUniform>
@@ -414,7 +418,7 @@ The form does not know where it is shown. The frame it opens in — a modal, or 
                         <WButton
                           :semantic-type="SemanticType.SECONDARY"
                           :disabled="scopeTasks.readonly || scopeTasks.submitting || scopeTasks.skeleton"
-                          class="mb-4 w-(--w-input-height)"
+                          class="w-(--w-input-height)"
                           @click="scopeTasks.unselect(item)"
                         >
                           <IconClose class="square-4" />
@@ -572,7 +576,7 @@ The steps belong to the form, which also renders them as tabs and on a page, so 
 
 ### The page
 
-On a page, the form is all there is: `<PlantForm :plant-id="id" async />`. Everything shown on the page and in the modal comes from the same item query, so a save in one updates the other through the cache. A field changed but not yet saved keeps its value when another one is saved.
+On a page, the form is all there is, in a section of the page: `<WSection><PlantForm :plant-id="id" async /></WSection>`. Everything shown on the page and in the modal comes from the same item query, so a save in one updates the other through the cache. A field changed but not yet saved keeps its value when another one is saved.
 
 ## Why it is built this way
 
