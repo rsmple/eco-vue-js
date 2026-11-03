@@ -1,5 +1,5 @@
 /*
- * Surface containment (plans/surface-containment.md): the page background, the two container kinds and the app
+ * Surface containment: the page background, the two container kinds and the app
  * chrome, shaped by tokens a theme sets. The defaults are the flat layout, which looks as before.
  *
  * Each container paints its base color at `--w-*-opacity` — 0 shows nothing (flat section), 1 is a card, between is
