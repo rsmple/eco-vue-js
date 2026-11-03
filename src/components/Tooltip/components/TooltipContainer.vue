@@ -1,6 +1,6 @@
 <template>
   <div
-    class="pointer-events-none flex items-center tone-surface-muted"
+    class="pointer-events-none flex items-center tone-dropdown"
     :class="{
       'flex-col': !isLeft && !isRight,
       'justify-end': isLeft,
@@ -17,7 +17,7 @@
     <div
       ref="container"
       class="
-        bg-tone-fill text-tone-on pointer-events-auto max-w-[calc(100vw-1.5rem)]
+        surface-dropdown text-accent pointer-events-auto max-w-[calc(100vw-1.5rem)]
         rounded-lg border border-solid
         border-line-raised px-3 py-2 text-center text-xs
         font-medium shadow-md will-change-transform

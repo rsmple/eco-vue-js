@@ -125,6 +125,25 @@ Off the page, such as in a preview, put the sections in `surface-stack-divided` 
 </template>
 ```
 
+## A section that scrolls inside
+
+A section with a height of its own, such as a column stuck beside a list, takes `scroll`: its content scrolls inside it, down to its bottom edge, while its heading and the `head` slot stay. Put what should stay in view in `head`, such as the item a list belongs to, not in a sticky block with a background: in glass the section's fill is the blurred page behind it, and an opaque block over the content shows as a strip of another color. Give the section its height, such as `max-h-*` or `h-full`; the section sets its own overflow.
+
+```vue
+<template>
+  <WSection
+    scroll
+    class="sticky top-(--w-header-inner) max-h-[calc(100vh-var(--w-header-inner)-var(--w-chrome-gap))]"
+  >
+    <template #head>
+      <PlantCard :plant="plant" />
+    </template>
+
+    <WateringLog :plant-id="plant.id" />
+  </WSection>
+</template>
+```
+
 ## Nesting
 
 Sections don't nest. A section inside another one paints nothing and takes no padding: it is a part of the outer section. A `WSection` there gets a smaller heading, one level down, and a part that follows other content gets a line above it, `--w-subsection-divide` (`1rem`) over its content. Cards do nest: a card in a section or in another card is filled and flat, one step darker than what it sits on.
@@ -169,6 +188,7 @@ import WSection from 'eco-vue-js/dist/components/Surface/WSection.vue'
 | `description` | `string` | — | A line under the heading on what the section is for, such as what a danger zone's action deletes and what stays, with its button in the `footer`. |
 | `tag` | `string` | `"section"` | Element to render. |
 | `semanticType` | `SemanticType` | — | Paints the section in the type's soft tone in every layout style, and its heading in the tone, such as a danger zone with `NEGATIVE`. `SECONDARY` is a plain section. |
+| `scroll` | `boolean` | — | Keeps to the height the page gives it, such as a column stuck beside a list, and scrolls its content inside, under the heading and the `head` slot, which stay. The content scrolls to the section's bottom edge: nothing sticky has to repaint the section over it, so it looks the same in every layout style. |
 
 #### Slots
 
@@ -178,6 +198,7 @@ import WSection from 'eco-vue-js/dist/components/Surface/WSection.vue'
 | `title` | — | Heading of the section, in place of `title`. |
 | `description` | — | Line under the heading, in place of `description`. |
 | `actions` | — | Buttons beside the heading. |
+| `head` | — | Content under the heading, before the content: with `scroll` it stays in view while the content scrolls, such as the item a list in the section belongs to, or a label of its own in place of the heading. |
 | `footer` | — | Buttons under the content, such as Save: past a line, or on the page in flat, past a space. |
 
 <!-- @api-end -->

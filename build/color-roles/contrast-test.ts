@@ -23,7 +23,7 @@ import {chromium} from 'playwright-core'
 import {readFileSync} from 'node:fs'
 import {fileURLToPath} from 'node:url'
 
-import {LAYOUTS, PRESETS, type PresetTokens, RANDOM_STYLES, expandTokens, getCanvasSamples, getRandomTokens, getThemeBlock} from '../../docs/.vitepress/themePresets.ts'
+import {LAYOUTS, PRESETS, type PresetTokens, RANDOM_STYLES, expandTokens, getCanvasSamples, getRandomTokens, getThemeBlock} from '../../src/utils/themePresets.ts'
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url))
 const CSS_DIR = ROOT + 'package/tailwind-base/css/'

@@ -22,7 +22,7 @@ import {availableParallelism} from 'node:os'
 import path from 'node:path'
 import {Worker, isMainThread, parentPort} from 'node:worker_threads'
 
-import {getLayoutsCss} from '../docs/.vitepress/themePresets.ts'
+import {getLayoutsCss} from '../src/utils/themePresets.ts'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const CHECK = process.argv.includes('--check')
@@ -422,7 +422,7 @@ const main = async () => {
     if (!CHECK) await writeFile(layoutsPath, layoutsCss, 'utf8')
 
     changed.push(layoutsFile)
-    details.push(`  ${ layoutsFile }`, '    generated from LAYOUT_TOKENS in docs/.vitepress/themePresets.ts')
+    details.push(`  ${ layoutsFile }`, '    generated from LAYOUT_TOKENS in src/utils/themePresets.ts')
   }
 
   const seconds = `${ ((performance.now() - start) / 1000).toFixed(1) }s, ${ rendered }/${ apiNames.size } API tables rendered`

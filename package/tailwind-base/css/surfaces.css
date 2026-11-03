@@ -147,6 +147,34 @@
 }
 
 /*
+ * A section that keeps to the height it is given and scrolls its content inside (WSection `scroll`), such as a column
+ * stuck beside a list: the heading and the head stay, and the content scrolls between the section's sides and down to
+ * its bottom edge, its scrollbar at the edge. Nothing sticks over the content, so nothing repaints the section's fill,
+ * which in glass is the blurred canvas.
+ */
+@utility surface-section-scroll {
+  overflow: hidden;
+
+  & > * {
+    flex-shrink: 0;
+  }
+
+  & > .surface-section-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    margin-inline: calc(var(--w-frame-padding) * -1);
+    padding-inline: var(--w-frame-padding);
+  }
+
+  & > .surface-section-body:last-child {
+    margin-bottom: calc(var(--w-section-padding) * -1);
+    padding-bottom: var(--w-section-padding);
+  }
+}
+
+/*
  * A section's buttons under its content (WSection `footer`), past a line where the section paints. In flat, on the
  * page, the line between sections marks where one ends: a second line under the content would read as another
  * section, so there the footer is only the space above it.
@@ -678,8 +706,8 @@
    * Room above the first item and under the last, inside the items so they stay clickable up to the nav's edge: the
    * pill is as far off the nav's top and bottom as off its end, and its corners run parallel to the nav's. Docked, the
    * last item clears the screen's edge. Not on the nav's scroller: content stuck to its edges would leave a strip
-   * where the items show through. Content other than an item at an end, such as a block stuck to the bottom, sets its
-   * own room. A collapsed group's items are hidden, not removed: the group's own item is then the last.
+   * where the items show through. Content other than an item at an end sets its own room; the last item keeps its room
+   * over the footer (`.w-nav-bar-footer`) too. A collapsed group's items are hidden, not removed: the group's own item is then the last.
    */
   .w-nav-bar-content:not(.w-nav-bar-brand + *)
     .w-nav-item-inset:first-child:not(.w-nav-bar-content :not(:first-child) .w-nav-item-inset) {
@@ -691,6 +719,21 @@
       .w-nav-bar-content :has(~ :not(.w-nav-group-collapsed)) .w-nav-item-inset
     ) {
     padding-bottom: calc(0.25rem + (1 - var(--w-chrome-float)) * 1rem + var(--w-chrome-float) * 0.25rem);
+
+    @variant sm-not {
+      padding-bottom: 1.25rem;
+    }
+  }
+
+  /*
+   * The nav's footer (WNavBar `footer`), under the items past a line, inset as they are. It takes the nav's width
+   * without setting it, and docked it clears the screen's edge as the last item does.
+   */
+  .w-nav-bar-footer {
+    contain: inline-size;
+    padding-block: 0.75rem calc(0.25rem + (1 - var(--w-chrome-float)) * 1rem + var(--w-chrome-float) * 0.5rem);
+    padding-inline: var(--w-nav-inset-start) var(--w-nav-inset-end);
+    border-top: 1px solid var(--w-line-subtle);
 
     @variant sm-not {
       padding-bottom: 1.25rem;

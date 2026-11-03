@@ -121,7 +121,7 @@ So a light brand color still gives readable links on white, and a yellow fill ge
 | `text-subtle` | `text-subtle` | `gray-400` / `gray-600` | Placeholders, disabled text, chart axes |
 | `surface` | `bg-surface` | `default` / `default-dark` | Page and cards |
 | `surface-subtle` | `bg-surface-subtle` | `gray-50` / `gray-850` | Barely raised areas: striped rows, empty chart cells, panels inside a card |
-| `surface-muted` | `bg-surface-muted` | `gray-100` / `gray-800` | Secondary fills, hovered rows, tooltips |
+| `surface-muted` | `bg-surface-muted` | `gray-100` / `gray-800` | Secondary fills, hovered rows |
 | `surface-inset` | `bg-surface-inset` | `gray-200` / `gray-700` | Fills inside controls, chips |
 | `surface-raised` | `bg-surface-raised`, `surface-raised` | `default` / `default-dark` lightened by 4% | Dropdowns and popovers — in dark mode a shadow hardly shows, so they are lighter than the page instead |
 | `overlay` | `bg-overlay` | `default` 40% / `default-dark` 60% | Translucent bars over scrolling content |
