@@ -600,18 +600,33 @@
   }
 
   /*
+   * How far the items keep off the nav's sides, the same both sides when floating; docked, xl and up, they run to the
+   * end. The start holds the active marker. The menu toggle reads it too, to line its icon up with the items'.
+   */
+  .w-nav-bar,
+  .w-nav-bar-toggle {
+    --w-nav-inset-start: 0.5rem;
+    --w-nav-inset-end: calc(var(--w-chrome-float) * 0.5rem);
+
+    @variant xl-not {
+      --w-nav-inset-end: max(0.25rem, var(--w-chrome-float) * 0.5rem);
+    }
+  }
+
+  /*
    * The brand row is inset as an item is, with its pill's rounding: a link filling it lines up with the items. Floating,
-   * the pill is as far off the nav's top edge as off its end, so its corners run parallel to the nav's. Under xl it
-   * starts past the menu toggle.
+   * the pill is as far off the nav's top edge as off its end, so its corners run parallel to the nav's. Under xl the
+   * menu toggle has the header's row: the brand is a row of its own under it.
    */
   .w-nav-bar-brand {
     --w-nav-item-rounded: max(var(--radius-lg), var(--w-chrome-rounded) - 0.5rem);
 
     padding-block: calc(0.25rem + var(--w-chrome-float) * 0.25rem) 0.25rem;
-    padding-inline: calc(0.5rem + var(--w-chrome-float) * 0.25rem) calc(var(--w-chrome-float) * 0.5rem);
+    padding-inline: var(--w-nav-inset-start) var(--w-nav-inset-end);
 
     @variant xl-not {
-      padding-inline: var(--header-height, 0px) max(0.25rem, var(--w-chrome-float) * 0.5rem);
+      margin-top: var(--header-height, 0px);
+      padding-top: 0.25rem;
     }
   }
 
@@ -640,20 +655,15 @@
     }
   }
 
-  /* On the item, not the nav: the nav's content has a fixed width. Docked, xl and up, items run to the edge. */
+  /* On the item, not the nav: the nav's content has a fixed width. */
   .w-nav-bar .w-nav-item-inset {
-    /* Floating, the active marker sits in the middle of this inset, clear of the nav's edge and of the item. */
-    padding-inline-start: calc(0.5rem + var(--w-chrome-float) * 0.25rem);
-    padding-inline-end: calc(var(--w-chrome-float) * 0.5rem);
-
-    @variant xl-not {
-      padding-inline-end: max(0.25rem, var(--w-chrome-float) * 0.5rem);
-    }
+    padding-inline: var(--w-nav-inset-start) var(--w-nav-inset-end);
   }
 
+  /* Floating, the active marker sits in the middle of the item's inset, clear of the nav's edge and of the item. */
   .w-nav-item-indicator {
     inset-block: calc(var(--w-chrome-float) * 0.5rem);
-    left: calc(var(--w-chrome-float) * 0.25rem);
+    left: calc(var(--w-chrome-float) * 0.125rem);
     height: auto;
     border-radius: calc(var(--w-chrome-float) * 9999px);
   }
@@ -675,9 +685,11 @@
     border-radius: var(--w-nav-dropdown-rounded);
   }
 
+  /* The icon starts where the items' do: past their inset and the item's own padding. */
   .w-nav-bar-toggle {
     top: var(--w-chrome-gap);
     left: calc(var(--w-left-margin, 0px) + var(--w-chrome-gap));
+    padding-left: calc(var(--w-nav-inset-start) + 0.5rem);
   }
 }
 

@@ -163,7 +163,7 @@ import WNavBar from 'eco-vue-js/dist/components/Nav/WNavBar.vue'
 | Slot | Props | Description |
 | --- | --- | --- |
 | `default` | — | Content of the nav, such as WNavItem items. |
-| `brand` | — | A logo or brand mark in the frame's top-left corner: the nav's top row, level with the header. With `brandTo` the row is a link and the slot is the mark in its pill. Without it the row is inset as the items are and the slot fills it, so content with `rounded-(--w-nav-item-rounded)` lines up with them. Below `xl` it starts after the toggle. |
+| `brand` | — | A logo or brand mark in the frame's top-left corner: the nav's top row, level with the header. With `brandTo` the row is a link and the slot is the mark in its pill. Without it the row is inset as the items are and the slot fills it, so content with `rounded-(--w-nav-item-rounded)` lines up with them. Below `xl` it is a row of its own under the toggle. |
 
 <!-- @api-end -->
 
