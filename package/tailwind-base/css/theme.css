@@ -1,7 +1,10 @@
 @theme {
   --color-*: initial;
   --font-*: initial;
+}
 
+/* Static: a runtime theme can name any of them in its values, such as `var(--color-gray-950)`, used by a class or not. */
+@theme static {
   --color-current: currentColor;
   --color-transparent: transparent;
 
@@ -76,7 +79,9 @@
   --color-data-fuchsia: oklch(56% 0.27 323);
   --color-data-pink: oklch(56% 0.22 1);
   --color-data-gray: var(--color-gray-500);
+}
 
+@theme {
   --font-sans: MontSerrat, system-ui, sans-serif;
   --font-roboto: Roboto, system-ui, sans-serif;
   --font-mono: RobotoMono, ui-monospace, monospace;

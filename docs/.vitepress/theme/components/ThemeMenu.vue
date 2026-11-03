@@ -116,6 +116,10 @@
           <IconCodeInline class="square-[1em]" /> {{ copyCss.copied.value ? 'Copied' : 'Copy theme CSS' }}
         </WMenuItem>
 
+        <WMenuItem @click="copyJson.doCopy">
+          <IconCodeBlock class="square-[1em]" /> {{ copyJson.copied.value ? 'Copied' : 'Copy theme JSON' }}
+        </WMenuItem>
+
         <WMenuItem :href="withBase('/guide/theming')">
           Customize…
         </WMenuItem>
@@ -151,6 +155,7 @@ import WButtonGroup from 'eco-vue-js/dist/components/Button/WButtonGroup.vue'
 import WDropdownAdaptive from 'eco-vue-js/dist/components/DropdownMenu/WDropdownAdaptive.vue'
 import WMenuItem from 'eco-vue-js/dist/components/MenuItem/WMenuItem.vue'
 
+import IconCodeBlock from 'eco-vue-js/dist/assets/icons/IconCodeBlock'
 import IconCodeInline from 'eco-vue-js/dist/assets/icons/IconCodeInline'
 import IconLink from 'eco-vue-js/dist/assets/icons/IconLink'
 import IconPalette from 'eco-vue-js/dist/assets/icons/IconPalette'
@@ -168,6 +173,7 @@ const activePreset = computed(() => themeConfig.value.preset ?? 'default')
 
 const copyLink = useCopy(() => getThemeLink(themeConfig.value, undefined, activeTheme.value?.name))
 const copyCss = useCopy(() => getThemeCss(themeTokens.value))
+const copyJson = useCopy(() => JSON.stringify(themeConfig.value, null, 2))
 
 const saveTheme = () => {
   isOpen.value = false

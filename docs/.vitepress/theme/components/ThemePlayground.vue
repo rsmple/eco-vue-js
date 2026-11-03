@@ -65,6 +65,14 @@
 
         <WButton
           :semantic-type="SemanticType.SECONDARY"
+          :disabled="!Object.keys(themeConfig).length"
+          @click="copyJson.doCopy"
+        >
+          <IconCodeBlock class="square-[1em]" /> {{ copyJson.copied.value ? 'Copied' : 'Copy JSON' }}
+        </WButton>
+
+        <WButton
+          :semantic-type="SemanticType.SECONDARY"
           @click="copyCss.doCopy"
         >
           <IconCodeInline class="square-[1em]" /> {{ copyCss.copied.value ? 'Copied' : 'Copy CSS' }}
@@ -325,6 +333,7 @@ import WSliderRange from 'eco-vue-js/dist/components/Slider/WSliderRange.vue'
 import WUniform from 'eco-vue-js/dist/components/Uniform/WUniform.vue'
 
 import IconCancel from 'eco-vue-js/dist/assets/icons/IconCancel'
+import IconCodeBlock from 'eco-vue-js/dist/assets/icons/IconCodeBlock'
 import IconCodeInline from 'eco-vue-js/dist/assets/icons/IconCodeInline'
 import IconCopy from 'eco-vue-js/dist/assets/icons/IconCopy'
 import IconEditCircle from 'eco-vue-js/dist/assets/icons/IconEditCircle'
@@ -428,6 +437,7 @@ const baseTokens = computed(() => getBaseTokens(themeConfig.value))
 const css = computed(() => getThemeCss(themeTokens.value))
 
 const copyLink = useCopy(() => getThemeLink(themeConfig.value, undefined, activeTheme.value?.name))
+const copyJson = useCopy(() => JSON.stringify(themeConfig.value, null, 2))
 const copyCss = useCopy(css)
 
 // The range under the pointer while dragging; the picked one takes over once it ends.

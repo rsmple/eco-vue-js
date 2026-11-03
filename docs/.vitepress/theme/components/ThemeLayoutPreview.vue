@@ -52,9 +52,10 @@
 </template>
 
 <script lang="ts" setup>
+import {LAYOUTS, LAYOUT_TOKENS, type LayoutId, expandTokens} from '@/utils/themePresets'
+
 import rolesCss from '../../../../package/tailwind-base/css/roles.css?raw'
 import surfacesCss from '../../../../package/tailwind-base/css/surfaces.css?raw'
-import {LAYOUTS, LAYOUT_TOKENS, type LayoutId, expandTokens} from '../../themePresets'
 
 const STATS = [
   {title: 'Plants', value: 128},

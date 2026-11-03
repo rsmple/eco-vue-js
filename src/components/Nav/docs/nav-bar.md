@@ -7,7 +7,9 @@ description: WNavBar, WNavItem, WNavItemExpand and WNavItemTransition — the ap
 
 `WNavBar` is the nav on the left of the [app shell](/guide/app-shell) — the one on the left of this page. It is `position: fixed` under the header and takes `--nav-bar-width` in layout from `xl` (1280px) up. Below it, it collapses and adds a menu button in the header's top-left corner, and opens as an overlay over the page; it emits `update:is-open` when the overlay opens or closes. Its class `w-nav-bar` is the hook for the app's surface and shadow, and its content uses `w-nav-bar-width` to keep its width while the nav collapses.
 
-The `brand` slot is the nav's top row, level with the header, for a logo. With `brandTo` the whole row is a link to it, such as the home page, with a hover pill inset as the items' are. In the floating layout styles the pill keeps as far off the nav's top edge as off its side, so its corners run parallel to the nav's, and so do the first and last items' at the nav's ends: the room there is in the item, so it is clickable up to the edge. Content at an end other than an item, such as a block stuck to the bottom, sets its own room.
+The `brand` slot is the nav's top row, level with the header, for a logo. With `brandTo` the whole row is a link to it, such as the home page, with a hover pill inset as the items' are. In the floating layout styles the pill keeps as far off the nav's top edge as off its side, so its corners run parallel to the nav's, and so do the first and last items' at the nav's ends: the room there is in the item, so it is clickable up to the edge. Content at the top other than an item sets its own room.
+
+The `footer` slot is the nav's bottom, such as a back button or the app's version. It stays under the items, which scroll above it, past a line, and is inset as they are. It paints nothing of its own: don't stick a block to the nav's bottom with a background, which in the glass style would cover the nav's translucent fill with an opaque strip.
 
 ```vue
 <WNavBar :brand-to="{name: RouteName.HOME}">
@@ -16,6 +18,10 @@ The `brand` slot is the nav's top row, level with the header, for a logo. With `
   </template>
 
   <WNavItem :to="{name: RouteName.PROJECTS}" />
+
+  <template #footer>
+    <span class="text-description text-xs">{{ version }}</span>
+  </template>
 </WNavBar>
 ```
 
@@ -164,6 +170,7 @@ import WNavBar from 'eco-vue-js/dist/components/Nav/WNavBar.vue'
 | --- | --- | --- |
 | `default` | — | Content of the nav, such as WNavItem items. |
 | `brand` | — | A logo or brand mark in the frame's top-left corner: the nav's top row, level with the header. With `brandTo` the row is a link and the slot is the mark in its pill. Without it the row is inset as the items are and the slot fills it, so content with `rounded-(--w-nav-item-rounded)` lines up with them. Below `xl` it is a row of its own under the toggle. |
+| `footer` | — | Content at the nav's bottom, such as a back button or the app's version: under the items, which scroll above it, past a line. It is inset as the items are and paints nothing of its own, so it is the nav's surface in every layout style. |
 
 <!-- @api-end -->
 

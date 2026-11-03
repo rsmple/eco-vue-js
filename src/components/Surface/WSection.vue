@@ -1,8 +1,11 @@
 <template>
   <component
     :is="tag"
-    class="surface-section grid gap-4"
-    :class="semanticType && semanticType !== SemanticType.SECONDARY ? ['surface-section-tone', sectionToneMap[semanticType]] : undefined"
+    class="surface-section gap-4"
+    :class="[
+      scroll ? 'surface-section-scroll flex flex-col' : 'grid',
+      semanticType && semanticType !== SemanticType.SECONDARY ? ['surface-section-tone', sectionToneMap[semanticType]] : undefined,
+    ]"
   >
     <div
       v-if="title || eyebrow || description || $slots.title || $slots.description || $slots.actions"
@@ -39,7 +42,16 @@
       <slot name="actions" />
     </div>
 
-    <slot />
+    <slot name="head" />
+
+    <div
+      v-if="scroll"
+      class="surface-section-body grid content-start gap-4"
+    >
+      <slot />
+    </div>
+
+    <slot v-else />
 
     <div
       v-if="$slots.footer"
@@ -77,6 +89,12 @@ withDefaults(
      * zone with `NEGATIVE`. `SECONDARY` is a plain section.
      */
     semanticType?: SemanticType
+    /**
+     * Keeps to the height the page gives it, such as a column stuck beside a list, and scrolls its content inside, under
+     * the heading and the `head` slot, which stay. The content scrolls to the section's bottom edge: nothing sticky has
+     * to repaint the section over it, so it looks the same in every layout style.
+     */
+    scroll?: boolean
   }>(),
   {
     title: undefined,
@@ -96,6 +114,11 @@ defineSlots<{
   description?: () => void
   /** Buttons beside the heading. */
   actions?: () => void
+  /**
+   * Content under the heading, before the content: with `scroll` it stays in view while the content scrolls, such as
+   * the item a list in the section belongs to, or a label of its own in place of the heading.
+   */
+  head?: () => void
   /** Buttons under the content, such as Save: past a line, or on the page in flat, past a space. */
   footer?: () => void
 }>()

@@ -13,7 +13,7 @@
     "docs/.vitepress/markdownSections.ts",
     "docs/.vitepress/sidebar.ts",
     "docs/.vitepress/themeHeadScript.ts",
-    "docs/.vitepress/themePresets.ts",
+    "src/utils/themePresets.ts",
     "tailwind/**/*",
     "package/tailwind-base/**/*"
   ],

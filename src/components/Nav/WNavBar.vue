@@ -49,6 +49,13 @@
     <div class="w-nav-bar-content mt---header-height flex min-h-0 flex-auto flex-col overflow-hidden">
       <slot />
     </div>
+
+    <div
+      v-if="$slots.footer"
+      class="w-nav-bar-footer w-nav-bar-width shrink-0"
+    >
+      <slot name="footer" />
+    </div>
   </nav>
 
   <div
@@ -88,6 +95,12 @@ defineSlots<{
   default?: () => void
   /** A logo or brand mark in the frame's top-left corner: the nav's top row, level with the header. With `brandTo` the row is a link and the slot is the mark in its pill. Without it the row is inset as the items are and the slot fills it, so content with `rounded-(--w-nav-item-rounded)` lines up with them. Below `xl` it is a row of its own under the toggle. */
   brand?: () => void
+  /**
+   * Content at the nav's bottom, such as a back button or the app's version: under the items, which scroll above it,
+   * past a line. It is inset as the items are and paints nothing of its own, so it is the nav's surface in every layout
+   * style.
+   */
+  footer?: () => void
 }>()
 
 provide(wBaseZIndex, BASE_ZINDEX_NAV_BAR)
