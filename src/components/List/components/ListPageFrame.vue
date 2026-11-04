@@ -53,7 +53,7 @@ import ListPageFrameScope from './ListPageFrameScope.vue'
 import ListPageSurface from './ListPageSurface.vue'
 
 import {wListPageFrame, wListPageFrameHeader} from '../models/injection'
-import {useStickyPath} from '../use/useStickyPath'
+import {usePageTableMark, useStickyPath} from '../use/useStickyPath'
 
 /**
  * A page list's frame around content that may hold one, such as the tabs of WTabs `section`, with a head over it. While
@@ -77,6 +77,7 @@ const isRepaint = ref(false)
 
 // The content beside the table on the page sticks while it scrolls sideways.
 useStickyPath(rootRef, () => isJoined.value && isTable.value ? {attribute: 'data-w-page-path', end: '.w-page'} : null)
+usePageTableMark(rootRef, () => isJoined.value && isTable.value)
 
 const frame = {
   target: computed(() => targetRef.value),

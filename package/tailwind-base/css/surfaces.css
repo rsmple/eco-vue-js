@@ -135,7 +135,7 @@
     border-radius: 0;
   }
 
-  :root:has(.w-list-page-table) & {
+  :root[data-w-page-table] & {
     @variant sm {
       position: sticky;
       left: calc(var(--w-left-inner) - var(--w-page-bleed, 0px));
@@ -225,7 +225,7 @@
     border-radius: 0;
   }
 
-  :root:has(.w-list-page-table) & {
+  :root[data-w-page-table] & {
     @variant sm {
       position: sticky;
       left: calc(var(--w-left-inner) - var(--w-page-bleed, 0px));
@@ -252,7 +252,7 @@
     margin-inline: 0;
   }
 
-  :root:has(.w-list-page-table) & {
+  :root[data-w-page-table] & {
     @variant sm {
       position: sticky;
       left: calc(var(--w-left-inner) - var(--w-page-bleed, 0px));
@@ -1120,7 +1120,8 @@
     display: none;
   }
 
-  .w-list-page :has(> .w-list-page-strip) {
+  /* On the box of the pages (InfiniteListPages) by its class: a `:has()` on any box in the list checks every cell. */
+  .w-list-page .w-infinite-list-pages:has(> .w-list-page-strip) {
     position: relative;
     isolation: isolate;
   }
@@ -1215,7 +1216,7 @@
     }
 
     /* Nothing to cover without rows, and the empty state keeps its full width. */
-    .w-list-page :has(> .w-list-page-strip):not(:has(.w-list-item)) > .w-list-page-strip {
+    .w-list-page .w-infinite-list-pages:not(:has(.w-list-item)) > .w-list-page-strip {
       display: none;
     }
 
@@ -1390,7 +1391,7 @@
       padding-inline: var(--w-page-inset, 0px);
     }
 
-    :root:has(.w-list-page-table) & {
+    :root[data-w-page-table] & {
       @variant sm {
         position: sticky;
         left: var(--w-left-inner);

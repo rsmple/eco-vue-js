@@ -262,7 +262,7 @@ import {wListPageFrame, wListPageFrameHeader} from './models/injection'
 import {isField} from './models/utils'
 import {AREA_MORE, AREA_SELECT} from './types'
 import {filterFields, forEachField, getFieldStylesSticky, getFieldTracks, sortFieldsDeep, useListConfig} from './use/useListConfig'
-import {useStickyPath} from './use/useStickyPath'
+import {usePageTableMark, useStickyPath} from './use/useStickyPath'
 
 defineOptions({inheritAttrs: false})
 
@@ -501,6 +501,8 @@ useStickyPath(rootRef, () => {
   if (isModal) return {attribute: 'data-w-modal-path', end: '.w-modal-wrapper', outside: '.w-list'}
   return null
 })
+
+usePageTableMark(rootRef, () => isPageOwn && !isGrid.value)
 
 const owner = Symbol('list')
 
