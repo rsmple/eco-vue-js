@@ -65,12 +65,10 @@
     --w-chrome-gap: 0px;
     --w-chrome-rounded: 0px;
     --w-chrome-border: 0px;
-    /* Shadows the bars combine with their edge and ring: a theme sets a shadow list, `0 0 #0000` for none, never `none`. */
+    /* Shadows the bars combine with their edge: a theme sets a shadow list, `0 0 #0000` for none, never `none`. */
     --w-chrome-shadow: 0 0 #0000;
     --w-chrome-opacity: 1;
     /* What blurs behind the bars, such as a glass theme's blur. Unset, the header keeps its own and the others none. */
-    /* What fills the gap around a floating bar, so content scrolling under the header doesn't show above it. */
-    --w-chrome-ring: transparent;
 
     /* A picture on the canvas, such as a glass theme's gradient: fixed to the viewport, so what paints it again matches. */
     --w-canvas-image: none;
@@ -533,8 +531,7 @@
  * App chrome. The nav and the actions bar run the screen's full height, so the nav's top, the brand's place, is the
  * frame's top-left corner in every style. Docked (flat), the header spans the screen under them. Floating, each bar
  * is a card `--w-chrome-gap` off the screen edges and the frame's margins, and the header only spans the page between
- * the nav and the actions bar. A floating header paints `--w-chrome-ring` over the gap above it and beside it, not
- * below: there the page shows, such as a stuck list's section above its toolbar.
+ * the nav and the actions bar. The header casts no shadow, so none spreads onto the bars beside it.
  */
 @layer utilities {
   /* Its content lines up with the page's: the header's own row adds `--inner-margin`, as the page does. */
@@ -566,9 +563,6 @@
       color-mix(in oklab, var(--w-chrome-base) calc(var(--w-chrome-opacity) * 100%), transparent) calc(var(--w-chrome-float) * 100%),
       var(--w-overlay)
     );
-    box-shadow:
-      var(--w-chrome-shadow),
-      0 calc(var(--w-chrome-gap) * -0.5) 0 calc(var(--w-chrome-gap) * 0.5) calc(var(--w-chrome-ring) * 0.5);
 
     /* On phones it spans the screen, like a section: only the edge toward the page is left. */
     @variant sm-not {
