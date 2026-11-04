@@ -35,6 +35,12 @@
       </div>
     </Transition>
 
+    <span
+      ref="anchor"
+      aria-hidden="true"
+      class="w-nav-item-anchor pointer-events-none absolute inset-x-0"
+    />
+
     <div class="[overflow:inherit]">
       <div
         class="w-ripple w-ripple-hover relative grid grid-cols-[1.5rem_1fr_auto] items-center rounded-(--w-nav-item-rounded,var(--radius-lg)) pr-2"
@@ -94,7 +100,7 @@
 <script lang="ts" setup>
 import type {NavItemProps} from './types'
 
-import {computed} from 'vue'
+import {computed, useTemplateRef} from 'vue'
 
 import WCounter from '@/components/Counter/WCounter.vue'
 import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
@@ -136,7 +142,11 @@ const titleLocal = computed<string>(() => props.title ?? (routeTitle.value ? get
 
 const isTextColor = computed(() => props.hasActive ? !props.indent : isActive.value)
 
+/** The item without the first and last items' extra room — where a group's dropdown opens. */
+const anchorRef = useTemplateRef<HTMLSpanElement>('anchor')
+
 defineExpose({
   isActive,
+  anchorRef,
 })
 </script>

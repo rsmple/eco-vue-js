@@ -761,6 +761,12 @@
     border-radius: calc(var(--w-chrome-float) * 9999px);
   }
 
+  /* A group's dropdown opens at the item without the first and last items' extra room, so it lines up with the pill. */
+  .w-nav-item-anchor {
+    top: calc(var(--w-nav-item-pad-top, 0.25rem) - 0.25rem);
+    bottom: calc(var(--w-nav-item-pad-bottom, 0.25rem) - 0.25rem);
+  }
+
   /*
    * A group's dropdown shares the nav's paint (`.w-nav-bar`) but not its place: it sizes to its items. Its corners
    * are the nav's when floating; docked they stay rounded, as before.

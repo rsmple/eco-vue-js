@@ -12,6 +12,7 @@
     <WDropdownMenu
       :is-open="isDropdownOpen && !isActive"
       :horizontal-align="HorizontalAlign.RIGHT_OUTER"
+      :parent-element="componentRef?.anchorRef ?? undefined"
       dropdown-class="flex relative"
     >
       <template #toggle>
