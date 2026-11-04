@@ -115,7 +115,8 @@ const getStickyTop = (): number => {
 // header covers of the page then starts at the head.
 const sectionHeadHeight = isContained ? null : inject(wSectionHeadHeight, null)
 const isPage = ref(false)
-const sectionHeadOffset = computed(() => isPage.value ? sectionHeadHeight?.value ?? 0 : 0)
+const stickyGap = ref(0)
+const sectionHeadOffset = computed(() => isPage.value ? sectionHeadHeight?.value ?? 0 : stickyGap.value)
 
 const observe = () => {
   if (!indicatorRef.value) return
@@ -123,6 +124,7 @@ const observe = () => {
   isPage.value = indicatorRef.value.closest('.w-list-page') !== null
 
   const top = getStickyTop()
+  stickyGap.value = isContained ? 0 : Math.max(0, top - headerHeight.value)
   if (observer && top === observerTop) return
 
   observer?.disconnect()

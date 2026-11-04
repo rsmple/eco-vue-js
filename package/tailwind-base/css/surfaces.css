@@ -647,6 +647,30 @@
   }
 
   /*
+   * A list header on the page outside any section, such as a page's own toolbar in WInfiniteListWrapper, is a section
+   * of its own: the section's paint, edges and padding, reaching into the page gutter, stuck under the header bar as
+   * the bars float. Flat, the section tokens are 0: it stays a clear bar the header bar grows behind.
+   */
+  .w-infinite-list-header:not(:is(.w-list-page, .surface-section, .surface-card) *) {
+    --w-surface: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), var(--w-canvas));
+
+    margin-inline: calc(var(--w-page-bleed, 0px) * -1);
+    padding: var(--w-section-padding);
+    background-color: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), transparent);
+    border: var(--w-section-border) solid var(--w-line-subtle);
+    border-radius: var(--w-section-rounded);
+    box-shadow: var(--w-section-shadow);
+    backdrop-filter: var(--w-section-backdrop);
+
+    @variant sm-not {
+      margin-inline: calc(var(--w-page-inset, 0px) * -1);
+      padding-inline: var(--inner-margin);
+      border-inline-width: 0;
+      border-radius: 0;
+    }
+  }
+
+  /*
    * Floating, the items keep off the nav's edges, and their hover pill and the active marker follow its rounding: the
    * pill's radius is the nav's less the inset, so the two curves run parallel. Docked, the pill and the marker meet
    * the edges as before.
