@@ -1181,8 +1181,9 @@
     }
 
     /*
-     * Over the section by itself, as the end's band. The masks run a little past the screen's sides: Safari can leave
-     * the band a pixel out of step with the rows there while they scroll sideways.
+     * Over the section by itself, as the end's band. The start mask runs a little past the screen's start: Safari can
+     * leave the band a pixel out of step with the rows there while they scroll sideways. The end mask stops at the
+     * screen's end, or the page would scroll sideways by the overrun under a list narrower than the screen.
      */
     .w-list-page-strip-band {
       --w-list-strip-overrun: 0.5rem;
@@ -1214,8 +1215,8 @@
       }
 
       &::after {
-        right: calc((var(--w-right-inner) - var(--w-section-padding)) * -1 - var(--w-list-strip-overrun));
-        width: calc(var(--w-right-inner) + var(--w-list-right) + var(--w-list-strip-overrun));
+        right: calc((var(--w-right-inner) - var(--w-section-padding)) * -1);
+        width: calc(var(--w-right-inner) + var(--w-list-right));
       }
     }
 
@@ -1294,12 +1295,14 @@
    */
   .w-list-page {
     /* The gap above the stuck header, which `--w-top-inner` counts too. On phones the header bar is docked, with no gap under it: the stuck toolbar keeps a small one. */
-    --w-list-header-gap: var(--w-section-padding);
+    /* Under a section head (`--w-joined`) at least the gap the head leaves above the list before it sticks. */
+    --w-list-joined-gap: calc(1rem * var(--w-joined, 0));
+    --w-list-header-gap: max(var(--w-section-padding), var(--w-list-joined-gap));
     /* Where the header sticks, and the group headings under it: under a section head over the list, which sticks above it. */
     --w-list-header-top: calc(var(--w-header-inner) + var(--w-section-head-height, 0px) + var(--w-list-header-gap));
 
     @variant sm-not {
-      --w-list-header-gap: calc(var(--w-chrome-float) * 0.5rem);
+      --w-list-header-gap: max(var(--w-chrome-float) * 0.5rem, var(--w-list-joined-gap));
     }
   }
 
@@ -1398,12 +1401,25 @@
     position: sticky;
     top: var(--w-header-inner);
     z-index: calc(22 - var(--w-chrome-float) * 15);
-    background-color: var(--w-canvas);
-    background-image: var(--w-page-fill);
-    background-attachment: fixed;
+    background-color: transparent;
     backdrop-filter: none;
     /* The list's frame runs on up over it and casts the section's shadow. */
     box-shadow: none;
+
+    /* Docked (flat) it stays clear: the header bar grows behind it and the stuck list header as one bar. */
+    &::before {
+      content: "";
+      position: absolute;
+      inset: calc(var(--w-section-border) * -1);
+      inset-block-end: 0;
+      z-index: -1;
+      border-radius: inherit;
+      opacity: var(--w-chrome-float);
+      background-color: var(--w-canvas);
+      background-image: var(--w-page-fill);
+      background-attachment: fixed;
+      pointer-events: none;
+    }
   }
 
   .w-list-page-repaint .w-infinite-list-header-stuck .w-infinite-list-header-edge::before,

@@ -112,11 +112,11 @@ const getStickyTop = (): number => {
 }
 
 // A page list's header sticks under a section head over it, such as WTabs `section`, which sticks above it: what the
-// header covers of the page then starts at the head.
+// header covers of the page then starts at the head, with the gap between them.
 const sectionHeadHeight = isContained ? null : inject(wSectionHeadHeight, null)
 const isPage = ref(false)
 const stickyGap = ref(0)
-const sectionHeadOffset = computed(() => isPage.value ? sectionHeadHeight?.value ?? 0 : stickyGap.value)
+const sectionHeadOffset = computed(() => isPage.value && !sectionHeadHeight?.value ? 0 : stickyGap.value)
 
 const observe = () => {
   if (!indicatorRef.value) return
