@@ -521,7 +521,7 @@ body {
   align-items: flex-start;
   max-width: var(--w-width-inner);
 
-  :root:has(.w-list.w-list-page) & {
+  :root:has(.w-list-page-table) & {
     @variant sm {
       position: sticky;
       left: var(--w-left-inner);

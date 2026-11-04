@@ -1,26 +1,14 @@
 <template>
   <div
+    ref="root"
     role="list"
-    :class="{
-      'w-card': isGrid,
-      'w-list': !isGrid,
-      'w-list-page': isPage,
-      'w-list-page-repaint': isRepaint,
-      '[--w-list-right:calc(var(--w-list-padding,1rem)*2+1.25em)]': hasMenu,
-      '[--w-list-right:var(--w-list-header-rounded,1rem)]': !hasMenu,
-      '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em-1px)]': allowSelect,
-      '[--w-list-left:var(--w-list-header-rounded,1rem)]': !allowSelect,
-    }"
+    :class="[listClasses, {
+      'w-list-page': isPageOwn,
+      'w-list-page-table': isPageOwn && !isGrid,
+      'w-list-page-repaint': isPageOwn && isRepaint,
+    }]"
   >
-    <div
-      v-if="isPage"
-      class="w-list-page-surface"
-    />
-
-    <div
-      ref="pageContent"
-      :class="isPage ? 'w-list-page-content' : 'contents'"
-    >
+    <component :is="isPageOwn ? ListPageSurface : WEmptyComponent">
       <WInfiniteList
         :use-query-fn="useQueryFn"
         :query-params="queryParams"
@@ -46,87 +34,93 @@
         @update:error="$emit('update:error', $event)"
       >
         <template #header="{updateHeader, isRefetchingAll, refetchAll}">
-          <ListToolbar
-            :count="listCount"
-            :total-count="countValue"
-            :selection-title="selectionTitle"
-            :bulk-disable-message="bulkDisableMessage"
-            :selection-count="selectionCount"
-            :select-all-value="selectAllValue"
-            :select-all-text-getter="selectAllTextGetter"
-            :is-shift="isShift"
-            :allow-select="allowSelect"
-            :select-only="selectOnly"
-            :readonly="isReadonly ?? isDisabled ?? false"
-
-            :query-params="queryParams"
-            :use-query-fn="useQueryFn"
-            :use-query-fn-export="useQueryFnExport"
-            :api-method-export="apiMethodExport"
-            :export-file-name="exportFileName"
-            :get-query-params-bulk="getQueryParamsBulk"
-            :to-markdown="toMarkdown"
-
-            :bulk="bulk"
-            :action="action"
-            :menu="menu"
-
-            :fields-visible="fieldsVisible"
-            :fields-filtered="fieldsFiltered"
-            :fields-sorted="fieldsSorted"
-            :field-config-map="fieldConfigMap"
-            :field-tracks="fieldTracks"
-            :styles-sticky="stylesSticky"
-            :ordering="ordering"
-            :mode="listConfig.mode"
-
-            :card="isGrid"
-            :mobile="isMobile"
-            :has-saved="hasSaved"
-            :no-refetch="noRefetch"
-            :no-ordering="noOrdering"
-            :no-header-settings="noHeaderSettings"
-            :no-mode="noMode"
-            :disable-export="disableExport"
-
-            :is-refetching-all="isRefetchingAll"
-            :refetch-all="refetchAll"
-            :update-header="updateHeader"
-
-            @reset:selection="resetSelection"
-            @toggle:selection="toggleSelectAll"
-            @set:is-selecting="setIsSelecting()"
-            @update:ordering="updateOrdering"
-            @update:mode="updateMode"
-            @update:field-config-map="updateFieldConfigMap"
-            @update:width="updateFieldWidth"
-            @save:width="save"
-            @click:reset="resetConfig"
+          <!-- Joined to a frame, the header is in the frame's stuck header: it takes the list's classes along. -->
+          <component
+            :is="frame ? 'div' : WEmptyComponent"
+            :class="frame ? ['contents', listClasses] : undefined"
           >
-            <template
-              v-if="$slots.header"
-              #header="scope"
-            >
-              <slot
-                name="header"
-                v-bind="scope"
-              />
-            </template>
+            <ListToolbar
+              :count="listCount"
+              :total-count="countValue"
+              :selection-title="selectionTitle"
+              :bulk-disable-message="bulkDisableMessage"
+              :selection-count="selectionCount"
+              :select-all-value="selectAllValue"
+              :select-all-text-getter="selectAllTextGetter"
+              :is-shift="isShift"
+              :allow-select="allowSelect"
+              :select-only="selectOnly"
+              :readonly="isReadonly ?? isDisabled ?? false"
 
-            <template
-              v-if="$slots.filter"
-              #filter
-            >
-              <slot name="filter" />
-            </template>
+              :query-params="queryParams"
+              :use-query-fn="useQueryFn"
+              :use-query-fn-export="useQueryFnExport"
+              :api-method-export="apiMethodExport"
+              :export-file-name="exportFileName"
+              :get-query-params-bulk="getQueryParamsBulk"
+              :to-markdown="toMarkdown"
 
-            <template
-              v-if="$slots.selection"
-              #selection
+              :bulk="bulk"
+              :action="action"
+              :menu="menu"
+
+              :fields-visible="fieldsVisible"
+              :fields-filtered="fieldsFiltered"
+              :fields-sorted="fieldsSorted"
+              :field-config-map="fieldConfigMap"
+              :field-tracks="fieldTracks"
+              :styles-sticky="stylesSticky"
+              :ordering="ordering"
+              :mode="listConfig.mode"
+
+              :card="isGrid"
+              :mobile="isMobile"
+              :has-saved="hasSaved"
+              :no-refetch="noRefetch"
+              :no-ordering="noOrdering"
+              :no-header-settings="noHeaderSettings"
+              :no-mode="noMode"
+              :disable-export="disableExport"
+
+              :is-refetching-all="isRefetchingAll"
+              :refetch-all="refetchAll"
+              :update-header="updateHeader"
+
+              @reset:selection="resetSelection"
+              @toggle:selection="toggleSelectAll"
+              @set:is-selecting="setIsSelecting()"
+              @update:ordering="updateOrdering"
+              @update:mode="updateMode"
+              @update:field-config-map="updateFieldConfigMap"
+              @update:width="updateFieldWidth"
+              @save:width="save"
+              @click:reset="resetConfig"
             >
-              <slot name="selection" />
-            </template>
-          </ListToolbar>
+              <template
+                v-if="$slots.header"
+                #header="scope"
+              >
+                <slot
+                  name="header"
+                  v-bind="scope"
+                />
+              </template>
+
+              <template
+                v-if="$slots.filter"
+                #filter
+              >
+                <slot name="filter" />
+              </template>
+
+              <template
+                v-if="$slots.selection"
+                #selection
+              >
+                <slot name="selection" />
+              </template>
+            </ListToolbar>
+          </component>
         </template>
 
         <template #default="{item, skeleton, setter, refetch, previous, first, index, position, value, results, intersecting}">
@@ -234,21 +228,7 @@
           />
         </template>
       </WInfiniteList>
-
-      <div
-        v-if="isPage"
-        class="w-list-page-end"
-      >
-        <div class="w-list-page-end-band">
-          <div class="w-list-page-end-fill" />
-        </div>
-      </div>
-    </div>
-
-    <div
-      v-if="isPage"
-      class="w-list-page-frame"
-    />
+    </component>
   </div>
 </template>
 
@@ -258,8 +238,9 @@ import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type Ref, type StyleValue, computed, inject, onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
+import {type Ref, type StyleValue, computed, inject, onBeforeUnmount, onMounted, provide, ref, toRef, useTemplateRef, watch, watchEffect} from 'vue'
 
+import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
 import {wScrollingElement} from '@/components/InfiniteList/models/injection'
@@ -274,7 +255,9 @@ import {ListMode} from '@/utils/utils'
 
 import ListGroupHeading from './components/ListGroupHeading.vue'
 import ListItem from './components/ListItem.vue'
+import ListPageSurface from './components/ListPageSurface.vue'
 import ListToolbar from './components/ListToolbar.vue'
+import {wListPageFrame, wListPageFrameHeader} from './models/injection'
 import {isField} from './models/utils'
 import {AREA_MORE, AREA_SELECT} from './types'
 import {filterFields, forEachField, getFieldStylesSticky, getFieldTracks, sortFieldsDeep, useListConfig} from './use/useListConfig'
@@ -439,11 +422,22 @@ const {isMobile} = useIsMobile()
 const isSectionNested = inject(wSectionNested, false)
 const isPage = !inject(wIsModal, false) && inject(wScrollingElement, null) === null && !isSectionNested
 
+// In a page list frame, such as WTabs `section`, the list joins the frame while shown: the frame draws the section and
+// holds the list's header, the list renders its rows. Lists in its rows are not on the page.
+const frame = isPage ? inject(wListPageFrame, null) : null
+const isPageOwn = isPage && !frame
+
+provide(wListPageFrame, null)
+provide(wListPageFrameHeader, frame ? {
+  target: computed(() => frame.shown.value ? frame.target.value : null),
+  scope: frame.scope,
+} : null)
+
 // Chromium moves a sticky column's layer when rows above it open or close without repainting it, so the backdrop it
 // paints, fixed to the viewport, stays where the column was until the next scroll. A no-op paint change on resize
 // repaints it.
 const isRepaint = ref(false)
-const pageContentRef = useTemplateRef('pageContent')
+const rootRef = useTemplateRef('root')
 
 let resizeObserver: ResizeObserver | null = null
 
@@ -453,11 +447,12 @@ let resizeObserver: ResizeObserver | null = null
 const observeRows = () => {
   resizeObserver?.disconnect()
 
-  const rows = isGrid.value ? null : pageContentRef.value?.querySelector('.w-list-page-rows')
+  const rows = isGrid.value ? null : rootRef.value?.querySelector('.w-list-page-rows')
   if (!rows) return
 
   resizeObserver ??= new ResizeObserver(() => {
-    isRepaint.value = !isRepaint.value
+    if (frame) frame.repaint()
+    else isRepaint.value = !isRepaint.value
   })
 
   resizeObserver.observe(rows)
@@ -495,6 +490,27 @@ const {
   () => props.defaultMode,
   props.noHeaderSettings,
 )
+
+const owner = Symbol('list')
+
+if (frame) {
+  watchEffect(() => {
+    if (frame.shown.value) frame.join(owner, !isGrid.value)
+    else frame.leave(owner)
+  })
+
+  onBeforeUnmount(() => frame.leave(owner))
+}
+
+// The list's mode and its select and menu columns, on its box, and in a frame on its header too.
+const listClasses = computed(() => ({
+  'w-card': isGrid.value,
+  'w-list': !isGrid.value,
+  '[--w-list-right:calc(var(--w-list-padding,1rem)*2+1.25em)]': hasMenu.value,
+  '[--w-list-right:var(--w-list-header-rounded,1rem)]': !hasMenu.value,
+  '[--w-list-left:calc(var(--w-list-padding,1rem)*2+1.25em-1px)]': allowSelect.value,
+  '[--w-list-left:var(--w-list-header-rounded,1rem)]': !allowSelect.value,
+}))
 
 const fieldsFiltered = computed(() => filterFields(fieldsVisible.value, field => fieldConfigMap.value[field.label]?.visible ?? false))
 

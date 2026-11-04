@@ -1,65 +1,84 @@
 <template>
-  <div
-    ref="indicator"
-    class="print:hidden"
-  />
-
-  <InfiniteListHeaderHeight
-    :is-intersecting="isIntersecting"
-    class="sticky print:hidden"
-    :class="{
-      'top-(--w-header-inner)': !isContained,
-      'w-infinite-list-header': !isContained && !noHeaderUpdate,
-      'w-infinite-list-header-stuck': !isContained && !noHeaderUpdate && isIntersecting === false,
-      'top-0 not-empty:pt-(--w-list-contained-top,0.75rem)': isContained && !isModal,
-      'top---modal-header-height': isModal,
-      'bg-surface': noHeaderUpdate || isContained,
-    }"
-    :style="{zIndex: isIntersecting ? BASE_ZINDEX_DROPDOWN : BASE_ZINDEX_LIST_HEADER}"
-  >
-    <template
-      v-if="isContained || noHeaderUpdate"
-      #header="scope"
+  <!-- A page list joined to a frame, such as in WTabs `section`: its header goes to the frame's stuck header. -->
+  <template v-if="joined">
+    <Teleport
+      v-if="joined.target.value"
+      :to="joined.target.value"
     >
       <slot
         name="header"
-        v-bind="scope"
+        v-bind="joined.scope"
       />
-    </template>
+    </Teleport>
 
-    <template
-      v-else
-      #header="scope"
+    <slot v-bind="joined.scope" />
+  </template>
+
+  <template v-else>
+    <div
+      ref="indicator"
+      class="print:hidden"
+    />
+
+    <InfiniteListHeaderHeight
+      :is-intersecting="isIntersecting"
+      class="print:hidden"
+      :class="inPlace ? undefined : {
+        'sticky': true,
+        'top-(--w-header-inner)': !isContained,
+        'w-infinite-list-header': !isContained && !noHeaderUpdate,
+        'w-infinite-list-header-stuck': !isContained && !noHeaderUpdate && isIntersecting === false,
+        'top-0 not-empty:pt-(--w-list-contained-top,0.75rem)': isContained && !isModal,
+        'top---modal-header-height': isModal,
+        'bg-surface': noHeaderUpdate || isContained,
+      }"
+      :style="inPlace ? undefined : {zIndex: isIntersecting ? BASE_ZINDEX_DROPDOWN : BASE_ZINDEX_LIST_HEADER}"
     >
-      <div
-        class="w-infinite-list-header-edge"
-        :style="{'--w-list-header-height': scope.headerHeight + 'px'}"
-      />
-
-      <InfiniteListHeaderPadding
-        :is-intersecting="isIntersecting"
-        :header-height="scope.headerHeight + sectionHeadOffset"
+      <template
+        v-if="isContained || noHeaderUpdate"
+        #header="scope"
       >
         <slot
           name="header"
           v-bind="scope"
         />
-      </InfiniteListHeaderPadding>
-    </template>
+      </template>
 
-    <template #default="scope">
-      <slot v-bind="scope" />
-    </template>
-  </InfiniteListHeaderHeight>
+      <template
+        v-else
+        #header="scope"
+      >
+        <div
+          v-if="!inPlace"
+          class="w-infinite-list-header-edge"
+          :style="{'--w-list-header-height': scope.headerHeight + 'px'}"
+        />
+
+        <InfiniteListHeaderPadding
+          :is-intersecting="inPlace || isIntersecting"
+          :header-height="scope.headerHeight + getPaddingOffset()"
+        >
+          <slot
+            name="header"
+            v-bind="scope"
+          />
+        </InfiniteListHeaderPadding>
+      </template>
+
+      <template #default="scope">
+        <slot v-bind="scope" />
+      </template>
+    </InfiniteListHeaderHeight>
+  </template>
 </template>
 
 <script lang="ts" setup>
 import type {InfiniteListHeaderScope} from './types'
 
-import {type VNode, computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef, watch} from 'vue'
+import {type VNode, inject, onBeforeUnmount, onMounted, provide, ref, useTemplateRef} from 'vue'
 
+import {wListPageFrameHeader} from '@/components/List/models/injection'
 import {wIsModal} from '@/components/Modal/models/injection'
-import {wSectionHeadHeight} from '@/components/Surface/models/injection'
 import {BASE_ZINDEX_DROPDOWN, BASE_ZINDEX_LIST_HEADER, getIsClientSide} from '@/utils/utils'
 
 import InfiniteListHeaderHeight from './components/InfiniteListHeaderHeight.vue'
@@ -75,6 +94,8 @@ const props = defineProps<{
   initIsIntersecting?: boolean
   /** Keeps the sticky header out of the app header bar's padding while scrolled. */
   noHeaderUpdate?: boolean
+  /** Renders the header in place over the content: it neither sticks nor pads the app header bar. */
+  inPlace?: boolean
 }>()
 
 const isModal = inject(wIsModal, false)
@@ -84,6 +105,11 @@ const isModal = inject(wIsModal, false)
 // so it keeps its own gap from the container's top edge: `--w-list-contained-top`, for a container whose padding it
 // should match.
 const isContained = isModal || inject(wScrollingElement, null) !== null
+
+const joined = isContained ? null : inject(wListPageFrameHeader, null)
+
+// A list in the content is not the one joined to the frame.
+provide(wListPageFrameHeader, null)
 
 // null until the observer reports, so the header padding is not applied before the real position is known
 const isIntersecting = ref<boolean | null>(props.initIsIntersecting ?? null)
@@ -111,17 +137,14 @@ const getStickyTop = (): number => {
   return Number.isNaN(top) ? headerHeight.value : top
 }
 
-// A page list's header sticks under a section head over it, such as WTabs `section`, which sticks above it: what the
-// header covers of the page then starts at the head, with the gap between them.
-const sectionHeadHeight = isContained ? null : inject(wSectionHeadHeight, null)
-const isPage = ref(false)
+// The header bar grows behind the stuck header by its height, and outside a page list by the gap above it too: a page
+// list's stuck header covers the gap itself.
 const stickyGap = ref(0)
-const sectionHeadOffset = computed(() => isPage.value && !sectionHeadHeight?.value ? 0 : stickyGap.value)
+
+const getPaddingOffset = (): number => indicatorRef.value?.closest('.w-list-page') ? 0 : stickyGap.value
 
 const observe = () => {
   if (!indicatorRef.value) return
-
-  isPage.value = indicatorRef.value.closest('.w-list-page') !== null
 
   const top = getStickyTop()
   stickyGap.value = isContained ? 0 : Math.max(0, top - headerHeight.value)
@@ -141,13 +164,11 @@ const observe = () => {
 }
 
 onMounted(() => {
-  if (!getIsClientSide()) return
+  if (!getIsClientSide() || joined) return
 
   observe()
   window.addEventListener('resize', observe)
 })
-
-if (sectionHeadHeight) watch(sectionHeadHeight, observe, {flush: 'post'})
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', observe)

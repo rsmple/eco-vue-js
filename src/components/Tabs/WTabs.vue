@@ -30,153 +30,173 @@
       </OverlayRegionPart>
     </template>
 
-    <div
-      v-if="!noHeader && !flat"
-      ref="buttonContainer"
-      class="relative"
-      :class="{
-        'sm-not:snap-start sm-not:px-(--w-frame-padding,var(--inner-margin)) grid grid-cols-[1fr_auto]': side,
-        'no-scrollbar flex overflow-x-auto overscroll-x-contain': !side,
-        'mb-4': !side && !section,
-        'surface-section-head': !side && section,
-        // In an overlay frame the bar scrolls from edge to edge, with the first tab in line with the content. On a page it
-        // keeps the phone inset, or on phones takes the padding of a box that sets `--w-frame-padding` instead of adding to it.
-        // A section head has the section's edges and padding.
-        'w-frame-bleed px-(--w-frame-padding)': !side && frame !== null,
-        'sm-not:w-frame-bleed sm-not:pl-[var(--w-frame-padding,var(--inner-margin))] sm-not:pr-[var(--w-frame-padding,0px)]': !side && frame === null && !section,
-        'flex-wrap': !side && wrap,
-        'shadow-[inset_0_-1px_var(--color-line-subtle)]': !side && divider && !section,
-        [headerClass ?? '']: true,
-      }"
-    >
-      <template
-        v-for="(slot, index) in defaultSlotsAll"
-        :key="slot.props?.name"
-      >
-        <TabTitleButton
-          v-if="isTabItem(slot)"
-          ref="button"
-          :active="current === slot.props.name"
-          :index="index"
-          :title="slot.props.title"
-          :icon="slot.props.icon"
-          :count="slot.props.count"
-          :to="slot.props.to"
-          :has-changes="slot.props.hasChanges ?? slot.props['has-changes' as never] ?? tabItemRefByName[slot.props.name]?.hasChanges"
-          :has-error="slot.props.hasError ?? slot.props['has-error' as never] ?? tabItemRefByName[slot.props.name]?.hasError"
-          :has-value="slot.props.hasValue ?? slot.props['has-value' as never] ?? tabItemRefByName[slot.props.name]?.hasValue"
-          :first="defaultSlotsIndexByName[slot.props.name] === 0"
-          :last="defaultSlotsIndexByName[slot.props.name] === defaultSlots.length - 1"
-          :disabled="isSlotDisabled(slot) || (stepper ? (defaultSlotsIndexByName[slot.props.name] ?? 0) > hasNoValueFirst : false)"
-          :stepper="stepper"
-          :show-has-value="showHasValue"
-          :side="side"
-          :status-icon="statusIcon"
-          :enable-overflow="side"
-          :indicator="indicator"
-          @update:scroll-position="updateScrollPosition"
-          @click="slot.props.to === undefined ? switchTab(slot.props.name) : scrollToTabContent()"
+    <!-- With `section`, a page list in the open tab joins the frame: the row of tabs is in its stuck header, over the list's. -->
+    <ListPageFrame :disabled="!isListFrame">
+      <template #head="{joined}">
+        <div
+          v-if="!noHeader && !flat"
+          ref="buttonContainer"
+          class="relative"
+          :class="{
+            'sm-not:snap-start sm-not:px-(--w-frame-padding,var(--inner-margin)) grid grid-cols-[1fr_auto]': side,
+            'no-scrollbar flex overflow-x-auto overscroll-x-contain': !side,
+            'mb-4': !side && !section,
+            'surface-section-head': !side && section && !joined,
+            'w-list-page-head': !side && section && joined,
+            // In an overlay frame the bar scrolls from edge to edge, with the first tab in line with the content. On a page it
+            // keeps the phone inset, or on phones takes the padding of a box that sets `--w-frame-padding` instead of adding to it.
+            // A section head has the section's edges and padding.
+            'w-frame-bleed px-(--w-frame-padding)': !side && frame !== null,
+            'sm-not:w-frame-bleed sm-not:pl-[var(--w-frame-padding,var(--inner-margin))] sm-not:pr-[var(--w-frame-padding,0px)]': !side && frame === null && !section,
+            'flex-wrap': !side && wrap,
+            'shadow-[inset_0_-1px_var(--color-line-subtle)]': !side && divider && !section,
+            [headerClass ?? '']: true,
+          }"
         >
           <template
-            v-if="(slot.children as Record<string, Component>)?.title"
-            #title="scope"
+            v-for="(slot, index) in defaultSlotsAll"
+            :key="slot.props?.name"
           >
-            <component
-              v-bind="scope"
-              :is="(slot.children as Record<string, Component>)?.title"
-            />
-          </template>
-
-          <template
-            v-if="(slot.children as Record<string, Component>)?.suffix"
-            #suffix="scope"
-          >
-            <component
-              v-bind="scope"
-              :is="(slot.children as Record<string, Component>)?.suffix" 
-            />
-          </template>
-
-          <template
-            v-if="(slot.children as Record<string, Component>)?.right || hasOnClose"
-            #right="scope"
-          >
-            <component
-              v-bind="scope"
-              :is="(slot.children as Record<string, Component>)?.right"
-            />
-
-            <button
-              v-if="'onClose' in slot.props"
-              class="w-ripple-trigger text-description sm-not:mx-3 flex h-full items-center justify-center px-1"
-              aria-label="Close tab"
-              @click="(slot.props.onClose as () => void)?.()"
+            <TabTitleButton
+              v-if="isTabItem(slot)"
+              ref="button"
+              :active="current === slot.props.name"
+              :index="index"
+              :title="slot.props.title"
+              :icon="slot.props.icon"
+              :count="slot.props.count"
+              :to="slot.props.to"
+              :has-changes="slot.props.hasChanges ?? slot.props['has-changes' as never] ?? tabItemRefByName[slot.props.name]?.hasChanges"
+              :has-error="slot.props.hasError ?? slot.props['has-error' as never] ?? tabItemRefByName[slot.props.name]?.hasError"
+              :has-value="slot.props.hasValue ?? slot.props['has-value' as never] ?? tabItemRefByName[slot.props.name]?.hasValue"
+              :first="defaultSlotsIndexByName[slot.props.name] === 0"
+              :last="defaultSlotsIndexByName[slot.props.name] === defaultSlots.length - 1"
+              :disabled="isSlotDisabled(slot) || (stepper ? (defaultSlotsIndexByName[slot.props.name] ?? 0) > hasNoValueFirst : false)"
+              :stepper="stepper"
+              :show-has-value="showHasValue"
+              :side="side"
+              :status-icon="statusIcon"
+              :enable-overflow="side"
+              :indicator="indicator"
+              @update:scroll-position="updateScrollPosition"
+              @click="slot.props.to === undefined ? switchTab(slot.props.name) : scrollToTabContent()"
             >
-              <div class="w-ripple w-ripple-hover relative rounded-full">
-                <IconClose />
-              </div>
-            </button>
+              <template
+                v-if="(slot.children as Record<string, Component>)?.title"
+                #title="scope"
+              >
+                <component
+                  v-bind="scope"
+                  :is="(slot.children as Record<string, Component>)?.title"
+                />
+              </template>
+
+              <template
+                v-if="(slot.children as Record<string, Component>)?.suffix"
+                #suffix="scope"
+              >
+                <component
+                  v-bind="scope"
+                  :is="(slot.children as Record<string, Component>)?.suffix" 
+                />
+              </template>
+
+              <template
+                v-if="(slot.children as Record<string, Component>)?.right || hasOnClose"
+                #right="scope"
+              >
+                <component
+                  v-bind="scope"
+                  :is="(slot.children as Record<string, Component>)?.right"
+                />
+
+                <button
+                  v-if="'onClose' in slot.props"
+                  class="w-ripple-trigger text-description sm-not:mx-3 flex h-full items-center justify-center px-1"
+                  aria-label="Close tab"
+                  @click="(slot.props.onClose as () => void)?.()"
+                >
+                  <div class="w-ripple w-ripple-hover relative rounded-full">
+                    <IconClose />
+                  </div>
+                </button>
             
-            <div
+                <div
+                  v-else
+                  class="w-10"
+                />
+              </template>
+            </TabTitleButton>
+
+            <component
+              :is="slot"
               v-else
-              class="w-10"
             />
           </template>
-        </TabTitleButton>
-
-        <component
-          :is="slot"
-          v-else
-        />
+        </div>
       </template>
-    </div>
 
-    <!-- Flat, the tabs' sections are the stack's own children, so they stack as a page's sections do. -->
-    <template v-if="flat">
-      <TabItem
-        v-for="slot in defaultSlots"
-        :ref="(setTabRef as VNodeRef)"
-        :key="slot.props.name"
-        :name="slot.props.name"
-        :title="slot.props.title"
-        :active="slot.props.name === current"
-        :removable="false"
-        flat
-      >
-        <component :is="slot" />
-      </TabItem>
-    </template>
+      <template #default="{joined}">
+        <!-- Flat, the tabs' sections are the stack's own children, so they stack as a page's sections do. -->
+        <template v-if="flat">
+          <TabItem
+            v-for="slot in defaultSlots"
+            :ref="(setTabRef as VNodeRef)"
+            :key="slot.props.name"
+            :name="slot.props.name"
+            :title="slot.props.title"
+            :active="slot.props.name === current"
+            :removable="false"
+            flat
+          >
+            <component :is="slot" />
+          </TabItem>
+        </template>
 
-    <div
-      v-else-if="defaultSlots.some(slot => (slot.children as Record<string, Component>)?.default)"
-      class="relative h-full transition-[min-height] duration-300"
-      :class="{
-        'surface-section-joined': !side && section,
-        'sm-not:snap-start sm-not:px-(--w-frame-padding,var(--inner-margin))': side,
-      }"
-      :style="[{minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}, sectionHeadStyle]"
-    >
-      <TransitionGroup
-        enter-active-class="transition-[translate,opacity] duration-250 w-full [overflow-anchor:none]"
-        leave-active-class="transition-[translate,opacity] duration-250 w-full absolute top-0 [overflow-anchor:none]"
-        :enter-from-class="lessTransitions || side || hasScrollbar ? 'opacity-0' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]'"
-        :leave-to-class="lessTransitions || side || hasScrollbar ? 'opacity-0 absolute' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]'"
-      >
-        <TabItem
-          v-for="slot in defaultSlots"
-          :ref="(setTabRef as VNodeRef)"
-          :key="slot.props.name"
-          :name="slot.props.name"
-          :title="slot.props.title"
-          :active="slot.props.name === current"
-          :removable="slot.props.removable ?? false"
-          :flat="false"
-          @update:height="!disableMinHeight && updateHeight($event)"
+        <div
+          v-else-if="defaultSlots.some(slot => (slot.children as Record<string, Component>)?.default)"
+          class="relative h-full transition-[min-height] duration-300"
+          :class="{
+            'surface-section-joined': !side && section && !joined,
+            'sm-not:snap-start sm-not:px-(--w-frame-padding,var(--inner-margin))': side,
+          }"
+          :style="{minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
         >
-          <component :is="slot" />
-        </TabItem>
-      </TransitionGroup>
-    </div>
+          <TransitionGroup
+            enter-active-class="transition-[translate,opacity] duration-250 w-full [overflow-anchor:none]"
+            leave-active-class="transition-[translate,opacity] duration-250 w-full absolute top-0 [overflow-anchor:none]"
+            :enter-from-class="lessTransitions || side || hasScrollbar ? 'opacity-0' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]'"
+            :leave-to-class="lessTransitions || side || hasScrollbar ? 'opacity-0 absolute' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]'"
+          >
+            <TabItem
+              v-for="slot in defaultSlots"
+              :ref="(setTabRef as VNodeRef)"
+              :key="slot.props.name"
+              :name="slot.props.name"
+              :title="slot.props.title"
+              :active="slot.props.name === current"
+              :removable="slot.props.removable ?? false"
+              :flat="false"
+              @update:height="!disableMinHeight && updateHeight($event)"
+            >
+              <component :is="slot" />
+            </TabItem>
+          </TransitionGroup>
+        </div>
+
+        <!-- Shared by all tabs, such as one list whose query the tabs change: it stays mounted when the tab changes. -->
+        <div
+          v-if="$slots.content"
+          class="relative"
+          :class="{'surface-section-joined': !flat && !side && section && !joined}"
+        >
+          <slot
+            name="content"
+            :current="current"
+          />
+        </div>
+      </template>
+    </ListPageFrame>
 
     <!-- The stepper's buttons, pinned by the frame, such as a modal's footer. -->
     <OverlayRegionPart
@@ -205,9 +225,9 @@ import WUniformErrorMessage from '@/components/Uniform/WUniformErrorMessage.vue'
 
 import IconClose from '@/assets/icons/IconClose.svg?component'
 
+import ListPageFrame from '@/components/List/components/ListPageFrame.vue'
 import OverlayRegionPart from '@/components/Modal/components/OverlayRegionPart.vue'
 import {wOverlayRegions} from '@/components/Modal/models/overlayRegistry'
-import {useSectionHead} from '@/components/Surface/use/useSectionHead'
 import {wUniformStepperController} from '@/components/Uniform/utils/injection'
 import {useOptionalRoute, useOptionalRouter} from '@/composables/useOptionalRouter'
 import {Notify} from '@/utils/Notify'
@@ -251,16 +271,15 @@ const hasScrollbar = getHasScrollbar()
 const slots = defineSlots<{
   /** WTabsItem elements. Anything else is rendered among the tab buttons. */
   default: () => VNode[]
+  /** Content shared by all tabs, under the open tab's content, such as one list the tabs filter. It stays mounted when the tab changes, and with `section` a page list in it joins the frame as an open tab's list does. Tabs with only this give WTabsItem no content. */
+  content?: (props: {current: string}) => void
 }>()
 
 const containerRef = useTemplateRef('container')
 const buttonContainerRef = useTemplateRef('buttonContainer')
 
-// With `section`, the row of tabs sticks over a page list in the open tab, and the list's header under it.
-const {style: sectionHeadStyle} = useSectionHead(
-  buttonContainerRef,
-  () => props.section === true && !props.side && !props.flat && !props.noHeader,
-)
+// With `section`, a page list in the open tab joins a frame with the row of tabs: the row sticks in its header, over the list's.
+const isListFrame = props.section === true && !props.side && !props.flat && !props.noHeader
 
 const isTabItem = (slot: VNode): slot is VNode<RendererNode, RendererElement, TabsItemProps> & {props: TabsItemProps} => {
   return slot.type instanceof Object && '__name' in slot.type && slot.type.__name === 'WTabsItem'

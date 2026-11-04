@@ -343,6 +343,7 @@ import WInfiniteListWrapper from 'eco-vue-js/dist/components/InfiniteList/WInfin
 | --- | --- | --- | --- |
 | `initIsIntersecting` | `boolean` | — | Whether the top of the content starts in view, before the first scroll is observed. `false` when opening at a later page. |
 | `noHeaderUpdate` | `boolean` | — | Keeps the sticky header out of the app header bar's padding while scrolled. |
+| `inPlace` | `boolean` | — | Renders the header in place over the content: it neither sticks nor pads the app header bar. |
 
 #### Slots
 

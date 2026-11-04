@@ -3,7 +3,7 @@
     ref="infiniteScroll"
     :style="!minHeight && !minHeightOnly ? {minHeight: `calc(var(--w-height-inner) - ${ headerHeight }px)`} : undefined"
     :class="{
-      'list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem) modal:min-h-[50vh] pb-16': !minHeight && !minHeightOnly,
+      'list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem) modal:min-h-[50vh]': !minHeight && !minHeightOnly,
       'min-h-full': minHeight,
       'list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem)': minHeightOnly,
     }"

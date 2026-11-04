@@ -19,10 +19,11 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeUnmount, onMounted, ref, toRef, useTemplateRef, watch} from 'vue'
+import {computed, inject, onBeforeUnmount, onMounted, provide, ref, toRef, useTemplateRef, watch} from 'vue'
 
 import WSection from '@/components/Surface/WSection.vue'
 
+import {wListPageFrame} from '@/components/List/models/injection'
 import {useUniformState} from '@/components/Uniform/utils/injection'
 
 import {useTabItemActiveListener} from '../use/useTabItemActiveListener'
@@ -41,6 +42,11 @@ const emit = defineEmits<{
 }>()
 
 const {hasChanges, hasValue, hasError, validate} = useUniformState()
+
+// In a page list frame (WTabs `section`) only the open tab's list joins it.
+const frame = inject(wListPageFrame, null)
+
+if (frame) provide(wListPageFrame, {...frame, shown: computed(() => props.active && frame.shown.value)})
 
 const {callListeners} = useTabItemActiveListener()
 

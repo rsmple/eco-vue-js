@@ -276,6 +276,7 @@ import WTabs from 'eco-vue-js/dist/components/Tabs/WTabs.vue'
 | Slot | Props | Description |
 | --- | --- | --- |
 | `default` | — | WTabsItem elements. Anything else is rendered among the tab buttons. |
+| `content` | `{ current: string; }` | Content shared by all tabs, under the open tab's content, such as one list the tabs filter. It stays mounted when the tab changes, and with `section` a page list in it joins the frame as an open tab's list does. Tabs with only this give WTabsItem no content. |
 
 <!-- @api-end -->
 
