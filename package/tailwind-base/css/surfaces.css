@@ -838,6 +838,16 @@
     --w-section-paint: color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), transparent);
     --w-band-start: calc(var(--w-left-inner) - var(--w-section-padding));
     --w-band-end: calc(100vw - var(--vw-scroll-bar-width, 0px) - var(--w-right-inner) + var(--w-section-padding));
+    /* The section's fill: for what draws the section's edges as its own border, which the bands would double. */
+    --w-page-fill:
+      linear-gradient(
+        to right,
+        transparent var(--w-band-start),
+        var(--w-section-paint) var(--w-band-start) var(--w-band-end),
+        transparent var(--w-band-end)
+      ),
+      var(--w-canvas-image);
+    /* The fill with the section's side edges, for what has no border of its own. */
     --w-page-backdrop:
       linear-gradient(
         to right,
@@ -847,13 +857,7 @@
         var(--w-line-subtle) calc(var(--w-band-end) - var(--w-section-border)) var(--w-band-end),
         transparent var(--w-band-end)
       ),
-      linear-gradient(
-        to right,
-        transparent var(--w-band-start),
-        var(--w-section-paint) var(--w-band-start) var(--w-band-end),
-        transparent var(--w-band-end)
-      ),
-      var(--w-canvas-image);
+      var(--w-page-fill);
   }
 
   .w-list-page {
@@ -954,6 +958,22 @@
     }
   }
 
+  .w-list-page-frame {
+    /*
+     * Joined to a section head above it, the frame runs on up over the head with its top corners: one shadow and one
+     * top highlight for the whole section, instead of the head's ending at its bottom and the frame's starting there.
+     */
+    --w-frame-head: calc(var(--w-section-head-height, 0px) * var(--w-joined, 0));
+
+    margin-top: calc(var(--w-section-padding) * -1 - var(--w-frame-head));
+    border-start-start-radius: var(--w-section-rounded);
+    border-start-end-radius: var(--w-section-rounded);
+
+    @variant sm-not {
+      border-radius: 0;
+    }
+  }
+
   .w-list-page-surface {
     background-color: var(--w-section-paint);
     border: var(--w-section-border) solid var(--w-line-subtle);
@@ -967,9 +987,12 @@
    * header bar.
    */
   .w-list-page-frame {
-    z-index: calc(21 - var(--w-chrome-float) * 15);
+    /* Over the head it runs up over (`--w-frame-head`), whose shadow it draws. */
+    z-index: calc(21 - var(--w-chrome-float) * 15 + var(--w-joined, 0) * 2);
     pointer-events: none;
     box-shadow: var(--w-section-shadow);
+    /* As wide as the section's edge, so a highlight inside the shadow lies inside the edge, as on a section, not over it. */
+    border: var(--w-section-border) solid transparent;
 
     /*
      * Only the part of the section in view, from the header bar's gap to the screen's bottom gap: its shadow wraps the
@@ -977,10 +1000,10 @@
      */
     @variant sm {
       align-self: start;
-      top: calc(var(--w-header-inner) + var(--w-section-head-height, 0px));
+      top: calc(var(--w-header-inner) + var(--w-section-head-height, 0px) - var(--w-frame-head, 0px));
       height: min(
-        calc(100% + var(--w-section-padding) * 2),
-        calc(100vh - var(--w-header-inner) - var(--w-section-head-height, 0px) - var(--w-chrome-gap))
+        calc(100% + var(--w-section-padding) * 2 + var(--w-frame-head, 0px)),
+        calc(100vh - var(--w-header-inner) - var(--w-section-head-height, 0px) + var(--w-frame-head, 0px) - var(--w-chrome-gap))
       );
     }
   }
@@ -1003,7 +1026,8 @@
 
     position: sticky;
     bottom: 0;
-    z-index: calc(22 - var(--w-chrome-float) * 15);
+    /* Over the frame also where it is raised over a joined head. */
+    z-index: calc(22 - var(--w-chrome-float) * 15 + var(--w-joined, 0) * 2);
     height: var(--w-list-end-height);
     margin-bottom: calc(var(--w-list-end-height) * -1);
     pointer-events: none;
@@ -1068,7 +1092,7 @@
     border-end-start-radius: var(--w-section-rounded);
     border-end-end-radius: var(--w-section-rounded);
     background-color: var(--w-canvas);
-    background-image: var(--w-page-backdrop);
+    background-image: var(--w-page-fill);
     background-attachment: fixed;
   }
 
@@ -1339,7 +1363,7 @@
     border-start-start-radius: calc(var(--w-section-rounded) * (1 - var(--w-joined, 0)));
     border-start-end-radius: calc(var(--w-section-rounded) * (1 - var(--w-joined, 0)));
     background-color: var(--w-canvas);
-    background-image: var(--w-page-backdrop);
+    background-image: var(--w-page-fill);
     background-attachment: fixed;
 
     @variant sm-not {
@@ -1357,9 +1381,11 @@
     top: var(--w-header-inner);
     z-index: calc(22 - var(--w-chrome-float) * 15);
     background-color: var(--w-canvas);
-    background-image: var(--w-page-backdrop);
+    background-image: var(--w-page-fill);
     background-attachment: fixed;
     backdrop-filter: none;
+    /* The list's frame runs on up over it and casts the section's shadow. */
+    box-shadow: none;
   }
 
   .w-list-page-repaint .w-infinite-list-header-stuck .w-infinite-list-header-edge::before,
