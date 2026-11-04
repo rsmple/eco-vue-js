@@ -568,7 +568,7 @@
     );
     box-shadow:
       var(--w-chrome-shadow),
-      0 calc(var(--w-chrome-gap) * -1) 0 var(--w-chrome-gap) var(--w-chrome-ring);
+      0 calc(var(--w-chrome-gap) * -0.5) 0 calc(var(--w-chrome-gap) * 0.5) calc(var(--w-chrome-ring) * 0.5);
 
     /* On phones it spans the screen, like a section: only the edge toward the page is left. */
     @variant sm-not {
