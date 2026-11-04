@@ -29,7 +29,7 @@ The `footer` slot is the nav's bottom, such as a back button or the app's versio
 
 `WNavItem` is a router link with an icon and a title. Both default to the route's `meta.icon` and `meta.titleShort` (or `meta.title`), so an item is often just `<WNavItem :to="{name: RouteName.PROJECTS}" />`. It is active while the current route has the same name; `queryFields` lists the query params that must match too, for items that open the same route with different filters. `count` shows a number in brackets after the title and `counter` a badge, with `skeleton` while they load.
 
-`WNavItemExpand` groups items under a title. The items show under it while one of them is active; otherwise hovering the group opens them in a menu to the right. With `to`, the group is a link of its own. `even` keeps the items always shown and not indented, for a nav inside a page.
+`WNavItemExpand` groups items under a title. The items show under it while one of them is active; otherwise hovering the group opens them in a menu to the right. One group's menu is open at a time, so moving down the nav switches it. The menu lines up with the group by its top, or by its bottom low on the screen, and shifts to stay on screen when it is taller than the room there — it scrolls once taller than the screen. With `to`, the group is a link of its own. `even` keeps the items always shown and not indented, for a nav inside a page.
 
 `WNavItemTransition` wraps a list of items so that the ones added or removed with `v-if` — such as an item for the current record — expand and collapse.
 

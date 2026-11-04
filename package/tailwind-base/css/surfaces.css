@@ -780,8 +780,37 @@
     top: auto;
     left: auto;
     height: auto;
-    max-height: none;
+    max-height: calc(100vh - 1.5rem);
     border-radius: var(--w-nav-dropdown-rounded);
+  }
+
+  /*
+   * A group's dropdown lines up with the item by its top, or by its bottom when it opens upward. Where that runs past
+   * the screen, it shifts to stay on it and sticks to the edge, and scrolls once taller than the screen. The space the
+   * dropdown would size it to is not kept, so the shift has room.
+   */
+  .w-nav-group-dropdown {
+    max-height: none !important;
+  }
+
+  .w-nav-group-dropdown-content {
+    --w-nav-group-edge: 0.75rem;
+
+    transform: translateY(
+      max(
+        var(--w-nav-group-edge) - var(--dropdown-y, 0px),
+        min(0px, 100vh - var(--w-nav-group-edge) - var(--dropdown-y, 0px) - 100%)
+      )
+    );
+
+    .dropdown-top & {
+      transform: translateY(
+        min(
+          100vh - var(--w-nav-group-edge) - var(--dropdown-y, 0px),
+          max(0px, var(--w-nav-group-edge) - var(--dropdown-y, 0px) + 100%)
+        )
+      );
+    }
   }
 
   /* The icon starts where the items' do: past their inset and the item's own padding. */
