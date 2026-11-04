@@ -289,12 +289,20 @@ export const getFieldStylesSticky = <Fields extends ListFields<any, any>>(fields
   return styles
 }
 
+// Every row renders the span of each nested field. The fields are never changed in place: filtering and sorting make
+// new arrays, so a cached count stays right.
+const columnCountCache = new WeakMap<object, number>()
+
 /** Number of table columns the fields take, counting the columns of nested fields. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getFieldColumnCount = <Fields extends ListFields<any, any>>(fields: Fields): number => {
-  let count = 0
+  let count = columnCountCache.get(fields)
 
-  forEachField(fields, () => count++)
+  if (count === undefined) {
+    count = 0
+    forEachField(fields, () => count!++)
+    columnCountCache.set(fields, count)
+  }
 
   return count
 }

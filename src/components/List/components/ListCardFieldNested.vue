@@ -19,46 +19,38 @@
           :class="[field.meta.cssClassArray, {'grid grid-cols-subgrid': !card}]"
           :style="card ? undefined : {gridColumn: `span ${ getFieldColumnCount(field.meta.fields) }`}"
         >
-          <ListCardFieldNestedArrayItems
-            :item="item"
-            :skeleton="skeleton"
-            :meta="field.meta"
-          >
-            <template #default="{items}">
-              <ListCardFieldNestedItem :items="items">
-                <template #default="{inner, index, last, first}">
-                  <!-- In the table the item is a line of the table, and what it adds besides the fields, like a separator, spans the line. -->
-                  <component
-                    :is="field.meta.componentItem ?? WEmptyComponent"
-                    v-bind="field.meta.componentItem ? {item, skeleton, card, index, last, first} : undefined"
-                    :class="field.meta.componentItem && !card ? 'col-span-full grid grid-cols-subgrid *:col-span-full' : undefined"
+          <ListCardFieldNestedItem :items="getArrayItems(item, skeleton, field.meta)">
+            <template #default="{inner, index, last, first}">
+              <!-- In the table the item is a line of the table, and what it adds besides the fields, like a separator, spans the line. -->
+              <component
+                :is="field.meta.componentItem ?? WEmptyComponent"
+                v-bind="field.meta.componentItem ? {item, skeleton, card, index, last, first} : undefined"
+                :class="field.meta.componentItem && !card ? 'col-span-full grid grid-cols-subgrid *:col-span-full' : undefined"
+              >
+                <div
+                  :class="[field.meta.cssClass, card ? 'flex' : 'col-span-full grid grid-cols-subgrid']"
+                >
+                  <ListCardFieldNested
+                    :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
+                    :column-data-map="columnDataMap"
+                    :item="inner"
+                    :skeleton="skeleton"
+                    :card="card"
+                    :readonly="readonly"
+                    :uniform-scope="uniformScope"
+                    :query-params="queryParams"
+                    :results="results"
+                    :intersecting="intersecting"
+                    nested
                   >
-                    <div
-                      :class="[field.meta.cssClass, card ? 'flex' : 'col-span-full grid grid-cols-subgrid']"
-                    >
-                      <ListCardFieldNested
-                        :fields="(field.meta.fields as ListFields<Data, QueryParams>)"
-                        :column-data-map="columnDataMap"
-                        :item="inner"
-                        :skeleton="skeleton"
-                        :card="card"
-                        :readonly="readonly"
-                        :uniform-scope="uniformScope"
-                        :query-params="queryParams"
-                        :results="results"
-                        :intersecting="intersecting"
-                        nested
-                      >
-                        <template #default="defaultScope">
-                          <slot v-bind="defaultScope" />
-                        </template>
-                      </ListCardFieldNested>
-                    </div>
-                  </component>
-                </template>
-              </ListCardFieldNestedItem>
+                    <template #default="defaultScope">
+                      <slot v-bind="defaultScope" />
+                    </template>
+                  </ListCardFieldNested>
+                </div>
+              </component>
             </template>
-          </ListCardFieldNestedArrayItems>
+          </ListCardFieldNestedItem>
         </component>
       </template>
 
@@ -97,13 +89,19 @@ import type {UniformScope} from '@/components/Uniform/types'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
-import ListCardFieldNestedArrayItems from './ListCardFieldNestedArrayItems.vue'
 import ListCardFieldNestedItem from './ListCardFieldNestedItem.vue'
 
 import {isField} from '../models/utils'
 import {getFieldColumnCount, getFirstFieldLabel} from '../use/useListConfig'
 
 const config = {width: null, visible: true, order: 0, sticky: false}
+
+// The inner items of an array field. While loading, the row's placeholder stands for one item.
+const getArrayItems = <Inner extends {id: number | string}>(item: Data, skeleton: boolean, meta: {keyArray: keyof Data} | {getterArray: (data: Data) => Inner[]}): Inner[] => {
+  if (skeleton) return [item] as unknown as Inner[]
+  if ('keyArray' in meta) return item[meta.keyArray] as Inner[]
+  return meta.getterArray(item)
+}
 
 defineProps<{
   fields: ListFields<Data, QueryParams>

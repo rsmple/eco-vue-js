@@ -159,6 +159,7 @@
             :expansion="expansion"
             :menu="menu"
             :to-markdown="toMarkdown"
+            :has-menu="hasMenu"
 
             :card="isGrid"
             :mobile="isMobile"

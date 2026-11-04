@@ -8,31 +8,27 @@
   >
     <template #default="innerScope">
       <div
-        v-bind="allowSelect ? {'onMouseover': () => $emit('hover:selected', position)} : undefined"
         ref="container"
         :role="skeleton ? undefined : 'listitem'"
-        class="w-list-item relative"
+        class="w-list-item group/row relative"
         :class="{
           [cardWrapperClass ?? '']: true,
           'w-ripple-trigger-list': isActionShown,
+          'w-list-item-highlighted': allowSelectHover || isAccented,
+          'w-list-item-accented': isAccented,
           'sm-not:even:bg-(--w-list-stripe,var(--w-surface-subtle)) grid grid-cols-1': card,
           'col-span-full grid grid-cols-subgrid': !card,
           '-mb-px': !card && isOpen,
           'w-hover-checked': allowSelectHover,
         }"
+        @mouseover="hoverSelected"
         @contextmenu="toggleMenu"
       >
-        <Transition
-          enter-active-class="transition-transform duration-200"
-          leave-active-class="transition-transform duration-200"
-          enter-from-class="-translate-x-2"
-          leave-to-class="-translate-x-2"
-        >
-          <div
-            v-if="mobile && selected"
-            class="tone-primary bg-tone-fill @sm:hidden absolute left-0 top-0 h-full w-2"
-          />
-        </Transition>
+        <div
+          v-if="mobile"
+          class="tone-primary bg-tone-fill @sm:hidden pointer-events-none absolute left-0 top-0 h-full w-2 transition-[translate,opacity] duration-200"
+          :class="{'-translate-x-2 opacity-0': !selected}"
+        />
 
         <div
           v-if="!card"
@@ -52,7 +48,7 @@
               'rounded-bl-[unset]!': isOpen,
               'border-b-transparent': hasBorder && isOpen,
               'pl-px': !hasBorder,
-              ...beforeClass,
+              [RIPPLE_CLASS]: isActionShown,
             }"
           >
             <!-- A loading row draws the box alone: the checkbox would only be disabled, and is the larger part of the row. -->
@@ -139,39 +135,58 @@
             :results="results"
             :intersecting="intersecting"
           >
-            <template #default="defaultScope">
-              <ListCardFieldItem
-                :field="defaultScope.field"
-                :item="defaultScope.item"
-                :nested="defaultScope.nested"
-                :column="defaultScope.column"
-                :config="fieldConfigMap[defaultScope.field.meta.label]!"
-                :readonly="readonly || (readonlyGetter?.(defaultScope.item as Data) ?? false)"
+            <template #default="{field, item: fieldItem, nested, column}">
+              <div
+                v-if="skeleton && !field.meta.customSkeleton"
+                class="list:pr-3 list:first-not:pl-3 grid grid-cols-1"
+                :class="[field.meta.cssClass, column.baseClass]"
+                :style="card && nested ? undefined : column.style"
+              >
+                <div
+                  class="tone-primary bg-tone-soft w-skeleton w-skeleton-opacity-50 dark:w-skeleton-opacity-5 before:animate-ticker w-option-has-bg"
+                  :style="{'--skeleton-width-internal': getSkeletonWidth(field.meta.label, position) + '%'}"
+                />
+              </div>
+
+              <component
+                :is="field.default"
+                v-else
+                :item="fieldItem"
+                :readonly="nested ? readonly || (readonlyGetter?.(fieldItem as Data) ?? false) : isReadonly"
                 :skeleton="skeleton"
                 :card="card"
+                :config="fieldConfigMap[field.meta.label]!"
                 :uniform-scope="uniformField !== undefined ? innerScope : undefined"
                 :query-params="queryParams"
                 :results="results"
                 :intersecting="intersecting"
-                :position="position"
-                :before-class="defaultScope.column.sticky ? beforeClass : undefined"
+                :class="[field.meta.cssClass, column.baseClass, column.sticky && isActionShown ? RIPPLE_CLASS : undefined]"
+                :style="card && nested ? undefined : column.style"
                 @update:item="setter"
-                @delete:item="setter(); refetch()"
+                @delete:item="deleteItem"
               />
             </template>
           </ListCardFieldNested>
 
-          <ListCardAction
+          <!-- `onClick` as a prop: it stays `undefined` for a link, so a row re-rendering does not re-render the link. -->
+          <!-- eslint-disable vue/attribute-hyphenation -->
+          <component
+            :is="action === 'link' ? WRouterLinkRaw : action === 'none' ? 'div' : 'button'"
             v-if="isActionShown"
-            :card="card"
-            v-bind="getActionProps(uniformField !== undefined ? innerScope : undefined)"
+            :aria-label="ACTION_LABEL[action]"
+            :aria-expanded="action === 'open' ? isOpen : undefined"
+            :to="action === 'link' ? to : undefined"
+            class="absolute inset-0 cursor-pointer select-none"
             :class="{
+              [RIPPLE_CLASS]: true,
+              'sm:w-ripple-rounded-(--w-list-rounded,unset) sm:rounded-(--w-list-rounded,unset)': card,
               'z-[-1]': action !== 'select',
-              'tone-primary before:text-tone': isHighlighted,
-              'before:opacity-10': isAccented,
             }"
-            :opacity-class="isHighlighted ? 'w-ripple-opacity-15' : undefined"
+            :onClick="action === 'action'
+              ? () => $emit('click:action', {item, setter, scope: uniformField !== undefined ? innerScope : undefined})
+              : action === 'select' || action === 'open' ? onAction : undefined"
           />
+          <!-- eslint-enable vue/attribute-hyphenation -->
 
           <WButtonMore
             v-if="card && hasMenu && !skeleton"
@@ -204,12 +219,9 @@
               :readonly="isReadonly"
               :uniform-scope="uniformField !== undefined ? innerScope : undefined"
               :update-item="setter"
-              :delete-item="() => {
-                setter()
-                refetch()
-              }"
+              :delete-item="deleteItem"
               @update:item="setter"
-              @delete:item="setter(); refetch()"
+              @delete:item="deleteItem"
             />
           </WButtonMore>
         </div>
@@ -232,7 +244,7 @@
               'tone-primary border-tone-line': hasBorder && selected,
               'rounded-br-[unset]!': isOpen,
               'border-b-transparent': hasBorder && isOpen,
-              ...beforeClass,
+              [RIPPLE_CLASS]: isActionShown,
             }"
           >
             <WButtonMore
@@ -269,12 +281,9 @@
                 :readonly="isReadonly"
                 :uniform-scope="uniformField !== undefined ? innerScope : undefined"
                 :update-item="setter"
-                :delete-item="() => {
-                  setter()
-                  refetch()
-                }"
+                :delete-item="deleteItem"
                 @update:item="setter"
-                @delete:item="setter(); refetch()"
+                @delete:item="deleteItem"
               />
             </WButtonMore>
           </div>
@@ -302,7 +311,7 @@
           :results="results"
           :intersecting="intersecting"
           @update:item="setter"
-          @delete:item="setter(); refetch()"
+          @delete:item="deleteItem"
         />
       </div>
     </template>
@@ -327,13 +336,24 @@ import IconTo from '@/assets/icons/IconTo.svg?component'
 
 import {createPointAnchor} from '@/utils/Overlay'
 
-import ListCardAction from './ListCardAction.vue'
-import ListCardFieldItem from './ListCardFieldItem.vue'
 import ListCardFieldNested from './ListCardFieldNested.vue'
 import ListMenuMarkdown from './ListMenuMarkdown.vue'
 
 import {getSkeletonWidth} from '../models/utils'
 import {AREA_MORE, AREA_SELECT} from '../types'
+
+const ACTION_LABEL: Record<ListActionMode, string | undefined> = {
+  select: 'Select row',
+  action: 'Open row',
+  link: 'Open row',
+  open: 'Expand row',
+  none: undefined,
+}
+
+// The ripple of the row's action, and of the sticky cells and edges that cover it. The same classes whatever the row's
+// state: the state is on the row (`w-list-item-highlighted`, `w-list-item-accented`), so a selection restyles the cells
+// without re-rendering them.
+const RIPPLE_CLASS = 'w-ripple-list w-ripple-hover-list w-ripple-opacity-5 group-[.w-list-item-highlighted]/row:tone-primary group-[.w-list-item-highlighted]/row:before:text-tone group-[.w-list-item-highlighted]/row:w-ripple-opacity-15 group-[.w-list-item-accented]/row:before:opacity-10'
 
 const props = defineProps<{
   item: Data
@@ -359,6 +379,7 @@ const props = defineProps<{
   expansion: ExpansionComponent<Data, QueryParams> | undefined
   menu: MenuComponent<Data>[] | undefined
   toMarkdown: ((data: Data, index: number) => string) | undefined
+  hasMenu: boolean
 
   card: boolean
   mobile: boolean
@@ -402,12 +423,8 @@ const isReadonly = computed(() => props.readonly || (props.readonlyGetter?.(prop
 
 const to = computed(() => props.skeleton ? undefined : props.cardTo?.(props.item))
 
-const hasMenu = computed(() => props.menu !== undefined || props.toMarkdown !== undefined)
-
 // Stays on while the menu, or a confirm opened from it, is open.
 const isAccented = computed(() => props.selected || moreRef.value?.isActive === true)
-
-const isHighlighted = computed(() => props.allowSelectHover || isAccented.value)
 
 const action = computed<ListActionMode>(() => {
   if (props.actionMode !== 'link' || to.value !== undefined) return props.actionMode
@@ -417,26 +434,21 @@ const action = computed<ListActionMode>(() => {
 
 const isActionShown = computed<boolean>(() => !props.skeleton && (action.value !== 'none' || isAccented.value))
 
-const getActionProps = (scope: UniformScope<Data> | undefined) => {
-  switch (action.value) {
-    case 'select': return {tag: 'button' as const, 'aria-label': 'Select row', onClick: () => emit('toggle:selected', props.value, props.position)}
-    case 'action': return {tag: 'button' as const, 'aria-label': 'Open row', onClick: () => emit('click:action', {item: props.item, setter: props.setter, scope})}
-    case 'link': return {tag: WRouterLinkRaw, 'aria-label': 'Open row', props: {to: to.value}}
-    case 'open': return {tag: 'button' as const, 'aria-label': 'Expand row', 'aria-expanded': isOpen.value, onClick: toggle}
-    default: return {tag: 'div' as const}
-  }
+// Stable, so the row re-rendering does not re-render the action or the menu items. `action` mode needs the row's
+// form scope, so its handler is bound in the template.
+const onAction = () => {
+  if (action.value === 'select') emit('toggle:selected', props.value, props.position)
+  else if (action.value === 'open') toggle()
 }
 
-const beforeClass = computed<Record<string, boolean | undefined>>(() => {
-  if (!isActionShown.value) return {}
+const deleteItem = () => {
+  props.setter()
+  props.refetch()
+}
 
-  return {
-    'w-ripple-list w-ripple-hover-list': true,
-    'w-ripple-opacity-5': !isHighlighted.value,
-    'tone-primary before:text-tone w-ripple-opacity-15': isHighlighted.value,
-    'before:opacity-10': isAccented.value,
-  }
-})
+const hoverSelected = () => {
+  if (props.allowSelect) emit('hover:selected', props.position)
+}
 
 const toggleMenu = (event: MouseEvent) => {
   if (props.skeleton || props.disableMore || !containerRef.value || !moreRef.value || event.ctrlKey) return
