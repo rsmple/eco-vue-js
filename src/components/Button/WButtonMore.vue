@@ -40,6 +40,12 @@
         :is="icon ?? IconMore"
         class="square-[1.125em]"
       />
+
+      <span
+        ref="circle"
+        aria-hidden="true"
+        class="pointer-events-none absolute inset-x-0 inset-y-[-60%]"
+      />
     </div>
   </button>
 </template>
@@ -85,6 +91,7 @@ const slots = useSlots()
 const renderSlot = markRaw(() => slots.default?.())
 
 const buttonRef = useTemplateRef('button')
+const circleRef = useTemplateRef('circle')
 
 const overlay = useOverlay()
 
@@ -101,7 +108,7 @@ const isActive = computed(() => anchorOpened.value !== null && hasAnchorLayer(an
 /** Opens the menu at `anchor` — such as a point made with `createPointAnchor` — instead of the `anchor` prop or the button. */
 const open = (anchor?: OverlayAnchor): void => {
   const target = anchor ?? props.anchor
-  const opened = target ?? buttonRef.value
+  const opened = target ?? circleRef.value ?? buttonRef.value
 
   if (!opened) return
 
