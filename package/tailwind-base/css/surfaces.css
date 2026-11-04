@@ -297,11 +297,12 @@
  * keeps the view's width instead of scrolling away with it. On every box on the way to the list, so it works through
  * the wrappers of any page. Sections and `w-page-bleed` rows set their own, reaching into the gutter; a page's own
  * `position` class wins. Only while there is such a list, a table (`w-list`): a list of cards wraps and never scrolls
- * sideways, and every sticky box is a layer of its own.
+ * sideways, and every sticky box is a layer of its own. The list marks the boxes on its way up to the page or the
+ * modal (`data-w-page-path`, `data-w-modal-path`): a `:has()` here would restyle the whole page on every page of rows.
  */
 @layer components {
-  :where(.w-page, .w-page *):has(.w-list-page-table) > :where(:not(.w-list-page, :has(.w-list-page-table))),
-  :where(.w-modal-wrapper, .w-modal-wrapper :not(.w-list *)):has(.w-list) > :where(:not(.w-list, :has(.w-list))) {
+  :where([data-w-page-path]) > :where(:not([data-w-page-path], .w-list-page)),
+  :where([data-w-modal-path]) > :where(:not([data-w-modal-path], .w-list)) {
     @variant sm {
       position: sticky;
       left: var(--w-left-inner);

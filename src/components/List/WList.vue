@@ -262,6 +262,7 @@ import {wListPageFrame, wListPageFrameHeader} from './models/injection'
 import {isField} from './models/utils'
 import {AREA_MORE, AREA_SELECT} from './types'
 import {filterFields, forEachField, getFieldStylesSticky, getFieldTracks, sortFieldsDeep, useListConfig} from './use/useListConfig'
+import {useStickyPath} from './use/useStickyPath'
 
 defineOptions({inheritAttrs: false})
 
@@ -421,7 +422,8 @@ const {isMobile} = useIsMobile()
 // Scrolls with the page, not inside a modal, a scrolling element or a section: the list paints its own section surface.
 // Also with `minHeight`, such as a list under tabs: it is still the page's section, only without the full-screen height.
 const isSectionNested = inject(wSectionNested, false)
-const isPage = !inject(wIsModal, false) && inject(wScrollingElement, null) === null && !isSectionNested
+const isModal = inject(wIsModal, false)
+const isPage = !isModal && inject(wScrollingElement, null) === null && !isSectionNested
 
 // In a page list frame, such as WTabs `section`, the list joins the frame while shown: the frame draws the section and
 // holds the list's header, the list renders its rows. Lists in its rows are not on the page.
@@ -491,6 +493,14 @@ const {
   () => props.defaultMode,
   props.noHeaderSettings,
 )
+
+// The content beside a table on the page, or beside a list in a modal, sticks while the list scrolls sideways.
+useStickyPath(rootRef, () => {
+  if (isGrid.value) return null
+  if (isPageOwn) return {attribute: 'data-w-page-path', end: '.w-page'}
+  if (isModal) return {attribute: 'data-w-modal-path', end: '.w-modal-wrapper', outside: '.w-list'}
+  return null
+})
 
 const owner = Symbol('list')
 

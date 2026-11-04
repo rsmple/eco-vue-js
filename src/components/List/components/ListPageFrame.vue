@@ -10,6 +10,7 @@
 
   <div
     v-else
+    ref="root"
     :class="{
       'w-list-page': isJoined,
       'w-list-page-table': isJoined && isTable,
@@ -52,6 +53,7 @@ import ListPageFrameScope from './ListPageFrameScope.vue'
 import ListPageSurface from './ListPageSurface.vue'
 
 import {wListPageFrame, wListPageFrameHeader} from '../models/injection'
+import {useStickyPath} from '../use/useStickyPath'
 
 /**
  * A page list's frame around content that may hold one, such as the tabs of WTabs `section`, with a head over it. While
@@ -65,12 +67,16 @@ defineProps<{
 }>()
 
 const targetRef = useTemplateRef('target')
+const rootRef = useTemplateRef('root')
 
 const lists = reactive(new Map<symbol, boolean>())
 
 const isJoined = computed(() => lists.size > 0)
 const isTable = computed(() => [...lists.values()].some(Boolean))
 const isRepaint = ref(false)
+
+// The content beside the table on the page sticks while it scrolls sideways.
+useStickyPath(rootRef, () => isJoined.value && isTable.value ? {attribute: 'data-w-page-path', end: '.w-page'} : null)
 
 const frame = {
   target: computed(() => targetRef.value),
