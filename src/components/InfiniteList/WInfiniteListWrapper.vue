@@ -20,8 +20,8 @@
       class="print:hidden"
     />
 
-    <InfiniteListHeaderHeight
-      :is-intersecting="isIntersecting"
+    <div
+      ref="header"
       class="print:hidden"
       :class="inPlace ? undefined : {
         'sticky': true,
@@ -34,55 +34,31 @@
       }"
       :style="inPlace ? undefined : {zIndex: isIntersecting ? BASE_ZINDEX_DROPDOWN : BASE_ZINDEX_LIST_HEADER}"
     >
-      <template
-        v-if="isContained || noHeaderUpdate"
-        #header="scope"
-      >
-        <slot
-          name="header"
-          v-bind="scope"
-        />
-      </template>
+      <div
+        v-if="!inPlace && !isContained && !noHeaderUpdate"
+        class="w-infinite-list-header-edge"
+        :style="{'--w-list-header-height': headerHeight + 'px'}"
+      />
 
-      <template
-        v-else
-        #header="scope"
-      >
-        <div
-          v-if="!inPlace"
-          class="w-infinite-list-header-edge"
-          :style="{'--w-list-header-height': scope.headerHeight + 'px'}"
-        />
+      <slot
+        name="header"
+        v-bind="{headerTop, headerHeight, stickyTop, updateHeader}"
+      />
+    </div>
 
-        <InfiniteListHeaderPadding
-          :is-intersecting="inPlace || isIntersecting"
-          :header-height="scope.headerHeight + getPaddingOffset()"
-        >
-          <slot
-            name="header"
-            v-bind="scope"
-          />
-        </InfiniteListHeaderPadding>
-      </template>
-
-      <template #default="scope">
-        <slot v-bind="scope" />
-      </template>
-    </InfiniteListHeaderHeight>
+    <slot v-bind="{headerTop, headerHeight, stickyTop, updateHeader}" />
   </template>
 </template>
 
 <script lang="ts" setup>
 import type {InfiniteListHeaderScope} from './types'
 
-import {type VNode, inject, onBeforeUnmount, onMounted, provide, ref, useTemplateRef} from 'vue'
+import {type VNode, inject, onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch} from 'vue'
 
 import {wListPageFrameHeader} from '@/components/List/models/injection'
-import {wIsModal} from '@/components/Modal/models/injection'
+import {wIsModal, wModalHeaderHeight} from '@/components/Modal/models/injection'
 import {BASE_ZINDEX_DROPDOWN, BASE_ZINDEX_LIST_HEADER, getIsClientSide} from '@/utils/utils'
 
-import InfiniteListHeaderHeight from './components/InfiniteListHeaderHeight.vue'
-import InfiniteListHeaderPadding from './components/InfiniteListHeaderPadding.vue'
 import {wScrollingElement} from './models/injection'
 
 import {useHeader} from '../HeaderBar/use/useHeader'
@@ -99,21 +75,89 @@ const props = defineProps<{
 }>()
 
 const isModal = inject(wIsModal, false)
+const modalHeaderHeight = inject(wModalHeaderHeight, undefined)
+const scrollingElement = inject(wScrollingElement, null)
 
 // Inside its own scroll container (a modal, or any WInfiniteListScrollingElement) the header sticks to that
 // container: it has its own background and leaves the page header alone. Outside a modal nothing sits above it,
 // so it keeps its own gap from the container's top edge: `--w-list-contained-top`, for a container whose padding it
 // should match.
-const isContained = isModal || inject(wScrollingElement, null) !== null
+const isContained = isModal || scrollingElement !== null
 
 const joined = isContained ? null : inject(wListPageFrameHeader, null)
 
 // A list in the content is not the one joined to the frame.
 provide(wListPageFrameHeader, null)
 
+const {headerHeight: headerHeightLayout, updateHeaderPadding} = useHeader()
+
+const indicatorRef = useTemplateRef('indicator')
+const headerRef = useTemplateRef('header')
+
+const headerHeight = ref(0)
+const headerTop = ref(0)
+const stickyTop = ref(0)
+
 // null until the observer reports, so the header padding is not applied before the real position is known
 const isIntersecting = ref<boolean | null>(props.initIsIntersecting ?? null)
-const indicatorRef = useTemplateRef('indicator')
+
+/** The header's sticky top on the page, which counts the gaps a theme keeps above it, not just the header bar. */
+const getPageStickyTop = (): number => {
+  const top = headerRef.value ? parseFloat(getComputedStyle(headerRef.value).top) : NaN
+
+  return Number.isNaN(top) ? headerHeightLayout.value : top
+}
+
+// What the header sticks under: the modal's title bar, nothing in another scroll container, or on the page its sticky top.
+const getTopOffset = (): number => {
+  if (modalHeaderHeight) return modalHeaderHeight.value
+  if (scrollingElement) return 0
+
+  return getPageStickyTop()
+}
+
+const updateHeaderTop = () => {
+  if (!headerRef.value) return
+
+  stickyTop.value = getTopOffset()
+
+  const rect = headerRef.value.getBoundingClientRect()
+  headerTop.value = rect.top + (scrollingElement?.value?.scrollTop ?? document.scrollingElement?.scrollTop ?? 0) - stickyTop.value
+}
+
+const updateHeader = () => {
+  if (!headerRef.value) return
+
+  headerHeight.value = headerRef.value.getBoundingClientRect().height
+  updateHeaderTop()
+}
+
+// In another scroll container the page header has no part in where the header sticks.
+watch(() => modalHeaderHeight?.value ?? (scrollingElement ? 0 : headerHeightLayout.value), updateHeaderTop)
+
+// The header bar grows behind the stuck header by its height, and outside a page list by the gap above it too: a page
+// list's stuck header covers the gap itself.
+const stickyGap = ref(0)
+
+const isPadding = () => !joined && !isContained && !props.noHeaderUpdate
+
+const updatePadding = () => {
+  if (!isPadding()) return
+
+  const intersecting = props.inPlace || isIntersecting.value
+  if (intersecting === null) return
+
+  const offset = indicatorRef.value?.closest('.w-list-page') ? 0 : stickyGap.value
+  const height = headerHeight.value + offset
+
+  updateHeaderPadding(!intersecting && height ? height : 0)
+}
+
+watch(() => [props.inPlace, isIntersecting.value, headerHeight.value, stickyGap.value], updatePadding)
+
+watch(() => props.noHeaderUpdate, value => {
+  if (value && !joined && !isContained) updateHeaderPadding(0)
+})
 
 const observerCb = (entries: IntersectionObserverEntry[]) => {
   isIntersecting.value = entries.some(entry => {
@@ -123,56 +167,60 @@ const observerCb = (entries: IntersectionObserverEntry[]) => {
   })
 }
 
-let observer: IntersectionObserver | null = null
-
-let observerTop: number | null = null
-
-const {headerHeight} = useHeader()
-
-// Where the header sticks: the gap and padding a theme keeps above it count, not just the header bar.
-const getStickyTop = (): number => {
-  const header = isContained ? null : indicatorRef.value?.nextElementSibling
-  const top = header ? parseFloat(getComputedStyle(header).top) : NaN
-
-  return Number.isNaN(top) ? headerHeight.value : top
-}
-
-// The header bar grows behind the stuck header by its height, and outside a page list by the gap above it too: a page
-// list's stuck header covers the gap itself.
-const stickyGap = ref(0)
-
-const getPaddingOffset = (): number => indicatorRef.value?.closest('.w-list-page') ? 0 : stickyGap.value
+let intersectionObserver: IntersectionObserver | null = null
+let intersectionObserverTop: number | null = null
 
 const observe = () => {
   if (!indicatorRef.value) return
 
-  const top = getStickyTop()
-  stickyGap.value = isContained ? 0 : Math.max(0, top - headerHeight.value)
-  if (observer && top === observerTop) return
+  const top = isContained ? headerHeightLayout.value : getPageStickyTop()
+  stickyGap.value = isContained ? 0 : Math.max(0, top - headerHeightLayout.value)
+  if (intersectionObserver && top === intersectionObserverTop) return
 
-  observer?.disconnect()
-  observerTop = top
+  intersectionObserver?.disconnect()
+  intersectionObserverTop = top
 
   // Reaches far below the screen: a jump from below it to past the top is still a change the observer reports.
-  observer = new IntersectionObserver(observerCb, {
+  intersectionObserver = new IntersectionObserver(observerCb, {
     root: null,
     rootMargin: `-${ top }px 100% 100000px 0px`,
     threshold: 1.0,
   })
 
-  observer.observe(indicatorRef.value)
+  intersectionObserver.observe(indicatorRef.value)
 }
 
+// The sticky top changes with the screen size, such as a gap that is smaller on phones.
+const onResize = () => {
+  updateHeaderTop()
+  observe()
+}
+
+let resizeObserver: ResizeObserver | null = null
+
 onMounted(() => {
-  if (!getIsClientSide() || joined) return
+  if (!getIsClientSide() || joined || !headerRef.value) return
+
+  resizeObserver = new ResizeObserver(entries => {
+    const entry = entries[0]
+    if (!entry) return
+
+    headerHeight.value = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height
+    updateHeaderTop()
+  })
+
+  resizeObserver.observe(headerRef.value)
 
   observe()
-  window.addEventListener('resize', observe)
+  window.addEventListener('resize', onResize)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', observe)
-  observer?.disconnect()
+  window.removeEventListener('resize', onResize)
+  resizeObserver?.disconnect()
+  intersectionObserver?.disconnect()
+
+  if (isPadding()) updateHeaderPadding(0)
 })
 
 defineSlots<{

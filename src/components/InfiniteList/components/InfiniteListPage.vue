@@ -24,51 +24,38 @@
     </slot>
   </div>
 
-  <component
-    :is="transition ? TransitionGroup : WEmptyComponent"
-    v-else-if="page && slotList.length !== 0"
-    v-bind="transition ? {
-      'enter-active-class': 'overflow-hidden opacity-0',
-      'enter-from-class': 'grid-rows-[0fr]',
-      'enter-to-class': 'grid-rows-[1fr]',
-      'leave-active-class': 'overflow-hidden opacity-0',
-      'leave-from-class': 'grid-rows-[1fr]',
-      'leave-to-class': 'grid-rows-[0fr]',
-      css: !resetting,
-    } : undefined"
+  <TransitionGroup
+    v-else-if="page && slotList.length !== 0 && transition"
+    enter-active-class="overflow-hidden opacity-0"
+    enter-from-class="grid-rows-[0fr]"
+    enter-to-class="grid-rows-[1fr]"
+    leave-active-class="overflow-hidden opacity-0"
+    leave-from-class="grid-rows-[1fr]"
+    leave-to-class="grid-rows-[0fr]"
+    :css="!resetting"
   >
-    <template
+    <div
       v-for="(slot, slotIndex) in slotList"
       :key="slot.key"
+      class="grid w-full transition-[grid-template-rows] duration-300"
     >
-      <component
-        :is="transition ? 'div' : WEmptyComponent"
-        v-bind="transition ? {class: 'w-full grid transition-[grid-template-rows] duration-300'} : undefined"
-      >
-        <component
-          :is="transition ? 'div' : WEmptyComponent"
-          v-bind="transition ? {class: '[overflow:inherit]'} : undefined"
-        >
-          <InfiniteListPageItem :ref="item => setItemRef(slot.key, item as ItemInstance | null)">
-            <slot
-              :item="slot.id !== null && data?.results ? data.results[slotIndex]! : getPlaceholder(slot.key)"
-              :setter="getSetter(slotIndex)"
-              :refetch="emitRefetch"
-              :skeleton="slot.id === null"
-              :next="slot.id !== null && data?.results ? data.results[slotIndex + 1] : undefined"
-              :previous="slot.id !== null && data?.results ? data.results[slotIndex - 1] : undefined"
-              :first="firstPage && slotIndex === 0"
-              :last="lastPage && slotIndex === slotList.length - 1"
-              :page="page"
-              :index="slotIndex"
-              :results="data?.results"
-              :intersecting="isIntersecting"
-            />
-          </InfiniteListPageItem>
-        </component>
-      </component>
-    </template>
-  </component>
+      <div class="[overflow:inherit]">
+        <InfiniteListPageItem :ref="item => setItemRef(slot.key, item as ItemInstance | null)">
+          <slot v-bind="getItemScope(slot, slotIndex, page)" />
+        </InfiniteListPageItem>
+      </div>
+    </div>
+  </TransitionGroup>
+
+  <template v-else-if="page && slotList.length !== 0">
+    <InfiniteListPageItem
+      v-for="(slot, slotIndex) in slotList"
+      :key="slot.key"
+      :ref="item => setItemRef(slot.key, item as ItemInstance | null)"
+    >
+      <slot v-bind="getItemScope(slot, slotIndex, page)" />
+    </InfiniteListPageItem>
+  </template>
 
   <div
     v-else
@@ -84,17 +71,18 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
+import type {InfiniteListItemScope} from '../types'
 import type {DefaultQueryOptions} from '@/utils/useDefaultQuery'
 
-import {type Ref, TransitionGroup, computed, inject, onBeforeUnmount, onMounted, ref, toRef, toValue, useTemplateRef, watch} from 'vue'
+import {type Ref, computed, inject, onBeforeUnmount, onMounted, ref, toRef, toValue, useTemplateRef, watch} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
-import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
 import {ApiError, ApiErrorCancel} from '@/utils/api'
 import {getLoadErrorMessage, useHandledQueryError} from '@/utils/queryClient'
 import {getText} from '@/utils/texts'
+import {getPosition} from '@/utils/useSelected'
 import {scrollInParent} from '@/utils/utils'
 
 import InfiniteListPageItem from './InfiniteListPageItem.vue'
@@ -114,13 +102,12 @@ const props = withDefaults(
     refetchInterval?: number | false
     queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>
     enabled?: boolean
+    /** Page size the list asks for, for the `position` of an item in the whole list. */
+    pageLength: number
 
     valueGetter: (data: Data) => Model
   }>(),
   {
-    keyGetter: undefined,
-    selected: undefined,
-    previous: undefined,
     emptyStub: 'Nothing to show',
     refetchInterval: undefined,
     queryOptions: undefined,
@@ -136,7 +123,6 @@ const emit = defineEmits<{
   (e: 'update:previous-page', value: number | null): void
   (e: 'remove:page', value: number): void
   (e: 'refetch'): void
-  (e: 'update:selected', values: Model[]): void
   (e: 'fetched'): void
   (e: 'update:error', value: ApiError): void
 }>()
@@ -259,9 +245,6 @@ const getElements = (): Element[] => {
 
   return slotList.value.flatMap(slot => itemRefs.get(slot.key)?.getElements() ?? [])
 }
-const nextPage = computed(() => data.value?.next)
-const previousPage = computed(() => data.value?.previous)
-
 const page = computed<number | null>(() => props.queryParams instanceof Object && 'page' in props.queryParams && Number.isInteger(props.queryParams.page) ? (props.queryParams.page as number) : null)
 
 // The item is written to every cached scope of the model - this page, the other loaded pages, and any list or
@@ -285,22 +268,38 @@ const emitRefetch = () => {
   emit('refetch')
 }
 
+const getItemScope = (slot: ItemSlot, index: number, page: number) => {
+  const results = data.value?.results
+  const item = slot.id !== null && results ? results[index]! : getPlaceholder(slot.key)
+
+  return {
+    item,
+    setter: getSetter(index),
+    refetch: emitRefetch,
+    skeleton: slot.id === null,
+    next: slot.id !== null ? results?.[index + 1] : undefined,
+    previous: slot.id !== null ? results?.[index - 1] : undefined,
+    first: props.firstPage && index === 0,
+    last: props.lastPage && index === slotList.value.length - 1,
+    page,
+    index,
+    position: getPosition(page, index, props.pageLength),
+    value: props.valueGetter(item),
+    results,
+    intersecting: isIntersecting.value,
+  }
+}
+
 const refetchPage = async () => {
   await refetch()
 
-  if (props.lastPage && nextPage.value !== undefined) emit('update:next-page', nextPage.value)
-  if (props.firstPage && previousPage.value !== undefined) emit('update:previous-page', previousPage.value)
+  if (props.lastPage && data.value?.next !== undefined) emit('update:next-page', data.value.next)
+  if (props.firstPage && data.value?.previous !== undefined) emit('update:previous-page', data.value.previous)
 }
 
-const getFirst = () => {
-  if (!data.value) return undefined
-  return data.value.results[0]
-}
+const getFirst = () => data.value?.results.at(0)
 
-const getLast = () => {
-  if (!data.value) return undefined
-  return data.value.results[data.value.results.length - 1]
-}
+const getLast = () => data.value?.results.at(-1)
 
 /** Item to scroll to again once the page's data replaces the skeletons, which can change the item's position. */
 let pendingIndex: number | undefined
@@ -429,20 +428,7 @@ defineExpose({
 })
 
 defineSlots<{
-  default?: (props: {
-    item: Data
-    setter: (newItem?: Data | undefined) => void
-    skeleton: boolean
-    refetch: () => void
-    previous?: Data
-    next?: Data
-    first: boolean
-    last: boolean
-    page: number
-    index: number
-    results: Data[] | undefined
-    intersecting: boolean
-  }) => void
+  default?: (props: Omit<InfiniteListItemScope<Data, Model>, 'resetting'>) => void
   empty?: () => void
   error?: (props: {error: Error, retry: () => Promise<void>, isFetching: boolean}) => void
 }>()

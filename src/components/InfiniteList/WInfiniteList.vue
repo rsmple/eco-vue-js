@@ -41,24 +41,8 @@
         @update:page="$emit('update:page', $event)"
         @update:error="$emit('update:error', $event)"
       >
-        <template #default="{item, value, setter, skeleton, refetch, previous, next, first, last, resetting, page, index, results, intersecting}">
-          <slot
-            :item="item"
-            :setter="setter"
-            :skeleton="skeleton"
-            :refetch="refetch"
-            :previous="previous"
-            :next="next"
-            :first="first"
-            :last="last"
-            :resetting="resetting"
-            :page="page"
-            :index="index"
-            :position="getPosition(page, index, pageLength)"
-            :value="value"
-            :results="results"
-            :intersecting="intersecting"
-          />
+        <template #default="scope">
+          <slot v-bind="scope" />
         </template>
 
         <template
@@ -97,8 +81,6 @@ import type {DefaultQueryOptions} from '@/utils/useDefaultQuery'
 import {type StyleValue, computed, useTemplateRef} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
-
-import {getPosition} from '@/utils/useSelected'
 
 import WInfiniteListWrapper from './WInfiniteListWrapper.vue'
 import InfiniteListPages from './components/InfiniteListPages.vue'

@@ -1,6 +1,6 @@
 <template>
-  <InfiniteListScroll
-    ref="infiniteScroll"
+  <div
+    ref="scroll"
     :style="!minHeight && !minHeightOnly ? {minHeight: `calc(var(--w-height-inner) - ${ headerHeight }px)`} : undefined"
     :class="{
       'list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem) modal:min-h-[50vh]': !minHeight && !minHeightOnly,
@@ -44,11 +44,12 @@
         :empty-stub="emptyStub"
         :refetch-interval="refetchInterval"
         :query-options="queryOptions"
+        :page-length="pageLength"
         :enabled="!disabledSlots.has(slotIds[index]!)"
 
         :value-getter="valueGetter"
 
-        @update:count="updateCount($event); $emit('update:count', $event)"
+        @update:count="count = $event; $emit('update:count', $event)"
         @update:pages-count="updatePagesCount"
         @update:page-size="pageSize = $event"
         @remove:page="removePage"
@@ -56,22 +57,13 @@
         @fetched="isResettingPage = false"
         @update:error="$emit('update:error', $event)"
       >
-        <template #default="{item, setter, skeleton, refetch, previous, next, first, last, page: itemPage, index: itemIndex, results, intersecting}">
+        <template #default="scope">
           <slot
-            :item="(item as Data)"
-            :setter="setter"
-            :skeleton="skeleton || isRefetchingAll"
-            :refetch="refetch"
-            :previous="((previous ?? getPageComponent(page - 1)?.getLast()) as Data | undefined)"
-            :next="((next ?? getPageComponent(page + 1)?.getFirst()) as Data | undefined)"
-            :first="first"
-            :last="last"
+            v-bind="scope"
+            :skeleton="scope.skeleton || isRefetchingAll"
+            :previous="((scope.previous ?? getPageComponent(page - 1)?.getLast()) as Data | undefined)"
+            :next="((scope.next ?? getPageComponent(page + 1)?.getFirst()) as Data | undefined)"
             :resetting="isResettingPage"
-            :page="itemPage"
-            :index="itemIndex"
-            :value="valueGetter(item as Data)"
-            :results="results"
-            :intersecting="intersecting"
           />
         </template>
 
@@ -96,10 +88,11 @@
 
     <div ref="bottomSentinel" />
     <div :style="{height: bottomSpacerHeight + 'px'}" />
-  </InfiniteListScroll>
+  </div>
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
+import type {InfiniteListItemScope} from '../types'
 import type {ApiError} from '@/utils/api'
 import type {DefaultQueryOptions} from '@/utils/useDefaultQuery'
 
@@ -108,7 +101,6 @@ import {type StyleValue, computed, inject, nextTick, onBeforeUnmount, onMounted,
 import {debounce, getIsClientSide, getOffsetTop, isEqualObj} from '@/utils/utils'
 
 import InfiniteListPage from './InfiniteListPage.vue'
-import InfiniteListScroll from './InfiniteListScroll.vue'
 
 import {wInfiniteListHeaderHeight, wScrollingElement} from '../models/injection'
 import {useRefetchNextPages} from '../use/useRefetchNextPages'
@@ -156,9 +148,13 @@ const emit = defineEmits<{
   (e: 'update:error', value: ApiError): void
 }>()
 
-const infiniteScrollRef = useTemplateRef('infiniteScroll')
+const scrollRef = useTemplateRef('scroll')
 
 const scrollingElement = inject(wScrollingElement, null)
+
+const getScrollElement = (): Element | null => scrollingElement?.value ?? document.scrollingElement
+
+const getIsDocumentScroll = (element: Element): boolean => element === document.scrollingElement || element === document.body || element === document.documentElement
 
 // Provided rather than set as a variable on the root: a variable there restyles every row when the header is measured.
 provide(wInfiniteListHeaderHeight, computed(() => props.headerHeight))
@@ -170,15 +166,14 @@ const pagesCount = ref(1)
 const count = ref(0)
 /** Items on a full page as the API returns them, which can differ from the `size` the list asks for. */
 const pageSize = ref(props.pageLength)
+// The pages are always in order and without gaps: pages are added and dropped only at the ends.
 const nextPage = computed(() => {
-  if (pagesCount.value === 0) return null
-  const max = Math.max(...pages.value, 0)
-  return max < pagesCount.value ? max + 1 : null
+  const last = pages.value.at(-1) ?? 0
+  return last < pagesCount.value ? last + 1 : null
 })
 const previousPage = computed(() => {
-  if (pagesCount.value === 0 || pages.value.length === 0) return null
-  const min = Math.min(...pages.value)
-  return min > 1 ? min - 1 : null
+  const first = pages.value[0]
+  return first !== undefined && first > 1 ? first - 1 : null
 })
 const isResettingPage = ref(false)
 
@@ -208,10 +203,6 @@ const topSentinelRef = useTemplateRef<HTMLDivElement>('topSentinel')
 const bottomSentinelRef = useTemplateRef<HTMLDivElement>('bottomSentinel')
 
 const {isFetching, isRefetchingAll, refetchNextPages, refetchAll} = useRefetchNextPages(pageComponentRef)
-
-const updateCount = (value: number): void => {
-  count.value = value
-}
 
 const updatePagesCount = (value: number): void => {
   pagesCount.value = Math.max(value, 1)
@@ -447,10 +438,7 @@ const updateColumnOffset = (pageElements: Element[][]): boolean => {
   return false
 }
 
-const getScrollElementTop = (element: Element): number => {
-  if (element === document.scrollingElement || element === document.body || element === document.documentElement) return 0
-  return element.getBoundingClientRect().top
-}
+const getScrollElementTop = (element: Element): number => getIsDocumentScroll(element) ? 0 : element.getBoundingClientRect().top
 
 /**
  * The pages render no element of their own, so the items of all pages share one layout, and a grid row can hold the
@@ -476,8 +464,7 @@ const measurePages = (correctScroll: boolean) => {
     return
   }
 
-  const instances = pageComponentRef.value ?? []
-  const pageElements = pages.value.map(page => instances.find(instance => instance?.pageNumber === page)?.getElements() ?? [])
+  const pageElements = pages.value.map(page => getPageComponent(page)?.getElements() ?? [])
 
   // The layout changes with the cells, so the pages are measured once it has rendered.
   if (updateColumnOffset(pageElements)) {
@@ -490,7 +477,7 @@ const measurePages = (correctScroll: boolean) => {
 
   const itemsTop = itemsEl.getBoundingClientRect().top
 
-  const scrollEl = scrollingElement?.value ?? document.scrollingElement
+  const scrollEl = getScrollElement()
   const scrollElTop = scrollEl ? getScrollElementTop(scrollEl) : 0
   let totalDelta = 0
   let isInViewFound = false
@@ -545,16 +532,16 @@ watch([pageComponentRef, () => slotIds.value.join()], () => measurePages(false),
 const SENTINEL_MARGIN = 200
 
 let intersectionObserver: IntersectionObserver | null = null
-const topSentinelIntersecting = ref(false)
-const bottomSentinelIntersecting = ref(false)
+let topSentinelIntersecting = false
+let bottomSentinelIntersecting = false
 
 const handleIntersection: IntersectionObserverCallback = (entries) => {
   for (const entry of entries) {
     if (entry.target === topSentinelRef.value) {
-      topSentinelIntersecting.value = entry.isIntersecting
+      topSentinelIntersecting = entry.isIntersecting
       if (entry.isIntersecting) addPreviousPage()
     } else if (entry.target === bottomSentinelRef.value) {
-      bottomSentinelIntersecting.value = entry.isIntersecting
+      bottomSentinelIntersecting = entry.isIntersecting
       if (entry.isIntersecting) addNextPage()
     }
   }
@@ -576,7 +563,7 @@ onBeforeUnmount(() => {
 })
 
 watch(nextPage, (value, oldValue) => {
-  if (oldValue === null && value !== null && bottomSentinelIntersecting.value) addNextPage()
+  if (oldValue === null && value !== null && bottomSentinelIntersecting) addNextPage()
 })
 
 const reobserve = (element: HTMLElement | null) => {
@@ -600,7 +587,7 @@ watch(pages, () => {
 }, {deep: true, flush: 'post'})
 
 watch(previousPage, (value, oldValue) => {
-  if (oldValue === null && value !== null && topSentinelIntersecting.value) addPreviousPage()
+  if (oldValue === null && value !== null && topSentinelIntersecting) addPreviousPage()
 })
 
 const removePage = (page: number): void => {
@@ -647,11 +634,11 @@ const goto = async (page = 1, itemIndex?: number) => {
 }
 
 const scrollTop = () => {
-  const element = scrollingElement?.value ?? document.scrollingElement
+  const element = getScrollElement()
 
   // On the page the list scrolls back to where its first item shows under the stuck header.
   const top = scrollingElement || props.stickyTop === undefined ? 60 : props.stickyTop
-  const value = (infiniteScrollRef.value?.$el ? getOffsetTop(infiniteScrollRef.value.$el) : 0) - props.headerHeight - top
+  const value = (scrollRef.value ? getOffsetTop(scrollRef.value) : 0) - props.headerHeight - top
 
   if (element && element.scrollTop > value) element.scrollTop = value
 }
@@ -671,12 +658,12 @@ const resetPage = async (page = 1) => {
   slotIds.value = [recycledSlotId ?? ++slotIdCounter]
 }
 
-const activateInOrder = async (ids: number[], order: number[], gen: number) => {
-  for (const idx of order) {
+/** Enables the queries of the pages one per tick, so the target page is fetched first and those nearest it next. */
+const activateInOrder = async (ids: number[], gen: number) => {
+  for (const id of ids) {
     await nextTick()
     if (gen !== activationGen) return
-    const id = ids[idx]
-    if (id !== undefined) disabledSlots.delete(id)
+    disabledSlots.delete(id)
   }
 }
 
@@ -692,47 +679,38 @@ const jumpToPage = (page: number) => {
   }
 
   const newPages: number[] = []
-  for (let p = start; p <= end; p++) newPages.push(p)
-
   const newSlotIds: number[] = []
-  const existingIds = slotIds.value.slice()
-  for (let i = 0; i < newPages.length; i++) {
-    newSlotIds.push(existingIds.shift() ?? ++slotIdCounter)
+  for (let p = start; p <= end; p++) {
+    newPages.push(p)
+    newSlotIds.push(slotIds.value[p - start] ?? ++slotIdCounter)
   }
 
   const foundIdx = newPages.indexOf(page)
   const targetIdx = foundIdx === -1 ? 0 : foundIdx
-  const priority: number[] = []
-  const seen = new Set<number>()
-  const pushIdx = (idx: number) => {
-    if (idx < 0 || idx >= newPages.length || seen.has(idx)) return
-    priority.push(idx)
-    seen.add(idx)
-  }
-  pushIdx(targetIdx)
+
+  // The pages around the target, nearest first.
+  const order: number[] = []
   for (let offset = 1; offset < newPages.length; offset++) {
-    pushIdx(targetIdx - offset)
-    pushIdx(targetIdx + offset)
+    if (targetIdx - offset >= 0) order.push(newSlotIds[targetIdx - offset]!)
+    if (targetIdx + offset < newPages.length) order.push(newSlotIds[targetIdx + offset]!)
   }
 
   disabledSlots.clear()
-  for (let i = 0; i < newSlotIds.length; i++) {
-    if (i !== targetIdx) disabledSlots.add(newSlotIds[i]!)
-  }
+  for (const id of order) disabledSlots.add(id)
 
   pages.value = newPages
   slotIds.value = newSlotIds
 
   emit('update:page', page === 1 ? undefined : page)
 
-  activateInOrder(newSlotIds, priority.slice(1), ++activationGen)
+  activateInOrder(order, ++activationGen)
 }
 
 const anyPageInViewport = (): boolean => {
-  const scrollEl = scrollingElement?.value ?? document.scrollingElement
+  const scrollEl = getScrollElement()
   if (!scrollEl) return true
 
-  const isDocumentScroll = scrollEl === document.scrollingElement || scrollEl === document.body || scrollEl === document.documentElement
+  const isDocumentScroll = getIsDocumentScroll(scrollEl)
   const viewportTop = isDocumentScroll ? 0 : scrollEl.getBoundingClientRect().top
   const viewportBottom = isDocumentScroll ? window.innerHeight : scrollEl.getBoundingClientRect().bottom
 
@@ -743,11 +721,11 @@ const anyPageInViewport = (): boolean => {
 }
 
 const getScrollPosition = () => {
-  const scrollEl = scrollingElement?.value ?? document.scrollingElement
-  const containerEl = infiniteScrollRef.value?.$el as HTMLElement | null | undefined
+  const scrollEl = getScrollElement()
+  const containerEl = scrollRef.value
   if (!scrollEl || !containerEl) return null
 
-  const isDocumentScroll = scrollEl === document.scrollingElement || scrollEl === document.body || scrollEl === document.documentElement
+  const isDocumentScroll = getIsDocumentScroll(scrollEl)
   const scrollTop = isDocumentScroll ? window.scrollY : scrollEl.scrollTop
   // Not offsetTop: it is measured from the offsetParent, which is not the scrolling element unless that one is positioned.
   const containerTop = containerEl.getBoundingClientRect().top - getScrollElementTop(scrollEl) + scrollTop
@@ -768,7 +746,7 @@ const scrollToOffset = (y: number) => {
 
 const checkScrollJump = debounce(() => {
   if (isResettingPage.value) return
-  if (topSentinelIntersecting.value || bottomSentinelIntersecting.value) return
+  if (topSentinelIntersecting || bottomSentinelIntersecting) return
   if (!avgPageHeight.value) return
   if (anyPageInViewport()) return
 
@@ -805,25 +783,17 @@ watch(() => props.queryParams, newValue => {
   oldQueryParams = {...newValue}
 }, {deep: true})
 
+// Drops the pages past the last one.
 watch(pagesCount, value => {
-  if (Math.max(...pages.value) > value) {
-    const newPages: number[] = []
-    const newSlotIds: number[] = []
+  const end = pages.value.findIndex(page => page > value)
+  if (end === -1) return
 
-    pages.value.forEach((page, index) => {
-      if (page <= value) {
-        newPages.push(page)
-        newSlotIds.push(slotIds.value[index]!)
-      }
-    })
-
-    if (newPages.length === 0) {
-      pages.value = [1]
-      slotIds.value = [++slotIdCounter]
-    } else {
-      pages.value = newPages
-      slotIds.value = newSlotIds
-    }
+  if (end === 0) {
+    pages.value = [1]
+    slotIds.value = [++slotIdCounter]
+  } else {
+    pages.value = pages.value.slice(0, end)
+    slotIds.value = slotIds.value.slice(0, end)
   }
 }, {immediate: true})
 
@@ -836,22 +806,7 @@ defineExpose({
 })
 
 defineSlots<{
-  default?: (props: {
-    item: Data
-    setter: (newItem?: Data | undefined) => void
-    skeleton: boolean
-    refetch: () => void
-    previous?: Data
-    next?: Data
-    first: boolean
-    last: boolean
-    resetting: boolean
-    page: number
-    index: number
-    value: Model
-    results: Data[] | undefined
-    intersecting: boolean
-  }) => void
+  default?: (props: InfiniteListItemScope<Data, Model>) => void
   before?: () => void
   empty?: () => void
   error?: (props: {error: Error, retry: () => Promise<void>, isFetching: boolean}) => void

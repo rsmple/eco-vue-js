@@ -12,3 +12,21 @@ export type InfiniteListScope = {
   isFetching: boolean
   isRefetchingAll: boolean
 }
+
+export type InfiniteListItemScope<Data, Model> = {
+  item: Data
+  setter: (newItem?: Data | undefined) => void
+  skeleton: boolean
+  refetch: () => void
+  previous: Data | undefined
+  next: Data | undefined
+  first: boolean
+  last: boolean
+  resetting: boolean
+  page: number
+  index: number
+  position: number
+  value: Model
+  results: Data[] | undefined
+  intersecting: boolean
+}
