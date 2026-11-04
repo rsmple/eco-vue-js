@@ -711,17 +711,21 @@
    */
   .w-nav-bar-content:not(.w-nav-bar-brand + *)
     .w-nav-item-inset:first-child:not(.w-nav-bar-content :not(:first-child) .w-nav-item-inset) {
-    padding-top: calc(0.25rem + var(--w-chrome-float) * 0.25rem);
+    --w-nav-item-pad-top: calc(0.25rem + var(--w-chrome-float) * 0.25rem);
+
+    padding-top: var(--w-nav-item-pad-top);
   }
 
   .w-nav-bar-content
     .w-nav-item-inset:not(:has(~ :not(.w-nav-group-collapsed))):not(
       .w-nav-bar-content :has(~ :not(.w-nav-group-collapsed)) .w-nav-item-inset
     ) {
-    padding-bottom: calc(0.25rem + (1 - var(--w-chrome-float)) * 1rem + var(--w-chrome-float) * 0.25rem);
+    --w-nav-item-pad-bottom: calc(0.25rem + (1 - var(--w-chrome-float)) * 1rem + var(--w-chrome-float) * 0.25rem);
+
+    padding-bottom: var(--w-nav-item-pad-bottom);
 
     @variant sm-not {
-      padding-bottom: 1.25rem;
+      --w-nav-item-pad-bottom: 1.25rem;
     }
   }
 
@@ -745,9 +749,13 @@
     padding-inline: var(--w-nav-inset-start) var(--w-nav-inset-end);
   }
 
-  /* Floating, the active marker sits in the middle of the item's inset, clear of the nav's edge and of the item. */
+  /*
+   * Floating, the active marker sits in the middle of the item's inset, clear of the nav's edge and of the item. It
+   * follows the pill, not the item: the first and last items' extra room (above) is taken off its ends.
+   */
   .w-nav-item-indicator {
-    inset-block: calc(var(--w-chrome-float) * 0.5rem);
+    top: calc(var(--w-nav-item-pad-top, 0.25rem) - 0.25rem + var(--w-chrome-float) * 0.5rem);
+    bottom: calc(var(--w-nav-item-pad-bottom, 0.25rem) - 0.25rem + var(--w-chrome-float) * 0.5rem);
     left: calc(var(--w-chrome-float) * 0.125rem);
     height: auto;
     border-radius: calc(var(--w-chrome-float) * 9999px);
