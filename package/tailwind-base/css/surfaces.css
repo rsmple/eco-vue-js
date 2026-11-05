@@ -60,6 +60,15 @@
     --w-card-shadow: none;
     --w-card-backdrop: none;
 
+    /*
+     * A pane of glass in a see-through section, a card or a WList card there: how much white tints it, in light and in
+     * dark, and how bright the light along its top edge is.
+     */
+    --w-pane-tint: 0.45;
+    --w-pane-tint-dark: 0.025;
+    --w-pane-highlight: 0.7;
+    --w-pane-highlight-dark: 0.05;
+
     /* 0: the bars are docked to the screen edges; 1: they float `--w-chrome-gap` off them, the nav and the actions bar under the header. */
     --w-chrome-float: 0;
     --w-chrome-gap: 0px;
@@ -481,20 +490,64 @@
     }
   }
 
-  /* A card in a section or another card: opaque and flat, one step darker than what it sits on. */
+  /*
+   * A card in a section or another card: opaque and flat, one step darker than what it sits on, without an edge. In a
+   * section that is see-through (glass) it is a pane of glass over it, as a WList card there: a light translucent fill
+   * the section shows through, a hairline edge and a lit top edge. Inside, `--w-surface` is the opaque color it ends up
+   * as over the section.
+   */
   @scope (.surface-section, .surface-card) to (.surface-root) {
     :scope .surface-card {
+      /* 1 in a see-through section (glass), 0 in flat and in an opaque one (card). */
+      --w-card-glass: calc(min(1, var(--w-section-opacity) * 100) * min(1, (1 - var(--w-section-opacity)) * 100));
       --w-card-base: var(--w-surface-subtle);
       --w-card-opacity: 1;
-      --w-card-border: 0px;
-      --w-card-shadow: none;
+      --w-card-border: calc(1px * var(--w-card-glass));
+      --w-card-shadow:
+        0 1px 3px 0 rgb(0 0 0 / calc(0.08 * var(--w-card-glass))),
+        inset 0 1px 0 0
+          light-dark(
+            oklch(100% 0 0 / calc(var(--w-pane-highlight) * var(--w-card-glass))),
+            oklch(100% 0 0 / calc(var(--w-pane-highlight-dark) * var(--w-card-glass)))
+          );
       --w-card-backdrop: none;
+      --w-surface: color-mix(
+        in oklab,
+        var(--w-card-base) calc((1 - var(--w-card-glass)) * 100%),
+        light-dark(
+          color-mix(
+            in oklab,
+            #fff calc(var(--w-pane-tint) * 100%),
+            color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), var(--w-canvas))
+          ),
+          color-mix(
+            in oklab,
+            #fff calc(var(--w-pane-tint-dark) * 100%),
+            color-mix(in oklab, var(--w-section-base) calc(var(--w-section-opacity) * 100%), var(--w-canvas))
+          )
+        )
+      );
+
+      background-color: color-mix(
+        in oklab,
+        var(--w-card-base) calc((1 - var(--w-card-glass)) * 100%),
+        light-dark(oklch(100% 0 0 / var(--w-pane-tint)), oklch(100% 0 0 / var(--w-pane-tint-dark)))
+      );
     }
   }
 
+  /* A card in a card is opaque, a step darker again. */
   @scope (.surface-card) to (.surface-root) {
     :scope .surface-card {
+      --w-card-glass: 0;
       --w-card-base: var(--w-surface-muted);
+    }
+  }
+
+  /* A modal is opaque: a card in its parts is too. */
+  @scope (.w-modal-wrapper) to (.surface-root) {
+    :scope .surface-section .surface-card {
+      --w-card-glass: 0;
     }
   }
 }
@@ -552,7 +605,8 @@
         color-mix(
           in oklab,
           color-mix(in oklab, var(--w-surface-subtle) calc(var(--w-list-card-solid) * 100%), transparent),
-          light-dark(oklch(100% 0 0 / 0.45), oklch(100% 0 0 / 0.05)) calc(var(--w-list-card-glass) * 100%)
+          light-dark(oklch(100% 0 0 / var(--w-pane-tint)), oklch(100% 0 0 / var(--w-pane-tint-dark)))
+            calc(var(--w-list-card-glass) * 100%)
         )
       );
       border: calc(1px * (var(--w-list-card-outline) + var(--w-list-card-glass))) solid var(--w-line-subtle);
@@ -563,7 +617,8 @@
         inset 0 1px 0 0
           color-mix(
             in oklab,
-            light-dark(oklch(100% 0 0 / 0.7), oklch(100% 0 0 / 0.08)) calc(var(--w-list-card-glass) * 100%),
+            light-dark(oklch(100% 0 0 / var(--w-pane-highlight)), oklch(100% 0 0 / var(--w-pane-highlight-dark)))
+              calc(var(--w-list-card-glass) * 100%),
             transparent
           );
     }

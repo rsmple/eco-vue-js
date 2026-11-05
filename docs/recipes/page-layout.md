@@ -105,7 +105,7 @@ Sections side by side are a grid with `surface-columns`, which spaces them by `-
 - **Between blocks.** Sections, page lists, rows of cards and tab sections one after another are the section gap apart, unless they are in a grid or a flex box, which spaces them itself.
 - **Content beside a wide list.** A list wider than the screen scrolls the window sideways. Everything beside it, a section, a description, a filter or a form, and the wrappers around them however deep the list is, sticks to the left inset and keeps the page's width. The list's own toolbar, header, empty state and error stay in view too. The same holds in a modal, for content beside a list in it.
 - **Stuck to the bottom.** A bar stuck to the bottom of the screen, such as an item's actions in a list row, is `sticky bottom---bottom-inner bg-surface`. `--w-bottom-inner` is the room the kit keeps at the bottom: a page list's bottom edge in card and glass, a modal's footer in a modal, none in flat. In a page list the bar paints the section behind it, as the stuck header does.
-- **Nesting.** A section in a section, or in a modal, is a part of it: no surface, a smaller heading and a line above it. A card in a section is filled and flat.
+- **Nesting.** A section in a section, or in a modal, is a part of it: no surface, a smaller heading and a line above it. A card in a section is filled and flat, and a pane of glass in a glass section.
 
 ## Don't
 
