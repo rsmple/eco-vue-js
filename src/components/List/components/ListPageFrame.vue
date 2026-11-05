@@ -18,7 +18,10 @@
     }"
   >
     <ListPageSurface :off="!isJoined">
-      <WInfiniteListWrapper :in-place="!isJoined">
+      <WInfiniteListWrapper
+        ref="wrapper"
+        :in-place="!isJoined"
+      >
         <template #header>
           <slot
             name="head"
@@ -68,6 +71,7 @@ defineProps<{
 
 const targetRef = useTemplateRef('target')
 const rootRef = useTemplateRef('root')
+const wrapperRef = useTemplateRef('wrapper')
 
 const lists = reactive(new Map<symbol, boolean>())
 
@@ -95,6 +99,13 @@ const frame = {
 // The frame's own header wrapper is not a list joined to a frame: the content gets the frame from ListPageFrameScope.
 provide(wListPageFrame, null)
 provide(wListPageFrameHeader, null)
+
+defineExpose({
+  /** While a list is joined and its header stuck, scrolls back to the list's top, such as before another list opens in the frame. */
+  resetScroll: () => {
+    if (isJoined.value) wrapperRef.value?.resetScroll()
+  },
+})
 
 defineSlots<{
   /** Over the content, in the stuck header while a list is joined, before the list's header. */

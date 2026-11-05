@@ -31,7 +31,10 @@
     </template>
 
     <!-- With `section`, a page list in the open tab joins the frame: the row of tabs is in its stuck header, over the list's. -->
-    <ListPageFrame :disabled="!isListFrame">
+    <ListPageFrame
+      ref="listPageFrame"
+      :disabled="!isListFrame"
+    >
       <template #head="{joined}">
         <div
           v-if="!noHeader && !flat"
@@ -157,6 +160,8 @@
           v-else-if="defaultSlots.some(slot => (slot.children as Record<string, Component>)?.default)"
           class="relative h-full transition-[min-height] duration-300"
           :class="{
+            // While the tab changes, the browser would keep a row of the previous tab in place as the next one replaces it.
+            '[overflow-anchor:none]': isSwitching,
             'surface-section-joined': !side && section && !joined,
             'sm-not:snap-start sm-not:px-(--w-frame-padding,var(--inner-margin))': side,
           }"
@@ -167,6 +172,8 @@
             leave-active-class="transition-[translate,opacity] duration-250 w-full absolute top-0 [overflow-anchor:none]"
             :enter-from-class="lessTransitions || side || hasScrollbar ? 'opacity-0' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]'"
             :leave-to-class="lessTransitions || side || hasScrollbar ? 'opacity-0 absolute' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]'"
+            @after-enter="isSwitching = false"
+            @after-leave="isSwitching = false"
           >
             <TabItem
               v-for="slot in defaultSlots"
@@ -277,6 +284,7 @@ const slots = defineSlots<{
 
 const containerRef = useTemplateRef('container')
 const buttonContainerRef = useTemplateRef('buttonContainer')
+const listPageFrameRef = useTemplateRef('listPageFrame')
 
 // With `section`, a page list in the open tab joins a frame with the row of tabs: the row sticks in its header, over the list's.
 const isListFrame = props.section === true && !props.side && !props.flat && !props.noHeader
@@ -420,10 +428,16 @@ const resetHorizontalScroll = () => {
   if (parent?.scrollLeft) parent.scrollTo({left: 0, behavior: 'instant'})
 }
 
+const isSwitching = ref(false)
+
 const setCurrent = (value: string) => {
   if (current.value === value || !defaultSlotsKeys.value.includes(value)) return
 
   resetHorizontalScroll()
+  // The row of tabs stays stuck over a list scrolled down, so the opened tab would show in mid scroll. Measured on the
+  // layout of the previous tab, before the opened one renders.
+  listPageFrameRef.value?.resetScroll()
+  isSwitching.value = true
   isDirect.value = defaultSlotsKeys.value.indexOf(current.value) < defaultSlotsKeys.value.indexOf(value)
   current.value = value
 

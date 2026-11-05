@@ -57,7 +57,7 @@ import {type VNode, inject, onBeforeUnmount, onMounted, provide, ref, useTemplat
 
 import {wListPageFrameHeader} from '@/components/List/models/injection'
 import {wIsModal, wModalHeaderHeight} from '@/components/Modal/models/injection'
-import {BASE_ZINDEX_DROPDOWN, BASE_ZINDEX_LIST_HEADER, getIsClientSide} from '@/utils/utils'
+import {BASE_ZINDEX_DROPDOWN, BASE_ZINDEX_LIST_HEADER, getIsClientSide, getScrollParent} from '@/utils/utils'
 
 import {wScrollingElement} from './models/injection'
 
@@ -221,6 +221,22 @@ onBeforeUnmount(() => {
   intersectionObserver?.disconnect()
 
   if (isPadding()) updateHeaderPadding(0)
+})
+
+/**
+ * While the header is stuck, scrolls back to where it stops sticking, such as before other content opens under it. The
+ * indicator stays where the header is in the flow, so how far it is above the stuck header is how far the content is scrolled.
+ */
+const resetScroll = () => {
+  if (!indicatorRef.value || !headerRef.value) return
+
+  const delta = indicatorRef.value.getBoundingClientRect().top - headerRef.value.getBoundingClientRect().top
+
+  if (delta < 0) (scrollingElement?.value ?? getScrollParent(indicatorRef.value) ?? document.scrollingElement)?.scrollBy({top: delta, behavior: 'instant'})
+}
+
+defineExpose({
+  resetScroll,
 })
 
 defineSlots<{
