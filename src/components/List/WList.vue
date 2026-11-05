@@ -17,6 +17,7 @@
         :refetch-interval="refetchInterval"
 
         :page-length="PAGE_LENGTH"
+        :keep-columns="isGrid"
         :page-class="
           isGrid
             ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-(--w-list-gap,0) isolate'

@@ -282,6 +282,7 @@ import WInfiniteList from 'eco-vue-js/dist/components/InfiniteList/WInfiniteList
 | `pageClass` | `string` | — | Class of the element holding the items of all loaded pages, e.g. a grid layout. The pages render no element of their own, so a grid row runs on from one page into the next. |
 | `pageStyle` | `StyleValue` | — | Style of the element holding the items, e.g. the columns of a grid. |
 | `maxPages` | `number` | — | Number of pages kept rendered, 5 by default. Scrolling further drops pages at the other end, keeping their height as space. |
+| `keepColumns` | `boolean` | — | Keeps each item in its column of a `pageClass` grid with several columns, such as cards, when the list starts past the first page or drops a page at the top. Leave it off when every item spans the row, as the rows of a table: the columns are then not measured. |
 | `refetchInterval` | `number \| false` | — | Refetches the pages in view every this many ms. |
 | `queryOptions` | `DefaultQueryOptions<PaginatedResponse<Data>>` | — | Options for every page query. |
 | `pageLength` | `number` | `24` | Page size, sent to the query as `size`. Must match the size the query returns. |

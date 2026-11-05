@@ -123,6 +123,7 @@ const props = withDefaults(
     pageClass?: string
     pageStyle?: StyleValue
     maxPages?: number
+    keepColumns?: boolean
     refetchInterval?: number | false
     queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>
 
@@ -303,6 +304,8 @@ const bottomSpacerHeight = computed(() => {
 const columnCount = ref(1)
 
 const getColumnCount = (element: HTMLElement): number => {
+  if (!props.keepColumns) return 1
+
   const style = getComputedStyle(element)
   if (style.display !== 'grid' && style.display !== 'inline-grid') return 1
 
@@ -380,11 +383,18 @@ const updateColumnOffset = (pageElements: Element[][]): boolean => {
   const itemsEl = itemsRef.value
   if (!itemsEl) return false
 
+  // Without the cells the leading rows place nothing.
+  if (columnCount.value <= 1) {
+    const isChanged = columnOffset.value !== 0
+    columnOffset.value = 0
+    return isChanged
+  }
+
   const firstElements = pageElements[0] ?? []
   const firstItemIndex = firstElements.findIndex(element => !getIsFullRow(element))
   const newLeadingRows = firstItemIndex === -1 ? 0 : firstItemIndex
 
-  if (columnCount.value <= 1 || firstItemIndex === -1) {
+  if (firstItemIndex === -1) {
     const isChanged = columnOffset.value !== 0 || leadingRows.value !== newLeadingRows
     columnOffset.value = 0
     leadingRows.value = newLeadingRows

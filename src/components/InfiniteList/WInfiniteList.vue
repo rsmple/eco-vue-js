@@ -29,6 +29,7 @@
         :page-class="pageClass"
         :page-style="pageStyle"
         :max-pages="maxPages"
+        :keep-columns="keepColumns"
         :refetch-interval="refetchInterval"
         :query-options="queryOptions"
 
@@ -111,6 +112,8 @@ const props = withDefaults(
     pageStyle?: StyleValue
     /** Number of pages kept rendered, 5 by default. Scrolling further drops pages at the other end, keeping their height as space. */
     maxPages?: number
+    /** Keeps each item in its column of a `pageClass` grid with several columns, such as cards, when the list starts past the first page or drops a page at the top. Leave it off when every item spans the row, as the rows of a table: the columns are then not measured. */
+    keepColumns?: boolean
     /** Refetches the pages in view every this many ms. */
     refetchInterval?: number | false
     /** Options for every page query. */

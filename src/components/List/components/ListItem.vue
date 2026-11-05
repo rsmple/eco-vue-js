@@ -10,7 +10,7 @@
       <div
         ref="container"
         :role="skeleton ? undefined : 'listitem'"
-        class="w-list-item group/row relative"
+        class="w-list-item w-skeleton-static group/row relative"
         :class="{
           [cardWrapperClass ?? '']: true,
           'w-ripple-trigger-list': isActionShown,
@@ -116,7 +116,7 @@
               :style="columnDataMap[field.meta.label]!.style"
             >
               <div
-                class="tone-primary bg-tone-soft w-skeleton w-skeleton-opacity-50 dark:w-skeleton-opacity-5 before:animate-ticker w-option-has-bg"
+                class="tone-primary bg-tone-soft w-skeleton w-option-has-bg"
                 :style="{'--skeleton-width-internal': getSkeletonWidth(field.meta.label, position) + '%'}"
               />
             </div>
@@ -143,7 +143,7 @@
                 :style="card && nested ? undefined : column.style"
               >
                 <div
-                  class="tone-primary bg-tone-soft w-skeleton w-skeleton-opacity-50 dark:w-skeleton-opacity-5 before:animate-ticker w-option-has-bg"
+                  class="tone-primary bg-tone-soft w-skeleton w-option-has-bg"
                   :style="{'--skeleton-width-internal': getSkeletonWidth(field.meta.label, position) + '%'}"
                 />
               </div>
@@ -349,6 +349,9 @@ const ACTION_LABEL: Record<ListActionMode, string | undefined> = {
   open: 'Expand row',
   none: undefined,
 }
+
+// The row's skeletons stay still (`w-skeleton-static` on the row): a shimmer in every cell repaints each of them every
+// frame while the rows are inserted, and costs more than the rows themselves.
 
 // The ripple of the row's action, and of the sticky cells and edges that cover it. The same classes whatever the row's
 // state: the state is on the row (`w-list-item-highlighted`, `w-list-item-accented`), so a selection restyles the cells
