@@ -107,7 +107,7 @@
                   :title="title"
                   :description="description"
                   :nested="isHeadingNested"
-                  class="w-list-heading"
+                  class="w-list-heading pb-2"
                 >
                   <template
                     v-if="$slots.title"
