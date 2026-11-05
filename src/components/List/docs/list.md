@@ -20,6 +20,12 @@ The [List with fields](/recipes/list-with-fields) recipe builds this step by ste
 
 The sticky header, the checkbox column and full-width rows position themselves from the app's layout variables — `--header-height`, `--nav-bar-width`, `--actions-bar-width` and `--inner-margin` — so the app has to set them (see [App shell](/guide/app-shell)). Inside a modal, the modal sets its own.
 
+## Cards
+
+In grid view the list draws each card itself. On a page in the flat layout a card is an outline with a light shadow. Where the section around it paints — the card and glass layouts, a section's parts, a modal or a card — it is a filled card without an edge, one step darker than what it sits on. On phones the cards are striped rows.
+
+The defaults are `--inner-margin` of padding, `xl` corners and a `1rem` gap. Set them on the list with `w-list-card-padding-*` (in `cardClass`), `w-list-rounded-*` and `w-list-gap-*`, and the card width with `w-list-card-w-*`. Leave the surface itself to the list. `cardClass` is for the inner layout, such as `card:gap-2` or `card:items-start`.
+
 ## Bulk actions
 
 Above the table is the selection bar, `WButtonSelection`. While nothing is selected it shows the `action` components and the list settings; while items are selected, the `bulk` components and a "Selected N items" counter with a clear button. Actions that don't fit move into a More menu.

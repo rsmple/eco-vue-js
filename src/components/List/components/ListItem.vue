@@ -86,7 +86,7 @@
             [cardClass ?? '']: true,
             '[contain-intrinsic-size:auto_3rem] [content-visibility:auto]': contentVisibility,
             'col-[2/-2] grid grid-cols-subgrid': !card,
-            'grid grid-cols-(--w-list-grid-cols) [grid-template-areas:var(--w-list-grid-areas)] sm:rounded-(--w-list-rounded,unset) sm:bg-(--w-list-card,var(--w-surface-subtle))': card,
+            'w-list-card-surface card:p-(--w-list-card-padding,1rem) grid grid-cols-(--w-list-grid-cols) [grid-template-areas:var(--w-list-grid-areas)]': card,
             'sm:border-y': hasBorder,
             'border-line': hasBorder && !selected,
             'tone-primary border-tone-line': hasBorder && selected,
@@ -179,7 +179,7 @@
             class="absolute inset-0 cursor-pointer select-none"
             :class="{
               [RIPPLE_CLASS]: true,
-              'sm:w-ripple-rounded-(--w-list-rounded,unset) sm:rounded-(--w-list-rounded,unset)': card,
+              'sm:w-ripple-rounded-(--w-list-rounded,var(--radius-xl)) sm:rounded-(--w-list-rounded,var(--radius-xl))': card,
               'z-[-1]': action !== 'select',
             }"
             :onClick="action === 'action'

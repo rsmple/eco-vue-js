@@ -245,6 +245,11 @@
   --w-ripple-border: --value([length], [*]);
 }
 
+@utility w-list-card-padding-* {
+  --w-list-card-padding: --spacing(--value(number));
+  --w-list-card-padding: --value(--spacing-*, --w-size-*, [*]);
+}
+
 @utility w-list-rounded-* {
   --w-list-rounded: --value(--radius-*, --w-radius-*, [*]);
 }

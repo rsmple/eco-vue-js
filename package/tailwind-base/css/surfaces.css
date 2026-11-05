@@ -529,6 +529,37 @@
 }
 
 /*
+ * A WList card from `sm` up (on phones the cards are striped rows). Where the section around it paints nothing, a page
+ * in flat, it is an outline with a light shadow. Where it paints, as in a card or glass layout, a section's parts, a
+ * modal or a card, it follows a card in a section: opaque, one step darker than what it sits on, without an edge.
+ * `--w-list-card` sets the fill instead, `--w-list-rounded` the corners.
+ */
+@layer utilities {
+  .w-list-card-surface {
+    @variant sm {
+      --w-list-card-fill: var(--w-section-paints, min(1, var(--w-section-opacity) * 100));
+      --w-list-card-outline: calc(1 - var(--w-list-card-fill));
+
+      background-color: var(
+        --w-list-card,
+        color-mix(in oklab, var(--w-surface-subtle) calc(var(--w-list-card-fill) * 100%), transparent)
+      );
+      border: calc(1px * var(--w-list-card-outline)) solid var(--w-line-subtle);
+      border-radius: var(--w-list-rounded, var(--radius-xl));
+      box-shadow:
+        0 1px 3px 0 rgb(0 0 0 / calc(0.1 * var(--w-list-card-outline))),
+        0 1px 2px -1px rgb(0 0 0 / calc(0.1 * var(--w-list-card-outline)));
+    }
+  }
+
+  @scope (.w-modal-wrapper, .surface-card) to (.surface-root) {
+    :scope .w-list-card-surface {
+      --w-list-card-fill: 1;
+    }
+  }
+}
+
+/*
  * App chrome. The nav and the actions bar run the screen's full height, so the nav's top, the brand's place, is the
  * frame's top-left corner in every style. Docked (flat), the header spans the screen under them. Floating, each bar
  * is a card `--w-chrome-gap` off the screen edges and the frame's margins, and the header only spans the page between
