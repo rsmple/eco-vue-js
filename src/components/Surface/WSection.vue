@@ -7,40 +7,35 @@
       semanticType && semanticType !== SemanticType.SECONDARY ? ['surface-section-tone', sectionToneMap[semanticType]] : undefined,
     ]"
   >
-    <div
+    <SectionHeading
       v-if="title || eyebrow || description || $slots.title || $slots.description || $slots.actions"
-      class="flex flex-wrap items-center gap-x-4 gap-y-2"
+      :title="title"
+      :eyebrow="eyebrow"
+      :description="description"
+      :nested="isNested"
+      :toned="!!semanticType && semanticType !== SemanticType.SECONDARY"
     >
-      <div class="mr-auto grid gap-1">
-        <div
-          v-if="eyebrow"
-          class="text-description text-xs font-semibold tracking-wider uppercase"
-        >
-          {{ eyebrow }}
-        </div>
+      <template
+        v-if="$slots.title"
+        #title
+      >
+        <slot name="title" />
+      </template>
 
-        <component
-          :is="isNested ? 'h3' : 'h2'"
-          class="font-semibold"
-          :class="[isNested ? 'text-base' : 'text-xl', semanticType && semanticType !== SemanticType.SECONDARY ? 'text-tone' : 'text-accent']"
-        >
-          <slot name="title">
-            {{ title }}
-          </slot>
-        </component>
+      <template
+        v-if="$slots.description"
+        #description
+      >
+        <slot name="description" />
+      </template>
 
-        <p
-          v-if="description || $slots.description"
-          class="text-description max-w-prose text-sm text-pretty"
-        >
-          <slot name="description">
-            {{ description }}
-          </slot>
-        </p>
-      </div>
-
-      <slot name="actions" />
-    </div>
+      <template
+        v-if="$slots.actions"
+        #actions
+      >
+        <slot name="actions" />
+      </template>
+    </SectionHeading>
 
     <slot name="head" />
 
@@ -68,6 +63,7 @@ import {inject, provide} from 'vue'
 import {wIsModal} from '@/components/Modal/models/injection'
 import {SemanticType} from '@/utils/SemanticType'
 
+import SectionHeading from './components/SectionHeading.vue'
 import {wSectionNested} from './models/injection'
 import {sectionToneMap} from './models/utils'
 

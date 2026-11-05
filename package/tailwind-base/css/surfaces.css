@@ -322,7 +322,7 @@
 
 /*
  * Blocks one after another on the page — sections, stacks of them, page lists, rows of cards, tabs over a section —
- * are apart through the wrappers of any page, as in `surface-stack-divided`: a page needs no stack of its own. In card
+ * are apart through the wrappers of any page, and after a wrapper that ends with one, such as a form of sections, as in `surface-stack-divided`: a page needs no stack of its own. In card
  * and glass `--w-section-gap` separates the surfaces; in flat, where sections paint nothing, the blocks are
  * `--w-stack-divide` apart and a section after a section has a line above its content, so its groups read apart there
  * too. Only in block flow, as a grid or a flex box spaces its children itself, not inside a section, where blocks are
@@ -339,7 +339,7 @@
 
   @scope (.w-page) to (.surface-section *, .surface-root *) {
     :where(:scope, :scope :not(.grid, .flex, .inline-grid, .inline-flex, .surface-columns, .surface-stack, .surface-stack-divided))
-      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section)
+      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child))
       + :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section) {
       /* 1 in flat, where sections paint nothing, 0 where they do. */
       --w-stack-flat: calc(1 - min(1, var(--w-section-opacity) * 100));
@@ -361,6 +361,12 @@
       > :where(.surface-section) + .surface-section {
       padding-top: calc(var(--w-section-padding) + var(--w-stack-divide, 2rem) * var(--w-stack-flat));
       border-top-width: calc(var(--w-section-border) + 1px * var(--w-stack-flat));
+    }
+
+    /* A page list is a section: after a block, the line goes on its surface, which keeps to the view. */
+    :where(:scope, :scope :not(.grid, .flex, .inline-grid, .inline-flex, .surface-columns, .surface-stack, .surface-stack-divided))
+      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child)) + .w-list-page {
+      --w-list-line: var(--w-stack-flat);
     }
   }
 }
@@ -492,7 +498,8 @@
     }
 
     /* A part after other content: a line above it, as between the groups of a form. */
-    :scope * + .surface-section {
+    :scope * + .surface-section,
+    :scope * + .w-list-section .w-list-heading {
       border-top: 1px solid var(--w-line-subtle);
       padding-top: var(--w-subsection-divide, 1rem);
     }
@@ -1003,8 +1010,11 @@
       transparent
     );
 
+    /* 1 after a block on the page in flat: a line above the list, `--w-stack-divide` over its content. */
+    --w-list-divide: calc(var(--w-stack-divide, 2rem) * var(--w-list-line, 0));
+
     display: grid;
-    padding-block: var(--w-section-padding);
+    padding-block: calc(var(--w-section-padding) + var(--w-list-divide)) var(--w-section-padding);
 
     @variant sm-not {
       --w-section-border: 0px;
@@ -1099,8 +1109,10 @@
   }
 
   .w-list-page-surface {
+    margin-top: calc((var(--w-section-padding) + var(--w-list-divide)) * -1);
     background-color: var(--w-section-paint);
     border: var(--w-section-border) solid var(--w-line-subtle);
+    border-top-width: calc(var(--w-section-border) + 1px * var(--w-list-line, 0));
     backdrop-filter: var(--w-section-backdrop);
   }
 

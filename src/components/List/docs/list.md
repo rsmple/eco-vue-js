@@ -114,6 +114,8 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
+| `title` | `string` | — | Heading of the list, as a section's: the list is a section of its own on the page, and a part of a section or a modal, with a smaller heading and a line above it after other content. The `title` slot replaces it. |
+| `description` | `string` | — | A line under the heading on what the list holds. The `description` slot replaces it. |
 | `count` | `number` | — | Total number of items, when known in advance. Sizes the skeleton and the select-all. Defaults to the count the query returns. |
 | `fields` | `Fields` | **required** | Field components, one per column, each with a `meta` export for its title, label, ordering field and classes. A meta with `fields` groups nested fields. |
 | `expansion` | `ExpansionComponent<Data, QueryParams>` | — | Detail component shown under a row when the row is clicked. Receives the same props as a field, except `config`. |
@@ -175,7 +177,9 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 
 | Slot | Props | Description |
 | --- | --- | --- |
-| `header` | `{ count: number \| undefined; }` | Content above the selection bar, with the count returned by the query. |
+| `title` | `{ count: number \| undefined; }` | Heading of the list, in place of `title`, with the count returned by the query. |
+| `description` | — | Line under the heading, in place of `description`. |
+| `header` | `{ count: number \| undefined; }` | Content above the selection bar, under the heading, with the count returned by the query. |
 | `filter` | — | Filters at the start of the selection bar, usually a WListFilter. They keep to one line, the chips that do not fit go to a menu, the list actions move to the end and fold into More first, and a selection replaces them. `--w-list-toolbar-height` sets the bar's height, the inherited input height by default. |
 | `selection` | — | Replaces the buttons at the end of the selection bar — range select, refetch, sort and column settings. |
 | `group` | `{ item: Data; previous: Data \| undefined; skeleton: boolean; }` | Content of the heading before each group of rows, with `groupBy`. The heading spans the whole row, sticks under the toolbar and, in list mode, to the left edge while the rows scroll sideways. Its content is laid out by the slot. `skeleton` is true while the page loads. |

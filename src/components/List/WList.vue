@@ -6,6 +6,7 @@
       'w-list-page': isPageOwn,
       'w-list-page-table': isPageOwn && !isGrid,
       'w-list-page-repaint': isPageOwn && isRepaint,
+      'w-list-section': hasHeading,
     }]"
   >
     <component :is="isPageOwn ? ListPageSurface : WEmptyComponent">
@@ -98,9 +99,34 @@
               @click:reset="resetConfig"
             >
               <template
-                v-if="$slots.header"
+                v-if="$slots.header || hasHeading"
                 #header="scope"
               >
+                <SectionHeading
+                  v-if="hasHeading"
+                  :title="title"
+                  :description="description"
+                  :nested="isHeadingNested"
+                  class="w-list-heading"
+                >
+                  <template
+                    v-if="$slots.title"
+                    #title
+                  >
+                    <slot
+                      name="title"
+                      v-bind="scope"
+                    />
+                  </template>
+
+                  <template
+                    v-if="$slots.description"
+                    #description
+                  >
+                    <slot name="description" />
+                  </template>
+                </SectionHeading>
+
                 <slot
                   name="header"
                   v-bind="scope"
@@ -240,13 +266,14 @@ import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
 
-import {type Ref, type StyleValue, computed, inject, onBeforeUnmount, onMounted, provide, ref, toRef, useTemplateRef, watch, watchEffect} from 'vue'
+import {type Ref, type StyleValue, computed, inject, onBeforeUnmount, onMounted, provide, ref, toRef, useSlots, useTemplateRef, watch, watchEffect} from 'vue'
 
 import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
 import {wScrollingElement} from '@/components/InfiniteList/models/injection'
 import {wIsModal} from '@/components/Modal/models/injection'
+import SectionHeading from '@/components/Surface/components/SectionHeading.vue'
 import {wSectionNested} from '@/components/Surface/models/injection'
 import {useIsMobile} from '@/utils/mobile'
 import {type OrderItem, encodeOrdering, parseOrdering} from '@/utils/order'
@@ -269,6 +296,13 @@ defineOptions({inheritAttrs: false})
 
 const props = withDefaults(
   defineProps<{
+    /**
+     * Heading of the list, as a section's: the list is a section of its own on the page, and a part of a section or a
+     * modal, with a smaller heading and a line above it after other content. The `title` slot replaces it.
+     */
+    title?: string
+    /** A line under the heading on what the list holds. The `description` slot replaces it. */
+    description?: string
     /** Total number of items, when known in advance. Sizes the skeleton and the select-all. Defaults to the count the query returns. */
     count?: number
     /** Field components, one per column, each with a `meta` export for its title, label, ordering field and classes. A meta with `fields` groups nested fields. */
@@ -385,6 +419,8 @@ const props = withDefaults(
     exportFileName: undefined,
     selection: undefined,
     toMarkdown: undefined,
+    title: undefined,
+    description: undefined,
   },
 )
 
@@ -402,7 +438,11 @@ const emit = defineEmits<{
 }>()
 
 defineSlots<{
-  /** Content above the selection bar, with the count returned by the query. */
+  /** Heading of the list, in place of `title`, with the count returned by the query. */
+  title?: (props: {count: number | undefined}) => void
+  /** Line under the heading, in place of `description`. */
+  description?: () => void
+  /** Content above the selection bar, under the heading, with the count returned by the query. */
   header?: (props: {count: number | undefined}) => void
   /** Filters at the start of the selection bar, usually a WListFilter. They keep to one line, the chips that do not fit go to a menu, the list actions move to the end and fold into More first, and a selection replaces them. `--w-list-toolbar-height` sets the bar's height, the inherited input height by default. */
   filter?: () => void
@@ -430,6 +470,10 @@ const isPage = !isModal && inject(wScrollingElement, null) === null && !isSectio
 // holds the list's header, the list renders its rows. Lists in its rows are not on the page.
 const frame = isPage ? inject(wListPageFrame, null) : null
 const isPageOwn = isPage && !frame
+
+const slots = useSlots()
+const hasHeading = computed(() => !!(props.title || props.description || slots.title || slots.description))
+const isHeadingNested = !isPageOwn
 
 provide(wListPageFrame, null)
 provide(wListPageFrameHeader, frame ? {
