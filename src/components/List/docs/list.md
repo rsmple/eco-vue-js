@@ -22,7 +22,7 @@ The sticky header, the checkbox column and full-width rows position themselves f
 
 ## Cards
 
-In grid view the list draws each card itself. On a page in the flat layout a card is an outline with a light shadow. Where the section around it paints — the card and glass layouts, a section's parts, a modal or a card — it is a filled card without an edge, one step darker than what it sits on. On phones the cards are striped rows.
+In grid view the list draws each card itself. On a page in the flat layout a card is an outline with a light shadow. Where the section around it paints — the card layout, a section's parts, a modal or a card — it is a filled card without an edge, one step darker than what it sits on. In a glass section it is a pane of glass over it: a light translucent fill the section shows through, with a hairline edge and a lit top edge. On phones the cards are striped rows.
 
 The defaults are `--inner-margin` of padding, `xl` corners and a `1rem` gap. Set them on the list with `w-list-card-padding-*` (in `cardClass`), `w-list-rounded-*` and `w-list-gap-*`, and the card width with `w-list-card-w-*`. Leave the surface itself to the list. `cardClass` is for the inner layout, such as `card:gap-2` or `card:items-start`.
 

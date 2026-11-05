@@ -530,31 +530,50 @@
 
 /*
  * A WList card from `sm` up (on phones the cards are striped rows). Where the section around it paints nothing, a page
- * in flat, it is an outline with a light shadow. Where it paints, as in a card or glass layout, a section's parts, a
- * modal or a card, it follows a card in a section: opaque, one step darker than what it sits on, without an edge.
- * `--w-list-card` sets the fill instead, `--w-list-rounded` the corners.
+ * in flat, it is an outline with a light shadow. Where it paints, as in a card layout, a section's parts, a modal or a
+ * card, it follows a card in a section: opaque, one step darker than what it sits on, without an edge. In a section
+ * that is see-through (glass) it is a pane of glass over it: a light translucent fill the section shows through, a
+ * hairline edge and a lit top edge. No blur of its own: the section's blur is the root of what it could blur, which is
+ * the section's own fill. `--w-list-card` sets the fill instead, `--w-list-rounded` the corners.
  */
 @layer utilities {
   .w-list-card-surface {
     @variant sm {
       --w-list-card-fill: var(--w-section-paints, min(1, var(--w-section-opacity) * 100));
       --w-list-card-outline: calc(1 - var(--w-list-card-fill));
+      /* 1 in a see-through section (glass), 0 in flat, painting or not, and in an opaque one (card). */
+      --w-list-card-glass: calc(
+        var(--w-list-card-fill) * min(1, var(--w-section-opacity) * 100) * min(1, (1 - var(--w-section-opacity)) * 100)
+      );
+      --w-list-card-solid: calc(var(--w-list-card-fill) * (1 - var(--w-list-card-glass)));
 
       background-color: var(
         --w-list-card,
-        color-mix(in oklab, var(--w-surface-subtle) calc(var(--w-list-card-fill) * 100%), transparent)
+        color-mix(
+          in oklab,
+          color-mix(in oklab, var(--w-surface-subtle) calc(var(--w-list-card-solid) * 100%), transparent),
+          light-dark(oklch(100% 0 0 / 0.45), oklch(100% 0 0 / 0.05)) calc(var(--w-list-card-glass) * 100%)
+        )
       );
-      border: calc(1px * var(--w-list-card-outline)) solid var(--w-line-subtle);
+      border: calc(1px * (var(--w-list-card-outline) + var(--w-list-card-glass))) solid var(--w-line-subtle);
       border-radius: var(--w-list-rounded, var(--radius-xl));
       box-shadow:
-        0 1px 3px 0 rgb(0 0 0 / calc(0.1 * var(--w-list-card-outline))),
-        0 1px 2px -1px rgb(0 0 0 / calc(0.1 * var(--w-list-card-outline)));
+        0 1px 3px 0 rgb(0 0 0 / calc(0.1 * var(--w-list-card-outline) + 0.08 * var(--w-list-card-glass))),
+        0 1px 2px -1px rgb(0 0 0 / calc(0.1 * var(--w-list-card-outline))),
+        inset 0 1px 0 0
+          color-mix(
+            in oklab,
+            light-dark(oklch(100% 0 0 / 0.7), oklch(100% 0 0 / 0.08)) calc(var(--w-list-card-glass) * 100%),
+            transparent
+          );
     }
   }
 
+  /* In a modal or a card, which are opaque, it is opaque too. */
   @scope (.w-modal-wrapper, .surface-card) to (.surface-root) {
     :scope .w-list-card-surface {
       --w-list-card-fill: 1;
+      --w-list-card-glass: 0;
     }
   }
 }
