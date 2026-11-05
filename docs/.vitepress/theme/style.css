@@ -2,6 +2,10 @@
 
 @source "../../../src";
 @source "../../examples";
+@source "../../guide";
+@source "../../recipes";
+@source "../../utilities";
+@source "../../*.md";
 @source "./";
 
 @import "../../../package/tailwind-base/base.css";
