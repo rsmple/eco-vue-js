@@ -4,7 +4,7 @@
     :container="{
       draggable,
       style: {order: order + 1},
-      class: disabled ? 'opacity-50' : undefined,
+      class: disabled ? 'opacity-50' : isDragging ? 'opacity-0 transition-opacity delay-100' : undefined,
       onDragend: !disabled ? endDrag : undefined,
       onDragenter: !draggable ? () => $emit('drag:enter', order) : undefined,
       onDragstart: !disabled ? startDrag : undefined,
@@ -21,7 +21,7 @@
   >
     <div
       v-if="isDragging"
-      class="bg-(--w-drag-item-overlay,var(--w-surface)) pointer-events-none absolute z-1 size-full transition-opacity col-[1/2]"
+      class="bg-(--w-drag-item-overlay,transparent) pointer-events-none absolute z-1 size-full transition-opacity col-[1/2]"
       :style="{gridRow: `${order + 1}/${order + 2}`}"
     />
   </Transition>
