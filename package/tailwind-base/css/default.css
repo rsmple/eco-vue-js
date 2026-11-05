@@ -94,6 +94,34 @@
   @apply surface-dropdown rounded-xl text-start font-normal shadow-md border border-solid border-line-raised overflow-clip;
 }
 
+/*
+ * The edge of a dropdown or popover frame that its tip (WDropdownTip) stands on: the border is cut where the tip meets it, and the
+ * tip's own outline joins it there. The tip's fill covers the border, but in glass that fill is see-through, so without the cut
+ * the border shows through the tip's base. The cut stops 1px short of the tip on each side, so the border runs under the ends of
+ * the tip's outline and no sliver opens where they meet. It follows the tip when the frame shifts on screen (`--w-tip-cut-shift`).
+ * The cut is a mask that keeps the shadow outside the frame; where `no-clip` is not supported the mask is dropped and the border
+ * stays whole.
+ */
+@utility w-tip-edge-top {
+  mask: linear-gradient(#000 0 0) no-clip, linear-gradient(#000 0 0) calc(50% - var(--w-tip-cut-shift, 0px)) 0 / calc(--spacing(4) - 2px) 1px no-repeat border-box;
+  mask-composite: exclude;
+}
+
+@utility w-tip-edge-bottom {
+  mask: linear-gradient(#000 0 0) no-clip, linear-gradient(#000 0 0) calc(50% - var(--w-tip-cut-shift, 0px)) 100% / calc(--spacing(4) - 2px) 1px no-repeat border-box;
+  mask-composite: exclude;
+}
+
+@utility w-tip-edge-left {
+  mask: linear-gradient(#000 0 0) no-clip, linear-gradient(#000 0 0) 0 calc(50% - var(--w-tip-cut-shift, 0px)) / 1px calc(--spacing(4) - 2px) no-repeat border-box;
+  mask-composite: exclude;
+}
+
+@utility w-tip-edge-right {
+  mask: linear-gradient(#000 0 0) no-clip, linear-gradient(#000 0 0) 100% calc(50% - var(--w-tip-cut-shift, 0px)) / 1px calc(--spacing(4) - 2px) no-repeat border-box;
+  mask-composite: exclude;
+}
+
 /* Reaches past the padding of the overlay frame the element is in — a modal, a dropdown or a bottom sheet — to its edges, such as a list or a tab bar in a form. */
 @utility w-frame-bleed {
   margin-inline: calc(var(--w-frame-padding, 0px) * -1);

@@ -25,7 +25,10 @@
         <template #default="{isTop}">
           <WDropdownTip :top="isTop" />
 
-          <div class="w-dropdown-frame w-tooltip-center-x flex gap-1 p-1">
+          <div
+            class="w-dropdown-frame w-tooltip-center-x flex gap-1 p-1"
+            :class="isTop ? 'w-tip-edge-bottom' : 'w-tip-edge-top'"
+          >
             <WMenuItem @click="add">
               Add to notes
             </WMenuItem>

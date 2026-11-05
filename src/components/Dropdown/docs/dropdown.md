@@ -14,7 +14,7 @@ description: WDropdown and WDropdownTip — content placed in a fixed layer agai
 
 It is `position: fixed`, so put it in a `<Teleport to="body">`: a transformed or filtered ancestor would otherwise become what it's positioned in.
 
-`WDropdownTip` is the small arrow of the kit's dropdowns and tooltips, drawn in the surface color of its tone with the raised line around it. Put it first in the slot with `top` set from `isTop`: it moves after the content when the dropdown opens above. `left` and `right` point it sideways, for content beside the parent.
+`WDropdownTip` is the small arrow of the kit's dropdowns and tooltips, drawn in the surface color of its tone with the raised line around it. Put it first in the slot with `top` set from `isTop`: it moves after the content when the dropdown opens above. `left` and `right` point it sideways, for content beside the parent. Give the frame `w-tip-edge-top`, `-bottom`, `-left` or `-right` for the edge the tip stands on: it cuts the border under the tip, which would otherwise show through it in glass.
 
 <!-- @example Dropdown/Basic client -->
 
@@ -48,7 +48,10 @@ It is `position: fixed`, so put it in a `<Teleport to="body">`: a transformed or
         <template #default="{isTop}">
           <WDropdownTip :top="isTop" />
 
-          <div class="w-dropdown-frame w-tooltip-center-x flex gap-1 p-1">
+          <div
+            class="w-dropdown-frame w-tooltip-center-x flex gap-1 p-1"
+            :class="isTop ? 'w-tip-edge-bottom' : 'w-tip-edge-top'"
+          >
             <WMenuItem @click="add">
               Add to notes
             </WMenuItem>

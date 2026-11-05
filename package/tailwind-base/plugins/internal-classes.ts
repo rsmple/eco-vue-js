@@ -134,11 +134,17 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
   })
 
   addBase({
+    // The shift is kept in `--w-tip-shift`, so the cut in the border under the tip (`w-tip-edge-*`) follows the tip, which stays on the anchor.
+    // The cut's copy, `--w-tip-cut-shift`, is the same shift for a mask position, where `50%` is half the frame less the cut (`--spacing(4) - 2px`).
     '.w-tooltip-center-x': {
-      transform: 'translate(calc(min(100vw - var(--dropdown-x, 0px) - 50% - 12px, max((var(--dropdown-x, 0px) - 50% - 12px) * -1, 0px))), 0)',
+      '--w-tip-shift': 'calc(min(100vw - var(--dropdown-x, 0px) - 50% - 12px, max((var(--dropdown-x, 0px) - 50% - 12px) * -1, 0px)))',
+      '--w-tip-cut-shift': 'calc(min(100vw - var(--dropdown-x, 0px) - (50% + 0.5rem - 1px) - 12px, max((var(--dropdown-x, 0px) - (50% + 0.5rem - 1px) - 12px) * -1, 0px)))',
+      transform: 'translate(var(--w-tip-shift), 0)',
     },
     '.w-tooltip-center-y': {
-      transform: 'translate(0, calc(min(100vh - var(--dropdown-y, 0px) - 50% - 12px, max((var(--dropdown-y, 0px) - 50% - 12px) * -1, 0px))))',
+      '--w-tip-shift': 'calc(min(100vh - var(--dropdown-y, 0px) - 50% - 12px, max((var(--dropdown-y, 0px) - 50% - 12px) * -1, 0px)))',
+      '--w-tip-cut-shift': 'calc(min(100vh - var(--dropdown-y, 0px) - (50% + 0.5rem - 1px) - 12px, max((var(--dropdown-y, 0px) - (50% + 0.5rem - 1px) - 12px) * -1, 0px)))',
+      transform: 'translate(0, var(--w-tip-shift))',
     },
   })
 

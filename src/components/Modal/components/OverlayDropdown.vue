@@ -103,6 +103,7 @@
               // A list of options, such as a filter's, sizes to its content up to that width. Fields have no width of their own, so a form of fields, such as a text filter, keeps to the smallest width.
               regions.title.length ? [options?.fitContent ? 'w-max min-w-[min(18rem,calc(100vw-2rem))] max-w-[min(24rem,calc(100vw-2rem))]' : 'w-[min(24rem,calc(100vw-2rem))]', 'max-h-112'] : undefined,
               hasTip ? isBeside ? 'w-tooltip-center-y' : 'w-tooltip-center-x' : undefined,
+              hasTip && (isBeside && isLeft ? 'w-tip-edge-right' : isBeside && isRight ? 'w-tip-edge-left' : !isBeside && isTop ? 'w-tip-edge-bottom' : 'w-tip-edge-top'),
               cornered && frameClass === undefined && {
                 'rounded-bl-none': isRight && isTop,
                 'rounded-tl-none': isRight && !isTop,

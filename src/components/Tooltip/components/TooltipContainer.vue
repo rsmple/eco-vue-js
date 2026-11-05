@@ -22,7 +22,7 @@
         border-line-raised px-3 py-2 text-center text-xs
         font-medium shadow-md will-change-transform
       "
-      :class="isLeft || isRight ? undefined : 'w-tooltip-center-x'"
+      :class="isLeft ? 'w-tip-edge-right' : isRight ? 'w-tip-edge-left' : ['w-tooltip-center-x', isTop ? 'w-tip-edge-bottom' : 'w-tip-edge-top']"
       @mouseover="$emit('over')"
       @mouseleave="$emit('leave')"
     >
