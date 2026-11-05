@@ -24,10 +24,10 @@
       ref="header"
       class="print:hidden"
       :class="inPlace ? undefined : {
-        'sticky': true,
+        'sticky': !isSectionInView,
         'top-(--w-header-inner)': !isContained,
         'w-infinite-list-header': !isContained && !noHeaderUpdate,
-        'w-infinite-list-header-stuck': !isContained && !noHeaderUpdate && isIntersecting === false,
+        'w-infinite-list-header-stuck': !isContained && !noHeaderUpdate && !isSectionInView && isIntersecting === false,
         'top-0 not-empty:pt-(--w-list-contained-top,0.75rem)': isContained && !isModal,
         'top---modal-header-height': isModal,
         'bg-surface': noHeaderUpdate || isContained,
@@ -144,7 +144,7 @@ const isPadding = () => !joined && !isContained && !props.noHeaderUpdate
 const updatePadding = () => {
   if (!isPadding()) return
 
-  const intersecting = props.inPlace || isIntersecting.value
+  const intersecting = props.inPlace || isSectionInView.value || isIntersecting.value
   if (intersecting === null) return
 
   const offset = indicatorRef.value?.closest('.w-list-page') ? 0 : stickyGap.value
@@ -153,7 +153,22 @@ const updatePadding = () => {
   updateHeaderPadding(!intersecting && height ? height : 0)
 }
 
-watch(() => [props.inPlace, isIntersecting.value, headerHeight.value, stickyGap.value], updatePadding)
+/**
+ * Whether the page list's section fits the screen below the header bar. Its frame then has no room to stick, so the
+ * section's top scrolls away above where a stuck header would draw it: the header scrolls along, as in a section.
+ */
+const isSectionInView = ref(false)
+
+const updateSectionInView = () => {
+  const page = indicatorRef.value?.closest('.w-list-page')
+  const surface = page?.querySelector(':scope > .w-list-page-surface')
+  const frame = page?.querySelector(':scope > .w-list-page-frame')
+
+  isSectionInView.value = !!surface && !!frame && getComputedStyle(frame).top !== 'auto'
+    && frame.getBoundingClientRect().height >= surface.getBoundingClientRect().height - 1
+}
+
+watch(() => [props.inPlace, isIntersecting.value, isSectionInView.value, headerHeight.value, stickyGap.value], updatePadding)
 
 watch(() => props.noHeaderUpdate, value => {
   if (value && !joined && !isContained) updateHeaderPadding(0)
@@ -194,9 +209,11 @@ const observe = () => {
 const onResize = () => {
   updateHeaderTop()
   observe()
+  updateSectionInView()
 }
 
 let resizeObserver: ResizeObserver | null = null
+let sectionObserver: ResizeObserver | null = null
 
 onMounted(() => {
   if (!getIsClientSide() || joined || !headerRef.value) return
@@ -211,6 +228,13 @@ onMounted(() => {
 
   resizeObserver.observe(headerRef.value)
 
+  const page = indicatorRef.value?.closest('.w-list-page')
+
+  if (page && !isContained) {
+    sectionObserver = new ResizeObserver(updateSectionInView)
+    sectionObserver.observe(page)
+  }
+
   observe()
   window.addEventListener('resize', onResize)
 })
@@ -218,6 +242,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', onResize)
   resizeObserver?.disconnect()
+  sectionObserver?.disconnect()
   intersectionObserver?.disconnect()
 
   if (isPadding()) updateHeaderPadding(0)

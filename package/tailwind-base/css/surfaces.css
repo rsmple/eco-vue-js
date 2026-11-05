@@ -329,6 +329,14 @@
  * its parts, and not in a stack the page sets, which spaces its own: `surface-stack` runs sections together in flat.
  */
 @layer components {
+  /*
+   * A page list is a section of its own: apart from the content before it, as sections in a `surface-stack` are. In
+   * this layer, under the page's spacing below, which wins in block flow; a stack the list is in sets its own.
+   */
+  :where(* + .w-list-page-table) {
+    margin-top: var(--w-section-gap);
+  }
+
   @scope (.w-page) to (.surface-section *, .surface-root *) {
     :where(:scope, :scope :not(.grid, .flex, .inline-grid, .inline-flex, .surface-columns, .surface-stack, .surface-stack-divided))
       > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section)
@@ -1003,11 +1011,6 @@
     }
   }
 
-  /* A section of its own: apart from the page content before it, as sections in a `surface-stack` are. A stack it is in sets its own. */
-  :where(* + .w-list-page-table) {
-    margin-top: var(--w-section-gap);
-  }
-
   /* As wide as its rows, plus the right inset: the last column scrolls clear of the sticky menu column. */
   .w-list-page-table {
     width: max-content;
@@ -1052,6 +1055,23 @@
     @variant sm-not {
       margin-inline: calc(var(--w-page-inset, 0px) * -1);
       --w-list-end-inner: 0px;
+    }
+  }
+
+  /*
+   * A page list of cards wraps and never scrolls sideways: while a table scrolls the window, its content keeps to the
+   * view as content beside the table does. Its parts stick on their own, as a table's toolbar does, and not as one
+   * box: the stuck header would stick inside another sticky box, which browsers move apart from it while scrolling,
+   * and the box's layer would hold the header and the edges under the frame. The surface, frame and edges keep to the
+   * view already.
+   */
+  :root[data-w-page-table] .w-list-page:not(.w-list-page-table) {
+    @variant sm {
+      & :where(.w-list-page-content > :not(.w-infinite-list-header, .w-list-page-end), .w-infinite-list-header > :not(.w-infinite-list-header-edge)) {
+        position: sticky;
+        left: var(--w-left-inner);
+        max-width: var(--w-width-inner);
+      }
     }
   }
 

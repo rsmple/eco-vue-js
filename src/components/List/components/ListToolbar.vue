@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="$slots.header"
-    class="w-list-header"
+    class="w-list-header list:left---left-inner list:w---width-inner list:sticky"
   >
     <slot
       name="header"
