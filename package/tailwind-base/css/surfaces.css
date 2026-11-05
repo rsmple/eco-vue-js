@@ -253,6 +253,36 @@
   padding-top: max(0px, 1rem - var(--w-section-padding));
 }
 
+/*
+ * A joined section has no top edge, so neither the lit top edge of a glass shadow. Its shadow is drawn from a box
+ * running on up behind the head, and stops at the section's top as the head's stops at its bottom: clipping the section
+ * itself would leave a seam between the two fills. A section after another in a stack there is not joined, and its
+ * shadow box is its own. Positioned under the utilities, so a sticky section stays sticky.
+ */
+@layer components {
+  :where(.surface-section-joined .surface-section:not(.surface-section *, .surface-section-tone)) {
+    --w-joined-reach: calc(3rem * var(--w-joined, 0));
+
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: calc(var(--w-joined-reach) * -1 - var(--w-section-border) * (1 - var(--w-joined, 0))) calc(var(--w-section-border) * -1) calc(var(--w-section-border) * -1);
+      border-radius: inherit;
+      box-shadow: var(--w-section-shadow);
+      clip-path: inset(calc(var(--w-joined-reach) - 100vh * (1 - var(--w-joined, 0))) -100vw -100vh);
+      pointer-events: none;
+    }
+  }
+}
+
+@layer utilities {
+  .surface-section-joined .surface-section:not(.surface-section *, .surface-section-tone) {
+    box-shadow: none;
+  }
+}
+
 /* Reaches into the page gutter like a section: for a row of cards on the canvas. On phones the cards keep the page inset. */
 @utility w-page-bleed {
   margin-inline: calc(var(--w-page-bleed, 0px) * -1);
@@ -501,7 +531,8 @@
     :scope * + .surface-section,
     :scope * + .w-list-section .w-list-heading {
       border-top: 1px solid var(--w-line-subtle);
-      padding-top: var(--w-subsection-divide, 1rem);
+      padding-top: var(--w-subsection-divide, 2rem);
+      margin-top: var(--w-subsection-divide, 2rem);
     }
   }
 
