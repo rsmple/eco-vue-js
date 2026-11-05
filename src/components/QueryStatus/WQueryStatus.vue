@@ -46,7 +46,20 @@ const queryClient = getQueryClient()
 
 const cacheVersion = ref(0)
 
-const unsubscribe = queryClient.getQueryCache().subscribe(() => cacheVersion.value++)
+// Once per task, after the render that fired the events: the cache notifies at once, and a list jumping to another
+// page changes dozens of queries in one flush, each of which would run this again within it.
+let isScheduled = false
+
+const unsubscribe = queryClient.getQueryCache().subscribe(() => {
+  if (isScheduled) return
+
+  isScheduled = true
+
+  setTimeout(() => {
+    isScheduled = false
+    cacheVersion.value++
+  })
+})
 
 const failedQueryList = computed(() => {
   void cacheVersion.value
