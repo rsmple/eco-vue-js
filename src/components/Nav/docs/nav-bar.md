@@ -31,6 +31,8 @@ The `footer` slot is the nav's bottom, such as a back button or the app's versio
 
 `WNavItemExpand` groups items under a title. The items show under it while one of them is active; otherwise hovering the group opens them in a menu to the right. One group's menu is open at a time, so moving down the nav switches it. The menu lines up with the group by its top, or by its bottom low on the screen, and shifts to stay on screen when it is taller than the room there — it scrolls once taller than the screen. With `to`, the group is a link of its own. `even` keeps the items always shown and not indented, for a nav inside a page.
 
+Groups can nest, and each level indents further. Items without an icon, from neither `icon`, the `icon` slot nor `meta.icon`, start with the title.
+
 `WNavItemTransition` wraps a list of items so that the ones added or removed with `v-if` — such as an item for the current record — expand and collapse.
 
 The demo below uses `even` to show a group inside a page. Its items link to pages of this site, so the one you're on is active.
@@ -186,15 +188,16 @@ import WNavItem from 'eco-vue-js/dist/components/Nav/WNavItem.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `icon` | `SVGComponent` | — | Icon before the title. Defaults to the route's `meta.icon`. |
+| `icon` | `SVGComponent` | — | Icon before the title. Defaults to the route's `meta.icon`. Without an icon the title takes its place. |
 | `title` | `string` | — | Title of the item. Defaults to the title the route's page registers with `useRouteTitle` while it is open, then the route's `meta.titleShort`, then `meta.title`. |
 | `count` | `number` | — | Number after the title in brackets, such as the number of items on the page it opens. |
 | `counter` | `number` | — | Number in a badge over the end of the title, such as unread items. Hidden at 0. |
 | `skeleton` | `boolean` | — | Shows a placeholder for `count` and hides `counter`, while they load. |
 | `hasActive` | `boolean` | — | Marks the item as the parent of the active item. Set by WNavItemExpand. |
 | `expand` | `boolean` | — | Marks the item as the toggle of a group without a route of its own. Set by WNavItemExpand. |
-| `indent` | `boolean` | — | Indents the item as a child of a group. Set by WNavItemExpand. |
+| `indent` | `number` | — | How many groups the item is nested in, which sets its indent. Set by WNavItemExpand. |
 | `queryFields` | `string[]` | — | Query params that must match the current route's for the item to be active, besides its route name. Other params, such as filters, are ignored. |
+| `paramFields` | `string[]` | — | Route params that must match the current route's for the item to be active, besides its route name. Other route params are ignored. |
 | `hovered` | `boolean` | — | Highlights the item as hovered. Set by WNavItemExpand while its menu is open. |
 | `even` | `boolean` | — | Lays the item out without the indent of a group. Set by WNavItemExpand. |
 | `to` | `RouteLocationRaw` | **required** | Router location — renders a router link. Needs vue-router installed in the app. |
@@ -220,13 +223,14 @@ import WNavItemExpand from 'eco-vue-js/dist/components/Nav/WNavItemExpand.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `icon` | `SVGComponent` | — | Icon before the title. |
+| `icon` | `SVGComponent` | — | Icon before the title. Without an icon the title takes its place. |
 | `title` | `string` | **required** | Title of the group. |
 | `count` | `number` | — | Number after the title in brackets. |
 | `counter` | `number` | — | Number in a badge over the end of the title. Hidden at 0. |
 | `skeleton` | `boolean` | — | Shows a placeholder for `count` and hides `counter`, while they load. |
-| `indent` | `boolean` | — | Indents the group as a child of another group. |
+| `indent` | `number` | — | How many groups the group is nested in, which sets its indent. Set by a parent WNavItemExpand. |
 | `queryFields` | `string[]` | — | Query params that must match the current route's for the group's own route to be active. |
+| `paramFields` | `string[]` | — | Route params that must match the current route's for the group's own route to be active. |
 | `even` | `boolean` | — | Keeps the items always shown, without indent and without the menu on hover, e.g. for a nav inside a page. |
 | `to` | `RouteLocationRaw` | — | Router location — renders a router link. Needs vue-router installed in the app. |
 

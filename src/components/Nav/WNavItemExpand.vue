@@ -3,7 +3,10 @@
     v-if="!slotsDefault.length"
     v-bind="($props as LinkProps)"
   >
-    <template #icon>
+    <template
+      v-if="$slots.icon"
+      #icon
+    >
       <slot name="icon" />
     </template>
   </WNavItem>
@@ -33,9 +36,13 @@
           :even="even"
           :expand="!to"
           :query-fields="queryFields"
+          :param-fields="paramFields"
           :hovered="isDropdownOpen && !hasActive"
         >
-          <template #icon>
+          <template
+            v-if="$slots.icon"
+            #icon
+          >
             <slot name="icon" />
           </template>
 
@@ -89,7 +96,7 @@
           :key="index"
           ref="inner"
           :even="even"
-          :indent="!even"
+          :indent="even ? undefined : (indent ?? 0) + 1"
         />
       </WNavItemTransition>
     </WExpansion>
@@ -134,8 +141,8 @@ const innerRef = useTemplateRef<(typeof WNavItem)[] | undefined>('inner')
 const {isOpen: isDropdownOpen, show: showDropdown, hide: hideDropdown, close: closeDropdown} = useNavGroupDropdown()
 const hasActive = ref(false)
 
-const isActive = computed(() => hasActive.value || (componentRef.value?.isActive ?? false))
 const hasInnerActive = computed(() => innerRef.value?.some(item => item.isActive) ?? false)
+const isActive = computed(() => hasInnerActive.value || hasActive.value || (componentRef.value?.isActive ?? false))
 
 const isVisible = computed(() => isDropdownOpen.value || isActive.value)
 
@@ -145,7 +152,11 @@ const updateHasActive = async () => {
   hasActive.value = innerRef.value?.some(item => item.isActive) ?? false
 }
 
-watch(hasInnerActive, updateHasActive, {immediate: true})
+watch(hasInnerActive, value => {
+  hasActive.value = value
+
+  updateHasActive()
+}, {immediate: true})
 watch(isActive, updateHasActive, {immediate: true})
 watch(slotsDefault, updateHasActive, {immediate: true})
 

@@ -29,7 +29,8 @@
     >
       <div
         v-if="indent && !expand && isActive"
-        class="absolute left-3 top-0 flex h-full items-center"
+        class="absolute top-0 flex h-full items-center"
+        :style="{left: getIndentLength(1)}"
       >
         <div class="square-1.5 rounded-full bg-(--w-nav-item-dot-color)" />
       </div>
@@ -43,14 +44,18 @@
 
     <div class="[overflow:inherit]">
       <div
-        class="w-ripple w-ripple-hover relative grid grid-cols-[1.5rem_1fr_auto] items-center rounded-(--w-nav-item-rounded,var(--radius-lg)) pr-2"
+        class="w-ripple w-ripple-hover relative grid items-center rounded-(--w-nav-item-rounded,var(--radius-lg)) pr-2"
         :class="{
           'before:opacity-10': hovered,
-          'pl-4': indent,
-          'pl-2': !indent,
+          'grid-cols-[1.5rem_1fr_auto]': iconLocal || $slots.icon,
+          'grid-cols-[1fr_auto]': !iconLocal && !$slots.icon,
         }"
+        :style="{paddingLeft: getIndentLength(2)}"
       >
-        <div class="flex items-center">
+        <div
+          v-if="iconLocal || $slots.icon"
+          class="flex items-center"
+        >
           <template v-if="iconLocal">
             <component
               :is="iconLocal"
@@ -112,6 +117,9 @@ import {getRouteTitle, getRouteTitleShort} from '@/utils/useRouteTitle'
 import {isEqualObj, numberCompactFormatter} from '@/utils/utils'
 
 const EXCLUDE_QUERY_FIELDS = ['ordering', 'page']
+const INDENT_STEP = 2
+
+const getParamValue = (value: string | string[] | undefined) => [value ?? ''].flat().join('/')
 
 const props = defineProps<NavItemProps>()
 
@@ -130,6 +138,7 @@ const routeTo = computed(() => router.resolve(props.to))
 const isActive = computed<boolean>(() => {
   if (!route) return false
   if (routeTo.value?.name !== route?.name) return false
+  if (props.paramFields?.some(field => getParamValue(route.params[field]) !== getParamValue(routeTo.value.params[field]))) return false
 
   return isEqualObj(route.query, routeTo.value.query ?? {}, EXCLUDE_QUERY_FIELDS, props.queryFields)
 })
@@ -139,6 +148,8 @@ const routeTitle = computed(() => getRouteTitle(routeTo.value?.matched ?? []))
 const iconLocal = computed(() => props.icon ?? routeTo.value?.meta?.icon)
 
 const titleLocal = computed<string>(() => props.title ?? (routeTitle.value ? getRouteTitleShort(routeTitle.value) : undefined) ?? (typeof routeTo.value?.meta?.titleShort === 'string' ? routeTo.value.meta.titleShort : typeof routeTo.value?.meta?.title === 'string' ? routeTo.value.meta.title : ''))
+
+const getIndentLength = (base: number) => `calc(var(--spacing) * ${ base + INDENT_STEP * (props.indent ?? 0) })`
 
 const isTextColor = computed(() => props.hasActive ? !props.indent : isActive.value)
 

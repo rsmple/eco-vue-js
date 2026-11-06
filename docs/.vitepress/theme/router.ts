@@ -12,7 +12,7 @@ import {type App, type PropType, defineComponent, h, reactive, watch} from 'vue'
 export const installKitRouter = (app: App, router: Router, base: string) => {
   const stripBase = (path: string) => '/' + path.slice(base.length).replace(/\.html$/, '')
 
-  const route = reactive<FallbackRoute>({name: '', path: '', query: {}, hash: '', fullPath: '', matched: []})
+  const route = reactive<FallbackRoute>({name: '', path: '', query: {}, params: {}, hash: '', fullPath: '', matched: []})
 
   const sync = () => {
     route.name = stripBase(router.route.path)
@@ -31,7 +31,7 @@ export const installKitRouter = (app: App, router: Router, base: string) => {
     const hash = location.hash ?? ''
     const href = base + path.replace(/^\//, '') + (search ? '?' + search : '') + hash
 
-    const result = {name: path, path, href, query, meta: undefined}
+    const result = {name: path, path, href, query, params: {}, meta: undefined}
 
     return {...result, matched: [result] as unknown as RouteRecordNormalized[]}
   }
