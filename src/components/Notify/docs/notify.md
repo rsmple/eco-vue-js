@@ -151,7 +151,7 @@ const {isOpen, toggle} = useNotifyCenter({
 })
 ```
 
-`WNotifyCenter` can also be placed on a page as it is. Notifications on the `ACTION` channel need the user: they are pinned on top under their own heading, their toast stays until closed, and clearing the history keeps them — as it keeps pending ones.
+`WNotifyCenter` can also be placed on a page as it is. Notifications on the `ACTION` channel need the user: they are pinned on top under their own heading, their toast stays until closed, and clearing the history keeps them — as it keeps pending ones. Each section has its own button: Clear beside the activity heading, and, with `onDismissActions`, Dismiss all beside the heading of the ones that need action. It hands them all to that function at once — such as to dismiss them on the server with one request by the same filters as the feed they came from — and removes them once it resolves, without calling each one's `onRemove`.
 
 <!-- @example Notify/Center -->
 
@@ -286,8 +286,10 @@ import WNotifyCenter from 'eco-vue-js/dist/components/Notify/WNotifyCenter.vue'
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
+| `onDismissActions` | `((items: NotifyItem[]) => unknown)` | — | Shows a button beside the heading of the notifications that need action that hands them all to this function — such as to dismiss them on the server in one request — and removes them once it resolves, without calling their `onRemove`. A rejection keeps them. |
 | `title` | `string` | — | Heading of the notify center. Defaults to `Notifications`. |
-| `clearText` | `string` | — | Text of the button that clears the history. Defaults to `Clear`. |
+| `clearText` | `string` | — | Text of the button beside the activity heading that clears it. Defaults to `Clear`. |
+| `dismissActionsText` | `string` | — | Text of the button that dismisses the notifications that need action, shown with `onDismissActions`. Defaults to `Dismiss all`. |
 | `emptyText` | `string` | — | Shown when there are no notifications. Defaults to `No notifications yet`. |
 | `actionText` | `string` | — | Heading of the notifications that need action (`NotifyChannel.ACTION`). Defaults to `Action required`. |
 | `activityText` | `string` | — | Heading of the rest of the history, shown under the ones that need action. Defaults to `Activity`. |
@@ -315,7 +317,9 @@ import WNotifyCenterButton from 'eco-vue-js/dist/components/Notify/WNotifyCenter
 | `title` | `string` | — | Tooltip of the button and heading of the notify center. Defaults to `Notifications`. |
 | `icon` | `SVGComponent` | — | Icon of the button. Defaults to a bell. |
 | `horizontalAlign` | `HorizontalAlign` | — | Aligns the notify center to the button — such as `HorizontalAlign.LEFT_INNER` to grow left from its right edge, without a tip, or `HorizontalAlign.LEFT_CENTER` beside it with a tip, for a button in a side rail. Defaults to centered under the button with a tip. |
-| `clearText` | `string` | — | Text of the button that clears the history. Defaults to `Clear`. |
+| `onDismissActions` | `((items: NotifyItem[]) => unknown)` | — | Shows a button beside the heading of the notifications that need action that hands them all to this function — such as to dismiss them on the server in one request — and removes them once it resolves, without calling their `onRemove`. A rejection keeps them. |
+| `clearText` | `string` | — | Text of the button beside the activity heading that clears it. Defaults to `Clear`. |
+| `dismissActionsText` | `string` | — | Text of the button that dismisses the notifications that need action, shown with `onDismissActions`. Defaults to `Dismiss all`. |
 | `emptyText` | `string` | — | Shown when there are no notifications. Defaults to `No notifications yet`. |
 | `actionText` | `string` | — | Heading of the notifications that need action (`NotifyChannel.ACTION`). Defaults to `Action required`. |
 | `activityText` | `string` | — | Heading of the rest of the history, shown under the ones that need action. Defaults to `Activity`. |

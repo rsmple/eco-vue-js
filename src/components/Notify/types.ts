@@ -1,3 +1,5 @@
+import type {NotifyItem} from './models/types'
+
 export type NotifyPosition = 'top-right' | 'top-center' | 'bottom-right' | 'bottom-center'
 
 export interface NotifyProps {
@@ -6,10 +8,14 @@ export interface NotifyProps {
 }
 
 export interface NotifyCenterProps {
+  /** Shows a button beside the heading of the notifications that need action that hands them all to this function — such as to dismiss them on the server in one request — and removes them once it resolves, without calling their `onRemove`. A rejection keeps them. */
+  onDismissActions?: (items: NotifyItem[]) => unknown
   /** Heading of the notify center. Defaults to `Notifications`. */
   title?: string
-  /** Text of the button that clears the history. Defaults to `Clear`. */
+  /** Text of the button beside the activity heading that clears it. Defaults to `Clear`. */
   clearText?: string
+  /** Text of the button that dismisses the notifications that need action, shown with `onDismissActions`. Defaults to `Dismiss all`. */
+  dismissActionsText?: string
   /** Shown when there are no notifications. Defaults to `No notifications yet`. */
   emptyText?: string
   /** Heading of the notifications that need action (`NotifyChannel.ACTION`). Defaults to `Action required`. */

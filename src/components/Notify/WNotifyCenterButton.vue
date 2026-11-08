@@ -46,6 +46,8 @@ const {isOpen, toggle} = useNotifyCenter({
   props: () => ({
     title: props.title,
     clearText: props.clearText,
+    dismissActionsText: props.dismissActionsText,
+    onDismissActions: props.onDismissActions,
     emptyText: props.emptyText,
     actionText: props.actionText,
     activityText: props.activityText,

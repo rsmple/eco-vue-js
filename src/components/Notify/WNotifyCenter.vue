@@ -17,15 +17,6 @@
         <div class="text-accent font-semibold h-8 flex items-center">
           {{ title ?? 'Notifications' }}
         </div>
-
-        <WButton
-          v-if="notifyCenterActivityItems.length"
-          :semantic-type="SemanticType.SECONDARY"
-          class="w-button-h-8 text-xs"
-          @click.stop="clearNotifyHistory"
-        >
-          {{ clearText ?? 'Clear' }}
-        </WButton>
       </div>
     </OverlayRegionPart>
 
@@ -43,9 +34,21 @@
     >
       <div
         v-if="notifyCenterActionItems.length"
-        class="tone-negative text-tone py-1 text-xs font-semibold uppercase"
+        class="flex min-h-9 items-center justify-between gap-4 py-1"
       >
-        {{ actionText ?? 'Action required' }}
+        <div class="tone-negative text-tone text-xs font-semibold uppercase">
+          {{ actionText ?? 'Action required' }}
+        </div>
+
+        <WButton
+          v-if="onDismissActions && notifyCenterActionRemovableItems.length"
+          :semantic-type="SemanticType.SECONDARY"
+          :loading="dismissingActions"
+          class="w-button-h-7 text-xs"
+          @click.stop="dismissActions"
+        >
+          {{ dismissActionsText ?? 'Dismiss all' }}
+        </WButton>
       </div>
 
       <TransitionGroup
@@ -71,10 +74,21 @@
       </TransitionGroup>
 
       <div
-        v-if="notifyCenterActivityItems.length && notifyCenterActionItems.length"
-        class="text-description pt-2 pb-1 text-xs font-semibold uppercase"
+        v-if="notifyCenterActivityItems.length"
+        class="flex min-h-9 items-center justify-between gap-4 py-1"
+        :class="{'mt-1': notifyCenterActionItems.length}"
       >
-        {{ activityText ?? 'Activity' }}
+        <div class="text-description text-xs font-semibold uppercase">
+          {{ activityText ?? 'Activity' }}
+        </div>
+
+        <WButton
+          :semantic-type="SemanticType.SECONDARY"
+          class="w-button-h-7 text-xs"
+          @click.stop="clearNotifyHistory"
+        >
+          {{ clearText ?? 'Clear' }}
+        </WButton>
       </div>
 
       <TransitionGroup
@@ -118,6 +132,8 @@
 <script lang="ts" setup>
 import type {NotifyCenterProps} from './types'
 
+import {ref} from 'vue'
+
 import WButton from '@/components/Button/WButton.vue'
 
 import OverlayRegionPart from '@/components/Modal/components/OverlayRegionPart.vue'
@@ -127,16 +143,18 @@ import {SemanticType} from '@/utils/SemanticType'
 import NotifyCard from './components/NotifyCard.vue'
 import {
   clearNotifyHistory,
+  dismissNotifyActions,
   getNotifyItemKey,
   notifyCenterActionEntries,
   notifyCenterActionItems,
+  notifyCenterActionRemovableItems,
   notifyCenterActivityEntries,
   notifyCenterActivityItems,
   notifyCenterItems,
   removeNotifyEntry,
 } from './models/notifyCenter'
 
-defineProps<NotifyCenterProps>()
+const props = defineProps<NotifyCenterProps>()
 
 defineSlots<{
   /** Under the list, such as a link to a page with every operation. Close the center from it with `closeNotifyCenter`. */
@@ -147,4 +165,18 @@ const frame = useOverlayFrame()
 
 // In an overlay, the frame pads the header, the list and the footer; on its own, it is the frame.
 useOverlayFrameOptions(() => ({padded: true}))
+
+const dismissingActions = ref(false)
+
+const dismissActions = (): void => {
+  if (!props.onDismissActions || dismissingActions.value) return
+
+  dismissingActions.value = true
+
+  dismissNotifyActions(props.onDismissActions)
+    .catch(() => undefined)
+    .finally(() => {
+      dismissingActions.value = false
+    })
+}
 </script>

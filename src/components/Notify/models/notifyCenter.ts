@@ -53,6 +53,8 @@ const isToastPinned = (item: NotifyItem) => isActionRequired(item) || isNotifyPe
 
 export const notifyCenterActionItems: ComputedRef<NotifyItem[]> = computed(() => items.value.filter(isActionRequired))
 
+export const notifyCenterActionRemovableItems: ComputedRef<NotifyItem[]> = computed(() => notifyCenterActionItems.value.filter(item => !isNotifyPending(item)))
+
 export const notifyCenterActivityItems: ComputedRef<NotifyItem[]> = computed(() => items.value.filter(item => !isActionRequired(item)))
 
 export const getNotifyItemKey = (item: NotifyItem): string => item.items ? `group:${ item.key }` : `item:${ item.id }`
@@ -331,6 +333,17 @@ export const removeNotifyEntry = (entry: NotifyItem): void => {
 /** Clears the history, keeping pending notifications, those that need action and those on screen. */
 export const clearNotifyHistory = (): void => {
   items.value = items.value.filter(item => isNotifyPending(item) || isActionRequired(item) || toastIds.value.includes(item.id))
+}
+
+/** Hands the notifications that need action to `onDismiss` — such as to dismiss them on the server in one request — and removes them once it resolves, without calling their `onRemove`. Pending ones stay. */
+export const dismissNotifyActions = async (onDismiss: (items: NotifyItem[]) => unknown): Promise<void> => {
+  const removable = notifyCenterActionRemovableItems.value
+
+  if (!removable.length) return
+
+  await onDismiss(removable)
+
+  removable.forEach(discardItem)
 }
 
 let closeCenter: (() => void) | null = null
