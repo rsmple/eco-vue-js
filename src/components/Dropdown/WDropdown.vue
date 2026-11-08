@@ -67,6 +67,16 @@ const atBottom = computed(() => y.value > window.innerHeight / 2)
 
 const order = computed(() => horizontalGetterOrderMap[props.horizontalAlign])
 
+const getX = (getter: HorizontalGetter, newRect: DOMRect): number => {
+  const defaultX = getter.x(newRect)
+
+  if (getter.origin !== OriginX.CENTER || !parentRect.value) return defaultX
+
+  const keptX = newRect.left + x.value - parentRect.value.left
+
+  return keptX > newRect.left && keptX < newRect.right ? keptX : defaultX
+}
+
 const setParentRect = (updateAlign = false): void => {
   // A parent taken off the page reads as an empty rect in the corner, so the dropdown stays where it was.
   if (parentRect.value && (props.freeze || !isAnchorConnected(props.parentElement))) return
@@ -88,7 +98,7 @@ const setParentRect = (updateAlign = false): void => {
         : searchStyleGetter(horizontalGetter.value!.verticalGetterOrder, newRect)
   }
 
-  if (isLeftChanged) x.value = horizontalGetter.value.x(newRect)
+  if (isLeftChanged) x.value = getX(horizontalGetter.value, newRect)
   if (isTopChanged) y.value = verticalGetter.value.y(newRect)
 
   if (isLeftChanged || isTopChanged) parentRect.value = newRect

@@ -30,6 +30,7 @@
           :key="index"
           v-bind="{
             ...props,
+            noMargin: noMargin || embedded,
             modelValue: getValue(item) === modelValue,
             title: titleMap?.[getValue(item)!.toString() as GroupModelStringified<Model>],
             tooltipText: tooltipTextMap?.[getValue(item)!.toString() as GroupModelStringified<Model>],
@@ -37,7 +38,7 @@
             loading: loading && getValue(item as Model | Entity) === loadingItem,
             disabled: disabled || (loading && getValue(item as Model | Entity) !== loadingItem),
           }"
-          :class="[classMap?.[getValue(item)!.toString() as GroupModelStringified<Model>], optionClass]"
+          :class="[{'py-1': embedded && !noMargin}, classMap?.[getValue(item)!.toString() as GroupModelStringified<Model>], optionClass]"
           @update:model-value="updateModelValue(getValue(item as Model | Entity))"
         >
           <template

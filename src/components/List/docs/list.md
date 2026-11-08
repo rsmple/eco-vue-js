@@ -74,7 +74,7 @@ In place, the filters are chips in a row: the set ones are shown, and a button a
 
 Put the `WListFilter` in WList's `filter` slot to show it at the start of the selection bar, on one line with the list actions and the list settings. Chips that do not fit go into a "more" chip that opens them as a list, and the list actions, which move to the end of the bar, fold into More before any chip does. While rows are selected, the selection with its bulk actions replaces the filters, so the bar keeps its height. On phones the filters take a row of their own above the actions, and the search narrows for them. `--w-list-toolbar-height` (`w-list-toolbar-h-*`) sets the height of the bar's inputs, chips and actions, by default the inherited input height.
 
-Each chip names its filter and, when set, the picked values. A filter's `meta.summary` returns them from the query params, such as the titles of the picked options; without it the chip shows how many values are picked. A chip in the "more" list can be removed there too.
+Each chip shows its filter's icon and title, or, once values are picked, the icon and those values instead of the title. A filter's `meta.summary` returns them from the query params, such as the titles of the picked options; without it the chip shows how many values are picked. A chip's dropdown keeps its tip where it was as the chip grows or shrinks with the picked values, while the tip still points at the chip. A chip in the "more" list can be removed there too.
 
 ## Groups
 

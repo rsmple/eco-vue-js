@@ -217,7 +217,7 @@ import WCheckboxGroup from 'eco-vue-js/dist/components/Checkbox/WCheckboxGroup.v
 | `topText` | `boolean` | — | Moves the counter and messages above the field instead of below it. |
 | `allowDropFile` | `boolean` | — | Accepts files dropped onto the field. |
 | `hideTitle` | `boolean` | — | Hides the title while keeping the rest of the layout. |
-| `embedded` | `boolean` | — | For a field placed inside another component, such as a dropdown: no title, no margin, and horizontal padding. |
+| `embedded` | `boolean` | — | For a field placed inside another component, such as a dropdown: no title, no margin, horizontal padding, and compact options. |
 
 :::
 
@@ -292,7 +292,7 @@ import WCheckboxGroupMultiple from 'eco-vue-js/dist/components/Checkbox/WCheckbo
 | `topText` | `boolean` | — | Moves the counter and messages above the field instead of below it. |
 | `allowDropFile` | `boolean` | — | Accepts files dropped onto the field. |
 | `hideTitle` | `boolean` | — | Hides the title while keeping the rest of the layout. |
-| `embedded` | `boolean` | — | For a field placed inside another component, such as a dropdown: no title, no margin, and horizontal padding. |
+| `embedded` | `boolean` | — | For a field placed inside another component, such as a dropdown: no title, no margin, horizontal padding, and compact options. |
 
 :::
 

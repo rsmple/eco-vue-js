@@ -25,15 +25,15 @@
       />
 
       <span
-        class="truncate"
-        :class="valuesShown.length ? 'text-description' : 'text-accent'"
+        class="text-accent truncate"
+        :class="{'sr-only': valuesShown.length}"
       >
         {{ title }}{{ valuesShown.length ? ':' : '' }}
       </span>
 
       <span
         v-if="valuesShown.length"
-        :title="valueList.join(', ')"
+        :title="[title, valueList.join(', ')].filter(Boolean).join(': ')"
         class="text-tone shrink-100 truncate font-semibold"
       >
         {{ valuesShown.join(', ') }}
