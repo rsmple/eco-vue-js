@@ -75,16 +75,16 @@ const FEATURES = [
   {
     icon: markRaw(IconElement),
     title: 'An app shell included',
-    details: 'Header, nav and actions bars described by a few CSS variables that sticky headers, dropdowns and modals all read. This site runs on it.',
+    details: 'Header, nav and actions bars described by a few CSS variables that sticky headers, dropdowns and modals all read, and pages built from sections, lists and tabs that the kit places at every width. This site runs on it.',
     action: 'App shell',
     link: '/guide/app-shell',
   },
   {
     icon: markRaw(IconSettings),
-    title: 'Styled with Tailwind v4',
-    details: 'The kit ships Tailwind classes, not compiled CSS: one import adds its tokens and variants, and dark mode follows a dark class on the page.',
-    action: 'Styles',
-    link: '/guide/getting-started#styles',
+    title: 'Themes you can see live',
+    details: 'Flat, card or glass layouts and frosted or lens overlays from one class, with a playground for presets, contrast-checked palettes and shareable theme links. Built on Tailwind v4 tokens.',
+    action: 'Theming',
+    link: '/guide/theming',
   },
   {
     icon: markRaw(IconMarkdown),
