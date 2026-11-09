@@ -72,6 +72,24 @@
 
         <ThemeLayoutSwitch class="w-button-h-8 w-button-rounded-lg mx-2 mt-1" />
 
+        <div class="text-xs mb-1 mt-3 text-description font-semibold px-3">
+          Overlays
+        </div>
+
+        <WButtonGroup
+          :model-value="overlay"
+          :list="OVERLAY_MATERIALS.map(material => material.id)"
+          :semantic-type="SemanticType.SECONDARY"
+          no-margin
+          stretch
+          class="w-button-h-8 w-button-rounded-lg mx-2 mt-1"
+          @update:model-value="setToken('overlay', $event)"
+        >
+          <template #option="{option}">
+            {{ OVERLAY_MATERIALS.find(material => material.id === option)?.name }}
+          </template>
+        </WButtonGroup>
+
         <div class="my-2 border-t border-line-subtle" />
 
         <div class="text-xs mb-1 text-description font-semibold px-3">
@@ -164,12 +182,15 @@ import IconRefresh from 'eco-vue-js/dist/assets/icons/IconRefresh'
 import ThemeLayoutSwitch from './ThemeLayoutSwitch.vue'
 import ThemeSwatch from './ThemeSwatch.vue'
 
-import {PRESETS, RANDOM_STYLES, activeTheme, activeThemeId, getThemeCss, getThemeLink, hasCustomTokens, isRandomTheme, randomStyle, resetTheme, savedThemes, selectTheme, setPreset, setRandomTheme, themeConfig, themeTokens} from '../docsTheme'
+import {OVERLAY_MATERIALS, PRESETS, RANDOM_STYLES, activeTheme, activeThemeId, getThemeCss, getThemeLink, hasCustomTokens, isRandomTheme, randomStyle, resetTheme, savedThemes, selectTheme, setPreset, setRandomTheme, setToken, themeConfig, themeTokens} from '../docsTheme'
 import {confirmDeleteAllThemes, openSaveTheme} from '../themeConfirm'
 
 const isOpen = ref(false)
 
 const activePreset = computed(() => themeConfig.value.preset ?? 'default')
+
+/** Frosted or lens glass for the theme in use, its preset's included; setting it overrides only that token. */
+const overlay = computed(() => themeTokens.value.overlay ?? 'frosted')
 
 const copyLink = useCopy(() => getThemeLink(themeConfig.value, undefined, activeTheme.value?.name))
 const copyCss = useCopy(() => getThemeCss(themeTokens.value))

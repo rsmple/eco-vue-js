@@ -84,7 +84,11 @@
       inset 0 0 16px light-dark(oklch(100% 0 0 / 0.5), oklch(100% 0 0 / 0.04)),
       inset -2px -2px 4px -2px light-dark(oklch(0% 0 0 / 0.12), oklch(0% 0 0 / 0));
 
-    /* 0: the bars are docked to the screen edges; 1: they float `--w-chrome-gap` off them, the nav and the actions bar under the header. */
+    /*
+     * 0: the bars are docked to the screen edges; 1: they float `--w-chrome-gap` off them, the nav and the actions bar
+     * under the header. Only floating bars are rounded, by `--w-chrome-rounded`, so lens glass can round them more
+     * and leave docked ones square.
+     */
     --w-chrome-float: 0;
     --w-chrome-gap: 0px;
     --w-chrome-rounded: 0px;
@@ -719,7 +723,7 @@
     left: calc((var(--w-left-inner) - var(--inner-margin, 0px)) * var(--w-chrome-float));
     right: calc((var(--w-right-inner) - var(--inner-margin, 0px)) * var(--w-chrome-float));
     border: var(--w-chrome-border) solid var(--w-line-subtle);
-    border-radius: var(--w-chrome-rounded);
+    border-radius: calc(var(--w-chrome-rounded) * var(--w-chrome-float));
     backdrop-filter: var(--w-chrome-backdrop, blur(8px));
     /*
      * Once the page settles the header turns translucent over what scrolls under it: docked, the overlay; floating,
@@ -755,7 +759,7 @@
 
     top: var(--w-chrome-gap);
     height: calc(100% - var(--w-chrome-gap) * 2);
-    border-radius: var(--w-chrome-rounded);
+    border-radius: calc(var(--w-chrome-rounded) * var(--w-chrome-float));
     background-color: var(--color-chrome);
     backdrop-filter: var(--w-chrome-backdrop, none);
     box-shadow: var(--w-chrome-bar-shadow, --theme(--shadow-md inline)), var(--w-chrome-edge);
@@ -846,7 +850,7 @@
    * the edges as before.
    */
   .w-nav-bar-content {
-    --w-nav-item-rounded: max(var(--radius-lg), var(--w-chrome-rounded) - 0.5rem);
+    --w-nav-item-rounded: max(var(--radius-lg), var(--w-chrome-rounded) * var(--w-chrome-float) - 0.5rem);
 
     margin-top: calc((1 - var(--w-chrome-float)) * var(--header-height, 0px));
 
@@ -880,7 +884,7 @@
    * menu toggle has the header's row: the brand is a row of its own under it.
    */
   .w-nav-bar-brand {
-    --w-nav-item-rounded: max(var(--radius-lg), var(--w-chrome-rounded) - 0.5rem);
+    --w-nav-item-rounded: max(var(--radius-lg), var(--w-chrome-rounded) * var(--w-chrome-float) - 0.5rem);
 
     padding-block: calc(0.25rem + var(--w-chrome-float) * 0.25rem) 0.25rem;
     padding-inline: var(--w-nav-inset-start) var(--w-nav-inset-end);
@@ -1619,5 +1623,19 @@
     &[data-w-lens-glass="bordered"]::after {
       box-shadow: var(--w-lens-rim);
     }
+  }
+}
+
+/*
+ * A dropdown's tip can't bend with the frame it points from, so its edge would show against the rim: a refracting
+ * frame drops it, and the cut in its edge where the tip met it, and sits against what it opened from.
+ */
+@layer utilities {
+  .w-dropdown-tip:has(~ [data-w-lens-glass]) {
+    display: none;
+  }
+
+  [data-w-lens-glass]:is(.w-tip-edge-top, .w-tip-edge-bottom, .w-tip-edge-left, .w-tip-edge-right) {
+    mask: none;
   }
 }

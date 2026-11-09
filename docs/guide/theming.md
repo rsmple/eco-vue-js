@@ -316,7 +316,7 @@ To make a theme from a description — "a warm, rounded theme for a finance dash
 | `w-card-padding` | `1rem` | `1rem` | Inside cards |
 | `w-card-rounded` | `1rem` | `1rem` | Radius of cards |
 | `w-chrome-gap` | `0px` | `0.75rem` | Between the floating bars, the screen edges and the page; `0px` on phones |
-| `w-chrome-rounded` | `0px` | `1rem` | Radius of the floating header, nav and actions bar |
+| `w-chrome-rounded` | `0px` | `1rem` | Radius of the floating header, nav and actions bar; docked bars stay square |
 
 A layout also sets the canvas and card roles (`role-canvas`, `role-card`) and the `w-section-*`, `w-card-*` and `w-chrome-*` opacity, edge, shadow and blur variables; **Copy CSS** lists them.
 
@@ -328,9 +328,9 @@ Dropdowns and popovers, the bottom sheets that stand in for them on phones, and 
 | --- | --- | --- | --- |
 | `overlay` | `frosted` | `lens` | The material of dropdowns, menus, notifications and the bars, and with it the variables below |
 
-**Frosted** is the default: what floats over the page blurs what is behind it as the layout sets, as above. **Lens** makes it lens glass: the page bends along the rim as through a lens, a little magnified in the middle, and the edge catches light. It takes in dropdowns and popovers, the bottom sheets that stand in for them on phones, the nav's group menus, notifications, and WHeaderBar, WNavBar and WActionsBar. It works in any layout and shows most in glass, where there is color behind the bars to bend. Dropdowns are rounder in it, for the rim to bend more of the page, and in card and glass the bars float on phones too, as a pill off the screen edges, where they dock otherwise. Where one glass covers another, such as a notification over the header, only the one on top bends the page.
+**Frosted** is the default: what floats over the page blurs what is behind it as the layout sets, as above. **Lens** makes it lens glass: the page bends along the rim as through a lens, a little magnified in the middle, and the edge catches light. It takes in dropdowns and popovers, the bottom sheets that stand in for them on phones, the nav's group menus, notifications, and WHeaderBar, WNavBar and WActionsBar. It works in any layout and shows most in glass, where there is color behind the bars to bend. Dropdowns and floating bars are rounder in it, for the rim to bend more of the page, and in card and glass the bars float on phones too, as a pill off the screen edges, where they dock otherwise. Where one glass covers another, such as a notification over the header, only the one on top bends the page; a dropdown opened from a floating header opens below it, so the two stay apart. A dropdown's tip can't bend with it, so a bending dropdown has none and sits against what it opened from.
 
-The bending is an SVG filter in `backdrop-filter`, which only Chromium browsers apply to a backdrop: in Safari and Firefox the edge stays plain, and only the lighter fill and blur below apply. Under the playground's **Layout**, **Overlays** switches it, and **Copy CSS** writes out its variables:
+The bending is an SVG filter in `backdrop-filter`, which only Chromium browsers apply to a backdrop: in Safari and Firefox the edge stays plain, and only the lighter fill and blur below apply. Under the playground's **Layout**, and in the theme menu, **Overlays** switches it, and **Copy CSS** writes out its variables:
 
 | Variable | Lens | Controls |
 | --- | --- | --- |
@@ -343,6 +343,7 @@ The bending is an SVG filter in `backdrop-filter`, which only Chromium browsers 
 | `w-chrome-opacity` | `0.35` | The fill of the bars |
 | `w-chrome-backdrop` | `blur(2px) saturate(1.8) brightness(1.1)` | The bars' blur |
 | `w-dropdown-rounded` | `1.25rem` | The rounding of dropdowns and popovers |
+| `w-chrome-rounded` | `1.5rem` | The rounding of floating bars; docked ones stay square |
 | `w-chrome-phone-gap` | `0.5rem` | How far the bars float off the screen edges on phones, in card and glass |
 | `w-chrome-phone-rounded` | `1.75rem` | The bars' rounding on phones |
 

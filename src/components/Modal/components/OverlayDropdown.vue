@@ -76,7 +76,7 @@
         :update-align="!cornered"
         :freeze="detached"
         :inner-class="hasTip ? isBeside ? 'w-max tone-dropdown flex items-center' : 'w-max tone-dropdown flex flex-col items-center' : 'w-max flex flex-col'"
-        :style="{zIndex}"
+        :style="{zIndex, '--w-dropdown-y-min': inHeader ? HEADER_CLEARANCE : undefined}"
       >
         <template #default="{isTop, isLeft, isRight}">
           <!--
@@ -85,7 +85,7 @@
           -->
           <WDropdownTip
             v-if="hasTip"
-            class="shrink-0"
+            class="w-dropdown-tip shrink-0"
             :top="!isBeside && isTop"
             :left="isBeside && isLeft"
             :right="isBeside && isRight"
@@ -233,6 +233,12 @@ if (props.onTop && !isMobile) watch(() => dropdownRef.value?.isTop ?? false, pro
 const isBeside = computed(() => props.align === HorizontalAlign.LEFT_CENTER || props.align === HorizontalAlign.RIGHT_CENTER)
 
 const hasTip = computed(() => (props.align === undefined || isBeside.value) && !props.cornered)
+
+// Opened from the header, such as its notifications or a menu, it opens under the header, the gap below it off it, where
+// the bars float: over a floating header it would cover it, and lens glass would stop bending the header there.
+const HEADER_CLEARANCE = 'calc(var(--w-header-inner) * var(--w-chrome-float, 0))'
+
+const inHeader = props.anchor instanceof Element && props.anchor.closest('.w-header-bar') !== null
 
 const zIndex = inject(wBaseZIndex, 0) + BASE_ZINDEX_DROPDOWN
 
