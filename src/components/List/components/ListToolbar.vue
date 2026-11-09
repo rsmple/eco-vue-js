@@ -192,6 +192,7 @@
     :count="totalCount"
     :selection="selectAllValue"
     :columns="fieldTracks"
+    :columns-min="fieldTracksMin"
     @toggle:selection="$emit('toggle:selection', $event)"
     @update:header="updateHeader"
   >
@@ -276,6 +277,7 @@ const props = defineProps<{
   fieldsSorted: ListFields<Data, QueryParams>
   fieldConfigMap: Record<string, FieldConfig>
   fieldTracks: string
+  fieldTracksMin: string
   stylesSticky: Record<string, {left: string, right: string}>
   ordering: OrderItem<keyof Data>[]
   mode: ListMode

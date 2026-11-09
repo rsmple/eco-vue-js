@@ -263,6 +263,18 @@ export const getFieldTracks = <Fields extends ListFields<any, any>>(fields: Fiel
   return tracks.join(' ')
 }
 
+/** Sum of the smallest widths of the table columns, which the table keeps however wide its cells' content is. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getFieldTracksMin = <Fields extends ListFields<any, any>>(fields: Fields, fieldConfigMap: Record<string, FieldConfig>): string => {
+  const widths: string[] = []
+
+  forEachField(fields, field => {
+    widths.push(getFieldTrackMin(getFieldTrack(field.meta, fieldConfigMap[field.meta.label])))
+  })
+
+  return widths.length ? `calc(${ widths.join(' + ') })` : '0px'
+}
+
 /** Offsets of the sticky columns, from the widths of the sticky columns before and after each. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getFieldStylesSticky = <Fields extends ListFields<any, any>>(fields: Fields, fieldConfigMap: Record<string, FieldConfig>): Record<string, {left: string, right: string}> => {

@@ -1,49 +1,54 @@
 <template>
   <div
-    class="grid h-(--w-list-header-height,2rem)"
-    :style="{gridTemplateColumns: `var(--w-list-left,auto) ${ columns } var(--w-list-right,auto)`}"
+    :class="{'contain-inline-size': columnsMin}"
+    :style="{minWidth: columnsMin ? `calc(var(--w-list-left,0px) + ${ columnsMin } + var(--w-list-right,0px))` : undefined}"
   >
-    <div class="left---left-inner bg-surface sticky z-1">
-      <div class="w-list-mask bg-surface w---left-inner absolute right-full top-0 -z-1 h-full" />
+    <div
+      class="grid h-(--w-list-header-height,2rem)"
+      :style="{gridTemplateColumns: `var(--w-list-left,auto) ${ columns } var(--w-list-right,auto)`}"
+    >
+      <div class="left---left-inner bg-surface sticky z-1">
+        <div class="w-list-mask bg-surface w---left-inner absolute right-full top-0 -z-1 h-full" />
 
-      <div
-        class="h-full rounded-l-(--w-list-header-rounded,0.75rem) border-y border-l border-solid border-line bg-(--w-list-header-bg,inherit)"
-        :class="{
-          'width-(--w-list-header-rounded,1rem)': !allowSelect,
-        }"
-      >
         <div
-          v-if="selectOnly"
-          class="mx-(--w-list-padding,1rem) w-[calc(var(--w-checkbox-size,1rem)*1.5)]"
-        />
-        <WCheckbox
-          v-else-if="allowSelect && selection !== undefined"
-          :disabled="disabled || count === 0 || count === undefined"
-          :readonly="false"
-          :model-value="selection"
-          :tooltip-text="tooltipText"
-          intermediate
-          class="size-full px-(--w-list-padding,1rem)"
-          @update:model-value="$emit('toggle:selection', $event)"
-        />
+          class="h-full rounded-l-(--w-list-header-rounded,0.75rem) border-y border-l border-solid border-line bg-(--w-list-header-bg,inherit)"
+          :class="{
+            'width-(--w-list-header-rounded,1rem)': !allowSelect,
+          }"
+        >
+          <div
+            v-if="selectOnly"
+            class="mx-(--w-list-padding,1rem) w-[calc(var(--w-checkbox-size,1rem)*1.5)]"
+          />
+          <WCheckbox
+            v-else-if="allowSelect && selection !== undefined"
+            :disabled="disabled || count === 0 || count === undefined"
+            :readonly="false"
+            :model-value="selection"
+            :tooltip-text="tooltipText"
+            intermediate
+            class="size-full px-(--w-list-padding,1rem)"
+            @update:model-value="$emit('toggle:selection', $event)"
+          />
+        </div>
       </div>
-    </div>
 
-    <div class="col-[2/-2] grid grid-cols-subgrid border-y border-solid border-line bg-(--w-list-header-bg,inherit)">
-      <slot />
-    </div>
+      <div class="col-[2/-2] grid grid-cols-subgrid border-y border-solid border-line bg-(--w-list-header-bg,inherit)">
+        <slot />
+      </div>
 
-    <div class="right---right-inner bg-surface sticky z-1">
-      <div class="w-list-mask bg-surface w---right-inner absolute left-full top-0 -z-1 h-full" />
+      <div class="right---right-inner bg-surface sticky z-1">
+        <div class="w-list-mask bg-surface w---right-inner absolute left-full top-0 -z-1 h-full" />
 
-      <div
-        class="h-full rounded-r-(--w-list-header-rounded,0.75rem) border-y border-r border-solid border-line bg-(--w-list-header-bg,inherit)"
-        :class="{
-          'width-[calc(var(--w-list-padding,1rem)*2+1.25em)]': !hideMore,
-          'width-(--w-list-header-rounded,1rem)': hideMore,
-        }"
-      >
-        <slot name="settings" />
+        <div
+          class="h-full rounded-r-(--w-list-header-rounded,0.75rem) border-y border-r border-solid border-line bg-(--w-list-header-bg,inherit)"
+          :class="{
+            'width-[calc(var(--w-list-padding,1rem)*2+1.25em)]': !hideMore,
+            'width-(--w-list-header-rounded,1rem)': hideMore,
+          }"
+        >
+          <slot name="settings" />
+        </div>
       </div>
     </div>
   </div>
@@ -57,6 +62,8 @@ import WCheckbox from '@/components/Checkbox/WCheckbox.vue'
 defineProps<{
   /** Track sizes of the columns between the checkbox and the end cap, as in `grid-template-columns`. The rows use the same tracks, so the cells line up with them. */
   columns: string
+  /** Sum of the columns' smallest widths. The header then keeps this width however long the titles are, like the rows. */
+  columnsMin?: string
   /** Shows the select-all checkbox. */
   allowSelect?: boolean
   /** Keeps the checkbox column's space without the checkbox, for lists without select-all. */

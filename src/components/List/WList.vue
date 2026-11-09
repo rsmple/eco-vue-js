@@ -29,8 +29,8 @@
         :page-style="isGrid ? undefined : {gridTemplateColumns: `var(--w-list-left) ${ fieldTracks } var(--w-list-right)`}"
         :min-height-only="minHeight || isSectionNested"
         :no-header-update="noHeaderUpdate"
-        :style="cardStyles"
-        :class="$attrs.class"
+        :style="isGrid ? cardStyles : {minWidth: `calc(var(--w-list-left) + ${ fieldTracksMin } + var(--w-list-right))`}"
+        :class="[$attrs.class, {'contain-inline-size': !isGrid}]"
 
         @update:count="listCount = $event; $emit('update:count', $event)"
         @update:error="$emit('update:error', $event)"
@@ -71,6 +71,7 @@
               :fields-sorted="fieldsSorted"
               :field-config-map="fieldConfigMap"
               :field-tracks="fieldTracks"
+              :field-tracks-min="fieldTracksMin"
               :styles-sticky="stylesSticky"
               :ordering="ordering"
               :mode="listConfig.mode"
@@ -289,7 +290,7 @@ import ListToolbar from './components/ListToolbar.vue'
 import {wListPageFrame, wListPageFrameHeader} from './models/injection'
 import {isField} from './models/utils'
 import {AREA_MORE, AREA_SELECT} from './types'
-import {filterFields, forEachField, getFieldStylesSticky, getFieldTracks, sortFieldsDeep, useListConfig} from './use/useListConfig'
+import {filterFields, forEachField, getFieldStylesSticky, getFieldTracks, getFieldTracksMin, sortFieldsDeep, useListConfig} from './use/useListConfig'
 import {usePageTableMark, useStickyPath} from './use/useStickyPath'
 
 defineOptions({inheritAttrs: false})
@@ -583,6 +584,8 @@ const skeletonFields = computed(() => fieldsSorted.value.every(field => isField(
 )
 
 const fieldTracks = computed(() => getFieldTracks(fieldsSorted.value, fieldConfigMap.value))
+
+const fieldTracksMin = computed(() => getFieldTracksMin(fieldsSorted.value, fieldConfigMap.value))
 
 const stylesSticky = computed(() => getFieldStylesSticky(fieldsSorted.value, fieldConfigMap.value))
 
