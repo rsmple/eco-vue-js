@@ -72,7 +72,8 @@ export default defineConfig({
 
   // Component pages live next to their component; guides and recipes live in docs/.
   srcDir: '..',
-  srcExclude: ['node_modules/**', 'package/**', 'plans/**', '*.md', 'docs/.vitepress/**'],
+  // e2e/ holds fixture pages for the end-to-end tests, built only for them (see playwright.config.ts).
+  srcExclude: ['node_modules/**', 'package/**', 'plans/**', '*.md', 'docs/.vitepress/**', 'test-results/**', 'playwright-report/**', ...process.env.DOCS_E2E ? [] : ['e2e/**']],
   rewrites: rewrite,
   lastUpdated: true,
 

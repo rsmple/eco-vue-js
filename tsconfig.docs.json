@@ -8,7 +8,9 @@
     "docs/**/*.ts",
     "docs/**/*.vue",
     "docs/.vitepress/**/*.ts",
-    "docs/.vitepress/**/*.vue"
+    "docs/.vitepress/**/*.vue",
+    "e2e/fixtures/**/*.ts",
+    "e2e/fixtures/**/*.vue"
   ],
   "exclude": [
     "node_modules",

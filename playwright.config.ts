@@ -8,7 +8,8 @@ const PORT = 4173
  *
  *   npm run test:e2e
  *
- * Locally a docs preview already running on the port is reused — rebuild it after changing the kit.
+ * Locally a docs preview already running on the port is reused — rebuild it after changing the kit, with `DOCS_E2E=1`
+ * so it has the fixture pages.
  */
 export default defineConfig({
   testDir: 'e2e',
@@ -29,7 +30,8 @@ export default defineConfig({
 
   webServer: {
     // Not docs:build: its stale-API check and release notes are not what these tests are about.
-    command: `vitepress build docs && vitepress preview docs --port ${ PORT }`,
+    // DOCS_E2E adds the fixture pages under e2e/fixtures, left out of the published docs.
+    command: `DOCS_E2E=1 vitepress build docs && vitepress preview docs --port ${ PORT }`,
     url: `http://localhost:${ PORT }/eco-vue-js/`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
