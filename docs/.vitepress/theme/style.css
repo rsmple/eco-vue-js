@@ -118,6 +118,11 @@ body {
 /* Content starts at the app's inner margin, like a page in a kit app, so it lines up with the header title. */
 #VPContent .VPDoc {
   padding-inline: var(--inner-margin);
+
+  /* On phones sections span the screen as on a `w-page`: they reach out by the inset, which is this padding. */
+  @media (width < 40rem) {
+    --w-page-inset: var(--inner-margin);
+  }
 }
 
 /* One text width on every page, with or without the outline: VitePress narrows the text to 43rem next to the outline
@@ -603,5 +608,234 @@ body {
     margin-top: 0.4375rem;
     border-radius: 2px;
     background-color: var(--vp-c-brand-1);
+  }
+}
+
+/* An `@api` region (markdownApi.ts, DocsApi.vue): Props, Events and Slots as tabs, with a filter, in a box of capped
+   height, so a component with dozens of props doesn't run the page on for screens. */
+#VPContent .vp-doc .docs-api {
+  margin: 1rem 0 1.5rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.docs-api-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  /* The filter sits off the right edge by its own top and bottom padding. */
+  padding: 0 0.375rem 0 0.75rem;
+}
+
+.docs-api-tabs {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 0.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.docs-api-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  padding: 0.75rem 0.5rem 0.625rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--vp-c-text-2);
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover {
+    color: var(--vp-c-text-1);
+  }
+
+  &.docs-api-tab-active {
+    border-bottom-color: var(--vp-c-brand-1);
+    color: var(--vp-c-brand-1);
+  }
+}
+
+.docs-api-count {
+  border-radius: 999px;
+  background-color: var(--vp-c-default-soft);
+  padding: 0 0.4375rem;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25rem;
+}
+
+.docs-api-filter {
+  flex: 0 1 14rem;
+  padding: 0.375rem 0;
+}
+
+/* On a phone the filter takes its own row under the tabs, and the box runs to the screen edge, as code blocks do. */
+@media (max-width: 639px) {
+  #VPContent .vp-doc .docs-api {
+    margin-inline: calc(var(--inner-margin) * -1);
+    border-inline: 0;
+    border-radius: 0;
+  }
+
+  .docs-api-header {
+    padding-right: 0.75rem;
+  }
+
+  .docs-api-filter {
+    flex-basis: 100%;
+    padding-top: 0;
+    padding-bottom: 0.75rem;
+  }
+}
+
+.docs-api-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  padding: 0.5rem 0.75rem;
+}
+
+.docs-api-group {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 999px;
+  padding: 0.125rem 0.375rem 0.125rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--vp-c-text-2);
+  transition: color 0.15s, background-color 0.15s;
+
+  &:hover {
+    color: var(--vp-c-text-1);
+  }
+
+  &.docs-api-group-active {
+    background-color: var(--vp-c-brand-soft);
+    color: var(--vp-c-brand-1);
+  }
+}
+
+.docs-api-panel {
+  max-height: min(36rem, 70vh);
+  overflow: auto;
+}
+
+/* Separate borders, each cell drawing only its bottom and left edge: collapsed borders belong to the table, so the
+   sticky header would leave its own behind, doubled with the row's until it scrolls away. */
+#VPContent .vp-doc .docs-api-panel {
+  & table {
+    display: table;
+    width: 100%;
+    margin: 0;
+    overflow: visible;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  & tr {
+    border: 0;
+  }
+
+  & :is(th, td) {
+    border: 0;
+    border-bottom: 1px solid var(--vp-c-divider);
+  }
+
+  & :is(th, td) + :is(th, td) {
+    border-left: 1px solid var(--vp-c-divider);
+  }
+
+  & tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  /* The header stays as the rows scroll under it, on an opaque fill: the soft fill alone lets the rows through. */
+  & thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: linear-gradient(var(--vp-c-bg-soft), var(--vp-c-bg-soft)), var(--vp-c-bg);
+  }
+
+  & td:first-child {
+    white-space: nowrap;
+  }
+
+  & p {
+    margin: 0;
+  }
+}
+
+.docs-api-group-content + .docs-api-group-content {
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+#VPContent .vp-doc .docs-api-source {
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  color: var(--vp-c-text-2);
+}
+
+#VPContent .vp-doc .docs-api-panel > .docs-api-group-content > p:only-of-type:not(.docs-api-source),
+#VPContent .vp-doc .docs-api-empty {
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: var(--vp-c-text-2);
+}
+
+/* On a phone a row is a card: the name and its type on top, then the other cells under their labels. */
+@media (max-width: 639px) {
+  #VPContent .vp-doc .docs-api-panel {
+    & thead {
+      display: none;
+    }
+
+    & :is(table, tbody, tr, td) {
+      display: block;
+    }
+
+    & tr {
+      border-top: 1px solid var(--vp-c-divider);
+      padding: 0.625rem var(--inner-margin);
+    }
+
+    & tbody tr:first-child {
+      border-top: 0;
+    }
+
+    & :is(th, td),
+    & :is(th, td) + :is(th, td) {
+      border: 0;
+      padding: 0.125rem 0;
+    }
+
+    & td:first-child,
+    & td:nth-child(2) {
+      display: inline-block;
+      margin-right: 0.375rem;
+    }
+
+    & td:first-child {
+      white-space: normal;
+    }
+
+    & td[data-empty] {
+      display: none;
+    }
+
+    & td:nth-child(n + 3)[data-label]:not([data-label="Description"])::before {
+      content: attr(data-label) " ";
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--vp-c-text-2);
+    }
   }
 }

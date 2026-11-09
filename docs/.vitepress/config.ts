@@ -5,6 +5,7 @@ import llmstxt, {copyOrDownloadAsMarkdownButtons} from 'vitepress-plugin-llms'
 import {existsSync, readFileSync} from 'node:fs'
 import {URL, fileURLToPath} from 'node:url'
 
+import {markdownApi} from './markdownApi.ts'
 import {markdownSections} from './markdownSections.ts'
 import {buildSidebar, rewrite} from './sidebar.ts'
 import {THEME_HEAD_SCRIPT} from './themeHeadScript.ts'
@@ -96,6 +97,7 @@ export default defineConfig({
   markdown: {
     config(md) {
       md.use(copyOrDownloadAsMarkdownButtons)
+      md.use(markdownApi)
       md.use(markdownSections)
     },
   },

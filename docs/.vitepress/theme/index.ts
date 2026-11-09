@@ -8,6 +8,7 @@ import {setQueryClient} from '@/utils/queryClient'
 import {appendScrollbarStyles} from '@/utils/scrollbarStyles'
 
 import DocsLayout from './DocsLayout.vue'
+import DocsApi from './components/DocsApi.vue'
 import DocsDemo from './components/DocsDemo.vue'
 import IconGallery from './components/IconGallery.vue'
 import NotifyPositionPlayground from './components/NotifyPositionPlayground.vue'
@@ -43,6 +44,7 @@ export default {
     installKitRouter(app, router, siteData.value.base)
     app.use(VueQueryPlugin, {queryClient: browserQueryClient ?? createQueryClient()})
     app.component('CopyOrDownloadAsMarkdownButtons', CopyOrDownloadAsMarkdownButtons)
+    app.component('DocsApi', DocsApi)
     app.component('DocsDemo', DocsDemo)
     app.component('IconGallery', IconGallery)
     app.component('NotifyPositionPlayground', NotifyPositionPlayground)
