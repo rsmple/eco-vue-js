@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts" setup>
-import {inject, useAttrs, useId} from 'vue'
+import {computed, inject, normalizeClass, useAttrs, useId} from 'vue'
 
 import {useOverlayFrameOptions} from '@/utils/Overlay'
 
@@ -111,9 +111,13 @@ const outerRegions = inject(wOverlayRegions, null)
 // In an overlay it hands its parts and its look to the frame. On a page it is the frame, for itself and for what the content inside hands over.
 const pageRegions = outerRegions ? null : useOverlayRegions(['title', 'subtitle', 'actions']).regions
 
+// The frame renders the content, so reading `attrs` there would update it on every new attribute — such as the overlay's own
+// `close:modal` listener, created anew on each of its renders when the content does not declare the emit. Only the class matters.
+const frameClass = computed(() => normalizeClass(attrs.class))
+
 useOverlayFrameOptions(() => ({
   padded: true,
-  class: attrs.class,
+  class: frameClass.value,
   maximized: props.maximized,
   actionsCol: props.actionsCol,
 }))

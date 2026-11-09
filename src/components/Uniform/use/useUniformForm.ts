@@ -5,6 +5,7 @@ import {type InvalidatePayload, type UniformInstance, type UniformValidate, isIn
 export const useUniformForm = (
   fieldGetter: () => string | number | symbol | undefined,
   titleGetter: () => string | undefined,
+  ownChangesGetter?: () => boolean,
 ) => {
   const map = ref<Record<string, UniformInstance>>({})
 
@@ -28,7 +29,8 @@ export const useUniformForm = (
 
   const hasShownError = computed<boolean>(() => mapValues.value.some(value => value.hasShownError))
 
-  const hasChanges = computed<boolean>(() => mapValues.value.some(value => value.hasChanges))
+  // The forms inside report the changes of the items; adding, removing or moving an item is the form's own change.
+  const hasChanges = computed<boolean>(() => (ownChangesGetter?.() ?? false) || mapValues.value.some(value => value.hasChanges))
 
   const isValid = computed<boolean>(() => mapValues.value.every(item => item.isValid))
 

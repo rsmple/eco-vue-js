@@ -69,6 +69,7 @@ import type {InnerInstanceExpose, UniformScope, UniformScopeField} from './types
 import {type Ref, type VNode, computed, inject, onUnmounted, provide, reactive, toRef, useId} from 'vue'
 
 import {useLayerBusy, useLayerChanges} from '@/utils/Overlay'
+import {isEqualArrObj} from '@/utils/utils'
 
 import {useUniformField} from './use/useUniformField'
 import {useUniformForm} from './use/useUniformForm'
@@ -253,6 +254,15 @@ const scopeField = slots.field ? useUniformField(
 const scopeForm = slots.default ? useUniformForm(
   () => props.field,
   () => props.title,
+  () => {
+    const value = scopeModel.modelValue.value
+
+    if (!Array.isArray(value)) return false
+
+    const init = scopeModel.modelValueInit.value
+
+    return !isEqualArrObj(value, Array.isArray(init) ? init : [])
+  },
 ) : undefined
 
 const scope = scopeField ?? scopeForm

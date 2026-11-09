@@ -88,9 +88,9 @@
                 v-if="(slot.children as Record<string, Component>)?.title"
                 #title="scope"
               >
-                <component
-                  v-bind="scope"
-                  :is="(slot.children as Record<string, Component>)?.title"
+                <SlotScope
+                  :render="(slot.children as Record<string, Slot>)?.title"
+                  :scope="scope"
                 />
               </template>
 
@@ -98,9 +98,9 @@
                 v-if="(slot.children as Record<string, Component>)?.suffix"
                 #suffix="scope"
               >
-                <component
-                  v-bind="scope"
-                  :is="(slot.children as Record<string, Component>)?.suffix" 
+                <SlotScope
+                  :render="(slot.children as Record<string, Slot>)?.suffix"
+                  :scope="scope"
                 />
               </template>
 
@@ -108,9 +108,9 @@
                 v-if="(slot.children as Record<string, Component>)?.right || hasOnClose"
                 #right="scope"
               >
-                <component
-                  v-bind="scope"
-                  :is="(slot.children as Record<string, Component>)?.right"
+                <SlotScope
+                  :render="(slot.children as Record<string, Slot>)?.right"
+                  :scope="scope"
                 />
 
                 <button
@@ -225,7 +225,7 @@
 <script lang="ts" setup>
 import type {TabsItemProps, TabsProps} from './types'
 
-import {type Component, type RendererElement, type RendererNode, type VNode, type VNodeRef, computed, h, inject, onBeforeUpdate, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch} from 'vue'
+import {type Component, type FunctionalComponent, type RendererElement, type RendererNode, type Slot, type VNode, type VNodeProps, type VNodeRef, computed, h, inject, onBeforeUpdate, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch} from 'vue'
 
 import WProgress from '@/components/Progress/WProgress.vue'
 import WUniformErrorMessage from '@/components/Uniform/WUniformErrorMessage.vue'
@@ -293,6 +293,19 @@ const isTabItem = (slot: VNode): slot is VNode<RendererNode, RendererElement, Ta
   return slot.type instanceof Object && '__name' in slot.type && slot.type.__name === 'WTabsItem'
 }
 
+// Renders a slot of a tab item with the scope the tab button gives. As a prop, a new scope re-renders the slot: rendered as a component
+// itself, the slot would get the same props object, updated in place, and whatever it passes the whole scope to would not update.
+const SlotScope: FunctionalComponent<{render: Slot | undefined, scope: Record<string, unknown>}> = props => props.render?.({...props.scope})
+
+SlotScope.props = ['render', 'scope']
+
+// Raw vnode props: a bare boolean attribute, `<WTabsItem require-save>`, is an empty string there, which the prop takes as `true`.
+const getBooleanProp = (props: TabsItemProps, key: 'init' | 'hasChanges' | 'hasError' | 'requireSave'): boolean | undefined => {
+  const value = getPropValue(props as TabsItemProps & VNodeProps, key) as unknown
+
+  return value === '' ? true : value as boolean | undefined
+}
+
 const isSlotDisabled = (slot: VNode): boolean => {
   const value = slot.props?.disabled
 
@@ -335,7 +348,7 @@ const routeTabName = computed<string | undefined>(() => defaultSlots.value
 
 const current = ref<string>(routeTabName.value ?? props.initTab ?? (props.initTabIndex !== undefined
   ? defaultSlotsKeys.value[props.initTabIndex]!
-  : defaultSlots.value.find(slot => !!slot.props?.init)?.props?.name ?? defaultSlotsKeys.value[0]!
+  : defaultSlots.value.find(slot => getBooleanProp(slot.props, 'init'))?.props?.name ?? defaultSlotsKeys.value[0]!
 ))
 const currentIndex = computed(() => defaultSlotsKeys.value.indexOf(current.value))
 
@@ -360,14 +373,14 @@ const setTabRef = (value: ComponentInstance<typeof TabItem> | null) => {
 const hasNoValueFirst = computed<number>(() => {
   if (!props.stepper) return 0
 
-  const index = defaultSlots.value.findIndex(item => item.props.hasValue === false)
+  const index = defaultSlots.value.findIndex(item => getPropValue(item.props, 'hasValue') === false)
 
   if (index === -1) return defaultSlotsKeys.value.length
 
   return index
 })
 
-const hasChanges = computed<boolean>(() => defaultSlots.value.some(slot => getPropValue(slot.props, 'hasChanges') ?? tabItemRefByName.value[slot.props.name]?.hasChanges))
+const hasChanges = computed<boolean>(() => defaultSlots.value.some(slot => getBooleanProp(slot.props, 'hasChanges') ?? tabItemRefByName.value[slot.props.name]?.hasChanges))
 
 watch(hasChanges, value => {
   emit('update:has-changes', value)
@@ -388,7 +401,7 @@ const switchTab = throttle(async (key: string) => {
 
   const requireSave = targetIndex > currentIndex.value && defaultSlots.value
     .slice(Math.max(currentIndex.value, 0), targetIndex)
-    .some(item => getPropValue(item.props, 'requireSave'))
+    .some(item => getBooleanProp(item.props, 'requireSave'))
 
   if (requireSave && stepperController && (stepperController.hasChanges() || stepperController.fullPayload())) {
     if (!await stepperController.submit()) return
@@ -628,7 +641,7 @@ if (props.stepper) {
 if (!props.noSwitchOnInvalid) {
   const switchTabDebounced = debounce(switchTab, 50)
 
-  watch(() => defaultSlots.value.filter(slot => getPropValue(slot.props, 'hasError') || tabItemRefByName.value[slot.props.name]?.hasError).map(item => item.props?.name), value => {
+  watch(() => defaultSlots.value.filter(slot => getBooleanProp(slot.props, 'hasError') || tabItemRefByName.value[slot.props.name]?.hasError).map(item => item.props?.name), value => {
     if (value.length && !value.includes(current.value)) switchTabDebounced(value[0])
   })
 }
