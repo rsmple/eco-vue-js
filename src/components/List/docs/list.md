@@ -374,6 +374,7 @@ import WListHeader from 'eco-vue-js/dist/components/List/WListHeader.vue'
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `columns` | `string` | **required** | Track sizes of the columns between the checkbox and the end cap, as in `grid-template-columns`. The rows use the same tracks, so the cells line up with them. |
+| `columnsMin` | `string` | — | Sum of the columns' smallest widths. The header then keeps this width however long the titles are, like the rows. |
 | `allowSelect` | `boolean` | — | Shows the select-all checkbox. |
 | `selectOnly` | `boolean` | — | Keeps the checkbox column's space without the checkbox, for lists without select-all. |
 | `hideMore` | `boolean` | — | Narrows the end cap when the rows have no menu. |
