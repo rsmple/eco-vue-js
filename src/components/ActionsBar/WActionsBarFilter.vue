@@ -3,6 +3,9 @@ import {type VNode, computed, onBeforeUnmount, useSlots, watch} from 'vue'
 
 import {useActionBarFilter} from './use/useActionsBarFilter'
 
+// Renders nothing in place: WActionsBar shows the slot.
+defineOptions({render: () => null})
+
 const props = defineProps<{
   /** Number of filters set, shown as a badge on the filter button. */
   count: number

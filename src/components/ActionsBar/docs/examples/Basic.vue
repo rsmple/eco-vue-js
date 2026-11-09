@@ -1,29 +1,27 @@
 <template>
   <!--
     The bar is `position: fixed` to the window in an app. The transform makes this frame the box it is fixed to,
-    and the variables are the ones an app sets on `body`.
+    and the variables are the ones an app sets on `body`. `docs-app-frame` is this site's own: it lets the bar float as the site's bars do.
   -->
   <div
     class="
-      relative h-96 overflow-hidden rounded-xl border border-solid border-line-subtle transform-[translateZ(0)]
-      [--actions-bar-filter-width:16rem] [--header-height:3.5rem] [--right-margin:0px] [--w-actions-bar-width:3.5rem]
+      docs-app-frame relative h-120 overflow-hidden rounded-xl border border-solid border-line-subtle transform-[translateZ(0)]
+      [--actions-bar-filter-width:16rem] [--header-height:3.5rem] [--w-actions-bar-width:3.5rem]
     "
   >
-    <div class="grid gap-2 p-4 pr-18">
+    <div class="p---inner-margin grid gap-2 pr-20">
       <span class="font-semibold">Plants</span>
       <span class="text-description text-sm">
         {{ onlyThirsty ? 'Thirsty plants only' : 'All plants' }}{{ light ? `, ${ light } light` : '' }}
       </span>
     </div>
 
-    <WActionsBar
-      text-filter="Filters"
-      class="bg-surface shadow-md"
-    >
+    <WActionsBar text-filter="Filters">
       <template #top>
         <WButtonAction
           title="Add plant"
           :icon="markRaw(IconAdd)"
+          title-text
           @click="added++"
         />
 
@@ -47,13 +45,12 @@
         <WButtonAction
           title="Settings"
           :icon="markRaw(IconSettings)"
-          title-text
         />
       </template>
     </WActionsBar>
 
     <WActionsBarFilter :count="(onlyThirsty ? 1 : 0) + (light ? 1 : 0)">
-      <div class="grid gap-4 px-4">
+      <div class="px---inner-margin grid gap-4">
         <WToggle
           v-model="onlyThirsty"
           title="Thirsty only"

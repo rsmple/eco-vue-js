@@ -4,6 +4,9 @@ import {type VNode, computed, onBeforeUnmount, useSlots, watch} from 'vue'
 import {useHeaderSearch} from './use/useHeaderSearch'
 import {useHeaderSearchVisible} from './use/useHeaderSearchVisible'
 
+// Renders nothing in place: WHeaderBar shows the slot.
+defineOptions({render: () => null})
+
 const props = defineProps<{
   /** Opens the search right away, and again whenever it becomes `true`. */
   shown?: boolean

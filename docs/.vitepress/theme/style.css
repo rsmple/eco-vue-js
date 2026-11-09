@@ -468,6 +468,10 @@ body {
 body {
   /* The page gutter, kept under another name: demos redefine --inner-margin for their own content. */
   --docs-page-margin: var(--inner-margin);
+  /* The chrome's layout tokens, kept for demos that show the bars: `.demo` docks them for everything else. */
+  --docs-chrome-float: var(--w-chrome-float);
+  --docs-chrome-gap: var(--w-chrome-gap);
+  --docs-chrome-rounded: var(--w-chrome-rounded);
 }
 
 /* A demo is a small app window: its own scroll container in both directions (overflow-x: auto makes overflow-y
@@ -495,6 +499,13 @@ body {
   isolation: isolate;
   /* The page background, so sections and cards show as on a page. */
   background: var(--w-canvas);
+}
+
+/* A demo of the app's bars: they float, round and stand off the edges as the site's own do. */
+.docs-app-frame {
+  --w-chrome-float: var(--docs-chrome-float);
+  --w-chrome-gap: var(--docs-chrome-gap);
+  --w-chrome-rounded: var(--docs-chrome-rounded);
 }
 
 /* Phones: edge to edge like VitePress code blocks, with the app's own inner margin — the width an app would have. */
