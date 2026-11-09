@@ -20,6 +20,8 @@ export type UniformInstance = {
   invalidate: (payload: InvalidatePayload) => void
   getInvalidatePayload: () => InvalidatePayload | undefined
   showMessage: (message: string, onlyChanged?: boolean, fields?: string[]) => void
+  /** Picks the fields `showMessage` would show the message on now, and returns the function that shows it on them later. */
+  prepareMessage: (onlyChanged?: boolean, fields?: string[]) => (message: string) => void
   getFieldChanged: (field: string) => boolean
 }
 

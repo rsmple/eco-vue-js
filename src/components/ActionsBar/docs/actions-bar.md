@@ -31,7 +31,7 @@ The demo's bar is fixed to the frame, not the window. Click the filter button.
   -->
   <div
     class="
-      docs-app-frame relative h-112 overflow-hidden rounded-xl border border-solid border-line-subtle transform-[translateZ(0)]
+      docs-app-frame relative h-120 overflow-hidden rounded-xl border border-solid border-line-subtle transform-[translateZ(0)]
       [--actions-bar-filter-width:16rem] [--header-height:3.5rem] [--w-actions-bar-width:3.5rem]
     "
   >
@@ -47,6 +47,7 @@ The demo's bar is fixed to the frame, not the window. Click the filter button.
         <WButtonAction
           title="Add plant"
           :icon="markRaw(IconAdd)"
+          title-text
           @click="added++"
         />
 
@@ -70,7 +71,6 @@ The demo's bar is fixed to the frame, not the window. Click the filter button.
         <WButtonAction
           title="Settings"
           :icon="markRaw(IconSettings)"
-          title-text
         />
       </template>
     </WActionsBar>

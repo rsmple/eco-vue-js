@@ -131,9 +131,11 @@ export const useUniformField = <Model>(
     return [...errorMessage.value]
   }
 
-  const showMessageField = (message: string, onlyChanged?: boolean) => {
-    if (!onlyChanged || hasChanges?.value) showMessage(message)
-  }
+  const prepareMessage = (onlyChanged?: boolean) => (!onlyChanged || hasChanges?.value)
+    ? (message: string) => showMessage(message)
+    : () => void 0
+
+  const showMessageField = (message: string, onlyChanged?: boolean) => prepareMessage(onlyChanged)(message)
 
   const cancelField = (): void => {
     for (const instance of Array.isArray(fieldRef.value) ? fieldRef.value : [fieldRef.value]) {
@@ -158,6 +160,7 @@ export const useUniformField = <Model>(
     invalidate,
     getInvalidatePayload,
     showMessage: showMessageField,
+    prepareMessage,
     getFieldChanged,
     cancelField,
   }

@@ -15,7 +15,7 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
   invalidate: (payload: InvalidatePayload) => void,
   onSuccess: (value: OriginalModel) => void,
   initModel: (value: OriginalModel | undefined, payload: ModelValue, partial: boolean) => void,
-  showMessage: (message: string, onlyChanged?: boolean, fields?: string[]) => void,
+  prepareMessage: (onlyChanged?: boolean, fields?: string[]) => (message: string) => void,
   noInitGetter: () => boolean,
   asyncGetter: () => boolean,
   fullPayloadGetter: () => boolean | undefined,
@@ -52,6 +52,9 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
 
     const fields = partial && payload instanceof Object ? Object.keys(payload) : undefined
 
+    // Picked now: a save that updates the cache before it resolves leaves the fields without changes by then.
+    const showMessage = prepareMessage(true, fields)
+
     submitting.value = true
 
     const promise = apiMethod(payload!)
@@ -61,7 +64,7 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
         const isResponse = isRequestResponse<OriginalModel>(response)
         const responseData = isResponse ? response.data : response
 
-        showMessage('Saved', true, fields)
+        showMessage('Saved')
 
         if (!noInitGetter()) initModel(responseData, payload, partial)
         onSuccess(responseData ?? payload as unknown as OriginalModel)

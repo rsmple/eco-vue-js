@@ -90,13 +90,19 @@ export const useUniformForm = (
     return merged
   }
 
-  const showMessage = (message: string, onlyChanged?: boolean, fields?: string[]): void => {
+  const prepareMessage = (onlyChanged?: boolean, fields?: string[]) => {
+    const list: ((message: string) => void)[] = []
+
     for (const item of mapValues.value) {
       if (fields && !fields.includes(String(item.field))) continue
 
-      item.showMessage(message, onlyChanged)
+      list.push(item.prepareMessage(onlyChanged))
     }
+
+    return (message: string): void => list.forEach(show => show(message))
   }
+
+  const showMessage = (message: string, onlyChanged?: boolean, fields?: string[]): void => prepareMessage(onlyChanged, fields)(message)
 
   const getFieldChanged = (field: string): boolean => {
     if (fieldGetter() === field) return hasChanges.value
@@ -121,6 +127,7 @@ export const useUniformForm = (
     invalidate,
     getInvalidatePayload,
     showMessage,
+    prepareMessage,
     getFieldChanged,
   }
 }

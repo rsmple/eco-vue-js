@@ -217,7 +217,7 @@ const scopeSubmit = props.apiMethod ? useUniformSubmit<ResultModel, InnerModel>(
     if (partial) scopeModel.initFields(result, payload)
     else scopeModel.initModel(result ?? payload as unknown as InnerModel)
   },
-  (message, onlyChanged, fields) => scope?.showMessage(message, onlyChanged, fields),
+  (onlyChanged, fields) => scope?.prepareMessage(onlyChanged, fields) ?? (() => void 0),
   () => props.noInit,
   () => props.async,
   () => props.fullPayload,
@@ -293,6 +293,7 @@ defineExpose({
   invalidate: scope?.invalidate ?? (() => void 0),
   getInvalidatePayload: scope?.getInvalidatePayload ?? (() => undefined),
   showMessage: scope?.showMessage ?? (() => void 0),
+  prepareMessage: scope?.prepareMessage ?? (() => () => void 0),
   getFieldChanged: scope?.getFieldChanged ?? (() => false),
 
   modelValue: scopeModel.modelValue,
