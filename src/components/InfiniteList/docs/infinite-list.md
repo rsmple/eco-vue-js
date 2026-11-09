@@ -5,13 +5,13 @@ description: WInfiniteList — items of a paginated query loaded page by page as
 
 # Infinite list
 
-`WInfiniteList` loads a paginated query page by page as it is scrolled, and renders each item with its default slot. It lays out nothing itself, so it fits any item layout — [WList](/components/list) and the async selects are built on it. You give it:
+`WInfiniteList` loads a paginated query page by page on scroll and renders each item with its default slot. It has no layout of its own — [WList](/components/list) and async selects build on it. You provide:
 
-- `useQueryFn` and `queryParams` — a paginated query. Each page is its own query with `page` and `size` added to the params.
-- `pageLength` — the page size the query returns.
-- A default slot for an item. While a page loads, the slot renders placeholders with `skeleton` set.
+- `useQueryFn` and `queryParams` — a paginated query; each page is its own query with `page` and `size` added.
+- `pageLength` — the query's page size.
+- A default slot per item; loading pages render it with `skeleton`.
 
-A change of `queryParams`, such as a new search, resets the list to the first page. Only a few pages stay rendered (`maxPages`). Scrolling further drops pages at the other end and keeps their height, so the scrollbar stays true to the whole list.
+Changing `queryParams` (e.g. a new search) resets to page one. Only `maxPages` pages stay rendered; dropped pages keep their height so the scrollbar stays accurate.
 
 <!-- @example InfiniteList/Basic -->
 
@@ -81,13 +81,13 @@ const count = ref(0)
 
 ## Scrolling inside an element
 
-By default the list loads as the page scrolls. `WInfiniteListScrollingElement` makes an element the scroll container instead, for the lists and sticky headers inside it — give it a height and `overflow-y-auto`, as above. Modals are scroll containers of their own already.
+By default the list follows page scroll. `WInfiniteListScrollingElement` makes an element the scroll container for lists and sticky headers inside — give it a height and `overflow-y-auto`. Modals already are scroll containers.
 
 ## Sticky header
 
-The `header` slot sticks above the items while they scroll: under the app header on a page, and at the top of a modal or scroll container. It gets `refetchAll`, `isFetching` and `isRefetchingAll` for a toolbar with a refresh button. `updateHeader` re-measures it right away, when its content changes in a way the list has to know about at once.
+The `header` slot sticks above the items: under the app header on a page, at the top in a modal or scroll container. It gets `refetchAll`, `isFetching` and `isRefetchingAll` for a refresh toolbar. `updateHeader` re-measures it immediately.
 
-`WInfiniteListWrapper` is the same sticky header for any content, without a list:
+`WInfiniteListWrapper` is the same sticky header for any content:
 
 ```vue
 <WInfiniteListWrapper>
@@ -101,24 +101,24 @@ The `header` slot sticks above the items while they scroll: under the app header
 
 ## Items
 
-Besides `item` and `skeleton`, the default slot gets:
+Besides `item` and `skeleton`, the slot gets:
 
-- `setter` — writes a changed item to the query cache, which updates it in every loaded page and every other query of the same model. Called with nothing, it removes the item.
-- `refetch` — refetches this page and the pages after it, e.g. after an item moved.
-- `previous` and `next` — the neighbouring items, across page borders; `first` and `last` for the ends of the list.
-- `position` — the item's index in the whole list; `page` and `index` — its page and index in the page.
+- `setter` — writes a changed item to the cache, updating every loaded page and query of the model; with no argument, removes it.
+- `refetch` — refetches this page and those after it, e.g. after a move.
+- `previous`, `next` — neighbouring items across pages; `first`, `last` — the list ends.
+- `position` — index in the whole list; `page`, `index` — page and index within it.
 
 ## Pages
 
-A template ref gives `refetchAll`, `resetPage(page)` to start over from a page, and `goto(page, index)` to scroll to an item. A page that isn't rendered is rendered in its place, with the pages around it; before the list knows the page count, it starts over from the page instead.
+A template ref gives `refetchAll`, `resetPage(page)` and `goto(page, index)`. An unrendered target page renders in place with its neighbours; before the page count is known, the list restarts from that page.
 
-`update:page` reports the page reached by scrolling. Keeping it in the URL and passing it back as `page` in `queryParams` opens the list at that page after a reload — the pages before it load when scrolling up.
+`update:page` reports the scrolled-to page. Keep it in the URL and pass it back as `page` in `queryParams` to reopen there after a reload; earlier pages load on scroll up.
 
 ## Long lists
 
-However long the query, the list keeps only `maxPages` pages in the DOM. Pages scrolled past are dropped and leave a space of their height, and their queries stay cached, so scrolling back renders them again at once. Spacers above and below the rendered pages stand in for the rest, sized by the number of pages times the average height of those rendered, so the scrollbar covers the whole list from the first page on. Browsers cap the height of an element, so for a list too long to fit under 15M px — about a million rows — the spacers shrink to fit, and the scrollbar moves through the list faster than the rows scroll.
+Only `maxPages` pages stay in the DOM. Scrolled-past pages leave a same-height space and stay cached, so scrolling back is instant. Spacers above and below are sized by page count × average rendered height, so the scrollbar spans the whole list from the start. Browsers cap element height, so past ~15M px (about a million rows) the spacers shrink and the scrollbar moves faster than the rows.
 
-The demo below pages through 10,000 events, 50 at a time. The counter shows how many rows are in the DOM while scrolling. "Go to row" calls `goto` with the row's page and its index in the page, and the pages around it load in place.
+The demo pages through 10,000 events, 50 at a time; the counter shows rows in the DOM. "Go to row" calls `goto` and loads the surrounding pages in place.
 
 <!-- @example InfiniteList/Large -->
 

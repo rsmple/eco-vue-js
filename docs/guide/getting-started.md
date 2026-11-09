@@ -12,22 +12,22 @@ description: Install eco-vue-js, wire Tailwind v4, vue-query and the global cont
 npm i eco-vue-js @tanstack/vue-query
 ```
 
-Peer dependencies: `vue` ≥ 3.5, `@tanstack/vue-query` ≥ 5. `vue-router` is optional — only needed for components that take a `to` prop.
+Peer dependencies: `vue` ≥ 3.5, `@tanstack/vue-query` ≥ 5. `vue-router` is optional — needed only for `to` props.
 
 ## Styles
 
-The kit ships Tailwind v4 classes, not compiled CSS. Import its Tailwind base right after Tailwind in your app's stylesheet — it adds the theme tokens, variants and plugins, and registers the kit's components as a Tailwind source:
+The kit ships Tailwind v4 classes, not compiled CSS. Import its base right after Tailwind — it adds theme tokens, variants and plugins, and registers the kit's components as a source:
 
 ```css
 @import "tailwindcss";
 @import "eco-vue-js/tailwind-base/base.css";
 ```
 
-Dark mode follows a `dark` class on an ancestor (usually `<html>`). Colors, fonts and field sizes are CSS variables — see [Theming](./theming) to change them.
+Dark mode follows a `dark` class on an ancestor (usually `<html>`). Colors, fonts and field sizes are CSS variables — see [Theming](./theming).
 
 ### Markdown
 
-Rendered markdown is styled inside a `.w-markdown` container: headings, lists, tables, inline code, and code blocks with numbered `.line`s. Sizes are in `em`, so the content follows the container's font size, and colors come from the color roles. Import it after the base:
+`.w-markdown` styles rendered markdown: headings, lists, tables, inline code, and code blocks with numbered `.line`s. Sizes are in `em` and colors use the color roles. Import it after the base:
 
 ```css
 @import "eco-vue-js/tailwind-base/markdown.css";
@@ -35,11 +35,11 @@ Rendered markdown is styled inside a `.w-markdown` container: headings, lists, t
 @import "eco-vue-js/tailwind-base/css/markdown/blocks.css";
 ```
 
-Add `enable-mobile` to the container to keep text on the page's inner margin below `sm` while code blocks and tables reach the screen edges, or `w-report` for print: code wraps and lines don't highlight on hover.
+Add `enable-mobile` to keep text on the inner margin below `sm` while code blocks and tables reach the edges, or `w-report` for print (code wraps, no line hover).
 
 ## Query client
 
-List, select and async components fetch through `@tanstack/vue-query`. Install the plugin and hand the same client to the kit, so model actions running outside `setup` can reach it:
+Lists, selects and async components fetch through `@tanstack/vue-query`. Install the plugin and pass the same client to the kit, so model actions outside `setup` can reach it:
 
 ```ts
 import {QueryClient, VueQueryPlugin} from '@tanstack/vue-query'
@@ -56,7 +56,7 @@ setQueryClient(queryClient)
 app.use(VueQueryPlugin, {queryClient})
 ```
 
-`defaultQueryRetry` retries a query twice when asking again may help: the server was unreachable, answered 5xx, 408 or 429. Other 4xx, cancelled requests and errors thrown by the query function fail at once. A query that must skip more composes it with `isRetryableError` or the same function:
+`defaultQueryRetry` retries twice when it may help: unreachable server, 5xx, 408 or 429. Other 4xx, cancellations and errors thrown by the query function fail immediately. To skip more, compose with `isRetryableError`:
 
 ```ts
 options: {
@@ -64,11 +64,11 @@ options: {
 }
 ```
 
-The queries themselves are declared per model — see [Data layer](/guide/data-layer).
+Queries are declared per model — see [Data layer](/guide/data-layer).
 
 ## App layout
 
-Sticky list headers and columns, full-width rows, dropdowns and modals position themselves from a few CSS variables that describe the app's frame. Set them on `body`, with the values your header and side bars actually take at each breakpoint — all default to `0px`:
+Sticky list headers and columns, full-width rows, dropdowns and modals position from CSS variables describing the app frame. Set them on `body` with your bars' actual sizes per breakpoint — all default to `0px`:
 
 ```css
 body {
@@ -80,11 +80,11 @@ body {
 }
 ```
 
-[App shell](./app-shell) explains each variable and sets up the header, nav and actions bars around the content.
+[App shell](./app-shell) explains each and sets up the bars.
 
 ## Global containers
 
-Modals, menus, notifications and tooltips render into containers mounted once at the root of the app — `WModal` renders the modals and every `WButtonMore` menu. `WShineEffect` is optional: it drives the moving shine on action buttons. `WNotify` shows the toasts; their history opens from `WNotifyCenterButton` in the actions bar (see [Notify](/components/notify#notify-center)). `WQueryStatus` shows one message with Retry when queries on screen fail to load (see [Query status](/components/query-status)).
+Modals, menus, notifications and tooltips render into containers mounted once at the app root. `WModal` renders modals and `WButtonMore` menus. `WShineEffect` (optional) drives the shine on action buttons. `WNotify` shows toasts; their history opens from `WNotifyCenterButton` ([Notify](/components/notify#notify-center)). `WQueryStatus` shows one message with Retry when on-screen queries fail ([Query status](/components/query-status)).
 
 ```vue
 <template>
@@ -108,7 +108,7 @@ import WTooltipContainer from 'eco-vue-js/dist/components/Tooltip/WTooltipContai
 
 ## Texts
 
-A few texts the components show on their own are in English: the Back, Next, Close, Cancel and submit buttons of a stepper, a confirm's Cancel and Accept, the question before a modal with unsaved changes closes, the warning about invalid fields, the From and To of a date picker, No data on an empty chart, the error and Retry of a list page, a [query boundary](/components/query-boundary) or the [query status](/components/query-status), and the heading, messages and buttons of a [page error](/components/page-error). Replace them once, before the app mounts. A getter is read as the text renders, so a translation follows the locale:
+Built-in texts are in English: stepper buttons, confirm Cancel/Accept, the unsaved-changes prompt, the invalid-fields warning, date picker From/To, the empty chart's No data, list/[query boundary](/components/query-boundary)/[query status](/components/query-status) errors and Retry, and the [page error](/components/page-error). Replace them once before mounting; getters are read at render, so translations follow the locale:
 
 ```ts
 import {setTexts} from 'eco-vue-js/dist/utils/texts'
@@ -121,9 +121,9 @@ setTexts({
 })
 ```
 
-A prop such as `submitText` or a confirm's `acceptText` still names its own button.
+Props like `submitText` or `acceptText` still override per button.
 
-Dates, times, durations and numbers are formatted in `en-GB` until `setLocale` sets another locale — see [Formatting](/utilities/formatting#dates):
+Dates, times, durations and numbers use `en-GB` until `setLocale` changes it — see [Formatting](/utilities/formatting#dates):
 
 ```ts
 import {setLocale} from 'eco-vue-js/dist/utils/locale'
@@ -133,7 +133,7 @@ setLocale(() => i18n.global.locale.value)
 
 ## Importing
 
-Import each component, utility and icon by its own path — there is no barrel import:
+Import each component, utility and icon by path — there is no barrel:
 
 ```ts
 import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
@@ -141,21 +141,21 @@ import {Notify} from 'eco-vue-js/dist/utils/Notify'
 import IconAdd from 'eco-vue-js/dist/assets/icons/IconAdd'
 ```
 
-See [Conventions](./conventions) for the patterns the rest of the docs assume.
+See [Conventions](./conventions) for patterns the docs assume.
 
 ## AI assistants
 
-The package carries these docs as Markdown, for the version it is: point an assistant at `node_modules/eco-vue-js/docs/llms.txt`, for example with a line in the app's `CLAUDE.md` or `AGENTS.md`:
+The package ships these docs as Markdown for its version: point an assistant at `node_modules/eco-vue-js/docs/llms.txt`, e.g. from the app's `CLAUDE.md` or `AGENTS.md`:
 
 ```md
 UI kit docs: node_modules/eco-vue-js/docs/llms.txt — read the page for a component before using it.
 ```
 
-This site also serves them for the latest version: [llms.txt](https://rsmple.github.io/eco-vue-js/llms.txt) indexes every page, and [llms-full.txt](https://rsmple.github.io/eco-vue-js/llms-full.txt) has all of them in one file.
+For the latest version, this site serves [llms.txt](https://rsmple.github.io/eco-vue-js/llms.txt) (an index) and [llms-full.txt](https://rsmple.github.io/eco-vue-js/llms-full.txt) (everything in one file).
 
 ## Eslint config
 
-The package also ships the shared eslint config used by its consumers:
+The package also ships a shared eslint config:
 
 ```js
 import plugin from 'eco-vue-js/eslint/plugin'

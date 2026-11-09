@@ -5,9 +5,9 @@ description: WImageViewer — an image URL as a thumbnail with its file name tha
 
 # Image viewer
 
-`WImageViewer` shows an image URL as a thumbnail, under an optional `title`. Hovering it shows the file name, taken from the end of the URL, and a click opens the full image in a modal, which closes on Escape or a click outside. Without a `modelValue`, or with `skeleton`, it shows a placeholder of the same size.
+`WImageViewer` shows an image URL as a thumbnail under an optional `title`. Hover shows the file name (from the URL); click opens the full image in a modal that closes on Escape or outside click. Without `modelValue`, or with `skeleton`, it shows a same-size placeholder.
 
-The modal opens with the [modal manager](/components/modal), so the app needs its [global containers](/guide/getting-started#global-containers).
+The modal uses the [modal manager](/components/modal), so the app needs its [global containers](/guide/getting-started#global-containers).
 
 <!-- @example ImageViewer/Basic -->
 

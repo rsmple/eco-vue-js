@@ -5,11 +5,11 @@ description: WProgress, WProgressStriped and WProgressBar — a thin line, a sli
 
 # Progress
 
-Three bars for the progress of a task:
+Three progress bars:
 
-- `WProgress` — a thin line, from 0 to 100, e.g. under a modal's title for the steps of a stepper.
-- `WProgressStriped` — a slim rounded bar, from 0 to 100, with a light sweeping the fill while in progress. A band sweeps the empty track at 0, and the full bar pulses at 100. It has no height of its own, so give it one, e.g. `h-1.5`.
-- `WProgressBar` — a large bar with the percentage in it, from 0 to 1; the label changes color where the fill passes under it. `null` sweeps the empty bar and shows a spinner, for a task that hasn't reported its progress yet.
+- `WProgress` — a thin line, 0–100, e.g. under a stepper modal's title.
+- `WProgressStriped` — a slim rounded bar, 0–100, with a sweeping light while in progress, a sweeping band at 0 and a pulse at 100. Give it a height, e.g. `h-1.5`.
+- `WProgressBar` — a large bar, 0–1, with an inline percentage that changes color over the fill. `null` sweeps the empty bar with a spinner, for unreported progress.
 
 <!-- @example Progress/Basic -->
 

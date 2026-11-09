@@ -17,7 +17,7 @@ import IconAdd from 'eco-vue-js/dist/assets/icons/IconAdd'
 </script>
 ```
 
-When passing an icon to a prop, wrap it in `markRaw` — `:icon="markRaw(IconAdd)"`.
+Wrap icons passed to props in `markRaw` — `:icon="markRaw(IconAdd)"`.
 
 <llm-exclude>
 

@@ -5,7 +5,7 @@ description: Showing success, warning, error and in-progress notifications with 
 
 # Notify
 
-Notifications are shown from code, from anywhere — setup, a store, a query's error handler. `Notify.success`, `Notify.warn` and `Notify.error` add one to the `WNotify` container mounted once at the app root (see [Getting started](/guide/getting-started#global-containers)); before it is mounted, the calls do nothing.
+Notifications are shown from code anywhere — setup, a store, a query error handler. `Notify.success`, `Notify.warn` and `Notify.error` add one to the `WNotify` container at the app root (see [Getting started](/guide/getting-started#global-containers)); before it mounts, calls do nothing.
 
 <!-- @example Notify/Basic -->
 
@@ -53,26 +53,26 @@ Each call takes:
 | --- | --- |
 | `title` | The message, as a string or a VNode. |
 | `caption` | A second line with details. |
-| `userInput` | What the user typed or picked, shown after the caption and broken anywhere to fit — a file name, a search term. |
-| `to` | A route; the notification links to it, titled with the route's `meta.title`. |
+| `userInput` | What the user typed or picked (a file name, a search term), shown after the caption and wrapped anywhere. |
+| `to` | A route to link to, titled with its `meta.title`. |
 | `channel` | `NotifyChannel.ACTIVITY` (the default) or `NotifyChannel.ACTION` — see [Notify center](#notify-center). |
-| `group` | Shows notifications with the same group `key` as one entry — see [Groups](#groups). |
-| `key` | Shows it once: the same key again returns the notification already there, and nothing comes back after the user closed it. |
-| `toast` | `false` adds it to the notify center without a toast. |
+| `group` | Merges notifications with the same group `key` into one entry — see [Groups](#groups). |
+| `key` | Shows it once: the same key returns the existing notification, and nothing reappears after the user closes it. |
+| `toast` | `false` adds it to the notify center only. |
 | `component`, `componentProps` | Content under the caption — see [Custom content](#custom-content). |
 | `onRemove` | Called when the user closes it. |
 
-A toast closes after 5 seconds, unless it is in progress or needs the user. While the pointer is over the toasts, none of them close: their time stops and goes on from where it was once the pointer leaves. The same notification shown again within those 5 seconds doesn't stack: the one on screen stays, gets a counter, and its 5 seconds start over. Clicking the same failing button five times shows one error with a 5 on it.
+Toasts close after 5 seconds unless in progress or needing action; hovering pauses all timers. A repeat within 5 seconds doesn't stack — the existing toast gets a counter and restarts its timer.
 
-Toasts show in the top right corner, under the header. `position` on `WNotify` moves them to `top-center`, `bottom-right` or `bottom-center`; at the bottom the newest toast is closest to the edge. On phones every position shows at the top edge of the screen, over the header or a modal's title — the bottom holds the buttons of a modal, a sheet or a page.
+Toasts show top-right under the header. `position` on `WNotify` sets `top-center`, `bottom-right` or `bottom-center` (newest nearest the edge). On phones they always show at the top, since the bottom holds modal, sheet and page buttons.
 
 <NotifyPositionPlayground />
 
-The kit shows notifications itself in a few places: copying and pasting, invalid form values when leaving a tab or submitting a form, a `validate` error in `WToggle`, and failed requests made through its API helpers.
+The kit notifies on its own for copy/paste, invalid form values on tab change or submit, `validate` errors in `WToggle`, and failed requests through its API helpers.
 
 ## Progress
 
-`Notify.process` shows something in progress with a spinner. Every call returns the notification's id — or `undefined` before `WNotify` is mounted — and `Notify.update` changes it later. Its toast stays on screen until then, and once it gets another type the toast shows again with the result — even after the user closed it — and closes after 5 seconds like any other. `Notify.remove` takes it away without calling `onRemove`.
+`Notify.process` shows a spinner. Every call returns the notification id (`undefined` before `WNotify` mounts); `Notify.update` changes it later. The toast stays until then; once its type changes it reappears with the result (even if closed) and closes after 5 seconds. `Notify.remove` removes it without calling `onRemove`.
 
 <!-- @example Notify/Process -->
 
@@ -106,11 +106,11 @@ const water = () => {
 
 <!-- @example-end -->
 
-A pending notification can't be closed in the notify center; closing its toast only hides the toast.
+A pending notification can't be closed in the center; closing its toast only hides the toast.
 
 ## Notify center
 
-Every notification is also kept in a history of the last 50, shown by `WNotifyCenter`. `WNotifyCenterButton` is a bell for the [actions bar](/guide/app-shell) that opens it as a dropdown — a bottom sheet on phones. It counts the notifications that need action and runs a shimmer while any is pending. Toasts are hidden while the center is open. The center opens under the button with a tip; `horizontal-align` places it otherwise. `HorizontalAlign.LEFT_INNER` suits a bell at the right end of the header — it grows left from the button's right edge, without a tip. `HorizontalAlign.LEFT_CENTER` suits a bell in a side rail — it opens beside the button with the tip pointing at it, and near the top or bottom of the screen only the box shifts, keeping a margin from the edge.
+`WNotifyCenter` shows a history of the last 50. `WNotifyCenterButton` is a bell for the [actions bar](/guide/app-shell) that opens it as a dropdown (a bottom sheet on phones), counts notifications needing action and shimmers while any is pending. Toasts hide while the center is open. It opens under the button with a tip; `horizontal-align` changes that — `HorizontalAlign.LEFT_INNER` for a bell at the header's right end (grows left, no tip), `HorizontalAlign.LEFT_CENTER` for a side rail (opens beside with a tip; only the box shifts near screen edges).
 
 ```vue
 <template>
@@ -139,7 +139,7 @@ import WNotifyCenterButton from 'eco-vue-js/dist/components/Notify/WNotifyCenter
 </script>
 ```
 
-For a trigger of your own, such as the bell in this site's header, open it with `useNotifyCenter`, called in setup. It returns `isOpen`, `open(anchor)`, `close` and `toggle(anchor)`, and takes the center's props, footer and `horizontalAlign`:
+For a custom trigger, like this site's header bell, use `useNotifyCenter` in setup. It returns `isOpen`, `open(anchor)`, `close` and `toggle(anchor)`, and takes the center's props, footer and `horizontalAlign`:
 
 ```ts
 import {HorizontalAlign} from 'eco-vue-js/dist/utils/HorizontalAlign'
@@ -151,7 +151,7 @@ const {isOpen, toggle} = useNotifyCenter({
 })
 ```
 
-`WNotifyCenter` can also be placed on a page as it is. Notifications on the `ACTION` channel need the user: they are pinned on top under their own heading, their toast stays until closed, and clearing the history keeps them — as it keeps pending ones. Each section has its own button: Clear beside the activity heading, and, with `onDismissActions`, Dismiss all beside the heading of the ones that need action. It hands them all to that function at once — such as to dismiss them on the server with one request by the same filters as the feed they came from — and removes them once it resolves, without calling each one's `onRemove`.
+`WNotifyCenter` can also sit directly on a page. `ACTION` notifications are pinned on top under their own heading, their toasts stay until closed, and Clear keeps them (as it keeps pending ones). Clear sits beside the activity heading; with `onDismissActions`, Dismiss all sits beside the action heading — it passes them all at once (e.g. to dismiss server-side in one request) and removes them on resolve, without each `onRemove`.
 
 <!-- @example Notify/Center -->
 
@@ -208,13 +208,13 @@ const checkSoil = () => {
 
 ### Groups
 
-Notifications with the same `group.key` show as one entry while there are two or more of them — in a toast and in the center — with the group's `title` and `caption`, the most severe type of its members, and a list of them to expand, newest first. A member is never merged into a repeat of itself — every one adds to the list, and the group's toast stays up for 5 seconds after its latest member. Closing the entry closes each member, or calls the group's `onRemoveItems` with all of them at once. A group's `component` gets its `items` along with `componentProps`.
+Notifications sharing `group.key` show as one entry once there are two or more — toast and center — with the group's `title` and `caption`, the most severe member type, and an expandable list, newest first. Members never merge as repeats; each joins the list, and the group's toast stays 5 seconds after the latest. Closing the entry closes each member, or calls `onRemoveItems` with all of them. A group's `component` gets `items` with `componentProps`.
 
 ## Custom content
 
-`component` renders under the caption with `componentProps`, such as the progress of a background operation. It may emit `update` with new fields — `title`, `caption`, `type`, `channel` or `group` — and `remove` to take the notification away; type its emits with `NotifyContentEmits` from `eco-vue-js/dist/utils/Notify`. In a group's list it gets `compact`.
+`component` renders under the caption with `componentProps`, e.g. a background job's progress. It may emit `update` with new `title`, `caption`, `type`, `channel` or `group`, and `remove`; type emits with `NotifyContentEmits` from `eco-vue-js/dist/utils/Notify`. In a group's list it gets `compact`.
 
-The toast and the center each render their own copy, so keep the state outside the component — in a query or a reactive object — rather than in it.
+Toast and center render separate copies, so keep state outside the component (a query or reactive object).
 
 <!-- @example Notify/Content -->
 

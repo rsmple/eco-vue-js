@@ -6,20 +6,20 @@ description: Build a paginated, sortable, searchable WList on a createRestModelA
 
 # List with fields
 
-**Problem:** a paginated collection needs a table on desktop and cards on mobile, sortable and resizable columns the user can show, hide and reorder, filters, per-row and bulk actions, and an expandable detail row — without each list re-implementing any of that.
+**Problem:** a paginated collection needs a table on desktop and cards on mobile; sortable, resizable, hideable, reorderable columns; filters; row and bulk actions; and an expandable detail row — without each list re-implementing them.
 
 **Pattern:** `WList` owns layout, pagination, selection, column settings and ordering. You supply:
 
 | Piece | What it is |
 | --- | --- |
-| A model | `createRestModelApi` with a paginated query, whose `use` is the list's `useQueryFn`, and the actions that change an item. |
-| Query params | `createUseQueryParams`, which keeps the user's search, filters and ordering in the URL. |
-| Filter components | One `.vue` per filter for `WListFilter`. The component renders the control; its exported `meta` declares the title, icon and the params it sets. |
-| Field components | One `.vue` per column. The component renders the cell; its exported `meta` declares the label, width, title and sort field. |
-| A fields index | The ordered tuple of field modules plus the default column config. |
+| A model | `createRestModelApi` with a paginated query (its `use` is the list's `useQueryFn`) and item actions. |
+| Query params | `createUseQueryParams` — keeps search, filters and ordering in the URL. |
+| Filter components | One `.vue` per filter for `WListFilter`: renders the control; `meta` declares title, icon and params. |
+| Field components | One `.vue` per column: renders the cell; `meta` declares label, width, title and sort field. |
+| A fields index | The ordered tuple of fields plus the default column config. |
 | Menu components | Row actions, typed with `MenuProps<T>` / `MenuEmits<T>`. |
-| Bulk components | Actions on the selected rows, typed with `BulkProps<QueryParams>`. |
-| An expansion component | Optional detail row, opened from the field marked `allow-open`. |
+| Bulk components | Actions on selected rows, typed with `BulkProps<QueryParams>`. |
+| An expansion component | Optional detail row, opened from the `allow-open` field. |
 
 <!-- @example recipes/plant-list/PlantList overflow -->
 
@@ -130,17 +130,17 @@ const cardAreas: CardAreas<typeof listFieldsPlant, typeof cardColumns['length']>
 
 <!-- @example-end -->
 
-Try picking a kind from the pinned chip, adding a filter, sorting by a few columns from the sort menu, resizing Name, hiding columns from the header settings, switching to cards, expanding a row, using the `⋯` menu, and selecting a few rows for the bulk actions above the list. The data is in memory here, behind the same model API a real endpoint would use.
+Try the pinned kind chip, adding filters, sorting, resizing Name, hiding columns, card view, expanding a row, the `⋯` menu and bulk actions. Data is in memory, behind the same model API a real endpoint would use.
 
 ## The code
 
 ### Model and filters
 
-The model is the only piece that knows where data comes from — see [Data layer](/guide/data-layer) for the whole API. `WList` calls `plantModelApi.paginated.use` with `{...queryParams, page}` for each page and expects a `PaginatedResponse<T>`. Here each request is answered from an array in memory; in an app it goes through your `apiClient`.
+The model is the only piece that knows where data comes from — see [Data layer](/guide/data-layer). `WList` calls `plantModelApi.paginated.use` with `{...queryParams, page}` per page and expects a `PaginatedResponse<T>`. Here requests are answered from memory; in an app they go through your `apiClient`.
 
-The item query holds the actions the menu calls. `update` puts the saved plant into every cached page that holds it, and `delete` returns `() => null` to drop the plant from them. The paginated query holds the bulk actions, `updateMany` and `deleteMany`. They take the list's query params narrowed to the selection — `id__in`, `id__not_in` or `slice_indexes` — and invalidate the model, since a bulk change can move plants in and out of the filters.
+The item query holds the menu's actions: `update` writes the saved plant into every cached page, `delete` returns `() => null` to drop it. The paginated query holds the bulk actions, `updateMany` and `deleteMany`. They take the query params narrowed to the selection (`id__in`, `id__not_in` or `slice_indexes`) and invalidate the model, since bulk changes can move rows across filters.
 
-`useQueryParamsPlants` declares the params the user sets: `search`, `ordering` and one per filter — `kind__in`, `light__in`, `watered` and `caretaker`. Each gets a parse function that reads it back from the URL and drops what does not parse, so a hand-edited link cannot put an unknown kind into the query. Leave `page` out — the list adds it to each page's query. The docs have no router, so the demo keeps the filters in the page with `useQueryParamsLocal()`. In an app, pass the route, and the filters live in the URL:
+`useQueryParamsPlants` declares `search`, `ordering` and one param per filter — `kind__in`, `light__in`, `watered`, `caretaker`. Each parse function drops values that don't parse, so a hand-edited link can't inject an unknown kind. Leave `page` out — the list adds it. The demo uses `useQueryParamsLocal()` since the docs have no router; in an app, pass the route:
 
 ```ts
 const {queryParams, updateQueryParams} = useQueryParamsPlants(useRoute())
@@ -587,14 +587,14 @@ export const plantModelApi = createRestModelApi({
 
 ### Fields
 
-Each field is a module with two exports: the component (default) renders the cell, and `meta` describes the column. Keep both in one file — the column cannot drift from what it renders.
+A field module has two exports: the component (default) renders the cell, `meta` describes the column. One file keeps them in sync.
 
-- `label` is the column's stable id: it keys the saved column config and names the area in `cardAreas`.
-- `width` is the column's width until the user resizes it: a length such as `'8rem'`, or `'minmax(12rem, 1fr)'` for a column that takes the space the others leave and shrinks to its minimum when the list scrolls sideways. The header and every row share these widths, so nothing is measured.
-- `field` makes the column sortable — its value is sent as `ordering` (`height`, `-height`).
-- `textFormat` gives a plain-text value for CSV export and "copy as Markdown", for cells that render components or format the value for display — like the water-by date, which is shown short and exported in full.
-- `allow-open` on `WListCardField` makes that cell toggle the expansion row.
-- A cell can render anything inside `WListCardField` — a tag in the kind's tone, a sparkline, a meter. Keep it one line high so the row height stays the same, and give it a `textFormat` for export.
+- `label` — stable column id; keys the saved config and names the `cardAreas` area.
+- `width` — initial width: `'8rem'`, or `'minmax(12rem, 1fr)'` to take leftover space. Header and rows share widths, so nothing is measured.
+- `field` — makes the column sortable; sent as `ordering` (`height`, `-height`).
+- `textFormat` — plain-text value for CSV export and "copy as Markdown", for cells that render components or display-formatted values.
+- `allow-open` on `WListCardField` — the cell toggles the expansion row.
+- A cell can render anything (a tag, a sparkline, a meter). Keep it one line high and give it a `textFormat`.
 
 ::: code-group
 
@@ -871,17 +871,17 @@ export const defaultFieldConfigMapPlant = getDefaultFieldConfigMap(listFieldsPla
 
 :::
 
-`as const satisfies ListFields<…>` keeps the tuple literal, which is what lets TypeScript check the labels in `getDefaultFieldConfigMap` and `cardAreas` — a typo in either is a type error.
+`as const satisfies ListFields<…>` keeps the tuple literal, so TypeScript checks labels in `getDefaultFieldConfigMap` and `cardAreas`.
 
 ### Filters
 
-`WListFilter` edits the same query params the list reads. Wrap it in a `WUniform` over `queryParams` and pass the `scope` down; `search` adds the search field. Put it in WList's `filter` slot and the filters sit in the selection bar, on one line with the list settings: each chip opens its control in a dropdown, the add button offers the rest, and chips that do not fit go into a "more" chip. While rows are selected, the bulk actions take the bar's place.
+`WListFilter` edits the same query params the list reads. Wrap it in a `WUniform` over `queryParams`, pass `scope` down, and add `search` for a search field. In WList's `filter` slot the filters sit in the selection bar: each chip opens its control in a dropdown, the add button offers the rest, and overflow goes into a "more" chip. Bulk actions replace the bar while rows are selected.
 
-`pinned` filters are always shown, first — here kind and watered, the ones most often reached for. Their remove button only clears them, so they stay in the bar.
+`pinned` filters are always shown first (kind and watered here); their remove button only clears them.
 
-Each filter is a module like a field: the component renders the control inside a `WUniform` bound to its param, and `meta` gives the chip's `title`, `icon` and the `fields` it sets — removing the chip clears them. `meta.summary` returns the picked values for the chip from the query params — the kind and light names, "Watered" or "Thirsty", the caretaker's name. Without it, the chip shows how many values are picked. The control is the same one a form would use: a `WSelect` for kinds, a `WCheckboxGroupMultiple` for light, a radio `WCheckboxGroup` for watered, where `undefined` means "Any", and a `WSelectSingle` for the caretaker. The two selects reuse option components from the [Select](/components/select) examples — the tone tag and the gardener with their week of watering — so a kind looks the same in the filter as in its column.
+A filter module is like a field: the component renders the control in a `WUniform` bound to its param; `meta` gives the chip's `title`, `icon` and the `fields` it sets (cleared on remove). `meta.summary` returns the chip text from the query params; without it the chip shows a count. Controls are the same as in a form — `WSelect`, `WCheckboxGroupMultiple`, a radio `WCheckboxGroup` (`undefined` = "Any") and `WSelectSingle`. The selects reuse option components from the [Select](/components/select) examples, so a kind looks the same in filter and column.
 
-The dropdown is titled with the filter's name and pads the control like a small form. `:embedded="!global"` drops the control's own title and margin, and lets a select's options and a checkbox list reach the dropdown's edges, as in a menu. With `global` the filters go into the app shell's filter panel instead, where each control keeps its title. A filter applies as it changes, so picking a caretaker closes the dropdown, as a single select's menu would — a multiple select stays open to pick more.
+The dropdown is titled with the filter name. `:embedded="!global"` drops the control's own title and margin and lets options reach the dropdown edges. With `global`, filters go into the app shell's filter panel and keep their titles. Filters apply on change: a single select closes the dropdown, a multiple select stays open.
 
 ::: code-group
 
@@ -1035,9 +1035,9 @@ export const listFilterPlantPinned = [
 
 ### Row menu
 
-Menu items receive the row and call the model's actions. The actions update the cached pages themselves, so the list changes without a refetch. The menu also gets `updateItem` and `deleteItem`, which write the row to the cache or remove it without a request — e.g. to drop a row that was never saved.
+Menu items receive the row and call the model's actions, which update cached pages — no refetch. The menu also gets `updateItem` and `deleteItem` to write or remove a row in the cache without a request.
 
-Always type menu components with `MenuProps<T>` and `MenuEmits<T>` from the kit — a hand-written props shape breaks when the kit adds a prop.
+Always type menus with `MenuProps<T>` and `MenuEmits<T>` — a hand-written props shape breaks when the kit adds a prop.
 
 ::: code-group
 
@@ -1147,15 +1147,15 @@ const remove = () => {
 
 :::
 
-`Modal.addConfirm` keeps the confirm open with a spinner while `onAccept`'s promise is pending, closes it when the promise resolves, and leaves it open if it rejects — so return the action's promise.
+`Modal.addConfirm` shows a spinner while `onAccept`'s promise is pending, closes on resolve and stays open on reject — so return the action's promise.
 
-Opened with `useOverlay()` from the menu, the confirm takes the menu's place as a dropdown — a bottom sheet on phones — instead of a modal, so the list stays in view. It opens under the row's `⋯` button, or where the row was right-clicked, and the row stays highlighted until it closes.
+Opened with `useOverlay()` from the menu, the confirm replaces the menu as a dropdown (a bottom sheet on phones) under the `⋯` button or the right-click point, and the row stays highlighted until it closes.
 
 ### Bulk actions
 
-Bulk components sit in the bar above the list and act on the selected rows. They get the `selectionCount` and a `queryParamsGetter` that returns the list's query params narrowed to the selection, which the model's bulk actions send as they are. Call `clearSelection()` to reset the selection once the action is done.
+Bulk components sit in the bar above the list. They get `selectionCount` and a `queryParamsGetter` returning query params narrowed to the selection, which bulk actions send as-is. Call `clearSelection()` when done.
 
-Each confirm opens under its button, like a filter's dropdown, so the selected rows stay in view. Actions that do not fit the bar — on phones, all but the first two buttons — move into a More menu, and there the confirm opens under the More button instead. A click outside closes the confirm, so changing the selection cancels it. Once accepted, the page is held still until the request settles, so the selection and filters cannot change under it.
+Each confirm opens under its button. Actions that don't fit (on phones, all but two) move into a More menu, and their confirm opens under More. Clicking outside cancels. Once accepted, the page is frozen until the request settles.
 
 ::: code-group
 
@@ -1287,9 +1287,9 @@ const markDry = (event: MouseEvent) => {
 
 #### Actions with a form
 
-An action that needs input, such as a new caretaker, opens a small form instead of a confirm: `useOverlay().open` with `present: 'dropdown'` puts it under the button — a bottom sheet on phones — and the same form serves the bulk action and the row menu. From the More menu or a row's `⋯` menu, it takes the menu's place, as a confirm does.
+An action that needs input, like a new caretaker, opens a form: `useOverlay().open` with `present: 'dropdown'` puts it under the button (a bottom sheet on phones). The same form serves the bulk action and the row menu, replacing the menu as a confirm does.
 
-The form is a `WModalWrapper` with a `WUniform` inside, the way it would be in a modal. The frame takes its title and buttons and pads the field, so the form brings no padding or layout for being in a dropdown, and it would open as a modal unchanged. The select is `embedded`, as in a filter: its search is pinned under the title and the caretakers are listed in place of a menu, with Save and Cancel pinned under them — unlike the filter, a pick waits for Save, so the list stays open. A click outside, Escape or a swipe dismisses it like a menu, and while the form saves, the dropdown stays open.
+The form is a `WModalWrapper` with a `WUniform`, as in a modal — the frame provides title, buttons and padding, so it would open as a modal unchanged. The select is `embedded`: search pinned under the title, options listed in place, Save and Cancel below. Unlike a filter, a pick waits for Save. Click outside, Escape or swipe dismisses; the dropdown stays open while saving.
 
 <!-- @source docs/examples/recipes/plant-list/PlantCaretakerForm.vue PlantCaretakerForm.vue -->
 
@@ -1466,7 +1466,7 @@ const openForm = (event: MouseEvent) => {
 
 ### Expansion
 
-The expansion gets the row's `item` and has the full width of the list, so it can hold what does not fit in a cell: here the care facts, a growth chart with a tooltip per month, a four-week watering calendar and the next tasks. While the row loads, `skeleton` is set and `item` may be `undefined` — each section shows its own placeholder.
+The expansion gets the row's `item` and the list's full width: care facts, a growth chart, a watering calendar and next tasks. While loading, `skeleton` is set and `item` may be `undefined`; each section shows its own placeholder.
 
 <!-- @source docs/examples/recipes/plant-list/PlantContent.vue PlantContent.vue -->
 
@@ -1665,16 +1665,16 @@ const getDueText = (due: Date) => {
 
 ## Why it is built this way
 
-- **One component per column** makes columns reusable across lists of the same model, lets each cell own its formatting and loading state, and keeps the column list declarative, so `WList` can reorder, hide and resize columns without knowing what they render.
-- **Query params are the whole state.** Search, filters and ordering go into `queryParams`; `WList` adds `page` and emits `update:query-params` when the user sorts. With `createUseQueryParams` they live in the route query, so the list is linkable and survives reloads.
-- **Card layout is data, not markup.** `cardColumns` and `cardAreas` place the same field components into a CSS grid for the mobile card view, using the field labels as area names. `area_select` and `area_more` place the checkbox and the menu. Name every field, including ones hidden by default: a field left out still renders in card mode, in an extra column the grid adds for it. A row whose fields are all hidden drops out, so the `water`/`seeds` and `kind` rows cost nothing until the user shows those columns.
-- **Cache updates instead of refetching.** The model's actions update the item in every cached page, so the user keeps their scroll position and loaded pages.
+- **One component per column** — reusable across lists of the same model, each cell owns its formatting and loading state, and `WList` can reorder, hide and resize columns without knowing what they render.
+- **Query params are the whole state.** `WList` adds `page` and emits `update:query-params` on sort. With `createUseQueryParams` they live in the URL, so lists are linkable and survive reloads.
+- **Card layout is data.** `cardColumns` and `cardAreas` place fields into a CSS grid for mobile, using labels as area names; `area_select` and `area_more` place the checkbox and menu. Name every field, including hidden ones — an unnamed field still renders, in an extra column. Rows whose fields are all hidden collapse.
+- **Cache updates instead of refetching** keep scroll position and loaded pages.
 
 ## Variations
 
-- **Filters above the list**: render the `WUniform` with `WListFilter` before `WList` instead of in its `filter` slot, and the chips wrap onto as many lines as they need.
-- **Filters in the app shell**: pass `global` to `WListFilter` to put the filters into the actions bar's panel and the search into the header bar, with a button that resets them. `disabledFilterFields` leaves out filters for params the page fixes, e.g. `caretaker` on a caretaker's own page.
+- **Filters above the list**: render the `WUniform` with `WListFilter` before `WList`; chips wrap onto multiple lines.
+- **Filters in the app shell**: `global` puts filters in the actions bar panel and search in the header bar, with a reset button. `disabledFilterFields` hides filters the page fixes, e.g. `caretaker` on a caretaker's page.
 - **Toolbar actions** (e.g. "Create"): pass `action` with components typed by `ActionProps<QueryParams>`.
-- **Nested columns**: a field's `meta` can be `{keyEntity, fields}` or `{keyArray, fields}` to render columns of a related object or of every item in an array — see [Nested fields](/components/list#nested-fields).
-- **Embedded lists**: a list is sized as a page by default — it reserves the viewport height. Inside a card, tab or docs page like this one, pass `min-height` to drop that.
-- **Read-only rows**: `readonlyGetter` marks individual rows read-only; menu items receive `readonly` and should disable themselves.
+- **Nested columns**: `meta` can be `{keyEntity, fields}` or `{keyArray, fields}` for a related object or an array — see [Nested fields](/components/list#nested-fields).
+- **Embedded lists**: lists reserve the viewport height by default; pass `min-height` inside a card, tab or docs page.
+- **Read-only rows**: `readonlyGetter` marks rows read-only; menu items receive `readonly` and should disable themselves.

@@ -5,7 +5,7 @@ description: Date, duration and number formatting from eco-vue-js — dateFormat
 
 # Formatting
 
-The functions the kit's components format values with, for the same output elsewhere in the app.
+The formatters the kit's components use, for matching output elsewhere.
 
 <!-- @example utilities/Formatting client -->
 
@@ -87,7 +87,7 @@ const download = () => {
 import {addDay, dateFormat, durationFormat, getStartOfDay} from 'eco-vue-js/dist/utils/dateTime'
 ```
 
-All of them work in local time, and format in the locale set with `setLocale` — `en-GB` by default. The examples are in `en-GB`.
+All work in local time and format in the `setLocale` locale (`en-GB` by default, used in the examples).
 
 ```ts
 import {setLocale} from 'eco-vue-js/dist/utils/locale'
@@ -95,27 +95,27 @@ import {setLocale} from 'eco-vue-js/dist/utils/locale'
 setLocale(() => i18n.global.locale.value)
 ```
 
-A getter is read as the value renders, so the text follows a change of locale.
+Getters are read at render, so text follows locale changes.
 
 | Function | Result |
 | --- | --- |
-| `dateFormat(date, {year?})` | `05 Oct 2026` — with the month name, so the date reads the same way in any locale. `year: 'auto'` drops the year when it is the current one: `05 Oct`. |
-| `timeFormat(date, {seconds?})` | `14:30:05`, or `2:30:05 PM` in a locale with a 12-hour clock. `seconds: false` drops the seconds: `14:30`. |
-| `datetimeFormat(date, {year?, seconds?})` | The date and the time, in the order and with the separator of the locale: `05 Oct 2026, 14:30:05`. Takes the options of both: `05 Oct, 14:30` with `{year: 'auto', seconds: false}`. |
+| `dateFormat(date, {year?})` | `05 Oct 2026` — month name, unambiguous in any locale. `year: 'auto'` drops the current year: `05 Oct`. |
+| `timeFormat(date, {seconds?})` | `14:30:05`, or `2:30:05 PM` in 12-hour locales. `seconds: false`: `14:30`. |
+| `datetimeFormat(date, {year?, seconds?})` | Date and time in the locale's order: `05 Oct 2026, 14:30:05`. Takes both sets of options: `05 Oct, 14:30`. |
 | `todayFormat()` | `Today`, as a label. |
-| `dateInputFormat(date)` | `05/10/2026` — the numeric date of the locale (`10/05/2026` in `en-US`), as [WInputDate](/components/input#date) shows it. `parseDateInput(text)` reads it back with any separators, or returns `undefined`. |
-| `parseDateQuery(text)` | Reads `05.10.2026` in every locale, such as from a query param, or returns `undefined`. |
-| `dateToQueryString(date)` | `2026-10-05`, the local date in ISO format, for a query param. |
-| `durationFormat(seconds, {style?, round?})` | `1 hr 30 mins`, or `1 hour 30 minutes` with `style: 'long'`. Shows the largest part and the one right below it, so `10 mths` and `10 mins` can't be mixed up; `round: true` keeps only the largest part, rounded: `2 hrs`. |
-| `getDurationRound(seconds)` | Rounds a duration up to a step that reads well — 10 seconds, a minute, 10 minutes, an hour, a day and so on. |
+| `dateInputFormat(date)` | `05/10/2026` — the locale's numeric date (`10/05/2026` in `en-US`), as [WInputDate](/components/input#date) shows. `parseDateInput(text)` reads it back with any separator, or `undefined`. |
+| `parseDateQuery(text)` | Reads `05.10.2026` in any locale (e.g. a query param), or `undefined`. |
+| `dateToQueryString(date)` | `2026-10-05`, local ISO date for a query param. |
+| `durationFormat(seconds, {style?, round?})` | `1 hr 30 mins`, or `1 hour 30 minutes` with `style: 'long'`. Shows the two largest parts so `10 mths` and `10 mins` can't be confused; `round: true` keeps one, rounded: `2 hrs`. |
+| `getDurationRound(seconds)` | Rounds up to a readable step — 10 s, 1 min, 10 min, 1 h, 1 day, … |
 
-Date math returns a new `Date` and leaves the one passed in as it was:
+Date math returns a new `Date`:
 
-- `getStartOfDay`, `getStartOfNextDay`, `getStartOfWeek` (Monday by default, or a `WeekDay`) and `getStartOfMonth` — each defaults to now.
-- `addDay`, `addMonth` and `addYear` — the count can be negative.
-- `isSameDate`, `isSameWeek`, `isSameMonth` and `isSameYear` compare two dates.
+- `getStartOfDay`, `getStartOfNextDay`, `getStartOfWeek` (Monday, or a `WeekDay`), `getStartOfMonth` — default to now.
+- `addDay`, `addMonth`, `addYear` — counts may be negative.
+- `isSameDate`, `isSameWeek`, `isSameMonth`, `isSameYear`.
 
-`weekdayShortFormatter`, `weekdayNarrowFormatter`, `monthShortFormatter` and `dateFormatter` format in the current locale, as the [date picker](/components/date-picker) and the heatmap do, and `WeekDay` and `Month` are enums of the JavaScript day and month numbers.
+`weekdayShortFormatter`, `weekdayNarrowFormatter`, `monthShortFormatter` and `dateFormatter` format in the current locale, as the [date picker](/components/date-picker) and heatmap do. `WeekDay` and `Month` enumerate JavaScript day and month numbers.
 
 ## Numbers
 
@@ -123,13 +123,13 @@ Date math returns a new `Date` and leaves the one passed in as it was:
 import {numberCompactFormatter, numberFormatter, percentFormatter} from 'eco-vue-js/dist/utils/utils'
 ```
 
-These are what [`WNumberFormatter`](/components/number-formatter) shows. Each has a `format(value)`:
+What [`WNumberFormatter`](/components/number-formatter) shows. Each has `format(value)`:
 
-They format in the locale set with `setLocale`, and group thousands with a space in every locale, since a comma or a dot there reads as a decimal separator in other locales.
+They use the `setLocale` locale but always group thousands with a space, since commas and dots read as decimals elsewhere.
 
-- `numberFormatter` — up to three decimals: `1 234 567.5`, or `1 234 567,5` in `ru`.
+- `numberFormatter` — up to three decimals: `1 234 567.5` (`1 234 567,5` in `ru`).
 - `numberCompactFormatter` — compact notation: `13K`.
-- `percentFormatter` and `percentCompactFormatter` — a fraction as a percentage: `43.75%`.
+- `percentFormatter`, `percentCompactFormatter` — fraction as percentage: `43.75%`.
 
 ## CSV
 
@@ -137,6 +137,6 @@ They format in the locale set with `setLocale`, and group thousands with a space
 import {buildCsvContent, escapeCsvValue} from 'eco-vue-js/dist/utils/exportToCsv'
 ```
 
-`buildCsvContent(rows, header?)` joins rows of strings into CSV text, escaping each value with `escapeCsvValue`: values with a quote, comma or line break are quoted, and values that start like a formula (`=`, `+`, `-`, `@`) get a leading space, so that a spreadsheet doesn't run them. `dateFormatterCsv` and `numberFormatCsv` from `utils` format dates and decimal numbers the way spreadsheets in most locales read them.
+`buildCsvContent(rows, header?)` joins string rows into CSV, escaping with `escapeCsvValue`: values with quotes, commas or line breaks are quoted, and formula-like values (`=`, `+`, `-`, `@`) get a leading space so spreadsheets don't execute them. `dateFormatterCsv` and `numberFormatCsv` from `utils` format for most spreadsheet locales.
 
-For a list export with a progress bar, use [`WModalExport`](/components/modal#export-and-import).
+For list exports with progress, use [`WModalExport`](/components/modal#export-and-import).

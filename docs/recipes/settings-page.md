@@ -6,21 +6,21 @@ description: A settings page split into WSection groups that read apart in every
 
 # Settings page
 
-**Problem:** a settings or setup page has several groups — the steps of a setup, the areas of a configuration. In card and glass each group is its own surface, but in flat they run together into one column, and nothing shows where one group ends and the next begins.
+**Problem:** a settings page has several groups — setup steps, configuration areas. Card and glass separate them as surfaces, but in flat they run into one column with no visible boundaries.
 
-**Pattern:** the page title and the page's buttons sit on the page, outside any section. Each group is a `WSection`. On the page (`w-page`) the kit sets them apart on its own; off it, as in the demo below, the groups go in `surface-stack-divided`:
+**Pattern:** the page title and buttons sit on the page, outside sections; each group is a `WSection`. On the page (`w-page`) the kit separates them; off it, as in the demo, use `surface-stack-divided`:
 
 | Piece | What it is |
 | --- | --- |
-| `surface-stack-divided` | Sections one after another: the theme's gap between them in card and glass, and a line with space around it in flat. Content in it that is not a section, such as a page list, gets the same space in flat, without the line. |
-| `eyebrow` | A short line above a section's heading, such as a step number. |
-| A `WSection` inside a section | A part of the group: it paints nothing, its heading is smaller and one level down, and a line sits above it when content comes before it. |
-| `WInfoCard`, `WCard` inside a section | A hint or a block of its own, one step darker than the section. |
-| `footer` slot | Buttons under the group's content, such as the group's Save: past a line, or on the page in flat, past a space, as the line there is between the groups. |
+| `surface-stack-divided` | Consecutive sections: the theme gap in card and glass, a line with space in flat. Non-section content (e.g. a page list) gets the space without the line. |
+| `eyebrow` | A short line above a section heading, e.g. a step number. |
+| A `WSection` inside a section | A part of the group: no paint, a smaller heading, a line above when preceded by content. |
+| `WInfoCard`, `WCard` inside a section | A hint or block, one step darker than the section. |
+| `footer` slot | Buttons under the group (e.g. Save), past a line — or just space on the page in flat, where lines separate groups. |
 
 ## Try it
 
-Switch the layout style in the header's theme menu to see the same page in each.
+Switch the layout style in the header's theme menu to compare.
 
 <!-- @example recipes/settings-page/GreenhouseSettings page -->
 
@@ -186,4 +186,4 @@ const notifyHeat = ref(false)
 
 ## Spacing in flat
 
-The space in flat is `--w-stack-divide` (`2rem`) between groups and `--w-subsection-divide` (`1rem`) above a part, for a page that needs it tighter or looser.
+Flat spacing is `--w-stack-divide` (`2rem`) between groups and `--w-subsection-divide` (`1rem`) above a part; adjust them per page.

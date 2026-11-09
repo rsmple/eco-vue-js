@@ -5,34 +5,34 @@ description: WList — paginated, sortable collections shown as a table on deskt
 
 # List
 
-`WList` renders a paginated collection as a table on desktop and as cards on mobile. It owns pagination, selection, column settings (show, hide, reorder, resize) and ordering. You give it:
+`WList` renders a paginated collection as a table on desktop and cards on mobile. It owns pagination, selection, column settings (show, hide, reorder, resize) and ordering. You provide:
 
 - `useQueryFn` and `queryParams` — a paginated query.
-- `fields` — one component per column. Each has a `meta` export with its title, width, ordering field and CSS class, and renders one cell from `item`.
-- `cardColumns` and `cardAreas` — the card layout as a CSS grid, with field labels as area names. Every field must appear in `cardAreas`, even ones hidden by default; a field left out renders in an extra grid column.
-- Optionally an expansion component for a detail row and a menu component for row actions.
+- `fields` — one component per column, rendering a cell from `item`, with a `meta` export for title, width, ordering field and CSS class.
+- `cardColumns` and `cardAreas` — the card CSS grid, with field labels as area names. List every field in `cardAreas`, even hidden ones, or it renders in an extra column.
+- Optionally, an expansion component (detail row) and a menu component (row actions).
 
-The [List with fields](/recipes/list-with-fields) recipe builds this step by step; the list below is its result.
+The [List with fields](/recipes/list-with-fields) recipe builds the list below step by step.
 
 <DocsDemo name="recipes/plant-list/PlantList" overflow />
 
 ## Layout variables
 
-The sticky header, the checkbox column and full-width rows position themselves from the app's layout variables — `--header-height`, `--nav-bar-width`, `--actions-bar-width` and `--inner-margin` — so the app has to set them (see [App shell](/guide/app-shell)). Inside a modal, the modal sets its own.
+The sticky header, checkbox column and full-width rows position from `--header-height`, `--nav-bar-width`, `--actions-bar-width` and `--inner-margin`, which the app must set (see [App shell](/guide/app-shell)). Modals set their own.
 
 ## Cards
 
-In grid view the list draws each card itself. On a page in the flat layout a card is an outline with a light shadow. Where the section around it paints — the card layout, a section's parts, a modal or a card — it is a filled card without an edge, one step darker than what it sits on. In a glass section it is a pane of glass over it: a light translucent fill the section shows through, with a hairline edge and a lit top edge. On phones the cards are striped rows.
+In grid view the list draws its cards. In a flat-layout page, a card is an outline with a light shadow. Inside a painted container (card layout, modal, card) it is an edgeless fill one step darker. In a glass section it is a translucent pane with a hairline and lit top edge. On phones cards are striped rows.
 
-The defaults are `--inner-margin` of padding, `xl` corners and a `1rem` gap. Set them on the list with `w-list-card-padding-*` (in `cardClass`), `w-list-rounded-*` and `w-list-gap-*`, and the card width with `w-list-card-w-*`. Leave the surface itself to the list. `cardClass` is for the inner layout, such as `card:gap-2` or `card:items-start`.
+Defaults: `--inner-margin` padding, `xl` corners, `1rem` gap. Override with `w-list-card-padding-*` (in `cardClass`), `w-list-rounded-*`, `w-list-gap-*` and `w-list-card-w-*`. Leave the surface to the list; use `cardClass` for inner layout, e.g. `card:gap-2`.
 
 ## Bulk actions
 
-Above the table is the selection bar, `WButtonSelection`. While nothing is selected it shows the `action` components and the list settings; while items are selected, the `bulk` components and a "Selected N items" counter with a clear button. Actions that don't fit move into a More menu.
+The selection bar, `WButtonSelection`, sits above the table. With nothing selected it shows the `action` components and list settings; with a selection, the `bulk` components and a "Selected N items" counter with a clear button. Overflow goes into a More menu.
 
-Each action is a component that renders a `WButtonSelectionAction` — an icon with a title, hidden on phones. A bulk action gets `BulkProps`: `selectionCount`, `queryParamsGetter()` for the query params narrowed to the selection, `readonly`, `disableMessage`, which disables the button with that text as its tooltip while nothing is selected, and `clearSelection()` to reset the selection when it is done.
+Each action renders a `WButtonSelectionAction` — icon and title (hidden on phones). Bulk actions get `BulkProps`: `selectionCount`, `queryParamsGetter()` (params narrowed to the selection), `readonly`, `disableMessage` (disables the button with that tooltip while nothing is selected), and `clearSelection()`.
 
-Call `clearSelection` rather than emitting `clear:selected`, which still works but is deprecated. An action that doesn't fit the bar renders in the More menu, and a confirm opened from there takes the menu's place, unmounting the action — an emit after the confirm is accepted never arrives.
+Use `clearSelection` instead of the deprecated `clear:selected` emit: a confirm opened from the More menu unmounts the action, so an emit after accepting never arrives.
 
 ```vue
 <template>
@@ -60,43 +60,43 @@ const archive = () => plantApi.archive(props.queryParamsGetter()).then(() => pro
 </script>
 ```
 
-`WButtonUnselect` is the small round clear button of the select chips.
+`WButtonUnselect` is the small round clear button on select chips.
 
 ## Filters
 
-`WListFilter` renders filter components for query params held in a Uniform form's `scope` — usually a form over the route query. Each filter is a component with a `meta` export (its `title`, `icon` and the `fields` it sets) that gets `scope`, `global` and `readonly`. `search` adds a text search for the `search` param, or `filterSearch` for your own.
+`WListFilter` renders filter components for query params in a Uniform `scope` — usually a form over the route query. Each filter has a `meta` export (`title`, `icon`, the `fields` it sets) and gets `scope`, `global` and `readonly`. `search` adds a text search for `search`, or `filterSearch` for your own.
 
-In place, the filters are chips in a row: the set ones are shown, and a button adds another. With `global` they go into the app shell instead — the filters into the actions bar's panel and the search into the header bar — with a button that resets them. `disabledFilterFields` leaves out filters for params the page fixes. `pinned` filters are always shown, first, and their remove button only clears them. The [List with fields](/recipes/list-with-fields#filters) recipe builds a set of filters for its list.
+In place, set filters are chips in a row with an add button. With `global` they move to the app shell (filters in the actions bar panel, search in the header bar) with a reset button. `disabledFilterFields` hides filters the page fixes. `pinned` filters always show first; removing only clears them. See the [recipe](/recipes/list-with-fields#filters).
 
-`WListHeader` and `WListHeaderItem` are the table header row of the list, with the select-all checkbox and sortable, resizable column titles. `WList` renders them from `fields`.
+`WListHeader` and `WListHeaderItem` are the header row (select-all checkbox, sortable resizable titles); `WList` renders them from `fields`.
 
 ### Filters in the selection bar
 
-Put the `WListFilter` in WList's `filter` slot to show it at the start of the selection bar, on one line with the list actions and the list settings. Chips that do not fit go into a "more" chip that opens them as a list, and the list actions, which move to the end of the bar, fold into More before any chip does. While rows are selected, the selection with its bulk actions replaces the filters, so the bar keeps its height. On phones the filters take a row of their own above the actions, and the search narrows for them. `--w-list-toolbar-height` (`w-list-toolbar-h-*`) sets the height of the bar's inputs, chips and actions, by default the inherited input height.
+In WList's `filter` slot, `WListFilter` starts the selection bar, on one line with actions and settings. Overflowing chips go into a "more" chip; list actions fold into More first. A selection replaces the filters, keeping the bar's height. On phones filters get their own row and the search narrows. `--w-list-toolbar-height` (`w-list-toolbar-h-*`) sets the bar's control height; defaults to the inherited input height.
 
-Each chip shows its filter's icon and title, or, once values are picked, the icon and those values instead of the title. A filter's `meta.summary` returns them from the query params, such as the titles of the picked options; without it the chip shows how many values are picked. A chip's dropdown keeps its tip where it was as the chip grows or shrinks with the picked values, while the tip still points at the chip. A chip in the "more" list can be removed there too.
+A chip shows its icon and title, or the icon and picked values. `meta.summary` returns those values from the query params; without it the chip shows a count. The dropdown tip keeps pointing at the chip as it resizes. Chips in the "more" list can be removed there.
 
 ## Groups
 
-`groupBy` tells whether two neighbouring items belong to the same group, and the `group` slot renders a heading before the first item of each group and before the first item rendered. Only neighbours are compared, so the query has to sort by the field the list groups by.
+`groupBy` tells whether two neighbouring items share a group; the `group` slot renders a heading before each group's first item and before the first rendered item. Only neighbours are compared, so sort the query by the grouping field.
 
-The items of all loaded pages share one layout. A group runs on across pages without a new heading, and in the grid a page that ends in the middle of a row is continued in that row by the next one. The list places the heading: it takes a row of its own in the grid, stays under the toolbar while its group scrolls past and, in list mode, stays at the left edge when the rows scroll sideways. The slot gives its content and lays it out.
+All loaded pages share one layout: groups continue across pages without a new heading, and a partial grid row continues with the next page. The heading takes its own grid row, sticks under the toolbar while its group scrolls, and in list mode stays at the left edge during horizontal scroll. The slot supplies only its content.
 
 <DocsDemo name="recipes/plant-list/PlantListGrouped" overflow />
 
 ## Nested fields
 
-A field's `meta` can hold `fields` instead of being a column itself. Its columns then show a related object or every item of an array:
+A field's `meta` can hold `fields` instead of being a column, showing a related object or an array:
 
-- `keyEntity`, or `getterEntity` for a computed one, gives the nested field components that object as `item`.
-- `keyArray`, or `getterArray`, repeats the columns once per array item, one line each. The items need an `id`. `componentItem` wraps each line, for example to draw a separator between them.
-- With neither, `fields` only groups the columns, such as to place them in one card area.
+- `keyEntity` (or `getterEntity`) passes that object as `item` to the nested fields.
+- `keyArray` (or `getterArray`) repeats the columns per array item, one line each; items need an `id`. `componentItem` wraps each line, e.g. for separators.
+- With neither, `fields` just groups columns, e.g. into one card area.
 
-In the table, nested columns are list columns like any other: each has its own header and width, can be hidden in the list settings, and lines up across the rows, including each line of an array. In a card, a nested field is a flex row. `cssClass` styles it, `cssClassArray` styles the wrapper of an array's lines, and `[grid-area:…]` places it in one of `cardAreas`; pick labels without `_` for that, since Tailwind reads `_` in a class as a space.
+In the table, nested columns behave like any column: own header and width, hideable, aligned across rows and array lines. In a card, a nested field is a flex row: `cssClass` styles it, `cssClassArray` the array wrapper, and `[grid-area:…]` places it in `cardAreas` — avoid `_` in labels, since Tailwind reads it as a space.
 
-In the table, the root of `componentItem` is a line of the table, and each of its children spans the whole line. Put a separator next to `<slot />`, not around it.
+In the table, `componentItem`'s root is a table line and each child spans it. Put separators beside `<slot />`, not around it.
 
-Rows with lines of an array are taller than one line, so the demo uses `align-top`. The checkbox and the row menu then sit `--w-list-align-top` from the top of the row. Set it with `w-list-align-top-*` on WList to match the row's top padding and first line: here the rows have `py-2`, and `w-list-align-top-2.5` centers the box on the first line.
+Array rows are taller than one line, so the demo uses `align-top`; the checkbox and menu then sit `--w-list-align-top` from the top. Set `w-list-align-top-*` on WList to match the row's padding and first line — here `py-2` rows use `w-list-align-top-2.5`.
 
 <DocsDemo name="recipes/plant-list/PlantListNested" overflow />
 

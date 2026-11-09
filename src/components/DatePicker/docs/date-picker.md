@@ -5,13 +5,13 @@ description: WDatePicker and WDatePickerSingle — calendars for picking a date 
 
 # Date picker
 
-Calendars for picking dates by pointing at them. They have no title or form-field frame of their own — put them in the `field` slot of a [`WFieldWrapper`](/components/field-wrapper) or next to your own label. In a form, [`WInputDate`](/components/input#date) is usually the one to use: it is a field with this calendar in a dropdown.
+Calendars for picking dates. They have no title or field frame — use a [`WFieldWrapper`](/components/field-wrapper)'s `field` slot or your own label. In forms, prefer [`WInputDate`](/components/input#date): a field with this calendar in a dropdown.
 
-`WDatePicker` picks a range: the first click starts it, the range follows the pointer, and the second click ends it and emits `{from, to}`, in order whichever day was clicked first. The two cards on top show the ends; clicking one goes to its month.
+`WDatePicker` picks a range: the first click starts it, it follows the pointer, and the second click emits `{from, to}`, ordered regardless of click order. The two cards on top show the ends; click one to jump to its month.
 
-`WDatePickerSingle` picks one day on the first click.
+`WDatePickerSingle` picks one day per click.
 
-`minDate` and `maxDate` limit the days that can be picked and the months the calendar goes to. Days come at the start of the day, in local time. Helpers such as `getStartOfDay`, `addDay` and `dateFormat` are in [Formatting](/utilities/formatting#dates).
+`minDate` and `maxDate` limit pickable days and navigable months. Days are start-of-day, local time. Helpers like `getStartOfDay`, `addDay` and `dateFormat` are in [Formatting](/utilities/formatting#dates).
 
 <!-- @example DatePicker/Basic -->
 

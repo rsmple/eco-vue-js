@@ -7,9 +7,9 @@ description: WButtonGroup — a segmented control that picks one value out of a 
 
 ## Basic usage
 
-`WButtonGroup` is a segmented control bound with `v-model`. `list` takes plain values; for objects, also pass `valueGetter` to pick the model value out of each item.
+`WButtonGroup` is a `v-model` segmented control. `list` takes plain values; for objects, add `valueGetter`.
 
-Options have no default label: render each one through the `option` slot, or pass an `optionComponent` that receives `option` and `selected`.
+There's no default label: use the `option` slot or an `optionComponent` (receives `option` and `selected`).
 
 <!-- @example Button/Group -->
 

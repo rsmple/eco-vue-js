@@ -6,23 +6,23 @@ description: WUniform — forms built from nested WUniform fields, with validati
 
 # Form
 
-Forms are built from one component, `WUniform`, used at two levels:
+Forms use one component, `WUniform`, at two levels:
 
-- The **form** holds the model and saves it. Its default slot gives a scope for the fields.
-- Each **field** is a nested `WUniform` that gets the form's scope with `v-bind="scope"` and a `field` key. Its `field` slot renders the control, which gets its value, title, error message and states with `v-bind="scopeField"`.
+- The **form** holds and saves the model; its default slot gives a scope for fields.
+- Each **field** is a nested `WUniform` with `v-bind="scope"` and a `field` key. Its `field` slot renders the control, bound with `v-bind="scopeField"` for value, title, error and states.
 
-The kit's controls — WInput, WSelect, WCheckbox, WToggle, WButtonGroup and the others — take the field scope as it is.
+The kit's controls (WInput, WSelect, WCheckbox, WToggle, WButtonGroup…) take the field scope as is.
 
 ## Submit
 
-With `initData`, the form keeps its own copy of the model, built from the given or loaded value. `submit` from the scope, or from the form's template ref, validates the fields and calls `apiMethod`:
+With `initData`, the form keeps its own copy of the model. `submit` (from the scope or a template ref) validates and calls `apiMethod`:
 
-- If a field is invalid, nothing is sent: the errors show on the fields, a warning lists them, and the page scrolls to the first one. The list in the warning is a `WUniformErrorMessage`, which can also show a validation result elsewhere.
-- Only the changed fields are sent. `fullPayload` sends the whole model.
-- The result of `apiMethod` becomes the new initial model, so `hasChanges` resets, and is emitted with `success`.
-- When `apiMethod` rejects with an `ApiError`, the field errors in its response show on the matching fields. Try `taken@example.com` below.
+- Invalid fields block sending: errors show, a warning lists them, and the page scrolls to the first. The list is a `WUniformErrorMessage`, usable elsewhere too.
+- Only changed fields are sent; `fullPayload` sends everything.
+- `apiMethod`'s result becomes the new initial model (resetting `hasChanges`) and is emitted with `success`.
+- If `apiMethod` rejects with an `ApiError`, its field errors show on matching fields. Try `taken@example.com` below.
 
-`validate` takes one function or a list, each returning an error message or `undefined`. Errors appear after a submit attempt — on each change with `async` — and clear as soon as the value is valid. `required` is checked first.
+`validate` takes a function or list, each returning an error message or `undefined`. Errors appear after a submit attempt (on each change with `async`) and clear once valid. `required` is checked first.
 
 <!-- @example Uniform/Basic -->
 
@@ -138,13 +138,13 @@ const save = (payload: Partial<Profile>) => new Promise<Profile>((resolve, rejec
 
 <!-- @example-end -->
 
-A form in a modal usually has its buttons in the modal's `actions` slot, outside the scope. There, a template ref gives the same `submit` and `submitting` — see [Modal](/components/modal).
+In a modal, buttons usually sit in the `actions` slot outside the scope; use a template ref for `submit` and `submitting` — see [Modal](/components/modal).
 
 ## Auto-save
 
-`async` saves every change right away, one field at a time. The changed field shows a spinner while it is saved, and the rest of the form stays editable. `confimGetter` asks before a change is applied — on cancel the change is dropped and the field shows the saved value again.
+`async` saves each change immediately, per field. The field shows a spinner while saving; the rest stays editable. `confimGetter` asks before applying — cancel restores the saved value.
 
-Only the changed fields are validated and sent. An invalid one shows its error at once and keeps its value without being saved, and changes to other fields are still saved. The value is sent once it is fixed. A change made while a save is in progress is sent when that save ends. When `apiMethod` returns nothing, the sent values become the initial ones for their fields. Fields that weren't sent keep their unsaved changes. `fullPayload` sends the whole model instead and waits until every field is valid.
+Only changed fields are validated and sent. An invalid field shows its error and is held back until fixed, while other fields still save. Changes made during a save are sent after it. If `apiMethod` returns nothing, sent values become their fields' initial values; unsent fields keep their changes. `fullPayload` sends the whole model and waits until all fields are valid.
 
 <!-- @example Uniform/Async -->
 
@@ -225,7 +225,7 @@ const confirmDisable = (value: boolean): ConfirmProps | undefined => value ? und
 
 ## Loading the model
 
-`useQueryFn` loads the model with a query when no `modelValue` is given, with `queryParams` for its params or `noParams` when it takes none. The fields show skeletons until it loads, and `initData` turns the loaded value into the editable model:
+Without `modelValue`, `useQueryFn` loads the model, with `queryParams` (or `noParams`). Fields show skeletons until it loads; `initData` maps the loaded value to the editable model:
 
 ```vue
 <WUniform
@@ -240,11 +240,11 @@ const confirmDisable = (value: boolean): ConfirmProps | undefined => value ? und
 </WUniform>
 ```
 
-When the loaded value changes — another view saved the item and updated the cache, or an auto-save did — the form takes it and keeps the changes not saved yet. When `queryParams` change, the form loads another item and drops its changes, and so do the forms inside it that keep their own copy of the model. Until that item loads, the form keeps its current model, so a create whose result carries the new id stays filled while the saved item loads.
+When the loaded value changes (another view saved, or an auto-save), the form takes it and keeps unsaved changes. When `queryParams` change, it loads the new item and drops changes, as do inner forms with their own copy. Until the new item loads, the current model stays — so a create returning the new id stays filled.
 
 ## Nested objects
 
-A nested `WUniform` with a default slot instead of a `field` slot edits an object inside the model. Its fields bind its own scope:
+A nested `WUniform` with a default slot instead of `field` edits an object in the model. Its fields bind its own scope:
 
 ```vue
 <WUniform
@@ -265,11 +265,11 @@ A nested `WUniform` with a default slot instead of a `field` slot edits an objec
 </WUniform>
 ```
 
-Changes, errors and `fullPayload` work per field as for top-level ones.
+Changes, errors and `fullPayload` work per field, as at the top level.
 
 ## Readonly, disabled and skeleton
 
-`readonly`, `disabled` and `skeleton` set on the form reach every field with the scope. While a form without `async` is submitting, its fields are disabled.
+`readonly`, `disabled` and `skeleton` on the form reach every field through the scope. A non-`async` form disables its fields while submitting.
 
 <!-- @example Uniform/States -->
 
@@ -341,7 +341,7 @@ const initData = () => ({title: 'Repot the monstera', priority: 'medium'})
 
 <!-- @example-end -->
 
-To set a state for a whole area — every form and control in a page, for a user without edit rights — provide it from a parent component instead. Controls use the provided value when their own prop is unset:
+To set a state for a whole area (e.g. a page for a user without edit rights), provide it from a parent. Controls use it when their own prop is unset:
 
 ```ts
 import {useProvideReadonly} from 'eco-vue-js/dist/utils/provide'
@@ -349,11 +349,11 @@ import {useProvideReadonly} from 'eco-vue-js/dist/utils/provide'
 useProvideReadonly(computed(() => !canEdit.value))
 ```
 
-`useProvideDisabled` and `useProvideSkeleton` work the same way.
+`useProvideDisabled` and `useProvideSkeleton` work the same.
 
 ## With tabs
 
-Forms inside [WTabs](/components/tabs) report their `hasChanges`, `hasValue` and errors to their tab, which marks its button. The tabs switch to a tab that gets an error. `mandatory` counts a field in `hasValue` without making it required, and `initHasValue` and `initHasError` set these states while a tab's fields are not mounted.
+Forms inside [WTabs](/components/tabs) report `hasChanges`, `hasValue` and errors to their tab, which marks its button and is switched to on error. `mandatory` counts a field in `hasValue` without requiring it; `initHasValue` and `initHasError` set states while a tab's fields are unmounted.
 
 ## API
 

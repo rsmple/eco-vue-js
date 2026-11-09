@@ -6,25 +6,25 @@ description: Set up the frame of an eco-vue-js app with WNavBar, WHeaderBar and 
 
 # App shell
 
-Kit apps share one frame: a fixed header on top (`WHeaderBar`), a nav on the left (`WNavBar`) and an actions bar on the right (`WActionsBar`), with the page content between them. The bars are `position: fixed` and don't push anything aside — the app describes the frame in a few CSS variables, pads its content by them, and every component that needs to know where the content box is (sticky list headers and columns, full-width rows, dropdowns, modals) reads the same variables.
+Kit apps share one frame: a fixed header (`WHeaderBar`), a nav on the left (`WNavBar`) and an actions bar on the right (`WActionsBar`), with content between. The bars are `position: fixed` and push nothing aside — the app describes the frame in CSS variables, pads content by them, and every component that needs the content box (sticky list headers and columns, full-width rows, dropdowns, modals) reads the same variables.
 
-This site is built that way: its layout is [`DocsLayout.vue`](https://github.com/rsmple/eco-vue-js/blob/main/docs/.vitepress/theme/DocsLayout.vue) and its shell styles are at the top of [`style.css`](https://github.com/rsmple/eco-vue-js/blob/main/docs/.vitepress/theme/style.css).
+This site works that way: see [`DocsLayout.vue`](https://github.com/rsmple/eco-vue-js/blob/main/docs/.vitepress/theme/DocsLayout.vue) and the top of [`style.css`](https://github.com/rsmple/eco-vue-js/blob/main/docs/.vitepress/theme/style.css).
 
 ## Frame variables
 
-Set them on `body`. Each one is the space a part of the frame takes *in layout* at the current breakpoint, so all but `--inner-margin` default to `0px`:
+Set them on `body`. Each is the layout space a frame part takes at the current breakpoint; all but `--inner-margin` default to `0px`:
 
 | Variable | What it is |
 | --- | --- |
 | `--header-height` | Height of the header. |
-| `--nav-bar-width` | Space taken by the nav — `0px` below `xl`, where the nav is an overlay opened from the header. |
-| `--actions-bar-width` | Space taken by the actions bar — `0px` on phones, where it is hidden. |
-| `--inner-margin` | Horizontal padding of the content. Comes from the theme — `w-inner-margin`, `w-inner-margin-sm` from `sm` up, `1rem` and `1.5rem` by default (see [Theming](./theming#layout)); set it here only to override the theme. |
-| `--left-margin`, `--right-margin` | Space outside the frame, to centre it yourself — by default it centres past `--w-content-max-width`, see [Centred frame](#centred-frame). |
+| `--nav-bar-width` | Space taken by the nav — `0px` below `xl`, where it's an overlay. |
+| `--actions-bar-width` | Space taken by the actions bar — `0px` on phones, where it's hidden. |
+| `--inner-margin` | Horizontal content padding. Comes from the theme (`w-inner-margin`, `w-inner-margin-sm`; `1rem`/`1.5rem`, see [Theming](./theming#layout)); set here only to override. |
+| `--left-margin`, `--right-margin` | Space outside the frame, for custom centring — see [Centred frame](#centred-frame). |
 | `--w-actions-bar-width` | Width of the actions bar itself, at every breakpoint. |
-| `--actions-bar-filter-width` | Width of the filter panel that slides out of the actions bar on `sm` and up — see [Filters](#filters-and-search). |
+| `--actions-bar-filter-width` | Width of the filter panel sliding out of the actions bar from `sm` — see [Filters](#filters-and-search). |
 
-The bars' own widths come from two theme tokens, so they are also Tailwind sizes: the nav's content uses `w-nav-bar-width` to keep its width while the nav collapses.
+The bars' widths are theme tokens, so also Tailwind sizes: the nav's content uses `w-nav-bar-width` to keep its width while collapsing.
 
 ```css
 @import "tailwindcss";
@@ -58,27 +58,27 @@ body {
 }
 ```
 
-The breakpoints aren't a free choice: `WNavBar` docks from `xl` (1280px) and turns into an overlay below it, and `useIsMobile()` reports `isMobile` below `sm` (640px) and `isTablet` below `xl` — the same widths the variables switch at.
+The breakpoints are fixed: `WNavBar` docks from `xl` (1280px), and `useIsMobile()` reports `isMobile` below `sm` (640px) and `isTablet` below `xl`.
 
 ### The content box
 
-From the frame variables the kit derives the content box on every element, and exposes each as a Tailwind size:
+The kit derives the content box from the frame variables, each also a Tailwind size:
 
 | Variable | Utility size | Value |
 | --- | --- | --- |
-| `--w-left-inner` | `---left-inner` | Left edge of the content: left margin + nav + inner margin. |
+| `--w-left-inner` | `---left-inner` | Content left edge: left margin + nav + inner margin. |
 | `--w-right-inner` | `---right-inner` | The same on the right, with the actions bar. |
-| `--w-width-inner` | `---width-inner` | Width of the content: `100vw` minus both. |
-| `--w-top-inner` | — | Header height plus the height of a sticky list header above. |
-| `--w-height-inner` | `---height-inner` | Height left under them. |
+| `--w-width-inner` | `---width-inner` | Content width: `100vw` minus both. |
+| `--w-top-inner` | — | Header height plus any sticky list header above. |
+| `--w-height-inner` | `---height-inner` | Height remaining below. |
 
-The frame variables are sizes too: `pt---header-height`, `pl---nav-bar-width`, `px---inner-margin`. Inside a modal, the modal replaces the content box with its own, so the same classes work there.
+Frame variables are sizes too: `pt---header-height`, `pl---nav-bar-width`, `px---inner-margin`. Modals replace the content box with their own, so the classes work there too.
 
-On a page (`w-page`) and in a modal, content beside a list wider than the view stays in view on its own while the list scrolls sideways: it sticks to the content's left edge and takes its width (see [List page](../recipes/list-page#content-beside-the-list)). Pages don't set these sizes for positioning; they are for what the kit doesn't place, such as a fixed overlay over the content.
+On a page (`w-page`) and in modals, content beside a wide list stays in view automatically while it scrolls sideways (see [List page](../recipes/list-page#content-beside-the-list)). Pages don't use these sizes for positioning — they're for what the kit doesn't place, like a fixed overlay.
 
 ## Layout component
 
-The root layout mounts the three bars, and its main area is `w-page`: it pads the content by the frame, under the header and off the bottom (see [Page layout](../recipes/page-layout)):
+The root layout mounts the three bars; its main area is `w-page`, which pads content by the frame (see [Page layout](../recipes/page-layout)):
 
 ```vue
 <template>
@@ -165,21 +165,21 @@ watch(theme, value => document.documentElement.classList.toggle('dark', value ==
 </script>
 ```
 
-What each part does:
+The parts:
 
-- **[`WNavBar`](/components/nav-bar)** docks at `xl`. Below it, it collapses and adds a menu button in the header's top-left corner — the header leaves that corner free on its own. It emits `update:is-open` when the overlay opens or closes.
-- **[`WHeaderBar`](/components/header-bar)** spans the whole width; the `pl`/`pr` classes keep its title and buttons between the bars. The title is the `title` prop or the `#title` slot, and the `#right` slot goes before the search button.
-- **[`WActionsBar`](/components/actions-bar)** holds icon buttons: `WButtonAction` in the `#top` and `#bottom` slots, with `to` for routes or `tag="a"` with `href` for links, and settings in `#footer`. On phones it is off-screen, so it slides in together with the open nav.
-- **Dark mode** is a `dark` class on an ancestor, usually `<html>`. [`WToggleTheme`](/components/toggle#theme-toggle) only switches a `Theme` value — applying and persisting it is up to the app.
+- **[`WNavBar`](/components/nav-bar)** docks at `xl`; below, it collapses and adds a menu button in the header's top-left corner (the header leaves it free). Emits `update:is-open`.
+- **[`WHeaderBar`](/components/header-bar)** spans the full width; `pl`/`pr` keep its contents between the bars. Title via `title` or `#title`; `#right` goes before the search button.
+- **[`WActionsBar`](/components/actions-bar)** holds `WButtonAction`s in `#top` and `#bottom` (`to` for routes, `tag="a"` + `href` for links) and settings in `#footer`. Off-screen on phones; slides in with the open nav.
+- **Dark mode** is a `dark` class on an ancestor, usually `<html>`. [`WToggleTheme`](/components/toggle#theme-toggle) only switches a `Theme` value — the app applies and persists it.
 
 ## Filters and search
 
-Pages put their own content into the bars without touching the layout:
+Pages add content to the bars without touching the layout:
 
-- **[`WActionsBarFilter`](/components/actions-bar#filters)** — its default slot becomes a filter panel that slides out of the actions bar, and the bar gets a filter button with the `count` prop as its badge. The panel is `--actions-bar-filter-width` wide from `sm` up, and covers the screen next to the bar on phones.
-- **[`WHeaderBarSearch`](/components/header-bar#search)** — its default slot is shown in place of the header's title row, and the header gets a search button that opens it. The slot receives `visible`, `show` and `hide`; the `shown` prop opens it right away.
+- **[`WActionsBarFilter`](/components/actions-bar#filters)** — its slot becomes a panel sliding out of the actions bar, which gets a filter button badged with `count`. `--actions-bar-filter-width` wide from `sm`; full screen beside the bar on phones.
+- **[`WHeaderBarSearch`](/components/header-bar#search)** — its slot replaces the header's title row, opened by a search button. The slot receives `visible`, `show` and `hide`; `shown` opens it immediately.
 
-Both render nothing where they are placed, and remove their content from the bar when the page unmounts.
+Both render nothing in place and clean up when the page unmounts.
 
 ```vue
 <template>
@@ -204,11 +204,11 @@ Both render nothing where they are placed, and remove their content from the bar
 
 ## Pages without a bar
 
-Everything measures from inherited variables, so a route without a bar only needs the bar left out and its variable reset on an element that wraps the header and the content — for a page with no actions bar, `[--actions-bar-width:0px]`. The header and every component inside then use the full width.
+Everything reads inherited variables, so a route without a bar just omits it and resets its variable on a wrapper of header and content — e.g. `[--actions-bar-width:0px]`.
 
 ## Centred frame
 
-On a wide screen the frame stops growing and centres itself: past `--w-content-max-width` (`80rem` by default, a theme token on `body`) the page between the nav and the actions bar keeps its width, and the space outside the frame grows on both sides. `WNavBar`, `WActionsBar` and `WHeaderBar` move in with it, and `---left-inner` and `---right-inner` include it, so the page needs nothing of its own.
+On wide screens the frame stops growing past `--w-content-max-width` (`80rem`, a theme token on `body`) and centres, with the outside space growing on both sides. The bars follow and `---left-inner`/`---right-inner` include it — pages need nothing.
 
 ```css
 body {
@@ -217,7 +217,7 @@ body {
 }
 ```
 
-To size the frame some other way, set the space outside it yourself as `--left-margin` and `--right-margin`, which take over from the token:
+To size the frame differently, set `--left-margin` and `--right-margin` yourself; they override the token:
 
 ```css
 body {

@@ -6,11 +6,11 @@ description: Rules every eco-vue-js consumer follows — import paths, markRaw f
 
 # Conventions
 
-These patterns hold across the whole kit. Most mistakes when using it come from breaking one of them.
+These hold across the kit; most mistakes come from breaking one.
 
 ## Import by path
 
-Components live at `eco-vue-js/dist/components/<Folder>/<Name>.vue`, their types at `eco-vue-js/dist/components/<Folder>/types`, utilities at `eco-vue-js/dist/utils/<file>` and icons at `eco-vue-js/dist/assets/icons/<IconName>` (no extension).
+Components: `eco-vue-js/dist/components/<Folder>/<Name>.vue`; types: `eco-vue-js/dist/components/<Folder>/types`; utilities: `eco-vue-js/dist/utils/<file>`; icons: `eco-vue-js/dist/assets/icons/<IconName>` (no extension).
 
 ```ts
 import type {FieldProps} from 'eco-vue-js/dist/components/List/types'
@@ -21,7 +21,7 @@ import IconEdit from 'eco-vue-js/dist/assets/icons/IconEdit'
 
 ## Wrap components passed as props in `markRaw`
 
-Props that take a component — icons, list fields, menus, bulk actions, option components — expect a raw component, so Vue does not make it reactive:
+Component props — icons, list fields, menus, bulk actions, option components — expect raw components so Vue doesn't make them reactive:
 
 ```vue
 <WButtonMoreItem
@@ -32,15 +32,15 @@ Props that take a component — icons, list fields, menus, bulk actions, option 
 
 ## Disabled, readonly and skeleton are inherited
 
-Inputs and buttons read `disabled`, `readonly` and `skeleton` from the nearest parent that provides them with `useProvideDisabled`, `useProvideReadonly` or `useProvideSkeleton` from `eco-vue-js/dist/utils/provide` when the prop is left unset. A [form](/components/form) passes its states to its fields through the scope instead. Only pass the prop to override the inherited state — passing `false` forces the control enabled even inside a disabled form.
+When the prop is unset, inputs and buttons read `disabled`, `readonly` and `skeleton` from the nearest parent providing them (`useProvideDisabled`, `useProvideReadonly`, `useProvideSkeleton` from `eco-vue-js/dist/utils/provide`). A [form](/components/form) passes states to fields through the scope. Pass the prop only to override — `false` forces a control enabled inside a disabled form.
 
 ## Semantic types, not colors
 
-Components take a `semanticType` (`primary`, `secondary`, `positive`, `negative`, `warning`, `info`) from `eco-vue-js/dist/utils/SemanticType` instead of color classes. The classes behind each type are set once per app with the `setSemanticType*Map` functions, which is how an app rebrands the kit.
+Components take a `semanticType` (`primary`, `secondary`, `positive`, `negative`, `warning`, `info`) from `eco-vue-js/dist/utils/SemanticType`, not color classes. Apps rebrand by setting each type's classes once with the `setSemanticType*Map` functions.
 
 ## Type list extensions with the kit's types
 
-Components plugged into `WList` — fields, menus, bulk actions, filters — must declare their props with the kit's types instead of restating the shape. When the kit adds a prop, a restated shape silently drifts and breaks on the next upgrade:
+Components plugged into `WList` — fields, menus, bulk actions, filters — must use the kit's prop types, not a restated shape, which drifts and breaks on upgrade when the kit adds a prop:
 
 ```ts
 import type {MenuEmits, MenuProps} from 'eco-vue-js/dist/components/List/types'
@@ -49,4 +49,4 @@ defineProps<MenuProps<Plant>>()
 defineEmits<MenuEmits<Plant>>()
 ```
 
-See the [List with fields](../recipes/list-with-fields) recipe for the full pattern.
+See [List with fields](../recipes/list-with-fields) for the full pattern.

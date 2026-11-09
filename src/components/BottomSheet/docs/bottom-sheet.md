@@ -5,11 +5,11 @@ description: WBottomSheet and WDismissable — the phone version of a dropdown, 
 
 # Bottom sheet
 
-`WBottomSheet` is the phone version of a dropdown: a sheet that slides up from the bottom with the toggle repeated at its top. The kit's menus and selects switch to it on phones on their own — through [`WDropdownAdaptive`](/components/dropdown-menu#custom-dropdown) and the overlay manager — so use it directly only for your own phone UI.
+`WBottomSheet` is a dropdown for phones: a sheet sliding up from the bottom, repeating the toggle at its top. The kit's menus and selects use it automatically via [`WDropdownAdaptive`](/components/dropdown-menu#custom-dropdown) and the overlay manager — use it directly only for custom phone UI.
 
-The `toggle` slot is rendered in place and again at the top of the sheet: `unclickable` is `true` for the one in place and `false` for the copy, so the copy can be made inert. The `content` slot scrolls under it. The sheet emits `close` when swiped down or when the backdrop is tapped — set `isOpen` to `false` on it. `compact` sizes it to its content, up to 90% of the screen, and `noOverlay` leaves the page in view without the backdrop; a tap on the page then closes it.
+The `toggle` slot renders in place and at the sheet's top, with `unclickable` `true` in place and `false` for the copy. `content` scrolls below. The sheet emits `close` on swipe down or backdrop tap — set `isOpen` to `false`. `compact` sizes to content (up to 90% of the screen); `noOverlay` drops the backdrop, and a page tap closes it.
 
-`WDismissable` is the swipe under the sheet: a full-screen layer whose content scrolls up into view when `isOpen` turns on, and emits `close` when it is scrolled mostly out of view. Build on it for another swipe-away panel.
+`WDismissable` is the swipe layer beneath: full-screen, scrolls its content into view when `isOpen` turns on, and emits `close` once mostly scrolled out. Build other swipe-away panels on it.
 
 <!-- @example BottomSheet/Basic client -->
 

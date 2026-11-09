@@ -6,14 +6,14 @@ description: Fetch data for the kit's lists and selects — ApiClientInstance fo
 
 # Data layer
 
-Lists, infinite lists and async selects don't fetch anything themselves. They take a query hook — `useQueryFn` — and call it for each page or lookup. The kit's data utilities build those hooks on top of `@tanstack/vue-query`:
+Lists, infinite lists and async selects don't fetch on their own — they take a query hook, `useQueryFn`, and call it per page or lookup. The kit builds those hooks on `@tanstack/vue-query`:
 
 - `ApiClientInstance` sends the requests and handles auth.
-- `createRestModelApi` declares a model's queries and the actions that change it, keeping every cached copy of an item in sync.
-- `createUseQueryParams` keeps the filters a user sets on a list in the URL.
+- `createRestModelApi` declares a model's queries and actions, keeping every cached copy of an item in sync.
+- `createUseQueryParams` keeps list filters in the URL.
 - `handleApiError` reports a failed request in a notification and in the form that sent it.
 
-The [query client](/guide/getting-started#query-client) has to be installed first.
+Install the [query client](/guide/getting-started#query-client) first.
 
 ## API client
 
@@ -31,15 +31,15 @@ export const apiClient = new ApiClientInstance({
 
 `get`, `post`, `patch` and `delete` resolve with `{data, status}` and take a config with:
 
-- `params` — the query string. Arrays of ids or strings are joined with commas, objects are sent as JSON, and empty values are left out.
-- `signal` — pass the one vue-query gives the query function, so a query that is no longer needed cancels its request.
-- `noAuth` — sends the request without an auth check, e.g. for the login.
+- `params` — query string. Arrays are comma-joined, objects sent as JSON, empty values dropped.
+- `signal` — pass vue-query's, so an unneeded query cancels its request.
+- `noAuth` — skips the auth check, e.g. for login.
 
-URLs start and end with a slash — `/products/` or `` `/products/${ id }/` `` — and are typed that way. `addInstance(baseUrl)` gives a client for another prefix that shares the auth.
+URLs start and end with a slash (`/products/`, `` `/products/${ id }/` ``) and are typed that way. `addInstance(baseUrl)` gives a client for another prefix with shared auth.
 
-A failed request rejects with an `ApiError`, whose `response` has the `status` and the error body in `data`. A cancelled one rejects with `ApiErrorCancel`, which error handlers skip. When the server can't be reached, or a gateway answers 502, 503 or 504 in its place, the request rejects with `ApiErrorUnavailable`, a subclass of `ApiError` with no `status` for a network failure.
+Failures reject with `ApiError` (`response.status`, body in `response.data`). Cancelled requests reject with `ApiErrorCancel`, which error handlers skip. An unreachable server, or a gateway 502/503/504, rejects with `ApiErrorUnavailable`, a subclass of `ApiError` (no `status` on network failure).
 
-`useAvailable()` returns a ref that turns false on such a failure and true again on the server's next answer. Hand it to `watchServerRecovery`, with a cheap request as the probe, to bring back what failed during an outage. vue-query's `refetchOnReconnect` only follows the browser's own connection, so it never notices a server coming back:
+`useAvailable()` returns a ref that turns false on such a failure and true on the next answer. Pass it to `watchServerRecovery` with a cheap probe request to refetch what failed during an outage — vue-query's `refetchOnReconnect` only tracks the browser's connection:
 
 ```ts
 import {watchServerRecovery} from 'eco-vue-js/dist/utils/queryClient'
@@ -47,20 +47,20 @@ import {watchServerRecovery} from 'eco-vue-js/dist/utils/queryClient'
 watchServerRecovery(queryClient, apiClient.useAvailable(), () => apiClient.get('/profile/'))
 ```
 
-While the server is unreachable, the probe is sent every few seconds, and at once when the browser comes back online or the tab is shown. Once the server answers again, the failed queries on screen are fetched again. Their error states, such as a list's Retry, a [page error](/components/page-error) or the [query status](/components/query-status) message, stay in place until then. A probe answered right away means the server is up and only some endpoints fail, so their queries wait for Retry instead of being fetched again and again.
+While the server is down, the probe runs every few seconds, and immediately when the browser goes online or the tab is shown. Once it answers, failed on-screen queries refetch; their error states (a list's Retry, a [page error](/components/page-error), a [query status](/components/query-status)) stay until then. If the probe succeeds immediately, only some endpoints are failing, so their queries wait for Retry instead of looping.
 
 ### Auth
 
-The client supports two kinds of auth:
+Two kinds:
 
-- **Cookie session** (the default). The server sets an `exp` cookie, readable from JS, with the session's expiry in seconds. Before each request the client checks it. Once it has passed, the client calls `refreshUrl` — or your own `tokenRefresh` — and then sends the request. A 401 also refreshes and retries once, except for requests sent with `noAuth`. A refresh that fails with `ApiErrorUnavailable` keeps the session and rejects the request; any other failed refresh logs out. Open tabs share the refresh, so only one of them calls the server. Without an `exp` cookie the client counts as logged out and rejects every request not sent with `noAuth`.
-- **Bearer token.** With `tokenGetter`, the client adds `Authorization: Bearer <token>` to each request and counts as logged out when it returns nothing.
+- **Cookie session** (default). The server sets a JS-readable `exp` cookie with the expiry in seconds. When it has passed, the client calls `refreshUrl` (or your `tokenRefresh`) before the request. A 401 also refreshes and retries once, except with `noAuth`. A refresh failing with `ApiErrorUnavailable` keeps the session; any other failure logs out. Tabs share one refresh. Without `exp` the client is logged out and rejects everything but `noAuth` requests.
+- **Bearer token.** With `tokenGetter`, the client sends `Authorization: Bearer <token>` and is logged out when it returns nothing.
 
-`useAuth()` returns a ref of the logged-in state, for a guard that shows the login page. `logout()` clears the session. `onFailure`, or `setOnFailure` later, is called with every failed response, e.g. to redirect on 403.
+`useAuth()` returns a logged-in ref for a login guard. `logout()` clears the session. `onFailure` (or `setOnFailure`) receives every failed response, e.g. to redirect on 403.
 
 ## Models
 
-`createRestModelApi` declares every query of one model — an item, a paginated list, a list of options, a settings object — together with the actions that change it:
+`createRestModelApi` declares every query of one model — item, paginated list, options list, settings — with the actions that change it:
 
 ```ts
 import {createRestModelApi} from 'eco-vue-js/dist/utils/restModelApi'
@@ -95,36 +95,36 @@ export const productModelApi = createRestModelApi({
 })
 ```
 
-- `modelKey` names the model in the cache. Every query of the model is keyed under it, so all of them can be updated or invalidated together.
-- `model` is the shape that every query of the model shares, and must have an `id`. It is used only for its type, so pass `{} as Product`.
+- `modelKey` — the model's cache key; all its queries sit under it, so they update or invalidate together.
+- `model` — the shape all queries share; must have an `id`. Type only: `{} as Product`.
 
 Each query has:
 
-- `scope` — what the query holds: `item` (one item), `list` (an array of items), `paginated` (a page, in `PaginatedResponse`), or `single` (anything else, such as settings). The first three hold items with an `id`, and actions keep them in sync. A `single` query is left alone.
-- `isQueryParams` — a type guard for the query's params. Without it the query takes no params. The query only runs when its params pass the guard, so `isId` holds back an item query until there is an id. A guard that accepts `undefined` also takes `{}`, and both share one cache entry.
-- `queryFn` — fetches the data. Its params are at `queryKey[2]`.
-- `dataType` — the type of the query's data, again as `{} as Type`. Declare it whenever `queryFn` reads `queryKey`, and whenever a query returns a richer shape than `model`, such as the full item where the list returns a short one.
-- `options` — default vue-query options for the query, e.g. `placeholderData`.
+- `scope` — `item`, `list` (array), `paginated` (`PaginatedResponse`) or `single` (anything else, like settings). The first three hold items with an `id` and are kept in sync by actions; `single` is left alone.
+- `isQueryParams` — type guard for params; without it the query takes none. The query runs only when params pass, so `isId` holds an item query until there is an id. A guard accepting `undefined` also takes `{}`, sharing one cache entry.
+- `queryFn` — fetches the data; params are at `queryKey[2]`.
+- `dataType` — the data type as `{} as Type`. Declare it when `queryFn` reads `queryKey`, or when the query returns a richer shape than `model`.
+- `options` — default vue-query options, e.g. `placeholderData`.
 
-The query's name is the last part of its key. Several queries of one scope, such as two paginated endpoints with different filters, don't collide.
+The query's name is the last key segment, so several queries of one scope don't collide.
 
 ### Using the queries
 
-Every query gives a hook at `<name>.use`:
+Each query gives a hook at `<name>.use`:
 
 ```ts
 const queryProduct = productModelApi.item.use(computed(() => props.productId ?? 0))
 ```
 
-- `use(params, options?)` — runs the query and returns the vue-query result, with `setItem` and `removeItem` added. `params` can be a ref, and a change runs the query for the new params.
-- `use.config(params)` — the query's options, for `queryClient.ensureQueryData` or `prefetchQuery` outside of a component.
-- `use.setItem(item)` and `use.removeItem(id)` — write to the cache without a component.
+- `use(params, options?)` — runs the query; returns the vue-query result plus `setItem` and `removeItem`. `params` can be a ref.
+- `use.config(params)` — the query options, for `ensureQueryData` or `prefetchQuery` outside components.
+- `use.setItem(item)`, `use.removeItem(id)` — write to the cache without a component.
 
-The `use` of a `paginated` query is what [WList](/components/list), [WInfiniteList](/components/infinite-list) and the async [selects](/components/select) take as `useQueryFn`. When a row changes, the list's `setter` calls `setItem`, which updates the item in every cached query of the model.
+A `paginated` query's `use` is what [WList](/components/list), [WInfiniteList](/components/infinite-list) and async [selects](/components/select) take as `useQueryFn`. When a row changes, the list's `setter` calls `setItem`, updating it in every cached query of the model.
 
 ### Actions
 
-Actions are the requests that change the model, declared on the query they belong to:
+Actions are the requests that change the model, declared on their query:
 
 ```ts
 item: {
@@ -147,21 +147,21 @@ item: {
 },
 ```
 
-They are called as `<name>.actions.<action>(params, payload)`, where `params` is left out for a query without them:
+Call them as `<name>.actions.<action>(params, payload)`; omit `params` for a query without them:
 
 ```ts
 await productModelApi.item.actions.update(product.id, {name})
 ```
 
-An action gets its query's params, its payload, and a context to change the cache with:
+An action receives its query's params, the payload and a cache context:
 
-- `set(item)` — puts the item, or an array of items, in every cached query of the model that holds it — items, lists and pages alike. On an `item` query it also sets that query's data.
-- `update(item => newItem)` — changes the cached items the action is about. On an `item` query that is the item with the id in the params. On a `list` or `paginated` query it is the items its bulk params select: `id__in`, or `id__not_in` and `slice_indexes` against the loaded pages with the same filters. Return `null` to remove an item. Call it before the request for an optimistic update: when the action rejects, the model's cache is restored.
-- `invalidate(scope?)` — refetches the model's queries of that scope, or all of them, once the action succeeds.
+- `set(item)` — writes the item (or array) into every cached query of the model that holds it. On an `item` query it also sets that query's data.
+- `update(item => newItem)` — changes the items the action targets: on `item`, the one with the params' id; on `list`/`paginated`, those selected by `id__in`, or `id__not_in` and `slice_indexes` against loaded pages with the same filters. Return `null` to remove. Call it before the request for an optimistic update — the cache is restored if the action rejects.
+- `invalidate(scope?)` — refetches that scope (or all) once the action succeeds.
 
-An action can also return an updater instead of calling `update`, and it then resolves with nothing. `() => null` above drops the deleted product from every list. For another model, use its `invalidate(scope?)`, e.g. to refresh a dashboard after a product is added.
+An action can instead return an updater, and then resolves with nothing — `() => null` above drops the deleted product from every list. For another model, call its `invalidate(scope?)`.
 
-In the demo, the toggle's action changes the task at once, in both the list and the detail. Turn on failing requests to see the change rolled back.
+In the demo, toggling updates the list and the detail at once. Turn on failing requests to see the rollback.
 
 <!-- @example guide/data-layer/TaskDemo client -->
 
@@ -253,7 +253,7 @@ const toggle = (done: boolean) => {
 
 <!-- @example-end -->
 
-The model behind it, with a stand-in for the server:
+The model, with a stand-in server:
 
 <!-- @source docs/examples/guide/data-layer/api/Task.ts -->
 
@@ -330,7 +330,7 @@ export const taskModelApi = createRestModelApi({
 
 ## Filters in the URL
 
-The filters a user sets on a list — a search, a type, a sort order — can be kept in the URL, so a reload or a shared link opens the list as it was. `createUseQueryParams` declares them with a parser for each, which turns the value from the URL back into its type:
+Filters kept in the URL survive reloads and shared links. `createUseQueryParams` declares them with a parser each:
 
 ```ts
 import {createUseQueryParams} from 'eco-vue-js/dist/utils/api'
@@ -346,24 +346,24 @@ export const useQueryParamsProducts = createUseQueryParams({
 export type QueryParamsProducts = typeof useQueryParamsProducts['QueryParams']
 ```
 
-Leave `page` and `size` out: the list adds them to each page's query itself.
+Leave `page` and `size` out — the list adds them.
 
-On a page, the declaration reads the filters from the route and writes changes back to it:
+On a page, it reads from and writes to the route:
 
 ```ts
 const route = useRoute()
 const {queryParams, updateQueryParams} = useQueryParamsProducts(route)
 ```
 
-- `queryParams` is a reactive object parsed from the route's query. It goes to the list as `query-params`. The object is created once per declaration, so the pages that use one declaration share it.
-- `updateQueryParams(value)` merges `value` into the URL with `router.replace`. An empty value removes its param. Bind it to the filters and to the list's `update:query-params`, which sets `ordering` when a column is sorted.
-- `useQueryParamsProducts.useQueryParamsLocal(initial?)` gives the same pair without the URL, for filters that don't need to survive a reload, e.g. in a modal.
+- `queryParams` — reactive object parsed from the route query; pass it as `query-params`. Created once per declaration, so pages using it share it.
+- `updateQueryParams(value)` — merges into the URL via `router.replace`; empty values remove the param. Bind it to the filters and to the list's `update:query-params` (sets `ordering` on sort).
+- `useQueryParamsProducts.useQueryParamsLocal(initial?)` — the same pair without the URL, e.g. in a modal.
 
-The parsers in `eco-vue-js/dist/utils/utils` are `parseString`, `parseBoolean`, `parseInteger`, `parseId`, `parseIdList`, `parseIntegerList`, `parseStringList` and `parseJson(guard)`. A declaration's `config` can be spread into another, to share filters between lists.
+Parsers in `eco-vue-js/dist/utils/utils`: `parseString`, `parseBoolean`, `parseInteger`, `parseId`, `parseIdList`, `parseIntegerList`, `parseStringList`, `parseJson(guard)`. Spread a declaration's `config` into another to share filters.
 
 ## Errors
 
-`handleApiError` shows an error notification with the server's `detail` or `non_field_errors`. With a [form](/components/form), it also shows the error body's field errors under the fields they name. It skips cancelled requests and rejects again, so a caller can still react:
+`handleApiError` shows a notification with the server's `detail` or `non_field_errors` and, in a [form](/components/form), field errors under their fields. It skips cancelled requests and rethrows:
 
 ```ts
 const submit = () => productModelApi.item.actions.update(id, payload)
@@ -371,10 +371,10 @@ const submit = () => productModelApi.item.actions.update(id, payload)
   .catch(error => handleApiError(error, formRef.value))
 ```
 
-The field errors are expected in the Django REST framework shape: `{name: ['This field is required.']}`.
+Field errors use the Django REST framework shape: `{name: ['This field is required.']}`.
 
 ## Lower-level helpers
 
-- `createDefaultQuery(modelKey, scope, name, queryFn, isQueryParams?, options?)` from `eco-vue-js/dist/utils/useDefaultQuery` builds one query hook, the way `createRestModelApi` builds each of its queries.
-- `makeQueryPaginated(modelKey, getter, setter?, pageLength?)` serves a paginated query from an array in memory, and `wrapUseQueryPaginated` pages the result of a query that returns the whole list. `paginateList` pages an array into a `PaginatedResponse`.
-- `setQueryItem`, `setQueryItems`, `removeQueryItem`, `removeQueryItems` and `updateQueryItems` from `eco-vue-js/dist/utils/queryCache` change a model's cached items outside an action, e.g. on a message from a websocket. `snapshotQueries` saves the model's cache and returns a function that restores it.
+- `createDefaultQuery(modelKey, scope, name, queryFn, isQueryParams?, options?)` from `eco-vue-js/dist/utils/useDefaultQuery` builds one query hook.
+- `makeQueryPaginated(modelKey, getter, setter?, pageLength?)` serves a paginated query from memory; `wrapUseQueryPaginated` pages a whole-list query; `paginateList` pages an array into a `PaginatedResponse`.
+- `setQueryItem`, `setQueryItems`, `removeQueryItem`, `removeQueryItems`, `updateQueryItems` (`eco-vue-js/dist/utils/queryCache`) change cached items outside actions, e.g. from a websocket. `snapshotQueries` saves the cache and returns a restore function.

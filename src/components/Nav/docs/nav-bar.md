@@ -5,11 +5,11 @@ description: WNavBar, WNavItem, WNavItemExpand and WNavItemTransition — the ap
 
 # Nav bar
 
-`WNavBar` is the nav on the left of the [app shell](/guide/app-shell) — the one on the left of this page. It is `position: fixed` under the header and takes `--nav-bar-width` in layout from `xl` (1280px) up. Below it, it collapses and adds a menu button in the header's top-left corner, and opens as an overlay over the page; it emits `update:is-open` when the overlay opens or closes. Its class `w-nav-bar` is the hook for the app's surface and shadow, and its content uses `w-nav-bar-width` to keep its width while the nav collapses.
+`WNavBar` is the [app shell](/guide/app-shell)'s left nav, as on this page. It's `position: fixed` under the header and takes `--nav-bar-width` from `xl` (1280px). Below that it collapses, adds a menu button in the header's top-left corner, and opens as an overlay, emitting `update:is-open`. `w-nav-bar` is the hook for the app's surface and shadow; its content uses `w-nav-bar-width` to keep its width while collapsing.
 
-The `brand` slot is the nav's top row, level with the header, for a logo. With `brandTo` the whole row is a link to it, such as the home page, with a hover pill inset as the items' are. In the floating layout styles the pill keeps as far off the nav's top edge as off its side, so its corners run parallel to the nav's, and so do the first and last items' at the nav's ends: the room there is in the item, so it is clickable up to the edge. Content at the top other than an item sets its own room.
+The `brand` slot is the top row, level with the header, for a logo. `brandTo` makes the whole row a link, with an inset hover pill like the items'. In floating layouts, the pill and the first and last items keep equal room from the nav's edges so their corners run parallel; that room is part of the item, so it's clickable to the edge. Other content at the top sets its own spacing.
 
-The `footer` slot is the nav's bottom, such as a back button or the app's version. It stays under the items, which scroll above it, past a line, and is inset as they are. It paints nothing of its own: don't stick a block to the nav's bottom with a background, which in the glass style would cover the nav's translucent fill with an opaque strip.
+The `footer` slot sits at the bottom below a line (e.g. a back button or version), with items scrolling above. It paints nothing — don't add an opaque sticky block, which in glass covers the translucent fill.
 
 ```vue
 <WNavBar :brand-to="{name: RouteName.HOME}">
@@ -27,15 +27,15 @@ The `footer` slot is the nav's bottom, such as a back button or the app's versio
 
 ## Nav items
 
-`WNavItem` is a router link with an icon and a title. Both default to the route's `meta.icon` and `meta.titleShort` (or `meta.title`), so an item is often just `<WNavItem :to="{name: RouteName.PROJECTS}" />`. It is active while the current route has the same name; `queryFields` lists the query params that must match too, for items that open the same route with different filters. `count` shows a number in brackets after the title and `counter` a badge, with `skeleton` while they load.
+`WNavItem` is a router link with icon and title, defaulting to the route's `meta.icon` and `meta.titleShort` (or `meta.title`) — often just `<WNavItem :to="{name: RouteName.PROJECTS}" />`. It's active when the route name matches; `queryFields` lists query params that must match too. `count` shows a bracketed number, `counter` a badge, `skeleton` while loading.
 
-`WNavItemExpand` groups items under a title. The items show under it while one of them is active; otherwise hovering the group opens them in a menu to the right. One group's menu is open at a time, so moving down the nav switches it. The menu lines up with the group by its top, or by its bottom low on the screen, and shifts to stay on screen when it is taller than the room there — it scrolls once taller than the screen. With `to`, the group is a link of its own. `even` keeps the items always shown and not indented, for a nav inside a page.
+`WNavItemExpand` groups items under a title: shown while one is active, otherwise opened in a hover menu to the right. One group menu opens at a time. The menu aligns to the group's top (or bottom low on screen), shifts to stay visible, and scrolls when taller than the screen. `to` makes the group a link; `even` keeps items always shown and unindented, for an in-page nav.
 
-Groups can nest, and each level indents further. Items without an icon, from neither `icon`, the `icon` slot nor `meta.icon`, start with the title.
+Groups nest, indenting per level. Items without an icon (`icon`, `icon` slot or `meta.icon`) start with the title.
 
-`WNavItemTransition` wraps a list of items so that the ones added or removed with `v-if` — such as an item for the current record — expand and collapse.
+`WNavItemTransition` wraps items so ones added or removed with `v-if` (e.g. the current record) expand and collapse.
 
-The demo below uses `even` to show a group inside a page. Its items link to pages of this site, so the one you're on is active.
+The demo uses `even` for an in-page group; its items link to this site, so the current page is active.
 
 <!-- @example Nav/Basic -->
 
@@ -113,7 +113,7 @@ const showRecent = ref(false)
 
 <!-- @example-end -->
 
-In an app the items open routes by name:
+In an app, items open routes by name:
 
 ```vue
 <WNavItemTransition>

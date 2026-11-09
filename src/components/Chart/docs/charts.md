@@ -5,17 +5,17 @@ description: WChartLinear and WChartLine for values over time, with bands, areas
 
 # Charts
 
-Small SVG charts of values over time. They are drawn in the current text color, so a text color class on the chart or the line sets its color.
+Small SVG charts of values over time, drawn in the current text color — set it with a text color class on the chart or line.
 
 ## Lines
 
-`WChartLinear` is the frame: a time axis over `xDomain`, a value axis on the left or `yRight`, and the plot between them. It fills its parent's height unless `height` is set, and follows its width. Its default slot gets the scales and sizes — bind them to each `WChartLine` with `v-bind="scope"`, or use `scaleX` and `scaleY` to draw your own marks, such as a threshold line.
+`WChartLinear` is the frame: a time axis over `xDomain`, a value axis (left, or `yRight`), and the plot. It fills its parent's height unless `height` is set, and follows its width. Its slot gets scales and sizes — bind them to each `WChartLine` with `v-bind="scope"`, or use `scaleX`/`scaleY` for custom marks like a threshold.
 
-`WChartLine` draws one line from `data`, newest point first, picking the time and value by `xKey` and `yKey`. The line runs on flat from its first and last points to the edges of the chart. The value axis fits all the lines in the chart, from 0 or with `calcMin` from their lowest value.
+`WChartLine` draws `data` (newest first) by `xKey` and `yKey`, extended flat to the chart edges. The value axis fits all lines, from 0 or, with `calcMin`, from their minimum.
 
-- `yKeyMin` and `yKeyMax` draw a faint band around the line, e.g. for a range or a confidence interval. `hasArea` fills the area under the line instead.
-- `strokeStyle` and `strokeWidth` set the line; the `gradient` slot colors it by value, with `stop` elements placed with `scaleYPercent`.
-- The `tooltip` slot adds a tooltip for the point nearest the pointer, with its data and the points before and after it.
+- `yKeyMin` and `yKeyMax` draw a faint band (a range or confidence interval); `hasArea` fills under the line instead.
+- `strokeStyle` and `strokeWidth` style the line; the `gradient` slot colors it by value with `stop`s placed via `scaleYPercent`.
+- The `tooltip` slot shows the nearest point, with its neighbours.
 
 <!-- @example Chart/Line client -->
 
@@ -95,7 +95,7 @@ const plantedOut = Array.from({length: 30}, (_, index) => ({date: +addDay(getSta
 
 ## Heatmap
 
-`WChartHeatmap` shows a value per day over the last year as a grid of weeks, in five shades of the current color: `text-tone-fill` gives it a tone's fill color, as bright as its buttons. The legend's steps are round numbers up to the highest value. The grid scrolls to today; the `tooltip` slot describes a day.
+`WChartHeatmap` shows a daily value over the last year as a week grid in five shades of the current color (`text-tone-fill` for a tone's fill). Legend steps are round numbers up to the max. The grid scrolls to today; the `tooltip` slot describes a day.
 
 <!-- @example Chart/Heatmap client -->
 

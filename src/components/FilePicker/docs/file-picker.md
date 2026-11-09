@@ -5,11 +5,11 @@ description: WFilePicker — a drop zone with a browse button for one or several
 
 # File picker
 
-`WFilePicker` is a drop zone with a browse button. Dropped or picked files replace the model; each one shows with its name and a button to remove it. Without `multiple`, only the first dropped file is taken. `accept` limits what the browse dialog offers, but not what can be dropped — check the files before uploading them.
+`WFilePicker` is a drop zone with a browse button. Dropped or picked files replace the model, each shown with its name and a remove button. Without `multiple`, only the first file is taken. `accept` limits the browse dialog, not drops — validate before uploading.
 
-`placeholder` shows a file that is already saved, such as the current avatar, by its name, until another file is picked. Removing it emits `clear:placeholder`. The `positive` and `negative` slots replace the file's icon, e.g. with a preview of an image.
+`placeholder` shows an already-saved file (e.g. the current avatar) by name until another is picked; removing it emits `clear:placeholder`. The `positive` and `negative` slots replace the file icon, e.g. with an image preview.
 
-The drop zone lights up while a file is dragged anywhere over the page, once the app has called `preventDragFile()` at startup — which also stops the browser from opening a file dropped beside the zone. See [Helpers](/utilities/helpers#browser).
+The zone lights up while a file is dragged over the page once the app calls `preventDragFile()` at startup, which also stops the browser opening near-miss drops. See [Helpers](/utilities/helpers#browser).
 
 <!-- @example FilePicker/Basic -->
 

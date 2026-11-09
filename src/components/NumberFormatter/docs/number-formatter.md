@@ -5,11 +5,11 @@ description: WNumberFormatter — a number with thousands separators, a fraction
 
 # Number formatter
 
-`WNumberFormatter` shows a number with thousands separators and up to three decimals, or a fraction as a percentage with `percent` — 0.25 is 25%. `compact` shortens it, 12840 to 13K, with the full number in a tooltip; `noTouch` skips the tooltip on touch devices.
+`WNumberFormatter` shows a number with thousands separators and up to three decimals, or with `percent` a fraction as a percentage (0.25 → 25%). `compact` shortens it (12840 → 13K) with the full value in a tooltip; `noTouch` skips the tooltip on touch devices.
 
-Without `tag` the number is plain text and the tooltip attaches to the parent element — so the parent's whole box is the hover target. With `tag`, the number gets its own element.
+Without `tag`, the number is plain text and the tooltip attaches to the parent, making its whole box the hover target. With `tag`, it gets its own element.
 
-The formatters behind it are exported for use in code — see [Formatting](/utilities/formatting#numbers).
+The underlying formatters are exported — see [Formatting](/utilities/formatting#numbers).
 
 <!-- @example NumberFormatter/Basic -->
 

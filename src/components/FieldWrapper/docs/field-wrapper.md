@@ -5,11 +5,11 @@ description: WFieldWrapper — the frame every control is built on, with title, 
 
 # Field wrapper
 
-`WFieldWrapper` is the frame that the inputs, selects and other controls are built on: the title (with `required` and `titleIcon`), a `description` under the field, the error message, the unsaved changes dot (`hasChanges`), a length counter (`maxLength`) and a tooltip, with the skeleton, disabled and readonly states inherited like any control.
+`WFieldWrapper` is the frame under every control: title (with `required` and `titleIcon`), `description`, error message, unsaved-changes dot (`hasChanges`), length counter (`maxLength`) and tooltip, with inherited skeleton, disabled and readonly states.
 
-On its own it shows a value that can't be edited, such as a detail on a record page. `modelValue` is formatted — numbers with thousands separators, `null` as "N / A" — or the default slot replaces it with anything, such as a chip. `allowCopy` adds a copy button and `mono` a monospace font.
+On its own it shows a read-only value, like a record detail. `modelValue` is formatted (thousands separators, `null` as "N / A"), or the default slot replaces it (e.g. with a chip). `allowCopy` adds a copy button, `mono` a monospace font.
 
-The `field` slot replaces the whole field, to give a control of your own — here a slider — the same title and messages as the kit's controls. The slot gets an `id` to label it, and `setFocused` for the counter.
+The `field` slot replaces the field, giving your own control (here a slider) the kit's title and messages. It gets an `id` for labelling and `setFocused` for the counter.
 
 <!-- @example FieldWrapper/Basic -->
 
@@ -85,10 +85,10 @@ const threshold = ref(7)
 
 ## Layout
 
-- `subgrid` puts the title and the field on the parent grid's columns, so that the titles of a column of fields line up — the parent needs a grid with those columns.
-- `seamless` hides the title and the field's frame until it is hovered or focused, for editing in place, such as in a table cell. `embedded` fits a field inside another component, without title or margin.
-- `filterField` adds a filter button to the title, which toggles the value as a query param — e.g. from a plant's bed to the list of that bed's plants.
-- `noMargin` drops the space under the field, `topText` moves the messages above it and `leftError` aligns the error to the left.
+- `subgrid` places title and field on the parent grid's columns so titles align; the parent needs those columns.
+- `seamless` hides the title and frame until hover or focus, for in-place editing (e.g. table cells). `embedded` fits inside another component, without title or margin.
+- `filterField` adds a title button toggling the value as a query param — e.g. from a plant's bed to that bed's plant list.
+- `noMargin` drops the bottom space, `topText` moves messages above, `leftError` left-aligns the error.
 
 ## API
 

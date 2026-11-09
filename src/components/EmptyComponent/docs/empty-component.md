@@ -5,7 +5,7 @@ description: WEmptyComponent — renders its slot without an element, as the "of
 
 # Empty component
 
-`WEmptyComponent` renders its default slot and nothing else — no element, no attributes. It is the "off" branch of an optional wrapper, so the content is written once:
+`WEmptyComponent` renders only its default slot — no element, no attributes. Use it as the "off" branch of an optional wrapper so content is written once:
 
 ```vue
 <component :is="scroll ? WTextOverflow : WEmptyComponent">
@@ -13,7 +13,7 @@ description: WEmptyComponent — renders its slot without an element, as the "of
 </component>
 ```
 
-The kit uses it this way for tab titles that scroll on overflow, and for `WNumberFormatter` without a `tag`.
+The kit uses it for overflow-scrolling tab titles and `WNumberFormatter` without `tag`.
 
 <!-- @example EmptyComponent/Basic -->
 

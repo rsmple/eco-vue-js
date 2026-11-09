@@ -5,9 +5,9 @@ description: WInfoCard and WInfoCardNegative — notes with an icon in the color
 
 # Info card
 
-`WInfoCard` is a note with an icon, in the color of its `semanticType`: gray by default, with an info icon, or an exclamation mark for `WARNING` and `NEGATIVE`. `icon` sets another icon, `noIcon` hides it, and `noBg` drops the background for a note inside other content. The `top` and `bottom` slots go above and under the text, e.g. for actions. On phones the card spans the screen edge to edge.
+`WInfoCard` is a note with an icon in its `semanticType` color: gray with an info icon by default, an exclamation mark for `WARNING` and `NEGATIVE`. `icon` replaces the icon, `noIcon` hides it, `noBg` drops the background for notes inside other content. `top` and `bottom` slots go around the text, e.g. for actions. On phones it spans edge to edge.
 
-`WInfoCardNegative` is a gray card with a warning icon, a `title` and a description, for an error or an empty state that explains what to do.
+`WInfoCardNegative` is a gray card with a warning icon, `title` and description, for errors or empty states that explain what to do.
 
 <!-- @example InfoCard/Basic -->
 

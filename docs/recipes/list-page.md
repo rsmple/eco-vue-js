@@ -16,19 +16,19 @@ description: A page whose WList scrolls with the window — a sticky toolbar und
 
 # List page
 
-**Problem:** a list is the page itself, not a block on it. The window should scroll it, its toolbar should stick under the app header, a table wider than the screen should scroll the window sideways, and the page content above it should stay in place while it does — in every layout style.
+**Problem:** the list is the page, not a block on it. The window scrolls it, its toolbar sticks under the header, a too-wide table scrolls the window sideways, and content above stays put — in every layout style.
 
-**Pattern:** render `WList` straight in the app's main area. A list that is not inside a modal or a scroll container, and has no `min-height`, is a **page list**:
+**Pattern:** render `WList` directly in the main area. A list outside modals and scroll containers, without `min-height`, is a **page list**:
 
-- It scrolls with the window and its toolbar sticks under the header (`--w-header-inner`).
-- In the card and glass layout styles it draws its own section: the surface behind the rows, rounded edges at the top of the stuck toolbar and at the bottom of the screen, and the backdrop of its sticky columns. Don't put it inside a `WSection`.
-- A table wider than the screen scrolls the window sideways, and the sticky columns and the section's edges stay in place.
+- It scrolls with the window; its toolbar sticks under the header (`--w-header-inner`).
+- In card and glass it draws its own section — surface, rounded edges at the stuck toolbar and screen bottom, sticky column backdrop. Don't wrap it in `WSection`.
+- A too-wide table scrolls the window sideways, with sticky columns and section edges fixed.
 
-The rest is in the app shell and the content beside the list.
+The rest is the app shell and the content beside the list.
 
 ## The app shell
 
-The main area is `w-page`, in a `1fr` grid track. A sticky box stays inside its parent, so content that sticks beside a wide list needs a parent as wide as the list: the track grows to the list's width, and the main area with it.
+The main area is `w-page` in a `1fr` grid track. Sticky boxes stay inside their parent, so content sticking beside a wide list needs a parent as wide as the list: the track grows with the list.
 
 ```vue
 <template>
@@ -45,7 +45,7 @@ The main area is `w-page`, in a `1fr` grid track. A sticky box stays inside its 
 
 ## Content beside the list
 
-While a page list is on the page, everything beside it sticks to the page's left inset and keeps the page's width when the window scrolls sideways: a section, a heading, a filter, and the wrappers around them, however deep the list is. It needs no class. The list's own toolbar, empty state and error stay in view too.
+While a page list is present, everything beside it — sections, headings, filters and their wrappers at any depth — sticks to the left inset at page width during horizontal scroll, with no class needed. The list's toolbar, empty and error states stay in view too.
 
 ```vue
 <template>
@@ -68,11 +68,11 @@ While a page list is on the page, everything beside it sticks to the page's left
 </template>
 ```
 
-The list is the one from [List with fields](/recipes/list-with-fields), without `min-height`.
+The list is from [List with fields](/recipes/list-with-fields), without `min-height`.
 
 ## Try it
 
-Switch the layout style, then scroll the list below: down past its toolbar, and sideways once columns are added or widened past the screen. This text and the cards above the list stay in place.
+Switch the layout style, then scroll the list down past its toolbar, and sideways once columns exceed the screen. This text and the cards above stay put.
 
 <div class="vp-raw max-w-80">
   <ClientOnly>

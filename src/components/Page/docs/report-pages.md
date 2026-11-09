@@ -5,11 +5,11 @@ description: WPage — A4 pages for printable reports, with numbered sections, a
 
 # Report pages
 
-`WPage` is an A4 page for a report that is read on screen and printed from the browser. Each page is 21 × 29.7 cm with print margins, and breaks to a new sheet when printed. Its footer has a logo (`logoComponent` or the `logo` slot), the `date` and the page number; `watermark` writes large faint text across it, such as "Draft".
+`WPage` is an A4 report page for screen and browser print: 21 × 29.7 cm with print margins, one sheet per page. The footer has a logo (`logoComponent` or `logo` slot), the `date` and the page number; `watermark` adds large faint text like "Draft".
 
-A page with a `title` starts a numbered section: the number and an `eyebrow` caption go above the title, and the `meta` slot to the right of it. `WPageTitle` is a heading inside a page, numbered in the same sequence; `big` makes it a large cover heading. Wrap the pages in `WPageNumerator` so the numbers start from 1. `empty` leaves a page, such as the cover, out of the page count.
+A `title` starts a numbered section, with the number and an `eyebrow` above and the `meta` slot beside. `WPageTitle` is an in-page heading in the same sequence; `big` makes a cover heading. Wrap pages in `WPageNumerator` to number from 1; `empty` excludes a page (e.g. the cover) from the count.
 
-`WPageBreadcrumbs` lists the titles of the pages on the screen, marks the one in view and scrolls to a page when clicked — put it in the header of the report view.
+`WPageBreadcrumbs` lists page titles, marks the one in view and scrolls on click — put it in the report view's header.
 
 <!-- @example Page/Basic -->
 
@@ -110,11 +110,11 @@ const observations = Array.from({length: 36}, (_, index) => ({title: TITLES[inde
 
 ## Content that doesn't fit
 
-Content is measured once it renders. Blocks that don't fit move to a continuation page, which repeats the title small at the top and the `header` slot, such as a table header, and so on until everything fits. By default a block moves whole. The children of an element with the `w-page-inner` class — the slot's `INNER_CLASS` — move one by one instead, so a long list continues where the page ends, inside a copy of that element. A child with one element inside or none moves whole; a child with several is a group, and its own children move one by one into a copy of it — so wrap a row's cells in one element to keep the row together.
+Content is measured after render. Blocks that don't fit move to a continuation page, which repeats the title (small) and the `header` slot (e.g. a table header), until everything fits. Blocks move whole by default. Children of a `w-page-inner` element (the slot's `INNER_CLASS`) move one by one into a copy of it, so long lists continue. A child with zero or one element moves whole; one with several is a group whose children move individually — wrap a row's cells in one element to keep it together.
 
-While the data loads, set `skeleton`: content that doesn't fit stays on the page until it turns `false`. When content changes size later, call the slot's `updateOverflow`.
+While loading, set `skeleton`: overflow stays put until it's `false`. If content resizes later, call the slot's `updateOverflow`.
 
-Content is moved as DOM elements, outside Vue: after it is split, keep it static. To show new data, re-render the page with a new `key`.
+Content is moved as DOM elements outside Vue, so keep it static after splitting. To show new data, re-render with a new `key`.
 
 ## API
 

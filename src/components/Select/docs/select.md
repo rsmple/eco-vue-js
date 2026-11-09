@@ -6,20 +6,20 @@ description: WSelectSingle, WSelect and their async variants — searchable sele
 
 # Select
 
-Selects pick values out of a list of objects. The model holds only the values — ids, codes — and the select finds the objects behind them to display.
+Selects pick values from a list of objects. The model holds only values (ids, codes); the select looks up the objects to display.
 
 | Component | Model | Options come from |
 | --- | --- | --- |
-| `WSelectSingle` | one value or `null` | `options` array, or a `useQueryFnOptions` query returning an array |
+| `WSelectSingle` | one value or `null` | `options` array, or a `useQueryFnOptions` query returning one |
 | `WSelect` | array of values | same as above |
-| `WSelectAsyncSingle` | one value or `null` | a paginated query, searched and paged on the server |
+| `WSelectAsyncSingle` | one value or `null` | a paginated query, searched and paged server-side |
 | `WSelectAsync` | array of values | same as above |
 
 Every select needs:
 
-- `valueGetter` — picks the model value out of an option.
-- An `option` slot or an `optionComponent` to render an option. There is no default label; the slot receives `option`, `selected` and `model` (`true` when rendering the chosen value in the field rather than in the dropdown). Put a `w-option` class on the option's root, so it takes the height and rounding of a line in the field; add `w-option-has-bg` when the option has a background of its own, like a tag, so the background covers the field's left padding instead of sitting inside it. Such options are best made an `optionComponent`, which can hold the unselect button inside the background — see [Multiple](#multiple).
-- `searchFn` for the static selects — the async ones send the search text to the query instead.
+- `valueGetter` — extracts the model value from an option.
+- An `option` slot or `optionComponent` — there is no default label. It receives `option`, `selected` and `model` (`true` in the field, not the dropdown). Put `w-option` on the root for the field's line height and rounding; add `w-option-has-bg` when the option has its own background (like a tag) so it covers the field's left padding. Make those an `optionComponent`, which can hold the unselect button inside the background — see [Multiple](#multiple).
+- `searchFn` for static selects; async ones send the search to the query.
 
 ## Single
 
@@ -70,11 +70,11 @@ const soil = ref<string | null>('loam')
 
 <!-- @example-end -->
 
-With `allowClear` the value can be cleared. `clearValue` sets what clearing emits — `null`, `undefined` or `''` — and passing it explicitly also narrows the emitted type to match your model.
+`allowClear` allows clearing. `clearValue` sets what clearing emits (`null`, `undefined` or `''`) and narrows the emitted type.
 
 ## Multiple
 
-`WSelect` has no `v-model`: it emits `select` and `unselect` with the value, and leaves adding and removing to the parent. That way the parent can save each change, and show a spinner on the option until it's done with `loading`.
+`WSelect` has no `v-model`: it emits `select` and `unselect`, and the parent adds and removes. The parent can then save each change and show a per-option spinner via `loading`.
 
 <!-- @example Select/Multiple -->
 
@@ -121,7 +121,7 @@ const tags = ref<number[]>([2, 3])
 
 <!-- @example-end -->
 
-The tags are drawn by an `optionComponent` rather than the `option` slot. The select passes its unselect button to the component's default slot, so the component can put it inside the tag's background; with the slot, the button sits next to the tag. The same component renders the tags in the dropdown, without a button.
+Tags here use an `optionComponent`, not the `option` slot: the select passes the unselect button into its default slot so it sits inside the tag (with the slot, it sits beside it). The same component renders dropdown tags, without the button.
 
 <!-- @source src/components/Select/docs/examples/parts/OptionTag.vue -->
 
@@ -158,9 +158,9 @@ defineProps<SelectOptionProps<{id: number, name: string}>>()
 
 ## Async
 
-`WSelectAsyncSingle` and `WSelectAsync` take `useQueryFnOptions` — a paginated query made with the kit's query helpers — and `queryParamsOptions`. The search text goes into the query params as `search` (`searchField` renames it), and more pages load as the dropdown scrolls.
+`WSelectAsyncSingle` and `WSelectAsync` take `useQueryFnOptions` (a paginated query from the kit's helpers) and `queryParamsOptions`. Search goes in as `search` (rename with `searchField`); pages load on scroll.
 
-To show the chosen value before the user opens the dropdown, the select requests it by id: the same query with `id__in` set to the model values (`valueQueryKey` renames it). The endpoint has to support that filter.
+To show the chosen value before opening, the select fetches it with `id__in` set to the model values (rename with `valueQueryKey`). The endpoint must support that filter.
 
 <!-- @example Select/Async -->
 
@@ -202,7 +202,7 @@ const plantId = ref<number | null>(3)
 
 <!-- @example-end -->
 
-Until the selected plant loads by id, the select renders its option with `skeleton` — give the option a `WSkeleton` branch, or the field stays blank for that moment. Options on menu pages that are still loading get it too.
+Until the selected item loads, its option renders with `skeleton` — add a `WSkeleton` branch or the field is blank meanwhile. Loading menu pages get it too.
 
 <!-- @source src/components/Select/docs/examples/parts/OptionPlant.vue OptionPlant.vue -->
 
@@ -256,18 +256,18 @@ const kindToneMap: Record<Kind, string> = {
 
 ## Option layouts
 
-An option is any markup, so it can carry as much as a card. The same component draws an option in three places, and its props tell them apart:
+An option is any markup. One component draws it in four situations:
 
-- **In the field** — `model` is `true`. Keep it to one line of `w-option` height, so the input does not grow. In a multiple select, the default slot holds the unselect button: place it inside the option's background.
-- **In the menu** — `model` is falsy and there is room: add more rows, and a `py-1` to space them. `selected` is set for picked options.
-- **While loading** — `skeleton` is `true` and `option` may be `undefined`. Draw a `WSkeleton` the size of what it stands for.
-- **The "New:" row** of `createOption` — `option` is empty and `search` holds the typed text, which the option shows instead.
+- **In the field** — `model` is `true`. Keep it one `w-option`-high line. In a multiple select the default slot holds the unselect button: put it inside the background.
+- **In the menu** — `model` is falsy; there's room for more rows (space them with `py-1`). `selected` marks picked options.
+- **Loading** — `skeleton` is `true`, `option` may be `undefined`. Draw a matching `WSkeleton`.
+- **The "New:" row** of `createOption` — `option` is empty; show `search` instead.
 
-Extra props of an option component, like a display variant, are passed with `optionComponentProps`.
+Pass extra props (e.g. a display variant) with `optionComponentProps`.
 
 ### Tags with their own color
 
-Each option carries its tone, and the tag paints a soft background with it — `w-option-has-bg` stretches it to the field's edge. A typed light level is created with the tag icon and a gray tone.
+Each option carries its tone for a soft tag background; `w-option-has-bg` stretches it to the field edge. Typed light levels are created with a tag icon and gray tone.
 
 <!-- @example Select/Light -->
 
@@ -380,7 +380,7 @@ defineProps<SelectOptionProps<ToneTag<Id>>>()
 
 ### Avatar and details
 
-One line in the field; in the menu, the option fills the row with a larger avatar, the role on a second line and the last week of watering pushed to the right, one bar a day. Each person carries their avatar tone, so they look the same everywhere — the home page and the [List with fields](/recipes/list-with-fields) recipe use the same people and option.
+One line in the field; in the menu, a larger avatar, the role on a second line and a week of watering bars on the right. Each person has a fixed avatar tone — the home page and [List with fields](/recipes/list-with-fields) use the same option.
 
 <!-- @example Select/Gardener -->
 
@@ -558,7 +558,7 @@ export const initials = (name: string) => {
 
 ### Joined segments
 
-Three segments, each a `w-option-has-bg` with its own background: the name, the humidity colored by range, and the kind on a gradient that holds the unselect button. The option's own `textOnly` prop, passed through `optionComponentProps`, drops the backgrounds and keeps the colored text — for a plain list or a table cell.
+Three `w-option-has-bg` segments: name, humidity colored by range, and kind on a gradient holding the unselect button. The option's `textOnly` prop (via `optionComponentProps`) drops backgrounds and keeps colored text, for plain lists or table cells.
 
 <!-- @example Select/Passport -->
 
@@ -690,7 +690,7 @@ const humidityTone = computed(() => {
 
 ### Compact in the field, a card in the menu
 
-The first line is the whole option in the field: the bed, the date and how many seedlings sprouted and were lost. The menu adds the crops and a bar of how the tray is doing. The skeleton follows the same split.
+In the field, one line: bed, date, sprouted and lost seedlings. The menu adds crops and a health bar. The skeleton follows the same split.
 
 <!-- @example Select/Batch -->
 
@@ -836,7 +836,7 @@ const total = computed(() => parts.value.reduce((sum, part) => sum + part.value,
 
 ### A dense card
 
-A seed variety with its crop, flags drawn as icons and a sowing calendar — twelve cells colored for sowing, harvest, or both. The legend sits above the options in the `content` slot. In the field it collapses to a colored tag.
+A seed variety with crop, icon flags and a twelve-month sowing/harvest calendar. The legend sits in the `content` slot above the options. In the field it collapses to a colored tag.
 
 <!-- @example Select/Variety -->
 
@@ -1002,7 +1002,7 @@ const monthClass = (month: number) => {
 
 <!-- @source-end -->
 
-The batches and varieties come from a mock API, built the same way as the plants:
+Batches and varieties come from a mock API, built like the plants one:
 
 <!-- @source src/components/Select/docs/examples/api/garden.ts api/garden.ts -->
 
@@ -1175,7 +1175,7 @@ export const varietyModelApi = createRestModelApi({
 
 ## In list cells
 
-A select per row costs most of a list's first render: each one sets up its search, cursor, dropdown and input, and a query of its own when the options come from `useQueryFnOptions`. With `deferred`, a `seamless` select renders only its field and the selected options until it is pressed or focused — then it mounts the full select and opens it. Options from a query are not loaded before that, so give the selected ones in `previewData`, from data the row already has. The async selects load their chips on their own when `previewData` is not given, as they do when mounted.
+A select per row dominates a list's first render: each sets up search, cursor, dropdown, input, and possibly its own query. With `deferred`, a `seamless` select renders only its field and selected options until pressed or focused, then mounts and opens. Query options aren't loaded until then, so pass selected ones in `previewData` from row data. Async selects load their chips themselves if `previewData` is missing.
 
 <!-- @example Select/Deferred -->
 
@@ -1235,8 +1235,8 @@ const plants = ref([
 
 ## Other forms
 
-- **`WSelectStringified`** is a `WSelect` whose model is one string — the values joined by `divider`, such as `"high,critical"` for a query param, or a JSON array with `divider="json"`.
-- **`WSelectAsyncList`** shows the options of a paginated query as a list that is always open, in a scrolling box, with the picked ones checked — for picking from a long list inside a form or a modal. It emits `select` and `unselect` instead of a model; `selectOnly` and `unselectOnly` allow only one of them.
+- **`WSelectStringified`** — a `WSelect` whose model is one string joined by `divider` (`"high,critical"` for a query param), or a JSON array with `divider="json"`.
+- **`WSelectAsyncList`** — an always-open, scrolling list of a paginated query's options with picked ones checked, for long lists in forms or modals. Emits `select`/`unselect`; `selectOnly` and `unselectOnly` restrict to one.
 
 ## API
 

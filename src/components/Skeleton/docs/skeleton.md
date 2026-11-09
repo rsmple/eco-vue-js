@@ -5,13 +5,13 @@ description: WSkeleton — a shimmering placeholder for content that is still lo
 
 # Skeleton
 
-`WSkeleton` is a shimmering placeholder for content that is still loading. It is one line of text tall and a random width between 40% and 80%, so a column of them doesn't look like a grid. Utilities from the kit's Tailwind base set its shape:
+`WSkeleton` is a shimmering loading placeholder, one text line tall and a random 40–80% wide so stacks don't look like a grid. Shape utilities:
 
-- `w-skeleton-w-*` and `w-skeleton-h-*` — width and height, e.g. `w-skeleton-h-12` for an avatar.
+- `w-skeleton-w-*`, `w-skeleton-h-*` — width and height, e.g. `w-skeleton-h-12` for an avatar.
 - `w-skeleton-rounded-*` — corner radius.
-- `w-skeleton-static` — stops the shimmer, on the skeleton or any parent.
+- `w-skeleton-static` — stops the shimmer, on the skeleton or a parent.
 
-Controls, chips and list fields have a `skeleton` prop that renders their own skeleton. A form or an area can set it for everything inside at once — see [Conventions](/guide/conventions) and [Component states](/utilities/composables#component-states).
+Controls, chips and list fields have a `skeleton` prop for their own placeholder, which a form or area can set for all descendants — see [Conventions](/guide/conventions) and [Component states](/utilities/composables#component-states).
 
 <!-- @example Skeleton/Basic -->
 

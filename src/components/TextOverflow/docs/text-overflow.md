@@ -5,9 +5,9 @@ description: WTextOverflow — one line cut at its width that scrolls the rest i
 
 # Text overflow
 
-`WTextOverflow` shows one line cut at its width, and scrolls the rest into view on hover — or on hover of a parent with the `group/overflow` class, such as a list row or a card. Text that fits doesn't move.
+`WTextOverflow` truncates one line and scrolls the rest into view on hover — its own, or a `group/overflow` parent's (a list row, a card). Fitting text doesn't move.
 
-The content has to stay on one line, so give it `whitespace-nowrap`.
+Keep the content on one line with `whitespace-nowrap`.
 
 <!-- @example TextOverflow/Basic -->
 

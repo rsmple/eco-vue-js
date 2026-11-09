@@ -6,24 +6,24 @@ description: One WUniform form component split into WTabs, used as a step-by-ste
 
 # Form in three modes
 
-**Problem:** an item is created in a wizard, edited in a modal, and edited again on its own page, where each change saves at once. Three forms drift apart: a field added to one is missing from the others, and the validation differs.
+**Problem:** an item is created in a wizard, edited in a modal, and edited on its own page with instant saves. Three separate forms drift: fields go missing, validation differs.
 
-**Pattern:** one form component holds the fields, split into tabs, and two props pick the mode:
+**Pattern:** one form component with fields split into tabs; two props pick the mode:
 
 | Mode | Props | What changes |
 | --- | --- | --- |
-| Create, in a modal | no `plantId` | The tabs become steps without tab buttons (`stepper`, `no-header`), bringing their own title, progress line and Back, Next and Add plant (`stepper-controls`). Next checks the step's fields. The whole model is sent once, at the end (`full-payload`). |
-| Edit, in a modal | `plantId` | The tabs get their buttons. Only the changed fields are sent, on Save. |
-| Edit, on a page | `plantId`, `async` | Every tab is shown under its title (`flat`). Each field saves when it changes. |
+| Create, in a modal | no `plantId` | Tabs become steps without buttons (`stepper`, `no-header`), with their own title, progress line and Back/Next/Add plant (`stepper-controls`). Next validates the step. The whole model is sent at the end (`full-payload`). |
+| Edit, in a modal | `plantId` | Tabs get buttons. Changed fields are sent on Save. |
+| Edit, on a page | `plantId`, `async` | All tabs shown under their titles (`flat`). Each field saves on change. |
 
 The pieces:
 
 | Piece | What it is |
 | --- | --- |
-| A model | `createRestModelApi` with an item query that loads the plant, an `update` action on it, and a `create` action on the list. |
-| The form | A `WUniform` that loads the model with `useQueryFn`, around a `WTabs`, inside a `WModalWrapper` that holds the title and the buttons when editing. |
-| The modal | The form itself, opened with `Modal.add`. The modal's frame places the title and the buttons. |
-| The page | The form with `async`, in a `WSection`. Outside an overlay, `WModalWrapper` lays it out in the flow of the page, without a title or buttons. |
+| A model | `createRestModelApi` with an item query, an `update` action, and a `create` action on the list. |
+| The form | A `WUniform` loading via `useQueryFn`, around a `WTabs`, inside a `WModalWrapper` holding the title and buttons. |
+| The modal | The form itself, opened with `Modal.add`; the frame places title and buttons. |
+| The page | The form with `async` in a `WSection`; outside an overlay, `WModalWrapper` lays out inline without title or buttons. |
 
 <!-- @example recipes/plant-form/PlantEditor page -->
 
@@ -104,16 +104,16 @@ const openModal = (id?: number) => {
 
 <!-- @example-end -->
 
-Pick a plant, change a field and leave it: it saves on its own. Open the same plant in the modal, change it there and save, and the page shows the change. In the tasks, add a row: the list is saved as a whole, with its own Save. Then try Add plant with the fields left empty. The data is in memory here, behind the same model API a real endpoint would use.
+Pick a plant, change a field and leave it — it saves. Edit the same plant in the modal and the page updates. Task rows save as a whole with their own Save. Try Add plant with empty fields. Data is in memory, behind the same model API a real endpoint would use.
 
 ## The code
 
 ### Model
 
-The form uses the plant model from [List with fields](/recipes/list-with-fields), with two more pieces:
+The plant model from [List with fields](/recipes/list-with-fields), plus:
 
-- A `list` query with a `create` action. The action calls `set` to cache the new plant for its item query, and `invalidate` to refetch the lists it may now appear in.
-- A payload type. The API takes the caretaker by id, as most APIs take a related item, so `update` and `create` accept `PlantPayload` rather than `Partial<Plant>`.
+- A `list` query with a `create` action that calls `set` to cache the new plant and `invalidate` to refetch lists.
+- A payload type: the API takes the caretaker by id, so `update` and `create` accept `PlantPayload`, not `Partial<Plant>`.
 
 ```ts
 list: {
@@ -137,28 +137,28 @@ list: {
 
 One `WUniform` holds the model in every mode:
 
-- `useQueryFn` and `queryParams` load the plant. Without a `plantId` the params are `0`, which the item query's `isId` guard holds back, so nothing loads and the form starts blank.
-- `initData` turns the loaded plant into the model the fields edit. It gets `{}` until the plant loads, and when creating, so read every key with a default. This is also where the API's shape and the form's differ: the plant has a caretaker object, the form edits its id.
-- `apiMethod` creates the plant or updates it. `full-payload` is set only when creating, so a create sends every field and an update only the changed ones.
-- `async` comes straight from the prop. Each field then saves on its own when it changes.
+- `useQueryFn` and `queryParams` load the plant. Without `plantId` the params are `0`, which `isId` rejects, so the form starts blank.
+- `initData` maps the plant to the form model. It gets `{}` before loading and when creating, so default every key. It's also where shapes differ: the plant has a caretaker object, the form edits its id.
+- `apiMethod` creates or updates. `full-payload` only when creating, so updates send changed fields only.
+- `async` comes from the prop: each field saves on change.
 
-Inside it, one `WTabs` takes the layout from the mode: `stepper` and `no-header` when creating, `flat` on a page, plain tabs when editing in a modal. Every field is written once and shows up in all three.
+One `WTabs` takes its layout from the mode: `stepper` + `no-header` when creating, `flat` on a page, plain tabs in a modal. Each field is written once.
 
-A stepper checks the fields of a step before it moves on. Invalid ones show their errors, a warning lists them, and the step stays open, so required fields need nothing beyond `required`. A submit checks every step and opens the first one with an error.
+A stepper validates a step before moving on: errors show, a warning lists them, the step stays. `required` is all a field needs. Submit validates every step and opens the first with an error.
 
-The tasks are an array, edited as a nested form with one row per item: `modelValueList` gives each row a stable key, and `select` and `unselect` add and remove rows. On a page, saving each keystroke of a half-typed row would be wrong, so the task list is a form of its own there:
+Tasks are an array edited as a nested form: `modelValueList` gives each row a stable key, `select`/`unselect` add and remove rows. On a page, saving half-typed rows per keystroke would be wrong, so the task list is its own form there:
 
-- `v-bind="{...scope, async: false}"` turns off saving on change, for this form only.
-- `init-data` makes it keep its own copy of the tasks. Its `api-method` only returns the value, and `@success` writes it into the plant's model, which then saves the field as any other.
-- In a modal or a wizard, both are left unset, and the tasks are a part of the plant's form.
+- `v-bind="{...scope, async: false}"` disables save-on-change for this form only.
+- `init-data` keeps its own copy; `api-method` returns the value and `@success` writes it into the plant model, which saves it like any field.
+- In a modal or wizard both are unset, and tasks are part of the plant form.
 
-What the form shows outside its fields comes from two places:
+Title and buttons come from:
 
-- Creating, the stepper brings it with `stepper-controls`: the step's title, a progress line under it, and Close or Back with Next or Add plant (`submit-text`). Add plant checks the last step and submits the `WUniform` around it.
-- Editing, `WModalWrapper` holds the plant's name as the title, and Cancel and Save, built from the `WUniform`'s template ref.
-- With `async`, on a page, there are neither: each field saves on its own.
+- Creating: the stepper's `stepper-controls` — step title, progress line, Close/Back and Next/Add plant (`submit-text`). Add plant validates the last step and submits.
+- Editing: `WModalWrapper` — the plant name as title, and Cancel/Save from the `WUniform`'s template ref.
+- With `async` on a page: neither.
 
-The form does not know where it is shown. The frame it opens in — a modal, or a dropdown and a bottom sheet for a small form — takes the title and the buttons from `WModalWrapper` and places them, pads the fields, and scrolls them between. On a page there is no frame, and `WModalWrapper` lays everything out in place. The `WUniform` tells the frame it is saving, which keeps it open, and that it has unsaved changes, so a modal asks before closing.
+The form doesn't know where it's shown. A frame (modal, or dropdown/bottom sheet for small forms) takes the title and buttons from `WModalWrapper`, pads the fields and scrolls between. On a page, `WModalWrapper` lays out in place. The `WUniform` tells the frame when it's saving (stay open) and has unsaved changes (confirm before close).
 
 <!-- @source docs/examples/recipes/plant-form/PlantForm.vue PlantForm.vue -->
 
@@ -570,25 +570,25 @@ const validatePercent = (value: unknown) => typeof value === 'number' && (value 
 
 ### Opening it
 
-The form is the modal: `Modal.add(markRaw(PlantForm), {plantId, onSaved})`. `saved` passes the saved plant back to whoever opened it — here it opens the new plant on the page — and after a save in an overlay the form emits `close:modal`. Load it with `defineAsyncComponent` where it is only opened, so its code is fetched on first open.
+The form is the modal: `Modal.add(markRaw(PlantForm), {plantId, onSaved})`. `saved` returns the plant to the opener (here, to open it on the page); after saving in an overlay the form emits `close:modal`. Use `defineAsyncComponent` so its code loads on first open.
 
-The steps belong to the form, which also renders them as tabs and on a page, so the form keeps them in its own `WTabs` rather than in a modal's. With `stepper-controls` the stepper hands its title, progress and buttons to the frame only while it is one; as tabs and on a page it has none.
+Steps belong to the form's own `WTabs`, not the modal's, since the form also renders them as tabs and on a page. `stepper-controls` hands title, progress and buttons to the frame only in stepper mode.
 
 ### The page
 
-On a page, the form is all there is, in a section of the page: `<WSection><PlantForm :plant-id="id" async /></WSection>`. Everything shown on the page and in the modal comes from the same item query, so a save in one updates the other through the cache. A field changed but not yet saved keeps its value when another one is saved.
+On a page: `<WSection><PlantForm :plant-id="id" async /></WSection>`. Page and modal read the same item query, so a save in one updates the other. Unsaved field values survive another field's save.
 
 ## Why it is built this way
 
-- **One set of fields.** A field, its validation and its control are written once. The modes differ only in layout and in when the model is sent, and both come from props on `WTabs` and `WUniform`.
-- **The frame places the form's parts.** The form renders its title and buttons once, in `WModalWrapper`, and does not know where it is shown. A modal, a dropdown, a bottom sheet and a page each put them where their layout needs, with their own padding.
-- **The cache is the shared state.** The form loads the plant with the item query, and the model's actions write to it. Every open view of the plant stays current without passing data around.
-- **The form edits its own shape.** `initData` turns the API's plant into what the controls need, and the payload is shaped back the way the API takes it.
+- **One set of fields.** Fields, validation and controls are written once; modes differ only in layout and send timing, both set by props on `WTabs` and `WUniform`.
+- **The frame places the form's parts.** Title and buttons render once in `WModalWrapper`; each frame positions and pads them.
+- **The cache is the shared state.** Every open view of the plant stays current without passing data.
+- **The form edits its own shape.** `initData` maps API to form; the payload maps back.
 
 ## Variations
 
-- **Pick a template first**: a first step with cards for common setups calls `scope.initModel(preset)` and then `next()`, so the next steps start from the preset.
-- **Save in the middle of the wizard**: `requireSave` on a step submits the form before moving past it, e.g. when a later step needs the saved id. After that save, the form updates the item it created: build the id from `plantId` or the saved model's id, and pass `full-payload` only while neither exists.
-- **Side tabs**: `side` on `WTabs` puts the tab buttons in a column, for a form with many tabs in a wide modal.
-- **Read-only users**: pass `readonly` to the form, or provide it for the whole page with `useProvideReadonly`.
-- **From the list**: a row menu item that opens `PlantForm` with the row's id edits the plant from [the list](/recipes/list-with-fields), and the list's row updates from the cache.
+- **Pick a template first**: a first step with preset cards calls `scope.initModel(preset)` then `next()`.
+- **Save mid-wizard**: `requireSave` on a step submits before moving on, e.g. when a later step needs the id. Afterwards the form updates the created item: build the id from `plantId` or the saved model's id, and pass `full-payload` only while neither exists.
+- **Side tabs**: `side` on `WTabs` stacks the tab buttons in a column for wide modals.
+- **Read-only users**: pass `readonly`, or provide it page-wide with `useProvideReadonly`.
+- **From the list**: a row menu item opening `PlantForm` with the row's id; the row updates from the cache.

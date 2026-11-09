@@ -6,20 +6,20 @@ description: Theme eco-vue-js with a palette, color roles and w-* CSS variables 
 
 # Theming
 
-The kit's look comes from three kinds of CSS variables:
+The kit's look comes from CSS variables:
 
-- **Palette** — a primary color, four status colors, a neutral `gray-*` scale, the page background and text, and fonts. They are Tailwind theme tokens: an app overrides them in its own `@theme`.
-- **Color roles** — what components actually paint with, named by purpose: main and muted text, surfaces, lines, focus. Each reads the palette by default, and an app can set any of them in `@theme` too.
-- **`w-*` variables** — sizes and radii of fields, buttons and list headers. An app sets them on `body`, directly or with the matching utilities (`w-input-h-9`, `w-button-rounded-xl`).
-- **Layout style** — how content is contained: flat, card or glass ([Layout styles](#layout-styles)). It is a set of the variables above, which the playground writes out.
-- **Overlays** — the material of what floats over the page: frosted or lens glass ([Overlays](#overlays)). It is a set of variables too.
+- **Palette** — primary, four status colors, a neutral `gray-*` scale, page background, text and fonts. Tailwind theme tokens, overridden in the app's `@theme`.
+- **Color roles** — what components paint with, named by purpose: text, surfaces, lines, focus. Each defaults to a palette color; override in `@theme`.
+- **`w-*` variables** — sizes and radii of fields, buttons and list headers. Set on `body`, directly or with utilities (`w-input-h-9`, `w-button-rounded-xl`).
+- **Layout style** — flat, card or glass containers ([Layout styles](#layout-styles)).
+- **Overlays** — frosted or lens glass for floating UI ([Overlays](#overlays)).
 
-All are plain CSS variables at runtime, so this site can swap them live: the whole site follows the playground below, including the header and every component page.
+They are plain CSS variables at runtime, so this whole site follows the playground below.
 
-- **The theme in use** is at the top, with what to do with it. **Save as…** keeps it under a name in this browser; changes to a saved theme are saved into it as you make them, and the palette button in the header switches to it from any page. **Copy link** shares it: the link opens this page with the theme applied, and adds it to the other person's themes when it is a saved one. **Copy CSS** gives the stylesheet for an app.
-- **Presets** are starting points, and **My themes** lists the saved ones. **Random** picks a primary color, status colors (negative, positive, warning, info) in the same style and weight, the neutral scale, size and radius that suit them, and a dark mode background that fits the style — lifted for Soft, almost black for Neon, whose shadows also glow in its primary — each at a lightness that passes the kit's contrast checks in both modes. A fill with black text can be bright, like warning, and goes brightest in Neon. A yellow or lime primary always is one, and the status colors turn bright with it. Bright fills stand out from a white page less than darker fills do, so their text and the focus ring are darkened to stay readable.
-- **Ask an AI assistant** describes a look in words: it opens Claude or ChatGPT with a prompt that explains the tokens, or copies it for another assistant. The reply gives the theme as JSON and as a link; paste either one, or the whole reply, into the field below the buttons.
-- **The fields below** adjust each token of the theme in use.
+- **The theme in use** is at the top. **Save as…** stores it in this browser (later changes save into it; the palette button in the header switches to it from any page). **Copy link** shares it — a saved theme is added to the recipient's themes. **Copy CSS** gives the stylesheet for an app.
+- **Presets** are starting points; **My themes** lists saved ones. **Random** picks a primary, matching status colors, a neutral scale, size, radius and dark background, all passing the kit's contrast checks in both modes. Bright fills (warning, or a yellow/lime primary) get black text, and their text shades and focus ring are darkened to stay readable on white.
+- **Ask an AI assistant** opens Claude or ChatGPT with a prompt explaining the tokens, or copies it. Paste the reply (JSON, link or the whole text) into the field below the buttons.
+- **The fields below** edit each token.
 
 <ClientOnly>
   <ThemePlayground />
@@ -45,19 +45,19 @@ All are plain CSS variables at runtime, so this site can swap them live: the who
 
 ## Layout styles
 
-A page holds two kinds of containers: a **section** ([WSection](/components/surface), `surface-section`) is a page-level area, such as a list, a form or a settings group, and a **card** ([WCard](/components/surface), `surface-card`) is a block that shows in every style, such as a tile or a stat. The layout style decides how they and the header, nav and actions bar look:
+A **section** ([WSection](/components/surface), `surface-section`) is a page-level area — a list, a form, a settings group. A **card** ([WCard](/components/surface), `surface-card`) is a block that shows in every style — a tile, a stat. The layout style sets how they and the bars look:
 
-- **Flat**, the default: sections paint nothing and their content sits on the page, cards are filled one step off the page, and the bars are docked to the screen edges.
-- **Card**: the page background (the canvas) is a step darker than the surface, sections and cards are surfaces on it with a radius and a light shadow, and the bars float as cards a gap off the screen edges.
-- **Glass**: as card, but sections, cards and bars are translucent over a canvas tinted with the primary color and a soft gradient of it and two data hues, and blur what is behind them.
+- **Flat** (default): sections paint nothing, cards are one step off the page, bars dock to the screen edges.
+- **Card**: the canvas is a step darker than the surface; sections and cards are rounded, lightly shadowed surfaces; bars float off the edges.
+- **Glass**: as card, but translucent and blurred over a canvas tinted with the primary and two data hues.
 
 <ClientOnly>
   <ThemeLayoutPreview />
 </ClientOnly>
 
-Switch this site to one here, or from the theme menu in the header; the switch overrides only the theme's `layout`, and picking the preset again goes back to its own. Its radii and the bars' gap can be adjusted under **Layout** in the playground. The canvas is set under **Page background**: its color in either mode, the three colors of the glass gradient (the primary and two data hues by default; Randomize picks them for a glass theme) and a grain over it, in any style. On phones the bars dock and sections span the screen in every style.
+Switch here or from the theme menu in the header; this overrides only the theme's `layout`. Radii and the bar gap are under **Layout** in the playground; canvas color, glass gradient and grain under **Page background**. On phones, bars dock and sections span the screen in every style.
 
-Card and glass ship with the kit: put `class="w-layout-card"` or `class="w-layout-glass"` on `<html>` and the app gets the style's tokens, kept in step with the kit's own. The CSS the playground gives then holds only what a theme changes on top of the style; a role the style sets goes on `:root` there, not in `@theme`, so it wins over the class.
+Card and glass ship with the kit: put `class="w-layout-card"` or `class="w-layout-glass"` on `<html>`. The playground's CSS then holds only what the theme changes on top; roles the style sets go on `:root`, not `@theme`, so they win over the class.
 
 <div class="vp-raw max-w-80">
   <ClientOnly>
@@ -65,14 +65,14 @@ Card and glass ship with the kit: put `class="w-layout-card"` or `class="w-layou
   </ClientOnly>
 </div>
 
-What follows the switch on this site is what an app gets from the containers, with no code of its own per style:
+On this site, with no per-style code:
 
-- **The bars**: the header and the nav are WHeaderBar and WNavBar, docked in flat and floating in card and glass.
-- **Docs pages**: a page is a stack of sections, one per heading and one per example (the demo with its code under it), and the outline is another. In flat they run together into one column as before; in card and glass they are separate surfaces on the canvas.
-- **The home page**: the hero's forms and the gallery's tiles are cards, and the footer is a section.
-- **A list page**: the [List page](/recipes/list-page) recipe ends in a list that scrolls with the window, which draws its own section.
+- **Bars**: WHeaderBar and WNavBar, docked in flat, floating in card and glass.
+- **Docs pages**: a stack of sections — one per heading, one per example, one for the outline. Flat runs them into one column; card and glass separate them.
+- **Home page**: hero forms and gallery tiles are cards, the footer a section.
+- **List page**: the [List page](/recipes/list-page) recipe's window-scrolling list draws its own section.
 
-What paints the surface inside a container, such as sticky list columns, striped rows and soft tones, follows it, and a list that scrolls with the page draws its own section. The contrast checks hold in every container and style, measured against the color a section or card ends up as over the canvas; for glass that is over the plain canvas and over each spot of its gradient. The canvas itself is checked for main text only: in card and glass it carries the page's headings, and everything else goes in a section or a card.
+Surfaces inside a container (sticky columns, striped rows, soft tones) follow it. Contrast checks run against the final section or card color over the canvas — for glass, over each spot of the gradient. The canvas is checked for main text only, since everything else sits in a section or card.
 
 ## In an app
 
@@ -95,23 +95,23 @@ body {
 }
 ```
 
-Only changed colors are listed, but every `w-*` variable is: this site sets its own sizes, and an app without them gets the kit's defaults instead (in the [shape table](#shape)). A card or glass layout adds its roles to `@theme`, its variables to `body`, and two rules after it: the bars dock on phones, and the page doesn't bounce sideways, which would move it but not the backgrounds that repaint a page list's section.
+Only changed colors are listed, but every `w-*` variable is, since this site's sizes differ from the kit's defaults ([shape table](#shape)). Card and glass add their roles to `@theme`, variables to `body`, and two rules: bars dock on phones, and the page doesn't bounce sideways.
 
 ### Light and dark mode
 
-A color named `X` is its value in light mode and `X-dark` its value in dark mode — not a darker shade. The status colors and primary default their `-dark` to the light value, which works when the color is a mid-tone: dark enough for white text, light enough to stand out on a dark page. Set `-dark` when one value can't do both, as the `compact` preset does with a near-black primary that turns light gray in dark mode.
+`X` is a color's light-mode value and `X-dark` its dark-mode value — not a darker shade. Primary and status colors default `-dark` to the light value, which works for mid-tones. Set `-dark` when one value can't serve both, as `compact` does with a near-black primary.
 
-Swapping the neutral scale in the playground also sets the dark page background, `default-dark`, to the scale's `gray-900`, so both modes take its tint. In an app, set `default-dark` alongside the scale: the kit keeps it fixed, since some apps use it and `gray-900` as two different surfaces.
+Swapping the neutral scale in the playground also sets `default-dark` to the scale's `gray-900`. In an app, set `default-dark` yourself — the kit keeps it fixed, since some apps use it and `gray-900` as different surfaces.
 
 ### Tones
 
-The palette gives one color per tone, the fill. Everything else a tone needs is derived from it in the current mode:
+The palette gives one color per tone, the fill. The rest is derived per mode:
 
-- **Text and borders** on the page — the fill's lightness clamped to stay readable: at most 53% in light mode, at least 72% in dark.
-- **Text on the fill** — black or white, whichever reads better by APCA, so a saturated purple or blue keeps white text where WCAG 2 would pick black.
-- **Soft background** — 12% of the fill over the surface, as in info cards.
+- **Text and borders** — the fill's lightness clamped: at most 53% in light mode, at least 72% in dark.
+- **Text on the fill** — black or white by APCA, so saturated purples and blues keep white text.
+- **Soft background** — 12% of the fill over the surface.
 
-So a light brand color still gives readable links on white, and a yellow fill gets black text, without extra tokens. To pin one of them, set `--tone-text-{name}`, `--tone-line-{name}`, `--tone-on-{name}` or `--tone-soft-{name}` in an `@theme inline` block — for example `--tone-on-warning: var(--color-black-default)`.
+To pin one, set `--tone-text-{name}`, `--tone-line-{name}`, `--tone-on-{name}` or `--tone-soft-{name}` in `@theme inline` — e.g. `--tone-on-warning: var(--color-black-default)`.
 
 ### Roles
 
@@ -136,7 +136,7 @@ So a light brand color still gives readable links on white, and a yellow fill ge
 | `focus` | `border-focus`, `outline-focus` | `primary` / `primary-dark` | Focused field border and ring |
 | `gradient-start`, `gradient-middle`, `gradient-end` | `from-gradient-start via-gradient-middle to-gradient-end` | `primary`, turned 30° and 60° towards pink / the same from `primary-dark` | The brand gradient |
 
-A theme sets a role with `--role-{name}` and `--role-{name}-dark` in `@theme`:
+Set a role with `--role-{name}` and `--role-{name}-dark` in `@theme`:
 
 ```css
 @theme {
@@ -145,7 +145,7 @@ A theme sets a role with `--role-{name}` and `--role-{name}-dark` in `@theme`:
 }
 ```
 
-The shadow's color is a role too, and `--w-shadow-lift` sets how far it falls: `0` centers it, so a theme can turn every `shadow-md` into a glow:
+`--w-shadow-lift` sets how far the shadow falls; `0` centers it, turning `shadow-md` into a glow:
 
 ```css
 @theme {
@@ -157,7 +157,7 @@ body {
 }
 ```
 
-On a dark page a glow shows about as bright as its alpha times its color's lightness, so a yellow or cyan glows much brighter than a purple at the same share. Dividing the alpha by the lightness evens that out — this matches 45% at lightness 0.6 for every hue:
+On a dark page a glow's brightness is roughly alpha × lightness, so yellow glows brighter than purple. Divide the alpha by the lightness to even it out — this matches 45% at lightness 0.6 for every hue:
 
 ```css
 @theme {
@@ -167,9 +167,9 @@ On a dark page a glow shows about as bright as its alpha times its color's light
 
 ### Data palette
 
-Categories — chart series, plant kinds, syntax colors — take the kit's data hues: `data-red`, `data-orange`, `data-amber`, `data-green`, `data-teal`, `data-cyan`, `data-blue`, `data-violet`, `data-fuchsia`, `data-pink` and `data-gray`. They are mid-tones like the status colors, so each works as a tone in both modes without `-dark` values (the Preview above shows them as fills and as soft chips).
+Categories — chart series, kinds, syntax colors — use the data hues: `data-red`, `data-orange`, `data-amber`, `data-green`, `data-teal`, `data-cyan`, `data-blue`, `data-violet`, `data-fuchsia`, `data-pink` and `data-gray`. They are mid-tones, so each works as a tone in both modes without `-dark` values.
 
-An app names its categories after them, so a theme that retunes the palette retunes the categories too:
+Name categories after them, so retuning the palette retunes the categories:
 
 ```css
 @theme {
@@ -185,7 +185,7 @@ An app names its categories after them, so a theme that retunes the palette retu
 
 ### In app code
 
-Components use the same classes, and app code should too: a color written as a role or a tone follows the theme and the mode by itself, with no `dark:` pair.
+App code should use the same classes: roles and tones follow theme and mode with no `dark:` pair.
 
 ```html
 <!-- muted text and a divider -->
@@ -210,21 +210,21 @@ Components use the same classes, and app code should too: a color written as a r
 | --- | --- |
 | `tone-{name}` | Sets the tone for the element and its children: `primary`, `negative`, `positive`, `warning`, `info`, any theme color (`tone-kind-fern`) or an arbitrary one (`tone-[#0f766e]`) |
 | `text-tone` | The tone's readable shade, for text and icons on the page |
-| `border-tone-line` | The tone's shade for borders and outlines on the page — nearer the fill than `text-tone`, as lines need less contrast than text |
+| `border-tone-line` | The tone's shade for borders — nearer the fill than `text-tone` |
 | `bg-tone-fill`, `border-tone-fill`, `text-tone-on` | The fill, and the text that goes on it |
 | `bg-tone-soft` | The tone's soft background |
-| `surface-fill` | Fill background; `text-accent`, `text-description`, `text-subtle` and lines inside switch to the text-on-fill color |
+| `surface-fill` | Fill background; roles inside switch to the text-on-fill color |
 | `surface-soft` | Soft background; roles inside stay as they are |
 | `surface-muted` | Muted background; a soft tone set inside it mixes over it |
-| `surface-raised` | Dropdown or popover background; a soft tone and `bg-surface` inside it follow it |
-| `surface` | Page background and text, and resets roles a scope outside changed |
-| `light`, `dark` | Forces a mode for the element and its children, as tooltips do with `dark` |
+| `surface-raised` | Dropdown background; soft tones and `bg-surface` inside follow it |
+| `surface` | Page background and text; resets roles changed by an outer scope |
+| `light`, `dark` | Forces a mode for the subtree, as tooltips do with `dark` |
 
 Roles take opacity like any color: `bg-surface-muted/50`, `outline-focus/20`.
 
 ### Migrating `dark:` pairs
 
-The kit ships a codemod that rewrites light/dark palette pairs in an app's class strings to roles and tones:
+A codemod rewrites light/dark palette pairs in class strings to roles and tones:
 
 ```sh
 npx eco-vue-color-roles                      # report what it would change in src/
@@ -232,7 +232,7 @@ npx eco-vue-color-roles --write src          # apply
 npx eco-vue-color-roles --exact --write src  # only replacements that render the same colors
 ```
 
-Without `--exact` it also moves near-duplicate grays to the role the kit uses and tone text to the readable shade derived from the fill. It ends with the pairs it found no role for, most frequent first. A frequent one usually means the app's surface or line differs from the kit's default. Set it as a role in the app's theme, then run again with `--theme`, so those pairs map too:
+Without `--exact` it also maps near-duplicate grays to roles and tone text to the derived shade. It ends by listing unmapped pairs, most frequent first — a frequent one usually means the app's surface or line differs from the kit's. Set it as a role in the theme and rerun with `--theme`:
 
 ```css
 @theme {
@@ -246,18 +246,18 @@ npx eco-vue-color-roles --theme src/assets/styles/index.css --write src
 
 ## Theme links
 
-A link to any page of this site can carry a theme in a `theme` query parameter. Opening it applies the theme, keeps it in the browser like one picked here, and drops the parameter from the address. **Copy link** above makes one for this page.
+Any page of this site accepts a `theme` query parameter. Opening it applies and keeps the theme, then drops the parameter. **Copy link** above makes one.
 
-The parameter is a preset id, or a URL-encoded JSON object of tokens, with an optional `preset` the tokens override:
+The value is a preset id, or URL-encoded JSON of tokens with an optional `preset` to override:
 
 ```
 https://rsmple.github.io/eco-vue-js/guide/theming?theme=ocean
 https://rsmple.github.io/eco-vue-js/components/select?theme={"preset":"compact","color-primary":"#e11d48","neutral":"stone"}
 ```
 
-Encode the JSON with `encodeURIComponent` when building a link in code; browsers accept it unencoded when typed. Keys are the variable names without `--`, plus `neutral`, which takes a scale name: `zinc`, `slate`, `gray`, `neutral` or `stone`, `layout`: `flat`, `card` or `glass`, and `overlay`: `frosted` or `lens`. An optional `name` saves the theme among the opener's themes under that name, numbered when it is taken; opening a theme that is saved already switches to it instead of saving a copy. Unknown keys are ignored, and so are values with `;`, `{`, `}`, `<`, `>`, `\`, `url(` or `@import`. Colors take any CSS color syntax, including `var(--color-gray-400)`; sizes any CSS length. Radii double as side padding, so a pill shape is half the height (`1.125rem` for `2.25rem`), not `9999px`.
+Encode with `encodeURIComponent` (browsers accept it unencoded when typed). Keys are variable names without `--`, plus `neutral` (`zinc`, `slate`, `gray`, `neutral`, `stone`), `layout` (`flat`, `card`, `glass`) and `overlay` (`frosted`, `lens`). An optional `name` saves it to the opener's themes, numbered if taken; an already-saved theme is switched to, not copied. Unknown keys are ignored, as are values containing `;`, `{`, `}`, `<`, `>`, `\`, `url(` or `@import`. Colors take any CSS color syntax, sizes any length. Radii double as side padding, so a pill is half the height (`1.125rem` for `2.25rem`), not `9999px`.
 
-To make a theme from a description — "a warm, rounded theme for a finance dashboard" — pick a neutral scale and a primary, adjust status colors only where they clash with it, and link to the page the theme should be seen on, or to this one to keep editing it. Mid-tone fills (OKLCH lightness 50–58%) work in both modes without `-dark` values.
+To build a theme from a description ("warm, rounded, for a finance dashboard"): pick a neutral scale and a primary, adjust status colors only where they clash, and link to the page it should be seen on. Mid-tone fills (OKLCH lightness 50–58%) need no `-dark` values.
 
 ### Presets
 
@@ -318,9 +318,9 @@ To make a theme from a description — "a warm, rounded theme for a finance dash
 | `w-chrome-gap` | `0px` | `0.75rem` | Between the floating bars, the screen edges and the page; `0px` on phones |
 | `w-chrome-rounded` | `0px` | `1rem` | Radius of the floating header, nav and actions bar; docked bars stay square |
 
-A layout also sets the canvas and card roles (`role-canvas`, `role-card`) and the `w-section-*`, `w-card-*` and `w-chrome-*` opacity, edge, shadow and blur variables; **Copy CSS** lists them.
+A layout also sets `role-canvas`, `role-card` and the `w-section-*`, `w-card-*` and `w-chrome-*` opacity, edge, shadow and blur variables; **Copy CSS** lists them.
 
-Dropdowns and popovers, the bottom sheets that stand in for them on phones, and notifications follow the cards: they take `w-card-backdrop` as their blur, and `w-card-opacity` halfway to opaque, since they lie over content rather than the page background. Glass cards at `0.4` make dropdowns at `0.7`; flat and card stay opaque. A theme sets `w-dropdown-opacity` and `w-dropdown-backdrop` to change them on their own.
+Dropdowns, their phone bottom sheets and notifications take `w-card-backdrop` and `w-card-opacity` halfway to opaque (glass `0.4` → `0.7`; flat and card stay opaque). Override with `w-dropdown-opacity` and `w-dropdown-backdrop`.
 
 ### Overlays
 
@@ -328,23 +328,23 @@ Dropdowns and popovers, the bottom sheets that stand in for them on phones, and 
 | --- | --- | --- | --- |
 | `overlay` | `frosted` | `lens` | The material of dropdowns, menus, notifications and the bars, and with it the variables below |
 
-**Frosted** is the default: what floats over the page blurs what is behind it as the layout sets, as above. **Lens** makes it lens glass: the page bends along the rim as through a lens, a little magnified in the middle, and the edge catches light. It takes in dropdowns and popovers, the bottom sheets that stand in for them on phones, the nav's group menus, notifications, and WHeaderBar, WNavBar and WActionsBar. It works in any layout and shows most in glass, where there is color behind the bars to bend. Dropdowns and floating bars are rounder in it, for the rim to bend more of the page, and in card and glass the bars float on phones too, as a pill off the screen edges, where they dock otherwise. Where one glass covers another, such as a notification over the header, only the one on top bends the page; a dropdown opened from a floating header opens below it, so the two stay apart. A dropdown's tip can't bend with it, so a bending dropdown has none and sits against what it opened from.
+**Frosted** (default) blurs what is behind, per the layout. **Lens** is a refractive effect similar to Apple's Liquid Glass: it bends the page along the rim, slightly magnifies the middle, and highlights the edge. It applies to dropdowns, their phone bottom sheets, nav group menus, notifications, WHeaderBar, WNavBar and WActionsBar, and shows best in glass. In lens, dropdowns and floating bars are rounder, and in card and glass the bars float on phones as pills. Where glass overlaps glass, only the top one bends; dropdowns from a floating header open below it, and bending dropdowns have no tip.
 
-The bending is an SVG filter in `backdrop-filter`, which only Chromium browsers apply to a backdrop: in Safari and Firefox the edge stays plain, and only the lighter fill and blur below apply. Under the playground's **Layout**, and in the theme menu, **Overlays** switches it, and **Copy CSS** writes out its variables:
+Bending is an SVG `backdrop-filter`, applied only by Chromium; Safari and Firefox get the lighter fill and blur. Switch it with **Overlays** under the playground's **Layout** or in the theme menu; **Copy CSS** writes its variables:
 
 | Variable | Lens | Controls |
 | --- | --- | --- |
-| `w-lens-refraction` | `40` | How far the rim bends the page, in pixels; `0` turns the bending off |
-| `w-lens-bezel` | `28` | How wide the bending rim is, in pixels |
-| `w-lens-magnify` | `0.04` | How much the middle magnifies the page: `0.04` is 4% |
-| `w-lens-dispersion` | `0` | Splits the colors along the rim, as a prism; off, since Chrome blurs it on high-density screens |
-| `w-dropdown-opacity` | `0.4` | The fill of dropdowns and notifications, lighter than frosted so the bending shows |
-| `w-dropdown-backdrop` | `blur(4px) saturate(1.8) brightness(1.1)` | Their blur, light so the page reads through the rim |
-| `w-chrome-opacity` | `0.35` | The fill of the bars |
+| `w-lens-refraction` | `40` | Rim bend in pixels; `0` turns it off |
+| `w-lens-bezel` | `28` | Rim width in pixels |
+| `w-lens-magnify` | `0.04` | Middle magnification: `0.04` is 4% |
+| `w-lens-dispersion` | `0` | Prism-like color split along the rim; off, since Chrome blurs it on high-density screens |
+| `w-dropdown-opacity` | `0.4` | Fill of dropdowns and notifications |
+| `w-dropdown-backdrop` | `blur(4px) saturate(1.8) brightness(1.1)` | Their blur |
+| `w-chrome-opacity` | `0.35` | Fill of the bars |
 | `w-chrome-backdrop` | `blur(2px) saturate(1.8) brightness(1.1)` | The bars' blur |
-| `w-dropdown-rounded` | `1.25rem` | The rounding of dropdowns and popovers |
-| `w-chrome-rounded` | `1.5rem` | The rounding of floating bars; docked ones stay square |
-| `w-chrome-phone-gap` | `0.5rem` | How far the bars float off the screen edges on phones, in card and glass |
-| `w-chrome-phone-rounded` | `1.75rem` | The bars' rounding on phones |
+| `w-dropdown-rounded` | `1.25rem` | Radius of dropdowns and popovers |
+| `w-chrome-rounded` | `1.5rem` | Radius of floating bars; docked ones stay square |
+| `w-chrome-phone-gap` | `0.5rem` | Bar gap from the screen edges on phones, in card and glass |
+| `w-chrome-phone-rounded` | `1.75rem` | Bar radius on phones |
 
-The kit has more `w-*` variables for single components, such as `w-list-padding` and `w-modal-wrapper-rounded`; the playground covers the ones that shape the whole app.
+More `w-*` variables exist for single components (`w-list-padding`, `w-modal-wrapper-rounded`); the playground covers the app-wide ones.

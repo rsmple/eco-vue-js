@@ -5,9 +5,9 @@ description: WCounter — a round badge with a number in compact notation, which
 
 # Counter
 
-`WCounter` is a round badge with a number, usually pinned to the corner of a button or a nav item. Large numbers are shortened, 1234 to 1.2K. It shakes when the count changes and is at least `trigger` — 2 by default, so a single item doesn't draw attention.
+`WCounter` is a round number badge, usually pinned to a button or nav item corner. Large numbers shorten (1234 → 1.2K). It shakes when the count changes and is at least `trigger` (default 2, so a single item stays quiet).
 
-It takes a `semanticType` for its color, from the same map as [WChip](/components/chip). The counter is sized in `em`, so a text size class sets its size. [WButtonAction](/components/actions-bar#action-buttons) and [WNavItem](/components/nav-bar) have a `counter` or `count` of their own.
+`semanticType` colors it, from the same map as [WChip](/components/chip). It's sized in `em`, so a text size class scales it. [WButtonAction](/components/actions-bar#action-buttons) and [WNavItem](/components/nav-bar) have their own `counter` or `count`.
 
 <!-- @example Counter/Basic -->
 

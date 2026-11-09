@@ -5,19 +5,19 @@ description: WActionsBar, WActionsBarFilter and WButtonAction — the app's bar 
 
 # Actions bar
 
-`WActionsBar` is the bar of icon buttons on the right of the [app shell](/guide/app-shell). It is `position: fixed`, `--w-actions-bar-width` wide, and takes `--actions-bar-width` in layout from `sm` up; on phones it is off-screen, and apps slide it in together with the open nav. Its class `w-actions-bar` is the hook for the app's surface and shadow.
+`WActionsBar` is the [app shell](/guide/app-shell)'s right bar of icon buttons: `position: fixed`, `--w-actions-bar-width` wide, taking `--actions-bar-width` from `sm`. On phones it's off-screen and slides in with the open nav. `w-actions-bar` is the hook for the app's surface and shadow.
 
-Buttons go in the `top` and `bottom` slots — the filter button sits between them — and settings, such as a [theme toggle](/components/toggle#theme-toggle), in `footer` at the bottom.
+Buttons go in `top` and `bottom` (the filter button sits between); settings like a [theme toggle](/components/toggle#theme-toggle) go in `footer`.
 
 ## Action buttons
 
-`WButtonAction` is the icon button of the actions bar. `title` names it in a tooltip, or under the icon with `titleText`, and for screen readers. It is a router link with `to`, an external link with `tag="a"` and `href`, and a button otherwise. `count` adds a badge, `active` colors the icon for a toggle that is on, and `loading` runs a shimmer while its action is in progress.
+`WButtonAction` is the bar's icon button. `title` labels it in a tooltip (or under the icon with `titleText`) and for screen readers. A router link with `to`, a link with `tag="a"` + `href`, else a button. `count` adds a badge, `active` highlights a toggle, `loading` shimmers.
 
 ## Filters
 
-`WActionsBarFilter` lets a page put its filters into the bar. Its default slot becomes a panel that slides out of the bar, and the bar gets a filter button with the `count` prop as its badge — titled by the bar's `textFilter`, which also heads the panel. The panel is `--actions-bar-filter-width` wide from `sm` up, and covers the screen next to the bar on phones. It renders nothing where it is placed, and takes the panel out of the bar when the page unmounts.
+`WActionsBarFilter` lets a page put filters in the bar: its slot becomes a sliding panel, and the bar gets a filter button badged with `count`, titled by the bar's `textFilter` (also the panel heading). `--actions-bar-filter-width` wide from `sm`; full screen beside the bar on phones. Renders nothing in place; cleans up on unmount.
 
-In the demo, the bar is fixed to the frame instead of the window. Click the filter button to slide out the panel.
+The demo's bar is fixed to the frame, not the window. Click the filter button.
 
 <!-- @example ActionsBar/Basic client -->
 

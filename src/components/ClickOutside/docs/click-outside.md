@@ -5,9 +5,9 @@ description: WClickOutside — emits click on a click or right-click anywhere ou
 
 # Click outside
 
-`WClickOutside` wraps content in a `div` and emits `click` on a click or right-click anywhere outside it — to close a custom dropdown, or to finish editing in place. The click that mounted it doesn't count, so it can wrap content that a click just opened. `noFilter` emits on clicks inside too.
+`WClickOutside` wraps content in a `div` and emits `click` on any click or right-click outside it — to close a custom dropdown or finish in-place editing. The click that mounted it is ignored. `noFilter` emits on inside clicks too.
 
-[WDropdownMenu](/components/dropdown-menu#custom-dropdown) leaves its state to the parent, which usually closes it with a `WClickOutside` around the content.
+[WDropdownMenu](/components/dropdown-menu#custom-dropdown) is stateless; the parent usually closes it with a `WClickOutside` around the content.
 
 <!-- @example ClickOutside/Basic -->
 

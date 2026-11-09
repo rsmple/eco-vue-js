@@ -5,7 +5,7 @@ description: WTabs and WTabsItem — tabbed content with icons, counters and dis
 
 # Tabs
 
-`WTabs` takes `WTabsItem` children and renders a header of tab buttons above the active tab's content. Each item needs a unique `name`; `title`, `icon` and `count` go on its button, the count as a badge. `divider` draws a line under the buttons. The first tab opens unless `initTab`, `initTabIndex` or an item's `init` says otherwise.
+`WTabs` renders a header of tab buttons for its `WTabsItem` children above the active tab's content. Each item needs a unique `name`; `title`, `icon` and `count` (a badge) go on its button. `divider` draws a line under the buttons. The first tab opens unless `initTab`, `initTabIndex` or an item's `init` says otherwise.
 
 <!-- @example Tabs/Basic overflowHidden -->
 
@@ -74,15 +74,15 @@ const current = ref('security')
 
 <!-- @example-end -->
 
-Switching slides the content in from the side of the new tab, and the content area keeps the height of the tallest tab opened so far, so what's below it doesn't jump — `disableMinHeight` turns that off, `lessTransitions` fades instead of sliding.
+Content slides in from the new tab's side, and the area keeps the tallest height seen so far so content below doesn't jump. `disableMinHeight` turns that off; `lessTransitions` fades instead.
 
-The slide moves content its full width plus `--inner-margin` past the edge of the tabs, and WTabs doesn't clip it: the container decides where it shows. Spanning the page, the content slides in from the screen edge. Inside a card, a modal or a column, give the container `overflow-x-clip` — unlike `overflow-hidden`, it keeps sticky elements inside working. A header wider than its space scrolls sideways and keeps the active tab in view.
+The slide travels the full width plus `--inner-margin`, unclipped — the container decides visibility. On a full-width page it slides from the screen edge; inside a card, modal or column, give the container `overflow-x-clip` (unlike `overflow-hidden`, it keeps sticky children working). An overflowing header scrolls sideways, keeping the active tab in view.
 
-`update:current` and `update:current-index` emit the active tab, and `update:current-title` its title — for putting it in a page header when the tabs' own header is hidden with `noHeader`. To switch from code, call `updateCurrent(name)` or `updateIndex(index)` on a template ref. The first `update:current` comes during setup, so when the parent shows the current tab, seed it and pass it as `initTab`, as the demo does — otherwise a server-rendered page shows a different value than the first client render.
+`update:current` and `update:current-index` emit the active tab, `update:current-title` its title (e.g. for a page header when `noHeader` hides the tabs' own). Switch from code with `updateCurrent(name)` or `updateIndex(index)` on a template ref. The first `update:current` fires during setup, so if the parent displays the current tab, seed it and pass it as `initTab` — otherwise SSR and the first client render disagree.
 
 ## Tabs as routes
 
-Give each `WTabsItem` a `to`, and the route opens the tab: the one whose location has the current route's path, whatever the query and hash. The tab buttons become links that replace the history entry, so Back leaves the page instead of stepping through tabs, and they open in a new browser tab on a middle click. Anything else that links to a tab's location — a summary card above the tabs, say, with filters in the query — switches to it, and `updateCurrent` navigates. `initTab` is only used when no tab matches the route.
+Give each `WTabsItem` a `to`: the tab whose location matches the current route's path (ignoring query and hash) opens. Buttons become links that replace the history entry (Back leaves the page) and open in a new tab on middle click. Any other link to a tab's location switches to it, and `updateCurrent` navigates. `initTab` applies only when no tab matches.
 
 ```vue
 <WTabs>
@@ -93,7 +93,7 @@ Give each `WTabsItem` a `to`, and the route opens the tab: the one whose locatio
 
 ## Closable and added tabs
 
-A tab with a `close` listener gets a close button. Children that aren't `WTabsItem` render in the header after the tab buttons, which is where an add button goes; `switchToNew` opens a tab as soon as it is added. When the active tab is removed, the one before it opens.
+A tab with a `close` listener gets a close button. Non-`WTabsItem` children render in the header after the buttons — put an add button there; `switchToNew` opens added tabs. Removing the active tab opens the previous one.
 
 <!-- @example Tabs/Closable overflowHidden -->
 
@@ -155,7 +155,7 @@ const remove = (id: number) => {
 
 ## Side layout
 
-`side` puts the tab buttons in a column to the left of the content, `w-tabs-side-width-*` sets the column's maximum width. On phones the column and the content become two full-width screens side by side, and picking a tab scrolls to its content.
+`side` puts the buttons in a column left of the content; `w-tabs-side-width-*` caps its width. On phones, column and content become two full-width screens side by side, and picking a tab scrolls to its content.
 
 <!-- @example Tabs/Side -->
 
@@ -208,17 +208,17 @@ import IconUser from 'eco-vue-js/dist/assets/icons/IconUser'
 
 <!-- @example-end -->
 
-`WButtonTab` is the tab button on its own, for a button among the tab buttons that isn't a tab — such as "New chat" at the top of a side column of chats. With `side` it lines up with the side column's buttons; `title`, `icon` and `count` show as on a tab, and it emits `click`.
+`WButtonTab` is a standalone tab button for non-tab actions among the tabs, like "New chat" atop a side column. It aligns with `side` columns, shows `title`, `icon` and `count`, and emits `click`.
 
-`WTabsColumns` shows its `WTabsItem` items as tabs on phones and as columns side by side from `sm` up, e.g. for the two halves of a form in a modal.
+`WTabsColumns` shows its items as tabs on phones and side-by-side columns from `sm`, e.g. for a form's two halves in a modal.
 
 ## Tabs in forms
 
-An item's `hasError`, `hasChanges` and `hasValue` mark its button — `statusIcon` shows them as icons, `showHasValue` marks tabs with a value. When a tab gets an error while another is open, the tabs switch to it; `noSwitchOnInvalid` turns that off. Inside a Uniform form the tab items pick these states up from their fields on their own.
+An item's `hasError`, `hasChanges` and `hasValue` mark its button; `statusIcon` shows them as icons, `showHasValue` marks tabs with a value. A tab that gets an error while another is open is switched to, unless `noSwitchOnInvalid`. Inside a Uniform form, items pick these states up from their fields.
 
-`stepper` turns the tabs into steps: the tabs after the first one with `hasValue` set to `false` are disabled, and `next()`, `previous()` and `jump(name)` on a template ref move between steps. Before `next()` and `jump(name)` leave a step, `validate` on its item runs, then the Uniform fields inside it are checked: invalid fields show their errors, a warning lists them, and the step stays open. `update:progress`, `update:first` and `update:last` emit where the stepper is, for the buttons around it.
+`stepper` turns tabs into steps: tabs after the first with `hasValue` `false` are disabled, and `next()`, `previous()` and `jump(name)` move between them. Before `next()` or `jump(name)` leaves a step, its item's `validate` runs, then its Uniform fields: errors show, a warning lists them, and the step stays. `update:progress`, `update:first` and `update:last` report position for surrounding buttons.
 
-`stepperControls` lets the stepper bring those buttons itself: Back, or on the first step in an overlay Close — Cancel once something is changed — and Next, or the submit on the last, named by `submitText`. `submitting` shows a spinner in it while a submit on `submit` runs, and `disabledNext` disables it. The texts come from `setTexts` ([Getting started](/guide/getting-started#texts)). The submit checks the last step and submits the Uniform form with `api-method` around it, or emits `submit`. In an overlay frame, or in a WModalWrapper on a page, the step's title, a progress line and the buttons go to the frame's title, subtitle and actions — the form's own title, if it has one, stays instead of the step's. A frame shows one stepper: the first one to mount takes it, and another one, such as a stepper inside a step, keeps its progress and buttons in itself.
+`stepperControls` renders those buttons: Back (or on the first step in an overlay, Close — Cancel once changed) and Next (or submit on the last, labelled by `submitText`). `submitting` shows a spinner during `submit`; `disabledNext` disables it. Texts come from `setTexts` ([Getting started](/guide/getting-started#texts)). Submit validates the last step and submits the surrounding `api-method` form, or emits `submit`. In an overlay frame, or a WModalWrapper on a page, the step title, progress line and buttons move to the frame's title, subtitle and actions (a form's own title takes precedence). One stepper per frame: the first to mount takes it; others, like a stepper inside a step, keep their controls inline.
 
 ## API
 

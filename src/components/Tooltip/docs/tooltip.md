@@ -5,7 +5,7 @@ description: WTooltip — a hover tooltip placed inside the element it describes
 
 # Tooltip
 
-`WTooltip` goes *inside* the element it describes and opens while the pointer is over that element — its parent. It renders nothing in place: the tooltip itself is drawn by the `WTooltipContainer` mounted once at the app root (see [Getting started](/guide/getting-started#global-containers)), so it is never clipped by an `overflow: hidden` ancestor.
+`WTooltip` goes *inside* the element it describes and opens while its parent is hovered. It renders nothing in place — the `WTooltipContainer` at the app root draws it (see [Getting started](/guide/getting-started#global-containers)), so `overflow: hidden` ancestors never clip it.
 
 <!-- @example Tooltip/Basic -->
 
@@ -64,15 +64,15 @@ import WTooltip from 'eco-vue-js/dist/components/Tooltip/WTooltip.vue'
 
 <!-- @example-end -->
 
-- **Content** is the `text` prop, or the default slot for markup. The slot stays reactive while the tooltip is open.
-- **Placement** is above or below the element, whichever fits; `top` and `bottom` force one, `left` and `right` put it at the side.
-- **`overflowOnly`** opens only when the parent's content is cut off — for truncated titles in narrow columns.
-- **`delay`** waits that many milliseconds before opening.
-- **`trigger`** listens on another element instead of the parent; `noTouch` skips the tooltip on touch devices.
+- **Content** — the `text` prop, or the default slot for markup (reactive while open).
+- **Placement** — above or below, whichever fits; `top`/`bottom` force one, `left`/`right` place it beside.
+- **`overflowOnly`** — opens only when the parent's content is truncated.
+- **`delay`** — milliseconds before opening.
+- **`trigger`** — listens on another element; `noTouch` skips touch devices.
 
-The tooltip stays open while the pointer moves onto it, so its text can be selected and its links clicked; `static` makes it ignore the cursor instead, so it closes as soon as the pointer leaves the element. Use it for short hints, where a tooltip that holds on to the cursor only gets in the way of the content under it.
+The tooltip stays open while hovered, so its text is selectable and links clickable. `static` closes it as soon as the pointer leaves the element — use it for short hints that would otherwise block content.
 
-Many components take a `tooltipText` prop that does the same without a child — `WButton`, `WCheckbox`, `WButtonMoreItem` and others.
+Many components (`WButton`, `WCheckbox`, `WButtonMoreItem`…) take a `tooltipText` prop instead.
 
 ## API
 

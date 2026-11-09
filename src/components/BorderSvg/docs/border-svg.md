@@ -5,13 +5,13 @@ description: WBorderSvg — a border drawn as SVG over a positioned element, for
 
 # Border SVG
 
-`WBorderSvg` draws a border as SVG over a positioned element — for dashes that a CSS border can't do, or a border that moves, as on the [file picker](/components/file-picker)'s drop zone while a file is dragged over the page.
+`WBorderSvg` draws an SVG border over a positioned element — for dashes CSS can't do, or a moving border like the [file picker](/components/file-picker)'s drop zone during a drag.
 
-`stroke` sets the color — `currentColor` follows the text color — and `strokeDasharray` the dashes. An `animate` element in the default slot animates the border, usually its `stroke-dashoffset`. Utilities from the kit's Tailwind base set the rest:
+`stroke` sets the color (`currentColor` follows text), `strokeDasharray` the dashes. An `animate` element in the slot animates it, usually `stroke-dashoffset`. Utilities:
 
-- `w-border-svg-rounded-*` — corner radius, to match the element's.
-- `w-border-svg-stroke-*` — line width in pixels, 2 by default, e.g. `w-border-svg-stroke-3`.
-- `w-border-svg-padding-*` — its inset.
+- `w-border-svg-rounded-*` — corner radius, matching the element.
+- `w-border-svg-stroke-*` — line width in px (default 2), e.g. `w-border-svg-stroke-3`.
+- `w-border-svg-padding-*` — inset.
 
 <!-- @example BorderSvg/Basic -->
 

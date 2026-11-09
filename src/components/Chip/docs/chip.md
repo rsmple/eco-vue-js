@@ -5,9 +5,9 @@ description: WChip — a short label in a colored box, such as a tag or a status
 
 # Chip
 
-`WChip` is a short label in a colored box, such as a tag on a card or the status of a row. The `text` prop is the label and `icon` puts an icon before it; the default slot replaces the label.
+`WChip` is a short label in a colored box, like a card tag or a row status. `text` is the label, `icon` precedes it; the default slot replaces the label.
 
-The color comes from `semanticType`. The classes behind each type are set once per app with `setSemanticTypeChipMap` from `eco-vue-js/dist/utils/SemanticType` — [WCounter](/components/counter) reads the same map. `soft` turns the box into a rounded pill with a tinted background and colored text, for a status that sits on its own rather than inside a dense row; its classes come from `setSemanticTypeChipSoftMap`. `skeleton` shows a placeholder the size of a chip, and a form or an area can set it for everything inside — see [Conventions](/guide/conventions).
+Color comes from `semanticType`, whose classes are set once per app with `setSemanticTypeChipMap` from `eco-vue-js/dist/utils/SemanticType` ([WCounter](/components/counter) reads the same map). `soft` makes a rounded pill with tinted background and colored text, for standalone statuses (classes from `setSemanticTypeChipSoftMap`). `skeleton` shows a chip-sized placeholder and can be inherited — see [Conventions](/guide/conventions).
 
 <!-- @example Chip/Basic -->
 

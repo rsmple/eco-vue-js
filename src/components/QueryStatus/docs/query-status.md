@@ -5,7 +5,7 @@ description: WQueryStatus — one message for the whole app when queries on scre
 
 # Query status
 
-`WQueryStatus` watches every query on screen. When one fails without data and asking again may help — the server could not be reached, or answered 5xx, 408 or 429 — a single message shows under the header with a Retry button that fetches every failed query again. Mount it once, next to the other [global containers](/guide/getting-started#global-containers):
+`WQueryStatus` watches every on-screen query. When one fails without data and a retry may help (unreachable server, 5xx, 408 or 429), one message shows under the header with Retry, which refetches all failed queries. Mount it once with the other [global containers](/guide/getting-started#global-containers):
 
 ```vue
 <template>
@@ -21,11 +21,11 @@ import WQueryStatus from 'eco-vue-js/dist/components/QueryStatus/WQueryStatus.vu
 </script>
 ```
 
-While the server cannot be reached, every skeleton on the page stops and greys out, since none of them will load. Once [`watchServerRecovery`](/guide/data-layer) sees the server again, the failed queries are fetched again and the message goes away on its own.
+While the server is unreachable, every skeleton stops and greys out. Once [`watchServerRecovery`](/guide/data-layer) sees it again, failed queries refetch and the message clears.
 
-A failure a component already shows stays out of the message: a list page with its error and Retry, or a [page error](/components/page-error). A [query boundary](/components/query-boundary) around a card greys out only that card's skeletons, and leaves the message to `WQueryStatus`. Errors that will not pass by asking again, such as 403 and 404, are never shown here.
+Failures a component already shows are left out: a list page's error and Retry, or a [page error](/components/page-error). A [query boundary](/components/query-boundary) only greys out its card and leaves the message to `WQueryStatus`. Permanent errors like 403 and 404 never show here.
 
-The texts are `serverUnavailable`, `partialLoadError` and `retry` — see [Texts](/guide/getting-started#texts).
+Texts: `serverUnavailable`, `partialLoadError`, `retry` — see [Texts](/guide/getting-started#texts).
 
 ## API
 

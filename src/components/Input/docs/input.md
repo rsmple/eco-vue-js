@@ -6,11 +6,11 @@ description: WInput — text, number, password and multiline inputs with titles,
 
 # Input
 
-`WInput` is a text field bound with `v-model`. It renders its own title, description and error message, so a form row is a single component. The other inputs in this folder wrap it: `WInputAsync` adds validation, `WInputSuggest` a dropdown, `WInputOptions` a list of suggestions and `WInputDate` a date picker.
+`WInput` is a `v-model` text field that renders its own title, description and error, so a form row is one component. Other inputs wrap it: `WInputAsync` (validation), `WInputSuggest` (a dropdown), `WInputOptions` (suggestions), `WInputDate` (a date picker).
 
 ## Basic usage
 
-`type="number"` makes the model a `number`; everything else is a `string`. `textarea` switches to a multiline field that grows with its content, `resize` lets the user drag it taller. `allowClear` adds a clear button. Clearing or deleting all the text emits `''` — or `undefined` or `null` set with `clearValue`, which also narrows the emitted type. `icon` adds an icon at the start.
+`type="number"` makes the model a `number`, otherwise a `string`. `textarea` is a multiline field that grows with content; `resize` lets the user drag it. `allowClear` adds a clear button. Clearing emits `''`, or the `clearValue` (`undefined`/`null`), which also narrows the type. `icon` adds a leading icon.
 
 <!-- @example Input/Basic -->
 
@@ -68,8 +68,8 @@ const notes = ref<string>()
 
 ## States
 
-- `title`, `description` and `errorMessage` render around the field. `required` adds an asterisk to the title.
-- `readonly`, `disabled` and `skeleton` fall back to the state provided by a parent, the same way as for buttons — a readonly form makes every input inside it readonly.
+- `title`, `description` and `errorMessage` render around the field; `required` adds an asterisk.
+- `readonly`, `disabled` and `skeleton` fall back to a parent's provided state, as for buttons.
 
 <!-- @example Input/States -->
 
@@ -119,7 +119,7 @@ import WInput from 'eco-vue-js/dist/components/Input/WInput.vue'
 
 ## Validation
 
-`WInputAsync` edits a local copy and saves it on Enter or blur (or after `debounce`). `validate` — one function or a list — returns an error message or `undefined`; an invalid value shows the error and is not saved, so the parent only ever receives valid values.
+`WInputAsync` edits a local copy and saves on Enter, blur or after `debounce`. `validate` (a function or list) returns an error or `undefined`; invalid values show the error and aren't saved, so the parent only gets valid values.
 
 <!-- @example Input/Validate -->
 
@@ -156,9 +156,9 @@ const isEmail: ValidateFn = value => typeof value === 'string' && value.includes
 
 ## Suggestions
 
-`WInputOptions` is a free-text input with a list of suggestions under it. Arrow keys move through the list, Enter or a click puts the option's `valueGetter` value into the input. The list is not filtered for you — pass the options that match the current text.
+`WInputOptions` is a free-text input with suggestions below. Arrows navigate; Enter or click inserts the option's `valueGetter` value. It doesn't filter — pass options matching the text.
 
-`WInputSuggest` is the same input with an empty menu: put anything into its `content` slot, and call the slot's `blur` to close it.
+`WInputSuggest` is the same with an empty menu: fill its `content` slot and call the slot's `blur` to close.
 
 <!-- @example Input/Options -->
 
@@ -210,9 +210,9 @@ const filtered = computed(() => plants.filter(item => item.name.toLowerCase().in
 
 <!-- @example-end -->
 
-The suggestions can come from a paginated query instead: pass `useQueryFnOptions` and `queryParamsOptions` in place of `options`. The typed text is sent in `searchField` (`search` by default), more pages load as the menu scrolls, and `optionComponent` takes the same components as `WSelectAsync`. The value stays free text — a suggestion only fills it in.
+Suggestions can come from a paginated query: pass `useQueryFnOptions` and `queryParamsOptions` instead of `options`. Text is sent as `searchField` (`search`), pages load on scroll, and `optionComponent` takes `WSelectAsync`'s components. The value stays free text.
 
-With `draft`, typing changes only the suggestions, not the value. An apply row at the top of the menu shows the typed text; it, Enter, or a picked suggestion sets the value, and closing the menu drops the draft. Use it where every change is costly, like a list filter.
+With `draft`, typing only updates suggestions. An apply row at the top shows the text; it, Enter or a picked suggestion sets the value; closing drops the draft. Use it where changes are costly, like list filters.
 
 <!-- @example Input/OptionsPaginated -->
 
@@ -255,7 +255,7 @@ const variety = ref<string | null>()
 
 ## Date
 
-`WInputDate` binds a `Date` and opens a calendar. The user can also type a date; `minDate` and `maxDate` limit both.
+`WInputDate` binds a `Date` and opens a calendar; typing works too. `minDate` and `maxDate` limit both.
 
 <!-- @example Input/Date -->
 
@@ -288,7 +288,7 @@ const date = ref<Date>()
 
 ## Toolbar
 
-A textarea with `rich` gets a toolbar of formatting buttons; `toolbarActions` adds your own. Each action wraps the selected text: `value` is a `WrapSelection`, such as a start and end marker to toggle, and a list of them makes a group that opens on hover. `WInputToolbarButton` is the button itself, for the `toolbar` slot of `WInputSuggest` when a button needs more than a formatting — call the slot's `wrapSelection` from its `click`.
+A `rich` textarea gets a formatting toolbar; `toolbarActions` adds your own. Each wraps the selection with a `WrapSelection` value (e.g. start/end markers to toggle); a list makes a hover group. `WInputToolbarButton` is the button itself, for `WInputSuggest`'s `toolbar` slot — call the slot's `wrapSelection` on `click`.
 
 ## API
 

@@ -5,9 +5,9 @@ description: WPageError — replaces a page whose query failed with the status, 
 
 # Page error
 
-`WPageError` wraps a page that shows one item. While the query's `error` is set, the page is replaced with the status and the server's `detail`, and a Back button. When the server could not be reached or failed with a 5xx, it also offers Retry, which fetches again every failed query on screen.
+`WPageError` wraps a single-item page. While the query's `error` is set, the page is replaced by the status, the server's `detail` and a Back button. For an unreachable server or a 5xx it adds Retry, which refetches every failed on-screen query.
 
-Without a `detail` from the server, the message comes from the [texts](/utilities/helpers): `serverUnavailable`, `serverError` or `pageNotFound`. Set them with `setTexts` to translate them, along with `errorTitle`, `back` and `retry`.
+Without a server `detail`, the message is the `serverUnavailable`, `serverError` or `pageNotFound` [text](/guide/getting-started#texts). Translate them with `setTexts`, along with `errorTitle`, `back` and `retry`.
 
 <!-- @example ErrorPage/Basic -->
 

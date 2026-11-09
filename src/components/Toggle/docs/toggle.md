@@ -6,7 +6,7 @@ description: WToggle — an on/off switch bound with v-model, with title, descri
 
 # Toggle
 
-`WToggle` is a switch for a `boolean` model. The title sits on the left and the switch on the right, so a column of toggles lines up; `rightLabel` puts the title after the switch instead.
+`WToggle` is a switch for a `boolean`. The title is on the left and the switch on the right, so columns align; `rightLabel` puts the title after.
 
 <!-- @example Toggle/Basic -->
 
@@ -48,11 +48,11 @@ const compact = ref(false)
 
 <!-- @example-end -->
 
-`validate` checks the new value before it is emitted: when it returns an error, the change is dropped and the error is shown as a warning notification. `negate` flips the switch so it shows `true` as off, for settings phrased the other way round.
+`validate` checks the new value first: on error the change is dropped and shown as a warning notification. `negate` shows `true` as off, for inversely phrased settings.
 
 ## Theme toggle
 
-`WToggleTheme` is a toggle for the app's light or dark theme: on with a sun for `Theme.LIGHT`, off with a moon for `Theme.DARK`. It only switches the `Theme` value — applying it, usually as a `dark` class on `<html>`, and remembering it is up to the app. See [App shell](/guide/app-shell#layout-component) and [Theming](/guide/theming).
+`WToggleTheme` switches the light/dark theme: on with a sun for `Theme.LIGHT`, off with a moon for `Theme.DARK`. It only changes the `Theme` value — the app applies it (usually a `dark` class on `<html>`) and persists it. See [App shell](/guide/app-shell#layout-component) and [Theming](/guide/theming).
 
 <!-- @example Toggle/Theme -->
 

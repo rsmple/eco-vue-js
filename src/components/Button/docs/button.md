@@ -5,11 +5,11 @@ description: WButton — the base action element with semantic colors, loading a
 
 # Button
 
-`WButton` is the base action element. It renders a `<button>` by default, a router link when `to` is set, and an `<a>` with `tag="a"` and `href`. Every other button in this folder (`WButtonMore`, `WButtonCopy`, `WButtonSelection`…) builds on it. For picking one value out of a few, see [Button group](./button-group).
+`WButton` is the base action element: a `<button>`, a router link with `to`, or an `<a>` with `tag="a"` and `href`. Other buttons here (`WButtonMore`, `WButtonCopy`, `WButtonSelection`…) build on it. For picking one of a few values, see [Button group](./button-group).
 
 ## Basic usage
 
-Put any content in the default slot. For icon-only buttons, set `tooltipText` — it is shown on hover and gives the button a readable hint.
+Any content goes in the default slot. Give icon-only buttons a `tooltipText`.
 
 <!-- @example Button/Basic -->
 
@@ -47,7 +47,7 @@ const count = ref(0)
 
 ## Semantic types
 
-`semanticType` picks the color scheme. The classes behind each type are app-wide and can be swapped once at startup with `setSemanticTypeButtonBackgroundMap` from `eco-vue-js/dist/utils/SemanticType`.
+`semanticType` picks the color scheme. Its classes are app-wide; swap them once at startup with `setSemanticTypeButtonBackgroundMap` from `eco-vue-js/dist/utils/SemanticType`.
 
 <!-- @example Button/SemanticTypes -->
 
@@ -77,8 +77,8 @@ import WButton from 'eco-vue-js/dist/components/Button/WButton.vue'
 
 ## States
 
-- `loading` hides the content behind a spinner but keeps the width, so the layout does not jump. Clicks are ignored.
-- `disabled` and `skeleton` fall back to the state provided by a parent when not set. A form or list that is disabled or loading disables or skeletons every button inside it — only pass these props to override that.
+- `loading` shows a spinner, keeps the width and ignores clicks.
+- `disabled` and `skeleton` fall back to a parent's provided state, so a disabled or loading form or list covers its buttons — pass them only to override.
 
 <!-- @example Button/States -->
 
@@ -123,9 +123,9 @@ const save = () => {
 
 ## Small buttons
 
-`WButtonCopy` copies `value` to the clipboard. Its icon turns into a check for a moment after copying. By default it takes up one line of the surrounding text, so it sits inside a sentence without changing the line height; `noInline` lays it out as a regular block instead.
+`WButtonCopy` copies `value`; the icon briefly turns into a check. It takes one line of surrounding text so it fits inline; `noInline` makes it a block.
 
-`WButtonInput` is a square icon button as tall as an input (`--w-input-height`), with the input's border and corners, to sit next to an input or in its `right` slot. `tooltipText` names it, `loading` swaps the icon for a spinner, and `to` makes it a router link.
+`WButtonInput` is a square icon button matching an input's height (`--w-input-height`), border and corners, for beside an input or its `right` slot. `tooltipText` labels it, `loading` shows a spinner, `to` makes it a link.
 
 <!-- @example Button/SmallButtons -->
 

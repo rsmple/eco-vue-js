@@ -6,7 +6,7 @@ description: WCheckbox, WCheckboxGroup and WCheckboxGroupMultiple — a single c
 
 # Checkbox
 
-`WCheckbox` is a checkbox for a `boolean` model. The title comes from the `title` prop or the default slot, and `radio` draws a round radio button instead. With `intermediate`, a `null` model shows the partly-selected mark — for a "select all" over a partial selection.
+`WCheckbox` binds a `boolean`. The title is the `title` prop or default slot; `radio` draws a radio button. With `intermediate`, a `null` model shows the partial mark, for "select all" over a partial selection.
 
 <!-- @example Checkbox/Basic -->
 
@@ -55,12 +55,12 @@ const compact = ref(true)
 
 ## Groups
 
-For a choice out of a list there are two group components. Both take the options as `list` and render inside a field wrapper, so they have the field's `title`, `description` and error layout:
+Two group components take options as `list` and render in a field wrapper (`title`, `description`, error):
 
-- `WCheckboxGroup` picks one value — `v-model` holds it. `allowClear` lets a click on the selected option clear it back to `null`.
-- `WCheckboxGroupMultiple` picks several. Its model is an array, but it doesn't emit a new array: it emits `select` and `unselect` with the one value that changed, so the parent can save each change on its own.
+- `WCheckboxGroup` picks one value via `v-model`. `allowClear` lets clicking the selected option reset to `null`.
+- `WCheckboxGroupMultiple` picks several. It emits `select` and `unselect` with the changed value instead of a new array, so the parent can save each change.
 
-`list` holds plain values, labelled with `titleMap` (and optionally `iconMap`, `tooltipTextMap`, `classMap`), or objects, with `valueGetter` to read the value out of each and the `option` slot or `optionComponent` to render it. `wrap` lays the options out in a row that wraps, `stretch` spreads them over the width.
+`list` holds plain values labelled by `titleMap` (plus optional `iconMap`, `tooltipTextMap`, `classMap`), or objects with `valueGetter` and an `option` slot or `optionComponent`. `wrap` wraps options in a row; `stretch` spreads them across the width.
 
 <!-- @example Checkbox/Group -->
 
@@ -116,7 +116,7 @@ const channels = ref<number[]>([1])
 
 <!-- @example-end -->
 
-With `loading`, the option that was clicked last shows a spinner and the others are disabled — set it while the change saves.
+With `loading`, the last clicked option spins and the rest are disabled — set it while saving.
 
 ## API
 

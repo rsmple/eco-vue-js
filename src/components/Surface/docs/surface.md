@@ -5,16 +5,16 @@ description: WSection and WCard — the page's containers, shaped by the theme's
 
 # Section and card
 
-A page groups its content in two kinds of containers, and the theme decides how they look ([Layout styles](/guide/theming#layout-styles)):
+Two containers, styled by the theme's [layout style](/guide/theming#layout-styles):
 
-- `WSection` is a page-level area: a list, a form, a settings group. In the flat style it paints nothing, and its content sits on the page as before. In the card and glass styles it is a rounded surface with padding.
-- `WCard` is a block that shows in every style, such as a dashboard tile or a stat. On the page it is one step off the page background; inside a section or another card it is one step off that.
+- `WSection` — a page-level area: a list, a form, a settings group. Paints nothing in flat; a rounded padded surface in card and glass.
+- `WCard` — a block shown in every style, like a tile or a stat; one step off whatever it sits on.
 
-Both take a `title`, or a `title` slot, and an `actions` slot beside it. A section also takes an `eyebrow`, a short line above its heading such as a step number, and a `footer` slot for buttons under its content, past a line. On the page in flat, where the line between sections marks where one ends, the footer has no line of its own, only the space above it. They don't set their own radius, padding or border: those come from the theme, so every container on the page matches. Content that paints the surface, such as sticky list columns and soft tones, follows the container it is in.
+Both take a `title` (prop or slot) and an `actions` slot beside it. A section also takes an `eyebrow` (a short line above the heading, e.g. a step number) and a `footer` slot for buttons below a line; in flat on the page, the footer gets only space, not a line. Radius, padding and border come from the theme, so containers match. Surface-painting content (sticky list columns, soft tones) follows its container.
 
-With a `semanticType` a section is in that tone: its soft paint in every layout style, flat included, and its heading in the tone. For a danger zone, `NEGATIVE`, a block of its own that reads apart from the page, in place of an info card in a section.
+`semanticType` tints a section in that tone in every style, heading included. Use `NEGATIVE` for a danger zone instead of an info card in a section.
 
-The same look without the component is the `surface-section` and `surface-card` classes. A list that scrolls with the page is a section of its own: put it on the page, not inside a `WSection`.
+Without the component, use the `surface-section` and `surface-card` classes. A window-scrolling list is its own section — put it on the page, not in a `WSection`.
 
 <!-- @example Surface/Basic page -->
 
@@ -76,7 +76,7 @@ const STATS = [
 
 ## Danger zone
 
-An action that can't be undone, or that costs something later, gets a section of its own: a `title`, a `description` saying what goes and what stays or what to expect after, and the button in the `footer`, at the section's end, where a form's Save is. Put the button in the `footer`, not in the content, where it would stretch across the section. Give the section `NEGATIVE` when something is lost for good; a plain section when the action only costs time, such as clearing a cache.
+Irreversible or costly actions get their own section: a `title`, a `description` of what goes, what stays or what to expect, and the button in `footer` (where a form's Save goes — in the content it would stretch). Use `NEGATIVE` for permanent loss; a plain section for actions that only cost time, like clearing a cache.
 
 <!-- @example Surface/DangerZone -->
 
@@ -111,9 +111,9 @@ import IconTrash from 'eco-vue-js/dist/assets/icons/IconTrash'
 
 ## Sections in a row
 
-A long page splits into several sections, one per topic. On the page (`w-page`) put them one after another, with no wrapper: the kit spaces them through any wrappers of the page. In card and glass the theme's section gap (`--w-section-gap`) goes between them, so they show as separate surfaces. In flat, where they paint nothing, a line goes between two sections, `--w-stack-divide` (`2rem`) below and above it, and other blocks, such as a page list, are as far apart without the line. A section in a tone paints its own edge and gets the space without the line. See [Settings page](/recipes/settings-page).
+Split long pages into one section per topic, placed directly on the page (`w-page`) with no wrapper — the kit spaces them. Card and glass put `--w-section-gap` between them; flat draws a line with `--w-stack-divide` (`2rem`) above and below, and spaces other blocks the same without the line. Toned sections paint their own edge and skip the line. See [Settings page](/recipes/settings-page).
 
-Off the page, such as in a preview, put the sections in `surface-stack-divided` for the same. `surface-stack` runs them together in flat instead: `0` apart, their content's margins carrying on across them, so the page looks the same as without the split. These docs are built this way: each page is a stack of sections, one per heading and one per example.
+Off the page (e.g. a preview), use `surface-stack-divided` for the same. `surface-stack` runs them together in flat — no gap, so it looks unsplit. These docs work this way: one section per heading and per example.
 
 ```vue
 <template>
@@ -127,7 +127,7 @@ Off the page, such as in a preview, put the sections in `surface-stack-divided` 
 
 ## A section that scrolls inside
 
-A section with a height of its own, such as a column stuck beside a list, takes `scroll`: its content scrolls inside it, down to its bottom edge, while its heading and the `head` slot stay. Put what should stay in view in `head`, such as the item a list belongs to, not in a sticky block with a background: in glass the section's fill is the blurred page behind it, and an opaque block over the content shows as a strip of another color. Give the section its height, such as `max-h-*` or `h-full`; the section sets its own overflow.
+A section with its own height (e.g. a column beside a list) takes `scroll`: content scrolls inside, while the heading and `head` slot stay. Put what should stay in view in `head`, not a sticky opaque block — in glass that shows as a strip of another color. Give the section a height (`max-h-*`, `h-full`); it sets its own overflow.
 
 ```vue
 <template>
@@ -146,28 +146,28 @@ A section with a height of its own, such as a column stuck beside a list, takes 
 
 ## Nesting
 
-Sections don't nest. A section inside another one paints nothing and takes no padding: it is a part of the outer section. A `WSection` there gets a smaller heading, one level down, and a part that follows other content gets a line above it, `--w-subsection-divide` (`1rem`) over its content. Cards do nest: a card in a section or in another card is filled and flat, one step darker than what it sits on. In a glass section it is a pane of glass over it instead, as a list card there: a light translucent fill the section shows through, with a hairline edge and a lit top edge.
+Sections don't nest: an inner section paints nothing and has no padding — it's a part of the outer one, with a smaller heading and, after other content, a line above (`--w-subsection-divide`, `1rem`). Cards nest: inside a section or card they're filled and flat, one step darker; in a glass section, a translucent pane with a hairline and lit top edge.
 
-A preview of a page inside a container, such as a layout picker or a demo, is a page of its own: mark its box `surface-root`, and the sections and cards in it render as on a page, not nested in the container around it. It also keeps sections inside the box, not reaching into the page gutter. The box is a well of the page's own background, the theme's gradient included, with a line around it in every layout style, so it reads apart from the page it sits on.
+A page preview inside a container (layout picker, demo) is its own page: mark its box `surface-root` so nesting starts over and sections don't reach into the page gutter. The box is a well of the page background (gradient included) with an outline.
 
 | Class | What it does |
 | --- | --- |
 | `surface-section` | A section; inside another section, nothing. |
 | `surface-card` | A card; inside a section or a card, one step darker. |
-| `surface-stack` | Sections one after another, `--w-section-gap` apart: run together in flat. |
-| `surface-stack-divided` | The same, with a line between the sections in flat, as the page sets its blocks. |
-| `surface-root` | A page of its own in a well of the page background: nesting starts over inside it. |
+| `surface-stack` | Sections `--w-section-gap` apart; run together in flat. |
+| `surface-stack-divided` | The same, with lines between sections in flat. |
+| `surface-root` | A page of its own in a well; nesting starts over inside. |
 
 ## On the page
 
-The app's main area is `w-page`, and the kit places the sections on it: on phones a section spans the screen with its content at the page inset, beside a list wider than the screen it stays in view, and under the last one the main area leaves room. Pages set no padding or positioning of their own. The rules for a whole page are in [Page layout](/recipes/page-layout).
+The main area is `w-page`; the kit places sections on it: full-width on phones, kept in view beside wide lists, with room after the last. Pages set no padding or positioning. See [Page layout](/recipes/page-layout).
 
 | Class | What it does |
 | --- | --- |
-| `w-page` | The app's main area: the page's inset at every width, the room under it, and content beside a wide list kept in view. |
-| `w-page-bleed` | A row of cards on the canvas, reaching into the gutter as a section does. |
-| `surface-columns` | Sections side by side on a grid, spaced for the layout style. |
-| `w-page-column` | The page's first column, for a page list beside other content: the list's section, header and bottom edge keep to the column. |
+| `w-page` | The app's main area: page inset, end room, content kept in view beside wide lists. |
+| `w-page-bleed` | A row of cards on the canvas, reaching into the gutter like a section. |
+| `surface-columns` | Side-by-side sections on a grid, spaced per layout style. |
+| `w-page-column` | First column holding a page list beside other content; keeps the list's section, header and bottom edge in the column. |
 
 ## API
 

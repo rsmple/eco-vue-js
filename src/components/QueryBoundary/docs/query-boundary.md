@@ -5,13 +5,13 @@ description: WQueryBoundary — stops the skeletons of a card whose query failed
 
 # Query boundary
 
-A card shows skeletons while its queries load. When one of them fails, the skeletons would shimmer forever. `WQueryBoundary` wraps the card and takes the queries it shows: once one fails without data, the skeletons stop and grey out under a short message, and the card keeps its size and layout.
+A card shows skeletons while its queries load; if one fails, they'd shimmer forever. `WQueryBoundary` wraps the card and takes its queries: once one fails without data, the skeletons stop and grey out under a short message, keeping the card's size and layout.
 
-The message is the server's short `detail`, or the `serverUnavailable` or `loadError` [text](/utilities/helpers). When the server could not be reached or failed with a 5xx, Retry fetches the failed queries again, and the skeletons shimmer while they load. A failure that will not pass, such as a 403, shows only the message.
+The message is the server's `detail`, or the `serverUnavailable` or `loadError` [text](/guide/getting-started#texts). For an unreachable server or a 5xx, Retry refetches the failed queries with shimmering skeletons. Permanent failures (e.g. 403) show only the message.
 
-A query that already has data keeps showing it when a later refetch fails.
+A query with data keeps showing it if a later refetch fails.
 
-With a [`WQueryStatus`](/components/query-status) in the app, a failure asking again may fix is told once for the whole page instead of on each card: the card only greys out its skeletons, so it is clear which card failed. A failure that will not pass, such as a 403, still shows its message on the card.
+With a [`WQueryStatus`](/components/query-status) in the app, retryable failures are reported once for the page; the card only greys out its skeletons. Permanent failures still show on the card.
 
 <!-- @example QueryBoundary/Basic -->
 

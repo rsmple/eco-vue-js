@@ -5,11 +5,11 @@ description: Opening modals with Modal.add and Modal.addConfirm, or useOverlay f
 
 # Modal
 
-Modals are not placed in templates. They are opened from code, rendered by the single `WModal` container mounted at the app root (see [Getting started](/guide/getting-started#global-containers)), and stacked when several are open. The same container renders the menus of WButtonMore, so a confirm can take a menu's place.
+Modals are opened from code, not templates. The single `WModal` container at the app root (see [Getting started](/guide/getting-started#global-containers)) renders and stacks them, along with WButtonMore's menus — so a confirm can replace a menu.
 
 ## Confirm
 
-`Modal.addConfirm` opens a ready-made dialog with a title, description and up to three actions. `onAccept` may return a promise — the accept button shows a spinner until it resolves, then the modal closes. If it rejects, the modal stays open.
+`Modal.addConfirm` opens a dialog with a title, description and up to three actions. If `onAccept` returns a promise, the button spins until it resolves and the modal closes; on reject it stays open.
 
 <!-- @example Modal/Confirm -->
 
@@ -60,16 +60,16 @@ const confirmDelete = () => {
 
 ## Anchored confirm
 
-A modal covers the page, so the user loses sight of the row or selection they are confirming for. Pass `anchor` and the same confirm opens as a dropdown under that element instead — a bottom sheet without the backdrop on phones. Use it for short yes-or-no questions; keep the modal for long descriptions and forms.
+A modal hides the row or selection being confirmed. Pass `anchor` to open the confirm as a dropdown under that element instead (a backdrop-less bottom sheet on phones). Use it for short yes/no questions; keep modals for long text and forms.
 
-Open it with `useOverlay()`, called in setup, whose `add`, `addAutoclosable` and `addConfirm` work like `Modal` for the overlay the component is in:
+Open it with `useOverlay()` (called in setup); its `add`, `addAutoclosable` and `addConfirm` work like `Modal` for the component's overlay:
 
-- Opened from a menu — WButtonMore, or the More menu of a list's selection bar — the confirm takes the menu's place at the menu's anchor, without `anchor`: the `⋯` button, or the point where a row was right-clicked. The row stays highlighted until the confirm closes.
-- Opened from a modal, it closes together with the modal, and a click beside the modal closes the confirm first.
+- From a menu (WButtonMore, or a selection bar's More), the confirm replaces the menu at its anchor without `anchor` — the `⋯` button or the right-click point. The row stays highlighted until it closes.
+- From a modal, it closes with the modal; a click beside the modal closes the confirm first.
 
-- A click outside, Escape or a swipe down closes it and calls `onCancel`. Opening it again from the same anchor closes it too.
-- While the `onAccept` promise is pending, clicks on the page are blocked, so the selection or filters it was confirmed for cannot change under it.
-- When the anchor is no longer on the page, `addConfirm` opens the modal instead.
+- Click outside, Escape or swipe down closes it and calls `onCancel`; so does reopening from the same anchor.
+- While `onAccept` is pending, page clicks are blocked so the confirmed selection can't change.
+- If the anchor is gone, `addConfirm` opens a modal instead.
 
 <!-- @example Modal/ConfirmAnchored -->
 
@@ -178,23 +178,23 @@ const confirmClear = () => {
 
 ## Dropdown or modal
 
-`useOverlay()`, called in setup, opens any component and lets WModal frame it. Say how with `present`:
+`useOverlay()` (in setup) opens any component framed by WModal. `present` picks how:
 
-- `modal` — centered over the backdrop, stacked over other modals. The component brings its own frame, such as `WModalWrapper`.
-- `dropdown` — at `anchor`, one at a time, and a bottom sheet on phones. It is centered on the anchor with a tip pointing at it, and near the edge of the screen the box shifts aside while the tip stays. `dropdown` options open it at a point instead (`cornered`) or aligned to the anchor without the tip (`align`, such as `HorizontalAlign.FILL` for a field's menu), set its box (`frameClass`), and whether a click inside closes it (`closeOnClick`). A layer opened from a dropdown with `closeOnClick` takes its place, as from a menu. Opened from any other dropdown, it stays over it — like a select's menu inside a filter, which closes first on Escape.
+- `modal` — centered over the backdrop, stacked. The component brings its own frame, e.g. `WModalWrapper`.
+- `dropdown` — at `anchor`, one at a time, a bottom sheet on phones. Centered on the anchor with a tip; near screen edges the box shifts while the tip stays. Options: `cornered` (open at a point), `align` (align without tip, e.g. `HorizontalAlign.FILL` for a field menu), `frameClass`, `closeOnClick`. A layer opened from a `closeOnClick` dropdown replaces it, like from a menu; from any other dropdown it stacks on top (Escape closes the top first).
 
-`open` returns a function that closes the layer, or `null` if nothing opened. The component closes the layer by emitting `close:modal`. Inside it:
+`open` returns a close function, or `null` if nothing opened. The component closes itself by emitting `close:modal`. Inside it:
 
-- It sees the opener's injections, and its own `useOverlay()` opens what belongs to the same layer.
-- `useOverlayFrame()` tells whether it is shown in a `modal`, a `dropdown` or a `sheet`, to adjust its layout.
-- `useOverlayClose()` closes the layer it is in, as emitting `close:modal` does — for content deeper than the root, such as a step's own Cancel button.
-- `useLayerBusy(() => loading.value)` keeps the layer open on Escape, outside clicks, swipes and a removed anchor while something runs.
+- It sees the opener's injections; its own `useOverlay()` opens into the same layer.
+- `useOverlayFrame()` returns `modal`, `dropdown` or `sheet`, for layout tweaks.
+- `useOverlayClose()` closes the layer from nested content, e.g. a step's Cancel.
+- `useLayerBusy(() => loading.value)` keeps the layer open against Escape, outside clicks, swipes and a removed anchor.
 
-A dropdown closes when the opener unmounts, unless it took a menu's place; a modal stays.
+Dropdowns close when the opener unmounts (unless they replaced a menu); modals stay.
 
-The frame owns the layout around the content. A component built on `WModalWrapper` opens as a modal, a dropdown or a bottom sheet unchanged: the frame takes its `title`, `subtitle` and `actions` and places them — a sticky header and footer in a modal, a compact heading and pinned buttons in a dropdown, a centered title and stacked buttons in a sheet — and pads the body by `--w-frame-padding`. The content brings no padding of its own; what reaches the edges, such as a list, takes `w-frame-bleed`. Outside an overlay, `WModalWrapper` lays the same parts out on the page. Content without it, such as a menu, is shown edge to edge; `useOverlayFrameOptions(() => ({padded: true}))` asks for the padding.
+The frame owns the layout. A `WModalWrapper` component opens unchanged as modal, dropdown or sheet: the frame places its `title`, `subtitle` and `actions` (sticky header/footer in a modal, compact heading and pinned buttons in a dropdown, centered title and stacked buttons in a sheet) and pads the body by `--w-frame-padding`. Content brings no padding; edge-to-edge parts like lists take `w-frame-bleed`. Outside an overlay, `WModalWrapper` lays out on the page. Content without it (e.g. a menu) is edge to edge; `useOverlayFrameOptions(() => ({padded: true}))` requests padding.
 
-A `WUniform` with `api-method` keeps its layer open while it saves, and in a modal asks before the close button discards unsaved changes. A dropdown is dismissed without asking, as a menu is — keep forms in it small enough to fill again. `useLayerBusy` and `useLayerChanges` do the same for other content.
+A `WUniform` with `api-method` keeps its layer open while saving and, in a modal, confirms before discarding unsaved changes. Dropdowns dismiss without asking, like menus — keep their forms small. `useLayerBusy` and `useLayerChanges` do the same for other content.
 
 ```ts
 import {useOverlay} from 'eco-vue-js/dist/utils/Overlay'
@@ -213,9 +213,9 @@ const openNotes = (event: MouseEvent) => {
 
 ## Custom modal
 
-`Modal.add(component, props)` opens any component. Wrap its content in `WModalWrapper`, which provides the title, a scrolling body and a sticky footer with the actions. Its padding comes from `--w-modal-wrapper-padding`, set once for the app (`w-modal-wrapper-p---inner-margin` on `body`), and the frame pads the title, the body and the actions with it — the content brings no padding of its own. Content that reaches the edges, such as a list, takes `w-frame-bleed`; WTabs and WInfoCard do it on their own. Give the action buttons `w-full` to share the footer width. The modal closes when it emits `close:modal`, when the backdrop's close button is clicked, or when the function returned by `Modal.add` is called.
+`Modal.add(component, props)` opens any component. Wrap its content in `WModalWrapper` for a title, scrolling body and sticky action footer. Padding comes from `--w-modal-wrapper-padding`, set once for the app (`w-modal-wrapper-p---inner-margin` on `body`); content brings none. Edge-to-edge content takes `w-frame-bleed` (WTabs and WInfoCard do it themselves). Give action buttons `w-full` to share the footer. The modal closes on `close:modal`, the backdrop's close button, or the function `Modal.add` returns.
 
-Pass callbacks as props to get results back. Load the modal with `defineAsyncComponent`, so its code is fetched on first open, and wrap it in `markRaw`, as for every component passed as a prop.
+Pass callbacks as props to get results. Load the modal with `defineAsyncComponent` and wrap it in `markRaw`, as with any component prop.
 
 <!-- @example Modal/Custom -->
 
@@ -315,13 +315,13 @@ const save = () => {
 
 <!-- @source-end -->
 
-If the modal body contains a form with unsaved changes, exposing it as `formRef` with a `hasChanges` flag makes the close button ask before discarding them.
+Expose the body's form as `formRef` with a `hasChanges` flag, and the close button asks before discarding.
 
 ## Steps
 
-A stepper `WTabs` with `stepper-controls` inside a `WModalWrapper` is a wizard: one `WTabsItem` per step. It hands the modal the current step's title, a progress line under it, and the buttons — Close, or Cancel once something is changed, or Back, and Next or the submit. `validate` on an item runs before Next leaves it, and so do the Uniform fields inside the step — an error message is shown and the step stays open — and `requireSave` submits the form inside first. The last step's button submits the form with `api-method` around the stepper, or emits `submit`; `submitText` names it. `submitting` shows its spinner while a submit on `submit` runs, and `disabledNext` disables it, e.g. until something is picked. A template ref gives `next()` and `previous()`, to move on after a pick. The button texts come from `setTexts`, so an app translates them once.
+A stepper `WTabs` with `stepper-controls` inside a `WModalWrapper` is a wizard, one `WTabsItem` per step. It gives the modal the step title, a progress line and buttons: Close (Cancel once changed) or Back, and Next or submit. Before Next, the item's `validate` and the step's Uniform fields run (errors keep the step open), and `requireSave` submits the inner form first. The last button submits the surrounding `api-method` form or emits `submit`; `submitText` labels it. `submitting` shows a spinner during `submit`; `disabledNext` disables it. The template ref exposes `next()` and `previous()`. Button texts come from `setTexts`.
 
-`WModalStepper` is deprecated: it is the same wizard with its own buttons, without Cancel or the form's submit. Move to a `WModalWrapper` around `WTabs stepper no-header stepper-controls`:
+`WModalStepper` is deprecated — the same wizard with its own buttons, without Cancel or form submit. Migrate to `WModalWrapper` around `WTabs stepper no-header stepper-controls`:
 
 | WModalStepper | Instead |
 | --- | --- |
@@ -329,8 +329,8 @@ A stepper `WTabs` with `stepper-controls` inside a `WModalWrapper` is a wizard: 
 | `disabledNext`, `submitText`, `disableMinHeight` | the same props on WTabs |
 | `disabled` | `submitting`, or `disabled` on the items |
 | `@submit` | `@submit` on WTabs, or the form's `api-method` |
-| `@close:modal` on the first step | not needed: Close closes the modal it is in |
-| `#title` | `#title` on WModalWrapper, which stays over the step's title |
+| `@close:modal` on the first step | not needed: Close closes the modal |
+| `#title` | `#title` on WModalWrapper, above the step title |
 | `next()`, `previous()` | the same methods of WTabs |
 
 <!-- @example Modal/Stepper -->
@@ -471,7 +471,7 @@ const send = () => {
 
 ## Export and import
 
-`WModalExport` and `WModalImport` are the modals behind the list's export and import. `WModalExport` loads every item of a query page by page — or with `apiMethod` in one request — with a progress bar, builds a JSON, CSV or Markdown file and offers it for download. `WModalImport` creates a list of items with `createMethod`, all at once, with a progress bar and a button that aborts the requests still running. Open them with `Modal.add` like any modal.
+`WModalExport` and `WModalImport` back the list's export and import. `WModalExport` loads every item page by page (or in one `apiMethod` request) with a progress bar and downloads JSON, CSV or Markdown. `WModalImport` creates items with `createMethod` in parallel, with a progress bar and an abort button. Open them with `Modal.add`.
 
 ## API
 

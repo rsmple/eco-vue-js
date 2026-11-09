@@ -5,7 +5,7 @@ description: WStatusIcon — a check, an exclamation mark or a dimmed slash for 
 
 # Status icon
 
-`WStatusIcon` shows whether something is filled in: a check with `hasValue`, an exclamation mark with `hasError`, and a dimmed slash with neither. [WTabs](/components/tabs) use it with `statusIcon` to mark the tabs that are done or have errors. Size it with `square-*`.
+`WStatusIcon` shows fill state: a check with `hasValue`, an exclamation mark with `hasError`, a dimmed slash with neither. [WTabs](/components/tabs) use it via `statusIcon`. Size with `square-*`.
 
 <!-- @example Status/Basic -->
 

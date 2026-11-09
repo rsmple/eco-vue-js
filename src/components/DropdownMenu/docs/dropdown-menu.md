@@ -6,14 +6,14 @@ description: Menus and dropdowns — WButtonMore and WButtonDropdown for action 
 
 # Dropdown menu
 
-For a menu of actions, use a ready-made button. For anything else anchored to an element — a column picker, a filter, a date range — build it on `WDropdownMenu`.
+Use a ready-made button for action menus; build anything else anchored to an element (a column picker, a filter, a date range) on `WDropdownMenu`.
 
 ## Action menus
 
-- `WButtonMore` is the "⋯" button: its default slot is the menu, and any click closes it. Only one menu is open at a time, and on phones it opens as a bottom sheet. The menu is rendered by `WModal` at the app root, with the slot keeping its context, and a confirm opened from an item with `useOverlay` takes its place — see [Anchored confirm](/components/modal#anchored-confirm). The `toggle` slot swaps the "⋯" for another button, such as a `WButtonInput`: it gets `toggle` for the click, `attrs` for the button and `active` for its highlight.
-- `WButtonDropdown` is a button with an arrow next to it: the `button` slot holds the main action and the `content` slot the others. The `content` slot gets `close`.
+- `WButtonMore` is the "⋯" button: its default slot is the menu, closed by any click. One menu opens at a time; on phones it's a bottom sheet. `WModal` renders it at the app root, keeping the slot's context, and a confirm opened from an item via `useOverlay` replaces it — see [Anchored confirm](/components/modal#anchored-confirm). The `toggle` slot swaps "⋯" for another button (e.g. `WButtonInput`), receiving `toggle`, `attrs` and `active`.
+- `WButtonDropdown` is a split button: `button` holds the main action, `content` the rest (gets `close`).
 
-Menu items are `WButtonMoreItem`s: a `text` (or the default slot), an `icon`, and `to` or `href` to make the item a link. A disabled item can explain itself with `tooltipText`. `semanticType` colors an item, like the red Delete below.
+Items are `WButtonMoreItem`s: `text` (or default slot), `icon`, and `to` or `href` for links. Disabled items can explain via `tooltipText`; `semanticType` colors them, like the red Delete below.
 
 <!-- @example DropdownMenu/ButtonMore -->
 
@@ -125,7 +125,7 @@ const action = ref<string>()
 
 ## Custom dropdown
 
-`WDropdownMenu` renders the `toggle` slot in place and, while `isOpen` is true, the `content` slot in a layer on `<body>`, positioned against the toggle. It has no state of its own: the parent opens and closes it, usually with a [`WClickOutside`](/components/click-outside) around the content to close it on a click elsewhere. It is built on [`WDropdown`](/components/dropdown), which also works without a toggle, e.g. against a text selection.
+`WDropdownMenu` renders `toggle` in place and, while `isOpen`, the `content` slot in a `<body>` layer positioned against it. It's stateless: the parent opens and closes it, usually with a [`WClickOutside`](/components/click-outside) around the content. It's built on [`WDropdown`](/components/dropdown), which works without a toggle too (e.g. on a text selection).
 
 <!-- @example DropdownMenu/Custom -->
 
@@ -185,14 +185,14 @@ const visible = ref(['Name', 'Species', 'Height'])
 
 <!-- @example-end -->
 
-- **`horizontalAlign`** lines the content up with the toggle: `LEFT_INNER` and `RIGHT_INNER` align their left or right edges, `FILL` makes the content as wide as the toggle, `CENTER` centres it, and the `OUTER` values put it beside the toggle.
-- **Vertically** it opens below the toggle, or above when there's more room there; `top` forces above. The `content` slot gets `isTop`, `isLeft` and `isRight`, to round the right corners or place an arrow.
-- **`parentElement`** anchors the content to another element than the toggle. `updateAlign` picks the sides again when the toggle moves while the dropdown is open.
-- **`dropdownClass`** goes on the positioned box, for its width or max height.
+- **`horizontalAlign`**: `LEFT_INNER`/`RIGHT_INNER` align edges, `FILL` matches the toggle's width, `CENTER` centres, `OUTER` values place it beside.
+- **Vertically** it opens below, or above when there's more room; `top` forces above. `content` gets `isTop`, `isLeft` and `isRight` for corner rounding or an arrow.
+- **`parentElement`** anchors to an element other than the toggle; `updateAlign` re-picks sides if the toggle moves while open.
+- **`dropdownClass`** goes on the positioned box, e.g. for width or max height.
 
-`WDropdownAdaptive` opens its `content` with the overlay manager, like the list's sort and filter menus: a dropdown in the standard `w-dropdown-frame`, or a [bottom sheet](/components/bottom-sheet) on phones. Only one is open at a time, and it emits `close` when it closes on its own — a click outside, Escape, a swipe, or another dropdown taking its place. Without `horizontalAlign` it is centered on the toggle with a tip. The sheet starts with the `header` slot, or else a copy of the toggle with `unclickable` false. Opened from inside a dropdown with `closeOnClick` it takes that one's place; from any other, such as a filter, it opens over it.
+`WDropdownAdaptive` opens `content` through the overlay manager, like the list's sort and filter menus: a `w-dropdown-frame` dropdown, or a [bottom sheet](/components/bottom-sheet) on phones. One at a time; emits `close` when dismissed (outside click, Escape, swipe, or replaced). Without `horizontalAlign` it centres on the toggle with a tip. The sheet starts with the `header` slot, or a copy of the toggle. Opened from a `closeOnClick` dropdown it replaces it; from any other (e.g. a filter) it stacks on top.
 
-`WMenuItem` is a row for the content of a custom menu — the row that `WButtonMoreItem` and the list menus are built from. It is a button, a router link with `to`, or a plain link with `href` (and `download` for a file). `active` marks the picked option with a check; `false` keeps room for the check, so that the rows of a picker line up. `loading` shows a spinner over it while its action runs.
+`WMenuItem` is the row `WButtonMoreItem` and list menus are built from: a button, a router link (`to`) or a link (`href`, plus `download`). `active` shows a check; `false` reserves its space so picker rows align. `loading` overlays a spinner.
 
 ## API
 

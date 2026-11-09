@@ -5,11 +5,11 @@ description: WLink and WLinkArrow text links, and WRouterLink that works with or
 
 # Links
 
-`WLink` is a link inside text, with an icon in a colored chip before it — a link icon by default, or `icon`. The text is `text` or the default slot. It is a router link with `to` and a plain link with `href`; `target` and `rel` go on the link either way. `semanticType` sets the color, primary by default.
+`WLink` is an inline text link with an icon chip before it (a link icon, or `icon`). Text is `text` or the default slot. A router link with `to`, a plain link with `href`; `target` and `rel` apply either way. `semanticType` sets the color (primary by default).
 
-`WLinkArrow` is a quiet "more" link with an arrow after the text, e.g. under a short list: `<WLinkArrow :to="{name: RouteName.PLANTS}" text="All plants" />`.
+`WLinkArrow` is a quiet "more" link with a trailing arrow, e.g. under a short list: `<WLinkArrow :to="{name: RouteName.PLANTS}" text="All plants" />`.
 
-`WRouterLink` renders the app's `RouterLink` with `to`, and a plain `a` with `href` otherwise — also in an app without vue-router. The kit's links and buttons are built on it.
+`WRouterLink` renders `RouterLink` with `to`, else a plain `a` with `href` — even without vue-router. The kit's links and buttons build on it.
 
 <!-- @example Button/Links -->
 

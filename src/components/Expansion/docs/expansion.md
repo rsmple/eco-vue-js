@@ -5,9 +5,9 @@ description: WExpansion and WExpansionItem — content that expands and collapse
 
 # Expansion
 
-`WExpansion` expands and collapses its content with `isOpen`, animating its height. Collapsed content is kept alive, so a form inside keeps what was typed. `isShown` hides it at once instead, without the animation.
+`WExpansion` animates its content open and closed with `isOpen`. Collapsed content stays alive, so forms keep their input. `isShown` hides it instantly instead.
 
-`WExpansionItem` adds a toggle row with a title and an arrow. It doesn't open itself: it emits `toggle` and takes `isOpen`, so the page decides — e.g. one item open at a time, as below. `hasFlag` puts a dot after the title. The row spans the content's inner margin (`--inner-margin`), like list rows.
+`WExpansionItem` adds a toggle row with a title and arrow. It emits `toggle` and takes `isOpen`, so the page decides — e.g. one open at a time, as below. `hasFlag` adds a dot after the title. The row spans `--inner-margin`, like list rows.
 
 <!-- @example Expansion/Basic -->
 

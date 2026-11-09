@@ -5,9 +5,9 @@ description: WShine and WShineEffect — the light that sweeps across action but
 
 # Shine
 
-`WShine` is the light that sweeps across the kit's action buttons every few seconds. Put it inside a positioned element; it takes its corners. Buttons add it on their own while they are enabled and not loading.
+`WShine` is the light sweeping across action buttons every few seconds. Put it inside a positioned element; it takes its corners. Buttons add it while enabled and not loading.
 
-The sweep comes from one `WShineEffect` mounted at the app root, next to the [global containers](/guide/getting-started#global-containers) — without it, there is no shine. It is hidden on phones and in print.
+It needs one `WShineEffect` at the app root with the [global containers](/guide/getting-started#global-containers). Hidden on phones and in print.
 
 <!-- @example Shine/Basic client -->
 

@@ -5,13 +5,13 @@ description: WHeaderBar and WHeaderBarSearch — the app's fixed header with the
 
 # Header bar
 
-`WHeaderBar` is the fixed header of the [app shell](/guide/app-shell) — the one at the top of this page. It spans the whole width, `--header-height` tall; pad it by the bars beside it, e.g. `pl---nav-bar-width pr---actions-bar-width`, to keep its title and buttons between them. Below `xl` it leaves its top-left corner free for the nav's menu button.
+`WHeaderBar` is the [app shell](/guide/app-shell)'s fixed header, as on this page: full width, `--header-height` tall. Pad it by the side bars (`pl---nav-bar-width pr---actions-bar-width`) to keep its content between them. Below `xl` it leaves its top-left corner free for the nav's menu button.
 
-The title is the `title` prop or the `title` slot, and the `right` slot goes after it, before the search button. Its background is translucent with a blur where the browser supports `backdrop-filter`, so the page shows through as it scrolls under.
+The title is the `title` prop or slot; the `right` slot follows, before the search button. The background is translucent and blurred where `backdrop-filter` is supported.
 
 ## Search
 
-`WHeaderBarSearch` puts a search into the header from any page, without touching the layout. Its default slot is shown in place of the header's title row, and the header gets a search button that opens it. The slot receives `visible`, `show` and `hide`; the `shown` prop opens it right away, and again whenever it turns `true`. It renders nothing where it is placed, and takes its content out of the header when the page unmounts.
+`WHeaderBarSearch` puts a search into the header from any page. Its slot replaces the title row, opened by a search button. The slot receives `visible`, `show` and `hide`; `shown` opens it immediately and whenever it turns `true`. It renders nothing in place and cleans up on unmount.
 
 <!-- @example HeaderBar/Basic client -->
 
@@ -81,9 +81,9 @@ const search = ref<string>()
 
 ## Route titles
 
-Without a `title` prop or slot, the header shows the titles of the current route as one line: its parent pages as muted links and the page's own title in bold. Each level of `route.matched` takes its title from the page, or from its `meta.title`.
+Without a `title`, the header shows the current route's titles on one line: parents as muted links, the page in bold. Each `route.matched` level takes its title from the page or its `meta.title`.
 
-A page reports a title that depends on its data from setup with `useRouteTitle`. It registers the title for the route record the page is rendered by, and removes it when the page unmounts:
+A page sets a data-dependent title from setup with `useRouteTitle`, registered for its route record and removed on unmount:
 
 ```ts
 import {useRouteTitle} from 'eco-vue-js/dist/utils/useRouteTitle'
@@ -94,12 +94,12 @@ useRouteTitle(() => ({
 }))
 ```
 
-- `title` is `undefined` while the data loads, and the header shows a placeholder.
-- `titleShort` goes to the breadcrumb, the browser tab and nav items, instead of `title`.
-- `documentTitle` goes to the browser tab only — e.g. a long name the page shows in full in its body, while the header shows a short label.
-- `to` is the breadcrumb link while a child page is open. It defaults to the level's named route, then its named `''` child, then its `redirect`.
-- `suffix` is a component shown after the title, only while the page is the current one — a parent page's chips leave the header on its child pages.
-- `trail` adds levels after the page that are not routes, such as the active filter of a list. The page level becomes a link (set its `to` to keep the other filters), and the last trail level is the current one, with its own `suffix`:
+- `title` — `undefined` while loading shows a placeholder.
+- `titleShort` — used in the breadcrumb, browser tab and nav items instead of `title`.
+- `documentTitle` — browser tab only, e.g. a long name while the header shows a short label.
+- `to` — breadcrumb link while a child page is open. Defaults to the level's named route, then its named `''` child, then its `redirect`.
+- `suffix` — a component after the title, only while the page is current.
+- `trail` — non-route levels after the page, like a list's active filter. The page level becomes a link (set `to` to keep other filters), and the last trail level is current, with its own `suffix`:
 
 ```ts
 useRouteTitle(() => ({
@@ -110,13 +110,13 @@ useRouteTitle(() => ({
 }))
 ```
 
-Records that share a path, such as a parent and its `''` child, are one level, so a parent layout can title its index page.
+Records sharing a path (a parent and its `''` child) are one level, so a parent layout can title its index page.
 
-The same titles fill other places:
+The same titles feed:
 
-- `useDocumentTitle(suffix)` keeps `document.title` in sync, page first: `payments/api · Payments Platform · App`. Call it once in the app's root component.
-- WNavItem shows the short title its route's page registers, while the page is open, so a nav item of an item page shows the item instead of a static "Item".
-- `useRouteTitles()` returns the levels for a custom header.
+- `useDocumentTitle(suffix)` — keeps `document.title` in sync, page first: `payments/api · Payments Platform · App`. Call once in the root component.
+- WNavItem — shows its page's registered short title while open, so an item page's nav entry shows the item, not "Item".
+- `useRouteTitles()` — the levels, for a custom header.
 
 ## API
 

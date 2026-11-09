@@ -5,9 +5,9 @@ description: WSpinner — an indeterminate spinner in the current text color, si
 
 # Spinner
 
-`WSpinner` is an indeterminate spinner in the current text color. `square-*` sets its size, 20px by default. Buttons show one over their label while `loading`.
+`WSpinner` is an indeterminate spinner in the current text color; `square-*` sizes it (20px default). Buttons show one while `loading`.
 
-For a spinner among regular icons, such as in a menu item, use `IconSpinner` — the same drawing as an icon component.
+Among regular icons (e.g. a menu item), use `IconSpinner` — the same drawing as an icon component.
 
 <!-- @example Spinner/Basic -->
 

@@ -5,16 +5,16 @@ description: WDropdown and WDropdownTip — content placed in a fixed layer agai
 
 # Dropdown
 
-`WDropdown` is the positioning layer under the kit's menus, selects and tooltips. It places its default slot in a fixed layer against `parentElement` — an element, or anything with `getBoundingClientRect`, such as a text selection `Range` — and follows it as the page scrolls. For a menu with a toggle, [`WDropdownMenu`](/components/dropdown-menu#custom-dropdown) adds the toggle and the teleport to `<body>`; use `WDropdown` directly for anything else, such as a toolbar over selected text.
+`WDropdown` is the positioning layer under the kit's menus, selects and tooltips. It places its slot in a fixed layer against `parentElement` — an element or anything with `getBoundingClientRect`, like a selection `Range` — and follows it on scroll. [`WDropdownMenu`](/components/dropdown-menu#custom-dropdown) adds a toggle and the `<body>` teleport; use `WDropdown` directly for the rest, e.g. a toolbar over selected text.
 
-- **`horizontalAlign`** lines the content up with the parent, as in `WDropdownMenu`. When it doesn't fit the screen, the next placement in order is tried.
-- **Vertically** it opens below the parent, or above when there's more room there; `top` prefers above and `bottom` always opens below. The slot gets `isTop`, `isLeft` and `isRight` for the side it picked.
-- **`updateAlign`** picks the placement again as the parent moves. `emitUpdate` stops following and emits `update:rect` on scroll and resize instead, e.g. to close it; `freeze` keeps the current position, e.g. while the parent leaves the page.
-- **`innerClass`** goes on the content's box, `w-max` by default.
+- **`horizontalAlign`** aligns with the parent as in `WDropdownMenu`, trying the next placement when it doesn't fit.
+- **Vertically** it opens below, or above when there's more room; `top` prefers above, `bottom` forces below. The slot gets `isTop`, `isLeft` and `isRight`.
+- **`updateAlign`** re-picks placement as the parent moves. `emitUpdate` stops following and emits `update:rect` on scroll and resize (e.g. to close); `freeze` holds the position (e.g. while the parent leaves).
+- **`innerClass`** goes on the content box, `w-max` by default.
 
-It is `position: fixed`, so put it in a `<Teleport to="body">`: a transformed or filtered ancestor would otherwise become what it's positioned in.
+It's `position: fixed`, so wrap it in `<Teleport to="body">` — a transformed or filtered ancestor would become its containing block.
 
-`WDropdownTip` is the small arrow of the kit's dropdowns and tooltips, drawn in the surface color of its tone with the raised line around it. Put it first in the slot with `top` set from `isTop`: it moves after the content when the dropdown opens above. `left` and `right` point it sideways, for content beside the parent. Give the frame `w-tip-edge-top`, `-bottom`, `-left` or `-right` for the edge the tip stands on: it cuts the border under the tip, which would otherwise show through it in glass.
+`WDropdownTip` is the arrow of the kit's dropdowns and tooltips, in its tone's surface color with the raised line. Put it first in the slot with `top` from `isTop` (it moves after the content when opening above); `left` and `right` point it sideways. Give the frame `w-tip-edge-top`/`-bottom`/`-left`/`-right` to cut the border under the tip, which would otherwise show through in glass.
 
 <!-- @example Dropdown/Basic client -->
 

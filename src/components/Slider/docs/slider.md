@@ -5,13 +5,13 @@ description: WSlider and WSliderRange — pick a number or a range by dragging, 
 
 # Slider
 
-`WSlider` picks a number and `WSliderRange` a range, from `min` to `max` in steps of `step`. They have no title or form-field frame of their own — put them in the `field` slot of a [`WFieldWrapper`](/components/field-wrapper) or next to your own label.
+`WSlider` picks a number, `WSliderRange` a range, from `min` to `max` by `step`. They have no title or field frame — use a [`WFieldWrapper`](/components/field-wrapper)'s `field` slot or your own label.
 
-Dragging emits `update-eager:model-value` at every step and `update:model-value` once it ends, so the value can be shown as it moves while the model — and a query using it — changes only once. The `right` slot is the place for it.
+Dragging emits `update-eager:model-value` per step and `update:model-value` on release, so a live value can show (in the `right` slot) while the model — and any query using it — changes once.
 
-`WSlider` is colored by `semanticType`. `WSliderRange` fades from one end's color to the other's, set with the `w-slider-from-*` and `w-slider-to-*` utilities from the kit's Tailwind base, e.g. `w-slider-from-positive w-slider-to-negative`. Both ends are primary by default.
+`WSlider` is colored by `semanticType`. `WSliderRange` fades between its ends' colors, set with `w-slider-from-*` and `w-slider-to-*` (e.g. `w-slider-from-positive w-slider-to-negative`); both default to primary.
 
-For a scale the colors run along, such as hues, set `--w-slider-track` and `--w-slider-fill` to background images: the first paints the whole track, the second the picked part over the end colors.
+For a color scale like hues, set `--w-slider-track` and `--w-slider-fill` to background images — the whole track, and the picked part over the end colors.
 
 <!-- @example Slider/Basic -->
 
