@@ -132,6 +132,11 @@ export const OVERLAY_TOKENS: Record<OverlayId, PresetTokens> = {
     'w-dropdown-backdrop': LENS_DROPDOWN_BACKDROP,
     'w-chrome-opacity': '0.35',
     'w-chrome-backdrop': LENS_CHROME_BACKDROP,
+    // Rounder, for the rim to bend more of the page. On phones the bars float too, as a pill off the screen edges,
+    // where a floating layout docks them otherwise.
+    'w-dropdown-rounded': '1.25rem',
+    'w-chrome-phone-gap': '0.5rem',
+    'w-chrome-phone-rounded': '1.75rem',
   },
 }
 
@@ -278,7 +283,8 @@ export const expandTokens = (tokens: PresetTokens): [key: string, value: string]
 }
 
 /**
- * The rules a floating layout adds besides tokens: on phones the bars dock and sections span the screen, and the page
+ * The rules a floating layout adds besides tokens: on phones the bars dock, unless lens glass floats them
+ * (`w-chrome-phone-gap`), and sections span the screen, and the page
  * doesn't bounce sideways, which would move it but not the fixed backgrounds that repaint a page list's section.
  */
 export const getLayoutRules = (tokens: PresetTokens, root = ':root', body = 'body') => {
@@ -287,8 +293,8 @@ export const getLayoutRules = (tokens: PresetTokens, root = ':root', body = 'bod
   return [
     `@media (max-width: 639px) {`,
     `  ${ body } {`,
-    '    --w-chrome-gap: 0px;',
-    '    --w-chrome-rounded: 0px;',
+    '    --w-chrome-gap: var(--w-chrome-phone-gap, 0px);',
+    '    --w-chrome-rounded: var(--w-chrome-phone-rounded, 0px);',
     '  }',
     '}',
     '',
@@ -338,9 +344,9 @@ export const getLayoutsCss = () => {
         '',
       ]
     }),
-    '  /* On phones the bars dock and sections span the screen. */',
+    '  /* On phones the bars dock, unless lens glass floats them, and sections span the screen. */',
     '  @media (width < 40rem) {',
-    ...block(`:where(${ floating.map(layout => `.${ getLayoutClass(layout.id) }`).join(', ') }) body`, [['w-chrome-gap', '0px'], ['w-chrome-rounded', '0px']]).map(line => `  ${ line }`),
+    ...block(`:where(${ floating.map(layout => `.${ getLayoutClass(layout.id) }`).join(', ') }) body`, [['w-chrome-gap', 'var(--w-chrome-phone-gap, 0px)'], ['w-chrome-rounded', 'var(--w-chrome-phone-rounded, 0px)']]).map(line => `  ${ line }`),
     '  }',
     '}',
     '',

@@ -34,8 +34,14 @@
 
       <slot name="footer" />
 
-      <!-- Under the sheet when it is pulled up past its end. Opaque, as its blur couldn't reach the page from inside the sheet: the sheet's surface, which is a glass sheet's color over the page background. -->
-      <div class="bg-surface absolute top-full h-screen w-full" />
+      <!--
+        Under the sheet when it is pulled up past its end, for it to read as pulled from below the screen. Opaque, as is the sheet over the backdrop.
+        Without the backdrop the sheet floats, so pulling it up only lifts it off the bottom edge.
+      -->
+      <div
+        v-if="!noOverlay"
+        class="bg-surface absolute top-full h-screen w-full"
+      />
 
       <!-- Clicks inside the sheet stop at its content, so any click that reaches the document landed outside. -->
       <WClickOutside
@@ -54,6 +60,7 @@ import {computed, inject, useTemplateRef} from 'vue'
 import WClickOutside from '@/components/ClickOutside/WClickOutside.vue'
 import WDismissable from '@/components/Dismissable/WDismissable.vue'
 
+import {useLensGlass} from '@/utils/useLensGlass'
 import {BASE_ZINDEX_BOTTOM_SHEET, wBaseZIndex} from '@/utils/utils'
 
 const props = defineProps<{
@@ -88,11 +95,16 @@ defineExpose({
   hide: (): Promise<void> => dismissableRef.value?.hide() ?? Promise.resolve(),
 })
 
-// Without the backdrop the page stays in view, as around a dropdown, and the sheet takes a dropdown's paint: glass in a glass theme.
-// Over the dimmed backdrop it stays opaque: that already blurs the page, and the sheet would only show its tint.
+// Without the backdrop the page stays in view, as around a dropdown, and the sheet stands in for one: it takes a dropdown's paint, glass in a glass
+// theme and lens glass where the theme turns it on, and floats off the screen's edges as a dropdown would, rounded all round.
+// Over the dimmed backdrop it stays opaque and docked: that already blurs the page, and the sheet would only show its tint.
 const contentClass = computed(() => [
-  'grid-cols-[1fr] grid-rows-[auto_1fr_auto] rounded-t-3xl shadow-md relative grid',
+  'grid-cols-[1fr] grid-rows-[auto_1fr_auto] shadow-md relative grid',
   props.compact ? 'max-h-[90%]' : 'height-[90%]',
-  props.noOverlay ? 'surface-dropdown pointer-events-auto border-t border-solid border-line-raised' : 'bg-surface',
+  props.noOverlay
+    ? 'surface-dropdown pointer-events-auto rounded-[2rem] border border-solid border-line-raised mx-2 mb-[max(0.5rem,env(safe-area-inset-bottom))] scroll-mb-[max(0.5rem,env(safe-area-inset-bottom))]'
+    : 'bg-surface rounded-t-3xl',
 ].join(' '))
+
+useLensGlass(() => props.noOverlay ? dismissableRef.value?.content : null)
 </script>

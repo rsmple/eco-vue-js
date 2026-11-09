@@ -731,10 +731,13 @@
       var(--w-overlay)
     );
 
-    /* On phones it spans the screen, like a section: only the edge toward the page is left. */
+    /*
+     * On phones it spans the screen, like a section: only the edge toward the page is left. Floated off the edges
+     * (`--w-chrome-phone-gap`, lens glass) it keeps them all: `min()` is the border with a gap and 0 without.
+     */
     @variant sm-not {
-      border-top-width: 0;
-      border-inline-width: 0;
+      border-top-width: min(var(--w-chrome-border), var(--w-chrome-gap) * 100);
+      border-inline-width: min(var(--w-chrome-border), var(--w-chrome-gap) * 100);
     }
   }
 
@@ -742,11 +745,13 @@
    * The nav and the actions bar paint themselves. A bar over the page or against it, the nav below `xl` (a drawer) and
    * the actions bar, casts `--w-chrome-bar-shadow`; the nav beside the page casts the chrome's, none when docked. The
    * edge is an inset shadow, not a border: the nav's width is its content's, and a border would widen it past
-   * `--nav-bar-width`. On phones only the edge toward the page is left, as on the header.
+   * `--nav-bar-width`. On phones only the edge toward the page is left, as on the header, unless they float there
+   * too: `--w-chrome-phone-edge` is the border then and 0 docked, and the edge toward the page comes in by it.
    */
   .w-nav-bar,
   .w-actions-bar {
     --w-chrome-edge: inset 0 0 0 var(--w-chrome-border) var(--w-line-subtle);
+    --w-chrome-phone-edge: min(var(--w-chrome-border), var(--w-chrome-gap) * 100);
 
     top: var(--w-chrome-gap);
     height: calc(100% - var(--w-chrome-gap) * 2);
@@ -759,7 +764,9 @@
   .w-nav-bar {
     @variant sm-not {
       &:not(.w-nav-bar-dropdown) {
-        --w-chrome-edge: inset calc(var(--w-chrome-border) * -1) 0 0 0 var(--w-line-subtle);
+        --w-chrome-edge:
+          inset 0 0 0 var(--w-chrome-phone-edge) var(--w-line-subtle),
+          inset calc(var(--w-chrome-phone-edge) - var(--w-chrome-border)) 0 0 0 var(--w-line-subtle);
       }
     }
 
@@ -776,14 +783,17 @@
     clip-path: inset(-100vmax calc(-100vmax * var(--w-chrome-float)) -100vmax -100vmax);
 
     @variant sm-not {
-      --w-chrome-edge: inset var(--w-chrome-border) 0 0 0 var(--w-line-subtle);
+      --w-chrome-edge:
+        inset 0 0 0 var(--w-chrome-phone-edge) var(--w-line-subtle),
+        inset calc(var(--w-chrome-border) - var(--w-chrome-phone-edge)) 0 0 0 var(--w-line-subtle);
     }
   }
 
   /*
    * A theme can set `--w-nav-height: auto` for a floating nav that is as tall as its items, down to the gap off the
    * screen's bottom edge, past which they scroll. Pinning items to the nav's bottom needs the full height.
-   * On phones the nav is a drawer over the docked header: it runs the screen's full height, as docked.
+   * On phones the nav is a drawer over the docked header: it runs the screen's full height, as docked, less the gap
+   * where lens glass floats the bars there.
    */
   .w-nav-bar {
     --w-nav-max-height: calc(100% - var(--w-chrome-gap) * 2);
@@ -793,8 +803,7 @@
     max-height: var(--w-nav-max-height);
 
     @variant sm-not {
-      top: 0;
-      height: 100%;
+      height: calc(100% - var(--w-chrome-gap) * 2);
       max-height: none;
     }
   }

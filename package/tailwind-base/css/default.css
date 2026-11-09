@@ -89,9 +89,9 @@
   border-radius: inherit;
 }
 
-/* The standard frame of a dropdown or popover. */
+/* The standard frame of a dropdown or popover. Lens glass rounds it more (`--w-dropdown-rounded`). */
 @utility w-dropdown-frame {
-  @apply surface-dropdown rounded-xl text-start font-normal shadow-md border border-solid border-line-raised overflow-clip;
+  @apply surface-dropdown rounded-(--w-dropdown-rounded,var(--radius-xl)) text-start font-normal shadow-md border border-solid border-line-raised overflow-clip;
 }
 
 /*

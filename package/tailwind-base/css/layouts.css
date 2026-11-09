@@ -74,11 +74,11 @@
     --w-chrome-backdrop: var(--w-section-backdrop);
   }
 
-  /* On phones the bars dock and sections span the screen. */
+  /* On phones the bars dock, unless lens glass floats them, and sections span the screen. */
   @media (width < 40rem) {
     :where(.w-layout-card, .w-layout-glass) body {
-      --w-chrome-gap: 0px;
-      --w-chrome-rounded: 0px;
+      --w-chrome-gap: var(--w-chrome-phone-gap, 0px);
+      --w-chrome-rounded: var(--w-chrome-phone-rounded, 0px);
     }
   }
 }

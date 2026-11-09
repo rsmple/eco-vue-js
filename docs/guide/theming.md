@@ -328,7 +328,7 @@ Dropdowns and popovers, the bottom sheets that stand in for them on phones, and 
 | --- | --- | --- | --- |
 | `overlay` | `frosted` | `lens` | The material of dropdowns, menus, notifications and the bars, and with it the variables below |
 
-**Frosted** is the default: what floats over the page blurs what is behind it as the layout sets, as above. **Lens** makes it lens glass: the page bends along the rim as through a lens, a little magnified in the middle, and the edge catches light. It takes in dropdowns and popovers, the nav's group menus, notifications, and WHeaderBar, WNavBar and WActionsBar. It works in any layout and shows most in glass, where there is color behind the bars to bend.
+**Frosted** is the default: what floats over the page blurs what is behind it as the layout sets, as above. **Lens** makes it lens glass: the page bends along the rim as through a lens, a little magnified in the middle, and the edge catches light. It takes in dropdowns and popovers, the bottom sheets that stand in for them on phones, the nav's group menus, notifications, and WHeaderBar, WNavBar and WActionsBar. It works in any layout and shows most in glass, where there is color behind the bars to bend. Dropdowns are rounder in it, for the rim to bend more of the page, and in card and glass the bars float on phones too, as a pill off the screen edges, where they dock otherwise. Where one glass covers another, such as a notification over the header, only the one on top bends the page.
 
 The bending is an SVG filter in `backdrop-filter`, which only Chromium browsers apply to a backdrop: in Safari and Firefox the edge stays plain, and only the lighter fill and blur below apply. Under the playground's **Layout**, **Overlays** switches it, and **Copy CSS** writes out its variables:
 
@@ -342,5 +342,8 @@ The bending is an SVG filter in `backdrop-filter`, which only Chromium browsers 
 | `w-dropdown-backdrop` | `blur(4px) saturate(1.8) brightness(1.1)` | Their blur, light so the page reads through the rim |
 | `w-chrome-opacity` | `0.35` | The fill of the bars |
 | `w-chrome-backdrop` | `blur(2px) saturate(1.8) brightness(1.1)` | The bars' blur |
+| `w-dropdown-rounded` | `1.25rem` | The rounding of dropdowns and popovers |
+| `w-chrome-phone-gap` | `0.5rem` | How far the bars float off the screen edges on phones, in card and glass |
+| `w-chrome-phone-rounded` | `1.75rem` | The bars' rounding on phones |
 
 The kit has more `w-*` variables for single components, such as `w-list-padding` and `w-modal-wrapper-rounded`; the playground covers the ones that shape the whole app.

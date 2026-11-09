@@ -10,6 +10,9 @@ import {type ComponentPublicInstance, type MaybeRefOrGetter, onScopeDispose, toV
  *
  * Only Chromium applies an SVG filter to the backdrop. Elsewhere, or with the refraction at 0, nothing is changed and
  * the element stays frosted.
+ *
+ * Where one glass lies over another, such as a notification over the header, only the one on top bends the page: the
+ * one under it keeps its blur and drops the refraction while covered, as the top one would bend it a second time.
  */
 
 const SVG_NS = 'http://www.w3.org/2000/svg'
@@ -133,6 +136,8 @@ const drawMap = (width: number, height: number, radius: number, bezel: number, r
 
 const mapCache = new Map<string, string>()
 
+const SIDES = ['top', 'right', 'bottom', 'left'] as const
+
 const CORNERS = [['Top', 'Left'], ['Top', 'Right'], ['Bottom', 'Right'], ['Bottom', 'Left']] as const
 
 // The padding box's corners, as `border-radius` takes them: each corner's radius less the borders beside it.
@@ -235,9 +240,70 @@ const fillFilter = (filter: SVGFilterElement, width: number, height: number, map
   filter.append(createNode('feComposite', {in: 'c01', in2: 'c2', operator: 'arithmetic', k2: 1, k3: 1}))
 }
 
-type Instance = {refresh: () => void}
+type Instance = {
+  refresh: () => void
+  /** The element while its refraction is set up, covered or not. */
+  getApplied: () => HTMLElement | null
+  setCovered: (value: boolean) => void
+}
 
 const instances = new Set<Instance>()
+
+/** The z-index the element is stacked by on the page: the outermost positioned ancestor's, a layer's such as a dropdown's. */
+const getLayerIndex = (element: HTMLElement) => {
+  let index = 0
+
+  for (let node: HTMLElement | null = element; node && node !== document.body; node = node.parentElement) {
+    const style = getComputedStyle(node)
+    const value = Number.parseInt(style.zIndex)
+
+    if (style.position !== 'static' && Number.isFinite(value)) index = value
+  }
+
+  return index
+}
+
+/** Whether `top` is stacked over `bottom`: in a higher layer, or later in the same one, such as inside it. */
+const isOver = (top: {element: HTMLElement, index: number}, bottom: {element: HTMLElement, index: number}) => top.index !== bottom.index
+  ? top.index > bottom.index
+  : Boolean(bottom.element.compareDocumentPosition(top.element) & Node.DOCUMENT_POSITION_FOLLOWING)
+
+const isOverlapping = (a: DOMRect, b: DOMRect) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom
+
+let coverFrame = 0
+
+const updateCovers = () => {
+  coverFrame = 0
+
+  const layers = [...instances].flatMap(instance => {
+    const element = instance.getApplied()
+
+    return element ? [{instance, element, index: getLayerIndex(element), rect: element.getBoundingClientRect()}] : []
+  })
+
+  for (const layer of layers) {
+    layer.instance.setCovered(layers.some(other => other !== layer && isOverlapping(other.rect, layer.rect) && isOver(other, layer)))
+  }
+}
+
+/** On the next frame, as glass opens, closes, resizes or moves with the page. */
+const scheduleCovers = () => {
+  coverFrame ||= requestAnimationFrame(updateCovers)
+}
+
+let isListening = false
+
+/** What is anchored on the page, such as a dropdown, moves over or off a fixed bar as the page scrolls. */
+const listenScroll = () => {
+  const value = instances.size > 1
+
+  if (value === isListening) return
+
+  isListening = value
+
+  if (value) window.addEventListener('scroll', scheduleCovers, {capture: true, passive: true})
+  else window.removeEventListener('scroll', scheduleCovers, {capture: true})
+}
 
 let themeObserver: MutationObserver | null = null
 
@@ -281,6 +347,13 @@ export const useLensGlass = (target: MaybeRefOrGetter<Element | ComponentPublicI
   let resizeObserver: ResizeObserver | null = null
   let frame = 0
   let applied = ''
+  // Its own backdrop, which it keeps while covered, and whether it is.
+  let own = ''
+  let covered = false
+
+  const setBackdrop = () => {
+    element?.style.setProperty('backdrop-filter', (covered ? own : `${ own } url(#${ id })`).trim() || 'none')
+  }
 
   const clear = () => {
     if (!element) return
@@ -289,6 +362,8 @@ export const useLensGlass = (target: MaybeRefOrGetter<Element | ComponentPublicI
     element.style.removeProperty('--w-lens-radius')
     element.removeAttribute('data-w-lens-glass')
     applied = ''
+    covered = false
+    scheduleCovers()
   }
 
   const apply = () => {
@@ -322,19 +397,28 @@ export const useLensGlass = (target: MaybeRefOrGetter<Element | ComponentPublicI
       applied = key
     }
 
-    const own = style.backdropFilter === 'none' ? '' : style.backdropFilter
+    own = style.backdropFilter === 'none' ? '' : style.backdropFilter
 
-    element.style.setProperty('backdrop-filter', `${ own } url(#${ id })`.trim())
-    // A frame with a border of its own keeps it as its edge, for the rim not to draw a second one inside it.
-    element.setAttribute('data-w-lens-glass', Number.parseFloat(style.borderTopWidth) > 0 ? 'bordered' : '')
+    setBackdrop()
+    // A frame with a border of its own keeps it as its edge, for the rim not to draw a second one inside it. A bar
+    // docked to the screen edge keeps only the one toward the page, and the others stay plain as well.
+    element.setAttribute('data-w-lens-glass', SIDES.some(side => Number.parseFloat(style.getPropertyValue(`border-${ side }-width`)) > 0) ? 'bordered' : '')
     // The rim lies inside the border, so it follows the inner curve: the radius less the border on each side, such as a card's thicker left edge.
     element.style.setProperty('--w-lens-radius', getInnerRadius(style))
+    scheduleCovers()
   }
 
   const instance: Instance = {
     refresh: () => {
       applied = ''
       apply()
+    },
+    getApplied: () => applied && element?.isConnected ? element : null,
+    setCovered: value => {
+      if (value === covered) return
+
+      covered = value
+      setBackdrop()
     },
   }
 
@@ -365,6 +449,7 @@ export const useLensGlass = (target: MaybeRefOrGetter<Element | ComponentPublicI
     resizeObserver = new ResizeObserver(schedule)
     resizeObserver.observe(value)
     instances.add(instance)
+    listenScroll()
     observeTheme()
     apply()
   }, {immediate: true, flush: 'post'})
@@ -374,6 +459,8 @@ export const useLensGlass = (target: MaybeRefOrGetter<Element | ComponentPublicI
     filter?.remove()
     filter = null
     instances.delete(instance)
+    listenScroll()
+    scheduleCovers()
     unobserveTheme()
   })
 }

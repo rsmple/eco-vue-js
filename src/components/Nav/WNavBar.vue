@@ -111,7 +111,10 @@ const {isTablet} = useIsMobile()
 
 const isOpen = ref(false)
 
-useLensGlass(useTemplateRef('nav'))
+const navRef = useTemplateRef('nav')
+
+// Below `xl` the closed drawer stays in place, clipped out of view: it bends nothing then, nor counts as glass over the header.
+useLensGlass(() => isOpen.value || !isTablet.value ? navRef.value : null)
 
 const emitIsOpen = () => {
   emit('update:is-open', isOpen.value)

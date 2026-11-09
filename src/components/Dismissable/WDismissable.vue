@@ -139,5 +139,7 @@ onBeforeUnmount(() => {
 
 defineExpose({
   hide,
+  /** The content's box, which slides up. */
+  content: contentRef,
 })
 </script>

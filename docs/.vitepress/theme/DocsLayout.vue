@@ -77,7 +77,8 @@
       </template>
     </WHeaderBar>
 
-    <div class="pl-[calc(var(--w-left-inner)-var(--inner-margin))] pr-[calc(var(--w-right-inner)-var(--inner-margin))]">
+    <!-- On phones the page spans the screen, as the kit's sections do, even where lens glass floats the bars off its edges. -->
+    <div class="sm-not:px-0 pl-[calc(var(--w-left-inner)-var(--inner-margin))] pr-[calc(var(--w-right-inner)-var(--inner-margin))]">
       <VPContent>
         <template #home-hero-before>
           <DocsHomeHero />
