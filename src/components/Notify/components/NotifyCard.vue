@@ -1,14 +1,21 @@
 <template>
   <div
-    class="text-accent relative grid grid-cols-[auto_1fr] gap-x-4 rounded-xl border border-l-4 border-solid border-line-subtle border-l-tone-fill pl-4 text-sm"
+    ref="card"
+    class="text-accent relative grid grid-cols-[auto_1fr] gap-x-4 rounded-xl border border-solid border-line-subtle pl-[calc(1rem+3px)] text-sm"
     :class="[
       notifyTypeToneMap[item.type],
-      history ? 'bg-surface-subtle w-full' : 'bg-surface-raised my-1.5 w-[min(24rem,calc(100vw-2rem))] shadow-lg',
+      history ? 'bg-surface-subtle w-full' : 'surface-dropdown my-1.5 w-[min(24rem,calc(100vw-2rem))] shadow-lg',
     ]"
   >
+    <!-- The type's stripe, over the border as the card's left edge. It curves with the corners, and lies over a glass rim so it keeps its color. -->
+    <div
+      class="pointer-events-none absolute -inset-px z-1 rounded-xl inset-shadow-[4px_0_var(--w-tone-fill)]"
+      aria-hidden="true"
+    />
+
     <WCounter
       v-show="item.count > 1"
-      class="absolute left-[-0.75em] top-[-0.5em] text-xs shadow-md"
+      class="absolute left-[-0.75em] top-[-0.5em] z-2 text-xs shadow-md"
       :count="item.count"
       :semantic-type="notifyTypeSemanticTypeMap[item.type]"
     />
@@ -150,7 +157,7 @@
 <script lang="ts" setup>
 import type {NotifyItem} from '../models/types'
 
-import {computed, ref} from 'vue'
+import {computed, ref, useTemplateRef} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
 import WCounter from '@/components/Counter/WCounter.vue'
@@ -161,6 +168,7 @@ import IconCancel from '@/assets/icons/IconCancel.svg?component'
 import {useOptionalRouter} from '@/composables/useOptionalRouter'
 import {SemanticType} from '@/utils/SemanticType'
 import {datetimeFormat, isSameDate, timeFormat} from '@/utils/dateTime'
+import {useLensGlass} from '@/utils/useLensGlass'
 
 import {NotifyType} from '../models/NotifyType'
 import {discardNotify, isNotifyPending, notifyTypeIconMap, notifyTypeSemanticTypeMap, updateNotify} from '../models/notifyCenter'
@@ -183,6 +191,11 @@ const notifyTypeToneMap: Record<NotifyType, string> = {
 }
 
 const router = useOptionalRouter()
+
+// A toast floats over the page like a dropdown, so it takes the same material. In the notify center it lies in the center's own frame, so it stays plain.
+const cardRef = useTemplateRef('card')
+
+useLensGlass(() => props.history ? null : cardRef.value)
 
 const isExpanded = ref(false)
 

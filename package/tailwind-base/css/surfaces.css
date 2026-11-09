@@ -69,6 +69,21 @@
     --w-pane-highlight: 0.7;
     --w-pane-highlight-dark: 0.05;
 
+    /*
+     * The lit rim of lens glass (`overlay: lens`, `useLensGlass`): light catching the curved edge, brightest at
+     * the top left where it falls and fainter at the bottom right where it leaves (`--w-lens-rim-edge`), over a soft
+     * glow inside the edge (`--w-lens-rim`). On a light page the bottom right is shaded too, as a white highlight
+     * alone is lost on white. A frame with a border keeps that as its edge and takes only the glow.
+     */
+    --w-lens-rim-edge:
+      inset 1.5px 1.5px 0 -0.5px light-dark(oklch(100% 0 0 / 1), oklch(100% 0 0 / 0.22)),
+      inset -1px -1px 0 -0.5px light-dark(oklch(100% 0 0 / 0.8), oklch(100% 0 0 / 0.1));
+    --w-lens-rim:
+      inset 3px 3px 6px -3px light-dark(oklch(100% 0 0 / 0.9), oklch(100% 0 0 / 0.12)),
+      inset -3px -3px 6px -3px light-dark(oklch(100% 0 0 / 0.6), oklch(100% 0 0 / 0.05)),
+      inset 0 0 16px light-dark(oklch(100% 0 0 / 0.5), oklch(100% 0 0 / 0.04)),
+      inset -2px -2px 4px -2px light-dark(oklch(0% 0 0 / 0.12), oklch(0% 0 0 / 0));
+
     /* 0: the bars are docked to the screen edges; 1: they float `--w-chrome-gap` off them, the nav and the actions bar under the header. */
     --w-chrome-float: 0;
     --w-chrome-gap: 0px;
@@ -1571,5 +1586,29 @@
   .w-list-page-repaint .w-infinite-list-header-stuck .w-infinite-list-header-edge::before,
   .w-list-page-repaint .w-infinite-list-header-stuck .w-infinite-list-header-edge::after {
     background-origin: border-box;
+  }
+}
+
+/*
+ * Lens glass, set by `useLensGlass` where the theme turns it on and the browser can refract the backdrop: the lit
+ * rim over the element's edge. An element left in place stands for it; the bars and dropdowns positioned already keep
+ * theirs, since a utility comes after this layer.
+ */
+@layer components {
+  [data-w-lens-glass] {
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: var(--w-lens-radius, inherit);
+      box-shadow: var(--w-lens-rim-edge), var(--w-lens-rim);
+      pointer-events: none;
+    }
+
+    &[data-w-lens-glass="bordered"]::after {
+      box-shadow: var(--w-lens-rim);
+    }
   }
 }

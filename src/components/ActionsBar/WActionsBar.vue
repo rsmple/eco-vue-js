@@ -1,5 +1,6 @@
 <template>
-  <div 
+  <div
+    ref="bar"
     class="
       w-actions-bar
       sm-not:[--actions-bar-filter-width:calc(100vw-var(--w-actions-bar-width))] fixed right-(--w-right-margin,0px) top-0 grid
@@ -75,7 +76,7 @@
 </template>
 
 <script lang="ts" setup>
-import {type VNode, computed, markRaw, provide, ref, watch} from 'vue'
+import {type VNode, computed, markRaw, provide, ref, useTemplateRef, watch} from 'vue'
 
 import WButtonAction from '@/components/Button/WButtonAction.vue'
 
@@ -83,6 +84,7 @@ import IconBack from '@/assets/icons/IconBack.svg?component'
 import IconFilter from '@/assets/icons/IconFilter.svg?component'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {useLensGlass} from '@/utils/useLensGlass'
 import {BASE_ZINDEX_ACTIONS_BAR, wBaseZIndex} from '@/utils/utils'
 
 import {useActionBarFilter} from './use/useActionsBarFilter'
@@ -99,6 +101,8 @@ const {filter, count} = useActionBarFilter()
 const hasFilter = computed(() => filter.value !== undefined)
 
 const isOpen = ref(false)
+
+useLensGlass(useTemplateRef('bar'))
 
 const toggle = () => {
   isOpen.value = !isOpen.value

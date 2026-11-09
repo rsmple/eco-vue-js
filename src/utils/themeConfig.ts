@@ -1,4 +1,4 @@
-import {CANVAS_GLOWS, LAYOUTS, type LayoutId, NEUTRAL_SCALES, NOISE_LEVELS, PRESETS, type PresetId, expandTokens, getLayoutRules, isLayoutId, isNeutralScale, isNoiseId} from './themePresets'
+import {CANVAS_GLOWS, LAYOUTS, type LayoutId, NEUTRAL_SCALES, NOISE_LEVELS, OVERLAY_MATERIALS, PRESETS, type PresetId, expandTokens, getLayoutRules, isLayoutId, isNeutralScale, isNoiseId, isOverlayId} from './themePresets'
 
 /**
  * Themes as data: the tokens a theme sets, how a pasted or linked theme is read and checked, and the CSS that applies
@@ -45,7 +45,7 @@ type LayoutKey = 'w-inner-margin' | 'w-inner-margin-sm' | 'w-section-rounded' | 
 
 type CanvasKey = 'role-canvas' | 'role-canvas-dark' | keyof typeof CANVAS_GLOWS | 'noise'
 
-export type TokenKey = PaletteKey | 'neutral' | `role-${ RoleName }` | `role-${ RoleName }-dark` | ShapeKey | 'layout' | LayoutKey | CanvasKey | 'font-sans'
+export type TokenKey = PaletteKey | 'neutral' | `role-${ RoleName }` | `role-${ RoleName }-dark` | ShapeKey | 'layout' | 'overlay' | LayoutKey | CanvasKey | 'font-sans'
 
 /**
  * The px a size slider runs through: from `min` to `max`, or for a radius to half of the `pillOf` height, where it
@@ -54,7 +54,7 @@ export type TokenKey = PaletteKey | 'neutral' | `role-${ RoleName }` | `role-${ 
 export type SizeRange = {min: number, max: number} | {min: number, pillOf: ShapeKey}
 
 /** `layouts`: the layout styles a token has an effect in; the playground shows it only in those. */
-export type Token = {key: TokenKey, group: string, label: string, description?: string, kind: 'color' | 'neutral' | 'layout' | 'noise' | 'size' | 'font', range?: SizeRange, layouts?: LayoutId[]}
+export type Token = {key: TokenKey, group: string, label: string, description?: string, kind: 'color' | 'neutral' | 'layout' | 'overlay' | 'noise' | 'size' | 'font', range?: SizeRange, layouts?: LayoutId[]}
 
 const HEIGHT_RANGE: SizeRange = {min: 24, max: 56}
 
@@ -96,6 +96,7 @@ export const TOKENS: Token[] = [
   {key: 'w-checkbox-size', group: 'Shape', label: 'Checkbox size', kind: 'size', range: {min: 10, max: 24}},
   {key: 'w-shadow-lift', group: 'Shape', label: 'Shadow lift', description: 'How far shadows fall under dropdowns, modals and tooltips; 0 centers them into a glow', kind: 'size', range: {min: 0, max: 16}},
   {key: 'layout', group: 'Layout', label: 'Layout style', description: 'How sections, cards and the bars look; the sizes below start from it', kind: 'layout'},
+  {key: 'overlay', group: 'Layout', label: 'Overlays', description: 'Dropdowns, menus and the bars over the page. Lens bends the page along their rim, in Chromium; other browsers keep them frosted', kind: 'overlay'},
   {key: 'w-inner-margin', group: 'Layout', label: 'Page margin, phones', description: 'Where page content starts off the screen edges and the bars; card and glass sections pad by it', kind: 'size', range: {min: 8, max: 32}},
   {key: 'w-inner-margin-sm', group: 'Layout', label: 'Page margin', description: 'The same from 640px up', kind: 'size', range: {min: 8, max: 48}},
   {key: 'w-section-rounded', group: 'Layout', label: 'Section radius', description: 'Sections, such as a list or a form, on the page', kind: 'size', range: {min: 0, max: 32}},
@@ -131,7 +132,7 @@ const MATH_FUNCTIONS = ['calc', 'min', 'max', 'clamp', 'var']
  * than filtered out: no quotes outside font names, so no strings for `image-set()` and the like to load, only the listed
  * functions, and no comments, which could swallow the end of the rule.
  */
-const VALUE_RULES: Record<Exclude<Token['kind'], 'neutral' | 'layout' | 'noise'>, {pattern: RegExp, functions: string[], property: string, error: string}> = {
+const VALUE_RULES: Record<Exclude<Token['kind'], 'neutral' | 'layout' | 'overlay' | 'noise'>, {pattern: RegExp, functions: string[], property: string, error: string}> = {
   color: {
     pattern: /^[\w #%.,+*/()-]+$/,
     functions: ['rgb', 'rgba', 'hsl', 'hsla', 'hwb', 'lab', 'lch', 'oklab', 'oklch', 'color', 'color-mix', 'light-dark', ...MATH_FUNCTIONS],
@@ -163,6 +164,7 @@ export const getTokenError = (key: TokenKey, value: string): string | undefined 
 
   if (kind === 'neutral') return isNeutralScale(value) ? undefined : `Not a neutral scale: one of ${ Object.keys(NEUTRAL_SCALES).join(', ') }`
   if (kind === 'layout') return isLayoutId(value) ? undefined : `Not a layout style: one of ${ LAYOUTS.map(layout => layout.id).join(', ') }`
+  if (kind === 'overlay') return isOverlayId(value) ? undefined : `Not an overlay material: one of ${ OVERLAY_MATERIALS.map(material => material.id).join(', ') }`
   if (kind === 'noise') return isNoiseId(value) ? undefined : `Not a grain: one of ${ NOISE_LEVELS.map(level => level.id).join(', ') }`
   if (!kind) return 'Unknown token'
   if (value.length > VALUE_MAX_LENGTH) return `At most ${ VALUE_MAX_LENGTH } characters`
@@ -202,6 +204,8 @@ export const normalizeConfig = (value: unknown): ThemeConfig => {
       if (isNeutralScale(item)) config.neutral = item
     } else if (key === 'layout') {
       if (isLayoutId(item)) config.layout = item
+    } else if (key === 'overlay') {
+      if (isOverlayId(item) && item !== 'frosted') config.overlay = item
     } else if (key === 'noise') {
       if (isNoiseId(item) && item !== 'none') config.noise = item
     } else if (isTokenKey(key) && typeof item === 'string' && item.trim() && !getTokenError(key, item.trim())) {

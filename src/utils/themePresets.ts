@@ -97,6 +97,44 @@ const getNoiseImage = (id: string | undefined) => {
   return `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 ${ alpha } 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
 }
 
+/**
+ * What the overlays are made of: the dropdowns, popovers and menus over the page, and the bars. Frosted is the
+ * layout's own blur. Lens bends the page along their rounded rim, as a curved pane of glass does (`useLensGlass`,
+ * Chromium only: other browsers keep the blur), with a lit edge and less fill, since the refraction shows only
+ * through it. It is a material for what floats over content, so it goes with any layout; the content stays as it is.
+ */
+export const OVERLAY_MATERIALS = [
+  {id: 'frosted', name: 'Frosted'},
+  {id: 'lens', name: 'Lens'},
+] as const
+
+export type OverlayId = typeof OVERLAY_MATERIALS[number]['id']
+
+export const isOverlayId = (value: unknown): value is OverlayId => OVERLAY_MATERIALS.some(material => material.id === value)
+
+/**
+ * A light blur, so the page bends through the rim legibly, saturation, as glass deepens the colors behind it, and some
+ * brightness, as it gathers light: the bars over the page blur least, the dropdowns more, to keep their text legible.
+ */
+const LENS_CHROME_BACKDROP = 'blur(2px) saturate(1.8) brightness(1.1)'
+const LENS_DROPDOWN_BACKDROP = 'blur(4px) saturate(1.8) brightness(1.1)'
+
+export const OVERLAY_TOKENS: Record<OverlayId, PresetTokens> = {
+  frosted: {},
+  lens: {
+    // In px: how far the rim shifts the page at the edge, and how wide it is; then how much larger the middle shows
+    // it (4%). `w-lens-dispersion` splits the colors along the rim too, off here: on a 2x screen Chrome smears the
+    // middle of the pane with it.
+    'w-lens-refraction': '40',
+    'w-lens-bezel': '28',
+    'w-lens-magnify': '0.04',
+    'w-dropdown-opacity': '0.4',
+    'w-dropdown-backdrop': LENS_DROPDOWN_BACKDROP,
+    'w-chrome-opacity': '0.35',
+    'w-chrome-backdrop': LENS_CHROME_BACKDROP,
+  },
+}
+
 /** The tokens each layout sets; the theme's own override them. Flat is the kit's defaults. */
 export const LAYOUT_TOKENS: Record<LayoutId, PresetTokens> = {
   flat: {},
@@ -223,8 +261,8 @@ export type PresetId = typeof PRESETS[number]['id']
  * `default-dark` fixed, since apps that set their own `gray-900` use the two as different surfaces.
  */
 export const expandTokens = (tokens: PresetTokens): [key: string, value: string][] => {
-  const {layout, noise, ...rest} = tokens
-  const expanded: PresetTokens = {...isLayoutId(layout) ? LAYOUT_TOKENS[layout] : {}, ...rest}
+  const {layout, overlay, noise, ...rest} = tokens
+  const expanded: PresetTokens = {...isLayoutId(layout) ? LAYOUT_TOKENS[layout] : {}, ...isOverlayId(overlay) ? OVERLAY_TOKENS[overlay] : {}, ...rest}
   const noiseImage = getNoiseImage(noise)
 
   if (noiseImage) expanded['w-canvas-image'] = expanded['w-canvas-image'] ? `${ noiseImage }, ${ expanded['w-canvas-image'] }` : noiseImage

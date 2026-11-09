@@ -1,14 +1,14 @@
 import {computed, ref, shallowRef, toRaw, watch} from 'vue'
 
 import {THEME_QUERY_PARAM, TOKENS, type ThemeConfig, type ThemeTokens, type Token, type TokenKey, findPreset, getThemeStyleCss, getTokenError, getTokens, isTokenInLayout, isTokenKey, normalizeConfig, parseThemeParam} from '@/utils/themeConfig'
-import {CANVAS_GLOWS, FULL_HUE_RANGE, type HueRange, LAYOUTS, LAYOUT_TOKENS, NEUTRAL_SCALES, NOISE_LEVELS, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, expandTokens, getHueGradient, getHueSwatch, getLayoutClass, getRandomTokens, getThemeBlock, isFullHueRange, isHueRange, isLayoutId, isRandomStyleId} from '@/utils/themePresets'
+import {CANVAS_GLOWS, FULL_HUE_RANGE, type HueRange, LAYOUTS, LAYOUT_TOKENS, NEUTRAL_SCALES, NOISE_LEVELS, OVERLAY_MATERIALS, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, expandTokens, getHueGradient, getHueSwatch, getLayoutClass, getRandomTokens, getThemeBlock, isFullHueRange, isHueRange, isLayoutId, isRandomStyleId} from '@/utils/themePresets'
 
 import rolesCss from '../../../package/tailwind-base/css/roles.css?raw'
 import themeCss from '../../../package/tailwind-base/css/theme.css?raw'
 import {THEME_STORAGE_KEY as STORAGE_KEY, THEME_STYLE_ID as STYLE_ID} from '../themeHeadScript'
 
 export {DATA_HUES, TOKENS, type ThemeConfig, type ThemeTokens, type TokenKey, findPreset, getTokenError, getTokens, isTokenInLayout, isTokenKey, normalizeConfig, parseThemeParam, parseThemeReply} from '@/utils/themeConfig'
-export {FULL_HUE_RANGE, type HueRange, LAYOUTS, NEUTRAL_SCALES, NOISE_LEVELS, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, getHueGradient, getHueSwatch, isFullHueRange}
+export {FULL_HUE_RANGE, type HueRange, LAYOUTS, NEUTRAL_SCALES, NOISE_LEVELS, OVERLAY_MATERIALS, PRESETS, type PresetId, RANDOM_STYLES, type RandomStyleId, getHueGradient, getHueSwatch, isFullHueRange}
 
 /** Groups the playground shows collapsed, with what they are for. */
 export const ADVANCED_GROUPS: Record<string, string> = {
@@ -33,6 +33,7 @@ export const DEFAULT_TOKENS: Record<TokenKey, string> = {
   'w-checkbox-size': '0.75rem',
   'w-shadow-lift': '0.5rem',
   layout: 'flat',
+  overlay: 'frosted',
   'w-inner-margin': '1rem',
   'w-inner-margin-sm': '1.5rem',
   'w-section-rounded': '0px',
@@ -274,6 +275,7 @@ export const getThemePrompt = (description: string, config: ThemeConfig) => {
     'Rules:',
     '- Colors as oklch(L% C H). "neutral" is one of: ' + Object.keys(NEUTRAL_SCALES).join(', ') + '.',
     '- "noise" is one of: ' + NOISE_LEVELS.map(level => level.id).join(', ') + '. The w-canvas-glow-* colors tint the glass layout\'s page background only.',
+    '- "overlay" is one of: ' + OVERLAY_MATERIALS.map(material => material.id).join(', ') + ': lens glass for dropdowns, menus and the bars, frosted otherwise.',
     '- "layout" is one of: ' + LAYOUTS.map(layout => `${ layout.id } (${ layout.look.toLowerCase() })`).join(', ') + '. Its sizes are set only to change the layout\'s own.',
     '- Primary and the status colors are fills under black or white text, whichever reads better by APCA: white on fills with less luminance than a gray of L 71%, so a saturated purple or blue at L 65% still takes white. A fill with white text needs 3:1 contrast with the page, in light mode against the background and in dark mode against the dark background, and its text APCA Lc 60. Avoid fills right at the switch, where neither text reaches it. Keep status fills with white text near Lc 68, no deeper than Lc 70, so they don\'t outweigh the content beside them. When one value cannot pass in both modes, set its -dark variant.',
     '- Readable text, focus rings and soft backgrounds are derived from these fills, so don\'t ask for more colors to get them.',
@@ -299,7 +301,7 @@ export const getThemeCss = (tokens: ThemeTokens) => {
   const preset: Record<string, string> = layout ? LAYOUT_TOKENS[layout] : {}
   const effective = {...DEFAULT_TOKENS, ...preset, ...tokens}
   const isOwn = (key: string, value: string) => preset[key] !== value
-  const changed = TOKENS.filter(token => !token.key.startsWith('w-') && token.kind !== 'layout' && token.kind !== 'noise' && effective[token.key] !== DEFAULT_TOKENS[token.key] && isOwn(token.key, effective[token.key])).map(token => [token.key, effective[token.key]] as const)
+  const changed = TOKENS.filter(token => !token.key.startsWith('w-') && token.kind !== 'layout' && token.kind !== 'overlay' && token.kind !== 'noise' && effective[token.key] !== DEFAULT_TOKENS[token.key] && isOwn(token.key, effective[token.key])).map(token => [token.key, effective[token.key]] as const)
   const theme = getThemeBlock(Object.fromEntries(changed.filter(([key]) => !(key in preset))))
   const root = changed.filter(([key]) => key in preset)
   // The grain is a picture, so `w-canvas-image` below carries it: expanded with the rest of the layout's tokens.

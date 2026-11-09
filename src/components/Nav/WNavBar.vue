@@ -20,6 +20,7 @@
   </Transition>
 
   <nav
+    ref="nav"
     class="
       w-nav-bar fixed left-(--w-left-margin,0px) top-0 flex h-full flex-col overflow-hidden
       transition-[clip-path] duration-200 [clip-path:inset(-2rem)] print:hidden
@@ -71,13 +72,14 @@
 <script lang="ts" setup>
 import type {LinkProps} from '@/types/types'
 
-import {provide, ref} from 'vue'
+import {provide, ref, useTemplateRef} from 'vue'
 
 import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 
 import IconMenu from '@/assets/icons/IconMenu.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
+import {useLensGlass} from '@/utils/useLensGlass'
 import {BASE_ZINDEX_NAV_BAR, wBaseZIndex} from '@/utils/utils'
 
 defineProps<{
@@ -108,6 +110,8 @@ provide(wBaseZIndex, BASE_ZINDEX_NAV_BAR)
 const {isTablet} = useIsMobile()
 
 const isOpen = ref(false)
+
+useLensGlass(useTemplateRef('nav'))
 
 const emitIsOpen = () => {
   emit('update:is-open', isOpen.value)

@@ -65,6 +65,7 @@
           @click="hideDropdown"
         >
           <div
+            ref="dropdown"
             class="
               w-nav-bar w-nav-bar-dropdown w-nav-bar-width overflow-y-auto overscroll-contain
               border border-solid border-line-raised text-start font-normal shadow
@@ -116,6 +117,7 @@ import IconArrow from '@/assets/icons/IconArrow.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {useIsMobile} from '@/utils/mobile'
+import {useLensGlass} from '@/utils/useLensGlass'
 import {unwrapSlots} from '@/utils/utils'
 
 import WNavItem from './WNavItem.vue'
@@ -161,6 +163,8 @@ watch(isActive, updateHasActive, {immediate: true})
 watch(slotsDefault, updateHasActive, {immediate: true})
 
 watch(hasActive, closeDropdown, {immediate: true})
+
+useLensGlass(useTemplateRef('dropdown'))
 
 defineSlots<{
   /** WNavItem items of the group. They show under the group while one of them is active, and in a menu on hover otherwise. */

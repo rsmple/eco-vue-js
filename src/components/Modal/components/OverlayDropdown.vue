@@ -96,6 +96,7 @@
             At a point, such as where a row was right-clicked, the corner at the point is squared off instead of a tip.
           -->
           <WClickOutside
+            ref="frame"
             :no-filter="closeOnClick"
             :class="[
               frameClass ?? 'w-dropdown-frame',
@@ -177,6 +178,7 @@ import WInfiniteListScrollingElement from '@/components/InfiniteList/WInfiniteLi
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {getIsMobile} from '@/utils/mobile'
+import {useLensGlass} from '@/utils/useLensGlass'
 import {BASE_ZINDEX_DROPDOWN, wBaseZIndex} from '@/utils/utils'
 
 import OverlayRegion from './OverlayRegion.vue'
@@ -222,6 +224,9 @@ const hasTop = computed(() => regions.title.length > 0 || regions.subtitle.lengt
 const titleId = useId()
 
 const dropdownRef = useTemplateRef('dropdown')
+
+// The frame floats over the page: lens glass where the theme turns it on.
+useLensGlass(useTemplateRef('frame'))
 
 if (props.onTop && !isMobile) watch(() => dropdownRef.value?.isTop ?? false, props.onTop, {immediate: true})
 
