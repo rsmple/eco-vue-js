@@ -12,6 +12,7 @@ The kit's look comes from three kinds of CSS variables:
 - **Color roles** — what components actually paint with, named by purpose: main and muted text, surfaces, lines, focus. Each reads the palette by default, and an app can set any of them in `@theme` too.
 - **`w-*` variables** — sizes and radii of fields, buttons and list headers. An app sets them on `body`, directly or with the matching utilities (`w-input-h-9`, `w-button-rounded-xl`).
 - **Layout style** — how content is contained: flat, card or glass ([Layout styles](#layout-styles)). It is a set of the variables above, which the playground writes out.
+- **Overlays** — the material of what floats over the page: frosted or lens glass ([Overlays](#overlays)). It is a set of variables too.
 
 All are plain CSS variables at runtime, so this site can swap them live: the whole site follows the playground below, including the header and every component page.
 
@@ -254,7 +255,7 @@ https://rsmple.github.io/eco-vue-js/guide/theming?theme=ocean
 https://rsmple.github.io/eco-vue-js/components/select?theme={"preset":"compact","color-primary":"#e11d48","neutral":"stone"}
 ```
 
-Encode the JSON with `encodeURIComponent` when building a link in code; browsers accept it unencoded when typed. Keys are the variable names without `--`, plus `neutral`, which takes a scale name: `zinc`, `slate`, `gray`, `neutral` or `stone`, and `layout`: `flat`, `card` or `glass`. An optional `name` saves the theme among the opener's themes under that name, numbered when it is taken; opening a theme that is saved already switches to it instead of saving a copy. Unknown keys are ignored, and so are values with `;`, `{`, `}`, `<`, `>`, `\`, `url(` or `@import`. Colors take any CSS color syntax, including `var(--color-gray-400)`; sizes any CSS length. Radii double as side padding, so a pill shape is half the height (`1.125rem` for `2.25rem`), not `9999px`.
+Encode the JSON with `encodeURIComponent` when building a link in code; browsers accept it unencoded when typed. Keys are the variable names without `--`, plus `neutral`, which takes a scale name: `zinc`, `slate`, `gray`, `neutral` or `stone`, `layout`: `flat`, `card` or `glass`, and `overlay`: `frosted` or `lens`. An optional `name` saves the theme among the opener's themes under that name, numbered when it is taken; opening a theme that is saved already switches to it instead of saving a copy. Unknown keys are ignored, and so are values with `;`, `{`, `}`, `<`, `>`, `\`, `url(` or `@import`. Colors take any CSS color syntax, including `var(--color-gray-400)`; sizes any CSS length. Radii double as side padding, so a pill shape is half the height (`1.125rem` for `2.25rem`), not `9999px`.
 
 To make a theme from a description — "a warm, rounded theme for a finance dashboard" — pick a neutral scale and a primary, adjust status colors only where they clash with it, and link to the page the theme should be seen on, or to this one to keep editing it. Mid-tone fills (OKLCH lightness 50–58%) work in both modes without `-dark` values.
 
@@ -319,6 +320,27 @@ To make a theme from a description — "a warm, rounded theme for a finance dash
 
 A layout also sets the canvas and card roles (`role-canvas`, `role-card`) and the `w-section-*`, `w-card-*` and `w-chrome-*` opacity, edge, shadow and blur variables; **Copy CSS** lists them.
 
-Dropdowns and popovers, and the bottom sheets that stand in for them on phones, follow the cards: they take `w-card-backdrop` as their blur, and `w-card-opacity` halfway to opaque, since they lie over content rather than the page background. Glass cards at `0.4` make dropdowns at `0.7`; flat and card stay opaque. A theme sets `w-dropdown-opacity` and `w-dropdown-backdrop` to change them on their own.
+Dropdowns and popovers, the bottom sheets that stand in for them on phones, and notifications follow the cards: they take `w-card-backdrop` as their blur, and `w-card-opacity` halfway to opaque, since they lie over content rather than the page background. Glass cards at `0.4` make dropdowns at `0.7`; flat and card stay opaque. A theme sets `w-dropdown-opacity` and `w-dropdown-backdrop` to change them on their own.
+
+### Overlays
+
+| Key | Default | Values | Controls |
+| --- | --- | --- | --- |
+| `overlay` | `frosted` | `lens` | The material of dropdowns, menus, notifications and the bars, and with it the variables below |
+
+**Frosted** is the default: what floats over the page blurs what is behind it as the layout sets, as above. **Lens** makes it lens glass: the page bends along the rim as through a lens, a little magnified in the middle, and the edge catches light. It takes in dropdowns and popovers, the nav's group menus, notifications, and WHeaderBar, WNavBar and WActionsBar. It works in any layout and shows most in glass, where there is color behind the bars to bend.
+
+The bending is an SVG filter in `backdrop-filter`, which only Chromium browsers apply to a backdrop: in Safari and Firefox the edge stays plain, and only the lighter fill and blur below apply. Under the playground's **Layout**, **Overlays** switches it, and **Copy CSS** writes out its variables:
+
+| Variable | Lens | Controls |
+| --- | --- | --- |
+| `w-lens-refraction` | `40` | How far the rim bends the page, in pixels; `0` turns the bending off |
+| `w-lens-bezel` | `28` | How wide the bending rim is, in pixels |
+| `w-lens-magnify` | `0.04` | How much the middle magnifies the page: `0.04` is 4% |
+| `w-lens-dispersion` | `0` | Splits the colors along the rim, as a prism; off, since Chrome blurs it on high-density screens |
+| `w-dropdown-opacity` | `0.4` | The fill of dropdowns and notifications, lighter than frosted so the bending shows |
+| `w-dropdown-backdrop` | `blur(4px) saturate(1.8) brightness(1.1)` | Their blur, light so the page reads through the rim |
+| `w-chrome-opacity` | `0.35` | The fill of the bars |
+| `w-chrome-backdrop` | `blur(2px) saturate(1.8) brightness(1.1)` | The bars' blur |
 
 The kit has more `w-*` variables for single components, such as `w-list-padding` and `w-modal-wrapper-rounded`; the playground covers the ones that shape the whole app.
