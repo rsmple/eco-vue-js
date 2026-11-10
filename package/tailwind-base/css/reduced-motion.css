@@ -1,4 +1,10 @@
-/* Turns off animations, transitions and smooth scrolling when the user asks the OS for reduced motion. Transitions still run for a moment so `transitionend` and Vue's `after-enter`/`after-leave` fire. */
+/*
+ * Turns off animations, transitions and smooth scrolling when the user asks the OS for reduced motion.
+ * Animations still run for a moment so `animationend` fires; they only run where one is declared.
+ * Transitions get no duration at all: `transition-property` defaults to `all`, so any duration here would make every
+ * element transition each inherited change — a theme switch would start one per SVG node. Vue's `after-enter` and
+ * `after-leave` still fire, since Vue finds no transition and finishes at once.
+ */
 @layer base {
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -8,7 +14,7 @@
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-delay: 0s !important;
-      transition-duration: 0.01ms !important;
+      transition-duration: 0s !important;
       scroll-behavior: auto !important;
     }
   }
