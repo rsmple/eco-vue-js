@@ -110,7 +110,7 @@
             @click="isOpen ? toggleScope.unclickable === false ? close() : blur() : focus()"
           >
             <IconArrow
-              class="square-3 text-description transition-transform"
+              class="square-3 text-description motion-safe:transition-transform"
               :class="{'rotate-180': isOpen}"
             />
           </InputActionsButton>

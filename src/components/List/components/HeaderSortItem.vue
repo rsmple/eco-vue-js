@@ -16,7 +16,7 @@
       >
         <IconBack
           v-if="index !== -1"
-          class="square-4 transition-transform"
+          class="square-4 motion-safe:transition-transform"
           :class="{
             'rotate-90': ordering[index]?.order === 'ASC',
             '-rotate-90': ordering[index]?.order === 'DESC'

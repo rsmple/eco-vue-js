@@ -48,7 +48,7 @@
 
           <template #right>
             <IconArrow
-              class="square-3 transition-transform"
+              class="square-3 motion-safe:transition-transform"
               :class="{
                 '-rotate-90': !hasActive && !even,
               }"

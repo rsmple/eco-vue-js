@@ -23,7 +23,7 @@
           :style="{width: `${ rangeScale(cursor ?? modelValue) * 100 }%`}"
         >
           <div
-            class="square-4 relative right-0 -mr-2 rounded-full bg-inherit transition-transform"
+            class="square-4 relative right-0 -mr-2 rounded-full bg-inherit motion-safe:transition-transform"
             :class="{
               'scale-180': isMoveStarted,
               'hover:scale-200': !readonly && !isMoveStarted,

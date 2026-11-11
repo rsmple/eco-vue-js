@@ -23,7 +23,7 @@
     ref="nav"
     class="
       w-nav-bar fixed left-(--w-left-margin,0px) top-0 flex h-full flex-col overflow-hidden
-      transition-[clip-path] duration-200 [clip-path:inset(-2rem)] print:hidden
+      motion-safe:transition-[clip-path] motion-safe:duration-200 [clip-path:inset(-2rem)] print:hidden
     "
     :class="[{
       'xl-not:[clip-path:inset(-2rem_calc(100%+2rem)_-2rem_-2rem)]': !isOpen,

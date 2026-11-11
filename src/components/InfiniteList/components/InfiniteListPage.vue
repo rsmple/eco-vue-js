@@ -37,7 +37,7 @@
     <div
       v-for="(slot, slotIndex) in slotList"
       :key="slot.key"
-      class="grid w-full transition-[grid-template-rows] duration-300"
+      class="grid w-full motion-safe:transition-[grid-template-rows] motion-safe:duration-300"
     >
       <div class="[overflow:inherit]">
         <InfiniteListPageItem :ref="item => setItemRef(slot.key, item as ItemInstance | null)">

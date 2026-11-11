@@ -38,7 +38,7 @@
 
     <div class="col-start-3 ml-auto flex items-center justify-center">
       <IconArrow
-        class="text-accent square-[1.25em] transition-transform"
+        class="text-accent square-[1.25em] motion-safe:transition-transform"
         :class="{'rotate-180': isOpen}"
       />
     </div>

@@ -18,7 +18,7 @@
       class="p-8"
     >
       <div
-        class="text-surface rounded-full bg-inherit p-1 outline transition-[outline-width] duration-500" 
+        class="text-surface rounded-full bg-inherit p-1 outline motion-safe:transition-[outline-width] motion-safe:duration-500" 
         :class="{
           'tone-negative bg-tone-fill outline-tone/10': hasError,
           'tone-positive bg-tone-fill outline-tone/10': !hasError && hasValue && showHasValue,
@@ -121,8 +121,8 @@
       </Transition>
 
       <Transition
-        enter-active-class="transition-[scale,opacity] origin-center duration-300"
-        leave-active-class="transition-[scale,opacity] origin-center duration-300"
+        enter-active-class="motion-safe:transition-[scale,opacity] origin-center motion-safe:duration-300"
+        leave-active-class="motion-safe:transition-[scale,opacity] origin-center motion-safe:duration-300"
         enter-from-class="scale-x-0 opacity-0"
         leave-to-class="scale-x-0 opacity-0"
         :css="!indicator"

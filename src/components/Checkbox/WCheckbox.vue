@@ -35,8 +35,8 @@
       @keypress.enter.stop.prevent="toggle"
     >
       <Transition
-        enter-active-class="transition-[scale,opacity]"
-        leave-active-class="transition-[scale,opacity]"
+        enter-active-class="motion-safe:transition-[scale,opacity]"
+        leave-active-class="motion-safe:transition-[scale,opacity]"
         :enter-from-class="radio ? 'opacity-0 scale-25!' : 'opacity-0 scale-50!'"
         :leave-to-class="radio ? 'opacity-0 scale-25!' : 'opacity-0 scale-50!'"
         :css="!lessTransitions"
@@ -51,7 +51,7 @@
             'rounded-[calc(0.25rem+1px)]': !radio && !(intermediate && modelValue === null),
             'tone-primary bg-tone-fill [.w-hover-checked:hover_&]:block!': !isDisabled && !isSkeleton,
             'bg-track': isDisabled || isSkeleton,
-            'transition-[scale,opacity]': !lessTransitions,
+            'motion-safe:transition-[scale,opacity]': !lessTransitions,
           }"
         />
       </Transition>

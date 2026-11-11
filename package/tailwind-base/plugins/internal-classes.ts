@@ -167,7 +167,9 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
         height: '100%',
         'background-repeat': 'repeat',
         'background-size': '40px 40px',
-        animation: theme('animation.move-horizontal'),
+        '@media (prefers-reduced-motion: no-preference)': {
+          animation: theme('animation.move-horizontal'),
+        },
       },
       [DARK_SELECTOR]: {
         '&::before': {
@@ -208,7 +210,9 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
         width: '100%',
         height: '100%',
         'background-image': 'linear-gradient(90deg, rgb(255 255 255 / 0), rgb(255 255 255 / var(--w-skeleton-opacity)), rgb(255 255 255 / 0))',
-        animation: theme('animation.ticker'),
+        '@media (prefers-reduced-motion: no-preference)': {
+          animation: theme('animation.ticker'),
+        },
       },
     },
   })

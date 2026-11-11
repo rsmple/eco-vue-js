@@ -158,7 +158,7 @@
 
         <div
           v-else-if="defaultSlots.some(slot => (slot.children as Record<string, Component>)?.default)"
-          class="relative h-full transition-[min-height] duration-300"
+          class="relative h-full motion-safe:transition-[min-height] motion-safe:duration-300"
           :class="{
             // While the tab changes, the browser would keep a row of the previous tab in place as the next one replaces it.
             '[overflow-anchor:none]': isSwitching,
@@ -168,8 +168,8 @@
           :style="{minHeight: minHeight ? minHeight + 'px' : 'auto', '--direction-factor': isDirect ? '1' : '-1'}"
         >
           <TransitionGroup
-            enter-active-class="transition-[translate,opacity] duration-250 w-full [overflow-anchor:none]"
-            leave-active-class="transition-[translate,opacity] duration-250 w-full absolute top-0 [overflow-anchor:none]"
+            enter-active-class="motion-safe:transition-[translate,opacity] motion-safe:duration-250 w-full [overflow-anchor:none]"
+            leave-active-class="motion-safe:transition-[translate,opacity] motion-safe:duration-250 w-full absolute top-0 [overflow-anchor:none]"
             :enter-from-class="lessTransitions || side || hasScrollbar ? 'opacity-0' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor))]'"
             :leave-to-class="lessTransitions || side || hasScrollbar ? 'opacity-0 absolute' : 'opacity-0 translate-x-[calc((100%+var(--inner-margin))*var(--direction-factor)*-1)]'"
             @after-enter="isSwitching = false"

@@ -48,7 +48,7 @@
 
       <IconArrow
         v-if="!hasValue"
-        class="square-[1em] text-description shrink-0 transition-transform"
+        class="square-[1em] text-description shrink-0 motion-safe:transition-transform"
         :class="{'rotate-180': isOpen}"
       />
     </button>

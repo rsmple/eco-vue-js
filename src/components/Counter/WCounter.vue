@@ -2,7 +2,7 @@
   <div
     class="flex min-w-[1.25em] items-center justify-center rounded-full px-[0.375em] font-medium leading-tight"
     :class="[{
-      'animate-shake': isShake,
+      'motion-safe:animate-shake': isShake,
     }, semanticTypeBgMap[semanticType]]"
   >
     {{ numberCompactFormatter.format(count) }}

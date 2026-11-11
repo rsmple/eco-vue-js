@@ -48,7 +48,9 @@ const pluginRipple = plugin(function ({matchUtilities, addUtilities, addBase}) {
   const configRippleStatic = {
     'w-ripple-active:not(:active)': () => ({
       '&::before': {
-        animation: 'ripple-active infinite linear alternate 0.5s',
+        '@media (prefers-reduced-motion: no-preference)': {
+          animation: 'ripple-active infinite linear alternate 0.5s',
+        },
       },
     }),
   }

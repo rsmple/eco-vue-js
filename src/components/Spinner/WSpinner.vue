@@ -3,7 +3,7 @@
     width="20"
     height="20"
     viewBox="0 0 24 24"
-    class="animate-spin"
+    class="motion-safe:animate-spin"
   >
     <circle
       class="animate-spinner-dash motion-reduce:[stroke-dasharray:40,57]"

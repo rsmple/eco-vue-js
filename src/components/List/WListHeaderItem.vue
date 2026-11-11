@@ -39,7 +39,7 @@
           class="flex items-center gap-1"
         >
           <IconBack
-            class="square-3 transition-transform"
+            class="square-3 motion-safe:transition-transform"
             :class="{
               'rotate-90': ordering[index]?.order === 'ASC',
               '-rotate-90': ordering[index]?.order === 'DESC',

@@ -24,7 +24,7 @@
       <div
         v-for="item in notifyCenterToastEntries"
         :key="getNotifyItemKey(item)"
-        class="grid transition-[translate,opacity,grid-template-rows] duration-300"
+        class="grid motion-safe:transition-[translate,opacity,grid-template-rows] motion-safe:duration-300"
         :class="isCenter ? 'justify-center' : 'justify-end'"
       >
         <div class="min-h-0">

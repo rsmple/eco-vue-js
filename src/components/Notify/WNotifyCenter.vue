@@ -60,7 +60,7 @@
         <div
           v-for="item in notifyCenterActionEntries"
           :key="getNotifyItemKey(item)"
-          class="grid transition-[transform,grid-template-rows] duration-300"
+          class="grid motion-safe:transition-[transform,grid-template-rows] motion-safe:duration-300"
         >
           <div class="min-h-0">
             <NotifyCard
@@ -100,7 +100,7 @@
         <div
           v-for="item in notifyCenterActivityEntries"
           :key="getNotifyItemKey(item)"
-          class="grid transition-[transform,grid-template-rows] duration-300"
+          class="grid motion-safe:transition-[transform,grid-template-rows] motion-safe:duration-300"
         >
           <div class="min-h-0">
             <NotifyCard

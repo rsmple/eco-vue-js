@@ -1,11 +1,12 @@
 import path from 'node:path'
 
+import plugin from './package/eslint/plugin.js'
 import recommended from './package/eslint/recommended.js'
 
 export default [
   {
     name: 'app/files-to-lint',
-    files: ['**/*.{ts,js,mts,tsx,vue,json,svg}'],
+    files: ['**/*.{ts,js,mts,tsx,vue,json,svg,css}'],
   },
 
   {
@@ -24,6 +25,8 @@ export default [
       'docs/.vitepress/tsconfig.json',
     ],
   }),
+
+  ...plugin.configs.motion().map(item => ({...item, ignores: ['package/eslint/**']})),
 
   {
     files: ['**/*.{ts,js,vue}'],

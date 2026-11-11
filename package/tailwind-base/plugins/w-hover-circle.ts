@@ -18,9 +18,11 @@ const pluginDefault = plugin(function ({addBase}) {
         'user-select': 'none',
         opacity: '0',
         transform: 'scaleX(0.5) scaleY(0.5)',
-        'transition-property': 'opacity, transform',
-        'transition-timing-function': 'cubic-bezier(0.4, 0, 0.2, 1)',
-        'transition-duration': '200ms',
+        '@media (prefers-reduced-motion: no-preference)': {
+          'transition-property': 'opacity, transform',
+          'transition-timing-function': 'cubic-bezier(0.4, 0, 0.2, 1)',
+          'transition-duration': '200ms',
+        },
       },
 
       '&:hover::after, .w-hover-circle-trigger:hover &::after, &:focus::after, .w-hover-circle-trigger:focus &::after': {

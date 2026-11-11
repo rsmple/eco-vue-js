@@ -9,7 +9,7 @@
         @click="toggle"
       >
         <IconArrow
-          class="square-4 transition-transform"
+          class="square-4 motion-safe:transition-transform"
           :class="{'rotate-180': isOpen}"
         />
       </WButton>
@@ -30,7 +30,7 @@
         @click="toggle"
       >
         <IconArrow
-          class="square-[1em] transition-transform"
+          class="square-[1em] motion-safe:transition-transform"
           :class="{'rotate-180': isOpen}"
         />
       </WButton>

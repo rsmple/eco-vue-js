@@ -10,8 +10,8 @@
     }"
   >
     <Transition
-      enter-active-class="transition-transform duration-200"
-      leave-active-class="transition-transform duration-200"
+      enter-active-class="motion-safe:transition-transform motion-safe:duration-200"
+      leave-active-class="motion-safe:transition-transform motion-safe:duration-200"
       enter-from-class="-translate-x-1"
       leave-to-class="-translate-x-1"
     >

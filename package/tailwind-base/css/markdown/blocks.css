@@ -75,7 +75,7 @@
   }
 
   .w-markdown summary svg {
-    @apply transition-transform self-center;
+    @apply motion-safe:transition-transform self-center;
   }
 
   .w-markdown details:open summary svg {

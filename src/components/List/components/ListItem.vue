@@ -26,7 +26,7 @@
       >
         <div
           v-if="mobile"
-          class="tone-primary bg-tone-fill @sm:hidden pointer-events-none absolute left-0 top-0 h-full w-2 transition-[translate,opacity] duration-200"
+          class="tone-primary bg-tone-fill @sm:hidden pointer-events-none absolute left-0 top-0 h-full w-2 motion-safe:transition-[translate,opacity] motion-safe:duration-200"
           :class="{'-translate-x-2 opacity-0': !selected}"
         />
 

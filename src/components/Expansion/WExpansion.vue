@@ -1,9 +1,9 @@
 <template>
   <Transition
-    enter-active-class="transition-[grid-template-rows] overflow-y-hidden grid"
+    enter-active-class="motion-safe:transition-[grid-template-rows] overflow-y-hidden grid"
     enter-from-class="grid-rows-[0fr]"
     enter-to-class="grid-rows-[1fr]"
-    leave-active-class="transition-[grid-template-rows] overflow-y-hidden grid"
+    leave-active-class="motion-safe:transition-[grid-template-rows] overflow-y-hidden grid"
     leave-from-class="grid-rows-[1fr]"
     leave-to-class="grid-rows-[0fr]"
     @before-enter="$emit('update:visible', true)"
@@ -13,7 +13,7 @@
       <div
         v-if="isOpen"
         v-show="isShown"
-        class="duration-(--expansion-duration,200ms)"
+        class="motion-safe:duration-(--expansion-duration,200ms)"
       >
         <div class="grid grid-cols-1 [overflow:inherit]">
           <slot />

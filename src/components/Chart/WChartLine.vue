@@ -43,7 +43,7 @@
             :d="minMaxAreaPath"
             fill="white"
             fill-opacity="0.2"
-            class="transition-[d]"
+            class="motion-safe:transition-[d]"
           />
         </template>
 
@@ -51,7 +51,7 @@
           v-else-if="hasArea && areaPath"
           :d="areaPath"
           :fill="`url(#${gradientAreaId})`"
-          class="transition-[d]"
+          class="motion-safe:transition-[d]"
         />
 
         <path
@@ -63,7 +63,7 @@
           stroke="white"
           stroke-linejoin="round"
           stroke-linecap="round"
-          class="transition-[d]"
+          class="motion-safe:transition-[d]"
         />
 
         <g v-if="$slots.tooltip && hoveredData && tooltipRef?.isOpen">

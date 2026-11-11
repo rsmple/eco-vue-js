@@ -30,7 +30,7 @@
           />
 
           <div
-            class="square-4 absolute left-0 -ml-2 rounded-full bg-(--w-slider-from,var(--color-primary)) transition-transform"
+            class="square-4 absolute left-0 -ml-2 rounded-full bg-(--w-slider-from,var(--color-primary)) motion-safe:transition-transform"
             :class="{
               'scale-180': isCursorFrom === true,
               'hover:scale-200': !readonly && isCursorFrom === null,
@@ -38,7 +38,7 @@
           />
 
           <div
-            class="square-4 absolute right-0 -mr-2 rounded-full bg-(--w-slider-to,var(--color-primary)) transition-transform"
+            class="square-4 absolute right-0 -mr-2 rounded-full bg-(--w-slider-to,var(--color-primary)) motion-safe:transition-transform"
             :class="{
               'scale-180': isCursorFrom === false,
               'hover:scale-200': !readonly && isCursorFrom === null,

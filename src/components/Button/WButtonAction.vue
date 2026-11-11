@@ -37,7 +37,7 @@
         <template v-if="icon">
           <component
             :is="icon"
-            class="square-6 w-svg-stroke-width-sm place-self-center transition-transform"
+            class="square-6 w-svg-stroke-width-sm place-self-center motion-safe:transition-transform"
             :class="{
               'group-hover:scale-120': !disabled,
             }"
@@ -51,7 +51,7 @@
         v-if="loading"
         class="absolute inset-0 rounded-inherit overflow-clip text-primary-darkest/10 dark:text-primary-light/20"
       >
-        <div class="absolute inset-0 bg-linear-90 from-current/0 to-current/0 via-current animate-ticker" />
+        <div class="absolute inset-0 bg-linear-90 from-current/0 to-current/0 via-current motion-safe:animate-ticker" />
       </div>
     </div>
 

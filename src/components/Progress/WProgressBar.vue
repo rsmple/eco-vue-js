@@ -9,14 +9,14 @@
   >
     <template v-if="modelValue !== null">
       <div
-        class="absolute inset-y-0 left-0 overflow-hidden rounded-xl transition-[width] duration-500 ease-out"
+        class="absolute inset-y-0 left-0 overflow-hidden rounded-xl motion-safe:transition-[width] motion-safe:duration-500 ease-out"
         :class="progressBarClass[semanticType]"
         :style="{width: percent}"
       >
         <!-- A light sweeps the fill while the task runs. -->
         <div
           v-if="modelValue < 1"
-          class="animate-ticker absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent [--tiker-duration:1.6s]"
+          class="motion-safe:animate-ticker absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent [--tiker-duration:1.6s]"
         />
       </div>
 
@@ -27,7 +27,7 @@
       <!-- The same label in the fill's color, cut to the filled part, so it reads on both sides of the edge. -->
       <div
         aria-hidden="true"
-        class="absolute inset-0 flex items-center justify-center transition-[clip-path] duration-500 ease-out"
+        class="absolute inset-0 flex items-center justify-center motion-safe:transition-[clip-path] motion-safe:duration-500 ease-out"
         :class="progressBarTextClass[semanticType]"
         :style="{clipPath: `inset(0 calc(100% - ${ percent }) 0 0)`}"
       >
@@ -37,7 +37,7 @@
 
     <template v-else>
       <div
-        class="animate-ticker absolute inset-0 bg-linear-to-r from-transparent to-transparent [--tiker-duration:1.4s]"
+        class="motion-safe:animate-ticker absolute inset-0 bg-linear-to-r from-transparent to-transparent [--tiker-duration:1.4s]"
         :class="progressBarIndeterminateClass[semanticType]"
       />
 

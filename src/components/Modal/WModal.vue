@@ -14,8 +14,8 @@
     </Transition>
 
     <TransitionGroup
-      enter-active-class="transition-all duration-300"
-      leave-active-class="transition-all duration-300"
+      enter-active-class="motion-safe:transition-all motion-safe:duration-300"
+      leave-active-class="motion-safe:transition-all motion-safe:duration-300"
       enter-from-class="translate-y-8 opacity-0"
       leave-to-class="-translate-y-5 opacity-0"
     >

@@ -9,7 +9,7 @@
   >
     <IconNotification
       class="square-5"
-      :class="{'animate-pulse': notifyCenterPendingCount !== 0}"
+      :class="{'motion-safe:animate-pulse': notifyCenterPendingCount !== 0}"
     />
 
     <WCounter

@@ -11,20 +11,20 @@
     <!-- Waiting to start: a band sweeps the empty track. -->
     <div
       v-if="modelValue <= 0"
-      class="animate-ticker tone-primary via-tone/60 absolute inset-0 bg-linear-to-r from-transparent to-transparent [--tiker-duration:1.4s]"
+      class="motion-safe:animate-ticker tone-primary via-tone/60 absolute inset-0 bg-linear-to-r from-transparent to-transparent [--tiker-duration:1.4s]"
     />
 
     <div
       v-else
-      class="from-primary-dark to-primary relative h-full overflow-hidden rounded-full bg-linear-to-r transition-[width] duration-500 ease-out"
+      class="from-primary-dark to-primary relative h-full overflow-hidden rounded-full bg-linear-to-r motion-safe:transition-[width] motion-safe:duration-500 ease-out"
       :style="{width: Math.min(modelValue, 100) + '%'}"
     >
       <!-- Running: a light sweeps the fill. Done: the full bar pulses. -->
       <div
         class="absolute inset-0"
         :class="modelValue < 100
-          ? 'animate-ticker bg-linear-to-r from-transparent via-white/40 to-transparent [--tiker-duration:1.6s]'
-          : 'bg-default/30 animate-pulse'"
+          ? 'motion-safe:animate-ticker bg-linear-to-r from-transparent via-white/40 to-transparent [--tiker-duration:1.6s]'
+          : 'bg-default/30 motion-safe:animate-pulse'"
       />
     </div>
   </div>

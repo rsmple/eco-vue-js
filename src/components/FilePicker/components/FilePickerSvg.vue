@@ -3,7 +3,7 @@
     stroke="currentColor"
     stroke-linecap="round"
     stroke-dasharray="4px 8px"
-    :rect-class="animate ? 'animate-border-march' : undefined"
+    :rect-class="animate ? 'motion-safe:animate-border-march' : undefined"
   />
 </template>
 

@@ -16,7 +16,7 @@
         :target="feature.external ? '_blank' : undefined"
         :rel="feature.external ? 'noopener' : undefined"
         class="
-          group surface-card flex flex-col gap-3 transition-[translate]
+          group surface-card flex flex-col gap-3 motion-safe:transition-[translate]
           hover:-translate-y-0.5 focus-visible:-translate-y-0.5
         "
       >

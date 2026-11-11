@@ -9,7 +9,7 @@
     <div
       v-if="isOpen"
       ref="container"
-      class="no-scrollbar snap-y snap-mandatory snap-always overflow-scroll overflow-y-auto overscroll-contain scroll-smooth"
+      class="no-scrollbar snap-y snap-mandatory snap-always overflow-scroll overflow-y-auto overscroll-contain motion-safe:scroll-smooth"
     >
       <button
         class="square-full snap-start"
