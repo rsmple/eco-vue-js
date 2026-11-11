@@ -119,7 +119,9 @@ export const checkStylesheet = (stylesheet, report, allow = []) => {
 
         if (name === 'apply') {
           if (gated || !node.prelude) return
-          for (const token of findUngated(generate(node.prelude), allow)) report(node, token)
+          for (const {token, duration} of findUngated(generate(node.prelude), allow)) {
+            report(node, duration ? `${ token } (transitions all properties)` : token)
+          }
           return
         }
 

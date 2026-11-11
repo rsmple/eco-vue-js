@@ -69,6 +69,8 @@ const motionRules = (config = {}) => [
   },
 ]
 
+plugin.configs.motion = motionRules
+
 plugin.configs.recommended = (config = {}) => [
   ...recommended(config),
 

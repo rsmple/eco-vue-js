@@ -31,6 +31,7 @@ export default {
     ],
     messages: {
       ungated: '`{{token}}` runs under reduced motion. Prefix it with `motion-safe:`, or add a `motion-reduce:` fallback in the same class string.',
+      ungatedDuration: '`{{token}}` has no transition property beside it, so under reduced motion it transitions every property. Prefix it with `motion-safe:` like the transition it belongs to.',
       ungatedCss: '`{{token}}` runs under reduced motion. Put it inside `@media (prefers-reduced-motion: no-preference)` or `@variant motion-safe`; in `@apply`, prefix the class with `motion-safe:`.',
     },
   },
@@ -41,8 +42,8 @@ export default {
     const check = (node, value) => {
       if (typeof value !== 'string' || !value) return
 
-      for (const token of findUngated(value, allow)) {
-        context.report({node, messageId: 'ungated', data: {token}})
+      for (const {token, duration} of findUngated(value, allow)) {
+        context.report({node, messageId: duration ? 'ungatedDuration' : 'ungated', data: {token}})
       }
     }
 

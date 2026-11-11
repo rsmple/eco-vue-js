@@ -1,4 +1,7 @@
-const MOTION = /^(?:transition(?:-(?!none$)[\w-[\]().,%/]+)?|animate-(?!none$)[\w-[\]().,%/]+|scroll-smooth)$/
+const MOTION = /^(?:transition(?:-(?:all|colors|opacity|shadow|transform|\[.+\]|\(.+\)))?|animate-(?!none$)[\w-[\]().,%/]+|scroll-smooth)$/
+// Class lists never hold sentence punctuation; UI copy such as "Status transition failed." does.
+const PROSE = /[`;?]|[.,:](?:\s|$)/
+const DURATION = /^duration-(?!0$|initial$)(?:\d+|\[.+\]|\(.+\))$/
 
 // Fading or recolouring is not motion, so it may still play when the OS asks for reduced motion.
 export const FADE_UTILITIES = ['transition-opacity', 'transition-colors', 'transition-shadow']
@@ -42,18 +45,30 @@ const splitVariants = token => {
   return parts
 }
 
+/**
+ * Returns `{token, duration}` for each class that would still animate under reduced motion. `duration` marks a
+ * `duration-*` class with no ungated transition property beside it: `transition-property` defaults to `all`, so on
+ * its own it transitions every property.
+ */
 export const findUngated = (value, allow) => {
-  const tokens = value.split(/\s+/).filter(Boolean)
+  if (PROSE.test(value)) return []
 
-  if (tokens.some(token => splitVariants(token).includes('motion-reduce'))) return []
-
-  return tokens.filter(token => {
+  const tokens = value.split(/\s+/).filter(Boolean).map(token => {
     const parts = splitVariants(token)
-    const utility = parts.pop().replace(/^!|!$/g, '')
-
-    if (!MOTION.test(utility) || isFade(utility)) return false
-    if (parts.includes('motion-safe')) return false
-
-    return !allow.includes(utility)
+    return {token, utility: parts.pop().replace(/^!|!$/g, ''), gated: parts.includes('motion-safe')}
   })
+
+  if (tokens.some(({token}) => splitVariants(token).includes('motion-reduce'))) return []
+
+  const hasStillProperty = tokens.some(({utility, gated}) => !gated && (utility === 'transition-none' || isFade(utility)))
+  const found = []
+
+  for (const {token, utility, gated} of tokens) {
+    if (gated || allow.includes(utility)) continue
+
+    if (MOTION.test(utility) && !isFade(utility)) found.push({token, duration: false})
+    else if (DURATION.test(utility) && !hasStillProperty) found.push({token, duration: true})
+  }
+
+  return found
 }
