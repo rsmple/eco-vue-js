@@ -76,6 +76,36 @@ Frame variables are sizes too: `pt---header-height`, `pl---nav-bar-width`, `px--
 
 On a page (`w-page`) and in modals, content beside a wide list stays in view automatically while it scrolls sideways (see [List page](../recipes/list-page#content-beside-the-list)). Pages don't use these sizes for positioning — they're for what the kit doesn't place, like a fixed overlay.
 
+### The page box
+
+The content box is where text starts. The page box is where sections and cards sit: the content box less the gutter a card or glass layout's sections reach into. In flat they're the same. Place anything that should line up with the sections, such as a side panel over the page or a toolbar of your own, by the page box:
+
+| Variable | Utility size | Value |
+| --- | --- | --- |
+| `--w-page-top` | `---page-top` | Under the header bar, and its gap where the bars float. |
+| `--w-page-bottom` | `---page-bottom` | The gap off the screen's bottom edge where the bars float, `0` docked. |
+| `--w-page-left` | `---page-left` | The sections' left edge; `0` on phones, where they span the screen. |
+| `--w-page-right` | `---page-right` | The same on the right. |
+| `--w-page-width` | `---page-width` | Between the two. |
+| `--w-page-height` | `---page-height` | Between the top and the bottom. |
+
+```vue
+<aside class="fixed top---page-top bottom---page-bottom right---page-right w-96 rounded-lg">
+```
+
+These and the content box are the layout variables to build on. The ones they're made of — the frame margins, `--w-chrome-gap`, `--w-page-bleed`, the bar widths — are theme tokens and may change with the layout.
+
+### Backdrops
+
+A backdrop of the app's own, such as behind a side panel, takes `w-page-backdrop`: it covers the page and the bars and leaves the header bar's row out, so the header stays sharp and its search and menus stay usable. Put it above the nav (`z-index` over 30) and the panel above it:
+
+```vue
+<button class="w-page-backdrop fixed inset-0 z-38 backdrop-blur-sm" @click="close" />
+<aside class="fixed top---page-top bottom---page-bottom right---page-right z-39 w-96">
+```
+
+The header's background is one blurred box, which grows over a stuck list toolbar when the bars are docked, so a backdrop can't go between the header and the page: it leaves the header out instead.
+
 ## Layout component
 
 The root layout mounts the three bars; its main area is `w-page`, which pads content by the frame (see [Page layout](../recipes/page-layout)):

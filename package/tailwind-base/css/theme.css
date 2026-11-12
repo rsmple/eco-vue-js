@@ -141,6 +141,12 @@
   --spacing---width-inner: var(--w-width-inner);
   --spacing---height-inner: var(--w-height-inner);
   --spacing---bottom-inner: var(--w-bottom-inner);
+  --spacing---page-top: var(--w-page-top);
+  --spacing---page-bottom: var(--w-page-bottom);
+  --spacing---page-left: var(--w-page-left);
+  --spacing---page-right: var(--w-page-right);
+  --spacing---page-width: var(--w-page-width);
+  --spacing---page-height: var(--w-page-height);
   --spacing---modal-header-height: var(--w-modal-header-height, 0px);
   --spacing---modal-footer-height: var(--w-modal-footer-height, 0px);
   --spacing---modal-content-height: var(--w-modal-content-height, 0px);

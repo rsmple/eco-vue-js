@@ -20,6 +20,24 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
       // In a page list, the section's bottom edge stuck to the bottom of the screen counts too.
       '--w-bottom-inner': 'var(--w-list-end-inner, 0px)',
       '--w-height-inner': 'calc(100vh - var(--w-top-inner, 0px) - var(--w-bottom-inner, 0px))',
+
+      // The page box: where sections and cards sit, the content box less the gutter they reach into.
+      '--w-page-top': 'var(--w-header-inner)',
+      '--w-page-bottom': 'var(--w-chrome-gap, 0px)',
+      '--w-page-left': 'calc(var(--w-left-inner) - var(--w-page-bleed, 0px))',
+      '--w-page-right': 'calc(var(--w-right-inner) - var(--w-page-bleed, 0px))',
+      '--w-page-width': 'calc(100vw - var(--vw-scroll-bar-width, 0px) - var(--w-page-left) - var(--w-page-right))',
+      '--w-page-height': 'calc(100vh - var(--w-page-top) - var(--w-page-bottom))',
+    },
+    // On phones nothing is beside the page: sections span the screen and the content keeps the inner margin, even where
+    // the bars float off the screen edges.
+    '@media (width < 40rem)': {
+      '*': {
+        '--w-left-inner': 'calc(var(--w-left-margin, 0px) + var(--nav-bar-width, 0px) + var(--inner-margin, 0px))',
+        '--w-right-inner': 'calc(var(--w-right-margin, 0px) + var(--actions-bar-width, 0px) + var(--inner-margin, 0px))',
+        '--w-page-left': '0px',
+        '--w-page-right': '0px',
+      },
     },
     '.w-modal-wrapper *': {
       '--w-left-inner': 'var(--w-modal-wrapper-padding, 0px)',

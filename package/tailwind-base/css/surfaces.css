@@ -166,8 +166,8 @@
   :root[data-w-page-table] & {
     @variant sm {
       position: sticky;
-      left: calc(var(--w-left-inner) - var(--w-page-bleed, 0px));
-      max-width: calc(var(--w-width-inner) + var(--w-page-bleed, 0px) * 2);
+      left: var(--w-page-left);
+      max-width: var(--w-page-width);
     }
   }
 }
@@ -256,8 +256,8 @@
   :root[data-w-page-table] & {
     @variant sm {
       position: sticky;
-      left: calc(var(--w-left-inner) - var(--w-page-bleed, 0px));
-      max-width: calc(var(--w-width-inner) + var(--w-page-bleed, 0px) * 2);
+      left: var(--w-page-left);
+      max-width: var(--w-page-width);
     }
   }
 }
@@ -302,6 +302,30 @@
   }
 }
 
+/*
+ * A backdrop of the app's own over the page and the bars, such as behind a side panel, that leaves the header bar out:
+ * the header stays sharp and usable, and the nav and the page dim. The header's background is one blurred box, as a
+ * second one beside it would draw an edge where they meet, so the backdrop cuts the header's row out of itself rather
+ * than stacking under the header. Below the header's row, where a docked header grows over a stuck list toolbar, it
+ * covers the toolbar with the page.
+ */
+@utility w-page-backdrop {
+  --w-backdrop-hole-left: calc(var(--w-left-inner) - var(--inner-margin, 0px));
+  --w-backdrop-hole-right: calc(100% - var(--w-right-inner) + var(--inner-margin, 0px));
+  --w-backdrop-hole-top: var(--w-chrome-gap);
+  --w-backdrop-hole-bottom: calc(var(--w-chrome-gap) + var(--header-height, 0px));
+
+  clip-path: polygon(
+    evenodd,
+    0 0, 100% 0, 100% 100%, 0 100%, 0 0,
+    var(--w-backdrop-hole-left) var(--w-backdrop-hole-top),
+    var(--w-backdrop-hole-right) var(--w-backdrop-hole-top),
+    var(--w-backdrop-hole-right) var(--w-backdrop-hole-bottom),
+    var(--w-backdrop-hole-left) var(--w-backdrop-hole-bottom),
+    var(--w-backdrop-hole-left) var(--w-backdrop-hole-top)
+  );
+}
+
 /* Reaches into the page gutter like a section: for a row of cards on the canvas. On phones the cards keep the page inset. */
 @utility w-page-bleed {
   margin-inline: calc(var(--w-page-bleed, 0px) * -1);
@@ -313,8 +337,8 @@
   :root[data-w-page-table] & {
     @variant sm {
       position: sticky;
-      left: calc(var(--w-left-inner) - var(--w-page-bleed, 0px));
-      max-width: calc(var(--w-width-inner) + var(--w-page-bleed, 0px) * 2);
+      left: var(--w-page-left);
+      max-width: var(--w-page-width);
     }
   }
 }
@@ -710,6 +734,11 @@
     top: var(--w-chrome-gap);
     padding-left: calc(var(--w-left-inner) - var(--inner-margin, 0px));
     padding-right: calc(var(--w-right-inner) - var(--inner-margin, 0px));
+
+    /* On phones the page's inset leaves out the gap the bars float off the screen edges by: the header keeps it. */
+    @variant sm-not {
+      padding-inline: var(--w-chrome-gap);
+    }
   }
 
   /*
@@ -722,6 +751,10 @@
     /* Floating, from the page's edges less its inner margin: the edges of the sections under it. */
     left: calc((var(--w-left-inner) - var(--inner-margin, 0px)) * var(--w-chrome-float));
     right: calc((var(--w-right-inner) - var(--inner-margin, 0px)) * var(--w-chrome-float));
+
+    @variant sm-not {
+      inset-inline: var(--w-chrome-gap);
+    }
     border: var(--w-chrome-border) solid var(--w-line-subtle);
     border-radius: calc(var(--w-chrome-rounded) * var(--w-chrome-float));
     backdrop-filter: var(--w-chrome-backdrop, blur(8px));
@@ -1144,8 +1177,11 @@
     }
   }
 
-  /* What a page sets in the list's header, such as its title, keeps the page inset there. */
-  .w-list-page .w-list-header {
+  /*
+   * What a page sets in the list's header, such as its title, and a row's expansion keep the page inset there, as the
+   * rows' content does.
+   */
+  .w-list-page :is(.w-list-header, .w-list-item-expansion) {
     @variant sm-not {
       padding-inline: var(--w-page-inset, 0px);
     }
@@ -1196,7 +1232,7 @@
       top: var(--w-header-inner);
       height: min(
         calc(100% + var(--w-section-padding) * 2),
-        calc(100vh - var(--w-header-inner) - var(--w-chrome-gap))
+        var(--w-page-height)
       );
     }
   }
@@ -1514,9 +1550,11 @@
 
   /*
    * The edge, over the canvas: from the section's padding above the stuck header down to its bottom. It stays over
-   * the section while the list scrolls sideways under it, as the frame does. The frame casts its shadow.
+   * the section while the list scrolls sideways under it, as the frame does. The frame casts its shadow. It only
+   * paints: its canvas reaches up over the header bar, and would take the header's clicks.
    */
   .w-list-page .w-infinite-list-header-edge {
+    pointer-events: none;
     position: sticky;
     left: var(--w-band-start);
     z-index: -1;
