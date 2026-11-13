@@ -2,9 +2,30 @@ import plugin from 'tailwindcss/plugin.js'
 
 import {DARK_SELECTOR} from '../constants.js'
 
+/**
+ * The boxes that set a size the derived sizes below are made of: by an arbitrary property class
+ * (`[--nav-bar-width:0px]`), a `w-input-*`, `w-button-*` or `w-modal-wrapper-*` utility, or an inline style of a size
+ * whose name ends as theirs do (`--w-modal-header-height`).
+ */
+const SIZE_SETTER_SELECTOR = [
+  '[class*="[--"]',
+  ...['w-input-h-', 'w-input-gap-', 'w-input-rounded-', 'w-button-h-', 'w-button-rounded-', 'w-modal-wrapper-p-', 'w-modal-wrapper-w-'].map(name => `[class*="${ name }"]`),
+  ...['margin', 'width', 'height', 'gap', 'inner', 'bleed', 'rounded', 'padding'].map(ending => `[style*="-${ ending }:"]`),
+].join(', ')
+
+/**
+ * Where the derived sizes are worked out again: the root, the boxes the kit's rules set a size on, and the size setters.
+ * Every other box inherits them worked out. On every box (`*`), each restyle worked out every formula again, which made
+ * up most of a list row's style time.
+ */
+const DERIVED_SIZES_SELECTOR = `:where(:root, body, .surface-root, .w-list-page, .w-list-page-content, .w-tooltip-dropdown, .w-modal-wrapper > *, ${ SIZE_SETTER_SELECTOR })`
+
+/** In a modal: its content, and the size setters in it. */
+const MODAL_DERIVED_SIZES_SELECTOR = `.w-modal-wrapper > *, .w-modal-wrapper :where(${ SIZE_SETTER_SELECTOR })`
+
 const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
   addBase({
-    '*': {
+    [DERIVED_SIZES_SELECTOR]: {
       // Space outside the frame: past `--w-content-max-width` the frame stops growing and centres itself. An app that
       // sets `--left-margin` and `--right-margin` itself, such as to a frame width of its own, overrides it.
       '--w-left-margin': 'var(--left-margin, max(0px, (100vw - var(--vw-scroll-bar-width, 0px) - var(--w-content-max-width, 100vw) - var(--nav-bar-width, 0px) - min(var(--nav-bar-width, 0px) * 1000, var(--w-chrome-gap, 0px)) - var(--actions-bar-width, 0px) - min(var(--actions-bar-width, 0px) * 1000, var(--w-chrome-gap, 0px)) - var(--w-chrome-gap, 0px) * 2 - var(--inner-margin, 0px) * 2) / 2))',
@@ -32,14 +53,14 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
     // On phones nothing is beside the page: sections span the screen and the content keeps the inner margin, even where
     // the bars float off the screen edges.
     '@media (width < 40rem)': {
-      '*': {
+      [DERIVED_SIZES_SELECTOR]: {
         '--w-left-inner': 'calc(var(--w-left-margin, 0px) + var(--nav-bar-width, 0px) + var(--inner-margin, 0px))',
         '--w-right-inner': 'calc(var(--w-right-margin, 0px) + var(--actions-bar-width, 0px) + var(--inner-margin, 0px))',
         '--w-page-left': '0px',
         '--w-page-right': '0px',
       },
     },
-    '.w-modal-wrapper *': {
+    [MODAL_DERIVED_SIZES_SELECTOR]: {
       '--w-left-inner': 'var(--w-modal-wrapper-padding, 0px)',
       '--w-right-inner': 'var(--w-modal-wrapper-padding, 0px)',
       // The box's width: its own, unless the screen is narrower, as the box's max width keeps it.
@@ -137,7 +158,7 @@ const pluginDefault = plugin(function ({addBase, addUtilities, theme}) {
     '.w-select-option': {
       padding: 'calc(var(--w-select-option-padding) / 2) var(--w-select-option-padding)',
     },
-    '*': {
+    [DERIVED_SIZES_SELECTOR]: {
       '--w-option-height': 'calc(var(--w-input-height,2.75rem) - (var(--w-input-gap,0.25rem) * 2) - 2px)',
       '--w-option-rounded': 'calc(var(--w-input-rounded,0.75rem) - var(--w-input-gap,0.25rem) - 1px)',
       '--w-option-padding': 'min(max(0.5rem, var(--w-input-rounded, 0.75rem)), calc(var(--w-input-height, 2.75rem) / 2 - var(--w-input-gap, 0.25rem) - 2px))',
