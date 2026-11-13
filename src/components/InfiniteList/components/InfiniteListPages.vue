@@ -694,7 +694,14 @@ const activateInOrder = async (ids: number[], gen: number) => {
   }
 }
 
-const jumpToPage = (page: number) => {
+/** The queries of the pages jumped to while scrolling, enabled once the scroll settles. */
+let pendingActivation: {ids: number[], gen: number} | null = null
+
+/**
+ * With `whileScrolling`, the pages render as skeletons right away and are fetched once the scroll settles, so a fast
+ * scroll does not fetch every page it passes.
+ */
+const jumpToPage = (page: number, whileScrolling = false) => {
   const totalPages = Math.max(1, pagesCount.value)
   const rangeSize = Math.min(props.maxPages, totalPages)
 
@@ -715,22 +722,40 @@ const jumpToPage = (page: number) => {
   const foundIdx = newPages.indexOf(page)
   const targetIdx = foundIdx === -1 ? 0 : foundIdx
 
-  // The pages around the target, nearest first.
-  const order: number[] = []
+  // The target, then the pages around it, nearest first.
+  const order: number[] = [newSlotIds[targetIdx]!]
   for (let offset = 1; offset < newPages.length; offset++) {
     if (targetIdx - offset >= 0) order.push(newSlotIds[targetIdx - offset]!)
     if (targetIdx + offset < newPages.length) order.push(newSlotIds[targetIdx + offset]!)
   }
 
+  const deferred = whileScrolling ? order : order.slice(1)
+
   disabledSlots.clear()
-  for (const id of order) disabledSlots.add(id)
+  for (const id of deferred) disabledSlots.add(id)
 
   pages.value = newPages
   slotIds.value = newSlotIds
 
   emit('update:page', page === 1 ? undefined : page)
 
-  activateInOrder(order, ++activationGen)
+  const gen = ++activationGen
+
+  if (whileScrolling) {
+    pendingActivation = {ids: deferred, gen}
+  } else {
+    pendingActivation = null
+    activateInOrder(deferred, gen)
+  }
+}
+
+const activatePending = () => {
+  if (!pendingActivation) return
+
+  const {ids, gen} = pendingActivation
+  pendingActivation = null
+
+  if (gen === activationGen) activateInOrder(ids, gen)
 }
 
 const anyPageInViewport = (): boolean => {
@@ -771,7 +796,7 @@ const scrollToOffset = (y: number) => {
   else position.scrollEl.scrollTop = top
 }
 
-const checkScrollJump = debounce(() => {
+const checkScrollJump = (whileScrolling: boolean) => {
   if (isResettingPage.value) return
   if (topSentinelIntersecting || bottomSentinelIntersecting) return
   if (!avgPageHeight.value) return
@@ -785,19 +810,41 @@ const checkScrollJump = debounce(() => {
   const target = Math.max(1, Math.min(Math.ceil(y / spacerPageHeight.value) + 1, pagesCount.value))
   if (pages.value.includes(target)) return
 
-  jumpToPage(target)
-}, 300)
+  jumpToPage(target, whileScrolling)
+}
+
+const SCROLL_SETTLE_DELAY = 150
+
+const handleScrollSettle = debounce(() => {
+  checkScrollJump(false)
+  activatePending()
+}, SCROLL_SETTLE_DELAY)
+
+let scrollFrame: number | null = null
+
+// Every frame rather than once the scroll stops: a trackpad's momentum keeps scrolling for seconds, showing only the spacers meanwhile.
+const handleScroll = () => {
+  handleScrollSettle()
+
+  if (scrollFrame !== null) return
+
+  scrollFrame = requestAnimationFrame(() => {
+    scrollFrame = null
+    checkScrollJump(true)
+  })
+}
 
 if (getIsClientSide()) {
   watch(() => scrollingElement?.value ?? window, (newEl, oldEl) => {
-    oldEl?.removeEventListener('scroll', checkScrollJump)
-    newEl?.addEventListener('scroll', checkScrollJump, {passive: true})
+    oldEl?.removeEventListener('scroll', handleScroll)
+    newEl?.addEventListener('scroll', handleScroll, {passive: true})
   }, {immediate: true})
 }
 
 onBeforeUnmount(() => {
   const el = scrollingElement?.value ?? window
-  el.removeEventListener('scroll', checkScrollJump)
+  el.removeEventListener('scroll', handleScroll)
+  if (scrollFrame !== null) cancelAnimationFrame(scrollFrame)
 })
 
 let oldQueryParams = {...props.queryParams}
