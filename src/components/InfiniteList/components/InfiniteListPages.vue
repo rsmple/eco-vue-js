@@ -7,6 +7,7 @@
       'list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem) modal:min-h-[50vh]': !minHeight && !minHeightOnly,
       'min-h-full': minHeight,
       'list:pt-(--w-list-gap,1rem) modal:pb-(--w-list-gap,1rem)': minHeightOnly,
+      '[overflow-anchor:none]': recycle,
     }"
   >
     <slot name="before" />
@@ -20,12 +21,12 @@
 
     <div
       ref="items"
-      :class="pageClass"
-      :style="pageStyle"
+      :class="[pageClass, {relative: recycle}]"
+      :style="recycle ? [pageStyle, {height: recycler.totalHeight.value + 'px'}] : pageStyle"
     >
       <!-- Not a scroll anchor: it moves to the start of the first page whenever one is added or dropped at the top. -->
       <div
-        v-if="columnOffset"
+        v-if="columnOffset && !recycle"
         aria-hidden="true"
         class="[overflow-anchor:none]"
         :style="{gridColumn: 'span ' + columnOffset, gridRow: leadingRows ? leadingRows + 1 : undefined}"
@@ -47,6 +48,9 @@
         :query-options="queryOptions"
         :page-length="pageLength"
         :enabled="!disabledSlots.has(slotIds[index]!)"
+        :headless="recycle"
+        :state-offset="recycle ? recycler.stateOffsets.value.get(slotIds[index]!) : undefined"
+        :intersecting="recycle && recycler.intersectingPages.value.has(page)"
 
         :value-getter="valueGetter"
 
@@ -57,8 +61,12 @@
         @refetch="refetchNextPages(page)"
         @fetched="isResettingPage = false"
         @update:error="$emit('update:error', $event)"
+        @register="setSource(slotIds[index]!, $event)"
       >
-        <template #default="scope">
+        <template
+          v-if="!recycle"
+          #default="scope"
+        >
           <slot
             v-bind="scope"
             :skeleton="scope.skeleton || isRefetchingAll"
@@ -85,6 +93,22 @@
           />
         </template>
       </InfiniteListPage>
+
+      <template v-if="recycle">
+        <InfiniteListRecycledRow
+          v-for="view in recycler.views"
+          :key="view.id"
+          :scope="view.scope"
+          @mount="recycler.setRowElement(view, $event)"
+        >
+          <template #default="scope">
+            <slot
+              v-bind="scope"
+              :resetting="isResettingPage"
+            />
+          </template>
+        </InfiniteListRecycledRow>
+      </template>
     </div>
 
     <div ref="bottomSentinel" />
@@ -93,19 +117,22 @@
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
+import type {PageSource} from '../models/pageSource'
 import type {InfiniteListItemScope} from '../types'
 import type {ApiError} from '@/utils/api'
 import type {DefaultQueryOptions} from '@/utils/useDefaultQuery'
 
-import {type StyleValue, computed, inject, nextTick, onBeforeUnmount, onMounted, provide, reactive, ref, useTemplateRef, watch} from 'vue'
+import {type StyleValue, computed, inject, nextTick, onBeforeUnmount, onMounted, provide, reactive, ref, shallowReactive, useTemplateRef, watch} from 'vue'
 
 import {debounce, getIsClientSide, getOffsetTop, isEqualObj} from '@/utils/utils'
 
 import InfiniteListPage from './InfiniteListPage.vue'
+import InfiniteListRecycledRow from './InfiniteListRecycledRow.vue'
 
 import {wInfiniteListHeaderHeight, wScrollingElement} from '../models/injection'
 import {INFINITE_LIST_UNMEASURED_ATTRIBUTE} from '../models/utils'
 import {useRefetchNextPages} from '../use/useRefetchNextPages'
+import {type RowRecycler, useRowRecycler} from '../use/useRowRecycler'
 
 const props = withDefaults(
   defineProps<{
@@ -125,6 +152,7 @@ const props = withDefaults(
     pageStyle?: StyleValue
     maxPages?: number
     keepColumns?: boolean
+    recycle?: boolean
     refetchInterval?: number | false
     queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>
 
@@ -258,7 +286,9 @@ const pageHeights = reactive(new Map<number, number>())
 const pageOffsets = new Map<number, number>()
 
 // Per item rather than per page: the last page can be short, and counted as a full one it would shrink every page.
-const avgItemHeight = computed(() => {
+const avgItemHeight = computed<number>(() => {
+  if (props.recycle) return recycler.averageItemHeight.value
+
   let sum = 0
   let itemCount = 0
   for (let i = 0; i < slotIds.value.length; i++) {
@@ -271,7 +301,7 @@ const avgItemHeight = computed(() => {
   return itemCount === 0 ? 0 : sum / itemCount
 })
 
-const avgPageHeight = computed(() => Math.round(avgItemHeight.value * pageSize.value))
+const avgPageHeight = computed<number>(() => Math.round(avgItemHeight.value * pageSize.value))
 
 /**
  * Browsers cap the height of an element, at about 17.9M px in Firefox and 33.5M px in Chrome and Safari, and lay out
@@ -285,9 +315,9 @@ const spacerScale = computed(() => {
   return height > MAX_SPACER_HEIGHT ? MAX_SPACER_HEIGHT / height : 1
 })
 
-const spacerPageHeight = computed(() => avgPageHeight.value * spacerScale.value)
+const spacerPageHeight = computed<number>(() => avgPageHeight.value * spacerScale.value)
 
-const topSpacerHeight = computed(() => {
+const topSpacerHeight = computed<number>(() => {
   if (!spacerPageHeight.value) return 0
   const firstRendered = pages.value[0] ?? 1
   return Math.max(0, Math.round((firstRendered - 1) * spacerPageHeight.value))
@@ -300,6 +330,27 @@ const bottomSpacerHeight = computed(() => {
   let itemCount = 0
   for (let page = lastRendered + 1; page <= pagesCount.value; page++) itemCount += getPageItemCount(page)
   return Math.round(itemCount * avgItemHeight.value * spacerScale.value)
+})
+
+const sources = shallowReactive(new Map<number, PageSource<Data>>())
+
+const setSource = (slotId: number, source: PageSource<Data> | null) => {
+  if (source) sources.set(slotId, source)
+  else if (!slotIds.value.includes(slotId)) sources.delete(slotId)
+}
+
+const recycler: RowRecycler<Model, Data> = useRowRecycler<Model, Data>({
+  pages,
+  slotIds,
+  sources,
+  isRefetchingAll,
+  itemsRef,
+  topSpacerHeight,
+  pageLength: () => props.pageLength,
+  getSkeletonLength,
+  valueGetter: data => props.valueGetter(data),
+  refetchFrom: page => refetchNextPages(page),
+  getScrollElement,
 })
 
 const columnCount = ref(1)
@@ -478,7 +529,7 @@ const getScrollElementTop = (element: Element): number => getIsDocumentScroll(el
  */
 const measurePages = (correctScroll: boolean) => {
   const itemsEl = itemsRef.value
-  if (!itemsEl) return
+  if (!itemsEl || props.recycle) return
 
   const newColumnCount = getColumnCount(itemsEl)
 
@@ -541,6 +592,8 @@ const measurePages = (correctScroll: boolean) => {
 }
 
 onMounted(() => {
+  if (props.recycle) return
+
   resizeObserver = new ResizeObserver(() => measurePages(true))
 
   if (itemsRef.value) resizeObserver.observe(itemsRef.value)
@@ -632,9 +685,14 @@ const removePage = (page: number): void => {
 
 const getPageComponent = (page: number) => pageComponentRef.value?.find(component => component?.pageNumber === page)
 
+const scrollToPageItem = (page: number, itemIndex: number | undefined, behavior?: ScrollBehavior) => {
+  if (props.recycle) recycler.scrollTo(page, itemIndex, behavior)
+  else getPageComponent(page)?.scrollTo(itemIndex, behavior)
+}
+
 const goto = async (page = 1, itemIndex?: number) => {
   if (pages.value.includes(page)) {
-    getPageComponent(page)?.scrollTo(itemIndex)
+    scrollToPageItem(page, itemIndex)
 
     return
   }
@@ -657,7 +715,7 @@ const goto = async (page = 1, itemIndex?: number) => {
   await nextTick()
 
   // Far away: a smooth scroll would pass through the spacers and load the pages on the way.
-  getPageComponent(page)?.scrollTo(itemIndex, 'instant')
+  scrollToPageItem(page, itemIndex, 'instant')
 }
 
 const scrollTop = () => {
@@ -831,6 +889,7 @@ const handleScroll = () => {
   scrollFrame = requestAnimationFrame(() => {
     scrollFrame = null
     checkScrollJump(true)
+    if (props.recycle) recycler.update(true)
   })
 }
 

@@ -1493,12 +1493,14 @@
      * takes it back, so a cell's own pointer-events still decides.
      */
     .w-list-page-rows,
+    .w-list-page-rows .w-infinite-list-row,
     .w-list-page-rows .w-list-item,
     .w-list-page-rows .w-list-item-middle {
       pointer-events: none;
     }
 
-    :where(.w-list-page-rows > *, .w-list-page-rows .w-list-item > *, .w-list-page-rows .w-list-item-middle > *) {
+    /* A recycled row wraps the item and its opened content, which are then the rows. */
+    :where(.w-list-page-rows > :not(.w-infinite-list-row), .w-list-page-rows > .w-infinite-list-row > *, .w-list-page-rows .w-list-item > *, .w-list-page-rows .w-list-item-middle > *) {
       pointer-events: auto;
     }
 

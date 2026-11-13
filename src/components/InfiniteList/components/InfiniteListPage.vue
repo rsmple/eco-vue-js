@@ -1,82 +1,89 @@
 <template>
-  <div
-    v-if="isFailed"
-    ref="state"
-    class="w-infinite-list-state sm:left---left-inner sm:max-w---width-inner col-span-full sm:sticky"
-  >
-    <slot
-      name="error"
-      :error="error!"
-      :retry="refetchPage"
-      :is-fetching="isFetching"
-    >
-      <div class="flex flex-col items-center gap-4 px-8 py-16 text-center">
-        <span class="text-accent font-normal">{{ errorMessage }}</span>
-
-        <WButton
-          :semantic-type="SemanticType.SECONDARY"
-          :loading="isFetching"
-          @click="refetchPage"
-        >
-          {{ getText('retry') }}
-        </WButton>
-      </div>
-    </slot>
-  </div>
-
-  <TransitionGroup
-    v-else-if="page && slotList.length !== 0 && transition"
-    enter-active-class="overflow-hidden opacity-0"
-    enter-from-class="grid-rows-[0fr]"
-    enter-to-class="grid-rows-[1fr]"
-    leave-active-class="overflow-hidden opacity-0"
-    leave-from-class="grid-rows-[1fr]"
-    leave-to-class="grid-rows-[0fr]"
-    :css="!resetting"
+  <component
+    :is="headless && (isFailed || isEmpty) ? 'div' : WEmptyComponent"
+    v-bind="headless ? {class: 'absolute inset-x-0 top-0 grid [grid-template-columns:inherit]', style: {transform: `translateY(${ stateOffset ?? 0 }px)`}} : undefined"
   >
     <div
-      v-for="(slot, slotIndex) in slotList"
-      :key="slot.key"
-      class="grid w-full motion-safe:transition-[grid-template-rows] motion-safe:duration-300"
+      v-if="isFailed"
+      ref="state"
+      class="w-infinite-list-state sm:left---left-inner sm:max-w---width-inner col-span-full sm:sticky"
     >
-      <div class="[overflow:inherit]">
-        <InfiniteListPageItem :ref="item => setItemRef(slot.key, item as ItemInstance | null)">
-          <slot v-bind="getItemScope(slot, slotIndex, page)" />
-        </InfiniteListPageItem>
-      </div>
+      <slot
+        name="error"
+        :error="error!"
+        :retry="refetchPage"
+        :is-fetching="isFetching"
+      >
+        <div class="flex flex-col items-center gap-4 px-8 py-16 text-center">
+          <span class="text-accent font-normal">{{ errorMessage }}</span>
+
+          <WButton
+            :semantic-type="SemanticType.SECONDARY"
+            :loading="isFetching"
+            @click="refetchPage"
+          >
+            {{ getText('retry') }}
+          </WButton>
+        </div>
+      </slot>
     </div>
-  </TransitionGroup>
 
-  <template v-else-if="page && slotList.length !== 0">
-    <InfiniteListPageItem
-      v-for="(slot, slotIndex) in slotList"
-      :key="slot.key"
-      :ref="item => setItemRef(slot.key, item as ItemInstance | null)"
+    <TransitionGroup
+      v-else-if="!headless && page && slotList.length !== 0 && transition"
+      enter-active-class="overflow-hidden opacity-0"
+      enter-from-class="grid-rows-[0fr]"
+      enter-to-class="grid-rows-[1fr]"
+      leave-active-class="overflow-hidden opacity-0"
+      leave-from-class="grid-rows-[1fr]"
+      leave-to-class="grid-rows-[0fr]"
+      :css="!resetting"
     >
-      <slot v-bind="getItemScope(slot, slotIndex, page)" />
-    </InfiniteListPageItem>
-  </template>
-
-  <div
-    v-else
-    ref="state"
-    class="w-infinite-list-state sm:left---left-inner sm:max-w---width-inner col-span-full sm:sticky"
-  >
-    <slot name="empty">
-      <div class="text-accent flex justify-center px-8 py-16 text-center font-normal">
-        {{ emptyStub }}
+      <div
+        v-for="(slot, slotIndex) in slotList"
+        :key="slot.key"
+        class="grid w-full motion-safe:transition-[grid-template-rows] motion-safe:duration-300"
+      >
+        <div class="[overflow:inherit]">
+          <InfiniteListPageItem :ref="item => setItemRef(slot.key, item as ItemInstance | null)">
+            <slot v-bind="getItemScope(slot, slotIndex, page)" />
+          </InfiniteListPageItem>
+        </div>
       </div>
-    </slot>
-  </div>
+    </TransitionGroup>
+
+    <template v-else-if="!headless && page && slotList.length !== 0">
+      <InfiniteListPageItem
+        v-for="(slot, slotIndex) in slotList"
+        :key="slot.key"
+        :ref="item => setItemRef(slot.key, item as ItemInstance | null)"
+      >
+        <slot v-bind="getItemScope(slot, slotIndex, page)" />
+      </InfiniteListPageItem>
+    </template>
+
+    <div
+      v-else-if="!headless || isEmpty"
+      ref="state"
+      class="w-infinite-list-state sm:left---left-inner sm:max-w---width-inner col-span-full sm:sticky"
+    >
+      <slot name="empty">
+        <div class="text-accent flex justify-center px-8 py-16 text-center font-normal">
+          {{ emptyStub }}
+        </div>
+      </slot>
+    </div>
+  </component>
 </template>
 
 <script lang="ts" setup generic="Model extends number | string, Data extends DefaultData, QueryParams">
+import type {PageSource} from '../models/pageSource'
 import type {InfiniteListItemScope} from '../types'
 import type {DefaultQueryOptions} from '@/utils/useDefaultQuery'
 
 import {type Ref, computed, inject, onBeforeUnmount, onMounted, ref, toRef, toValue, useTemplateRef, watch} from 'vue'
 
 import WButton from '@/components/Button/WButton.vue'
+import WEmptyComponent from '@/components/EmptyComponent/WEmptyComponent.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
 import {ApiError, ApiErrorCancel} from '@/utils/api'
@@ -105,6 +112,14 @@ const props = withDefaults(
     /** Page size the list asks for, for the `position` of an item in the whole list. */
     pageLength: number
 
+    /**
+     * The list renders the items from the page's data, and the page only its error or empty state, placed `stateOffset`
+     * down the items. `intersecting` is then whether any item of the page is in view.
+     */
+    headless?: boolean
+    stateOffset?: number
+    intersecting?: boolean
+
     valueGetter: (data: Data) => Model
   }>(),
   {
@@ -112,6 +127,7 @@ const props = withDefaults(
     refetchInterval: undefined,
     queryOptions: undefined,
     enabled: true,
+    stateOffset: undefined,
   },
 )
 
@@ -125,12 +141,14 @@ const emit = defineEmits<{
   (e: 'refetch'): void
   (e: 'fetched'): void
   (e: 'update:error', value: ApiError): void
+  (e: 'register', value: PageSource<Data> | null): void
 }>()
 
 type ItemInstance = ComponentInstance<typeof InfiniteListPageItem>
 
 const stateRef = useTemplateRef<HTMLDivElement>('state')
-const isIntersecting = ref(false)
+const isObservedIntersecting = ref(false)
+const isIntersecting = computed(() => props.headless ? props.intersecting : isObservedIntersecting.value)
 
 const scrollingElement = inject(wScrollingElement, null)
 
@@ -223,6 +241,8 @@ const getPlaceholder = (key: number): Data => {
 }
 
 watch([data, () => props.skeletonLength], () => {
+  if (props.headless) return
+
   reconcileSlots()
 
   const skeletonKeys = new Set(slotList.value.filter(slot => slot.id === null).map(slot => slot.key))
@@ -340,6 +360,17 @@ const isFailed = computed(() => !!error.value && !(error.value instanceof ApiErr
 
 const errorMessage = computed(() => getLoadErrorMessage(error.value))
 
+const isEmpty = computed(() => page.value === null || (data.value ? data.value.results.length === 0 : props.skeletonLength === 0))
+
+emit('register', {
+  get page() { return page.value },
+  get results() { return isFailed.value ? undefined : data.value?.results },
+  get isState() { return isFailed.value || isEmpty.value },
+  setItem: item => setItem(item),
+  removeItem: id => removeItem(id),
+  getStateElement: () => stateRef.value,
+})
+
 useHandledQueryError(() => isFailed.value ? error.value : null)
 
 watch(error, error => {
@@ -366,7 +397,7 @@ const observerCb = (entries: IntersectionObserverEntry[]) => {
     else intersectingElements.delete(entry.target)
   }
 
-  isIntersecting.value = intersectingElements.size !== 0
+  isObservedIntersecting.value = intersectingElements.size !== 0
 }
 
 /** Observes the elements the page renders now, which change as its items load, are added or removed. */
@@ -390,10 +421,12 @@ const observeElements = () => {
     observedElements.add(element)
   }
 
-  isIntersecting.value = intersectingElements.size !== 0
+  isObservedIntersecting.value = intersectingElements.size !== 0
 }
 
 onMounted(() => {
+  if (props.headless) return
+
   intersectionObserver = new IntersectionObserver(
     observerCb,
     {
@@ -413,6 +446,8 @@ onBeforeUnmount(() => {
   intersectionObserver = undefined
   observedElements.clear()
   intersectingElements.clear()
+
+  emit('register', null)
 
   if (page.value !== null) emit('remove:page', page.value)
 })
