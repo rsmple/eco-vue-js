@@ -8,8 +8,10 @@
   --animate-border-march: border-march 0.5s linear infinite;
   --animate-dojo-logo-dashoffset: dojo-logo-dashoffset 1.6s linear 1;
   --animate-spinner-dash: spinner-dash 1.6s linear infinite;
+  --animate-spinner-arc: spinner-arc 1.6s linear infinite;
   --animate-ping-fast: ping-big .5s cubic-bezier(0, 0, 0.2, 1);
   --animate-ping-opacity: ping-opacity 1.2s linear infinite alternate-reverse;
+  --animate-ping-stroke: ping-stroke 1.2s linear infinite alternate-reverse;
 
   @keyframes ticker {
     from {
@@ -109,6 +111,21 @@
     }
   }
 
+  @keyframes spinner-arc {
+    0% {
+      stroke-dasharray: 2, 101;
+      stroke-dashoffset: 0;
+    }
+    50% {
+      stroke-dasharray: 71, 101;
+      stroke-dashoffset: -128;
+    }
+    100% {
+      stroke-dasharray: 71, 101;
+      stroke-dashoffset: -299;
+    }
+  }
+
   @keyframes ping-big {
     75%, 100% {
       transform: scale(4);
@@ -125,6 +142,18 @@
     }
     100% {
       opacity: 0.1;
+    }
+  }
+
+  @keyframes ping-stroke {
+    0% {
+      stroke-opacity: 1;
+    }
+    60% {
+      stroke-opacity: 1;
+    }
+    100% {
+      stroke-opacity: 0.1;
     }
   }
 }
