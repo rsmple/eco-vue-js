@@ -1,6 +1,7 @@
 @theme {
   --animate-ticker: ticker var(--tiker-duration, 0.8s) linear infinite;
   --animate-ticker-rare: ticker-rare var(--tiker-duration, 10s) linear infinite;
+  --animate-sweep: sweep var(--tiker-duration, 0.8s) linear infinite;
   --animate-move-horizontal: move-horizontal var(--tiker-duration, 0.8s) linear infinite;
   --animate-shake: shake .6s linear infinite;
   --animate-border-rotate: border-rotate linear infinite 10s;
@@ -16,6 +17,17 @@
     }
     to {
       transform: translateX(100%);
+    }
+  }
+
+  @keyframes sweep {
+    from {
+      background-size: 300% 100%;
+      background-position-x: 100%;
+    }
+    to {
+      background-size: 300% 100%;
+      background-position-x: 0%;
     }
   }
 

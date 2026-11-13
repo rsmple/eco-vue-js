@@ -16,7 +16,7 @@
         <!-- A light sweeps the fill while the task runs. -->
         <div
           v-if="modelValue < 1"
-          class="motion-safe:animate-ticker absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent [--tiker-duration:1.6s]"
+          class="motion-safe:animate-sweep absolute inset-0 bg-linear-to-r from-transparent from-33% via-default/30 via-50% to-transparent to-67% [--tiker-duration:1.6s]"
         />
       </div>
 
@@ -37,7 +37,7 @@
 
     <template v-else>
       <div
-        class="motion-safe:animate-ticker absolute inset-0 bg-linear-to-r from-transparent to-transparent [--tiker-duration:1.4s]"
+        class="motion-safe:animate-sweep absolute inset-0 bg-linear-to-r from-transparent from-33% via-50% to-transparent to-67% [--tiker-duration:1.4s]"
         :class="progressBarIndeterminateClass[semanticType]"
       />
 

@@ -11,7 +11,7 @@
     <!-- Waiting to start: a band sweeps the empty track. -->
     <div
       v-if="modelValue <= 0"
-      class="motion-safe:animate-ticker tone-primary via-tone/20 absolute inset-0 bg-linear-to-r from-transparent to-transparent [--tiker-duration:1.4s]"
+      class="motion-safe:animate-sweep tone-primary absolute inset-0 bg-linear-to-r from-transparent from-33% via-tone/20 via-50% to-transparent to-67% [--tiker-duration:1.4s]"
     />
 
     <div
@@ -23,7 +23,7 @@
       <div
         class="absolute inset-0"
         :class="modelValue < 100
-          ? 'motion-safe:animate-ticker bg-linear-to-r from-transparent via-white/40 to-transparent [--tiker-duration:1.6s]'
+          ? 'motion-safe:animate-sweep bg-linear-to-r from-transparent from-33% via-default/40 via-50% to-transparent to-67% [--tiker-duration:1.6s]'
           : 'bg-default/30 motion-safe:animate-pulse'"
       />
     </div>
