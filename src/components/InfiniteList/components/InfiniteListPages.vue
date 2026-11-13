@@ -104,6 +104,7 @@ import {debounce, getIsClientSide, getOffsetTop, isEqualObj} from '@/utils/utils
 import InfiniteListPage from './InfiniteListPage.vue'
 
 import {wInfiniteListHeaderHeight, wScrollingElement} from '../models/injection'
+import {INFINITE_LIST_UNMEASURED_ATTRIBUTE} from '../models/utils'
 import {useRefetchNextPages} from '../use/useRefetchNextPages'
 
 const props = withDefaults(
@@ -449,6 +450,20 @@ const updateColumnOffset = (pageElements: Element[][]): boolean => {
   return false
 }
 
+/** The space the page's unmeasured elements take, with their margins and the row gap each opens in a grid. */
+const getUnmeasuredHeight = (elements: Element[], rowGap: number): number => {
+  let height = 0
+
+  for (const element of elements) {
+    if (!element.hasAttribute(INFINITE_LIST_UNMEASURED_ATTRIBUTE)) continue
+
+    const style = getComputedStyle(element)
+    height += element.getBoundingClientRect().height + (Number.parseFloat(style.marginTop) || 0) + (Number.parseFloat(style.marginBottom) || 0) + rowGap
+  }
+
+  return height
+}
+
 const getScrollElementTop = (element: Element): number => getIsDocumentScroll(element) ? 0 : element.getBoundingClientRect().top
 
 /**
@@ -485,6 +500,7 @@ const measurePages = (correctScroll: boolean) => {
 
   const tops = pageElements.map(elements => elements[0]?.getBoundingClientRect().top)
   const itemsBottom = itemsEl.getBoundingClientRect().bottom
+  const rowGap = Number.parseFloat(getComputedStyle(itemsEl).rowGap) || 0
 
   const itemsTop = itemsEl.getBoundingClientRect().top
 
@@ -502,7 +518,7 @@ const measurePages = (correctScroll: boolean) => {
     const offset = Math.round(top - itemsTop)
     const oldOffset = pageOffsets.get(slotId)
 
-    pageHeights.set(slotId, Math.round(bottom - top))
+    pageHeights.set(slotId, Math.round(bottom - top - getUnmeasuredHeight(pageElements[i]!, rowGap)))
     pageOffsets.set(slotId, offset)
 
     if (isInViewFound || bottom <= scrollElTop) continue

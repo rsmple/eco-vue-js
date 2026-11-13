@@ -292,6 +292,7 @@
 
       <div
         v-if="expansion && isOpen"
+        v-bind="{[INFINITE_LIST_UNMEASURED_ATTRIBUTE]: ''}"
         class="w-list-item-expansion list:w---width-inner list:left---left-inner list:sticky col-span-full"
         :class="{
           'border-line': hasBorder && !selected,
@@ -334,6 +335,7 @@ import WUniform from '@/components/Uniform/WUniform.vue'
 
 import IconTo from '@/assets/icons/IconTo.svg?component'
 
+import {INFINITE_LIST_UNMEASURED_ATTRIBUTE} from '@/components/InfiniteList/models/utils'
 import {createPointAnchor} from '@/utils/Overlay'
 
 import ListCardFieldNested from './ListCardFieldNested.vue'
