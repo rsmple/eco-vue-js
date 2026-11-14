@@ -236,6 +236,8 @@ Both render nothing in place and clean up when the page unmounts.
 
 Everything reads inherited variables, so a route without a bar just omits it and resets its variable on a wrapper of header and content — e.g. `[--actions-bar-width:0px]`.
 
+The content box (`--w-left-inner` and the rest) is worked out again only where a frame variable is set: on `body`, on a box with an arbitrary property class as above, or with an inline style. Everywhere else it is inherited, so set a frame variable in one of these ways, not in a CSS rule of your own on another selector.
+
 ## Centred frame
 
 On wide screens the frame stops growing past `--w-content-max-width` (`80rem`, a theme token on `body`) and centres, with the outside space growing on both sides. The bars follow and `---left-inner`/`---right-inner` include it — pages need nothing.

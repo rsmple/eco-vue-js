@@ -30,6 +30,8 @@
         :page-style="pageStyle"
         :max-pages="maxPages"
         :keep-columns="keepColumns"
+        :recycle="recycle"
+        :group-by="groupBy"
         :refetch-interval="refetchInterval"
         :query-options="queryOptions"
 
@@ -44,6 +46,16 @@
       >
         <template #default="scope">
           <slot v-bind="scope" />
+        </template>
+
+        <template
+          v-if="$slots.group"
+          #group="scope"
+        >
+          <slot
+            name="group"
+            v-bind="scope"
+          />
         </template>
 
         <template
@@ -114,6 +126,15 @@ const props = withDefaults(
     maxPages?: number
     /** Keeps each item in its column of a `pageClass` grid with several columns, such as cards, when the list starts past the first page or drops a page at the top. Leave it off when every item spans the row, as the rows of a table: the columns are then not measured. */
     keepColumns?: boolean
+    /**
+     * Renders only the items in view, each row of them placed by `top`, and gives a row leaving the view to the next row
+     * of its kind, a loading one or one with data, instead of rendering a new one. Each row is a grid taking the columns
+     * and the column gap of the `pageClass` grid (`inherit`): an item spanning the row, as a table row, or with
+     * `keepColumns` one item per column, as cards. Not for `transition`.
+     */
+    recycle?: boolean
+    /** With `recycle`, whether two neighbouring items are in the same group: the `group` slot renders before each new group. */
+    groupBy?: (a: Data, b: Data) => boolean
     /** Refetches the pages in view every this many ms. */
     refetchInterval?: number | false
     /** Options for every page query. */
@@ -135,6 +156,7 @@ const props = withDefaults(
     refetchInterval: undefined,
     valueGetter: (item: Data) => (item as unknown as {id: Model}).id,
     queryOptions: undefined,
+    groupBy: undefined,
 
     pageLength: 24,
   },
@@ -178,6 +200,12 @@ defineSlots<{
     results: Data[] | undefined
     intersecting: boolean
   }) => void
+  /**
+   * With `recycle` and `groupBy`, the heading of a group, its first child sticking for as long as the group is in view.
+   * Gets the group's first `item`, the item before it as `previous`, and its `page`, `index` and `position`; while the
+   * first page loads, `skeleton` is true and the group spans its skeletons.
+   */
+  group?: (props: {item: Data, previous: Data | undefined, skeleton: boolean, page: number, index: number, position: number}) => void
   /** Sticky content above the items, such as a toolbar. Gets `refetchAll`, `resetPage`, `goto`, `isFetching` and `isRefetchingAll`, and `updateHeader` to re-measure it right away. */
   header?: (props: InfiniteListHeaderScope & Partial<InfiniteListScope>) => void
   /** Shown when the query returns no items. Replaces `emptyStub`. */

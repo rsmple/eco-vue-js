@@ -411,14 +411,22 @@
   }
 
   @scope (.w-page) to (.surface-section *, .surface-root *) {
+    /* A selector per block: a list in the `:where()` a selector ends with is tried on every box of the page. */
     :where(:scope, :scope :not(.grid, .flex, .inline-grid, .inline-flex, .surface-columns, .surface-stack, .surface-stack-divided))
-      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child))
-      + :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section) {
-      /* 1 in flat, where sections paint nothing, 0 where they do. */
-      --w-stack-flat: calc(1 - min(1, var(--w-section-opacity) * 100));
-      --w-joined: 0;
+      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child)) {
+      & + :where(.surface-section),
+      & + :where(.surface-stack),
+      & + :where(.surface-stack-divided),
+      & + :where(.surface-columns),
+      & + :where(.w-list-page),
+      & + :where(.w-page-bleed),
+      & + :where(.w-tabs-section) {
+        /* 1 in flat, where sections paint nothing, 0 where they do. */
+        --w-stack-flat: calc(1 - min(1, var(--w-section-opacity) * 100));
+        --w-joined: 0;
 
-      margin-top: calc(var(--w-section-gap) + var(--w-stack-divide, 2rem) * var(--w-stack-flat));
+        margin-top: calc(var(--w-section-gap) + var(--w-stack-divide, 2rem) * var(--w-stack-flat));
+      }
     }
   }
 }
@@ -438,8 +446,10 @@
 
     /* A page list is a section: after a block, the line goes on its surface, which keeps to the view. */
     :where(:scope, :scope :not(.grid, .flex, .inline-grid, .inline-flex, .surface-columns, .surface-stack, .surface-stack-divided))
-      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child)) + .w-list-page {
-      --w-list-line: var(--w-stack-flat);
+      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child)) {
+      & + .w-list-page {
+        --w-list-line: var(--w-stack-flat);
+      }
     }
   }
 }
@@ -1178,10 +1188,10 @@
   }
 
   /*
-   * What a page sets in the list's header, such as its title, and a row's expansion keep the page inset there, as the
-   * rows' content does.
+   * What a page sets in the list's header, such as its title, keeps the page inset there, as the rows' content does.
+   * A row's expansion runs to the screen's edges, as the row does, and pads its content itself.
    */
-  .w-list-page :is(.w-list-header, .w-list-item-expansion) {
+  .w-list-page .w-list-header {
     @variant sm-not {
       padding-inline: var(--w-page-inset, 0px);
     }
@@ -1474,12 +1484,14 @@
      * takes it back, so a cell's own pointer-events still decides.
      */
     .w-list-page-rows,
+    .w-list-page-rows .w-infinite-list-row,
     .w-list-page-rows .w-list-item,
     .w-list-page-rows .w-list-item-middle {
       pointer-events: none;
     }
 
-    :where(.w-list-page-rows > *, .w-list-page-rows .w-list-item > *, .w-list-page-rows .w-list-item-middle > *) {
+    /* A recycled row wraps the item and its opened content, which are then the rows. */
+    :where(.w-list-page-rows > :not(.w-infinite-list-row), .w-list-page-rows > .w-infinite-list-row > *, .w-list-page-rows .w-list-item > *, .w-list-page-rows .w-list-item-middle > *) {
       pointer-events: auto;
     }
 

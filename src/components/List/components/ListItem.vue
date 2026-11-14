@@ -16,7 +16,10 @@
           'w-ripple-trigger-list': isActionShown,
           'w-list-item-highlighted': allowSelectHover || isAccented,
           'w-list-item-accented': isAccented,
-          'sm-not:even:bg-(--w-list-stripe,var(--w-surface-subtle)) grid grid-cols-1': card,
+          'w-list-item-first': first,
+          'w-list-item-last': last,
+          'grid grid-cols-1': card,
+          'sm-not:bg-(--w-list-stripe,var(--w-surface-subtle))': card && position % 2 === 1,
           'col-span-full grid grid-cols-subgrid': !card,
           '-mb-px': !card && isOpen,
           'w-hover-checked': allowSelectHover,
@@ -365,6 +368,9 @@ const props = defineProps<{
   skeleton: boolean
   setter: (newItem?: Data | undefined) => void
   refetch: () => void
+  /** First and last item of the whole list, set on the row as `w-list-item-first` and `w-list-item-last`. */
+  first: boolean
+  last: boolean
   index: number
   position: number
   value: number

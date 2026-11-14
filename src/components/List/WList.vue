@@ -19,9 +19,11 @@
 
         :page-length="PAGE_LENGTH"
         :keep-columns="isGrid"
+        recycle
+        :group-by="$slots.group ? groupBy : undefined"
         :page-class="
           isGrid
-            ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-(--w-list-gap,0) sm:gap-(--w-list-gap,1rem) isolate'
+            ? 'grid grid-cols-[repeat(auto-fill,minmax(min(var(--w-list-card-width,16rem),100%),1fr))] gap-(--w-list-gap,0) sm:gap-(--w-list-gap,1rem) isolate'
             : isPage
               ? 'w-list-page-rows grid gap-(--w-list-gap,0)'
               : 'grid gap-(--w-list-gap,0) isolate'
@@ -151,24 +153,14 @@
           </component>
         </template>
 
-        <template #default="{item, skeleton, setter, refetch, previous, first, index, position, value, results, intersecting}">
-          <ListGroupHeading
-            v-if="groupBy && $slots.group && (first || (!skeleton && (position === 0 || (!!previous && !groupBy(item, previous)))))"
-            :class="position === 0 ? 'list:-mt-2' : 'card:mt-2'"
-          >
-            <slot
-              name="group"
-              :item="item"
-              :previous="previous"
-              :skeleton="skeleton"
-            />
-          </ListGroupHeading>
-
+        <template #default="{item, skeleton, setter, refetch, first, last, index, position, value, results, intersecting}">
           <ListItem
             :item="item"
             :skeleton="skeleton"
             :setter="setter"
             :refetch="refetch"
+            :first="first"
+            :last="last"
             :index="index"
             :position="position"
             :value="(value as number)"
@@ -238,6 +230,20 @@
               </div>
             </div>
           </div>
+        </template>
+
+        <template
+          v-if="groupBy && $slots.group"
+          #group="{item, previous, skeleton, position}"
+        >
+          <ListGroupHeading :class="position === 0 ? 'list:-mt-2' : 'card:mt-2'">
+            <slot
+              name="group"
+              :item="item"
+              :previous="previous"
+              :skeleton="skeleton"
+            />
+          </ListGroupHeading>
         </template>
 
         <template
@@ -332,7 +338,7 @@ const props = withDefaults(
     readonlyGetter?: (item: Data) => boolean
     /** Classes for each row's content box. */
     cardClass?: string
-    /** Classes for each row's outer box. */
+    /** Classes for each row's outer box. A recycled list places each row on its own, so `:first-child` and `:last-child` match every row — the list's first and last row carry `w-list-item-first` and `w-list-item-last` instead (`[&.w-list-item-last]:mb-4`, `in-[.w-list-item-first]:rounded-t-2xl`). */
     cardWrapperClass?: string
     /** Tooltip of the select-all checkbox in the table header. */
     selectAllTextGetter: (isUnselect: boolean, count: number) => string
