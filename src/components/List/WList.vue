@@ -23,7 +23,7 @@
         :group-by="$slots.group ? groupBy : undefined"
         :page-class="
           isGrid
-            ? 'grid grid-cols-[repeat(auto-fill,minmax(var(--w-list-card-width,16rem),1fr))] gap-(--w-list-gap,0) sm:gap-(--w-list-gap,1rem) isolate'
+            ? 'grid grid-cols-[repeat(auto-fill,minmax(min(var(--w-list-card-width,16rem),100%),1fr))] gap-(--w-list-gap,0) sm:gap-(--w-list-gap,1rem) isolate'
             : isPage
               ? 'w-list-page-rows grid gap-(--w-list-gap,0)'
               : 'grid gap-(--w-list-gap,0) isolate'

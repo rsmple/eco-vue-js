@@ -1188,10 +1188,10 @@
   }
 
   /*
-   * What a page sets in the list's header, such as its title, and a row's expansion keep the page inset there, as the
-   * rows' content does.
+   * What a page sets in the list's header, such as its title, keeps the page inset there, as the rows' content does.
+   * A row's expansion runs to the screen's edges, as the row does, and pads its content itself.
    */
-  .w-list-page :is(.w-list-header, .w-list-item-expansion) {
+  .w-list-page .w-list-header {
     @variant sm-not {
       padding-inline: var(--w-page-inset, 0px);
     }
