@@ -413,31 +413,20 @@
   @scope (.w-page) to (.surface-section *, .surface-root *) {
     /* A selector per block: a list in the `:where()` a selector ends with is tried on every box of the page. */
     :where(:scope, :scope :not(.grid, .flex, .inline-grid, .inline-flex, .surface-columns, .surface-stack, .surface-stack-divided))
-      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child))
-      + :where(.surface-section),
-    :where(:scope, :scope :not(.grid, .flex, .inline-grid, .inline-flex, .surface-columns, .surface-stack, .surface-stack-divided))
-      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child))
-      + :where(.surface-stack),
-    :where(:scope, :scope :not(.grid, .flex, .inline-grid, .inline-flex, .surface-columns, .surface-stack, .surface-stack-divided))
-      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child))
-      + :where(.surface-stack-divided),
-    :where(:scope, :scope :not(.grid, .flex, .inline-grid, .inline-flex, .surface-columns, .surface-stack, .surface-stack-divided))
-      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child))
-      + :where(.surface-columns),
-    :where(:scope, :scope :not(.grid, .flex, .inline-grid, .inline-flex, .surface-columns, .surface-stack, .surface-stack-divided))
-      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child))
-      + :where(.w-list-page),
-    :where(:scope, :scope :not(.grid, .flex, .inline-grid, .inline-flex, .surface-columns, .surface-stack, .surface-stack-divided))
-      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child))
-      + :where(.w-page-bleed),
-    :where(:scope, :scope :not(.grid, .flex, .inline-grid, .inline-flex, .surface-columns, .surface-stack, .surface-stack-divided))
-      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child))
-      + :where(.w-tabs-section) {
-      /* 1 in flat, where sections paint nothing, 0 where they do. */
-      --w-stack-flat: calc(1 - min(1, var(--w-section-opacity) * 100));
-      --w-joined: 0;
+      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child)) {
+      & + :where(.surface-section),
+      & + :where(.surface-stack),
+      & + :where(.surface-stack-divided),
+      & + :where(.surface-columns),
+      & + :where(.w-list-page),
+      & + :where(.w-page-bleed),
+      & + :where(.w-tabs-section) {
+        /* 1 in flat, where sections paint nothing, 0 where they do. */
+        --w-stack-flat: calc(1 - min(1, var(--w-section-opacity) * 100));
+        --w-joined: 0;
 
-      margin-top: calc(var(--w-section-gap) + var(--w-stack-divide, 2rem) * var(--w-stack-flat));
+        margin-top: calc(var(--w-section-gap) + var(--w-stack-divide, 2rem) * var(--w-stack-flat));
+      }
     }
   }
 }
@@ -457,8 +446,10 @@
 
     /* A page list is a section: after a block, the line goes on its surface, which keeps to the view. */
     :where(:scope, :scope :not(.grid, .flex, .inline-grid, .inline-flex, .surface-columns, .surface-stack, .surface-stack-divided))
-      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child)) + .w-list-page {
-      --w-list-line: var(--w-stack-flat);
+      > :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section, :has(> :where(.surface-section, .surface-stack, .surface-stack-divided, .surface-columns, .w-list-page, .w-page-bleed, .w-tabs-section):last-child)) {
+      & + .w-list-page {
+        --w-list-line: var(--w-stack-flat);
+      }
     }
   }
 }
