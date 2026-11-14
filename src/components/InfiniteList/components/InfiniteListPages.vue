@@ -108,6 +108,21 @@
             />
           </template>
         </InfiniteListRecycledRow>
+
+        <template v-if="$slots.group">
+          <InfiniteListGroupBand
+            v-for="band in recycler.bands.value"
+            :key="band.key"
+            :top="band.top"
+            :height="band.height"
+            @mount="recycler.setGroupElement(band.key, $event)"
+          >
+            <slot
+              name="group"
+              v-bind="band.scope"
+            />
+          </InfiniteListGroupBand>
+        </template>
       </template>
     </div>
 
@@ -126,13 +141,14 @@ import {type StyleValue, computed, inject, nextTick, onBeforeUnmount, onMounted,
 
 import {debounce, getIsClientSide, getOffsetTop, isEqualObj} from '@/utils/utils'
 
+import InfiniteListGroupBand from './InfiniteListGroupBand.vue'
 import InfiniteListPage from './InfiniteListPage.vue'
 import InfiniteListRecycledRow from './InfiniteListRecycledRow.vue'
 
 import {wInfiniteListHeaderHeight, wScrollingElement} from '../models/injection'
 import {INFINITE_LIST_UNMEASURED_ATTRIBUTE} from '../models/utils'
 import {useRefetchNextPages} from '../use/useRefetchNextPages'
-import {type RowRecycler, useRowRecycler} from '../use/useRowRecycler'
+import {type GroupScope, type RowRecycler, useRowRecycler} from '../use/useRowRecycler'
 
 const props = withDefaults(
   defineProps<{
@@ -153,6 +169,7 @@ const props = withDefaults(
     maxPages?: number
     keepColumns?: boolean
     recycle?: boolean
+    groupBy?: (a: Data, b: Data) => boolean
     refetchInterval?: number | false
     queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>
 
@@ -170,6 +187,7 @@ const props = withDefaults(
     maxPages: 5,
     refetchInterval: undefined,
     queryOptions: undefined,
+    groupBy: undefined,
   },
 )
 
@@ -351,6 +369,7 @@ const recycler: RowRecycler<Model, Data> = useRowRecycler<Model, Data>({
   valueGetter: data => props.valueGetter(data),
   refetchFrom: page => refetchNextPages(page),
   getScrollElement,
+  groupBy: () => props.recycle ? props.groupBy : undefined,
 })
 
 const columnCount = ref(1)
@@ -940,6 +959,7 @@ defineExpose({
 
 defineSlots<{
   default?: (props: InfiniteListItemScope<Data, Model>) => void
+  group?: (props: GroupScope<Data>) => void
   before?: () => void
   empty?: () => void
   error?: (props: {error: Error, retry: () => Promise<void>, isFetching: boolean}) => void

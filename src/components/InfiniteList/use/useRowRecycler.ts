@@ -7,12 +7,38 @@ import {getPosition} from '@/utils/useSelected'
 
 import {INFINITE_LIST_UNMEASURED_ATTRIBUTE} from '../models/utils'
 
-type EntryKind = 'skeleton' | 'data' | 'state'
-type RowKind = Exclude<EntryKind, 'state'>
+type EntryKind = 'skeleton' | 'data' | 'state' | 'group'
+type RowKind = 'skeleton' | 'data'
+type MeasuredKind = RowKind | 'group'
 
 export type RecycledScope<Data, Model> = Omit<InfiniteListItemScope<Data, Model>, 'resetting'>
 
-/** An item of the loaded pages in their order, or the error or empty state of a page, which the page renders itself. */
+/** What the heading of a group gets: the group's first item, the item before it, and its place in the list. */
+export interface GroupScope<Data> {
+  item: Data
+  previous: Data | undefined
+  skeleton: boolean
+  page: number
+  index: number
+  position: number
+}
+
+/**
+ * The box of a group, from its heading to its last item, which the heading sticks in: a sticky box never leaves its
+ * parent, so in the row of the group's first item it would leave the view with that row. Before the pages load, the
+ * group of the first item spans their skeletons.
+ */
+export interface GroupBand<Data> {
+  key: string
+  top: number
+  height: number
+  scope: GroupScope<Data>
+}
+
+/**
+ * An item of the loaded pages in their order, the heading of a group before its first item, or the error or empty
+ * state of a page, which the page renders itself.
+ */
 interface Entry<Data> {
   key: string
   kind: EntryKind
@@ -22,6 +48,7 @@ interface Entry<Data> {
   index: number
   item: Data | undefined
   results: Data[] | undefined
+  group?: GroupScope<Data>
 }
 
 /** A row kept for one kind of item: a skeleton row never shows data nor a data row a skeleton. */
@@ -42,6 +69,8 @@ const DEFAULT_ROW_HEIGHT = 48
 
 const DEFAULT_STATE_HEIGHT = 160
 
+const DEFAULT_GROUP_HEIGHT = 40
+
 /** Parked rows kept per kind beyond those in use, the rest are unmounted. */
 const MAX_PARKED = 40
 
@@ -57,6 +86,8 @@ interface Options<Model, Data> {
   valueGetter: (data: Data) => Model
   refetchFrom: (page: number) => void
   getScrollElement: () => Element | null
+  /** Whether two items are in the same group, each group then opening with a heading. */
+  groupBy: () => ((a: Data, b: Data) => boolean) | undefined
 }
 
 const getIsDocumentScroll = (element: Element): boolean => element === document.scrollingElement || element === document.body || element === document.documentElement
@@ -84,9 +115,9 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
 
   /** Heights without the opened content of a row, for the guess. */
   const guessHeights = new Map<string, number>()
-  const guessSums: Record<RowKind, {sum: number, count: number}> = {skeleton: {sum: 0, count: 0}, data: {sum: 0, count: 0}}
+  const guessSums: Record<MeasuredKind, {sum: number, count: number}> = {skeleton: {sum: 0, count: 0}, data: {sum: 0, count: 0}, group: {sum: 0, count: 0}}
 
-  const setGuessHeight = (key: string, kind: RowKind, height: number) => {
+  const setGuessHeight = (key: string, kind: MeasuredKind, height: number) => {
     const old = guessHeights.get(key)
     const sums = guessSums[kind]
 
@@ -100,21 +131,27 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
     sums.count++
   }
 
-  const getAverage = (kind: RowKind): number => {
+  const getAverage = (kind: MeasuredKind): number => {
     const sums = guessSums[kind]
     return sums.count === 0 ? 0 : sums.sum / sums.count
   }
 
   const getGuess = (kind: EntryKind): number => {
     if (kind === 'state') return DEFAULT_STATE_HEIGHT
+    if (kind === 'group') return getAverage('group') || DEFAULT_GROUP_HEIGHT
 
     const other: RowKind = kind === 'data' ? 'skeleton' : 'data'
 
     return getAverage(kind) || getAverage(other) || DEFAULT_ROW_HEIGHT
   }
 
+  const groupPlaceholder = {id: 0} as unknown as Data
+
   const entries = computed<Entry<Data>[]>(() => {
     const list: Entry<Data>[] = []
+    const groupBy = options.groupBy()
+    const pageLength = options.pageLength()
+    let lastData: Data | undefined
 
     pages.value.forEach((page, pageIndex) => {
       const slotId = slotIds.value[pageIndex]!
@@ -134,6 +171,13 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
           const value = options.valueGetter(item)
           const key = seen.has(value) ? `${ page }:${ value }#${ index }` : `${ page }:${ value }`
           seen.add(value)
+
+          if (groupBy && (lastData === undefined || !groupBy(item, lastData))) {
+            const group = {item, previous: lastData, skeleton: false, page, index, position: getPosition(page, index, pageLength)}
+            list.push({key: `group:${ key }`, kind: 'group', slotId, page, index, item, results, group})
+          }
+
+          lastData = item
           list.push({key, kind: 'data', slotId, page, index, item, results})
         })
 
@@ -141,6 +185,11 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
       }
 
       const length = options.getSkeletonLength(page - 1)
+
+      if (groupBy && list.length === 0 && length !== 0) {
+        const group = {item: groupPlaceholder, previous: undefined, skeleton: true, page, index: 0, position: getPosition(page, 0, pageLength)}
+        list.push({key: `group:skeleton:${ page }`, kind: 'group', slotId, page, index: 0, item: undefined, results: undefined, group})
+      }
 
       for (let index = 0; index < length; index++) {
         list.push({key: `skeleton:${ page }:${ index }`, kind: 'skeleton', slotId, page, index, item: undefined, results: undefined})
@@ -193,7 +242,7 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
 
     for (let i = 0; i < list.length; i++) {
       const entry = list[i]!
-      if (entry.page !== page) continue
+      if (entry.page !== page || entry.kind === 'group') continue
       if (first === -1) first = i
       if (index === undefined || entry.index === index) return i
     }
@@ -289,8 +338,8 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
     const entry = list[index]!
     const isData = entry.kind === 'data'
     const item = isData ? entry.item! : getPlaceholder(view.id)
-    const previous = list[index - 1]
-    const next = list[index + 1]
+    const previous = list[index - 1]?.kind === 'group' ? list[index - 2] : list[index - 1]
+    const next = list[index + 1]?.kind === 'group' ? list[index + 2] : list[index + 1]
 
     return {
       item,
@@ -299,7 +348,7 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
       skeleton: !isData,
       previous: isData && previous?.kind === 'data' ? previous.item : undefined,
       next: isData && next?.kind === 'data' ? next.item : undefined,
-      first: index === 0,
+      first: index === 0 || (index === 1 && list[0]!.kind === 'group'),
       last: index === list.length - 1,
       page: entry.page,
       index: entry.index,
@@ -328,15 +377,24 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
 
     for (const record of records) {
       const view = viewsByElement.get(record.target)
-      const key = view ? view.key : stateKeysByElement.get(record.target)
+      const groupKey = view ? undefined : groupKeysByElement.get(record.target)
+      const key = view ? view.key : groupKey ?? stateKeysByElement.get(record.target)
       if (key === null || key === undefined) continue
 
-      const height = record.borderBoxSize?.[0]?.blockSize ?? (record.target as HTMLElement).offsetHeight
+      let height = record.borderBoxSize?.[0]?.blockSize ?? (record.target as HTMLElement).offsetHeight
+
+      // The heading's margins are its own, as they were in the grid of the items.
+      if (groupKey !== undefined) {
+        const style = getComputedStyle(record.target)
+        height += (Number.parseFloat(style.marginTop) || 0) + (Number.parseFloat(style.marginBottom) || 0)
+      }
 
       if (heights.get(key) !== height) {
         heights.set(key, height)
         isChanged = true
       }
+
+      if (groupKey !== undefined) setGuessHeight(key, 'group', height)
 
       if (!view) continue
 
@@ -403,6 +461,64 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
     }
   }
 
+  const groupKeysByElement = new Map<Element, string>()
+  const groupElements = new Map<string, Element>()
+
+  /** The heading of a band, measured as an entry of the layout. */
+  const setGroupElement = (key: string, element: Element | null) => {
+    const old = groupElements.get(key)
+
+    if (old) {
+      resizeObserver?.unobserve(old)
+      groupKeysByElement.delete(old)
+      groupElements.delete(key)
+    }
+
+    if (!element) return
+
+    groupElements.set(key, element)
+    groupKeysByElement.set(element, key)
+    resizeObserver?.observe(element)
+  }
+
+  const bands = shallowRef<GroupBand<Data>[]>([])
+
+  const groupStarts = computed(() => {
+    const starts: number[] = []
+    entries.value.forEach((entry, index) => {
+      if (entry.kind === 'group') starts.push(index)
+    })
+    return starts
+  })
+
+  /** The bands of the groups in the rendered range, the one the range starts in among them. */
+  const assignBands = () => {
+    const list = entries.value
+    const {offsets, total} = layout.value
+    const starts = groupStarts.value
+    const next: GroupBand<Data>[] = []
+
+    let i = 0
+    while (i + 1 < starts.length && starts[i + 1]! <= range.start) i++
+
+    for (; i < starts.length && starts[i]! < range.end; i++) {
+      const start = starts[i]!
+      const end = starts[i + 1]
+      const top = offsets[start]!
+      const bottom = end === undefined ? total : offsets[end]! - rowGap.value
+
+      next.push({key: list[start]!.key, top, height: Math.max(0, bottom - top), scope: list[start]!.group!})
+    }
+
+    const old = bands.value
+    const isChanged = next.length !== old.length || next.some((band, index) => {
+      const oldBand = old[index]!
+      return band.key !== oldBand.key || band.top !== oldBand.top || band.height !== oldBand.height || band.scope !== oldBand.scope
+    })
+
+    if (isChanged) bands.value = next
+  }
+
   const stateOffsets = computed(() => {
     const map = new Map<number, number>()
     const list = entries.value
@@ -429,7 +545,7 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
     const wanted = new Map<string, number>()
     for (let i = range.start; i < range.end; i++) {
       const entry = list[i]
-      if (entry && entry.kind !== 'state') wanted.set(entry.key, i)
+      if (entry && (entry.kind === 'data' || entry.kind === 'skeleton')) wanted.set(entry.key, i)
     }
 
     const free: Record<RowKind, RecycledView<Data, Model>[]> = {skeleton: [], data: []}
@@ -539,8 +655,11 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
       return
     }
 
-    const entry = list[getEntryIndexAt(viewTop)]!
-    anchor = {page: entry.page, index: entry.index, top: topSpacerHeight.value + layout.value.offsets[getEntryIndexAt(viewTop)]!}
+    let index = getEntryIndexAt(viewTop)
+    if (list[index]!.kind === 'group' && index + 1 < list.length) index++
+
+    const entry = list[index]!
+    anchor = {page: entry.page, index: entry.index, top: topSpacerHeight.value + layout.value.offsets[index]!}
   }
 
   const updateIntersecting = (viewport: {top: number, height: number}) => {
@@ -591,6 +710,7 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
     setAnchor(viewport.top)
     updateIntersecting(viewport)
     assign()
+    assignBands()
     observeStates()
 
     if (pendingScroll) {
@@ -652,7 +772,7 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
     for (const [key, height] of guessHeights) {
       if (keys.has(key)) continue
 
-      const sums = guessSums[key.startsWith('skeleton:') ? 'skeleton' : 'data']
+      const sums = guessSums[key.startsWith('group:') ? 'group' : key.startsWith('skeleton:') ? 'skeleton' : 'data']
       sums.sum -= height
       sums.count--
       guessHeights.delete(key)
@@ -661,11 +781,13 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
 
   return {
     views,
+    bands,
     totalHeight: computed(() => layout.value.total),
     stateOffsets,
     intersectingPages,
     averageItemHeight,
     setRowElement,
+    setGroupElement,
     update,
     scrollTo,
   }
