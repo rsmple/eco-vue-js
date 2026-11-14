@@ -1,7 +1,7 @@
 <template>
   <component
     :is="headless && (isFailed || isEmpty) ? 'div' : WEmptyComponent"
-    v-bind="headless ? {class: 'absolute inset-x-0 top-0 grid [grid-template-columns:inherit]', style: {transform: `translateY(${ stateOffset ?? 0 }px)`}} : undefined"
+    v-bind="headless ? {class: 'absolute inset-x-0 top-0 grid grid-cols-[inherit]', style: {transform: `translateY(${ stateOffset ?? 0 }px)`}} : undefined"
   >
     <div
       v-if="isFailed"

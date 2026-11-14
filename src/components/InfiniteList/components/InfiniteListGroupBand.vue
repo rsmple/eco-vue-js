@@ -1,7 +1,7 @@
 <template>
   <div
     ref="band"
-    class="w-infinite-list-band pointer-events-none absolute inset-x-0 grid content-start [grid-template-columns:inherit] *:pointer-events-auto"
+    class="w-infinite-list-band pointer-events-none absolute inset-x-0 grid content-start grid-cols-[inherit] *:pointer-events-auto"
     :style="{top: `${ top }px`, height: `${ height }px`}"
   >
     <slot />

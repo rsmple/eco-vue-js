@@ -1,7 +1,7 @@
 <template>
   <div
     ref="row"
-    class="w-infinite-list-row absolute inset-x-0 grid [grid-template-columns:inherit] [column-gap:inherit]"
+    class="w-infinite-list-row absolute inset-x-0 grid grid-cols-[inherit] [column-gap:inherit]"
   >
     <div
       v-if="column"
