@@ -130,7 +130,7 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 | `menu` | `MenuComponent<Data>[]` | — | Row menu items, opened by the row's more button or a right click. A `[component, props]` tuple passes extra props. |
 | `readonlyGetter` | `((item: Data) => boolean)` | — | Makes a single row readonly. |
 | `cardClass` | `string` | — | Classes for each row's content box. |
-| `cardWrapperClass` | `string` | — | Classes for each row's outer box. |
+| `cardWrapperClass` | `string` | — | Classes for each row's outer box. A recycled list places each row on its own, so `:first-child` and `:last-child` match every row — the list's first and last row carry `w-list-item-first` and `w-list-item-last` instead (`[&.w-list-item-last]:mb-4`, `in-[.w-list-item-first]:rounded-t-2xl`). |
 | `selectAllTextGetter` | `(isUnselect: boolean, count: number) => string` | **required** | Tooltip of the select-all checkbox in the table header. |
 | `hasBorder` | `boolean` | — | Draws a border around each row. |
 | `configKey` | `string` | **required** | `localStorage` key the column settings and view mode are saved under. |

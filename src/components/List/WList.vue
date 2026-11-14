@@ -153,12 +153,14 @@
           </component>
         </template>
 
-        <template #default="{item, skeleton, setter, refetch, index, position, value, results, intersecting}">
+        <template #default="{item, skeleton, setter, refetch, first, last, index, position, value, results, intersecting}">
           <ListItem
             :item="item"
             :skeleton="skeleton"
             :setter="setter"
             :refetch="refetch"
+            :first="first"
+            :last="last"
             :index="index"
             :position="position"
             :value="(value as number)"
@@ -336,7 +338,7 @@ const props = withDefaults(
     readonlyGetter?: (item: Data) => boolean
     /** Classes for each row's content box. */
     cardClass?: string
-    /** Classes for each row's outer box. */
+    /** Classes for each row's outer box. A recycled list places each row on its own, so `:first-child` and `:last-child` match every row — the list's first and last row carry `w-list-item-first` and `w-list-item-last` instead (`[&.w-list-item-last]:mb-4`, `in-[.w-list-item-first]:rounded-t-2xl`). */
     cardWrapperClass?: string
     /** Tooltip of the select-all checkbox in the table header. */
     selectAllTextGetter: (isUnselect: boolean, count: number) => string
