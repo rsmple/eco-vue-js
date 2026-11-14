@@ -17,3 +17,12 @@ export const getIsScrollDown = (element: Element | null): boolean => {
 
   return element.scrollTop > (element.scrollHeight - element.clientHeight) - TRIGGER_FACTOR
 }
+
+export const getIsDocumentScroll = (element: Element): boolean => element === document.scrollingElement || element === document.body || element === document.documentElement
+
+/** The columns of a grid, as its computed columns are the resolved track sizes, one length per column; 1 for any other box. */
+export const getGridColumnCount = (style: CSSStyleDeclaration): number => {
+  if (style.display !== 'grid' && style.display !== 'inline-grid') return 1
+
+  return Math.max(style.gridTemplateColumns.match(/[\d.]+px/g)?.length ?? 1, 1)
+}

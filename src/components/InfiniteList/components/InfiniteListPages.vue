@@ -96,11 +96,11 @@
 
       <template v-if="recycle">
         <InfiniteListRecycledRow
-          v-for="view in recycler.views"
-          :key="view.id"
-          :cells="view.cells"
-          :column="view.column"
-          @mount="recycler.setRowElement(view, $event)"
+          v-for="row in recycler.rows"
+          :key="row.id"
+          :cells="row.view.cells"
+          :column="row.view.column"
+          @mount="recycler.setRowElement(row, $event)"
         >
           <template #default="scope">
             <slot
@@ -147,7 +147,7 @@ import InfiniteListPage from './InfiniteListPage.vue'
 import InfiniteListRecycledRow from './InfiniteListRecycledRow.vue'
 
 import {wInfiniteListHeaderHeight, wScrollingElement} from '../models/injection'
-import {INFINITE_LIST_UNMEASURED_ATTRIBUTE} from '../models/utils'
+import {INFINITE_LIST_UNMEASURED_ATTRIBUTE, getGridColumnCount, getIsDocumentScroll} from '../models/utils'
 import {useRefetchNextPages} from '../use/useRefetchNextPages'
 import {type GroupScope, type RowRecycler, useRowRecycler} from '../use/useRowRecycler'
 
@@ -203,8 +203,6 @@ const scrollRef = useTemplateRef('scroll')
 const scrollingElement = inject(wScrollingElement, null)
 
 const getScrollElement = (): Element | null => scrollingElement?.value ?? document.scrollingElement
-
-const getIsDocumentScroll = (element: Element): boolean => element === document.scrollingElement || element === document.body || element === document.documentElement
 
 // Provided rather than set as a variable on the root: a variable there restyles every row when the header is measured.
 provide(wInfiniteListHeaderHeight, computed(() => props.headerHeight))
@@ -354,11 +352,14 @@ const bottomSpacerHeight = computed(() => {
 const sources = shallowReactive(new Map<number, PageSource<Data>>())
 
 const setSource = (slotId: number, source: PageSource<Data> | null) => {
+  if (!props.recycle) return
+
   if (source) sources.set(slotId, source)
   else if (!slotIds.value.includes(slotId)) sources.delete(slotId)
 }
 
 const recycler: RowRecycler<Model, Data> = useRowRecycler<Model, Data>({
+  enabled: () => props.recycle,
   pages,
   slotIds,
   sources,
@@ -376,15 +377,7 @@ const recycler: RowRecycler<Model, Data> = useRowRecycler<Model, Data>({
 
 const columnCount = ref(1)
 
-const getColumnCount = (element: HTMLElement): number => {
-  if (!props.keepColumns) return 1
-
-  const style = getComputedStyle(element)
-  if (style.display !== 'grid' && style.display !== 'inline-grid') return 1
-
-  // A grid's computed columns are the resolved track sizes, one length per column.
-  return Math.max(style.gridTemplateColumns.match(/[\d.]+px/g)?.length ?? 1, 1)
-}
+const getColumnCount = (element: HTMLElement): number => props.keepColumns ? getGridColumnCount(getComputedStyle(element)) : 1
 
 /**
  * Empty cells before the first rendered item, as many as the column it has in the whole list. Without them, a list
