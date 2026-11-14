@@ -283,6 +283,8 @@ import WInfiniteList from 'eco-vue-js/dist/components/InfiniteList/WInfiniteList
 | `pageStyle` | `StyleValue` | — | Style of the element holding the items, e.g. the columns of a grid. |
 | `maxPages` | `number` | — | Number of pages kept rendered, 5 by default. Scrolling further drops pages at the other end, keeping their height as space. |
 | `keepColumns` | `boolean` | — | Keeps each item in its column of a `pageClass` grid with several columns, such as cards, when the list starts past the first page or drops a page at the top. Leave it off when every item spans the row, as the rows of a table: the columns are then not measured. |
+| `recycle` | `boolean` | — | Renders only the items in view, each row of them placed by `top`, and gives a row leaving the view to the next row of its kind, a loading one or one with data, instead of rendering a new one. Each row is a grid taking the columns and the column gap of the `pageClass` grid (`inherit`): an item spanning the row, as a table row, or with `keepColumns` one item per column, as cards. Not for `transition`. |
+| `groupBy` | `((a: Data, b: Data) => boolean)` | — | With `recycle`, whether two neighbouring items are in the same group: the `group` slot renders before each new group. |
 | `refetchInterval` | `number \| false` | — | Refetches the pages in view every this many ms. |
 | `queryOptions` | `DefaultQueryOptions<PaginatedResponse<Data>>` | — | Options for every page query. |
 | `pageLength` | `number` | `24` | Page size, sent to the query as `size`. Must match the size the query returns. |
@@ -301,6 +303,7 @@ import WInfiniteList from 'eco-vue-js/dist/components/InfiniteList/WInfiniteList
 | Slot | Props | Description |
 | --- | --- | --- |
 | `default` | `{ item: Data; setter: (newItem?: Data \| undefined) => void; skeleton: boolean; refetch: () => void; previous: Data \| undefined; next: Data \| undefined; first: boolean; last: boolean; resetting: boolean; page: number; index: number; position: number; value: Model; results: Data[] \| undefined; intersecting: boolean; }` | An item, or a skeleton placeholder while its page loads. `setter` writes a changed item to the query cache, or removes it when called with nothing; `position` is the item's index in the whole list. |
+| `group` | `{ item: Data; previous: Data \| undefined; skeleton: boolean; page: number; index: number; position: number; }` | With `recycle` and `groupBy`, the heading of a group, its first child sticking for as long as the group is in view. Gets the group's first `item`, the item before it as `previous`, and its `page`, `index` and `position`; while the first page loads, `skeleton` is true and the group spans its skeletons. |
 | `header` | `InfiniteListHeaderScope & Partial<InfiniteListScope>` | Sticky content above the items, such as a toolbar. Gets `refetchAll`, `resetPage`, `goto`, `isFetching` and `isRefetchingAll`, and `updateHeader` to re-measure it right away. |
 | `empty` | — | Shown when the query returns no items. Replaces `emptyStub`. |
 | `pages-before` | — | Rendered in the box that holds the loaded pages, before them, such as a layer that spans them. |

@@ -127,10 +127,10 @@ const props = withDefaults(
     /** Keeps each item in its column of a `pageClass` grid with several columns, such as cards, when the list starts past the first page or drops a page at the top. Leave it off when every item spans the row, as the rows of a table: the columns are then not measured. */
     keepColumns?: boolean
     /**
-     * Renders only the items in view, each in a row of its own placed by `top`, and gives a row leaving the view
-     * to the next item of its kind, a loading one or one with data, instead of rendering a new one. Each row is a grid
-     * taking the columns of `pageStyle` (`grid-template-columns: inherit`), so it is for lists whose every item spans the
-     * row, as the rows of a table, and not for `keepColumns` or `transition`.
+     * Renders only the items in view, each row of them placed by `top`, and gives a row leaving the view to the next row
+     * of its kind, a loading one or one with data, instead of rendering a new one. Each row is a grid taking the columns
+     * and the column gap of the `pageClass` grid (`inherit`): an item spanning the row, as a table row, or with
+     * `keepColumns` one item per column, as cards. Not for `transition`.
      */
     recycle?: boolean
     /** With `recycle`, whether two neighbouring items are in the same group: the `group` slot renders before each new group. */

@@ -51,13 +51,27 @@ interface Entry<Data> {
   group?: GroupScope<Data>
 }
 
-/** A row kept for one kind of item: a skeleton row never shows data nor a data row a skeleton. */
+/**
+ * The entries in one row of the grid: as many items as it has columns, from `column` in the first row of the list, or
+ * one heading or state spanning the row. Its kind is `skeleton` when every item in it is one.
+ */
+interface Line {
+  key: string
+  kind: EntryKind
+  start: number
+  end: number
+  column: number
+}
+
+/** A row kept for one kind of line: a skeleton row never shows data nor a data row only skeletons. */
 export interface RecycledView<Data, Model> {
   readonly id: number
   readonly kind: RowKind
-  /** The entry the row shows, `null` while it is parked off screen keeping what it showed last. */
+  /** The line the row shows, `null` while it is parked off screen keeping what it showed last. */
   key: string | null
-  scope: RecycledScope<Data, Model>
+  cells: RecycledScope<Data, Model>[]
+  /** Columns left empty before the first cell. */
+  column: number
 }
 
 /** Rows rendered past each end of the view, so a scroll shows rows already laid out. */
@@ -88,6 +102,8 @@ interface Options<Model, Data> {
   getScrollElement: () => Element | null
   /** Whether two items are in the same group, each group then opening with a heading. */
   groupBy: () => ((a: Data, b: Data) => boolean) | undefined
+  /** Whether the items fill the columns of a grid, as cards, rather than each spanning the row. */
+  keepColumns: () => boolean
 }
 
 const getIsDocumentScroll = (element: Element): boolean => element === document.scrollingElement || element === document.body || element === document.documentElement
@@ -101,11 +117,12 @@ const isScopeEqual = <Data, Model>(a: RecycledScope<Data, Model> | undefined, b:
 }
 
 /**
- * Renders the items of the loaded pages that are in view: each row is
- * placed by `top` at the sum of the heights before it, and a row leaving the view is given to the next item of its
- * kind entering it, so scrolling patches rows instead of mounting them, and a page loading swaps skeleton rows for data
- * rows instead of turning each row from one into the other. The heights are measured as the rows render, the others
- * guessed from them, and the list keeps the item at the top of the view in place as they change.
+ * Renders the items of the loaded pages that are in view: the items are
+ * laid in rows of as many as the grid has columns, one in a table, each row placed by `top` at the sum of the heights
+ * before it, and a row leaving the view is given to the next row of its kind entering it, so scrolling patches rows
+ * instead of mounting them, and a page loading swaps skeleton rows for data rows instead of turning each row from one
+ * into the other. The heights are measured as the rows render, the others guessed from them, and the list keeps the
+ * item at the top of the view in place as they change, or as the columns do.
  */
 export const useRowRecycler = <Model extends number | string, Data extends DefaultData>(options: Options<Model, Data>) => {
   const {pages, slotIds, sources, isRefetchingAll, itemsRef, topSpacerHeight} = options
@@ -113,22 +130,33 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
   const heightVersion = shallowRef(0)
   const heights = new Map<string, number>()
 
-  /** Heights without the opened content of a row, for the guess. */
-  const guessHeights = new Map<string, number>()
-  const guessSums: Record<MeasuredKind, {sum: number, count: number}> = {skeleton: {sum: 0, count: 0}, data: {sum: 0, count: 0}, group: {sum: 0, count: 0}}
+  /** Heights without the opened content of a row, for the guess, and the items in the row. */
+  const guessHeights = new Map<string, {height: number, kind: MeasuredKind, items: number}>()
+  const guessSums: Record<MeasuredKind, {sum: number, count: number, items: number}> = {
+    skeleton: {sum: 0, count: 0, items: 0},
+    data: {sum: 0, count: 0, items: 0},
+    group: {sum: 0, count: 0, items: 0},
+  }
 
-  const setGuessHeight = (key: string, kind: MeasuredKind, height: number) => {
+  const forgetGuessHeight = (key: string) => {
     const old = guessHeights.get(key)
+    if (!old) return
+
+    const sums = guessSums[old.kind]
+    sums.sum -= old.height
+    sums.count--
+    sums.items -= old.items
+    guessHeights.delete(key)
+  }
+
+  const setGuessHeight = (key: string, kind: MeasuredKind, height: number, items: number) => {
+    forgetGuessHeight(key)
+
+    guessHeights.set(key, {height, kind, items})
     const sums = guessSums[kind]
-
-    if (old !== undefined) {
-      sums.sum -= old
-      sums.count--
-    }
-
-    guessHeights.set(key, height)
     sums.sum += height
     sums.count++
+    sums.items += items
   }
 
   const getAverage = (kind: MeasuredKind): number => {
@@ -200,28 +228,83 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
   })
 
   const rowGap = shallowRef(0)
+  const columnCount = shallowRef(1)
+
+  /** Reads the gap between the rows and the columns of the grid, which change with the width and the breakpoint. */
+  const readGrid = () => {
+    const itemsEl = itemsRef.value
+    if (!itemsEl) return
+
+    const style = getComputedStyle(itemsEl)
+    const isGrid = style.display === 'grid' || style.display === 'inline-grid'
+
+    rowGap.value = Number.parseFloat(style.rowGap) || 0
+    // A grid's computed columns are the resolved track sizes, one length per column.
+    columnCount.value = options.keepColumns() && isGrid ? Math.max(style.gridTemplateColumns.match(/[\d.]+px/g)?.length ?? 1, 1) : 1
+  }
+
+  const grid = computed(() => {
+    const list = entries.value
+    const columns = columnCount.value
+    const pageLength = options.pageLength()
+    const lines: Line[] = []
+    const lineOf = new Int32Array(list.length)
+
+    let i = 0
+
+    while (i < list.length) {
+      const entry = list[i]!
+
+      if (entry.kind === 'state' || entry.kind === 'group') {
+        lineOf[i] = lines.length
+        lines.push({key: entry.key, kind: entry.kind, start: i, end: i + 1, column: 0})
+        i++
+        continue
+      }
+
+      // Only the first row of the list is known to start past the first column, as the items of the pages before it.
+      const column = i === 0 ? getPosition(entry.page, entry.index, pageLength) % columns : 0
+      let end = i
+      let isData = false
+
+      while (end < list.length && end - i < columns - column) {
+        const kind = list[end]!.kind
+        if (kind !== 'data' && kind !== 'skeleton') break
+        if (kind === 'data') isData = true
+        lineOf[end] = lines.length
+        end++
+      }
+
+      const keys = list.slice(i, end).map(item => item.key).join(',')
+
+      lines.push({key: column ? `${ column }+${ keys }` : keys, kind: isData ? 'data' : 'skeleton', start: i, end, column})
+      i = end
+    }
+
+    return {lines, lineOf}
+  })
 
   const layout = computed(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     heightVersion.value
 
-    const list = entries.value
-    const offsets = new Float64Array(list.length + 1)
+    const {lines} = grid.value
+    const offsets = new Float64Array(lines.length + 1)
     let y = 0
 
-    for (let i = 0; i < list.length; i++) {
-      const entry = list[i]!
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!
       offsets[i] = y
-      y += (heights.get(entry.key) ?? getGuess(entry.kind)) + (i === list.length - 1 ? 0 : rowGap.value)
+      y += (heights.get(line.key) ?? getGuess(line.kind)) + (i === lines.length - 1 ? 0 : rowGap.value)
     }
 
-    offsets[list.length] = y
+    offsets[lines.length] = y
 
     return {offsets, total: y}
   })
 
-  /** Index of the entry at `y`, the first or the last when `y` is before or after them. */
-  const getEntryIndexAt = (y: number): number => {
+  /** Index of the line at `y`, the first or the last when `y` is before or after them. */
+  const getLineIndexAt = (y: number): number => {
     const {offsets} = layout.value
     const length = offsets.length - 1
     let low = 0
@@ -248,6 +331,11 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
     }
 
     return first
+  }
+
+  const findLineIndex = (page: number, index: number | undefined): number => {
+    const entryIndex = findEntryIndex(page, index)
+    return entryIndex === -1 ? -1 : grid.value.lineOf[entryIndex]!
   }
 
   const getScrollElement = (): Element | null => options.getScrollElement()
@@ -283,18 +371,18 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
   /** The entry each row showed last, so an entry back in view takes the row that still shows it and nothing renders. */
   const lastKeys = new Map<number, string>()
 
-  const placeholders = new Map<number, Data>()
+  const placeholders = new Map<number, Data[]>()
 
-  /** The item of a skeleton row, the same object for as long as the row lives, so it renders nothing again when it moves. */
-  const getPlaceholder = (viewId: number): Data => {
-    let placeholder = placeholders.get(viewId)
+  /** The item of a skeleton cell, the same object for as long as the row lives, so it renders nothing again when it moves. */
+  const getPlaceholder = (viewId: number, cell: number): Data => {
+    let list = placeholders.get(viewId)
 
-    if (!placeholder) {
-      placeholder = {id: -viewId} as unknown as Data
-      placeholders.set(viewId, placeholder)
+    if (!list) {
+      list = []
+      placeholders.set(viewId, list)
     }
 
-    return placeholder
+    return list[cell] ??= {id: -(viewId * 1000 + cell)} as unknown as Data
   }
 
   const setters = new Map<string, (newItem?: Data) => void>()
@@ -334,10 +422,10 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
 
   const intersectingPages = shallowRef(new Set<number>())
 
-  const getScope = (view: RecycledView<Data, Model>, list: Entry<Data>[], index: number): RecycledScope<Data, Model> => {
+  const getScope = (view: RecycledView<Data, Model>, list: Entry<Data>[], index: number, cell: number): RecycledScope<Data, Model> => {
     const entry = list[index]!
     const isData = entry.kind === 'data'
-    const item = isData ? entry.item! : getPlaceholder(view.id)
+    const item = isData ? entry.item! : getPlaceholder(view.id, cell)
     const previous = list[index - 1]?.kind === 'group' ? list[index - 2] : list[index - 1]
     const next = list[index + 1]?.kind === 'group' ? list[index + 2] : list[index + 1]
 
@@ -394,14 +482,14 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
         isChanged = true
       }
 
-      if (groupKey !== undefined) setGuessHeight(key, 'group', height)
+      if (groupKey !== undefined) setGuessHeight(key, 'group', height, 1)
 
       if (!view) continue
 
       let unmeasured = 0
-      for (const element of record.target.querySelectorAll(`[${ INFINITE_LIST_UNMEASURED_ATTRIBUTE }]`)) unmeasured += element.getBoundingClientRect().height
+      for (const element of record.target.querySelectorAll(`[${ INFINITE_LIST_UNMEASURED_ATTRIBUTE }]`)) unmeasured = Math.max(unmeasured, element.getBoundingClientRect().height)
 
-      setGuessHeight(key, view.kind, height - unmeasured)
+      setGuessHeight(key, view.kind, height - unmeasured, view.cells.length)
     }
 
     if (isChanged) heightVersion.value++
@@ -485,8 +573,8 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
 
   const groupStarts = computed(() => {
     const starts: number[] = []
-    entries.value.forEach((entry, index) => {
-      if (entry.kind === 'group') starts.push(index)
+    grid.value.lines.forEach((line, index) => {
+      if (line.kind === 'group') starts.push(index)
     })
     return starts
   })
@@ -494,6 +582,7 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
   /** The bands of the groups in the rendered range, the one the range starts in among them. */
   const assignBands = () => {
     const list = entries.value
+    const {lines} = grid.value
     const {offsets, total} = layout.value
     const starts = groupStarts.value
     const next: GroupBand<Data>[] = []
@@ -507,7 +596,9 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
       const top = offsets[start]!
       const bottom = end === undefined ? total : offsets[end]! - rowGap.value
 
-      next.push({key: list[start]!.key, top, height: Math.max(0, bottom - top), scope: list[start]!.group!})
+      const entry = list[lines[start]!.start]!
+
+      next.push({key: entry.key, top, height: Math.max(0, bottom - top), scope: entry.group!})
     }
 
     const old = bands.value
@@ -523,15 +614,15 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
     const map = new Map<number, number>()
     const list = entries.value
 
-    list.forEach((entry, index) => {
-      if (entry.kind === 'state') map.set(entry.slotId, layout.value.offsets[index]!)
+    grid.value.lines.forEach((line, index) => {
+      if (line.kind === 'state') map.set(list[line.start]!.slotId, layout.value.offsets[index]!)
     })
 
     return map
   })
 
   const createView = (kind: RowKind): RecycledView<Data, Model> => {
-    const view = shallowReactive({id: ++viewIdCounter, kind, key: null, scope: undefined}) as unknown as RecycledView<Data, Model>
+    const view = shallowReactive({id: ++viewIdCounter, kind, key: null, cells: [], column: 0}) as RecycledView<Data, Model>
     views.push(view)
     return view
   }
@@ -540,20 +631,36 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
 
   const assign = () => {
     const list = entries.value
+    const {lines} = grid.value
     const {offsets} = layout.value
 
     const wanted = new Map<string, number>()
     for (let i = range.start; i < range.end; i++) {
-      const entry = list[i]
-      if (entry && (entry.kind === 'data' || entry.kind === 'skeleton')) wanted.set(entry.key, i)
+      const line = lines[i]
+      if (line && (line.kind === 'data' || line.kind === 'skeleton')) wanted.set(line.key, i)
     }
 
     const free: Record<RowKind, RecycledView<Data, Model>[]> = {skeleton: [], data: []}
     const inUse: Record<RowKind, number> = {skeleton: 0, data: 0}
 
     const show = (view: RecycledView<Data, Model>, index: number) => {
-      const scope = getScope(view, list, index)
-      if (!isScopeEqual(view.scope, scope)) view.scope = scope
+      const line = lines[index]!
+      const cells: RecycledScope<Data, Model>[] = []
+      let isSame = view.column === line.column && view.cells.length === line.end - line.start
+
+      for (let i = line.start; i < line.end; i++) {
+        const old = view.cells[i - line.start]
+        const scope = getScope(view, list, i, i - line.start)
+        const cell = isScopeEqual(old, scope) ? old! : scope
+
+        if (cell !== old) isSame = false
+        cells.push(cell)
+      }
+
+      if (!isSame) {
+        view.cells = cells
+        view.column = line.column
+      }
 
       rowY.set(view.id, offsets[index]!)
       writeY(view)
@@ -584,7 +691,7 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
 
     for (const [key, index] of wanted) {
       const view = freeByLastKey.get(key)
-      if (!view || view.kind !== list[index]!.kind) continue
+      if (!view || view.kind !== lines[index]!.kind) continue
 
       taken.add(view)
       wanted.delete(key)
@@ -595,7 +702,7 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
     for (const kind of ['skeleton', 'data'] as const) free[kind] = free[kind].filter(view => !taken.has(view))
 
     for (const [key, index] of wanted) {
-      const kind = list[index]!.kind as RowKind
+      const kind = lines[index]!.kind as RowKind
       const view = free[kind].pop() ?? createView(kind)
 
       view.key = key
@@ -641,7 +748,7 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
       return
     }
 
-    const top = topSpacerHeight.value + layout.value.offsets[index]!
+    const top = topSpacerHeight.value + layout.value.offsets[grid.value.lineOf[index]!]!
     const delta = top - anchor.top
 
     anchor.top = top
@@ -649,26 +756,31 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
   }
 
   const setAnchor = (viewTop: number) => {
-    const list = entries.value
-    if (list.length === 0 || viewTop < 0) {
+    const {lines} = grid.value
+    if (lines.length === 0 || viewTop < 0) {
       anchor = null
       return
     }
 
-    let index = getEntryIndexAt(viewTop)
-    if (list[index]!.kind === 'group' && index + 1 < list.length) index++
+    let index = getLineIndexAt(viewTop)
+    if (lines[index]!.kind === 'group' && index + 1 < lines.length) index++
 
-    const entry = list[index]!
+    const entry = entries.value[lines[index]!.start]!
     anchor = {page: entry.page, index: entry.index, top: topSpacerHeight.value + layout.value.offsets[index]!}
   }
 
   const updateIntersecting = (viewport: {top: number, height: number}) => {
     const list = entries.value
+    const {lines} = grid.value
     const set = new Set<number>()
 
-    if (list.length !== 0 && viewport.top + viewport.height > 0 && viewport.top < layout.value.total) {
-      const last = getEntryIndexAt(viewport.top + viewport.height)
-      for (let i = getEntryIndexAt(viewport.top); i <= last; i++) set.add(list[i]!.page)
+    if (lines.length !== 0 && viewport.top + viewport.height > 0 && viewport.top < layout.value.total) {
+      const last = getLineIndexAt(viewport.top + viewport.height)
+
+      for (let i = getLineIndexAt(viewport.top); i <= last; i++) {
+        const line = lines[i]!
+        for (let j = line.start; j < line.end; j++) set.add(list[j]!.page)
+      }
     }
 
     const old = intersectingPages.value
@@ -678,12 +790,12 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
   let pendingScroll: {page: number, index: number | undefined} | null = null
 
   const scrollToEntry = (page: number, index: number | undefined, behavior: ScrollBehavior): boolean => {
-    const entryIndex = findEntryIndex(page, index)
+    const lineIndex = findLineIndex(page, index)
     const viewport = getViewport()
-    if (entryIndex === -1 || !viewport) return false
+    if (lineIndex === -1 || !viewport) return false
 
     const {offsets} = layout.value
-    const center = (offsets[entryIndex]! + offsets[entryIndex + 1]!) / 2
+    const center = (offsets[lineIndex]! + offsets[lineIndex + 1]!) / 2
 
     scrollBy(center - viewport.top - viewport.height / 2, behavior)
 
@@ -701,9 +813,9 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
     const viewport = getViewport()
     if (!viewport) return
 
-    const list = entries.value
-    const start = list.length === 0 ? 0 : getEntryIndexAt(viewport.top - BUFFER)
-    const end = list.length === 0 ? 0 : getEntryIndexAt(viewport.top + viewport.height + BUFFER) + 1
+    const {lines} = grid.value
+    const start = lines.length === 0 ? 0 : getLineIndexAt(viewport.top - BUFFER)
+    const end = lines.length === 0 ? 0 : getLineIndexAt(viewport.top + viewport.height + BUFFER) + 1
 
     range = {start, end}
 
@@ -717,7 +829,7 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
       const entryIndex = findEntryIndex(pendingScroll.page, pendingScroll.index)
       const entry = entries.value[entryIndex]
 
-      if (entry && entry.kind !== 'skeleton' && heights.has(entry.key)) {
+      if (entry && entry.kind !== 'skeleton' && heights.has(grid.value.lines[grid.value.lineOf[entryIndex]!]!.key)) {
         scrollToEntry(pendingScroll.page, pendingScroll.index, 'instant')
         pendingScroll = null
       }
@@ -728,19 +840,33 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
   const scrollTo = (page: number, index: number | undefined, behavior: ScrollBehavior = 'smooth') => {
     scrollToEntry(page, index, behavior)
 
-    const entry = entries.value[findEntryIndex(page, index)]
-    pendingScroll = entry && entry.kind !== 'skeleton' && heights.has(entry.key) ? null : {page, index}
+    const entryIndex = findEntryIndex(page, index)
+    const entry = entries.value[entryIndex]
+    pendingScroll = entry && entry.kind !== 'skeleton' && heights.has(grid.value.lines[grid.value.lineOf[entryIndex]!]!.key) ? null : {page, index}
   }
 
   const onWindowResize = () => update()
+
+  let itemsWidth = 0
+
+  // The height of the items is the list's own, so only a new width can change the columns.
+  const gridObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(records => {
+    const width = records[0]?.contentRect.width ?? 0
+    if (width === itemsWidth) return
+
+    itemsWidth = width
+    readGrid()
+  })
 
   onMounted(() => {
     isMounted = true
 
     // Not in setup: the spacers are sized by the average this returns.
     watch([layout, topSpacerHeight], () => update(), {flush: 'post'})
+    watch(options.keepColumns, readGrid, {flush: 'post'})
 
-    if (itemsRef.value) rowGap.value = Number.parseFloat(getComputedStyle(itemsRef.value).rowGap) || 0
+    readGrid()
+    if (itemsRef.value) gridObserver?.observe(itemsRef.value)
 
     window.addEventListener('resize', onWindowResize, {passive: true})
 
@@ -751,32 +877,34 @@ export const useRowRecycler = <Model extends number | string, Data extends Defau
     isMounted = false
     window.removeEventListener('resize', onWindowResize)
     resizeObserver?.disconnect()
+    gridObserver?.disconnect()
   })
 
-  /** Per item, without opened rows, for the space of the pages not loaded; 0 before any row is measured. */
+  const getItemAverage = (kind: RowKind): number => {
+    const sums = guessSums[kind]
+    return sums.items === 0 ? 0 : sums.sum / sums.items
+  }
+
+  /**
+   * Per item, without opened rows, for the space of the pages not loaded; 0 before any row is measured. In a grid it
+   * is the row's height shared by its items.
+   */
   const averageItemHeight = computed(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     heightVersion.value
 
-    return getAverage('data') || getAverage('skeleton')
+    return getItemAverage('data') || getItemAverage('skeleton')
   })
 
-  /** Forgets the heights of items no longer loaded, as items of other pages or other params take their keys. */
-  watch(entries, list => {
-    if (heights.size < list.length * 4) return
+  /** Forgets the heights of lines no longer loaded, as items of other pages or other params take their keys. */
+  watch(grid, ({lines}) => {
+    if (heights.size < lines.length * 4) return
 
-    const keys = new Set(list.map(entry => entry.key))
+    const keys = new Set(lines.map(line => line.key))
 
     for (const key of heights.keys()) if (!keys.has(key)) heights.delete(key)
 
-    for (const [key, height] of guessHeights) {
-      if (keys.has(key)) continue
-
-      const sums = guessSums[key.startsWith('group:') ? 'group' : key.startsWith('skeleton:') ? 'skeleton' : 'data']
-      sums.sum -= height
-      sums.count--
-      guessHeights.delete(key)
-    }
+    for (const key of [...guessHeights.keys()]) if (!keys.has(key)) forgetGuessHeight(key)
   })
 
   return {

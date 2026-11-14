@@ -98,7 +98,8 @@
         <InfiniteListRecycledRow
           v-for="view in recycler.views"
           :key="view.id"
-          :scope="view.scope"
+          :cells="view.cells"
+          :column="view.column"
           @mount="recycler.setRowElement(view, $event)"
         >
           <template #default="scope">
@@ -370,6 +371,7 @@ const recycler: RowRecycler<Model, Data> = useRowRecycler<Model, Data>({
   refetchFrom: page => refetchNextPages(page),
   getScrollElement,
   groupBy: () => props.recycle ? props.groupBy : undefined,
+  keepColumns: () => props.keepColumns,
 })
 
 const columnCount = ref(1)

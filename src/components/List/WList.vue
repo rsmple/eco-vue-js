@@ -19,7 +19,7 @@
 
         :page-length="PAGE_LENGTH"
         :keep-columns="isGrid"
-        :recycle="!isGrid"
+        recycle
         :group-by="$slots.group ? groupBy : undefined"
         :page-class="
           isGrid
@@ -153,19 +153,7 @@
           </component>
         </template>
 
-        <template #default="{item, skeleton, setter, refetch, previous, first, index, position, value, results, intersecting}">
-          <ListGroupHeading
-            v-if="isGrid && groupBy && $slots.group && (first || (!skeleton && (position === 0 || (!!previous && !groupBy(item, previous)))))"
-            :class="position === 0 ? 'list:-mt-2' : 'card:mt-2'"
-          >
-            <slot
-              name="group"
-              :item="item"
-              :previous="previous"
-              :skeleton="skeleton"
-            />
-          </ListGroupHeading>
-
+        <template #default="{item, skeleton, setter, refetch, index, position, value, results, intersecting}">
           <ListItem
             :item="item"
             :skeleton="skeleton"
@@ -243,10 +231,10 @@
         </template>
 
         <template
-          v-if="!isGrid && groupBy && $slots.group"
+          v-if="groupBy && $slots.group"
           #group="{item, previous, skeleton, position}"
         >
-          <ListGroupHeading :class="{'list:-mt-2': position === 0}">
+          <ListGroupHeading :class="position === 0 ? 'list:-mt-2' : 'card:mt-2'">
             <slot
               name="group"
               :item="item"
