@@ -83,7 +83,7 @@
         v-if="!empty"
         class="col-start-3 justify-self-end font-semibold uppercase tracking-[0.12em]"
       >
-        Page <span class="before:[--tw-content:counter(page)]" />
+        {{ getText('page') }} <span class="before:[--tw-content:counter(page)]" />
       </div>
     </div>
 
@@ -139,6 +139,7 @@ import {type Component, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRe
 
 import {useHeader} from '@/components/HeaderBar/use/useHeader'
 import {dateFormat} from '@/utils/dateTime'
+import {getText} from '@/utils/texts'
 
 import {usePageBreadcrumb} from './use/usePageBreadcrumbs'
 

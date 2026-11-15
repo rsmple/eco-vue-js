@@ -36,7 +36,7 @@
       >
         <nav
           v-if="parentTitles.length"
-          aria-label="Breadcrumb"
+          :aria-label="getText('breadcrumb')"
           class="sm-not:hidden text-description flex shrink-0 items-baseline gap-2"
         >
           <template
@@ -104,7 +104,7 @@
       <button
         v-if="search"
         class="w-ripple-trigger sm:pr---inner-margin h-full select-none"
-        aria-label="Open search"
+        :aria-label="getText('openSearch')"
         @click="updateVisible(true)"
       >
         <div class="w-ripple w-ripple-hover sm-not:px---inner-margin relative flex h-full items-center px-(--w-list-padding,1rem)">
@@ -136,6 +136,7 @@ import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 import IconSearch from '@/assets/icons/IconSearch.svg?component'
 
+import {getText} from '@/utils/texts'
 import {useLensGlass} from '@/utils/useLensGlass'
 import {getRouteTitleShort, useRouteTitles} from '@/utils/useRouteTitle'
 import {BASE_ZINDEX_HEADER_BAR, wBaseZIndex} from '@/utils/utils'

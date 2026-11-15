@@ -1662,7 +1662,7 @@ import WSelectAsync from 'eco-vue-js/dist/components/Select/WSelectAsync.vue'
 | `reverse` | `boolean` | — | Shows the check mark on options that are not selected instead of those that are — for a select that picks what to exclude. |
 | `modelValue` | `Model[] \| undefined` | **required** | Selected values. The component does not change it — update it from `select` and `unselect`. |
 | `useQueryFnDefault` | `UseQueryDefault<Data, undefined>` | — | Query that loads a default option. When it resolves while nothing is selected, the option is selected and `init-model` is emitted. |
-| `emptyStub` | `string` | `"No match"` | Shown in the menu instead of "Nothing to show" when there are no options and no search. |
+| `emptyStub` | `string` | — | Shown in the menu instead of "Nothing to show" when there are no options and no search. |
 | `disableClear` | `boolean` | — | Hides the remove button on the selected chips. |
 | `hidePrefix` | `boolean` | — | Hides the selected chips while the menu is open, leaving room to type. |
 | `createOption` | `((search: string) => Data \| Promise<Data \| undefined> \| undefined)` | — | Adds a "New:" option for the typed search. Return the created option to select it, or `undefined` to cancel. |

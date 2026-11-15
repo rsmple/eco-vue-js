@@ -12,13 +12,13 @@
       >
         <IconAdd class="square-[1.25em]" />
 
-        <span class="whitespace-nowrap">Add filter</span>
+        <span class="whitespace-nowrap">{{ getText('addFilter') }}</span>
       </WButton>
     </template>
 
     <template #header>
       <div class="py-2 text-base font-semibold">
-        Add filter
+        {{ getText('addFilter') }}
       </div>
     </template>
 
@@ -53,6 +53,7 @@ import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 import IconAdd from '@/assets/icons/IconAdd.svg?component'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {getText} from '@/utils/texts'
 
 import {getMetaValue} from '../models/utils'
 

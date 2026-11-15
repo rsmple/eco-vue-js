@@ -88,7 +88,7 @@
             }"
           >
             <slot v-bind="{id, setFocused, focused, isDragover}">
-              {{ typeof modelValue === 'number' ? numberFormatter.format(modelValue) : modelValue === null ? 'N / A' : modelValue }}
+              {{ typeof modelValue === 'number' ? numberFormatter.format(modelValue) : modelValue === null ? getText('notAvailable') : modelValue }}
             </slot>
 
             <WButtonCopy
@@ -190,6 +190,7 @@ import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
 import {encodeQueryParam} from '@/utils/api'
+import {getText} from '@/utils/texts'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {numberFormatter} from '@/utils/utils'
 

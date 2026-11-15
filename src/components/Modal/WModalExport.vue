@@ -14,7 +14,7 @@
       />
 
       <div class="text-description mt-1 text-end text-xs">
-        {{ page }} / {{ pagesCount }} page{{ pagesCount === 1 ? '' : 's' }}
+        {{ page }} / {{ pagesCount === null ? '…' : getCountText('pagesCount', pagesCount) }}
       </div>
     </div>
 
@@ -23,11 +23,11 @@
       class="mb-4 text-center"
     >
       <div v-if="loading || loadingExportValue">
-        <WSpinner class="square-[1.25em] inline" /> Loading
+        <WSpinner class="square-[1.25em] inline" /> {{ getText('loading') }}
       </div>
 
       <div v-else>
-        Download is ready
+        {{ getText('downloadReady') }}
       </div>
     </div>
 
@@ -37,7 +37,7 @@
         class="flex-1"
         @click="$emit('close:modal')"
       >
-        {{ cancelText ?? 'Close' }}
+        {{ cancelText ?? getText('close') }}
       </WButton>
 
       <WButton
@@ -50,7 +50,7 @@
         class="flex-1"
         @click="handleDownload"
       >
-        {{ downloadText ?? 'Download' }}
+        {{ downloadText ?? getText('download') }}
       </WButton>
     </template>
   </WModalWrapper>
@@ -70,6 +70,7 @@ import {SemanticType} from '@/utils/SemanticType'
 import {handleApiError} from '@/utils/api'
 import {dateToQueryString} from '@/utils/dateTime'
 import {buildCsvContent} from '@/utils/exportToCsv'
+import {getCountText, getText} from '@/utils/texts'
 import {genId} from '@/utils/utils'
 
 import WProgressBar from '../Progress/WProgressBar.vue'
@@ -164,7 +165,7 @@ const handleDownload = (): void => {
 
     props.resolve?.()
 
-    Notify.success({title: 'File downloaded successfully'})
+    Notify.success({title: getText('fileDownloaded')})
 
     emit('close:modal')
   }, 500)

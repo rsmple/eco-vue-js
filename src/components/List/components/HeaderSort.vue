@@ -9,8 +9,8 @@
         :icon="markRaw(IconSort)"
         :disabled="disabled"
         :active="isOpen"
-        :tooltip-text="isOpen ? undefined : 'Sort'"
-        label="Sort"
+        :tooltip-text="isOpen ? undefined : getText('sort')"
+        :label="getText('sort')"
         :aria-expanded="isOpen"
         @click="isOpen = !isOpen"
       >
@@ -24,7 +24,7 @@
     </template>
 
     <template #header>
-      Sort
+      {{ getText('sort') }}
     </template>
 
     <template #content>
@@ -49,10 +49,10 @@
           }"
           :disabled="!canClear"
           :aria-disabled="!canClear"
-          aria-label="Clear sorting"
+          :aria-label="getText('clearSorting')"
           @click="canClear && $emit('update:ordering', [])"
         >
-          Clear
+          {{ getText('clear') }}
         </button>
       </div>
     </template>
@@ -72,6 +72,7 @@ import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 import IconSort from '@/assets/icons/IconSort.svg?component'
 
 import {SemanticType} from '@/utils/SemanticType.ts'
+import {getText} from '@/utils/texts'
 import {type ListMode} from '@/utils/utils'
 
 import HeaderSortItem from './HeaderSortItem.vue'

@@ -116,7 +116,7 @@
                 <button
                   v-if="'onClose' in slot.props"
                   class="w-ripple-trigger text-description sm-not:mx-3 flex h-full items-center justify-center px-1"
-                  aria-label="Close tab"
+                  :aria-label="getText('closeTab')"
                   @click="(slot.props.onClose as () => void)?.()"
                 >
                   <div class="w-ripple w-ripple-hover relative rounded-full">

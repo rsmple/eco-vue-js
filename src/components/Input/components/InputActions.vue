@@ -12,7 +12,7 @@
       :icon="markRaw(IconClose)"
       :disabled="disabled"
       :tooltip-right="textarea"
-      tooltip-text="Clear"
+      :tooltip-text="getText('clear')"
       top
       @click="$emit('click:clear')"
     />
@@ -21,7 +21,7 @@
       v-if="allowCopy && !textSecure"
       :icon="markRaw(iconCopy)"
       :tooltip-right="textarea"
-      tooltip-text="Copy"
+      :tooltip-text="getText('copy')"
       top
       @click="doCopy"
     />
@@ -31,7 +31,7 @@
       :icon="markRaw(IconPaste)"
       :disabled="disabled"
       :tooltip-right="textarea"
-      tooltip-text="Paste"
+      :tooltip-text="getText('paste')"
       top
       @click="$emit('click:paste')"
     />
@@ -41,7 +41,7 @@
       :icon="markRaw(IconUpload)"
       :disabled="disabled"
       :tooltip-right="textarea"
-      tooltip-text="Read from file"
+      :tooltip-text="getText('readFromFile')"
       top
       @click="$emit('click:drop-file')"
     />
@@ -49,7 +49,7 @@
     <InputActionsButton
       v-if="textSecure"
       :icon="isSecureVisible ? markRaw(IconEye) : markRaw(IconEyeSlash)"
-      :tooltip-text="isSecureVisible ? 'Hide' : 'Show'"
+      :tooltip-text="isSecureVisible ? getText('hide') : getText('show')"
       :disabled="disabled || readonly"
       :tooltip-right="textarea"
       top
@@ -82,6 +82,7 @@ import IconEyeSlash from '@/assets/icons/IconEyeSlash.svg?component'
 import IconPaste from '@/assets/icons/IconPaste.svg?component'
 import IconUpload from '@/assets/icons/IconUpload.svg?component'
 
+import {getText} from '@/utils/texts'
 import {useCopy} from '@/utils/useCopy'
 
 import InputActionsButton from './InputActionsButton.vue'

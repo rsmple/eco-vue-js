@@ -43,7 +43,7 @@
         class="col-start-2"
         @click="openConfirmReset"
       >
-        <IconFilterRemove /> Reset Filters
+        <IconFilterRemove /> {{ getText('resetFilters') }}
       </WButton>
     </div>
   </WActionsBarFilter>
@@ -63,6 +63,7 @@ import IconFilterRemove from '@/assets/icons/IconFilterRemove.svg?component'
 
 import {Modal} from '@/utils/Modal'
 import {SemanticType} from '@/utils/SemanticType'
+import {getText} from '@/utils/texts'
 
 import ListFilterGlobalItem from './ListFilterGlobalItem.vue'
 import * as ListFilterSearch from './ListFilterSearch.vue'
@@ -91,9 +92,9 @@ const openConfirmReset = () => {
   closeModal = Modal
     .addConfirm(
       {
-        title: 'Are you sure?',
-        description: 'Do you want to reset filters?',
-        acceptText: 'Reset Filters',
+        title: getText('resetFiltersTitle'),
+        description: getText('resetFiltersDescription'),
+        acceptText: getText('resetFilters'),
         onAccept: () => {
           closeModal = null
 

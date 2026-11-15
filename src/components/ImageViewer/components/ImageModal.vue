@@ -3,7 +3,7 @@
     <div class="relative">
       <button
         class="w-ripple w-ripple-hover absolute -top-14 right-3 rounded-full p-3 outline-none sm:-right-14"
-        aria-label="Close image viewer"
+        :aria-label="getText('closeImageViewer')"
         @click="$emit('close:modal')"
       >
         <IconCancel class="text-description" />
@@ -25,6 +25,8 @@
 import {computed} from 'vue'
 
 import IconCancel from '@/assets/icons/IconCancel.svg?component'
+
+import {getText} from '@/utils/texts'
 
 const props = defineProps<{
   modelValue: string

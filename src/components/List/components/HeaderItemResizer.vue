@@ -7,7 +7,7 @@
 
     <button
       class="absolute -right-2 top-0 flex h-full w-6 cursor-col-resize items-center opacity-50 hover:opacity-100"
-      aria-label="Resize column"
+      :aria-label="getText('resizeColumn')"
       @mousedown.stop.prevent="startDrag"
       @click.stop.prevent
     >
@@ -22,6 +22,7 @@ import {onBeforeUnmount, useTemplateRef} from 'vue'
 import IconDrag from '@/assets/icons/IconDrag.svg?component'
 
 import {DOMListenerContainer} from '@/utils/DOMListenerContainer'
+import {getText} from '@/utils/texts'
 
 const MIN_WIDTH = 64
 const MAX_WIDTH = 2000

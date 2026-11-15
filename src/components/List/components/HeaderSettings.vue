@@ -8,15 +8,15 @@
         :icon="markRaw(IconListSettings)"
         :disabled="disabled"
         :active="isOpen"
-        :tooltip-text="isOpen ? undefined : 'Table settings'"
-        label="Table settings"
+        :tooltip-text="isOpen ? undefined : getText('tableSettings')"
+        :label="getText('tableSettings')"
         :aria-expanded="isOpen"
         @click="isOpen = !isOpen"
       />
     </template>
 
     <template #header>
-      Table settings
+      {{ getText('tableSettings') }}
     </template>
 
     <template #content>
@@ -66,10 +66,10 @@
               }"
               :disabled="!hasSaved"
               :aria-disabled="!hasSaved"
-              aria-label="Reset column settings"
+              :aria-label="getText('resetColumnSettings')"
               @click="hasSaved && $emit('click:reset')"
             >
-              Reset
+              {{ getText('reset') }}
             </button>
           </div>
         </div>
@@ -88,6 +88,7 @@ import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconListSettings from '@/assets/icons/IconListSettings.svg?component'
 
+import {getText} from '@/utils/texts'
 import {type ListMode} from '@/utils/utils'
 
 import HeaderSettingsList from './HeaderSettingsList.vue'

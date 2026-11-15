@@ -104,7 +104,7 @@
           #suffix
         >
           <InputActionsButton
-            label="Show suggest"
+            :label="getText('showSuggest')"
             :expanded="isOpen"
             :disabled="isDisabled"
             @click="isOpen ? toggleScope.unclickable === false ? close() : blur() : focus()"
@@ -164,6 +164,7 @@ import IconArrow from '@/assets/icons/IconArrow.svg?component'
 
 import {HorizontalAlign} from '@/utils/HorizontalAlign'
 import {useIsMobile} from '@/utils/mobile'
+import {getText} from '@/utils/texts'
 import {useClearValue} from '@/utils/useClearValue'
 import {useComponentStates} from '@/utils/useComponentStates'
 

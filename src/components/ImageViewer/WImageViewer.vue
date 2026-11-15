@@ -19,7 +19,7 @@
       border-line-raised bg-cover bg-center outline-none
     "
       :style="{backgroundImage: `url(${modelValue})`}"
-      aria-label="View image"
+      :aria-label="getText('viewImage')"
       @click="openModal"
     >
       <div class="opacity-0 transition-opacity group-hover/image-button:opacity-100">
@@ -51,6 +51,7 @@ import {defineAsyncComponent, markRaw} from 'vue'
 import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 import {Modal} from '@/utils/Modal'
+import {getText} from '@/utils/texts'
 
 const ImageModal = defineAsyncComponent(() => import('./components/ImageModal.vue'))
 

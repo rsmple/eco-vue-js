@@ -4,6 +4,7 @@ import IconGrid from '@/assets/icons/IconGrid.svg?component'
 import IconList from '@/assets/icons/IconList.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
+import {getText} from '@/utils/texts'
 import {ListMode, getIsClientSide} from '@/utils/utils'
 
 import {type FieldConfig, type FieldConfigMap, type ListColumnWidth, type ListConfig, type ListField, type ListFields} from '../types'
@@ -27,8 +28,8 @@ export const listModeIconMap: Record<ListMode, SVGComponent> = {
 }
 
 export const listModeLabelMap: Record<ListMode, string> = {
-  [ListMode.TABLE]: 'Table mode',
-  [ListMode.GRID]: 'Grid mode',
+  get [ListMode.TABLE]() { return getText('tableMode') },
+  get [ListMode.GRID]() { return getText('gridMode') },
 }
 
 const fieldConfigKeyLength: ObjectKeys<FieldConfig>['length'] = 4

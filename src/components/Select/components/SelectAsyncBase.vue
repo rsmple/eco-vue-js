@@ -97,7 +97,7 @@
         :query-params="queryParams"
         :loading="loading || isFetchingPrefix"
         :disabled="isDisabledComputed"
-        :empty-stub="!search && emptyStub ? emptyStub : undefined"
+        :empty-stub="search ? undefined : emptyStub ?? getText('noMatch')"
         :allow-create="createOption && (!hasSearchOption || isModelValueSearch)"
         :hide-option-icon="hideOptionIcon"
         :value-getter="valueGetter"
@@ -153,6 +153,7 @@ import {computed, effectScope, nextTick, ref, shallowRef, useTemplateRef, watch}
 import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 import {useIsMobile} from '@/utils/mobile'
+import {getText} from '@/utils/texts'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {PAGE_LENGTH} from '@/utils/useDefaultQuery.ts'
 
@@ -164,7 +165,7 @@ defineOptions({inheritAttrs: false})
 const props = withDefaults(
   defineProps<SelectAsyncProps<Model, Data, QueryParams, OptionComponent>>(),
   {
-    emptyStub: 'No match',
+    emptyStub: undefined,
     valueGetter: (data: Data) => (data as unknown as {id: Model}).id,
     valueQueryKey: 'id__in',
     prefixMax: 8,

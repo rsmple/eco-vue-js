@@ -7,7 +7,7 @@
     }"
     role="region"
     class="grid"
-    :aria-label="title ?? 'Notifications'"
+    :aria-label="title ?? getText('notifications')"
   >
     <OverlayRegionPart region="header">
       <div
@@ -15,7 +15,7 @@
         :class="{'border-line-subtle border-b border-solid px-4 py-3': frame === null}"
       >
         <div class="text-accent font-semibold h-8 flex items-center">
-          {{ title ?? 'Notifications' }}
+          {{ title ?? getText('notifications') }}
         </div>
       </div>
     </OverlayRegionPart>
@@ -24,7 +24,7 @@
       v-if="!notifyCenterItems.length"
       class="text-description py-2 text-center self-center"
     >
-      {{ emptyText ?? 'No notifications yet' }}
+      {{ emptyText ?? getText('noNotifications') }}
     </div>
 
     <div
@@ -37,7 +37,7 @@
         class="flex min-h-9 items-center justify-between gap-4 py-1"
       >
         <div class="tone-negative text-tone text-xs font-semibold uppercase">
-          {{ actionText ?? 'Action required' }}
+          {{ actionText ?? getText('actionRequired') }}
         </div>
 
         <WButton
@@ -47,7 +47,7 @@
           class="w-button-h-7 text-xs"
           @click.stop="dismissActions"
         >
-          {{ dismissActionsText ?? 'Dismiss all' }}
+          {{ dismissActionsText ?? getText('dismissAll') }}
         </WButton>
       </div>
 
@@ -79,7 +79,7 @@
         :class="{'mt-1': notifyCenterActionItems.length}"
       >
         <div class="text-description text-xs font-semibold uppercase">
-          {{ activityText ?? 'Activity' }}
+          {{ activityText ?? getText('activity') }}
         </div>
 
         <WButton
@@ -87,7 +87,7 @@
           class="w-button-h-7 text-xs"
           @click.stop="clearNotifyHistory"
         >
-          {{ clearText ?? 'Clear' }}
+          {{ clearText ?? getText('clear') }}
         </WButton>
       </div>
 
@@ -139,6 +139,7 @@ import WButton from '@/components/Button/WButton.vue'
 import OverlayRegionPart from '@/components/Modal/components/OverlayRegionPart.vue'
 import {useOverlayFrame, useOverlayFrameOptions} from '@/utils/Overlay'
 import {SemanticType} from '@/utils/SemanticType'
+import {getText} from '@/utils/texts'
 
 import NotifyCard from './components/NotifyCard.vue'
 import {

@@ -68,7 +68,7 @@
     >
       <slot name="empty">
         <div class="text-accent flex justify-center px-8 py-16 text-center font-normal">
-          {{ emptyStub }}
+          {{ emptyStub ?? getText('nothingToShow') }}
         </div>
       </slot>
     </div>
@@ -123,7 +123,7 @@ const props = withDefaults(
     valueGetter: (data: Data) => Model
   }>(),
   {
-    emptyStub: 'Nothing to show',
+    emptyStub: undefined,
     refetchInterval: undefined,
     queryOptions: undefined,
     enabled: true,

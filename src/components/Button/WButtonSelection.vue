@@ -38,7 +38,7 @@
       >
         <template #toggle>
           <WButtonSelectionAction
-            title="More"
+            :title="getText('more')"
             :icon="markRaw(IconMore)"
             :aria-expanded="isOpen"
             :disable-message="isFilterShown ? undefined : disableMessageValue"
@@ -50,7 +50,7 @@
         </template>
 
         <template #header>
-          More
+          {{ getText('more') }}
         </template>
 
         <template #content>
@@ -73,7 +73,7 @@
         v-if="selectedCount"
         @click="$emit('clear:selection')"
       >
-        <span class="sm-not:hidden">Selected&nbsp;</span><span class="tone-primary text-tone font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ title }}{{ selectedCount === 1 ? '' : 's' }}</span>
+        <span class="sm-not:hidden">{{ getText('selected') }}&nbsp;</span><span class="tone-primary text-tone font-semibold">{{ numberFormatter.format(selectedCount) }}</span><span class="sm-not:text-xs">&nbsp;{{ typeof title === 'function' ? title(selectedCount) : `${ title }${ selectedCount === 1 ? '' : 's' }` }}</span>
       </WButtonSelectionState>
 
       <slot
@@ -92,6 +92,7 @@ import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconMore from '@/assets/icons/IconMore.svg?component'
 
+import {getText} from '@/utils/texts'
 import {BASE_ZINDEX_LIST_HEADER, numberFormatter, wBaseZIndex} from '@/utils/utils'
 
 import WButtonSelectionAction from './WButtonSelectionAction.vue'
@@ -99,8 +100,8 @@ import WButtonSelectionState from './WButtonSelectionState.vue'
 
 const props = withDefaults(
   defineProps<{
-    /** Singular noun in the "Selected N items" counter. An "s" is added for more than one. */
-    title?: string
+    /** Noun in the "Selected N items" counter: a singular noun that gets an "s" for more than one, or a function of the count, so a translation can pick its plural form. */
+    title?: string | ((count: number) => string)
     /** Tooltip of the actions while nothing is selected, which also disables them. */
     disableMessage?: string
     /** Number of selected items. While it is above 0, the counter with a clear button replaces the `settings` slot. */
@@ -108,7 +109,7 @@ const props = withDefaults(
   }>(),
   {
     title: 'item',
-    disableMessage: 'No selected items',
+    disableMessage: undefined,
     selectedCount: undefined,
   },
 )
@@ -122,7 +123,7 @@ const baseZIndex = inject(wBaseZIndex, null)
 
 provide(wBaseZIndex, baseZIndex ?? BASE_ZINDEX_LIST_HEADER)
 
-const disableMessageValue = computed<string | undefined>(() => props.selectedCount === 0 ? props.disableMessage : undefined)
+const disableMessageValue = computed<string | undefined>(() => props.selectedCount === 0 ? props.disableMessage ?? getText('noSelectedItems') : undefined)
 
 const isOpen = ref(false)
 

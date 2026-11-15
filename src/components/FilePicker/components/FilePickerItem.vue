@@ -17,7 +17,7 @@
 
       <button
         class="w-ripple square-5 hover:bg-accent/5 absolute right-0 top-0 flex items-center justify-center rounded-full outline-none"
-        aria-label="Remove file"
+        :aria-label="getText('removeFile')"
         @click.stop.prevent="$emit('click:cancel')"
       >
         <IconCancel class="square-3 text-description" />
@@ -34,6 +34,8 @@
 import IconCancel from '@/assets/icons/IconCancel.svg?component'
 import IconCheckCircle from '@/assets/icons/IconCheckCircle.svg?component'
 import IconCloseCircle from '@/assets/icons/IconCloseCircle.svg?component'
+
+import {getText} from '@/utils/texts'
 
 defineProps<{
   name?: string

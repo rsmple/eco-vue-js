@@ -1,7 +1,7 @@
 <template>
   <WModalWrapper class="w-modal-wrapper-w-160">
     <template #title>
-      {{ title ?? `Importing ${numberFormatter.format(items.length)} item${items.length === 1 ? '' : 's'}` }}
+      {{ title ?? getCountText('importingItems', items.length) }}
     </template>
 
     <div>
@@ -23,7 +23,7 @@
         class="flex-1"
         @click="abortUpload"
       >
-        {{ isDone ? successText ?? 'Done' : abortText ?? 'Abort upload' }}
+        {{ isDone ? successText ?? getText('done') : abortText ?? getText('abortUpload') }}
       </WButton>
     </template>
   </WModalWrapper>
@@ -37,7 +37,7 @@ import WModalWrapper from '@/components/Modal/WModalWrapper.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
 import {handleApiError} from '@/utils/api'
-import {numberFormatter} from '@/utils/utils'
+import {getCountText, getText} from '@/utils/texts'
 
 import WProgressStriped from '../Progress/WProgressStriped.vue'
 

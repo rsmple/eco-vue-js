@@ -1,7 +1,7 @@
 <template>
   <WButtonAction
     ref="button"
-    :title="title ?? 'Notifications'"
+    :title="title ?? getText('notifications')"
     :icon="icon ?? IconNotification"
     :count="notifyCenterActionCount"
     :loading="notifyCenterPendingCount !== 0"
@@ -20,6 +20,8 @@ import {type VNode, useTemplateRef} from 'vue'
 import WButtonAction from '@/components/Button/WButtonAction.vue'
 
 import IconNotification from '@/assets/icons/IconNotification.svg?component'
+
+import {getText} from '@/utils/texts'
 
 import {notifyCenterActionCount, notifyCenterPendingCount} from './models/notifyCenter'
 import {useNotifyCenter} from './use/useNotifyCenter'

@@ -150,7 +150,7 @@ defineOptions({inheritAttrs: false})
 const props = withDefaults(
   defineProps<SelectAsyncProps<Model, Data, QueryParams, OptionComponent>>(),
   {
-    emptyStub: 'No match',
+    emptyStub: undefined,
     valueGetter: (data: Data) => (data as unknown as {id: Model}).id,
     valueQueryKey: 'id__in',
     prefixMax: 8,

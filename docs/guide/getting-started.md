@@ -108,7 +108,7 @@ import WTooltipContainer from 'eco-vue-js/dist/components/Tooltip/WTooltipContai
 
 ## Texts
 
-Built-in texts are in English: stepper buttons, confirm Cancel/Accept, the unsaved-changes prompt, the invalid-fields warning, date picker From/To, the empty chart's No data, list/[query boundary](/components/query-boundary)/[query status](/components/query-status) errors and Retry, and the [page error](/components/page-error). Replace them once before mounting; getters are read at render, so translations follow the locale:
+Every text the components show on their own is in English: buttons, labels, tooltips, aria labels, empty and loading states, notifications and errors — the full list is the `Texts` type in `eco-vue-js/dist/utils/texts`. Replace them once before mounting; getters are read at render, so translations follow the locale. Texts with a count (`moreCount`, `pagesCount`, `importingItems`, `showAll`) are functions of the count, so a translation can pick its plural form:
 
 ```ts
 import {setTexts} from 'eco-vue-js/dist/utils/texts'
@@ -118,8 +118,11 @@ setTexts({
   next: () => i18n.global.t('modal.next'),
   close: () => i18n.global.t('modal.close'),
   cancel: () => i18n.global.t('modal.cancel'),
+  moreCount: count => i18n.global.t('list.more', {count}, count),
 })
 ```
+
+The selection bar's noun works the same way: `selection-title` on [WList](/components/list) takes a function of the count as well as a singular noun.
 
 Props like `submitText` or `acceptText` still override per button.
 

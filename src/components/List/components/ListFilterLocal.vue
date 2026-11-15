@@ -50,7 +50,7 @@
     >
       <template #toggle>
         <ListFilterChip
-          :title="isCompact ? 'Filters' : `${ hiddenList.length } more`"
+          :title="isCompact ? getText('filters') : getCountText('moreCount', hiddenList.length)"
           :icon="markRaw(IconFilter)"
           :values="undefined"
           :count="hiddenActiveCount"
@@ -65,7 +65,7 @@
       <template #header>
         <IconFilter class="square-[1.25em]" />
 
-        <span>Filters</span>
+        <span>{{ getText('filters') }}</span>
       </template>
 
       <template #content>
@@ -78,7 +78,7 @@
             :is-open="overflowOpenId === item.id"
             :disabled-filter-fields="disabledFilterFields"
             :readonly="readonly"
-            :remove-label="readonly || isCompact || pinnedIds.includes(item.id) || !allShown.includes(item.id) ? undefined : 'Remove filter'"
+            :remove-label="readonly || isCompact || pinnedIds.includes(item.id) || !allShown.includes(item.id) ? undefined : getText('removeFilter')"
             class="px---inner-margin"
             :class="index === overflowList.length - 1 ? 'pb---inner-margin' : undefined"
             @toggle="overflowOpenId = overflowOpenId === item.id ? null : item.id"
@@ -108,6 +108,7 @@ import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 import IconFilter from '@/assets/icons/IconFilter.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
+import {getCountText, getText} from '@/utils/texts'
 import {BASE_ZINDEX_ACTIONS_BAR, wBaseZIndex} from '@/utils/utils.ts'
 
 import ListFilterChip from './ListFilterChip.vue'

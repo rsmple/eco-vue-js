@@ -390,6 +390,7 @@ import IconCheckSecret from '@/assets/icons/IconCheckSecret.svg?component'
 import {Notify} from '@/utils/Notify'
 import {getIsMobile} from '@/utils/mobile'
 import {isDragging} from '@/utils/preventDragFile'
+import {getText} from '@/utils/texts'
 import {useClearValue} from '@/utils/useClearValue'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {checkPermissionPaste} from '@/utils/useCopy'
@@ -731,20 +732,20 @@ const paste = async () => {
       .readText()
       .then(value => {
         if (!value) {
-          Notify.warn({title: 'Nothing to paste'})
+          Notify.warn({title: getText('nothingToPaste')})
         } else if (!props.maxLength || value.length <= props.maxLength) {
           updateModelValue(value, true)
-          Notify.success({title: 'Pasted'})
+          Notify.success({title: getText('pasted')})
           nextTick().then(() => emit('paste'))
         } else Notify.error({
-          title: 'Unable to paste',
-          caption: 'The length of the pasted value exceeds the allowed limit',
+          title: getText('pasteTooLong'),
+          caption: getText('pasteTooLongDescription'),
         })
       })
   } catch {
     Notify.error({
-      title: 'Paste failed',
-      caption: `Please allow the clipboard actions in browser settings for current domain: ${ location.host }`,
+      title: getText('pasteFailed'),
+      caption: `${ getText('clipboardDenied') }: ${ location.host }`,
     })
   }
 }

@@ -45,12 +45,12 @@
         :query-params="queryParams"
         :loading="loading"
         :disabled="isDisabledComputed"
-        :empty-stub="emptyStub ?? 'No suggestion'"
+        :empty-stub="emptyStub ?? getText('noSuggestion')"
         :value-getter="valueGetter"
         :query-options="{placeholderData: keepPreviousData}"
         :search="draft ? search?.toString() : undefined"
         :allow-create="draft"
-        :create-prefix="applyPrefix ?? 'Apply:'"
+        :create-prefix="applyPrefix ?? getText('applyPrefix')"
         :cursor-on-create="draft"
         apply-always
         @select="(_value, option) => select(option)"
@@ -99,7 +99,7 @@
         >
           <template #prefix>
             <span class="w-option w-option-padding-y flex items-center self-start pr-2">
-              {{ applyPrefix ?? 'Apply:' }}
+              {{ applyPrefix ?? getText('applyPrefix') }}
             </span>
           </template>
 
@@ -111,7 +111,7 @@
           <span
             v-else
             class="text-description w-option w-option-padding-y flex items-center"
-          >Start typing..</span>
+          >{{ getText('startTyping') }}</span>
         </SelectOption>
 
         <div
@@ -121,7 +121,7 @@
           <div
             class="w-select-field sm-not:px-3 cursor-default select-none"
           >
-            {{ emptyStub ?? 'No suggestion' }}
+            {{ emptyStub ?? getText('noSuggestion') }}
           </div>
         </div>
 
@@ -173,6 +173,7 @@ import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 import SelectAsyncList from '@/components/Select/components/SelectAsyncList.vue'
 import SelectOption from '@/components/Select/components/SelectOption.vue'
+import {getText} from '@/utils/texts'
 import {useClearValue} from '@/utils/useClearValue'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {debounce as debounceImport} from '@/utils/utils'

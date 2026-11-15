@@ -18,7 +18,7 @@
 
       <WTooltip
         class="pointer-events-none"
-        text="Copy"
+        :text="getText('copy')"
         no-touch
       />
     </button>
@@ -30,6 +30,7 @@ import {toRef} from 'vue'
 
 import WTooltip from '@/components/Tooltip/WTooltip.vue'
 
+import {getText} from '@/utils/texts'
 import {useCopy} from '@/utils/useCopy'
 
 const props = defineProps<{

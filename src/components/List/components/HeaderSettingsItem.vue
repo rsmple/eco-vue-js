@@ -15,7 +15,7 @@
     <button
       v-if="!disabledDrag"
       class="w-ripple w-ripple-hover relative flex cursor-grab items-center justify-center active:cursor-grabbing"
-      aria-label="Reorder field"
+      :aria-label="getText('reorderField')"
       @mousedown="initDrag"
     >
       <IconDrag class="rotate-90" />
@@ -28,7 +28,7 @@
     <button
       class="w-ripple w-ripple-hover relative flex items-center px-2"
       :aria-pressed="!fieldConfig.visible"
-      aria-label="Hide field"
+      :aria-label="getText('hideField')"
       @click="$emit('update:fields-config-map', {[field.meta.label]: {...fieldConfig, visible: !fieldConfig.visible}})"
     >
       <component
@@ -47,6 +47,8 @@ import {ref} from 'vue'
 import IconDrag from '@/assets/icons/IconDrag.svg?component'
 import IconEye from '@/assets/icons/IconEye.svg?component'
 import IconEyeSlash from '@/assets/icons/IconEyeSlash.svg?component'
+
+import {getText} from '@/utils/texts'
 
 const props = defineProps<{
   field: ListFieldExport<FieldComponent<Data, QueryParams>, ListField<Data, QueryParams>>

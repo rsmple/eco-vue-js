@@ -40,7 +40,7 @@
       class="mt-4 w-full"
       @click="scope.updateModelValue({...scope.modelValue, ...getDefaultQuery()})"
     >
-      Reset
+      {{ getText('reset') }}
     </WButton>
   </WExpansionItem>
 </template>
@@ -55,6 +55,7 @@ import WButton from '@/components/Button/WButton.vue'
 import WExpansionItem from '@/components/Expansion/WExpansionItem.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {getText} from '@/utils/texts'
 
 import {getMetaValue} from '../models/utils'
 

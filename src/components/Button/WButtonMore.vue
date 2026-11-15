@@ -25,7 +25,7 @@
     class="flex justify-center outline-none"
     :aria-expanded="isOpen"
     :aria-disabled="disabled"
-    aria-label="More options"
+    :aria-label="getText('moreOptions')"
     @click="toggle"
   >
     <div
@@ -57,6 +57,7 @@ import IconMore from '@/assets/icons/IconMore.svg?component'
 
 import {hasAnchorLayer} from '@/components/Modal/models/overlayRegistry'
 import {type OverlayAnchor, useOverlay} from '@/utils/Overlay'
+import {getText} from '@/utils/texts'
 
 const props = defineProps<{
   /** Icon of the button. Defaults to three dots. */

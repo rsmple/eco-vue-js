@@ -13,7 +13,7 @@
     >
       <button
         class="square-full snap-start"
-        aria-label="Close"
+        :aria-label="getText('close')"
         @click="hide"
       />
 
@@ -33,6 +33,7 @@
 <script lang="ts" setup>
 import {onBeforeUnmount, onMounted, useTemplateRef, watch} from 'vue'
 
+import {getText} from '@/utils/texts'
 import {getSmoothScrollBehavior} from '@/utils/utils'
 
 const props = defineProps<{

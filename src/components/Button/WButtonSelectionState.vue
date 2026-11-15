@@ -6,7 +6,7 @@
 
     <button
       class="text-description w-ripple w-ripple-hover sm-not:px---inner-margin relative flex cursor-pointer select-none items-center justify-self-end px-(--w-list-padding,1rem)"
-      aria-label="Clear selection"
+      :aria-label="getText('clearSelection')"
       @click="$emit('click', $event)"
     >
       <IconCancel class="square-[1.25em]" />
@@ -16,6 +16,8 @@
 
 <script setup lang="ts">
 import IconCancel from '@/assets/icons/IconCancel.svg?component'
+
+import {getText} from '@/utils/texts'
 
 defineEmits<{
   /** The clear button was clicked. */

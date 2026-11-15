@@ -7,7 +7,7 @@
   >
     <div
       v-if="isOpen && isTablet"
-      title="Click to close"
+      :title="getText('clickToClose')"
       class="
         bg-backdrop no-scrollbar fixed left-0 top-0 size-full
         overflow-y-auto overflow-x-hidden overscroll-contain backdrop-blur print:hidden
@@ -79,6 +79,7 @@ import WRouterLink from '@/components/RouterLink/WRouterLink.vue'
 import IconMenu from '@/assets/icons/IconMenu.svg?component'
 
 import {useIsMobile} from '@/utils/mobile'
+import {getText} from '@/utils/texts'
 import {useLensGlass} from '@/utils/useLensGlass'
 import {BASE_ZINDEX_NAV_BAR, wBaseZIndex} from '@/utils/utils'
 

@@ -36,7 +36,7 @@
         <button
           v-if="!disabled"
           class="w-ripple w-ripple-hover relative flex cursor-grab items-center justify-center active:cursor-grabbing"
-          aria-label="Reorder field"
+          :aria-label="getText('reorderField')"
           @mousedown="initDrag"
         >
           <IconDrag class="rotate-90" />
@@ -49,7 +49,7 @@
         <button
           class="w-ripple w-ripple-hover group relative flex items-center justify-center"
           :aria-pressed="!fieldConfigMap[item.meta.label]?.visible"
-          aria-label="Hide field"
+          :aria-label="getText('hideField')"
           @click="$emit('update:field-config-map', {[item.meta.label]: {...fieldConfigMap[item.meta.label]!, visible: !fieldConfigMap[item.meta.label]?.visible}})"
         >
           <component
@@ -65,7 +65,7 @@
           v-if="!nested"
           class="w-ripple w-ripple-hover group relative flex items-center justify-center"
           :aria-pressed="fieldConfigMap[item.meta.label]?.sticky"
-          aria-label="Pin column"
+          :aria-label="getText('pinColumn')"
           @click="$emit('update:field-config-map', {[item.meta.label]: {...fieldConfigMap[item.meta.label]!, sticky: !fieldConfigMap[item.meta.label]?.sticky}})"
         >
           <component
@@ -91,6 +91,8 @@ import IconEye from '@/assets/icons/IconEye.svg?component'
 import IconEyeSlash from '@/assets/icons/IconEyeSlash.svg?component'
 import IconLock from '@/assets/icons/IconLock.svg?component'
 import IconLockOff from '@/assets/icons/IconLockOff.svg?component'
+
+import {getText} from '@/utils/texts'
 
 import {sortFields} from '../use/useListConfig'
 

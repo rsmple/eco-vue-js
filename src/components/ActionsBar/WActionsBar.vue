@@ -22,7 +22,7 @@
 
       <div class="pb-16">
         <div class="text-accent px---inner-margin h---header-height flex items-center text-xl font-semibold">
-          {{ textFilter ?? 'Filters' }}
+          {{ textFilter ?? getText('filters') }}
         </div>
 
         <component
@@ -38,7 +38,7 @@
         v-if="hasFilter"
         class="w-ripple w-ripple-hover relative row-start-1 flex cursor-pointer select-none items-center justify-center"
         :aria-expanded="isOpen"
-        aria-label="Toggle filters"
+        :aria-label="getText('toggleFilters')"
         @click="toggle"
       >
         <IconBack
@@ -58,7 +58,7 @@
 
           <WButtonAction
             v-if="hasFilter"
-            :title="textFilter ?? 'Filters'"
+            :title="textFilter ?? getText('filters')"
             :icon="markRaw(IconFilter)"
             :active="isOpen"
             :count="count"
@@ -84,6 +84,7 @@ import IconBack from '@/assets/icons/IconBack.svg?component'
 import IconFilter from '@/assets/icons/IconFilter.svg?component'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {getText} from '@/utils/texts'
 import {useLensGlass} from '@/utils/useLensGlass'
 import {BASE_ZINDEX_ACTIONS_BAR, wBaseZIndex} from '@/utils/utils'
 

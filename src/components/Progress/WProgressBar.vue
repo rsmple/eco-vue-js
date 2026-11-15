@@ -44,7 +44,7 @@
       <div class="text-description relative flex h-full items-center justify-center gap-2 font-medium">
         <WSpinner class="square-4" />
 
-        <span>In progress</span>
+        <span>{{ getText('inProgress') }}</span>
       </div>
     </template>
   </div>
@@ -56,6 +56,7 @@ import {computed} from 'vue'
 import WSpinner from '@/components/Spinner/WSpinner.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {getText} from '@/utils/texts'
 import {percentCompactFormatter} from '@/utils/utils'
 
 import {progressBarClass, progressBarIndeterminateClass, progressBarTextClass} from './utils/progressBarClass'

@@ -3,6 +3,8 @@ import {type MaybeRefOrGetter, computed, markRaw, ref, toValue} from 'vue'
 import IconCopy from '@/assets/icons/IconCopy.svg?component'
 import IconCopySuccess from '@/assets/icons/IconCopySuccess.svg?component'
 
+import {getText} from '@/utils/texts'
+
 import {Notify} from './Notify'
 
 export const checkPermissionPaste = async (): Promise<boolean> => {
@@ -18,7 +20,7 @@ const checkPermissionCopy = async (): Promise<boolean> => {
 const _doCopy = (text: string | number | undefined | null) => {
   if (!text) {
     Notify.warn({
-      title: 'Nothing to copy',
+      title: getText('nothingToCopy'),
     })
 
     return Promise.resolve()
@@ -27,7 +29,7 @@ const _doCopy = (text: string | number | undefined | null) => {
   return navigator.clipboard.writeText(typeof text === 'number' ? `${ text }` : text)
     .then(() => {
       Notify.success({
-        title: 'Copied',
+        title: getText('copied'),
       })
     })
 }
@@ -42,8 +44,8 @@ export const doCopy = async (text: string | number | undefined | null) => {
     return true
   } catch {
     Notify.error({
-      title: 'Copy failed',
-      caption: `Please allow the clipboard actions in browser settings for current domain: ${ location.host }`,
+      title: getText('copyFailed'),
+      caption: `${ getText('clipboardDenied') }: ${ location.host }`,
     })
     return false
   }

@@ -326,8 +326,8 @@ const props = withDefaults(
     queryOptions?: DefaultQueryOptions<PaginatedResponse<Data>>
     /** Tooltip on the `bulk` actions while nothing is selected. Defaults to "No selected items". */
     bulkDisableMessage?: string
-    /** Singular noun in the "Selected N items" counter of the selection bar. */
-    selectionTitle: string
+    /** Noun in the "Selected N items" counter of the selection bar: a singular noun that gets an "s" for more than one, or a function of the count, so a translation can pick its plural form. */
+    selectionTitle: string | ((count: number) => string)
     /** Actions in the selection bar while items are selected. Each gets the selection count and a getter of the query params narrowed to the selection. The ones that do not fit the bar move into a More menu. */
     bulk?: BulkComponent<QueryParams>[]
     /** Actions in the selection bar while nothing is selected, with the current query params. */

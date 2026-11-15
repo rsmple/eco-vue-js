@@ -19,6 +19,7 @@ import IconTable from '@/assets/icons/IconTable.svg?component'
 import IconTableCollapsed from '@/assets/icons/IconTableCollapsed.svg?component'
 // import IconUnderline from '@/assets/icons/IconUnderline.svg?component'
 
+import {getText} from '@/utils/texts'
 import {WrapSelectionType} from '@/utils/utils'
 
 export const linePrefixRegex = /^-\s|^>\s|^\d+\.\s|^\[ \]\s|^#{1,6}\s/
@@ -80,17 +81,17 @@ export const toolbarActionList: ToolbarAction[] = [
   {
     icon: markRaw(IconBold),
     value: {type: WrapSelectionType.TOGGLE, start: '**', end: '**'},
-    tooltip: 'Bold',
+    get tooltip() { return getText('bold') },
   },
   {
     icon: markRaw(IconItalic),
     value: {type: WrapSelectionType.TOGGLE, start: ' _', end: '_ '},
-    tooltip: 'Italic',
+    get tooltip() { return getText('italic') },
   },
   {
     icon: markRaw(IconStrikethrough),
     value: {type: WrapSelectionType.TOGGLE, start: '~~', end: '~~'},
-    tooltip: 'Strikethrough',
+    get tooltip() { return getText('strikethrough') },
   },
   // {
   //   icon: markRaw(IconUnderline),
@@ -100,22 +101,22 @@ export const toolbarActionList: ToolbarAction[] = [
   {
     icon: markRaw(IconCodeInline),
     value: {type: WrapSelectionType.TOGGLE, start: '`', end: '`'},
-    tooltip: 'Inline code',
+    get tooltip() { return getText('inlineCode') },
   },
   {
     icon: markRaw(IconCodeBlock),
     value: {type: WrapSelectionType.TOGGLE, start: '\n```\n', end: '\n```\n'},
-    tooltip: 'Code block',
+    get tooltip() { return getText('codeBlock') },
   },
   {
     icon: markRaw(IconLink),
     value: {type: WrapSelectionType.TOGGLE, start: '[', end: '](url)'},
-    tooltip: 'Insert link',
+    get tooltip() { return getText('insertLink') },
   },
   {
     icon: markRaw(IconListBullet),
     value: {type: WrapSelectionType.LINE_PREFIX, linePrefix: '- '},
-    tooltip: 'Bullet list',
+    get tooltip() { return getText('bulletList') },
   },
   {
     icon: markRaw(IconListNumbered),
@@ -124,7 +125,7 @@ export const toolbarActionList: ToolbarAction[] = [
       detectPattern: /^\d+\.\s/,
       lineTransform: (line, index) => preserveIndentation(line, `${ index + 1 }. `),
     },
-    tooltip: 'Numbered list',
+    get tooltip() { return getText('numberedList') },
   },
   // {
   //   icon: markRaw(IconListCheckbox),
@@ -134,35 +135,35 @@ export const toolbarActionList: ToolbarAction[] = [
   {
     icon: markRaw(IconListIncrease),
     value: {type: WrapSelectionType.LINE_PREFIX, lineTransform: line => indent + line},
-    tooltip: 'Increase indent',
+    get tooltip() { return getText('increaseIndent') },
   },
   {
     icon: markRaw(IconListDecrease),
     value: {type: WrapSelectionType.LINE_PREFIX, lineTransform: line => line.startsWith(indent) ? line.slice(indent.length) : line},
-    tooltip: 'Decrease indent',
+    get tooltip() { return getText('decreaseIndent') },
   },
   {
     icon: markRaw(IconQuote),
     value: {type: WrapSelectionType.LINE_PREFIX, linePrefix: '> '},
-    tooltip: 'Quote',
+    get tooltip() { return getText('quote') },
   },
   {
     icon: markRaw(IconTable),
     value: {type: WrapSelectionType.LINE_PREFIX, lineTransformAll: insertTable},
-    tooltip: 'Insert table / Align table',
+    get tooltip() { return getText('insertTable') },
   },
   {
     icon: markRaw(IconTableCollapsed),
     value: {type: WrapSelectionType.LINE_PREFIX, lineTransformAll: lines => insertTable(lines, true)},
-    tooltip: 'Collapse table',
+    get tooltip() { return getText('collapseTable') },
   },
   {
     icon: markRaw(IconHeading),
     value: Array(6).fill(null).map((_, index) => ({
       title: `H${ index + 1 }`,
       value: {type: WrapSelectionType.LINE_PREFIX, linePrefix: `${ '#'.repeat(index + 1) } `},
-      label: `Heading ${ index + 1 }`,
+      get label() { return `${ getText('heading') } ${ index + 1 }` },
     })),
-    label: 'Heading',
+    get label() { return getText('heading') },
   },
 ]

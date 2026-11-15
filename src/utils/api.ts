@@ -5,6 +5,7 @@ import type WFormValidator from '@/components/Form/WFormValidator.vue'
 
 import {useOptionalRouter} from '@/composables/useOptionalRouter'
 import {Notify} from '@/utils/Notify'
+import {getText} from '@/utils/texts'
 
 import {get, isEqualArrObj} from './utils'
 
@@ -45,7 +46,7 @@ export const handleApiError = <Error>(
       ?? (field ? (get<string[], Record<string, string[]>>(error.response?.data as Record<string, string[]> ?? {}, field))?.join(', ') : undefined)
 
     Notify.error({
-      title: 'Error',
+      title: getText('error'),
       caption: typeof caption === 'string' && caption.length < 200 ? caption : undefined,
     })
 

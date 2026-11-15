@@ -104,7 +104,7 @@
         >
           <template #prefix>
             <div class="w-option w-option-padding-y flex items-center self-start pr-2">
-              New:
+              {{ getText('newOption') }}
             </div>
           </template>
 
@@ -132,7 +132,7 @@
             v-else
             class="text-description w-option w-option-padding-y flex items-center"
           >
-            Start typing..
+            {{ getText('startTyping') }}
           </div>
         </SelectOption>
 
@@ -141,7 +141,7 @@
           class="w-select-option first:pt---w-select-option-padding last:pb---w-select-option-padding text-description"
         >
           <div class="w-option flex cursor-default select-none items-center">
-            {{ isFetching ? 'Loading..' : !search && emptyStub ? emptyStub : search ? 'No match' : 'Nothing to show' }}
+            {{ isFetching ? getText('loading') : !search && emptyStub ? emptyStub : search ? getText('noMatch') : getText('nothingToShow') }}
           </div>
         </div>
 
@@ -196,6 +196,7 @@ import WInputSuggest from '@/components/Input/WInputSuggest.vue'
 
 import {ApiError} from '@/utils/api'
 import {useIsMobile} from '@/utils/mobile'
+import {getText} from '@/utils/texts'
 import {useComponentStates} from '@/utils/useComponentStates'
 import {debounce} from '@/utils/utils'
 

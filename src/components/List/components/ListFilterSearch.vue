@@ -6,7 +6,7 @@
     <template #field="scopeField">
       <WInput
         v-bind="scopeField"
-        placeholder="Search.."
+        :placeholder="getText('searchPlaceholder')"
         allow-clear
         class="w-full"
         no-margin
@@ -29,6 +29,8 @@ import WUniform from '@/components/Uniform/WUniform.vue'
 
 import IconSearch from '@/assets/icons/IconSearch.svg?component'
 
+import {getText} from '@/utils/texts'
+
 defineProps<FilterProps<QueryParams> & {autofocus?: boolean}>()
 
 defineEmits<FilterEmits>()
@@ -36,7 +38,7 @@ defineEmits<FilterEmits>()
 
 <script lang="ts">
 export const meta = {
-  title: 'Search',
+  title: getText('search'),
   icon: markRaw(IconSearch),
   fields: [
     'search',

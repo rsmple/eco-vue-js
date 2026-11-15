@@ -128,14 +128,14 @@
           :icon="markRaw(IconRange)"
           :active="isShift"
           :aria-pressed="isShift"
-          tooltip-text="Select range"
+          :tooltip-text="getText('selectRange')"
           class="last-not:border-r border-solid border-line"
           @click="$emit('set:is-selecting')"
         >
           <template #tooltip>
             <div class="grid grid-cols-[1fr_auto] gap-4">
               <div>
-                Select range
+                {{ getText('selectRange') }}
               </div>
 
               <div class="text-description whitespace-nowrap">
@@ -150,7 +150,7 @@
           :icon="markRaw(IconRefresh)"
           :loading="isRefetchingAll"
           :active="isRefetchingAll"
-          tooltip-text="Refetch"
+          :tooltip-text="getText('refetch')"
           class="last-not:border-r border-solid border-line"
           @click="refetchAll"
         />
@@ -234,6 +234,7 @@ import IconRange from '@/assets/icons/IconRange.svg?component'
 import IconRefresh from '@/assets/icons/IconRefresh.svg?component'
 import IconShift from '@/assets/icons/IconShift.svg?component'
 
+import {getText} from '@/utils/texts'
 import {BASE_ZINDEX_DROPDOWN} from '@/utils/utils'
 
 import HeaderExport from './HeaderExport.vue'
@@ -250,7 +251,7 @@ const props = defineProps<{
   count: number | undefined
   /** The consumer-supplied count when there is one, falling back to `count`. */
   totalCount: number | undefined
-  selectionTitle: string
+  selectionTitle: string | ((count: number) => string)
   bulkDisableMessage: string | undefined
   selectionCount: number
   selectAllValue: boolean | null

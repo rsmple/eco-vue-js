@@ -13,7 +13,7 @@
         :count="count"
         :is-open="isOpen"
         :shrink="shrink"
-        :remove-label="readonly ? undefined : pinned ? (count ? 'Clear filter' : undefined) : 'Remove filter'"
+        :remove-label="readonly ? undefined : pinned ? (count ? getText('clearFilter') : undefined) : getText('removeFilter')"
         @toggle="$emit('toggle')"
         @remove="$emit('remove')"
       />
@@ -61,6 +61,7 @@ import {computed, provide} from 'vue'
 import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import {wCloseOverlayOnPick} from '@/components/Select/models/useCloseOnPick'
+import {getText} from '@/utils/texts'
 
 import ListFilterChip from './ListFilterChip.vue'
 

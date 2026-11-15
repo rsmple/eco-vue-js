@@ -8,7 +8,7 @@
     }"
     :disabled="disabled"
     :aria-disabled="disabled || loading"
-    aria-label="Clear selection"
+    :aria-label="getText('clearSelection')"
     @click="!loading && !disabled && $emit('click', $event)"
     @mousedown="!loading && !disabled && $emit('mousedown', $event)"
   >
@@ -18,6 +18,8 @@
 
 <script setup lang="ts">
 import IconCancel from '@/assets/icons/IconCancel.svg?component'
+
+import {getText} from '@/utils/texts'
 
 defineProps<{
   /** Disables the button. */

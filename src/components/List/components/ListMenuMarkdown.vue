@@ -1,7 +1,7 @@
 <template>
   <WMenuItem @click="doCopy">
     <div class="min-w-20 flex-1 text-start">
-      Copy as Markdown
+      {{ getText('copyAsMarkdown') }}
     </div>
 
     <component
@@ -17,6 +17,7 @@ import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 import IconCopySuccess from '@/assets/icons/IconCopySuccess.svg?component'
 import IconMarkdown from '@/assets/icons/IconMarkdown.svg?component'
 
+import {getText} from '@/utils/texts'
 import {useCopy} from '@/utils/useCopy'
 
 const props = defineProps<{

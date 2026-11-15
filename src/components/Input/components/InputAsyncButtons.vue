@@ -7,7 +7,7 @@
       @mousedown.prevent=""
       @click="$emit('cancel')"
     >
-      Cancel
+      {{ getText('cancel') }}
     </WButton>
 
     <WButton
@@ -18,7 +18,7 @@
       @mousedown.prevent=""
       @click="$emit('save')"
     >
-      Save
+      {{ getText('save') }}
     </WButton>
   </div>
 </template>
@@ -27,6 +27,7 @@
 import WButton from '@/components/Button/WButton.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {getText} from '@/utils/texts'
 
 defineProps<{
   disabled?: boolean

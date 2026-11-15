@@ -8,30 +8,30 @@
       <WButtonSelectionAction
         :icon="markRaw(IconExport)"
         :active="isOpen"
-        title="Export"
+        :title="getText('export')"
         :aria-expanded="isOpen"
         @click="isOpen = !isOpen"
       />
     </template>
 
     <template #header>
-      Export
+      {{ getText('export') }}
     </template>
 
     <template #content>
       <WMenuItem @click="exportAs('csv')">
-        Export as CSV
+        {{ getText('exportCsv') }}
       </WMenuItem>
 
       <WMenuItem @click="exportAs('json')">
-        Export as JSON
+        {{ getText('exportJson') }}
       </WMenuItem>
 
       <WMenuItem
         v-if="toMarkdown"
         @click="exportAs('md')"
       >
-        Export as Markdown
+        {{ getText('exportMarkdown') }}
       </WMenuItem>
     </template>
   </WDropdownAdaptive>
@@ -50,6 +50,7 @@ import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 import IconExport from '@/assets/icons/IconExport.svg?component'
 
 import {Modal} from '@/utils/Modal'
+import {getText} from '@/utils/texts'
 
 import {buildExportColumns} from '../use/useExportColumns'
 

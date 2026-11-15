@@ -78,11 +78,11 @@
         class="text-accent flex size-full flex-col items-center"
       >
         <div class="mt-16 font-semibold">
-          Drag and drop files here
+          {{ getText('dropFiles') }}
         </div>
 
         <div class="mt-4 font-normal">
-          or
+          {{ getText('or') }}
         </div>
 
         <WButton
@@ -91,7 +91,7 @@
           class="mt-4"
           @click.stop.prevent="inputRef?.click()"
         >
-          Browse file
+          {{ getText('browseFile') }}
         </WButton>
       </div>
 
@@ -149,6 +149,7 @@ import WSkeleton from '@/components/Skeleton/WSkeleton.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
 import {isDragging} from '@/utils/preventDragFile'
+import {getText} from '@/utils/texts'
 import {useComponentStates} from '@/utils/useComponentStates'
 
 import FilePickerItem from './components/FilePickerItem.vue'

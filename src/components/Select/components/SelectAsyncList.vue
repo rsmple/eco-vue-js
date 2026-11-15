@@ -44,7 +44,7 @@
         v-else
         class="text-description w-option w-option-padding-y flex items-center"
       >
-        Start typing..
+        {{ getText('startTyping') }}
       </div>
     </SelectOption>
 
@@ -114,7 +114,7 @@
           }"
         >
           <div class="w-option flex cursor-default select-none items-center">
-            {{ emptyStub ?? (search ? 'No match' : 'Nothing to show') }}
+            {{ emptyStub ?? (search ? getText('noMatch') : getText('nothingToShow')) }}
           </div>
         </div>
       </template>
@@ -129,6 +129,7 @@ import {type UnwrapRef, computed, ref} from 'vue'
 
 import WInfiniteList from '@/components/InfiniteList/WInfiniteList.vue'
 
+import {getText} from '@/utils/texts'
 import {debounce} from '@/utils/utils'
 
 import SelectOption from './SelectOption.vue'

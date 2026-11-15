@@ -84,7 +84,7 @@ export const useUniformSubmit = <ModelValue, OriginalModel>(
           const text = typeof caption === 'string' ? caption : Array.isArray(caption) && caption.every(item => typeof item === 'string') ? caption.join('. ') : undefined
 
           Notify.error({
-            title: 'Error',
+            title: getText('error'),
             caption: text && text.length < 200 ? text : undefined,
           })
 

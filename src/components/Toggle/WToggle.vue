@@ -92,6 +92,7 @@ import WSpinner from '@/components/Spinner/WSpinner.vue'
 
 import {Notify} from '@/utils/Notify'
 import {SemanticType, useSemanticTypeBackgroundMap} from '@/utils/SemanticType'
+import {getText} from '@/utils/texts'
 import {useComponentStates} from '@/utils/useComponentStates'
 
 defineOptions({inheritAttrs: false})
@@ -141,7 +142,7 @@ const value = computed<boolean | null>({
 
     if (errorMessage) {
       Notify.warn({
-        title: 'Error',
+        title: getText('error'),
         caption: errorMessage,
       })
 

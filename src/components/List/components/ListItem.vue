@@ -70,7 +70,7 @@
               v-else-if="allowSelect"
               :model-value="selected"
               :readonly="false"
-              label="Select row"
+              :label="getText('selectRow')"
               :align-top="alignTop"
               :less-transitions="allowSelectHover"
               class="h-full px-(--w-list-padding,1rem)"
@@ -101,7 +101,7 @@
             v-if="allowSelect && card && !skeleton"
             :model-value="selected"
             :readonly="false"
-            label="Select row"
+            :label="getText('selectRow')"
             class="p---inner-margin -my---inner-margin -mr---inner-margin justify-end self-start"
             :class="{
               'opacity-50': allowSelectHover,
@@ -200,7 +200,7 @@
           >
             <WButtonMoreItem
               v-if="alwaysSelect && allowSelect && to"
-              text="View"
+              :text="getText('view')"
               :icon="IconToRaw"
               :to="to"
               @click="$emit('toggle:selected', value, position)"
@@ -262,7 +262,7 @@
             >
               <WButtonMoreItem
                 v-if="alwaysSelect && allowSelect && to"
-                text="View"
+                :text="getText('view')"
                 :icon="IconToRaw"
                 :to="to"
                 @click="$emit('toggle:selected', value, position)"
@@ -340,6 +340,7 @@ import IconTo from '@/assets/icons/IconTo.svg?component'
 
 import {INFINITE_LIST_UNMEASURED_ATTRIBUTE} from '@/components/InfiniteList/models/utils'
 import {createPointAnchor} from '@/utils/Overlay'
+import {getText} from '@/utils/texts'
 
 import ListCardFieldNested from './ListCardFieldNested.vue'
 import ListMenuMarkdown from './ListMenuMarkdown.vue'
@@ -348,10 +349,10 @@ import {getSkeletonWidth} from '../models/utils'
 import {AREA_MORE, AREA_SELECT} from '../types'
 
 const ACTION_LABEL: Record<ListActionMode, string | undefined> = {
-  select: 'Select row',
-  action: 'Open row',
-  link: 'Open row',
-  open: 'Expand row',
+  get select() { return getText('selectRow') },
+  get action() { return getText('openRow') },
+  get link() { return getText('openRow') },
+  get open() { return getText('expandRow') },
   none: undefined,
 }
 

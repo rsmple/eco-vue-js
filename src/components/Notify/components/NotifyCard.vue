@@ -41,7 +41,7 @@
       <button
         v-if="!(history && isNotifyPending(item))"
         class="w-ripple-trigger w-ripple-hover text-description flex cursor-pointer self-start p-2"
-        aria-label="Close notification"
+        :aria-label="getText('closeNotification')"
         @click.stop="$emit('click:close', item)"
       >
         <div class="square-6 w-ripple relative flex items-center justify-center rounded-full">
@@ -86,7 +86,7 @@
           :aria-expanded="isExpanded"
           @click.stop="isExpanded = !isExpanded"
         >
-          {{ isExpanded ? 'Hide' : `Show all ${ item.items.length }` }}
+          {{ isExpanded ? getText('hide') : getCountText('showAll', item.items.length) }}
         </button>
 
         <div
@@ -128,7 +128,7 @@
             <button
               v-if="!isNotifyPending(child)"
               class="w-ripple-trigger w-ripple-hover text-description flex cursor-pointer"
-              aria-label="Close notification"
+              :aria-label="getText('closeNotification')"
               @click.stop="$emit('click:close', child)"
             >
               <div class="square-6 w-ripple relative flex items-center justify-center rounded-full">
@@ -168,6 +168,7 @@ import IconCancel from '@/assets/icons/IconCancel.svg?component'
 import {useOptionalRouter} from '@/composables/useOptionalRouter'
 import {SemanticType} from '@/utils/SemanticType'
 import {datetimeFormat, isSameDate, timeFormat} from '@/utils/dateTime'
+import {getCountText, getText} from '@/utils/texts'
 import {useLensGlass} from '@/utils/useLensGlass'
 
 import {NotifyType} from '../models/NotifyType'

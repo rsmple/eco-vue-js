@@ -12,7 +12,7 @@
       'tone-primary surface-fill': $route.query[filterField] === encodedQueryParam,
     }"
     :aria-pressed="$route.query[filterField] === encodedQueryParam"
-    aria-label="Toggle filter"
+    :aria-label="getText('toggleFilter')"
     @click.stop="$router.replace({query: {...$route.query, [filterField]: $route.query[filterField] === encodedQueryParam ? undefined : encodedQueryParam}})"
   >
     <IconFilter class="square-[1.25em]" />
@@ -21,6 +21,8 @@
 
 <script lang="ts" setup>
 import IconFilter from '@/assets/icons/IconFilter.svg?component'
+
+import {getText} from '@/utils/texts'
 
 defineProps<{
   filterField: string

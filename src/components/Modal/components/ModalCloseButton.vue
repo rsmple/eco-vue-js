@@ -2,13 +2,15 @@
   <button
     ref="closeButton"
     class="absolute left-0 top-0 -z-10 size-full cursor-pointer outline-none"
-    aria-label="Close modal"
+    :aria-label="getText('closeModal')"
     @click="$emit('click', $event)"
   />
 </template>
 
 <script lang="ts" setup>
 import {onMounted, useTemplateRef} from 'vue'
+
+import {getText} from '@/utils/texts'
 
 defineEmits<{
   (e: 'click', value: MouseEvent): void
