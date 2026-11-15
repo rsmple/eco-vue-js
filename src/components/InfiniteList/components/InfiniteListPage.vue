@@ -152,7 +152,9 @@ const isIntersecting = computed(() => props.headless ? props.intersecting : isOb
 
 const scrollingElement = inject(wScrollingElement, null)
 
-const {data, error, setItem, removeItem, refetch, isFetching} = props.useQueryFn(
+const page = computed<number | null>(() => props.queryParams instanceof Object && 'page' in props.queryParams && Number.isInteger(props.queryParams.page) ? (props.queryParams.page as number) : null)
+
+const {data: queryData, isPlaceholderData, error, setItem, removeItem, refetch, isFetching} = props.useQueryFn(
   toRef(() => props.queryParams),
   {
     refetchInterval: props.refetchInterval ? (() => isIntersecting.value ? props.refetchInterval : undefined) : undefined,
@@ -160,6 +162,20 @@ const {data, error, setItem, removeItem, refetch, isFetching} = props.useQueryFn
     enabled: computed<boolean>(() => props.enabled && (props.queryOptions && 'enabled' in props.queryOptions ? toValue(props.queryOptions.enabled) as boolean : true)),
   },
 )
+
+/** The page the query last got a response for. */
+const fetchedPage = ref<number | null>(null)
+
+// Not a sync watcher: the query writes its data before its placeholder flag.
+watch([queryData, isPlaceholderData], () => {
+  if (queryData.value && !isPlaceholderData.value) fetchedPage.value = page.value
+}, {immediate: true})
+
+/**
+ * The page's data, without a placeholder kept from another page: a page reused for the next one would show the items
+ * of the page it was until its own load, instead of skeletons.
+ */
+const data = computed(() => isPlaceholderData.value && fetchedPage.value !== page.value ? undefined : queryData.value)
 
 interface ItemSlot {
   key: number
@@ -265,7 +281,6 @@ const getElements = (): Element[] => {
 
   return slotList.value.flatMap(slot => itemRefs.get(slot.key)?.getElements() ?? [])
 }
-const page = computed<number | null>(() => props.queryParams instanceof Object && 'page' in props.queryParams && Number.isInteger(props.queryParams.page) ? (props.queryParams.page as number) : null)
 
 // The item is written to every cached scope of the model - this page, the other loaded pages, and any list or
 // item query sharing the model key - so the index only serves to find which item was edited.
