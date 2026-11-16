@@ -5,11 +5,11 @@
       w-actions-bar
       sm-not:[--actions-bar-filter-width:calc(100vw-var(--w-actions-bar-width))] fixed right-(--w-right-margin,0px) top-0 grid
       grid-cols-[var(--actions-bar-filter-width-current,0)_var(--w-actions-bar-width)] grid-rows-[var(--header-height)_1fr]
-      justify-end overflow-hidden motion-safe:transition-[grid-template-columns]
+      justify-end overflow-hidden motion-safe:transition-[grid-template-columns,box-shadow]
       motion-safe:duration-300 print:hidden
     "
     :class="{
-      '[--actions-bar-filter-width-current:var(--actions-bar-filter-width)]': isOpen && hasFilter,
+      'w-actions-bar-open [--actions-bar-filter-width-current:var(--actions-bar-filter-width)]': isOpen && hasFilter,
     }"
     :style="{zIndex: BASE_ZINDEX_ACTIONS_BAR}"
   >

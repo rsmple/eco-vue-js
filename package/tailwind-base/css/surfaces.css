@@ -824,10 +824,16 @@
 
   /*
    * Docked, the actions bar casts its shadow only toward the page: on a screen wider than the frame it stands off the
-   * screen edge, and the shadow would fall on the empty margin past it. Floating, it casts it all round.
+   * screen edge, and the shadow would fall on the empty margin past it. Floating, it casts it all round. Without a
+   * theme's `--w-chrome-bar-shadow`, as in flat, it lies against the page like the nav and casts one only with the
+   * filter open, over the page.
    */
   .w-actions-bar {
     clip-path: inset(-100vmax calc(-100vmax * var(--w-chrome-float)) -100vmax -100vmax);
+
+    &:not(.w-actions-bar-open) {
+      box-shadow: var(--w-chrome-bar-shadow, 0 0 #0000), var(--w-chrome-edge);
+    }
 
     @variant sm-not {
       --w-chrome-edge:
