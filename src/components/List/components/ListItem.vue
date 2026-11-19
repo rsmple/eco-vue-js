@@ -73,7 +73,7 @@
               :label="getText('selectRow')"
               :align-top="alignTop"
               :less-transitions="allowSelectHover"
-              class="h-full px-(--w-list-padding,1rem)"
+              class="w-ripple-stop h-full px-(--w-list-padding,1rem)"
               :class="{
                 'opacity-50': allowSelectHover,
                 'pt-(--w-list-align-top,1.125rem)': alignTop,
@@ -103,7 +103,7 @@
             :model-value="selected"
             :readonly="false"
             :label="getText('selectRow')"
-            class="self-start"
+            class="w-ripple-stop self-start"
             :class="[cardSelectClass, {
               'opacity-50': allowSelectHover,
               'p---inner-margin -my---inner-margin -mr---inner-margin justify-end': !overlaySelect,
@@ -198,7 +198,7 @@
           <WButtonMore
             v-if="card && hasMenu && !skeleton"
             ref="more"
-            class="flex items-center"
+            class="w-ripple-stop flex items-center"
             :class="[cardMoreClass, {
               'p---inner-margin -my---inner-margin -mr---inner-margin': !overlayMore,
               'z-1 m-(--w-list-card-overlay-inset,0.25rem) self-start justify-self-end p-1.5 text-lg w-button-more-color-white drop-shadow-[0_0_2px_rgb(0_0_0/0.9)]': overlayMore,
@@ -261,7 +261,7 @@
             <WButtonMore
               v-if="hasMenu && !skeleton"
               ref="more"
-              class="flex h-full px-(--w-list-padding,1rem)"
+              class="w-ripple-stop flex h-full px-(--w-list-padding,1rem)"
               :class="{
                 'pt-(--w-list-align-top,1.125rem) items-start': alignTop,
                 'items-center': !alignTop,

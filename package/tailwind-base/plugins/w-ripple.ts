@@ -1,8 +1,16 @@
 import plugin from 'tailwindcss/plugin.js'
 
+/**
+ * In a list row or card (the `-list` variant), a press that starts on a `.w-ripple-stop` element (a control inside the
+ * row: its checkbox, its menu, photo arrows) does not count as a press of the row: the row keeps its hover look.
+ * Only that variant pays for the `:has()`; the other ripples have no controls inside.
+ */
+const pressed = (value: string) => value === '-list' ? ':active:not(:has(.w-ripple-stop:active))' : ':active'
+const notPressed = (value: string) => value === '-list' ? ':is(:not(:active), :has(.w-ripple-stop:active))' : ':not(:active)'
+
 const pluginRipple = plugin(function ({matchUtilities, addUtilities, addBase}) {
   const configRipple = {
-    'w-ripple': () => ({
+    'w-ripple': (value: string) => ({
       '&::before': {
         content: '""',
         position: 'absolute',
@@ -14,7 +22,7 @@ const pluginRipple = plugin(function ({matchUtilities, addUtilities, addBase}) {
         opacity: '0',
       },
 
-      '&:active::before': {
+      [`&${ pressed(value ? `-${ value }` : '') }::before`]: {
         opacity: 'calc(var(--w-ripple-opacity, 0.10) * 2)',
       },
     }),
@@ -23,7 +31,7 @@ const pluginRipple = plugin(function ({matchUtilities, addUtilities, addBase}) {
       value = value ? `-${ value }` : ''
 
       return {
-        [`&:active .w-ripple${ value }::before, &:active.w-ripple${ value }::before`]: {
+        [`&${ pressed(value) } .w-ripple${ value }::before, &${ pressed(value) }.w-ripple${ value }::before`]: {
           opacity: 'calc(var(--w-ripple-opacity, 0.10) * 2)',
         },
       }
@@ -33,9 +41,9 @@ const pluginRipple = plugin(function ({matchUtilities, addUtilities, addBase}) {
       value = value ? `-${ value }` : ''
 
       return {
-        [`&:not(:active):hover, .w-ripple-trigger${ value }:not(:active):hover &,
-          &:not(:active):focus, .w-ripple-trigger${ value }:not(:active):focus &,
-          &:not(:active):focus-within, .w-ripple-trigger${ value }:not(:active):focus-within &`]: {
+        [`&${ notPressed(value) }:hover, .w-ripple-trigger${ value }${ notPressed(value) }:hover &,
+          &${ notPressed(value) }:focus, .w-ripple-trigger${ value }${ notPressed(value) }:focus &,
+          &${ notPressed(value) }:focus-within, .w-ripple-trigger${ value }${ notPressed(value) }:focus-within &`]: {
           [`& .w-ripple${ value }:not(:active)::before, &.w-ripple${ value }::before`]: {
             opacity: 'var(--w-ripple-opacity, 0.10)',
           },

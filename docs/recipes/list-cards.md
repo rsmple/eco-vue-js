@@ -77,7 +77,7 @@ Both have an area of their own by default (`AREA_SELECT`, `AREA_MORE`). With a p
 
 ## Controls over a photo
 
-Use `black` and `white` for what sits on a photo — arrows, dots, counters, scrims (`bg-black/55 text-white`). They are the same in both modes, unlike `default` and the gray scale. Show the arrows on hover and always on touch screens (`[@media(hover:none)]:opacity-100`), and stop their click from reaching the row's link (`@click.stop.prevent`).
+Use `black` and `white` for what sits on a photo — arrows, dots, counters, scrims (`bg-black/55 text-white`). They are the same in both modes, unlike `default` and the gray scale. Show the arrows on hover and always on touch screens (`[@media(hover:none)]:opacity-100`), and stop their click from reaching the row's link (`@click.stop.prevent`). Give them `w-ripple-stop`, so pressing one does not play the card's ripple (the list's own select box and menu have it), and give them a plain `hover:` / `active:` background rather than `w-ripple`: a ripple inside a card also lights up when the card is hovered.
 
 ## Pitfalls
 
