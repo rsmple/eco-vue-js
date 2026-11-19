@@ -97,16 +97,19 @@
             'border-b-transparent': !card && hasBorder && isOpen,
           }"
         >
+          <!-- Over a field (`cardOverlay`), the box sits in its top-left corner, lifted over it: it comes before the fields. -->
           <WCheckbox
             v-if="allowSelect && card && !skeleton"
             :model-value="selected"
             :readonly="false"
             :label="getText('selectRow')"
-            class="p---inner-margin -my---inner-margin -mr---inner-margin justify-end self-start"
-            :class="{
+            class="self-start"
+            :class="[cardSelectClass, {
               'opacity-50': allowSelectHover,
-            }"
-            :style="{gridArea: AREA_SELECT}"
+              'p---inner-margin -my---inner-margin -mr---inner-margin justify-end': !overlaySelect,
+              'z-1 m-(--w-list-card-overlay-inset,0.25rem) justify-self-start p-1.5': overlaySelect,
+            }]"
+            :style="{gridArea: overlaySelect ?? AREA_SELECT}"
             @update:model-value="$emit('toggle:selected', value, position)"
           />
 
@@ -115,7 +118,7 @@
               v-for="field in skeletonFields"
               :key="field.meta.label"
               class="list:pr-3 list:first-not:pl-3 grid grid-cols-1"
-              :class="[field.meta.cssClass, columnDataMap[field.meta.label]!.baseClass]"
+              :class="[field.meta.cssClass, field.meta.skeletonClass, columnDataMap[field.meta.label]!.baseClass]"
               :style="columnDataMap[field.meta.label]!.style"
             >
               <div
@@ -142,7 +145,7 @@
               <div
                 v-if="skeleton && !field.meta.customSkeleton"
                 class="list:pr-3 list:first-not:pl-3 grid grid-cols-1"
-                :class="[field.meta.cssClass, column.baseClass]"
+                :class="[field.meta.cssClass, field.meta.skeletonClass, column.baseClass]"
                 :style="card && nested ? undefined : column.style"
               >
                 <div
@@ -191,12 +194,17 @@
           />
           <!-- eslint-enable vue/attribute-hyphenation -->
 
+          <!-- Over a field (`cardOverlay`), such as a photo: in its top-right corner, a light icon with a dark halo. -->
           <WButtonMore
             v-if="card && hasMenu && !skeleton"
             ref="more"
-            class="p---inner-margin -my---inner-margin -mr---inner-margin flex items-center"
+            class="flex items-center"
+            :class="[cardMoreClass, {
+              'p---inner-margin -my---inner-margin -mr---inner-margin': !overlayMore,
+              'z-1 m-(--w-list-card-overlay-inset,0.25rem) self-start justify-self-end p-1.5 text-lg w-button-more-color-white drop-shadow-[0_0_2px_rgb(0_0_0/0.9)]': overlayMore,
+            }]"
             :disabled="disableMore"
-            :style="{gridArea: AREA_MORE}"
+            :style="{gridArea: overlayMore ?? AREA_MORE}"
           >
             <WButtonMoreItem
               v-if="alwaysSelect && allowSelect && to"
@@ -397,6 +405,12 @@ const props = defineProps<{
   mobile: boolean
   cardClass: string | undefined
   cardWrapperClass: string | undefined
+  cardSelectClass: string | undefined
+  cardMoreClass: string | undefined
+  /** Field the card's select box is drawn over, when it is shown; otherwise the box has an area of its own. */
+  overlaySelect: string | undefined
+  /** Field the card's menu is drawn over, when it is shown. */
+  overlayMore: string | undefined
   hasBorder: boolean | undefined
   alignTop: boolean | undefined
   allowOpen: boolean

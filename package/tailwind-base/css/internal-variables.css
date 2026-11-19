@@ -95,6 +95,26 @@
   --skeleton-margin-y: 0px;
 }
 
+/*
+ * A one-line text placeholder centred in a taller box, such as a list cell whose loaded content is two lines:
+ * `w-skeleton-box-h-10` keeps the bar 1em thick in a 2.5rem box, so a loading row is as tall as a loaded one.
+ */
+@utility w-skeleton-box-h-* {
+  --skeleton-margin-y: calc((--spacing(--value(number)) - 1em) / 2);
+  --skeleton-margin-y: calc((--value(--spacing-*, --w-size-*, [length]) - 1em) / 2);
+}
+
+/* Space between a card's overlaid select box or menu (`cardOverlay`) and the field's corner. */
+@utility w-list-card-overlay-inset-* {
+  --w-list-card-overlay-inset: --spacing(--value(number));
+  --w-list-card-overlay-inset: --value(--spacing-*, --w-size-*, [*]);
+}
+
+/* Idle colour of WButtonMore's icon, `text-description` by default; `w-button-more-color-white` over a photo. */
+@utility w-button-more-color-* {
+  --w-button-more-color: --value(--color-*, [color], [*]);
+}
+
 @utility w-list-card-w-* {
   --w-list-card-width: --spacing(--value(number));
   --w-list-card-width: --value(--spacing-*, --w-size-*, [*]);

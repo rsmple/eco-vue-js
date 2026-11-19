@@ -26,6 +26,10 @@ In grid view the list draws its cards. In a flat-layout page, a card is an outli
 
 Defaults: `--inner-margin` padding, `xl` corners, `1rem` gap. Override with `w-list-card-padding-*` (in `cardClass`), `w-list-rounded-*`, `w-list-gap-*` and `w-list-card-w-*`. Leave the surface to the list; use `cardClass` for inner layout, e.g. `card:gap-2`.
 
+The select box and the row menu take the `AREA_SELECT` and `AREA_MORE` areas, or sit over a field with `cardOverlay` — the menu over a photo's corner: `{[AREA_MORE]: 'photo'}`. `cardSelectClass` and `cardMoreClass` style them.
+
+A loading row draws a placeholder per cell with the field's `cssClass` and `skeletonClass`: give the placeholder the loaded cell's size (`w-skeleton-h-*`, `w-skeleton-box-h-*` for one line in a taller cell), separately for `list:` and `card:`. The [List cards and skeletons](/recipes/list-cards) recipe has the details.
+
 ## Bulk actions
 
 The selection bar, `WButtonSelection`, sits above the table. With nothing selected it shows the `action` components and list settings; with a selection, the `bulk` components and a "Selected N items" counter with a clear button. Overflow goes into a More menu.
@@ -131,6 +135,9 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 | `readonlyGetter` | `((item: Data) => boolean)` | — | Makes a single row readonly. |
 | `cardClass` | `string` | — | Classes for each row's content box. |
 | `cardWrapperClass` | `string` | — | Classes for each row's outer box. A recycled list places each row on its own, so `:first-child` and `:last-child` match every row — the list's first and last row carry `w-list-item-first` and `w-list-item-last` instead (`[&.w-list-item-last]:mb-4`, `in-[.w-list-item-first]:rounded-t-2xl`). |
+| `cardSelectClass` | `string` | — | Classes for the card's select box, in its `AREA_SELECT` area or over a field (`cardOverlay`). |
+| `cardMoreClass` | `string` | — | Classes for the card's row menu button, in its `AREA_MORE` area or over a field (`cardOverlay`). `w-button-more-color-*` sets its icon colour. |
+| `cardOverlay` | `Partial<Record<"area_select" \| "area_more", GetFieldLabels<Fields>>>` | — | Draws the card's select box and row menu over a field instead of in areas of their own — the select box in the field's top-left corner, the menu in its top-right one, as on a photo: `{[AREA_MORE]: 'photo'}`. Over a field, the menu is a white icon with a dark halo. While the field is hidden, they go back to their areas. |
 | `selectAllTextGetter` | `(isUnselect: boolean, count: number) => string` | **required** | Tooltip of the select-all checkbox in the table header. |
 | `hasBorder` | `boolean` | — | Draws a border around each row. |
 | `configKey` | `string` | **required** | `localStorage` key the column settings and view mode are saved under. |

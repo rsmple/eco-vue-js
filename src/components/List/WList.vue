@@ -185,6 +185,10 @@
             :mobile="isMobile"
             :card-class="cardClass"
             :card-wrapper-class="cardWrapperClass"
+            :card-select-class="cardSelectClass"
+            :card-more-class="cardMoreClass"
+            :overlay-select="overlaySelect"
+            :overlay-more="overlayMore"
             :has-border="hasBorder"
             :align-top="alignTop"
             :allow-open="allowOpen"
@@ -268,7 +272,7 @@
 </template>
 
 <script lang="ts" setup generic="Data extends DefaultData, QueryParams, Fields extends ListFields<Data, QueryParams>, CardColumns extends readonly GridCol[]">
-import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, ColumnData, ExpansionComponent, FieldConfig, FieldConfigMap, GridCol, ListActionMode, ListFields, MenuComponent} from './types'
+import type {ActionComponent, BulkComponent, CardActionParams, CardAreas, CardOverlay, ColumnData, ExpansionComponent, FieldConfig, FieldConfigMap, GridCol, ListActionMode, ListFields, MenuComponent} from './types'
 import type {UniformScope} from '@/components/Uniform/types'
 import type {LinkProps} from '@/types/types'
 import type {ApiError} from '@/utils/api'
@@ -340,6 +344,16 @@ const props = withDefaults(
     cardClass?: string
     /** Classes for each row's outer box. A recycled list places each row on its own, so `:first-child` and `:last-child` match every row — the list's first and last row carry `w-list-item-first` and `w-list-item-last` instead (`[&.w-list-item-last]:mb-4`, `in-[.w-list-item-first]:rounded-t-2xl`). */
     cardWrapperClass?: string
+    /** Classes for the card's select box, in its `AREA_SELECT` area or over a field (`cardOverlay`). */
+    cardSelectClass?: string
+    /** Classes for the card's row menu button, in its `AREA_MORE` area or over a field (`cardOverlay`). `w-button-more-color-*` sets its icon colour. */
+    cardMoreClass?: string
+    /**
+     * Draws the card's select box and row menu over a field instead of in areas of their own — the select box in the
+     * field's top-left corner, the menu in its top-right one, as on a photo: `{[AREA_MORE]: 'photo'}`. Over a field,
+     * the menu is a white icon with a dark halo. While the field is hidden, they go back to their areas.
+     */
+    cardOverlay?: CardOverlay<Fields>
     /** Tooltip of the select-all checkbox in the table header. */
     selectAllTextGetter: (isUnselect: boolean, count: number) => string
     /** Draws a border around each row. */
@@ -416,6 +430,9 @@ const props = withDefaults(
     readonly: undefined,
     cardClass: undefined,
     cardWrapperClass: undefined,
+    cardSelectClass: undefined,
+    cardMoreClass: undefined,
+    cardOverlay: undefined,
     defaultMode: ListMode.TABLE,
     formFieldGetter: undefined,
     uniformScope: undefined,
@@ -638,6 +655,16 @@ const hasMenu = computed(() => props.menu !== undefined || props.toMarkdown !== 
 
 const disableSelect = computed(() => !allowSelect.value)
 
+// A field the select box or the menu is drawn over, while that field is shown.
+const overlaySelect = computed(() => {
+  const label = props.cardOverlay?.[AREA_SELECT]
+  return label && label in columnDataMap.value ? label : undefined
+})
+const overlayMore = computed(() => {
+  const label = props.cardOverlay?.[AREA_MORE]
+  return label && label in columnDataMap.value ? label : undefined
+})
+
 const cardStyles = computed<StyleValue>(() => {
   const cardColumns = props.cardColumns
   const cardAreas = props.cardAreas
@@ -645,8 +672,8 @@ const cardStyles = computed<StyleValue>(() => {
   if (!cardColumns || !cardAreas) return
 
   const isAreaShown = (area: string): boolean => {
-    if (area === AREA_SELECT) return allowSelect.value
-    if (area === AREA_MORE) return hasMenu.value
+    if (area === AREA_SELECT) return allowSelect.value && !overlaySelect.value
+    if (area === AREA_MORE) return hasMenu.value && !overlayMore.value
 
     return area in columnDataMap.value
   }
