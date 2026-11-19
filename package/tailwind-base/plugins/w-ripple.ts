@@ -10,7 +10,7 @@ const notPressed = (value: string) => value === '-list' ? ':is(:not(:active), :h
 
 const pluginRipple = plugin(function ({matchUtilities, addUtilities, addBase}) {
   const configRipple = {
-    'w-ripple': (value: string) => ({
+    'w-ripple': (value: string): Record<string, Record<string, string>> => ({
       '&::before': {
         content: '""',
         position: 'absolute',
