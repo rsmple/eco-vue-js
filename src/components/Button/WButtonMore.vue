@@ -32,7 +32,7 @@
       class="relative"
       :class="{
         'w-hover-circle': !disabled,
-        'text-description': !isOpen || isCustomAnchor,
+        'text-(--w-button-more-color,var(--color-description))': !isOpen || isCustomAnchor,
         'tone-primary text-tone': isOpen && !isCustomAnchor,
       }"
     >

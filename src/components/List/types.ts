@@ -41,7 +41,14 @@ export type ListField<Data, QueryParams = unknown> = {
   label: string
   /** Width of the column until the user resizes it. Defaults to `10rem`. */
   width?: ListColumnWidth
+  /** Classes of the cell, in the table and the card, loaded and loading. `list:` and `card:` variants tell the two apart. */
   cssClass?: string
+  /**
+   * Classes of the cell only while its row is loading, for the placeholder's shape: `w-skeleton-h-*`, `w-skeleton-w-*`,
+   * `w-skeleton-rounded-*` for a block such as a photo, `w-skeleton-box-h-*` for a line of text in a cell taller than
+   * one line. The loaded cell does not get them. A text size in `cssClass` also sizes the placeholder.
+   */
+  skeletonClass?: string
   cssClassHeader?: string
   field?: Extract<keyof Data, string> | ((params: QueryParams) => Extract<keyof Data, string> | undefined)
   visibleGetter?: (params: QueryParams) => boolean
@@ -176,6 +183,13 @@ export type FieldConfigMap<Fields extends ListFields<any, any>> = Record<GetFiel
 
 export const AREA_SELECT = 'area_select'
 export const AREA_MORE = 'area_more'
+
+/**
+ * The card's select box and row menu drawn over a field instead of in an area of their own, such as over a photo:
+ * the select box in the field's top-left corner, the menu in its top-right one, both lifted over it.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CardOverlay<Fields extends ListFields<any, any>> = Partial<Record<typeof AREA_SELECT | typeof AREA_MORE, GetFieldLabels<Fields>>>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type CardAreas<Fields extends ListFields<any, any>, Length extends number> = (readonly (GetFieldLabels<Fields> | typeof AREA_SELECT | typeof AREA_MORE | '.')[] & { length: Length })[]

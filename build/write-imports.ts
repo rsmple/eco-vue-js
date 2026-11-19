@@ -2,7 +2,8 @@
 import fs from 'fs/promises'
 import path from 'path'
 
-type ComponentPath = {name: string, path: string}
+/** `runtime`: a `types.ts` that also exports values (constants), so its subpath resolves to the built `.js` at runtime. */
+type ComponentPath = {name: string, path: string, runtime?: boolean}
 
 const PATH_BASE = 'src'
 const PATH_ICONS = 'assets/icons'
@@ -23,8 +24,10 @@ const getIconPaths = () => {
 const getComponentPaths = (root: string) => {
   return fs
     .readdir(path.resolve(PATH_BASE, PATH_COMPONENTS, root))
-    .then(files => files
-      .reduce<ComponentPath[]>((result, name) => {
+    .then(async files => {
+      const typesSource = files.includes('types.ts') ? await fs.readFile(path.resolve(PATH_BASE, PATH_COMPONENTS, root, 'types.ts'), 'utf8') : ''
+
+      return files.reduce<ComponentPath[]>((result, name) => {
         if (name.startsWith('W') && name.endsWith('.vue')) {
           result.push({
             name: name.slice(0, -4),
@@ -36,12 +39,13 @@ const getComponentPaths = (root: string) => {
           result.push({
             name: name.slice(0, -3),
             path: path.join(PATH_COMPONENTS, root, name.slice(0, -3) + '.d.ts'),
+            runtime: /^export (const|function|class) /m.test(typesSource),
           })
         }
 
         return result
-      }, []),
-    )
+      }, [])
+    })
 }
 
 const getComponentsList = async () => (await Promise.all(
@@ -74,7 +78,7 @@ const getUtils = () => {
 }
 
 const getPackageExports = (list: ComponentPath[]) => {
-  const result: Record<string, {import: string, require?: string, style?: string}> = {
+  const result: Record<string, {types?: string, import: string, require?: string, style?: string}> = {
     '.': {
       import: './dist/main.js',
     },
@@ -109,7 +113,7 @@ const getPackageExports = (list: ComponentPath[]) => {
     const distPath = `./dist/${ item.path }`
 
     if (item.path.endsWith('.d.ts')) {
-      result[distPath.slice(0, -5)] = {import: distPath}
+      result[distPath.slice(0, -5)] = item.runtime ? {types: distPath, import: distPath.slice(0, -5) + '.js'} : {import: distPath}
     } else if (item.path.endsWith('.ts')) {
       result[distPath.slice(0, -3)] = {import: distPath.slice(0, -3) + '.js'}
     } else {

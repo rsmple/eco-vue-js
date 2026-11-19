@@ -8,6 +8,10 @@
   --color-current: currentColor;
   --color-transparent: transparent;
 
+  /* The same in both modes, for what sits on a photo or a map: a scrim (`bg-black/50`), its text and icons (`text-white`). */
+  --color-black: #000000;
+  --color-white: #ffffff;
+
   --color-default: #ffffff;
   --color-default-dark: oklch(21% 0.006 285.885); /* zinc-900 */
 
