@@ -34,6 +34,9 @@ jobs:
       # The docs deploy fails on stale generated API tables.
       - run: node build/docs-generate.ts --check
 
+      # Apps store only a seed per theme, so a seeded theme version must never change.
+      - run: node build/theme-seed-test.ts
+
   e2e:
     runs-on: ubuntu-latest
 

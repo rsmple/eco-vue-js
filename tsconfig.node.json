@@ -15,6 +15,7 @@
     "docs/.vitepress/sidebar.ts",
     "docs/.vitepress/themeHeadScript.ts",
     "src/utils/themePresets.ts",
+    "src/utils/themeSeed.ts",
     "tailwind/**/*",
     "package/tailwind-base/**/*"
   ],
