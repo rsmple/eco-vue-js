@@ -10,7 +10,7 @@
     white-space: pre;
     word-break: break-word;
     background-color: var(--w-input-bg, inherit);
-    @apply mb-3 overflow-x-auto overscroll-x-contain rounded-xl border border-solid border-line-subtle
+    @apply last-not:mb-3 overflow-x-auto overscroll-x-contain rounded-xl border border-solid border-line-subtle
       print:whitespace-pre-wrap print:break-all;
   }
 
