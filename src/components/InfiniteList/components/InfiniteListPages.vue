@@ -923,6 +923,7 @@ onBeforeUnmount(() => {
 let oldQueryParams = {...props.queryParams}
 
 watch(() => props.queryParams, newValue => {
+  if (isEqualObj(newValue as NonNullable<unknown>, oldQueryParams as NonNullable<unknown>)) return
   if (pages.value.length > 1 && isEqualObj(newValue as NonNullable<unknown>, oldQueryParams as NonNullable<unknown>, ['page', ...(props.excludeParams ?? []) as string[]])) return
 
   resetPage()
