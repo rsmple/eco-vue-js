@@ -78,6 +78,7 @@
               <component
                 :is="slot"
                 even
+                :indent="getSlotIndent(slot, 0)"
                 @update:is-active="$event[1] && hideDropdown()"
               />
             </template>
@@ -97,7 +98,7 @@
           :key="index"
           ref="inner"
           :even="even"
-          :indent="even ? undefined : (indent ?? 0) + 1"
+          :indent="getSlotIndent(slot, even ? (indent === undefined ? undefined : indent + 1) : (indent ?? 0) + 1)"
         />
       </WNavItemTransition>
     </WExpansion>
@@ -136,6 +137,14 @@ const slots = useSlots() as {
 const {isMobile} = useIsMobile()
 
 const slotsDefault = computed(() => unwrapSlots(slots.default?.() ?? []))
+
+const getSlotIndent = (slot: VNode, base: number | undefined): number | undefined => {
+  const own = slot.props?.indent as number | undefined
+
+  if (base === undefined) return own
+
+  return base + (own ?? 0)
+}
 
 const componentRef = useTemplateRef<typeof WNavItem>('component')
 const innerRef = useTemplateRef<(typeof WNavItem)[] | undefined>('inner')

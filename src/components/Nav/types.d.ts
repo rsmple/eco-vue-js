@@ -15,7 +15,7 @@ export interface NavItemProps extends LinkProps {
   hasActive?: boolean
   /** Marks the item as the toggle of a group without a route of its own. Set by WNavItemExpand. */
   expand?: boolean
-  /** How many groups the item is nested in, which sets its indent. Set by WNavItemExpand. */
+  /** How many levels the item is nested in, which sets its indent. WNavItemExpand adds its own level, so inside a group set only the extra levels, e.g. `1` for the current record under its list item. */
   indent?: number
   /** Query params that must match the current route's for the item to be active, besides its route name. Other params, such as filters, are ignored. */
   queryFields?: string[]

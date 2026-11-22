@@ -31,7 +31,7 @@ The `footer` slot sits at the bottom below a line (e.g. a back button or version
 
 `WNavItemExpand` groups items under a title: shown while one is active, otherwise opened in a hover menu to the right. One group menu opens at a time. The menu aligns to the group's top (or bottom low on screen), shifts to stay visible, and scrolls when taller than the screen. `to` makes the group a link; `even` keeps items always shown and unindented, for an in-page nav.
 
-Groups nest, indenting per level. Items without an icon (`icon`, `icon` slot or `meta.icon`) start with the title.
+Groups nest, indenting per level. An item's own `indent` adds levels inside its group, so the current record shows nested under its list item (`indent="1"`) without being a group itself; menus keep these levels too. Items without an icon (`icon`, `icon` slot or `meta.icon`) start with the title.
 
 `WNavItemTransition` wraps items so ones added or removed with `v-if` (e.g. the current record) expand and collapse.
 
@@ -195,7 +195,7 @@ import WNavItem from 'eco-vue-js/dist/components/Nav/WNavItem.vue'
 | `skeleton` | `boolean` | — | Shows a placeholder for `count` and hides `counter`, while they load. |
 | `hasActive` | `boolean` | — | Marks the item as the parent of the active item. Set by WNavItemExpand. |
 | `expand` | `boolean` | — | Marks the item as the toggle of a group without a route of its own. Set by WNavItemExpand. |
-| `indent` | `number` | — | How many groups the item is nested in, which sets its indent. Set by WNavItemExpand. |
+| `indent` | `number` | — | How many levels the item is nested in, which sets its indent. WNavItemExpand adds its own level, so inside a group set only the extra levels, e.g. `1` for the current record under its list item. |
 | `queryFields` | `string[]` | — | Query params that must match the current route's for the item to be active, besides its route name. Other params, such as filters, are ignored. |
 | `paramFields` | `string[]` | — | Route params that must match the current route's for the item to be active, besides its route name. Other route params are ignored. |
 | `hovered` | `boolean` | — | Highlights the item as hovered. Set by WNavItemExpand while its menu is open. |
