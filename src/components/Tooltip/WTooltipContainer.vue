@@ -35,7 +35,7 @@
 
           <div
             v-else-if="tooltipMeta.text"
-            class="whitespace-nowrap"
+            class="max-w-sm text-pretty wrap-break-word"
           >
             {{ tooltipMeta.text }}
           </div>
