@@ -76,7 +76,7 @@
             :scope="scope"
             :item="item.item"
             :is-open="overflowOpenId === item.id"
-            :disabled-filter-fields="disabledFilterFields"
+            :disabled-filter-fields="pinnedIds.includes(item.id) ? [] : disabledFilterFields"
             :readonly="readonly"
             :remove-label="readonly || isCompact || pinnedIds.includes(item.id) || !allShown.includes(item.id) ? undefined : getText('removeFilter')"
             class="px---inner-margin"
@@ -157,6 +157,7 @@ const filterList = computed(() => {
     const meta = getMeta(item.item)
 
     if (getMetaValue(meta.hidden, props.scope.modelValue)) return false
+    if (pinnedIds.includes(item.id)) return true
 
     const fields = meta.fields ?? []
     return !fields.some(field => props.disabledFilterFields.includes(field))
