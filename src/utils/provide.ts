@@ -1,5 +1,7 @@
 import {type InjectionKey, type MaybeRef, inject, provide} from 'vue'
 
+import {wIsModal} from '@/components/Modal/models/injection'
+
 const wReadonlyKey = Symbol('wReadonlyKey') as InjectionKey<MaybeRef<boolean>>
 
 export const useProvideReadonly = (value?: MaybeRef<boolean>) => {
@@ -23,6 +25,8 @@ export const useProvideSkeleton = (value?: MaybeRef<boolean>) => {
 
   return inject(wSkeletonKey, undefined)
 }
+
+export const useIsModal = () => inject(wIsModal, false)
 
 // const wAsyncKey = Symbol('wAsyncKey') as InjectionKey<MaybeRef<boolean>>
 
