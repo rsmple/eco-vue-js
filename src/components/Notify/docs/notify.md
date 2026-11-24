@@ -62,7 +62,7 @@ Each call takes:
 | `component`, `componentProps` | Content under the caption — see [Custom content](#custom-content). |
 | `onRemove` | Called when the user closes it. |
 
-Toasts close after 5 seconds unless in progress or needing action; hovering pauses all timers. A repeat within 5 seconds doesn't stack — the existing toast gets a counter and restarts its timer.
+Toasts close after 5 seconds unless in progress or needing action; hovering pauses all timers. A repeat within 5 seconds doesn't stack — the existing toast gets a counter and restarts its timer. At most 5 toasts show at once; the older ones on screen are counted in an `N more` line (the `moreCount` [text](/guide/getting-started#texts)) until the newer ones close.
 
 Toasts show top-right under the header. `position` on `WNotify` sets `top-center`, `bottom-right` or `bottom-center` (newest nearest the edge). On phones they always show at the top, since the bottom holds modal, sheet and page buttons.
 
@@ -110,7 +110,7 @@ A pending notification can't be closed in the center; closing its toast only hid
 
 ## Notify center
 
-`WNotifyCenter` shows a history of the last 50. `WNotifyCenterButton` is a bell for the [actions bar](/guide/app-shell) that opens it as a dropdown (a bottom sheet on phones), counts notifications needing action and shimmers while any is pending. Toasts hide while the center is open. It opens under the button with a tip; `horizontal-align` changes that — `HorizontalAlign.LEFT_INNER` for a bell at the header's right end (grows left, no tip), `HorizontalAlign.LEFT_CENTER` for a side rail (opens beside with a tip; only the box shifts near screen edges).
+`WNotifyCenter` shows a history of the last 50. Each section renders at most 50 entries and counts the rest in an `N more` line — link to a page with all of them from its `footer`. `resetNotifyCenter` from `eco-vue-js/dist/utils/NotifyCenter` drops everything, pending and action notifications included, without their `onRemove` — call it on logout so the next user starts empty. `WNotifyCenterButton` is a bell for the [actions bar](/guide/app-shell) that opens it as a dropdown (a bottom sheet on phones), counts notifications needing action and shimmers while any is pending. Toasts hide while the center is open. It opens under the button with a tip; `horizontal-align` changes that — `HorizontalAlign.LEFT_INNER` for a bell at the header's right end (grows left, no tip), `HorizontalAlign.LEFT_CENTER` for a side rail (opens beside with a tip; only the box shifts near screen edges).
 
 ```vue
 <template>

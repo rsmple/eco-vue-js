@@ -22,6 +22,19 @@
       tag="div"
     >
       <div
+        v-if="notifyCenterToastHiddenCount"
+        key="hidden-count"
+        class="grid motion-safe:transition-[translate,opacity,grid-template-rows] motion-safe:duration-300"
+        :class="isCenter ? 'justify-center' : 'justify-end'"
+      >
+        <div class="min-h-0">
+          <div class="surface-dropdown border-line-subtle text-description my-1.5 rounded-full border border-solid px-3 py-1 text-xs shadow-lg">
+            {{ getCountText('moreCount', notifyCenterToastHiddenCount) }}
+          </div>
+        </div>
+      </div>
+
+      <div
         v-for="item in notifyCenterToastEntries"
         :key="getNotifyItemKey(item)"
         class="grid motion-safe:transition-[translate,opacity,grid-template-rows] motion-safe:duration-300"
@@ -44,9 +57,10 @@ import type {NotifyProps} from './types'
 import {computed, onBeforeMount, onBeforeUnmount} from 'vue'
 
 import {initNotify} from '@/utils/Notify'
+import {getCountText} from '@/utils/texts'
 
 import NotifyCard from './components/NotifyCard.vue'
-import {addNotify, getNotifyItemKey, hideToast, notifyCenterToastEntries, setToastsPaused} from './models/notifyCenter'
+import {addNotify, getNotifyItemKey, hideToast, notifyCenterToastEntries, notifyCenterToastHiddenCount, setToastsPaused} from './models/notifyCenter'
 
 const props = withDefaults(defineProps<NotifyProps>(), {position: 'top-right'})
 

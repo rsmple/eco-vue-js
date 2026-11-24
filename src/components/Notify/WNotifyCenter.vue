@@ -74,6 +74,13 @@
       </TransitionGroup>
 
       <div
+        v-if="notifyCenterActionHiddenCount"
+        class="text-description py-1 text-center text-xs"
+      >
+        {{ getCountText('moreCount', notifyCenterActionHiddenCount) }}
+      </div>
+
+      <div
         v-if="notifyCenterActivityItems.length"
         class="flex min-h-9 items-center justify-between gap-4 py-1"
         :class="{'mt-1': notifyCenterActionItems.length}"
@@ -112,6 +119,13 @@
           </div>
         </div>
       </TransitionGroup>
+
+      <div
+        v-if="notifyCenterActivityHiddenCount"
+        class="text-description py-1 text-center text-xs"
+      >
+        {{ getCountText('moreCount', notifyCenterActivityHiddenCount) }}
+      </div>
     </div>
 
     <!-- In an overlay, the frame pins it under the list with its buttons. -->
@@ -139,7 +153,7 @@ import WButton from '@/components/Button/WButton.vue'
 import OverlayRegionPart from '@/components/Modal/components/OverlayRegionPart.vue'
 import {useOverlayFrame, useOverlayFrameOptions} from '@/utils/Overlay'
 import {SemanticType} from '@/utils/SemanticType'
-import {getText} from '@/utils/texts'
+import {getCountText, getText} from '@/utils/texts'
 
 import NotifyCard from './components/NotifyCard.vue'
 import {
@@ -147,9 +161,11 @@ import {
   dismissNotifyActions,
   getNotifyItemKey,
   notifyCenterActionEntries,
+  notifyCenterActionHiddenCount,
   notifyCenterActionItems,
   notifyCenterActionRemovableItems,
   notifyCenterActivityEntries,
+  notifyCenterActivityHiddenCount,
   notifyCenterActivityItems,
   notifyCenterItems,
   removeNotifyEntry,

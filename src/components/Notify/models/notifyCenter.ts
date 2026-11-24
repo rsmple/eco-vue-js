@@ -30,6 +30,8 @@ const notifyTypeSeverityList: NotifyType[] = [NotifyType.PENDING, NotifyType.DAN
 
 const TOAST_DELAY = 5000
 const HISTORY_LIMIT = 50
+const TOAST_ENTRY_LIMIT = 5
+const CENTER_ENTRY_LIMIT = 50
 
 const items = ref([]) as Ref<NotifyItem[]>
 const toastIds = ref<number[]>([])
@@ -97,9 +99,17 @@ const groupItems = (list: NotifyItem[]): NotifyItem[] => {
   })
 }
 
-export const notifyCenterActionEntries: ComputedRef<NotifyItem[]> = computed(() => groupItems(notifyCenterActionItems.value))
+const notifyCenterActionEntryList = computed(() => groupItems(notifyCenterActionItems.value))
 
-export const notifyCenterActivityEntries: ComputedRef<NotifyItem[]> = computed(() => groupItems(notifyCenterActivityItems.value))
+const notifyCenterActivityEntryList = computed(() => groupItems(notifyCenterActivityItems.value))
+
+export const notifyCenterActionEntries: ComputedRef<NotifyItem[]> = computed(() => notifyCenterActionEntryList.value.slice(0, CENTER_ENTRY_LIMIT))
+
+export const notifyCenterActivityEntries: ComputedRef<NotifyItem[]> = computed(() => notifyCenterActivityEntryList.value.slice(0, CENTER_ENTRY_LIMIT))
+
+export const notifyCenterActionHiddenCount = computed(() => notifyCenterActionEntryList.value.length - notifyCenterActionEntries.value.length)
+
+export const notifyCenterActivityHiddenCount = computed(() => notifyCenterActivityEntryList.value.length - notifyCenterActivityEntries.value.length)
 
 export const notifyCenterActionCount = computed(() => notifyCenterActionItems.value.length)
 
@@ -110,7 +120,11 @@ const notifyCenterToasts: ComputedRef<NotifyItem[]> = computed(() => toastIds.va
   .filter(item => item !== undefined),
 )
 
-export const notifyCenterToastEntries: ComputedRef<NotifyItem[]> = computed(() => groupItems(notifyCenterToasts.value))
+const notifyCenterToastEntryList = computed(() => groupItems(notifyCenterToasts.value))
+
+export const notifyCenterToastEntries: ComputedRef<NotifyItem[]> = computed(() => notifyCenterToastEntryList.value.slice(-TOAST_ENTRY_LIMIT))
+
+export const notifyCenterToastHiddenCount = computed(() => notifyCenterToastEntryList.value.length - notifyCenterToastEntries.value.length)
 
 let i = 0
 const getId = () => ++i
@@ -356,4 +370,14 @@ export const setNotifyCenterClose = (value: (() => void) | null): void => {
 /** Closes the notify center, if it is open — such as from a link in its footer. */
 export const closeNotifyCenter = (): void => {
   closeCenter?.()
+}
+
+/** Drops every notification, pending ones and those that need action too, without calling their `onRemove` — such as on logout, so the next user starts empty. Keys removed before can be added again. */
+export const resetNotifyCenter = (): void => {
+  hideAllToasts()
+  dismissedKeys.clear()
+
+  items.value = []
+
+  closeNotifyCenter()
 }
