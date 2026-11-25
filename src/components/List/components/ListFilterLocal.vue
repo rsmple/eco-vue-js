@@ -107,6 +107,7 @@ import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import IconFilter from '@/assets/icons/IconFilter.svg?component'
 
+import {getMetaValue} from '@/utils/listFilter'
 import {useIsMobile} from '@/utils/mobile'
 import {getCountText, getText} from '@/utils/texts'
 import {BASE_ZINDEX_ACTIONS_BAR, wBaseZIndex} from '@/utils/utils.ts'
@@ -118,7 +119,6 @@ import * as ListFilterSearch from './ListFilterSearch.vue'
 import ListFilterSelect from './ListFilterSelect.vue'
 
 import {wListToolbar} from '../models/toolbar'
-import {getMetaValue} from '../models/utils'
 
 const props = defineProps<{
   scope: UniformScope<QueryParams>

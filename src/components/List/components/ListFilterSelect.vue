@@ -53,9 +53,8 @@ import WMenuItem from '@/components/MenuItem/WMenuItem.vue'
 import IconAdd from '@/assets/icons/IconAdd.svg?component'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {getMetaValue} from '@/utils/listFilter'
 import {getText} from '@/utils/texts'
-
-import {getMetaValue} from '../models/utils'
 
 defineProps<{
   filter: {id: string, item: FilterComponent<QueryParams>}[]

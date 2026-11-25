@@ -67,12 +67,12 @@ import {computed, provide} from 'vue'
 import WDropdownAdaptive from '@/components/DropdownMenu/WDropdownAdaptive.vue'
 
 import {wCloseOverlayOnPick} from '@/components/Select/models/useCloseOnPick'
+import {getFilterCount, getFilterMeta, getMetaValue, hasFilterSummary} from '@/utils/listFilter'
 import {getText} from '@/utils/texts'
 
 import ListFilterChip from './ListFilterChip.vue'
 
 import WListFilterSummary from '../WListFilterSummary.vue'
-import {getFilterCount, getFilterMeta, getMetaValue, hasFilterSummary} from '../models/utils'
 
 const VALUES_SHOWN = 2
 

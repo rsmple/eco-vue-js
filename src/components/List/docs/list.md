@@ -101,7 +101,7 @@ const names = computed(() => data.value?.results.map(item => item.name) ?? [])
 </script>
 ```
 
-`WListFilterSummary` renders a filter's summary, text or component, outside the chip, e.g. to describe a saved filter set in a table cell. It renders nothing for an unset filter; `hasFilterSummary(meta, queryParams)` from `models/utils` tells when it renders.
+`WListFilterSummary` renders a filter's summary, text or component, outside the chip, e.g. to describe a saved filter set in a table cell. It renders nothing for an unset filter; `eco-vue-js/dist/utils/listFilter` has `hasFilterSummary(meta, queryParams)` to tell when it renders, plus `getFilterMeta`, `getFilterCount` and `getMetaValue` for listing the set filters with their titles and icons.
 
 ## Groups
 

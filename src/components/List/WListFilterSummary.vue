@@ -1,18 +1,16 @@
 <template>
-  <template v-if="hasFilterSummary(meta, queryParams)">
-    <component
-      :is="meta.summaryComponent"
-      v-if="meta.summaryComponent"
-      :query-params="queryParams"
-      :limit="limit"
-    />
+  <component
+    :is="meta.summaryComponent"
+    v-if="meta.summaryComponent && hasFilterSummary(meta, queryParams)"
+    :query-params="queryParams"
+    :limit="limit"
+  />
 
-    <WListFilterValues
-      v-else-if="values"
-      :values="values"
-      :limit="limit"
-    />
-  </template>
+  <WListFilterValues
+    v-else-if="!meta.summaryComponent && values"
+    :values="values"
+    :limit="limit"
+  />
 </template>
 
 <script setup lang="ts" generic="QueryParams">
@@ -20,8 +18,9 @@ import type {FilterComponent} from './types'
 
 import {computed} from 'vue'
 
+import {getFilterMeta, getFilterValues, hasFilterSummary} from '@/utils/listFilter'
+
 import WListFilterValues from './WListFilterValues.vue'
-import {getFilterMeta, getFilterValues, hasFilterSummary} from './models/utils'
 
 const props = defineProps<{
   /** The filter module, as listed in WListFilter's `filters`. */

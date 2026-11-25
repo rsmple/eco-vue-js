@@ -55,9 +55,8 @@ import WButton from '@/components/Button/WButton.vue'
 import WExpansionItem from '@/components/Expansion/WExpansionItem.vue'
 
 import {SemanticType} from '@/utils/SemanticType'
+import {getMetaValue} from '@/utils/listFilter'
 import {getText} from '@/utils/texts'
-
-import {getMetaValue} from '../models/utils'
 
 const props = defineProps<{
   scope: UniformScope<QueryParams>
