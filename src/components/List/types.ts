@@ -223,6 +223,17 @@ export type FilterMeta<QueryParams> = {
   hidden?: boolean | ((queryParams: QueryParams) => boolean)
   /** Picked values for the filter chip, such as option titles. Without it, the chip shows how many values are picked. */
   summary?: (queryParams: QueryParams) => string | string[] | undefined
+  /**
+   * Renders the picked values inline, for values that need loading, such as the names of picked IDs. Takes over from
+   * `summary` and renders while any of `fields` is set. Render the values with WListFilterValues.
+   */
+  summaryComponent?: Component<FilterSummaryProps<QueryParams>>
+}
+
+export type FilterSummaryProps<QueryParams> = {
+  queryParams: QueryParams
+  /** How many values to name before a "+N" badge. All of them when unset. */
+  limit?: number
 }
 
 export type FilterEmits = {

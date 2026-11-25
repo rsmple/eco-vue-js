@@ -26,17 +26,16 @@
 
       <span
         class="text-accent truncate"
-        :class="{'sr-only': valuesShown.length}"
+        :class="{'sr-only': summarized}"
       >
-        {{ title }}{{ valuesShown.length ? ':' : '' }}
+        {{ title }}{{ summarized ? ':' : '' }}
       </span>
 
       <span
-        v-if="valuesShown.length"
-        :title="[title, valueList.join(', ')].filter(Boolean).join(': ')"
-        class="text-tone shrink-100 truncate font-semibold"
+        v-if="summarized"
+        class="text-tone shrink-100 flex min-w-0 font-semibold"
       >
-        {{ valuesShown.join(', ') }}
+        <slot />
       </span>
 
       <span
@@ -73,14 +72,12 @@ import IconClose from '@/assets/icons/IconClose.svg?component'
 
 import {numberFormatter} from '@/utils/utils'
 
-const VALUES_SHOWN = 2
-
 const props = defineProps<{
   title: string | undefined
   icon: SVGComponent | undefined
-  /** Picked values to name, from the filter's `summary`. */
-  values: string[] | undefined
-  /** Number of picked values, for a filter without `summary`. */
+  /** Shows the default slot, which names the picked values, in place of the title and count. */
+  summarized: boolean
+  /** Number of picked values, shown when not `summarized`. */
   count: number
   isOpen: boolean
   /** Label of the remove button, which shows when set. */
@@ -95,16 +92,12 @@ defineEmits<{
   (e: 'remove'): void
 }>()
 
-const valueList = computed(() => props.values ?? [])
-
-const valuesShown = computed(() => valueList.value.slice(0, VALUES_SHOWN))
-
-const hasValue = computed(() => props.count > 0 || valueList.value.length > 0)
+const hasValue = computed(() => props.count > 0 || props.summarized)
 
 const badge = computed<string | undefined>(() => {
-  if (props.values) return valueList.value.length > VALUES_SHOWN ? `+${ valueList.value.length - VALUES_SHOWN }` : undefined
+  if (props.summarized || !props.count) return undefined
 
-  return props.count ? numberFormatter.format(props.count) : undefined
+  return numberFormatter.format(props.count)
 })
 
 const isRemovable = computed(() => props.removeLabel !== undefined)

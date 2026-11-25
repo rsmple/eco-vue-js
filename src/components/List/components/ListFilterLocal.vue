@@ -52,7 +52,7 @@
         <ListFilterChip
           :title="isCompact ? getText('filters') : getCountText('moreCount', hiddenList.length)"
           :icon="markRaw(IconFilter)"
-          :values="undefined"
+          :summarized="false"
           :count="hiddenActiveCount"
           :is-open="isOverflowOpen"
           :remove-label="undefined"

@@ -9,14 +9,20 @@
       <ListFilterChip
         :title="title"
         :icon="icon"
-        :values="values"
+        :summarized="summarized"
         :count="count"
         :is-open="isOpen"
         :shrink="shrink"
         :remove-label="readonly ? undefined : pinned ? (count ? getText('clearFilter') : undefined) : getText('removeFilter')"
         @toggle="$emit('toggle')"
         @remove="$emit('remove')"
-      />
+      >
+        <WListFilterSummary
+          :filter="item"
+          :query-params="scope.modelValue"
+          :limit="VALUES_SHOWN"
+        />
+      </ListFilterChip>
     </template>
 
     <template #header>
@@ -65,7 +71,10 @@ import {getText} from '@/utils/texts'
 
 import ListFilterChip from './ListFilterChip.vue'
 
-import {getMetaValue} from '../models/utils'
+import WListFilterSummary from '../WListFilterSummary.vue'
+import {getFilterCount, getFilterMeta, getMetaValue, hasFilterSummary} from '../models/utils'
+
+const VALUES_SHOWN = 2
 
 const props = defineProps<{
   scope: UniformScope<QueryParams>
@@ -86,27 +95,13 @@ defineEmits<{
 // A filter applies as it changes, so a pick in an embedded single select inside is done with it, and closes it.
 provide(wCloseOverlayOnPick, true)
 
-const meta = computed(() => Array.isArray(props.item) ? props.item[0].meta : props.item.meta)
+const meta = computed(() => getFilterMeta(props.item))
 
 const title = computed(() => getMetaValue(meta.value.title, props.scope.modelValue))
 
 const icon = computed(() => getMetaValue(meta.value.icon, props.scope.modelValue))
 
-const count = computed(() => (meta.value.fields ?? []).reduce((sum, field) => {
-  const value = props.scope.modelValue[field]
+const count = computed(() => getFilterCount(meta.value, props.scope.modelValue))
 
-  if (Array.isArray(value)) return sum + value.length
-
-  return value === undefined || value === null ? sum : sum + 1
-}, 0))
-
-const values = computed<string[] | undefined>(() => {
-  const summary = meta.value.summary?.(props.scope.modelValue)
-
-  if (summary === undefined) return undefined
-
-  const list = Array.isArray(summary) ? summary : [summary]
-
-  return list.length ? list : undefined
-})
+const summarized = computed(() => hasFilterSummary(meta.value, props.scope.modelValue))
 </script>

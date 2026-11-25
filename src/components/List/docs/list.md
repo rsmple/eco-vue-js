@@ -80,6 +80,29 @@ In WList's `filter` slot, `WListFilter` starts the selection bar, on one line wi
 
 A chip shows its icon and title, or the icon and picked values. `meta.summary` returns those values from the query params; without it the chip shows a count. The dropdown tip keeps pointing at the chip as it resizes. Chips in the "more" list can be removed there.
 
+### Filter summaries
+
+When the values need loading, such as names of picked IDs, `meta.summaryComponent` renders them instead. It gets `queryParams` and `limit`, renders only while one of `fields` is set, and should render inline text: `WListFilterValues` names the values and folds the rest into a "+N" badge.
+
+```vue
+<template>
+  <WListFilterValues
+    :values="names"
+    :limit="limit"
+  />
+</template>
+
+<script lang="ts" setup>
+const props = defineProps<FilterSummaryProps<QueryParamsPlants>>()
+
+const {data} = useGardenerList(computed(() => ({id__in: props.queryParams.caretaker__in})))
+
+const names = computed(() => data.value?.results.map(item => item.name) ?? [])
+</script>
+```
+
+`WListFilterSummary` renders a filter's summary, text or component, outside the chip, e.g. to describe a saved filter set in a table cell. It renders nothing for an unset filter; `hasFilterSummary(meta, queryParams)` from `models/utils` tells when it renders.
+
 ## Groups
 
 `groupBy` tells whether two neighbouring items share a group; the `group` slot renders a heading before each group's first item and before the first rendered item. Only neighbours are compared, so sort the query by the grouping field.
@@ -365,6 +388,41 @@ import WListFilter from 'eco-vue-js/dist/components/List/WListFilter.vue'
 | `global` | `boolean` | — | Puts the filters in the actions bar's filter panel and the search in the header bar, instead of in a row in place. |
 | `readonly` | `boolean` | — | Shows the filters without changing them. |
 | `searchVisible` | `boolean` | — | **Deprecated**: No effect: the search field is always shown in place, and behind the header's search button with `global`. |
+
+<!-- @api-end -->
+
+<!-- @api WListFilterSummary -->
+
+### WListFilterSummary
+
+```ts
+import WListFilterSummary from 'eco-vue-js/dist/components/List/WListFilterSummary.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `filter` | `FilterComponent<QueryParams>` | **required** | The filter module, as listed in WListFilter's `filters`. |
+| `queryParams` | `QueryParams` | **required** | — |
+| `limit` | `number` | — | How many values to name before a "+N" badge. All of them when unset. |
+
+<!-- @api-end -->
+
+<!-- @api WListFilterValues -->
+
+### WListFilterValues
+
+```ts
+import WListFilterValues from 'eco-vue-js/dist/components/List/WListFilterValues.vue'
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `values` | `string[]` | **required** | Picked values, such as option titles. |
+| `limit` | `number` | — | How many values to name before a "+N" badge. All of them when unset. |
 
 <!-- @api-end -->
 
