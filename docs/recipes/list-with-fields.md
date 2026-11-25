@@ -875,7 +875,7 @@ export const defaultFieldConfigMapPlant = getDefaultFieldConfigMap(listFieldsPla
 
 ### Filters
 
-`WListFilter` edits the same query params the list reads. Wrap it in a `WUniform` over `queryParams`, pass `scope` down, and add `search` for a search field. In WList's `filter` slot the filters sit in the selection bar: each chip opens its control in a dropdown, the add button offers the rest, and overflow goes into a "more" chip. Bulk actions replace the bar while rows are selected.
+`WListFilter` edits the same query params the list reads. Wrap it in a `WUniform` over `queryParams`, pass `scope` down, and add `search` for a search field. In WList's `filter` slot the filters sit in the selection bar: each chip opens its control in a dropdown, the add button offers the rest, and overflow goes into a "more" chip. Bulk actions replace the bar while rows are selected; a list with no bulk actions and no export keeps its filters.
 
 `pinned` filters are always shown first (kind and watered here); their remove button only clears them.
 

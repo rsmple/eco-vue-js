@@ -468,7 +468,7 @@ defineSlots<{
   description?: () => void
   /** Content above the selection bar, under the heading, with the count returned by the query. */
   header?: (props: {count: number | undefined}) => void
-  /** Filters at the start of the selection bar, usually a WListFilter. They keep to one line, the chips that do not fit go to a menu, the list actions move to the end and fold into More first, and a selection replaces them. `--w-list-toolbar-height` sets the bar's height, the inherited input height by default. */
+  /** Filters at the start of the selection bar, usually a WListFilter. They keep to one line, the chips that do not fit go to a menu, the list actions move to the end and fold into More first, and a selection replaces them when the list has bulk actions or export. `--w-list-toolbar-height` sets the bar's height, the inherited input height by default. */
   filter?: () => void
   /** Replaces the buttons at the end of the selection bar — range select, refetch, sort and column settings. */
   selection?: () => void

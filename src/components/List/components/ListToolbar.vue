@@ -12,7 +12,7 @@
   <WButtonSelection
     :title="selectionTitle"
     :disable-message="bulkDisableMessage"
-    :selected-count="selectionCount"
+    :selected-count="selectionCountShown"
     :style="{zIndex: BASE_ZINDEX_DROPDOWN}"
     @clear:selection="$emit('reset:selection')"
   >
@@ -20,7 +20,7 @@
       v-if="bulk || action || !disableExport"
       #default="{disableMessage, cssClass, visibleCount}"
     >
-      <template v-if="selectionCount === 0 && action">
+      <template v-if="selectionCountShown === 0 && action">
         <template
           v-for="(item, index) in action"
           :key="index"
@@ -92,7 +92,7 @@
     </template>
 
     <template
-      v-else-if="bulk?.length && !(selectionCount === 0 && action) && !isFilterIdle"
+      v-else-if="bulk?.length && !(selectionCountShown === 0 && action) && !isFilterIdle"
       #more="scope"
     >
       <template
@@ -315,7 +315,11 @@ const slots = defineSlots<{
   selection?: () => void
 }>()
 
-const isFilterIdle = computed(() => !!slots.filter && props.selectionCount === 0)
+const hasSelectionActions = computed(() => !!props.bulk?.length || !props.disableExport)
+
+const selectionCountShown = computed(() => hasSelectionActions.value ? props.selectionCount : 0)
+
+const isFilterIdle = computed(() => !!slots.filter && selectionCountShown.value === 0)
 
 // The export comes first in the bar, so the bulk actions start after it.
 const bulkOffset = computed(() => props.disableExport ? 0 : 1)

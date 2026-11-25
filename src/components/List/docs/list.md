@@ -76,7 +76,7 @@ In place, set filters are chips in a row with an add button. With `global` they 
 
 ### Filters in the selection bar
 
-In WList's `filter` slot, `WListFilter` starts the selection bar, on one line with actions and settings. Overflowing chips go into a "more" chip; list actions fold into More first. A selection replaces the filters, keeping the bar's height. On phones filters get their own row and the search narrows. `--w-list-toolbar-height` (`w-list-toolbar-h-*`) sets the bar's control height; defaults to the inherited input height.
+In WList's `filter` slot, `WListFilter` starts the selection bar, on one line with actions and settings. Overflowing chips go into a "more" chip; list actions fold into More first. A selection replaces the filters, keeping the bar's height — unless the list has no bulk actions and no export, when the filters stay and no counter is shown. On phones filters get their own row and the search narrows. `--w-list-toolbar-height` (`w-list-toolbar-h-*`) sets the bar's control height; defaults to the inherited input height.
 
 A chip shows its icon and title, or the icon and picked values. `meta.summary` returns those values from the query params; without it the chip shows a count. The dropdown tip keeps pointing at the chip as it resizes. Chips in the "more" list can be removed there.
 
@@ -210,7 +210,7 @@ import WList from 'eco-vue-js/dist/components/List/WList.vue'
 | `title` | `{ count: number \| undefined; }` | Heading of the list, in place of `title`, with the count returned by the query. |
 | `description` | — | Line under the heading, in place of `description`. |
 | `header` | `{ count: number \| undefined; }` | Content above the selection bar, under the heading, with the count returned by the query. |
-| `filter` | — | Filters at the start of the selection bar, usually a WListFilter. They keep to one line, the chips that do not fit go to a menu, the list actions move to the end and fold into More first, and a selection replaces them. `--w-list-toolbar-height` sets the bar's height, the inherited input height by default. |
+| `filter` | — | Filters at the start of the selection bar, usually a WListFilter. They keep to one line, the chips that do not fit go to a menu, the list actions move to the end and fold into More first, and a selection replaces them when the list has bulk actions or export. `--w-list-toolbar-height` sets the bar's height, the inherited input height by default. |
 | `selection` | — | Replaces the buttons at the end of the selection bar — range select, refetch, sort and column settings. |
 | `group` | `{ item: Data; previous: Data \| undefined; skeleton: boolean; }` | Content of the heading before each group of rows, with `groupBy`. The heading spans the whole row, sticks under the toolbar and, in list mode, to the left edge while the rows scroll sideways. Its content is laid out by the slot. `skeleton` is true while the page loads. |
 | `empty` | — | Shown instead of the rows when the query returns no items. |
